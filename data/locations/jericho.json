@@ -57,7 +57,7 @@
       "text": "The Old Testament city associated with Joshua's conquest narrative is generally identified with the tell of Tell es-Sultan; by the first century AD the inhabited settlement had shifted about two kilometers south to a site built up by the Hasmonean and Herodian dynasties as a winter palace complex, which is the Jericho of the Gospel narratives.",
       "sources": [
         "wikidata:Q2460244",
-        "openbible:jericho-2"
+        "bib:murphy-oconnor-holy-land-guide"
       ]
     }
   ],
@@ -146,7 +146,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

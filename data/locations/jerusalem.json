@@ -34,7 +34,7 @@
     }
   ],
   "summary": {
-    "text": "Jerusalem was the capital of Judea and the site of the Second Temple, and in the first century AD it functioned as the religious center of Judaism and as the setting of the Gospels' accounts of Jesus' final days, death, and resurrection appearances.",
+    "text": "Jerusalem was the capital of Judea under its Herodian client kings and, throughout the first century AD, the religious center of Judaism as the site of the Second Temple; the Gospels set Jesus' final days, death, and resurrection appearances there.",
     "sources": [
       "wikidata:Q1218",
       "pleiades:687928",
@@ -989,7 +989,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

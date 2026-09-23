@@ -35,7 +35,7 @@
       ],
       "coordinateSource": "wikidata:Q2898847",
       "confidence": "disputed",
-      "support": "About 60 stadia (roughly 11 km) from Jerusalem, matching the distance given in most Greek manuscripts of Luke 24:13; recent excavations of a first-century Jewish village at the site have led some modern scholars to favor this candidate, though it lacks the long history of Christian commemoration of Emmaus Nicopolis.",
+      "support": "About 60 stadia (roughly 11 km) from Jerusalem, matching the distance given in most Greek manuscripts of Luke 24:13; salvage excavations at the site have uncovered a first-century Jewish village, which has led some modern scholars to favor this candidate, though it lacks the long history of Christian commemoration of Emmaus Nicopolis.",
       "sources": [
         "wikidata:Q2898847",
         "openbible:emmaus"
@@ -80,6 +80,7 @@
     {
       "text": "Luke's Gospel states the distance from Jerusalem to Emmaus as 'sixty stadia' in the majority of surviving Greek manuscripts, about 11 kilometers, while the fourth-century Codex Sinaiticus reads 'one hundred and sixty stadia,' about 30 kilometers; the two readings underlie much of the modern disagreement over which site is meant.",
       "sources": [
+        "bib:metzger-textual-commentary",
         "openbible:emmaus"
       ]
     }
@@ -146,7 +147,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

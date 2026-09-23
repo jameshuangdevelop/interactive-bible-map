@@ -40,9 +40,9 @@
   },
   "history": [
     {
-      "text": "Excavations beneath and around the Basilica of the Annunciation and nearby sites have uncovered rock-cut tombs, cisterns, and agricultural installations consistent with a small first-century Jewish village, matching the modest size implied by the Gospels' description of Nazareth.",
+      "text": "Excavations beneath and around the Basilica of the Annunciation and nearby sites, notably at the Sisters of Nazareth Convent, have uncovered rock-cut tombs, cisterns, and a domestic structure consistent with a small first-century Jewish village, matching the modest size implied by the Gospels' description of Nazareth.",
       "sources": [
-        "dare:22899",
+        "bib:dark-nazareth-archaeology",
         "openbible:nazareth"
       ]
     }
@@ -214,6 +214,7 @@
       "ref": "Isaiah 11:1",
       "note": "Some scholars connect the Hebrew word for 'branch' (netzer) in Isaiah's messianic oracle to the wordplay in Matthew 2:23 about Jesus being called a Nazarene, though the connection is debated among scholars rather than a direct quotation.",
       "sources": [
+        "bib:freedman-anchor-bible-dictionary",
         "openbible:nazareth"
       ]
     }
@@ -253,7 +254,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

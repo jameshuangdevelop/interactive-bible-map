@@ -39,10 +39,10 @@
   },
   "history": [
     {
-      "text": "The Church of the Nativity, first built under Constantine in the fourth century AD and rebuilt in the sixth century, marks the traditional site of Jesus' birth and stands over one of the longest continuously venerated locations in Christian tradition.",
+      "text": "The Church of the Nativity, first built under Constantine around 339 AD and rebuilt in the mid-sixth century under Justinian, marks the traditional site of Jesus' birth and stands over one of the longest continuously venerated locations in Christian tradition.",
       "sources": [
-        "wikidata:Q194504",
-        "openbible:bethlehem-1"
+        "bib:unesco-church-of-nativity",
+        "bib:murphy-oconnor-holy-land-guide"
       ]
     }
   ],
@@ -158,7 +158,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

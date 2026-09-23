@@ -22,7 +22,8 @@
       "support": "Wikidata's coordinate for the traditional garden is corroborated by OpenBible.info's independently recorded point for the same site, at the foot of the Mount of Olives across the Kidron Valley from the Temple Mount. The general area is not disputed, but the exact garden plot is: at least two distinct denominational traditions claim the site, about 200 meters apart, including a Franciscan-custodied garden by the Church of All Nations and a Russian Orthodox garden near the Church of Mary Magdalene, and no first-century boundary of 'the garden' itself is archaeologically fixed.",
       "sources": [
         "wikidata:Q205333",
-        "openbible:gethsemane"
+        "openbible:gethsemane",
+        "bib:murphy-oconnor-holy-land-guide"
       ]
     }
   ],
@@ -35,9 +36,9 @@
   },
   "history": [
     {
-      "text": "The name Gethsemane derives from an Aramaic/Hebrew term for an olive-oil press, consistent with the site's traditional identification as an olive grove at the base of the Mount of Olives.",
+      "text": "The name Gethsemane derives from an Aramaic/Hebrew term, gat shemanim, meaning an olive-oil press, consistent with the site's traditional identification as an olive grove at the base of the Mount of Olives.",
       "sources": [
-        "wikidata:Q205333",
+        "bib:bdag-greek-lexicon",
         "openbible:gethsemane"
       ]
     }
@@ -56,7 +57,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

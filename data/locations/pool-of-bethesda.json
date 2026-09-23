@@ -24,7 +24,8 @@
       "support": "Wikidata's coordinate for the Pool of Bethesda matches OpenBible.info's independently recorded point for the same site exactly, and the location corresponds to the excavated twin-pool remains near St. Anne's Church.",
       "sources": [
         "wikidata:Q831297",
-        "openbible:bethesda"
+        "openbible:bethesda",
+        "bib:murphy-oconnor-holy-land-guide"
       ]
     }
   ],
@@ -37,10 +38,10 @@
   },
   "history": [
     {
-      "text": "Archaeological excavation near St. Anne's Church uncovered a large twin-pool complex with five porticoes, matching the Gospel of John's description and confirming the pool's existence as a real Second Temple-period structure.",
+      "text": "Archaeological excavation near St. Anne's Church uncovered a large twin-pool complex divided by a central dam, with column bases and sockets marking five porticoes, matching the Gospel of John's description and confirming the pool's existence as a real Second Temple-period structure.",
       "sources": [
         "wikidata:Q831297",
-        "openbible:bethesda"
+        "bib:murphy-oconnor-holy-land-guide"
       ]
     }
   ],
@@ -53,7 +54,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }
