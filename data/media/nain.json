@@ -1,0 +1,23 @@
+{
+  "locationId": "nain",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Nain.jpg",
+      "author": "Ian Philp",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nain.jpg",
+      "caption": "Village of Nain (Nein) in Galilee",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Niin_120.jpg",
+      "author": "Ori~",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Niin_120.jpg",
+      "caption": "Church of the Resurrection of the Widow's Son, Nein",
+      "aiGenerated": false
+    }
+  ]
+}
