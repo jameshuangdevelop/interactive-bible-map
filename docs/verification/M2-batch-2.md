@@ -1,8 +1,10 @@
 # M2 batch 2 verification — Samaria, Acts and Pauline cities
 
-Independent Phase C review of `data/locations/*.json` (21 records), `data/media/*.json` (21 files, 48 images) and the two new `data/bibliography.json` entries added in `data/m2-batch-2`. Verified against primary sources directly (Wikidata entity JSON, Pleiades bulk JSON where the live site's Anubis challenge allowed it, DARE, and the cited article), not on the Research Lead's or Media Curator's word. Reviewed 2026-09-23.
+Independent Phase C review of `data/locations/*.json` (21 records), `data/media/*.json` (21 files, 48 images) and the two new `data/bibliography.json` entries added in `data/m2-batch-2`. Verified against primary sources directly (Wikidata entity JSON, Pleiades bulk JSON where the live site's Anubis challenge allowed it, DARE, and the cited article), not on the Research Lead's or Media Curator's word. Reviewed 2026-09-23; re-verified 2026-09-23 after fix commits `90c5069` and `97456e3` (see "Re-verification" below). The needs-change table and verdicts below reflect the **final, re-verified state**; the original (superseded) findings are kept in "Re-verification" for the record.
 
-## Needs-change summary (fix and owner)
+## Needs-change summary (fix and owner) — as of the original review
+
+The nine items below were found in the original review. All nine are now fixed (`90c5069`, `97456e3`) and re-verified as resolved; see "Re-verification." This table is kept for traceability and is no longer actionable.
 
 | # | Item | Owner | Exact change required |
 |---|---|---|---|
@@ -16,7 +18,7 @@ Independent Phase C review of `data/locations/*.json` (21 records), `data/media/
 | 8 | `data/media/philippi.json` — `Ancient_Philippi.jpg` author | media-curator | Correct `"author": "Unknown"` to `"author": "MrPanyGoff"` (confirmed via the Commons API `extmetadata.Artist` field). |
 | 9 | `data/media/thessalonica.json` — `Thessaloniki_Ancient_Agora_(1).jpg` author | media-curator | Correct `"author": "Unknown"` to `"author": "Armineaghayan"` (confirmed via the Commons API `extmetadata.Artist` field). |
 
-No fail verdicts; all issues above are needs-change. All other items pass as detailed below.
+No fail verdicts; all nine issues above were needs-change and are now resolved (see "Re-verification").
 
 ## Licensing decisions (new sources)
 
@@ -74,22 +76,38 @@ No unsupported "capital of X" or similar overreaching claims were found beyond w
 
 Empty in all 21 records. **Acceptable for M2.** The task brief scopes the province/administrative timeline to M4, and several sites carry well-known Roman administrative statuses (e.g., Antioch in Pisidia and Iconium as coloniae, Corinth as capital of Achaia, Caesarea Maritima as the Judean prefect/procurator's seat) that could support entries — but pinning precise, cross-checked start/end years for each without further dedicated research would risk guessing at the dates the schema requires (integers, BC negative, no year 0). Leaving `politicalHistory` empty rather than guessing is the correct call for this milestone; this is not a needs-change.
 
-## Verdicts
+## Verdicts (final, after re-verification)
 
 ### Location records (21) — `data/locations/`
-All pass except `sychar`, which is needs-change (see above) and stays `status: "draft"`. The other 20 are set to `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`: `samaria`, `caesarea-philippi`, `caesarea-maritima`, `joppa`, `damascus`, `antioch-syria`, `tarsus`, `paphos`, `antioch-pisidia`, `iconium`, `lystra`, `derbe`, `philippi`, `thessalonica`, `berea`, `athens`, `corinth`, `ephesus`, `colossae`, `rome`.
+All 21 pass. All 21 are `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`: `samaria`, `sychar`, `caesarea-philippi`, `caesarea-maritima`, `joppa`, `damascus`, `antioch-syria`, `tarsus`, `paphos`, `antioch-pisidia`, `iconium`, `lystra`, `derbe`, `philippi`, `thessalonica`, `berea`, `athens`, `corinth`, `ephesus`, `colossae`, `rome`.
 
 ### Media records (21) — `data/media/`
-15 pass outright: `samaria`, `sychar`, `caesarea-philippi`, `joppa`, `damascus`, `tarsus`, `paphos`, `antioch-pisidia`, `lystra`, `derbe`, `berea`, `athens`, `corinth`, `ephesus`, `rome`.
-6 are needs-change: `caesarea-maritima`, `antioch-syria`, `colossae`, `iconium`, `philippi`, `thessalonica` (see table above; media files carry no `status` field, so none are marked).
+All 21 pass. The 6 originally needs-change (`caesarea-maritima`, `antioch-syria`, `colossae`, `iconium`, `philippi`, `thessalonica`) are now resolved and pass on re-verification (see "Re-verification" above; media files carry no `status` field, so none are marked).
 
 ### Images (48 total)
-39 pass. 9 are needs-change: `Flag_of_Antioque.png` and the Julian cameo (antioch-syria); the Fatimid jewelry photo (caesarea-maritima); the Archippus/Philemon icon and the Galatia-map caption (colossae); both Konya museum artifacts (iconium); the `Ancient_Philippi.jpg` and `Thessaloniki_Ancient_Agora_(1).jpg` author fields (philippi, thessalonica) — the last two are metadata-only corrections, the image files themselves pass.
+All 48 pass. The 9 originally needs-change (2 on `antioch-syria`, 1 on `caesarea-maritima`, 2 on `colossae`, 2 on `iconium`, 1 author fix each on `philippi` and `thessalonica`) are resolved: the 7 image swaps were independently re-confirmed (license, author, and — for the two most consequential swaps — direct visual inspection) to show the correct location, and the 2 author corrections match the Commons API exactly.
 
-## Validation
+## Re-verification (2026-09-23, after `90c5069` and `97456e3`)
 
-`npm run validate:data`: 0 errors, 29 warnings (all reviewed above). `npm test`: 24/24 passing. Both re-run after this report's `status` edits, with identical results.
+**`sychar` (research-lead, `90c5069`).** The Askar candidate and its `bib:daahl-askar-site` citation are removed entirely, from both the location record and `data/bibliography.json`; no dangling `daahl` reference remains anywhere in `data/` (checked). `names.modern` now reads "Tell Balata (Nablus, West Bank)" only. The remaining Shechem/Tell Balata candidate's `support` text now explicitly names Askar as a proposed modern equivalent and states plainly why it isn't mapped (no confirmable non-OSM, non-Wikipedia coordinate). A new `history` entry repeats this reasoning and notes the nearest confirmed independent point (the Askar refugee camp, Wikidata `Q4302319`) sits ~800 m away and describes a different feature — consistent with this Fact-Checker's own original measurement. The `summary` still names Askar as part of the scholarly debate, so the record does not silently drop a serious candidate; it explains the gap. **Judgment: this is neutral and complete.** Askar remains a real, named position in Sychar scholarship and is disclosed in prose; only its map-quality coordinate is missing, and that absence is honestly attributed to a sourcing gap rather than hidden or guessed. This is the correct call given the constraint (no acceptable license/second-source), not a defect. **Verdict: pass.** `status` set to `verified` (`verifiedBy: fact-checker`, `lastReviewed: 2026-09-23`).
+
+**Media fixes (media-curator, `97456e3`).** Confirmed via the Commons API (`imageinfo`/`extmetadata`) and, for the two most consequential replacements, direct visual inspection of the downloaded file:
+
+- `antioch-syria`: `Cameo_Julian_the_Apostate...` and `Flag_of_Antioque.png` replaced with `Antakya_-_2011-04-10.jpg` (Maarten Sepp, CC BY-SA 4.0 — matches Commons exactly) and `Antioch_Saint_Pierre_Church_Front.JPG` (Volkan Hatem, CC BY 2.5 — matches Commons exactly). Visually confirmed the first is a genuine cityscape of Antakya; the second (by title/category) is the Cave Church of St. Peter, a well-attested historic site in Antakya traditionally linked to the earliest Antiochene church. Both now show the location. **Pass.**
+- `caesarea-maritima`: the Fatimid jewelry photo replaced with `Ancient_Roman_aqueduct_in_Caesarea_Maritima_DSC05202.JPG` (Lior Golgher, CC BY-SA 3.0 — matches Commons; the record drops the Hebrew half of the bilingual Commons byline, which is an acceptable simplification, not a misattribution). Title and category confirm it depicts the Caesarea Maritima aqueduct ruins directly. **Pass.**
+- `colossae`: the Archippus/Philemon icon removed; `Colossae'den_Honaz_görünüm.jpg` added (Gülhan Nurhan, CC BY-SA 4.0 — matches Commons). Visually confirmed: a photo taken from the Colossae mound itself looking toward Honaz, showing the unexcavated site (a grass field) with Mount Honaz behind — accurately captioned and genuinely depicts the location. The Galatia-map caption is corrected to "Map of Asia Minor c. 50 AD, showing Colossae and surrounding ancient regions," which no longer misstates the map as a Galatia-only map or misplaces Colossae inside Galatia. **Pass** (both images and the caption fix).
+- `iconium`: both Konya Archaeological Museum artifact photos replaced with `Konya_view_from_Seljuk_Tower_3998.jpg` (Dosseman, CC BY-SA 4.0 — matches Commons) and `Alâeddin_hill,_Konya.jpg` (CC BY-SA 3.0 — matches Commons; Commons itself records no machine-readable author, so the record's `"author": "Unknown"` is accurate here, unlike the earlier misattributions). Both are genuine views of modern Konya/the Alaeddin Hill citadel mound, the historic core of ancient Iconium — a reasonable, defensible way to depict a site with no visible ancient ruins. **Pass**, and this resolves the earlier concern about artifact-only imagery.
+- `philippi`: `Ancient_Philippi.jpg` author corrected from "Unknown" to "MrPanyGoff," matching the Commons API exactly. **Pass.**
+- `thessalonica`: `Thessaloniki_Ancient_Agora_(1).jpg` author corrected from "Unknown" to "Armineaghayan," matching the Commons API exactly. **Pass.**
+
+No new issues were introduced by any of the fixes; every replacement image's license and author were independently re-confirmed against the Commons API rather than taken on trust, and every one now passes the "shows this location" test.
+
+## Validation (re-run after fixes)
+
+`npm run validate:data`: 0 errors, 29 warnings — identical set to the original review (`sychar`'s scripture list is unchanged, so no new warnings were introduced by the candidate/bibliography edit). `npm test`: 24/24 passing.
 
 ## Remaining work
 
-None deferred for credit reasons — all 21 location records, all 21 media records, and all 48 images were individually reviewed within this session's budget.
+None. All 21 location records and all 21 media files (48 images) now pass; no items are outstanding or deferred.
+
+
