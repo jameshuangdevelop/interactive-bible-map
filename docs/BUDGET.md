@@ -69,6 +69,7 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | Checkpoint | Month | Credits this milestone | Month total | % of cap |
 |---|---|---:|---:|---:|
 | CP0 | 2026-09 | ~500 | ~500 | ~0.05% |
+| CP1 | 2026-09 | ~2,760 | ~3,260 | ~0.3% |
 
 ## Ledger — 2026-09
 | Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
@@ -78,3 +79,9 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M1-01 source inventory (incl. PR review follow-up) | ~220k / ~23k | ~825 | ~1,475 |
 | 2026-09-23 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M1-02 stack and hosting options | ~520k / ~44k | ~440 | ~1,915 |
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M1-03 license review (incl. PR review follow-up) | ~230k / ~27k | ~400 | ~2,315 |
+| 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-00 | ~55k / ~3k | ~12 | ~2,327 |
+| 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-01 | ~95k / ~7k | ~24 | ~2,351 |
+| 2026-09-23 | pr-reviewer | Claude Sonnet 5 (Copilot CLI subagent) | Review M1-02 | ~260k / ~12k | ~95 | ~2,446 |
+| 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-03 | ~180k / ~10k | ~90 | ~2,536 |
+| 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M1-04 orchestration, reviews and CP1 summary | ~200k / ~30k | ~650 | ~3,186 |
+| 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-04 (CP1) | ~150k / ~8k | ~74 | ~3,260 |
