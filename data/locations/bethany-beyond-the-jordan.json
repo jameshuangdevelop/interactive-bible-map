@@ -73,6 +73,14 @@
   "otConnections": [],
   "politicalHistory": [
     {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
       "fromYear": -4,
       "toYear": 39,
       "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",

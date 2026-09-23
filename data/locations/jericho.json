@@ -15,19 +15,33 @@
   "parentId": "judea",
   "candidates": [
     {
-      "label": "Tell es-Sultan (ancient Jericho mound)",
+      "label": "Tell es-Sultan (Old Testament-era mound)",
       "coordinates": [
         35.444564,
         31.871719
       ],
       "coordinateSource": "wikidata:Q2402267",
       "confidence": "high",
-      "support": "Wikidata's coordinate agrees with the Digital Atlas of the Roman Empire's point to within about 200 meters and with Pleiades' representative point to within about 70 meters.",
+      "support": "Wikidata's coordinate agrees with the Digital Atlas of the Roman Empire's point to within about 200 meters and with Pleiades' representative point to within about 70 meters. This point represents the pre-exilic and Old Testament-era city; the Gospel-era episodes below are set at the separate Herodian/Roman-period site about 2 km south (see the second candidate).",
       "sources": [
         "wikidata:Q2402267",
         "dare:23403",
         "pleiades:687917",
         "openbible:jericho-1"
+      ]
+    },
+    {
+      "label": "Tulul Abu al-'Alayiq (Hasmonean/Herodian winter palace complex)",
+      "coordinates": [
+        35.436238,
+        31.851872
+      ],
+      "coordinateSource": "wikidata:Q2460244",
+      "confidence": "high",
+      "support": "This is the Gospel-era city: a Hasmonean and Herodian winter-palace complex about 2 km south of Tell es-Sultan, matching the site the New Testament episodes below (Zacchaeus, the blind man/men, the road to Jericho) are set in or near. OpenBible.info's own place record for the New Testament-era Jericho resolves to this same site, independently confirming the identification; no separate DARE or Pleiades numeric ID could be found cataloging this complex apart from the main Jericho entries above.",
+      "sources": [
+        "wikidata:Q2460244",
+        "openbible:jericho-2"
       ]
     }
   ],

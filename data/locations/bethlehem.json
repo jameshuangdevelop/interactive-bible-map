@@ -122,6 +122,40 @@
       "sources": [
         "bib:rainey-notley-sacred-bridge"
       ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
     }
   ],
   "status": "draft"
