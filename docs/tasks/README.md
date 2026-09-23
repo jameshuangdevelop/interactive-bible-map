@@ -7,9 +7,10 @@ One card = one task = one branch = one PR. The PO writes the cards.
 ## Index
 | ID | Title | Agent | Branch | Status |
 |---|---|---|---|---|
-| [M1-01](M1-01-source-inventory.md) | Source inventory with licenses | research-lead | `docs/m1-source-inventory` | Done, PR pending review |
-| [M1-02](M1-02-stack-options.md) | Stack and hosting options with pricing | gis-engineer | `docs/m1-stack-options` | Done, PR pending review |
-| [M1-03](M1-03-license-review.md) | License verification and content-license decisions | fact-checker | `docs/m1-license-review` | In progress |
+| M1-01 to M1-03 | M1 research and license review | — | — | Merged (#4–#6) |
+| [M2-01](M2-01-schema-validation.md) | Data schema, validation and CI | gis-engineer | `feat/m2-schema-validation` | In progress |
+| [M2-02](M2-02-core-sites-batch-1.md) | Core sites, batch 1 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Waits for M2-01 |
+| [M2-03](M2-03-core-sites-batch-2.md) | Core sites, batch 2 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Waits for M2-01 |
 
 ## Template
 ```markdown
