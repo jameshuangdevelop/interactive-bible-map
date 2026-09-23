@@ -35,6 +35,18 @@
       "journal": "Tyndale Bulletin",
       "url": "https://www.sevenchurches.org/wp-content/uploads/2020/03/Why-Derbe-Wagner-Wilson-Tyndale-Bulletin.pdf",
       "accessed": "2026-09-23"
+    },
+    {
+      "id": "worldhistory-corinth",
+      "type": "web",
+      "title": "Corinth",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/corinth/",
+      "accessed": "2026-09-23"
     }
   ]
 }

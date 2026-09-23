@@ -30,7 +30,7 @@
     }
   ],
   "summary": {
-    "text": "Antioch on the Orontes was a major Hellenistic and Roman city in northern Syria, one of the largest cities of the ancient Mediterranean, and the base from which Paul and Barnabas were sent out on missionary journeys. Acts records that the disciples were first called Christians here.",
+    "text": "Antioch on the Orontes was a major Hellenistic and Roman city in northern Syria, one of the four cities of the Seleucid Syrian Tetrapolis, and the base from which Paul and Barnabas were sent out on missionary journeys. Acts records that the disciples were first called Christians here.",
     "sources": [
       "pleiades:658381",
       "wikidata:Q200441",
@@ -139,7 +139,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

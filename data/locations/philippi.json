@@ -29,7 +29,7 @@
     }
   ],
   "summary": {
-    "text": "Philippi was a Roman colony in Macedonia, founded by Philip II of Macedon on an earlier Thasian settlement and refounded as a colony after the battle fought nearby in 42 BC. Acts describes it as the first city in Macedonia where Paul preached, resulting in the conversion of Lydia and Paul and Silas's imprisonment.",
+    "text": "Philippi was a Roman colony in Macedonia, founded by Philip II of Macedon on an earlier Thasian settlement. Acts describes it as the first city in Macedonia where Paul preached, calling it 'a Roman colony,' resulting in the conversion of Lydia and Paul and Silas's imprisonment.",
     "sources": [
       "pleiades:501482",
       "wikidata:Q379652",
@@ -61,7 +61,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

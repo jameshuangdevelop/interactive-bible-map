@@ -39,7 +39,7 @@
   },
   "history": [
     {
-      "text": "Herod the Great constructed the city, including an artificial harbor, over roughly a twelve-year building program, naming it Caesarea in honor of Augustus.",
+      "text": "Herod the Great constructed the city, including an artificial harbor, naming it Caesarea in honor of Augustus.",
       "sources": [
         "pleiades:678401",
         "wikidata:Q319242"
@@ -140,7 +140,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

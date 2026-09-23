@@ -19,7 +19,7 @@
       ],
       "coordinateSource": "wikidata:Q20717624",
       "confidence": "high",
-      "support": "In 1956 M. H. Ballance discovered a dedicatory inscription naming the boule and demos of Derbe on this mound near Ekinözü, and this identification is followed by the Barrington Atlas and the Digital Atlas of the Roman Empire; Pleiades and Wikidata's coordinates for the mound agree closely.",
+      "support": "In 1956 M. H. Ballance discovered a dedicatory inscription naming the boule and demos of Derbe on this mound near Ekinözü, and this identification is followed by the Barrington Atlas and (per the cited article) the GPS coordinates in an atlas of the Roman world; Pleiades and Wikidata's coordinates for the mound agree closely.",
       "sources": [
         "wikidata:Q20717624",
         "pleiades:648620",
@@ -85,7 +85,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

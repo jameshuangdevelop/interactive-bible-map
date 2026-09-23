@@ -27,7 +27,7 @@
     }
   ],
   "summary": {
-    "text": "Ephesus was the leading city of the Roman province of Asia and home to the great temple of Artemis, one of the Seven Wonders of the ancient world. Paul spent about three years there on his third journey, and the city is addressed directly in Ephesians, 1 and 2 Timothy, and Revelation.",
+    "text": "Ephesus was, per Pleiades, 'the most important ancient metropolis of Ionian Asia Minor,' and home to the great temple of Artemis, a scene Acts 19:35 confirms by calling Ephesus 'temple keeper of the great goddess Artemis.' Paul spent about three years there on his third journey, and the city is addressed directly in Ephesians, 1 and 2 Timothy, and Revelation.",
     "sources": [
       "pleiades:599612",
       "wikidata:Q47611",
@@ -139,7 +139,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

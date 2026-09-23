@@ -21,7 +21,7 @@
       ],
       "coordinateSource": "pleiades:707586",
       "confidence": "high",
-      "support": "Nea Paphos, a UNESCO World Heritage archaeological park, was the Roman-period capital of Cyprus and is the undisputed setting of Paul and Barnabas's encounter with the proconsul Sergius Paulus in Acts 13.",
+      "support": "Nea Paphos, per Pleiades, 'has been a center of activity since the Final Bronze Age' and is a UNESCO World Heritage archaeological park; it is the undisputed setting of Paul and Barnabas's visit recorded in Acts 13.",
       "sources": [
         "pleiades:707586",
         "wikidata:Q22991943"
@@ -29,7 +29,7 @@
     }
   ],
   "summary": {
-    "text": "Paphos (Nea Paphos) was the Roman capital of the province of Cyprus, where Acts records that the proconsul Sergius Paulus believed after witnessing Paul's confrontation with the sorcerer Elymas.",
+    "text": "Paphos (Nea Paphos) was a Cyprus settlement Paul and Barnabas visited on the first missionary journey; Acts records events there before their onward voyage to Perga in Pamphylia.",
     "sources": [
       "pleiades:707586",
       "wikidata:Q22991943",
@@ -51,7 +51,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

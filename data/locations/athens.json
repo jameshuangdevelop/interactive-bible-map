@@ -27,7 +27,7 @@
     }
   ],
   "summary": {
-    "text": "Athens was the leading city of classical Greek philosophy and culture. Acts describes Paul addressing the Areopagus council there, engaging Epicurean and Stoic philosophers on the nature of the 'unknown god.'",
+    "text": "Athens was, per Pleiades, 'a major Greek city-state and the principal city of Attika.' Acts describes Paul, troubled by the city's many idols, addressing the Areopagus council and telling the Athenians they were 'very religious in all things.'",
     "sources": [
       "pleiades:579885",
       "wikidata:Q1524",
@@ -69,7 +69,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

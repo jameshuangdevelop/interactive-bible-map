@@ -37,7 +37,7 @@
   },
   "history": [
     {
-      "text": "The city of Samaria was founded as capital of the northern kingdom of Israel and gave its name to the surrounding region; the kingdom and its capital fell to the Neo-Assyrian empire in the eighth century BC.",
+      "text": "The city of Samaria was founded as capital of the northern kingdom of Israel and gave its name to the surrounding region. Per Pleiades, it was conquered by the Assyrian king Shalmaneser V, probably in 722 BC, and the city and surrounding area were reorganized into an Assyrian province.",
       "sources": [
         "pleiades:44836840",
         "openbible:samaria-1"
@@ -136,7 +136,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

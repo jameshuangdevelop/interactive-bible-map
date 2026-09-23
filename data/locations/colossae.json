@@ -27,7 +27,7 @@
     }
   ],
   "summary": {
-    "text": "Colossae was a town in the Lycus Valley of Phrygia, overshadowed in the first century by its neighbors Laodicea and Hierapolis, and addressed by Paul's letter to the Colossians even though Acts does not record him visiting personally.",
+    "text": "Colossae was, per Wikidata, 'an ancient city of Phrygia,' addressed by Paul's letter to the Colossians even though Acts does not record him visiting personally.",
     "sources": [
       "pleiades:638811",
       "wikidata:Q1001370",
@@ -44,7 +44,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }
