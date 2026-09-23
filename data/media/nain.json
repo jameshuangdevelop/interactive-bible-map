@@ -2,21 +2,30 @@
   "locationId": "nain",
   "images": [
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Nain.jpg",
-      "author": "Ian Philp",
-      "license": "CC0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nain.jpg",
-      "caption": "Village of Nain (Nein) in Galilee",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Church_of_the_Resurrection_of_the_Widow%27s_Son_01.jpg",
+      "author": "Hoshvilim",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_the_Resurrection_of_the_Widow%27s_Son_01.jpg",
+      "caption": "Church of the Resurrection of the Widow's Son, Nein",
       "aiGenerated": false
     },
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Niin_120.jpg",
-      "author": "Ori~",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Niin_120.jpg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Church_of_the_Resurrection_of_the_Widow%27s_Son_02.jpg",
+      "author": "Hoshvilim",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_the_Resurrection_of_the_Widow%27s_Son_02.jpg",
       "caption": "Church of the Resurrection of the Widow's Son, Nein",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/General_view%2C_Nain%2C_Holy_Land%2C_%28i.e.%2C_Nein%2C_Israel%29-LCCN2002725044.jpg",
+      "author": "Library of Congress",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:General_view,_Nain,_Holy_Land,_(i.e.,_Nein,_Israel)-LCCN2002725044.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:General_view,_Nain,_Holy_Land,_(i.e.,_Nein,_Israel)-LCCN2002725044.jpg",
+      "caption": "General view of Nain (Nein), Holy Land",
       "aiGenerated": false
     }
   ]
