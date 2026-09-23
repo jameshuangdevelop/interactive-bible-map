@@ -89,3 +89,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-01 schema, validation and CI | ~900k / ~90k | ~790 | ~4,500 |
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 research (Phase A) | ~380k / ~50k | ~950 | ~5,450 |
 | 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 batch 2 media (Phase B) | ~150k / ~8k | ~80 | ~5,530 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 fact-check (Phase C) | ~520k / ~45k | ~950 | ~6,480 |
