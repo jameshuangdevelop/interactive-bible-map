@@ -1,0 +1,150 @@
+{
+  "id": "emmaus",
+  "names": {
+    "ancient": [
+      "Emmaus"
+    ],
+    "modern": "Disputed (see candidates)",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Emmaus Nicopolis (Imwas)",
+      "coordinates": [
+        34.989458,
+        31.8393
+      ],
+      "coordinateSource": "wikidata:Q847246",
+      "confidence": "disputed",
+      "support": "About 160 stadia (roughly 30 km) from Jerusalem, matching the reading in the fourth-century Codex Sinaiticus; has significant Christian veneration and Byzantine-period archaeological remains, but the distance is difficult to reconcile with a same-day round trip on foot as narrated in Luke 24.",
+      "sources": [
+        "wikidata:Q847246",
+        "dare:21656",
+        "pleiades:687891",
+        "openbible:emmaus"
+      ]
+    },
+    {
+      "label": "Qaloniya / Motza",
+      "coordinates": [
+        35.163889,
+        31.793917
+      ],
+      "coordinateSource": "wikidata:Q2898847",
+      "confidence": "disputed",
+      "support": "About 60 stadia (roughly 11 km) from Jerusalem, matching the distance given in most Greek manuscripts of Luke 24:13; recent excavations of a first-century Jewish village at the site have led some modern scholars to favor this candidate, though it lacks the long history of Christian commemoration of Emmaus Nicopolis.",
+      "sources": [
+        "wikidata:Q2898847",
+        "openbible:emmaus"
+      ]
+    },
+    {
+      "label": "El-Qubeibeh",
+      "coordinates": [
+        35.13685,
+        31.839933
+      ],
+      "coordinateSource": "wikidata:Q6041947",
+      "confidence": "low",
+      "support": "About 60 stadia from Jerusalem; identified with Emmaus mainly from the Crusader period onward and recognized by the Franciscans, but no ancient source calls the site Emmaus.",
+      "sources": [
+        "wikidata:Q6041947",
+        "openbible:emmaus"
+      ]
+    },
+    {
+      "label": "Abu Ghosh",
+      "coordinates": [
+        35.107541,
+        31.80742
+      ],
+      "coordinateSource": "wikidata:Q759606",
+      "confidence": "low",
+      "support": "Identified with Emmaus in the Middle Ages partly on the strength of a large church at the site, though the village is more commonly identified by scholars with the biblical Kiriath-Jearim than with Emmaus.",
+      "sources": [
+        "wikidata:Q759606",
+        "openbible:emmaus"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Emmaus is the village to which two disciples were walking on the day of the resurrection, according to Luke 24, when the risen Jesus joined them without being recognized; its identification is disputed, with candidate sites proposed at very different distances from Jerusalem.",
+    "sources": [
+      "openbible:emmaus"
+    ]
+  },
+  "history": [
+    {
+      "text": "Luke's Gospel states the distance from Jerusalem to Emmaus as 'sixty stadia' in the majority of surviving Greek manuscripts, about 11 kilometers, while the fourth-century Codex Sinaiticus reads 'one hundred and sixty stadia,' about 30 kilometers; the two readings underlie much of the modern disagreement over which site is meant.",
+      "sources": [
+        "openbible:emmaus"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 24:13",
+      "book": "Luke",
+      "textWEB": "Behold, two of them were going that very day to a village named Emmaus, which was sixty stadia from Jerusalem."
+    },
+    {
+      "ref": "Luke 24:28",
+      "book": "Luke",
+      "textWEB": "They came near to the village where they were going, and he acted like he would go further."
+    },
+    {
+      "ref": "Luke 24:35",
+      "book": "Luke",
+      "textWEB": "They related the things that happened along the way, and how he was recognized by them in the breaking of the bread."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "draft"
+}

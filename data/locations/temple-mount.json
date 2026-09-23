@@ -1,0 +1,111 @@
+{
+  "id": "temple-mount",
+  "names": {
+    "ancient": [
+      "The Temple",
+      "Herod's Temple"
+    ],
+    "modern": "Temple Mount / Haram al-Sharif",
+    "alternate": [
+      "Har haBayit"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Temple Mount",
+      "coordinates": [
+        35.235556,
+        31.777778
+      ],
+      "coordinateSource": "wikidata:Q193163",
+      "confidence": "high",
+      "support": "Wikidata's point for the Temple Mount is corroborated by scholarly archaeological reconstruction of the platform published by Ritmeyer; as a roughly 15-hectare platform, any single point is a center reference rather than a precise boundary.",
+      "sources": [
+        "wikidata:Q193163",
+        "bib:ritmeyer-temple-mount-quest"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Temple Mount is the elevated platform in Jerusalem's Old City that carried Herod the Great's expanded Second Temple, the building the Gospels describe Jesus visiting, teaching in, and, in one episode, driving merchants and money changers from.",
+    "sources": [
+      "wikidata:Q193163",
+      "bib:ritmeyer-temple-mount-quest"
+    ]
+  },
+  "history": [
+    {
+      "text": "Herod the Great began a major expansion and rebuilding of the Second Temple and its surrounding platform around 20-19 BC, a project that, per the Gospel of John, was still being completed decades into the first century AD.",
+      "sources": [
+        "bib:ritmeyer-temple-mount-quest"
+      ]
+    },
+    {
+      "text": "The Temple was destroyed by Roman forces in AD 70, leaving the retaining walls of Herod's platform, including the section known today as the Western Wall, as its most substantial surviving remains.",
+      "sources": [
+        "wikidata:Q193163",
+        "bib:ritmeyer-temple-mount-quest"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 2:46",
+      "book": "Luke",
+      "textWEB": "After three days they found him in the temple, sitting in the middle of the teachers, both listening to them and asking them questions."
+    },
+    {
+      "ref": "Matthew 21:12",
+      "book": "Matthew",
+      "textWEB": "Jesus entered into the temple of God and drove out all of those who sold and bought in the temple, and overthrew the money changers’ tables and the seats of those who sold the doves."
+    },
+    {
+      "ref": "Mark 11:15",
+      "book": "Mark",
+      "textWEB": "They came to Jerusalem, and Jesus entered into the temple and began to throw out those who sold and those who bought in the temple, and overthrew the money changers’ tables and the seats of those who sold the doves."
+    },
+    {
+      "ref": "John 2:14",
+      "book": "John",
+      "textWEB": "He found in the temple those who sold oxen, sheep, and doves, and the changers of money sitting."
+    },
+    {
+      "ref": "Matthew 24:1",
+      "book": "Matthew",
+      "textWEB": "Jesus went out from the temple, and was going on his way. His disciples came to him to show him the buildings of the temple."
+    },
+    {
+      "ref": "Acts 3:2",
+      "book": "Acts",
+      "textWEB": "A certain man who was lame from his mother’s womb was being carried, whom they laid daily at the door of the temple which is called Beautiful, to ask gifts for the needy of those who entered into the temple."
+    },
+    {
+      "ref": "Acts 21:27",
+      "book": "Acts",
+      "textWEB": "When the seven days were almost completed, the Jews from Asia, when they saw him in the temple, stirred up all the multitude and laid hands on him,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -19,
+      "toYear": -9,
+      "entity": "Herod the Great's expansion of the Temple platform and rebuilding of the Second Temple",
+      "sources": [
+        "bib:ritmeyer-temple-mount-quest"
+      ]
+    },
+    {
+      "fromYear": 70,
+      "toYear": 70,
+      "entity": "Destruction of the Second Temple by Roman forces under Titus",
+      "sources": [
+        "wikidata:Q1003997"
+      ]
+    }
+  ],
+  "status": "draft"
+}

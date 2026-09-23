@@ -1,0 +1,102 @@
+{
+  "id": "bethany-beyond-the-jordan",
+  "names": {
+    "ancient": [
+      "Bethany beyond the Jordan",
+      "Bethabara"
+    ],
+    "modern": "Disputed (see candidates)",
+    "alternate": []
+  },
+  "type": "site",
+  "zoomTier": "city",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Al-Maghtas / Wadi al-Kharrar (Jordan, east bank)",
+      "coordinates": [
+        35.550278,
+        31.837222
+      ],
+      "coordinateSource": "wikidata:Q12193567",
+      "confidence": "medium",
+      "support": "Byzantine-period churches, hermit caves and baptismal structures excavated on the Jordanian east bank match the site's depiction on the sixth-century Madaba mosaic map, making it the most archaeologically supported candidate; this is the basis of its UNESCO World Heritage listing as the traditional site of John's baptisms.",
+      "sources": [
+        "wikidata:Q12193567",
+        "openbible:bethany-2",
+        "bib:unesco-baptism-site-al-maghtas"
+      ]
+    },
+    {
+      "label": "Qasr al-Yahud (West Bank, opposite bank)",
+      "coordinates": [
+        35.546497,
+        31.837093
+      ],
+      "coordinateSource": "wikidata:Q1574073",
+      "confidence": "low",
+      "support": "A parallel pilgrimage site on the river's west bank with two fifth-century Byzantine churches, but no confirmed first-century occupation layer, making it a weaker archaeological candidate than Al-Maghtas for the Gospel event itself.",
+      "sources": [
+        "wikidata:Q1574073",
+        "openbible:bethany-2"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Bethany beyond the Jordan, named in John 1:28 as the place where John the Baptist was baptizing, including Jesus, is located east of the Jordan River; its precise site is debated, and the wording itself was altered to 'Bethabara' in some later manuscripts and older English translations.",
+    "sources": [
+      "openbible:bethany-2",
+      "bib:hutton-bethany-beyond-jordan"
+    ]
+  },
+  "history": [
+    {
+      "text": "The third-century scholar Origen could not find a village called Bethany east of the Jordan in his own day and proposed emending the text to 'Bethabara' ('house of the ford'), a reading that entered later manuscripts and older English translations, though the earliest and best-attested Greek manuscripts read 'Bethany.'",
+      "sources": [
+        "bib:hutton-bethany-beyond-jordan"
+      ]
+    },
+    {
+      "text": "Some scholars have proposed a location farther north and east, in the region historically called Batanea, as a better fit for the Gospel's geography and for John the Baptist's later arrest by Herod Antipas; this remains a minority academic view without a single agreed coordinate.",
+      "sources": [
+        "bib:hutton-bethany-beyond-jordan"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 1:28",
+      "book": "John",
+      "textWEB": "These things were done in Bethany beyond the Jordan, where John was baptizing."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "draft"
+}

@@ -1,0 +1,361 @@
+{
+  "id": "judea",
+  "names": {
+    "ancient": [
+      "Judea",
+      "Judaea"
+    ],
+    "modern": "Judea (historical region, West Bank / Israel)",
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Judea (historical region)",
+      "coordinates": [
+        35.306389,
+        31.698889
+      ],
+      "coordinateSource": "wikidata:Q104028",
+      "confidence": "high",
+      "support": "Wikidata's item for the historical region of Judea gives a representative point in the Judean hill country; as a broad region rather than a single site, any point is only an approximate reference, cross-checked against OpenBible.info's separate identification of the same region name.",
+      "sources": [
+        "wikidata:Q104028",
+        "openbible:judea-1"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Judea was the southern part of the historical land of Israel in the first century AD, encompassing Jerusalem and the surrounding hill country, and gave its name to the Herodian and Roman administrative units that governed the area through the New Testament period.",
+    "sources": [
+      "wikidata:Q104028",
+      "bib:rainey-notley-sacred-bridge"
+    ]
+  },
+  "history": [
+    {
+      "text": "After Herod the Great's death in 4 BC, Judea proper passed to his son Herod Archelaus as ethnarch; when Rome deposed Archelaus in AD 6, Judea became a Roman province administered first by a prefect and later by a procurator, normally based at Caesarea Maritima.",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 2:1",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus was born in Bethlehem of Judea in the days of King Herod, behold, wise men from the east came to Jerusalem, saying,"
+    },
+    {
+      "ref": "Matthew 2:5",
+      "book": "Matthew",
+      "textWEB": "They said to him, “In Bethlehem of Judea, for this is written through the prophet,"
+    },
+    {
+      "ref": "Matthew 2:22",
+      "book": "Matthew",
+      "textWEB": "But when he heard that Archelaus was reigning over Judea in the place of his father, Herod, he was afraid to go there. Being warned in a dream, he withdrew into the region of Galilee,"
+    },
+    {
+      "ref": "Matthew 3:1",
+      "book": "Matthew",
+      "textWEB": "In those days, John the Baptizer came, preaching in the wilderness of Judea, saying,"
+    },
+    {
+      "ref": "Matthew 3:5",
+      "book": "Matthew",
+      "textWEB": "Then people from Jerusalem, all of Judea, and all the region around the Jordan went out to him."
+    },
+    {
+      "ref": "Matthew 4:12",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus heard that John was delivered up, he withdrew into Galilee."
+    },
+    {
+      "ref": "Matthew 4:25",
+      "book": "Matthew",
+      "textWEB": "Great multitudes from Galilee, Decapolis, Jerusalem, Judea, and from beyond the Jordan followed him."
+    },
+    {
+      "ref": "Matthew 19:1",
+      "book": "Matthew",
+      "textWEB": "When Jesus had finished these words, he departed from Galilee and came into the borders of Judea beyond the Jordan."
+    },
+    {
+      "ref": "Matthew 24:16",
+      "book": "Matthew",
+      "textWEB": "then let those who are in Judea flee to the mountains."
+    },
+    {
+      "ref": "Mark 1:5",
+      "book": "Mark",
+      "textWEB": "All the country of Judea and all those of Jerusalem went out to him. They were baptized by him in the Jordan river, confessing their sins."
+    },
+    {
+      "ref": "Mark 3:7",
+      "book": "Mark",
+      "textWEB": "Jesus withdrew to the sea with his disciples; and a great multitude followed him from Galilee, from Judea,"
+    },
+    {
+      "ref": "Mark 10:1",
+      "book": "Mark",
+      "textWEB": "He arose from there and came into the borders of Judea and beyond the Jordan. Multitudes came together to him again. As he usually did, he was again teaching them."
+    },
+    {
+      "ref": "Mark 13:14",
+      "book": "Mark",
+      "textWEB": "“But when you see the abomination of desolation, spoken of by Daniel the prophet, standing where it ought not” (let the reader understand), “then let those who are in Judea flee to the mountains,"
+    },
+    {
+      "ref": "Luke 1:5",
+      "book": "Luke",
+      "textWEB": "There was in the days of Herod, the king of Judea, a certain priest named Zacharias, of the priestly division of Abijah. He had a wife of the daughters of Aaron, and her name was Elizabeth."
+    },
+    {
+      "ref": "Luke 1:39",
+      "book": "Luke",
+      "textWEB": "Mary arose in those days and went into the hill country with haste, into a city of Judah,"
+    },
+    {
+      "ref": "Luke 1:65",
+      "book": "Luke",
+      "textWEB": "Fear came on all who lived around them, and all these sayings were talked about throughout all the hill country of Judea."
+    },
+    {
+      "ref": "Luke 2:4",
+      "book": "Luke",
+      "textWEB": "Joseph also went up from Galilee, out of the city of Nazareth, into Judea, to David’s city, which is called Bethlehem, because he was of the house and family of David,"
+    },
+    {
+      "ref": "Luke 3:1",
+      "book": "Luke",
+      "textWEB": "Now in the fifteenth year of the reign of Tiberius Caesar, Pontius Pilate being governor of Judea, and Herod being tetrarch of Galilee, and his brother Philip tetrarch of the region of Ituraea and Trachonitis, and Lysanias tetrarch of Abilene,"
+    },
+    {
+      "ref": "Luke 4:44",
+      "book": "Luke",
+      "textWEB": "He was preaching in the synagogues of Galilee."
+    },
+    {
+      "ref": "Luke 5:17",
+      "book": "Luke",
+      "textWEB": "On one of those days, he was teaching; and there were Pharisees and teachers of the law sitting by who had come out of every village of Galilee, Judea, and Jerusalem. The power of the Lord was with him to heal them."
+    },
+    {
+      "ref": "Luke 6:17",
+      "book": "Luke",
+      "textWEB": "He came down with them and stood on a level place, with a crowd of his disciples and a great number of the people from all Judea and Jerusalem and the sea coast of Tyre and Sidon, who came to hear him and to be healed of their diseases,"
+    },
+    {
+      "ref": "Luke 7:17",
+      "book": "Luke",
+      "textWEB": "This report went out concerning him in the whole of Judea and in all the surrounding region."
+    },
+    {
+      "ref": "Luke 21:21",
+      "book": "Luke",
+      "textWEB": "Then let those who are in Judea flee to the mountains. Let those who are in the middle of her depart. Let those who are in the country not enter therein."
+    },
+    {
+      "ref": "Luke 23:5",
+      "book": "Luke",
+      "textWEB": "But they insisted, saying, “He stirs up the people, teaching throughout all Judea, beginning from Galilee even to this place.”"
+    },
+    {
+      "ref": "Luke 23:51",
+      "book": "Luke",
+      "textWEB": "(he had not consented to their counsel and deed), from Arimathaea, a city of the Jews, who was also waiting for God’s Kingdom."
+    },
+    {
+      "ref": "John 3:22",
+      "book": "John",
+      "textWEB": "After these things, Jesus came with his disciples into the land of Judea. He stayed there with them and baptized."
+    },
+    {
+      "ref": "John 4:3",
+      "book": "John",
+      "textWEB": "he left Judea and departed into Galilee."
+    },
+    {
+      "ref": "John 4:47",
+      "book": "John",
+      "textWEB": "When he heard that Jesus had come out of Judea into Galilee, he went to him and begged him that he would come down and heal his son, for he was at the point of death."
+    },
+    {
+      "ref": "John 4:54",
+      "book": "John",
+      "textWEB": "This is again the second sign that Jesus did, having come out of Judea into Galilee."
+    },
+    {
+      "ref": "John 7:1",
+      "book": "John",
+      "textWEB": "After these things, Jesus was walking in Galilee, for he wouldn’t walk in Judea, because the Jews sought to kill him."
+    },
+    {
+      "ref": "John 7:3",
+      "book": "John",
+      "textWEB": "His brothers therefore said to him, “Depart from here and go into Judea, that your disciples also may see your works which you do."
+    },
+    {
+      "ref": "John 11:7",
+      "book": "John",
+      "textWEB": "Then after this he said to the disciples, “Let’s go into Judea again.”"
+    },
+    {
+      "ref": "John 11:8",
+      "book": "John",
+      "textWEB": "The disciples asked him, “Rabbi, the Jews were just trying to stone you. Are you going there again?”"
+    },
+    {
+      "ref": "John 11:54",
+      "book": "John",
+      "textWEB": "Jesus therefore walked no more openly among the Jews, but departed from there into the country near the wilderness, to a city called Ephraim. He stayed there with his disciples."
+    },
+    {
+      "ref": "Acts 1:8",
+      "book": "Acts",
+      "textWEB": "But you will receive power when the Holy Spirit has come upon you. You will be witnesses to me in Jerusalem, in all Judea and Samaria, and to the uttermost parts of the earth.”"
+    },
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    },
+    {
+      "ref": "Acts 2:14",
+      "book": "Acts",
+      "textWEB": "But Peter, standing up with the eleven, lifted up his voice and spoke out to them, “You men of Judea and all you who dwell at Jerusalem, let this be known to you, and listen to my words."
+    },
+    {
+      "ref": "Acts 8:1",
+      "book": "Acts",
+      "textWEB": "Saul was consenting to his death. A great persecution arose against the assembly which was in Jerusalem in that day. They were all scattered abroad throughout the regions of Judea and Samaria, except for the apostles."
+    },
+    {
+      "ref": "Acts 9:31",
+      "book": "Acts",
+      "textWEB": "So the assemblies throughout all Judea, Galilee, and Samaria had peace and were built up. They were multiplied, walking in the fear of the Lord and in the comfort of the Holy Spirit."
+    },
+    {
+      "ref": "Acts 10:37",
+      "book": "Acts",
+      "textWEB": "you yourselves know what happened, which was proclaimed throughout all Judea, beginning from Galilee, after the baptism which John preached;"
+    },
+    {
+      "ref": "Acts 10:39",
+      "book": "Acts",
+      "textWEB": "We are witnesses of everything he did both in the country of the Jews and in Jerusalem; whom they also killed, hanging him on a tree."
+    },
+    {
+      "ref": "Acts 11:1",
+      "book": "Acts",
+      "textWEB": "Now the apostles and the brothers who were in Judea heard that the Gentiles had also received the word of God."
+    },
+    {
+      "ref": "Acts 11:29",
+      "book": "Acts",
+      "textWEB": "As any of the disciples had plenty, each determined to send relief to the brothers who lived in Judea;"
+    },
+    {
+      "ref": "Acts 12:19",
+      "book": "Acts",
+      "textWEB": "When Herod had sought for him and didn’t find him, he examined the guards, then commanded that they should be put to death. He went down from Judea to Caesarea, and stayed there."
+    },
+    {
+      "ref": "Acts 15:1",
+      "book": "Acts",
+      "textWEB": "Some men came down from Judea and taught the brothers, “Unless you are circumcised after the custom of Moses, you can’t be saved.”"
+    },
+    {
+      "ref": "Acts 21:10",
+      "book": "Acts",
+      "textWEB": "As we stayed there some days, a certain prophet named Agabus came down from Judea."
+    },
+    {
+      "ref": "Acts 26:20",
+      "book": "Acts",
+      "textWEB": "but declared first to them of Damascus, at Jerusalem, and throughout all the country of Judea, and also to the Gentiles, that they should repent and turn to God, doing works worthy of repentance."
+    },
+    {
+      "ref": "Acts 28:21",
+      "book": "Acts",
+      "textWEB": "They said to him, “We neither received letters from Judea concerning you, nor did any of the brothers come here and report or speak any evil of you."
+    },
+    {
+      "ref": "Romans 15:31",
+      "book": "Romans",
+      "textWEB": "that I may be delivered from those who are disobedient in Judea, and that my service which I have for Jerusalem may be acceptable to the saints,"
+    },
+    {
+      "ref": "2 Corinthians 1:16",
+      "book": "2 Corinthians",
+      "textWEB": "and by you to pass into Macedonia, and again from Macedonia to come to you, and to be sent forward by you on my journey to Judea."
+    },
+    {
+      "ref": "Galatians 1:22",
+      "book": "Galatians",
+      "textWEB": "I was still unknown by face to the assemblies of Judea which were in Christ,"
+    },
+    {
+      "ref": "1 Thessalonians 2:14",
+      "book": "1 Thessalonians",
+      "textWEB": "For you, brothers, became imitators of the assemblies of God which are in Judea in Christ Jesus; for you also suffered the same things from your own countrymen, even as they did from the Jews"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Ezra 5:8",
+      "note": "An early Persian-period Aramaic report refers to 'the province of Judea,' the administrative ancestor of the later Herodian and Roman units of the same name.",
+      "sources": [
+        "openbible:judea-2"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "draft"
+}

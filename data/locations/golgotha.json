@@ -1,0 +1,105 @@
+{
+  "id": "golgotha",
+  "names": {
+    "ancient": [
+      "Golgotha",
+      "Place of a Skull"
+    ],
+    "modern": "Golgotha / Calvary (disputed)",
+    "alternate": [
+      "Calvary"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Church of the Holy Sepulchre (traditional site)",
+      "coordinates": [
+        35.22975,
+        31.778444
+      ],
+      "coordinateSource": "wikidata:Q187702",
+      "confidence": "medium",
+      "support": "Identified as Golgotha since the fourth century AD under Constantine; archaeological work beneath the church has found a first-century quarry with rock-cut tombs consistent with a site once outside the city wall, which is the majority scholarly view, though the precise course of the wall in Jesus' time remains debated.",
+      "sources": [
+        "wikidata:Q187702",
+        "openbible:golgotha",
+        "bib:taylor-golgotha-reconsideration"
+      ]
+    },
+    {
+      "label": "Garden Tomb / Gordon's Calvary",
+      "coordinates": [
+        35.230147,
+        31.783957
+      ],
+      "coordinateSource": "wikidata:Q1494672",
+      "confidence": "low",
+      "support": "Popularized as an alternative site in the nineteenth century, partly on the basis of a rock formation resembling a skull nearby; most archaeologists date the tomb chamber here many centuries before the first century AD, which is a difficulty for its identification as the Gospels' 'new tomb'.",
+      "sources": [
+        "wikidata:Q1494672",
+        "openbible:golgotha",
+        "bib:taylor-golgotha-reconsideration"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Golgotha, 'place of a skull,' is the site of Jesus' crucifixion described in all four Gospels as located outside Jerusalem's walls; its precise location is not settled, with the Church of the Holy Sepulchre and the Garden Tomb the two most discussed candidate sites, and some scholars proposing the crucifixion and burial were at somewhat separate spots within the same general quarry area.",
+    "sources": [
+      "openbible:golgotha",
+      "bib:taylor-golgotha-reconsideration"
+    ]
+  },
+  "history": [
+    {
+      "text": "Byzantine tradition, following fourth-century construction under Constantine, identifies the site beneath the Church of the Holy Sepulchre; archaeological work has confirmed the area functioned as a stone quarry with rock-cut tombs before Jerusalem's walls were later extended to enclose it.",
+      "sources": [
+        "wikidata:Q187702",
+        "bib:taylor-golgotha-reconsideration"
+      ]
+    },
+    {
+      "text": "The Garden Tomb, promoted as an alternative site from the nineteenth century onward, contains a rock-cut tomb chamber that most archaeologists date many centuries before the first century AD.",
+      "sources": [
+        "wikidata:Q1494672",
+        "bib:taylor-golgotha-reconsideration"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 27:33",
+      "book": "Matthew",
+      "textWEB": "When they came to a place called “Golgotha”, that is to say, “The place of a skull,”"
+    },
+    {
+      "ref": "Mark 15:22",
+      "book": "Mark",
+      "textWEB": "They brought him to the place called Golgotha, which is, being interpreted, “The place of a skull.”"
+    },
+    {
+      "ref": "Luke 23:33",
+      "book": "Luke",
+      "textWEB": "When they came to the place that is called “The Skull”, they crucified him there with the criminals, one on the right and the other on the left."
+    },
+    {
+      "ref": "John 19:17",
+      "book": "John",
+      "textWEB": "He went out, bearing his cross, to the place called “The Place of a Skull”, which is called in Hebrew, “Golgotha”,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": 26,
+      "toYear": 36,
+      "entity": "Roman province of Judaea under the prefecture of Pontius Pilate, during whose tenure the Gospels place Jesus' trial and crucifixion",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "draft"
+}

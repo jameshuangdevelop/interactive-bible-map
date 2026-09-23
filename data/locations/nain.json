@@ -1,0 +1,89 @@
+{
+  "id": "nain",
+  "names": {
+    "ancient": [
+      "Nain"
+    ],
+    "modern": "Nein",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Nein",
+      "coordinates": [
+        35.35,
+        32.633333
+      ],
+      "coordinateSource": "wikidata:Q934904",
+      "confidence": "high",
+      "support": "Wikidata's coordinate is corroborated by OpenBible.info's independently recorded point for the same village, about 300 meters apart, and the modern Arabic village name directly preserves the ancient name.",
+      "sources": [
+        "wikidata:Q934904",
+        "openbible:nain"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Nain was a small Galilean village where, according to Luke 7, Jesus raised a widow's only son from death as his funeral procession left the town.",
+    "sources": [
+      "wikidata:Q934904",
+      "openbible:nain"
+    ]
+  },
+  "history": [
+    {
+      "text": "The modern village of Nein preserves the ancient name, and a small church commemorating the miracle has stood at the site since at least the Crusader period.",
+      "sources": [
+        "wikidata:Q934904",
+        "openbible:nain"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 7:11",
+      "book": "Luke",
+      "textWEB": "Soon afterwards, he went to a city called Nain. Many of his disciples, along with a great multitude, went with him."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "draft"
+}

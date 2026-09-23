@@ -22,6 +22,115 @@
       "publisher": "eBible.org",
       "url": "https://ebible.org/find/details.php?id=engwebp",
       "accessed": "2026-09-23"
+    },
+    {
+      "id": "rainey-notley-sacred-bridge",
+      "type": "book",
+      "title": "The Sacred Bridge: Carta's Atlas of the Biblical World",
+      "authors": [
+        "Anson F. Rainey",
+        "R. Steven Notley"
+      ],
+      "year": 2006,
+      "publisher": "Carta Jerusalem"
+    },
+    {
+      "id": "arav-bethsaida-et-tell",
+      "type": "article",
+      "title": "Searching for Bethsaida: The Case for Et-Tell",
+      "authors": [
+        "Rami Arav"
+      ],
+      "year": 2020,
+      "journal": "Biblical Archaeology Review"
+    },
+    {
+      "id": "notley-aviam-bethsaida-el-araj",
+      "type": "article",
+      "title": "Searching for Bethsaida: The Case for El-Araj",
+      "authors": [
+        "R. Steven Notley",
+        "Mordechai Aviam"
+      ],
+      "year": 2020,
+      "journal": "Biblical Archaeology Review"
+    },
+    {
+      "id": "taylor-golgotha-reconsideration",
+      "type": "article",
+      "title": "Golgotha: A Reconsideration of the Evidence for the Sites of Jesus' Crucifixion and Burial",
+      "authors": [
+        "Joan E. Taylor"
+      ],
+      "year": 1998,
+      "journal": "New Testament Studies",
+      "doi": "10.1017/S0028688500016465"
+    },
+    {
+      "id": "hutton-bethany-beyond-jordan",
+      "type": "article",
+      "title": "'Bethany Beyond the Jordan' in Text, Tradition, and Historical Geography",
+      "authors": [
+        "Jeremy M. Hutton"
+      ],
+      "year": 2008,
+      "journal": "Biblica"
+    },
+    {
+      "id": "mccollough-khirbet-qana",
+      "type": "chapter",
+      "title": "Khirbet Qana",
+      "authors": [
+        "C. Thomas McCollough"
+      ],
+      "year": 2015,
+      "containerTitle": "Galilee in the Late Second Temple and Mishnaic Periods, Volume 2: The Archaeological Record from Cities, Towns, and Villages",
+      "publisher": "Fortress Press"
+    },
+    {
+      "id": "reich-shukron-siloam-pool",
+      "type": "article",
+      "title": "The Second Temple Period Pool of Siloam in Jerusalem",
+      "authors": [
+        "Ronny Reich",
+        "Eli Shukron"
+      ],
+      "year": 2005,
+      "journal": "Israel Exploration Journal"
+    },
+    {
+      "id": "unesco-baptism-site-al-maghtas",
+      "type": "web",
+      "title": "Baptism Site \"Bethany Beyond the Jordan\" (Al-Maghtas)",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1446",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "inpa-korazim-national-park",
+      "type": "web",
+      "title": "Korazim National Park",
+      "authors": [
+        "Israel Nature and Parks Authority"
+      ],
+      "year": 2026,
+      "publisher": "Israel Nature and Parks Authority",
+      "url": "https://en.parks.org.il/reserve-park/korazim-national-park/",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "ritmeyer-temple-mount-quest",
+      "type": "book",
+      "title": "The Quest: Revealing the Temple Mount in Jerusalem",
+      "authors": [
+        "Leen Ritmeyer"
+      ],
+      "year": 2006,
+      "publisher": "Carta Jerusalem"
     }
   ]
 }
