@@ -84,7 +84,7 @@ About **27,000 AI credits for the whole project** (range 15k–55k, roughly US$1
 | M1-03 | [License review](docs/verification/M1.md): content licenses decided in [LICENSES.md](docs/LICENSES.md) and [ATTRIBUTION.md](ATTRIBUTION.md) | `docs/m1-license-review` |
 | M1-04 | This summary, and the proposed stack ADRs | `docs/cp1-summary` |
 
-Each branch was reviewed by the PR Reviewer from a different vendor than its author (ADR-0004). Every must-consider finding was fixed before this checkpoint.
+Each branch, M1-00 to M1-04, was reviewed by the PR Reviewer from a different vendor than its author (ADR-0004). Every must-consider finding was fixed in a follow-up commit on that branch before the PRs were opened.
 
 ### Decisions needed from you
 **Merging this PR accepts every recommendation below.** To choose differently, comment on the PR, and the PO will update the ADRs before you merge.
@@ -98,7 +98,7 @@ Each branch was reviewed by the PR Reviewer from a different vendor than its aut
 | 5 | Backend | **None for the MVP**: static JSON files and client-side search | Cloudflare Workers + D1 | $0 / $0 | ADR-0011 |
 | 6 | WEB edition | **`engwebp`** (US spelling). Both options are public domain, 66-book, and use "LORD". | `engwebpb` (British spelling) | — | ADR-0013 |
 
-**For your information (already decided by the Fact-Checker; brief §2.4):** code is MIT, data and content are CC BY-SA 4.0, and geometry derived from OpenStreetMap or AWMC in `data/geo/` is ODbL 1.0 (ADR-0012).
+**For your information (already decided by the Fact-Checker; brief §2.4):** code is MIT, geometry derived from OpenStreetMap or AWMC in `data/geo/` is ODbL 1.0, all other data and content is CC BY-SA 4.0, and WEB text stays public domain (ADR-0012).
 
 **What you'll need to do later (in M3, not now):** create a free Cloudflare account and add a Pages deploy token to the repository's GitHub secrets, so CI can publish preview deploys. The M3 card will give the exact steps.
 
@@ -114,7 +114,7 @@ Each branch was reviewed by the PR Reviewer from a different vendor than its aut
 - **Stacked PRs.** These must be merged in the order shown above, or a later PR will pull in earlier commits.
 
 ### Budget
-M1 used about **2,700 AI credits** (forecast ~2,200; the review-and-fix rounds were the extra cost), and the month total is about **3,200 of 1,000,000 (0.3%)**. See [BUDGET.md](docs/BUDGET.md).
+M1 used about **2,800 AI credits** (forecast ~2,200; the review-and-fix rounds were the extra cost), and the month total is about **3,300 of 1,000,000 (0.3%)**. See [BUDGET.md](docs/BUDGET.md).
 
 ### Next (after you approve)
 The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), then the 40 core sites in 2 batches (Research Lead, then Media Curator and Fact-Checker), and then CP2.

@@ -69,7 +69,7 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | Checkpoint | Month | Credits this milestone | Month total | % of cap |
 |---|---|---:|---:|---:|
 | CP0 | 2026-09 | ~500 | ~500 | ~0.05% |
-| CP1 | 2026-09 | ~2,686 | ~3,186 | ~0.3% |
+| CP1 | 2026-09 | ~2,760 | ~3,260 | ~0.3% |
 
 ## Ledger — 2026-09
 | Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
@@ -84,3 +84,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | pr-reviewer | Claude Sonnet 5 (Copilot CLI subagent) | Review M1-02 | ~260k / ~12k | ~95 | ~2,446 |
 | 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-03 | ~180k / ~10k | ~90 | ~2,536 |
 | 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M1-04 orchestration, reviews and CP1 summary | ~200k / ~30k | ~650 | ~3,186 |
+| 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-04 (CP1) | ~150k / ~8k | ~74 | ~3,260 |

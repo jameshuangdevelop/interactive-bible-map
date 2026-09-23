@@ -81,7 +81,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 
 ## ADR-0012 — Content licenses
 - **Date:** 2026-09-23 · **Status:** Accepted · **By:** Fact-Checker (M1-03; brief §2.4 gives this decision to the agents)
-- **Decision:** Code is MIT. `data/` and `content/` are CC BY-SA 4.0. OSM- and AWMC-derived geometry in `data/geo/` is ODbL 1.0. WEB text stays public domain. Accepted image licenses are PD/CC0, CC BY and CC BY-SA, with each file's exact license recorded. The full rules are in [LICENSES.md](LICENSES.md).
+- **Decision:** Code is MIT. OSM- and AWMC-derived geometry in `data/geo/` is ODbL 1.0. All other `data/` and `content/` is CC BY-SA 4.0. WEB text stays public domain. Accepted image licenses are PD/CC0, CC BY and CC BY-SA, with each file's exact license recorded. The full rules are in [LICENSES.md](LICENSES.md).
 - **Consequences:** Anyone reusing our data must share alike. Data PRs must record each field's source so that ODbL-derived values stay out of CC BY-SA records.
 
 ## ADR-0013 — WEB edition
