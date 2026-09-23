@@ -1,0 +1,32 @@
+{
+  "locationId": "caesarea-maritima",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/124995_caesarea_national_park_PikiWiki_Israel.jpg",
+      "author": "מיכל פריימן",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:124995_caesarea_national_park_PikiWiki_Israel.jpg",
+      "caption": "Remains of Caesarea Maritima, the port city built by Herod the Great.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/124996_caesarea_national_park_PikiWiki_Israel.jpg",
+      "author": "מיכל פריימן",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:124996_caesarea_national_park_PikiWiki_Israel.jpg",
+      "caption": "Archaeological site of Caesarea Maritima national park.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/11th_Century_%28Fatimid_Period%29_jewelry_from_Caesarea_in_the_Muslims_and_Crusaders_Exhibit.jpg",
+      "author": "Edmund Gall",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:11th_Century_(Fatimid_Period)_jewelry_from_Caesarea_in_the_Muslims_and_Crusaders_Exhibit.jpg",
+      "caption": "11th century jewelry from Caesarea, exhibited in the Muslims and Crusaders exhibit.",
+      "aiGenerated": false
+    }
+  ]
+}

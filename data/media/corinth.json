@@ -1,0 +1,32 @@
+{
+  "locationId": "corinth",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/20090731_korinthos05.jpg",
+      "author": "Jeanhousen",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20090731_korinthos05.jpg",
+      "caption": "Ruins of the Temple of Apollo at ancient Corinth, Greece.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Agaven_Antikes_Korinth.jpg",
+      "author": "Michael J. Zirbes",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Agaven_Antikes_Korinth.jpg",
+      "caption": "Sculptural fragments at ancient Corinth.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/2007_Greece_Acrocorinth_%26_Ancient_Corinth_01.jpg",
+      "author": "Nicholas Hartmann",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2007_Greece_Acrocorinth_&_Ancient_Corinth_01.jpg",
+      "caption": "View of Acrocorinth and the ancient Corinth archaeological site.",
+      "aiGenerated": false
+    }
+  ]
+}

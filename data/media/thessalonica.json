@@ -1,0 +1,32 @@
+{
+  "locationId": "thessalonica",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Thessaloniki%2C_Greece_-_Pavlova.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki,_Greece_-_Pavlova.jpg",
+      "caption": "Street in Thessaloniki (ancient Thessalonica), Greece.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Thessaloniki%2C_Greece%2C_Feb_2023_-_Western_Walls.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki,_Greece,_Feb_2023_-_Western_Walls.jpg",
+      "caption": "Western walls of the Old City in Thessaloniki.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Thessaloniki_Ancient_Agora_%281%29.jpg",
+      "author": "Unknown",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki_Ancient_Agora_(1).jpg",
+      "caption": "Remains of the Ancient Agora in Thessaloniki.",
+      "aiGenerated": false
+    }
+  ]
+}

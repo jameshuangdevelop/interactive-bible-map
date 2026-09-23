@@ -1,0 +1,32 @@
+{
+  "locationId": "antioch-syria",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Fall_of_Antioch_in_969.png",
+      "author": "Unknown (12th/13th century author)",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fall_of_Antioch_in_969.png",
+      "caption": "Historical manuscript depicting the fall of Antioch in 969 CE.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Cameo_Julian_the_Apostate_Inv312a_CdM_Paris.jpg",
+      "author": "Unknown artist",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Cameo_Julian_the_Apostate_Inv312a_CdM_Paris.jpg",
+      "caption": "Roman cameo depicting Julian the Apostate, emperor during the Christian era of late Antioch.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Flag_of_Antioque.png",
+      "author": "Niqholas2",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Flag_of_Antioque.png",
+      "caption": "Flag of Antakya (modern Antioch), Turkey.",
+      "aiGenerated": false
+    }
+  ]
+}

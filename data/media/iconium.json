@@ -1,0 +1,23 @@
+{
+  "locationId": "iconium",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Konya_Archaeological_Museum%2C_Turkey_06.jpg",
+      "author": "Murat Özsoy 1958",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Konya_Archaeological_Museum,_Turkey_06.jpg",
+      "caption": "Artifacts from the Konya Archaeological Museum (ancient Iconium).",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Konya_Archaeological_Museum%2C_Turkey_12.jpg",
+      "author": "Murat Özsoy 1958",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Konya_Archaeological_Museum,_Turkey_12.jpg",
+      "caption": "Artifacts displayed in the Konya Archaeological Museum.",
+      "aiGenerated": false
+    }
+  ]
+}
