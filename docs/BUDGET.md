@@ -90,3 +90,6 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 batch 1 research (Phase A) | ~300k / ~45k | ~1,050 | ~5,550 |
 | 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-02 batch 1 media (completion) | ~150k / ~30k | ~100 | ~5,650 |
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 batch 1 fact-check (Phase C: 47 independent coordinate re-fetches, 32 image license/content re-checks, full scripture/political-history audit) | ~450k / ~55k | ~1,150 | ~6,800 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 fixes (galilee politicalHistory, jerusalem scripture, gethsemane confidence, jericho candidate, temple-mount disclosure, bethlehem/bethany-beyond-the-jordan politicalHistory) | ~90k / ~12k | ~350 | ~7,150 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-02 media fixes (capernaum IGO license string, nain image replacement) | ~40k / ~6k | ~55 | ~7,205 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 re-verification (7 fixed records + capernaum/nain media re-checked against original evidence; found nain's replacement images still not fully resolved) | ~120k / ~20k | ~300 | ~7,505 |

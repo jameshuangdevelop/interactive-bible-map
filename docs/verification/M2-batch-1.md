@@ -1,24 +1,53 @@
 # M2 batch 1 verification report — Jerusalem, Judea and Galilee (M2-02, Phase C)
 
+## Re-verification (2026-09-23, after research-lead commit `f33c4fb` and media-curator commits `866cbea`/`b4ecb15`)
+
+All 7 flagged records were re-checked against their original evidence, not re-verified on trust. **6 of 7 fixes are correct; all 7 records now pass and are `verified`.** Of the 2 flagged media files, `capernaum` is fixed; **`nain` is still not fixed** — the replacement image set introduces a *new* wrong-place image.
+
+| Item | Verdict | Detail |
+|---|---|---|
+| `galilee.json` politicalHistory | **Fixed** | Now `-4→39` Antipas / `39→44` Agrippa I / `44→70` Roman province — matches every sibling Galilee record. The stray "6→41 Roman province" entry and the text/`toYear` mismatch are both gone. |
+| `jerusalem.json` scripture | **Fixed** | Luke 10:38 and John 3:22 removed; `scripture.length` confirmed 174 (was 176). Re-running the validator confirms warnings dropped by exactly 2 (jerusalem: 35→33; batch total: 68→66), with 0 errors — no new issues introduced. |
+| `gethsemane.json` confidence | **Fixed** | Now `medium`, with the two ~200 m-apart denominational-tradition caveat added to `support`, matching the recommendation exactly. |
+| `jericho.json` candidates | **Fixed** | Tulul Abu al-'Alayiq added as a second candidate, `coordinateSource: wikidata:Q2460244` (re-fetched live: 35.436238, 31.851872 — exact match, and not `osm:`-prefixed), cross-cited to `openbible:jericho-2`. The Herodian/Roman-period identification of this site is well-established mainstream archaeology (Netzer's excavations), consistent with the record's own history text. Two independent sources per candidate, same standard already used elsewhere in this batch (e.g. `temple-mount`). |
+| `temple-mount.json` scope disclosure | **Fixed** | A third `history` entry now states the 7 references are "a representative sample... not an exhaustive list." |
+| `bethlehem.json` politicalHistory | **Fixed** | Full 5-entry chain added, now matching the standard Judea-group template used by `bethany`/`jericho`/`emmaus`. |
+| `bethany-beyond-the-jordan.json` politicalHistory | **Fixed** | Initial `-37→-4` Herod the Great entry added ahead of the existing Antipas/Agrippa I/Roman-province chain. |
+| `data/media/capernaum.json` image 2 license | **Fixed** | Now `"CC BY-SA 3.0 IGO"` with `licenseUrl` `https://creativecommons.org/licenses/by-sa/3.0/igo/` — re-fetched and confirmed a genuine, distinct Creative Commons legal instrument (same Attribution/ShareAlike terms, plus IGO dispute-resolution clause). |
+| `data/media/nain.json` | **Still failing — not fixed.** | See §6.3 below: one of the two replacement images is in the wrong *country*, and the other's actual Commons license is not one this project accepts. |
+
+All 22 location records now carry `status: "verified"`. `npm run validate:data`: 0 errors, 66 warnings. `npm test`: 26/26 passing (2 new tests, added for IGO license support in the schema).
+
+### 6.3 `nain.json` re-check — still not resolved
+
+Re-fetched both new images' full Commons metadata (categories, description, license) directly, not from the media record's claim:
+
+- **`Nain.jpg`** (claimed: CC0, Ian Philp, "Village of Nain (Nein) in Galilee") — **wrong place, again.** Its own Commons description reads "A panorama of Nain **from Mount Sophie**, September 2011," and its categories are "Bodies of water in **Canada**," "**Nain, Newfoundland and Labrador**," "Buildings in Nain, Newfoundland and Labrador." This is Nain, an Inuit community in Nunatsiavut, **Labrador, Canada** — an unrelated place that merely shares a name with the Galilean village. This repeats the exact failure mode from the first round (then Iran, now Canada). The license/author metadata itself is accurately recorded (CC0, Ian Philp) — only the location is wrong. **Remove.**
+- **`Niin_120.jpg`** (claimed: CC BY 2.0, Ori~, "Church of the Resurrection of the Widow's Son, Nein") — **content is correct** (Commons category "Church of the Resurrection of the Widow's Son (Nein)" is the actual Franciscan church commemorating Luke 7's miracle in Nein, Israel; no ambiguity). **License is mislabeled and, once corrected, is not an accepted license.** The file's own wikitext uses the bare `{{attribution}}` template ("Attribution only license" — confirmed via `Commons:Template:Attribution`), a generic, non-versioned, non-Creative-Commons permission grant ("the copyright holder... allows anyone to use it for any purpose, provided attribution"), not a specific "CC BY 2.0" legal instrument as recorded. This does not match any of the three accepted bands (`Public domain`/`CC0`, `CC BY <version>`, `CC BY-SA <version>`) — it is a distinct, uncodified grant, in the same spirit as the GFDL/FAL/GPL-only files LICENSES.md already excludes despite being freely hosted on Commons. **Do not use as currently licensed;** find a differently-licensed image, or escalate to the PO for an ADR if the project wants to expand the accepted bands to include Commons' generic "Attribution only license" tag.
+
+**`nain.json` therefore needs a third round: remove `Nain.jpg` entirely, and replace `Niin_120.jpg` with either a correctly-identified CC0/CC BY/CC BY-SA image, or omit media for this location per the task card's fallback rule if none can be found.**
+
 Independently verified by the Fact-Checker & Licensing agent on 2026-09-23. Coordinates were re-fetched live from Wikidata (REST API `wikibase/v1/entities/items/<id>/statements`), DARE (`imperium.ahlfeldt.se/api/geojson.php`) and Pleiades (`pleiades.stoa.org/places/<id>/json`) — not taken on trust from the Research Lead's cited values. Image licenses were re-read from the Wikimedia Commons API (`action=query&prop=imageinfo&iiprop=extmetadata`), not from the media record's own claim. Scripture claims were checked against the actual WEB verse text already embedded in each record; all 68 validator warnings were individually reviewed (not just 15 spot-checked). Nothing in this report was accepted on the Research Lead's or Media Curator's word.
 
-**Scope:** 22 location records, 22 media files (32 images), the 10 new `bib:` bibliography entries, and the M2-01 `data/reference/` snapshot row.
+**Scope:** 22 location records, media files (32 images as of the first pass, 33 after the `nain.json` media fix attempt), the 10 new `bib:` bibliography entries, and the M2-01 `data/reference/` snapshot row.
 
-## Needs-change summary (fix required before re-verification)
+## Needs-change summary — current status (updated after re-verification)
 
-| # | Item | Owner | Exact change required |
+All record-level items (1 fix pending confirmation aside) and one of two flagged media items are now resolved. **One item remains open:**
+
+| # | Item | Owner | Status |
 |---|---|---|---|
-| 1 | `data/media/nain.json` | media-curator | **Remove immediately.** The only image, `Arriving Na'in (1040189092).jpg`, is a 2005 photo tagged on Commons "2005 in Iran" by a cycle-touring photographer (sibling category "Cycling in Isfahan"). It depicts **Na'in, Isfahan Province, Iran** — an unrelated desert town on the Isfahan–Yazd road — not Nain/Nein in Galilee. Find a genuine free image of Nein, Israel, or omit media for this location per the task card's fallback rule. |
-| 2 | `data/locations/galilee.json` `politicalHistory` | research-lead | Entry 2's own text reads "(4 BC – AD 39)" but its `toYear` field is `6`; entry 3 ("Roman province of Judaea," 6–41) never applied to Galilee, which stayed under Herodian client rule the whole period. Every sibling Galilee record (`nazareth`, `capernaum`, `cana`, `chorazin`, `magdala`, `nain`, `sea-of-galilee`, `bethsaida`) instead uses `-4→39` (Antipas), `39→44` (Agrippa I), `44→70` (Roman province). Apply that same template to `galilee.json` — it is currently the only Galilee-region record using the wrong (Judea) template. |
-| 3 | `data/locations/jerusalem.json` `scripture[43]` (Luke 10:38) | research-lead | Text is "a certain village" — no mention of Jerusalem or any alternate name; the only identification (via John 11:1) is **Bethany**, which already has its own record in this batch. Remove this entry from `jerusalem.json`, or add a `sources` justification if a dataset genuinely ties it to Jerusalem. |
-| 4 | `data/locations/jerusalem.json` `scripture[70]` (John 3:22) | research-lead | Text names "Judea," not Jerusalem; the same verse is already correctly included in `judea.json`. Remove the duplicate from `jerusalem.json` (its narrated activity — baptizing in the Judean countryside — is not set in Jerusalem itself). |
-| 5 | `data/media/capernaum.json`, second image | media-curator | Commons' own license for `Sites_of_Christianity_in_the_Galillee_-_Ruins_of_the_ancient_Great_Synagogue_at_Capernaum...jpg` is **CC BY-SA 3.0 IGO** (a UNESCO-produced file — see its `CC-BY-SA-3.0-IGO` category), not plain "CC BY-SA 3.0" as recorded. Correct the `license` string. (Decision: this IGO variant is accepted under the CC BY-SA band — see `docs/LICENSES.md`.) |
-| 6 | `data/locations/gethsemane.json` `confidence` | research-lead | `high` overstates certainty in the *exact* garden plot. The general area (foot of the Mount of Olives, across the Kidron from the Temple Mount) is not disputed, but at least two distinct denominational garden traditions (the Franciscan-custodied garden by the Church of All Nations, and the Russian Orthodox garden near the Church of Mary Magdalene, ~200 m apart) claim the site, and no first-century boundary of "the garden" itself is archaeologically fixed. Recommend downgrading to `medium`, or explicitly disclosing the multi-tradition caveat in `support` (as `magdala.json` already does for its own coordinate spread). |
-| 7 | `data/locations/jericho.json` coordinate scope | research-lead | The candidate point is Tell es-Sultan (the Old Testament–era mound), but the record's own `history` and all six `scripture` entries concern the *Gospel-era* city, which its own text says had "shifted about two kilometers south" by the first century (cited as `wikidata:Q2460244`, never used as a candidate). Either add the Herodian/Roman-period site as a second candidate, or add a sentence to `support` explaining why the OT tell was kept as the sole representative point for a record whose content is mostly NT. |
-| 8 | `data/locations/temple-mount.json` scripture scope | research-lead | The 7-entry list is a reasonable, deliberately curated sample (not every "temple" mention, of which the NT has 100+) — but this choice is disclosed only in the (uncommitted) PR body, not in the record itself. Add one sentence to `summary` or a `history` entry stating that the list is representative, not exhaustive. |
-| 9 | `data/locations/bethlehem.json` and `bethany-beyond-the-jordan.json` `politicalHistory` | research-lead | Minor/optional. `bethlehem.json` has only its `-37→-4` (Herod the Great) entry, unlike every sibling Judea-group record (`bethany`, `jericho`, `emmaus`), which carries the full 5-entry chain through AD 70. `bethany-beyond-the-jordan.json` is missing the initial `-37→-4` entry that every other record (including its own Perea/Antipas-template siblings) has. Neither is factually wrong, just inconsistent; complete them for uniformity if convenient. |
+| 1 | `data/media/nain.json` | media-curator | **Still open — see §6.3.** First fix removed the Iran image but replaced it with `Nain.jpg` (Nain, **Newfoundland and Labrador, Canada** — still the wrong country) plus `Niin_120.jpg` (correct place, but its actual Commons license is a generic, non-versioned `{{attribution}}` grant, not "CC BY 2.0" as recorded, and not one of the three accepted bands). Remove `Nain.jpg`; replace or correctly re-license `Niin_120.jpg`. |
+| 2 | `data/locations/galilee.json` `politicalHistory` | research-lead | **Resolved**, confirmed in re-verification. |
+| 3 | `data/locations/jerusalem.json` scripture (Luke 10:38, John 3:22) | research-lead | **Resolved**, confirmed in re-verification. |
+| 4 | *(merged into #3)* | — | — |
+| 5 | `data/media/capernaum.json` license | media-curator | **Resolved**, confirmed in re-verification. |
+| 6 | `data/locations/gethsemane.json` confidence | research-lead | **Resolved**, confirmed in re-verification. |
+| 7 | `data/locations/jericho.json` coordinate scope | research-lead | **Resolved**, confirmed in re-verification. |
+| 8 | `data/locations/temple-mount.json` scripture scope | research-lead | **Resolved**, confirmed in re-verification. |
+| 9 | `bethlehem.json`/`bethany-beyond-the-jordan.json` politicalHistory | research-lead | **Resolved**, confirmed in re-verification. |
 
-**Everything else — all other content, all coordinates, all disputed-site framing, all other images, all licensing, all political-history entries not listed above — passed.**
+**Everything else — all other content, all coordinates, all disputed-site framing, all other images, all licensing, all political-history entries not listed above — passed** (original pass, unchanged by this round).
 
 ## 1. Location records (22)
 
@@ -26,20 +55,20 @@ Independently verified by the Fact-Checker & Licensing agent on 2026-09-23. Coor
 
 | Record | Verdict | Notes |
 |---|---|---|
-| `jerusalem` | **Needs-change** | Coordinate, summary, history, politicalHistory, and 173/176 scripture entries pass; see items 3–4 above. |
+| `jerusalem` | Pass → `verified` | Coordinate, summary, history, politicalHistory pass; scripture mis-links fixed (176→174 entries). |
 | `judea` | Pass → `verified` | |
-| `galilee` | **Needs-change** | See item 2 above; everything else (coordinate, summary, scripture, 58/72 warning-flagged verses) passes. |
-| `temple-mount` | **Needs-change** | See item 8; coordinate, candidate, summary and all 7 scripture entries pass. |
+| `galilee` | Pass → `verified` | politicalHistory template fixed; everything else (coordinate, summary, scripture) passes. |
+| `temple-mount` | Pass → `verified` | Scope-disclosure sentence added; coordinate, candidate, summary and all 7 scripture entries pass. |
 | `pool-of-bethesda` | Pass → `verified` | |
 | `pool-of-siloam` | Pass → `verified` | |
 | `mount-of-olives` | Pass → `verified` | |
-| `gethsemane` | **Needs-change** | See item 6. |
+| `gethsemane` | Pass → `verified` | Confidence corrected to `medium` with multi-tradition disclosure. |
 | `golgotha` | Pass → `verified` | Disputed site — see §3. |
-| `bethlehem` | **Needs-change** | See item 9 (minor). |
+| `bethlehem` | Pass → `verified` | politicalHistory chain completed. |
 | `bethany` | Pass → `verified` | |
-| `jericho` | **Needs-change** | See item 7. |
+| `jericho` | Pass → `verified` | Herodian/Roman-era candidate added, independently confirmed. |
 | `emmaus` | Pass → `verified` | Disputed site — see §3. |
-| `bethany-beyond-the-jordan` | **Needs-change** | See item 9 (minor). Disputed site — see §3. |
+| `bethany-beyond-the-jordan` | Pass → `verified` | politicalHistory initial entry added. Disputed site — see §3. |
 | `nazareth` | Pass → `verified` | |
 | `capernaum` | Pass → `verified` | |
 | `bethsaida` | Pass → `verified` | Disputed site — see §3. |
@@ -49,7 +78,7 @@ Independently verified by the Fact-Checker & Licensing agent on 2026-09-23. Coor
 | `nain` | Pass → `verified` | Identification is genuinely secure (name continuity to modern Nein, Eusebius' *Onomasticon*); `confidence: high` is justified. Its *media* file fails — see item 1. |
 | `sea-of-galilee` | Pass → `verified` | |
 
-**15 of 22 records now carry `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`. 7 records remain `draft` pending the fixes above; re-submit for re-verification once changed.**
+**All 22 of 22 records now carry `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`** (15 in the first pass, the remaining 7 confirmed and marked in this re-verification round).
 
 ### 1.2 Coordinates — independently re-fetched, not taken on trust
 
@@ -84,18 +113,19 @@ The Magdala image's own embedded EXIF GPS metadata (32.827069, 35.513552) indepe
 
 ## 2. Scripture verification
 
-Counts match exactly: `jerusalem` 176, `galilee` 72, `judea` 52, `temple-mount` 7.
+Counts at initial verification: `jerusalem` 176, `galilee` 72, `judea` 52, `temple-mount` 7. After the fix, `jerusalem` is now 174 (Luke 10:38 and John 3:22 removed; confirmed by re-reading `scripture.length` and by the validator's warning count dropping by exactly 2).
 
-**All 68 validator warnings were individually reviewed** (not just the 15 required by the task): jerusalem 35, galilee 14, judea 7, nazareth 3, bethlehem 2, capernaum 2, emmaus 2, bethany 1, golgotha 1, sea-of-galilee 1. Categorized:
+**All 68 (now 66) validator warnings were individually reviewed** (not just the 15 required by the task): jerusalem 35→33, galilee 14, judea 7, nazareth 3, bethlehem 2, capernaum 2, emmaus 2, bethany 1, golgotha 1, sea-of-galilee 1. Categorized:
 
 - **Periphrasis the automated name-matcher can't recognize** ("the holy city," "David's city," "his own country," "the great city... where their Lord was crucified," "the Skull" for "Place of a Skull," "Judah" for "Judea," "the Galilean(s)," "Herod's jurisdiction/the tetrarch" for Galilee) — legitimate, no change needed.
 - **Same-pericope continuation verses** immediately adjacent to an explicit naming (confirmed by reading the surrounding context, e.g. Mark 10:17 sits directly before Mark 10:32–33, which names Jerusalem twice in the same continuous episode) — legitimate.
 - **One genuine manuscript-variant crux** at Luke 4:44 (WEB "Galilee" vs. the critical text's "Judea," both correctly represented per project convention) — legitimate and well-disclosed.
-- **Two genuine mis-links**, both in `jerusalem.json` — see needs-change items 3–4. These are not periphrasis or continuation; the verses' own identifiable place is a different location entirely.
+- **Two genuine mis-links found in the first pass, both in `jerusalem.json` — now fixed** (Luke 10:38, John 3:22; see the Re-verification section above).
 
-`temple-mount`'s curated (non-exhaustive) 7-verse scope is a reasonable editorial choice — see item 8 for the one documentation gap. All OT references confirmed present only in `otConnections`, never in `scripture[]`.
+`temple-mount`'s curated (non-exhaustive) 7-verse scope is a reasonable editorial choice, now explicitly disclosed in the record's own `history`. All OT references confirmed present only in `otConnections`, never in `scripture[]`.
 
 ## 3. Disputed sites
+
 
 All five required disputed sites (`golgotha`, `emmaus`, `bethany-beyond-the-jordan`, `bethsaida`, `cana`) list every candidate current scholarship treats as serious, in neutral language that takes no side between church tradition and archaeology:
 
@@ -117,31 +147,34 @@ Full cross-file dump reviewed (not spot-checked). Result: one significant error 
 
 All summary, history, and caption text read is descriptive and hedged ("popularized," "traditional," "some scholars," "widely agreed," "recent excavations... have led some modern scholars to favor") with no side taken on any live dispute. The three `temple-mount` captions ("The Dome of the Rock, one of the most iconic structures on the Temple Mount"; "The Western Wall and Dome of the Rock in the Old City of Jerusalem"; "The Dome of the Rock and Western Wall in Jerusalem") are purely descriptive, with no sovereignty, religious-primacy, or political framing.
 
-## 6. Media / images (22 files, 32 images)
+## 6. Media / images (22 files, 32 images initially; 33 after the `nain.json` re-fix attempt)
 
-Every image's license and author were re-read live from the Wikimedia Commons API (`extmetadata.LicenseShortName`, `extmetadata.Artist`), not taken from the media record's own claim. Content was cross-checked against each file's Commons categories/description (and, for one file, embedded EXIF GPS).
+Every image's license and author were re-read live from the Wikimedia Commons API (`extmetadata.LicenseShortName`, `extmetadata.Artist`), not taken from the media record's own claim. Content was cross-checked against each file's Commons categories/description (and, for two files, embedded EXIF GPS/description text).
 
-### 6.1 Results
+### 6.1 Results (after re-verification)
 
-- **31 of 32 images: license, author and depicted location all confirmed correct.** Full per-file license/author cross-check is in §6.2.
-- **1 needs-change**: `capernaum.json`'s second image is recorded as "CC BY-SA 3.0" but Commons' own page shows **CC BY-SA 3.0 IGO** (a UNESCO-produced file) — see needs-change item 5. Author and depicted content (Capernaum's Byzantine-era synagogue ruins) are correct.
-- **1 fail**: `nain.json`'s only image depicts **Na'in, Iran**, not Nain, Israel — see needs-change item 1. This is exactly the "picture of the wrong place" failure mode the task warned about from an earlier batch.
+- **31 of 33 images: license, author and depicted location all confirmed correct**, including `capernaum`'s second image, now correctly re-licensed `CC BY-SA 3.0 IGO`. Full per-file license/author cross-check is in §6.2.
+- **1 fail**: `nain.json`'s `Nain.jpg` depicts **Nain, Newfoundland and Labrador, Canada**, not Nain, Israel — see §6.3. Second consecutive wrong-place image for this location (first Iran, now Canada).
+- **1 needs-change**: `nain.json`'s `Niin_120.jpg` depicts the correct place (confirmed: Commons category "Church of the Resurrection of the Widow's Son (Nein)") but is licensed under a generic, non-versioned Commons `{{attribution}}` grant, not "CC BY 2.0" as recorded, and not one of the three accepted license bands — see §6.3.
 
 ### 6.2 Per-file license/author confirmation (Commons vs. recorded)
 
-All of the following matched exactly: `jerusalem` (Nettadi, CC BY-SA 3.0); `golgotha` ×2 (Berthold Werner, CC BY-SA 3.0; Bukvoed, CC BY 4.0); `temple-mount` ×3 (Godot13, CC BY-SA 4.0; Yourway-to-israel, CC BY-SA 3.0; Berthold Werner, Public domain); `pool-of-bethesda` ×3 (Berthold Werner, Public domain; Ariely, CC BY 3.0; Krupski Oleg, CC BY-SA 3.0); `bethlehem` ×2 (Neil Ward, CC BY 2.0; Ian and Wendy Sewell, CC BY-SA 3.0); `capernaum` image 1 (Berthold Werner, Public domain); `bethany-beyond-the-jordan` ×2 (Bahnfrend, CC BY-SA 4.0; krebsmaus07, CC BY 2.0); `jericho` ×2 (Daniel Case, CC BY-SA 3.0; Tamarah, CC BY 3.0); `bethany` (Rijksmuseum, CC0); `emmaus` (Emmaus, CC BY-SA 3.0); `nazareth` (Zairon, CC BY-SA 4.0); `bethsaida` (Chmee2, CC BY 3.0); `cana` (Owenglyndur, CC BY 4.0); `magdala` (AVRAM GRAICER, CC BY-SA 3.0); `chorazin` (Zeev Stein/Pikiwiki, CC BY 2.5); `sea-of-galilee` ×2 (Юкатан, CC BY-SA 3.0; Kimberlyblaker, CC BY-SA 3.0); `gethsemane` (Mlevitt1, CC BY-SA 4.0); `mount-of-olives` (Godot13, CC BY-SA 4.0); `pool-of-siloam` (Aleksei m, CC BY-SA 4.0); `judea` (Rh0809, CC BY-SA 4.0); `galilee` (AdrianAbdulBaha, CC BY-SA 4.0). All licenses fall within the accepted PD/CC BY/CC BY-SA bands. `nain` (Peter Dunning, CC BY 2.0 — license itself is fine; the image is the wrong place, see item 1). `capernaum` image 2 (Eddie Gerald, license mismatch — see item 5).
+All of the following matched exactly: `jerusalem` (Nettadi, CC BY-SA 3.0); `golgotha` ×2 (Berthold Werner, CC BY-SA 3.0; Bukvoed, CC BY 4.0); `temple-mount` ×3 (Godot13, CC BY-SA 4.0; Yourway-to-israel, CC BY-SA 3.0; Berthold Werner, Public domain); `pool-of-bethesda` ×3 (Berthold Werner, Public domain; Ariely, CC BY 3.0; Krupski Oleg, CC BY-SA 3.0); `bethlehem` ×2 (Neil Ward, CC BY 2.0; Ian and Wendy Sewell, CC BY-SA 3.0); `capernaum` ×2 (Berthold Werner, Public domain; Eddie Gerald, **CC BY-SA 3.0 IGO** — re-fetched and confirmed a genuine, distinct CC legal instrument at `creativecommons.org/licenses/by-sa/3.0/igo/`); `bethany-beyond-the-jordan` ×2 (Bahnfrend, CC BY-SA 4.0; krebsmaus07, CC BY 2.0); `jericho` ×2 (Daniel Case, CC BY-SA 3.0; Tamarah, CC BY 3.0); `bethany` (Rijksmuseum, CC0); `emmaus` (Emmaus, CC BY-SA 3.0); `nazareth` (Zairon, CC BY-SA 4.0); `bethsaida` (Chmee2, CC BY 3.0); `cana` (Owenglyndur, CC BY 4.0); `magdala` (AVRAM GRAICER, CC BY-SA 3.0); `chorazin` (Zeev Stein/Pikiwiki, CC BY 2.5); `sea-of-galilee` ×2 (Юкатан, CC BY-SA 3.0; Kimberlyblaker, CC BY-SA 3.0); `gethsemane` (Mlevitt1, CC BY-SA 4.0); `mount-of-olives` (Godot13, CC BY-SA 4.0); `pool-of-siloam` (Aleksei m, CC BY-SA 4.0); `judea` (Rh0809, CC BY-SA 4.0); `galilee` (AdrianAbdulBaha, CC BY-SA 4.0). All licenses fall within the accepted PD/CC BY/CC BY-SA(-IGO) bands. `nain` — see §6.3 for both images.
 
 ## 7. New sources and licensing decisions
 
 - **10 new `bib:` bibliography entries** (Rainey & Notley; Arav; Notley & Aviam; Taylor; Hutton; McCollough; Reich & Shukron; UNESCO Al-Maghtas; INPA Korazim; Ritmeyer): all are cite-only academic/institutional works, never quoted or closely paraphrased in the records. This is already covered by the existing "copyrighted academic works — cite only" rule in `docs/LICENSES.md`'s do-not-use list; **no new ATTRIBUTION.md rows required.**
-- **CC BY-SA 3.0 IGO** (found on one Commons image, §6.1): **accepted**, added to `docs/LICENSES.md` as a documented decision — this IGO variant carries the same Attribution/ShareAlike permissions as standard CC BY-SA, differing only in UN/IGO-specific jurisdiction/immunity boilerplate. The Media Curator must still record the exact variant string, not the plain version number (item 5).
-- **`data/reference/` public-domain row (added in M2-01)**: confirmed accurate. Re-verified the committed snapshot's SHA-256 independently (`Get-FileHash`) — matches `engwebp_snapshot_metadata.json` exactly (`bd5f4ac0...9833`) — and spot-checked its content (e.g. `MAT 1:1`) against the known WEB text. `docs/LICENSES.md`'s existing row correctly states public domain per ADR-0012; no change needed.
+- **CC BY-SA 3.0 IGO** (found on the Capernaum UNESCO image): **accepted**, added to `docs/LICENSES.md` as a documented decision — this IGO variant carries the same Attribution/ShareAlike permissions as standard CC BY-SA, differing only in UN/IGO-specific jurisdiction/immunity boilerplate. Confirmed fixed and re-verified this round.
+- **Commons' bare `{{Attribution}}` / "Attribution only license" tag** (found on `Niin_120.jpg`, §6.3): **not accepted.** Per `Commons:Template:Attribution`, this is a generic, uncodified, non-versioned permission statement, not a specific Creative Commons legal instrument — it does not match any of the three accepted bands (`Public domain`/`CC0`, `CC BY <version>`, `CC BY-SA <version>`), in the same way GFDL-only, FAL-only, and GPL/LGPL-only files are already excluded despite being freely hosted on Commons. This is a **new do-not-use decision**, recorded for future reference in case the same tag recurs.
+- **`data/reference/` public-domain row (added in M2-01)**: confirmed accurate (unchanged from the first pass). Re-verified the committed snapshot's SHA-256 independently (`Get-FileHash`) — matches `engwebp_snapshot_metadata.json` exactly (`bd5f4ac0...9833`) — and spot-checked its content (e.g. `MAT 1:1`) against the known WEB text. `docs/LICENSES.md`'s existing row correctly states public domain per ADR-0012; no change needed.
 
 ## 8. Acceptance criteria status
 
-- [x] All 22 records exist and validate (`npm run validate:data`: 0 errors, 68 reviewed warnings; `npm test`: 24/24 passing).
+- [x] All 22 records exist and validate (`npm run validate:data`: 0 errors, 66 reviewed warnings; `npm test`: 26/26 passing).
 - [x] All 5 disputed sites list every serious candidate, neutrally, with fitting confidence.
 - [x] Every coordinate has ≥2 independent sources; none OSM-derived; none swapped.
 - [x] All `textWEB` matches WEB (validator-enforced).
-- [ ] All image licenses confirmed on their Commons page — 31/32 confirmed correct; 1 needs a corrected license string (item 5); 1 needs removal for depicting the wrong place (item 1).
-- [ ] 7 of 22 records need the fixes listed above before they can be marked `verified`; 15 are done.
+- [ ] All image licenses confirmed on their Commons page and every image confirmed to depict its location — 31/33 confirmed fully correct; `nain.json` still has one wrong-place image and one wrongly/non-acceptably licensed image (§6.3).
+- [x] **All 22 of 22 records now pass and are marked `verified`.**
+- [ ] `nain.json`'s media file is the only remaining open item in the whole batch.
+
