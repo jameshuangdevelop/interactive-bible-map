@@ -4,20 +4,22 @@
 
 This inventory evaluates open datasets for biblical place identification, ancient
 Roman-era geography, modern basemaps, the WEB Bible text, images, and citable
-scholarly references, before any project data is written. All candidates named in
-the brief were reviewed, plus the World English Bible's own publisher. Licenses
-were read directly from each source's own site. OpenBible.info and Pleiades are
-CC BY; DARE and OpenStreetMap-derived AWMC data are share-alike (CC BY-SA 3.0 /
-ODbL 1.0); ORBIS's downloadable dataset is CC BY 3.0 but its interactive web app's
-own terms could not be confirmed; Wikidata is CC0; Natural Earth is public domain;
-Wikimedia Commons requires a per-file license read via its API. The WEB Bible
-(eBible.org) is public domain, though its name is trademarked. A ten-place
-spot-check across OpenBible.info, Pleiades, DARE, and Wikidata found solid coverage
-of first-century cities, sparse-to-absent coverage of small Galilee villages in
-DARE, and multiple recorded candidate sites for Bethsaida, Cana, and Emmaus,
-consistent with their disputed status. Five licensing questions are raised for the
-Fact-Checker, chiefly about share-alike propagation when combining sources of
-different licenses into one dataset.
+scholarly references, before any project data is written. All brief candidates
+were reviewed, plus the WEB's own publisher. Licenses were read directly from
+each source's own site. OpenBible.info and Pleiades are CC BY; DARE and
+OpenStreetMap-derived AWMC data are share-alike (CC BY-SA 3.0 / ODbL 1.0);
+ORBIS's dataset is CC BY 3.0 but its web app's own terms are unconfirmed;
+Wikidata is CC0; Natural Earth is public domain; Wikimedia Commons needs a
+per-file license read via its API. The WEB Bible (eBible.org) is public domain
+though its name is trademarked; only its Protestant-canon-only editions
+(`engwebp`/`engwebpb`) fit the brief's 66-book canon, and the choice between
+them is left to the human at CP1. A ten-place spot-check across OpenBible.info,
+Pleiades, DARE, and Wikidata found solid coverage of first-century cities,
+including small Galilee villages once each source's own ancient-name form was
+searched, and multiple recorded candidates for Bethsaida, Cana, and Emmaus,
+consistent with their disputed status. Five licensing questions are raised for
+the Fact-Checker, chiefly about share-alike propagation when combining sources
+of different licenses into one dataset.
 
 ## Overview table
 
@@ -32,7 +34,7 @@ different licenses into one dataset.
 | Wikimedia Commons | Images | Varies per file (CC BY / CC BY-SA / PD only; no NC/fair-use) | Per file | Per file (many share-alike) | `commons:` | Primary for images |
 | Natural Earth | Modern coastlines/borders | Public domain | No | None | `naturalearth:` (feature `ne_id`) | Primary for modern basemap (subject to M1-02) |
 | OpenStreetMap-based data | Modern names/roads/borders | ODbL 1.0 (data); CC BY-SA 2.0 (docs) | Yes | Share-alike | `osm:` | Cross-check / basemap only |
-| eBible.org (World English Bible) | Bible text | Public domain (name trademarked) | No (customary) | None | scripture ref (no ID needed) | Primary and only Bible text source |
+| eBible.org (World English Bible) | Bible text | Public domain (name trademarked) | No (customary) | None | scripture ref (no ID needed) | Primary; Protestant-canon-only edition (`engwebp` or `engwebpb`), human picks at CP1 |
 | Wikipedia | Background/cite-only | CC BY-SA 4.0 / GFDL | Yes | Share-alike | `wikipedia:` | Cite only, summarize in own words |
 | Perseus Digital Library | Ancient primary texts, cite-only | Not fully verified (see below) | Unknown | Unknown | `perseus:` (CTS URN) | Cite only, license unverified |
 
@@ -41,14 +43,14 @@ different licenses into one dataset.
 ### 1. Biblical place identification and coordinates
 
 #### OpenBible.info Bible Geocoding
-- **URL / maintainer:** <https://www.openbible.info/geo/>; a single volunteer maintainer (the site's own FAQ gives no name, only "I graduated from Wheaton College, Illinois (2000)").
-- **Coverage:** Catalogs every identifiable place in the Protestant Bible (Old and New Testament), with modern candidate identifications and a confidence score drawn from "over seventy modern sources" (per the project's GitHub README). All 10 spot-check places were found, several with multiple recorded candidates.
+- **URL / maintainer:** <https://www.openbible.info/geo/>; a single volunteer maintainer whose "About" section describes relevant undergraduate coursework and personal travel to biblical sites, but no professional credentials in biblical geography, and gives no name.
+- **Coverage:** Catalogs every identifiable place in the Protestant Bible (Old and New Testament), with modern candidate identifications and a confidence score drawn from more than seventy modern scholarly sources, per the project's own count in its GitHub README. All 10 spot-check places were found, several with multiple recorded candidates.
 - **Format / API:** Static HTML atlas and per-place pages; structured bulk data as JSON Lines (`ancient.jsonl`, `modern.jsonl`, `geometry.jsonl`, `image.jsonl`, `source.jsonl`) in the GitHub repo `openbibleinfo/Bible-Geocoding-Data`; also KML/KMZ and a thumbnail-image archive.
 - **License:** CC BY 4.0 for the core dataset, per the "Can I Use These Files?" section of <https://www.openbible.info/geo/> and the repo's own README at <https://github.com/openbibleinfo/Bible-Geocoding-Data> (both read 2026-09-23). Some location data comes from OpenStreetMap and stays under OSM's ODbL license. Image licenses vary per photo.
 - **Attribution:** Credit OpenBible.info.
 - **Share-alike / NC / ND:** None on the core CC BY 4.0 data; the OSM-derived portion is ODbL (share-alike).
 - **Stable ID:** The record's `url_slug`, e.g. `openbible:capernaum`.
-- **Known quality issues:** A single-maintainer synthesis of secondary sources (the site itself says "I don't have any special qualifications, only a lot of free time"), not a peer-reviewed institutional gazetteer; useful precisely because it aggregates and scores many other sources' opinions.
+- **Known quality issues:** A single-maintainer synthesis of secondary sources — the site's own FAQ disclaims any special scholarly qualifications, describing the effort instead as a matter of time invested — not a peer-reviewed institutional gazetteer; useful precisely because it aggregates and scores many other sources' opinions.
 - **Recommended use:** Primary source for biblical place identification and for enumerating candidate sites at disputed locations.
 
 #### Pleiades
@@ -66,12 +68,12 @@ different licenses into one dataset.
 
 #### Digital Atlas of the Roman Empire (DARE)
 - **URL / maintainer:** <http://imperium.ahlfeldt.se/> (also documented elsewhere as `dare.ht.lu.se`, which did not resolve — DNS lookup failed — during this research); Johan Åhlfeldt, Lund University.
-- **Coverage:** Roman-era administrative and urban settlements empire-wide. The spot-check found Jerusalem, Nazareth, Antioch (Syria), Ephesus, Corinth, and Philippi, plus two disputed-site pairs (Bethsaida ×2; Cana ×2, with Kafr Kanna marked uncertain "Kana?" and Qana, Lebanon marked "certain"). Capernaum was absent under both its ancient and modern names.
-- **Format / API:** Interactive map plus a live GeoJSON API (`imperium.ahlfeldt.se/api/geojson.php`, parameters `bbox`/`point`/`id`/`ass` [ancient name]/`mss` [modern name]/`pleiades`), confirmed working during this research.
-- **License:** CC BY-SA 3.0, per <https://imperium.ahlfeldt.se/print.php?doc=info_api> (read 2026-09-23) — share-alike: derivative works must be distributed "only under the same or similar license."
+- **Coverage:** Roman-era administrative and urban settlements empire-wide. The spot-check found all 10 places, including Jerusalem, Nazareth, Antioch (Syria), Ephesus, Corinth, Philippi, Capernaum (`dare:33337`), plus two disputed-site pairs (Bethsaida ×2; Cana ×2, with Kafr Kanna marked uncertain "Kana?" and Qana, Lebanon marked "certain"). Capernaum initially appeared absent because the ancient- and modern-name search fields use DARE's own toponyms — "Kefar Nahum/Kapharnaoum" (ancient) and "Tell Hum" (modern) — rather than the English name "Capernaum," which only appears in a linked Wikipedia tag; searching by the site's Latin/Greek or local name (or cross-referencing its linked Pleiades ID, 678231) finds it.
+- **Format / API:** Interactive map plus a live GeoJSON API (`imperium.ahlfeldt.se/api/geojson.php`, parameters `bbox`/`point`/`id`/`ass` [ancient name]/`mss` [modern name]/`pleiades`), confirmed working during this research. Because `ass`/`mss` do plain substring matching against DARE's own toponym fields, a place should be looked up by its ancient/modern DARE name (or by a linked Pleiades/Wikidata ID) rather than by its common English name alone.
+- **License:** CC BY-SA 3.0, per <https://imperium.ahlfeldt.se/print.php?doc=info_api> (read 2026-09-23) — share-alike: DARE's own terms require that any work built on its data be shared under the same or a comparably open license.
 - **Attribution:** Link to `imperium.ahlfeldt.se` or the relevant DARE page.
 - **Stable ID:** The numeric `id` property returned by the API, e.g. `dare:21094` for Antioch.
-- **Known quality issues:** Sparse coverage of small Galilee villages (no Capernaum record found under any name tested); some near-duplicate records for the same disputed site at different precisions.
+- **Known quality issues:** Some near-duplicate records exist for the same disputed site at different precisions (e.g. two Bethsaida records); the ancient/modern name fields store DARE's own toponyms, so English-name substring searches can produce false negatives (see Capernaum above).
 - **Recommended use:** Cross-check for Roman-era city coordinates and as scholarly-source context for the ancient layer (M4). Its CC BY-SA share-alike term needs Fact-Checker sign-off before combining with CC BY sources in one dataset.
 
 #### ORBIS (Stanford)
@@ -98,9 +100,9 @@ different licenses into one dataset.
 #### Natural Earth
 - **URL / maintainer:** <https://www.naturalearthdata.com/>; Tom Patterson and Nathaniel Vaughn Kelso, with contributors.
 - **Coverage:** Modern-world basemap vector/raster data at three scales (1:10m, 1:50m, 1:110m): coastlines, countries, populated places, physical features. Not first-century-specific; it would supply the "Modern" toggle's coastline/border layer. Choice of exact scale/layer is the GIS Engineer's call (M1-02).
-- **License:** Public domain, per <https://www.naturalearthdata.com/about/terms-of-use/> (read 2026-09-23) — "No permission is needed... Crediting the authors is unnecessary," though citing "Made with Natural Earth" is invited.
+- **License:** Public domain, per <https://www.naturalearthdata.com/about/terms-of-use/> (read 2026-09-23) — the authors state that no permission or attribution is needed to use the data, though citing "Made with Natural Earth" is invited.
 - **Stable ID:** Recent releases carry a feature-level `ne_id`; no biblical-place-specific IDs.
-- **Known quality issues:** None found for licensing. Some upstream contributors (The Washington Post, EC JRC IES, XNR Productions) granted Natural Earth a non-exclusive license "for the sole purpose of creating a world base map" — this does not restrict our reuse of the resulting public-domain product, but the Fact-Checker should be aware of it.
+- **Known quality issues:** None found for licensing. Some upstream contributors (The Washington Post, EC JRC IES, XNR Productions) granted Natural Earth a non-exclusive license limited to building Natural Earth's own world base map — this does not restrict our reuse of the resulting public-domain product, but the Fact-Checker should be aware of it.
 - **Recommended use:** Primary candidate for the modern basemap's coastlines/borders, subject to M1-02's tile/hosting decision; no share-alike concerns.
 
 #### OpenStreetMap-based data
@@ -113,15 +115,21 @@ different licenses into one dataset.
 
 ### 4. WEB Bible text
 
-#### eBible.org — World English Bible (WEB)
-- **URL / maintainer:** <https://ebible.org/eng-web/> (also mirrored at <https://eBible.org/web/> and <https://WorldEnglish.Bible>); eBible.org / Michael Paul Johnson.
-- **Coverage:** The complete WEB translation (Old Testament, New Testament, Apocrypha/Deuterocanon), 2020 stable-text edition, "Classic" American-English variant (uses "Yahweh" for God's name in the Old Testament). Other WEB variants (British spelling, "LORD"/"GOD" instead of "Yahweh") are separate downloads on the same site.
-- **Format / API:** Per-book HTML pages and a downloadable HTML zip (`eng-web_html.zip`); other machine-readable formats (e.g. USFM) are listed in eBible.org's catalog for this and related WEB editions.
-- **License:** Public domain — "not copyrighted" — per <https://ebible.org/find/details.php?id=eng-web> (read 2026-09-23). "World English Bible" is a trademark of eBible.org: a modified text must not be called "World English Bible."
+#### eBible.org — World English Bible (WEB) editions
+- **URL / maintainer:** <https://ebible.org/> ; eBible.org / Michael Paul Johnson.
+- **Coverage:** eBible.org publishes several WEB editions that differ in how the Old Testament renders God's name, in US vs. British/international spelling, and in whether the Deuterocanon/Apocrypha is included. The brief fixes the canon to the 66-book Protestant Bible, so only Protestant-canon-only editions are in scope. The "Classic" edition (`eng-web`) and its British counterpart (`eng-webbe`) both include the Apocrypha/Deuterocanon per their own pages, so neither is used here.
+- **Protestant-canon-only editions found (each verified on its own page, read 2026-09-23):**
+
+  | eBible ID | Name | Divine name (OT) | Spelling | Canon | Machine-readable formats |
+  |---|---|---|---|---|---|
+  | `engwebp` | World English Bible Protestant Edition | "LORD"/"GOD" | US | 66 books only | HTML zip (`engwebp_html.zip`) and USFM zip (`engwebp_usfm.zip`), both confirmed downloadable at `ebible.org/Scriptures/` |
+  | `engwebpb` | World English Bible British Edition (Protestant) | "LORD"/"GOD" | British/international | 66 books only | HTML and USFM zip (`engwebpb_usfm.zip`), confirmed downloadable at `ebible.org/Scriptures/` |
+
+- **License:** Both editions are public domain, carrying no copyright, per their own pages (<https://ebible.org/find/details.php?id=engwebp> and `.../engwebpb`, both read 2026-09-23). "World English Bible" remains a trademark of eBible.org for both: a modified text may not be labeled with that name.
 - **Attribution:** Not legally required (public domain), but because of the trademark, our app should not label any edited or excerpted text as "the World English Bible" if it diverges from the source text.
 - **Stable ID:** Not needed — cite scripture directly by standard book:chapter:verse reference, which is already the project's citation convention.
-- **Known quality issues:** None found; confirms hard rule #3 (WEB only, public domain).
-- **Recommended use:** Primary and only Bible-text source, per brief §2.3 and hard rule #3.
+- **Known quality issues:** None found.
+- **Recommended use:** Primary and only Bible-text source, per brief §2.3 and hard rule #3. This inventory does not choose between `engwebp` and `engwebpb` — the US-vs-British spelling choice is the human's decision at CP1. The one firm recommendation is that whichever edition is chosen must be a Protestant-canon-only package (`engwebp` or `engwebpb`), not `eng-web`/`eng-webbe`, since the latter two include the Apocrypha/Deuterocanon and would break the brief's 66-book canon rule.
 
 ### 5. Images
 
@@ -149,7 +157,7 @@ IDs only; no coordinates recorded (coordinates come in M2). "Candidates" counts 
 | Place | OpenBible.info | Pleiades | DARE | Wikidata | Candidates found |
 |---|---|---|---|---|---|
 | Jerusalem | `openbible:jerusalem` | `pleiades:687928` | `dare:15896` | `wikidata:Q1218` | 1 (undisputed) |
-| Capernaum | `openbible:capernaum` | `pleiades:678231` | absent (checked ancient + modern name) | `wikidata:Q59174` | 2 in OpenBible.info (Tell Hum; Khirbet Minyeh) — Tell Hum is the near-consensus site |
+| Capernaum | `openbible:capernaum` | `pleiades:678231` | `dare:33337` (found by searching DARE's own ancient toponym "Kapharnaoum"/modern "Tell Hum"; the English name "Capernaum" alone returns no result) | `wikidata:Q59174` | 2 in OpenBible.info (Tell Hum; Khirbet Minyeh) — Tell Hum is the near-consensus site |
 | Bethsaida | `openbible:bethsaida-1` + `openbible:bethsaida-2` | `pleiades:678065` | `dare:21665` + `dare:33272` | `wikidata:Q501773` | 4 in OpenBible.info (et-Tell, el-'Araj, el-Mes'adiye, Tabgha); DARE and Pleiades each record et-Tell/el-'Araj as one candidate. Genuinely disputed. |
 | Cana | `openbible:cana` | `pleiades:678220` (Kafr Kanna, ISR, marked "less-certain") + `pleiades:678219` (Qana, Lebanon, marked "certain") | `dare:43765` (Kafr Kanna, marked uncertain "Kana?") + `dare:43764` (Qana, Lebanon) | `wikidata:Q2633158` (Kafr Kanna candidate) | 3 in OpenBible.info (Horbat Qana, Kefr Kenna, Ain Qana); sources disagree on which site is "certain." Genuinely disputed. |
 | Emmaus | `openbible:emmaus` | `pleiades:687891` (Emmaus/Nicopolis = Imwas only) | `dare:21656` (Emmaus/Nicopolis = Imwas only) | `wikidata:Q165887` | 6 in OpenBible.info (Qalunya, Emmaus Nicopolis, El Qubeibeh, Artas, Khirbet Khamasa, Abu Ghosh); Pleiades and DARE model only the Nicopolis/Imwas candidate as a record. Genuinely disputed. |
