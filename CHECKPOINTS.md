@@ -4,8 +4,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 
 | CP | Milestone | Deliverable | Status | PR |
 |---|---|---|---|---|
-| CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | **Awaiting review** | — |
-| CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Not started | |
+| CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | Approved 2026-09-23 | #2 |
+| CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | **In progress** | |
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Not started | |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Not started | |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Not started | |
@@ -36,7 +36,7 @@ flowchart TD
 Agent definitions are in `.github/agents/`. Model choices and fallbacks are in ADR-0003, and the reviewer's vendor rule is in ADR-0004 ([DECISIONS.md](docs/DECISIONS.md)).
 
 ### Plan
-**How work flows.** The PO writes a task card. The human opens a new Copilot Chat, picks the agent and model on the card, and pastes it. The agent works on its own branch, commits, and prints the push and PR commands. The human runs `pr-reviewer` on the PR and merges. Cards for a milestone are written when it starts, so each one builds on the latest results.
+**How work flows.** The PO writes a task card. The human opens a new Copilot Chat, picks the agent and model on the card, and pastes it. The agent works on its own branch, commits, and prints the push and PR commands. The human runs `pr-reviewer` on the PR and merges. Cards for a milestone are written when it starts, so each one builds on the latest results. When the human asks the PO to drive from Copilot CLI, the PO runs the cards as subagents instead (ADR-0007).
 
 **M1 — Research & Options** (the first two cards are ready)
 
