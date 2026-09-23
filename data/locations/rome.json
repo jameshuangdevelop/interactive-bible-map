@@ -1,0 +1,113 @@
+{
+  "id": "rome",
+  "names": {
+    "ancient": [
+      "Rome",
+      "Roma"
+    ],
+    "modern": "Rome (Italy)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Rome (historic center)",
+      "coordinates": [
+        12.491258,
+        41.889977
+      ],
+      "coordinateSource": "pleiades:423025",
+      "confidence": "high",
+      "support": "Rome's location as capital of the Roman Empire is undisputed; Pleiades and Wikidata's coordinates for the historic city center agree closely.",
+      "sources": [
+        "pleiades:423025",
+        "wikidata:Q220"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Rome was the capital of the Roman Empire. Acts ends with Paul under house arrest there awaiting trial, and Paul's letter to the Romans is addressed to the believers already established in the city before his arrival.",
+    "sources": [
+      "pleiades:423025",
+      "wikidata:Q220",
+      "openbible:rome"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Acts 18:2",
+      "book": "Acts",
+      "textWEB": "He found a certain Jew named Aquila, a man of Pontus by race, who had recently come from Italy with his wife Priscilla, because Claudius had commanded all the Jews to depart from Rome. He came to them,"
+    },
+    {
+      "ref": "Acts 19:21",
+      "book": "Acts",
+      "textWEB": "Now after these things had ended, Paul determined in the Spirit, when he had passed through Macedonia and Achaia, to go to Jerusalem, saying, “After I have been there, I must also see Rome.”"
+    },
+    {
+      "ref": "Acts 23:11",
+      "book": "Acts",
+      "textWEB": "The following night, the Lord stood by him and said, “Cheer up, Paul, for as you have testified about me at Jerusalem, so you must testify also at Rome.”"
+    },
+    {
+      "ref": "Acts 25:25",
+      "book": "Acts",
+      "textWEB": "But when I found that he had committed nothing worthy of death, and as he himself appealed to the emperor, I determined to send him,"
+    },
+    {
+      "ref": "Acts 25:27",
+      "book": "Acts",
+      "textWEB": "For it seems to me unreasonable, in sending a prisoner, not to also specify the charges against him.”"
+    },
+    {
+      "ref": "Acts 28:14",
+      "book": "Acts",
+      "textWEB": "where we found brothers, and were entreated to stay with them for seven days. So we came to Rome."
+    },
+    {
+      "ref": "Acts 28:15",
+      "book": "Acts",
+      "textWEB": "From there the brothers, when they heard of us, came to meet us as far as The Market of Appius and The Three Taverns. When Paul saw them, he thanked God and took courage."
+    },
+    {
+      "ref": "Acts 28:16",
+      "book": "Acts",
+      "textWEB": "When we entered into Rome, the centurion delivered the prisoners to the captain of the guard, but Paul was allowed to stay by himself with the soldier who guarded him."
+    },
+    {
+      "ref": "Acts 28:30",
+      "book": "Acts",
+      "textWEB": "Paul stayed two whole years in his own rented house and received all who were coming to him,"
+    },
+    {
+      "ref": "Romans 1:7",
+      "book": "Romans",
+      "textWEB": "to all who are in Rome, beloved of God, called to be saints: Grace to you and peace from God our Father and the Lord Jesus Christ."
+    },
+    {
+      "ref": "Romans 1:15",
+      "book": "Romans",
+      "textWEB": "So as much as is in me, I am eager to preach the Good News to you also who are in Rome."
+    },
+    {
+      "ref": "Romans 15:24",
+      "book": "Romans",
+      "textWEB": "whenever I travel to Spain, I will come to you. For I hope to see you on my journey, and to be helped on my way there by you, if first I may enjoy your company for a while."
+    },
+    {
+      "ref": "2 Timothy 1:17",
+      "book": "2 Timothy",
+      "textWEB": "but when he was in Rome, he sought me diligently and found me"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

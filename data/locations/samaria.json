@@ -1,0 +1,140 @@
+{
+  "id": "samaria",
+  "names": {
+    "ancient": [
+      "Samaria"
+    ],
+    "modern": "Northern West Bank (around Nablus and Sebastia)",
+    "alternate": [
+      "Shomron"
+    ]
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Samaria (historical hill-country region)",
+      "coordinates": [
+        35.190436,
+        32.276529
+      ],
+      "coordinateSource": "pleiades:44836840",
+      "confidence": "high",
+      "support": "The region name derives from the city of Samaria, capital of the northern kingdom of Israel, and denotes the central hill country between Galilee and Judea in both Old and New Testament use. The representative point given here (a modern gazetteer province marker) agrees closely with Wikidata's coordinate for the region.",
+      "sources": [
+        "pleiades:44836840",
+        "wikidata:Q1294629"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Samaria is the hill-country region of the central Levant lying between Galilee to the north and Judea to the south, named after the city of Samaria that Omri made capital of the northern kingdom of Israel. In the New Testament it denotes the same region under Roman-era administration, the setting for John 4 and much of Acts 8.",
+    "sources": [
+      "pleiades:44836840",
+      "wikidata:Q1294629",
+      "openbible:samaria-2"
+    ]
+  },
+  "history": [
+    {
+      "text": "The city of Samaria was founded as capital of the northern kingdom of Israel and gave its name to the surrounding region; the kingdom and its capital fell to the Neo-Assyrian empire in the eighth century BC.",
+      "sources": [
+        "pleiades:44836840",
+        "openbible:samaria-1"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 17:11",
+      "book": "Luke",
+      "textWEB": "As he was on his way to Jerusalem, he was passing along the borders of Samaria and Galilee."
+    },
+    {
+      "ref": "John 4:4",
+      "book": "John",
+      "textWEB": "He needed to pass through Samaria."
+    },
+    {
+      "ref": "John 4:5",
+      "book": "John",
+      "textWEB": "So he came to a city of Samaria called Sychar, near the parcel of ground that Jacob gave to his son Joseph."
+    },
+    {
+      "ref": "John 4:7",
+      "book": "John",
+      "textWEB": "A woman of Samaria came to draw water. Jesus said to her, “Give me a drink.”"
+    },
+    {
+      "ref": "John 4:9",
+      "book": "John",
+      "textWEB": "The Samaritan woman therefore said to him, “How is it that you, being a Jew, ask for a drink from me, a Samaritan woman?” (For Jews have no dealings with Samaritans.)"
+    },
+    {
+      "ref": "Acts 1:8",
+      "book": "Acts",
+      "textWEB": "But you will receive power when the Holy Spirit has come upon you. You will be witnesses to me in Jerusalem, in all Judea and Samaria, and to the uttermost parts of the earth.”"
+    },
+    {
+      "ref": "Acts 8:1",
+      "book": "Acts",
+      "textWEB": "Saul was consenting to his death. A great persecution arose against the assembly which was in Jerusalem in that day. They were all scattered abroad throughout the regions of Judea and Samaria, except for the apostles."
+    },
+    {
+      "ref": "Acts 8:5",
+      "book": "Acts",
+      "textWEB": "Philip went down to the city of Samaria and proclaimed to them the Christ."
+    },
+    {
+      "ref": "Acts 8:9",
+      "book": "Acts",
+      "textWEB": "But there was a certain man, Simon by name, who used to practice sorcery in the city and amazed the people of Samaria, making himself out to be some great one,"
+    },
+    {
+      "ref": "Acts 8:14",
+      "book": "Acts",
+      "textWEB": "Now when the apostles who were at Jerusalem heard that Samaria had received the word of God, they sent Peter and John to them,"
+    },
+    {
+      "ref": "Acts 8:25",
+      "book": "Acts",
+      "textWEB": "They therefore, when they had testified and spoken the word of the Lord, returned to Jerusalem, and preached the Good News to many villages of the Samaritans."
+    },
+    {
+      "ref": "Acts 9:31",
+      "book": "Acts",
+      "textWEB": "So the assemblies throughout all Judea, Galilee, and Samaria had peace and were built up. They were multiplied, walking in the fear of the Lord and in the comfort of the Holy Spirit."
+    },
+    {
+      "ref": "Acts 15:3",
+      "book": "Acts",
+      "textWEB": "They, being sent on their way by the assembly, passed through both Phoenicia and Samaria, declaring the conversion of the Gentiles. They caused great joy to all the brothers."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "1 Kings 16:24",
+      "note": "Omri, king of Israel, purchases the hill of Samaria and builds his capital city there, the event from which the region later takes its name.",
+      "sources": [
+        "openbible:samaria-1",
+        "pleiades:44836840"
+      ]
+    },
+    {
+      "ref": "2 Kings 17:5",
+      "note": "The Assyrian king besieges Samaria, the event that begins the fall of the northern kingdom of Israel.",
+      "sources": [
+        "openbible:samaria-1"
+      ]
+    },
+    {
+      "ref": "2 Kings 17:6",
+      "note": "Samaria falls and its population is deported by Assyria, ending the northern kingdom of Israel.",
+      "sources": [
+        "openbible:samaria-1"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -1,0 +1,87 @@
+{
+  "id": "thessalonica",
+  "names": {
+    "ancient": [
+      "Thessalonica"
+    ],
+    "modern": "Thessaloniki (Greece)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Thessaloniki (historic center)",
+      "coordinates": [
+        22.952885,
+        40.628342
+      ],
+      "coordinateSource": "pleiades:491741",
+      "confidence": "high",
+      "support": "Thessaloniki has been continuously inhabited on this site since its Hellenistic founding and is undisputed as ancient Thessalonica. Wikidata's point for the modern city center lies about 1.9 km from Pleiades' representative point for the ancient city, a difference consistent with the two datasets marking different features (modern city centroid versus ancient walled city) within a large, continuously occupied urban area.",
+      "sources": [
+        "pleiades:491741",
+        "wikidata:Q17151"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Thessalonica was the capital of the Roman province of Macedonia and a major port on the Via Egnatia. Paul founded a church there on his second missionary journey, later writing 1 and 2 Thessalonians to its believers.",
+    "sources": [
+      "pleiades:491741",
+      "wikidata:Q17151",
+      "openbible:thessalonica"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 17:1",
+      "book": "Acts",
+      "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+    },
+    {
+      "ref": "Acts 17:11",
+      "book": "Acts",
+      "textWEB": "Now these were more noble than those in Thessalonica, in that they received the word with all readiness of mind, examining the Scriptures daily to see whether these things were so."
+    },
+    {
+      "ref": "Acts 17:13",
+      "book": "Acts",
+      "textWEB": "But when the Jews of Thessalonica had knowledge that the word of God was proclaimed by Paul at Beroea also, they came there likewise, agitating the multitudes."
+    },
+    {
+      "ref": "Acts 20:4",
+      "book": "Acts",
+      "textWEB": "These accompanied him as far as Asia: Sopater of Beroea, Aristarchus and Secundus of the Thessalonians, Gaius of Derbe, Timothy, and Tychicus and Trophimus of Asia."
+    },
+    {
+      "ref": "Acts 27:2",
+      "book": "Acts",
+      "textWEB": "Embarking in a ship of Adramyttium, which was about to sail to places on the coast of Asia, we put to sea, Aristarchus, a Macedonian of Thessalonica being with us."
+    },
+    {
+      "ref": "Philippians 4:16",
+      "book": "Philippians",
+      "textWEB": "For even in Thessalonica you sent once and again to my need."
+    },
+    {
+      "ref": "1 Thessalonians 1:1",
+      "book": "1 Thessalonians",
+      "textWEB": "Paul, Silvanus, and Timothy, to the assembly of the Thessalonians in God the Father and the Lord Jesus Christ: Grace to you and peace from God our Father and the Lord Jesus Christ."
+    },
+    {
+      "ref": "2 Thessalonians 1:1",
+      "book": "2 Thessalonians",
+      "textWEB": "Paul, Silvanus, and Timothy, to the assembly of the Thessalonians in God our Father and the Lord Jesus Christ:"
+    },
+    {
+      "ref": "2 Timothy 4:10",
+      "book": "2 Timothy",
+      "textWEB": "for Demas left me, having loved this present world, and went to Thessalonica; Crescens to Galatia; and Titus to Dalmatia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

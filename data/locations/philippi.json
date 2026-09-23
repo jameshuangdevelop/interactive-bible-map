@@ -1,0 +1,65 @@
+{
+  "id": "philippi",
+  "names": {
+    "ancient": [
+      "Philippi",
+      "Krenides"
+    ],
+    "modern": "Filippoi (near Kavala, Greece)",
+    "alternate": [
+      "Colonia Iulia Augusta Philippensis"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Philippi archaeological site",
+      "coordinates": [
+        24.284637,
+        41.012651
+      ],
+      "coordinateSource": "pleiades:501482",
+      "confidence": "high",
+      "support": "The extensive excavated remains near modern Krinides, a UNESCO World Heritage Site, are undisputed as ancient Philippi; Pleiades and Wikidata's coordinates agree closely.",
+      "sources": [
+        "pleiades:501482",
+        "wikidata:Q379652"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Philippi was a Roman colony in Macedonia, founded by Philip II of Macedon on an earlier Thasian settlement and refounded as a colony after the battle fought nearby in 42 BC. Acts describes it as the first city in Macedonia where Paul preached, resulting in the conversion of Lydia and Paul and Silas's imprisonment.",
+    "sources": [
+      "pleiades:501482",
+      "wikidata:Q379652",
+      "openbible:philippi"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 16:12",
+      "book": "Acts",
+      "textWEB": "and from there to Philippi, which is a city of Macedonia, the foremost of the district, a Roman colony. We were staying some days in this city."
+    },
+    {
+      "ref": "Acts 20:6",
+      "book": "Acts",
+      "textWEB": "We sailed away from Philippi after the days of Unleavened Bread, and came to them at Troas in five days, where we stayed seven days."
+    },
+    {
+      "ref": "Philippians 1:1",
+      "book": "Philippians",
+      "textWEB": "Paul and Timothy, servants of Jesus Christ, to all the saints in Christ Jesus who are at Philippi, with the overseers and servants:"
+    },
+    {
+      "ref": "1 Thessalonians 2:2",
+      "book": "1 Thessalonians",
+      "textWEB": "but having suffered before and been shamefully treated, as you know, at Philippi, we grew bold in our God to tell you the Good News of God in much conflict."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

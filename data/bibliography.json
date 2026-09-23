@@ -22,6 +22,31 @@
       "publisher": "eBible.org",
       "url": "https://ebible.org/find/details.php?id=engwebp",
       "accessed": "2026-09-23"
+    },
+    {
+      "id": "wagner-wilson-why-derbe",
+      "type": "article",
+      "title": "Why Derbe? An Unlikely Lycaonian City for Paul's Ministry",
+      "authors": [
+        "Bob Wagner",
+        "Mark Wilson"
+      ],
+      "year": 2019,
+      "journal": "Tyndale Bulletin",
+      "url": "https://www.sevenchurches.org/wp-content/uploads/2020/03/Why-Derbe-Wagner-Wilson-Tyndale-Bulletin.pdf",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "daahl-askar-site",
+      "type": "dataset",
+      "title": "Askar site record (DAAHL Site No. 353204210)",
+      "authors": [
+        "Digital Archaeological Atlas of the Holy Land (DAAHL)"
+      ],
+      "year": 2008,
+      "publisher": "University of California, San Diego",
+      "url": "https://daahl.ucsd.edu/DAAHL/SitesDataView.php?SiteNo=353204210",
+      "accessed": "2026-09-23"
     }
   ]
 }

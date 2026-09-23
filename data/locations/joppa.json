@@ -1,0 +1,117 @@
+{
+  "id": "joppa",
+  "names": {
+    "ancient": [
+      "Joppa",
+      "Yafo"
+    ],
+    "modern": "Jaffa (Tel Aviv-Yafo, Israel)",
+    "alternate": [
+      "Iafo"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Jaffa (Old Jaffa)",
+      "coordinates": [
+        34.75,
+        32.0535
+      ],
+      "coordinateSource": "pleiades:687931",
+      "confidence": "high",
+      "support": "Old Jaffa's tell and harbor have been continuously identified with ancient Joppa since antiquity and preserve occupation layers from the Bronze Age through the Roman period.",
+      "sources": [
+        "pleiades:687931",
+        "wikidata:Q7083682"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Joppa was an ancient Mediterranean port, the traditional embarkation point for cedar shipped to Jerusalem for temple building, and in Acts the town where Peter raised Tabitha and received his vision leading to Cornelius's household.",
+    "sources": [
+      "pleiades:687931",
+      "wikidata:Q7083682",
+      "openbible:joppa"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 9:36",
+      "book": "Acts",
+      "textWEB": "Now there was at Joppa a certain disciple named Tabitha, which when translated means Dorcas. This woman was full of good works and acts of mercy which she did."
+    },
+    {
+      "ref": "Acts 9:38",
+      "book": "Acts",
+      "textWEB": "As Lydda was near Joppa, the disciples, hearing that Peter was there, sent two men to him, imploring him not to delay in coming to them."
+    },
+    {
+      "ref": "Acts 9:42",
+      "book": "Acts",
+      "textWEB": "This became known throughout all Joppa, and many believed in the Lord."
+    },
+    {
+      "ref": "Acts 9:43",
+      "book": "Acts",
+      "textWEB": "He stayed many days in Joppa with a tanner named Simon."
+    },
+    {
+      "ref": "Acts 10:5",
+      "book": "Acts",
+      "textWEB": "Now send men to Joppa, and get Simon, who is also called Peter."
+    },
+    {
+      "ref": "Acts 10:8",
+      "book": "Acts",
+      "textWEB": "Having explained everything to them, he sent them to Joppa."
+    },
+    {
+      "ref": "Acts 10:23",
+      "book": "Acts",
+      "textWEB": "So he called them in and provided a place to stay. On the next day Peter arose and went out with them, and some of the brothers from Joppa accompanied him."
+    },
+    {
+      "ref": "Acts 10:32",
+      "book": "Acts",
+      "textWEB": "Send therefore to Joppa and summon Simon, who is also called Peter. He is staying in the house of a tanner named Simon, by the seaside. When he comes, he will speak to you.’"
+    },
+    {
+      "ref": "Acts 11:5",
+      "book": "Acts",
+      "textWEB": "“I was in the city of Joppa praying, and in a trance I saw a vision: a certain container descending, like it was a great sheet let down from heaven by four corners. It came as far as me."
+    },
+    {
+      "ref": "Acts 11:13",
+      "book": "Acts",
+      "textWEB": "He told us how he had seen the angel standing in his house and saying to him, ‘Send to Joppa and get Simon, who is called Peter,"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Jonah 1:3",
+      "note": "Jonah boards a ship at Joppa in his attempt to flee from his commission to Nineveh.",
+      "sources": [
+        "openbible:joppa"
+      ]
+    },
+    {
+      "ref": "2 Chronicles 2:16",
+      "note": "Cedar timber for Solomon's temple is floated to Joppa before being transported inland to Jerusalem.",
+      "sources": [
+        "openbible:joppa"
+      ]
+    },
+    {
+      "ref": "Ezra 3:7",
+      "note": "Cedar timber for the rebuilt post-exilic temple is again brought by sea to Joppa.",
+      "sources": [
+        "openbible:joppa"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -1,0 +1,63 @@
+{
+  "id": "caesarea-philippi",
+  "names": {
+    "ancient": [
+      "Caesarea Philippi",
+      "Paneas"
+    ],
+    "modern": "Banias",
+    "alternate": [
+      "Panias"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Banias (Paneas)",
+      "coordinates": [
+        35.693333,
+        33.246111
+      ],
+      "coordinateSource": "wikidata:Q2484244",
+      "confidence": "high",
+      "support": "Banias preserves the ancient name Paneas, the settlement Philip the Tetrarch enlarged and renamed Caesarea in his own honor (distinguishing it from the coastal Caesarea Maritima); the site's spring and grotto sacred to Pan are well attested archaeologically.",
+      "sources": [
+        "wikidata:Q2484244",
+        "pleiades:678324"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Caesarea Philippi was a city at the foot of Mount Hermon, at the principal spring source of the Jordan River, rebuilt and named by Philip the Tetrarch in honor of Augustus. It is the setting for Peter's confession of Jesus as the Christ.",
+    "sources": [
+      "pleiades:678324",
+      "wikidata:Q2484244",
+      "openbible:caesarea-philippi"
+    ]
+  },
+  "history": [
+    {
+      "text": "The site was long a shrine to the Greek god Pan, hence its earlier name Paneas; Philip the Tetrarch enlarged the settlement and renamed it Caesarea in Augustus's honor, adding his own name to distinguish it from the coastal city of the same name.",
+      "sources": [
+        "pleiades:678324",
+        "openbible:caesarea-philippi"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 16:13",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus came into the parts of Caesarea Philippi, he asked his disciples, saying, “Who do men say that I, the Son of Man, am?”"
+    },
+    {
+      "ref": "Mark 8:27",
+      "book": "Mark",
+      "textWEB": "Jesus went out, with his disciples, into the villages of Caesarea Philippi. On the way he asked his disciples, “Who do men say that I am?”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

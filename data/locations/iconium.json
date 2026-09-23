@@ -1,0 +1,73 @@
+{
+  "id": "iconium",
+  "names": {
+    "ancient": [
+      "Iconium",
+      "Claudiconium"
+    ],
+    "modern": "Konya (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Konya (ancient Iconium)",
+      "coordinates": [
+        32.492295,
+        37.872456
+      ],
+      "coordinateSource": "pleiades:648647",
+      "confidence": "high",
+      "support": "The modern city of Konya overlies ancient Iconium continuously; the identification is undisputed and Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:648647",
+        "wikidata:Q79857"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Iconium was a city of Lycaonia (later administratively linked with Galatia) that Paul and Barnabas visited on the first missionary journey, preaching in its synagogue before opposition drove them on to Lystra.",
+    "sources": [
+      "pleiades:648647",
+      "wikidata:Q79857",
+      "openbible:iconium"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 13:51",
+      "book": "Acts",
+      "textWEB": "But they shook off the dust of their feet against them, and came to Iconium."
+    },
+    {
+      "ref": "Acts 14:1",
+      "book": "Acts",
+      "textWEB": "In Iconium, they entered together into the synagogue of the Jews, and so spoke that a great multitude both of Jews and of Greeks believed."
+    },
+    {
+      "ref": "Acts 14:19",
+      "book": "Acts",
+      "textWEB": "But some Jews from Antioch and Iconium came there, and having persuaded the multitudes, they stoned Paul and dragged him out of the city, supposing that he was dead."
+    },
+    {
+      "ref": "Acts 14:21",
+      "book": "Acts",
+      "textWEB": "When they had preached the Good News to that city and had made many disciples, they returned to Lystra, Iconium, and Antioch,"
+    },
+    {
+      "ref": "Acts 16:2",
+      "book": "Acts",
+      "textWEB": "The brothers who were at Lystra and Iconium gave a good testimony about him."
+    },
+    {
+      "ref": "2 Timothy 3:11",
+      "book": "2 Timothy",
+      "textWEB": "persecutions, and sufferings—those things that happened to me at Antioch, Iconium, and Lystra. I endured those persecutions. The Lord delivered me out of them all."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -1,0 +1,73 @@
+{
+  "id": "athens",
+  "names": {
+    "ancient": [
+      "Athens",
+      "Athenae"
+    ],
+    "modern": "Athens (Greece)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Athens (historic center and Acropolis)",
+      "coordinates": [
+        23.723914,
+        37.971637
+      ],
+      "coordinateSource": "pleiades:579885",
+      "confidence": "high",
+      "support": "Athens is continuously inhabited and undisputed as the site of the New Testament city. Wikidata's point for the modern capital lies about 1.4 km from Pleiades' representative point for the ancient city, consistent with the two datasets marking slightly different reference features within the same urban area.",
+      "sources": [
+        "pleiades:579885",
+        "wikidata:Q1524"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Athens was the leading city of classical Greek philosophy and culture. Acts describes Paul addressing the Areopagus council there, engaging Epicurean and Stoic philosophers on the nature of the 'unknown god.'",
+    "sources": [
+      "pleiades:579885",
+      "wikidata:Q1524",
+      "openbible:athens"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 17:15",
+      "book": "Acts",
+      "textWEB": "But those who escorted Paul brought him as far as Athens. Receiving a commandment to Silas and Timothy that they should come to him very quickly, they departed."
+    },
+    {
+      "ref": "Acts 17:16",
+      "book": "Acts",
+      "textWEB": "Now while Paul waited for them at Athens, his spirit was provoked within him as he saw the city full of idols."
+    },
+    {
+      "ref": "Acts 17:21",
+      "book": "Acts",
+      "textWEB": "Now all the Athenians and the strangers living there spent their time in nothing else, but either to tell or to hear some new thing."
+    },
+    {
+      "ref": "Acts 17:22",
+      "book": "Acts",
+      "textWEB": "Paul stood in the middle of the Areopagus and said, “You men of Athens, I perceive that you are very religious in all things."
+    },
+    {
+      "ref": "Acts 18:1",
+      "book": "Acts",
+      "textWEB": "After these things Paul departed from Athens and came to Corinth."
+    },
+    {
+      "ref": "1 Thessalonians 3:1",
+      "book": "1 Thessalonians",
+      "textWEB": "Therefore when we couldn’t stand it any longer, we thought it good to be left behind at Athens alone,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

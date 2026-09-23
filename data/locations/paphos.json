@@ -1,0 +1,55 @@
+{
+  "id": "paphos",
+  "names": {
+    "ancient": [
+      "Paphos",
+      "Nea Paphos"
+    ],
+    "modern": "Kato Paphos (Cyprus)",
+    "alternate": [
+      "New Paphos"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Nea Paphos (Kato Paphos archaeological site)",
+      "coordinates": [
+        32.406593,
+        34.757212
+      ],
+      "coordinateSource": "pleiades:707586",
+      "confidence": "high",
+      "support": "Nea Paphos, a UNESCO World Heritage archaeological park, was the Roman-period capital of Cyprus and is the undisputed setting of Paul and Barnabas's encounter with the proconsul Sergius Paulus in Acts 13.",
+      "sources": [
+        "pleiades:707586",
+        "wikidata:Q22991943"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Paphos (Nea Paphos) was the Roman capital of the province of Cyprus, where Acts records that the proconsul Sergius Paulus believed after witnessing Paul's confrontation with the sorcerer Elymas.",
+    "sources": [
+      "pleiades:707586",
+      "wikidata:Q22991943",
+      "openbible:paphos"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 13:6",
+      "book": "Acts",
+      "textWEB": "When they had gone through the island to Paphos, they found a certain sorcerer, a false prophet, a Jew whose name was Bar Jesus,"
+    },
+    {
+      "ref": "Acts 13:13",
+      "book": "Acts",
+      "textWEB": "Now Paul and his company set sail from Paphos and came to Perga in Pamphylia. John departed from them and returned to Jerusalem."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}
