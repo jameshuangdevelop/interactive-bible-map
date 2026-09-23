@@ -17,6 +17,10 @@ All source links below were read **2026-09-23**.
 | **Worldview** | A worldview is a region-specific border/label representation for disputed areas. |
 | **Attribution** | Attribution is the legally required credit text for map data and map services. |
 | **PMTiles** | PMTiles is a single-file tiled-data archive that can be hosted on object storage. |
+| **XYZ tile URL** | An XYZ tile URL is a template like `/tiles/{z}/{x}/{y}.png`, where `z` is zoom and `x/y` are tile coordinates [S6][S48]. |
+| **ODbL** | ODbL is the Open Database License used for OpenStreetMap-derived databases, with attribution duties [S37]. |
+| **R2 Class A operation** | In Cloudflare R2, Class A operations are higher-cost state-changing/listing calls such as `PutObject` and `ListObjects` [S47]. |
+| **R2 Class B operation** | In Cloudflare R2, Class B operations are lower-cost read/lookup calls such as `GetObject` and `HeadObject` [S47]. |
 
 ## Traffic assumptions and math
 | Input | Hobby | Moderate | Notes |
@@ -24,10 +28,12 @@ All source links below were read **2026-09-23**.
 | Visits / month | 1,000 | 50,000 | Required by card |
 | Map initializations / visit | 1 | 1 | Session/map-load style billing assumption |
 | **Map sessions / month** | 1,000 | 50,000 | visits × 1 |
-| Tile/API requests / visit | 60 | 60 | Request-metered scenario assumption |
+| Tile/API requests / visit | 60 | 60 | Basis: initial map load + light pan/zoom path; **recalibrate from telemetry after M3** |
 | **Tile/API requests / month** | 60,000 | 3,000,000 | visits × 60 |
-| Hosting transfer / visit | 3 MB | 3 MB | Static app + JSON/GeoJSON assumption |
+| Hosting transfer / visit | 3 MB | 3 MB | Basis: JS bundle + styles + data payload after caching; **recalibrate after M3 telemetry** |
 | **Hosting transfer / month** | 3 GB | 150 GB | visits × 3 MB |
+| Hosting web/edge requests / visit | 40 | 40 | Basis: HTML + assets + API/data fetches for one map-screen journey; **recalibrate after M3 telemetry** |
+| **Hosting web/edge requests / month** | 40,000 | 2,000,000 | visits × 40 |
 | Backend API calls / visit (if used) | 3 | 3 | Search + detail lookups assumption |
 | **Backend API calls / month** | 3,000 | 150,000 | visits × 3 |
 
@@ -75,6 +81,8 @@ All source links below were read **2026-09-23**.
 **Modern recommendation:** **A. OpenFreeMap public vector styles**  
 **Modern runner-up:** **B. Protomaps PMTiles self-hosted on R2** (if we need stronger control/SLA via our own infra)
 
+**Production readiness note (launch gate):** because OpenFreeMap currently offers no SLA [S31], ship launch with tile-load error monitoring and a **pre-configured fallback basemap style** (for example Protomaps PMTiles self-host path [S37][S38] or another hosted free-tier style) that is switchable by config before go-live.
+
 ### 2.4 Ancient basemap implementation approaches (PO fix)
 | Approach | MapLibre fit | Data size/performance at ~300 places + ~8 province snapshots | Timeline layer switching | Contested-border policy fit | Cost (hobby / moderate) | Notes |
 |---|---|---|---|---|---:|---|
@@ -88,10 +96,10 @@ All source links below were read **2026-09-23**.
 ---
 
 ## 3) Hosting options (static app + PR previews from GitHub Actions)
-| Option | PR preview/deploy path | Limits behavior | Pros / Cons | Hobby cost | Moderate cost |
-|---|---|---|---|---:|---:|
-| **A. Cloudflare Pages** | Direct upload CI and GitHub Actions with Wrangler are documented [S50]. | Pages limits include 500 builds/month on Free [S39]. For delivery: static asset requests are explicitly free and unlimited on free and paid plans [S40]. Free plan price is $0; Pro plan listed at $20/mo annually ($25 monthly billing) [S41]. | **Pros:** $0 static traffic, straightforward CI path. **Cons:** monthly build count cap on Free. | **$0** | **$0** (static-only delivery model) |
-| **B. Vercel** | Preview deploys for each git push and GitHub Actions path documented [S43][S45]. | Hobby includes 100 GB transfer + 1M edge requests; overage can pause/limit use on Hobby [S42][S44]. Pro is $20/mo and includes larger quotas [S42]. | **Pros:** excellent preview workflow defaults. **Cons:** paid plan likely needed at moderate traffic + policy limits on Hobby. | **$0** | **$20** (Pro) |
+| Option | License / terms | PR preview/deploy path | Limits behavior | Pros / Cons (lock-in) | Hobby cost | Moderate cost |
+|---|---|---|---|---|---:|---:|
+| **A. Cloudflare Pages** | Proprietary hosted service under Cloudflare Self-Serve Subscription Agreement [S51]. | Direct upload CI and GitHub Actions with Wrangler are documented [S50]. | Pages limits include 500 builds/month on Free [S39]. For delivery: static asset requests are explicitly free and unlimited on free and paid plans [S40]. Free plan price is $0; Pro plan listed at $20/mo annually ($25 monthly billing) [S41]. | **Pros:** $0 static traffic, straightforward CI path. **Cons:** monthly build count cap on Free. **Lock-in:** low for static bundles (portable to other static hosts), medium if Pages Functions features are adopted. | **$0** | **$0** (static-only delivery model) |
+| **B. Vercel** | Proprietary hosted service under Vercel Terms of Service [S52]. | Preview deploys for each git push and GitHub Actions path documented [S43][S45]. | Hobby includes 100 GB transfer + 1M edge requests; overage can pause/limit use on Hobby [S42][S44]. Pro is $20/mo and includes larger quotas [S42]. | **Pros:** excellent preview workflow defaults. **Cons:** paid plan likely needed at moderate traffic + policy limits on Hobby. **Lock-in:** low/medium for static bundles; higher if project depends on Vercel-specific platform features. | **$0** | **$20** (Pro) |
 
 ### Hosting traffic math
 | Metric | Hobby | Moderate |
@@ -107,10 +115,10 @@ All source links below were read **2026-09-23**.
 ## 4) Is a backend needed?
 Expected M1 scope data (~300 places + timeline provinces/roads/routes) is small enough for static delivery first.
 
-| Option | What it means | Pricing/limits source | Hobby monthly | Moderate monthly | Pros | Cons |
-|---|---|---|---:|---:|---|---|
-| **A. No backend (static JSON + client search)** | Serve JSON/GeoJSON from static hosting | N/A | **$0** | **$0** | Lowest complexity and ops | Less control over analytics/auth/edit workflows |
-| **B. Small API + DB (Cloudflare Workers + D1)** | Search/filter API + optional editorial tooling | Workers + D1 pricing/quotas [S46] | **$0** | **$0** | Leaves growth path without major replatform | More moving parts than static |
+| Option | What it means | License / terms | Pricing/limits source | Hobby monthly | Moderate monthly | Pros | Cons |
+|---|---|---|---|---:|---:|---|---|
+| **A. No backend (static JSON + client search)** | Serve JSON/GeoJSON from static hosting | JSON/GeoJSON are open formats (GeoJSON RFC) [S53]; hosting still follows chosen provider terms (Cloudflare [S51] or Vercel [S52]). | N/A | **$0** | **$0** | Lowest complexity and ops; highest portability across hosts | Less control over analytics/auth/edit workflows |
+| **B. Small API + DB (Cloudflare Workers + D1)** | Search/filter API + optional editorial tooling | Proprietary managed services under Cloudflare Self-Serve terms [S51]. | Workers + D1 pricing/quotas [S46] | **$0** | **$0** | Leaves growth path without major replatform | More moving parts than static; moderate lock-in to Worker runtime/bindings |
 
 Why option B still estimates $0 here: 150k API calls/month is below Workers Free daily cap (100k/day), and D1 free limits are high for this usage profile [S46].
 
@@ -120,10 +128,11 @@ Why option B still estimates $0 here: 150k API calls/month is below Workers Free
 ---
 
 ## Risks and unknowns
-1. **OpenFreeMap public-instance quota/overage policy is unknown** in reviewed pages; only “free/public, no SLA yet” is explicit [S31].  
-2. **Protomaps storage cost depends on chosen extract size**, which is unknown before we choose region coverage and tile detail [S47].  
-3. **Mapbox-in-MapLibre estimates here model Vector Tiles API requests only**; any additional billable non-tile API usage in a final style stack is unknown from reviewed pages [S24][S26][S27].  
-4. **Ancient third-party tiles licensing compatibility** is intentionally deferred to M1-01/M1-03 per milestone split.  
+1. **OpenFreeMap public-instance quota/overage policy is unknown** in reviewed pages; “no SLA/personal support” is explicit [S31]. **Mitigation:** monitor tile-load failure rate from launch day and keep a config-switch fallback style ready before go-live.  
+2. **Fallback readiness is an execution risk**: Protomaps self-host requires medium/high setup [S37][S38], so fallback infra/style wiring must be prepared ahead of launch, not during an outage.  
+3. **Protomaps storage cost depends on chosen extract size**, which is unknown before we choose region coverage and tile detail [S47].  
+4. **Mapbox-in-MapLibre estimates here model Vector Tiles API requests only**; any additional billable non-tile API usage in a final style stack is unknown from reviewed pages [S24][S26][S27].  
+5. **Ancient third-party tiles licensing compatibility** is intentionally deferred to M1-01/M1-03 per milestone split.  
 
 ---
 
@@ -142,7 +151,7 @@ Why option B still estimates $0 here: 150k API calls/month is below Workers Free
 Use MapLibre renderers (`react-map-gl/maplibre` on web, `@maplibre/maplibre-react-native` for native later). This keeps renderer code open-source, supports vector tiles + GeoJSON overlays + clustering, and keeps an Expo migration path.
 
 ### ADR draft — Basemap and ancient mode
-Use OpenFreeMap for modern basemap in CP1, with explicit style rules to hide disputed boundaries when uncertain (`disputed=1` on OpenMapTiles boundary data). For ancient mode, ship project-owned GeoJSON overlays first (provinces/roads/routes by timeline year) on a neutral base. Keep PMTiles as the scale-up path when timeline datasets grow.
+Use OpenFreeMap for modern basemap in CP1, with explicit style rules to hide disputed boundaries when uncertain (`disputed=1` on OpenMapTiles boundary data). Because OpenFreeMap has no SLA [S31], launch only with a config-switch fallback basemap style pre-wired (for example Protomaps PMTiles self-host path [S37][S38] or an alternate hosted style). For ancient mode, ship project-owned GeoJSON overlays first (provinces/roads/routes by timeline year) on a neutral base. Keep PMTiles as the scale-up path when timeline datasets grow.
 
 ### ADR draft — Hosting
 Host static app/data on Cloudflare Pages and deploy via GitHub Actions + Wrangler. This preserves $0 static-request cost at the target traffic and provides preview deploy workflows.
@@ -205,3 +214,6 @@ Start with static JSON + client search. Add Workers + D1 only if profiling or ed
 | S48 | https://cawm.lib.uiowa.edu/index.html | CAWM raster tile endpoint and citation/license page |
 | S49 | https://raw.githubusercontent.com/klokantech/dare-raster-tiles/gh-pages/README.md | DARE raster tiles availability example |
 | S50 | https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/ | Cloudflare Pages CI deployment from GitHub Actions/Wrangler |
+| S51 | https://www.cloudflare.com/terms/ | Cloudflare Self-Serve Subscription Agreement (hosted service terms) |
+| S52 | https://vercel.com/legal/terms | Vercel Terms of Service (hosted service terms) |
+| S53 | https://datatracker.ietf.org/doc/html/rfc7946 | GeoJSON open standard reference |
