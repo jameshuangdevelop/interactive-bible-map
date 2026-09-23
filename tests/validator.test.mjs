@@ -70,6 +70,23 @@ test("media schema-invalid fixture fails", async () => {
   );
 });
 
+test("media fixture accepts CC BY-SA 3.0 IGO", async () => {
+  const result = await runCase("valid-media-igo-license");
+  assert.equal(result.errors.length, 0);
+});
+
+test("media fixture rejects malformed IGO variant", async () => {
+  const result = await runCase("invalid-media-igo-license");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("id must equal filename", async () => {
   const result = await runCase("invalid-id-filename");
   assert.ok(
