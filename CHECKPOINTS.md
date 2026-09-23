@@ -4,8 +4,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 
 | CP | Milestone | Deliverable | Status | PR |
 |---|---|---|---|---|
-| CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | **Awaiting review** | — |
-| CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Not started | |
+| CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | Approved 2026-09-23 | #2 |
+| CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | **In progress** | |
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Not started | |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Not started | |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Not started | |

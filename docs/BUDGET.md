@@ -74,3 +74,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
 |---|---|---|---|---|---:|---:|
 | 2026-09-22 | project-owner | Claude Opus 5.5 (Copilot CLI) | M0-01 setup & plan | ~130k / ~45k | ~500 | ~500 |
+| 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M1-00 kickoff and dispatch | ~110k / ~10k | ~150 | ~650 |
