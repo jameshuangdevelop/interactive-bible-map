@@ -1,0 +1,53 @@
+{
+  "id": "duplicate-id",
+  "names": {
+    "ancient": ["Duplicate A"],
+    "modern": "Duplicate A",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Example A",
+      "coordinates": [35.1, 32.1],
+      "coordinateSource": "wikidata:Q1218",
+      "confidence": "high",
+      "support": "Illustrative only.",
+      "sources": ["wikidata:Q1218", "openbible:capernaum"]
+    }
+  ],
+  "summary": {
+    "text": "Illustrative summary.",
+    "sources": ["wikipedia:Capernaum"]
+  },
+  "history": [
+    {
+      "text": "Illustrative history.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Mark 1:21",
+      "book": "Mark",
+      "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Illustrative note.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Illustrative only.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "status": "draft"
+}

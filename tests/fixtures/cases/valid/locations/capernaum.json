@@ -1,0 +1,56 @@
+{
+  "id": "capernaum",
+  "names": {
+    "ancient": ["Capernaum", "Kfar Nahum"],
+    "modern": "Kfar Nahum / Tell Hum",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Tell Hum",
+      "coordinates": [35.575, 32.88],
+      "coordinateSource": "pleiades:678180",
+      "confidence": "high",
+      "support": "Illustrative neutral support note only.",
+      "sources": ["pleiades:678180", "openbible:capernaum"]
+    }
+  ],
+  "summary": {
+    "text": "Illustrative summary for fixture testing only.",
+    "sources": ["wikipedia:Capernaum"]
+  },
+  "history": [
+    {
+      "text": "Illustrative history statement for tests only.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Mark 1:21-22",
+      "book": "Mark",
+      "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught. They were astonished at his teaching, for he taught them as having authority, and not as the scribes."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Illustrative Old Testament connection only.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Herod Antipas (illustrative only).",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

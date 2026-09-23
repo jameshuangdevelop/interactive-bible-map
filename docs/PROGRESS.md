@@ -14,7 +14,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 |---|---|---|---|---|---|
 | M0–M1 | Setup, research, stack, licenses | — | — | Merged (CP0, CP1 approved) | #2–#7 |
 | M2-00 | M2 kickoff: record CP1, write M2 cards | project-owner | `docs/m2-kickoff` | Done, PR pending | — |
-| M2-01 | Data schema, validation and CI | gis-engineer | `feat/m2-schema-validation` | In progress (subagent, ADR-0007) | — |
+| M2-01 | Data schema, validation and CI | gis-engineer | `feat/m2-schema-validation` | Done, PR pending review | — |
 | M2-02 | Core sites, batch 1 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Waits for M2-01 | — |
 | M2-03 | Core sites, batch 2 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Waits for M2-01 | — |
 | M2-04 | CP2 summary | project-owner | `docs/cp2-summary` | Planned | — |

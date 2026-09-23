@@ -1,0 +1,19 @@
+{
+  "name": "interactive-bible-map-data-tools",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Schema, validation, and scripture text tooling for Interactive Bible Map data.",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "fill:scripture": "node scripts/fill-scripture-text.mjs",
+    "test": "node --test",
+    "validate:data": "node scripts/validate-data.mjs"
+  },
+  "dependencies": {
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1"
+  }
+}

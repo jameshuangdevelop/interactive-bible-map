@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-bible-map/schemas/source-id.schema.json",
+  "title": "Source ID prefixes",
+  "description": "Allowed source ID prefixes and formats for citations in location and media records.",
+  "$defs": {
+    "openbibleSourceId": {
+      "type": "string",
+      "description": "OpenBible.info Bible Geocoding url_slug, for example openbible:capernaum.",
+      "pattern": "^openbible:[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "pleiadesSourceId": {
+      "type": "string",
+      "description": "Pleiades numeric place ID, for example pleiades:678231.",
+      "pattern": "^pleiades:[0-9]+$"
+    },
+    "dareSourceId": {
+      "type": "string",
+      "description": "Digital Atlas of the Roman Empire numeric ID, for example dare:21094.",
+      "pattern": "^dare:[0-9]+$"
+    },
+    "wikidataSourceId": {
+      "type": "string",
+      "description": "Wikidata QID, for example wikidata:Q1218.",
+      "pattern": "^wikidata:Q[0-9]+$"
+    },
+    "osmSourceId": {
+      "type": "string",
+      "description": "OpenStreetMap element identifier, for example osm:way/123456789.",
+      "pattern": "^osm:(?:node|way|relation)/[0-9]+$"
+    },
+    "naturalEarthSourceId": {
+      "type": "string",
+      "description": "Natural Earth feature ne_id, for example naturalearth:1159152091.",
+      "pattern": "^naturalearth:[0-9]+$"
+    },
+    "commonsSourceId": {
+      "type": "string",
+      "description": "Wikimedia Commons file title, for example commons:File:Example.jpg.",
+      "pattern": "^commons:File:.+$"
+    },
+    "orbisSourceId": {
+      "type": "string",
+      "description": "ORBIS dataset ID, for example orbis:1234.",
+      "pattern": "^orbis:[A-Za-z0-9._-]+$"
+    },
+    "awmcSourceId": {
+      "type": "string",
+      "description": "AWMC feature ID, for example awmc:1234.",
+      "pattern": "^awmc:[A-Za-z0-9._-]+$"
+    },
+    "wikipediaSourceId": {
+      "type": "string",
+      "description": "Wikipedia article title for citation only, for example wikipedia:Capernaum.",
+      "pattern": "^wikipedia:[A-Za-z0-9()'., _-]+$"
+    },
+    "perseusSourceId": {
+      "type": "string",
+      "description": "Perseus CTS URN for citation only, for example perseus:urn:cts:greekLit:tlg0526.",
+      "pattern": "^perseus:urn:cts:[A-Za-z0-9._:-]+$"
+    },
+    "sourceId": {
+      "description": "A citation ID that uses one of the approved prefixes.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/openbibleSourceId"
+        },
+        {
+          "$ref": "#/$defs/pleiadesSourceId"
+        },
+        {
+          "$ref": "#/$defs/dareSourceId"
+        },
+        {
+          "$ref": "#/$defs/wikidataSourceId"
+        },
+        {
+          "$ref": "#/$defs/osmSourceId"
+        },
+        {
+          "$ref": "#/$defs/naturalEarthSourceId"
+        },
+        {
+          "$ref": "#/$defs/commonsSourceId"
+        },
+        {
+          "$ref": "#/$defs/orbisSourceId"
+        },
+        {
+          "$ref": "#/$defs/awmcSourceId"
+        },
+        {
+          "$ref": "#/$defs/wikipediaSourceId"
+        },
+        {
+          "$ref": "#/$defs/perseusSourceId"
+        }
+      ]
+    }
+  }
+}
