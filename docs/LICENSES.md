@@ -1,16 +1,57 @@
 # Licenses
 
-License decisions for this project. Maintained by the Fact-Checker & Licensing agent. Every upstream source and its required attribution is listed in [ATTRIBUTION.md](../ATTRIBUTION.md).
+License decisions for this project. Maintained by the Fact-Checker & Licensing agent. Every upstream source and its required attribution is listed in [ATTRIBUTION.md](../ATTRIBUTION.md). Decisions below were made in M1-03 (`docs/verification/M1.md`), independently re-verifying every source's license on its own site on 2026-09-23.
 
 | Content | License | Status |
 |---|---|---|
 | Code | MIT ([LICENSE](../LICENSE)) | Decided |
-| Data and written content (`data/`, `content/`) | To be decided in M1-03, after the source inventory (M1-01). If upstream sources require it, this may be a share-alike license such as CC BY-SA 4.0. | Open |
-| Bible text | World English Bible (WEB), which the brief describes as public domain. The Fact-Checker confirms and cites the public-domain statement in M1-03. | To confirm |
-| Images | Hotlinked, never committed. Each image keeps its own license; the accepted licenses are listed below once decided. | Open |
+| `data/geo/` (geometry extracted from AWMC and OpenStreetmap-derived sources: ancient roads/provinces/coastlines, and any modern boundary/geometry pulled directly from OSM) | **ODbL 1.0** — required because extracting this content into our own database makes it a "Derivative Database" under ODbL §4.4(b), which AWMC's and OSM's own ODbL terms require to stay ODbL (or a licensor-designated compatible license; none is designated, so plain ODbL 1.0 it is). | Decided |
+| All other `data/` and `content/` (location records, scripture references, routes, timeline, narrative summaries, image metadata, image prompts) | **CC BY-SA 4.0** — the strictest license among the non-ODbL upstream sources we combine (DARE is CC BY-SA 3.0). CC BY-SA 3.0's own ShareAlike clause permits relicensing Adapted Material under "a later version of this License with the same License Elements" (confirmed in the CC BY-SA 3.0 legal code, §4(b)), so CC BY-SA 4.0 satisfies DARE. It is also a strict superset of the plainer CC BY 4.0/3.0 obligations from OpenBible.info, Pleiades, and the ORBIS dataset, and is compatible with folding in CC0 Wikidata content. **One consistent OSM rule:** OpenBible.info's OSM-derived coordinate/geometry fields (any `coordinates_source`/`secondary_sources` entry with `type: "osm"`/`"osm_group"` in `modern.jsonl`, and `precise_geometry_id` in `ancient.jsonl` — see `docs/verification/M1.md` Q3) never go into these CC BY-SA 4.0 records; location coordinates come from a non-OSM source instead (Wikidata, DARE, or Pleiades, cross-checked). OpenBible.info's identification and candidate-site data (CC BY 4.0, not OSM-derived) is still fully used. | Decided |
+| Bible text | World English Bible (WEB), Protestant-canon editions only (`engwebp`/`engwebpb`). Confirmed **public domain** on eBible.org's own pages; "World English Bible" is a **trademark** of eBible.org (not to be used to label a changed text). Public domain regardless of which JSON record the text sits inside — it is not covered by the project's CC BY-SA 4.0 data license. | Decided |
+| Images | Hotlinked, never committed. Each image keeps its own upstream license (read per file from Wikimedia Commons). Accepted licenses listed below. | Decided |
+| Map tiles (basemap) | Depends on the CP1 stack choice (`docs/research/STACK_OPTIONS.md`). All leading candidates (OpenFreeMap, self-hosted Protomaps PMTiles) trace back to OpenStreetMap data under ODbL 1.0, requiring an OSM attribution notice displayed via the map library's attribution control. Exact provider and wording finalized after CP1; see the placeholder row in `ATTRIBUTION.md`. | **Open (waits for CP1)** |
 
 ## Accepted image licenses
-To be decided in M1-03.
+Per Media Curator brief rule #5, the project accepts only:
+- **Public domain** (PD-old, PD-US-gov, CC0, etc.)
+- **CC BY** (any version)
+- **CC BY-SA** (any version)
+
+**unless this list is expanded later by an ADR.** Wikimedia Commons' own free-content policy (`commons.wikimedia.org/wiki/Commons:Licensing`, read 2026-09-23) means every file hosted there is *free*, but Commons hosts a substantially wider range of free licenses than the three above — confirmed at `commons.wikimedia.org/wiki/Commons:Reusing_content_outside_Wikimedia/licenses/en` and `commons.wikimedia.org/wiki/Commons:Copyright_tags` (both read 2026-09-23), which document GFDL (a documentation license "not accepted for new files on Commons except under specific circumstances," but still present on legacy files), GPL/LGPL (used for some icons/screenshots), the Free Art License, and assorted "various free licenses" including government/open-data licences (e.g. national open-government licences) as all commonly tagged on Commons. Being hosted on Commons is therefore **not** sufficient evidence of an accepted license. **The Media Curator must read and record each file's exact license from its own description page and reject anything outside the three accepted bands above — explicitly including GFDL-only files, Free Art License (FAL)-only files, GPL/LGPL-only files, and government/open-data-licence-only files** — even though all of these are freely hosted on Commons. A file that is multi-licensed (e.g. GFDL *and* CC BY-SA) is fine to use under its CC BY-SA option.
+
+**What the UI must show for share-alike (CC BY-SA) images:** for an unmodified, hotlinked image (no cropping/recoloring/compositing), CC BY-SA's Attribution condition (§3(a) of the CC BY-SA 4.0 legal code) applies, not the fuller ShareAlike condition (§3(b), which only triggers when we produce "Adapted Material"). The details panel must show, for every image: the creator's name, the exact license name (e.g. "CC BY-SA 4.0") linked to its legal text, an indication that the file is unmodified, and a link to the Commons source page. If any future feature crops, recolors, or otherwise adapts an image, that adaptation must additionally be offered under the same or a BY-SA-compatible license and carry its own ShareAlike notice — flagged here for the Frontend Engineer/Media Curator to revisit if that feature is ever built.
+
+## WEB (Bible text) attribution wording
+> Scripture quotations are from the **World English Bible (WEB)**, a public-domain translation of the Bible (66-book Protestant-canon edition, eBible.org). "World English Bible" is a trademark of eBible.org; this project is not produced, reviewed, or endorsed by eBible.org.
+
+This wording is edition-agnostic and works for either `engwebp` (US spelling, "LORD"/"GOD") or `engwebpb` (British/international spelling, "LORD"/"GOD") — both are public domain with identical trademark status, confirmed on their own eBible.org pages (read 2026-09-23). The edition itself (US vs. British spelling) is the human's choice at CP1; see `docs/verification/M1.md` §2 Q4. The Classic editions (`eng-web`/`eng-webbe`, which use "Yahweh" and include the Apocrypha) remain out of scope per the brief's 66-book canon rule.
 
 ## Source compatibility
-To be filled in M1-03: each source's license and whether it is compatible with the code and data licenses.
+| Source | License (verified 2026-09-23) | Compatible with project? | Use |
+|---|---|---|---|
+| OpenBible.info Bible Geocoding | CC BY 4.0 (core); ODbL 1.0 (OSM-derived parts, not used — see below) | Yes | Primary place ID/candidates; coordinates taken from a non-OSM `coordinates_source` |
+| Pleiades | CC BY 3.0 | Yes | Primary ancient ID/coordinate cross-check |
+| Digital Atlas of the Roman Empire (DARE) | CC BY-SA 3.0 | Yes — drives the CC BY-SA 4.0 data-license choice above | Cross-check only |
+| ORBIS (Stanford) — dataset | CC BY 3.0 | Yes | Routes tab (M5) travel-time/route cross-check |
+| ORBIS (Stanford) — live web app | Unconfirmed; own tiles are CC BY-NC 3.0 (non-commercial) | **No** | Do not use; see do-not-use list |
+| AWMC Geodata | ODbL 1.0 | Yes, kept in `data/geo/` | Primary ancient roads/provinces/coastlines (M4) |
+| Wikidata | CC0 (statements); CC BY-SA 4.0 (prose, not used) | Yes | Cross-check / ID crosswalk |
+| Wikimedia Commons | Varies per file — Commons itself hosts far more than we accept (GFDL, FAL, GPL/LGPL, government licences, etc.) | Yes, restricted to the three accepted bands (see "Accepted image licenses") | Primary image source |
+| Natural Earth | Public domain | Yes | Modern basemap coastlines/borders (subject to M1-02) |
+| OpenStreetMap-based data | ODbL 1.0 (data); CC BY-SA 2.0 (docs) | Yes, kept in `data/geo/` under ODbL 1.0; never embedded as extracted facts in CC BY-SA 4.0 location records (see the one-rule policy above and `docs/verification/M1.md` Q3) | Modern basemap / cross-check only |
+| eBible.org WEB (`engwebp`/`engwebpb`) | Public domain (name trademarked) | Yes | Primary and only Bible text |
+| Wikipedia | CC BY-SA (unversioned) / GFDL | Cite-only; never copied per brief rule #6 | Background pointer only |
+| Perseus Digital Library | **Unverified** — no reusable-content license found | **Not yet** | Do not quote; cite-only if ever confirmed |
+
+## Do-not-use / not-yet list
+- **ORBIS interactive web app** (`orbis.stanford.edu`) — figures, screenshots, or tiles read directly from the live app. Its own footer credits its background tiles to AWMC under **CC BY-NC 3.0** (non-commercial), and no other terms page could be found. Use only the CC BY 3.0 flat-file node/edge dataset.
+- **Perseus Digital Library** texts — no content license was found on the pages checked (`/hopper/copyright` is 404; `/hopper/opensource` covers only the Hopper software, not the texts). Cite-only if ever independently confirmed; do not quote.
+- **Wikipedia text** — cite as a pointer to primary/secondary sources only; never copy or closely paraphrase, per brief rule #6, even though CC BY-SA would technically permit reuse with attribution.
+- **eBible.org Classic editions** (`eng-web`, `eng-webbe`) — include the Apocrypha/Deuterocanon and use "Yahweh"; excluded by the brief's 66-book Protestant canon rule. Only `engwebp`/`engwebpb` are in scope.
+- **Any Wikimedia Commons file whose license is not PD/CC0, CC BY, or CC BY-SA** — Commons excludes NC/fair-use/ND uploads, but it does host GFDL-only, Free Art License (FAL)-only, GPL/LGPL-only, and government/open-data-licence-only files, none of which this project accepts (unless expanded later by an ADR). The Media Curator must read and record the specific license per file and reject anything outside those three bands, not assume Commons hosting implies acceptability.
+- **OpenBible.info fields sourced from OpenStreetMap** — any `coordinates_source`/`secondary_sources` entry with `type: "osm"`/`"osm_group"` (`modern.jsonl`), or a `precise_geometry_id` (`ancient.jsonl`). Use a non-OSM coordinate source instead; see the one-rule policy above and `docs/verification/M1.md` Q3.
+- **Copyrighted academic works** (journal articles, the Anchor Bible Dictionary, the print Barrington Atlas, etc.) — cite only, per brief rule #4/§2.6; never copied or paraphrased closely enough to be a derivative reproduction.
+
+## CP1 decisions needing the human
+1. **WEB edition:** `engwebp` (US spelling) vs. `engwebpb` (British/international spelling). Licensing is identical for both (public domain, same trademark status, both 66-book Protestant canon, both render God's name as "LORD"/"GOD"). Purely an editorial choice. **Recommendation:** `engwebp`, as the more common default for a US-hosted, English-first audience — but either is fully compliant.
+2. **Basemap/tile provider** (M1-02's stack recommendation: OpenFreeMap, runner-up self-hosted Protomaps PMTiles). Both trace back to OpenStreetMap ODbL data and require the same OSM attribution notice; the exact wording and any additional provider-specific credit (e.g. "OpenMapTiles") depends on which is chosen. See the placeholder row in `ATTRIBUTION.md`.

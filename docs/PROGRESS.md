@@ -17,7 +17,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M1-00 | M1 kickoff: record CP0, dispatch process | project-owner | `docs/m1-kickoff` | Done, PR pending | — |
 | M1-01 | Source inventory with licenses | research-lead | `docs/m1-source-inventory` | Done, PR pending review | — |
 | M1-02 | Stack and hosting options with pricing | gis-engineer | `docs/m1-stack-options` | Done, PR pending review | — |
-| M1-03 | License verification of the inventory | fact-checker | `docs/m1-license-review` | Planned, after M1-01 | — |
+| M1-03 | License verification of the inventory | fact-checker | `docs/m1-license-review` | Done, PR pending review | — |
 | M1-04 | CP1 summary and stack ADRs | project-owner | `docs/cp1-summary` | Planned, after M1-03 | — |
 
 ## Open questions
