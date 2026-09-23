@@ -8,7 +8,8 @@ At most 15 links, one-line each, focused on what the project needs first.
 | `[lon, lat]` in MapLibre examples | https://maplibre.org/maplibre-gl-js/docs/ | Quick reminder that map coordinates are longitude first, latitude second. |
 | Web Mercator + slippy tiles | https://docs.maptiler.com/google-maps-coordinates-tile-bounds-projection/ | Practical explanation of the projection/tile scheme used by most web maps. |
 | Coordinate systems primer | https://docs.maptiler.com/guides/how-maps-work/coordinate-systems/ | Understand geographic vs projected coordinates before editing data. |
-| Vector vs raster map usage | https://docs.maptiler.com/guides/account/sessions-vs-requests/ | Shows how map interactions translate into tile/API usage and billing. |
+| Vector vs raster tiles | https://docs.maptiler.com/guides/how-maps-work/raster-vector-tiles/ | Plain-language comparison of raster vs vector tiles, including performance and styling tradeoffs. |
+| Map usage billing (sessions vs requests) | https://docs.maptiler.com/guides/account/sessions-vs-requests/ | Explains how provider billing can count map sessions differently from raw API/tile requests. |
 | MapLibre GL JS docs | https://maplibre.org/maplibre-gl-js/docs/ | Core web renderer docs for layers, sources, controls, and styling. |
 | MapLibre style spec | https://maplibre.org/maplibre-style-spec/layers/ | Exact layer properties (including visibility/filtering) for custom map behavior. |
 | react-map-gl get started | https://visgl.github.io/react-map-gl/docs/get-started | Fast path to wire MapLibre or Mapbox renderers into React UI components. |
