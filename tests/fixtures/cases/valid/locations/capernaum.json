@@ -20,12 +20,12 @@
   ],
   "summary": {
     "text": "Illustrative summary for fixture testing only.",
-    "sources": ["wikipedia:Capernaum"]
+    "sources": ["openbible:capernaum", "bib:existing-bib-source"]
   },
   "history": [
     {
       "text": "Illustrative history statement for tests only.",
-      "sources": ["wikipedia:Capernaum"]
+      "sources": ["pleiades:678231"]
     }
   ],
   "scripture": [
@@ -39,7 +39,7 @@
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative Old Testament connection only.",
-      "sources": ["wikipedia:Capernaum"]
+      "sources": ["openbible:capernaum"]
     }
   ],
   "politicalHistory": [
@@ -47,7 +47,7 @@
       "fromYear": -4,
       "toYear": 39,
       "entity": "Tetrarchy of Herod Antipas (illustrative only).",
-      "sources": ["wikipedia:Capernaum"]
+      "sources": ["pleiades:678231"]
     }
   ],
   "status": "verified",

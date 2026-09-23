@@ -1,20 +1,22 @@
 # Data schema guide (M2-01)
 
-This folder defines the JSON Schema rules and data-validation behavior for `data/locations/` and `data/media/`.
+This folder defines the JSON Schema rules and data-validation behavior for `data/locations/`, `data/media/`, and `data/bibliography.json`.
 
 All example values below are **illustrative only** (not verified historical claims).
 
 ## Files and responsibilities
 - `location.schema.json`: one location record per `data/locations/<id>.json`
 - `media.schema.json`: one media record per `data/media/<location-id>.json`
-- `source-id.schema.json`: allowed source-ID prefixes and patterns
+- `source-id.schema.json`: allowed source-ID prefixes and patterns (including `bib:`)
+- `bibliography.schema.json`: structure for `data/bibliography.json`
 - `scripts/fill-scripture-text.mjs`: fills `scripture[].textWEB` from the WEB source text
-- `scripts/validate-data.mjs`: schema + cross-file + scripture checks used by CI
+- `scripts/validate-data.mjs`: schema + cross-file + scripture + checksum checks used by CI
 
 ## Core conventions
 
 ### Coordinates and WGS 84
-- Coordinates are decimal degrees in **WGS 84** and use GeoJSON order **`[lon, lat]`**.
+- **WGS 84** is the standard global latitude/longitude coordinate system used by GPS and most web maps.
+- Coordinates are decimal degrees in GeoJSON order **`[lon, lat]`**.
 - `location.schema.json` enforces global coordinate ranges (`lon` between `-180` and `180`, `lat` between `-90` and `90`).
 - The validator additionally enforces a project bounding box for the Mediterranean/Near East:
   - longitude `-20` to `60`
@@ -45,7 +47,7 @@ If any candidate has confidence `disputed`, the record must include at least **t
 
 ### Source-ID prefixes
 
-The schema accepts these prefixes (from `docs/research/SOURCES.md`):
+The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` for this task):
 
 | Prefix | Pattern example |
 |---|---|
@@ -58,19 +60,41 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md`):
 | `commons:` | `commons:File:Example.jpg` |
 | `orbis:` | `orbis:1234` |
 | `awmc:` | `awmc:feature-1` |
-| `wikipedia:` | `wikipedia:Capernaum` |
+| `wikipedia:` | `wikipedia:Capernaum` (pointer only, never sole support) |
 | `perseus:` | `perseus:urn:cts:greekLit:tlg0526` |
+| `bib:` | `bib:pleiades-place-resource` |
 
-### One consistent OSM coordinate rule
+### Bibliography registry
+- `data/bibliography.json` holds reusable entries keyed by `id`.
+- Use `bib:<id>` in any `sources[]` array when citing a book, chapter, article, web authority page, or dataset entry.
+- The validator rejects any `bib:` ID that is missing from `data/bibliography.json`.
+
+### One consistent OSM and Wikipedia coordinate rule
 - Coordinates in `data/locations/` must come from a non-OSM source.
-- Each candidate stores `coordinateSource` so this is auditable.
-- The validator rejects any `coordinateSource` beginning with `osm:`.
+- Coordinates must not cite `wikipedia:` as `coordinateSource`.
+- Each candidate stores `coordinateSource`, and that value must also appear in `candidates[].sources`.
+
+### Sources quality floor
+- A `sources[]` array cannot consist only of `wikipedia:` IDs.
+- Use at least one non-Wikipedia source ID (dataset ID or `bib:`).
+
+### Scripture reference format
+- `scripture[].ref` and `otConnections[].ref` use `Book Chapter:Verse` or `Book Chapter:Start-End`.
+- A single `ref` covers one chapter only; cross-chapter passages must be split into one entry per chapter.
+
+### Accepted media license strings
+`media.schema.json` accepts these `images[].license` values:
+- `Public domain`
+- `CC0` or `CC0 1.0`
+- `CC BY <version>` (for example `CC BY 4.0`)
+- `CC BY-SA <version>` (for example `CC BY-SA 4.0`)
 
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
 - Source URL: `https://eBible.org/Scriptures/engwebp_vpl.zip`
 - Read date for this snapshot: **2026-09-23**
-- Committed snapshot file: `data/reference/engwebp_vpl.txt` (parsed locally, no network needed for validation/tests).
+- Committed snapshot file: `data/reference/engwebp_vpl.txt`
+- Snapshot metadata + checksum: `data/reference/engwebp_snapshot_metadata.json`
 
 Fill scripture text for all location files:
 
@@ -100,7 +124,7 @@ CI runs:
 
 ## Dependencies (kept minimal)
 - `ajv`: JSON Schema draft 2020-12 validation.
-- `ajv-formats`: standard format checks (for example, ISO date for `lastReviewed`).
+- `ajv-formats`: standard format checks (for example, ISO date for `lastReviewed` and `accessed`).
 
 ## Complete example record (illustrative only)
 
@@ -119,20 +143,20 @@ CI runs:
     {
       "label": "Tell Hum",
       "coordinates": [35.575, 32.88],
-      "coordinateSource": "pleiades:678180",
+      "coordinateSource": "pleiades:678231",
       "confidence": "high",
       "support": "Illustrative neutral summary only.",
-      "sources": ["pleiades:678180", "openbible:capernaum"]
+      "sources": ["pleiades:678231", "openbible:capernaum"]
     }
   ],
   "summary": {
     "text": "Illustrative neutral summary only.",
-    "sources": ["wikipedia:Capernaum"]
+    "sources": ["bib:pleiades-place-resource", "openbible:capernaum"]
   },
   "history": [
     {
       "text": "Illustrative historical note only.",
-      "sources": ["wikipedia:Capernaum"]
+      "sources": ["bib:pleiades-place-resource"]
     }
   ],
   "scripture": [
@@ -146,7 +170,7 @@ CI runs:
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative Old Testament linkage only.",
-      "sources": ["wikipedia:Capernaum"]
+      "sources": ["openbible:capernaum"]
     }
   ],
   "politicalHistory": [
@@ -154,7 +178,7 @@ CI runs:
       "fromYear": -4,
       "toYear": 39,
       "entity": "Tetrarchy of Herod Antipas (illustrative label).",
-      "sources": ["wikipedia:Capernaum"]
+      "sources": ["bib:pleiades-place-resource"]
     }
   ],
   "status": "verified",

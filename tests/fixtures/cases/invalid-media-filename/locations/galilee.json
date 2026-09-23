@@ -1,18 +1,18 @@
 {
-  "id": "unnamed-mountain",
+  "id": "galilee",
   "names": {
-    "ancient": ["Unknown Peak"],
-    "modern": "Unknown Mountain",
+    "ancient": ["Galilee"],
+    "modern": "Galilee",
     "alternate": []
   },
-  "type": "natural-feature",
-  "zoomTier": "site",
+  "type": "region",
+  "zoomTier": "region",
   "candidates": [
     {
-      "label": "Illustrative summit",
-      "coordinates": [35.3, 32.7],
+      "label": "Galilee",
+      "coordinates": [35.4, 32.9],
       "coordinateSource": "wikidata:Q1384",
-      "confidence": "low",
+      "confidence": "high",
       "support": "Illustrative only.",
       "sources": ["wikidata:Q1384", "openbible:galilee"]
     }
@@ -29,9 +29,9 @@
   ],
   "scripture": [
     {
-      "ref": "Matthew 5:1",
-      "book": "Matthew",
-      "textWEB": "Seeing the multitudes, he went up onto the mountain. When he had sat down, his disciples came to him."
+      "ref": "Isaiah 9:1",
+      "book": "Isaiah",
+      "textWEB": "But there shall be no more gloom for her who was in anguish. In the former time, he brought into contempt the land of Zebulun and the land of Naphtali; but in the latter time he has made it glorious, by the way of the sea, beyond the Jordan, Galilee of the nations."
     }
   ],
   "otConnections": [

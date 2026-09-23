@@ -19,12 +19,12 @@
   ],
   "summary": {
     "text": "Illustrative summary for fixture testing only.",
-    "sources": ["wikipedia:Galilee"]
+    "sources": ["openbible:galilee"]
   },
   "history": [
     {
       "text": "Illustrative history statement for tests only.",
-      "sources": ["wikipedia:Galilee"]
+      "sources": ["pleiades:678231"]
     }
   ],
   "scripture": [
@@ -38,7 +38,7 @@
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative Old Testament connection only.",
-      "sources": ["wikipedia:Galilee"]
+      "sources": ["openbible:galilee"]
     }
   ],
   "politicalHistory": [
@@ -46,7 +46,7 @@
       "fromYear": -63,
       "toYear": 135,
       "entity": "Roman administration (illustrative only).",
-      "sources": ["wikipedia:Galilee"]
+      "sources": ["pleiades:678231"]
     }
   ],
   "status": "draft"

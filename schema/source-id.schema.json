@@ -59,6 +59,11 @@
       "description": "Perseus CTS URN for citation only, for example perseus:urn:cts:greekLit:tlg0526.",
       "pattern": "^perseus:urn:cts:[A-Za-z0-9._:-]+$"
     },
+    "bibliographySourceId": {
+      "type": "string",
+      "description": "Bibliography registry key, for example bib:pleiades-place-resource.",
+      "pattern": "^bib:[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
     "sourceId": {
       "description": "A citation ID that uses one of the approved prefixes.",
       "oneOf": [
@@ -94,6 +99,9 @@
         },
         {
           "$ref": "#/$defs/perseusSourceId"
+        },
+        {
+          "$ref": "#/$defs/bibliographySourceId"
         }
       ]
     }

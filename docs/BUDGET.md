@@ -86,4 +86,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M1-04 orchestration, reviews and CP1 summary | ~200k / ~30k | ~650 | ~3,186 |
 | 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-04 (CP1) | ~150k / ~8k | ~74 | ~3,260 |
 | 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M2-00 push M1, CP1 follow-up, M2 kickoff and cards | ~220k / ~20k | ~450 | ~3,710 |
-| 2026-09-23 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-01 schema, validation and CI | ~560k / ~58k | ~511 | ~4,221 |
+| 2026-09-23 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-01 schema, validation and CI | ~900k / ~90k | ~790 | ~4,500 |
