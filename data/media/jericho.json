@@ -1,0 +1,23 @@
+{
+  "locationId": "jericho",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Jericho_cityscape_from_wall_ruins.jpg",
+      "author": "Daniel Case",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_cityscape_from_wall_ruins.jpg",
+      "caption": "Panorama of Jericho from the ancient city walls",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Jericho_-_Tel_Es-Sultan1.jpg",
+      "author": "Tamarah",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_-_Tel_Es-Sultan1.jpg",
+      "caption": "Tell es-Sultan archaeological site, ancient Jericho",
+      "aiGenerated": false
+    }
+  ]
+}

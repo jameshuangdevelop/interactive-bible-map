@@ -1,0 +1,14 @@
+{
+  "locationId": "nazareth",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Nazareth_Altstadt.JPG",
+      "author": "Zairon",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nazareth_Altstadt.JPG",
+      "caption": "Old city of Nazareth",
+      "aiGenerated": false
+    }
+  ]
+}
