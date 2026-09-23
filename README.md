@@ -15,4 +15,4 @@ A team of GitHub Copilot custom agents ([.github/agents/](.github/agents/)) does
 - Deferred ideas: [BACKLOG.md](BACKLOG.md)
 
 ## Licenses
-Code is released under the MIT License ([LICENSE](LICENSE)). Data and content licenses and upstream attribution are in [docs/LICENSES.md](docs/LICENSES.md) and [ATTRIBUTION.md](ATTRIBUTION.md); they will be decided in M1.
+Code is released under the MIT License ([LICENSE](LICENSE)). Data and content are released under CC BY-SA 4.0, and geometry derived from OpenStreetMap or AWMC in `data/geo/` under ODbL 1.0. The full rules and upstream attribution are in [docs/LICENSES.md](docs/LICENSES.md) and [ATTRIBUTION.md](ATTRIBUTION.md).
