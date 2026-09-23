@@ -87,6 +87,40 @@ test("media fixture rejects malformed IGO variant", async () => {
   );
 });
 
+test("media fixture accepts jurisdiction-ported CC BY-SA license", async () => {
+  const result = await runCase("valid-media-port-by-sa-de");
+  assert.equal(result.errors.length, 0);
+});
+
+test("media fixture accepts jurisdiction-ported CC BY license", async () => {
+  const result = await runCase("valid-media-port-by-nl");
+  assert.equal(result.errors.length, 0);
+});
+
+test("media fixture rejects malformed jurisdiction code", async () => {
+  const result = await runCase("invalid-media-port-code");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("media fixture rejects missing version in jurisdiction variant", async () => {
+  const result = await runCase("invalid-media-port-no-version");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("id must equal filename", async () => {
   const result = await runCase("invalid-id-filename");
   assert.ok(

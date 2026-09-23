@@ -47,7 +47,7 @@
           "license": {
             "type": "string",
             "description": "Image license text. Allowed: Public domain/CC0, CC BY, or CC BY-SA.",
-            "pattern": "^(?:Public domain|CC0(?: 1\\.0)?|CC BY(?:-SA)? [0-9](?:\\.[0-9])?(?: IGO)?)$"
+            "pattern": "^(?:Public domain|CC0(?: 1\\.0)?|CC BY(?:-SA)? [0-9](?:\\.[0-9])?(?: [a-z]{2})?(?: IGO)?)$"
           },
           "licenseUrl": {
             "type": "string",

@@ -88,9 +88,10 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 - `CC0` or `CC0 1.0`
 - `CC BY <version>` (for example `CC BY 4.0`)
 - `CC BY-SA <version>` (for example `CC BY-SA 4.0`)
+- `CC BY <version> <port>` and `CC BY-SA <version> <port>` where `<port>` is a two-letter lowercase jurisdiction code (for example `CC BY-SA 2.0 de` or `CC BY 3.0 nl`)
 - `CC BY <version> IGO` and `CC BY-SA <version> IGO` (for example `CC BY-SA 3.0 IGO`)
 
-When an IGO variant exists upstream, record the license string exactly as shown on the source page.
+When a jurisdiction-ported or IGO variant exists upstream, copy the license string exactly as shown on the Commons file page.
 
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
