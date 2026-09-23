@@ -1,0 +1,23 @@
+# Backlog
+
+Ideas that are deferred and not scheduled. The PO moves an item into a milestone only with the human's approval.
+
+## Out of scope for now (brief §1)
+- 3D terrain
+- Offline use
+- Languages other than English
+- Quizzes
+- Audio
+- Search by verse or by person
+- Any period other than the first century (the timeline is designed to extend later)
+- Native iOS/Android app build (React Native Web keeps this path open)
+
+## Process and tooling
+- Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
+
+## Deferred review findings
+PR Reviewer findings that were not addressed in their PR, each with a reason.
+
+| Date | PR | Finding | Label | Why deferred |
+|---|---|---|---|---|
+| — | — | None yet | — | — |
