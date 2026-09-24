@@ -31,7 +31,10 @@
     "sources": [
       "pleiades:678106",
       "wikidata:Q3678596",
-      "openbible:damascus"
+      "openbible:damascus",
+      "scripture:Acts 9:3",
+      "scripture:Acts 9:27",
+      "scripture:Isaiah 7:8"
     ]
   },
   "history": [],
@@ -122,33 +125,35 @@
       "ref": "Genesis 14:15",
       "note": "Abraham pursues the kings who captured Lot as far north as the area of Damascus.",
       "sources": [
-        "openbible:damascus"
+        "openbible:damascus",
+        "scripture:Genesis 14:15"
       ]
     },
     {
       "ref": "2 Samuel 8:5",
       "note": "David defeats the Arameans of Damascus and stations a garrison there.",
       "sources": [
-        "openbible:damascus"
+        "openbible:damascus",
+        "scripture:2 Samuel 8:5"
       ]
     },
     {
       "ref": "Isaiah 7:8",
       "note": "Isaiah's oracle states directly that Damascus is 'the head of Syria,' i.e. the capital of the kingdom of Aram.",
       "sources": [
-        "openbible:damascus"
+        "openbible:damascus",
+        "scripture:Isaiah 7:8"
       ]
     },
     {
       "ref": "Amos 1:3",
       "note": "The prophet Amos pronounces judgment on Damascus for threshing Gilead 'with instruments of iron.'",
       "sources": [
-        "openbible:damascus"
+        "openbible:damascus",
+        "scripture:Amos 1:3"
       ]
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

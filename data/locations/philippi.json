@@ -33,7 +33,10 @@
     "sources": [
       "pleiades:501482",
       "wikidata:Q379652",
-      "openbible:philippi"
+      "openbible:philippi",
+      "scripture:Acts 16:12",
+      "scripture:Acts 16:14",
+      "scripture:Acts 16:23"
     ]
   },
   "history": [],
@@ -61,7 +64,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

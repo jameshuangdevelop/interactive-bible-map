@@ -29,11 +29,13 @@
     }
   ],
   "summary": {
-    "text": "Antioch in Pisidia (kept distinct here from Antioch on the Orontes in Syria) is recorded by Pleiades under the additional name 'Col. Caesarea' (Colonia Caesarea), reflecting Roman colonial status. In Acts 13, Paul and Barnabas preached in its synagogue on the Sabbath.",
+    "text": "Antioch in Pisidia (kept distinct here from Antioch on the Orontes in Syria) is recorded by Pleiades under the additional name 'Col. Caesarea' (Colonia Caesarea), reflecting Roman colonial status. In Acts 13, Paul and Barnabas preached in its synagogue on the Sabbath, and after opposition from the city's Jews, Paul declared, 'we turn to the Gentiles.'",
     "sources": [
       "pleiades:609307",
       "wikidata:Q579468",
-      "openbible:antioch-2"
+      "openbible:antioch-2",
+      "scripture:Acts 13:14",
+      "scripture:Acts 13:46"
     ]
   },
   "history": [],
@@ -61,7 +63,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

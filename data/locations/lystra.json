@@ -32,7 +32,11 @@
     "text": "Lystra was a Roman colony in Lycaonia where, according to Acts, a crowd first hailed Paul and Barnabas as gods after a healing and then, incited by opponents, stoned Paul. Timothy, Paul's later companion, was from Lystra.",
     "sources": [
       "pleiades:648699",
-      "openbible:lystra"
+      "openbible:lystra",
+      "scripture:Acts 14:11",
+      "scripture:Acts 14:19",
+      "scripture:Acts 16:1",
+      "scripture:Acts 16:2"
     ]
   },
   "history": [],
@@ -70,7 +74,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

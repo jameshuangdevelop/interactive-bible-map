@@ -117,26 +117,27 @@
       "note": "Omri, king of Israel, purchases the hill of Samaria and builds his capital city there, the event from which the region later takes its name.",
       "sources": [
         "openbible:samaria-1",
-        "pleiades:44836840"
+        "pleiades:44836840",
+        "scripture:1 Kings 16:24"
       ]
     },
     {
       "ref": "2 Kings 17:5",
       "note": "The Assyrian king besieges Samaria, the event that begins the fall of the northern kingdom of Israel.",
       "sources": [
-        "openbible:samaria-1"
+        "openbible:samaria-1",
+        "scripture:2 Kings 17:5"
       ]
     },
     {
       "ref": "2 Kings 17:6",
       "note": "Samaria falls and its population is deported by Assyria, ending the northern kingdom of Israel.",
       "sources": [
-        "openbible:samaria-1"
+        "openbible:samaria-1",
+        "scripture:2 Kings 17:6"
       ]
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

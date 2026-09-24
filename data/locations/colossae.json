@@ -31,7 +31,8 @@
     "sources": [
       "pleiades:638811",
       "wikidata:Q1001370",
-      "openbible:colossae"
+      "openbible:colossae",
+      "scripture:Colossians 1:2"
     ]
   },
   "history": [],
@@ -44,7 +45,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

@@ -54,12 +54,12 @@
       "ref": "Genesis 48:22",
       "note": "John 4:5 explicitly recalls this plot of ground near Shechem that Jacob gave to his son Joseph, tying the Gospel scene to the patriarchal narrative.",
       "sources": [
-        "openbible:sychar"
+        "openbible:sychar",
+        "scripture:Genesis 48:22",
+        "scripture:John 4:5"
       ]
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }
