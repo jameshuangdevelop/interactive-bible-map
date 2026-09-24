@@ -140,4 +140,4 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Date:** 2026-09-24 · **Status:** Proposed (CP2 decision 6) · **By:** PO
 - **Context:** In batches 1–2, the PR Reviewers caught unsupported claims and wrong images that the Fact-Checker (Claude Sonnet 5) had passed. Batch 3's Fact-Checker ran on Claude Opus 5.5. It found 30 issues in its first round, then 5, then 1, and the reviewer then found no data problems.
 - **Decision:** The Fact-Checker uses Claude Opus 5.5, with Claude Sonnet 5 as the fallback.
-- **Consequences:** About 1.7× the cost per session, offset by fewer fix rounds: batch 3 cost about 3,400 credits in total, against about 5,100 and 6,700 for batches 1 and 2.
+- **Consequences:** About 1.7× the cost per session, offset by fewer fix rounds: batch 3 cost about 3,500 credits, against about 5,100 and 6,700 for batches 1 and 2 (agent and review sessions, not the PO's coordination).

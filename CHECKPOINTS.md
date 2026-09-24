@@ -179,7 +179,7 @@ The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), t
 - **Verification cost.** M2 needed more rounds than forecast. Stronger models from the start (ADR-0020, ADR-0021) made batch 3 cheaper than batches 1–2.
 
 ### Budget
-M2 used about **22,700 AI credits** against a forecast of about 4,000. Batches 1 and 2 cost about 5,100 and 6,700 credits, and batch 3 about 3,400. The month total is about **25,900 of 1,000,000 (2.6%)**. See [BUDGET.md](docs/BUDGET.md).
+M2 used about **22,700 AI credits** against a forecast of about 4,000. Counting each batch's agent and review sessions but not the PO's coordination, batches 1, 2 and 3 cost about 5,100, 6,700 and 3,500 credits. The month total is about **25,900 of 1,000,000 (2.6%)**. See [BUDGET.md](docs/BUDGET.md).
 
 ### Next (after you approve)
 M3, the MVP app.
