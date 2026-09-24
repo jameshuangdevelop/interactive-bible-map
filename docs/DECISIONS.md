@@ -101,3 +101,20 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Context:** Review comments are posted under the human's GitHub login, and the reviewer's original findings read as open issues even after they are fixed.
 - **Decision:** Every posted review comment starts with two lines: `**PR Reviewer (advisory) · <model>**`, then either `**Status: ✅ all findings addressed in <commit>.**` or `**Status: ⚠️ open: <list>**`. The PO fills in the status line before posting, and adds a follow-up note at the end that lists the fixes.
 - **Consequences:** The human can see at a glance who reviewed a PR and whether anything still needs attention.
+
+## ADR-0016 — The Media Curator runs on Claude Haiku 4.5
+- **Date:** 2026-09-23 · **Status:** Accepted · **By:** PO. This supersedes ADR-0003's media-curator row.
+- **Context:** On GPT-5 mini (ADR-0003's first choice), the Media Curator found images for only 4 of 21 locations in batch 2 and 13 of 22 in batch 1, mostly one image each. Some showed the wrong place (Berea, Ohio; Na'in, Iran).
+- **Decision:** The Media Curator uses Claude Haiku 4.5, which was the fallback. The agent file lists `['Claude Haiku 4.5', 'GPT-5 mini']`.
+- **Consequences:** About 100 extra credits per batch. Haiku reached every location with 1–3 images, although the Fact-Checker still caught two wrong-place images, which is why ADR-0017 requires checking a file's categories.
+
+## ADR-0017 — Every factual clause is stated by a cited source
+- **Date:** 2026-09-23 · **Status:** Accepted · **By:** PO, from the M2 reviews
+- **Context:** Records cited dataset entries (Pleiades, Wikidata, OpenBible) for historical claims that those entries do not state. The Fact-Checker passed some of them; the PR Reviewers caught them.
+- **Decision:** Each factual clause in `summary`, `history`, `support` and `otConnections` must be stated by at least one cited source that the author has opened.
+  - Dataset IDs support identification and coordinates.
+  - `bib:` entries (scholarly works, authority pages) support historical claims.
+  - `scripture:<ref>` supports only what that passage says.
+  - Wikipedia is never the only source.
+  - Media must show the place, confirmed through the file's Commons categories, and must record the exact Commons license name, including IGO and port codes.
+- **Consequences:** Data takes longer to write but is safer for public use. The Research Lead, Fact-Checker and Media Curator agent files state these rules.

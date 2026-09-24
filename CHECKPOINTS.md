@@ -6,7 +6,7 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 |---|---|---|---|---|
 | CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | Approved 2026-09-23 | #2 |
 | CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Approved 2026-09-23 | #3–#7 |
-| CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | **In progress** | |
+| CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | **Awaiting review** | |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Not started | |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Not started | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
@@ -120,3 +120,48 @@ M1 used about **2,800 AI credits** (forecast ~2,200; the review-and-fix rounds w
 
 ### Next (after you approve)
 The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), then the 40 core sites in 2 batches (Research Lead, then Media Curator and Fact-Checker), and then CP2.
+
+---
+
+## CP2 — Schema & Core Data
+
+### What was delivered
+| Task | Output | Branch (merge in this order) |
+|---|---|---|
+| M2-00 | CP1 recorded, the M2 cards, ADR-0014 and ADR-0015 | `docs/m2-kickoff` |
+| M2-01 | Location, media and bibliography schemas; a validator with 41 tests and CI; the WEB `engwebp` text snapshot | `feat/m2-schema-validation` |
+| M2-02 | Batch 1: 20 sites and 2 regions (Jerusalem, Judea, Galilee), 34 images, [verification report](docs/verification/M2-batch-1.md) | `data/m2-batch-1` |
+| M2-03 | Batch 2: 20 sites and 1 region (Samaria, Acts, the Pauline cities), 48 images, [verification report](docs/verification/M2-batch-2.md) | `data/m2-batch-2` |
+| M2-04 | This summary, ADR-0016 and ADR-0017, and agent-file updates | `docs/cp2-summary` |
+
+**The dataset:** 40 core sites and 3 region records, **all verified** by the Fact-Checker. They have 82 freely licensed images (hotlinked, never committed) and 609 New Testament references, whose WEB text the validator checks. Seven places are disputed and list several candidate sites: Golgotha, Emmaus, Bethany beyond the Jordan, Bethsaida, Cana, Jericho (the Old Testament tell and the Herodian city) and Derbe.
+
+### How quality was checked
+- Each batch was one branch: the Research Lead drafted it, the Media Curator added images, and the Fact-Checker verified it. A PR Reviewer from a different vendor then audited samples (ADR-0014).
+- The reviewers caught text that its cited sources did not state, such as Corinth as "capital of Achaia" and Gospel events in the Jerusalem and Temple Mount summaries. Every clause in all 43 records was then checked against its sources, and anything unsupported was sourced or softened. Two new citation types made this possible: `bib:` entries for scholarly works and authority pages, and `scripture:` for what a passage reports (ADR-0017).
+- The first image pass (GPT-5 mini) found too few images, and some showed the wrong place: Berea, Ohio, and Na'in, Iran. The Media Curator moved to Claude Haiku 4.5 (ADR-0016). The Fact-Checker confirmed every image's place and its exact license name, including IGO and country-specific variants.
+
+### Decisions needed from you
+**Merging this PR approves CP2 with the recommendations below.** To choose differently, comment on the PR.
+
+| # | Decision | Recommendation | Alternative |
+|---|---|---|---|
+| 1 | Temple Mount scripture | Keep a representative set of 7 passages set at the Temple, as the record states | List every New Testament mention of the Temple (100+) |
+| 2 | Candidate sites without a usable coordinate | Accept a prose-only mention for now (Sychar: Askar has no licensable coordinate), and add an "unmapped candidate" field to the schema before M6. The Fact-Checker agrees. | Hold Sychar back until it can be mapped |
+| 3 | Political history | Fill it in consistently in M4 from the timeline events. Batch 1 has it; batch 2 is empty. | Fill batch 2 now |
+| 4 | Fact-Checker model | Move the Fact-Checker to Claude Opus 5.5 from M3 on. The reviewers caught claim problems it had passed. Each session costs about 1.7× more, still under 0.3% of the monthly budget per batch. | Keep Sonnet 5 and rely on reviewer sampling |
+
+### Concepts for you
+- **Kinds of citation.** Dataset IDs (Pleiades, Wikidata, DARE, OpenBible) establish *where* a place is. `bib:` entries point to scholarly works and authorities for historical claims. `scripture:` points to the passage that reports an event.
+- **Disputed site.** A place with several proposed locations. The map shows every candidate, each with its own confidence level. [Pleiades on uncertainty](https://pleiades.stoa.org/help/conceptual-overview)
+- **License port.** A country-specific version of a Creative Commons license, for example CC BY-SA 2.0 de, with the same terms. We record the exact name. [Creative Commons FAQ](https://creativecommons.org/faq/)
+
+### Risks
+- **Upstream changes.** Wikidata and OpenBible coordinates can change. The `coordinateSource` recorded on each candidate lets a later check detect drift.
+- **Verification rounds cost more than forecast** (see the budget below). Moving the Fact-Checker to a stronger model (decision 4) should cut the number of rounds.
+
+### Budget
+M2 used about **15,500 AI credits** against a forecast of about 4,000. Most of the difference went into four verification rounds per batch. The month total is about **19,200 of 1,000,000 (1.9%)**. The revised forecast is about 7,000 credits per batch, so M6 (about 5 batches) would be about 35,000. See [BUDGET.md](docs/BUDGET.md).
+
+### Next (after you approve)
+M3, the MVP app. The PO writes a low-fidelity visual spec (CP3a). Then the Frontend Engineer scaffolds Expo with React Native Web and MapLibre, and builds the map, pins, zoom tiers, details panel, candidate sites and search, with a Cloudflare Pages preview (CP3b). At that point you'll need a free Cloudflare account and a deploy token; the M3 card will give the steps.
