@@ -1,0 +1,35 @@
+{
+  "locationId": "neapolis-macedonia",
+  "images": [
+    {
+      "id": "neapolis-macedonia-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/A_peasant_at_Kavala_%28Reeve_039924%29%2C_National_Museum_of_Health_and_Medicine_%284534054351%29.jpg",
+      "author": "National Museum of Health and Medicine",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:A_peasant_at_Kavala_(Reeve_039924),_National_Museum_of_Health_and_Medicine_(4534054351).jpg",
+      "caption": "Ancient Neapolis",
+      "aiGenerated": false
+    },
+    {
+      "id": "neapolis-macedonia-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/da/Alexander_the_Great_monument_Kavala.jpg",
+      "author": "Xristoupolitis",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alexander_the_Great_monument_Kavala.jpg",
+      "caption": "Ancient Neapolis",
+      "aiGenerated": false
+    },
+    {
+      "id": "neapolis-macedonia-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Almyra_Hotel%2C_Kavala.jpg",
+      "author": "Aysinirmakyigit",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Almyra_Hotel,_Kavala.jpg",
+      "caption": "Ancient Neapolis",
+      "aiGenerated": false
+    }
+  ]
+}

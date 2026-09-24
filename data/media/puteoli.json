@@ -1,0 +1,35 @@
+{
+  "locationId": "puteoli",
+  "images": [
+    {
+      "id": "puteoli-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Anarchici.jpg",
+      "author": "Kikuyu3",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Anarchici.jpg",
+      "caption": "Ancient Puteoli",
+      "aiGenerated": false
+    },
+    {
+      "id": "puteoli-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Antonio_Joli_-_Veduta_del_golfo_di_Pozzuoli_da_Napoli.jpg",
+      "author": "Antonio Joli",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Antonio_Joli_-_Veduta_del_golfo_di_Pozzuoli_da_Napoli.jpg",
+      "caption": "Ancient Puteoli",
+      "aiGenerated": false
+    },
+    {
+      "id": "puteoli-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Arcobaleno_a_Pozzuoli.JPG",
+      "author": "Sabinolembo",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Arcobaleno_a_Pozzuoli.JPG",
+      "caption": "Ancient Puteoli",
+      "aiGenerated": false
+    }
+  ]
+}

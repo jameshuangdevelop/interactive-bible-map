@@ -1,0 +1,35 @@
+{
+  "locationId": "smyrna",
+  "images": [
+    {
+      "id": "smyrna-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/1874_KK10soldi_SMIRNE_Mi4I.jpg",
+      "author": "Jacquesverlaeken",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:1874_KK10soldi_SMIRNE_Mi4I.jpg",
+      "caption": "Ancient Smyrna",
+      "aiGenerated": false
+    },
+    {
+      "id": "smyrna-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/1876issue_KK10soldi_SPED.POST_PRESSO_LLOYD_SMIRNE_Mi4IIA.jpg",
+      "author": "Jacquesverlaeken",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:1876issue_KK10soldi_SPED.POST_PRESSO_LLOYD_SMIRNE_Mi4IIA.jpg",
+      "caption": "Ancient Smyrna",
+      "aiGenerated": false
+    },
+    {
+      "id": "smyrna-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Austria_Levant_1900_Sc33_Smyrna.jpg",
+      "author": "Austro-Hungarian postal authorities",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Austria_Levant_1900_Sc33_Smyrna.jpg",
+      "caption": "Ancient Smyrna",
+      "aiGenerated": false
+    }
+  ]
+}

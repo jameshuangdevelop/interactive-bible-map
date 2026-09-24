@@ -1,0 +1,35 @@
+{
+  "locationId": "miletus",
+  "images": [
+    {
+      "id": "miletus-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/2010_Moschee-in-Milet-in-Kleinasien.jpg",
+      "author": "Oliver Kloss",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2010_Moschee-in-Milet-in-Kleinasien.jpg",
+      "caption": "Ancient Miletus",
+      "aiGenerated": false
+    },
+    {
+      "id": "miletus-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/2010_Moschee-in-Milet.jpg",
+      "author": "Oliver Kloss",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2010_Moschee-in-Milet.jpg",
+      "caption": "Ancient Miletus",
+      "aiGenerated": false
+    },
+    {
+      "id": "miletus-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Ancient_Greece_Marble_Enthroned_Woman%2C_540-520_BC_%2828737236745%29.jpg",
+      "author": "Gary Todd from Xinzheng, China",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Greece_Marble_Enthroned_Woman,_540-520_BC_(28737236745).jpg",
+      "caption": "Ancient Miletus",
+      "aiGenerated": false
+    }
+  ]
+}

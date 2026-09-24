@@ -1,0 +1,35 @@
+{
+  "locationId": "troas",
+  "images": [
+    {
+      "id": "troas-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/A_Road_in_Alexandria_Troas.jpg",
+      "author": "Raicem",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:A_Road_in_Alexandria_Troas.jpg",
+      "caption": "Ancient Alexandria Troas",
+      "aiGenerated": false
+    },
+    {
+      "id": "troas-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Alexandria_Troas_-_2.jpg",
+      "author": "Raicem",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alexandria_Troas_-_2.jpg",
+      "caption": "Ancient Alexandria Troas",
+      "aiGenerated": false
+    },
+    {
+      "id": "troas-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Alexandria_Troas_2025-08-31_10-24-54.jpg",
+      "author": "Özgür Arda BAYRAM",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alexandria_Troas_2025-08-31_10-24-54.jpg",
+      "caption": "Ancient Alexandria Troas",
+      "aiGenerated": false
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "locationId": "pergamum",
+  "images": [
+    {
+      "id": "pergamum-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/1879_anonymer_Fotograf_Otto_Raschdorff%2C_Carl_Humann%2C_Alexander_Conze%2C_Hermann_Stiller_und_Richard_Bohn_%28von_links_nach_rechts%29_vor_der_Grabungsh%C3%BCtte_auf_dem_Burgberg_von_Pergamon.jpg",
+      "author": "ungenannte/r Fotograf/in",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:1879_anonymer_Fotograf_Otto_Raschdorff,_Carl_Humann,_Alexander_Conze,_Hermann_Stiller_und_Richard_Bohn_(von_links_nach_rechts)_vor_der_Grabungshütte_auf_dem_Burgberg_von_Pergamon.jpg",
+      "caption": "Ancient Pergamum",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/1941_Friedrich_Conze_Die_Familie_Conze_aus_Elze%2C_Berlin_de_Gruyter_1941%2C_S._160a_o_Pergamon_1870_Raschdorff_Humann_Conze_Stiller_Bohn.jpg",
+      "author": "Abbildungen in der Familen-Monographie von Friedrich Conze",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:1941_Friedrich_Conze_Die_Familie_Conze_aus_Elze,_Berlin_de_Gruyter_1941,_S._160a_o_Pergamon_1870_Raschdorff_Humann_Conze_Stiller_Bohn.jpg",
+      "caption": "Ancient Pergamum",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Bergama_%281%29.jpg",
+      "author": "Marmaracalypso",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bergama_(1).jpg",
+      "caption": "Ancient Pergamum",
+      "aiGenerated": false
+    }
+  ]
+}

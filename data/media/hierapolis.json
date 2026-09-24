@@ -1,0 +1,35 @@
+{
+  "locationId": "hierapolis",
+  "images": [
+    {
+      "id": "hierapolis-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/20190_Pamukkale-Denizli_Merkez-Denizli%2C_Turkey_-_panoramio_%281%29.jpg",
+      "author": "Francis Cook",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20190_Pamukkale-Denizli_Merkez-Denizli,_Turkey_-_panoramio_(1).jpg",
+      "caption": "Ancient Hierapolis",
+      "aiGenerated": false
+    },
+    {
+      "id": "hierapolis-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/20190_Pamukkale-Denizli_Merkez-Denizli%2C_Turkey_-_panoramio_%2810%29.jpg",
+      "author": "Денис Александров",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20190_Pamukkale-Denizli_Merkez-Denizli,_Turkey_-_panoramio_(10).jpg",
+      "caption": "Ancient Hierapolis",
+      "aiGenerated": false
+    },
+    {
+      "id": "hierapolis-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/20190_Pamukkale-Denizli_Merkez-Denizli%2C_Turkey_-_panoramio_%284%29.jpg",
+      "author": "Денис Александров",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20190_Pamukkale-Denizli_Merkez-Denizli,_Turkey_-_panoramio_(4).jpg",
+      "caption": "Ancient Hierapolis",
+      "aiGenerated": false
+    }
+  ]
+}

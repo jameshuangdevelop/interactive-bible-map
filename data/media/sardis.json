@@ -1,0 +1,35 @@
+{
+  "locationId": "sardis",
+  "images": [
+    {
+      "id": "sardis-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/20_%E2%80%93_Sardis%2C_The_Roman_Colonnaded_Avenue_%2851175357203%29.jpg",
+      "author": "Egisto Sani from Viareggio, Italia",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20_–_Sardis,_The_Roman_Colonnaded_Avenue_(51175357203).jpg",
+      "caption": "Ancient Sardis",
+      "aiGenerated": false
+    },
+    {
+      "id": "sardis-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/21_%E2%80%93_Sardis%2C_The_Roman_Colonnaded_Avenue_%2851176226120%29.jpg",
+      "author": "Egisto Sani from Viareggio, Italia",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:21_–_Sardis,_The_Roman_Colonnaded_Avenue_(51176226120).jpg",
+      "caption": "Ancient Sardis",
+      "aiGenerated": false
+    },
+    {
+      "id": "sardis-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/22_%E2%80%93_Sardis%2C_Archaeological_Map_of_Bath-Gymnasium_Complex_Area_%2851176226150%29.jpg",
+      "author": "Egisto Sani from Viareggio, Italia",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:22_–_Sardis,_Archaeological_Map_of_Bath-Gymnasium_Complex_Area_(51176226150).jpg",
+      "caption": "Ancient Sardis",
+      "aiGenerated": false
+    }
+  ]
+}

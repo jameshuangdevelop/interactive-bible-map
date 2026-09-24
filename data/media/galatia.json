@@ -1,0 +1,35 @@
+{
+  "locationId": "galatia",
+  "images": [
+    {
+      "id": "galatia-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Alba_Iulia_National_Museum_of_the_Union_2011_-_Votive_Shrine_Dedicated_to_Jupiter%2C_Sol_Bussurigius%2C_Apulum.JPG",
+      "author": "Codrin.B",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alba_Iulia_National_Museum_of_the_Union_2011_-_Votive_Shrine_Dedicated_to_Jupiter,_Sol_Bussurigius,_Apulum.JPG",
+      "caption": "Ancient Galatia region",
+      "aiGenerated": false
+    },
+    {
+      "id": "galatia-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Alba_Iulia_National_Museum_of_the_Union_2011_-_Votive_Shrine_Dedicated_to_Jupiter%2C_Sol_Bussurigius%2C_Apulum_Sign.JPG",
+      "author": "Codrin.B",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alba_Iulia_National_Museum_of_the_Union_2011_-_Votive_Shrine_Dedicated_to_Jupiter,_Sol_Bussurigius,_Apulum_Sign.JPG",
+      "caption": "Ancient Galatia region",
+      "aiGenerated": false
+    },
+    {
+      "id": "galatia-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Galacia-mapa.png",
+      "author": "Jolle",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Galacia-mapa.png",
+      "caption": "Ancient Galatia region",
+      "aiGenerated": false
+    }
+  ]
+}
