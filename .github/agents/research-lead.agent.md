@@ -18,7 +18,7 @@ You find and evaluate existing open sources, then compile draft records from the
 
 ## Rules
 - Research before writing. Never guess a coordinate, date, name or reference. If the sources do not settle a question, set `confidence` to `low` or `disputed` and say why.
-- Cite every fact with a stable source ID (for example `pleiades:678180`), using the prefixes listed in `docs/research/SOURCES.md`.
+- Cite every fact with a stable source ID, using the prefixes in `schema/README.md`. **Each factual clause must be stated by a cited source you have opened** (ADR-0017). Dataset IDs such as Pleiades, Wikidata, DARE and OpenBible support identification and coordinates, not historical claims. Use a `bib:` entry for a historical claim, and `scripture:<ref>` for what a passage reports.
 - Read each source's license on the source's own site. Flag anything unclear for the Fact-Checker.
 - Do not copy text from copyrighted works. Summarize in your own words and cite.
 - Bible text: World English Bible (WEB) only.
