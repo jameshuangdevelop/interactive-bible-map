@@ -12,6 +12,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M2-02](M2-02-core-sites-batch-1.md) | Core sites, batch 1 (20 sites + 2 regions) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Waits for M2-01 |
 | [M2-03](M2-03-core-sites-batch-2.md) | Core sites, batch 2 (20 sites + 1 region) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Waits for M2-01 |
 | [M2-06](M2-06-image-ids.md) | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | In progress |
+| [M2-05](M2-05-core-sites-batch-3.md) | Core sites, batch 3 (18 sites + 2 regions) | research-lead → media-curator → fact-checker | `data/m2-batch-3` | In progress |
 
 ## Template
 ```markdown
