@@ -28,6 +28,7 @@ Give every image a stable, predictable name of our own. The human asked (in a co
 2. **Media Curator:**
    - For all 43 media files, make sure `-01` is the clearest photo of the place itself, such as the site, its ruins or the city, and reorder where needed, renumbering the ids.
    - Remove any image that does not show the place. For example, `antioch-syria`'s `Fall_of_Antioch_in_969.png` is a medieval manuscript scene of a 10th-century siege.
+   - If a removal leaves a location with no image, add a replacement photo of the place. A replacement may bring the file back to 1–3 images. If no acceptable image exists, follow the fallback in `docs/tasks/M2-02-core-sites-batch-1.md`, Phase B: keep the location record, omit only its `data/media/<id>.json`, list it in the PR body and the verification report, and let the human decide at CP2.
    - List every change in the PR body.
    - Commit: `data(media): review lead images`.
 3. **Fact-Checker:**

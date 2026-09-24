@@ -3,12 +3,12 @@
   "images": [
     {
       "id": "thessalonica-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Thessaloniki%2C_Greece_-_Pavlova.jpg",
-      "author": "Sharon Hahn Darlin",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki,_Greece_-_Pavlova.jpg",
-      "caption": "Street in Thessaloniki (ancient Thessalonica), Greece.",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Thessaloniki_Ancient_Agora_%281%29.jpg",
+      "author": "Armineaghayan",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki_Ancient_Agora_(1).jpg",
+      "caption": "Remains of the Ancient Agora in Thessaloniki.",
       "aiGenerated": false
     },
     {
@@ -19,16 +19,6 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki,_Greece,_Feb_2023_-_Western_Walls.jpg",
       "caption": "Western walls of the Old City in Thessaloniki.",
-      "aiGenerated": false
-    },
-    {
-      "id": "thessalonica-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Thessaloniki_Ancient_Agora_%281%29.jpg",
-      "author": "Armineaghayan",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki_Ancient_Agora_(1).jpg",
-      "caption": "Remains of the Ancient Agora in Thessaloniki.",
       "aiGenerated": false
     }
   ]

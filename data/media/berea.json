@@ -3,32 +3,22 @@
   "images": [
     {
       "id": "berea-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/%CE%92%CE%AD%CF%81%CE%BF%CE%B9%CE%B1%2C_%CE%97%CE%BC%CE%B1%CE%B8%CE%AF%CE%B1%CF%82.jpg",
+      "author": "Apaleutos25",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Βέροια,_Ημαθίας.jpg",
+      "caption": "Aerial view of Veria (ancient Berea), Greece, from the south.",
+      "aiGenerated": false
+    },
+    {
+      "id": "berea-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Veria_BW_2017-10-06_09-39-17.jpg",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Veria_BW_2017-10-06_09-39-17.jpg",
-      "caption": "Street view of Veria (ancient Berea), Greece.",
-      "aiGenerated": false
-    },
-    {
-      "id": "berea-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Veria_BW_2017-10-06_09-39-44.jpg",
-      "author": "Berthold Werner",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Veria_BW_2017-10-06_09-39-44.jpg",
-      "caption": "Architecture in Veria (ancient Berea), Greece.",
-      "aiGenerated": false
-    },
-    {
-      "id": "berea-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Beroia_Archaelogical_Museum.jpg",
-      "author": "Pjposullivan",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Beroia_Archaelogical_Museum.jpg",
-      "caption": "Beroia Archaeological Museum, housing artifacts from ancient Berea.",
+      "caption": "Saint Paul's altar, a memorial shrine in Veria (ancient Berea).",
       "aiGenerated": false
     }
   ]
