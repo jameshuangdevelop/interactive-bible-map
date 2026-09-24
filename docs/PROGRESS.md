@@ -17,8 +17,8 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M2-06 | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | Verified | — |
 | M2-00 | M2 kickoff: record CP1, write M2 cards | project-owner | `docs/m2-kickoff` | Done, reviewed; PR pending push | — |
 | M2-01 | Data schema, validation and CI | gis-engineer | `feat/m2-schema-validation` | Done, reviewed; PR pending push | — |
-| M2-02 | Core sites, batch 1 (22) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Verified, reviewed; PR pending push | — |
-| M2-03 | Core sites, batch 2 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Verified, reviewed; PR pending push | — |
+| M2-02 | Core sites, batch 1 (20 sites + 2 regions) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Verified, reviewed; PR pending push | — |
+| M2-03 | Core sites, batch 2 (20 sites + 1 region) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Verified, reviewed; PR pending push | — |
 | M2-04 | CP2 summary | project-owner | `docs/cp2-summary` | Done, awaiting CP2 | — |
 
 ## Open questions

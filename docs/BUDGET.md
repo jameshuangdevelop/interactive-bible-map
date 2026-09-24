@@ -65,14 +65,14 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 
 **What this means.** The whole project is forecast at under 3% of one month's cap, so budget does not set the pace; the time it takes to review each checkpoint does. The 80% and 95% stops stay in place as safety rails, and the session guard is the control that matters day to day. The brief's cost-efficiency rules (§2.8) still apply.
 
-> **Forecast revision (CP2):** M2 cost about 3.8× its forecast, because each data batch needed 3–4 verification rounds. Plan on about 7,000 credits per data batch from now on, so M6 (about 5 batches) is about 35,000. Moving the Fact-Checker to Claude Opus 5.5 (CP2 decision 4) adds about 250 credits per session but should cut the number of rounds.
+> **Forecast revision (CP2):** M2 cost about 4× its forecast, because each data batch needed 3–4 verification rounds. Plan on about 7,000 credits per data batch from now on, so M6 (about 5 batches) is about 35,000. Moving the Fact-Checker to Claude Opus 5.5 (CP2 decision 4) adds about 250 credits per session but should cut the number of rounds.
 
 ## Rollups
 | Checkpoint | Month | Credits this milestone | Month total | % of cap |
 |---|---|---:|---:|---:|
 | CP0 | 2026-09 | ~500 | ~500 | ~0.05% |
 | CP1 | 2026-09 | ~2,760 | ~3,260 | ~0.3% |
-| CP2 | 2026-09 | ~15,455 | ~19,165 | ~1.9% |
+| CP2 | 2026-09 | ~16,085 | ~19,345 | ~1.9% |
 
 ## Ledger — 2026-09
 | Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
@@ -122,20 +122,21 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M2-03 | ~340k / ~15k | ~160 | ~16,825 |
 | 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M2-02 | ~300k / ~12k | ~140 | ~16,965 |
 | 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M2 orchestration, stacking and CP2 summary | ~250k / ~40k | ~2,200 | ~19,165 |
-| 2026-09-24 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-06 image IDs | ~360k / ~25k | ~147 | ~19,312 |
-| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 batch 3 research (Phase A: 20 records, extensive external source fetching for ADR-0017 compliance) | ~420k / ~55k | ~1,150 | ~20,462 |
-| 2026-09-24 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-05 batch 3 media (Phase B: 20 locations, Wikimedia Commons search and retrieval, 51 images across 16 locations, license verification, JSON generation and schema validation) | ~150k / ~15k | ~80 | ~20,542 |
-| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 batch 3 media (redo: PO rejected first pass for wrong-place/irrelevant images; re-sourced all 20 locations from Wikidata P18/P373 plus Commons category browsing, independently re-verified every candidate's license and subject, added tyre/salamis-cyprus/cenchreae/perga which had no images, kept 6 already-plausible locations after re-check) | ~430k / ~22k | ~160 | ~20,702 |
-| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 fact-check | ~200k / ~55k | ~750 | ~21,452 |
-| 2026-09-24 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-06 lead-image review (43 locations, fetched Commons metadata, analyzed 3 removals, renumbered IDs) | ~200k / ~15k | ~80 | ~21,532 |
-| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 check (semantic media-migration diff across 43 files, Commons API + visual re-check of the 3 removals and all 40 other leads, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~380k / ~35k | ~525 | ~22,057 |
-| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 lead-image fixes (Wikidata P18/P373 lookups and Commons license/visual checks for 7 flagged files: thessalonica, berea, corinth, colossae, lystra, gethsemane, cana; Sonnet 5 rates +50%) | ~400k / ~25k | ~160 | ~22,217 |
-| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 re-check (Commons API + thumbnail re-verification of 6 fixed leads, Wikidata P18/P373/coordinate lookup for lystra incl. a distance correction, removed `data/media/lystra.json`, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~210k / ~20k | ~300 | ~22,517 |
-| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 fixes | — | ~450 | ~22,967 |
-| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 media fixes | — | ~60 | ~23,027 |
-| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 re-verification (Opus 5.5 rates +50%) | ~245k / ~20k | ~420 | ~23,447 |
-| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 final fixes | — | ~60 | ~23,507 |
-| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta image | — | ~25 | ~23,532 |
-| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 re-verification 2 (Opus 5.5 rates +50%) | ~265k / ~8k | ~180 | ~23,712 |
-| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta author | — | ~10 | ~23,722 |
-| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 sign-off (Opus 5.5 rates +50%) | ~275k / ~3k | ~90 | ~23,812 |
+| 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M2-04 (CP2) | ~360k / ~12k | ~180 | ~19,345 |
+| 2026-09-24 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-06 image IDs | ~360k / ~25k | ~147 | ~19,492 |
+| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 batch 3 research (Phase A: 20 records, extensive external source fetching for ADR-0017 compliance) | ~420k / ~55k | ~1,150 | ~20,642 |
+| 2026-09-24 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-05 batch 3 media (Phase B: 20 locations, Wikimedia Commons search and retrieval, 51 images across 16 locations, license verification, JSON generation and schema validation) | ~150k / ~15k | ~80 | ~20,722 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 batch 3 media (redo: PO rejected first pass for wrong-place/irrelevant images; re-sourced all 20 locations from Wikidata P18/P373 plus Commons category browsing, independently re-verified every candidate's license and subject, added tyre/salamis-cyprus/cenchreae/perga which had no images, kept 6 already-plausible locations after re-check) | ~430k / ~22k | ~160 | ~20,882 |
+| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 fact-check | ~200k / ~55k | ~750 | ~21,632 |
+| 2026-09-24 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-06 lead-image review (43 locations, fetched Commons metadata, analyzed 3 removals, renumbered IDs) | ~200k / ~15k | ~80 | ~21,712 |
+| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 check (semantic media-migration diff across 43 files, Commons API + visual re-check of the 3 removals and all 40 other leads, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~380k / ~35k | ~525 | ~22,237 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 lead-image fixes (Wikidata P18/P373 lookups and Commons license/visual checks for 7 flagged files: thessalonica, berea, corinth, colossae, lystra, gethsemane, cana; Sonnet 5 rates +50%) | ~400k / ~25k | ~160 | ~22,397 |
+| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 re-check (Commons API + thumbnail re-verification of 6 fixed leads, Wikidata P18/P373/coordinate lookup for lystra incl. a distance correction, removed `data/media/lystra.json`, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~210k / ~20k | ~300 | ~22,697 |
+| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 fixes | — | ~450 | ~23,147 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 media fixes | — | ~60 | ~23,207 |
+| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 re-verification (Opus 5.5 rates +50%) | ~245k / ~20k | ~420 | ~23,627 |
+| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 final fixes | — | ~60 | ~23,687 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta image | — | ~25 | ~23,712 |
+| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 re-verification 2 (Opus 5.5 rates +50%) | ~265k / ~8k | ~180 | ~23,892 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta author | — | ~10 | ~23,902 |
+| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 sign-off (Opus 5.5 rates +50%) | ~275k / ~3k | ~90 | ~23,992 |

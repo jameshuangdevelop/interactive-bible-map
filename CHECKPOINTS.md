@@ -134,7 +134,7 @@ The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), t
 | M2-03 | Batch 2: 20 sites and 1 region (Samaria, Acts, the Pauline cities), 48 images, [verification report](docs/verification/M2-batch-2.md) | `data/m2-batch-2` |
 | M2-04 | This summary, ADR-0016 and ADR-0017, and agent-file updates | `docs/cp2-summary` |
 
-**The dataset:** 40 core sites and 3 region records, **all verified** by the Fact-Checker. They have 82 freely licensed images (hotlinked, never committed) and 609 New Testament references, whose WEB text the validator checks. Seven places are disputed and list several candidate sites: Golgotha, Emmaus, Bethany beyond the Jordan, Bethsaida, Cana, Jericho (the Old Testament tell and the Herodian city) and Derbe.
+**The dataset:** 40 core sites and 3 region records, **all verified** by the Fact-Checker. They have 82 freely licensed images (hotlinked, never committed) and 609 New Testament references, whose WEB text the validator checks. Six disputed places list several candidate sites: Golgotha, Emmaus, Bethany beyond the Jordan, Bethsaida, Cana and Derbe. Sychar is also disputed, but its second candidate, Askar, is described only in text because no licensable coordinate exists (decision 2). Jericho has two points for two periods, the Old Testament tell and the Herodian city; it is not disputed.
 
 ### How quality was checked
 - Each batch was one branch: the Research Lead drafted it, the Media Curator added images, and the Fact-Checker verified it. A PR Reviewer from a different vendor then audited samples (ADR-0014).
@@ -153,7 +153,7 @@ The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), t
 
 ### Concepts for you
 - **Kinds of citation.** Dataset IDs (Pleiades, Wikidata, DARE, OpenBible) establish *where* a place is. `bib:` entries point to scholarly works and authorities for historical claims. `scripture:` points to the passage that reports an event.
-- **Disputed site.** A place with several proposed locations. The map shows every candidate, each with its own confidence level. [Pleiades on uncertainty](https://pleiades.stoa.org/help/conceptual-overview)
+- **Disputed site.** A place with several proposed locations. The map shows every candidate that has a usable coordinate, each with its own confidence level. Sychar's Askar has none yet (decision 2). [Pleiades on uncertainty](https://pleiades.stoa.org/help/conceptual-overview)
 - **License port.** A country-specific version of a Creative Commons license, for example CC BY-SA 2.0 de, with the same terms. We record the exact name. [Creative Commons FAQ](https://creativecommons.org/faq/)
 
 ### Risks
@@ -161,7 +161,7 @@ The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), t
 - **Verification rounds cost more than forecast** (see the budget below). Moving the Fact-Checker to a stronger model (decision 4) should cut the number of rounds.
 
 ### Budget
-M2 used about **15,500 AI credits** against a forecast of about 4,000. Most of the difference went into four verification rounds per batch. The month total is about **19,200 of 1,000,000 (1.9%)**. The revised forecast is about 7,000 credits per batch, so M6 (about 5 batches) would be about 35,000. See [BUDGET.md](docs/BUDGET.md).
+M2 used about **16,100 AI credits** against a forecast of about 4,000. Most of the difference went into four verification rounds per batch. The month total is about **19,300 of 1,000,000 (1.9%)**. The revised forecast is about 7,000 credits per batch, so M6 (about 5 batches) would be about 35,000. See [BUDGET.md](docs/BUDGET.md).
 
 ### Next (after you approve)
 M3, the MVP app. The PO writes a low-fidelity visual spec (CP3a). Then the Frontend Engineer scaffolds Expo with React Native Web and MapLibre, and builds the map, pins, zoom tiers, details panel, candidate sites and search, with a Cloudflare Pages preview (CP3b). At that point you'll need a free Cloudflare account and a deploy token; the M3 card will give the steps.

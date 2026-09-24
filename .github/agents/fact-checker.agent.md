@@ -23,6 +23,7 @@ You verify other agents' work independently. Your findings cannot be overruled. 
 - **Confidence** fits the evidence. A disputed site lists every serious candidate.
 - **Neutrality**: no side is taken between traditions or scholarly positions.
 - **Sources**: every source ID resolves, and **every factual clause is actually stated by at least one of its cited sources**; open them (ADR-0017). A `scripture:` source supports only what that passage says.
+- **Images**: each image shows this place, confirmed through the file's Commons categories and description, and its `license` matches Commons' `LicenseShortName` exactly, including IGO or country codes (ADR-0017).
 
 ## Licensing
 - Read each source's and each image's license at the source itself. Decide whether it is compatible with the code license (MIT) and the data license.
