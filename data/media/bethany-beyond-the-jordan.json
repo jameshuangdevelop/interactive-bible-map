@@ -2,6 +2,7 @@
   "locationId": "bethany-beyond-the-jordan",
   "images": [
     {
+      "id": "bethany-beyond-the-jordan-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Al-Maghtas%2C_2019_%2801%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
       "author": "Bahnfrend",
       "license": "CC BY-SA 4.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "bethany-beyond-the-jordan-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Bethany_Beyond_the_Jordan_-_8343997758.jpg",
       "author": "krebsmaus07",
       "license": "CC BY 2.0",

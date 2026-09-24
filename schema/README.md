@@ -97,6 +97,11 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 
 Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists upstream, copy the license string exactly as shown on the Commons file page.
 
+### Image IDs and storage
+- Location images are hotlinked from Wikimedia Commons and keep their Commons file names. Keep `url` and `sourcePage` pointing to Commons, and do not download, rename, or commit those image files into this repository.
+- `images[].id` is this project's stable image name. It uses `<location-id>-NN` in display order, where `-01` is the lead image shown first in the details panel.
+- The pattern `<location-id>-ai-NN` is reserved for future AI reconstructions. Those are the only images this project will host itself, saved as `<id>.<ext>`, and prompts in `content/image-prompts/<location-id>.md` will use the same IDs. The current media schema does not accept AI IDs yet.
+
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
 - Source URL: `https://eBible.org/Scriptures/engwebp_vpl.zip`

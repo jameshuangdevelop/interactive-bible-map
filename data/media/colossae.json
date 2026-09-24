@@ -2,15 +2,7 @@
   "locationId": "colossae",
   "images": [
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Colossae.jpg",
-      "author": "Skylight 555",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae.jpg",
-      "caption": "Aerial view of the archaeological site of Colossae in modern-day Turkey.",
-      "aiGenerated": false
-    },
-    {
+      "id": "colossae-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Colossae%27den_Honaz_g%C3%B6r%C3%BCn%C3%BCm.jpg",
       "author": "Gülhan Nurhan",
       "license": "CC BY-SA 4.0",
@@ -20,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "colossae-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/C%2BB-Galatia-Map.JPG",
       "author": "no idea - see source",
       "license": "Public domain",

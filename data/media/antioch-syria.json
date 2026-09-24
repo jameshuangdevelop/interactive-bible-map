@@ -2,15 +2,7 @@
   "locationId": "antioch-syria",
   "images": [
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Fall_of_Antioch_in_969.png",
-      "author": "Unknown, 12th/13th century author",
-      "license": "Public domain",
-      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fall_of_Antioch_in_969.png",
-      "caption": "Historical manuscript depicting the fall of Antioch in 969 CE.",
-      "aiGenerated": false
-    },
-    {
+      "id": "antioch-syria-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Antakya_-_2011-04-10.jpg",
       "author": "Maarten Sepp",
       "license": "CC BY-SA 4.0",
@@ -20,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "antioch-syria-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Antioch_Saint_Pierre_Church_Front.JPG",
       "author": "Volkan Hatem",
       "license": "CC BY 2.5",

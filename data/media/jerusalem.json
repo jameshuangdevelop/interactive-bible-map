@@ -2,6 +2,7 @@
   "locationId": "jerusalem",
   "images": [
     {
+      "id": "jerusalem-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Jerusalem_old_city_panorama_.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
       "author": "Nettadi",
       "license": "CC BY-SA 3.0",

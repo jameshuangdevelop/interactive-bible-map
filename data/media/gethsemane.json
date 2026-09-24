@@ -2,12 +2,23 @@
   "locationId": "gethsemane",
   "images": [
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Khachkar_in_the_Armenian_Garden_of_Gethsemane%2C_Jerusalem.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-      "author": "Mlevitt1",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Khachkar_in_the_Armenian_Garden_of_Gethsemane,_Jerusalem.JPG",
-      "caption": "Armenian Garden of Gethsemane, Jerusalem",
+      "id": "gethsemane-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Getsemane2.JPG",
+      "author": "Mewasul",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Getsemane2.JPG",
+      "caption": "Olive trees at the traditional site of the Garden of Gethsemane, Jerusalem.",
+      "aiGenerated": false
+    },
+    {
+      "id": "gethsemane-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Church_of_all_Nations.jpg",
+      "author": "Karsten Müller",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_all_Nations.jpg",
+      "caption": "The Church of All Nations, at the traditional site of Gethsemane, Jerusalem.",
       "aiGenerated": false
     }
   ]

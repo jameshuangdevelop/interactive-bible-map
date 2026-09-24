@@ -12,7 +12,7 @@
 
 ## How to record usage
 - Every PR appends one row to the current month's ledger below. The PR Reviewer does not commit, so it puts its row in the review comment and the PO copies it here at the next checkpoint.
-- **AI credits**: if your tool shows the credits the session used (in Copilot CLI, run `/usage`), record that figure. Otherwise estimate it from the rates below, or scale the per-session forecast by how long the session ran, and prefix the estimate with `~`.
+- **AI credits**: if your tool shows the credits the session used (in Copilot CLI, run `/usage`), record that figure. Otherwise estimate it from the rates below, add 50% for cache writes and cache misses (the same allowance the forecast uses), and prefix the estimate with `~`.
 - **Tokens in / out** (rough estimates, used only to spot sessions that read too much): *in* is the context-window total at session end (VS Code: hover over the context indicator in the chat input; Copilot CLI: `/context`), and *out* is the generated text, about characters written ÷ 4.
 - **Month total** is the previous row's total plus this row's credits. Parallel branches may start from the same previous total, so the PO recomputes it at each checkpoint and reconciles it with GitHub's billing usage report, which is authoritative (ADR-0005).
 - For a new month, add a new `## Ledger — YYYY-MM` section.
@@ -110,3 +110,8 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 corinth image | ~25k / ~2k | ~30 | ~13,920 |
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 scripture citations | ~700k / ~75k | ~1,450 | ~15,370 |
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 3 | ~200k / ~20k | ~400 | ~15,770 |
+| 2026-09-24 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-06 image IDs | ~360k / ~25k | ~147 | ~15,917 |
+| 2026-09-24 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-06 lead-image review (43 locations, fetched Commons metadata, analyzed 3 removals, renumbered IDs) | ~200k / ~15k | ~80 | ~15,997 |
+| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 check (semantic media-migration diff across 43 files, Commons API + visual re-check of the 3 removals and all 40 other leads, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~380k / ~35k | ~525 | ~16,522 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 lead-image fixes (Wikidata P18/P373 lookups and Commons license/visual checks for 7 flagged files: thessalonica, berea, corinth, colossae, lystra, gethsemane, cana; Sonnet 5 rates +50%) | ~400k / ~25k | ~160 | ~16,682 |
+| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 re-check (Commons API + thumbnail re-verification of 6 fixed leads, Wikidata P18/P373/coordinate lookup for lystra incl. a distance correction, removed `data/media/lystra.json`, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~210k / ~20k | ~300 | ~16,982 |

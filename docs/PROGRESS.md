@@ -17,6 +17,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M2-01 | Data schema, validation and CI | gis-engineer | `feat/m2-schema-validation` | Done, PR pending review | — |
 | M2-02 | Core sites, batch 1 (22) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Verified | — |
 | M2-03 | Core sites, batch 2 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Verified | — |
+| M2-06 | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | Verified | — |
 | M2-04 | CP2 summary | project-owner | `docs/cp2-summary` | Planned | — |
 
 ## Open questions

@@ -2,15 +2,7 @@
   "locationId": "corinth",
   "images": [
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/20090731_korinthos05.jpg",
-      "author": "Jeanhousen",
-      "license": "CC BY 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:20090731_korinthos05.jpg",
-      "caption": "Ruins of the Temple of Apollo at ancient Corinth, Greece.",
-      "aiGenerated": false
-    },
-    {
+      "id": "corinth-01",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Temple_d%27Apollon_%C3%A0_Corinthe.jpg",
       "author": "Van Der Meulen Christofle",
@@ -20,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "corinth-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/2007_Greece_Acrocorinth_%26_Ancient_Corinth_01.jpg",
       "author": "Nicholas Hartmann",
       "license": "CC BY-SA 4.0",

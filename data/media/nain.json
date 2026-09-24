@@ -2,6 +2,7 @@
   "locationId": "nain",
   "images": [
     {
+      "id": "nain-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Church_of_the_Resurrection_of_the_Widow%27s_Son_01.jpg",
       "author": "Hoshvilim",
       "license": "CC BY-SA 4.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "nain-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Church_of_the_Resurrection_of_the_Widow%27s_Son_02.jpg",
       "author": "Hoshvilim",
       "license": "CC BY-SA 4.0",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "nain-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/General_view%2C_Nain%2C_Holy_Land%2C_%28i.e.%2C_Nein%2C_Israel%29-LCCN2002725044.jpg",
       "author": "Library of Congress",
       "license": "Public domain",

@@ -1,0 +1,25 @@
+{
+  "locationId": "capernaum",
+  "images": [
+    {
+      "id": "capernaum-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/example.jpg",
+      "author": "Example Author",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Example.jpg",
+      "caption": "Illustrative lead image fixture only.",
+      "aiGenerated": false
+    },
+    {
+      "id": "capernaum-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/example-2.jpg",
+      "author": "Example Author",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Example-2.jpg",
+      "caption": "Illustrative second image fixture only.",
+      "aiGenerated": false
+    }
+  ]
+}

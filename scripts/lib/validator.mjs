@@ -572,6 +572,7 @@ export async function validateData(options = {}) {
   }
 
   const locationIdToFiles = new Map();
+  const imageIdToFiles = new Map();
   const locationIds = new Set();
 
   for (const locationRecord of locationRecords) {
@@ -903,6 +904,62 @@ export async function validateData(options = {}) {
         mediaRecord.relativePath,
         "$.locationId",
         `locationId '${data.locationId}' does not match any location id`
+      );
+    }
+
+    if (Array.isArray(data.images)) {
+      data.images.forEach((image, imageIndex) => {
+        if (!image || typeof image !== "object" || typeof image.id !== "string") {
+          return;
+        }
+
+        const imageIdPath = `$.images[${imageIndex}].id`;
+        if (typeof data.locationId === "string") {
+          const expectedPrefix = `${data.locationId}-`;
+          if (!image.id.startsWith(expectedPrefix)) {
+            recordError(
+              errors,
+              mediaRecord.relativePath,
+              imageIdPath,
+              `Image id '${image.id}' must start with '${expectedPrefix}' to match locationId`
+            );
+          } else {
+            const expectedId = `${data.locationId}-${String(imageIndex + 1).padStart(2, "0")}`;
+            if (image.id !== expectedId) {
+              recordError(
+                errors,
+                mediaRecord.relativePath,
+                imageIdPath,
+                `Image id '${image.id}' must be '${expectedId}' to keep sequential order 01, 02, ...`
+              );
+            }
+          }
+        }
+
+        const files = imageIdToFiles.get(image.id) ?? [];
+        files.push({
+          file: mediaRecord.relativePath,
+          path: imageIdPath
+        });
+        imageIdToFiles.set(image.id, files);
+      });
+    }
+  }
+
+  for (const [imageId, files] of imageIdToFiles.entries()) {
+    if (files.length < 2) {
+      continue;
+    }
+
+    for (const entry of files) {
+      recordError(
+        errors,
+        entry.file,
+        entry.path,
+        `Duplicate image id '${imageId}' also appears in ${files
+          .filter((candidate) => candidate !== entry)
+          .map((candidate) => `${candidate.file}:${candidate.path}`)
+          .join(", ")}`
       );
     }
   }

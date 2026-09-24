@@ -2,6 +2,7 @@
   "locationId": "bethlehem",
   "images": [
     {
+      "id": "bethlehem-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Church_of_the_Nativity_%287703592746%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
       "author": "Neil Ward",
       "license": "CC BY 2.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "bethlehem-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Bethlehem-03-Church_of_the_Nativity.jpg",
       "author": "Ian and Wendy Sewell",
       "license": "CC BY-SA 3.0",
