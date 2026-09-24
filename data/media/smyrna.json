@@ -3,32 +3,32 @@
   "images": [
     {
       "id": "smyrna-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/1874_KK10soldi_SMIRNE_Mi4I.jpg",
-      "author": "Jacquesverlaeken",
-      "license": "CC0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:1874_KK10soldi_SMIRNE_Mi4I.jpg",
-      "caption": "Ancient Smyrna",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/Agora_of_Smyrna%2C_built_during_the_Hellenistic_era_at_the_base_of_Pagos_Hill_and_totally_rebuilt_under_Marcus_Aurelius_after_the_destructive_178_AD_earthquake%2C_Izmir%2C_Turkey_%2818511982670%29.jpg",
+      "author": "Carole Raddato",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Agora_of_Smyrna,_built_during_the_Hellenistic_era_at_the_base_of_Pagos_Hill_and_totally_rebuilt_under_Marcus_Aurelius_after_the_destructive_178_AD_earthquake,_Izmir,_Turkey_(18511982670).jpg",
+      "caption": "Ruins of the Roman-era agora of ancient Smyrna, Izmir",
       "aiGenerated": false
     },
     {
       "id": "smyrna-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/1876issue_KK10soldi_SPED.POST_PRESSO_LLOYD_SMIRNE_Mi4IIA.jpg",
-      "author": "Jacquesverlaeken",
-      "license": "CC0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:1876issue_KK10soldi_SPED.POST_PRESSO_LLOYD_SMIRNE_Mi4IIA.jpg",
-      "caption": "Ancient Smyrna",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Izmir_agora_north_of_Northwest_Basilica_6668.jpg",
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Izmir_agora_north_of_Northwest_Basilica_6668.jpg",
+      "caption": "Substructure of the agora of ancient Smyrna, Izmir",
       "aiGenerated": false
     },
     {
       "id": "smyrna-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Austria_Levant_1900_Sc33_Smyrna.jpg",
-      "author": "Austro-Hungarian postal authorities",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Austria_Levant_1900_Sc33_Smyrna.jpg",
-      "caption": "Ancient Smyrna",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Roman_Bath_of_Smyrna_in_%C4%B0zmir_Agora.jpg",
+      "author": "Msee35",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_Bath_of_Smyrna_in_%C4%B0zmir_Agora.jpg",
+      "caption": "Remains of the Roman bath within the agora of ancient Smyrna",
       "aiGenerated": false
     }
   ]

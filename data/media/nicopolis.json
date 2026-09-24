@@ -3,32 +3,22 @@
   "images": [
     {
       "id": "nicopolis-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/IAN_F1237_Nicourt_865_Preveza.jpg",
-      "author": "The postcard was published by Nikolaos Kourtides (Nicourt) in 1935 c.",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:IAN_F1237_Nicourt_865_Preveza.jpg",
-      "caption": "Ancient Nicopolis site",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Nicopolis_nymphaeum.jpg",
+      "author": "Marsyas",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nicopolis_nymphaeum.jpg",
+      "caption": "Roman nymphaeum near the west gate of ancient Nicopolis in Epirus",
       "aiGenerated": false
     },
     {
       "id": "nicopolis-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/IAN_F1239_Nicourt_867_Preveza.jpg",
-      "author": "The postcard was published by Nikolaos Kourtides (Nicourt) in 1935 c.",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:IAN_F1239_Nicourt_867_Preveza.jpg",
-      "caption": "Ancient Nicopolis site",
-      "aiGenerated": false
-    },
-    {
-      "id": "nicopolis-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/IAN_F2828_Unknown_Preveza.jpg",
-      "author": "The postcard was published by an unknown publisher in 1935 c.",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:IAN_F2828_Unknown_Preveza.jpg",
-      "caption": "Ancient Nicopolis site",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/20140413_nikopolis014.JPG",
+      "author": "Jean Housen",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20140413_nikopolis014.JPG",
+      "caption": "View of the ancient ruins of Nicopolis in Epirus",
       "aiGenerated": false
     }
   ]

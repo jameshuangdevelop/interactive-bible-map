@@ -3,32 +3,32 @@
   "images": [
     {
       "id": "puteoli-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Anarchici.jpg",
-      "author": "Kikuyu3",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Ancient_Roman_market_place_and_Serapis_temple_panorama_-_Pozzuoli_-_Campania_-_Italy_-_July_11th_2013.jpg",
+      "author": "Norbert Nagel",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Anarchici.jpg",
-      "caption": "Ancient Puteoli",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Roman_market_place_and_Serapis_temple_panorama_-_Pozzuoli_-_Campania_-_Italy_-_July_11th_2013.jpg",
+      "caption": "Ruins of the Macellum, the ancient market of Puteoli once mistaken for a Temple of Serapis",
       "aiGenerated": false
     },
     {
       "id": "puteoli-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Antonio_Joli_-_Veduta_del_golfo_di_Pozzuoli_da_Napoli.jpg",
-      "author": "Antonio Joli",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Antonio_Joli_-_Veduta_del_golfo_di_Pozzuoli_da_Napoli.jpg",
-      "caption": "Ancient Puteoli",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Macellum_de_Pozzuoli_01.JPG",
+      "author": "Miguel Hermoso Cuesta",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Macellum_de_Pozzuoli_01.JPG",
+      "caption": "Columns of the Macellum, the ancient marketplace of Puteoli",
       "aiGenerated": false
     },
     {
       "id": "puteoli-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Arcobaleno_a_Pozzuoli.JPG",
-      "author": "Sabinolembo",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Arcobaleno_a_Pozzuoli.JPG",
-      "caption": "Ancient Puteoli",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Coast_of_Pozzuoli_01.jpg",
+      "author": "Superchilum",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Coast_of_Pozzuoli_01.jpg",
+      "caption": "The coastline of Pozzuoli, ancient Puteoli, on the Bay of Naples",
       "aiGenerated": false
     }
   ]

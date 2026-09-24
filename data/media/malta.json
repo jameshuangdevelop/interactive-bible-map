@@ -3,32 +3,32 @@
   "images": [
     {
       "id": "malta-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/2007_March_24%2C_parade_in_Malta_4.jpg",
-      "author": "Syced",
-      "license": "CC0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:2007_March_24,_parade_in_Malta_4.jpg",
-      "caption": "The island of Malta",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Banc_public_%2830849344002%29.jpg",
+      "author": "Maxence",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Banc_public_(30849344002).jpg",
+      "caption": "The Dingli Cliffs on the island of Malta",
       "aiGenerated": false
     },
     {
       "id": "malta-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/2007_March_24%2C_parade_in_Malta_6.jpg",
-      "author": "Syced",
-      "license": "CC0",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:2007_March_24,_parade_in_Malta_6.jpg",
-      "caption": "The island of Malta",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Malta%2C_2010_-_panoramio_-_Bengt_Nyman_%2823%29.jpg",
+      "author": "Bengt Nyman",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Malta,_2010_-_panoramio_-_Bengt_Nyman_(23).jpg",
+      "caption": "View of Marsamxett Harbour and Valletta on the island of Malta",
       "aiGenerated": false
     },
     {
       "id": "malta-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/20231112_154409_Indul%C4%A1enza_f%27_%C4%A6al_Tarxien.jpg",
-      "author": "NoelMalta",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Munxar_cliffs%2C_st_thomas_bay.jpg",
+      "author": "Jeanetz",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:20231112_154409_Indulġenza_f'_Ħal_Tarxien.jpg",
-      "caption": "The island of Malta",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Munxar_cliffs,_st_thomas_bay.jpg",
+      "caption": "Coastal cliffs at St. Thomas Bay on the island of Malta",
       "aiGenerated": false
     }
   ]

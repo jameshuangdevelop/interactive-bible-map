@@ -3,32 +3,32 @@
   "images": [
     {
       "id": "crete-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Archive_of_the_first_Duke_of_Crete.jpg",
-      "author": "Mourtzana",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Archive_of_the_first_Duke_of_Crete.jpg",
-      "caption": "The island of Crete",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Crete_Nasa.jpg",
+      "author": "NASA",
+      "license": "Public domain",
+      "licenseUrl": "https://creativecommons.org/publicdomain/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Crete_Nasa.jpg",
+      "caption": "Satellite image of the island of Crete",
       "aiGenerated": false
     },
     {
       "id": "crete-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Bananenstaude.jpg",
-      "author": "Oliver Deisenroth",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bananenstaude.jpg",
-      "caption": "The island of Crete",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
+      "author": "Jebulon",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
+      "caption": "The Mount Ida chain and Messara plain seen from Phaistos, Crete",
       "aiGenerated": false
     },
     {
       "id": "crete-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Besser_is_das....._%2847067559804%29.jpg",
-      "author": "Rolf Dietrich Brecher from Germany",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Besser_is_das....._(47067559804).jpg",
-      "caption": "The island of Crete",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Agios_Nikolaos%2C_Crete_%E2%80%93_Harbour_2019a.jpg",
+      "author": "Cayambe",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Agios_Nikolaos,_Crete_%E2%80%93_Harbour_2019a.jpg",
+      "caption": "Harbour of Agios Nikolaos on the island of Crete",
       "aiGenerated": false
     }
   ]

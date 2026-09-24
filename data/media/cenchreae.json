@@ -1,0 +1,25 @@
+{
+  "locationId": "cenchreae",
+  "images": [
+    {
+      "id": "cenchreae-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Remains_of_an_early_Christian_Basilica_and_Temple_of_Isis_at_the_ancient_harbour_at_Kenchreai%2C_one_of_the_two_ports_of_the_inland_city-state_of_Corinth%2C_Greece_%2814079053672%29.jpg",
+      "author": "Carole Raddato",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Remains_of_an_early_Christian_Basilica_and_Temple_of_Isis_at_the_ancient_harbour_at_Kenchreai,_one_of_the_two_ports_of_the_inland_city-state_of_Corinth,_Greece_(14079053672).jpg",
+      "caption": "Remains of the ancient harbour and an early Christian basilica at Kenchreai (Cenchreae)",
+      "aiGenerated": false
+    },
+    {
+      "id": "cenchreae-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/The_tower_guarding_the_entrance_to_the_port_of_ancient_Kechries_on_January_10%2C_2020.jpg",
+      "author": "George E. Koronaios",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_tower_guarding_the_entrance_to_the_port_of_ancient_Kechries_on_January_10,_2020.jpg",
+      "caption": "Tower guarding the harbour entrance at ancient Kenchreai (Cenchreae)",
+      "aiGenerated": false
+    }
+  ]
+}

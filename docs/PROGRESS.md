@@ -30,3 +30,4 @@ Shared memory for all agents. Every session reads this first and updates its own
 | 2026-09-22 | project-owner | M0-01 | Created M0 files and the M1 cards |
 | 2026-09-23 | project-owner | M1-00 to M1-04 | Ran M1 as subagents, with reviews; CP1 approved (#3–#7) |
 | 2026-09-23 | project-owner | M2-00 | Recorded CP1; wrote the M2-01 to M2-03 cards; added ADR-0014 and ADR-0015 |
+| 2026-09-24 | media-curator | M2-05 (redo) | Redid Phase B media for all 20 batch 3 locations after PO rejected the first pass (wrong-place and irrelevant images). Re-sourced every location from Wikidata P18/P373 and Commons category browsing; added images for tyre, salamis-cyprus, cenchreae and perga (previously missing); kept images only after independently re-verifying subject and license. `npm run validate:data` passes with 0 errors. |

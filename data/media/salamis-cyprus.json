@@ -1,0 +1,25 @@
+{
+  "locationId": "salamis-cyprus",
+  "images": [
+    {
+      "id": "salamis-cyprus-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Salamis.jpg",
+      "author": "Gustavobw",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Salamis.jpg",
+      "caption": "Ruins of the ancient theatre at Salamis, Cyprus",
+      "aiGenerated": false
+    },
+    {
+      "id": "salamis-cyprus-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/20/383Zypern_Salamis_Gymnasium_%2814227776424%29.jpg",
+      "author": "Rüdiger Stehn",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:383Zypern_Salamis_Gymnasium_(14227776424).jpg",
+      "caption": "Ruins of the gymnasium at Salamis, Cyprus",
+      "aiGenerated": false
+    }
+  ]
+}

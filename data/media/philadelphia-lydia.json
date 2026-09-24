@@ -3,32 +3,32 @@
   "images": [
     {
       "id": "philadelphia-lydia-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/1922_Ala%C5%9Fehir_Yang%C4%B1n%C4%B1.jpg",
-      "author": "Albert Kahn (Yaşam süresi: 1860-1940)",
-      "license": "Public domain",
-      "licenseUrl": "https://creativecommons.org/publicdomain/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:1922_Alaşehir_Yangını.jpg",
-      "caption": "Ancient Philadelphia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Ala%C5%9Fehir_Church_of_St._John.jpg",
+      "author": "simonjenkins",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ala%C5%9Fehir_Church_of_St._John.jpg",
+      "caption": "Ruins of the Basilica of St. John in Alaşehir, ancient Philadelphia",
       "aiGenerated": false
     },
     {
       "id": "philadelphia-lydia-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Alasehir%2C_Manisa_tabela.jpg",
-      "author": "The original uploader was Citrat at Turkish Wikipedia.",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alasehir,_Manisa_tabela.jpg",
-      "caption": "Ancient Philadelphia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Carved_stone_slab_01.JPG",
+      "author": "Murat Bengisu",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Carved_stone_slab_01.JPG",
+      "caption": "Carved stone at the ruins of St. John's Church, ancient Philadelphia",
       "aiGenerated": false
     },
     {
       "id": "philadelphia-lydia-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Alasehir_Kenan_Evren_monument.jpg",
-      "author": "Unknown",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Alasehir_Kenan_Evren_monument.jpg",
-      "caption": "Ancient Philadelphia",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Biblical_Philadelphia%2C_Ala%C5%9Fehir%2C_Turkey_%28%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D%29_%2851966166907%29.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Biblical_Philadelphia,_Ala%C5%9Fehir,_Turkey_(%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D)_(51966166907).jpg",
+      "caption": "Ruins of St. John's Church in Alaşehir, ancient Philadelphia",
       "aiGenerated": false
     }
   ]
