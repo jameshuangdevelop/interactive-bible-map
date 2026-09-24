@@ -125,3 +125,5 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 final fixes | — | ~60 | ~20,112 |
 | 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta image | — | ~25 | ~20,137 |
 | 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 re-verification 2 (Opus 5.5 rates +50%) | ~265k / ~8k | ~180 | ~20,317 |
+| 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta author | — | ~10 | ~20,327 |
+| 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 sign-off (Opus 5.5 rates +50%) | ~275k / ~3k | ~90 | ~20,417 |

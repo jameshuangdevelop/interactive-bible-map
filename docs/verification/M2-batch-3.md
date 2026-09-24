@@ -24,6 +24,8 @@
 
 **Validation:** `npm run validate:data`: 0 errors, 99 warnings (unchanged). `npm test`: 46/46 pass.
 
+**R-5 closed (`8ca53d3`):** `malta-01`'s `author` is now "Jeffrey Sciberras (photo credited to Arnold Sciberras)". This matches the Commons API: `Artist` is "Jeffrey Sciberras", `Credit` is "Own work", and the description reads "Photo: Arnold Sciberras". The license (CC BY 3.0) is unchanged and matches. **Pass. M2-05 is signed off: 20 of 20 records verified, 20 of 20 media files (55 of 55 images) pass.**
+
 ## Re-verification (2026-09-24: fixes `3018cd9` research-lead, `4339f00` media-curator)
 
 **Result: 16 of 20 records pass and are now `verified`. 19 of 20 media files (54 of 55 images) pass. 5 items remain open: 4 for the research-lead and 1 for the media-curator.** `corinth.json` (batch 2) passes its paraphrase re-check, and its `lastReviewed` is set to 2026-09-24.
