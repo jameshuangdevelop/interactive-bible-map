@@ -24,7 +24,8 @@
         "wikidata:Q847246",
         "dare:21656",
         "pleiades:687891",
-        "openbible:emmaus"
+        "openbible:emmaus",
+        "scripture:Luke 24:13"
       ]
     },
     {
@@ -38,7 +39,8 @@
       "support": "About 60 stadia (roughly 11 km) from Jerusalem, matching the distance given in most Greek manuscripts of Luke 24:13; salvage excavations at the site have uncovered a first-century Jewish village, which has led some modern scholars to favor this candidate, though it lacks the long history of Christian commemoration of Emmaus Nicopolis.",
       "sources": [
         "wikidata:Q2898847",
-        "openbible:emmaus"
+        "openbible:emmaus",
+        "scripture:Luke 24:13"
       ]
     },
     {
@@ -52,7 +54,8 @@
       "support": "About 60 stadia from Jerusalem; identified with Emmaus mainly from the Crusader period onward and recognized by the Franciscans, but no ancient source calls the site Emmaus.",
       "sources": [
         "wikidata:Q6041947",
-        "openbible:emmaus"
+        "openbible:emmaus",
+        "scripture:Luke 24:13"
       ]
     },
     {
@@ -66,14 +69,16 @@
       "support": "Identified with Emmaus in the Middle Ages partly on the strength of a large church at the site, though the village is more commonly identified by scholars with the biblical Kiriath-Jearim than with Emmaus.",
       "sources": [
         "wikidata:Q759606",
-        "openbible:emmaus"
+        "openbible:emmaus",
+        "scripture:Luke 24:13"
       ]
     }
   ],
   "summary": {
     "text": "Emmaus is the village to which two disciples were walking on the day of the resurrection, according to Luke 24, when the risen Jesus joined them without being recognized; its identification is disputed, with candidate sites proposed at very different distances from Jerusalem.",
     "sources": [
-      "openbible:emmaus"
+      "openbible:emmaus",
+      "scripture:Luke 24:13"
     ]
   },
   "history": [
@@ -81,7 +86,8 @@
       "text": "Luke's Gospel states the distance from Jerusalem to Emmaus as 'sixty stadia' in the majority of surviving Greek manuscripts, about 11 kilometers, while the fourth-century Codex Sinaiticus reads 'one hundred and sixty stadia,' about 30 kilometers; the two readings underlie much of the modern disagreement over which site is meant.",
       "sources": [
         "bib:metzger-textual-commentary",
-        "openbible:emmaus"
+        "openbible:emmaus",
+        "scripture:Luke 24:13"
       ]
     }
   ],
@@ -147,7 +153,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

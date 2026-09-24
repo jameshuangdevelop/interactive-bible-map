@@ -61,7 +61,9 @@
   "summary": {
     "text": "Cana of Galilee is named in the Gospel of John as the site of Jesus' first miracle, turning water into wine at a wedding, and of a second miracle recorded there; its identification is disputed among several candidate villages.",
     "sources": [
-      "openbible:cana"
+      "openbible:cana",
+      "scripture:John 2:1",
+      "scripture:John 4:46"
     ]
   },
   "history": [
@@ -130,7 +132,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

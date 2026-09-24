@@ -30,7 +30,8 @@
     "text": "Nain was a small Galilean village where, according to Luke 7, Jesus raised a widow's only son from death as his funeral procession left the town.",
     "sources": [
       "wikidata:Q934904",
-      "openbible:nain"
+      "openbible:nain",
+      "scripture:Luke 7:14"
     ]
   },
   "history": [
@@ -85,7 +86,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

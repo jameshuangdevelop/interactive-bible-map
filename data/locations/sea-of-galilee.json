@@ -35,7 +35,10 @@
     "text": "The Sea of Galilee is the freshwater lake in northern Israel around which much of Jesus' Galilean ministry took place, including the calling of his first disciples, several miracles at sea, and post-resurrection appearances recorded in the Gospels.",
     "sources": [
       "wikidata:Q126982",
-      "openbible:sea-of-galilee"
+      "openbible:sea-of-galilee",
+      "scripture:Mark 1:16",
+      "scripture:Matthew 14:25",
+      "scripture:John 21:1"
     ]
   },
   "history": [
@@ -127,7 +130,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

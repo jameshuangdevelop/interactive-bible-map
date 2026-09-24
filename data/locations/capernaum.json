@@ -35,7 +35,9 @@
     "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee that served as a base for Jesus' Galilean ministry, described in the Gospels as the home of Peter and the location of numerous healings and teachings, including in its synagogue.",
     "sources": [
       "wikidata:Q59174",
-      "openbible:capernaum"
+      "openbible:capernaum",
+      "scripture:Mark 1:21",
+      "scripture:Mark 2:1"
     ]
   },
   "history": [
@@ -183,7 +185,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

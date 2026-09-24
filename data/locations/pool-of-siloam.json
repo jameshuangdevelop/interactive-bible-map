@@ -34,7 +34,8 @@
     "text": "The Pool of Siloam is a reservoir at the southern end of Jerusalem's City of David, fed by the Gihon Spring, where the Gospel of John records Jesus sending a man born blind to wash and receive his sight.",
     "sources": [
       "wikidata:Q1483483",
-      "openbible:siloam"
+      "openbible:siloam",
+      "scripture:John 9:7"
     ]
   },
   "history": [
@@ -73,7 +74,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

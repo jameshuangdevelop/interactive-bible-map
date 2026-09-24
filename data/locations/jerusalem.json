@@ -38,7 +38,11 @@
     "sources": [
       "wikidata:Q1218",
       "pleiades:687928",
-      "dare:15896"
+      "dare:15896",
+      "bib:rainey-notley-sacred-bridge",
+      "scripture:Matthew 21:1",
+      "scripture:John 19:20",
+      "scripture:Luke 24:36"
     ]
   },
   "history": [
@@ -989,7 +993,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

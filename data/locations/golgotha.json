@@ -49,7 +49,12 @@
     "text": "Golgotha, 'place of a skull,' is the site of Jesus' crucifixion described in all four Gospels as located outside Jerusalem's walls; its precise location is not settled, with the Church of the Holy Sepulchre and the Garden Tomb the two most discussed candidate sites, and some scholars proposing the crucifixion and burial were at somewhat separate spots within the same general quarry area.",
     "sources": [
       "openbible:golgotha",
-      "bib:taylor-golgotha-reconsideration"
+      "bib:taylor-golgotha-reconsideration",
+      "scripture:Matthew 27:33",
+      "scripture:Mark 15:22",
+      "scripture:Luke 23:33",
+      "scripture:John 19:17",
+      "scripture:Hebrews 13:12"
     ]
   },
   "history": [
@@ -101,7 +106,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

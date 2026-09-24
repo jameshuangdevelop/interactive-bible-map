@@ -31,7 +31,8 @@
     "text": "Gethsemane is the garden at the foot of the Mount of Olives where, according to Matthew and Mark, Jesus prayed with his disciples on the night of his arrest.",
     "sources": [
       "wikidata:Q205333",
-      "openbible:gethsemane"
+      "openbible:gethsemane",
+      "scripture:Matthew 26:36"
     ]
   },
   "history": [
@@ -57,7 +58,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

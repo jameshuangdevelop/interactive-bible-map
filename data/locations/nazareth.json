@@ -35,7 +35,9 @@
     "text": "Nazareth was a small Galilean village in the first century AD, identified in the Gospels of Matthew and Luke as the town where Jesus grew up and from which he is repeatedly called 'Jesus of Nazareth' throughout the New Testament.",
     "sources": [
       "wikidata:Q430776",
-      "openbible:nazareth"
+      "openbible:nazareth",
+      "scripture:Matthew 2:23",
+      "scripture:Mark 1:24"
     ]
   },
   "history": [
@@ -254,7 +256,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

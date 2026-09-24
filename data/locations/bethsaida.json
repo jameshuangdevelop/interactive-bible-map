@@ -47,7 +47,9 @@
   "summary": {
     "text": "Bethsaida is named in the Gospels as the home town of the apostles Peter, Andrew and Philip and the setting of the feeding of the five thousand and other episodes; its location is disputed between two excavated sites on the northern shore of the Sea of Galilee.",
     "sources": [
-      "openbible:bethsaida-1"
+      "openbible:bethsaida-1",
+      "scripture:John 1:44",
+      "scripture:Luke 9:10"
     ]
   },
   "history": [
@@ -146,7 +148,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

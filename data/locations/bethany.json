@@ -31,7 +31,9 @@
     "text": "Bethany was a village on the eastern slope of the Mount of Olives, close to Jerusalem, identified in the Gospel of John as the home of Lazarus, Martha and Mary and the site of Lazarus being raised from death.",
     "sources": [
       "wikidata:Q7818622",
-      "openbible:bethany-1"
+      "openbible:bethany-1",
+      "scripture:John 11:1",
+      "scripture:John 11:43"
     ]
   },
   "history": [
@@ -150,7 +152,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

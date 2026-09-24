@@ -34,7 +34,10 @@
     "text": "Magdala, on the western shore of the Sea of Galilee near Tiberias, is best known as the home village implied by the epithet 'Magdalene' given to Mary Magdalene throughout the Gospels; a place named Magadan or Dalmanutha in the same general area is also mentioned in Matthew and Mark.",
     "sources": [
       "openbible:magdala",
-      "wikidata:Q4880851"
+      "wikidata:Q4880851",
+      "scripture:Luke 8:2",
+      "scripture:Matthew 15:39",
+      "scripture:Mark 8:10"
     ]
   },
   "history": [
@@ -94,7 +97,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

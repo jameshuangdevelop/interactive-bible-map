@@ -33,7 +33,8 @@
     "text": "The Pool of Bethesda is a reservoir near Jerusalem's Sheep Gate that the Gospel of John names as the site where Jesus healed a man who had been an invalid for thirty-eight years.",
     "sources": [
       "wikidata:Q831297",
-      "openbible:bethesda"
+      "openbible:bethesda",
+      "scripture:John 5:5"
     ]
   },
   "history": [
@@ -41,7 +42,8 @@
       "text": "Archaeological excavation near St. Anne's Church uncovered a large twin-pool complex divided by a central dam, with column bases and sockets marking five porticoes, matching the Gospel of John's description and confirming the pool's existence as a real Second Temple-period structure.",
       "sources": [
         "wikidata:Q831297",
-        "bib:murphy-oconnor-holy-land-guide"
+        "bib:murphy-oconnor-holy-land-guide",
+        "scripture:John 5:2"
       ]
     }
   ],
@@ -54,7 +56,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }
