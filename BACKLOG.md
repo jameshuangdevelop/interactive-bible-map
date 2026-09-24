@@ -20,4 +20,4 @@ PR Reviewer findings that were not addressed in their PR, each with a reason.
 
 | Date | PR | Finding | Label | Why deferred |
 |---|---|---|---|---|
-| — | — | None yet | — | — |
+| 2026-09-24 | M2-06 | `tests/validator.test.mjs`: the cross-file duplicate-image-id fixture also trips the prefix rule; add a comment explaining why a fully isolated duplicate case is impossible | nit | The test is correct as it is. Add the comment the next time the validator tests are touched. |
