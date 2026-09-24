@@ -1,0 +1,54 @@
+{
+  "id": "philadelphia-lydia",
+  "names": {
+    "ancient": [
+      "Philadelphia",
+      "Philadelpheia"
+    ],
+    "modern": "Alaşehir (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Philadelphia archaeological remains (Alaşehir)",
+      "coordinates": [
+        28.516667,
+        38.35
+      ],
+      "coordinateSource": "pleiades:550822",
+      "confidence": "high",
+      "support": "This is the Philadelphia of Lydia, continuous with modern Alaşehir, Turkey, one of the seven churches of Revelation 2-3; it is a distinct city from the Decapolis city also called Philadelphia in antiquity (Rabbath-Ammon, modern Amman) and from other places later named Philadelphia. Pleiades' non-OSM DARE-derived point and Wikidata's coordinate for Alaşehir agree closely.",
+      "sources": [
+        "pleiades:550822",
+        "wikidata:Q138280"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Philadelphia was a Lydian city in the Hermus valley near an active volcanic region, founded by the Pergamene king Eumenes II and named for the brotherly loyalty ('Philadelphos') for which he was known. It is one of the seven churches addressed in Revelation 2-3, given no rebuke and promised an open door because it 'kept my word, and didn't deny my name.'",
+    "sources": [
+      "pleiades:550822",
+      "wikidata:Q138280",
+      "scripture:Revelation 3:7",
+      "scripture:Revelation 3:8"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 3:7",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Philadelphia write: “He who is holy, he who is true, he who has the key of David, he who opens and no one can shut, and who shuts and no one opens, says these things:"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -1,0 +1,52 @@
+{
+  "id": "smyrna",
+  "names": {
+    "ancient": [
+      "Smyrna"
+    ],
+    "modern": "İzmir (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Smyrna (Roman-era city, İzmir)",
+      "coordinates": [
+        27.142836,
+        38.418611
+      ],
+      "coordinateSource": "pleiades:550893",
+      "confidence": "high",
+      "support": "This is the Roman-period city addressed in Revelation, at the location of modern İzmir's ancient agora, distinct from the earlier 'Old Smyrna' settlement at nearby Bayraklı; Pleiades and Wikidata's coordinates for the Roman-era site agree closely.",
+      "sources": [
+        "pleiades:550893",
+        "wikidata:Q1379299"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Smyrna was a major Greek city on the Aegean coast of Asia Minor, at the site of modern İzmir. It is one of the seven churches addressed in Revelation 2-3, where the risen Christ commends the congregation's endurance under persecution and poverty without any rebuke.",
+    "sources": [
+      "pleiades:550893",
+      "wikidata:Q1379299",
+      "scripture:Revelation 2:8"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 2:8",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Smyrna write: “The first and the last, who was dead, and has come to life says these things:"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -18,7 +18,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M2-02 | Core sites, batch 1 (22) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Verified | — |
 | M2-03 | Core sites, batch 2 (20) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Verified | — |
 | M2-06 | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | Schema done; media review next | — |
-| M2-05 | Core sites, batch 3 (18 sites + 2 regions) | research-lead → media-curator → fact-checker | `data/m2-batch-3` | In progress (subagent, ADR-0007) | — |
+| M2-05 | Core sites, batch 3 (18 sites + 2 regions) | research-lead → media-curator → fact-checker | `data/m2-batch-3` | Research done; media next | — |
 | M2-04 | CP2 summary | project-owner | `docs/cp2-summary` | Planned | — |
 
 ## Open questions

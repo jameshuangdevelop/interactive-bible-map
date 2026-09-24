@@ -232,6 +232,126 @@
       "publisher": "World History Encyclopedia",
       "url": "https://www.worldhistory.org/corinth/",
       "accessed": "2026-09-23"
+    },
+    {
+      "id": "zondervan-who-were-galatians",
+      "type": "web",
+      "title": "Who Were the Galatians?",
+      "authors": [
+        "Thomas R. Schreiner"
+      ],
+      "year": 2017,
+      "publisher": "Zondervan Academic",
+      "url": "https://zondervanacademic.com/blog/who-were-the-galatians",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-hierapolis-pamukkale",
+      "type": "web",
+      "title": "Hierapolis-Pamukkale",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/485",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "livius-actium",
+      "type": "web",
+      "title": "Naval Battle of Actium (31 BCE)",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/battle/actium-31-bce/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "livius-miletus",
+      "type": "web",
+      "title": "Miletus",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/miletus/?lang=en",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-pergamon",
+      "type": "web",
+      "title": "Pergamon and its Multi-Layered Cultural Landscape",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1457",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "worldhistory-sardis",
+      "type": "web",
+      "title": "Sardis",
+      "authors": [
+        "World History Encyclopedia"
+      ],
+      "year": 2024,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/sardis/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-patmos",
+      "type": "web",
+      "title": "The Historic Centre (Chorá) with the Monastery of Saint-John the Theologian and the Cave of the Apocalypse on the Island of Pátmos",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/942",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "bibleplaces-puteoli",
+      "type": "web",
+      "title": "Puteoli",
+      "authors": [
+        "BiblePlaces.com"
+      ],
+      "year": 2026,
+      "publisher": "BiblePlaces.com",
+      "url": "https://www.bibleplaces.com/puteoli/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-tyre",
+      "type": "web",
+      "title": "Tyre",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/299",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "hmml-contesting-shipwreck",
+      "type": "web",
+      "title": "Contesting Saint Paul's Shipwreck",
+      "authors": [
+        "Daniel K. Gullo"
+      ],
+      "year": 2026,
+      "publisher": "Hill Museum & Manuscript Library, Saint John's University",
+      "url": "https://hmml.org/stories/series-weather-contesting-saint-paul-s-shipwreck/",
+      "accessed": "2026-09-24"
     }
   ]
 }

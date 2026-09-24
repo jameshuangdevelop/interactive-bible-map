@@ -1,0 +1,76 @@
+{
+  "id": "laodicea",
+  "names": {
+    "ancient": [
+      "Laodicea",
+      "Laodicea on the Lycus",
+      "Laodicea ad Lycum"
+    ],
+    "modern": "Near Denizli (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Laodicea on the Lycus archaeological site",
+      "coordinates": [
+        29.136425,
+        37.855246
+      ],
+      "coordinateSource": "pleiades:638955",
+      "confidence": "high",
+      "support": "The extensively excavated site near modern Denizli, distinct from other ancient cities named Laodicea, is undisputed as the New Testament Laodicea on the Lycus; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:638955",
+        "wikidata:Q849709"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Laodicea on the Lycus was a wealthy city of the Lycus Valley in Roman Phrygia, grouped with nearby Colossae and Hierapolis in Colossians 4:13. Paul's letter to the Colossians directs that it be read also at Laodicea and that a (non-surviving) letter to Laodicea be read at Colossae, and Laodicea is separately addressed as one of the seven churches of Revelation 2-3, rebuked there for lukewarm faith and material self-sufficiency.",
+    "sources": [
+      "pleiades:638955",
+      "wikidata:Q849709",
+      "scripture:Colossians 4:13",
+      "scripture:Colossians 4:16",
+      "scripture:Revelation 3:14"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Colossians 2:1",
+      "book": "Colossians",
+      "textWEB": "For I desire to have you know how greatly I struggle for you and for those at Laodicea, and for as many as have not seen my face in the flesh;"
+    },
+    {
+      "ref": "Colossians 4:13",
+      "book": "Colossians",
+      "textWEB": "For I testify about him that he has great zeal for you, and for those in Laodicea, and for those in Hierapolis."
+    },
+    {
+      "ref": "Colossians 4:15",
+      "book": "Colossians",
+      "textWEB": "Greet the brothers who are in Laodicea, with Nymphas and the assembly that is in his house."
+    },
+    {
+      "ref": "Colossians 4:16",
+      "book": "Colossians",
+      "textWEB": "When this letter has been read among you, cause it to be read also in the assembly of the Laodiceans, and that you also read the letter from Laodicea."
+    },
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 3:14",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Laodicea write: “The Amen, the Faithful and True Witness, the Beginning of God’s creation, says these things:"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

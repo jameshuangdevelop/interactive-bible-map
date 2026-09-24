@@ -1,0 +1,122 @@
+{
+  "id": "tyre",
+  "names": {
+    "ancient": [
+      "Tyre",
+      "Tyrus"
+    ],
+    "modern": "Sour / Tyre (Lebanon)",
+    "alternate": [
+      "Sour"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Tyre archaeological site (Sour)",
+      "coordinates": [
+        35.2,
+        33.266667
+      ],
+      "coordinateSource": "pleiades:678437",
+      "confidence": "high",
+      "support": "Tyre, on the coast of the South Governorate of Lebanon, is undisputed in identity and location; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:678437",
+        "wikidata:Q82070"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Tyre was, per UNESCO, 'the great Phoenician city that reigned over the seas,' founding colonies such as Carthage and controlling much of the ancient Mediterranean's maritime trade. Jesus withdrew into the region of Tyre and Sidon and healed a Gentile woman's daughter there, and on his final journey to Jerusalem Paul's ship put in at Tyre, where he found and stayed with disciples for seven days before continuing to Ptolemais.",
+    "sources": [
+      "pleiades:678437",
+      "wikidata:Q82070",
+      "bib:unesco-tyre",
+      "scripture:Matthew 15:21",
+      "scripture:Acts 21:3"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Matthew 11:21",
+      "book": "Matthew",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago in sackcloth and ashes."
+    },
+    {
+      "ref": "Matthew 11:22",
+      "book": "Matthew",
+      "textWEB": "But I tell you, it will be more tolerable for Tyre and Sidon on the day of judgment than for you."
+    },
+    {
+      "ref": "Matthew 15:21",
+      "book": "Matthew",
+      "textWEB": "Jesus went out from there and withdrew into the region of Tyre and Sidon."
+    },
+    {
+      "ref": "Mark 3:8",
+      "book": "Mark",
+      "textWEB": "from Jerusalem, from Idumaea, beyond the Jordan, and those from around Tyre and Sidon. A great multitude, hearing what great things he did, came to him."
+    },
+    {
+      "ref": "Mark 7:24",
+      "book": "Mark",
+      "textWEB": "From there he arose and went away into the borders of Tyre and Sidon. He entered into a house and didn’t want anyone to know it, but he couldn’t escape notice."
+    },
+    {
+      "ref": "Mark 7:31",
+      "book": "Mark",
+      "textWEB": "Again he departed from the borders of Tyre and Sidon, and came to the sea of Galilee through the middle of the region of Decapolis."
+    },
+    {
+      "ref": "Luke 6:17",
+      "book": "Luke",
+      "textWEB": "He came down with them and stood on a level place, with a crowd of his disciples and a great number of the people from all Judea and Jerusalem and the sea coast of Tyre and Sidon, who came to hear him and to be healed of their diseases,"
+    },
+    {
+      "ref": "Luke 10:13",
+      "book": "Luke",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago, sitting in sackcloth and ashes."
+    },
+    {
+      "ref": "Luke 10:14",
+      "book": "Luke",
+      "textWEB": "But it will be more tolerable for Tyre and Sidon in the judgment than for you."
+    },
+    {
+      "ref": "Acts 12:20",
+      "book": "Acts",
+      "textWEB": "Now Herod was very angry with the people of Tyre and Sidon. They came with one accord to him and, having made Blastus, the king’s personal aide, their friend, they asked for peace, because their country depended on the king’s country for food."
+    },
+    {
+      "ref": "Acts 21:3",
+      "book": "Acts",
+      "textWEB": "When we had come in sight of Cyprus, leaving it on the left hand, we sailed to Syria and landed at Tyre, for the ship was there to unload her cargo."
+    },
+    {
+      "ref": "Acts 21:7",
+      "book": "Acts",
+      "textWEB": "When we had finished the voyage from Tyre, we arrived at Ptolemais. We greeted the brothers and stayed with them one day."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Ezekiel 26:3",
+      "note": "Ezekiel pronounces a lengthy oracle of judgment against Tyre for its role in ancient Mediterranean trade, one of the Old Testament's most extensive prophecies against a single foreign city.",
+      "sources": [
+        "scripture:Ezekiel 26:3"
+      ]
+    },
+    {
+      "ref": "1 Kings 5:1",
+      "note": "Hiram, king of Tyre, supplies King Solomon with cedar and craftsmen for the building of the Jerusalem temple, an alliance the New Testament's Gospel references to Tyre and Sidon presuppose as long-standing regional neighbors of Israel.",
+      "sources": [
+        "scripture:1 Kings 5:1"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "draft"
+}

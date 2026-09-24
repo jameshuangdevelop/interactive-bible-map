@@ -1,0 +1,75 @@
+{
+  "id": "troas",
+  "names": {
+    "ancient": [
+      "Troas",
+      "Alexandria Troas"
+    ],
+    "modern": "Near Ezine (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Alexandria Troas archaeological site",
+      "coordinates": [
+        26.152555,
+        39.76128
+      ],
+      "coordinateSource": "pleiades:550434",
+      "confidence": "high",
+      "support": "The 'Troas' of Acts and Paul's letters is the Roman coastal city of Alexandria Troas, a Roman colony near the mouth of the Dardanelles, not the wider Troad region or Troy itself; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:550434",
+        "wikidata:Q1393407"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Alexandria Troas was a Roman colony and port city near the northwestern coast of Asia Minor, close to the site of ancient Troy. It is where Paul received his vision of a Macedonian man calling him to Europe, a stop on both directions of his third journey, and the place where he later left a cloak and books with Carpus.",
+    "sources": [
+      "pleiades:550434",
+      "wikidata:Q1393407",
+      "scripture:Acts 16:8",
+      "scripture:Acts 20:6",
+      "scripture:2 Timothy 4:13"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 16:8",
+      "book": "Acts",
+      "textWEB": "Passing by Mysia, they came down to Troas."
+    },
+    {
+      "ref": "Acts 16:11",
+      "book": "Acts",
+      "textWEB": "Setting sail therefore from Troas, we made a straight course to Samothrace, and the day following to Neapolis;"
+    },
+    {
+      "ref": "Acts 20:5",
+      "book": "Acts",
+      "textWEB": "But these had gone ahead, and were waiting for us at Troas."
+    },
+    {
+      "ref": "Acts 20:6",
+      "book": "Acts",
+      "textWEB": "We sailed away from Philippi after the days of Unleavened Bread, and came to them at Troas in five days, where we stayed seven days."
+    },
+    {
+      "ref": "2 Corinthians 2:12",
+      "book": "2 Corinthians",
+      "textWEB": "Now when I came to Troas for the Good News of Christ, and when a door was opened to me in the Lord,"
+    },
+    {
+      "ref": "2 Timothy 4:13",
+      "book": "2 Timothy",
+      "textWEB": "Bring the cloak that I left at Troas with Carpus when you come—and the books, especially the parchments."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

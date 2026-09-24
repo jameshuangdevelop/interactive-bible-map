@@ -1,0 +1,60 @@
+{
+  "id": "miletus",
+  "names": {
+    "ancient": [
+      "Miletus",
+      "Milawanda"
+    ],
+    "modern": "Near Balat (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Miletus archaeological site",
+      "coordinates": [
+        27.275556,
+        37.531111
+      ],
+      "coordinateSource": "pleiades:599799",
+      "confidence": "high",
+      "support": "The extensively excavated site near modern Balat, south of the Meander river's mouth, is undisputed as ancient Miletus; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:599799",
+        "wikidata:Q169460"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Miletus was, per Livius, the 'unofficial capital of the Ionian Greeks,' a major port city south of Ephesus known in earlier centuries as a center of Greek philosophy and colonization. On his third missionary journey Paul sailed past Ephesus to save time and instead summoned the Ephesian elders to meet him at Miletus, where he delivered his farewell address recorded in Acts 20; Paul's second letter to Timothy also mentions leaving a companion sick at Miletus.",
+    "sources": [
+      "pleiades:599799",
+      "wikidata:Q169460",
+      "bib:livius-miletus",
+      "scripture:Acts 20:17",
+      "scripture:2 Timothy 4:20"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 20:15",
+      "book": "Acts",
+      "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+    },
+    {
+      "ref": "Acts 20:17",
+      "book": "Acts",
+      "textWEB": "From Miletus he sent to Ephesus and called to himself the elders of the assembly."
+    },
+    {
+      "ref": "2 Timothy 4:20",
+      "book": "2 Timothy",
+      "textWEB": "Erastus remained at Corinth, but I left Trophimus at Miletus sick."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -1,0 +1,60 @@
+{
+  "id": "sardis",
+  "names": {
+    "ancient": [
+      "Sardis"
+    ],
+    "modern": "Sart (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Sardis archaeological site (Sart)",
+      "coordinates": [
+        28.040286,
+        38.488314
+      ],
+      "coordinateSource": "pleiades:550867",
+      "confidence": "high",
+      "support": "The extensively excavated site near modern Sart is undisputed as ancient Sardis, capital of the Kingdom of Lydia; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:550867",
+        "wikidata:Q232615"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Sardis was the capital of the ancient Kingdom of Lydia and, per World History Encyclopedia, was 'famous in antiquity for its wealth, culture, and favorable position on the central trade route from the Aegean Sea to the interior of Asia Minor,' later becoming an important city of the Roman province of Asia. It is one of the seven churches addressed in Revelation 2-3, warned there that it has 'a name that you are alive, but you are dead.'",
+    "sources": [
+      "pleiades:550867",
+      "wikidata:Q232615",
+      "bib:worldhistory-sardis",
+      "scripture:Revelation 3:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "Sardis was capital of the Lydian kingdom under kings such as Croesus, famed for his wealth, until the Persian conquest of 547/546 BC; it later passed through Seleucid and Roman rule and remained an important city of Roman Asia into the Byzantine period, when it was counted among the seven churches of Revelation.",
+      "sources": [
+        "bib:worldhistory-sardis"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 3:1",
+      "book": "Revelation",
+      "textWEB": "“And to the angel of the assembly in Sardis write: “He who has the seven Spirits of God and the seven stars says these things: “I know your works, that you have a reputation of being alive, but you are dead."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

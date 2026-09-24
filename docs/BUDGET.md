@@ -111,3 +111,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 scripture citations | ~700k / ~75k | ~1,450 | ~15,370 |
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 3 | ~200k / ~20k | ~400 | ~15,770 |
 | 2026-09-24 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-06 image IDs | ~360k / ~25k | ~147 | ~15,917 |
+| 2026-09-24 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 batch 3 research (Phase A: 20 records, extensive external source fetching for ADR-0017 compliance) | ~420k / ~55k | ~1,150 | ~17,067 |

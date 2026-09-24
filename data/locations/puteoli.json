@@ -1,0 +1,56 @@
+{
+  "id": "puteoli",
+  "names": {
+    "ancient": [
+      "Puteoli",
+      "Dikaiarcheia"
+    ],
+    "modern": "Pozzuoli (Italy)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Puteoli archaeological remains (Pozzuoli)",
+      "coordinates": [
+        14.121869,
+        40.827957
+      ],
+      "coordinateSource": "pleiades:432815",
+      "confidence": "high",
+      "support": "Puteoli, continuous with modern Pozzuoli on the Bay of Naples, is undisputed in identity and location; Pleiades' non-OSM DARE-derived point and Wikidata's coordinate for Pozzuoli agree closely.",
+      "sources": [
+        "pleiades:432815",
+        "wikidata:Q72425"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Puteoli was, until the completion of the harbor at Ostia under Claudius, the main port serving Rome and the chief destination of the Alexandrian grain fleet from Egypt. Acts records that Paul, sailing to Rome as a prisoner aboard an Alexandrian ship, landed at Puteoli and found believers there who urged him to stay with them seven days before the final overland journey to Rome.",
+    "sources": [
+      "pleiades:432815",
+      "wikidata:Q72425",
+      "bib:bibleplaces-puteoli",
+      "scripture:Acts 28:13"
+    ]
+  },
+  "history": [
+    {
+      "text": "Puteoli's secure natural harbor made it the principal port for Rome's seaborne trade, especially the Egyptian grain fleet, until the emperor Claudius completed an artificial harbor at Ostia in the mid-first century AD.",
+      "sources": [
+        "bib:bibleplaces-puteoli"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:13",
+      "book": "Acts",
+      "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

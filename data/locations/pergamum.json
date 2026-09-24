@@ -1,0 +1,70 @@
+{
+  "id": "pergamum",
+  "names": {
+    "ancient": [
+      "Pergamum",
+      "Pergamon"
+    ],
+    "modern": "Bergama (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Pergamon archaeological site",
+      "coordinates": [
+        27.183333,
+        39.116667
+      ],
+      "coordinateSource": "pleiades:550812",
+      "confidence": "high",
+      "support": "The extensively excavated acropolis and lower city near modern Bergama, a UNESCO World Heritage Site, are undisputed as ancient Pergamon; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:550812",
+        "wikidata:Q18986"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Pergamon was founded in the 3rd century BC as the capital of the Attalid dynasty and, per UNESCO, became 'an important cultural, scientific and political centre' with one of antiquity's largest libraries; after passing to Rome in 133 BC it served as capital of the Roman province of Asia. It is addressed in Revelation 2 as one of the seven churches, described there as the place 'where Satan's throne is,' commonly associated by commentators with the city's prominent imperial cult and pagan temples.",
+    "sources": [
+      "pleiades:550812",
+      "wikidata:Q18986",
+      "bib:unesco-pergamon",
+      "scripture:Revelation 2:12"
+    ]
+  },
+  "history": [
+    {
+      "text": "After the last Attalid king bequeathed his kingdom to Rome in 133 BC, Pergamon became a metropolis of the Roman province of Asia and remained a major religious center into the Byzantine period, when it was counted among the seven churches of the Book of Revelation.",
+      "sources": [
+        "bib:unesco-pergamon"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 2:12",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Pergamum write: “He who has the sharp two-edged sword says these things:"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -133,
+      "toYear": 395,
+      "entity": "Roman province of Asia (Pergamon became a metropolis after the Attalid bequest of 133 BC)",
+      "sources": [
+        "bib:unesco-pergamon"
+      ]
+    }
+  ],
+  "status": "draft"
+}

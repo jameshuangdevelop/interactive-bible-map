@@ -1,0 +1,47 @@
+{
+  "id": "neapolis-macedonia",
+  "names": {
+    "ancient": [
+      "Neapolis"
+    ],
+    "modern": "Kavala (Greece)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Neapolis archaeological remains (Kavala)",
+      "coordinates": [
+        24.415015,
+        40.93504
+      ],
+      "coordinateSource": "pleiades:501523",
+      "confidence": "high",
+      "support": "This Neapolis, the seaport of Philippi in Macedonia and continuous with modern Kavala, is a distinct place from Neapolis in Samaria (Flavia Neapolis, modern Nablus) and from other ancient cities named Neapolis. Pleiades' non-OSM DARE-derived point and Wikidata's coordinate for Kavala agree closely.",
+      "sources": [
+        "pleiades:501523",
+        "wikidata:Q187352"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Neapolis was the port city of Philippi on the coast of Macedonia. Acts records it as the first landfall in Europe on Paul's second missionary journey, reached by sailing from Troas, from where the party went inland to Philippi.",
+    "sources": [
+      "pleiades:501523",
+      "wikidata:Q187352",
+      "scripture:Acts 16:11"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 16:11",
+      "book": "Acts",
+      "textWEB": "Setting sail therefore from Troas, we made a straight course to Samothrace, and the day following to Neapolis;"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}
