@@ -1,0 +1,71 @@
+{
+  "id": "tarsus",
+  "names": {
+    "ancient": [
+      "Tarsus"
+    ],
+    "modern": "Tarsus (Mersin Province, Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Tarsus (modern city center)",
+      "coordinates": [
+        34.896467,
+        36.914043
+      ],
+      "coordinateSource": "pleiades:648789",
+      "confidence": "high",
+      "support": "The modern city of Tarsus overlies the ancient site, historically known also as Antiochia ad Cydnum; continuous occupation and identification are undisputed.",
+      "sources": [
+        "pleiades:648789",
+        "wikidata:Q134287"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Tarsus was, per Pleiades, 'an important city and river port on the Cydnus river located in Cilicia Pedias,' and, according to Acts, the birthplace of Paul, who identifies himself as 'a citizen of no insignificant city.'",
+    "sources": [
+      "pleiades:648789",
+      "wikidata:Q134287",
+      "openbible:tarsus",
+      "scripture:Acts 21:39",
+      "scripture:Acts 22:3"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 9:11",
+      "book": "Acts",
+      "textWEB": "The Lord said to him, “Arise and go to the street which is called Straight, and inquire in the house of Judah for one named Saul, a man of Tarsus. For behold, he is praying,"
+    },
+    {
+      "ref": "Acts 9:30",
+      "book": "Acts",
+      "textWEB": "When the brothers knew it, they brought him down to Caesarea and sent him off to Tarsus."
+    },
+    {
+      "ref": "Acts 11:25",
+      "book": "Acts",
+      "textWEB": "Barnabas went out to Tarsus to look for Saul."
+    },
+    {
+      "ref": "Acts 21:39",
+      "book": "Acts",
+      "textWEB": "But Paul said, “I am a Jew from Tarsus in Cilicia, a citizen of no insignificant city. I beg you, allow me to speak to the people.”"
+    },
+    {
+      "ref": "Acts 22:3",
+      "book": "Acts",
+      "textWEB": "“I am indeed a Jew, born in Tarsus of Cilicia, but brought up in this city at the feet of Gamaliel, instructed according to the strict tradition of the law of our fathers, being zealous for God, even as you all are today."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

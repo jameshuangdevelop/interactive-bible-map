@@ -1,0 +1,152 @@
+{
+  "id": "ephesus",
+  "names": {
+    "ancient": [
+      "Ephesus",
+      "Arsinoeia"
+    ],
+    "modern": "Selçuk (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Ephesus archaeological site",
+      "coordinates": [
+        27.342403,
+        37.940164
+      ],
+      "coordinateSource": "pleiades:599612",
+      "confidence": "high",
+      "support": "The extensively excavated site near modern Selçuk is undisputed as ancient Ephesus; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:599612",
+        "wikidata:Q47611"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Ephesus was, per Pleiades, 'the most important ancient metropolis of Ionian Asia Minor,' and home to the great temple of Artemis, a scene Acts 19:35 confirms by calling Ephesus 'temple keeper of the great goddess Artemis.' Paul spent about three years there on his third journey, and the city is addressed directly in Ephesians, 1 and 2 Timothy, and Revelation.",
+    "sources": [
+      "pleiades:599612",
+      "wikidata:Q47611",
+      "openbible:ephesus",
+      "scripture:Acts 19:35",
+      "scripture:Acts 20:31",
+      "scripture:Ephesians 1:1",
+      "scripture:1 Timothy 1:3",
+      "scripture:2 Timothy 4:12",
+      "scripture:Revelation 1:11",
+      "scripture:Revelation 2:1"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 18:19",
+      "book": "Acts",
+      "textWEB": "He came to Ephesus, and he left them there; but he himself entered into the synagogue and reasoned with the Jews."
+    },
+    {
+      "ref": "Acts 18:21",
+      "book": "Acts",
+      "textWEB": "but taking his leave of them, he said, “I must by all means keep this coming feast in Jerusalem, but I will return again to you if God wills.” Then he set sail from Ephesus."
+    },
+    {
+      "ref": "Acts 18:24",
+      "book": "Acts",
+      "textWEB": "Now a certain Jew named Apollos, an Alexandrian by race, an eloquent man, came to Ephesus. He was mighty in the Scriptures."
+    },
+    {
+      "ref": "Acts 18:27",
+      "book": "Acts",
+      "textWEB": "When he had determined to pass over into Achaia, the brothers encouraged him; and wrote to the disciples to receive him. When he had come, he greatly helped those who had believed through grace;"
+    },
+    {
+      "ref": "Acts 19:1",
+      "book": "Acts",
+      "textWEB": "While Apollos was at Corinth, Paul, having passed through the upper country, came to Ephesus and found certain disciples."
+    },
+    {
+      "ref": "Acts 19:17",
+      "book": "Acts",
+      "textWEB": "This became known to all, both Jews and Greeks, who lived at Ephesus. Fear fell on them all, and the name of the Lord Jesus was magnified."
+    },
+    {
+      "ref": "Acts 19:23",
+      "book": "Acts",
+      "textWEB": "About that time there arose no small disturbance concerning the Way."
+    },
+    {
+      "ref": "Acts 19:26",
+      "book": "Acts",
+      "textWEB": "You see and hear that not at Ephesus alone, but almost throughout all Asia, this Paul has persuaded and turned away many people, saying that they are no gods that are made with hands."
+    },
+    {
+      "ref": "Acts 19:35",
+      "book": "Acts",
+      "textWEB": "When the town clerk had quieted the multitude, he said, “You men of Ephesus, what man is there who doesn’t know that the city of the Ephesians is temple keeper of the great goddess Artemis, and of the image which fell down from Zeus?"
+    },
+    {
+      "ref": "Acts 20:16",
+      "book": "Acts",
+      "textWEB": "For Paul had determined to sail past Ephesus, that he might not have to spend time in Asia; for he was hastening, if it were possible for him, to be in Jerusalem on the day of Pentecost."
+    },
+    {
+      "ref": "Acts 20:17",
+      "book": "Acts",
+      "textWEB": "From Miletus he sent to Ephesus and called to himself the elders of the assembly."
+    },
+    {
+      "ref": "Acts 21:29",
+      "book": "Acts",
+      "textWEB": "For they had seen Trophimus the Ephesian with him in the city, and they supposed that Paul had brought him into the temple."
+    },
+    {
+      "ref": "1 Corinthians 15:32",
+      "book": "1 Corinthians",
+      "textWEB": "If I fought with animals at Ephesus for human purposes, what does it profit me? If the dead are not raised, then “let’s eat and drink, for tomorrow we die.”"
+    },
+    {
+      "ref": "1 Corinthians 16:8",
+      "book": "1 Corinthians",
+      "textWEB": "But I will stay at Ephesus until Pentecost,"
+    },
+    {
+      "ref": "Ephesians 1:1",
+      "book": "Ephesians",
+      "textWEB": "Paul, an apostle of Christ Jesus through the will of God, to the saints who are at Ephesus, and the faithful in Christ Jesus:"
+    },
+    {
+      "ref": "1 Timothy 1:3",
+      "book": "1 Timothy",
+      "textWEB": "As I urged you when I was going into Macedonia, stay at Ephesus that you might command certain men not to teach a different doctrine,"
+    },
+    {
+      "ref": "2 Timothy 1:18",
+      "book": "2 Timothy",
+      "textWEB": "(the Lord grant to him to find the Lord’s mercy in that day); and in how many things he served at Ephesus, you know very well."
+    },
+    {
+      "ref": "2 Timothy 4:12",
+      "book": "2 Timothy",
+      "textWEB": "But I sent Tychicus to Ephesus."
+    },
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 2:1",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Ephesus write: “He who holds the seven stars in his right hand, he who walks among the seven golden lamp stands says these things:"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

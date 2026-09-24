@@ -98,3 +98,15 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 re-verification 2 (claim-by-claim audit of 13 records, opened 2 new web sources directly, verified 7 new bib: entries, re-checked nain's 3 new images, spot-checked 8 other image licenses) | ~150k / ~25k | ~350 | ~8,575 |
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 scripture citations (added scripture: source IDs to summary/history/support clauses across 20 records) | ~200k / ~30k | ~550 | ~9,125 |
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 re-verification 3 (pulled all ~40 cited scripture: references directly from the WEB snapshot and checked each against its specific clause; verified bib:rainey-notley-sacred-bridge and the softened Qasr al-Yahud wording) | ~100k / ~18k | ~250 | ~9,375 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 research (Phase A) | ~380k / ~50k | ~950 | ~10,325 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 batch 2 media (Phase B) | ~150k / ~8k | ~80 | ~10,405 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 fact-check (Phase C) | ~520k / ~45k | ~950 | ~11,355 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 sychar fix | ~60k / ~5k | ~120 | ~11,475 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 media fixes | ~40k / ~3k | ~25 | ~11,500 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification | ~190k / ~18k | ~350 | ~11,850 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 claims audit | ~650k / ~70k | ~1,350 | ~13,200 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 license strings | ~50k / ~4k | ~40 | ~13,240 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 2 | ~350k / ~35k | ~650 | ~13,890 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 corinth image | ~25k / ~2k | ~30 | ~13,920 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 scripture citations | ~700k / ~75k | ~1,450 | ~15,370 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 3 | ~200k / ~20k | ~400 | ~15,770 |

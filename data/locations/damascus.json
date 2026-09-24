@@ -1,0 +1,161 @@
+{
+  "id": "damascus",
+  "names": {
+    "ancient": [
+      "Damascus",
+      "Darmeseq"
+    ],
+    "modern": "Damascus (Syria)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Damascus (historic city center)",
+      "coordinates": [
+        36.309102,
+        33.511612
+      ],
+      "coordinateSource": "pleiades:678106",
+      "confidence": "high",
+      "support": "Damascus has been continuously inhabited and identified at this location since antiquity; the old city, including the street called Straight, is a UNESCO World Heritage Site.",
+      "sources": [
+        "pleiades:678106",
+        "wikidata:Q3678596"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Damascus is among the oldest continuously inhabited cities in the world and, in Acts, the city near which Paul experienced his conversion and where he first preached. Isaiah's oracle against Aram calls it 'the head of Syria.'",
+    "sources": [
+      "pleiades:678106",
+      "wikidata:Q3678596",
+      "openbible:damascus",
+      "scripture:Acts 9:3",
+      "scripture:Acts 9:27",
+      "scripture:Isaiah 7:8"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 9:2",
+      "book": "Acts",
+      "textWEB": "and asked for letters from him to the synagogues of Damascus, that if he found any who were of the Way, whether men or women, he might bring them bound to Jerusalem."
+    },
+    {
+      "ref": "Acts 9:3",
+      "book": "Acts",
+      "textWEB": "As he traveled, he got close to Damascus, and suddenly a light from the sky shone around him."
+    },
+    {
+      "ref": "Acts 9:8",
+      "book": "Acts",
+      "textWEB": "Saul arose from the ground, and when his eyes were opened, he saw no one. They led him by the hand and brought him into Damascus."
+    },
+    {
+      "ref": "Acts 9:10",
+      "book": "Acts",
+      "textWEB": "Now there was a certain disciple at Damascus named Ananias. The Lord said to him in a vision, “Ananias!” He said, “Behold, it’s me, Lord.”"
+    },
+    {
+      "ref": "Acts 9:19",
+      "book": "Acts",
+      "textWEB": "He took food and was strengthened. Saul stayed several days with the disciples who were at Damascus."
+    },
+    {
+      "ref": "Acts 9:22",
+      "book": "Acts",
+      "textWEB": "But Saul increased more in strength, and confounded the Jews who lived at Damascus, proving that this is the Christ."
+    },
+    {
+      "ref": "Acts 9:27",
+      "book": "Acts",
+      "textWEB": "But Barnabas took him and brought him to the apostles, and declared to them how he had seen the Lord on the way, and that he had spoken to him, and how at Damascus he had preached boldly in the name of Jesus."
+    },
+    {
+      "ref": "Acts 22:5",
+      "book": "Acts",
+      "textWEB": "as also the high priest and all the council of the elders testify, from whom also I received letters to the brothers, and traveled to Damascus to bring them also who were there to Jerusalem in bonds to be punished."
+    },
+    {
+      "ref": "Acts 22:6",
+      "book": "Acts",
+      "textWEB": "“As I made my journey and came close to Damascus, about noon suddenly a great light shone around me from the sky."
+    },
+    {
+      "ref": "Acts 22:10",
+      "book": "Acts",
+      "textWEB": "I said, ‘What shall I do, Lord?’ The Lord said to me, ‘Arise, and go into Damascus. There you will be told about all things which are appointed for you to do.’"
+    },
+    {
+      "ref": "Acts 22:11",
+      "book": "Acts",
+      "textWEB": "When I couldn’t see for the glory of that light, being led by the hand of those who were with me, I came into Damascus."
+    },
+    {
+      "ref": "Acts 22:12",
+      "book": "Acts",
+      "textWEB": "“One Ananias, a devout man according to the law, well reported of by all the Jews who lived in Damascus,"
+    },
+    {
+      "ref": "Acts 26:12",
+      "book": "Acts",
+      "textWEB": "“Whereupon as I traveled to Damascus with the authority and commission from the chief priests,"
+    },
+    {
+      "ref": "Acts 26:20",
+      "book": "Acts",
+      "textWEB": "but declared first to them of Damascus, at Jerusalem, and throughout all the country of Judea, and also to the Gentiles, that they should repent and turn to God, doing works worthy of repentance."
+    },
+    {
+      "ref": "2 Corinthians 11:32",
+      "book": "2 Corinthians",
+      "textWEB": "In Damascus the governor under King Aretas guarded the Damascenes’ city, desiring to arrest me."
+    },
+    {
+      "ref": "Galatians 1:17",
+      "book": "Galatians",
+      "textWEB": "nor did I go up to Jerusalem to those who were apostles before me, but I went away into Arabia. Then I returned to Damascus."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 14:15",
+      "note": "Abraham pursues the kings who captured Lot as far north as the area of Damascus.",
+      "sources": [
+        "openbible:damascus",
+        "scripture:Genesis 14:15"
+      ]
+    },
+    {
+      "ref": "2 Samuel 8:5",
+      "note": "David defeats the Arameans of Damascus and stations a garrison there.",
+      "sources": [
+        "openbible:damascus",
+        "scripture:2 Samuel 8:5"
+      ]
+    },
+    {
+      "ref": "Isaiah 7:8",
+      "note": "Isaiah's oracle states directly that Damascus is 'the head of Syria,' i.e. the capital of the kingdom of Aram.",
+      "sources": [
+        "openbible:damascus",
+        "scripture:Isaiah 7:8"
+      ]
+    },
+    {
+      "ref": "Amos 1:3",
+      "note": "The prophet Amos pronounces judgment on Damascus for threshing Gilead 'with instruments of iron.'",
+      "sources": [
+        "openbible:damascus",
+        "scripture:Amos 1:3"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

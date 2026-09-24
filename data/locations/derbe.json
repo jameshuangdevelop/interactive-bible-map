@@ -1,0 +1,93 @@
+{
+  "id": "derbe",
+  "names": {
+    "ancient": [
+      "Derbe",
+      "Claudioderbe"
+    ],
+    "modern": "Ekinözü / Devri Şehri area (Karaman Province, Turkey)",
+    "alternate": []
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Kerti Höyük",
+      "coordinates": [
+        33.361453,
+        37.348569
+      ],
+      "coordinateSource": "wikidata:Q20717624",
+      "confidence": "high",
+      "support": "In 1956 M. H. Ballance discovered a dedicatory inscription naming the boule and demos of Derbe on this mound near Ekinözü, and this identification is followed by the Barrington Atlas and (per the cited article) the GPS coordinates in an atlas of the Roman world; Pleiades and Wikidata's coordinates for the mound agree closely.",
+      "sources": [
+        "wikidata:Q20717624",
+        "pleiades:648620",
+        "bib:wagner-wilson-why-derbe"
+      ]
+    },
+    {
+      "label": "Devri Şehri",
+      "coordinates": [
+        33.394803,
+        37.318797
+      ],
+      "coordinateSource": "bib:wagner-wilson-why-derbe",
+      "confidence": "low",
+      "support": "An extensive ancient site about four kilometers south-southeast of Kerti Höyük; some travellers reported the Ballance inscription as having come from here rather than from Kerti Höyük, and at least one published Bible atlas (the IVP Atlas) places Derbe at this site instead. Coordinates for this candidate are approximate, positioned from its reported distance and direction from Kerti Höyük in the cited source; no independent geodetic dataset entry specific to this mound was found, so this candidate's precision is lower than Kerti Höyük's.",
+      "sources": [
+        "bib:wagner-wilson-why-derbe",
+        "openbible:derbe"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Derbe was a minor city of Lycaonia on Paul's first missionary journey and, according to Acts, a place he revisited on his return through the region; its precise site was debated by nineteenth- and twentieth-century travellers until an inscription tied the name to a specific mound, though some ambiguity between two neighboring sites remains in the literature.",
+    "sources": [
+      "bib:wagner-wilson-why-derbe",
+      "openbible:derbe",
+      "scripture:Acts 14:20",
+      "scripture:Acts 16:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "A mound called Güdelisin, situated between the two candidate sites, was also visited by early explorers such as W. M. Ramsay as a possible location for Derbe, but more recent scholarship identifies it instead with the separate ancient site of Kodylessos, not Derbe.",
+      "sources": [
+        "bib:wagner-wilson-why-derbe"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 14:6",
+      "book": "Acts",
+      "textWEB": "they became aware of it and fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region."
+    },
+    {
+      "ref": "Acts 14:20",
+      "book": "Acts",
+      "textWEB": "But as the disciples stood around him, he rose up, and entered into the city. On the next day he went out with Barnabas to Derbe."
+    },
+    {
+      "ref": "Acts 14:21",
+      "book": "Acts",
+      "textWEB": "When they had preached the Good News to that city and had made many disciples, they returned to Lystra, Iconium, and Antioch,"
+    },
+    {
+      "ref": "Acts 16:1",
+      "book": "Acts",
+      "textWEB": "He came to Derbe and Lystra; and behold, a certain disciple was there, named Timothy, the son of a Jewess who believed, but his father was a Greek."
+    },
+    {
+      "ref": "Acts 20:4",
+      "book": "Acts",
+      "textWEB": "These accompanied him as far as Asia: Sopater of Beroea, Aristarchus and Secundus of the Thessalonians, Gaius of Derbe, Timothy, and Tychicus and Trophimus of Asia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

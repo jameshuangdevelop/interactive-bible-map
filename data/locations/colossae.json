@@ -1,0 +1,51 @@
+{
+  "id": "colossae",
+  "names": {
+    "ancient": [
+      "Colossae",
+      "Colosse"
+    ],
+    "modern": "Honaz (Denizli Province, Turkey)",
+    "alternate": []
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Colossae mound, near Honaz",
+      "coordinates": [
+        29.259921,
+        37.786795
+      ],
+      "coordinateSource": "pleiades:638811",
+      "confidence": "high",
+      "support": "The unexcavated tell near modern Honaz is undisputed as the site of ancient Colossae; Pleiades' coordinate and Wikidata's OpenBible.info-sourced coordinate for the site agree closely.",
+      "sources": [
+        "pleiades:638811",
+        "wikidata:Q1001370"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Colossae was, per Wikidata, 'an ancient city of Phrygia,' addressed by Paul's letter to the Colossians even though Acts does not record him visiting personally.",
+    "sources": [
+      "pleiades:638811",
+      "wikidata:Q1001370",
+      "openbible:colossae",
+      "scripture:Colossians 1:2"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Colossians 1:2",
+      "book": "Colossians",
+      "textWEB": "to the saints and faithful brothers in Christ at Colossae: Grace to you and peace from God our Father and the Lord Jesus Christ."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

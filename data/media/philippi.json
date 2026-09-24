@@ -1,0 +1,32 @@
+{
+  "locationId": "philippi",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Ancient_Philippi.jpg",
+      "author": "MrPanyGoff",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Philippi.jpg",
+      "caption": "Ruins of the ancient city of Philippi.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
+      "author": "Berthold Werner",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
+      "caption": "Archaeological site of Philippi, Greece.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Archaeological_site_of_Philippi_BW_2017-10-05_12-47-21.jpg",
+      "author": "Berthold Werner",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Archaeological_site_of_Philippi_BW_2017-10-05_12-47-21.jpg",
+      "caption": "Ancient structures at the Philippi archaeological site.",
+      "aiGenerated": false
+    }
+  ]
+}

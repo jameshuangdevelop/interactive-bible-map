@@ -1,0 +1,67 @@
+{
+  "id": "sychar",
+  "parentId": "samaria",
+  "names": {
+    "ancient": [
+      "Sychar"
+    ],
+    "modern": "Tell Balata (Nablus, West Bank)",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "site",
+  "candidates": [
+    {
+      "label": "Shechem (Tell Balata)",
+      "coordinates": [
+        35.281944,
+        32.213611
+      ],
+      "coordinateSource": "wikidata:Q7951237",
+      "confidence": "medium",
+      "support": "Some scholarship treats Sychar as a variant name for, or a place very near, the ancient city of Shechem, whose remains lie at Tell Balata; OpenBible.info's ancient-place catalog records this identification as an alternative for Sychar's ancient-name resolution. The modern village of Askar, about a kilometre northeast and close to the traditional site of Jacob's well, is also proposed in scholarship as Sychar's modern equivalent on the strength of the name's similarity, but no coordinate for Askar itself could be confirmed against an accepted, non-OSM, non-Wikipedia source to the standard used elsewhere in this dataset, so it is not given its own mapped candidate here.",
+      "sources": [
+        "wikidata:Q7951237",
+        "wikidata:Q7697383",
+        "openbible:sychar"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Sychar is the Samaritan town where, according to John's Gospel, Jesus met a Samaritan woman at Jacob's well. Its precise location is debated: some identify it with the modern village of Askar, others with the ancient city of Shechem at nearby Tell Balata. Only the Shechem/Tell Balata candidate is mapped here; see history for why Askar is not.",
+    "sources": [
+      "openbible:sychar",
+      "wikidata:Q7951237"
+    ]
+  },
+  "history": [
+    {
+      "text": "Askar remains part of the scholarly discussion of Sychar's identity, but no coordinate for the village could be confirmed against an accepted, non-OSM, non-Wikipedia source (the nearest confirmed independent point, for the Askar refugee camp, sits roughly 800 m away and describes a different feature), so it is omitted as a mapped candidate rather than sourced to an unconfirmed dataset.",
+      "sources": [
+        "openbible:sychar"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 4:5",
+      "book": "John",
+      "textWEB": "So he came to a city of Samaria called Sychar, near the parcel of ground that Jacob gave to his son Joseph."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 48:22",
+      "note": "John 4:5 explicitly recalls this plot of ground near Shechem that Jacob gave to his son Joseph, tying the Gospel scene to the patriarchal narrative.",
+      "sources": [
+        "openbible:sychar",
+        "scripture:Genesis 48:22",
+        "scripture:John 4:5"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

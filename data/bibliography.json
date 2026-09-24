@@ -1,6 +1,29 @@
 {
   "entries": [
     {
+      "id": "pleiades-place-resource",
+      "type": "dataset",
+      "title": "Pleiades: A Gazetteer of Past Places",
+      "authors": [
+        "Pleiades contributors"
+      ],
+      "year": 2026,
+      "publisher": "Institute for the Study of the Ancient World, New York University",
+      "url": "https://pleiades.stoa.org/"
+    },
+    {
+      "id": "ebible-engwebp-details",
+      "type": "web",
+      "title": "World English Bible (engwebp) details",
+      "authors": [
+        "eBible.org"
+      ],
+      "year": 2026,
+      "publisher": "eBible.org",
+      "url": "https://ebible.org/find/details.php?id=engwebp",
+      "accessed": "2026-09-23"
+    },
+    {
       "id": "murphy-oconnor-holy-land-guide",
       "type": "book",
       "title": "The Holy Land: An Oxford Archaeological Guide from Earliest Times to 1700",
@@ -74,29 +97,6 @@
       "year": 2026,
       "publisher": "UNESCO",
       "url": "https://whc.unesco.org/en/list/1433",
-      "accessed": "2026-09-23"
-    },
-    {
-      "id": "pleiades-place-resource",
-      "type": "dataset",
-      "title": "Pleiades: A Gazetteer of Past Places",
-      "authors": [
-        "Pleiades contributors"
-      ],
-      "year": 2026,
-      "publisher": "Institute for the Study of the Ancient World, New York University",
-      "url": "https://pleiades.stoa.org/"
-    },
-    {
-      "id": "ebible-engwebp-details",
-      "type": "web",
-      "title": "World English Bible (engwebp) details",
-      "authors": [
-        "eBible.org"
-      ],
-      "year": 2026,
-      "publisher": "eBible.org",
-      "url": "https://ebible.org/find/details.php?id=engwebp",
       "accessed": "2026-09-23"
     },
     {
@@ -207,6 +207,31 @@
       ],
       "year": 2006,
       "publisher": "Carta Jerusalem"
+    },
+    {
+      "id": "wagner-wilson-why-derbe",
+      "type": "article",
+      "title": "Why Derbe? An Unlikely Lycaonian City for Paul's Ministry",
+      "authors": [
+        "Bob Wagner",
+        "Mark Wilson"
+      ],
+      "year": 2019,
+      "journal": "Tyndale Bulletin",
+      "url": "https://www.sevenchurches.org/wp-content/uploads/2020/03/Why-Derbe-Wagner-Wilson-Tyndale-Bulletin.pdf",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "worldhistory-corinth",
+      "type": "web",
+      "title": "Corinth",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/corinth/",
+      "accessed": "2026-09-23"
     }
   ]
 }

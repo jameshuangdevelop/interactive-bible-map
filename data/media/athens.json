@@ -1,0 +1,14 @@
+{
+  "locationId": "athens",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/View_of_the_Areopagus_from_the_Acropolis_in_Athens%2C_20240531_1329_9684.jpg",
+      "author": "Jakub Ha\u0142un",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:View_of_the_Areopagus_from_the_Acropolis_in_Athens,_20240531_1329_9684.jpg",
+      "caption": "View of the Areopagus from the Acropolis, Athens, Greece.",
+      "aiGenerated": false
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "caesarea-maritima",
+  "names": {
+    "ancient": [
+      "Caesarea Maritima",
+      "Strato's Tower"
+    ],
+    "modern": "Caesarea (Israel)",
+    "alternate": [
+      "Straton's Tower",
+      "Caesarea"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Caesarea (coastal ruins south of Haifa)",
+      "coordinates": [
+        34.892,
+        32.5015
+      ],
+      "coordinateSource": "pleiades:678401",
+      "confidence": "high",
+      "support": "The site preserves extensive Herodian and Roman-period harbor and city remains, built over the earlier Hellenistic settlement of Strato's Tower; it is uncontested as the location of Caesarea Maritima.",
+      "sources": [
+        "pleiades:678401",
+        "wikidata:Q319242"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Caesarea Maritima was a Mediterranean port city built by Herod the Great on the site of the older settlement of Strato's Tower and named for Augustus. It served as the administrative center of Roman Judea and appears repeatedly in Acts as the base of Roman governors and the site of Paul's imprisonment before his voyage to Rome.",
+    "sources": [
+      "pleiades:678401",
+      "wikidata:Q319242",
+      "openbible:caesarea",
+      "scripture:Acts 23:33",
+      "scripture:Acts 25:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "Herod the Great constructed the city, including an artificial harbor, naming it Caesarea in honor of Augustus.",
+      "sources": [
+        "pleiades:678401",
+        "wikidata:Q319242"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 8:40",
+      "book": "Acts",
+      "textWEB": "But Philip was found at Azotus. Passing through, he preached the Good News to all the cities until he came to Caesarea."
+    },
+    {
+      "ref": "Acts 9:30",
+      "book": "Acts",
+      "textWEB": "When the brothers knew it, they brought him down to Caesarea and sent him off to Tarsus."
+    },
+    {
+      "ref": "Acts 10:1",
+      "book": "Acts",
+      "textWEB": "Now there was a certain man in Caesarea, Cornelius by name, a centurion of what was called the Italian Regiment,"
+    },
+    {
+      "ref": "Acts 10:24",
+      "book": "Acts",
+      "textWEB": "On the next day they entered into Caesarea. Cornelius was waiting for them, having called together his relatives and his near friends."
+    },
+    {
+      "ref": "Acts 11:11",
+      "book": "Acts",
+      "textWEB": "Behold, immediately three men stood before the house where I was, having been sent from Caesarea to me."
+    },
+    {
+      "ref": "Acts 12:19",
+      "book": "Acts",
+      "textWEB": "When Herod had sought for him and didn’t find him, he examined the guards, then commanded that they should be put to death. He went down from Judea to Caesarea, and stayed there."
+    },
+    {
+      "ref": "Acts 18:22",
+      "book": "Acts",
+      "textWEB": "When he had landed at Caesarea, he went up and greeted the assembly, and went down to Antioch."
+    },
+    {
+      "ref": "Acts 21:8",
+      "book": "Acts",
+      "textWEB": "On the next day, we who were Paul’s companions departed and came to Caesarea. We entered into the house of Philip the evangelist, who was one of the seven, and stayed with him."
+    },
+    {
+      "ref": "Acts 21:16",
+      "book": "Acts",
+      "textWEB": "Some of the disciples from Caesarea also went with us, bringing one Mnason of Cyprus, an early disciple, with whom we would stay."
+    },
+    {
+      "ref": "Acts 23:23",
+      "book": "Acts",
+      "textWEB": "He called to himself two of the centurions, and said, “Prepare two hundred soldiers to go as far as Caesarea, with seventy horsemen and two hundred men armed with spears, at the third hour of the night.”"
+    },
+    {
+      "ref": "Acts 23:32",
+      "book": "Acts",
+      "textWEB": "But on the next day they left the horsemen to go with him, and returned to the barracks."
+    },
+    {
+      "ref": "Acts 23:33",
+      "book": "Acts",
+      "textWEB": "When they came to Caesarea and delivered the letter to the governor, they also presented Paul to him."
+    },
+    {
+      "ref": "Acts 24:1",
+      "book": "Acts",
+      "textWEB": "After five days, the high priest, Ananias, came down with certain elders and an orator, one Tertullus. They informed the governor against Paul."
+    },
+    {
+      "ref": "Acts 25:1",
+      "book": "Acts",
+      "textWEB": "Festus therefore, having come into the province, after three days went up to Jerusalem from Caesarea."
+    },
+    {
+      "ref": "Acts 25:4",
+      "book": "Acts",
+      "textWEB": "However Festus answered that Paul should be kept in custody at Caesarea, and that he himself was about to depart shortly."
+    },
+    {
+      "ref": "Acts 25:6",
+      "book": "Acts",
+      "textWEB": "When he had stayed among them more than ten days, he went down to Caesarea, and on the next day he sat on the judgment seat, and commanded Paul to be brought."
+    },
+    {
+      "ref": "Acts 25:13",
+      "book": "Acts",
+      "textWEB": "Now when some days had passed, King Agrippa and Bernice arrived at Caesarea and greeted Festus."
+    },
+    {
+      "ref": "Acts 25:24",
+      "book": "Acts",
+      "textWEB": "Festus said, “King Agrippa, and all men who are here present with us, you see this man about whom all the multitude of the Jews petitioned me, both at Jerusalem and here, crying that he ought not to live any longer."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

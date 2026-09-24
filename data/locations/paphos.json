@@ -1,0 +1,60 @@
+{
+  "id": "paphos",
+  "names": {
+    "ancient": [
+      "Paphos",
+      "Nea Paphos"
+    ],
+    "modern": "Kato Paphos (Cyprus)",
+    "alternate": [
+      "New Paphos"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Nea Paphos (Kato Paphos archaeological site)",
+      "coordinates": [
+        32.406593,
+        34.757212
+      ],
+      "coordinateSource": "pleiades:707586",
+      "confidence": "high",
+      "support": "Nea Paphos, per Pleiades, 'has been a center of activity since the Final Bronze Age' and is a UNESCO World Heritage archaeological park; it is the undisputed setting of Paul and Barnabas's visit recorded in Acts 13.",
+      "sources": [
+        "pleiades:707586",
+        "wikidata:Q22991943"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Paphos (Nea Paphos) was a Cyprus settlement Paul and Barnabas visited on the first missionary journey; Acts records that the proconsul Sergius Paulus believed after witnessing Paul's confrontation with the sorcerer Elymas, before the party's onward voyage to Perga in Pamphylia.",
+    "sources": [
+      "pleiades:707586",
+      "wikidata:Q22991943",
+      "openbible:paphos",
+      "scripture:Acts 13:8",
+      "scripture:Acts 13:12",
+      "scripture:Acts 13:13"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 13:6",
+      "book": "Acts",
+      "textWEB": "When they had gone through the island to Paphos, they found a certain sorcerer, a false prophet, a Jew whose name was Bar Jesus,"
+    },
+    {
+      "ref": "Acts 13:13",
+      "book": "Acts",
+      "textWEB": "Now Paul and his company set sail from Paphos and came to Perga in Pamphylia. John departed from them and returned to Jerusalem."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

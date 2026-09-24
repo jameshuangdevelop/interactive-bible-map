@@ -1,0 +1,105 @@
+{
+  "id": "corinth",
+  "names": {
+    "ancient": [
+      "Corinth",
+      "Korinthos"
+    ],
+    "modern": "Ancient Corinth / Korinthos (Greece)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Ancient Corinth (Archaia Korinthos)",
+      "coordinates": [
+        22.878614,
+        37.905642
+      ],
+      "coordinateSource": "pleiades:570182",
+      "confidence": "high",
+      "support": "The extensively excavated site at Archaia Korinthos, distinct from the modern city of Corinth a few kilometers away, is undisputed as the location of the ancient and New Testament city; Pleiades and Wikidata's coordinates agree closely.",
+      "sources": [
+        "pleiades:570182",
+        "wikidata:Q1363688"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Corinth was a major commercial center on the isthmus linking central Greece to the Peloponnese; after Julius Caesar refounded it as a Roman colony in 44 BC it became, per World History Encyclopedia, 'an important administrative and trade centre.' Paul spent eighteen months founding a church there on his second journey, an episode Acts ties to his appearance before the proconsul Gallio, and later wrote 1 and 2 Corinthians to the congregation.",
+    "sources": [
+      "pleiades:570182",
+      "wikidata:Q1363688",
+      "openbible:corinth",
+      "bib:worldhistory-corinth",
+      "scripture:Acts 18:11",
+      "scripture:Acts 18:12",
+      "scripture:1 Corinthians 1:2",
+      "scripture:2 Corinthians 1:1"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 18:1",
+      "book": "Acts",
+      "textWEB": "After these things Paul departed from Athens and came to Corinth."
+    },
+    {
+      "ref": "Acts 18:8",
+      "book": "Acts",
+      "textWEB": "Crispus, the ruler of the synagogue, believed in the Lord with all his house. Many of the Corinthians, when they heard, believed and were baptized."
+    },
+    {
+      "ref": "Acts 18:11",
+      "book": "Acts",
+      "textWEB": "He lived there a year and six months, teaching the word of God among them."
+    },
+    {
+      "ref": "Acts 18:12",
+      "book": "Acts",
+      "textWEB": "But when Gallio was proconsul of Achaia, the Jews with one accord rose up against Paul and brought him before the judgment seat,"
+    },
+    {
+      "ref": "Acts 18:18",
+      "book": "Acts",
+      "textWEB": "Paul, having stayed after this many more days, took his leave of the brothers, and sailed from there for Syria, together with Priscilla and Aquila. He shaved his head in Cenchreae, for he had a vow."
+    },
+    {
+      "ref": "Acts 19:1",
+      "book": "Acts",
+      "textWEB": "While Apollos was at Corinth, Paul, having passed through the upper country, came to Ephesus and found certain disciples."
+    },
+    {
+      "ref": "1 Corinthians 1:2",
+      "book": "1 Corinthians",
+      "textWEB": "to the assembly of God which is at Corinth—those who are sanctified in Christ Jesus, called saints, with all who call on the name of our Lord Jesus Christ in every place, both theirs and ours:"
+    },
+    {
+      "ref": "2 Corinthians 1:1",
+      "book": "2 Corinthians",
+      "textWEB": "Paul, an apostle of Christ Jesus through the will of God, and Timothy our brother, to the assembly of God which is at Corinth, with all the saints who are in the whole of Achaia:"
+    },
+    {
+      "ref": "2 Corinthians 1:23",
+      "book": "2 Corinthians",
+      "textWEB": "But I call God for a witness to my soul, that to spare you, I didn’t come to Corinth."
+    },
+    {
+      "ref": "2 Corinthians 10:14",
+      "book": "2 Corinthians",
+      "textWEB": "For we don’t stretch ourselves too much, as though we didn’t reach to you. For we came even as far as to you with the Good News of Christ,"
+    },
+    {
+      "ref": "2 Timothy 4:20",
+      "book": "2 Timothy",
+      "textWEB": "Erastus remained at Corinth, but I left Trophimus at Miletus sick."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

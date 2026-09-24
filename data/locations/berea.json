@@ -1,0 +1,77 @@
+{
+  "id": "berea",
+  "names": {
+    "ancient": [
+      "Berea",
+      "Beroea"
+    ],
+    "modern": "Veria (Greece)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Veria",
+      "coordinates": [
+        22.201493,
+        40.522127
+      ],
+      "coordinateSource": "pleiades:491546",
+      "confidence": "high",
+      "support": "The modern Greek city of Veria continues the site and name of ancient Berea without dispute; Pleiades and Wikidata's coordinates agree closely.",
+      "sources": [
+        "pleiades:491546",
+        "wikidata:Q201722"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Berea was a city of Macedonia that Paul and Silas visited after leaving Thessalonica; Acts commends its residents for examining the scriptures daily to test Paul's teaching.",
+    "sources": [
+      "pleiades:491546",
+      "wikidata:Q201722",
+      "openbible:berea",
+      "scripture:Acts 17:10",
+      "scripture:Acts 17:11"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 17:10",
+      "book": "Acts",
+      "textWEB": "The brothers immediately sent Paul and Silas away by night to Beroea. When they arrived, they went into the Jewish synagogue."
+    },
+    {
+      "ref": "Acts 17:11",
+      "book": "Acts",
+      "textWEB": "Now these were more noble than those in Thessalonica, in that they received the word with all readiness of mind, examining the Scriptures daily to see whether these things were so."
+    },
+    {
+      "ref": "Acts 17:13",
+      "book": "Acts",
+      "textWEB": "But when the Jews of Thessalonica had knowledge that the word of God was proclaimed by Paul at Beroea also, they came there likewise, agitating the multitudes."
+    },
+    {
+      "ref": "Acts 17:14",
+      "book": "Acts",
+      "textWEB": "Then the brothers immediately sent out Paul to go as far as to the sea, and Silas and Timothy still stayed there."
+    },
+    {
+      "ref": "Acts 17:15",
+      "book": "Acts",
+      "textWEB": "But those who escorted Paul brought him as far as Athens. Receiving a commandment to Silas and Timothy that they should come to him very quickly, they departed."
+    },
+    {
+      "ref": "Acts 20:4",
+      "book": "Acts",
+      "textWEB": "These accompanied him as far as Asia: Sopater of Beroea, Aristarchus and Secundus of the Thessalonians, Gaius of Derbe, Timothy, and Tychicus and Trophimus of Asia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

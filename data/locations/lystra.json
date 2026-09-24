@@ -1,0 +1,80 @@
+{
+  "id": "lystra",
+  "names": {
+    "ancient": [
+      "Lystra"
+    ],
+    "modern": "Hatunsaray (Konya Province, Turkey)",
+    "alternate": [
+      "Khatun Serai",
+      "Tel Lystra"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Tel Lystra, near Hatunsaray",
+      "coordinates": [
+        32.344473,
+        37.588278
+      ],
+      "coordinateSource": "pleiades:648699",
+      "confidence": "high",
+      "support": "This mound near Hatunsaray was identified as Lystra following the nineteenth-century discovery of a Latin dedicatory inscription naming the Roman colony of Lystra; ToposText and OpenBible.info's catalog independently place the site at the same coordinates. One Wikidata item (not used as a source here) lists a point about 14 km northeast of this location; that entry appears to be a coordinate error rather than a competing scholarly identification, since no published source we found places Lystra there.",
+      "sources": [
+        "pleiades:648699",
+        "openbible:lystra"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Lystra was a Roman colony in Lycaonia where, according to Acts, a crowd first hailed Paul and Barnabas as gods after a healing and then, incited by opponents, stoned Paul. Timothy, Paul's later companion, was from Lystra.",
+    "sources": [
+      "pleiades:648699",
+      "openbible:lystra",
+      "scripture:Acts 14:11",
+      "scripture:Acts 14:19",
+      "scripture:Acts 16:1",
+      "scripture:Acts 16:2"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 14:6",
+      "book": "Acts",
+      "textWEB": "they became aware of it and fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region."
+    },
+    {
+      "ref": "Acts 14:8",
+      "book": "Acts",
+      "textWEB": "At Lystra a certain man sat, impotent in his feet, a cripple from his mother’s womb, who never had walked."
+    },
+    {
+      "ref": "Acts 14:21",
+      "book": "Acts",
+      "textWEB": "When they had preached the Good News to that city and had made many disciples, they returned to Lystra, Iconium, and Antioch,"
+    },
+    {
+      "ref": "Acts 16:1",
+      "book": "Acts",
+      "textWEB": "He came to Derbe and Lystra; and behold, a certain disciple was there, named Timothy, the son of a Jewess who believed, but his father was a Greek."
+    },
+    {
+      "ref": "Acts 16:2",
+      "book": "Acts",
+      "textWEB": "The brothers who were at Lystra and Iconium gave a good testimony about him."
+    },
+    {
+      "ref": "2 Timothy 3:11",
+      "book": "2 Timothy",
+      "textWEB": "persecutions, and sufferings—those things that happened to me at Antioch, Iconium, and Lystra. I endured those persecutions. The Lord delivered me out of them all."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

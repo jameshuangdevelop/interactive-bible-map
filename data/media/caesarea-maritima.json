@@ -1,0 +1,32 @@
+{
+  "locationId": "caesarea-maritima",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/124995_caesarea_national_park_PikiWiki_Israel.jpg",
+      "author": "מיכל פריימן",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:124995_caesarea_national_park_PikiWiki_Israel.jpg",
+      "caption": "Remains of Caesarea Maritima, the port city built by Herod the Great.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/124996_caesarea_national_park_PikiWiki_Israel.jpg",
+      "author": "מיכל פריימן",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:124996_caesarea_national_park_PikiWiki_Israel.jpg",
+      "caption": "Archaeological site of Caesarea Maritima national park.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Ancient_Roman_aqueduct_in_Caesarea_Maritima_DSC05202.JPG",
+      "author": "Lior Golgher • ליאור גולגר",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Roman_aqueduct_in_Caesarea_Maritima_DSC05202.JPG",
+      "caption": "Roman aqueduct ruins at Caesarea Maritima, Israel.",
+      "aiGenerated": false
+    }
+  ]
+}

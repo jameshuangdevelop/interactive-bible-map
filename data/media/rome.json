@@ -1,0 +1,32 @@
+{
+  "locationId": "rome",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Colosseum_in_Rome-April_2007-1-_copie_2B.jpg",
+      "author": "Diliff",
+      "license": "CC BY-SA 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colosseum_in_Rome-April_2007-1-_copie_2B.jpg",
+      "caption": "The Colosseum (Flavian Amphitheatre) in Rome, Italy.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Colosseum_in_Rome%2C_Italy_-_April_2007.jpg",
+      "author": "Diliff",
+      "license": "CC BY-SA 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colosseum_in_Rome,_Italy_-_April_2007.jpg",
+      "caption": "Exterior view of the Colosseum in Rome.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Forum_Romanum_%2814%29.jpg",
+      "author": "Krzysztof Golik",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Forum_Romanum_(14).jpg",
+      "caption": "The Forum Romanum (Roman Forum), the heart of ancient Rome.",
+      "aiGenerated": false
+    }
+  ]
+}

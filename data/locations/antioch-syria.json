@@ -1,0 +1,147 @@
+{
+  "id": "antioch-syria",
+  "names": {
+    "ancient": [
+      "Antioch on the Orontes",
+      "Theoupolis"
+    ],
+    "modern": "Antakya (Turkey)",
+    "alternate": [
+      "Antiochia",
+      "Antioch"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Antakya (ancient Antioch on the Orontes)",
+      "coordinates": [
+        36.181667,
+        36.204722
+      ],
+      "coordinateSource": "wikidata:Q200441",
+      "confidence": "high",
+      "support": "Antakya is the accepted continuation of the Hellenistic and Roman city, founded around 300 BC by Seleucus I Nicator and renamed Theoupolis in the Byzantine period. Pleiades' representative point for the ancient city sits about two kilometers from Wikidata's point, a normal spread for a city of this size given its position across the Orontes floodplain.",
+      "sources": [
+        "wikidata:Q200441",
+        "pleiades:658381"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Antioch on the Orontes was a major Hellenistic and Roman city in northern Syria, one of the four cities of the Seleucid Syrian Tetrapolis, and the base from which Paul and Barnabas were sent out on missionary journeys. Acts records that the disciples were first called Christians here.",
+    "sources": [
+      "pleiades:658381",
+      "wikidata:Q200441",
+      "openbible:antioch-1",
+      "scripture:Acts 14:26",
+      "scripture:Acts 11:26"
+    ]
+  },
+  "history": [
+    {
+      "text": "The city was founded around 300 BC by Seleucus I Nicator, a successor of Alexander the Great, and grew into one of the great trading centers of the eastern Mediterranean.",
+      "sources": [
+        "pleiades:658381"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 6:5",
+      "book": "Acts",
+      "textWEB": "These words pleased the whole multitude. They chose Stephen, a man full of faith and of the Holy Spirit, Philip, Prochorus, Nicanor, Timon, Parmenas, and Nicolaus, a proselyte of Antioch,"
+    },
+    {
+      "ref": "Acts 11:19",
+      "book": "Acts",
+      "textWEB": "They therefore who were scattered abroad by the oppression that arose about Stephen traveled as far as Phoenicia, Cyprus, and Antioch, speaking the word to no one except to Jews only."
+    },
+    {
+      "ref": "Acts 11:20",
+      "book": "Acts",
+      "textWEB": "But there were some of them, men of Cyprus and Cyrene, who, when they had come to Antioch, spoke to the Hellenists, preaching the Lord Jesus."
+    },
+    {
+      "ref": "Acts 11:22",
+      "book": "Acts",
+      "textWEB": "The report concerning them came to the ears of the assembly which was in Jerusalem. They sent out Barnabas to go as far as Antioch,"
+    },
+    {
+      "ref": "Acts 11:26",
+      "book": "Acts",
+      "textWEB": "When he had found him, he brought him to Antioch. For a whole year they were gathered together with the assembly, and taught many people. The disciples were first called Christians in Antioch."
+    },
+    {
+      "ref": "Acts 11:27",
+      "book": "Acts",
+      "textWEB": "Now in these days, prophets came down from Jerusalem to Antioch."
+    },
+    {
+      "ref": "Acts 11:29",
+      "book": "Acts",
+      "textWEB": "As any of the disciples had plenty, each determined to send relief to the brothers who lived in Judea;"
+    },
+    {
+      "ref": "Acts 13:1",
+      "book": "Acts",
+      "textWEB": "Now in the assembly that was at Antioch there were some prophets and teachers: Barnabas, Simeon who was called Niger, Lucius of Cyrene, Manaen the foster brother of Herod the tetrarch, and Saul."
+    },
+    {
+      "ref": "Acts 14:26",
+      "book": "Acts",
+      "textWEB": "From there they sailed to Antioch, from where they had been committed to the grace of God for the work which they had fulfilled."
+    },
+    {
+      "ref": "Acts 14:27",
+      "book": "Acts",
+      "textWEB": "When they had arrived and had gathered the assembly together, they reported all the things that God had done with them, and that he had opened a door of faith to the nations."
+    },
+    {
+      "ref": "Acts 15:1",
+      "book": "Acts",
+      "textWEB": "Some men came down from Judea and taught the brothers, “Unless you are circumcised after the custom of Moses, you can’t be saved.”"
+    },
+    {
+      "ref": "Acts 15:22",
+      "book": "Acts",
+      "textWEB": "Then it seemed good to the apostles and the elders, with the whole assembly, to choose men out of their company, and send them to Antioch with Paul and Barnabas: Judas called Barsabbas, and Silas, chief men among the brothers."
+    },
+    {
+      "ref": "Acts 15:23",
+      "book": "Acts",
+      "textWEB": "They wrote these things by their hand: “The apostles, the elders, and the brothers, to the brothers who are of the Gentiles in Antioch, Syria, and Cilicia: greetings."
+    },
+    {
+      "ref": "Acts 15:30",
+      "book": "Acts",
+      "textWEB": "So, when they were sent off, they came to Antioch. Having gathered the multitude together, they delivered the letter."
+    },
+    {
+      "ref": "Acts 15:35",
+      "book": "Acts",
+      "textWEB": "But Paul and Barnabas stayed in Antioch, teaching and preaching the word of the Lord, with many others also."
+    },
+    {
+      "ref": "Acts 18:22",
+      "book": "Acts",
+      "textWEB": "When he had landed at Caesarea, he went up and greeted the assembly, and went down to Antioch."
+    },
+    {
+      "ref": "Acts 18:23",
+      "book": "Acts",
+      "textWEB": "Having spent some time there, he departed and went through the region of Galatia and Phrygia, in order, establishing all the disciples."
+    },
+    {
+      "ref": "Galatians 2:11",
+      "book": "Galatians",
+      "textWEB": "But when Peter came to Antioch, I resisted him to his face, because he stood condemned."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

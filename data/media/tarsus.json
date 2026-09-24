@@ -1,0 +1,32 @@
+{
+  "locationId": "tarsus",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Tarsus_in_2011_0961.jpg",
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Tarsus_in_2011_0961.jpg",
+      "caption": "City view of Tarsus, Turkey.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Roman_road_in_Tarsus%2C_Mersin_Province.jpg",
+      "author": "Nedim Ardoğa",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_road_in_Tarsus,_Mersin_Province.jpg",
+      "caption": "Roman road remains in Tarsus, Mersin Province, Turkey.",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Saint_Paul%27s_Church%2C_Tarsus_02.jpg",
+      "author": "Jordi Gili",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Saint_Paul's_Church,_Tarsus_02.jpg",
+      "caption": "Saint Paul's Church in Tarsus, traditionally associated with Paul the Apostle.",
+      "aiGenerated": false
+    }
+  ]
+}
