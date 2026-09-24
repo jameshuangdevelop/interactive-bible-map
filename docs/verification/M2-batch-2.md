@@ -1,6 +1,6 @@
 # M2 batch 2 verification — Samaria, Acts and Pauline cities
 
-Independent Phase C review of `data/locations/*.json` (21 records), `data/media/*.json` (21 files, 48 images) and the two new `data/bibliography.json` entries added in `data/m2-batch-2`. Verified against primary sources directly (Wikidata entity JSON, Pleiades bulk JSON where the live site's Anubis challenge allowed it, DARE, and the cited article), not on the Research Lead's or Media Curator's word. Reviewed 2026-09-23; re-verified 2026-09-23 after fix commits `90c5069` and `97456e3` (see "Re-verification"); re-verified again 2026-09-23 after the claims-audit commits `21432ac` and `36ab5b7` (see "Re-verification 2" — **current state**). The needs-change table and verdicts below reflect the state as of "Re-verification"; "Re-verification 2" supersedes them with the current, final findings.
+Independent Phase C review of `data/locations/*.json` (21 records), `data/media/*.json` (21 files, 48 images) and the two new `data/bibliography.json` entries added in `data/m2-batch-2`. Verified against primary sources directly (Wikidata entity JSON, Pleiades bulk JSON where the live site's Anubis challenge allowed it, DARE, and the cited article), not on the Research Lead's or Media Curator's word. Reviewed 2026-09-23; re-verified 2026-09-23 after fix commits `90c5069` and `97456e3` (see "Re-verification"); re-verified again 2026-09-23 after the claims-audit commits `21432ac` and `36ab5b7` (see "Re-verification 2"); re-verified a third time 2026-09-23 after the scripture-citation commits `5aeb104` and `b9ca419` (see "Re-verification 3" — **current, final state**). Each round's findings are kept below for the record; the latest round supersedes the ones before it.
 
 ## Needs-change summary (fix and owner) — as of the original review
 
@@ -91,7 +91,7 @@ All 48 pass. The 9 originally needs-change (2 on `antioch-syria`, 1 on `caesarea
 
 *(This image verdict was also current only as of "Re-verification." "Re-verification 2" found one new caption error — see below — so the current count is 47 of 48 passing.)*
 
-## Verdicts 2 (current, final — after "Re-verification 2")
+## Verdicts 2 (superseded — see "Verdicts 3" for the current, final state)
 
 ### Location records (21) — `data/locations/`
 All 21 pass and are `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`. 15 were re-audited for claim support and re-verified in this round (`antioch-pisidia`, `antioch-syria`, `athens`, `caesarea-maritima`, `caesarea-philippi`, `colossae`, `corinth`, `damascus`, `derbe`, `ephesus`, `paphos`, `philippi`, `samaria`, `tarsus`, `thessalonica`); 6 were unaffected by the audit and remain verified from the prior round (`sychar`, `joppa`, `iconium`, `lystra`, `berea`, `rome`).
@@ -185,8 +185,59 @@ My view: prose-only disclosure (the current state) is an **acceptable stopgap fo
 
 `npm run validate:data`: 0 errors, 29 warnings — same 29 as every prior round (no record's `scripture[]` changed in a way that affects the name-matching heuristic). `npm test`: 30/30 passing (up from 24; the schema rebase added 6 new jurisdiction-port fixture tests, all passing).
 
+## Re-verification 3 (2026-09-23, after `5aeb104` and `b9ca419`)
+
+The Corinth caption issue from "Re-verification 2" is fixed (see below), and the schema gained a new `scripture:<ref>` source-ID prefix (a Bible passage cited as a source only for what it itself says, never as a `coordinateSource`) plus tighter license-pattern rules (IGO only with `3.0`, jurisdiction ports only with `1.0`–`3.0`, no combining the two). The Research Lead added `scripture:` citations to every summary/history/otConnections/candidate-support clause that reports a Bible event across **all 21 records**, restoring six clauses that an earlier audit round had softened only for lack of a source once a passage was found that states them directly, and reset all 21 to `status: "draft"` for this round.
+
+### Location records — does each `scripture:` citation actually state the claim?
+
+Checked every added `scripture:<ref>` citation across all 21 records directly against `data/reference/engwebp_vpl.txt` (the committed WEB snapshot), the same text the schema validates them against. Gave the six restored clauses (nine verse citations) particular care, per the PO's request, by pulling the exact WEB line for each:
+
+| Record | Restored clause | Cited verse(s) | WEB text | Match? |
+|---|---|---|---|---|
+| `antioch-pisidia` | Paul's declaration to turn to the Gentiles | Acts 13:46 | "...we turn to the Gentiles." | Exact ✓ |
+| `lystra` | Crowd hailing Paul and Barnabas as gods | Acts 14:11 | "The gods have come down to us in the likeness of men!" | Exact ✓ |
+| `lystra` | The stoning | Acts 14:19 | "...they stoned Paul and dragged him out of the city..." | Exact ✓ |
+| `paphos` | Paul's confrontation with Elymas | Acts 13:8 | "...Elymas the sorcerer...withstood them, seeking to turn the proconsul away from the faith." | Exact ✓ |
+| `paphos` | Sergius Paulus believed | Acts 13:12 | "...the proconsul, when he saw what was done, believed..." | Exact ✓ |
+| `philippi` | Lydia's conversion | Acts 16:14 | "...The Lord opened her heart to listen to the things which were spoken by Paul." | Exact ✓ |
+| `philippi` | The imprisonment | Acts 16:23 | "...they threw them into prison..." | Exact ✓ |
+| `joppa` | Tabitha's raising | Acts 9:40 | "...he said, 'Tabitha, get up!' She opened her eyes...and sat up." | Exact ✓ |
+| `ephesus` | Paul's three years | Acts 20:31 | "...for a period of three years I didn't cease to admonish everyone..." | Exact ✓ |
+
+All nine restored-clause citations are exact, verbatim matches. **Pass** on all six restored clauses.
+
+Every other `scripture:` citation added across the remaining records (`antioch-syria`, `athens`, `berea`, `caesarea-maritima`, `caesarea-philippi`, `colossae`, `corinth`, `damascus`, `derbe`, `iconium`, `rome`, `samaria`, `sychar`, `tarsus`, `thessalonica`, plus the rest of `ephesus`/`paphos`/`philippi`/`lystra`) cites a verse already present in that record's own `scripture[]` array (already read and confirmed word-for-word in the original review) or an `otConnections[]`/candidate-`support` note that is now self-citing its own `ref` — i.e. the note is simply restating what its already-quoted passage says, which is trivially correct. No citation was found pointing to a verse that doesn't actually support its clause, and no `scripture:` ID is used as a `coordinateSource` anywhere (checked with a repo-wide search — none found, as the new rule requires).
+
+**All 21 location records pass.** `status` set to `verified` (`verifiedBy: fact-checker`, `lastReviewed: 2026-09-23`) on all 21.
+
+### Corinth's new image (`Temple_d'Apollon_à_Corinthe.jpg`)
+
+Re-queried the Commons API and downloaded the file for visual inspection, checking place, license, author and caption as asked:
+- **Place:** confirmed — the photo shows fluted Doric monolithic columns at an archaeological site with mountains behind, matching the well-known Temple of Apollo at ancient Corinth. Genuinely shows the location (unlike the agave photo it replaces).
+- **License:** `CC0` — matches the Commons API's `LicenseShortName` exactly. `licenseUrl` (`http://creativecommons.org/publicdomain/zero/1.0/deed.en`) also matches exactly.
+- **Author:** `"Van Der Meulen Christofle"` — matches the Commons API's `Artist` field exactly.
+- **Caption:** `"Temple of Apollo at ancient Corinth."` — accurate and neutral.
+- **One minor, non-blocking issue:** the recorded `url` field is `https://upload.wikimedia.org/wikipedia/commons/a/a8/Temple_d%27Apollon_%C3%A0_Corinthe.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original` — it carries a stray `?utm_source=...&utm_campaign=...&utm_content=original` query suffix, apparently copy-pasted from an API response, that no other entry in the dataset carries. Confirmed by a direct HEAD request that both the suffixed and clean (`.../Temple_d%27Apollon_%C3%A0_Corinthe.jpg`) URLs resolve to the identical file (same content type and length), so this is cosmetic, not a functional defect. Noting it for the Media Curator to tidy in a future pass; it does not block this record's pass verdict.
+
+**Pass**, with the cosmetic URL note above.
+
+## Validation (re-run after the scripture-citation round)
+
+`npm run validate:data`: 0 errors, 29 warnings — same 29 as every prior round. `npm test`: 41/41 passing (up from 30; the schema rebase added `scripture:` source-ID and tightened-license-pattern fixture tests).
+
+## Verdicts 3 (current, final)
+
+### Location records (21) — `data/locations/`
+All 21 pass and are `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`.
+
+### Media records (21) — `data/media/`
+All 21 pass.
+
+### Images (48 total)
+All 48 pass. `corinth`'s replacement image carries one cosmetic, non-blocking note (a stray tracking query string on its `url`; see above).
+
 ## Remaining work
 
-One item remains open: the Corinth agave image caption (see above), owned by media-curator. Everything else — all 21 location records, all 21 media files, and 47 of 48 images (all but the one caption) — passes.
-
+None blocking. One cosmetic note is open (the Corinth image's `url` query-string suffix) but does not affect its pass verdict; owner media-curator, low priority, safe to fold into a future media pass rather than a dedicated round.
 
