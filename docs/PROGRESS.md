@@ -2,12 +2,12 @@
 
 Shared memory for all agents. Every session reads this first and updates its own task row before committing.
 
-**Current milestone:** M2 – Schema & Core Data · **Status:** in progress (CP1 approved 2026-09-23) · **Budget used this month:** ~3,700 of 1,000,000 AI credits ([BUDGET.md](BUDGET.md))
+**Current milestone:** M2 – Schema & Core Data · **Status:** batches 1–3 and image IDs verified and reviewed; the CP2 summary is next · **Budget used this month:** ~20,417 of 1,000,000 AI credits ([BUDGET.md](BUDGET.md))
 
 ## Resume point
-1. **M2-01** (schema, validation, CI) runs first as a subagent (ADR-0007). M2-02 and M2-03 need its schema.
-2. **M2-02 and M2-03** (20 locations each) then run in parallel. Each batch is one branch: Research Lead, then Media Curator, then Fact-Checker (ADR-0014).
-3. **After review:** the PO stacks the M2 branches, asks the human before pushing, and writes the CP2 summary (M2-04).
+1. **PO:** write the CP2 summary (M2-04) on `docs/cp2-summary`, stacked on this branch, and ask the human before pushing `feat/m2-image-ids` → `data/m2-batch-3` → `docs/cp2-summary`.
+2. **Human:** merge those PRs in that order. Merging the CP2 PR approves CP2.
+3. **After CP2:** the PO writes the M3 cards, starting with the low-fidelity visual spec (CP3a).
 
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
