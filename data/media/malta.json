@@ -3,12 +3,12 @@
   "images": [
     {
       "id": "malta-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Banc_public_%2830849344002%29.jpg",
-      "author": "Maxence",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Banc_public_(30849344002).jpg",
-      "caption": "The Dingli Cliffs on the island of Malta",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Baia_di_S.Paolo.JPG",
+      "author": "Aldo Ardetti",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Baia_di_S.Paolo.JPG",
+      "caption": "St Paul's Bay on the island of Malta, traditionally associated with Paul's shipwreck (Acts 28)",
       "aiGenerated": false
     },
     {
@@ -23,12 +23,12 @@
     },
     {
       "id": "malta-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Munxar_cliffs%2C_st_thomas_bay.jpg",
-      "author": "Jeanetz",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Munxar_cliffs,_st_thomas_bay.jpg",
-      "caption": "Coastal cliffs at St. Thomas Bay on the island of Malta",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Dingli_Cliffs_2009.JPG",
+      "author": "Felix König",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dingli_Cliffs_2009.JPG",
+      "caption": "The Dingli Cliffs, the highest point on the island of Malta",
       "aiGenerated": false
     }
   ]

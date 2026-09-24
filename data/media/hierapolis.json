@@ -3,32 +3,32 @@
   "images": [
     {
       "id": "hierapolis-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/20190_Pamukkale-Denizli_Merkez-Denizli%2C_Turkey_-_panoramio_%281%29.jpg",
-      "author": "Francis Cook",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:20190_Pamukkale-Denizli_Merkez-Denizli,_Turkey_-_panoramio_(1).jpg",
-      "caption": "Ancient Hierapolis",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/The_Roman_theatre%2C_built_in_the_2nd_century_AD_under_Hadrian_on_the_ruins_of_an_earlier_theatre%2C_later_renovated_under_Septimius_Severus%2C_Hierapolis%2C_Turkey_-_17033895960.jpg",
+      "author": "Carole Raddato",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Roman_theatre,_built_in_the_2nd_century_AD_under_Hadrian_on_the_ruins_of_an_earlier_theatre,_later_renovated_under_Septimius_Severus,_Hierapolis,_Turkey_-_17033895960.jpg",
+      "caption": "The Roman theatre at the archaeological site of Hierapolis",
       "aiGenerated": false
     },
     {
       "id": "hierapolis-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/20190_Pamukkale-Denizli_Merkez-Denizli%2C_Turkey_-_panoramio_%2810%29.jpg",
-      "author": "Денис Александров",
-      "license": "CC BY 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:20190_Pamukkale-Denizli_Merkez-Denizli,_Turkey_-_panoramio_(10).jpg",
-      "caption": "Ancient Hierapolis",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Hierapolis_Frontinus_Gate_5037.jpg",
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hierapolis_Frontinus_Gate_5037.jpg",
+      "caption": "The Frontinus Gate and colonnaded street at Hierapolis",
       "aiGenerated": false
     },
     {
       "id": "hierapolis-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/20190_Pamukkale-Denizli_Merkez-Denizli%2C_Turkey_-_panoramio_%284%29.jpg",
-      "author": "Денис Александров",
-      "license": "CC BY 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:20190_Pamukkale-Denizli_Merkez-Denizli,_Turkey_-_panoramio_(4).jpg",
-      "caption": "Ancient Hierapolis",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Hierapolis_Eastern_Necropolis_4901.jpg",
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Hierapolis_Eastern_Necropolis_4901.jpg",
+      "caption": "Tombs of the necropolis at Hierapolis",
       "aiGenerated": false
     }
   ]
