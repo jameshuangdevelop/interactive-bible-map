@@ -2,6 +2,7 @@
   "locationId": "capernaum",
   "images": [
     {
+      "id": "capernaum-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/example.jpg",
       "author": "Example Author",
       "license": "CC BY 3.0 nl",

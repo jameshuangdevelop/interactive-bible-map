@@ -2,6 +2,7 @@
   "locationId": "damascus",
   "images": [
     {
+      "id": "damascus-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Umayyad_Mosque%2C_Damascus.jpg",
       "author": "Bernard Gagnon",
       "license": "CC BY-SA 3.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "damascus-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Damascus%2C_Syria%2C_Panoramic_view_of_Damascus.jpg",
       "author": "Vyacheslav Argenberg",
       "license": "CC BY 4.0",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "damascus-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Golden_art_inside_the_Umayyad_Mosque_in_Damascus.jpg",
       "author": "Shahdddddddd",
       "license": "CC BY-SA 4.0",

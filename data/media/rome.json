@@ -2,6 +2,7 @@
   "locationId": "rome",
   "images": [
     {
+      "id": "rome-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Colosseum_in_Rome-April_2007-1-_copie_2B.jpg",
       "author": "Diliff",
       "license": "CC BY-SA 2.5",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "rome-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Colosseum_in_Rome%2C_Italy_-_April_2007.jpg",
       "author": "Diliff",
       "license": "CC BY-SA 2.5",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "rome-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Forum_Romanum_%2814%29.jpg",
       "author": "Krzysztof Golik",
       "license": "CC BY-SA 4.0",

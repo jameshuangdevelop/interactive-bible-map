@@ -2,6 +2,7 @@
   "locationId": "thessalonica",
   "images": [
     {
+      "id": "thessalonica-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Thessaloniki%2C_Greece_-_Pavlova.jpg",
       "author": "Sharon Hahn Darlin",
       "license": "CC BY 2.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "thessalonica-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Thessaloniki%2C_Greece%2C_Feb_2023_-_Western_Walls.jpg",
       "author": "Sharon Hahn Darlin",
       "license": "CC BY 2.0",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "thessalonica-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Thessaloniki_Ancient_Agora_%281%29.jpg",
       "author": "Armineaghayan",
       "license": "CC BY-SA 4.0",

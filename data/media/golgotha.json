@@ -2,6 +2,7 @@
   "locationId": "golgotha",
   "images": [
     {
+      "id": "golgotha-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Jerusalem_Holy_Sepulchre_BW_19.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "golgotha-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Jerusalem-Garden-Tomb-KTM-1262.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
       "author": "Bukvoed",
       "license": "CC BY 4.0",

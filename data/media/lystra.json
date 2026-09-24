@@ -2,6 +2,7 @@
   "locationId": "lystra",
   "images": [
     {
+      "id": "lystra-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Saint_Paul_at_Lystra_MET_DP820060.jpg",
       "author": "Jacob Jordaens",
       "license": "CC0",

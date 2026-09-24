@@ -2,6 +2,7 @@
   "locationId": "ephesus",
   "images": [
     {
+      "id": "ephesus-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Terrace_Houses_of_Ephesus%2C_Ephesus_Archaeological_Site%2C_Selcuk%2C_Turkiye_%2853528102764%29.jpg",
       "author": "Warren LeMay from Chicago, IL, United States",
       "license": "CC BY-SA 2.0",

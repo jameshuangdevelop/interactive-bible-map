@@ -2,6 +2,7 @@
   "locationId": "galilee",
   "images": [
     {
+      "id": "galilee-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/example.jpg",
       "author": "Example Author",
       "license": "CC BY 4.0",

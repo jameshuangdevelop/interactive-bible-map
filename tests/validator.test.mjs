@@ -188,6 +188,62 @@ test("media fixture rejects non-3.0 IGO variant", async () => {
   );
 });
 
+test("media fixture accepts sequential image IDs", async () => {
+  const result = await runCase("valid-media-image-ids");
+  assert.equal(result.errors.length, 0);
+});
+
+test("media image IDs must start with locationId", async () => {
+  const result = await runCase("invalid-media-image-id-prefix");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].id" &&
+        error.message.includes("must start with 'capernaum-'")
+    )
+  );
+});
+
+test("media image IDs must not skip numbers", async () => {
+  const result = await runCase("invalid-media-image-id-gap");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[1].id" &&
+        error.message.includes("must be 'capernaum-02'")
+    )
+  );
+});
+
+test("media image IDs must follow array order", async () => {
+  const result = await runCase("invalid-media-image-id-order");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].id" &&
+        error.message.includes("must be 'capernaum-01'")
+    )
+  );
+});
+
+test("duplicate image IDs across media files fail", async () => {
+  const result = await runCase("invalid-media-image-id-duplicate");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.images[0].id" &&
+        error.message.includes("Duplicate image id 'capernaum-01'")
+    )
+  );
+});
+
 test("scripture source accepts single verse reference", async () => {
   const result = await runCase("valid-scripture-source-single");
   assert.equal(result.errors.length, 0);

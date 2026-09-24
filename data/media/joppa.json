@@ -2,6 +2,7 @@
   "locationId": "joppa",
   "images": [
     {
+      "id": "joppa-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/100351_jaffa_beach_PikiWiki_Israel.jpg",
       "author": "יקוב בנאור",
       "license": "Public domain",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "joppa-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/100353_jaffa_-_bosphorus_street_PikiWiki_Israel.jpg",
       "author": "Unknown authorUnknown author",
       "license": "Public domain",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "joppa-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/%28%D8%A8%D8%AD%D8%B1_%D9%8A%D8%A7%D9%81%D8%A7%29.jpg",
       "author": "نغم بدر",
       "license": "CC BY-SA 4.0",

@@ -2,6 +2,7 @@
   "locationId": "capernaum",
   "images": [
     {
+      "id": "capernaum-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Kafarnaum_BW_7.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
       "author": "Berthold Werner",
       "license": "Public domain",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "capernaum-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Sites_of_Christianity_in_the_Galillee_-_Ruins_of_the_ancient_Great_Synagogue_at_Capernaum_%28or_Kfar_Nahum%29_on_the_shore_of_the_Lake_of_Galilee%2C_Northern_Israel.jpg",
       "author": "Eddie Gerald",
       "license": "CC BY-SA 3.0 IGO",

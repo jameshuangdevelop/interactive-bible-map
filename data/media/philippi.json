@@ -2,6 +2,7 @@
   "locationId": "philippi",
   "images": [
     {
+      "id": "philippi-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Ancient_Philippi.jpg",
       "author": "MrPanyGoff",
       "license": "CC BY-SA 3.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "philippi-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "philippi-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Archaeological_site_of_Philippi_BW_2017-10-05_12-47-21.jpg",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",

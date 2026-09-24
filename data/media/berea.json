@@ -2,6 +2,7 @@
   "locationId": "berea",
   "images": [
     {
+      "id": "berea-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Veria_BW_2017-10-06_09-39-17.jpg",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "berea-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Veria_BW_2017-10-06_09-39-44.jpg",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "berea-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Beroia_Archaelogical_Museum.jpg",
       "author": "Pjposullivan",
       "license": "CC BY-SA 3.0",

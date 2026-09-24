@@ -2,6 +2,7 @@
   "locationId": "caesarea-maritima",
   "images": [
     {
+      "id": "caesarea-maritima-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/124995_caesarea_national_park_PikiWiki_Israel.jpg",
       "author": "מיכל פריימן",
       "license": "CC BY 2.5",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "caesarea-maritima-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/124996_caesarea_national_park_PikiWiki_Israel.jpg",
       "author": "מיכל פריימן",
       "license": "CC BY 2.5",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "caesarea-maritima-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Ancient_Roman_aqueduct_in_Caesarea_Maritima_DSC05202.JPG",
       "author": "Lior Golgher • ליאור גולגר",
       "license": "CC BY-SA 3.0",

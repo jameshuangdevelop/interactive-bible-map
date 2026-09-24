@@ -2,6 +2,7 @@
   "locationId": "jericho",
   "images": [
     {
+      "id": "jericho-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Jericho_cityscape_from_wall_ruins.jpg",
       "author": "Daniel Case",
       "license": "CC BY-SA 3.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "jericho-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Jericho_-_Tel_Es-Sultan1.jpg",
       "author": "Tamarah",
       "license": "CC BY 3.0",

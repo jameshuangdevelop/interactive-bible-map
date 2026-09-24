@@ -1,0 +1,15 @@
+{
+  "locationId": "galilee",
+  "images": [
+    {
+      "id": "capernaum-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/example.jpg",
+      "author": "Example Author",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Example.jpg",
+      "caption": "Illustrative image fixture only.",
+      "aiGenerated": false
+    }
+  ]
+}

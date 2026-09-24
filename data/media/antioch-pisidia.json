@@ -2,6 +2,7 @@
   "locationId": "antioch-pisidia",
   "images": [
     {
+      "id": "antioch-pisidia-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Antioch_of_Pisidia_2888.jpg",
       "author": "Dosseman",
       "license": "CC BY-SA 4.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "antioch-pisidia-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Antioch_of_Pisidia_2893.jpg",
       "author": "Dosseman",
       "license": "CC BY-SA 4.0",
@@ -20,6 +22,7 @@
       "aiGenerated": false
     },
     {
+      "id": "antioch-pisidia-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Antioch_of_Pisidia_2898.jpg",
       "author": "Dosseman",
       "license": "CC BY-SA 4.0",

@@ -2,6 +2,7 @@
   "locationId": "iconium",
   "images": [
     {
+      "id": "iconium-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Konya_view_from_Seljuk_Tower_3998.jpg",
       "author": "Dosseman",
       "license": "CC BY-SA 4.0",
@@ -11,6 +12,7 @@
       "aiGenerated": false
     },
     {
+      "id": "iconium-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Al%C3%A2eddin_hill%2C_Konya.jpg",
       "author": "Unknown",
       "license": "CC BY-SA 3.0",
