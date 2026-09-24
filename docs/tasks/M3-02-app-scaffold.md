@@ -25,7 +25,7 @@ Deliver a working, empty app skeleton that the later M3 tasks build on: Expo wit
 2. **Repository layout:** the root `package.json` already holds the data tools (`npm test` and `npm run validate:data`). Choose a layout for both (npm workspaces are the likely fit), justify it in the PR, and keep every existing root command working unchanged.
 3. **Data build** (`npm run build:data`):
    - It runs the data validator first, and **fails if validation fails**.
-   - It writes `places.index.json` for the map and search: for each record, the `id`, `names`, `type`, `zoomTier`, `parentId`, and each candidate's `label`, `coordinates` and `confidence`. The target size is about 17 KB.
+   - It writes `places.index.json` for the map and search: for each record, the `id`, `names`, `type`, `zoomTier`, `parentId`, and each candidate's `label`, `coordinates` and `confidence`. The target size is about 18 KB minified.
    - It writes one `places/<id>.json` per record: the full record, its media, and the bibliography entries its `bib:` sources refer to.
    - Output goes to the app's static folder and is **generated, not committed** (add it to `.gitignore`).
 4. **App shell** (spec §1): a full-screen area for the map, a floating search-box placeholder and a panel placeholder. The design tokens (spec §6) live in one theme module. No map library yet; that is M3-03.

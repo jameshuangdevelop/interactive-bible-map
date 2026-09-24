@@ -19,21 +19,27 @@ Let users find any place by name, as `docs/design/VISUAL_SPEC.md` §4 describes.
 - This card
 
 ## Scope
-1. **Matching:**
+1. **What is searched:** each record's ancient, modern and alternate names, **plus its candidates' `label` values**, so that "Imwas" finds Emmaus.
+2. **Matching:**
    - Match word starts and prefixes, ignoring case and diacritics (Unicode normalization, then stripping combining marks), so that "alasehir" finds Alaşehir.
    - Allow one typo in names of 5 letters or more.
    - Rank exact matches first, then prefix matches, then typo matches, with ties broken by name. Return up to 8 results.
    - If you use a library, justify it and keep it small; a hand-written matcher is fine at this size (about 60 places).
-2. **Results:** each result shows the title name with the match in bold, and a second line with the modern name and type. A match found through an alternate name adds "also: *name*". Same-named places are listed separately (for example, "Antioch" returns two places).
-3. **Accessibility:** follow the ARIA 1.2 combobox pattern. ↓ and ↑ move, Enter opens, and Esc clears. Pressing "/" anywhere focuses the box. The list has accessible names, and the result count is announced.
-4. **Behaviour:** opening a result selects the place through M3-03's selection, which zooms the map and updates the URL. The no-results state reads: "No places match '*query*'. Search covers place names only."
-5. **Menu:** the ☰ button in the search box opens a drawer with About this map, Sources & credits, Report an issue, and View on GitHub.
+3. **Results:** each result shows the title name with the match in bold, and a second line with the modern name and type.
+   - Disputed places (no modern name, after M3-08) read "Disputed · *n* proposed sites · *type*".
+   - Records without a modern name show just the type.
+   - A match found through an alternate name or a candidate label adds "also: *name*".
+   - Same-named places are listed separately (for example, "Antioch" returns two places).
+4. **Accessibility:** follow the ARIA 1.2 combobox pattern. ↓ and ↑ move, Enter opens, and Esc clears. Pressing "/" anywhere focuses the box. The list has accessible names, and the result count is announced.
+5. **Behaviour:** opening a result selects the place through M3-03's selection, which zooms the map and updates the URL. The no-results state reads: "No places match '*query*'. Search covers place names only."
+6. **Menu:** the ☰ button in the search box opens a drawer with About this map, Sources & credits, Report an issue, and View on GitHub.
    - **Sources & credits** shows the data license, the WEB notice word for word from `docs/LICENSES.md`, and the upstream sources from `ATTRIBUTION.md`.
    - The other entries are short static text or links.
-6. **Tests:**
+7. **Tests:**
    - "Antioch" returns two places;
    - "alasehir" finds Philadelphia (Alaşehir);
    - "capernam" finds Capernaum;
+   - "imwas" finds Emmaus, with the "also:" note;
    - "cor" ranks Corinth before other matches;
    - a verse query gives the no-results state;
    - the combobox works by keyboard.

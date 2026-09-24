@@ -28,7 +28,7 @@ Deploy the MVP to Cloudflare Pages: a preview for every pull request and product
    - Use only `secrets.CLOUDFLARE_API_TOKEN` and `secrets.CLOUDFLARE_ACCOUNT_ID`. Never print them.
 2. **Smoke test on the deployed preview:** a scripted browser check, such as Playwright, run in CI against the preview URL. It checks that the map loads, that selecting Capernaum shows the panel with a credit line, that searching "Antioch" gives two results, and that opening `?place=emmaus` shows the disputed layout.
 3. **Accessibility check:** run an automated check (for example axe) on the preview for the overview, an open place panel and the search box, and fix every serious or critical issue.
-4. **Performance check:** measure against spec §11 (a usable map within 3 seconds on a mid-range laptop, with Lighthouse or an equivalent). Report the numbers in the PR, and fix clear regressions.
+4. **Performance check:** run Lighthouse with the **desktop preset on a cold cache** against the preview (in CI, for example with Lighthouse CI), and assert the spec §11 gates: Largest Contentful Paint of 2.5 s or less and Total Blocking Time of 200 ms or less. Report the numbers in the PR.
 5. **Docs:** add `docs/DEPLOY.md`, explaining how deploys work, where to find the preview URL, how to roll back, and what to do if tiles fail (the ADR-0009 fallback).
 
 ## Out of scope
@@ -38,7 +38,7 @@ New features, custom domains, and analytics.
 - [ ] This PR's own preview deploys, and the URL is posted on the PR.
 - [ ] The smoke test passes against that preview.
 - [ ] Automated accessibility checks report no serious or critical issues.
-- [ ] Performance numbers are reported against spec §11.
+- [ ] The Lighthouse desktop gates from spec §11 pass in CI, and the numbers are in the PR.
 - [ ] No secret values appear in logs, code or docs.
 - [ ] Committed as `feat(deploy): add Cloudflare Pages preview and production deploys`.
 

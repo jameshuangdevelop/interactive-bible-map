@@ -24,7 +24,7 @@ Show every place on an interactive map, the way `docs/design/VISUAL_SPEC.md` §2
    - Host a style file in the app, derived from OpenFreeMap **Positron**, that uses English labels where available, removes points of interest, and **hides boundary features with `disputed = 1`** (the OpenMapTiles `boundary` layer).
    - Keep glyph, sprite and tile URLs pointing at OpenFreeMap.
    - Record the source style's license and where it came from in the PR.
-3. **Fallback:** a second style (OpenFreeMap Bright), set by configuration. After repeated tile errors, switch to it automatically and show the message from spec §5.
+3. **Fallback:** a basemap from a **different provider or host** than OpenFreeMap, chosen from the options whose licenses M3-07 verifies (for example a self-hosted Protomaps extract, or another provider that needs no API key). It must also hide disputed boundaries. Configuration can select it, and after repeated tile errors the app switches to it automatically and shows the message from spec §5. Record the choice and why in the PR. OpenFreeMap's Bright and Liberty styles are not fallbacks, because they use the same servers.
 4. **Places:**
    - Pins are coloured by type (spec §2) and are **keyboard-focusable buttons** named like "Capernaum, city".
    - Region and island records appear as clickable labels.
@@ -44,7 +44,7 @@ The place panel content (M3-04), search (M3-05), the Ancient layer and timeline 
 ## Acceptance criteria
 - [ ] Every record in `places.index.json` appears at the right zoom, with the colour and label spec §2 gives.
 - [ ] Disputed boundaries are hidden, which the tests confirm.
-- [ ] The fallback works: a test shows that simulated tile errors switch the style and show the message.
+- [ ] The fallback works: it is on a different provider or host, and a test shows that simulated tile errors switch to it and show the message.
 - [ ] Pins, labels and controls can be reached and operated by keyboard, and have accessible names.
 - [ ] The attribution is visible, and uses M3-07's exact text if it has merged, or a marked placeholder if not.
 - [ ] CI passes. Committed as `feat(map): add map view with places, tiers and clustering`.

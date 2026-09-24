@@ -202,7 +202,7 @@ M3, the MVP app.
 | ID | Task | Agent | Starts after |
 |---|---|---|---|
 | [M3-02](docs/tasks/M3-02-app-scaffold.md) | App scaffold, data build and CI | frontend-engineer | CP3a (in parallel with M3-07 and M3-08) |
-| [M3-07](docs/tasks/M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | CP3a |
+| [M3-07](docs/tasks/M3-07-basemap-attribution.md) | Basemap attribution, style license and fallback-provider licenses | fact-checker | CP3a |
 | [M3-08](docs/tasks/M3-08-modern-names.md) | Neutral modern names (decision 3) | gis-engineer → research-lead → fact-checker | CP3a |
 | [M3-03](docs/tasks/M3-03-map-view.md) | Map view: basemap, pins, tiers, clustering, disputed candidates | frontend-engineer | M3-02 |
 | [M3-04](docs/tasks/M3-04-place-panel.md) | Place panel | frontend-engineer | M3-03 (in parallel with M3-05) |

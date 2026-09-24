@@ -33,7 +33,7 @@ The reserved areas are **not built in M3**. The wireframes show them with dashed
   - English labels where the data has them;
   - points of interest removed;
   - **disputed boundary lines hidden** (the OpenMapTiles `boundary` layer, where `disputed = 1`; ADR-0009).
-- **Fallback:** a second style (OpenFreeMap Bright) can be switched in by configuration, and the app switches to it automatically if tiles keep failing (ADR-0009).
+- **Fallback:** a basemap from a **different provider or host**, so that it still works if OpenFreeMap itself is down (ADR-0009). The app switches to it automatically after repeated tile errors, and configuration can also switch it. The fallback must hide disputed boundaries too. M3-03 chooses it from the options whose licenses M3-07 verifies, for example a self-hosted Protomaps extract or another provider that needs no API key. OpenFreeMap's Bright and Liberty styles use the same servers, so they are theme alternatives, not fallbacks.
 - **Alternative (CP3a decision 1):** OpenFreeMap Liberty, which is more colourful and closer to Google Maps.
 
 ### Places on the map
@@ -91,9 +91,12 @@ The section order follows brief §1.4. Sections without data are left out.
 The panel closes with its × button or with Esc. While the panel is open, the map keeps its position.
 
 ## 4. Search
-- **Placeholder:** "Search biblical places". The box searches **place names only**: ancient, modern and alternate names (brief §1.7).
+- **Placeholder:** "Search biblical places". The box searches **place names only** (brief §1.7): ancient, modern and alternate names, **and candidate-site labels**, so that "Imwas" finds Emmaus.
 - **Matching:** prefix and word-start matches, ignoring case and diacritics, so "alasehir" finds Alaşehir. It tolerates one typo in names of 5 letters or more.
-- **Results:** up to 8 appear as the user types. Each shows the title name with the match in bold, and a second line with the modern name and type. A match found through an alternate name adds "also: *name*". Searching "Antioch" lists **Antioch on the Orontes** (Antakya) and **Antioch in Pisidia** (Yalvaç) as separate places.
+- **Results:** up to 8 appear as the user types. Each shows the title name with the match in bold, and a second line with the modern name and type.
+  - Disputed places have no modern name, so their second line reads "Disputed · *n* proposed sites · *type*".
+  - Records without a modern name show just the type.
+  - A match found through an alternate name or a candidate label adds "also: *name*". Searching "Antioch" lists **Antioch on the Orontes** (Antakya) and **Antioch in Pisidia** (Yalvaç) as separate places.
 - **Keyboard:** ↓ and ↑ move through the results, Enter opens one, and Esc clears the box. Pressing "/" anywhere focuses the search.
 - **No results:** "No places match *'xyz'*. Search covers place names only."
 - **Menu** (☰ in the search box) opens a drawer with About this map, Sources & credits, Report an issue, and View on GitHub.
@@ -101,7 +104,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 5. States
 | State | Behaviour |
 |---|---|
-| Loading a place | Grey skeleton blocks in the panel. The map is usable at once, because the map and search data (about 17 KB) load with the app. |
+| Loading a place | Grey skeleton blocks in the panel. The map is usable at once, because the map and search data (about 18 KB) load with the app. |
 | Basemap tiles failing | After repeated tile errors, switch to the fallback style and show a message: "The main map service isn't responding. Showing the backup map." |
 | An image fails to load | A grey placeholder with an icon; the credit line stays. |
 | A link to an unknown place | The default view, with the message "Place not found". |
@@ -113,7 +116,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 | Surface / subtle surface / divider | `#FFFFFF` / `#F1F3F4` / `#DADCE0` |
 | Accent (links, primary buttons, focus ring) | `#1A73E8` |
 | Confidence: high | text `#137333` on `#E6F4EA` |
-| Confidence: medium | text `#B06000` on `#FEF7E0` |
+| Confidence: medium | text `#9A5200` on `#FEF7E0` (5.5:1) |
 | Confidence: low | text `#5F6368` on `#F1F3F4` |
 | Confidence: disputed | text `#A50E0E` on `#FCE8E6` |
 | UI font | `system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif` |
@@ -155,8 +158,8 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - Copy link copies that URL. Opening it selects the place.
 
 ## 11. Performance targets
-- **First interaction:** the map is usable within 3 seconds on a mid-range laptop with ordinary broadband.
-- **Data loading:** the map and search data (about 17 KB) load with the app. Each place's details load when it is opened; the largest, Jerusalem, is about 34 KB.
+- **Load speed:** measured with Lighthouse's **desktop preset on a cold cache** against the preview deploy, the Largest Contentful Paint must be **2.5 s or less**, and the Total Blocking Time **200 ms or less**. These are Lighthouse's "good" thresholds.
+- **Data loading:** the map and search data (about 18 KB minified) load with the app. Each place's details load when it is opened; the largest, Jerusalem, is about 36 KB minified.
 - **Images:** load lazily, using Commons thumbnail URLs at panel size rather than full-resolution files.
 
 ## 12. Not in M3
