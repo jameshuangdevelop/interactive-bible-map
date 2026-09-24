@@ -1,0 +1,27 @@
+{
+  "entries": [
+    {
+      "id": "pleiades-place-resource",
+      "type": "dataset",
+      "title": "Pleiades: A Gazetteer of Past Places",
+      "authors": [
+        "Pleiades contributors"
+      ],
+      "year": 2026,
+      "publisher": "Institute for the Study of the Ancient World, New York University",
+      "url": "https://pleiades.stoa.org/"
+    },
+    {
+      "id": "ebible-engwebp-details",
+      "type": "web",
+      "title": "World English Bible (engwebp) details",
+      "authors": [
+        "eBible.org"
+      ],
+      "year": 2026,
+      "publisher": "eBible.org",
+      "url": "https://ebible.org/find/details.php?id=engwebp",
+      "accessed": "2026-09-23"
+    }
+  ]
+}

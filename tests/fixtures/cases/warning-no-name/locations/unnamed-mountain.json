@@ -1,0 +1,53 @@
+{
+  "id": "unnamed-mountain",
+  "names": {
+    "ancient": ["Unknown Peak"],
+    "modern": "Unknown Mountain",
+    "alternate": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "site",
+  "candidates": [
+    {
+      "label": "Illustrative summit",
+      "coordinates": [35.3, 32.7],
+      "coordinateSource": "wikidata:Q1384",
+      "confidence": "low",
+      "support": "Illustrative only.",
+      "sources": ["wikidata:Q1384", "openbible:galilee"]
+    }
+  ],
+  "summary": {
+    "text": "Illustrative summary.",
+    "sources": ["openbible:galilee"]
+  },
+  "history": [
+    {
+      "text": "Illustrative history.",
+      "sources": ["pleiades:678231"]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 5:1",
+      "book": "Matthew",
+      "textWEB": "Seeing the multitudes, he went up onto the mountain. When he had sat down, his disciples came to him."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Illustrative note.",
+      "sources": ["openbible:galilee"]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -63,
+      "toYear": 135,
+      "entity": "Illustrative only.",
+      "sources": ["pleiades:678231"]
+    }
+  ],
+  "status": "draft"
+}

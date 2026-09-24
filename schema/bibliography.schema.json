@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-bible-map/schemas/bibliography.schema.json",
+  "title": "Bibliography registry",
+  "description": "Registry of scholarly and authority sources referenced by location records through bib:<id> source IDs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entries"
+  ],
+  "properties": {
+    "entries": {
+      "type": "array",
+      "description": "Bibliography entries keyed by id for reuse in location source citations.",
+      "items": {
+        "type": "object",
+        "description": "One bibliography entry.",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "title",
+          "authors",
+          "year"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable bibliography key used by location source IDs as bib:<id>.",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "type": {
+            "type": "string",
+            "description": "Source type.",
+            "enum": [
+              "book",
+              "article",
+              "chapter",
+              "web",
+              "dataset"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the work, article, page, or dataset.",
+            "minLength": 1
+          },
+          "authors": {
+            "type": "array",
+            "description": "Author or institutional-author names in display order.",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "description": "One author name.",
+              "minLength": 1
+            }
+          },
+          "year": {
+            "type": "integer",
+            "description": "Publication year as an integer."
+          },
+          "publisher": {
+            "type": "string",
+            "description": "Publisher or issuing authority name.",
+            "minLength": 1
+          },
+          "journal": {
+            "type": "string",
+            "description": "Journal or periodical title for articles.",
+            "minLength": 1
+          },
+          "containerTitle": {
+            "type": "string",
+            "description": "Container work title, for example a book title for a chapter.",
+            "minLength": 1
+          },
+          "doi": {
+            "type": "string",
+            "description": "Digital Object Identifier if available.",
+            "pattern": "^10\\.[0-9]{4,9}/[-._;()/:A-Za-z0-9]+$"
+          },
+          "isbn": {
+            "type": "string",
+            "description": "ISBN-10 or ISBN-13 without spaces.",
+            "pattern": "^(?:97[89])?[0-9]{9}[0-9Xx]$"
+          },
+          "url": {
+            "type": "string",
+            "description": "Direct URL for web pages or dataset landing pages.",
+            "format": "uri"
+          },
+          "accessed": {
+            "type": "string",
+            "description": "Date when a web source was accessed, in YYYY-MM-DD format.",
+            "format": "date"
+          }
+        },
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "required": [
+                  "publisher"
+                ]
+              },
+              {
+                "required": [
+                  "journal"
+                ]
+              }
+            ]
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "web"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "url",
+                "accessed"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

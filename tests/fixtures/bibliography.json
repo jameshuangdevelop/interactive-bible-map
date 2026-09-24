@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "id": "existing-bib-source",
+      "type": "article",
+      "title": "Illustrative fixture article title",
+      "authors": [
+        "Example Author"
+      ],
+      "year": 2024,
+      "journal": "Illustrative Journal of Ancient Studies",
+      "doi": "10.1234/example-fixture-doi"
+    }
+  ]
+}

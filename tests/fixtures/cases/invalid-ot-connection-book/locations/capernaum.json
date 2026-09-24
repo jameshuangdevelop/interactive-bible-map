@@ -1,0 +1,53 @@
+{
+  "id": "capernaum",
+  "names": {
+    "ancient": ["Capernaum"],
+    "modern": "Kfar Nahum",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Tell Hum",
+      "coordinates": [35.575, 32.88],
+      "coordinateSource": "pleiades:678231",
+      "confidence": "high",
+      "support": "Illustrative only.",
+      "sources": ["pleiades:678231", "openbible:capernaum"]
+    }
+  ],
+  "summary": {
+    "text": "Illustrative summary.",
+    "sources": ["openbible:capernaum"]
+  },
+  "history": [
+    {
+      "text": "Illustrative history.",
+      "sources": ["pleiades:678231"]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Mark 1:21",
+      "book": "Mark",
+      "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Mark 1:21",
+      "note": "Illustrative note.",
+      "sources": ["openbible:capernaum"]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Illustrative only.",
+      "sources": ["pleiades:678231"]
+    }
+  ],
+  "status": "draft"
+}

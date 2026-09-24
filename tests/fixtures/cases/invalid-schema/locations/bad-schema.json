@@ -1,0 +1,43 @@
+{
+  "id": "bad-schema",
+  "names": {
+    "ancient": ["Bad Schema"],
+    "modern": "Bad Schema",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "summary": {
+    "text": "Missing candidates on purpose for schema failure.",
+    "sources": ["wikipedia:Capernaum"]
+  },
+  "history": [
+    {
+      "text": "Illustrative history entry.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Mark 1:21",
+      "book": "Mark",
+      "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Illustrative note.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Illustrative only.",
+      "sources": ["wikipedia:Capernaum"]
+    }
+  ],
+  "status": "draft"
+}

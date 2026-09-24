@@ -1,0 +1,53 @@
+{
+  "id": "galilee",
+  "names": {
+    "ancient": ["Galilee"],
+    "modern": "Galilee",
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Galilee",
+      "coordinates": [35.4, 32.9],
+      "coordinateSource": "wikidata:Q1384",
+      "confidence": "high",
+      "support": "Illustrative only.",
+      "sources": ["wikidata:Q1384", "openbible:galilee"]
+    }
+  ],
+  "summary": {
+    "text": "Illustrative summary.",
+    "sources": ["openbible:galilee"]
+  },
+  "history": [
+    {
+      "text": "Illustrative history.",
+      "sources": ["pleiades:678231"]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Isaiah 9:1",
+      "book": "Isaiah",
+      "textWEB": "But there shall be no more gloom for her who was in anguish. In the former time, he brought into contempt the land of Zebulun and the land of Naphtali; but in the latter time he has made it glorious, by the way of the sea, beyond the Jordan, Galilee of the nations."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Illustrative note.",
+      "sources": ["openbible:galilee"]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -63,
+      "toYear": 135,
+      "entity": "Illustrative only.",
+      "sources": ["pleiades:678231"]
+    }
+  ],
+  "status": "draft"
+}
