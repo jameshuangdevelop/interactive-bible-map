@@ -3,16 +3,6 @@
   "images": [
     {
       "id": "temple-mount-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/ISR-2013-Jerusalem-Temple_Mount-Dome_of_the_Rock-Fa%C3%A7ade_01.jpg",
-      "author": "Godot13",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:ISR-2013-Jerusalem-Temple_Mount-Dome_of_the_Rock-Fa%C3%A7ade_01.jpg",
-      "caption": "The Dome of the Rock, one of the most iconic structures on the Temple Mount",
-      "aiGenerated": false
-    },
-    {
-      "id": "temple-mount-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/The_Western_Wall_and_Dome_of_the_rock_in_the_old_city_of_Jerusalem.jpg",
       "author": "Yourway-to-israel",
       "license": "CC BY-SA 3.0",
@@ -22,7 +12,7 @@
       "aiGenerated": false
     },
     {
-      "id": "temple-mount-03",
+      "id": "temple-mount-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Jerusalem_Dome_of_the_rock_BW_13.JPG",
       "author": "Berthold Werner",
       "license": "Public domain",
