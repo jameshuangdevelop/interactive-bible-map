@@ -3,7 +3,7 @@ name: fact-checker
 description: Fact-Checker & Licensing — independently verifies records, scripture, dates, neutrality and licenses.
 argument-hint: Paste your task card from docs/tasks/
 tools: ['read', 'edit', 'search', 'execute', 'web']
-model: ['Claude Sonnet 5', 'Claude Sonnet 4.6']
+model: ['Claude Opus 5.5', 'Claude Sonnet 5']
 agents: []
 ---
 

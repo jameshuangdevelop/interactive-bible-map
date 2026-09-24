@@ -103,7 +103,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** The human can see at a glance who reviewed a PR and whether anything still needs attention.
 
 ## ADR-0016 — The Media Curator runs on Claude Haiku 4.5
-- **Date:** 2026-09-23 · **Status:** Accepted · **By:** PO. This supersedes ADR-0003's media-curator row.
+- **Date:** 2026-09-23 · **Status:** Superseded by ADR-0020 · **By:** PO. This supersedes ADR-0003's media-curator row.
 - **Context:** On GPT-5 mini (ADR-0003's first choice), the Media Curator found images for only 4 of 21 locations in batch 2 and 13 of 22 in batch 1, mostly one image each. Some showed the wrong place (Berea, Ohio; Na'in, Iran).
 - **Decision:** The Media Curator uses Claude Haiku 4.5, which was the fallback. The agent file lists `['Claude Haiku 4.5', 'GPT-5 mini']`.
 - **Consequences:** About 100 extra credits per batch. Haiku reached every location with 1–3 images, although the Fact-Checker still caught two wrong-place images, which is why ADR-0017 requires checking a file's categories.
@@ -118,3 +118,26 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   - Wikipedia is never the only source.
   - Media must show the place, confirmed through the file's Commons categories, and must record the exact Commons license name, including IGO and port codes.
 - **Consequences:** Data takes longer to write but is safer for public use. The Research Lead, Fact-Checker and Media Curator agent files state these rules.
+
+## ADR-0018 — Rebalance the core set toward Acts and the Epistles
+- **Date:** 2026-09-24 · **Status:** Proposed (CP2 decision 1) · **By:** PO, at the human's request ("more Acts and Epistles focused … at least have all the Paul's letters")
+- **Context:** Brief §1 gives the Gospels and Acts the most detail, and §5 schedules the Epistles and Revelation places for M6. After reviewing the 40 core sites, the human asked for more Acts and Epistles coverage.
+- **Decision:** Keep the 40 verified sites and add batch 3 (M2-05): every destination of Paul's letters, the other places the letters name, Revelation's seven churches and Patmos, and key stops in Acts. It adds 17 sites plus the Galatia, Crete and Malta area records. The regions of 1 Peter 1:1 arrive as province polygons in M4.
+- **Consequences:** The core is 57 sites and 6 area records: 22 Gospel sites and 35 Acts and Epistles sites. The M6 batches shrink by about 20 places.
+
+## ADR-0019 — The PO may reply to GitHub comments directly
+- **Date:** 2026-09-24 · **Status:** Accepted · **By:** the human ("in the future you can just directly reply to github comments (only for this repo)")
+- **Decision:** In this repository, the PO may reply to PR and issue comments without asking first. Each reply opens with `**Project Owner (agent) · <model>**`. Pushing, opening, merging or closing PRs, labels and every other remote change still need the human's approval each time.
+- **Consequences:** Questions on PRs get answered where they were asked, without a round trip through chat.
+
+## ADR-0020 — The Media Curator runs on Claude Sonnet 5 and starts from Wikidata's main image
+- **Date:** 2026-09-24 · **Status:** Accepted · **By:** PO. This supersedes ADR-0016.
+- **Context:** On Claude Haiku 4.5, batch 3's first image pass took the first files each Commons category listed: a museum in Romania for Galatia, postage stamps for Smyrna, a banana plant for Crete. It left four places empty. The M2-06 review also found 10 poor lead images from the earlier light-model passes.
+- **Decision:** The Media Curator uses Claude Sonnet 5, with Claude Haiku 4.5 as the fallback. For each place, it starts from the Wikidata item's main image (P18) and Commons category (P373), then judges every file by its Commons categories and description.
+- **Consequences:** About 500 credits per 20-place batch instead of about 80, still under 0.1% of a month. In batch 3's redo, 40 of 55 images passed on the first check, and the rest were fixed in one round.
+
+## ADR-0021 — The Fact-Checker runs on Claude Opus 5.5
+- **Date:** 2026-09-24 · **Status:** Proposed (CP2 decision 6) · **By:** PO
+- **Context:** In batches 1–2, the PR Reviewers caught unsupported claims and wrong images that the Fact-Checker (Claude Sonnet 5) had passed. Batch 3's Fact-Checker ran on Claude Opus 5.5. It found 30 issues in its first round, then 5, then 1, and the reviewer then found no data problems.
+- **Decision:** The Fact-Checker uses Claude Opus 5.5, with Claude Sonnet 5 as the fallback.
+- **Consequences:** About 1.7× the cost per session, offset by fewer fix rounds: batch 3 cost about 3,400 credits in total, against about 5,100 and 6,700 for batches 1 and 2.

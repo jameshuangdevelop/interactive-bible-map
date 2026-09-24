@@ -126,42 +126,63 @@ The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), t
 ## CP2 — Schema & Core Data
 
 ### What was delivered
-| Task | Output | Branch (merge in this order) |
+| Task | Output | PR / branch (merge in this order) |
 |---|---|---|
-| M2-00 | CP1 recorded, the M2 cards, ADR-0014 and ADR-0015 | `docs/m2-kickoff` |
-| M2-01 | Location, media and bibliography schemas; a validator with 41 tests and CI; the WEB `engwebp` text snapshot | `feat/m2-schema-validation` |
-| M2-02 | Batch 1: 20 sites and 2 regions (Jerusalem, Judea, Galilee), 34 images, [verification report](docs/verification/M2-batch-1.md) | `data/m2-batch-1` |
-| M2-03 | Batch 2: 20 sites and 1 region (Samaria, Acts, the Pauline cities), 48 images, [verification report](docs/verification/M2-batch-2.md) | `data/m2-batch-2` |
-| M2-04 | This summary, ADR-0016 and ADR-0017, and agent-file updates | `docs/cp2-summary` |
+| M2-00 | CP1 recorded, the M2 cards, ADR-0014 and ADR-0015 | #8 (merged) |
+| M2-01 | Location, media and bibliography schemas; a validator and CI; the WEB `engwebp` text snapshot | #9 (merged) |
+| M2-02 | Batch 1: Jerusalem, Judea and Galilee, 20 sites and 2 regions ([verification](docs/verification/M2-batch-1.md)) | #10 (merged) |
+| M2-03 | Batch 2: Samaria, Acts and the Pauline cities, 20 sites and 1 region ([verification](docs/verification/M2-batch-2.md)) | #11 (merged) |
+| M2-06 | Stable image IDs (`<location-id>-NN`) and a review of every lead image, answering your question on #11 | `feat/m2-image-ids` |
+| M2-05 | Batch 3: Paul's letters, Revelation's churches and Acts, 20 places ([verification](docs/verification/M2-batch-3.md)) | `data/m2-batch-3` |
+| M2-04 | This summary, ADR-0016 to ADR-0021, and agent-file updates | `docs/cp2-summary` |
 
-**The dataset:** 40 core sites and 3 region records, **all verified** by the Fact-Checker. They have 82 freely licensed images (hotlinked, never committed) and 609 New Testament references, whose WEB text the validator checks. Six disputed places list several candidate sites: Golgotha, Emmaus, Bethany beyond the Jordan, Bethsaida, Cana and Derbe. Sychar is also disputed, but its second candidate, Askar, is described only in text because no licensable coordinate exists (decision 2). Jericho has two points for two periods, the Old Testament tell and the Herodian city; it is not disputed.
+**The dataset:** 63 records, **all verified by the Fact-Checker**: 57 sites and 6 area records (Judea, Galilee, Samaria, Galatia, Crete and the island of Malta).
+- **Images:** 131 freely licensed images, hotlinked from Wikimedia Commons and never committed. Each has a stable id.
+- **Scripture:** 677 New Testament references, whose WEB text the validator checks.
+- **Sources:** 31 bibliography entries.
+- **Split:** 22 Gospel sites and 35 Acts and Epistles sites.
+- **Coverage:** every destination of Paul's letters (Rome, Corinth, Galatia, Ephesus, Philippi, Colossae, Thessalonica and Crete), the other places the letters name (Cenchreae, Laodicea, Hierapolis, Nicopolis, Troas and Miletus), all seven churches of Revelation plus Patmos, and the main stops of Paul's journeys in Acts.
+- **Disputed places:** seven show several mapped candidates: Golgotha, Emmaus, Bethany beyond the Jordan, Bethsaida, Cana, Derbe and Malta (Melita). Sychar is also disputed, but its second candidate, Askar, is described only in text (decision 3). Jericho has two points for two periods; it is not disputed.
 
 ### How quality was checked
-- Each batch was one branch: the Research Lead drafted it, the Media Curator added images, and the Fact-Checker verified it. A PR Reviewer from a different vendor then audited samples (ADR-0014).
-- The reviewers caught text that its cited sources did not state, such as Corinth as "capital of Achaia" and Gospel events in the Jerusalem and Temple Mount summaries. Every clause in all 43 records was then checked against its sources, and anything unsupported was sourced or softened. Two new citation types made this possible: `bib:` entries for scholarly works and authority pages, and `scripture:` for what a passage reports (ADR-0017).
-- The first image pass (GPT-5 mini) found too few images, and some showed the wrong place: Berea, Ohio, and Na'in, Iran. The Media Curator moved to Claude Haiku 4.5 (ADR-0016). The Fact-Checker confirmed every image's place and its exact license name, including IGO and country-specific variants.
+- **One branch per batch:** the Research Lead drafted it, the Media Curator added images, and the Fact-Checker verified it. A PR Reviewer from a different vendor then audited samples (ADR-0004, ADR-0014).
+- **Claims:** the reviewers caught text that its sources did not state, such as Corinth as "capital of Achaia". Since then, every factual clause must be stated by a cited source: dataset IDs for locations, `bib:` entries for history, and `scripture:` for what a passage reports (ADR-0017).
+- **Images:** the lighter models chose wrong or irrelevant images. Examples include Berea, Ohio; Na'in, Iran; a dessert as Thessalonica's lead photo; and postage stamps for Smyrna.
+  - The M2-06 review fixed 10 lead images in batches 1–2.
+  - Batch 3's first image pass was rejected and redone on Claude Sonnet 5, starting from each place's Wikidata main image (ADR-0020).
+- **Stronger Fact-Checker:** batch 3's Fact-Checker ran on Claude Opus 5.5 (decision 6, applied early). It found 30 issues in its first round, mostly coordinates credited to the wrong dataset, then 5, then 1. Batch 3's reviewer then found no data problems.
 
 ### Decisions needed from you
 **Merging this PR approves CP2 with the recommendations below.** To choose differently, comment on the PR.
 
 | # | Decision | Recommendation | Alternative |
 |---|---|---|---|
-| 1 | Temple Mount scripture | Keep a representative set of 7 passages set at the Temple, as the record states | List every New Testament mention of the Temple (100+) |
-| 2 | Candidate sites without a usable coordinate | Accept a prose-only mention for now (Sychar: Askar has no licensable coordinate), and add an "unmapped candidate" field to the schema before M6. The Fact-Checker agrees. | Hold Sychar back until it can be mapped |
-| 3 | Political history | Fill it in consistently in M4 from the timeline events. Batch 1 has it; batch 2 is empty. | Fill batch 2 now |
-| 4 | Fact-Checker model | Move the Fact-Checker to Claude Opus 5.5 from M3 on. The reviewers caught claim problems it had passed. Each session costs about 1.7× more, still under 0.3% of the monthly budget per batch. | Keep Sonnet 5 and rely on reviewer sampling |
+| 1 | The batch 3 list (the Acts and Epistles rebalance, ADR-0018) | Keep it as delivered. The reviewer suggests Assos, Sidon and Myra for a later batch. | Add or drop places |
+| 2 | Temple Mount scripture | Keep a representative set of 7 passages set at the Temple, as the record states | List every New Testament mention of the Temple (100+) |
+| 3 | Candidate sites without a usable coordinate | Accept a text-only mention for now (Sychar: Askar has no licensable coordinate), and add an "unmapped candidate" field to the schema before M6 | Hold Sychar back until it can be mapped |
+| 4 | Lystra has no image | Accept this for now. No freely licensed photo of the site exists, and Wikidata confuses it with nearby Kilistra. Revisit in M6, or use a labeled AI reconstruction later. | Show a painting, which breaks the "shows the place" rule |
+| 5 | Political history | Fill it in consistently in M4 from the timeline events. Batch 1 has it; batches 2–3 have little. | Fill it in now |
+| 6 | Fact-Checker model (ADR-0021) | Claude Opus 5.5 from now on: about 1.7× the cost per session, but fewer rounds | Go back to Claude Sonnet 5 |
+
+**For your information:**
+- **ADR-0019:** you let the PO reply to GitHub comments directly in this repository.
+- **ADR-0020:** the Media Curator now runs on Claude Sonnet 5.
 
 ### Concepts for you
 - **Kinds of citation.** Dataset IDs (Pleiades, Wikidata, DARE, OpenBible) establish *where* a place is. `bib:` entries point to scholarly works and authorities for historical claims. `scripture:` points to the passage that reports an event.
-- **Disputed site.** A place with several proposed locations. The map shows every candidate that has a usable coordinate, each with its own confidence level. Sychar's Askar has none yet (decision 2). [Pleiades on uncertainty](https://pleiades.stoa.org/help/conceptual-overview)
+- **Stable image id.** Our own name for a Commons image, for example `corinth-01`, where `-01` is the lead photo. The file itself stays on Commons under its Commons name.
+- **Disputed site.** A place with several proposed locations. The map shows every candidate that has a usable coordinate, each with its own confidence level. [Pleiades on uncertainty](https://pleiades.stoa.org/help/conceptual-overview)
 - **License port.** A country-specific version of a Creative Commons license, for example CC BY-SA 2.0 de, with the same terms. We record the exact name. [Creative Commons FAQ](https://creativecommons.org/faq/)
 
 ### Risks
-- **Upstream changes.** Wikidata and OpenBible coordinates can change. The `coordinateSource` recorded on each candidate lets a later check detect drift.
-- **Verification rounds cost more than forecast** (see the budget below). Moving the Fact-Checker to a stronger model (decision 4) should cut the number of rounds.
+- **Upstream data errors.** Wikidata and Pleiades entries can be wrong or change; Wikidata's Lystra item describes Kilistra. Each coordinate records its source and is checked against a second source, so drift can be detected later.
+- **Verification cost.** M2 needed more rounds than forecast. Stronger models from the start (ADR-0020, ADR-0021) made batch 3 cheaper than batches 1–2.
 
 ### Budget
-M2 used about **16,100 AI credits** against a forecast of about 4,000. Most of the difference went into four verification rounds per batch. The month total is about **19,300 of 1,000,000 (1.9%)**. The revised forecast is about 7,000 credits per batch, so M6 (about 5 batches) would be about 35,000. See [BUDGET.md](docs/BUDGET.md).
+M2 used about **22,700 AI credits** against a forecast of about 4,000. Batches 1 and 2 cost about 5,100 and 6,700 credits, and batch 3 about 3,400. The month total is about **25,900 of 1,000,000 (2.6%)**. See [BUDGET.md](docs/BUDGET.md).
 
 ### Next (after you approve)
-M3, the MVP app. The PO writes a low-fidelity visual spec (CP3a). Then the Frontend Engineer scaffolds Expo with React Native Web and MapLibre, and builds the map, pins, zoom tiers, details panel, candidate sites and search, with a Cloudflare Pages preview (CP3b). At that point you'll need a free Cloudflare account and a deploy token; the M3 card will give the steps.
+M3, the MVP app.
+- The PO writes a low-fidelity visual spec (CP3a).
+- The Frontend Engineer scaffolds Expo with React Native Web and MapLibre, and builds the map, pins, zoom tiers, details panel, candidate sites and search, with a Cloudflare Pages preview (CP3b).
+- At that point you'll need a free Cloudflare account and a deploy token; the M3 card will give the steps.

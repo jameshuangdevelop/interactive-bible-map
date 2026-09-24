@@ -65,14 +65,14 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 
 **What this means.** The whole project is forecast at under 3% of one month's cap, so budget does not set the pace; the time it takes to review each checkpoint does. The 80% and 95% stops stay in place as safety rails, and the session guard is the control that matters day to day. The brief's cost-efficiency rules (§2.8) still apply.
 
-> **Forecast revision (CP2):** M2 cost about 4× its forecast, because each data batch needed 3–4 verification rounds. Plan on about 7,000 credits per data batch from now on, so M6 (about 5 batches) is about 35,000. Moving the Fact-Checker to Claude Opus 5.5 (CP2 decision 4) adds about 250 credits per session but should cut the number of rounds.
+> **Forecast revision (CP2):** M2 cost about 22,666 credits against a forecast of about 4,000, because batches 1–2 needed 3–4 verification rounds each. With the Media Curator on Claude Sonnet 5 and the Fact-Checker on Claude Opus 5.5 (ADR-0020, ADR-0021), batch 3 cost about 3,400. Plan on about 3,500–5,000 credits per 20-place batch. That puts M6 (about 240 more places, 12 batches) at about 45,000–60,000 credits, under 6% of one month's cap.
 
 ## Rollups
 | Checkpoint | Month | Credits this milestone | Month total | % of cap |
 |---|---|---:|---:|---:|
 | CP0 | 2026-09 | ~500 | ~500 | ~0.05% |
 | CP1 | 2026-09 | ~2,760 | ~3,260 | ~0.3% |
-| CP2 | 2026-09 | ~16,085 | ~19,345 | ~1.9% |
+| CP2 | 2026-09 | ~22,666 | ~25,926 | ~2.6% |
 
 ## Ledger — 2026-09
 | Date | Agent | Model | Task | Tokens in / out (est.) | AI credits | Month total |
@@ -140,3 +140,6 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 re-verification 2 (Opus 5.5 rates +50%) | ~265k / ~8k | ~180 | ~23,892 |
 | 2026-09-24 | media-curator | Claude Sonnet 5 (Copilot CLI subagent) | M2-05 malta author | — | ~10 | ~23,902 |
 | 2026-09-24 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M2-05 batch 3 sign-off (Opus 5.5 rates +50%) | ~275k / ~3k | ~90 | ~23,992 |
+| 2026-09-24 | pr-reviewer | Claude Sonnet 5 (Copilot CLI subagent) | Review M2-06 | ~700k / ~15k | ~330 | ~24,322 |
+| 2026-09-24 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M2-05 | ~260k / ~10k | ~104 | ~24,426 |
+| 2026-09-24 | project-owner | Claude Opus 5.5 (Copilot CLI) | M2-05 and M2-06 orchestration, stacking and CP2 update | ~300k / ~45k | ~1,500 | ~25,926 |
