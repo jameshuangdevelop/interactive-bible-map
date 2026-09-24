@@ -10,6 +10,20 @@
 - **Web sources:** opened all 10 new `bib:` URLs and checked each clause that cites them. Read each site's own text license (see Licensing).
 - **Images:** queried the Commons API (`prop=imageinfo|categories&iiprop=url|extmetadata`) for all 55 files, read the wikitext of every public-domain file, and **looked at every image** (a thumbnail of each), because the first Phase B pass was rejected for wrong-place images.
 
+## Re-verification 2 (2026-09-24: fixes `3dff52d` research-lead, `247ea38` media-curator)
+
+**Result: all 20 records pass and are `verified`. 19 of 20 media files (54 of 55 images) pass. 1 item remains open, for the media-curator.**
+
+| Item | File | Result |
+|---|---|---|
+| R-1 | galatia | The support now says the Celts "had migrated to Asia Minor by 278 BC", Zondervan's own wording, and gives "about 90 km" for the Pleiades 619161 label (measured live: 88.2 km). **Pass → verified.** |
+| R-2 | malta | (a) `pleiades:462311` ("Melita/Malta (island)") is back in the Malta candidate's `sources`. Measured live, its point is 3.72 km from the value, which still equals Wikidata Q233's `P625` exactly. (b) "Mainstream" is replaced by "traditionally identified" in the summary and "the traditional identification" in the Mljet support. Both are supported by HMML ("historically had been identified as the site"). **Pass → verified.** |
+| R-3 | thyatira | The summary now reads "Lydia, whose conversion and baptism at Philippi Acts records", citing `scripture:Acts 16:15` (WEB: "When she and her household were baptized…") alongside 16:14. **Pass → verified.** |
+| R-4 | tyre | The quotation now reads "'a Greek, a Syrophoenician by race'", confirmed as an exact substring of Mark 7:26 in the WEB snapshot. **Pass → verified.** |
+| R-5 | media malta | `malta-01` is now `Selmunett_Island.jpg`. **The subject passes**: I viewed the image, which shows St Paul's Islands with the statue of Paul and no people, in the category "St Paul's Islands", and the caption is neutral. The `license` (CC BY 3.0), `licenseUrl` and `url` match Commons. **The author does not match.** The file page gives `Author = User:Jeffrey Sciberras`, `Source = own work` and `{{self|cc-by-3.0}}`, so Jeffrey Sciberras is the licensor. The description separately says "Photo: Arnold Sciberras". The record credits only "Arnold Sciberras". **Needs-change (media-curator).** Set `"author": "Jeffrey Sciberras (photo credited to Arnold Sciberras)"` so that both names the page designates are credited. Because the page's own-work claim and its photo credit disagree, replacing the file with a St Paul's Bay or St Paul's Islands image with unambiguous authorship would also be acceptable, and cleaner. |
+
+**Validation:** `npm run validate:data`: 0 errors, 99 warnings (unchanged). `npm test`: 46/46 pass.
+
 ## Re-verification (2026-09-24: fixes `3018cd9` research-lead, `4339f00` media-curator)
 
 **Result: 16 of 20 records pass and are now `verified`. 19 of 20 media files (54 of 55 images) pass. 5 items remain open: 4 for the research-lead and 1 for the media-curator.** `corinth.json` (batch 2) passes its paraphrase re-check, and its `lastReviewed` is set to 2026-09-24.
