@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 
-import { OLD_TESTAMENT_BOOKS, parseReference } from "./books.mjs";
+import { CANONICAL_BOOKS, OLD_TESTAMENT_BOOKS, parseReference } from "./books.mjs";
 import {
   DEFAULT_WEB_VPL_PATH,
   getWebTextForReference,
@@ -57,6 +57,8 @@ export const PROJECT_BOUNDS = Object.freeze({
   minLat: -5,
   maxLat: 50
 });
+
+const CANONICAL_BOOK_SET = new Set(CANONICAL_BOOKS);
 
 function toPosixPath(value) {
   return value.replace(/\\/gu, "/");
@@ -177,11 +179,68 @@ function sourceArrayHasOnlyWikipedia(sourceIds) {
   );
 }
 
+function sourceArrayHasScriptureSource(sourceIds) {
+  return (
+    Array.isArray(sourceIds) &&
+    sourceIds.some(
+      (sourceId) =>
+        typeof sourceId === "string" && sourceId.startsWith("scripture:")
+    )
+  );
+}
+
+function locationHasScriptureSources(locationData) {
+  if (!locationData || typeof locationData !== "object") {
+    return false;
+  }
+
+  if (sourceArrayHasScriptureSource(locationData.summary?.sources)) {
+    return true;
+  }
+
+  if (
+    Array.isArray(locationData.candidates) &&
+    locationData.candidates.some((candidate) =>
+      sourceArrayHasScriptureSource(candidate?.sources)
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    Array.isArray(locationData.history) &&
+    locationData.history.some((entry) => sourceArrayHasScriptureSource(entry?.sources))
+  ) {
+    return true;
+  }
+
+  if (
+    Array.isArray(locationData.otConnections) &&
+    locationData.otConnections.some((entry) =>
+      sourceArrayHasScriptureSource(entry?.sources)
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    Array.isArray(locationData.politicalHistory) &&
+    locationData.politicalHistory.some((entry) =>
+      sourceArrayHasScriptureSource(entry?.sources)
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 function validateSourceArray({
   sourceIds,
   file,
   pathValue,
   bibliographyIds,
+  webVerseIndex,
   errors
 }) {
   if (!Array.isArray(sourceIds) || sourceIds.length === 0) {
@@ -198,17 +257,69 @@ function validateSourceArray({
   }
 
   sourceIds.forEach((sourceId, sourceIndex) => {
-    if (typeof sourceId !== "string" || !sourceId.startsWith("bib:")) {
+    if (typeof sourceId !== "string") {
       return;
     }
 
-    const bibliographyId = sourceId.slice("bib:".length);
-    if (!bibliographyIds.has(bibliographyId)) {
+    if (sourceId.startsWith("bib:")) {
+      const bibliographyId = sourceId.slice("bib:".length);
+      if (!bibliographyIds.has(bibliographyId)) {
+        recordError(
+          errors,
+          file,
+          `${pathValue}[${sourceIndex}]`,
+          `Bibliography source '${sourceId}' was not found in data/bibliography.json`
+        );
+      }
+      return;
+    }
+
+    if (!sourceId.startsWith("scripture:")) {
+      return;
+    }
+
+    const sourceReference = sourceId.slice("scripture:".length);
+    let parsedReference;
+    try {
+      parsedReference = parseReference(sourceReference);
+    } catch (error) {
       recordError(
         errors,
         file,
         `${pathValue}[${sourceIndex}]`,
-        `Bibliography source '${sourceId}' was not found in data/bibliography.json`
+        `Invalid scripture source '${sourceId}': ${error.message}`
+      );
+      return;
+    }
+
+    if (!CANONICAL_BOOK_SET.has(parsedReference.book)) {
+      recordError(
+        errors,
+        file,
+        `${pathValue}[${sourceIndex}]`,
+        `Scripture source '${sourceId}' uses a non-canonical book '${parsedReference.book}'`
+      );
+      return;
+    }
+
+    if (!webVerseIndex) {
+      recordError(
+        errors,
+        file,
+        `${pathValue}[${sourceIndex}]`,
+        `Unable to validate scripture source '${sourceId}' because WEB text is unavailable`
+      );
+      return;
+    }
+
+    try {
+      getWebTextForReference(sourceReference, webVerseIndex);
+    } catch (error) {
+      recordError(
+        errors,
+        file,
+        `${pathValue}[${sourceIndex}]`,
+        `Scripture source '${sourceId}' references verse(s) not found in WEB snapshot: ${error.message}`
       );
     }
   });
@@ -503,10 +614,13 @@ export async function validateData(options = {}) {
   }
 
   let webVerseIndex;
+  const hasScriptureSources = locationRecords.some((record) =>
+    locationHasScriptureSources(record.data)
+  );
   const hasScripture = locationRecords.some(
     (record) => Array.isArray(record.data.scripture) && record.data.scripture.length > 0
   );
-  if (hasScripture) {
+  if (hasScripture || hasScriptureSources) {
     try {
       webVerseIndex = await loadWebVerseIndex(webVplPath);
     } catch (error) {
@@ -514,8 +628,8 @@ export async function validateData(options = {}) {
         recordError(
           errors,
           locationRecord.relativePath,
-          "$.scripture",
-          `Unable to read WEB source text: ${error.message}`
+          hasScripture ? "$.scripture" : "$",
+          `Unable to read WEB source text required for scripture validation: ${error.message}`
         );
       }
       return { errors, warnings };
@@ -580,6 +694,18 @@ export async function validateData(options = {}) {
         }
 
         if (
+          typeof candidate.coordinateSource === "string" &&
+          candidate.coordinateSource.startsWith("scripture:")
+        ) {
+          recordError(
+            errors,
+            locationRecord.relativePath,
+            `$.candidates[${candidateIndex}].coordinateSource`,
+            "Coordinate source must not use scripture: IDs; use a geospatial dataset source"
+          );
+        }
+
+        if (
           Array.isArray(candidate.sources) &&
           typeof candidate.coordinateSource === "string" &&
           !candidate.sources.includes(candidate.coordinateSource)
@@ -597,6 +723,7 @@ export async function validateData(options = {}) {
           file: locationRecord.relativePath,
           pathValue: `$.candidates[${candidateIndex}].sources`,
           bibliographyIds,
+          webVerseIndex,
           errors
         });
 
@@ -618,6 +745,7 @@ export async function validateData(options = {}) {
       file: locationRecord.relativePath,
       pathValue: "$.summary.sources",
       bibliographyIds,
+      webVerseIndex,
       errors
     });
 
@@ -628,6 +756,7 @@ export async function validateData(options = {}) {
           file: locationRecord.relativePath,
           pathValue: `$.history[${historyIndex}].sources`,
           bibliographyIds,
+          webVerseIndex,
           errors
         });
       });
@@ -661,6 +790,7 @@ export async function validateData(options = {}) {
           file: locationRecord.relativePath,
           pathValue: `$.otConnections[${connectionIndex}].sources`,
           bibliographyIds,
+          webVerseIndex,
           errors
         });
       });
@@ -684,6 +814,7 @@ export async function validateData(options = {}) {
           file: locationRecord.relativePath,
           pathValue: `$.politicalHistory[${entryIndex}].sources`,
           bibliographyIds,
+          webVerseIndex,
           errors
         });
       });

@@ -121,6 +121,57 @@ test("media fixture rejects missing version in jurisdiction variant", async () =
   );
 });
 
+test("scripture source accepts single verse reference", async () => {
+  const result = await runCase("valid-scripture-source-single");
+  assert.equal(result.errors.length, 0);
+});
+
+test("scripture source accepts verse range reference", async () => {
+  const result = await runCase("valid-scripture-source-range");
+  assert.equal(result.errors.length, 0);
+});
+
+test("scripture source accepts numbered-book reference", async () => {
+  const result = await runCase("valid-scripture-source-numbered");
+  assert.equal(result.errors.length, 0);
+});
+
+test("scripture source rejects unknown book names", async () => {
+  const result = await runCase("invalid-scripture-source-unknown-book");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.summary.sources[1]" &&
+        error.message.includes("non-canonical book")
+    )
+  );
+});
+
+test("scripture source rejects nonexistent verses", async () => {
+  const result = await runCase("invalid-scripture-source-missing-verse");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.summary.sources[1]" &&
+        error.message.includes("not found in WEB snapshot")
+    )
+  );
+});
+
+test("coordinateSource cannot use scripture source IDs", async () => {
+  const result = await runCase("invalid-scripture-coordinate-source");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.candidates[0].coordinateSource" &&
+        error.message.includes("must not use scripture:")
+    )
+  );
+});
+
 test("id must equal filename", async () => {
   const result = await runCase("invalid-id-filename");
   assert.ok(

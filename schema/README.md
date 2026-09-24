@@ -62,6 +62,7 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 | `awmc:` | `awmc:feature-1` |
 | `wikipedia:` | `wikipedia:Capernaum` (pointer only, never sole support) |
 | `perseus:` | `perseus:urn:cts:greekLit:tlg0526` |
+| `scripture:` | `scripture:Mark 11:15-17` |
 | `bib:` | `bib:pleiades-place-resource` |
 
 ### Bibliography registry
@@ -77,6 +78,7 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 ### Sources quality floor
 - A `sources[]` array cannot consist only of `wikipedia:` IDs.
 - Use at least one non-Wikipedia source ID (dataset ID or `bib:`).
+- Cite the passage with `scripture:` when a text clause reports what a Bible passage says; a scripture source supports only what the passage itself says.
 
 ### Scripture reference format
 - `scripture[].ref` and `otConnections[].ref` use `Book Chapter:Verse` or `Book Chapter:Start-End`.
