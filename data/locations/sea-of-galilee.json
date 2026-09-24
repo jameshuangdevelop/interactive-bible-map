@@ -1,0 +1,136 @@
+{
+  "id": "sea-of-galilee",
+  "names": {
+    "ancient": [
+      "Sea of Galilee",
+      "Sea of Tiberias",
+      "Sea of Chinnereth",
+      "Lake of Gennesaret"
+    ],
+    "modern": "Sea of Galilee / Lake Kinneret",
+    "alternate": [
+      "Yam Kinneret"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Sea of Galilee",
+      "coordinates": [
+        35.590033,
+        32.818906
+      ],
+      "coordinateSource": "wikidata:Q126982",
+      "confidence": "high",
+      "support": "Wikidata's coordinate is corroborated by OpenBible.info's independently recorded point for the same lake.",
+      "sources": [
+        "wikidata:Q126982",
+        "openbible:sea-of-galilee"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Sea of Galilee is the freshwater lake in northern Israel around which much of Jesus' Galilean ministry took place, including the calling of his first disciples, several miracles at sea, and post-resurrection appearances recorded in the Gospels.",
+    "sources": [
+      "wikidata:Q126982",
+      "openbible:sea-of-galilee",
+      "scripture:Mark 1:16",
+      "scripture:Matthew 14:25",
+      "scripture:John 21:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The lake sits in the Jordan Rift Valley more than 200 meters below sea level and is fed principally by the Jordan River, which enters from the north and exits to the south.",
+      "sources": [
+        "wikidata:Q126982"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 4:18",
+      "book": "Matthew",
+      "textWEB": "Walking by the sea of Galilee, he saw two brothers: Simon, who is called Peter, and Andrew, his brother, casting a net into the sea; for they were fishermen."
+    },
+    {
+      "ref": "Matthew 9:1",
+      "book": "Matthew",
+      "textWEB": "He entered into a boat and crossed over, and came into his own city."
+    },
+    {
+      "ref": "Matthew 15:29",
+      "book": "Matthew",
+      "textWEB": "Jesus departed from there and came near to the sea of Galilee; and he went up on the mountain and sat there."
+    },
+    {
+      "ref": "Mark 1:16",
+      "book": "Mark",
+      "textWEB": "Passing along by the sea of Galilee, he saw Simon and Andrew, the brother of Simon, casting a net into the sea, for they were fishermen."
+    },
+    {
+      "ref": "Mark 7:31",
+      "book": "Mark",
+      "textWEB": "Again he departed from the borders of Tyre and Sidon, and came to the sea of Galilee through the middle of the region of Decapolis."
+    },
+    {
+      "ref": "John 6:1",
+      "book": "John",
+      "textWEB": "After these things, Jesus went away to the other side of the sea of Galilee, which is also called the Sea of Tiberias."
+    },
+    {
+      "ref": "John 21:1",
+      "book": "John",
+      "textWEB": "After these things, Jesus revealed himself again to the disciples at the sea of Tiberias. He revealed himself this way."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Numbers 34:11",
+      "note": "The lake is called the 'Sea of Chinnereth' in the Old Testament, an older name for the same body of water later known as the Sea of Galilee or Sea of Tiberias.",
+      "sources": [
+        "openbible:sea-of-galilee"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

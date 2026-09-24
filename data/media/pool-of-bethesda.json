@@ -1,0 +1,32 @@
+{
+  "locationId": "pool-of-bethesda",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Jerusalem_Bethesda_BW_1.JPG",
+      "author": "Berthold Werner",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Jerusalem_Bethesda_BW_1.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_Bethesda_BW_1.JPG",
+      "caption": "Archaeological remains of the Pool of Bethesda in the Old City of Jerusalem",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Pool_of_Bethesda1.jpg",
+      "author": "Ariely",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pool_of_Bethesda1.jpg",
+      "caption": "Model of the Pool of Bethesda at the Israel Museum",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/2Pool_of_Bethesda.JPG",
+      "author": "Krupski Oleg",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:2Pool_of_Bethesda.JPG",
+      "caption": "Byzantine church ruins at the Pool of Bethesda archaeological site",
+      "aiGenerated": false
+    }
+  ]
+}

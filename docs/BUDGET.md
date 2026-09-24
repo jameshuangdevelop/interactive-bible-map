@@ -87,15 +87,26 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M1-04 (CP1) | ~150k / ~8k | ~74 | ~3,260 |
 | 2026-09-23 | project-owner | Claude Opus 5.5 (Copilot CLI) | M2-00 push M1, CP1 follow-up, M2 kickoff and cards | ~220k / ~20k | ~450 | ~3,710 |
 | 2026-09-23 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-01 schema, validation and CI | ~900k / ~90k | ~790 | ~4,500 |
-| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 research (Phase A) | ~380k / ~50k | ~950 | ~5,450 |
-| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 batch 2 media (Phase B) | ~150k / ~8k | ~80 | ~5,530 |
-| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 fact-check (Phase C) | ~520k / ~45k | ~950 | ~6,480 |
-| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 sychar fix | ~60k / ~5k | ~120 | ~6,600 |
-| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 media fixes | ~40k / ~3k | ~25 | ~6,625 |
-| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification | ~190k / ~18k | ~350 | ~6,975 |
-| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 claims audit | ~650k / ~70k | ~1,350 | ~8,325 |
-| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 license strings | ~50k / ~4k | ~40 | ~8,365 |
-| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 2 | ~350k / ~35k | ~650 | ~9,015 |
-| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 corinth image | ~25k / ~2k | ~30 | ~9,045 |
-| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 scripture citations | ~700k / ~75k | ~1,450 | ~10,495 |
-| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 3 | ~200k / ~20k | ~400 | ~10,895 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 batch 1 research (Phase A) | ~300k / ~45k | ~1,050 | ~5,550 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-02 batch 1 media (completion) | ~150k / ~30k | ~100 | ~5,650 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 batch 1 fact-check (Phase C: 47 independent coordinate re-fetches, 32 image license/content re-checks, full scripture/political-history audit) | ~450k / ~55k | ~1,150 | ~6,800 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 fixes (galilee politicalHistory, jerusalem scripture, gethsemane confidence, jericho candidate, temple-mount disclosure, bethlehem/bethany-beyond-the-jordan politicalHistory) | ~90k / ~12k | ~350 | ~7,150 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-02 media fixes (capernaum IGO license string, nain image replacement) | ~40k / ~6k | ~55 | ~7,205 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 re-verification (7 fixed records + capernaum/nain media re-checked against original evidence; found nain's replacement images still not fully resolved) | ~120k / ~20k | ~300 | ~7,505 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 claims audit (source-checked all 22 records' text claims against sources; 13 records changed, 7 new bib: entries added) | ~250k / ~40k | ~700 | ~8,205 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-02 nain and license strings (replaced nain images, re-checked all 34 license strings against LicenseShortName, fixed bethany's CC0 string) | ~50k / ~8k | ~20 | ~8,225 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 re-verification 2 (claim-by-claim audit of 13 records, opened 2 new web sources directly, verified 7 new bib: entries, re-checked nain's 3 new images, spot-checked 8 other image licenses) | ~150k / ~25k | ~350 | ~8,575 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 scripture citations (added scripture: source IDs to summary/history/support clauses across 20 records) | ~200k / ~30k | ~550 | ~9,125 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-02 re-verification 3 (pulled all ~40 cited scripture: references directly from the WEB snapshot and checked each against its specific clause; verified bib:rainey-notley-sacred-bridge and the softened Qasr al-Yahud wording) | ~100k / ~18k | ~250 | ~9,375 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 research (Phase A) | ~380k / ~50k | ~950 | ~10,325 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 batch 2 media (Phase B) | ~150k / ~8k | ~80 | ~10,405 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 batch 2 fact-check (Phase C) | ~520k / ~45k | ~950 | ~11,355 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 sychar fix | ~60k / ~5k | ~120 | ~11,475 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 media fixes | ~40k / ~3k | ~25 | ~11,500 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification | ~190k / ~18k | ~350 | ~11,850 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 claims audit | ~650k / ~70k | ~1,350 | ~13,200 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 license strings | ~50k / ~4k | ~40 | ~13,240 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 2 | ~350k / ~35k | ~650 | ~13,890 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 corinth image | ~25k / ~2k | ~30 | ~13,920 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 scripture citations | ~700k / ~75k | ~1,450 | ~15,370 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 3 | ~200k / ~20k | ~400 | ~15,770 |

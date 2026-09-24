@@ -1,0 +1,80 @@
+{
+  "id": "pool-of-siloam",
+  "names": {
+    "ancient": [
+      "Siloam",
+      "Shelah"
+    ],
+    "modern": "Pool of Siloam",
+    "alternate": [
+      "Silwan"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Pool of Siloam",
+      "coordinates": [
+        35.235,
+        31.770556
+      ],
+      "coordinateSource": "wikidata:Q1483483",
+      "confidence": "high",
+      "support": "Wikidata's coordinate matches OpenBible.info's independently recorded point exactly, and corresponds to the monumental stepped pool excavated at the foot of the City of David.",
+      "sources": [
+        "wikidata:Q1483483",
+        "openbible:siloam",
+        "bib:reich-shukron-siloam-pool"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Pool of Siloam is a reservoir at the southern end of Jerusalem's City of David, fed by the Gihon Spring, where the Gospel of John records Jesus sending a man born blind to wash and receive his sight.",
+    "sources": [
+      "wikidata:Q1483483",
+      "openbible:siloam",
+      "scripture:John 9:7"
+    ]
+  },
+  "history": [
+    {
+      "text": "Archaeologists Ronny Reich and Eli Shukron identified a monumental stepped pool from the Second Temple period at the base of the City of David in 2004, which they identify with the Pool of Siloam known to first-century Jerusalem.",
+      "sources": [
+        "bib:reich-shukron-siloam-pool",
+        "openbible:siloam"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 13:4",
+      "book": "Luke",
+      "textWEB": "Or those eighteen on whom the tower in Siloam fell and killed them—do you think that they were worse offenders than all the men who dwell in Jerusalem?"
+    },
+    {
+      "ref": "John 9:7",
+      "book": "John",
+      "textWEB": "and said to him, “Go, wash in the pool of Siloam” (which means “Sent”). So he went away, washed, and came back seeing."
+    },
+    {
+      "ref": "John 9:11",
+      "book": "John",
+      "textWEB": "He answered, “A man called Jesus made mud, anointed my eyes, and said to me, ‘Go to the pool of Siloam and wash.’ So I went away and washed, and I received sight.”"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Nehemiah 3:15",
+      "note": "Nehemiah's account of rebuilding Jerusalem's walls mentions the 'pool of Shelah' (Siloam) by the king's garden, an earlier water installation on the same site later associated with the Second Temple-period pool of John 9.",
+      "sources": [
+        "openbible:siloam"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

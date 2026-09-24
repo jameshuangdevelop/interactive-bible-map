@@ -1,0 +1,64 @@
+{
+  "id": "gethsemane",
+  "names": {
+    "ancient": [
+      "Gethsemane"
+    ],
+    "modern": "Gethsemane",
+    "alternate": []
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Gethsemane",
+      "coordinates": [
+        35.239425,
+        31.779419
+      ],
+      "coordinateSource": "wikidata:Q205333",
+      "confidence": "medium",
+      "support": "Wikidata's coordinate for the traditional garden is corroborated by OpenBible.info's independently recorded point for the same site, at the foot of the Mount of Olives across the Kidron Valley from the Temple Mount. The general area is not disputed, but the exact garden plot is: at least two distinct denominational traditions claim the site, about 200 meters apart, including a Franciscan-custodied garden by the Church of All Nations and a Russian Orthodox garden near the Church of Mary Magdalene, and no first-century boundary of 'the garden' itself is archaeologically fixed.",
+      "sources": [
+        "wikidata:Q205333",
+        "openbible:gethsemane",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Gethsemane is the garden at the foot of the Mount of Olives where, according to Matthew and Mark, Jesus prayed with his disciples on the night of his arrest.",
+    "sources": [
+      "wikidata:Q205333",
+      "openbible:gethsemane",
+      "scripture:Matthew 26:36"
+    ]
+  },
+  "history": [
+    {
+      "text": "The name Gethsemane derives from an Aramaic/Hebrew term, gat shemanim, meaning an olive-oil press, consistent with the site's traditional identification as an olive grove at the base of the Mount of Olives.",
+      "sources": [
+        "bib:bdag-greek-lexicon",
+        "openbible:gethsemane"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 26:36",
+      "book": "Matthew",
+      "textWEB": "Then Jesus came with them to a place called Gethsemane, and said to his disciples, “Sit here, while I go there and pray.”"
+    },
+    {
+      "ref": "Mark 14:32",
+      "book": "Mark",
+      "textWEB": "They came to a place which was named Gethsemane. He said to his disciples, “Sit here while I pray.”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

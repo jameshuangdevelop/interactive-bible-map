@@ -1,0 +1,103 @@
+{
+  "id": "magdala",
+  "names": {
+    "ancient": [
+      "Magdala",
+      "Magadan",
+      "Dalmanutha",
+      "Taricheae"
+    ],
+    "modern": "Migdal",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Migdal (Majdal)",
+      "coordinates": [
+        35.515763,
+        32.825077
+      ],
+      "coordinateSource": "dare:33357",
+      "confidence": "medium",
+      "support": "The Digital Atlas of the Roman Empire's point sits within about 250 meters of OpenBible.info's independently recorded point for the same village, but roughly 1.6-2.3 km from the points recorded on two separate Wikidata items describing the ancient site and the modern town, a spread consistent with genuine uncertainty over the precise center of the ancient settlement within the wider modern-town area rather than a firmly resolved single point.",
+      "sources": [
+        "dare:33357",
+        "wikidata:Q4880851",
+        "openbible:magdala"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Magdala, on the western shore of the Sea of Galilee near Tiberias, is best known as the home village implied by the epithet 'Magdalene' given to Mary Magdalene throughout the Gospels; a place named Magadan or Dalmanutha in the same general area is also mentioned in Matthew and Mark.",
+    "sources": [
+      "openbible:magdala",
+      "wikidata:Q4880851",
+      "scripture:Luke 8:2",
+      "scripture:Matthew 15:39",
+      "scripture:Mark 8:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "Excavations beginning in 2009 uncovered a first-century synagogue together with a paved street and a building resting against a stone quay on the ancient shoreline, consistent with Josephus' description of the town, which he calls Taricheae, as a fishing and fish-processing center on the lake.",
+      "sources": [
+        "bib:iaa-magdala-excavation",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 15:39",
+      "book": "Matthew",
+      "textWEB": "Then he sent away the multitudes, got into the boat, and came into the borders of Magdala."
+    },
+    {
+      "ref": "Mark 8:10",
+      "book": "Mark",
+      "textWEB": "Immediately he entered into the boat with his disciples and came into the region of Dalmanutha."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

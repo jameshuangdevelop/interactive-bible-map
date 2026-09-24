@@ -1,0 +1,158 @@
+{
+  "id": "bethany",
+  "names": {
+    "ancient": [
+      "Bethany"
+    ],
+    "modern": "Al-Eizariya",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Al-Eizariya (Tomb of Lazarus site)",
+      "coordinates": [
+        35.255903,
+        31.771661
+      ],
+      "coordinateSource": "wikidata:Q7818622",
+      "confidence": "high",
+      "support": "Wikidata's point for the traditional Tomb of Lazarus sits about 850 meters from the broader modern town's own Wikidata coordinate, a difference consistent with one marking a specific pilgrimage site within the wider settlement rather than a coordinate disagreement.",
+      "sources": [
+        "wikidata:Q7818622",
+        "wikidata:Q2181579",
+        "openbible:bethany-1"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Bethany was a village on the eastern slope of the Mount of Olives, close to Jerusalem, identified in the Gospel of John as the home of Lazarus, Martha and Mary and the site of Lazarus being raised from death.",
+    "sources": [
+      "wikidata:Q7818622",
+      "openbible:bethany-1",
+      "scripture:John 11:1",
+      "scripture:John 11:43"
+    ]
+  },
+  "history": [
+    {
+      "text": "The modern Palestinian town of al-Eizariya, whose Arabic name preserves the memory of Lazarus ('al-Azir'), occupies the traditional site and includes a tomb venerated since at least the fourth century AD as the tomb of Lazarus.",
+      "sources": [
+        "wikidata:Q2181579",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 21:17",
+      "book": "Matthew",
+      "textWEB": "He left them and went out of the city to Bethany, and camped there."
+    },
+    {
+      "ref": "Matthew 26:6",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus was in Bethany, in the house of Simon the leper,"
+    },
+    {
+      "ref": "Mark 11:1",
+      "book": "Mark",
+      "textWEB": "When they came near to Jerusalem, to Bethsphage and Bethany, at the Mount of Olives, he sent two of his disciples"
+    },
+    {
+      "ref": "Mark 11:11",
+      "book": "Mark",
+      "textWEB": "Jesus entered into the temple in Jerusalem. When he had looked around at everything, it being now evening, he went out to Bethany with the twelve."
+    },
+    {
+      "ref": "Mark 11:12",
+      "book": "Mark",
+      "textWEB": "The next day, when they had come out from Bethany, he was hungry."
+    },
+    {
+      "ref": "Mark 14:3",
+      "book": "Mark",
+      "textWEB": "While he was at Bethany, in the house of Simon the leper, as he sat at the table, a woman came having an alabaster jar of ointment of pure nard—very costly. She broke the jar and poured it over his head."
+    },
+    {
+      "ref": "Luke 19:29",
+      "book": "Luke",
+      "textWEB": "When he came near to Bethsphage and Bethany, at the mountain that is called Olivet, he sent two of his disciples,"
+    },
+    {
+      "ref": "Luke 24:50",
+      "book": "Luke",
+      "textWEB": "He led them out as far as Bethany, and he lifted up his hands and blessed them."
+    },
+    {
+      "ref": "John 11:1",
+      "book": "John",
+      "textWEB": "Now a certain man was sick, Lazarus from Bethany, of the village of Mary and her sister, Martha."
+    },
+    {
+      "ref": "John 11:17",
+      "book": "John",
+      "textWEB": "So when Jesus came, he found that he had been in the tomb four days already."
+    },
+    {
+      "ref": "John 11:18",
+      "book": "John",
+      "textWEB": "Now Bethany was near Jerusalem, about fifteen stadia away."
+    },
+    {
+      "ref": "John 12:1",
+      "book": "John",
+      "textWEB": "Then, six days before the Passover, Jesus came to Bethany, where Lazarus was, who had been dead, whom he raised from the dead."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

@@ -1,0 +1,191 @@
+{
+  "id": "capernaum",
+  "names": {
+    "ancient": [
+      "Capernaum",
+      "Kfar Nahum"
+    ],
+    "modern": "Kfar Nahum / Tell Hum",
+    "alternate": [
+      "Talhum"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Tell Hum",
+      "coordinates": [
+        35.575,
+        32.881111
+      ],
+      "coordinateSource": "wikidata:Q59174",
+      "confidence": "high",
+      "support": "Wikidata's coordinate agrees with the Digital Atlas of the Roman Empire's point to within about 50 meters and with Pleiades' representative point to within about 60 meters.",
+      "sources": [
+        "wikidata:Q59174",
+        "dare:33337",
+        "pleiades:678231",
+        "openbible:capernaum"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee that served as a base for Jesus' Galilean ministry, described in the Gospels as the home of Peter and the location of numerous healings and teachings, including in its synagogue.",
+    "sources": [
+      "wikidata:Q59174",
+      "openbible:capernaum",
+      "scripture:Mark 1:21",
+      "scripture:Mark 2:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "Archaeological excavation has uncovered a limestone synagogue, generally dated several centuries after Jesus' lifetime, built over the foundations of an earlier, more modest structure, along with a Byzantine octagonal church built over a first-century house that an early Christian graffiti tradition identifies as Peter's house.",
+      "sources": [
+        "bib:murphy-oconnor-holy-land-guide",
+        "dare:33337"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 4:13",
+      "book": "Matthew",
+      "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
+    },
+    {
+      "ref": "Matthew 8:5",
+      "book": "Matthew",
+      "textWEB": "When he came into Capernaum, a centurion came to him, asking him for help,"
+    },
+    {
+      "ref": "Matthew 11:23",
+      "book": "Matthew",
+      "textWEB": "You, Capernaum, who are exalted to heaven, you will go down to Hades. For if the mighty works had been done in Sodom which were done in you, it would have remained until today."
+    },
+    {
+      "ref": "Matthew 17:24",
+      "book": "Matthew",
+      "textWEB": "When they had come to Capernaum, those who collected the didrachma coins came to Peter, and said, “Doesn’t your teacher pay the didrachma?”"
+    },
+    {
+      "ref": "Mark 1:21",
+      "book": "Mark",
+      "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught."
+    },
+    {
+      "ref": "Mark 2:1",
+      "book": "Mark",
+      "textWEB": "When he entered again into Capernaum after some days, it was heard that he was at home."
+    },
+    {
+      "ref": "Mark 9:33",
+      "book": "Mark",
+      "textWEB": "He came to Capernaum, and when he was in the house he asked them, “What were you arguing among yourselves on the way?”"
+    },
+    {
+      "ref": "Mark 10:1",
+      "book": "Mark",
+      "textWEB": "He arose from there and came into the borders of Judea and beyond the Jordan. Multitudes came together to him again. As he usually did, he was again teaching them."
+    },
+    {
+      "ref": "Luke 4:23",
+      "book": "Luke",
+      "textWEB": "He said to them, “Doubtless you will tell me this proverb, ‘Physician, heal yourself! Whatever we have heard done at Capernaum, do also here in your hometown.’”"
+    },
+    {
+      "ref": "Luke 4:31",
+      "book": "Luke",
+      "textWEB": "He came down to Capernaum, a city of Galilee. He was teaching them on the Sabbath day,"
+    },
+    {
+      "ref": "Luke 7:1",
+      "book": "Luke",
+      "textWEB": "After he had finished speaking in the hearing of the people, he entered into Capernaum."
+    },
+    {
+      "ref": "Luke 10:15",
+      "book": "Luke",
+      "textWEB": "You, Capernaum, who are exalted to heaven, will be brought down to Hades."
+    },
+    {
+      "ref": "John 2:12",
+      "book": "John",
+      "textWEB": "After this, he went down to Capernaum, he, and his mother, his brothers, and his disciples; and they stayed there a few days."
+    },
+    {
+      "ref": "John 4:46",
+      "book": "John",
+      "textWEB": "Jesus came therefore again to Cana of Galilee, where he made the water into wine. There was a certain nobleman whose son was sick at Capernaum."
+    },
+    {
+      "ref": "John 4:47",
+      "book": "John",
+      "textWEB": "When he heard that Jesus had come out of Judea into Galilee, he went to him and begged him that he would come down and heal his son, for he was at the point of death."
+    },
+    {
+      "ref": "John 6:17",
+      "book": "John",
+      "textWEB": "They entered into the boat, and were going over the sea to Capernaum. It was now dark, and Jesus had not come to them."
+    },
+    {
+      "ref": "John 6:24",
+      "book": "John",
+      "textWEB": "When the multitude therefore saw that Jesus wasn’t there, nor his disciples, they themselves got into the boats and came to Capernaum, seeking Jesus."
+    },
+    {
+      "ref": "John 6:59",
+      "book": "John",
+      "textWEB": "He said these things in the synagogue, as he taught in Capernaum."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Matthew 4:13-16 quotes Isaiah's description of the territory 'by the way of the sea, beyond the Jordan, Galilee of the Gentiles' as finding fulfillment when Jesus relocated his base of ministry to Capernaum.",
+      "sources": [
+        "openbible:capernaum"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

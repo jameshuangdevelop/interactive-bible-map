@@ -1,0 +1,62 @@
+{
+  "id": "pool-of-bethesda",
+  "names": {
+    "ancient": [
+      "Bethesda"
+    ],
+    "modern": "Pool of Bethesda",
+    "alternate": [
+      "Bezetha"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "site",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Pool of Bethesda",
+      "coordinates": [
+        35.235833,
+        31.781389
+      ],
+      "coordinateSource": "wikidata:Q831297",
+      "confidence": "high",
+      "support": "Wikidata's coordinate for the Pool of Bethesda matches OpenBible.info's independently recorded point for the same site exactly, and the location corresponds to the excavated twin-pool remains near St. Anne's Church.",
+      "sources": [
+        "wikidata:Q831297",
+        "openbible:bethesda",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Pool of Bethesda is a reservoir near Jerusalem's Sheep Gate that the Gospel of John names as the site where Jesus healed a man who had been an invalid for thirty-eight years.",
+    "sources": [
+      "wikidata:Q831297",
+      "openbible:bethesda",
+      "scripture:John 5:5"
+    ]
+  },
+  "history": [
+    {
+      "text": "Archaeological excavation near St. Anne's Church uncovered a large twin-pool complex divided by a central dam, with column bases and sockets marking five porticoes, matching the Gospel of John's description and confirming the pool's existence as a real Second Temple-period structure.",
+      "sources": [
+        "wikidata:Q831297",
+        "bib:murphy-oconnor-holy-land-guide",
+        "scripture:John 5:2"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 5:2",
+      "book": "John",
+      "textWEB": "Now in Jerusalem by the sheep gate, there is a pool, which is called in Hebrew, “Bethesda”, having five porches."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

@@ -1,0 +1,262 @@
+{
+  "id": "nazareth",
+  "names": {
+    "ancient": [
+      "Nazareth"
+    ],
+    "modern": "Nazareth",
+    "alternate": [
+      "an-Nasira",
+      "Nazarene"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Nazareth",
+      "coordinates": [
+        35.29785,
+        32.702103
+      ],
+      "coordinateSource": "wikidata:Q430776",
+      "confidence": "high",
+      "support": "The Digital Atlas of the Roman Empire and Pleiades both place ancient Nazareth about 350 meters from Wikidata's town-level point, near the Basilica of the Annunciation, well within the range expected for a small village whose archaeological core has been mapped around that immediate area.",
+      "sources": [
+        "wikidata:Q430776",
+        "dare:22899",
+        "pleiades:678299",
+        "openbible:nazareth"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Nazareth was a small Galilean village in the first century AD, identified in the Gospels of Matthew and Luke as the town where Jesus grew up and from which he is repeatedly called 'Jesus of Nazareth' throughout the New Testament.",
+    "sources": [
+      "wikidata:Q430776",
+      "openbible:nazareth",
+      "scripture:Matthew 2:23",
+      "scripture:Mark 1:24"
+    ]
+  },
+  "history": [
+    {
+      "text": "Excavations beneath and around the Basilica of the Annunciation and nearby sites, notably at the Sisters of Nazareth Convent, have uncovered rock-cut tombs, cisterns, and a domestic structure consistent with a small first-century Jewish village, matching the modest size implied by the Gospels' description of Nazareth.",
+      "sources": [
+        "bib:dark-nazareth-archaeology",
+        "openbible:nazareth"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 2:23",
+      "book": "Matthew",
+      "textWEB": "and came and lived in a city called Nazareth; that it might be fulfilled which was spoken through the prophets that he will be called a Nazarene."
+    },
+    {
+      "ref": "Matthew 4:13",
+      "book": "Matthew",
+      "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
+    },
+    {
+      "ref": "Matthew 13:54",
+      "book": "Matthew",
+      "textWEB": "Coming into his own country, he taught them in their synagogue, so that they were astonished and said, “Where did this man get this wisdom and these mighty works?"
+    },
+    {
+      "ref": "Matthew 21:11",
+      "book": "Matthew",
+      "textWEB": "The multitudes said, “This is the prophet, Jesus, from Nazareth of Galilee.”"
+    },
+    {
+      "ref": "Matthew 26:71",
+      "book": "Matthew",
+      "textWEB": "When he had gone out onto the porch, someone else saw him and said to those who were there, “This man also was with Jesus of Nazareth.”"
+    },
+    {
+      "ref": "Mark 1:9",
+      "book": "Mark",
+      "textWEB": "In those days, Jesus came from Nazareth of Galilee, and was baptized by John in the Jordan."
+    },
+    {
+      "ref": "Mark 1:24",
+      "book": "Mark",
+      "textWEB": "saying, “Ha! What do we have to do with you, Jesus, you Nazarene? Have you come to destroy us? I know who you are: the Holy One of God!”"
+    },
+    {
+      "ref": "Mark 6:1",
+      "book": "Mark",
+      "textWEB": "He went out from there. He came into his own country, and his disciples followed him."
+    },
+    {
+      "ref": "Mark 10:47",
+      "book": "Mark",
+      "textWEB": "When he heard that it was Jesus the Nazarene, he began to cry out and say, “Jesus, you son of David, have mercy on me!”"
+    },
+    {
+      "ref": "Mark 14:67",
+      "book": "Mark",
+      "textWEB": "and seeing Peter warming himself, she looked at him and said, “You were also with the Nazarene, Jesus!”"
+    },
+    {
+      "ref": "Mark 16:6",
+      "book": "Mark",
+      "textWEB": "He said to them, “Don’t be amazed. You seek Jesus, the Nazarene, who has been crucified. He has risen! He is not here. See the place where they laid him!"
+    },
+    {
+      "ref": "Luke 1:26",
+      "book": "Luke",
+      "textWEB": "Now in the sixth month, the angel Gabriel was sent from God to a city of Galilee named Nazareth,"
+    },
+    {
+      "ref": "Luke 2:4",
+      "book": "Luke",
+      "textWEB": "Joseph also went up from Galilee, out of the city of Nazareth, into Judea, to David’s city, which is called Bethlehem, because he was of the house and family of David,"
+    },
+    {
+      "ref": "Luke 2:39",
+      "book": "Luke",
+      "textWEB": "When they had accomplished all things that were according to the law of the Lord, they returned into Galilee, to their own city, Nazareth."
+    },
+    {
+      "ref": "Luke 2:43",
+      "book": "Luke",
+      "textWEB": "and when they had fulfilled the days, as they were returning, the boy Jesus stayed behind in Jerusalem. Joseph and his mother didn’t know it,"
+    },
+    {
+      "ref": "Luke 2:51",
+      "book": "Luke",
+      "textWEB": "And he went down with them and came to Nazareth. He was subject to them, and his mother kept all these sayings in her heart."
+    },
+    {
+      "ref": "Luke 4:16",
+      "book": "Luke",
+      "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
+    },
+    {
+      "ref": "Luke 4:34",
+      "book": "Luke",
+      "textWEB": "saying, “Ah! what have we to do with you, Jesus of Nazareth? Have you come to destroy us? I know who you are: the Holy One of God!”"
+    },
+    {
+      "ref": "Luke 18:37",
+      "book": "Luke",
+      "textWEB": "They told him that Jesus of Nazareth was passing by."
+    },
+    {
+      "ref": "Luke 24:19",
+      "book": "Luke",
+      "textWEB": "He said to them, “What things?” They said to him, “The things concerning Jesus the Nazarene, who was a prophet mighty in deed and word before God and all the people;"
+    },
+    {
+      "ref": "John 1:45",
+      "book": "John",
+      "textWEB": "Philip found Nathanael, and said to him, “We have found him of whom Moses in the law and also the prophets, wrote: Jesus of Nazareth, the son of Joseph.”"
+    },
+    {
+      "ref": "John 1:46",
+      "book": "John",
+      "textWEB": "Nathanael said to him, “Can any good thing come out of Nazareth?” Philip said to him, “Come and see.”"
+    },
+    {
+      "ref": "John 18:5",
+      "book": "John",
+      "textWEB": "They answered him, “Jesus of Nazareth.” Jesus said to them, “I am he.” Judas also, who betrayed him, was standing with them."
+    },
+    {
+      "ref": "John 18:7",
+      "book": "John",
+      "textWEB": "Again therefore he asked them, “Who are you looking for?” They said, “Jesus of Nazareth.”"
+    },
+    {
+      "ref": "John 19:19",
+      "book": "John",
+      "textWEB": "Pilate wrote a title also, and put it on the cross. There was written, “JESUS OF NAZARETH, THE KING OF THE JEWS.”"
+    },
+    {
+      "ref": "Acts 2:22",
+      "book": "Acts",
+      "textWEB": "“Men of Israel, hear these words! Jesus of Nazareth, a man approved by God to you by mighty works and wonders and signs which God did by him among you, even as you yourselves know,"
+    },
+    {
+      "ref": "Acts 3:6",
+      "book": "Acts",
+      "textWEB": "But Peter said, “I have no silver or gold, but what I have, that I give you. In the name of Jesus Christ of Nazareth, get up and walk!”"
+    },
+    {
+      "ref": "Acts 4:10",
+      "book": "Acts",
+      "textWEB": "may it be known to you all, and to all the people of Israel, that in the name of Jesus Christ of Nazareth, whom you crucified, whom God raised from the dead, this man stands here before you whole in him."
+    },
+    {
+      "ref": "Acts 6:14",
+      "book": "Acts",
+      "textWEB": "For we have heard him say that this Jesus of Nazareth will destroy this place, and will change the customs which Moses delivered to us.”"
+    },
+    {
+      "ref": "Acts 10:38",
+      "book": "Acts",
+      "textWEB": "how God anointed Jesus of Nazareth with the Holy Spirit and with power, who went about doing good and healing all who were oppressed by the devil, for God was with him."
+    },
+    {
+      "ref": "Acts 22:8",
+      "book": "Acts",
+      "textWEB": "I answered, ‘Who are you, Lord?’ He said to me, ‘I am Jesus of Nazareth, whom you persecute.’"
+    },
+    {
+      "ref": "Acts 26:9",
+      "book": "Acts",
+      "textWEB": "“I myself most certainly thought that I ought to do many things contrary to the name of Jesus of Nazareth."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 11:1",
+      "note": "Some scholars connect the Hebrew word for 'branch' (netzer) in Isaiah's messianic oracle to the wordplay in Matthew 2:23 about Jesus being called a Nazarene, though the connection is debated among scholars rather than a direct quotation.",
+      "sources": [
+        "bib:freedman-anchor-bible-dictionary",
+        "openbible:nazareth"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

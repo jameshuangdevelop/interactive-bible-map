@@ -1,0 +1,14 @@
+{
+  "locationId": "jerusalem",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Jerusalem_old_city_panorama_.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Nettadi",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_old_city_panorama_.jpg",
+      "caption": "Panorama of Jerusalem's Old City",
+      "aiGenerated": false
+    }
+  ]
+}

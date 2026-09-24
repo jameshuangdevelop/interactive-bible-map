@@ -1,0 +1,100 @@
+{
+  "id": "chorazin",
+  "names": {
+    "ancient": [
+      "Chorazin",
+      "Korazin"
+    ],
+    "modern": "Khirbet Karraza / Korazim",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Khirbet Karraza (Korazim)",
+      "coordinates": [
+        35.563889,
+        32.911389
+      ],
+      "coordinateSource": "wikidata:Q2456076",
+      "confidence": "high",
+      "support": "Wikidata's coordinate agrees with the Digital Atlas of the Roman Empire's point to within about 30 meters.",
+      "sources": [
+        "wikidata:Q2456076",
+        "dare:33283",
+        "openbible:chorazin"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Chorazin was a Galilean town near Capernaum that, according to Matthew and Luke, Jesus rebuked for failing to repent despite witnessing his miracles there.",
+    "sources": [
+      "wikidata:Q2456076",
+      "openbible:chorazin",
+      "scripture:Matthew 11:21",
+      "scripture:Luke 10:13"
+    ]
+  },
+  "history": [
+    {
+      "text": "The site, now a national park, preserves the remains of a Jewish town including a basalt-stone synagogue generally dated to the third or fourth century AD, built on a settlement with earlier Roman-period occupation layers beneath it.",
+      "sources": [
+        "bib:inpa-korazim-national-park",
+        "dare:33283"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 11:21",
+      "book": "Matthew",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago in sackcloth and ashes."
+    },
+    {
+      "ref": "Luke 10:13",
+      "book": "Luke",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago, sitting in sackcloth and ashes."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

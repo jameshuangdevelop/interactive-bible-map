@@ -1,0 +1,166 @@
+{
+  "id": "bethlehem",
+  "names": {
+    "ancient": [
+      "Bethlehem",
+      "Bethlehem Ephrathah"
+    ],
+    "modern": "Bethlehem",
+    "alternate": [
+      "Beit Lahm"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Bethlehem",
+      "coordinates": [
+        35.206111,
+        31.704444
+      ],
+      "coordinateSource": "wikidata:Q5776",
+      "confidence": "high",
+      "support": "Wikidata's coordinate for the town agrees with the Digital Atlas of the Roman Empire's point to within about 130 meters, and both sit within about 150 meters of the traditional birth site marked by the Church of the Nativity.",
+      "sources": [
+        "wikidata:Q5776",
+        "dare:28331",
+        "openbible:bethlehem-1"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Bethlehem is a town in the Judean hill country south of Jerusalem, identified in Matthew and Luke as the birthplace of Jesus and already known in the Old Testament as the home town of David.",
+    "sources": [
+      "wikidata:Q5776",
+      "openbible:bethlehem-1",
+      "scripture:Matthew 2:1",
+      "scripture:Luke 2:4"
+    ]
+  },
+  "history": [
+    {
+      "text": "The Church of the Nativity, first built under Constantine around 339 AD and rebuilt in the mid-sixth century under Justinian, marks the traditional site of Jesus' birth and stands over one of the longest continuously venerated locations in Christian tradition.",
+      "sources": [
+        "bib:unesco-church-of-nativity",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 2:1",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus was born in Bethlehem of Judea in the days of King Herod, behold, wise men from the east came to Jerusalem, saying,"
+    },
+    {
+      "ref": "Matthew 2:5",
+      "book": "Matthew",
+      "textWEB": "They said to him, “In Bethlehem of Judea, for this is written through the prophet,"
+    },
+    {
+      "ref": "Matthew 2:6",
+      "book": "Matthew",
+      "textWEB": "‘You Bethlehem, land of Judah, are in no way least among the princes of Judah; for out of you shall come a governor who shall shepherd my people, Israel.’”"
+    },
+    {
+      "ref": "Matthew 2:8",
+      "book": "Matthew",
+      "textWEB": "He sent them to Bethlehem, and said, “Go and search diligently for the young child. When you have found him, bring me word, so that I also may come and worship him.”"
+    },
+    {
+      "ref": "Matthew 2:9",
+      "book": "Matthew",
+      "textWEB": "They, having heard the king, went their way; and behold, the star, which they saw in the east, went before them until it came and stood over where the young child was."
+    },
+    {
+      "ref": "Matthew 2:16",
+      "book": "Matthew",
+      "textWEB": "Then Herod, when he saw that he was mocked by the wise men, was exceedingly angry, and sent out and killed all the male children who were in Bethlehem and in all the surrounding countryside, from two years old and under, according to the exact time which he had learned from the wise men."
+    },
+    {
+      "ref": "Luke 2:4",
+      "book": "Luke",
+      "textWEB": "Joseph also went up from Galilee, out of the city of Nazareth, into Judea, to David’s city, which is called Bethlehem, because he was of the house and family of David,"
+    },
+    {
+      "ref": "Luke 2:11",
+      "book": "Luke",
+      "textWEB": "For there is born to you today, in David’s city, a Savior, who is Christ the Lord."
+    },
+    {
+      "ref": "Luke 2:15",
+      "book": "Luke",
+      "textWEB": "When the angels went away from them into the sky, the shepherds said to one another, “Let’s go to Bethlehem, now, and see this thing that has happened, which the Lord has made known to us.”"
+    },
+    {
+      "ref": "John 7:42",
+      "book": "John",
+      "textWEB": "Hasn’t the Scripture said that the Christ comes of the offspring of David, and from Bethlehem, the village where David was?”"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Micah 5:2",
+      "note": "Micah's prophecy naming Bethlehem Ephrathah as the origin of a future ruler is quoted in Matthew 2:6 as being fulfilled by Jesus' birth there.",
+      "sources": [
+        "openbible:bethlehem-1"
+      ]
+    },
+    {
+      "ref": "Ruth 4:11",
+      "note": "Bethlehem is the setting of the book of Ruth and the home of Ruth's descendant David, background for the Davidic association invoked in the Gospel birth narratives.",
+      "sources": [
+        "openbible:bethlehem-1"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}
