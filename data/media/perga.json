@@ -1,0 +1,35 @@
+{
+  "locationId": "perga",
+  "images": [
+    {
+      "id": "perga-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/Perge_city_overview.jpg",
+      "author": "Saffron Blaze",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Perge_city_overview.jpg",
+      "caption": "View over the ruins of ancient Perga from the acropolis",
+      "aiGenerated": false
+    },
+    {
+      "id": "perga-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Antique_city_Perge_-_panoramio.jpg",
+      "author": "Валерий Дед",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Antique_city_Perge_-_panoramio.jpg",
+      "caption": "General view of the archaeological site of ancient Perga",
+      "aiGenerated": false
+    },
+    {
+      "id": "perga-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Jonenines_kolonos.JPG",
+      "author": "Andrius v110",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jonenines_kolonos.JPG",
+      "caption": "Ionic columns at the site of ancient Perga",
+      "aiGenerated": false
+    }
+  ]
+}

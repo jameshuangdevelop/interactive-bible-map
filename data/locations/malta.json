@@ -1,0 +1,87 @@
+{
+  "id": "malta",
+  "names": {
+    "ancient": [
+      "Melita",
+      "Melite"
+    ],
+    "modern": "Malta",
+    "alternate": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Malta (island)",
+      "coordinates": [
+        14.4,
+        35.9
+      ],
+      "coordinateSource": "wikidata:Q233",
+      "confidence": "high",
+      "support": "OpenBible.info's identification for Acts 28:1 resolves to Malta, south of Sicily, which historically had been identified as the site of Paul's shipwreck.",
+      "sources": [
+        "wikidata:Q233",
+        "pleiades:462311",
+        "openbible:malta",
+        "bib:hmml-contesting-shipwreck"
+      ]
+    },
+    {
+      "label": "Mljet (Melite Illyrica), Croatia",
+      "coordinates": [
+        17.535,
+        42.745
+      ],
+      "coordinateSource": "wikidata:Q211306",
+      "confidence": "low",
+      "support": "A minority proposal, put forward by the Ragusan scholar Ignjat Đurđević in a 1730 book presenting a systematic linguistic, historical, scientific and cultural argument, holds that Paul's 'Melite' was instead the Adriatic island of Mljet (then called 'Melite Illyrica'); this view has not displaced the traditional identification with Malta.",
+      "sources": [
+        "wikidata:Q211306",
+        "bib:hmml-contesting-shipwreck",
+        "pleiades:197376"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Malta is the Mediterranean island south of Sicily traditionally identified as the 'Melita' where Paul was shipwrecked on his voyage to Rome; a minority view instead points to the Adriatic island of Mljet off the coast of Croatia. Acts recounts that the islanders showed Paul and his companions 'uncommon kindness,' that Paul was bitten by a viper without harm, that he healed the father of Publius, the chief man of the island, along with other sick residents, and that the party later sailed on from the island toward Rome.",
+    "sources": [
+      "wikidata:Q233",
+      "openbible:malta",
+      "bib:hmml-contesting-shipwreck",
+      "scripture:Acts 28:1",
+      "scripture:Acts 28:2",
+      "scripture:Acts 28:3-6",
+      "scripture:Acts 28:7-9",
+      "scripture:Acts 28:11"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 28:1",
+      "book": "Acts",
+      "textWEB": "When we had escaped, then they learned that the island was called Malta."
+    },
+    {
+      "ref": "Acts 28:2",
+      "book": "Acts",
+      "textWEB": "The natives showed us uncommon kindness; for they kindled a fire and received us all, because of the present rain and because of the cold."
+    },
+    {
+      "ref": "Acts 28:7",
+      "book": "Acts",
+      "textWEB": "Now in the neighborhood of that place were lands belonging to the chief man of the island, named Publius, who received us and courteously entertained us for three days."
+    },
+    {
+      "ref": "Acts 28:9",
+      "book": "Acts",
+      "textWEB": "Then when this was done, the rest also who had diseases in the island came and were cured."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

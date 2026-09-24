@@ -1,0 +1,35 @@
+{
+  "locationId": "miletus",
+  "images": [
+    {
+      "id": "miletus-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/The_Theater_of_Miletus.jpg",
+      "author": "jiuguangw",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Theater_of_Miletus.jpg",
+      "caption": "The Hellenistic-Roman theatre of ancient Miletus",
+      "aiGenerated": false
+    },
+    {
+      "id": "miletus-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Miletus_Sacred_Road_in_2007_4576.jpg",
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Miletus_Sacred_Road_in_2007_4576.jpg",
+      "caption": "The Sacred Road at the archaeological site of ancient Miletus",
+      "aiGenerated": false
+    },
+    {
+      "id": "miletus-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/B%C3%BCy%C3%BCk_Menderes_%28ancient_Maeander%29_river_panorama_from_Miletus.jpg",
+      "author": "Tomisti",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:B%C3%BCy%C3%BCk_Menderes_(ancient_Maeander)_river_panorama_from_Miletus.jpg",
+      "caption": "View of the B\u00fcy\u00fck Menderes (ancient Maeander) plain from the site of Miletus",
+      "aiGenerated": false
+    }
+  ]
+}

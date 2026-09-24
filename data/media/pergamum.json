@@ -1,0 +1,35 @@
+{
+  "locationId": "pergamum",
+  "images": [
+    {
+      "id": "pergamum-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Temple_of_Trajan%2C_Pergamon_01.jpg",
+      "author": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Temple_of_Trajan,_Pergamon_01.jpg",
+      "caption": "Columns of the Temple of Trajan on the acropolis of Pergamon",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Pergamon_ancient_city_1.jpg",
+      "author": "Burakoskay1",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pergamon_ancient_city_1.jpg",
+      "caption": "Ruins of the ancient city of Pergamon",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Portals_of_Pergamon.jpg",
+      "author": "Ayratayrat",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Portals_of_Pergamon.jpg",
+      "caption": "Ancient gateways at the archaeological site of Pergamon",
+      "aiGenerated": false
+    }
+  ]
+}

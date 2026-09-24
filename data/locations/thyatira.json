@@ -1,0 +1,66 @@
+{
+  "id": "thyatira",
+  "names": {
+    "ancient": [
+      "Thyatira"
+    ],
+    "modern": "Akhisar (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Thyatira archaeological remains (Akhisar)",
+      "coordinates": [
+        27.840523,
+        38.922933
+      ],
+      "coordinateSource": "dare:21159",
+      "confidence": "high",
+      "support": "Thyatira is undisputed as continuous with modern Akhisar; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
+      "sources": [
+        "dare:21159",
+        "wikidata:Q1135603"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Thyatira was an ancient city of Asia Minor, at the site of modern Akhisar. Acts identifies Lydia, whose conversion and baptism at Philippi Acts records, as 'a seller of purple, of the city of Thyatira,' and Thyatira is also one of the seven churches addressed in Revelation 2, commended for love and service but rebuked for tolerating a false prophetess.",
+    "sources": [
+      "dare:21159",
+      "wikidata:Q1135603",
+      "scripture:Acts 16:14",
+      "scripture:Acts 16:15",
+      "scripture:Revelation 2:19-20"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 16:14",
+      "book": "Acts",
+      "textWEB": "A certain woman named Lydia, a seller of purple, of the city of Thyatira, one who worshiped God, heard us. The Lord opened her heart to listen to the things which were spoken by Paul."
+    },
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 2:18",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Thyatira write: “The Son of God, who has his eyes like a flame of fire, and his feet are like burnished brass, says these things:"
+    },
+    {
+      "ref": "Revelation 2:24",
+      "book": "Revelation",
+      "textWEB": "But to you I say, to the rest who are in Thyatira—as many as don’t have this teaching, who don’t know what some call ‘the deep things of Satan’—to you I say, I am not putting any other burden on you."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

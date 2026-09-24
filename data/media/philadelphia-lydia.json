@@ -1,0 +1,35 @@
+{
+  "locationId": "philadelphia-lydia",
+  "images": [
+    {
+      "id": "philadelphia-lydia-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Ala%C5%9Fehir_Church_of_St._John.jpg",
+      "author": "simonjenkins",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ala%C5%9Fehir_Church_of_St._John.jpg",
+      "caption": "Ruins of the Basilica of St. John in Alaşehir, ancient Philadelphia",
+      "aiGenerated": false
+    },
+    {
+      "id": "philadelphia-lydia-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Ala%C5%9Fehir_Church_of_St._John_2.jpg",
+      "author": "simonjenkins",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ala%C5%9Fehir_Church_of_St._John_2.jpg",
+      "caption": "Ruins of the Basilica of St. John in Alaşehir, ancient Philadelphia",
+      "aiGenerated": false
+    },
+    {
+      "id": "philadelphia-lydia-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Biblical_Philadelphia%2C_Ala%C5%9Fehir%2C_Turkey_%28%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D%29_%2851966166907%29.jpg",
+      "author": "Sharon Hahn Darlin",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Biblical_Philadelphia,_Ala%C5%9Fehir,_Turkey_(%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D)_(51966166907).jpg",
+      "caption": "Ruins of St. John's Church in Alaşehir, ancient Philadelphia",
+      "aiGenerated": false
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "locationId": "galatia",
+  "images": [
+    {
+      "id": "galatia-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Galacia-mapa.png",
+      "author": "Jolle",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Galacia-mapa.png",
+      "caption": "Historical map of ancient Galatia and its tetrarchies, 277-179 BC",
+      "aiGenerated": false
+    },
+    {
+      "id": "galatia-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Galatia_Map.svg",
+      "author": "ArdadN",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Galatia_Map.svg",
+      "caption": "Map of the Roman province of Galatia in the 2nd century AD",
+      "aiGenerated": false
+    }
+  ]
+}

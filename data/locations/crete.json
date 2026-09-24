@@ -1,0 +1,78 @@
+{
+  "id": "crete",
+  "names": {
+    "ancient": [
+      "Crete",
+      "Creta"
+    ],
+    "modern": "Crete (Greece)",
+    "alternate": [
+      "Kriti"
+    ]
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Crete (island, label point)",
+      "coordinates": [
+        24.893333,
+        35.309722
+      ],
+      "coordinateSource": "wikidata:Q34374",
+      "confidence": "high",
+      "support": "Crete is the large island south of the Aegean Sea, undisputed in identity and location. The coordinate is Wikidata's value for the island; Pleiades' label point for Crete sits about 20 km away, a reasonable margin for an island-wide label.",
+      "sources": [
+        "pleiades:589748",
+        "wikidata:Q34374"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Crete is the large Mediterranean island south of the Aegean Sea. Acts records that Paul's ship sailed under the lee of Crete and, further on, close along its shore, on the journey to Rome; the Letter to Titus states that Paul left Titus in Crete to set in order what was lacking and appoint elders in every city.",
+    "sources": [
+      "wikidata:Q34374",
+      "scripture:Acts 27:7",
+      "scripture:Acts 27:13",
+      "scripture:Titus 1:5"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 27:7",
+      "book": "Acts",
+      "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+    },
+    {
+      "ref": "Acts 27:12",
+      "book": "Acts",
+      "textWEB": "Because the haven was not suitable to winter in, the majority advised going to sea from there, if by any means they could reach Phoenix and winter there, which is a port of Crete, looking southwest and northwest."
+    },
+    {
+      "ref": "Acts 27:13",
+      "book": "Acts",
+      "textWEB": "When the south wind blew softly, supposing that they had obtained their purpose, they weighed anchor and sailed along Crete, close to shore."
+    },
+    {
+      "ref": "Acts 27:21",
+      "book": "Acts",
+      "textWEB": "When they had been long without food, Paul stood up in the middle of them and said, “Sirs, you should have listened to me, and not have set sail from Crete and have gotten this injury and loss."
+    },
+    {
+      "ref": "Titus 1:5",
+      "book": "Titus",
+      "textWEB": "I left you in Crete for this reason, that you would set in order the things that were lacking and appoint elders in every city, as I directed you—"
+    },
+    {
+      "ref": "Titus 1:12",
+      "book": "Titus",
+      "textWEB": "One of them, a prophet of their own, said, “Cretans are always liars, evil beasts, and idle gluttons.”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

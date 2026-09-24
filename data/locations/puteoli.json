@@ -1,0 +1,60 @@
+{
+  "id": "puteoli",
+  "names": {
+    "ancient": [
+      "Puteoli",
+      "Dikaiarcheia"
+    ],
+    "modern": "Pozzuoli (Italy)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Puteoli archaeological remains (Pozzuoli)",
+      "coordinates": [
+        14.121869,
+        40.827957
+      ],
+      "coordinateSource": "pleiades:432815",
+      "confidence": "high",
+      "support": "Puteoli, continuous with modern Pozzuoli on the Bay of Naples, is undisputed in identity and location; Pleiades' non-OSM DARE-derived point and Wikidata's coordinate for Pozzuoli agree closely.",
+      "sources": [
+        "pleiades:432815",
+        "wikidata:Q72425"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Puteoli was, per BiblePlaces.com, the main harbor serving Rome until Claudius began building an artificial harbor at Ostia, which was completed in the reign of Trajan; much of Rome's commerce from Egypt and Palestine passed through Puteoli. Acts records that Paul, sailing to Rome as a prisoner aboard an Alexandrian ship, landed at Puteoli and found believers there who urged him to stay with them seven days before the final overland journey to Rome.",
+    "sources": [
+      "pleiades:432815",
+      "wikidata:Q72425",
+      "bib:bibleplaces-puteoli",
+      "scripture:Acts 28:11",
+      "scripture:Acts 28:13",
+      "scripture:Acts 28:14"
+    ]
+  },
+  "history": [
+    {
+      "text": "Puteoli's secure natural harbor made it the main port for Rome's seaborne trade, including much of its commerce from Egypt and Palestine, until Claudius began an artificial harbor at Ostia that was completed in the reign of Trajan (AD 98-117).",
+      "sources": [
+        "bib:bibleplaces-puteoli"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:13",
+      "book": "Acts",
+      "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

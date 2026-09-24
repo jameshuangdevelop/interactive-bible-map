@@ -1,0 +1,51 @@
+{
+  "id": "salamis-cyprus",
+  "names": {
+    "ancient": [
+      "Salamis"
+    ],
+    "modern": "Near Famagusta (Cyprus)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Salamis archaeological site (Cyprus)",
+      "coordinates": [
+        33.903589,
+        35.175101
+      ],
+      "coordinateSource": "pleiades:707617",
+      "confidence": "high",
+      "support": "This is Salamis on Cyprus, near modern Famagusta; it is a distinct place from the island of Salamis in the Saronic Gulf near Athens. Pleiades and Wikidata's coordinates for the Cyprus site agree closely.",
+      "sources": [
+        "pleiades:707617",
+        "wikidata:Q767089"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Salamis was a city on the east coast of Cyprus. Acts records it as Paul and Barnabas's first stop on Cyprus on their first missionary journey, where they proclaimed the word of God in the Jewish synagogues of the city before continuing across the island to Paphos.",
+    "sources": [
+      "pleiades:707617",
+      "wikidata:Q767089",
+      "scripture:Acts 13:4",
+      "scripture:Acts 13:5",
+      "scripture:Acts 13:6"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 13:5",
+      "book": "Acts",
+      "textWEB": "When they were at Salamis, they proclaimed God’s word in the Jewish synagogues. They also had John as their attendant."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

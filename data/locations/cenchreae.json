@@ -1,0 +1,57 @@
+{
+  "id": "cenchreae",
+  "names": {
+    "ancient": [
+      "Cenchreae",
+      "Kenchreai"
+    ],
+    "modern": "Kechries (Greece)",
+    "alternate": []
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "parentId": "corinth",
+  "candidates": [
+    {
+      "label": "Cenchreae archaeological site",
+      "coordinates": [
+        22.9925,
+        37.8824
+      ],
+      "coordinateSource": "pleiades:570347",
+      "confidence": "high",
+      "support": "Cenchreae, per Wikidata, was 'the eastern port town of ancient Corinth' on the Saronic Gulf, distinct from other ancient places of the same name; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "sources": [
+        "pleiades:570347",
+        "wikidata:Q111565756"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cenchreae was Corinth's eastern harbor on the Saronic Gulf. Acts records that Paul had his hair cut off there under a vow before sailing for Syria, and Paul's letter to the Romans commends Phoebe as a servant of the church at Cenchreae.",
+    "sources": [
+      "pleiades:570347",
+      "wikidata:Q111565756",
+      "scripture:Acts 18:18",
+      "scripture:Romans 16:1"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 18:18",
+      "book": "Acts",
+      "textWEB": "Paul, having stayed after this many more days, took his leave of the brothers, and sailed from there for Syria, together with Priscilla and Aquila. He shaved his head in Cenchreae, for he had a vow."
+    },
+    {
+      "ref": "Romans 16:1",
+      "book": "Romans",
+      "textWEB": "I commend to you Phoebe, our sister, who is a servant of the assembly that is at Cenchreae,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

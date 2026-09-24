@@ -1,0 +1,51 @@
+{
+  "id": "patmos",
+  "names": {
+    "ancient": [
+      "Patmos"
+    ],
+    "modern": "Patmos (Greece)",
+    "alternate": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Patmos (island)",
+      "coordinates": [
+        26.541667,
+        37.325
+      ],
+      "coordinateSource": "wikidata:Q190053",
+      "confidence": "high",
+      "support": "Patmos is a small island of the Dodecanese in the Aegean Sea, undisputed in identity and location. The coordinate is Wikidata's value for the island; the Digital Atlas of the Roman Empire's point for Patmos sits about 0.7 km away, a reasonable cross-check.",
+      "sources": [
+        "wikidata:Q190053",
+        "dare:29028"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Patmos is a small Aegean island where, per Revelation 1:9, John was present 'because of God's Word and the testimony of Jesus Christ' when, per Revelation 1:10-11, he received the visions recorded in the Book of Revelation. The island is traditionally held to be where Saint John the Theologian wrote both his Gospel and the Book of Revelation around AD 95, a tradition commemorated since 1088 by the monastery built there in his honor.",
+    "sources": [
+      "wikidata:Q190053",
+      "dare:29028",
+      "bib:unesco-patmos",
+      "scripture:Revelation 1:9",
+      "scripture:Revelation 1:10-11"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Revelation 1:9",
+      "book": "Revelation",
+      "textWEB": "I John, your brother and partner with you in the oppression, Kingdom, and perseverance in Christ Jesus, was on the isle that is called Patmos because of God’s Word and the testimony of Jesus Christ."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

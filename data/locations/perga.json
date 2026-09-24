@@ -1,0 +1,62 @@
+{
+  "id": "perga",
+  "names": {
+    "ancient": [
+      "Perga",
+      "Perge"
+    ],
+    "modern": "Near Antalya (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Perge archaeological site",
+      "coordinates": [
+        30.854274,
+        36.961406
+      ],
+      "coordinateSource": "dare:21450",
+      "confidence": "high",
+      "support": "The extensively excavated site east of modern Antalya, per Wikidata 'an ancient city of Pamphylia,' is undisputed as ancient Perga; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
+      "sources": [
+        "dare:21450",
+        "wikidata:Q719815"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Perga was a major city of Pamphylia in southern Asia Minor. On the first missionary journey, Paul and Barnabas sailed to Perga from Paphos, and it was here that John Mark left the party and returned to Jerusalem; the pair passed back through Perga, preaching there, on their return journey before sailing home from Attalia.",
+    "sources": [
+      "wikidata:Q719815",
+      "dare:21450",
+      "scripture:Acts 13:13",
+      "scripture:Acts 14:25",
+      "scripture:Acts 14:26"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 13:13",
+      "book": "Acts",
+      "textWEB": "Now Paul and his company set sail from Paphos and came to Perga in Pamphylia. John departed from them and returned to Jerusalem."
+    },
+    {
+      "ref": "Acts 13:14",
+      "book": "Acts",
+      "textWEB": "But they, passing on from Perga, came to Antioch of Pisidia. They went into the synagogue on the Sabbath day and sat down."
+    },
+    {
+      "ref": "Acts 14:25",
+      "book": "Acts",
+      "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

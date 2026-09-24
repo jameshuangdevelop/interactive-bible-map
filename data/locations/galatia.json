@@ -1,0 +1,105 @@
+{
+  "id": "galatia",
+  "names": {
+    "ancient": [
+      "Galatia"
+    ],
+    "modern": "North-central Turkey (around Ankara)",
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Galatia (region and Roman province, label point)",
+      "coordinates": [
+        32.983333,
+        39.266667
+      ],
+      "coordinateSource": "wikidata:Q26847",
+      "confidence": "high",
+      "support": "Galatia was, per Wikidata, the highland area of central Asia Minor; Celtic (Gaulish) migrants had migrated to Asia Minor by 278 BC, and the region was organized as a Roman province in 25 BC (per bib:zondervan-who-were-galatians). The label point is Wikidata's coordinate for the region; Pleiades' 'Galatia' province/region label (a separate entity from the late Roman 'Galatia I' record) is about 90 km away, a reasonable margin for a region label.",
+      "sources": [
+        "pleiades:619161",
+        "wikidata:Q26847",
+        "bib:zondervan-who-were-galatians"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Galatia was both an ethnic region of Celtic settlers in the highlands of central Asia Minor and, from 25 BC, a much larger Roman province of the same name that also reached south to cities such as Antioch in Pisidia, Iconium, Lystra, and Derbe. Scholars are divided, without a clear consensus, on which of these Paul meant by 'the assemblies of Galatia' in his letter: the 'North Galatian' view holds he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled area, while the 'South Galatian' view holds he wrote to the congregations he founded on his first journey in the province's southern cities; this project takes neither side.",
+    "sources": [
+      "pleiades:619161",
+      "wikidata:Q26847",
+      "wikidata:Q1249412",
+      "bib:zondervan-who-were-galatians",
+      "scripture:Galatians 1:2",
+      "scripture:Acts 13:14",
+      "scripture:Acts 14:6"
+    ]
+  },
+  "history": [
+    {
+      "text": "The Roman province of Galatia was formed in 25 BC and administered from the provincial capital Ancyra (modern Ankara); in its larger first-century extent it also included southern regions such as Pisidia and Lycaonia, before Vespasian detached most of Pisidia in AD 74.",
+      "sources": [
+        "bib:zondervan-who-were-galatians",
+        "wikidata:Q1249412"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:6",
+      "book": "Acts",
+      "textWEB": "When they had gone through the region of Phrygia and Galatia, they were forbidden by the Holy Spirit to speak the word in Asia."
+    },
+    {
+      "ref": "Acts 18:23",
+      "book": "Acts",
+      "textWEB": "Having spent some time there, he departed and went through the region of Galatia and Phrygia, in order, establishing all the disciples."
+    },
+    {
+      "ref": "1 Corinthians 16:1",
+      "book": "1 Corinthians",
+      "textWEB": "Now concerning the collection for the saints: as I commanded the assemblies of Galatia, you do likewise."
+    },
+    {
+      "ref": "Galatians 1:2",
+      "book": "Galatians",
+      "textWEB": "and all the brothers who are with me, to the assemblies of Galatia:"
+    },
+    {
+      "ref": "2 Timothy 4:10",
+      "book": "2 Timothy",
+      "textWEB": "for Demas left me, having loved this present world, and went to Thessalonica; Crescens to Galatia; and Titus to Dalmatia."
+    },
+    {
+      "ref": "1 Peter 1:1",
+      "book": "1 Peter",
+      "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -25,
+      "toYear": 74,
+      "entity": "Roman province of Galatia in its larger first-century extent, including Pisidia and Lycaonia, administered from Ancyra",
+      "sources": [
+        "bib:zondervan-who-were-galatians",
+        "wikidata:Q1249412"
+      ]
+    },
+    {
+      "fromYear": 74,
+      "toYear": 137,
+      "entity": "Roman province of Galatia after Vespasian detached most of Pisidia in AD 74",
+      "sources": [
+        "bib:zondervan-who-were-galatians"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

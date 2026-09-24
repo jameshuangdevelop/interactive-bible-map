@@ -1,0 +1,55 @@
+{
+  "id": "philadelphia-lydia",
+  "names": {
+    "ancient": [
+      "Philadelphia",
+      "Philadelpheia"
+    ],
+    "modern": "Alaşehir (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Philadelphia archaeological remains (Alaşehir)",
+      "coordinates": [
+        28.516667,
+        38.35
+      ],
+      "coordinateSource": "pleiades:550822",
+      "confidence": "high",
+      "support": "This is the Philadelphia of Lydia, continuous with modern Alaşehir, Turkey, one of the seven churches of Revelation 2-3; it is a distinct city from the Decapolis city also called Philadelphia in antiquity (Rabbath-Ammon, modern Amman) and from other places later named Philadelphia. Pleiades' non-OSM DARE-derived point and Wikidata's coordinate for Alaşehir agree closely.",
+      "sources": [
+        "pleiades:550822",
+        "wikidata:Q138280"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Philadelphia was an ancient city of Asia Minor, at the site of modern Alaşehir. It is one of the seven churches addressed in Revelation 2-3, told there, 'I have set before you an open door,' and given no rebuke.",
+    "sources": [
+      "pleiades:550822",
+      "wikidata:Q138280",
+      "scripture:Revelation 3:7-13"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Revelation 1:11",
+      "book": "Revelation",
+      "textWEB": "saying, “What you see, write in a book and send to the seven assemblies: to Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, and to Laodicea.”"
+    },
+    {
+      "ref": "Revelation 3:7",
+      "book": "Revelation",
+      "textWEB": "“To the angel of the assembly in Philadelphia write: “He who is holy, he who is true, he who has the key of David, he who opens and no one can shut, and who shuts and no one opens, says these things:"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

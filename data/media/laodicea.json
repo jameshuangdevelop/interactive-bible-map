@@ -1,0 +1,35 @@
+{
+  "locationId": "laodicea",
+  "images": [
+    {
+      "id": "laodicea-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Ancient_City_of_Laodicea%2C_2019_01.jpg",
+      "author": "Gargarapalvin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_City_of_Laodicea,_2019_01.jpg",
+      "caption": "Ancient city of Laodicea",
+      "aiGenerated": false
+    },
+    {
+      "id": "laodicea-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Ancient_City_of_Laodicea%2C_2019_02.jpg",
+      "author": "Gargarapalvin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_City_of_Laodicea,_2019_02.jpg",
+      "caption": "Ancient city of Laodicea",
+      "aiGenerated": false
+    },
+    {
+      "id": "laodicea-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Ancient_City_of_Laodicea%2C_2019_03.jpg",
+      "author": "Gargarapalvin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_City_of_Laodicea,_2019_03.jpg",
+      "caption": "Ancient city of Laodicea",
+      "aiGenerated": false
+    }
+  ]
+}

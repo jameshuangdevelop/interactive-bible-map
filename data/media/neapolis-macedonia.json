@@ -1,0 +1,35 @@
+{
+  "locationId": "neapolis-macedonia",
+  "images": [
+    {
+      "id": "neapolis-macedonia-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Port_of_Kavala.jpg",
+      "author": "Politicslover2",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Port_of_Kavala.jpg",
+      "caption": "The harbour of Kavala, site of ancient Neapolis",
+      "aiGenerated": false
+    },
+    {
+      "id": "neapolis-macedonia-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Kavala_Aqueduct_Kamares_Greece_%2816611060636%29.jpg",
+      "author": "thintruman",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kavala_Aqueduct_Kamares_Greece_(16611060636).jpg",
+      "caption": "The Ottoman-era Kamares aqueduct at Kavala",
+      "aiGenerated": false
+    },
+    {
+      "id": "neapolis-macedonia-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Kavala_001.jpg",
+      "author": "Klausweingartner",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kavala_001.jpg",
+      "caption": "View from the old town toward the harbour of Kavala, ancient Neapolis",
+      "aiGenerated": false
+    }
+  ]
+}

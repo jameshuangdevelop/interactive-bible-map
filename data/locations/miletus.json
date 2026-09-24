@@ -1,0 +1,64 @@
+{
+  "id": "miletus",
+  "names": {
+    "ancient": [
+      "Miletus",
+      "Milawanda"
+    ],
+    "modern": "Near Balat (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Miletus archaeological site",
+      "coordinates": [
+        27.2774885,
+        37.5292362
+      ],
+      "coordinateSource": "dare:21166",
+      "confidence": "high",
+      "support": "The extensively excavated site near modern Balat, south of the Meander river's mouth, is undisputed as ancient Miletus; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
+      "sources": [
+        "dare:21166",
+        "wikidata:Q169460"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Miletus was, per Livius.org, effectively the leading city among the Ionian Greeks, a major port south of Ephesus and, in earlier centuries, a center of Greek philosophy and colonization. On his third missionary journey Paul sailed past Ephesus to save time (Acts 20:16) and instead summoned the Ephesian elders to meet him at Miletus, where he delivered the farewell address recorded beginning at Acts 20:18; Paul's second letter to Timothy also mentions leaving a companion sick at Miletus.",
+    "sources": [
+      "dare:21166",
+      "wikidata:Q169460",
+      "bib:livius-miletus",
+      "scripture:Acts 20:16",
+      "scripture:Acts 20:17",
+      "scripture:Acts 20:18",
+      "scripture:2 Timothy 4:20"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 20:15",
+      "book": "Acts",
+      "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+    },
+    {
+      "ref": "Acts 20:17",
+      "book": "Acts",
+      "textWEB": "From Miletus he sent to Ephesus and called to himself the elders of the assembly."
+    },
+    {
+      "ref": "2 Timothy 4:20",
+      "book": "2 Timothy",
+      "textWEB": "Erastus remained at Corinth, but I left Trophimus at Miletus sick."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}

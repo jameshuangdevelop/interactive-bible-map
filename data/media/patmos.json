@@ -1,0 +1,35 @@
+{
+  "locationId": "patmos",
+  "images": [
+    {
+      "id": "patmos-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Blick-auf-skala-2024.jpg",
+      "author": "Kaethe17",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Blick-auf-skala-2024.jpg",
+      "caption": "The island of Patmos",
+      "aiGenerated": false
+    },
+    {
+      "id": "patmos-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Patmos_Kastelli_ancient_acropolis.jpg",
+      "author": "Tomisti",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Patmos_Kastelli_ancient_acropolis.jpg",
+      "caption": "Kastelli hill, the ancient acropolis of Patmos, seen from Chora",
+      "aiGenerated": false
+    },
+    {
+      "id": "patmos-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Patmos_View_2023.jpg",
+      "author": "Stargirl351",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Patmos_View_2023.jpg",
+      "caption": "The island of Patmos",
+      "aiGenerated": false
+    }
+  ]
+}

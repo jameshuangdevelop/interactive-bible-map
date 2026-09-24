@@ -1,0 +1,58 @@
+{
+  "id": "hierapolis",
+  "names": {
+    "ancient": [
+      "Hierapolis"
+    ],
+    "modern": "Pamukkale (Turkey)",
+    "alternate": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "candidates": [
+    {
+      "label": "Hierapolis archaeological site (Pamukkale)",
+      "coordinates": [
+        29.12418,
+        37.92925
+      ],
+      "coordinateSource": "dare:21205",
+      "confidence": "high",
+      "support": "The city's ruins beside the Pamukkale travertine terraces, a UNESCO World Heritage Site, are undisputed as ancient Hierapolis; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
+      "sources": [
+        "dare:21205",
+        "wikidata:Q7428276"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Hierapolis was a Phrygian spa city built beside mineral hot springs near the Lycus Valley, founded, per UNESCO, by the Attalid kings of Pergamon at the end of the 2nd century BC and later flourishing under Rome. Paul's letter to the Colossians names Epaphras, described in Colossians 4:12 as one of the Colossians, as having, per 4:13, 'great zeal for you, and for those in Laodicea, and for those in Hierapolis.'",
+    "sources": [
+      "dare:21205",
+      "wikidata:Q7428276",
+      "bib:unesco-hierapolis-pamukkale",
+      "scripture:Colossians 4:12",
+      "scripture:Colossians 4:13"
+    ]
+  },
+  "history": [
+    {
+      "text": "Hierapolis was ceded to Rome in 133 BC and, after being destroyed by an earthquake around AD 60, was rebuilt, reaching its peak of importance in the 2nd and 3rd centuries AD.",
+      "sources": [
+        "bib:unesco-hierapolis-pamukkale"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Colossians 4:13",
+      "book": "Colossians",
+      "textWEB": "For I testify about him that he has great zeal for you, and for those in Laodicea, and for those in Hierapolis."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-24"
+}
