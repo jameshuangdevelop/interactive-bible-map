@@ -112,3 +112,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 3 | ~200k / ~20k | ~400 | ~15,770 |
 | 2026-09-24 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M2-06 image IDs | ~360k / ~25k | ~147 | ~15,917 |
 | 2026-09-24 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-06 lead-image review (43 locations, fetched Commons metadata, analyzed 3 removals, renumbered IDs) | ~200k / ~15k | ~80 | ~15,997 |
+| 2026-09-24 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-06 check (semantic media-migration diff across 43 files, Commons API + visual re-check of the 3 removals and all 40 other leads, `npm test` + `npm run validate:data`; Sonnet 5 rates +50%) | ~380k / ~35k | ~525 | ~16,522 |

@@ -241,3 +241,58 @@ All 48 pass. `corinth`'s replacement image carries one cosmetic, non-blocking no
 
 None blocking. One cosmetic note is open (the Corinth image's `url` query-string suffix) but does not affect its pass verdict; owner media-curator, low priority, safe to fold into a future media pass rather than a dedicated round.
 
+## Image IDs and lead images (M2-06)
+
+Independent review of `feat/m2-image-ids` (commits `2ab531d` "feat(schema): add stable image IDs" and `ee62b8c` "data(media): review lead images"), covering the media files of **both** M2 batches (43 `data/media/*.json` files, 82 images before this branch). Checked directly against the Commons API (`prop=imageinfo|categories`, `extmetadata`) and, for every file flagged below, against the actual downloaded thumbnail — not on caption text alone, since two of the findings below turned out to be caption/content mismatches that description text alone did not catch.
+
+### 1. Migration result: PASS
+
+A throwaway Node script (`$env:TEMP\m2-06-diff-check.mjs`) parsed every `data/media/*.json` at `f4afc98` (pre-migration base) and `HEAD`, matched images by `url` (the one field that cannot change), and diffed every other field except the new `id`:
+
+- **No unexpected field changes.** `url`, `license`, `licenseUrl`, `author`, `caption`, `sourcePage`, and `aiGenerated` are byte-identical for every image that survived the migration.
+- **Exactly 3 removals, 0 additions**, matching the Media Curator's notes: `antioch-syria` (`Fall_of_Antioch_in_969.png`), `berea` (`Beroia_Archaelogical_Museum.jpg`), `temple-mount` (`ISR-2013-…-Façade_01.jpg`). Totals: 82 → 79 images.
+- **Every `id` is well-formed**: prefix equals the file's `locationId`, numbering is sequential `01, 02, …` with no gaps, and order matches the `images[]` array — checked programmatically for all 43 files, 0 issues.
+
+### 2. The 3 removals
+
+Verified via Commons API description/categories, then confirmed visually from the downloaded thumbnail of both the removed file and the new `-01`:
+
+| Location | Removed image | Removal verdict | New `-01` | Is `-01` the clearest photo of the place? |
+|---|---|---|---|---|
+| `antioch-syria` | `Fall_of_Antioch_in_969.png` | **Correct.** Confirmed a 12th/13th-century manuscript miniature of the 969 CE siege (categories: `Antioch`, `28 October`; visually a two-figure tent/ladder battle scene, no resemblance to the modern city). | `Antakya_-_2011-04-10.jpg` | **Yes.** Genuine elevated cityscape of Antakya (confirmed visually). The remaining `-02` (St. Peter's Church façade) is a real site photo too, so the file keeps 2 good images. |
+| `berea` | `Beroia_Archaelogical_Museum.jpg` | **Correct.** Confirmed a museum building's front entrance/courtyard with displayed statues (Commons desc: "Entrance to Veria Archaelogical Museum") — a museum, not the ancient city. | `Veria_BW_2017-10-06_09-39-17.jpg` | **No — needs-change.** Caption says "Street view of Veria," but the Commons description is "Greece, Veria, Saint Paul altar," and the downloaded thumbnail confirms it: a close-up of a modern mosaic-icon shrine (the "Bema of Apostle Paul" memorial), i.e. a portrait/artifact, not a street or cityscape. **The remaining `-02` (`Veria_BW_2017-10-06_09-39-44.jpg`, captioned "Architecture in Veria") is the same shrine from a different angle** (Commons desc is again "Saint Paul altar"; thumbnail confirms the identical mosaic icon) — so after this removal, `berea` has **zero** images that show the city, its ruins, or its landscape. See needs-change table below. |
+| `temple-mount` | `ISR-2013-Jerusalem-Temple_Mount-Dome_of_the_Rock-Façade_01.jpg` | **Correct, confirmed only a detail.** Thumbnail shows a tight crop of the Dome of the Rock's tile mosaic pattern — no building outline, no site context, exactly the "close-up facade detail" the Media Curator described. | `The_Western_Wall_and_Dome_of_the_rock_in_the_old_city_of_Jerusalem.jpg` | **Yes.** Both remaining images (`-01` and `-02`) are wide elevated views showing the Western Wall plaza and the Dome of the Rock together — a standard, neutral, factual framing of the site that does not privilege one tradition's structure over the other's. Confirmed visually. |
+
+### 3. The other 40 leads
+
+Fetched Commons categories/description for all 40 remaining `-01` images via the API, then downloaded and visually inspected every lead whose description text raised a concern. **34 of 40 pass** (site, ruins, city, landscape, or — for the 3 region records `galilee`, `judea`, `samaria` — a map, consistent with the convention). **6 needs-change**, all caught either because the description named a different subject than the caption, or because the image is an artwork/detail rather than a place photo:
+
+| # | File | Current `-01` | Recommended `-01` | Reason |
+|---|---|---|---|---|
+| 1 | `thessalonica.json` | `Thessaloniki,_Greece_-_Pavlova.jpg` | `Thessaloniki,_Greece,_Feb_2023_-_Western_Walls.jpg` (current `-02`) | Commons description: "Pavlova... a meringue-based dessert... enjoyed here in Greece." Confirmed visually — it is a photo of a plated dessert on a restaurant table, not the city. `-02` (city walls ruins) or `-03` (Ancient Agora) both show the place; `-02` is the cleaner standalone ruins shot. |
+| 2 | `corinth.json` | `20090731_korinthos05.jpg` | `Temple_d'Apollon_à_Corinthe.jpg` (current `-02`) | Caption claims "Ruins of the Temple of Apollo," but the file is a modern shopping street (a "SUPER MARKET" sign, awnings, parked cars — confirmed visually and by Commons categories "Shops/Awnings/Parasols/Streets in Corinth"). `-02` is a genuine photo of the standing Temple of Apollo columns and matches its own caption. |
+| 3 | `lystra.json` | `Saint_Paul_at_Lystra_MET_DP820060.jpg` | *(no acceptable alternate in file — needs a new image)* | Commons `ObjectName`/categories: "Drawing; Drawings." Confirmed visually — a Baroque ink-and-wash drawing by Jacob Jordaens of the sacrifice-at-Lystra narrative scene (Acts 14), not a photo of the place. This is the file's only image, so per the card's scope exception ("adding new images... to replace a removed lead image where a location would otherwise be left with none"), the Media Curator should source a free-licensed photo of the Lystra/Hatunsaray site or leave a documented gap for CP2 if none exists (cf. the same batch's existing `iconium` precedent). |
+| 4 | `gethsemane.json` | `Khachkar_in_the_Armenian_Garden_of_Gethsemane,_Jerusalem.JPG` | *(no acceptable alternate in file — needs a new image)* | Commons description: "Armenian cross-stone or Khachkar... installed in 2014." Confirmed visually — a tight shot of a carved stone memorial monument with an icon-like relief, not the garden or a site view. Only image in the file; needs a genuine photo of the Garden of Gethsemane / its olive trees or the Church of All Nations. |
+| 5 | `cana.json` | `Khirbet_Qana_-_Columbarium.jpg` | *(no acceptable alternate in file — needs a new image)* | Commons description: "A rock-cut Columbarium used for breeding doves." Confirmed visually — a close-up of a single rock-cut niche wall (an archaeological detail), not a recognizable view of the Khirbet Qana site. Only image in the file; needs a wider site/ruins photo. |
+
+Also checked but **passing despite an unusual description**: `colossae-01` (`Colossae.jpg`) — Commons description is Russian for "the city of Kolossy on the map," and the thumbnail is indeed a stylized map graphic, which does not match its own caption ("Aerial view of the archaeological site"); however `colossae.json`'s `-02` (`Colossae'den_Honaz_görünüm.jpg`, "View from the Colossae site toward Mount Honaz") is a genuine landscape photo taken from the site. **This is also a needs-change** (Colossae's `type` is `"town"`/`zoomTier: "city"`, not `"region"`, so a map does not satisfy the convention) — see table below, item 6.
+
+| # | File | Current `-01` | Recommended `-01` | Reason |
+|---|---|---|---|---|
+| 6 | `colossae.json` | `Colossae.jpg` | `Colossae'den_Honaz_görünüm.jpg` (current `-02`) | `-01` is a stylized decorative map with a single labeled dot (confirmed visually), not a photo, and `colossae` is a city/town record, not a region, so the "map" exception in the convention doesn't apply. `-02` is a genuine photo of the landscape viewed from the site. |
+
+`derbe-01` (a 19th-century engraving, "SITE OF DERBE, KARAJH DAGH MOUNTAINS IN THE DISTANCE") and `bethany-01`/`joppa-01` (a 19th-century book-plate photo of the Tomb of Lazarus entrance, and a vintage colorized photo of Jaffa's harbor, respectively) were also inspected visually because their descriptions read as historical rather than photographic; all three genuinely depict the physical site or city and **pass** — the convention does not require a modern photograph, only that the image show the place.
+
+**Total needs-change across the branch: 7** (berea from the 3 removals, plus thessalonica, corinth, lystra, gethsemane, cana, and colossae from the other 40). All are owned by **media-curator**.
+
+**Minor, non-blocking note:** `.git/PR_BODY-M2-06.md`'s removal table spells Berea's removed image id `beria-03` (should read `berea-03`); a documentation typo only, no data is affected.
+
+### 4. IDs validate: PASS
+
+- `npm test` — 46/46 pass, including all image-ID schema/validator cases (sequential numbering, prefix match, no gaps, array order, cross-file duplicate detection).
+- `npm run validate:data` — passes (exit code 0). The 95 warnings printed are all pre-existing "scripture text contains none of this location's configured names" linkage warnings unrelated to M2-06 (out of scope for this card).
+
+### Verdict
+
+Migration: **pass**. Removals: **2 of 3 correct with a good new lead** (`antioch-syria`, `temple-mount`); **1 needs-change** (`berea` — correct removal, but neither remaining image shows the city). Leads (other 40): **34 of 40 pass**; **6 needs-change**. **7 needs-change total across the branch** (including berea). IDs: **valid**, tests and validation both green.
+
