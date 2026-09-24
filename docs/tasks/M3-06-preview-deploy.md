@@ -1,0 +1,46 @@
+# M3-06 — Preview deploy and CP3b readiness
+
+| | |
+|---|---|
+| Agent | `frontend-engineer` |
+| Model | GPT-5.3-Codex (fallback GPT-5.5) |
+| Branch | `feat/m3-preview-deploy` |
+| Depends on | M3-04 and M3-05 merged, **and the human has added the Cloudflare secrets** (see CHECKPOINTS.md → CP3a → Your action before CP3b) |
+| Parallel with | none |
+| Credit target | ~600 AI credits (session guard: 1,500) |
+
+## Goal
+Deploy the MVP to Cloudflare Pages: a preview for every pull request and production from `main` (ADR-0010). Then confirm that the deployed app meets the spec's accessibility and performance targets, so the PO can write the CP3b summary.
+
+## Inputs (read only these)
+- `docs/DECISIONS.md`: ADR-0009 (the basemap fallback) and ADR-0010 (hosting)
+- `docs/design/VISUAL_SPEC.md` §5, §7 and §11
+- `.github/workflows/app.yml` from M3-02
+- Cloudflare's guide to [Direct Upload with continuous integration](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/)
+- This card
+
+## Scope
+1. **Deploy jobs:** add them to `app.yml`, using `cloudflare/wrangler-action` at its current major version (confirm it on the action's release page).
+   - The Pages project is `interactive-bible-map`. If it does not exist yet, create it with `wrangler pages project create`, with `main` as the production branch.
+   - **Pull requests:** deploy the web export as a preview, and post the preview URL as a PR comment.
+   - **Push to `main`:** deploy to production.
+   - Deploy jobs **skip, and do not fail**, when the secrets are missing (for example on a fork).
+   - Use only `secrets.CLOUDFLARE_API_TOKEN` and `secrets.CLOUDFLARE_ACCOUNT_ID`. Never print them.
+2. **Smoke test on the deployed preview:** a scripted browser check, such as Playwright, run in CI against the preview URL. It checks that the map loads, that selecting Capernaum shows the panel with a credit line, that searching "Antioch" gives two results, and that opening `?place=emmaus` shows the disputed layout.
+3. **Accessibility check:** run an automated check (for example axe) on the preview for the overview, an open place panel and the search box, and fix every serious or critical issue.
+4. **Performance check:** measure against spec §11 (a usable map within 3 seconds on a mid-range laptop, with Lighthouse or an equivalent). Report the numbers in the PR, and fix clear regressions.
+5. **Docs:** add `docs/DEPLOY.md`, explaining how deploys work, where to find the preview URL, how to roll back, and what to do if tiles fail (the ADR-0009 fallback).
+
+## Out of scope
+New features, custom domains, and analytics.
+
+## Acceptance criteria
+- [ ] This PR's own preview deploys, and the URL is posted on the PR.
+- [ ] The smoke test passes against that preview.
+- [ ] Automated accessibility checks report no serious or critical issues.
+- [ ] Performance numbers are reported against spec §11.
+- [ ] No secret values appear in logs, code or docs.
+- [ ] Committed as `feat(deploy): add Cloudflare Pages preview and production deploys`.
+
+## Finish
+Follow the session protocol in `.github/agents/frontend-engineer.agent.md`. PR title: `feat(deploy): Cloudflare Pages previews and production`. After it merges, the PO writes the CP3b summary.

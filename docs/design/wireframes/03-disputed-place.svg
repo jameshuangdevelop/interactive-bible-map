@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif">
+  <title>Wireframe 03 — Disputed place: Emmaus (desktop, low fidelity)</title>
+  <defs>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#3C4043" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#3C4043" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .label { font-size: 12px; fill: #202124; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
+      .pin { fill: #C5221F; stroke: #ffffff; stroke-width: 2.5; }
+      .cand { fill: #C5221F; stroke: #ffffff; stroke-width: 2; stroke-dasharray: 3 2; }
+      .letter { font-size: 11px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+      .note { font-size: 12px; fill: #C2185B; font-style: italic; }
+      .leader { stroke: #C2185B; stroke-width: 1; fill: none; }
+      .h2 { font-size: 16px; font-weight: 500; fill: #202124; }
+      .name { font-size: 14px; font-weight: 600; fill: #202124; }
+      .muted { font-size: 13px; fill: #5F6368; }
+      .small { font-size: 12px; fill: #5F6368; }
+      .link { fill: #1A73E8; }
+    </style>
+  </defs>
+
+  <!-- Map (Judean hills west of Jerusalem, schematic) -->
+  <rect width="1440" height="900" fill="#F4F4F2"/>
+  <path d="M430,640 C600,600 760,640 900,610 S1200,640 1440,600" stroke="#E0E0DC" stroke-width="6" fill="none"/>
+  <path d="M470,300 C640,330 820,300 980,340 S1260,330 1440,380" stroke="#E6E6E2" stroke-width="4" fill="none"/>
+  <g filter="url(#shadow)"><circle cx="618" cy="358" r="12" class="cand"/></g>
+  <text class="letter" x="618" y="362">A</text>
+  <circle cx="1089" cy="500" r="9" class="cand"/><text class="letter" x="1089" y="504">B</text>
+  <circle cx="1017" cy="355" r="9" class="cand"/><text class="letter" x="1017" y="359">C</text>
+  <circle cx="938" cy="459" r="9" class="cand"/><text class="letter" x="938" y="463">D</text>
+  <text class="label" x="636" y="362" font-weight="600">Emmaus (A)</text>
+  <text class="label" x="1104" y="504">Emmaus (B)</text>
+  <text class="label" x="1032" y="359">Emmaus (C)</text>
+  <text class="label" x="953" y="463">Emmaus (D)</text>
+  <circle cx="1225" cy="554" r="8" class="pin"/><text class="label" x="1239" y="558">Jerusalem</text>
+
+  <!-- Map controls -->
+  <g filter="url(#shadow)">
+    <rect x="1384" y="700" width="40" height="80" rx="8" fill="#ffffff"/>
+    <rect x="1384" y="792" width="40" height="40" rx="8" fill="#ffffff"/>
+    <circle cx="1404" cy="866" r="11" fill="#ffffff"/>
+  </g>
+  <line x1="1390" y1="740" x2="1418" y2="740" stroke="#DADCE0"/>
+  <text x="1404" y="728" font-size="20" fill="#5F6368" text-anchor="middle">+</text>
+  <text x="1404" y="768" font-size="20" fill="#5F6368" text-anchor="middle">−</text>
+  <circle cx="1404" cy="812" r="8" fill="none" stroke="#5F6368" stroke-width="2"/><circle cx="1404" cy="812" r="2.5" fill="#5F6368"/>
+  <text x="1404" y="871" font-size="13" font-weight="700" fill="#5F6368" text-anchor="middle">i</text>
+
+  <!-- Panel -->
+  <g filter="url(#shadow)"><rect x="0" y="0" width="408" height="900" fill="#ffffff"/></g>
+  <rect x="0" y="0" width="408" height="200" fill="#DADCE0"/>
+  <path d="M150,160 L200,100 L240,140 L262,120 L300,160 Z" fill="#BDC1C6"/>
+  <text x="204" y="186" font-size="12" fill="#5F6368" text-anchor="middle">Photo 1 (emmaus-01; caption names the candidate shown)</text>
+  <g filter="url(#shadow)"><rect x="16" y="16" width="376" height="48" rx="24" fill="#ffffff"/></g>
+  <g stroke="#5F6368" stroke-width="2" stroke-linecap="round">
+    <line x1="34" y1="33" x2="50" y2="33"/><line x1="34" y1="40" x2="50" y2="40"/><line x1="34" y1="47" x2="50" y2="47"/>
+  </g>
+  <text x="66" y="45" font-size="15" fill="#202124">Emmaus</text>
+  <text x="368" y="46" font-size="18" fill="#5F6368" text-anchor="middle">×</text>
+  <text class="small" x="24" y="222">Photo: <tspan fill="#202124">author</tspan> · <tspan class="link">license</tspan> · <tspan class="link">Wikimedia Commons</tspan></text>
+
+  <text x="24" y="262" font-size="22" font-weight="600" fill="#202124">Emmaus</text>
+  <text class="muted" x="24" y="286">Village · <tspan class="link">Judea</tspan></text>
+  <rect x="24" y="300" width="360" height="40" rx="8" fill="#FCE8E6"/>
+  <text x="40" y="325" font-size="14" font-weight="500" fill="#A50E0E">Location disputed · 4 proposed sites</text>
+
+  <g fill="#ffffff" stroke="#DADCE0" stroke-width="1.5">
+    <circle cx="60" cy="380" r="20"/><circle cx="140" cy="380" r="20"/><circle cx="220" cy="380" r="20"/>
+  </g>
+  <circle cx="60" cy="380" r="7" fill="none" stroke="#1A73E8" stroke-width="2"/><circle cx="60" cy="380" r="2" fill="#1A73E8"/>
+  <text x="140" y="385" font-size="15" fill="#1A73E8" text-anchor="middle">🔗</text>
+  <g stroke="#1A73E8" stroke-width="2"><line x1="211" y1="374" x2="229" y2="374"/><line x1="211" y1="380" x2="229" y2="380"/><line x1="211" y1="386" x2="223" y2="386"/></g>
+  <text x="60" y="418" font-size="12" fill="#1A73E8" text-anchor="middle">Fit all sites</text>
+  <text x="140" y="418" font-size="12" fill="#1A73E8" text-anchor="middle">Copy link</text>
+  <text x="220" y="418" font-size="12" fill="#1A73E8" text-anchor="middle">Sources</text>
+  <line x1="0" y1="434" x2="408" y2="434" stroke="#DADCE0"/>
+
+  <text class="h2" x="24" y="462">Proposed sites</text>
+  <!-- Candidate A (selected) -->
+  <rect x="12" y="474" width="384" height="74" rx="8" fill="#E8F0FE"/>
+  <circle cx="36" cy="496" r="11" class="cand"/><text class="letter" x="36" y="500">A</text>
+  <text class="name" x="56" y="501">Emmaus Nicopolis (Imwas)</text>
+  <rect x="300" y="484" width="78" height="22" rx="11" fill="#FCE8E6"/><text x="339" y="499" font-size="12" font-weight="500" fill="#A50E0E" text-anchor="middle">Disputed</text>
+  <text class="small" x="56" y="522">Support text from the data (two lines, expandable)</text>
+  <text class="small" x="56" y="538">… <tspan class="link">[4] [5]</tspan></text>
+  <!-- Candidate B -->
+  <circle cx="36" cy="574" r="11" class="cand"/><text class="letter" x="36" y="578">B</text>
+  <text class="name" x="56" y="579">Qaloniya / Motza</text>
+  <rect x="300" y="562" width="78" height="22" rx="11" fill="#FCE8E6"/><text x="339" y="577" font-size="12" font-weight="500" fill="#A50E0E" text-anchor="middle">Disputed</text>
+  <text class="small" x="56" y="600">Support text from the data … <tspan class="link">[6]</tspan></text>
+  <!-- Candidate C -->
+  <circle cx="36" cy="632" r="11" class="cand"/><text class="letter" x="36" y="636">C</text>
+  <text class="name" x="56" y="637">El-Qubeibeh</text>
+  <rect x="300" y="620" width="78" height="22" rx="11" fill="#F1F3F4"/><text x="339" y="635" font-size="12" font-weight="500" fill="#5F6368" text-anchor="middle">Low</text>
+  <text class="small" x="56" y="658">Support text from the data … <tspan class="link">[7]</tspan></text>
+  <!-- Candidate D -->
+  <circle cx="36" cy="690" r="11" class="cand"/><text class="letter" x="36" y="694">D</text>
+  <text class="name" x="56" y="695">Abu Ghosh</text>
+  <rect x="300" y="678" width="78" height="22" rx="11" fill="#F1F3F4"/><text x="339" y="693" font-size="12" font-weight="500" fill="#5F6368" text-anchor="middle">Low</text>
+  <text class="small" x="56" y="716">Support text from the data … <tspan class="link">[8]</tspan></text>
+  <line x1="0" y1="736" x2="408" y2="736" stroke="#DADCE0"/>
+
+  <text class="h2" x="24" y="764">About</text>
+  <text x="24" y="788" font-size="14" fill="#202124">Summary and history, each with source markers …</text>
+  <line x1="0" y1="806" x2="408" y2="806" stroke="#DADCE0"/>
+  <text class="h2" x="24" y="834">In the Bible · 3 passages</text>
+  <text x="24" y="858" font-size="14" font-weight="600" fill="#202124">Luke 24:13</text>
+  <text x="24" y="880" font-size="15" fill="#202124" font-family="Georgia, 'Noto Serif', serif">Behold, two of them were going that very day …</text>
+
+  <!-- Annotations -->
+  <path class="leader" d="M384,320 L440,300"/><text class="note" x="446" y="304">Disputed places: a banner instead of a modern-name line</text>
+  <path class="leader" d="M396,511 L440,520"/><text class="note" x="446" y="524">Candidates in the data's order, all styled alike; the selected one is highlighted</text>
+  <text class="note" x="446" y="544">Selecting a candidate centres the map on it; opening the place fits all four</text>
+  <path class="leader" d="M378,690 L440,690"/><text class="note" x="446" y="694">Confidence chip per candidate, in words</text>
+  <path class="leader" d="M1004,352 L1060,300"/><text class="note" x="1064" y="296">Lettered candidate pins match the list (A–D)</text>
+  <text x="1430" y="892" font-size="12" fill="#80868B" text-anchor="end">03 · Disputed place · desktop · low fidelity</text>
+</svg>

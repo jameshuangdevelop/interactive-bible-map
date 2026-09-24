@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif">
+  <title>Wireframe 01 — Map overview (desktop, low fidelity)</title>
+  <defs>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#3C4043" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#3C4043" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .label { font-size: 12px; fill: #202124; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
+      .region { font-size: 12px; fill: #5F6368; letter-spacing: 2px; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; }
+      .country { font-size: 13px; fill: #9AA0A6; }
+      .note { font-size: 12px; fill: #C2185B; font-style: italic; }
+      .reserved { fill: none; stroke: #9AA0A6; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .reservedText { font-size: 13px; fill: #80868B; }
+      .pin { fill: #C5221F; stroke: #ffffff; stroke-width: 2.5; }
+      .leader { stroke: #C2185B; stroke-width: 1; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Basemap (abstract): land, Mediterranean, Adriatic, Black Sea, islands -->
+  <rect width="1440" height="900" fill="#F4F4F2"/>
+  <path fill="#D5E3EC" d="M0,380 L180,330 L250,280 L300,300 L330,340 L420,320 L520,300 L600,300 L610,380 L660,390 L720,330 L760,300 L785,360 L840,400 L960,420 L1040,440 L1060,560 L1050,650 L960,640 L860,610 L740,570 L600,560 L480,540 L400,520 L300,560 L200,600 L100,600 L0,560 Z"/>
+  <path fill="#D5E3EC" d="M330,150 L380,160 L520,260 L480,280 L400,220 Z"/>
+  <ellipse cx="1010" cy="110" rx="190" ry="55" fill="#D5E3EC"/>
+  <ellipse cx="360" cy="372" rx="34" ry="13" fill="#F4F4F2"/>
+  <ellipse cx="338" cy="436" rx="5" ry="3" fill="#F4F4F2"/>
+  <ellipse cx="720" cy="470" rx="48" ry="8" fill="#F4F4F2"/>
+  <ellipse cx="990" cy="478" rx="34" ry="10" fill="#F4F4F2"/>
+  <ellipse cx="760" cy="390" rx="7" ry="4" fill="#F4F4F2"/>
+  <ellipse cx="850" cy="430" rx="9" ry="5" fill="#F4F4F2"/>
+  <text class="country" x="196" y="146">Italy</text>
+  <text class="country" x="600" y="190">Greece</text>
+  <text class="country" x="1000" y="770">Egypt</text>
+
+  <!-- Region / island records: labels, no pin -->
+  <text class="region" x="960" y="288">GALATIA</text>
+  <text class="region" x="696" y="497">CRETE</text>
+  <text class="region" x="318" y="456">MALTA</text>
+
+  <!-- City pins -->
+  <g>
+    <circle class="pin" cx="270" cy="175" r="8"/><text class="label" x="284" y="179">Rome</text>
+    <circle class="pin" cx="328" cy="223" r="8"/><text class="label" x="342" y="227">Puteoli</text>
+    <circle class="pin" cx="644" cy="232" r="8"/><text class="label" x="560" y="236">Thessalonica</text>
+    <circle class="pin" cx="695" cy="214" r="8"/><text class="label" x="709" y="218">Philippi</text>
+    <circle class="pin" cx="644" cy="347" r="8"/><text class="label" x="587" y="351">Corinth</text>
+    <circle class="pin" cx="673" cy="343" r="8"/><text class="label" x="687" y="347">Athens</text>
+    <circle class="pin" cx="943" cy="330" r="8"/><text class="label" x="957" y="334">Antioch in Pisidia</text>
+    <circle class="pin" cx="1076" cy="390" r="8"/><text class="label" x="1090" y="394">Tarsus</text>
+    <circle class="pin" cx="1123" cy="420" r="8"/><text class="label" x="1137" y="424">Antioch on the Orontes</text>
+    <circle class="pin" cx="986" cy="478" r="8"/><text class="label" x="930" y="506">Paphos</text>
+    <circle class="pin" cx="1127" cy="536" r="8"/><text class="label" x="1141" y="540">Damascus</text>
+  </g>
+
+  <!-- Clusters (count bubbles) -->
+  <g font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <circle cx="812" cy="330" r="17" fill="#C5221F" stroke="#ffffff" stroke-width="3"/><text x="812" y="334">9</text>
+    <circle cx="1085" cy="592" r="19" fill="#C5221F" stroke="#ffffff" stroke-width="3"/><text x="1085" y="596">24</text>
+  </g>
+
+  <!-- Disputed place: one pin with a "?" badge until zoom 8 -->
+  <circle class="pin" cx="1022" cy="371" r="8"/>
+  <circle cx="1031" cy="362" r="7" fill="#ffffff" stroke="#C5221F" stroke-width="1.5"/>
+  <text x="1031" y="366" font-size="10" font-weight="700" fill="#C5221F" text-anchor="middle">?</text>
+  <text class="label" x="990" y="395">Derbe</text>
+
+  <!-- Search box with menu -->
+  <g filter="url(#shadow)">
+    <rect x="16" y="16" width="400" height="48" rx="24" fill="#ffffff"/>
+  </g>
+  <g stroke="#5F6368" stroke-width="2" stroke-linecap="round">
+    <line x1="34" y1="33" x2="50" y2="33"/><line x1="34" y1="40" x2="50" y2="40"/><line x1="34" y1="47" x2="50" y2="47"/>
+  </g>
+  <text x="66" y="45" font-size="15" fill="#5F6368">Search biblical places</text>
+  <circle cx="386" cy="38" r="7" fill="none" stroke="#5F6368" stroke-width="2"/>
+  <line x1="391" y1="43" x2="397" y2="49" stroke="#5F6368" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Reserved areas (later milestones) -->
+  <rect class="reserved" x="620" y="16" width="200" height="48" rx="24"/>
+  <text class="reservedText" x="720" y="45" text-anchor="middle">Map | Routes — M5</text>
+  <rect class="reserved" x="1254" y="16" width="170" height="48" rx="24"/>
+  <text class="reservedText" x="1339" y="45" text-anchor="middle">Modern | Ancient — M4</text>
+  <rect class="reserved" x="470" y="820" width="500" height="56" rx="12"/>
+  <text class="reservedText" x="720" y="853" text-anchor="middle">Timeline slider, 4 BC – AD 100 — M4</text>
+
+  <!-- Map controls: zoom, reset view, attribution -->
+  <g filter="url(#shadow)">
+    <rect x="1384" y="700" width="40" height="80" rx="8" fill="#ffffff"/>
+    <rect x="1384" y="792" width="40" height="40" rx="8" fill="#ffffff"/>
+    <circle cx="1404" cy="866" r="11" fill="#ffffff"/>
+  </g>
+  <line x1="1390" y1="740" x2="1418" y2="740" stroke="#DADCE0"/>
+  <text x="1404" y="728" font-size="20" fill="#5F6368" text-anchor="middle">+</text>
+  <text x="1404" y="768" font-size="20" fill="#5F6368" text-anchor="middle">−</text>
+  <circle cx="1404" cy="812" r="8" fill="none" stroke="#5F6368" stroke-width="2"/>
+  <circle cx="1404" cy="812" r="2.5" fill="#5F6368"/>
+  <text x="1404" y="871" font-size="13" font-weight="700" fill="#5F6368" text-anchor="middle">i</text>
+
+  <!-- Scale bar -->
+  <g stroke="#5F6368" stroke-width="1.5">
+    <line x1="24" y1="872" x2="124" y2="872"/><line x1="24" y1="866" x2="24" y2="872"/><line x1="124" y1="866" x2="124" y2="872"/>
+  </g>
+  <text x="24" y="860" font-size="11" fill="#5F6368">200 km</text>
+
+  <!-- Annotations -->
+  <text class="note" x="24" y="88">Search box: place names only (ancient, modern, alternate)</text>
+  <text class="note" x="24" y="104">The menu button opens About, Sources &amp; credits, Report an issue</text>
+  <text class="note" x="720" y="86" text-anchor="middle">Dashed = reserved for a later milestone (not built in M3)</text>
+  <path class="leader" d="M1016,377 L960,430"/>
+  <text class="note" x="780" y="444">Disputed place: one pin with "?" until zoom 8</text>
+  <path class="leader" d="M1104,597 L1180,640"/>
+  <text class="note" x="1184" y="644">Cluster bubble: click to zoom in</text>
+  <path class="leader" d="M696,500 L620,540"/>
+  <text class="note" x="430" y="556">Region or island record: a label, no pin</text>
+  <text class="note" x="1374" y="690" text-anchor="end">Zoom in / out, reset view, attribution (ⓘ)</text>
+  <text x="24" y="836" font-size="12" fill="#80868B">01 · Map overview · desktop · low fidelity (basemap shapes are schematic)</text>
+</svg>

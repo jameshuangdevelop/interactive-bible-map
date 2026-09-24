@@ -7,7 +7,7 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | Approved 2026-09-23 | #2 |
 | CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Approved 2026-09-23 | #3–#7 |
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
-| CP3a | M3 MVP App | Low-fidelity visual spec and mockup | **In progress** | |
+| CP3a | M3 MVP App | Low-fidelity visual spec and mockup | **Awaiting review** | |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Not started | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
@@ -188,3 +188,53 @@ M3, the MVP app.
 - The PO writes a low-fidelity visual spec (CP3a).
 - The Frontend Engineer scaffolds Expo with React Native Web and MapLibre, and builds the map, pins, zoom tiers, details panel, candidate sites and search, with a Cloudflare Pages preview (CP3b).
 - At that point you'll need a free Cloudflare account and a deploy token; the M3 card will give the steps.
+
+---
+
+## CP3a — Visual spec
+
+### What was delivered
+- **[Visual spec](docs/design/VISUAL_SPEC.md):** layout, map, place panel, search, states, visual tokens, accessibility (WCAG 2.2 AA), neutrality rules, attribution, links and performance targets. The model is Google Maps on desktop, with a muted basemap so the biblical places stand out.
+- **[Five low-fidelity wireframes](docs/design/wireframes/):** the map overview, a place panel (Capernaum), a disputed place (Emmaus, with four lettered candidates), search ("Antioch"), and the small screen. Every name, count and quotation in them comes from the real data and the WEB.
+- **The M3 build cards** (plan below). They are ready to dispatch as soon as you approve.
+
+### The M3 plan
+| ID | Task | Agent | Starts after |
+|---|---|---|---|
+| [M3-02](docs/tasks/M3-02-app-scaffold.md) | App scaffold, data build and CI | frontend-engineer | CP3a (in parallel with M3-07 and M3-08) |
+| [M3-07](docs/tasks/M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | CP3a |
+| [M3-08](docs/tasks/M3-08-modern-names.md) | Neutral modern names (decision 3) | gis-engineer → research-lead → fact-checker | CP3a |
+| [M3-03](docs/tasks/M3-03-map-view.md) | Map view: basemap, pins, tiers, clustering, disputed candidates | frontend-engineer | M3-02 |
+| [M3-04](docs/tasks/M3-04-place-panel.md) | Place panel | frontend-engineer | M3-03 (in parallel with M3-05) |
+| [M3-05](docs/tasks/M3-05-search.md) | Search by place name, and the menu | frontend-engineer | M3-03 |
+| [M3-06](docs/tasks/M3-06-preview-deploy.md) | Preview deploy, accessibility and performance checks | frontend-engineer | M3-04, M3-05 and your Cloudflare secrets |
+| CP3b | Working MVP deployed to a preview | project-owner | M3-06 |
+
+### Decisions needed from you
+**Merging this PR approves CP3a with the recommendations below.** To choose differently, comment on the PR, and I'll update the spec before the build starts.
+
+| # | Decision | Recommendation | Alternative |
+|---|---|---|---|
+| 1 | Basemap look | OpenFreeMap **Positron**: light grey and muted, so the pins stand out and the tone stays scholarly | OpenFreeMap **Liberty**: colourful and closer to Google Maps |
+| 2 | Place title | The ancient name first (**Capernaum**), with the modern name underneath | The modern name first |
+| 3 | Modern names | The place name only: no country, state or political descriptor, and none for disputed places. Today's data mixes these ("Yalvaç (Turkey)", "Tell Balata (Nablus, West Bank)"), so M3-08 cleans it up. | Keep countries where the border is undisputed |
+| 4 | Scripture list | The first 5 passages, then "Show all *n*" (Jerusalem has 174) | Always show every passage |
+| 5 | Disputed places when zoomed out | One pin with a "?" badge until zoom 8, then one lettered pin per candidate | Always show every candidate |
+
+### Your action before CP3b (about 10 minutes, any time before M3-06)
+The preview deploy needs a free Cloudflare account and two repository secrets. I never see the values.
+1. Sign up at [dash.cloudflare.com](https://dash.cloudflare.com/sign-up) (the free plan is enough).
+2. Create an API token: **Account API tokens → Create Token → Custom token**, with the permission **Account · Cloudflare Pages · Edit**. Copy the token.
+3. Copy your **Account ID** from the dashboard; it is shown on the account's overview pages.
+4. In this repository, go to **Settings → Secrets and variables → Actions → New repository secret**, and add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+5. Tell me "Cloudflare secrets added". M3-06 creates the Pages project itself.
+
+Source: [Cloudflare: Direct Upload with continuous integration](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/) (read 2026-09-24).
+
+### Concepts for you
+- **Style file.** A JSON file that tells the map how to draw the tiles: colours, which labels to show, which layers to hide. We host our own copy of Positron, so we can hide disputed borders. [MapLibre style spec](https://maplibre.org/maplibre-style-spec/)
+- **Zoom level.** Web maps use levels from about 0 (the whole world) to 20 (a building). Our tiers map onto them: regions at 4–9, cities from 4, and sites within a city from 12.
+- **Clustering.** When pins are too close together at a low zoom, they merge into a bubble with a count, which splits apart as you zoom in.
+
+### Budget
+The spec and cards cost about 900 AI credits. M3 is forecast at about 7,000–9,000 credits: five Frontend Engineer sessions, M3-07 and M3-08, and their reviews. The month total is about 27,100 of 1,000,000 (2.7%). See [BUDGET.md](docs/BUDGET.md).

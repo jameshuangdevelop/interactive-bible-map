@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="520" viewBox="0 0 1000 520" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif">
+  <title>Wireframe 04 — Search results (desktop, low fidelity)</title>
+  <defs>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="160%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#3C4043" flood-opacity="0.3"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#3C4043" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .note { font-size: 12px; fill: #C2185B; font-style: italic; }
+      .leader { stroke: #C2185B; stroke-width: 1; fill: none; }
+      .title { font-size: 14px; fill: #202124; }
+      .sub { font-size: 12px; fill: #5F6368; }
+      .pinSmall { fill: #C5221F; stroke: #ffffff; stroke-width: 2; }
+    </style>
+  </defs>
+  <rect width="1000" height="520" fill="#F4F4F2"/>
+  <path fill="#D5E3EC" d="M0,330 L200,300 L420,320 L600,300 L760,340 L1000,330 L1000,520 L0,520 Z"/>
+
+  <!-- A: results for "Antioch" -->
+  <g filter="url(#shadow)">
+    <rect x="16" y="16" width="400" height="48" rx="24" fill="#ffffff"/>
+    <rect x="16" y="72" width="400" height="164" rx="8" fill="#ffffff"/>
+  </g>
+  <g stroke="#5F6368" stroke-width="2" stroke-linecap="round">
+    <line x1="34" y1="33" x2="50" y2="33"/><line x1="34" y1="40" x2="50" y2="40"/><line x1="34" y1="47" x2="50" y2="47"/>
+  </g>
+  <text x="66" y="45" font-size="15" fill="#202124">Antioch</text>
+  <rect x="124" y="30" width="1.5" height="20" fill="#1A73E8"/>
+  <text x="392" y="46" font-size="18" fill="#5F6368" text-anchor="middle">×</text>
+
+  <rect x="16" y="80" width="400" height="56" fill="#F1F3F4"/>
+  <circle cx="44" cy="108" r="7" class="pinSmall"/>
+  <text class="title" x="64" y="104"><tspan font-weight="700">Antioch</tspan> on the Orontes</text>
+  <text class="sub" x="64" y="124">Antakya · City</text>
+  <circle cx="44" cy="164" r="7" class="pinSmall"/>
+  <text class="title" x="64" y="160"><tspan font-weight="700">Antioch</tspan> in Pisidia</text>
+  <text class="sub" x="64" y="180">Yalvaç · City</text>
+  <line x1="16" y1="200" x2="416" y2="200" stroke="#DADCE0"/>
+  <text x="32" y="222" font-size="12" fill="#5F6368">↑ ↓ to move · Enter to open · Esc to clear</text>
+
+  <path class="leader" d="M300,104 L440,96"/><text class="note" x="446" y="100">The match is in bold; the second line shows the modern name and type (no country)</text>
+  <path class="leader" d="M300,160 L440,140"/><text class="note" x="446" y="144">Same-named places are listed separately</text>
+  <text class="note" x="446" y="184">Matches ancient, modern and alternate names, ignoring case and diacritics,</text>
+  <text class="note" x="446" y="200">with one typo tolerated in names of 5 letters or more; up to 8 results</text>
+
+  <!-- B: no results -->
+  <g filter="url(#shadow)">
+    <rect x="16" y="300" width="400" height="48" rx="24" fill="#ffffff"/>
+    <rect x="16" y="356" width="400" height="76" rx="8" fill="#ffffff"/>
+  </g>
+  <g stroke="#5F6368" stroke-width="2" stroke-linecap="round">
+    <line x1="34" y1="317" x2="50" y2="317"/><line x1="34" y1="324" x2="50" y2="324"/><line x1="34" y1="331" x2="50" y2="331"/>
+  </g>
+  <text x="66" y="329" font-size="15" fill="#202124">John 3:16</text>
+  <text x="392" y="330" font-size="18" fill="#5F6368" text-anchor="middle">×</text>
+  <text class="title" x="32" y="386">No places match "John 3:16".</text>
+  <text class="sub" x="32" y="410">Search covers place names only.</text>
+  <path class="leader" d="M300,398 L440,398"/><text class="note" x="446" y="402">Verse and person search are out of scope (brief §1.7), so say so plainly</text>
+
+  <text x="990" y="512" font-size="12" fill="#80868B" text-anchor="end">04 · Search · desktop · low fidelity</text>
+</svg>
