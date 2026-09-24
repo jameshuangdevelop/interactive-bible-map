@@ -1,14 +1,21 @@
+import fs from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { parseReference } from "../scripts/lib/books.mjs";
 import { validateData } from "../scripts/lib/validator.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const fixturesDirectory = path.join(testDirectory, "fixtures");
 const casesDirectory = path.join(fixturesDirectory, "cases");
 const webFixturePath = path.join(fixturesDirectory, "web", "engwebp-mini.vpl.txt");
+const webFixtureMissingInteriorPath = path.join(
+  fixturesDirectory,
+  "web",
+  "engwebp-missing-interior.vpl.txt"
+);
 const webSnapshotMetadataMismatchPath = path.join(
   fixturesDirectory,
   "web",
@@ -16,12 +23,36 @@ const webSnapshotMetadataMismatchPath = path.join(
 );
 const bibliographyFixturePath = path.join(fixturesDirectory, "bibliography.json");
 
-async function runCase(caseName) {
+const locationSchemaPath = path.join(
+  testDirectory,
+  "..",
+  "schema",
+  "location.schema.json"
+);
+const sourceIdSchemaPath = path.join(
+  testDirectory,
+  "..",
+  "schema",
+  "source-id.schema.json"
+);
+
+const locationSchema = JSON.parse(fs.readFileSync(locationSchemaPath, "utf8"));
+const sourceIdSchema = JSON.parse(fs.readFileSync(sourceIdSchemaPath, "utf8"));
+const locationReferenceRegex = new RegExp(
+  locationSchema.properties.scripture.items.properties.ref.pattern,
+  "u"
+);
+const scriptureSourceRegex = new RegExp(
+  sourceIdSchema.$defs.scriptureSourceId.pattern,
+  "u"
+);
+
+async function runCase(caseName, options = {}) {
   const caseDirectory = path.join(casesDirectory, caseName);
   return validateData({
     locationsDirectory: path.join(caseDirectory, "locations"),
     mediaDirectory: path.join(caseDirectory, "media"),
-    webVplPath: webFixturePath,
+    webVplPath: options.webVplPath ?? webFixturePath,
     bibliographyPath: bibliographyFixturePath,
     skipSnapshotChecksumCheck: true
   });
@@ -121,6 +152,42 @@ test("media fixture rejects missing version in jurisdiction variant", async () =
   );
 });
 
+test("media fixture rejects port and IGO suffix combination", async () => {
+  const result = await runCase("invalid-media-port-igo-combo");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("media fixture rejects 4.0 jurisdiction-ported variant", async () => {
+  const result = await runCase("invalid-media-port-v4");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("media fixture rejects non-3.0 IGO variant", async () => {
+  const result = await runCase("invalid-media-igo-v2");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("scripture source accepts single verse reference", async () => {
   const result = await runCase("valid-scripture-source-single");
   assert.equal(result.errors.length, 0);
@@ -160,6 +227,20 @@ test("scripture source rejects nonexistent verses", async () => {
   );
 });
 
+test("scripture source rejects a range with a missing interior verse", async () => {
+  const result = await runCase("invalid-scripture-source-missing-interior-range", {
+    webVplPath: webFixtureMissingInteriorPath
+  });
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.summary.sources[1]" &&
+        error.message.includes("not found in WEB snapshot")
+    )
+  );
+});
+
 test("coordinateSource cannot use scripture source IDs", async () => {
   const result = await runCase("invalid-scripture-coordinate-source");
   assert.ok(
@@ -170,6 +251,34 @@ test("coordinateSource cannot use scripture source IDs", async () => {
         error.message.includes("must not use scripture:")
     )
   );
+});
+
+test("reference grammar stays aligned across parser and schemas", () => {
+  const validReferences = [
+    "Mark 1:21",
+    "Mark 1:21-22",
+    "1 Corinthians 1:2",
+    "Song of Solomon 1:1"
+  ];
+  const invalidReferences = [
+    "Mark1:21",
+    "Mark 0:1",
+    "Mark 1:0",
+    "1Corinthians 1:2",
+    "Mark 1:21-"
+  ];
+
+  for (const reference of validReferences) {
+    assert.equal(locationReferenceRegex.test(reference), true, reference);
+    assert.equal(scriptureSourceRegex.test(`scripture:${reference}`), true, reference);
+    assert.doesNotThrow(() => parseReference(reference), reference);
+  }
+
+  for (const reference of invalidReferences) {
+    assert.equal(locationReferenceRegex.test(reference), false, reference);
+    assert.equal(scriptureSourceRegex.test(`scripture:${reference}`), false, reference);
+    assert.throws(() => parseReference(reference), undefined, reference);
+  }
 });
 
 test("id must equal filename", async () => {

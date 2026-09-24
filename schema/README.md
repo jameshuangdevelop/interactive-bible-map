@@ -70,9 +70,10 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 - Use `bib:<id>` in any `sources[]` array when citing a book, chapter, article, web authority page, or dataset entry.
 - The validator rejects any `bib:` ID that is missing from `data/bibliography.json`.
 
-### One consistent OSM and Wikipedia coordinate rule
+### One consistent coordinateSource rule (OSM, Wikipedia, and scripture)
 - Coordinates in `data/locations/` must come from a non-OSM source.
 - Coordinates must not cite `wikipedia:` as `coordinateSource`.
+- Coordinates must not cite `scripture:` as `coordinateSource`.
 - Each candidate stores `coordinateSource`, and that value must also appear in `candidates[].sources`.
 
 ### Sources quality floor
@@ -83,6 +84,7 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 ### Scripture reference format
 - `scripture[].ref` and `otConnections[].ref` use `Book Chapter:Verse` or `Book Chapter:Start-End`.
 - A single `ref` covers one chapter only; cross-chapter passages must be split into one entry per chapter.
+- `scripture:` source IDs use the same one-chapter reference format.
 
 ### Accepted media license strings
 `media.schema.json` accepts these `images[].license` values:
@@ -90,10 +92,10 @@ The schema accepts these prefixes (from `docs/research/SOURCES.md` plus `bib:` f
 - `CC0` or `CC0 1.0`
 - `CC BY <version>` (for example `CC BY 4.0`)
 - `CC BY-SA <version>` (for example `CC BY-SA 4.0`)
-- `CC BY <version> <port>` and `CC BY-SA <version> <port>` where `<port>` is a two-letter lowercase jurisdiction code (for example `CC BY-SA 2.0 de` or `CC BY 3.0 nl`)
-- `CC BY <version> IGO` and `CC BY-SA <version> IGO` (for example `CC BY-SA 3.0 IGO`)
+- `CC BY <version> <port>` and `CC BY-SA <version> <port>` where `<port>` is a two-letter lowercase jurisdiction code and `<version>` is 1.x, 2.x, or 3.x (for example `CC BY-SA 2.0 de` or `CC BY 3.0 nl`)
+- `CC BY 3.0 IGO` and `CC BY-SA 3.0 IGO`
 
-When a jurisdiction-ported or IGO variant exists upstream, copy the license string exactly as shown on the Commons file page.
+Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists upstream, copy the license string exactly as shown on the Commons file page.
 
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
