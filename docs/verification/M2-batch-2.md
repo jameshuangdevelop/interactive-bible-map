@@ -1,6 +1,6 @@
 # M2 batch 2 verification — Samaria, Acts and Pauline cities
 
-Independent Phase C review of `data/locations/*.json` (21 records), `data/media/*.json` (21 files, 48 images) and the two new `data/bibliography.json` entries added in `data/m2-batch-2`. Verified against primary sources directly (Wikidata entity JSON, Pleiades bulk JSON where the live site's Anubis challenge allowed it, DARE, and the cited article), not on the Research Lead's or Media Curator's word. Reviewed 2026-09-23; re-verified 2026-09-23 after fix commits `90c5069` and `97456e3` (see "Re-verification" below). The needs-change table and verdicts below reflect the **final, re-verified state**; the original (superseded) findings are kept in "Re-verification" for the record.
+Independent Phase C review of `data/locations/*.json` (21 records), `data/media/*.json` (21 files, 48 images) and the two new `data/bibliography.json` entries added in `data/m2-batch-2`. Verified against primary sources directly (Wikidata entity JSON, Pleiades bulk JSON where the live site's Anubis challenge allowed it, DARE, and the cited article), not on the Research Lead's or Media Curator's word. Reviewed 2026-09-23; re-verified 2026-09-23 after fix commits `90c5069` and `97456e3` (see "Re-verification"); re-verified again 2026-09-23 after the claims-audit commits `21432ac` and `36ab5b7` (see "Re-verification 2" — **current state**). The needs-change table and verdicts below reflect the state as of "Re-verification"; "Re-verification 2" supersedes them with the current, final findings.
 
 ## Needs-change summary (fix and owner) — as of the original review
 
@@ -76,16 +76,31 @@ No unsupported "capital of X" or similar overreaching claims were found beyond w
 
 Empty in all 21 records. **Acceptable for M2.** The task brief scopes the province/administrative timeline to M4, and several sites carry well-known Roman administrative statuses (e.g., Antioch in Pisidia and Iconium as coloniae, Corinth as capital of Achaia, Caesarea Maritima as the Judean prefect/procurator's seat) that could support entries — but pinning precise, cross-checked start/end years for each without further dedicated research would risk guessing at the dates the schema requires (integers, BC negative, no year 0). Leaving `politicalHistory` empty rather than guessing is the correct call for this milestone; this is not a needs-change.
 
-## Verdicts (final, after re-verification)
+## Verdicts (superseded — see "Re-verification 2" for the current, final state)
 
 ### Location records (21) — `data/locations/`
 All 21 pass. All 21 are `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`: `samaria`, `sychar`, `caesarea-philippi`, `caesarea-maritima`, `joppa`, `damascus`, `antioch-syria`, `tarsus`, `paphos`, `antioch-pisidia`, `iconium`, `lystra`, `derbe`, `philippi`, `thessalonica`, `berea`, `athens`, `corinth`, `ephesus`, `colossae`, `rome`.
+
+*(This verdict was current as of "Re-verification" above. The PR Reviewer subsequently found unsupported claims in several of these records — see "Re-verification 2" for the claims-audit findings and the final, current verdict.)*
 
 ### Media records (21) — `data/media/`
 All 21 pass. The 6 originally needs-change (`caesarea-maritima`, `antioch-syria`, `colossae`, `iconium`, `philippi`, `thessalonica`) are now resolved and pass on re-verification (see "Re-verification" above; media files carry no `status` field, so none are marked).
 
 ### Images (48 total)
 All 48 pass. The 9 originally needs-change (2 on `antioch-syria`, 1 on `caesarea-maritima`, 2 on `colossae`, 2 on `iconium`, 1 author fix each on `philippi` and `thessalonica`) are resolved: the 7 image swaps were independently re-confirmed (license, author, and — for the two most consequential swaps — direct visual inspection) to show the correct location, and the 2 author corrections match the Commons API exactly.
+
+*(This image verdict was also current only as of "Re-verification." "Re-verification 2" found one new caption error — see below — so the current count is 47 of 48 passing.)*
+
+## Verdicts 2 (current, final — after "Re-verification 2")
+
+### Location records (21) — `data/locations/`
+All 21 pass and are `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-09-23"`. 15 were re-audited for claim support and re-verified in this round (`antioch-pisidia`, `antioch-syria`, `athens`, `caesarea-maritima`, `caesarea-philippi`, `colossae`, `corinth`, `damascus`, `derbe`, `ephesus`, `paphos`, `philippi`, `samaria`, `tarsus`, `thessalonica`); 6 were unaffected by the audit and remain verified from the prior round (`sychar`, `joppa`, `iconium`, `lystra`, `berea`, `rome`).
+
+### Media records (21) — `data/media/`
+All 21 pass.
+
+### Images (48 total)
+47 pass; 1 needs-change: the `Agaven_Antikes_Korinth.jpg` caption on `corinth` (owner: media-curator — see "Re-verification 2").
 
 ## Re-verification (2026-09-23, after `90c5069` and `97456e3`)
 
@@ -106,8 +121,72 @@ No new issues were introduced by any of the fixes; every replacement image's lic
 
 `npm run validate:data`: 0 errors, 29 warnings — identical set to the original review (`sychar`'s scripture list is unchanged, so no new warnings were introduced by the candidate/bibliography edit). `npm test`: 24/24 passing.
 
+## Re-verification 2 (2026-09-23, after `21432ac` and `36ab5b7`)
+
+Triggered by the PR Reviewer (GPT-5.4) finding that `corinth`'s summary claimed "capital of Roman Achaia" and "major commercial center" without a cited source stating either. The PO had the Research Lead audit **every text claim in every record** against its cited sources, applying the strict test: is the clause actually stated by at least one cited source, not merely true? 15 of 21 location records needed changes and were reset to `status: "draft"`; the schema was also rebased onto a commit accepting jurisdiction-ported CC licenses (e.g. `CC BY-SA 2.0 de`, `CC BY 3.0 nl`), and the Media Curator re-checked all 48 images' license strings against the Commons API.
+
+### Location records — clause-by-clause re-check
+
+Independently re-checked every changed clause in all 15 draft records against Wikidata entity JSON, Pleiades' own place-resource text (via targeted search since the live site's Anubis challenge still blocks direct fetches — consistent with `docs/research/SOURCES.md`), the WEB text already in each record's `scripture[]`, and (for `corinth`) the new `bib:worldhistory-corinth` source directly:
+
+- **`corinth`** (the record that triggered the audit): the unsupported "capital of the Roman province of Achaia" and unqualified "major commercial center" clauses are replaced. Fetched `https://www.worldhistory.org/corinth/` directly and confirmed, verbatim: *"A brighter period returned to the city when Julius Caesar founded his colony at the site in 44 BCE... The city was once more flourishing by the 1st century CE and became an important administrative and trade centre."* The record's new text — "after Julius Caesar refounded it as a Roman colony in 44 BC it became, per World History Encyclopedia, 'an important administrative and trade centre'" — is an exact, correctly attributed quotation. **Pass.**
+  - **World History Encyclopedia as a source**: judged **acceptable** as a `bib:` cite-only source for this kind of narrative-synthesis clause. It is a named-author (Mark Cartwright), editorially reviewed general reference (distinct from Wikipedia's open-editing model, which the brief already excludes from being copied), the record quotes it verbatim in quotation marks with clear attribution rather than presenting it as the project's own synthesis, and it is not used for coordinates or bulk data extraction. Treated the same as the existing `bib:wagner-wilson-why-derbe` citation: no new `ATTRIBUTION.md`/`LICENSES.md` row is needed, consistent with how the project already treats cite-only academic/reference works.
+- **`antioch-pisidia`**: "Col. Caesarea" is confirmed as Pleiades' own recorded alternate name — the resource's canonical title is literally "Antiochia/Col. Caesarea: a Pleiades place resource." **Pass.**
+- **`antioch-syria`**: "one of the four cities of the Seleucid Syrian Tetrapolis" is corroborated by sources citing the Pleiades 658381 resource page for this specific fact alongside its own description of the founding and later Theoupolis renaming. **Pass.**
+- **`athens`**: "a major Greek city-state and the principal city of Attika" is an exact quotation from the Pleiades 579885 resource. **Pass.**
+- **`caesarea-maritima`**: the uncited "twelve-year building program" detail is removed; the remaining text is unaffected and still passes. **Pass.**
+- **`caesarea-philippi`**: the uncited Philip-the-Tetrarch-renaming/Pan-shrine narrative history entry is removed; the replacement support/summary text (two names given together, southwest foot of Mount Hermon) is confirmed directly against the Pleiades 678324 resource, whose title is "Paneas/Caesarea Philippi." **Pass.**
+- **`colossae`**: "an ancient city of Phrygia" is an exact quotation from Wikidata `Q1001370`'s description. **Pass.**
+- **`damascus`**: the new `Isaiah 7:8` otConnection quotes WEB text stating directly "the head of Syria is Damascus" — confirmed against the WEB text already used elsewhere in the project; the reworded Amos 1:3 note ("threshing Gilead 'with instruments of iron'") matches Amos 1:3's WEB wording exactly, replacing the earlier unsupported "capital of Aram" inference. **Pass.**
+- **`derbe`**: the reworded support clause attributes the "GPS coordinates in an atlas of the Roman world" detail explicitly to "(per the cited article)" rather than asserting it as independently confirmed; secondary reporting on Wagner & Wilson 2019 corroborates that the article discusses exactly this atlas-coordinate question for Kerti Höyük. Appropriately hedged. **Pass.**
+- **`ephesus`**: "the most important ancient metropolis of Ionian Asia Minor" is an exact quotation from the Pleiades 599612 resource; the Artemis "temple keeper" clause quotes Acts 19:35, already in the record's own `scripture[]`. **Pass.**
+- **`paphos`**: the unsupported "Roman capital of the province of Cyprus" claim is removed; "has been a center of activity since the Final Bronze Age" is an exact quotation from the Pleiades 707586 resource. **Pass.**
+- **`philippi`**: the uncited "refounded as a colony after the battle fought nearby in 42 BC" clause is removed; the replacement quotes Acts 16:12 calling Philippi "a Roman colony" (verbatim, already in `scripture[]`). **Pass.**
+- **`samaria`**: "conquered by the Assyrian king Shalmaneser V, probably in 722 BC... reorganized into an Assyrian province" matches the Pleiades 44836840 resource's own account closely. **Pass.**
+- **`tarsus`**: the unsupported "capital of Roman Cilicia" claim is removed; "an important city and river port on the Cydnus river located in Cilicia Pedias" is confirmed against the Pleiades 648789 resource. **Pass.**
+- **`thessalonica`**: "capital of the Roman province of Macedonia" remains sourced to Wikidata `Q17151`, whose own `P1376` ("capital of") claims include Macedonia (confirmed directly via the Wikidata API in the original review); "an important center of the Roman and Late Antique worlds" is an exact quotation from the Pleiades 491741 resource. **Pass.**
+
+All 15 pass. `status` set to `verified` (`verifiedBy: fact-checker`, `lastReviewed: 2026-09-23`) on all 15.
+
+**Spot-checked one unchanged record for the same risk pattern**: `lystra`'s "Roman colony" claim (not touched by this audit) is independently confirmed — Pleiades' own title for resource 648699 is "Lystra/Col. Iulia Felix Gemina," directly recording the colony name. No issue found; the five other unchanged records (`berea`, `iconium`, `joppa`, `lystra`, `rome`) were in scope only for the draft records per this round's instructions, and their claims are lower-risk (direct scripture paraphrase or self-evident facts), so a full re-audit of all six was not repeated here.
+
+### Media — 10-image spot-check (license, `licenseUrl`, author, and subject)
+
+Independently re-queried the Commons API (`imageinfo`/`extmetadata`) for all 10 files touched by `36ab5b7` and confirmed every `license`, `licenseUrl`, and `author` value matches exactly, including the schema's new jurisdiction-port support:
+
+| File | License | `licenseUrl` | Author |
+|---|---|---|---|
+| `Agaven_Antikes_Korinth.jpg` (corinth) | `CC BY-SA 2.0 de` ✓ | matches ✓ | "Michael J. Zirbes" ✓ |
+| `Alâeddin_hill,_Konya.jpg` (iconium) | `CC BY-SA 3.0` ✓ | matches ✓ (http, not https — now correct) | "Unknown" ✓ (Commons itself has no machine-readable author) |
+| `Ancient_Roman_aqueduct_in_Caesarea_Maritima...jpg` | `CC BY-SA 3.0` ✓ | matches ✓ | "Lior Golgher • ליאור גולגר" ✓ (full bilingual byline) |
+| `C+B-Galatia-Map.JPG` (colossae) | `Public domain` ✓ | — | "no idea - see source" ✓ (verbatim from Commons) |
+| `Umayyad_Mosque,_Damascus.jpg` | `CC BY-SA 3.0` ✓ | matches ✓ | "Bernard Gagnon" ✓ |
+| `Damascus,_Syria,_Panoramic_view...jpg` | `CC BY 4.0` ✓ | matches ✓ | "Vyacheslav Argenberg" ✓ |
+| `DAVIS(1879)_p329_SITE_OF_DERBE...jpg` | `Public domain` ✓ | — | "Unknown" ✓ (Commons Artist field is empty) |
+| `Terrace_Houses_of_Ephesus...jpg` | `CC BY-SA 2.0` ✓ | matches ✓ | "Warren LeMay from Chicago, IL, United States" ✓ (full byline) |
+| `100353_jaffa_-_bosphorus_street...jpg` (joppa) | `Public domain` ✓ | — | "Unknown authorUnknown author" ✓ (verbatim Commons quirk) |
+| `Saint_Paul's_Church,_Tarsus_02.jpg` | `CC BY-SA 4.0` ✓ | matches ✓ | "Jordi Gili" ✓ |
+
+All 10 pass on license/author/URL accuracy.
+
+**Subject check, including the Corinth agave image specifically requested**: downloaded and visually inspected `Agaven_Antikes_Korinth.jpg`. It shows large agave plants (not an ancient Mediterranean species — agave is native to the Americas and was introduced/naturalized around the Mediterranean much later) growing at the ancient Corinth site, with a stone wall visible behind them — the photo does show the correct location. **However, its caption, "Sculptural fragments at ancient Corinth," is wrong: the image contains no sculpture at all, only agave plants and trees.** This is a new needs-change, not previously caught (the original review checked this file's license/author but not its visual subject against its caption).
+
+**Needs-change (new): `data/media/corinth.json` — `Agaven_Antikes_Korinth.jpg` caption (media-curator).** Replace "Sculptural fragments at ancient Corinth" with an accurate caption, e.g. "Agave plants growing at the archaeological site of ancient Corinth, Greece." The image itself, its license, and its author are all fine and may stay; only the caption is wrong.
+
+### Askar / `sychar` — is prose-only disclosure acceptable, or should the data model change?
+
+My view: prose-only disclosure (the current state) is an **acceptable stopgap for M2**, but the schema should grow proper support for an unmapped candidate before M6 (the next batch of ~50 sites), not be left as a one-off workaround.
+
+- It is acceptable now because it is honest and neutral: Askar is named as a real, serious candidate in both `summary` and `history`, and the reason it isn't mapped (no confirmable non-OSM, non-Wikipedia coordinate) is stated plainly rather than glossed over. A reader of the record is not misled about what evidence exists.
+- It is not a good long-term pattern because the `candidates[]` array is the schema's structured, machine-readable way to represent "serious candidate sites," and every other disputed site in this batch (`derbe`) represents its weaker candidate with a real (if lower-confidence) mapped point rather than dropping it to prose. Sychar's Askar candidate is the first case in the M2 batches where a serious candidate has genuinely **no** confirmable coordinate at all, and prose is the only tool available for that case today. If this recurs at M6's scale (~50 more sites), each occurrence will read as an inconsistent, ad hoc treatment unless the schema explicitly plans for it.
+- Concretely, I'd recommend `location.schema.json` allow a `candidates[]` entry to omit `coordinates`/`coordinateSource` (perhaps via a new boolean like `"unmapped": true` plus a required `note` explaining why), so the disputed-site UI can still list Askar as a named candidate — just without a pin on the map — instead of requiring every candidate to carry a coordinate or be demoted entirely to prose. This is a schema change, so it belongs in a future M2-01-style or M4 card, not something to retrofit into this batch's already-verified records.
+
+## Validation (re-run after the claims audit)
+
+`npm run validate:data`: 0 errors, 29 warnings — same 29 as every prior round (no record's `scripture[]` changed in a way that affects the name-matching heuristic). `npm test`: 30/30 passing (up from 24; the schema rebase added 6 new jurisdiction-port fixture tests, all passing).
+
 ## Remaining work
 
-None. All 21 location records and all 21 media files (48 images) now pass; no items are outstanding or deferred.
+One item remains open: the Corinth agave image caption (see above), owned by media-curator. Everything else — all 21 location records, all 21 media files, and 47 of 48 images (all but the one caption) — passes.
 
 

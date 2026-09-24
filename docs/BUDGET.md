@@ -93,3 +93,6 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 sychar fix | ~60k / ~5k | ~120 | ~6,600 |
 | 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 media fixes | ~40k / ~3k | ~25 | ~6,625 |
 | 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification | ~190k / ~18k | ~350 | ~6,975 |
+| 2026-09-23 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 claims audit | ~650k / ~70k | ~1,350 | ~8,325 |
+| 2026-09-23 | media-curator | Claude Haiku 4.5 (Copilot CLI subagent) | M2-03 license strings | ~50k / ~4k | ~40 | ~8,365 |
+| 2026-09-23 | fact-checker | Claude Sonnet 5 (Copilot CLI subagent) | M2-03 re-verification 2 | ~350k / ~35k | ~650 | ~9,015 |
