@@ -1,0 +1,452 @@
+{
+  "id": "galilee",
+  "names": {
+    "ancient": [
+      "Galilee"
+    ],
+    "modern": "Galilee (Northern Israel)",
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Galilee (historical region)",
+      "coordinates": [
+        35.3,
+        33
+      ],
+      "coordinateSource": "wikidata:Q83241",
+      "confidence": "high",
+      "support": "Wikidata's current representative point for the Galilee region sits roughly 30 km north of the point OpenBible.info recorded for the same Wikidata item in its own snapshot; both are reasonable approximations for a large, imprecisely bounded historical region rather than a single site, and both fall within the broad area described as Galilee in first-century sources.",
+      "sources": [
+        "wikidata:Q83241",
+        "openbible:galilee-1"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Galilee was the hill country and lakeside region of northern Israel in the first century AD, home to Nazareth, Capernaum and the other towns beside the Sea of Galilee where most of Jesus' public ministry, as narrated in the Gospels, is set.",
+    "sources": [
+      "wikidata:Q83241",
+      "openbible:galilee-1"
+    ]
+  },
+  "history": [
+    {
+      "text": "Roman-era Galilee was administratively distinct from Judea for most of the first century, governed first by a Herodian tetrarch and only folded into direct Roman provincial rule alongside Judea after AD 44.",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 2:22",
+      "book": "Matthew",
+      "textWEB": "But when he heard that Archelaus was reigning over Judea in the place of his father, Herod, he was afraid to go there. Being warned in a dream, he withdrew into the region of Galilee,"
+    },
+    {
+      "ref": "Matthew 3:13",
+      "book": "Matthew",
+      "textWEB": "Then Jesus came from Galilee to the Jordan to John, to be baptized by him."
+    },
+    {
+      "ref": "Matthew 4:12",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus heard that John was delivered up, he withdrew into Galilee."
+    },
+    {
+      "ref": "Matthew 4:13",
+      "book": "Matthew",
+      "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
+    },
+    {
+      "ref": "Matthew 4:15",
+      "book": "Matthew",
+      "textWEB": "“The land of Zebulun and the land of Naphtali, toward the sea, beyond the Jordan, Galilee of the Gentiles,"
+    },
+    {
+      "ref": "Matthew 4:23",
+      "book": "Matthew",
+      "textWEB": "Jesus went about in all Galilee, teaching in their synagogues, preaching the Good News of the Kingdom, and healing every disease and every sickness among the people."
+    },
+    {
+      "ref": "Matthew 4:25",
+      "book": "Matthew",
+      "textWEB": "Great multitudes from Galilee, Decapolis, Jerusalem, Judea, and from beyond the Jordan followed him."
+    },
+    {
+      "ref": "Matthew 11:1",
+      "book": "Matthew",
+      "textWEB": "When Jesus had finished directing his twelve disciples, he departed from there to teach and preach in their cities."
+    },
+    {
+      "ref": "Matthew 14:1",
+      "book": "Matthew",
+      "textWEB": "At that time, Herod the tetrarch heard the report concerning Jesus,"
+    },
+    {
+      "ref": "Matthew 15:21",
+      "book": "Matthew",
+      "textWEB": "Jesus went out from there and withdrew into the region of Tyre and Sidon."
+    },
+    {
+      "ref": "Matthew 17:22",
+      "book": "Matthew",
+      "textWEB": "While they were staying in Galilee, Jesus said to them, “The Son of Man is about to be delivered up into the hands of men,"
+    },
+    {
+      "ref": "Matthew 19:1",
+      "book": "Matthew",
+      "textWEB": "When Jesus had finished these words, he departed from Galilee and came into the borders of Judea beyond the Jordan."
+    },
+    {
+      "ref": "Matthew 21:11",
+      "book": "Matthew",
+      "textWEB": "The multitudes said, “This is the prophet, Jesus, from Nazareth of Galilee.”"
+    },
+    {
+      "ref": "Matthew 26:32",
+      "book": "Matthew",
+      "textWEB": "But after I am raised up, I will go before you into Galilee.”"
+    },
+    {
+      "ref": "Matthew 26:69",
+      "book": "Matthew",
+      "textWEB": "Now Peter was sitting outside in the court, and a maid came to him, saying, “You were also with Jesus, the Galilean!”"
+    },
+    {
+      "ref": "Matthew 27:55",
+      "book": "Matthew",
+      "textWEB": "Many women were there watching from afar, who had followed Jesus from Galilee, serving him."
+    },
+    {
+      "ref": "Matthew 28:7",
+      "book": "Matthew",
+      "textWEB": "Go quickly and tell his disciples, ‘He has risen from the dead, and behold, he goes before you into Galilee; there you will see him.’ Behold, I have told you.”"
+    },
+    {
+      "ref": "Matthew 28:10",
+      "book": "Matthew",
+      "textWEB": "Then Jesus said to them, “Don’t be afraid. Go tell my brothers that they should go into Galilee, and there they will see me.”"
+    },
+    {
+      "ref": "Matthew 28:16",
+      "book": "Matthew",
+      "textWEB": "But the eleven disciples went into Galilee, to the mountain where Jesus had sent them."
+    },
+    {
+      "ref": "Mark 1:9",
+      "book": "Mark",
+      "textWEB": "In those days, Jesus came from Nazareth of Galilee, and was baptized by John in the Jordan."
+    },
+    {
+      "ref": "Mark 1:14",
+      "book": "Mark",
+      "textWEB": "Now after John was taken into custody, Jesus came into Galilee, preaching the Good News of God’s Kingdom,"
+    },
+    {
+      "ref": "Mark 1:28",
+      "book": "Mark",
+      "textWEB": "The report of him went out immediately into all the region of Galilee and its surrounding area."
+    },
+    {
+      "ref": "Mark 1:39",
+      "book": "Mark",
+      "textWEB": "He went into their synagogues throughout all Galilee, preaching and casting out demons."
+    },
+    {
+      "ref": "Mark 3:7",
+      "book": "Mark",
+      "textWEB": "Jesus withdrew to the sea with his disciples; and a great multitude followed him from Galilee, from Judea,"
+    },
+    {
+      "ref": "Mark 6:21",
+      "book": "Mark",
+      "textWEB": "Then a convenient day came when Herod on his birthday made a supper for his nobles, the high officers, and the chief men of Galilee."
+    },
+    {
+      "ref": "Mark 7:24",
+      "book": "Mark",
+      "textWEB": "From there he arose and went away into the borders of Tyre and Sidon. He entered into a house and didn’t want anyone to know it, but he couldn’t escape notice."
+    },
+    {
+      "ref": "Mark 8:27",
+      "book": "Mark",
+      "textWEB": "Jesus went out, with his disciples, into the villages of Caesarea Philippi. On the way he asked his disciples, “Who do men say that I am?”"
+    },
+    {
+      "ref": "Mark 9:30",
+      "book": "Mark",
+      "textWEB": "They went out from there and passed through Galilee. He didn’t want anyone to know it,"
+    },
+    {
+      "ref": "Mark 14:28",
+      "book": "Mark",
+      "textWEB": "However, after I am raised up, I will go before you into Galilee.”"
+    },
+    {
+      "ref": "Mark 15:41",
+      "book": "Mark",
+      "textWEB": "who, when he was in Galilee, followed him and served him; and many other women who came up with him to Jerusalem."
+    },
+    {
+      "ref": "Mark 16:7",
+      "book": "Mark",
+      "textWEB": "But go, tell his disciples and Peter, ‘He goes before you into Galilee. There you will see him, as he said to you.’”"
+    },
+    {
+      "ref": "Luke 1:26",
+      "book": "Luke",
+      "textWEB": "Now in the sixth month, the angel Gabriel was sent from God to a city of Galilee named Nazareth,"
+    },
+    {
+      "ref": "Luke 2:4",
+      "book": "Luke",
+      "textWEB": "Joseph also went up from Galilee, out of the city of Nazareth, into Judea, to David’s city, which is called Bethlehem, because he was of the house and family of David,"
+    },
+    {
+      "ref": "Luke 2:39",
+      "book": "Luke",
+      "textWEB": "When they had accomplished all things that were according to the law of the Lord, they returned into Galilee, to their own city, Nazareth."
+    },
+    {
+      "ref": "Luke 3:1",
+      "book": "Luke",
+      "textWEB": "Now in the fifteenth year of the reign of Tiberius Caesar, Pontius Pilate being governor of Judea, and Herod being tetrarch of Galilee, and his brother Philip tetrarch of the region of Ituraea and Trachonitis, and Lysanias tetrarch of Abilene,"
+    },
+    {
+      "ref": "Luke 3:19",
+      "book": "Luke",
+      "textWEB": "but Herod the tetrarch, being reproved by him for Herodias, his brother’s wife, and for all the evil things which Herod had done,"
+    },
+    {
+      "ref": "Luke 4:14",
+      "book": "Luke",
+      "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
+    },
+    {
+      "ref": "Luke 4:31",
+      "book": "Luke",
+      "textWEB": "He came down to Capernaum, a city of Galilee. He was teaching them on the Sabbath day,"
+    },
+    {
+      "ref": "Luke 5:17",
+      "book": "Luke",
+      "textWEB": "On one of those days, he was teaching; and there were Pharisees and teachers of the law sitting by who had come out of every village of Galilee, Judea, and Jerusalem. The power of the Lord was with him to heal them."
+    },
+    {
+      "ref": "Luke 8:26",
+      "book": "Luke",
+      "textWEB": "Then they arrived at the country of the Gadarenes, which is opposite Galilee."
+    },
+    {
+      "ref": "Luke 9:7",
+      "book": "Luke",
+      "textWEB": "Now Herod the tetrarch heard of all that was done by him; and he was very perplexed, because it was said by some that John had risen from the dead,"
+    },
+    {
+      "ref": "Luke 13:1",
+      "book": "Luke",
+      "textWEB": "Now there were some present at the same time who told him about the Galileans whose blood Pilate had mixed with their sacrifices."
+    },
+    {
+      "ref": "Luke 13:2",
+      "book": "Luke",
+      "textWEB": "Jesus answered them, “Do you think that these Galileans were worse sinners than all the other Galileans, because they suffered such things?"
+    },
+    {
+      "ref": "Luke 17:11",
+      "book": "Luke",
+      "textWEB": "As he was on his way to Jerusalem, he was passing along the borders of Samaria and Galilee."
+    },
+    {
+      "ref": "Luke 23:5",
+      "book": "Luke",
+      "textWEB": "But they insisted, saying, “He stirs up the people, teaching throughout all Judea, beginning from Galilee even to this place.”"
+    },
+    {
+      "ref": "Luke 23:6",
+      "book": "Luke",
+      "textWEB": "But when Pilate heard Galilee mentioned, he asked if the man was a Galilean."
+    },
+    {
+      "ref": "Luke 23:7",
+      "book": "Luke",
+      "textWEB": "When he found out that he was in Herod’s jurisdiction, he sent him to Herod, who was also in Jerusalem during those days."
+    },
+    {
+      "ref": "Luke 23:49",
+      "book": "Luke",
+      "textWEB": "All his acquaintances and the women who followed with him from Galilee stood at a distance, watching these things."
+    },
+    {
+      "ref": "Luke 23:55",
+      "book": "Luke",
+      "textWEB": "The women who had come with him out of Galilee followed after, and saw the tomb and how his body was laid."
+    },
+    {
+      "ref": "Luke 24:6",
+      "book": "Luke",
+      "textWEB": "He isn’t here, but is risen. Remember what he told you when he was still in Galilee,"
+    },
+    {
+      "ref": "John 1:43",
+      "book": "John",
+      "textWEB": "On the next day, he was determined to go out into Galilee, and he found Philip. Jesus said to him, “Follow me.”"
+    },
+    {
+      "ref": "John 2:1",
+      "book": "John",
+      "textWEB": "The third day, there was a wedding in Cana of Galilee. Jesus’ mother was there."
+    },
+    {
+      "ref": "John 2:11",
+      "book": "John",
+      "textWEB": "This beginning of his signs Jesus did in Cana of Galilee, and revealed his glory; and his disciples believed in him."
+    },
+    {
+      "ref": "John 4:3",
+      "book": "John",
+      "textWEB": "he left Judea and departed into Galilee."
+    },
+    {
+      "ref": "John 4:43",
+      "book": "John",
+      "textWEB": "After the two days he went out from there and went into Galilee."
+    },
+    {
+      "ref": "John 4:45",
+      "book": "John",
+      "textWEB": "So when he came into Galilee, the Galileans received him, having seen all the things that he did in Jerusalem at the feast, for they also went to the feast."
+    },
+    {
+      "ref": "John 4:46",
+      "book": "John",
+      "textWEB": "Jesus came therefore again to Cana of Galilee, where he made the water into wine. There was a certain nobleman whose son was sick at Capernaum."
+    },
+    {
+      "ref": "John 4:47",
+      "book": "John",
+      "textWEB": "When he heard that Jesus had come out of Judea into Galilee, he went to him and begged him that he would come down and heal his son, for he was at the point of death."
+    },
+    {
+      "ref": "John 4:54",
+      "book": "John",
+      "textWEB": "This is again the second sign that Jesus did, having come out of Judea into Galilee."
+    },
+    {
+      "ref": "John 7:1",
+      "book": "John",
+      "textWEB": "After these things, Jesus was walking in Galilee, for he wouldn’t walk in Judea, because the Jews sought to kill him."
+    },
+    {
+      "ref": "John 7:3",
+      "book": "John",
+      "textWEB": "His brothers therefore said to him, “Depart from here and go into Judea, that your disciples also may see your works which you do."
+    },
+    {
+      "ref": "John 7:9",
+      "book": "John",
+      "textWEB": "Having said these things to them, he stayed in Galilee."
+    },
+    {
+      "ref": "John 7:41",
+      "book": "John",
+      "textWEB": "Others said, “This is the Christ.” But some said, “What, does the Christ come out of Galilee?"
+    },
+    {
+      "ref": "John 7:52",
+      "book": "John",
+      "textWEB": "They answered him, “Are you also from Galilee? Search and see that no prophet has arisen out of Galilee.”"
+    },
+    {
+      "ref": "John 12:21",
+      "book": "John",
+      "textWEB": "Therefore, these came to Philip, who was from Bethsaida of Galilee, and asked him, saying, “Sir, we want to see Jesus.”"
+    },
+    {
+      "ref": "John 21:2",
+      "book": "John",
+      "textWEB": "Simon Peter, Thomas called Didymus, Nathanael of Cana in Galilee, and the sons of Zebedee, and two others of his disciples were together."
+    },
+    {
+      "ref": "Acts 1:11",
+      "book": "Acts",
+      "textWEB": "who also said, “You men of Galilee, why do you stand looking into the sky? This Jesus, who was received up from you into the sky, will come back in the same way as you saw him going into the sky.”"
+    },
+    {
+      "ref": "Acts 2:7",
+      "book": "Acts",
+      "textWEB": "They were all amazed and marveled, saying to one another, “Behold, aren’t all these who speak Galileans?"
+    },
+    {
+      "ref": "Acts 5:37",
+      "book": "Acts",
+      "textWEB": "After this man, Judas of Galilee rose up in the days of the enrollment, and drew away some people after him. He also perished, and all, as many as obeyed him, were scattered abroad."
+    },
+    {
+      "ref": "Acts 9:31",
+      "book": "Acts",
+      "textWEB": "So the assemblies throughout all Judea, Galilee, and Samaria had peace and were built up. They were multiplied, walking in the fear of the Lord and in the comfort of the Holy Spirit."
+    },
+    {
+      "ref": "Acts 10:37",
+      "book": "Acts",
+      "textWEB": "you yourselves know what happened, which was proclaimed throughout all Judea, beginning from Galilee, after the baptism which John preached;"
+    },
+    {
+      "ref": "Acts 13:31",
+      "book": "Acts",
+      "textWEB": "and he was seen for many days by those who came up with him from Galilee to Jerusalem, who are his witnesses to the people."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Isaiah 9:1",
+      "note": "Isaiah's oracle naming 'Galilee of the nations' is quoted in Matthew 4:15-16 as finding fulfillment when Jesus based his ministry in Galilee.",
+      "sources": [
+        "openbible:galilee-1"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas (4 BC - AD 39)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

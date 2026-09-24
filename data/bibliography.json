@@ -1,6 +1,82 @@
 {
   "entries": [
     {
+      "id": "murphy-oconnor-holy-land-guide",
+      "type": "book",
+      "title": "The Holy Land: An Oxford Archaeological Guide from Earliest Times to 1700",
+      "authors": [
+        "Jerome Murphy-O'Connor"
+      ],
+      "year": 2008,
+      "publisher": "Oxford University Press"
+    },
+    {
+      "id": "dark-nazareth-archaeology",
+      "type": "book",
+      "title": "The Sisters of Nazareth Convent: A Roman-period, Byzantine, and Crusader Site in Central Nazareth",
+      "authors": [
+        "Ken Dark"
+      ],
+      "year": 2020,
+      "publisher": "Routledge"
+    },
+    {
+      "id": "metzger-textual-commentary",
+      "type": "book",
+      "title": "A Textual Commentary on the Greek New Testament",
+      "authors": [
+        "Bruce M. Metzger"
+      ],
+      "year": 1994,
+      "publisher": "United Bible Societies"
+    },
+    {
+      "id": "bdag-greek-lexicon",
+      "type": "book",
+      "title": "A Greek-English Lexicon of the New Testament and Other Early Christian Literature",
+      "authors": [
+        "Frederick William Danker",
+        "Walter Bauer"
+      ],
+      "year": 2000,
+      "publisher": "University of Chicago Press"
+    },
+    {
+      "id": "freedman-anchor-bible-dictionary",
+      "type": "book",
+      "title": "The Anchor Bible Dictionary",
+      "authors": [
+        "David Noel Freedman"
+      ],
+      "year": 1992,
+      "publisher": "Doubleday"
+    },
+    {
+      "id": "iaa-magdala-excavation",
+      "type": "web",
+      "title": "Migdal, Preliminary Report",
+      "authors": [
+        "Dina Avshalom-Gorni",
+        "Israel Antiquities Authority"
+      ],
+      "year": 2013,
+      "publisher": "Israel Antiquities Authority, Hadashot Arkheologiyot",
+      "url": "https://hadashot.iaa.org.il/report_detail_eng.aspx?id=2304",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "unesco-church-of-nativity",
+      "type": "web",
+      "title": "Birthplace of Jesus: Church of the Nativity and the Pilgrimage Route, Bethlehem",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1433",
+      "accessed": "2026-09-23"
+    },
+    {
       "id": "pleiades-place-resource",
       "type": "dataset",
       "title": "Pleiades: A Gazetteer of Past Places",
@@ -22,6 +98,115 @@
       "publisher": "eBible.org",
       "url": "https://ebible.org/find/details.php?id=engwebp",
       "accessed": "2026-09-23"
+    },
+    {
+      "id": "rainey-notley-sacred-bridge",
+      "type": "book",
+      "title": "The Sacred Bridge: Carta's Atlas of the Biblical World",
+      "authors": [
+        "Anson F. Rainey",
+        "R. Steven Notley"
+      ],
+      "year": 2006,
+      "publisher": "Carta Jerusalem"
+    },
+    {
+      "id": "arav-bethsaida-et-tell",
+      "type": "article",
+      "title": "Searching for Bethsaida: The Case for Et-Tell",
+      "authors": [
+        "Rami Arav"
+      ],
+      "year": 2020,
+      "journal": "Biblical Archaeology Review"
+    },
+    {
+      "id": "notley-aviam-bethsaida-el-araj",
+      "type": "article",
+      "title": "Searching for Bethsaida: The Case for El-Araj",
+      "authors": [
+        "R. Steven Notley",
+        "Mordechai Aviam"
+      ],
+      "year": 2020,
+      "journal": "Biblical Archaeology Review"
+    },
+    {
+      "id": "taylor-golgotha-reconsideration",
+      "type": "article",
+      "title": "Golgotha: A Reconsideration of the Evidence for the Sites of Jesus' Crucifixion and Burial",
+      "authors": [
+        "Joan E. Taylor"
+      ],
+      "year": 1998,
+      "journal": "New Testament Studies",
+      "doi": "10.1017/S0028688500016465"
+    },
+    {
+      "id": "hutton-bethany-beyond-jordan",
+      "type": "article",
+      "title": "'Bethany Beyond the Jordan' in Text, Tradition, and Historical Geography",
+      "authors": [
+        "Jeremy M. Hutton"
+      ],
+      "year": 2008,
+      "journal": "Biblica"
+    },
+    {
+      "id": "mccollough-khirbet-qana",
+      "type": "chapter",
+      "title": "Khirbet Qana",
+      "authors": [
+        "C. Thomas McCollough"
+      ],
+      "year": 2015,
+      "containerTitle": "Galilee in the Late Second Temple and Mishnaic Periods, Volume 2: The Archaeological Record from Cities, Towns, and Villages",
+      "publisher": "Fortress Press"
+    },
+    {
+      "id": "reich-shukron-siloam-pool",
+      "type": "article",
+      "title": "The Second Temple Period Pool of Siloam in Jerusalem",
+      "authors": [
+        "Ronny Reich",
+        "Eli Shukron"
+      ],
+      "year": 2005,
+      "journal": "Israel Exploration Journal"
+    },
+    {
+      "id": "unesco-baptism-site-al-maghtas",
+      "type": "web",
+      "title": "Baptism Site \"Bethany Beyond the Jordan\" (Al-Maghtas)",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1446",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "inpa-korazim-national-park",
+      "type": "web",
+      "title": "Korazim National Park",
+      "authors": [
+        "Israel Nature and Parks Authority"
+      ],
+      "year": 2026,
+      "publisher": "Israel Nature and Parks Authority",
+      "url": "https://en.parks.org.il/reserve-park/korazim-national-park/",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "ritmeyer-temple-mount-quest",
+      "type": "book",
+      "title": "The Quest: Revealing the Temple Mount in Jerusalem",
+      "authors": [
+        "Leen Ritmeyer"
+      ],
+      "year": 2006,
+      "publisher": "Carta Jerusalem"
     }
   ]
 }

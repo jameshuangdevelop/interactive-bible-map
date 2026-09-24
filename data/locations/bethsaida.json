@@ -1,0 +1,154 @@
+{
+  "id": "bethsaida",
+  "names": {
+    "ancient": [
+      "Bethsaida",
+      "Julias"
+    ],
+    "modern": "Disputed (see candidates)",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "et-Tell",
+      "coordinates": [
+        35.630536,
+        32.90995
+      ],
+      "coordinateSource": "wikidata:Q501773",
+      "confidence": "disputed",
+      "support": "Excavated since 1987 and long treated as the leading candidate, with a substantial Roman and Byzantine-period settlement and a possible city gate; critics note the site sits more than a mile from the present shoreline of the Sea of Galilee, awkward for a fishing village.",
+      "sources": [
+        "wikidata:Q501773",
+        "dare:21665",
+        "bib:arav-bethsaida-et-tell"
+      ]
+    },
+    {
+      "label": "el-Araj",
+      "coordinates": [
+        35.619,
+        32.893528
+      ],
+      "coordinateSource": "wikidata:Q47466555",
+      "confidence": "disputed",
+      "support": "Systematically excavated since 2016, much closer to the ancient shoreline than et-Tell, with Roman and Byzantine-period layers and a mosaic inscription that excavators argue supports an early Christian association with the site; the debate between the two candidates remains unresolved among specialists.",
+      "sources": [
+        "wikidata:Q47466555",
+        "dare:33272",
+        "pleiades:678065",
+        "bib:notley-aviam-bethsaida-el-araj"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Bethsaida is named in the Gospels as the home town of the apostles Peter, Andrew and Philip and the setting of the feeding of the five thousand and other episodes; its location is disputed between two excavated sites on the northern shore of the Sea of Galilee.",
+    "sources": [
+      "openbible:bethsaida-1",
+      "scripture:John 1:44",
+      "scripture:Luke 9:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "Ancient sources, including Josephus, describe Bethsaida being refounded and elevated to a Greek-style city named Julias by the tetrarch Philip early in the first century AD, a status that both excavation teams look for evidence of at their respective candidate sites.",
+      "sources": [
+        "bib:arav-bethsaida-et-tell",
+        "bib:notley-aviam-bethsaida-el-araj"
+      ]
+    },
+    {
+      "text": "Two older candidates, el-Mes'adiye and the Tabgha area, were proposed in earlier twentieth-century surveys but receive little attention in recent scholarly literature, which has focused on the et-Tell/el-Araj debate.",
+      "sources": [
+        "openbible:bethsaida-1"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 11:21",
+      "book": "Matthew",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago in sackcloth and ashes."
+    },
+    {
+      "ref": "Mark 6:45",
+      "book": "Mark",
+      "textWEB": "Immediately he made his disciples get into the boat and go ahead to the other side, to Bethsaida, while he himself sent the multitude away."
+    },
+    {
+      "ref": "Mark 8:22",
+      "book": "Mark",
+      "textWEB": "He came to Bethsaida. They brought a blind man to him and begged him to touch him."
+    },
+    {
+      "ref": "Luke 9:10",
+      "book": "Luke",
+      "textWEB": "The apostles, when they had returned, told him what things they had done. He took them and withdrew apart to a desert region of a city called Bethsaida."
+    },
+    {
+      "ref": "Luke 10:13",
+      "book": "Luke",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago, sitting in sackcloth and ashes."
+    },
+    {
+      "ref": "John 1:44",
+      "book": "John",
+      "textWEB": "Now Philip was from Bethsaida, the city of Andrew and Peter."
+    },
+    {
+      "ref": "John 12:21",
+      "book": "John",
+      "textWEB": "Therefore, these came to Philip, who was from Bethsaida of Galilee, and asked him, saying, “Sir, we want to see Jesus.”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 34,
+      "entity": "Tetrarchy of Herod Philip (Iturea, Trachonitis, Gaulanitis and Batanea, including Bethsaida)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 34,
+      "toYear": 37,
+      "entity": "Direct Roman administration after Philip's death without an heir",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 37,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

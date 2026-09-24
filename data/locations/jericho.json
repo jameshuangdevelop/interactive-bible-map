@@ -1,0 +1,156 @@
+{
+  "id": "jericho",
+  "names": {
+    "ancient": [
+      "Jericho",
+      "Hierichous"
+    ],
+    "modern": "Jericho",
+    "alternate": [
+      "Ariha"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Tell es-Sultan (Old Testament-era mound)",
+      "coordinates": [
+        35.444564,
+        31.871719
+      ],
+      "coordinateSource": "wikidata:Q2402267",
+      "confidence": "high",
+      "support": "Wikidata's coordinate agrees with the Digital Atlas of the Roman Empire's point to within about 200 meters and with Pleiades' representative point to within about 70 meters. This point represents the pre-exilic and Old Testament-era city; the Gospel-era episodes below are set at the separate Herodian/Roman-period site about 2 km south (see the second candidate).",
+      "sources": [
+        "wikidata:Q2402267",
+        "dare:23403",
+        "pleiades:687917",
+        "openbible:jericho-1"
+      ]
+    },
+    {
+      "label": "Tulul Abu al-'Alayiq (Hasmonean/Herodian winter palace complex)",
+      "coordinates": [
+        35.436238,
+        31.851872
+      ],
+      "coordinateSource": "wikidata:Q2460244",
+      "confidence": "high",
+      "support": "This is the Gospel-era city: a Hasmonean and Herodian winter-palace complex about 2 km south of Tell es-Sultan, matching the site the New Testament episodes below (Zacchaeus, the blind man/men, the road to Jericho) are set in or near. OpenBible.info's own place record for the New Testament-era Jericho resolves to this same site, independently confirming the identification; no separate DARE or Pleiades numeric ID could be found cataloging this complex apart from the main Jericho entries above.",
+      "sources": [
+        "wikidata:Q2460244",
+        "openbible:jericho-2",
+        "scripture:Mark 10:46",
+        "scripture:Luke 19:1"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Jericho, near the Jordan River in the eastern Judean lowlands, is one of the most anciently inhabited sites in the region; the Gospels set the healing of a blind man (or men) and Jesus' encounter with the tax collector Zacchaeus on the road through or near the city.",
+    "sources": [
+      "wikidata:Q2402267",
+      "openbible:jericho-1",
+      "scripture:Mark 10:46",
+      "scripture:Luke 19:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The Old Testament city associated with Joshua's conquest narrative is generally identified with the tell of Tell es-Sultan; by the first century AD the inhabited settlement had shifted about two kilometers south to a site built up by the Hasmonean and Herodian dynasties as a winter palace complex, which is the Jericho of the Gospel narratives.",
+      "sources": [
+        "wikidata:Q2460244",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 20:29",
+      "book": "Matthew",
+      "textWEB": "As they went out from Jericho, a great multitude followed him."
+    },
+    {
+      "ref": "Mark 10:46",
+      "book": "Mark",
+      "textWEB": "They came to Jericho. As he went out from Jericho with his disciples and a great multitude, the son of Timaeus, Bartimaeus, a blind beggar, was sitting by the road."
+    },
+    {
+      "ref": "Luke 10:30",
+      "book": "Luke",
+      "textWEB": "Jesus answered, “A certain man was going down from Jerusalem to Jericho, and he fell among robbers, who both stripped him and beat him, and departed, leaving him half dead."
+    },
+    {
+      "ref": "Luke 18:35",
+      "book": "Luke",
+      "textWEB": "As he came near Jericho, a certain blind man sat by the road, begging."
+    },
+    {
+      "ref": "Luke 19:1",
+      "book": "Luke",
+      "textWEB": "He entered and was passing through Jericho."
+    },
+    {
+      "ref": "Hebrews 11:30",
+      "book": "Hebrews",
+      "textWEB": "By faith the walls of Jericho fell down after they had been encircled for seven days."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Joshua 6:20",
+      "note": "The account of Jericho's walls falling during Joshua's conquest is the Old Testament's best-known episode set at the site and is referenced in the New Testament at Hebrews 11:30.",
+      "sources": [
+        "openbible:jericho-1"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

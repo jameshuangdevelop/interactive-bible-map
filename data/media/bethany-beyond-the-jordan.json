@@ -1,0 +1,23 @@
+{
+  "locationId": "bethany-beyond-the-jordan",
+  "images": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Al-Maghtas%2C_2019_%2801%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Bahnfrend",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Al-Maghtas,_2019_(01).jpg",
+      "caption": "Al-Maghtas (Wadi al-Kharrar), one proposed site of Bethany beyond the Jordan",
+      "aiGenerated": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Bethany_Beyond_the_Jordan_-_8343997758.jpg",
+      "author": "krebsmaus07",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethany_Beyond_the_Jordan_-_8343997758.jpg",
+      "caption": "Archaeological site at Bethany Beyond the Jordan in Jordan",
+      "aiGenerated": false
+    }
+  ]
+}

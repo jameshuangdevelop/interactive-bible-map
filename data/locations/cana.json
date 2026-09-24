@@ -1,0 +1,138 @@
+{
+  "id": "cana",
+  "names": {
+    "ancient": [
+      "Cana",
+      "Cana of Galilee"
+    ],
+    "modern": "Disputed (see candidates)",
+    "alternate": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "parentId": "galilee",
+  "candidates": [
+    {
+      "label": "Khirbet Qana",
+      "coordinates": [
+        35.30269,
+        32.8222
+      ],
+      "coordinateSource": "wikidata:Q17199012",
+      "confidence": "disputed",
+      "support": "Excavations since the late 1990s found a Jewish village occupied from the Hellenistic through Roman periods, including caves later adapted for Christian pilgrimage veneration with inscriptions invoking Jesus; many recent archaeologists favor this site over Kafr Kanna.",
+      "sources": [
+        "wikidata:Q17199012",
+        "openbible:cana",
+        "bib:mccollough-khirbet-qana"
+      ]
+    },
+    {
+      "label": "Kafr Kanna",
+      "coordinates": [
+        35.35,
+        32.75
+      ],
+      "coordinateSource": "wikidata:Q2633158",
+      "confidence": "disputed",
+      "support": "Venerated by pilgrims since at least the medieval period and the traditional site shown to tourists today; the Digital Atlas of the Roman Empire and Pleiades both flag their own identification of this site with ancient Cana as uncertain, and their approximately 2 km-precision points differ from Wikidata's village-center point by about 1.2 km, reflecting genuine positional imprecision rather than a firm alternative location.",
+      "sources": [
+        "wikidata:Q2633158",
+        "dare:43765",
+        "openbible:cana"
+      ]
+    },
+    {
+      "label": "Qana, Lebanon",
+      "coordinates": [
+        35.299167,
+        33.209167
+      ],
+      "coordinateSource": "wikidata:Q753812",
+      "confidence": "low",
+      "support": "A longstanding minority tradition, especially in Lebanese Christian communities, identifies this southern Lebanese village with biblical Cana; both the Digital Atlas of the Roman Empire and Pleiades catalog the site's own existence at this location as certain, but this reflects certainty about the site, not scholarly consensus that it is the Cana of John 2, which is set within Galilee.",
+      "sources": [
+        "wikidata:Q753812",
+        "dare:43764",
+        "pleiades:678219"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cana of Galilee is named in the Gospel of John as the site of Jesus' first miracle, turning water into wine at a wedding, and of a second miracle recorded there; its identification is disputed among several candidate villages.",
+    "sources": [
+      "openbible:cana",
+      "scripture:John 2:1",
+      "scripture:John 4:46"
+    ]
+  },
+  "history": [
+    {
+      "text": "Excavations at Khirbet Qana uncovered a Jewish village with caves later adapted for Christian pilgrimage veneration, while the rival site of Kafr Kanna has been venerated by pilgrims since at least the medieval period despite thinner first-century archaeological evidence.",
+      "sources": [
+        "bib:mccollough-khirbet-qana"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 2:1",
+      "book": "John",
+      "textWEB": "The third day, there was a wedding in Cana of Galilee. Jesus’ mother was there."
+    },
+    {
+      "ref": "John 2:11",
+      "book": "John",
+      "textWEB": "This beginning of his signs Jesus did in Cana of Galilee, and revealed his glory; and his disciples believed in him."
+    },
+    {
+      "ref": "John 4:46",
+      "book": "John",
+      "textWEB": "Jesus came therefore again to Cana of Galilee, where he made the water into wine. There was a certain nobleman whose son was sick at Capernaum."
+    },
+    {
+      "ref": "John 21:2",
+      "book": "John",
+      "textWEB": "Simon Peter, Thomas called Didymus, Nathanael of Cana in Galilee, and the sons of Zebedee, and two others of his disciples were together."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}

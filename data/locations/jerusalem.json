@@ -1,0 +1,999 @@
+{
+  "id": "jerusalem",
+  "names": {
+    "ancient": [
+      "Jerusalem",
+      "Hierosolyma",
+      "Ierusalem"
+    ],
+    "modern": "Jerusalem",
+    "alternate": [
+      "Yerushalayim",
+      "Al-Quds"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Jerusalem (Old City)",
+      "coordinates": [
+        35.234156,
+        31.776679
+      ],
+      "coordinateSource": "wikidata:Q1218",
+      "confidence": "high",
+      "support": "Wikidata's coordinate for Jerusalem agrees with the Digital Atlas of the Roman Empire's point to within a few meters and with Pleiades' representative point to within about 100 meters, a strong three-source agreement for an undisputed location.",
+      "sources": [
+        "wikidata:Q1218",
+        "dare:15896",
+        "pleiades:687928",
+        "openbible:jerusalem"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Jerusalem was the capital of Judea under its Herodian client kings and, throughout the first century AD, the religious center of Judaism as the site of the Second Temple; the Gospels set Jesus' final days, death, and resurrection appearances there.",
+    "sources": [
+      "wikidata:Q1218",
+      "pleiades:687928",
+      "dare:15896",
+      "bib:rainey-notley-sacred-bridge",
+      "scripture:Matthew 21:1",
+      "scripture:John 19:20",
+      "scripture:Luke 24:36"
+    ]
+  },
+  "history": [
+    {
+      "text": "By the time of Herod the Great, Jerusalem had grown well beyond its earlier Old Testament boundaries, and Herod's building program, including the enlarged Temple platform, made it one of the major cities of the eastern Roman world.",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge",
+        "dare:15896"
+      ]
+    },
+    {
+      "text": "Roman forces under Titus destroyed the city and the Second Temple in AD 70 during the First Jewish-Roman War, an event referenced elsewhere in the New Testament as a coming judgment.",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 2:1",
+      "book": "Matthew",
+      "textWEB": "Now when Jesus was born in Bethlehem of Judea in the days of King Herod, behold, wise men from the east came to Jerusalem, saying,"
+    },
+    {
+      "ref": "Matthew 2:3",
+      "book": "Matthew",
+      "textWEB": "When King Herod heard it, he was troubled, and all Jerusalem with him."
+    },
+    {
+      "ref": "Matthew 3:5",
+      "book": "Matthew",
+      "textWEB": "Then people from Jerusalem, all of Judea, and all the region around the Jordan went out to him."
+    },
+    {
+      "ref": "Matthew 4:5",
+      "book": "Matthew",
+      "textWEB": "Then the devil took him into the holy city. He set him on the pinnacle of the temple,"
+    },
+    {
+      "ref": "Matthew 4:25",
+      "book": "Matthew",
+      "textWEB": "Great multitudes from Galilee, Decapolis, Jerusalem, Judea, and from beyond the Jordan followed him."
+    },
+    {
+      "ref": "Matthew 5:35",
+      "book": "Matthew",
+      "textWEB": "nor by the earth, for it is the footstool of his feet; nor by Jerusalem, for it is the city of the great King."
+    },
+    {
+      "ref": "Matthew 15:1",
+      "book": "Matthew",
+      "textWEB": "Then Pharisees and scribes came to Jesus from Jerusalem, saying,"
+    },
+    {
+      "ref": "Matthew 16:21",
+      "book": "Matthew",
+      "textWEB": "From that time, Jesus began to show his disciples that he must go to Jerusalem and suffer many things from the elders, chief priests, and scribes, and be killed, and the third day be raised up."
+    },
+    {
+      "ref": "Matthew 20:17",
+      "book": "Matthew",
+      "textWEB": "As Jesus was going up to Jerusalem, he took the twelve disciples aside, and on the way he said to them,"
+    },
+    {
+      "ref": "Matthew 20:18",
+      "book": "Matthew",
+      "textWEB": "“Behold, we are going up to Jerusalem, and the Son of Man will be delivered to the chief priests and scribes, and they will condemn him to death,"
+    },
+    {
+      "ref": "Matthew 21:1",
+      "book": "Matthew",
+      "textWEB": "When they came near to Jerusalem and came to Bethsphage, to the Mount of Olives, then Jesus sent two disciples,"
+    },
+    {
+      "ref": "Matthew 21:10",
+      "book": "Matthew",
+      "textWEB": "When he had come into Jerusalem, all the city was stirred up, saying, “Who is this?”"
+    },
+    {
+      "ref": "Matthew 21:18",
+      "book": "Matthew",
+      "textWEB": "Now in the morning, as he returned to the city, he was hungry."
+    },
+    {
+      "ref": "Matthew 23:37",
+      "book": "Matthew",
+      "textWEB": "“Jerusalem, Jerusalem, who kills the prophets and stones those who are sent to her! How often I would have gathered your children together, even as a hen gathers her chicks under her wings, and you would not!"
+    },
+    {
+      "ref": "Matthew 27:53",
+      "book": "Matthew",
+      "textWEB": "and coming out of the tombs after his resurrection, they entered into the holy city and appeared to many."
+    },
+    {
+      "ref": "Mark 1:5",
+      "book": "Mark",
+      "textWEB": "All the country of Judea and all those of Jerusalem went out to him. They were baptized by him in the Jordan river, confessing their sins."
+    },
+    {
+      "ref": "Mark 3:8",
+      "book": "Mark",
+      "textWEB": "from Jerusalem, from Idumaea, beyond the Jordan, and those from around Tyre and Sidon. A great multitude, hearing what great things he did, came to him."
+    },
+    {
+      "ref": "Mark 3:22",
+      "book": "Mark",
+      "textWEB": "The scribes who came down from Jerusalem said, “He has Beelzebul,” and, “By the prince of the demons he casts out the demons.”"
+    },
+    {
+      "ref": "Mark 7:1",
+      "book": "Mark",
+      "textWEB": "Then the Pharisees and some of the scribes gathered together to him, having come from Jerusalem."
+    },
+    {
+      "ref": "Mark 10:17",
+      "book": "Mark",
+      "textWEB": "As he was going out into the way, one ran to him, knelt before him, and asked him, “Good Teacher, what shall I do that I may inherit eternal life?”"
+    },
+    {
+      "ref": "Mark 10:32",
+      "book": "Mark",
+      "textWEB": "They were on the way, going up to Jerusalem; and Jesus was going in front of them, and they were amazed; and those who followed were afraid. He again took the twelve, and began to tell them the things that were going to happen to him."
+    },
+    {
+      "ref": "Mark 10:33",
+      "book": "Mark",
+      "textWEB": "“Behold, we are going up to Jerusalem. The Son of Man will be delivered to the chief priests and the scribes. They will condemn him to death, and will deliver him to the Gentiles."
+    },
+    {
+      "ref": "Mark 11:1",
+      "book": "Mark",
+      "textWEB": "When they came near to Jerusalem, to Bethsphage and Bethany, at the Mount of Olives, he sent two of his disciples"
+    },
+    {
+      "ref": "Mark 11:11",
+      "book": "Mark",
+      "textWEB": "Jesus entered into the temple in Jerusalem. When he had looked around at everything, it being now evening, he went out to Bethany with the twelve."
+    },
+    {
+      "ref": "Mark 11:15",
+      "book": "Mark",
+      "textWEB": "They came to Jerusalem, and Jesus entered into the temple and began to throw out those who sold and those who bought in the temple, and overthrew the money changers’ tables and the seats of those who sold the doves."
+    },
+    {
+      "ref": "Mark 11:27",
+      "book": "Mark",
+      "textWEB": "They came again to Jerusalem, and as he was walking in the temple, the chief priests, the scribes, and the elders came to him,"
+    },
+    {
+      "ref": "Mark 14:13",
+      "book": "Mark",
+      "textWEB": "He sent two of his disciples and said to them, “Go into the city, and there a man carrying a pitcher of water will meet you. Follow him,"
+    },
+    {
+      "ref": "Mark 15:41",
+      "book": "Mark",
+      "textWEB": "who, when he was in Galilee, followed him and served him; and many other women who came up with him to Jerusalem."
+    },
+    {
+      "ref": "Mark 16:12",
+      "book": "Mark",
+      "textWEB": "After these things he was revealed in another form to two of them as they walked, on their way into the country."
+    },
+    {
+      "ref": "Luke 2:22",
+      "book": "Luke",
+      "textWEB": "When the days of their purification according to the law of Moses were fulfilled, they brought him up to Jerusalem to present him to the Lord"
+    },
+    {
+      "ref": "Luke 2:25",
+      "book": "Luke",
+      "textWEB": "Behold, there was a man in Jerusalem whose name was Simeon. This man was righteous and devout, looking for the consolation of Israel, and the Holy Spirit was on him."
+    },
+    {
+      "ref": "Luke 2:38",
+      "book": "Luke",
+      "textWEB": "Coming up at that very hour, she gave thanks to the Lord, and spoke of him to all those who were looking for redemption in Jerusalem."
+    },
+    {
+      "ref": "Luke 2:41",
+      "book": "Luke",
+      "textWEB": "His parents went every year to Jerusalem at the feast of the Passover."
+    },
+    {
+      "ref": "Luke 2:42",
+      "book": "Luke",
+      "textWEB": "When he was twelve years old, they went up to Jerusalem according to the custom of the feast;"
+    },
+    {
+      "ref": "Luke 2:43",
+      "book": "Luke",
+      "textWEB": "and when they had fulfilled the days, as they were returning, the boy Jesus stayed behind in Jerusalem. Joseph and his mother didn’t know it,"
+    },
+    {
+      "ref": "Luke 2:45",
+      "book": "Luke",
+      "textWEB": "When they didn’t find him, they returned to Jerusalem, looking for him."
+    },
+    {
+      "ref": "Luke 4:9",
+      "book": "Luke",
+      "textWEB": "He led him to Jerusalem and set him on the pinnacle of the temple, and said to him, “If you are the Son of God, cast yourself down from here,"
+    },
+    {
+      "ref": "Luke 5:17",
+      "book": "Luke",
+      "textWEB": "On one of those days, he was teaching; and there were Pharisees and teachers of the law sitting by who had come out of every village of Galilee, Judea, and Jerusalem. The power of the Lord was with him to heal them."
+    },
+    {
+      "ref": "Luke 6:17",
+      "book": "Luke",
+      "textWEB": "He came down with them and stood on a level place, with a crowd of his disciples and a great number of the people from all Judea and Jerusalem and the sea coast of Tyre and Sidon, who came to hear him and to be healed of their diseases,"
+    },
+    {
+      "ref": "Luke 9:31",
+      "book": "Luke",
+      "textWEB": "who appeared in glory and spoke of his departure, which he was about to accomplish at Jerusalem."
+    },
+    {
+      "ref": "Luke 9:51",
+      "book": "Luke",
+      "textWEB": "It came to pass, when the days were near that he should be taken up, he intently set his face to go to Jerusalem"
+    },
+    {
+      "ref": "Luke 9:53",
+      "book": "Luke",
+      "textWEB": "They didn’t receive him, because he was traveling with his face set toward Jerusalem."
+    },
+    {
+      "ref": "Luke 10:30",
+      "book": "Luke",
+      "textWEB": "Jesus answered, “A certain man was going down from Jerusalem to Jericho, and he fell among robbers, who both stripped him and beat him, and departed, leaving him half dead."
+    },
+    {
+      "ref": "Luke 13:4",
+      "book": "Luke",
+      "textWEB": "Or those eighteen on whom the tower in Siloam fell and killed them—do you think that they were worse offenders than all the men who dwell in Jerusalem?"
+    },
+    {
+      "ref": "Luke 13:22",
+      "book": "Luke",
+      "textWEB": "He went on his way through cities and villages, teaching, and traveling on to Jerusalem."
+    },
+    {
+      "ref": "Luke 13:33",
+      "book": "Luke",
+      "textWEB": "Nevertheless I must go on my way today and tomorrow and the next day, for it can’t be that a prophet would perish outside of Jerusalem.’"
+    },
+    {
+      "ref": "Luke 13:34",
+      "book": "Luke",
+      "textWEB": "“Jerusalem, Jerusalem, you who kills the prophets and stones those who are sent to her! How often I wanted to gather your children together, like a hen gathers her own brood under her wings, and you refused!"
+    },
+    {
+      "ref": "Luke 17:11",
+      "book": "Luke",
+      "textWEB": "As he was on his way to Jerusalem, he was passing along the borders of Samaria and Galilee."
+    },
+    {
+      "ref": "Luke 18:31",
+      "book": "Luke",
+      "textWEB": "He took the twelve aside and said to them, “Behold, we are going up to Jerusalem, and all the things that are written through the prophets concerning the Son of Man will be completed."
+    },
+    {
+      "ref": "Luke 19:11",
+      "book": "Luke",
+      "textWEB": "As they heard these things, he went on and told a parable, because he was near Jerusalem, and they supposed that God’s Kingdom would be revealed immediately."
+    },
+    {
+      "ref": "Luke 19:28",
+      "book": "Luke",
+      "textWEB": "Having said these things, he went on ahead, going up to Jerusalem."
+    },
+    {
+      "ref": "Luke 19:41",
+      "book": "Luke",
+      "textWEB": "When he came near, he saw the city and wept over it,"
+    },
+    {
+      "ref": "Luke 21:20",
+      "book": "Luke",
+      "textWEB": "“But when you see Jerusalem surrounded by armies, then know that its desolation is at hand."
+    },
+    {
+      "ref": "Luke 21:21",
+      "book": "Luke",
+      "textWEB": "Then let those who are in Judea flee to the mountains. Let those who are in the middle of her depart. Let those who are in the country not enter therein."
+    },
+    {
+      "ref": "Luke 21:24",
+      "book": "Luke",
+      "textWEB": "They will fall by the edge of the sword, and will be led captive into all the nations. Jerusalem will be trampled down by the Gentiles until the times of the Gentiles are fulfilled."
+    },
+    {
+      "ref": "Luke 22:10",
+      "book": "Luke",
+      "textWEB": "He said to them, “Behold, when you have entered into the city, a man carrying a pitcher of water will meet you. Follow him into the house which he enters."
+    },
+    {
+      "ref": "Luke 23:5",
+      "book": "Luke",
+      "textWEB": "But they insisted, saying, “He stirs up the people, teaching throughout all Judea, beginning from Galilee even to this place.”"
+    },
+    {
+      "ref": "Luke 23:7",
+      "book": "Luke",
+      "textWEB": "When he found out that he was in Herod’s jurisdiction, he sent him to Herod, who was also in Jerusalem during those days."
+    },
+    {
+      "ref": "Luke 23:19",
+      "book": "Luke",
+      "textWEB": "one who was thrown into prison for a certain revolt in the city, and for murder."
+    },
+    {
+      "ref": "Luke 23:28",
+      "book": "Luke",
+      "textWEB": "But Jesus, turning to them, said, “Daughters of Jerusalem, don’t weep for me, but weep for yourselves and for your children."
+    },
+    {
+      "ref": "Luke 24:13",
+      "book": "Luke",
+      "textWEB": "Behold, two of them were going that very day to a village named Emmaus, which was sixty stadia from Jerusalem."
+    },
+    {
+      "ref": "Luke 24:18",
+      "book": "Luke",
+      "textWEB": "One of them, named Cleopas, answered him, “Are you the only stranger in Jerusalem who doesn’t know the things which have happened there in these days?”"
+    },
+    {
+      "ref": "Luke 24:33",
+      "book": "Luke",
+      "textWEB": "They rose up that very hour, returned to Jerusalem, and found the eleven gathered together, and those who were with them,"
+    },
+    {
+      "ref": "Luke 24:47",
+      "book": "Luke",
+      "textWEB": "and that repentance and remission of sins should be preached in his name to all the nations, beginning at Jerusalem."
+    },
+    {
+      "ref": "Luke 24:49",
+      "book": "Luke",
+      "textWEB": "Behold, I send out the promise of my Father on you. But wait in the city of Jerusalem until you are clothed with power from on high.”"
+    },
+    {
+      "ref": "Luke 24:52",
+      "book": "Luke",
+      "textWEB": "They worshiped him and returned to Jerusalem with great joy,"
+    },
+    {
+      "ref": "John 1:19",
+      "book": "John",
+      "textWEB": "This is John’s testimony, when the Jews sent priests and Levites from Jerusalem to ask him, “Who are you?”"
+    },
+    {
+      "ref": "John 2:13",
+      "book": "John",
+      "textWEB": "The Passover of the Jews was at hand, and Jesus went up to Jerusalem."
+    },
+    {
+      "ref": "John 2:23",
+      "book": "John",
+      "textWEB": "Now when he was in Jerusalem at the Passover, during the feast, many believed in his name, observing his signs which he did."
+    },
+    {
+      "ref": "John 4:20",
+      "book": "John",
+      "textWEB": "Our fathers worshiped in this mountain, and you Jews say that in Jerusalem is the place where people ought to worship.”"
+    },
+    {
+      "ref": "John 4:21",
+      "book": "John",
+      "textWEB": "Jesus said to her, “Woman, believe me, the hour is coming when neither in this mountain nor in Jerusalem will you worship the Father."
+    },
+    {
+      "ref": "John 4:45",
+      "book": "John",
+      "textWEB": "So when he came into Galilee, the Galileans received him, having seen all the things that he did in Jerusalem at the feast, for they also went to the feast."
+    },
+    {
+      "ref": "John 5:1",
+      "book": "John",
+      "textWEB": "After these things, there was a feast of the Jews, and Jesus went up to Jerusalem."
+    },
+    {
+      "ref": "John 5:2",
+      "book": "John",
+      "textWEB": "Now in Jerusalem by the sheep gate, there is a pool, which is called in Hebrew, “Bethesda”, having five porches."
+    },
+    {
+      "ref": "John 7:25",
+      "book": "John",
+      "textWEB": "Therefore some of them of Jerusalem said, “Isn’t this he whom they seek to kill?"
+    },
+    {
+      "ref": "John 10:22",
+      "book": "John",
+      "textWEB": "It was the Feast of the Dedication at Jerusalem."
+    },
+    {
+      "ref": "John 11:18",
+      "book": "John",
+      "textWEB": "Now Bethany was near Jerusalem, about fifteen stadia away."
+    },
+    {
+      "ref": "John 11:54",
+      "book": "John",
+      "textWEB": "Jesus therefore walked no more openly among the Jews, but departed from there into the country near the wilderness, to a city called Ephraim. He stayed there with his disciples."
+    },
+    {
+      "ref": "John 11:55",
+      "book": "John",
+      "textWEB": "Now the Passover of the Jews was at hand. Many went up from the country to Jerusalem before the Passover, to purify themselves."
+    },
+    {
+      "ref": "John 12:11",
+      "book": "John",
+      "textWEB": "because on account of him many of the Jews went away and believed in Jesus."
+    },
+    {
+      "ref": "John 12:12",
+      "book": "John",
+      "textWEB": "On the next day a great multitude had come to the feast. When they heard that Jesus was coming to Jerusalem,"
+    },
+    {
+      "ref": "John 12:20",
+      "book": "John",
+      "textWEB": "Now there were certain Greeks among those who went up to worship at the feast."
+    },
+    {
+      "ref": "John 19:20",
+      "book": "John",
+      "textWEB": "Therefore many of the Jews read this title, for the place where Jesus was crucified was near the city; and it was written in Hebrew, in Latin, and in Greek."
+    },
+    {
+      "ref": "Acts 1:4",
+      "book": "Acts",
+      "textWEB": "Being assembled together with them, he commanded them, “Don’t depart from Jerusalem, but wait for the promise of the Father, which you heard from me."
+    },
+    {
+      "ref": "Acts 1:8",
+      "book": "Acts",
+      "textWEB": "But you will receive power when the Holy Spirit has come upon you. You will be witnesses to me in Jerusalem, in all Judea and Samaria, and to the uttermost parts of the earth.”"
+    },
+    {
+      "ref": "Acts 1:12",
+      "book": "Acts",
+      "textWEB": "Then they returned to Jerusalem from the mountain called Olivet, which is near Jerusalem, a Sabbath day’s journey away."
+    },
+    {
+      "ref": "Acts 1:13",
+      "book": "Acts",
+      "textWEB": "When they had come in, they went up into the upper room where they were staying, that is Peter, John, James, Andrew, Philip, Thomas, Bartholomew, Matthew, James the son of Alphaeus, Simon the Zealot, and Judas the son of James."
+    },
+    {
+      "ref": "Acts 1:19",
+      "book": "Acts",
+      "textWEB": "It became known to everyone who lived in Jerusalem that in their language that field was called ‘Akeldama,’ that is, ‘The field of blood.’"
+    },
+    {
+      "ref": "Acts 2:5",
+      "book": "Acts",
+      "textWEB": "Now there were dwelling in Jerusalem Jews, devout men, from every nation under the sky."
+    },
+    {
+      "ref": "Acts 2:14",
+      "book": "Acts",
+      "textWEB": "But Peter, standing up with the eleven, lifted up his voice and spoke out to them, “You men of Judea and all you who dwell at Jerusalem, let this be known to you, and listen to my words."
+    },
+    {
+      "ref": "Acts 4:5",
+      "book": "Acts",
+      "textWEB": "In the morning, their rulers, elders, and scribes were gathered together in Jerusalem."
+    },
+    {
+      "ref": "Acts 4:16",
+      "book": "Acts",
+      "textWEB": "saying, “What shall we do to these men? Because indeed a notable miracle has been done through them, as can be plainly seen by all who dwell in Jerusalem, and we can’t deny it."
+    },
+    {
+      "ref": "Acts 5:16",
+      "book": "Acts",
+      "textWEB": "The multitude also came together from the cities around Jerusalem, bringing sick people and those who were tormented by unclean spirits; and they were all healed."
+    },
+    {
+      "ref": "Acts 5:28",
+      "book": "Acts",
+      "textWEB": "saying, “Didn’t we strictly command you not to teach in this name? Behold, you have filled Jerusalem with your teaching, and intend to bring this man’s blood on us.”"
+    },
+    {
+      "ref": "Acts 6:7",
+      "book": "Acts",
+      "textWEB": "The word of God increased and the number of the disciples greatly multiplied in Jerusalem. A great company of the priests were obedient to the faith."
+    },
+    {
+      "ref": "Acts 8:1",
+      "book": "Acts",
+      "textWEB": "Saul was consenting to his death. A great persecution arose against the assembly which was in Jerusalem in that day. They were all scattered abroad throughout the regions of Judea and Samaria, except for the apostles."
+    },
+    {
+      "ref": "Acts 8:14",
+      "book": "Acts",
+      "textWEB": "Now when the apostles who were at Jerusalem heard that Samaria had received the word of God, they sent Peter and John to them,"
+    },
+    {
+      "ref": "Acts 8:25",
+      "book": "Acts",
+      "textWEB": "They therefore, when they had testified and spoken the word of the Lord, returned to Jerusalem, and preached the Good News to many villages of the Samaritans."
+    },
+    {
+      "ref": "Acts 8:26",
+      "book": "Acts",
+      "textWEB": "Then an angel of the Lord spoke to Philip, saying, “Arise, and go toward the south to the way that goes down from Jerusalem to Gaza. This is a desert.”"
+    },
+    {
+      "ref": "Acts 8:27",
+      "book": "Acts",
+      "textWEB": "He arose and went; and behold, there was a man of Ethiopia, a eunuch of great authority under Candace, queen of the Ethiopians, who was over all her treasure, who had come to Jerusalem to worship."
+    },
+    {
+      "ref": "Acts 9:2",
+      "book": "Acts",
+      "textWEB": "and asked for letters from him to the synagogues of Damascus, that if he found any who were of the Way, whether men or women, he might bring them bound to Jerusalem."
+    },
+    {
+      "ref": "Acts 9:13",
+      "book": "Acts",
+      "textWEB": "But Ananias answered, “Lord, I have heard from many about this man, how much evil he did to your saints at Jerusalem."
+    },
+    {
+      "ref": "Acts 9:21",
+      "book": "Acts",
+      "textWEB": "All who heard him were amazed, and said, “Isn’t this he who in Jerusalem made havoc of those who called on this name? And he had come here intending to bring them bound before the chief priests!”"
+    },
+    {
+      "ref": "Acts 9:26",
+      "book": "Acts",
+      "textWEB": "When Saul had come to Jerusalem, he tried to join himself to the disciples; but they were all afraid of him, not believing that he was a disciple."
+    },
+    {
+      "ref": "Acts 9:28",
+      "book": "Acts",
+      "textWEB": "He was with them entering into Jerusalem,"
+    },
+    {
+      "ref": "Acts 10:39",
+      "book": "Acts",
+      "textWEB": "We are witnesses of everything he did both in the country of the Jews and in Jerusalem; whom they also killed, hanging him on a tree."
+    },
+    {
+      "ref": "Acts 11:2",
+      "book": "Acts",
+      "textWEB": "When Peter had come up to Jerusalem, those who were of the circumcision contended with him,"
+    },
+    {
+      "ref": "Acts 11:22",
+      "book": "Acts",
+      "textWEB": "The report concerning them came to the ears of the assembly which was in Jerusalem. They sent out Barnabas to go as far as Antioch,"
+    },
+    {
+      "ref": "Acts 11:27",
+      "book": "Acts",
+      "textWEB": "Now in these days, prophets came down from Jerusalem to Antioch."
+    },
+    {
+      "ref": "Acts 11:30",
+      "book": "Acts",
+      "textWEB": "which they also did, sending it to the elders by the hands of Barnabas and Saul."
+    },
+    {
+      "ref": "Acts 12:25",
+      "book": "Acts",
+      "textWEB": "Barnabas and Saul returned to Jerusalem when they had fulfilled their service, also taking with them John who was called Mark."
+    },
+    {
+      "ref": "Acts 13:13",
+      "book": "Acts",
+      "textWEB": "Now Paul and his company set sail from Paphos and came to Perga in Pamphylia. John departed from them and returned to Jerusalem."
+    },
+    {
+      "ref": "Acts 13:27",
+      "book": "Acts",
+      "textWEB": "For those who dwell in Jerusalem, and their rulers, because they didn’t know him, nor the voices of the prophets which are read every Sabbath, fulfilled them by condemning him."
+    },
+    {
+      "ref": "Acts 13:31",
+      "book": "Acts",
+      "textWEB": "and he was seen for many days by those who came up with him from Galilee to Jerusalem, who are his witnesses to the people."
+    },
+    {
+      "ref": "Acts 15:2",
+      "book": "Acts",
+      "textWEB": "Therefore when Paul and Barnabas had no small discord and discussion with them, they appointed Paul, Barnabas, and some others of them to go up to Jerusalem to the apostles and elders about this question."
+    },
+    {
+      "ref": "Acts 15:3",
+      "book": "Acts",
+      "textWEB": "They, being sent on their way by the assembly, passed through both Phoenicia and Samaria, declaring the conversion of the Gentiles. They caused great joy to all the brothers."
+    },
+    {
+      "ref": "Acts 15:4",
+      "book": "Acts",
+      "textWEB": "When they had come to Jerusalem, they were received by the assembly and the apostles and the elders, and they reported everything that God had done with them."
+    },
+    {
+      "ref": "Acts 15:22",
+      "book": "Acts",
+      "textWEB": "Then it seemed good to the apostles and the elders, with the whole assembly, to choose men out of their company, and send them to Antioch with Paul and Barnabas: Judas called Barsabbas, and Silas, chief men among the brothers."
+    },
+    {
+      "ref": "Acts 15:23",
+      "book": "Acts",
+      "textWEB": "They wrote these things by their hand: “The apostles, the elders, and the brothers, to the brothers who are of the Gentiles in Antioch, Syria, and Cilicia: greetings."
+    },
+    {
+      "ref": "Acts 15:33",
+      "book": "Acts",
+      "textWEB": "After they had spent some time there, they were dismissed in peace from the brothers to the apostles."
+    },
+    {
+      "ref": "Acts 16:4",
+      "book": "Acts",
+      "textWEB": "As they went on their way through the cities, they delivered the decrees to them to keep which had been ordained by the apostles and elders who were at Jerusalem."
+    },
+    {
+      "ref": "Acts 18:21",
+      "book": "Acts",
+      "textWEB": "but taking his leave of them, he said, “I must by all means keep this coming feast in Jerusalem, but I will return again to you if God wills.” Then he set sail from Ephesus."
+    },
+    {
+      "ref": "Acts 18:22",
+      "book": "Acts",
+      "textWEB": "When he had landed at Caesarea, he went up and greeted the assembly, and went down to Antioch."
+    },
+    {
+      "ref": "Acts 19:21",
+      "book": "Acts",
+      "textWEB": "Now after these things had ended, Paul determined in the Spirit, when he had passed through Macedonia and Achaia, to go to Jerusalem, saying, “After I have been there, I must also see Rome.”"
+    },
+    {
+      "ref": "Acts 20:16",
+      "book": "Acts",
+      "textWEB": "For Paul had determined to sail past Ephesus, that he might not have to spend time in Asia; for he was hastening, if it were possible for him, to be in Jerusalem on the day of Pentecost."
+    },
+    {
+      "ref": "Acts 20:22",
+      "book": "Acts",
+      "textWEB": "Now, behold, I go bound by the Spirit to Jerusalem, not knowing what will happen to me there;"
+    },
+    {
+      "ref": "Acts 21:4",
+      "book": "Acts",
+      "textWEB": "Having found disciples, we stayed there seven days. These said to Paul through the Spirit that he should not go up to Jerusalem."
+    },
+    {
+      "ref": "Acts 21:11",
+      "book": "Acts",
+      "textWEB": "Coming to us and taking Paul’s belt, he bound his own feet and hands, and said, “The Holy Spirit says: ‘So the Jews at Jerusalem will bind the man who owns this belt, and will deliver him into the hands of the Gentiles.’”"
+    },
+    {
+      "ref": "Acts 21:12",
+      "book": "Acts",
+      "textWEB": "When we heard these things, both we and the people of that place begged him not to go up to Jerusalem."
+    },
+    {
+      "ref": "Acts 21:13",
+      "book": "Acts",
+      "textWEB": "Then Paul answered, “What are you doing, weeping and breaking my heart? For I am ready not only to be bound, but also to die at Jerusalem for the name of the Lord Jesus.”"
+    },
+    {
+      "ref": "Acts 21:15",
+      "book": "Acts",
+      "textWEB": "After these days we took up our baggage and went up to Jerusalem."
+    },
+    {
+      "ref": "Acts 21:17",
+      "book": "Acts",
+      "textWEB": "When we had come to Jerusalem, the brothers received us gladly."
+    },
+    {
+      "ref": "Acts 21:18",
+      "book": "Acts",
+      "textWEB": "The day following, Paul went in with us to James; and all the elders were present."
+    },
+    {
+      "ref": "Acts 21:21",
+      "book": "Acts",
+      "textWEB": "They have been informed about you, that you teach all the Jews who are among the Gentiles to forsake Moses, telling them not to circumcise their children and not to walk after the customs."
+    },
+    {
+      "ref": "Acts 21:31",
+      "book": "Acts",
+      "textWEB": "As they were trying to kill him, news came up to the commanding officer of the regiment that all Jerusalem was in an uproar."
+    },
+    {
+      "ref": "Acts 22:3",
+      "book": "Acts",
+      "textWEB": "“I am indeed a Jew, born in Tarsus of Cilicia, but brought up in this city at the feet of Gamaliel, instructed according to the strict tradition of the law of our fathers, being zealous for God, even as you all are today."
+    },
+    {
+      "ref": "Acts 22:5",
+      "book": "Acts",
+      "textWEB": "as also the high priest and all the council of the elders testify, from whom also I received letters to the brothers, and traveled to Damascus to bring them also who were there to Jerusalem in bonds to be punished."
+    },
+    {
+      "ref": "Acts 22:17",
+      "book": "Acts",
+      "textWEB": "“When I had returned to Jerusalem and while I prayed in the temple, I fell into a trance"
+    },
+    {
+      "ref": "Acts 22:18",
+      "book": "Acts",
+      "textWEB": "and saw him saying to me, ‘Hurry and get out of Jerusalem quickly, because they will not receive testimony concerning me from you.’"
+    },
+    {
+      "ref": "Acts 23:11",
+      "book": "Acts",
+      "textWEB": "The following night, the Lord stood by him and said, “Cheer up, Paul, for as you have testified about me at Jerusalem, so you must testify also at Rome.”"
+    },
+    {
+      "ref": "Acts 24:11",
+      "book": "Acts",
+      "textWEB": "seeing that you can verify that it is not more than twelve days since I went up to worship at Jerusalem."
+    },
+    {
+      "ref": "Acts 24:17",
+      "book": "Acts",
+      "textWEB": "Now after some years, I came to bring gifts for the needy to my nation, and offerings;"
+    },
+    {
+      "ref": "Acts 25:1",
+      "book": "Acts",
+      "textWEB": "Festus therefore, having come into the province, after three days went up to Jerusalem from Caesarea."
+    },
+    {
+      "ref": "Acts 25:3",
+      "book": "Acts",
+      "textWEB": "asking a favor against him, that he would summon him to Jerusalem, plotting to kill him on the way."
+    },
+    {
+      "ref": "Acts 25:7",
+      "book": "Acts",
+      "textWEB": "When he had come, the Jews who had come down from Jerusalem stood around him, bringing against him many and grievous charges which they could not prove,"
+    },
+    {
+      "ref": "Acts 25:9",
+      "book": "Acts",
+      "textWEB": "But Festus, desiring to gain favor with the Jews, answered Paul and said, “Are you willing to go up to Jerusalem and be judged by me there concerning these things?”"
+    },
+    {
+      "ref": "Acts 25:15",
+      "book": "Acts",
+      "textWEB": "about whom, when I was at Jerusalem, the chief priests and the elders of the Jews informed me, asking for a sentence against him."
+    },
+    {
+      "ref": "Acts 25:20",
+      "book": "Acts",
+      "textWEB": "Being perplexed how to inquire concerning these things, I asked whether he was willing to go to Jerusalem and there be judged concerning these matters."
+    },
+    {
+      "ref": "Acts 25:24",
+      "book": "Acts",
+      "textWEB": "Festus said, “King Agrippa, and all men who are here present with us, you see this man about whom all the multitude of the Jews petitioned me, both at Jerusalem and here, crying that he ought not to live any longer."
+    },
+    {
+      "ref": "Acts 26:4",
+      "book": "Acts",
+      "textWEB": "“Indeed, all the Jews know my way of life from my youth up, which was from the beginning among my own nation and at Jerusalem;"
+    },
+    {
+      "ref": "Acts 26:10",
+      "book": "Acts",
+      "textWEB": "I also did this in Jerusalem. I both shut up many of the saints in prisons, having received authority from the chief priests; and when they were put to death I gave my vote against them."
+    },
+    {
+      "ref": "Acts 26:20",
+      "book": "Acts",
+      "textWEB": "but declared first to them of Damascus, at Jerusalem, and throughout all the country of Judea, and also to the Gentiles, that they should repent and turn to God, doing works worthy of repentance."
+    },
+    {
+      "ref": "Acts 28:17",
+      "book": "Acts",
+      "textWEB": "After three days Paul called together those who were the leaders of the Jews. When they had come together, he said to them, “I, brothers, though I had done nothing against the people or the customs of our fathers, still was delivered prisoner from Jerusalem into the hands of the Romans,"
+    },
+    {
+      "ref": "Romans 15:19",
+      "book": "Romans",
+      "textWEB": "in the power of signs and wonders, in the power of God’s Spirit; so that from Jerusalem and around as far as to Illyricum, I have fully preached the Good News of Christ;"
+    },
+    {
+      "ref": "Romans 15:25",
+      "book": "Romans",
+      "textWEB": "But now, I say, I am going to Jerusalem, serving the saints."
+    },
+    {
+      "ref": "Romans 15:26",
+      "book": "Romans",
+      "textWEB": "For it has been the good pleasure of Macedonia and Achaia to make a certain contribution for the poor among the saints who are at Jerusalem."
+    },
+    {
+      "ref": "Romans 15:27",
+      "book": "Romans",
+      "textWEB": "Yes, it has been their good pleasure, and they are their debtors. For if the Gentiles have been made partakers of their spiritual things, they owe it to them also to serve them in material things."
+    },
+    {
+      "ref": "Romans 15:31",
+      "book": "Romans",
+      "textWEB": "that I may be delivered from those who are disobedient in Judea, and that my service which I have for Jerusalem may be acceptable to the saints,"
+    },
+    {
+      "ref": "1 Corinthians 16:1",
+      "book": "1 Corinthians",
+      "textWEB": "Now concerning the collection for the saints: as I commanded the assemblies of Galatia, you do likewise."
+    },
+    {
+      "ref": "1 Corinthians 16:3",
+      "book": "1 Corinthians",
+      "textWEB": "When I arrive, I will send whoever you approve with letters to carry your gracious gift to Jerusalem."
+    },
+    {
+      "ref": "2 Corinthians 8:4",
+      "book": "2 Corinthians",
+      "textWEB": "begging us with much entreaty to receive this grace and the fellowship in the service to the saints."
+    },
+    {
+      "ref": "2 Corinthians 8:19",
+      "book": "2 Corinthians",
+      "textWEB": "Not only so, but he was also appointed by the assemblies to travel with us in this grace, which is served by us to the glory of the Lord himself, and to show our readiness."
+    },
+    {
+      "ref": "2 Corinthians 9:1",
+      "book": "2 Corinthians",
+      "textWEB": "It is indeed unnecessary for me to write to you concerning the service to the saints,"
+    },
+    {
+      "ref": "2 Corinthians 9:12",
+      "book": "2 Corinthians",
+      "textWEB": "For this service of giving that you perform not only makes up for lack among the saints, but abounds also through much giving of thanks to God,"
+    },
+    {
+      "ref": "Galatians 1:17",
+      "book": "Galatians",
+      "textWEB": "nor did I go up to Jerusalem to those who were apostles before me, but I went away into Arabia. Then I returned to Damascus."
+    },
+    {
+      "ref": "Galatians 1:18",
+      "book": "Galatians",
+      "textWEB": "Then after three years I went up to Jerusalem to visit Peter, and stayed with him fifteen days."
+    },
+    {
+      "ref": "Galatians 2:1",
+      "book": "Galatians",
+      "textWEB": "Then after a period of fourteen years I went up again to Jerusalem with Barnabas, taking Titus also with me."
+    },
+    {
+      "ref": "Galatians 4:25",
+      "book": "Galatians",
+      "textWEB": "For this Hagar is Mount Sinai in Arabia, and answers to the Jerusalem that exists now, for she is in bondage with her children."
+    },
+    {
+      "ref": "Galatians 4:26",
+      "book": "Galatians",
+      "textWEB": "But the Jerusalem that is above is free, which is the mother of us all."
+    },
+    {
+      "ref": "Hebrews 12:22",
+      "book": "Hebrews",
+      "textWEB": "But you have come to Mount Zion and to the city of the living God, the heavenly Jerusalem, and to innumerable multitudes of angels,"
+    },
+    {
+      "ref": "Revelation 3:12",
+      "book": "Revelation",
+      "textWEB": "He who overcomes, I will make him a pillar in the temple of my God, and he will go out from there no more. I will write on him the name of my God and the name of the city of my God, the new Jerusalem, which comes down out of heaven from my God, and my own new name."
+    },
+    {
+      "ref": "Revelation 11:8",
+      "book": "Revelation",
+      "textWEB": "Their dead bodies will be in the street of the great city, which spiritually is called Sodom and Egypt, where also their Lord was crucified."
+    },
+    {
+      "ref": "Revelation 21:2",
+      "book": "Revelation",
+      "textWEB": "I saw the holy city, New Jerusalem, coming down out of heaven from God, prepared like a bride adorned for her husband."
+    },
+    {
+      "ref": "Revelation 21:10",
+      "book": "Revelation",
+      "textWEB": "He carried me away in the Spirit to a great and high mountain, and showed me the holy city, Jerusalem, coming down out of heaven from God,"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "2 Samuel 5:6",
+      "note": "Records David's capture of the Jebusite stronghold that became the City of David, the historical core from which later Jerusalem expanded.",
+      "sources": [
+        "openbible:jerusalem"
+      ]
+    },
+    {
+      "ref": "Psalms 122:6",
+      "note": "One of the 'Songs of Ascents' associated with pilgrimage to Jerusalem, reflecting the city's Old Testament role as a pilgrimage destination that continued into the Second Temple period described in the Gospels.",
+      "sources": [
+        "openbible:jerusalem"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "entity": "Ethnarchy of Judea under Herod Archelaus",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judaea (prefectural rule)",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "entity": "Kingdom of Herod Agrippa I (Roman client king)",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "entity": "Roman province of Judaea (procuratorial rule), ending in the First Jewish-Roman War and the destruction of the Second Temple in AD 70",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-23"
+}
