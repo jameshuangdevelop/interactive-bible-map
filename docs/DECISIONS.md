@@ -58,24 +58,24 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** Fewer manual handoffs, and still one task = one branch = one PR. Subagent sessions have no usage view of their own, so their credits are estimates. The PO reconciles them with GitHub's billing report at each checkpoint. Parallel branches all edit neighbouring rows in `docs/PROGRESS.md` and `docs/BUDGET.md`, so before pushing, the PO rebases the finished branches into one linear stack and resolves those rows locally. Each PR says which PR it is stacked on, and the human merges them in that order, so no merge conflicts reach GitHub.
 
 ## ADR-0008 — Map library: MapLibre
-- **Date:** 2026-09-23 · **Status:** Proposed (CP1) · **By:** PO, from M1-02 ([STACK_OPTIONS.md](research/STACK_OPTIONS.md) §1)
+- **Date:** 2026-09-23 · **Status:** Accepted (CP1, 2026-09-23, #7) · **By:** PO, from M1-02 ([STACK_OPTIONS.md](research/STACK_OPTIONS.md) §1)
 - **Context:** The app is React Native Web from day one, and it needs a path to a native app later (brief §3). It must support vector tiles, GeoJSON overlays and clustering.
 - **Decision:** Use MapLibre: `react-map-gl/maplibre` on web and `@maplibre/maplibre-react-native` for native later, behind one app-level map component with `.web` and `.native` implementations. The Frontend Engineer confirms this at the start of M3.
 - **Consequences:** Open-source renderer (BSD-3 and MIT) with no vendor lock-in. There are two renderer bindings to maintain. The runner-up is Mapbox, which has commercial terms.
 
 ## ADR-0009 — Basemap and ancient mode
-- **Date:** 2026-09-23 · **Status:** Proposed (CP1) · **By:** PO, from M1-02 §2
+- **Date:** 2026-09-23 · **Status:** Accepted (CP1, 2026-09-23, #7) · **By:** PO, from M1-02 §2
 - **Context:** Modern mode needs mainstream borders with contested borders hidden when uncertain (brief §1.2). Ancient mode needs first-century provinces for each timeline year, plus roads and coastlines.
 - **Decision:** For modern mode, use OpenFreeMap's public OpenMapTiles styles, hiding boundary features where `disputed=1`. It has no SLA, so launch (CP3b) requires tile-error monitoring and a fallback basemap style that can be switched by config, such as Protomaps PMTiles on Cloudflare R2. For ancient mode, draw project-owned GeoJSON overlays on a neutral base and switch them by timeline year. Move to our own PMTiles archive only if the overlay data becomes too large to load.
 - **Consequences:** $0 at both traffic levels, with no account or API key. The OSM/OpenMapTiles attribution must be visible. Mapbox tiles in MapLibre were rejected on cost: about $650 a month at 50k visits.
 
 ## ADR-0010 — Hosting: Cloudflare Pages
-- **Date:** 2026-09-23 · **Status:** Proposed (CP1) · **By:** PO, from M1-02 §3
+- **Date:** 2026-09-23 · **Status:** Accepted (CP1, 2026-09-23, #7) · **By:** PO, from M1-02 §3
 - **Decision:** Host the static app and data on Cloudflare Pages. Deploy production and a preview for each PR from GitHub Actions with Wrangler.
 - **Consequences:** Static requests are free and unlimited, and the Free plan allows 500 builds a month. The human creates the Cloudflare account and the deploy token in M3. A static build stays portable to other hosts. The runner-up is Vercel, which would cost $20 a month at moderate traffic.
 
 ## ADR-0011 — No backend for the MVP
-- **Date:** 2026-09-23 · **Status:** Proposed (CP1) · **By:** PO, from M1-02 §4
+- **Date:** 2026-09-23 · **Status:** Accepted (CP1, 2026-09-23, #7) · **By:** PO, from M1-02 §4
 - **Decision:** Ship static JSON and GeoJSON files, with client-side name search. Add Cloudflare Workers + D1 only if profiling or an editing workflow shows a need for it.
 - **Consequences:** No server to run or secure. Search stays a client-side index over roughly 300 locations.
 
@@ -85,7 +85,19 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** Anyone reusing our data must share alike. Data PRs must record each field's source so that ODbL-derived values stay out of CC BY-SA records.
 
 ## ADR-0013 — WEB edition
-- **Date:** 2026-09-23 · **Status:** Proposed (CP1) · **By:** PO, from M1-01 and M1-03
+- **Date:** 2026-09-23 · **Status:** Accepted (CP1, 2026-09-23, #7) · **By:** PO, from M1-01 and M1-03
 - **Context:** Only eBible.org's Protestant-canon packages fit the 66-book rule. `engwebp` (US spelling) and `engwebpb` (British spelling) are both public domain and both render God's name as "LORD".
 - **Decision:** Use `engwebp`.
 - **Consequences:** Spelling follows US conventions. Changing edition later means re-importing the scripture text only.
+
+## ADR-0014 — A data batch is one branch and one PR
+- **Date:** 2026-09-23 · **Status:** Accepted · **By:** PO
+- **Context:** Brief §6 requires Fact-Checker sign-off on every data PR. If research, images and verification were separate PRs, each data PR would merge before it was verified.
+- **Decision:** Each data batch has one card, one branch and one PR. The Research Lead, the Media Curator and the Fact-Checker each add their own commit or commits, in that order. Items that need changes go back to their author on the same branch until the Fact-Checker passes them. The PR Reviewer then reviews the whole branch.
+- **Consequences:** Every data PR arrives already verified. A batch takes longer to finish, but the human reviews one PR per batch instead of three.
+
+## ADR-0015 — Review comments open with a reviewer and status header
+- **Date:** 2026-09-23 · **Status:** Accepted · **By:** PO, at the human's request
+- **Context:** Review comments are posted under the human's GitHub login, and the reviewer's original findings read as open issues even after they are fixed.
+- **Decision:** Every posted review comment starts with two lines: `**PR Reviewer (advisory) · <model>**`, then either `**Status: ✅ all findings addressed in <commit>.**` or `**Status: ⚠️ open: <list>**`. The PO fills in the status line before posting, and adds a follow-up note at the end that lists the fixes.
+- **Consequences:** The human can see at a glance who reviewed a PR and whether anything still needs attention.
