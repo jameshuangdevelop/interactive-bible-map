@@ -1,5 +1,28 @@
 # M2 batch 1 verification report — Jerusalem, Judea and Galilee (M2-02, Phase C)
 
+## Re-verification 3 (2026-09-23, after research-lead commit `a546a9d` / cited by the PO as `4753b18`)
+
+**Trigger:** the schema gained `scripture:<ref>` source IDs (a passage supports only what it itself states; never usable as a `coordinateSource`) and tightened license patterns (IGO only with 3.0; jurisdiction ports only with 1.0–3.0; no combining the two). The research-lead added `scripture:` citations to summary/history/support clauses that report Bible events across 20 records (`judea` and `galilee` untouched), added `bib:rainey-notley-sacred-bridge` to `jerusalem`'s historical clause, and further softened `bethany-beyond-the-jordan`'s Qasr al-Yahud wording.
+
+**Method:** every one of the ~40 unique `scripture:` references cited across the 20 records was pulled directly from the committed WEB snapshot (`data/reference/engwebp_vpl.txt`) with a script (not read from the location record's own `scripture[]` array, which could differ) and checked word-for-word against the specific clause it was cited to support.
+
+**Result: every citation checks out. All 20 records pass and are now `verified`.**
+
+Highlights of particularly precise citation choices confirmed accurate:
+- **`golgotha`**: "located outside Jerusalem's walls" is supported by **Hebrews 13:12** ("Jesus also... suffered outside of the gate") — none of the four Gospel crucifixion verses say this, so this was the right verse to reach for, and it does state it.
+- **`jerusalem`**: three scripture citations map to three distinct parts of one sentence — Matthew 21:1 (final days: triumphal entry), John 19:20 ("the place where Jesus was crucified was near the city" — death), Luke 24:36 (resurrection appearance to the gathered disciples). `bib:rainey-notley-sacred-bridge` (previously verified as a real, on-topic atlas) appropriately supports the "capital of Judea under its Herodian client kings" clause, consistent with its use for every other Herodian-period political claim in this batch.
+- **`temple-mount`**: John 2:20 ("It took forty-six years to build this temple!") exactly anchors the history clause about Herod's temple project "still being completed decades into the first century AD."
+- **`magdala`**: Luke 8:2, Matthew 15:39, and Mark 8:10 map precisely to the summary's three separate sub-claims (the "Magdalene" epithet, "Magadan" in Matthew, "Dalmanutha" in Mark) rather than being a generic bundle.
+- **`nazareth`**: Matthew 2:23 supports the Matthew/Luke-scoped "town where Jesus grew up" clause; Mark 1:24 ("Jesus, you Nazarene!") is correctly scoped only to the sentence's broader, unqualified "called ... throughout the New Testament" clause, not misattributed to the "Gospels of Matthew and Luke" part.
+
+No mismatched, unsupported, or overreaching scripture citation was found in any of the 20 records.
+
+**`bethany-beyond-the-jordan`'s softened Qasr al-Yahud wording** — checked for accuracy and neutrality: the new text ("this bank has seen less archaeological investigation, making the case... harder to establish on present evidence") replaces a specific negative-existence claim ("have not documented occupation layers") with an accurate, more easily defensible relative-investigation-intensity claim (Qasr al-Yahud/West Bank was a closed military zone until 2011 and has seen markedly less excavation than Al-Maghtas/Jordan), while adding balancing positive detail (the two fifth-century Byzantine churches). Neutral, accurate, takes no side. Pass.
+
+`npm run validate:data`: 0 errors, 66 warnings (unchanged). `npm test`: 41/41 passing (11 new tests, for `scripture:` source IDs and the tightened IGO/jurisdiction-port license patterns).
+
+**All 22 of 22 records are `verified`. No open items remain in this batch.**
+
 ## Re-verification 2 (2026-09-23, after research-lead commit `8ee1705` and media-curator commit `db5701c`)
 
 **Trigger:** the batch 2 PR Reviewer found summary clauses whose cited sources didn't actually state them (e.g. Corinth "capital of Achaia" cited only to Pleiades/Wikidata/OpenBible). The PO had both Research Leads audit every text claim in this batch against its sources under the same stricter test.
