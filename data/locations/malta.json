@@ -22,6 +22,7 @@
       "support": "OpenBible.info's identification for Acts 28:1 resolves to Malta, south of Sicily, which historically had been identified as the site of Paul's shipwreck.",
       "sources": [
         "wikidata:Q233",
+        "pleiades:462311",
         "openbible:malta",
         "bib:hmml-contesting-shipwreck"
       ]
@@ -34,7 +35,7 @@
       ],
       "coordinateSource": "wikidata:Q211306",
       "confidence": "low",
-      "support": "A minority proposal, put forward by the Ragusan scholar Ignjat Đurđević in a 1730 book presenting a systematic linguistic, historical, scientific and cultural argument, holds that Paul's 'Melite' was instead the Adriatic island of Mljet (then called 'Melite Illyrica'); this view has not displaced the mainstream identification with Malta.",
+      "support": "A minority proposal, put forward by the Ragusan scholar Ignjat Đurđević in a 1730 book presenting a systematic linguistic, historical, scientific and cultural argument, holds that Paul's 'Melite' was instead the Adriatic island of Mljet (then called 'Melite Illyrica'); this view has not displaced the traditional identification with Malta.",
       "sources": [
         "wikidata:Q211306",
         "bib:hmml-contesting-shipwreck",
@@ -43,7 +44,7 @@
     }
   ],
   "summary": {
-    "text": "Malta is the Mediterranean island south of Sicily identified by mainstream scholarship as the 'Melita' where Paul was shipwrecked on his voyage to Rome; a minority view instead points to the Adriatic island of Mljet off the coast of Croatia. Acts recounts that the islanders showed Paul and his companions 'uncommon kindness,' that Paul was bitten by a viper without harm, that he healed the father of Publius, the chief man of the island, along with other sick residents, and that the party later sailed on from the island toward Rome.",
+    "text": "Malta is the Mediterranean island south of Sicily traditionally identified as the 'Melita' where Paul was shipwrecked on his voyage to Rome; a minority view instead points to the Adriatic island of Mljet off the coast of Croatia. Acts recounts that the islanders showed Paul and his companions 'uncommon kindness,' that Paul was bitten by a viper without harm, that he healed the father of Publius, the chief man of the island, along with other sick residents, and that the party later sailed on from the island toward Rome.",
     "sources": [
       "wikidata:Q233",
       "openbible:malta",
