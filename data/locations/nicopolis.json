@@ -19,15 +19,16 @@
       ],
       "coordinateSource": "pleiades:531013",
       "confidence": "high",
-      "support": "Several cities in antiquity were named Nicopolis ('victory city'), but the Nicopolis of Titus 3:12 is almost universally identified by commentators with this one in Epirus, northwestern Greece, which Augustus founded to commemorate his naval victory at nearby Actium and which lay on a natural travel hub for someone wintering in Greece; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "support": "Several cities in antiquity were named Nicopolis ('victory city'); OpenBible.info's identification for Titus 3:12 resolves to this Nicopolis in Epirus, northwestern Greece, which Augustus founded to commemorate his naval victory at nearby Actium. Pleiades and Wikidata's coordinates for the site agree closely.",
       "sources": [
         "pleiades:531013",
-        "wikidata:Q943637"
+        "wikidata:Q943637",
+        "openbible:nicopolis"
       ]
     }
   ],
   "summary": {
-    "text": "Nicopolis in Epirus was founded by Augustus (then Octavian) to commemorate his victory over Mark Antony and Cleopatra at the nearby Battle of Actium in 31 BC, and was settled with veterans and built up as a major city. Paul's letter to Titus asks Titus to join him at Nicopolis, where Paul had decided to spend the winter.",
+    "text": "Nicopolis in Epirus was founded by Augustus (then Octavian) to commemorate his victory over Mark Antony and Cleopatra at the nearby Battle of Actium in 31 BC. Paul's letter to Titus asks Titus to join him at Nicopolis, where Paul had decided to spend the winter.",
     "sources": [
       "pleiades:531013",
       "wikidata:Q943637",
@@ -37,7 +38,7 @@
   },
   "history": [
     {
-      "text": "Augustus founded Nicopolis after his naval victory at Actium in 31 BC, settling veterans there and building monuments to celebrate the triumph that made him sole ruler of the Roman world.",
+      "text": "Augustus founded Nicopolis, near his former camp, as the largest of the monuments built to commemorate his victory at Actium in 31 BC.",
       "sources": [
         "bib:livius-actium"
       ]

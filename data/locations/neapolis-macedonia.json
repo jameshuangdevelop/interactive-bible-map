@@ -18,7 +18,7 @@
       ],
       "coordinateSource": "pleiades:501523",
       "confidence": "high",
-      "support": "This Neapolis, the seaport of Philippi in Macedonia and continuous with modern Kavala, is a distinct place from Neapolis in Samaria (Flavia Neapolis, modern Nablus) and from other ancient cities named Neapolis. Pleiades' non-OSM DARE-derived point and Wikidata's coordinate for Kavala agree closely.",
+      "support": "This Neapolis, the seaport of Philippi in Macedonia and continuous with modern Kavala, is a distinct place from Neapolis in Samaria (Flavia Neapolis, modern Nablus) and from other ancient cities named Neapolis. The Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate for Kavala agree closely.",
       "sources": [
         "pleiades:501523",
         "wikidata:Q187352"
@@ -26,11 +26,12 @@
     }
   ],
   "summary": {
-    "text": "Neapolis was the port city of Philippi on the coast of Macedonia. Acts records it as the first landfall in Europe on Paul's second missionary journey, reached by sailing from Troas, from where the party went inland to Philippi.",
+    "text": "Neapolis was, per Pleiades, on the coast of Thrace, and served as the port of Philippi in Hellenistic and Roman times. Acts records the route by which Paul's party reached it: from Troas by way of Samothrace to Neapolis, and from there to Philippi.",
     "sources": [
       "pleiades:501523",
       "wikidata:Q187352",
-      "scripture:Acts 16:11"
+      "scripture:Acts 16:11",
+      "scripture:Acts 16:12"
     ]
   },
   "history": [],

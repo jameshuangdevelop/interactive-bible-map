@@ -16,26 +16,30 @@
     {
       "label": "Tyre archaeological site (Sour)",
       "coordinates": [
-        35.2,
-        33.266667
+        35.209358,
+        33.268071
       ],
-      "coordinateSource": "pleiades:678437",
+      "coordinateSource": "dare:21116",
       "confidence": "high",
-      "support": "Tyre, on the coast of the South Governorate of Lebanon, is undisputed in identity and location; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "support": "Tyre, on the coast of the South Governorate of Lebanon, is undisputed in identity and location; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
       "sources": [
-        "pleiades:678437",
+        "dare:21116",
         "wikidata:Q82070"
       ]
     }
   ],
   "summary": {
-    "text": "Tyre was, per UNESCO, 'the great Phoenician city that reigned over the seas,' founding colonies such as Carthage and controlling much of the ancient Mediterranean's maritime trade. Jesus withdrew into the region of Tyre and Sidon and healed a Gentile woman's daughter there, and on his final journey to Jerusalem Paul's ship put in at Tyre, where he found and stayed with disciples for seven days before continuing to Ptolemais.",
+    "text": "Tyre was, per UNESCO, a major Phoenician city that dominated ancient Mediterranean seaborne trade, founding colonies such as Carthage. Jesus withdrew into the region of Tyre and Sidon, and there healed the daughter of a Gentile woman whom Mark calls 'a Greek, a Syrophoenician by birth'; on his final journey to Jerusalem Paul's ship put in at Tyre, where he stayed with disciples for seven days before continuing to Ptolemais.",
     "sources": [
-      "pleiades:678437",
+      "dare:21116",
       "wikidata:Q82070",
       "bib:unesco-tyre",
       "scripture:Matthew 15:21",
-      "scripture:Acts 21:3"
+      "scripture:Matthew 15:28",
+      "scripture:Mark 7:26",
+      "scripture:Acts 21:3",
+      "scripture:Acts 21:4",
+      "scripture:Acts 21:7"
     ]
   },
   "history": [],
@@ -104,16 +108,18 @@
   "otConnections": [
     {
       "ref": "Ezekiel 26:3",
-      "note": "Ezekiel pronounces a lengthy oracle of judgment against Tyre for its role in ancient Mediterranean trade, one of the Old Testament's most extensive prophecies against a single foreign city.",
+      "note": "Ezekiel pronounces judgment against Tyre because the city gloated over Jerusalem's fall ('Aha! She is broken!'), declaring that many nations will come up against Tyre 'as the sea causes its waves to come up.'",
       "sources": [
+        "scripture:Ezekiel 26:2",
         "scripture:Ezekiel 26:3"
       ]
     },
     {
-      "ref": "1 Kings 5:1",
-      "note": "Hiram, king of Tyre, supplies King Solomon with cedar and craftsmen for the building of the Jerusalem temple, an alliance the New Testament's Gospel references to Tyre and Sidon presuppose as long-standing regional neighbors of Israel.",
+      "ref": "1 Kings 5:6-10",
+      "note": "Hiram, king of Tyre, supplies Solomon with cedar timber for the building of the Jerusalem temple; UNESCO also states that Hiram supplied the temple's material and architect.",
       "sources": [
-        "scripture:1 Kings 5:1"
+        "scripture:1 Kings 5:6-10",
+        "bib:unesco-tyre"
       ]
     }
   ],

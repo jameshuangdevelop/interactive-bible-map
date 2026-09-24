@@ -13,24 +13,24 @@
     {
       "label": "Smyrna (Roman-era city, İzmir)",
       "coordinates": [
-        27.142836,
-        38.418611
+        27.1383,
+        38.41905
       ],
-      "coordinateSource": "pleiades:550893",
+      "coordinateSource": "dare:21157",
       "confidence": "high",
-      "support": "This is the Roman-period city addressed in Revelation, at the location of modern İzmir's ancient agora, distinct from the earlier 'Old Smyrna' settlement at nearby Bayraklı; Pleiades and Wikidata's coordinates for the Roman-era site agree closely.",
+      "support": "This is the Roman-period city addressed in Revelation, at the location of modern İzmir's ancient agora, distinct from the earlier 'Old Smyrna' settlement at nearby Bayraklı; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
       "sources": [
-        "pleiades:550893",
+        "dare:21157",
         "wikidata:Q1379299"
       ]
     }
   ],
   "summary": {
-    "text": "Smyrna was a major Greek city on the Aegean coast of Asia Minor, at the site of modern İzmir. It is one of the seven churches addressed in Revelation 2-3, where the risen Christ commends the congregation's endurance under persecution and poverty without any rebuke.",
+    "text": "Smyrna was a Greek city on the Aegean coast of Asia Minor, at the site of modern İzmir. It is one of the seven churches addressed in Revelation 2-3, where the risen Christ commends the congregation's endurance under persecution and poverty without any rebuke.",
     "sources": [
-      "pleiades:550893",
+      "dare:21157",
       "wikidata:Q1379299",
-      "scripture:Revelation 2:8"
+      "scripture:Revelation 2:8-11"
     ]
   },
   "history": [],

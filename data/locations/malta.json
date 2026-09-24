@@ -17,12 +17,13 @@
         14.4,
         35.9
       ],
-      "coordinateSource": "pleiades:462311",
+      "coordinateSource": "wikidata:Q233",
       "confidence": "high",
-      "support": "The overwhelming majority of scholars, following continuous local tradition, ancient geographic usage of the name 'Melite,' and the sailing route described in Acts 27, identify the 'Melita' of Acts 28:1 with the island of Malta, south of Sicily; Pleiades and Wikidata's coordinates for the island agree closely.",
+      "support": "OpenBible.info's identification for Acts 28:1 resolves to Malta, south of Sicily, which historically had been identified as the site of Paul's shipwreck.",
       "sources": [
-        "pleiades:462311",
-        "wikidata:Q233"
+        "wikidata:Q233",
+        "openbible:malta",
+        "bib:hmml-contesting-shipwreck"
       ]
     },
     {
@@ -33,21 +34,25 @@
       ],
       "coordinateSource": "wikidata:Q211306",
       "confidence": "low",
-      "support": "A minority proposal, argued most fully by the Ragusan scholar Ignjat Đurđević in the 1730s, holds that Paul's 'Melite' was instead the Adriatic island of Mljet (then called 'Melite Illyrica'), reasoning that the 'Adria' of Acts 27:27 points further north than Malta and that the island preserved its own tradition of Paul's shipwreck from at least the 10th century; this view has not displaced the mainstream identification with Malta.",
+      "support": "A minority proposal, put forward by the Ragusan scholar Ignjat Đurđević in a 1730 book presenting a systematic linguistic, historical, scientific and cultural argument, holds that Paul's 'Melite' was instead the Adriatic island of Mljet (then called 'Melite Illyrica'); this view has not displaced the mainstream identification with Malta.",
       "sources": [
         "wikidata:Q211306",
-        "bib:hmml-contesting-shipwreck"
+        "bib:hmml-contesting-shipwreck",
+        "pleiades:197376"
       ]
     }
   ],
   "summary": {
-    "text": "Malta is the Mediterranean island south of Sicily identified by mainstream scholarship as the 'Melita' where Paul was shipwrecked on his voyage to Rome; a minority view instead points to the Adriatic island of Mljet off the coast of Croatia. Acts recounts that the islanders showed Paul and his companions 'uncommon kindness,' that Paul was bitten by a viper without harm, and that he healed the father of Publius, the chief man of the island, along with other sick residents before the party's onward journey to Rome.",
+    "text": "Malta is the Mediterranean island south of Sicily identified by mainstream scholarship as the 'Melita' where Paul was shipwrecked on his voyage to Rome; a minority view instead points to the Adriatic island of Mljet off the coast of Croatia. Acts recounts that the islanders showed Paul and his companions 'uncommon kindness,' that Paul was bitten by a viper without harm, that he healed the father of Publius, the chief man of the island, along with other sick residents, and that the party later sailed on from the island toward Rome.",
     "sources": [
-      "pleiades:462311",
       "wikidata:Q233",
+      "openbible:malta",
       "bib:hmml-contesting-shipwreck",
       "scripture:Acts 28:1",
-      "scripture:Acts 28:2"
+      "scripture:Acts 28:2",
+      "scripture:Acts 28:3-6",
+      "scripture:Acts 28:7-9",
+      "scripture:Acts 28:11"
     ]
   },
   "history": [],

@@ -13,25 +13,25 @@
     {
       "label": "Thyatira archaeological remains (Akhisar)",
       "coordinates": [
-        27.841667,
-        38.920833
+        27.840523,
+        38.922933
       ],
-      "coordinateSource": "pleiades:550924",
+      "coordinateSource": "dare:21159",
       "confidence": "high",
-      "support": "Thyatira, in the region of Lydia, is undisputed as continuous with modern Akhisar; Pleiades and Wikidata's coordinates for the site agree closely.",
+      "support": "Thyatira is undisputed as continuous with modern Akhisar; the Digital Atlas of the Roman Empire's coordinate for the site and Wikidata's coordinate agree closely.",
       "sources": [
-        "pleiades:550924",
+        "dare:21159",
         "wikidata:Q1135603"
       ]
     }
   ],
   "summary": {
-    "text": "Thyatira was a Lydian city on a tributary of the Hermus river, known from inscriptions for its trade guilds. Acts identifies Lydia, the first convert baptized at Philippi, as 'a seller of purple, of the city of Thyatira,' and Thyatira is also one of the seven churches addressed in Revelation 2, commended for love and service but rebuked for tolerating a false prophetess.",
+    "text": "Thyatira was an ancient city of Asia Minor, at the site of modern Akhisar. Acts identifies Lydia, the first convert baptized at Philippi, as 'a seller of purple, of the city of Thyatira,' and Thyatira is also one of the seven churches addressed in Revelation 2, commended for love and service but rebuked for tolerating a false prophetess.",
     "sources": [
-      "pleiades:550924",
+      "dare:21159",
       "wikidata:Q1135603",
       "scripture:Acts 16:14",
-      "scripture:Revelation 2:18"
+      "scripture:Revelation 2:19-20"
     ]
   },
   "history": [],
@@ -50,6 +50,11 @@
       "ref": "Revelation 2:18",
       "book": "Revelation",
       "textWEB": "“To the angel of the assembly in Thyatira write: “The Son of God, who has his eyes like a flame of fire, and his feet are like burnished brass, says these things:"
+    },
+    {
+      "ref": "Revelation 2:24",
+      "book": "Revelation",
+      "textWEB": "But to you I say, to the rest who are in Thyatira—as many as don’t have this teaching, who don’t know what some call ‘the deep things of Satan’—to you I say, I am not putting any other burden on you."
     }
   ],
   "otConnections": [],

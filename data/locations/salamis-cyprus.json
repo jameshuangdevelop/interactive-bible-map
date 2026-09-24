@@ -18,7 +18,7 @@
       ],
       "coordinateSource": "pleiades:707617",
       "confidence": "high",
-      "support": "This is Salamis on Cyprus, the island's largest ancient city, near modern Famagusta; it is a distinct place from the island of Salamis in the Saronic Gulf near Athens, site of the 480 BC naval battle. Pleiades and Wikidata's coordinates for the Cyprus site agree closely.",
+      "support": "This is Salamis on Cyprus, near modern Famagusta; it is a distinct place from the island of Salamis in the Saronic Gulf near Athens. Pleiades and Wikidata's coordinates for the Cyprus site agree closely.",
       "sources": [
         "pleiades:707617",
         "wikidata:Q767089"
@@ -26,11 +26,13 @@
     }
   ],
   "summary": {
-    "text": "Salamis was the largest city-kingdom of ancient Cyprus, on the island's east coast. Acts records it as the first stop of Paul and Barnabas's first missionary journey, where they proclaimed the word of God in the Jewish synagogues of the city before continuing across the island to Paphos.",
+    "text": "Salamis was a city on the east coast of Cyprus. Acts records it as Paul and Barnabas's first stop on Cyprus on their first missionary journey, where they proclaimed the word of God in the Jewish synagogues of the city before continuing across the island to Paphos.",
     "sources": [
       "pleiades:707617",
       "wikidata:Q767089",
-      "scripture:Acts 13:5"
+      "scripture:Acts 13:4",
+      "scripture:Acts 13:5",
+      "scripture:Acts 13:6"
     ]
   },
   "history": [],
