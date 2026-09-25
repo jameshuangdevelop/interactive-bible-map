@@ -221,15 +221,15 @@ M3, the MVP app.
 | 4 | Scripture list | The first 5 passages, then "Show all *n*" (Jerusalem has 174) | Always show every passage |
 | 5 | Disputed places when zoomed out | One pin with a "?" badge until zoom 8, then one lettered pin per candidate | Always show every candidate |
 
-### Your action before CP3b (about 10 minutes, any time before M3-06)
-The preview deploy needs a free Cloudflare account and two repository secrets. I never see the values.
-1. Sign up at [dash.cloudflare.com](https://dash.cloudflare.com/sign-up) (the free plan is enough).
-2. Create an API token: **Account API tokens → Create Token → Custom token**, with the permission **Account · Cloudflare Pages · Edit**. Copy the token.
-3. Copy your **Account ID** from the dashboard; it is shown on the account's overview pages.
-4. In this repository, go to **Settings → Secrets and variables → Actions → New repository secret**, and add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
-5. Tell me "Cloudflare secrets added". M3-06 creates the Pages project itself.
+### Your action before CP3b — done (2026-09-25)
+The preview deploy needs a Cloudflare API token that can only deploy Pages, plus the account ID, stored as the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Both were added on 2026-09-25.
 
-Source: [Cloudflare: Direct Upload with continuous integration](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/) (read 2026-09-24).
+Cloudflare's token screen had changed, so the token was created through the Cloudflare API with [`scripts/setup-cloudflare-token.ps1`](scripts/setup-cloudflare-token.ps1). The script is run by the human, never by an agent, and never prints a token:
+1. In the Cloudflare dashboard (**Manage Account → Account API Tokens**), create a temporary bootstrap token with the single permission policy **Create account tokens**, expiring the next day, with no IP filtering.
+2. Run `pwsh -File scripts/setup-cloudflare-token.ps1` and enter the account ID (the 32-character id in the dashboard URL) and the bootstrap token (input hidden).
+3. The script creates a token limited to **Pages Write** that is valid for one year, stores both secrets with the GitHub CLI, and offers to delete the bootstrap token.
+
+**Renewal:** the token expires on about 2027-09-25. Run the same script again before then. Sources: [Create Token](https://developers.cloudflare.com/api/resources/accounts/subresources/tokens/methods/create/) and [Account API tokens](https://developers.cloudflare.com/fundamentals/api/get-started/account-owned-tokens/) (read 2026-09-25).
 
 ### Concepts for you
 - **Style file.** A JSON file that tells the map how to draw the tiles: colours, which labels to show, which layers to hide. We host our own copy of Positron, so we can hide disputed borders. [MapLibre style spec](https://maplibre.org/maplibre-style-spec/)

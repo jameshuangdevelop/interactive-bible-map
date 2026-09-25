@@ -5,7 +5,7 @@
 | Agent | `frontend-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m3-preview-deploy` |
-| Depends on | M3-04 and M3-05 merged, **and the human has added the Cloudflare secrets** (see CHECKPOINTS.md → CP3a → Your action before CP3b) |
+| Depends on | M3-04 and M3-05 merged. The Cloudflare secrets were added on 2026-09-25 (see CHECKPOINTS.md → CP3a). |
 | Parallel with | none |
 | Credit target | ~600 AI credits (session guard: 1,500) |
 
@@ -29,7 +29,7 @@ Deploy the MVP to Cloudflare Pages: a preview for every pull request and product
 2. **Smoke test on the deployed preview:** a scripted browser check, such as Playwright, run in CI against the preview URL. It checks that the map loads, that selecting Capernaum shows the panel with a credit line, that searching "Antioch" gives two results, and that opening `?place=emmaus` shows the disputed layout.
 3. **Accessibility check:** run an automated check (for example axe) on the preview for the overview, an open place panel and the search box, and fix every serious or critical issue.
 4. **Performance check:** run Lighthouse with the **desktop preset on a cold cache** against the preview (in CI, for example with Lighthouse CI), and assert the spec §11 gates: Largest Contentful Paint of 2.5 s or less and Total Blocking Time of 200 ms or less. Report the numbers in the PR.
-5. **Docs:** add `docs/DEPLOY.md`, explaining how deploys work, where to find the preview URL, how to roll back, and what to do if tiles fail (the ADR-0009 fallback).
+5. **Docs:** add `docs/DEPLOY.md`, explaining how deploys work, where to find the preview URL, how to roll back, what to do if tiles fail (the ADR-0009 fallback), and how to renew the Cloudflare token with `scripts/setup-cloudflare-token.ps1`. The token expires on about 2027-09-25.
 
 ## Out of scope
 New features, custom domains, and analytics.

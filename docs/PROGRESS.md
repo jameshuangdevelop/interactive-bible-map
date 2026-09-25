@@ -7,7 +7,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 ## Resume point
 1. **Human:** approve pushing `docs/m3-kickoff` → `docs/cp3a-visual-spec` and merge them in that order. Merging the CP3a PR approves the spec and the five recommendations.
 2. **After CP3a:** the PO dispatches M3-02, M3-07 and M3-08 in parallel. Then M3-03, then M3-04 and M3-05 in parallel, then M3-06. The plan is in [CHECKPOINTS.md → CP3a](../CHECKPOINTS.md#cp3a--visual-spec).
-3. **Human, before M3-06:** add the two Cloudflare secrets (steps in CP3a).
+3. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. The token expires on about 2027-09-25.
 
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
@@ -20,7 +20,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-03 | Map view | frontend-engineer | `feat/m3-map` | Card ready, waits for M3-02 | — |
 | M3-04 | Place panel | frontend-engineer | `feat/m3-place-panel` | Card ready, waits for M3-03 | — |
 | M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Card ready, waits for M3-03 | — |
-| M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Card ready, waits for M3-04, M3-05 and the Cloudflare secrets | — |
+| M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Card ready, waits for M3-04 and M3-05 (secrets added) | — |
 | M3-07 | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Card ready, waits for CP3a | — |
 | M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Card ready, waits for CP3a | — |
 

@@ -17,7 +17,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-03](M3-03-map-view.md) | Map view | frontend-engineer | `feat/m3-map` | Waits for M3-02 |
 | [M3-04](M3-04-place-panel.md) | Place panel | frontend-engineer | `feat/m3-place-panel` | Waits for M3-03 |
 | [M3-05](M3-05-search.md) | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Waits for M3-03 |
-| [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for M3-04, M3-05 and the Cloudflare secrets |
+| [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for M3-04 and M3-05 |
 | [M3-07](M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Waits for CP3a |
 | [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Waits for CP3a |
 
