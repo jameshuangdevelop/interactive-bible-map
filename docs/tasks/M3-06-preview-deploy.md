@@ -5,7 +5,7 @@
 | Agent | `frontend-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m3-preview-deploy` |
-| Depends on | M3-04 and M3-05 merged. The Cloudflare secrets were added on 2026-09-25 (see CHECKPOINTS.md → CP3a). |
+| Depends on | M3-04 and M3-05 merged. The Cloudflare secrets were added on 2026-09-25 (see CHECKPOINTS.md → CP3a); this task's first preview deploy confirms that they work. |
 | Parallel with | none |
 | Credit target | ~600 AI credits (session guard: 1,500) |
 

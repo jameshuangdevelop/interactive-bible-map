@@ -221,11 +221,11 @@ M3, the MVP app.
 | 4 | Scripture list | The first 5 passages, then "Show all *n*" (Jerusalem has 174) | Always show every passage |
 | 5 | Disputed places when zoomed out | One pin with a "?" badge until zoom 8, then one lettered pin per candidate | Always show every candidate |
 
-### Your action before CP3b — done (2026-09-25)
-The preview deploy needs a Cloudflare API token that can only deploy Pages, plus the account ID, stored as the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Both were added on 2026-09-25.
+### Your action before CP3b — secrets added (2026-09-25)
+The preview deploy needs a Cloudflare API token that can only deploy Pages, plus the account ID, stored as the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Both were added on 2026-09-25, and `gh secret list` confirms their names. The first preview deploy in M3-06 will confirm that the token works.
 
 Cloudflare's token screen had changed, so the token was created through the Cloudflare API with [`scripts/setup-cloudflare-token.ps1`](scripts/setup-cloudflare-token.ps1). The script is run by the human, never by an agent, and never prints a token:
-1. In the Cloudflare dashboard (**Manage Account → Account API Tokens**), create a temporary bootstrap token with the single permission policy **Create account tokens**, expiring the next day, with no IP filtering.
+1. In the Cloudflare dashboard (**Manage Account → Account API Tokens**), create a temporary bootstrap token for this account with the single permission policy **Create account tokens** (the API calls it *Account API Tokens Write*), expiring the next day. Restrict it to your current IP address if that is practical.
 2. Run `pwsh -File scripts/setup-cloudflare-token.ps1` and enter the account ID (the 32-character id in the dashboard URL) and the bootstrap token (input hidden).
 3. The script creates a token limited to **Pages Write** that is valid for one year, stores both secrets with the GitHub CLI, and offers to delete the bootstrap token.
 

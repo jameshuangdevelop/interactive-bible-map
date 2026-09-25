@@ -85,10 +85,19 @@ try {
     }
     if (-not $created.value) { throw 'Cloudflare created the token but returned no value; delete it in the dashboard and try again.' }
 
-    gh secret set CLOUDFLARE_API_TOKEN --repo $Repo --body $created.value
-    if ($LASTEXITCODE -ne 0) { throw 'Setting CLOUDFLARE_API_TOKEN failed. The new token exists in Cloudflare; delete it there and rerun.' }
-    gh secret set CLOUDFLARE_ACCOUNT_ID --repo $Repo --body $accountId
-    if ($LASTEXITCODE -ne 0) { throw 'Setting CLOUDFLARE_ACCOUNT_ID failed.' }
+    # Values go in on standard input (gh strips the trailing newline), so the token never
+    # appears on a command line. The non-secret account ID is stored first; if storing the
+    # token then fails, the new token is deleted so no unused credential is left behind.
+    $accountId | gh secret set CLOUDFLARE_ACCOUNT_ID --repo $Repo
+    if ($LASTEXITCODE -ne 0) {
+        Invoke-Cloudflare DELETE "/accounts/$accountId/tokens/$($created.id)" | Out-Null
+        throw 'Storing CLOUDFLARE_ACCOUNT_ID failed, so the new Cloudflare token was deleted. Fix the GitHub CLI access and rerun.'
+    }
+    $created.value | gh secret set CLOUDFLARE_API_TOKEN --repo $Repo
+    if ($LASTEXITCODE -ne 0) {
+        Invoke-Cloudflare DELETE "/accounts/$accountId/tokens/$($created.id)" | Out-Null
+        throw 'Storing CLOUDFLARE_API_TOKEN failed, so the new Cloudflare token was deleted. CLOUDFLARE_ACCOUNT_ID may already be set; that is harmless. Rerun the script.'
+    }
 
     Write-Host ''
     Write-Host "Created token '$TokenName' (id $($created.id)), permission '$($pages.name)', expires $expiresOn."

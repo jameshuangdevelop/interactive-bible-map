@@ -7,7 +7,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 ## Resume point
 1. **Human:** approve pushing `docs/m3-kickoff` → `docs/cp3a-visual-spec` and merge them in that order. Merging the CP3a PR approves the spec and the five recommendations.
 2. **After CP3a:** the PO dispatches M3-02, M3-07 and M3-08 in parallel. Then M3-03, then M3-04 and M3-05 in parallel, then M3-06. The plan is in [CHECKPOINTS.md → CP3a](../CHECKPOINTS.md#cp3a--visual-spec).
-3. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. The token expires on about 2027-09-25.
+3. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`, and their names are confirmed. M3-06's first deploy confirms that they work. The token expires on about 2027-09-25.
 
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
