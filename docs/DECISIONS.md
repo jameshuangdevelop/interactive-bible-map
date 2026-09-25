@@ -120,7 +120,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** Data takes longer to write but is safer for public use. The Research Lead, Fact-Checker and Media Curator agent files state these rules.
 
 ## ADR-0018 — Rebalance the core set toward Acts and the Epistles
-- **Date:** 2026-09-24 · **Status:** Proposed (CP2 decision 1) · **By:** PO, at the human's request ("more Acts and Epistles focused … at least have all the Paul's letters")
+- **Date:** 2026-09-24 · **Status:** Accepted (CP2, 2026-09-24, #14) · **By:** PO, at the human's request ("more Acts and Epistles focused … at least have all the Paul's letters")
 - **Context:** Brief §1 gives the Gospels and Acts the most detail, and §5 schedules the Epistles and Revelation places for M6. After reviewing the 40 core sites, the human asked for more Acts and Epistles coverage.
 - **Decision:** Keep the 40 verified sites and add batch 3 (M2-05): every destination of Paul's letters, the other places the letters name, Revelation's seven churches and Patmos, and key stops in Acts. It adds 17 sites plus the Galatia, Crete and Malta area records. The regions of 1 Peter 1:1 arrive as province polygons in M4.
 - **Consequences:** The core is 57 sites and 6 area records: 22 Gospel sites and 35 Acts and Epistles sites. The M6 batches shrink by about 20 places.
@@ -137,7 +137,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** About 500 credits per 20-place batch instead of about 80, still under 0.1% of a month. In batch 3's redo, 40 of 55 images passed on the first check, and the rest were fixed in one round.
 
 ## ADR-0021 — The Fact-Checker runs on Claude Opus 5.5
-- **Date:** 2026-09-24 · **Status:** Proposed (CP2 decision 6) · **By:** PO
+- **Date:** 2026-09-24 · **Status:** Accepted (CP2, 2026-09-24, #14) · **By:** PO
 - **Context:** In batches 1–2, the PR Reviewers caught unsupported claims and wrong images that the Fact-Checker (Claude Sonnet 5) had passed. Batch 3's Fact-Checker ran on Claude Opus 5.5. It found 30 issues in its first round, then 5, then 1, and the reviewer then found no data problems.
 - **Decision:** The Fact-Checker uses Claude Opus 5.5, with Claude Sonnet 5 as the fallback.
 - **Consequences:** About 1.7× the cost per session, offset by fewer fix rounds: batch 3 cost about 3,500 credits, against about 5,100 and 6,700 for batches 1 and 2 (agent and review sessions, not the PO's coordination).

@@ -6,8 +6,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 |---|---|---|---|---|
 | CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | Approved 2026-09-23 | #2 |
 | CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Approved 2026-09-23 | #3–#7 |
-| CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | **Awaiting review** | |
-| CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Not started | |
+| CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
+| CP3a | M3 MVP App | Low-fidelity visual spec and mockup | **In progress** | |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Not started | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
@@ -124,6 +124,8 @@ The PO writes the M2 cards. First the schema and validation CI (GIS Engineer), t
 ---
 
 ## CP2 — Schema & Core Data
+
+**Outcome:** approved as recommended on 2026-09-24 (#14). ADR-0018 and ADR-0021 are Accepted.
 
 ### What was delivered
 | Task | Output | PR / branch (merge in this order) |

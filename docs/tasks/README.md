@@ -11,8 +11,8 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M2-01](M2-01-schema-validation.md) | Data schema, validation and CI | gis-engineer | `feat/m2-schema-validation` | Merged (#9) |
 | [M2-02](M2-02-core-sites-batch-1.md) | Core sites, batch 1 (20 sites + 2 regions) | research-lead → media-curator → fact-checker | `data/m2-batch-1` | Merged (#10) |
 | [M2-03](M2-03-core-sites-batch-2.md) | Core sites, batch 2 (20 sites + 1 region) | research-lead → media-curator → fact-checker | `data/m2-batch-2` | Merged (#11) |
-| [M2-05](M2-05-core-sites-batch-3.md) | Core sites, batch 3 (17 sites + 3 area records) | research-lead → media-curator → fact-checker | `data/m2-batch-3` | Verified and reviewed; PR pending |
-| [M2-06](M2-06-image-ids.md) | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | Verified and reviewed; PR pending |
+| [M2-05](M2-05-core-sites-batch-3.md) | Core sites, batch 3 (17 sites + 3 area records) | research-lead → media-curator → fact-checker | `data/m2-batch-3` | Merged (#13) |
+| [M2-06](M2-06-image-ids.md) | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | Merged (#12) |
 
 ## Template
 ```markdown
