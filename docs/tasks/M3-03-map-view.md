@@ -20,8 +20,14 @@ Show every place on an interactive map, the way `docs/design/VISUAL_SPEC.md` §2
 
 ## Scope
 1. **MapLibre on the web** through `react-map-gl/maplibre`, with a `.native.tsx` stub, so a native build is not blocked later.
+   - Use **MapLibre GL JS 6.9 or later**. From 6.9, MapLibre draws Hebrew and Arabic labels correctly without a right-to-left plugin; earlier versions display them backwards.
+   - MapLibre 6 ships **only as an ES module** and loads a **web worker** from its own `dist/` folder. Configure the worker URL for the Expo (Metro) web build, and test that the map loads in the built export, not only in development.
 2. **Basemap style:**
-   - Host a style file in the app, derived from OpenFreeMap **Positron**, that uses English labels where available, removes points of interest, and **hides boundary features with `disputed = 1`** (the OpenMapTiles `boundary` layer).
+   - Host a style file in the app, derived from OpenFreeMap **Positron** (or Liberty, if CP3a decision 1 chooses it), that:
+     - uses English labels where available: replace each name-based `text-field` with `coalesce(name:en, name:latin, name)`;
+     - removes points of interest (the `poi` source layer);
+     - **hides boundary features with `disputed = 1`** (the OpenMapTiles `boundary` layer).
+   - `docs/design/VISUAL_SPEC.md` → "Basemap options" shows the intended result.
    - Keep glyph, sprite and tile URLs pointing at OpenFreeMap.
    - Record the source style's license and where it came from in the PR.
 3. **Fallback:** a basemap from a **different provider or host** than OpenFreeMap, chosen from the options whose licenses M3-07 verifies (for example a self-hosted Protomaps extract, or another provider that needs no API key). It must also hide disputed boundaries. Configuration can select it, and after repeated tile errors the app switches to it automatically and shows the message from spec §5. Record the choice and why in the PR. OpenFreeMap's Bright and Liberty styles are not fallbacks, because they use the same servers.

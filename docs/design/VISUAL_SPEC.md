@@ -36,6 +36,22 @@ The reserved areas are **not built in M3**. The wireframes show them with dashed
 - **Fallback:** a basemap from a **different provider or host**, so that it still works if OpenFreeMap itself is down (ADR-0009). The app switches to it automatically after repeated tile errors, and configuration can also switch it. The fallback must hide disputed boundaries too. M3-03 chooses it from the options whose licenses M3-07 verifies, for example a self-hosted Protomaps extract or another provider that needs no API key. OpenFreeMap's Bright and Liberty styles use the same servers, so they are theme alternatives, not fallbacks.
 - **Alternative (CP3a decision 1):** OpenFreeMap Liberty, which is more colourful and closer to Google Maps.
 
+
+### Basemap options: what Positron and Liberty look like (CP3a decision 1)
+These are real renders, not wireframes. They are what the app's map will look like, drawn with MapLibre 6.10 from OpenFreeMap tiles, with all 63 of our places in the pin colours from this spec.
+- **Customizations the app will make:** English labels where the map data has them, no points of interest, clustering below zoom 7, a "?" pin for disputed places when zoomed out, and lettered candidates when zoomed in.
+- **Borders:** hidden in these previews, so that no contested line is shown here. The app hides only disputed boundaries.
+- **Attribution:** each image carries the OpenFreeMap, OpenMapTiles and OpenStreetMap attribution in its corner.
+
+| View | Positron (recommended): muted greys | Liberty: colourful, closer to Google Maps |
+|---|---|---|
+| Mediterranean overview (zoom 4.7) | ![Positron overview](basemap-options/positron-overview.jpg) | ![Liberty overview](basemap-options/liberty-overview.jpg) |
+| Galilee (zoom 10.4) | ![Positron Galilee](basemap-options/positron-galilee.jpg) | ![Liberty Galilee](basemap-options/liberty-galilee.jpg) |
+| Jerusalem, sites within the city (zoom 14.6) | ![Positron Jerusalem](basemap-options/positron-jerusalem.jpg) | ![Liberty Jerusalem](basemap-options/liberty-jerusalem.jpg) |
+
+- **Positron** draws land in light grey and water in grey-blue, with thin white roads and small grey labels. The red, purple and green pins are the strongest colours on the screen, even in dense Jerusalem.
+- **Liberty** draws land in beige and water in blue, with yellow and orange roads, green parks and building outlines. It looks more like Google Maps and gives more modern context, but it competes with the pins, especially at city zoom.
+
 ### Places on the map
 | Record | Shown as | Colour |
 |---|---|---|

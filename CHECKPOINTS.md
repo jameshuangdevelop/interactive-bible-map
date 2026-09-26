@@ -195,7 +195,8 @@ M3, the MVP app.
 
 ### What was delivered
 - **[Visual spec](docs/design/VISUAL_SPEC.md):** layout, map, place panel, search, states, visual tokens, accessibility (WCAG 2.2 AA), neutrality rules, attribution, links and performance targets. The model is Google Maps on desktop, with a muted basemap so the biblical places stand out.
-- **[Five low-fidelity wireframes](docs/design/wireframes/):** the map overview, a place panel (Capernaum), a disputed place (Emmaus, with four lettered candidates), search ("Antioch"), and the small screen. Every name, count and quotation in them comes from the real data and the WEB.
+- **[Five low-fidelity wireframes](docs/design/wireframes/):** the map overview, a place panel (Capernaum), a disputed place (Emmaus, with four lettered candidates), search ("Antioch"), and the small screen. Every name, count and quotation in them comes from the real data and the WEB. The wireframes draw the map schematically on purpose, to show layout.
+- **[Basemap previews](docs/design/VISUAL_SPEC.md#basemap-options-what-positron-and-liberty-look-like-cp3a-decision-1):** real renders of Positron and Liberty at three zoom levels, with all 63 places drawn on them. They show what the finished map will look like.
 - **The M3 build cards** (plan below). They are ready to dispatch as soon as you approve.
 
 ### The M3 plan
@@ -215,7 +216,7 @@ M3, the MVP app.
 
 | # | Decision | Recommendation | Alternative |
 |---|---|---|---|
-| 1 | Basemap look | OpenFreeMap **Positron**: light grey and muted, so the pins stand out and the tone stays scholarly | OpenFreeMap **Liberty**: colourful and closer to Google Maps |
+| 1 | Basemap look ([see both](docs/design/VISUAL_SPEC.md#basemap-options-what-positron-and-liberty-look-like-cp3a-decision-1)) | OpenFreeMap **Positron**: light grey and muted, so the pins stand out and the tone stays scholarly | OpenFreeMap **Liberty**: colourful and closer to Google Maps |
 | 2 | Place title | The ancient name first (**Capernaum**), with the modern name underneath | The modern name first |
 | 3 | Modern names | The place name only: no country, state or political descriptor, and none for disputed places. Today's data mixes these ("Yalvaç (Turkey)", "Tell Balata (Nablus, West Bank)"), so M3-08 cleans it up. | Keep countries where the border is undisputed |
 | 4 | Scripture list | The first 5 passages, then "Show all *n*" (Jerusalem has 174) | Always show every passage |
