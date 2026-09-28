@@ -1,0 +1,14 @@
+This file is part of Interactive Bible Map's outage-only fallback basemap.
+
+Source style: VersaTiles Colorful
+Source URL: https://tiles.versatiles.org/assets/styles/colorful/style.json
+Source style license: CC0 1.0 (metadata.license in upstream style)
+Fallback policy: use this style only when the primary OpenFreeMap Liberty basemap is unavailable.
+
+Modifications in this copy:
+- English labels via coalesce(name:en, name:latin, name)
+- Points of interest removed
+- Disputed boundary lines hidden (removed boundary-country-disputed and the disputed branch of boundary-country:outline)
+
+Attribution string used in the vector source:
+<a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)
