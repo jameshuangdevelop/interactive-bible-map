@@ -141,3 +141,9 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Context:** In batches 1–2, the PR Reviewers caught unsupported claims and wrong images that the Fact-Checker (Claude Sonnet 5) had passed. Batch 3's Fact-Checker ran on Claude Opus 5.5. It found 30 issues in its first round, then 5, then 1, and the reviewer then found no data problems.
 - **Decision:** The Fact-Checker uses Claude Opus 5.5, with Claude Sonnet 5 as the fallback.
 - **Consequences:** About 1.7× the cost per session, offset by fewer fix rounds: batch 3 cost about 3,500 credits, against about 5,100 and 6,700 for batches 1 and 2 (agent and review sessions, not the PO's coordination).
+
+## ADR-0022 — Basemap style: OpenFreeMap Liberty
+- **Date:** 2026-09-28 · **Status:** Accepted · **By:** the human, at CP3a ("let's go with Liberty")
+- **Context:** ADR-0009 chose OpenFreeMap basemaps. The PO recommended the muted Positron style so that the pins would stand out. After comparing real renders of Positron and Liberty at three zoom levels ([VISUAL_SPEC.md → Basemap options](design/VISUAL_SPEC.md#basemap-options-what-positron-and-liberty-look-like-cp3a-decision-1)), the human chose Liberty.
+- **Decision:** The app hosts a customized copy of OpenFreeMap **Liberty**, with English labels, no points of interest, and disputed boundaries hidden. The fallback remains a different provider or host (ADR-0009).
+- **Consequences:** The map looks more like Google Maps and gives more modern context. To keep every pin at 3:1 contrast or better against Liberty's colours (spec §2), the natural-feature pin changes from `#188038` to `#0B6B2E`; the old colour reached only 2.7:1 on water.
