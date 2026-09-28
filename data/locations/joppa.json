@@ -2,11 +2,12 @@
   "id": "joppa",
   "names": {
     "ancient": [
-      "Joppa",
-      "Yafo"
+      "Joppa"
     ],
     "modern": "Jaffa",
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
+      "Yafo",
       "Iafo"
     ]
   },
@@ -35,7 +36,13 @@
       "wikidata:Q7083682",
       "openbible:joppa",
       "scripture:Acts 9:40",
-      "scripture:Acts 11:5"
+      "scripture:Acts 11:5",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
@@ -118,7 +125,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

@@ -6,7 +6,8 @@
       "Place of a Skull"
     ],
     "alternate": [
-      "Calvary"
+      "Calvary",
+      "The Skull"
     ]
   },
   "type": "site",
@@ -53,7 +54,13 @@
       "scripture:Mark 15:22",
       "scripture:Luke 23:33",
       "scripture:John 19:17",
-      "scripture:Hebrews 13:12"
+      "scripture:Hebrews 13:12",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [
@@ -105,7 +112,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

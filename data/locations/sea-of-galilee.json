@@ -8,7 +8,8 @@
       "Lake of Gennesaret"
     ],
     "modern": "Sea of Galilee / Lake Kinneret",
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
       "Yam Kinneret"
     ]
   },
@@ -38,7 +39,13 @@
       "openbible:sea-of-galilee",
       "scripture:Mark 1:16",
       "scripture:Matthew 14:25",
-      "scripture:John 21:1"
+      "scripture:John 21:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [
@@ -130,7 +137,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }

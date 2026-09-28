@@ -2,11 +2,14 @@
   "id": "malta",
   "names": {
     "ancient": [
-      "Melita",
-      "Melite"
+      "Malta",
+      "Melita"
     ],
     "modern": "Malta",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Melite"
+    ]
   },
   "type": "natural-feature",
   "zoomTier": "region",
@@ -53,7 +56,13 @@
       "scripture:Acts 28:2",
       "scripture:Acts 28:3-6",
       "scripture:Acts 28:7-9",
-      "scripture:Acts 28:11"
+      "scripture:Acts 28:11",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
@@ -81,7 +90,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

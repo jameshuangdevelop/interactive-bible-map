@@ -776,3 +776,27 @@ test("duplicate-name error is skipped when names.otherLanguages is absent", asyn
     false
   );
 });
+
+test("names.modern repeating an ancient or otherLanguages name is not a duplicate error", async () => {
+  // Many places (Rome, Jerusalem, Capernaum's "Kfar Nahum") are still known today by the
+  // same name they carried in antiquity or in another language; that repetition is expected
+  // and must not be flagged once names.otherLanguages is also present.
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Kfar Nahum",
+      alternate: [],
+      otherLanguages: ["Kfar Nahum"]
+    };
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names" &&
+        error.message.includes("Duplicate location name")
+    ),
+    false
+  );
+});

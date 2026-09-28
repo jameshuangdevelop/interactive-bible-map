@@ -4,7 +4,8 @@
     "ancient": [
       "Samaria"
     ],
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
       "Shomron"
     ]
   },
@@ -31,7 +32,13 @@
     "sources": [
       "pleiades:44836840",
       "wikidata:Q1294629",
-      "openbible:samaria-2"
+      "openbible:samaria-2",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [
@@ -138,7 +145,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

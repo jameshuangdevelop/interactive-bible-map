@@ -48,7 +48,7 @@ If any candidate has confidence `disputed`, the record must include at least **t
 - `names.otherLanguages` is optional and stores names in other languages and non-English ancient-language forms.
 - The app ignores `names.otherLanguages`: it does not display them and does not search them.
 - `names.otherLanguages` values must be unique, non-empty, and trimmed (no leading or trailing whitespace).
-- When `names.otherLanguages` is present, the validator treats `names.modern` as slash-delimited variants (`/`) and raises an error if any name appears more than once across `names.ancient`, `names.alternate`, `names.modern`, and `names.otherLanguages`, compared case-insensitively after Unicode normalization.
+- When `names.otherLanguages` is present, the validator raises an error if any name appears more than once across `names.ancient`, `names.alternate`, and `names.otherLanguages`, compared case-insensitively after Unicode normalization. `names.modern` is intentionally excluded from this check: many places (Rome, Jerusalem, Capernaum's "Kfar Nahum") are still known today by the same name they carried in antiquity or in another language, so `names.modern` legitimately repeating one of those names is expected, not a data error.
 - Scripture-linkage name matching still uses all configured names (`ancient`, `alternate`, `modern`, and `otherLanguages`).
 
 ### Modern names

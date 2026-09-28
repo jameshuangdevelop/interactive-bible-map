@@ -158,19 +158,17 @@ function collectTrimmedLocationNames(locationRecord) {
 function collectLocationNameEntries(locationRecord) {
   const entries = [];
 
+  // names.modern is deliberately excluded here: many places (Rome, Jerusalem, Damascus,
+  // Capernaum's "Kfar Nahum") are still known today by the same name they carried in
+  // antiquity or in another language, so modern legitimately repeating an ancient,
+  // alternate, or otherLanguages entry is expected, not a data error. This check instead
+  // catches accidental duplication among the three "historical name" buckets themselves.
   if (Array.isArray(locationRecord.names?.ancient)) {
     locationRecord.names.ancient.forEach((name, index) => {
       entries.push({
         path: `$.names.ancient[${index}]`,
         value: name
       });
-    });
-  }
-
-  for (const modernVariant of splitModernNameVariants(locationRecord.names?.modern)) {
-    entries.push({
-      path: "$.names.modern",
-      value: modernVariant
     });
   }
 
@@ -855,7 +853,7 @@ export async function validateData(options = {}) {
           errors,
           locationRecord.relativePath,
           "$.names",
-          `Duplicate location name '${duplicateNameEntries[0].value}' appears more than once across names.ancient, names.alternate, names.modern, and names.otherLanguages: ${duplicateLocations}`
+          `Duplicate location name '${duplicateNameEntries[0].value}' appears more than once across names.ancient, names.alternate, and names.otherLanguages: ${duplicateLocations}`
         );
       }
     }

@@ -2,11 +2,13 @@
   "id": "iconium",
   "names": {
     "ancient": [
-      "Iconium",
-      "Claudiconium"
+      "Iconium"
     ],
     "modern": "Konya",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Claudiconium"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -33,7 +35,13 @@
       "wikidata:Q79857",
       "openbible:iconium",
       "scripture:Acts 14:1",
-      "scripture:Acts 14:19"
+      "scripture:Acts 14:19",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
@@ -71,7 +79,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

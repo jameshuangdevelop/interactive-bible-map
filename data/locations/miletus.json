@@ -2,11 +2,13 @@
   "id": "miletus",
   "names": {
     "ancient": [
-      "Miletus",
-      "Milawanda"
+      "Miletus"
     ],
     "modern": "Near Balat",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Milawanda"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -35,7 +37,13 @@
       "scripture:Acts 20:16",
       "scripture:Acts 20:17",
       "scripture:Acts 20:18",
-      "scripture:2 Timothy 4:20"
+      "scripture:2 Timothy 4:20",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
@@ -58,7 +66,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

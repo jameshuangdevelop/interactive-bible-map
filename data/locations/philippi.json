@@ -2,11 +2,12 @@
   "id": "philippi",
   "names": {
     "ancient": [
-      "Philippi",
-      "Krenides"
+      "Philippi"
     ],
     "modern": "Filippoi",
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
+      "Krenides",
       "Colonia Iulia Augusta Philippensis"
     ]
   },
@@ -36,7 +37,13 @@
       "openbible:philippi",
       "scripture:Acts 16:12",
       "scripture:Acts 16:14",
-      "scripture:Acts 16:23"
+      "scripture:Acts 16:23",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
@@ -64,7 +71,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

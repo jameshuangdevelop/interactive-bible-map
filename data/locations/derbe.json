@@ -2,10 +2,12 @@
   "id": "derbe",
   "names": {
     "ancient": [
-      "Derbe",
-      "Claudioderbe"
+      "Derbe"
     ],
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Claudioderbe"
+    ]
   },
   "type": "town",
   "zoomTier": "city",
@@ -46,7 +48,13 @@
       "bib:wagner-wilson-why-derbe",
       "openbible:derbe",
       "scripture:Acts 14:20",
-      "scripture:Acts 16:1"
+      "scripture:Acts 16:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [
@@ -86,7 +94,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

@@ -2,12 +2,16 @@
   "id": "antioch-pisidia",
   "names": {
     "ancient": [
-      "Antioch in Pisidia",
-      "Colonia Caesarea"
+      "Antioch in Pisidia"
     ],
     "modern": "Yalvaç",
     "alternate": [
-      "Antioch"
+      "Antioch",
+      "Pisidian Antioch",
+      "Antioch of Pisidia"
+    ],
+    "otherLanguages": [
+      "Colonia Caesarea"
     ]
   },
   "type": "city",
@@ -35,7 +39,13 @@
       "wikidata:Q579468",
       "openbible:antioch-2",
       "scripture:Acts 13:14",
-      "scripture:Acts 13:46"
+      "scripture:Acts 13:46",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2016-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1769-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
@@ -63,7 +73,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }
