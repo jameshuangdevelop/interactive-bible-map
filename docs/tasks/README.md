@@ -20,6 +20,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for M3-04 and M3-05 |
 | [M3-07](M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | In progress |
 | [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | In progress |
+| [M3-10](M3-10-english-names.md) | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | In progress |
 
 ## Template
 ```markdown
