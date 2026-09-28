@@ -148,5 +148,8 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-25 | project-owner | Claude Opus 5.5 (Copilot CLI) | CP3a push, and the Cloudflare token setup script | ~120k / ~10k | ~250 | ~27,326 |
 | 2026-09-28 | project-owner | Claude Opus 5.5 (Copilot CLI) | CP3a basemap previews (real renders), their review fixes, and the Liberty decision (ADR-0022) | ~250k / ~25k | ~600 | ~27,926 |
 | 2026-09-28 | project-owner | Claude Opus 5.5 (Copilot CLI) | M3-09 record CP3a, dispatch M3-02, M3-07, M3-08 | ~60k / ~6k | ~150 | ~28,076 |
-| 2026-09-28 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M3-07 basemap attribution (OpenFreeMap, OpenMapTiles, OSM, Liberty style lineage, fonts and sprites, Protomaps and VersaTiles fallbacks; Opus 5.5 rates +50%) | ~170k / ~40k | ~470 | ~28,546 |
-| 2026-09-28 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3-07 | ~320k / ~9k | ~130 | ~28,676 |
+| 2026-09-28 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-02 app scaffold | ~780k / ~60k | ~323 | ~28,399 |
+| 2026-09-28 | pr-reviewer | Claude Sonnet 5 (Copilot CLI subagent) | M3-02 review (app scaffold, data build, CI) | ~220k / ~16k | ~380 | ~28,779 |
+| 2026-09-28 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-02 follow-up fixes (router removal, workflow/doc/accessibility updates) | ~500k / ~40k | ~230 | ~29,009 |
+| 2026-09-28 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M3-07 basemap attribution (OpenFreeMap, OpenMapTiles, OSM, Liberty style lineage, fonts and sprites, Protomaps and VersaTiles fallbacks; Opus 5.5 rates +50%) | ~170k / ~40k | ~470 | ~29,479 |
+| 2026-09-28 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3-07 | ~320k / ~9k | ~130 | ~29,609 |

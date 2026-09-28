@@ -17,7 +17,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-00 | M3 kickoff: record CP2 | project-owner | `docs/m3-kickoff` | Merged | #15 |
 | M3-01 | Low-fidelity visual spec and wireframes (CP3a) | project-owner | `docs/cp3a-visual-spec` | Merged (CP3a approved) | #16 |
 | M3-09 | Record CP3a and start the build | project-owner | `docs/m3-build-kickoff` | Done, PR pending push | — |
-| M3-02 | App scaffold, data build and CI | frontend-engineer | `feat/m3-app-scaffold` | In progress (subagent) | — |
+| M3-02 | App scaffold, data build and CI | frontend-engineer | `feat/m3-app-scaffold` | Done, PR pending review | — |
 | M3-03 | Map view | frontend-engineer | `feat/m3-map` | Card ready, waits for M3-02 | — |
 | M3-04 | Place panel | frontend-engineer | `feat/m3-place-panel` | Card ready, waits for M3-03 | — |
 | M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Card ready, waits for M3-03 | — |
