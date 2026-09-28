@@ -41,6 +41,14 @@ All example values below are **illustrative only** (not verified historical clai
 
 If any candidate has confidence `disputed`, the record must include at least **two** candidates.
 
+### Modern names
+- `names.modern` is optional and, when present, must be the modern place name only.
+- Do not include country, state, province, political descriptors, or editorial notes in `names.modern`.
+- For disputed places (records with more than one candidate), leave out `names.modern`; candidate labels already carry the modern site names.
+- Region and island records should use a neutral geographic name when one exists; otherwise leave `names.modern` out.
+- The validator enforces the machine-checkable parts: `names.modern` must not contain the word `disputed`, and records with multiple candidates must omit `names.modern`.
+- Country/descriptor neutrality is reviewed by the Research Lead and Fact-Checker.
+
 ### Status workflow
 - `status: "draft"`: in-progress research; `verifiedBy` and `lastReviewed` are optional.
 - `status: "verified"`: reviewed and accepted; `verifiedBy` and `lastReviewed` are required.

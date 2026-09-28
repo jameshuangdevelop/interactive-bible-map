@@ -23,7 +23,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Card ready, waits for M3-03 | — |
 | M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Card ready, waits for M3-04 and M3-05 (secrets added) | — |
 | M3-07 | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | In progress (subagent) | — |
-| M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | In progress (subagent) | — |
+| M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Schema done; data next | — |
 
 ## Open questions
 - None open.

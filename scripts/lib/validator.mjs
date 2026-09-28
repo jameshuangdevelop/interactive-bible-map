@@ -741,6 +741,26 @@ export async function validateData(options = {}) {
       });
     }
 
+    if (typeof data.names?.modern === "string") {
+      if (/\bdisputed\b/iu.test(data.names.modern)) {
+        recordError(
+          errors,
+          locationRecord.relativePath,
+          "$.names.modern",
+          "names.modern must not contain the word 'disputed'"
+        );
+      }
+
+      if (Array.isArray(data.candidates) && data.candidates.length > 1) {
+        recordError(
+          errors,
+          locationRecord.relativePath,
+          "$.names.modern",
+          "names.modern must be omitted when a record has more than one candidate"
+        );
+      }
+    }
+
     validateSourceArray({
       sourceIds: data.summary?.sources,
       file: locationRecord.relativePath,

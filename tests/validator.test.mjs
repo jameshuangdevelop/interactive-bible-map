@@ -508,6 +508,35 @@ test("disputed candidates require at least two entries", async () => {
   );
 });
 
+test("names.modern cannot contain the word disputed", async () => {
+  const result = await runCase("invalid-modern-name-disputed");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.modern" &&
+        error.message.includes("must not contain the word 'disputed'")
+    )
+  );
+});
+
+test("names.modern must be omitted for multiple-candidate records", async () => {
+  const result = await runCase("invalid-modern-name-multiple-candidates");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.modern" &&
+        error.message.includes("must be omitted when a record has more than one candidate")
+    )
+  );
+});
+
+test("disputed multi-candidate record may omit names.modern", async () => {
+  const result = await runCase("valid-disputed-no-modern");
+  assert.equal(result.errors.length, 0);
+});
+
 test("scripture.book must match scripture.ref", async () => {
   const result = await runCase("invalid-scripture-book-mismatch");
   assert.ok(
