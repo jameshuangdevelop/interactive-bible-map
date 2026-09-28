@@ -27,9 +27,9 @@ Build the Google-Maps-style place panel exactly as `docs/design/VISUAL_SPEC.md` 
    - Show a placeholder when an image fails to load, keeping the credit.
 3. **Names and confidence:**
    - The title is the first ancient name. Below it come the modern name (hidden for disputed places), "Also known as …", and the type and parent link.
-   - Show a confidence chip in words for single-candidate places, and the disputed banner for places with several candidates.
-4. **Candidates** (disputed places): a lettered list with a chip, support text (two lines, expandable) and sources for each. Selecting one centres the map on it and updates `&candidate=`.
-5. **Actions:** Zoom to (Fit all sites for disputed places), Copy link, and Sources, which scrolls to the list.
+   - Show a confidence chip in words for single-candidate places, the "Location disputed · *n* proposed sites" banner for **disputed** places (at least one candidate with confidence `disputed`), and a neutral "*n* sites" line for other places with several candidates (for example Jericho).
+4. **Candidates** (places with several candidates): a lettered list with a chip, support text (two lines, expandable) and sources for each. Selecting one centres the map on it and updates `&candidate=`.
+5. **Actions:** Zoom to (Fit all sites for places with several candidates), Copy link, and Sources, which scrolls to the list.
 6. **About:** the summary, then the history notes, each followed by numbered source markers that link to Sources.
 7. **In the Bible:**
    - Group the passages by book in canonical order, using the book order the validator already uses.
