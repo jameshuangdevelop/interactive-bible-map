@@ -5,7 +5,7 @@
       "Miletus",
       "Milawanda"
     ],
-    "modern": "Near Balat (Turkey)",
+    "modern": "Near Balat",
     "alternate": []
   },
   "type": "city",
@@ -58,7 +58,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "status": "draft"
 }

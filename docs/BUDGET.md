@@ -149,3 +149,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-28 | project-owner | Claude Opus 5.5 (Copilot CLI) | CP3a basemap previews (real renders), their review fixes, and the Liberty decision (ADR-0022) | ~250k / ~25k | ~600 | ~27,926 |
 | 2026-09-28 | project-owner | Claude Opus 5.5 (Copilot CLI) | M3-09 record CP3a, dispatch M3-02, M3-07, M3-08 | ~60k / ~6k | ~150 | ~28,076 |
 | 2026-09-28 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-08 schema | ~320k / ~22k | ~130 | ~28,206 |
+| 2026-09-28 | research-lead | Claude Sonnet 5 (Copilot CLI subagent) | M3-08 data: normalize modern names (63 records read, 48 changed via a checked script, semantic diff, validate:data and test runs) plus a PO follow-up (malta.json names.alternate fix, re-validated, amended 109bd14) | ~320k / ~27k | ~420 | ~28,626 |

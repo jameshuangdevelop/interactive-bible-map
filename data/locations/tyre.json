@@ -5,7 +5,7 @@
       "Tyre",
       "Tyrus"
     ],
-    "modern": "Sour / Tyre (Lebanon)",
+    "modern": "Sour / Tyre",
     "alternate": [
       "Sour"
     ]
@@ -124,7 +124,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "status": "draft"
 }

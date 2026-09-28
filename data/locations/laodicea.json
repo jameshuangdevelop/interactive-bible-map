@@ -6,7 +6,7 @@
       "Laodicea on the Lycus",
       "Laodicea ad Lycum"
     ],
-    "modern": "Near Denizli (Turkey)",
+    "modern": "Near Denizli",
     "alternate": []
   },
   "type": "city",
@@ -77,7 +77,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "status": "draft"
 }

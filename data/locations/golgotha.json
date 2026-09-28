@@ -5,7 +5,6 @@
       "Golgotha",
       "Place of a Skull"
     ],
-    "modern": "Golgotha / Calvary (disputed)",
     "alternate": [
       "Calvary"
     ]
@@ -106,7 +105,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "status": "draft"
 }
