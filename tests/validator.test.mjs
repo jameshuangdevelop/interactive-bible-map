@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
@@ -518,6 +519,59 @@ test("names.modern cannot contain the word disputed", async () => {
         error.message.includes("must not contain the word 'disputed'")
     )
   );
+});
+
+test("names.modern word check respects word boundaries", async () => {
+  const temporaryDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "ibm-modern-name-boundary-")
+  );
+
+  try {
+    const caseDirectory = path.join(
+      temporaryDirectory,
+      "valid-modern-name-boundary"
+    );
+    const locationsDirectory = path.join(caseDirectory, "locations");
+    const mediaDirectory = path.join(caseDirectory, "media");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+    fs.writeFileSync(path.join(mediaDirectory, ".gitkeep"), "");
+
+    const sourceLocationPath = path.join(
+      casesDirectory,
+      "valid-modern-name-multiple-candidates",
+      "locations",
+      "capernaum.json"
+    );
+    const locationData = JSON.parse(fs.readFileSync(sourceLocationPath, "utf8"));
+    locationData.names.modern = "Undisputed Hill";
+
+    fs.writeFileSync(
+      path.join(locationsDirectory, "capernaum.json"),
+      `${JSON.stringify(locationData, null, 2)}\n`
+    );
+
+    const result = await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      webVplPath: webFixturePath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true
+    });
+
+    assert.equal(result.errors.length, 0);
+    assert.equal(
+      hasError(
+        result,
+        (error) =>
+          error.path === "$.names.modern" &&
+          error.message.includes("must not contain the word 'disputed'")
+      ),
+      false
+    );
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
 });
 
 test("names.modern must be omitted when a disputed-confidence candidate exists", async () => {
