@@ -194,7 +194,7 @@ M3, the MVP app.
 ## CP3a — Visual spec
 
 ### What was delivered
-- **[Visual spec](docs/design/VISUAL_SPEC.md):** layout, map, place panel, search, states, visual tokens, accessibility (WCAG 2.2 AA), neutrality rules, attribution, links and performance targets. The model is Google Maps on desktop, with a muted basemap so the biblical places stand out.
+- **[Visual spec](docs/design/VISUAL_SPEC.md):** layout, map, place panel, search, states, visual tokens, accessibility (WCAG 2.2 AA), neutrality rules, attribution, links and performance targets. The model is Google Maps on desktop, with the colourful OpenFreeMap Liberty basemap (decision 1).
 - **[Five low-fidelity wireframes](docs/design/wireframes/):** the map overview, a place panel (Capernaum), a disputed place (Emmaus, with four lettered candidates), search ("Antioch"), and the small screen. Every name, count and quotation in them comes from the real data and the WEB. The wireframes draw the map schematically on purpose, to show layout.
 - **[Basemap previews](docs/design/VISUAL_SPEC.md#basemap-options-what-positron-and-liberty-look-like-cp3a-decision-1):** real renders of Positron and Liberty at three zoom levels, with all 63 places drawn on them. They show the intended look of the finished map's basemap and pins.
 - **The M3 build cards** (plan below). They are ready to dispatch as soon as you approve.
@@ -212,11 +212,11 @@ M3, the MVP app.
 | CP3b | Working MVP deployed to a preview | project-owner | M3-06 |
 
 ### Decisions needed from you
-**Merging this PR approves CP3a with the recommendations below.** To choose differently, comment on the PR, and I'll update the spec before the build starts.
+**Decision 1 is already decided (Liberty). Merging this PR approves decisions 2–5 as recommended.** To choose differently, comment on the PR, and I'll update the spec before the build starts.
 
 | # | Decision | Recommendation | Alternative |
 |---|---|---|---|
-| 1 | Basemap look ([see both](docs/design/VISUAL_SPEC.md#basemap-options-what-positron-and-liberty-look-like-cp3a-decision-1)) | OpenFreeMap **Positron**: light grey and muted, so the pins stand out and the tone stays scholarly | OpenFreeMap **Liberty**: colourful and closer to Google Maps |
+| 1 | Basemap look ([see both](docs/design/VISUAL_SPEC.md#basemap-options-what-positron-and-liberty-look-like-cp3a-decision-1)) | **Decided: OpenFreeMap Liberty**, which is colourful and closer to Google Maps. This was your choice on 2026-09-28, after comparing the renders (ADR-0022). The natural-feature pin was darkened so that every pin keeps at least 3:1 contrast on it. | OpenFreeMap Positron, muted grey (the PO's original recommendation) |
 | 2 | Place title | The ancient name first (**Capernaum**), with the modern name underneath | The modern name first |
 | 3 | Modern names | The place name only: no country, state or political descriptor, and none for disputed places. Today's data mixes these ("Yalvaç (Turkey)", "Tell Balata (Nablus, West Bank)"), so M3-08 cleans it up. | Keep countries where the border is undisputed |
 | 4 | Scripture list | The first 5 passages, then "Show all *n*" (Jerusalem has 174) | Always show every passage |
@@ -233,7 +233,7 @@ Cloudflare's token screen had changed, so the token was created through the Clou
 **Renewal:** the token expires on about 2027-09-25. Run the same script again before then. Sources: [Create Token](https://developers.cloudflare.com/api/resources/accounts/subresources/tokens/methods/create/) and [Account API tokens](https://developers.cloudflare.com/fundamentals/api/get-started/account-owned-tokens/) (read 2026-09-25).
 
 ### Concepts for you
-- **Style file.** A JSON file that tells the map how to draw the tiles: colours, which labels to show, which layers to hide. We host our own copy of Positron, so we can hide disputed borders. [MapLibre style spec](https://maplibre.org/maplibre-style-spec/)
+- **Style file.** A JSON file that tells the map how to draw the tiles: colours, which labels to show, which layers to hide. We host our own customized copy of Liberty, so we can hide disputed borders, show English labels and remove points of interest. [MapLibre style spec](https://maplibre.org/maplibre-style-spec/)
 - **Zoom level.** Web maps use levels from about 0 (the whole world) to 20 (a building). Our tiers map onto them: regions at 4–9, cities from 4, and sites within a city from 12.
 - **Clustering.** When pins are too close together at a low zoom, they merge into a bubble with a count, which splits apart as you zoom in.
 

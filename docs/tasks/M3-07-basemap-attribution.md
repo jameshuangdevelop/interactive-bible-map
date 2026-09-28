@@ -13,7 +13,7 @@
 Verify the licenses of the main basemap and of the candidate **fallback providers**, and replace the basemap placeholder rows in `ATTRIBUTION.md` and `docs/LICENSES.md`, which have waited on the stack choice since M1, with verified licenses and the exact attribution text the app must show.
 
 ## Inputs (read only these)
-- `docs/DECISIONS.md` → ADR-0009 (OpenFreeMap Positron, customized and hosted by the app, with OpenFreeMap Bright as the fallback)
+- `docs/DECISIONS.md` → ADR-0009 and ADR-0022 (OpenFreeMap Liberty, customized and hosted by the app, with a fallback on a different provider or host)
 - `docs/LICENSES.md` and `ATTRIBUTION.md`
 - `docs/design/VISUAL_SPEC.md` §9
 - This card
@@ -22,7 +22,7 @@ Verify the licenses of the main basemap and of the candidate **fallback provider
 1. **Verify each license on the provider's own pages,** giving the URL and the date read, for:
    - the **tiles and data**: OpenFreeMap, and the OpenStreetMap data under ODbL;
    - the **schema**: OpenMapTiles;
-   - the **styles**: Positron and Bright, which we will modify and host, so check what their license requires for a modified style (for example keeping a notice);
+   - the **style**: Liberty, which we will modify and host, so check what its license requires for a modified style (for example keeping a notice);
    - the **fonts and sprites** served by OpenFreeMap;
    - the **fallback candidates**, which must use a different provider or host (spec §2): a self-hosted Protomaps extract (the ADR-0009 runner-up; its basemap data, style and software licenses), and at least one provider that needs no API key. For each, give its license, attribution, usage terms or limits, and whether its data marks disputed boundaries so we can hide them.
 2. **Write the exact attribution string** for the map's attribution control, and the fuller credits text for the app's "Sources & credits" drawer.

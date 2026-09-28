@@ -2,7 +2,7 @@
 
 This spec describes how the MVP map app looks and behaves. It is low fidelity on purpose: it fixes layout, content order, interaction and accessibility, and leaves exact pixels to the build. The wireframes are in [wireframes/](wireframes/). The Frontend Engineer builds against this document (tasks M3-02 to M3-06), and the PO updates it when a decision changes.
 
-**Model:** Google Maps on desktop: a full-screen map, a floating search box, and a place panel on the left. The tone is calm and scholarly: a muted basemap, so that the biblical places stand out.
+**Model:** Google Maps on desktop: a full-screen map, a floating search box, and a place panel on the left. The basemap is colourful and familiar, like Google Maps (OpenFreeMap Liberty, chosen at CP3a; ADR-0022). The biblical places stay clearly visible on it, and the tone of the text stays calm and scholarly.
 
 ## 1. Layout
 
@@ -29,21 +29,23 @@ The reserved areas are **not built in M3**. The wireframes show them with dashed
 ## 2. The map
 
 ### Basemap
-- **Style:** based on OpenFreeMap **Positron**, a light grey and muted style, customized and **hosted by the app** as its own style file (OpenFreeMap requires hosting a customized style yourself):
+- **Style:** based on OpenFreeMap **Liberty** (chosen at CP3a; ADR-0022), a colourful style close to Google Maps. It is customized and **hosted by the app** as its own style file (OpenFreeMap requires hosting a customized style yourself):
   - English labels where the data has them;
   - points of interest removed;
   - **disputed boundary lines hidden** (the OpenMapTiles `boundary` layer, where `disputed = 1`; ADR-0009).
 - **Fallback:** a basemap from a **different provider or host**, so that it still works if OpenFreeMap itself is down (ADR-0009). The app switches to it automatically after repeated tile errors, and configuration can also switch it. The fallback must hide disputed boundaries too. M3-03 chooses it from the options whose licenses M3-07 verifies, for example a self-hosted Protomaps extract or another provider that needs no API key. OpenFreeMap's Bright and Liberty styles use the same servers, so they are theme alternatives, not fallbacks.
-- **Alternative (CP3a decision 1):** OpenFreeMap Liberty, which is more colourful and closer to Google Maps.
+- **Considered at CP3a:** OpenFreeMap Positron, a muted grey style, was the PO's recommendation. The human chose Liberty after comparing the renders below.
 
 
 ### Basemap options: what Positron and Liberty look like (CP3a decision 1)
+**Decided:** Liberty, on 2026-09-28 (ADR-0022). The comparison is kept as the record of the choice.
+
 These are real renders, not wireframes. They are what the app's map will look like, drawn with MapLibre 6.10 from OpenFreeMap tiles, with all 63 of our places in the pin colours from this spec.
 - **Customizations the app will make:** English labels where the map data has them, no points of interest, clustering below zoom 7, a "?" pin for disputed places when zoomed out, and lettered candidates when zoomed in.
 - **Borders:** hidden in these previews, so that no contested line is shown here. The app hides only disputed boundaries.
 - **Attribution:** each image carries the OpenFreeMap, OpenMapTiles and OpenStreetMap attribution in its corner.
 
-| View | Positron (recommended): muted greys | Liberty: colourful, closer to Google Maps |
+| View | Positron: muted greys | **Liberty (chosen):** colourful, closer to Google Maps |
 |---|---|---|
 | Mediterranean overview (zoom 4.7) | ![Positron overview](basemap-options/positron-overview.jpg) | ![Liberty overview](basemap-options/liberty-overview.jpg) |
 | Galilee (zoom 10.4) | ![Positron Galilee](basemap-options/positron-galilee.jpg) | ![Liberty Galilee](basemap-options/liberty-galilee.jpg) |
@@ -57,9 +59,10 @@ These are real renders, not wireframes. They are what the app's map will look li
 |---|---|---|
 | City, town, village | Round pin with a white 2 px outline; label beside it | Deep red `#C5221F` |
 | Site within a city (for example the Temple Mount) | Round pin | Purple `#8430CE` |
-| Natural feature (for example the Sea of Galilee) | Round pin | Green `#188038` |
+| Natural feature (for example the Sea of Galilee) | Round pin | Dark green `#0B6B2E` |
 | Region or island record (for example Galilee or Crete) | **No pin:** a clickable label in spaced capitals, `#5F6368` | — |
 
+- **Contrast on Liberty:** every pin colour has at least 3:1 contrast against every Liberty background, park, wood, grass, building and water colour; the lowest is red on water, at 3.1:1. The natural-feature green was darkened from `#188038` because that colour reached only 2.7:1 on water, where pins such as the Sea of Galilee sit. The white outline separates each pin from the map.
 - **Selected place:** its pin grows by about 30% and gets a drop shadow; the other pins stay as they are.
 - **Hover** (on desktop): a tooltip with the name and type.
 - **Pins are real buttons**, so they can be reached by keyboard (see §7).

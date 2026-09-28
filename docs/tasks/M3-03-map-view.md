@@ -23,7 +23,7 @@ Show every place on an interactive map, the way `docs/design/VISUAL_SPEC.md` §2
    - Use **MapLibre GL JS 6.9 or later**, so that Hebrew and Arabic labels render correctly without the right-to-left plugin ([v6.9.0 release notes](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.9.0)). In the PO's previews, version 5 without the plugin drew Hebrew labels backwards.
    - MapLibre 6 ships **only as an ES module** (`dist/maplibre-gl.mjs`) and runs its tile work in a **web worker** (`dist/maplibre-gl-worker.mjs`). Browsers only load a worker from the page's own origin, so serve the worker file with the app's build and point MapLibre at it with `setWorkerUrl()`. Test that the map loads in the built web export, not only in development.
 2. **Basemap style:**
-   - Host a style file in the app, derived from OpenFreeMap **Positron** (or Liberty, if CP3a decision 1 chooses it), that:
+   - Host a style file in the app, derived from OpenFreeMap **Liberty** (CP3a decision 1; ADR-0022), that:
      - uses English labels where available: replace each name-based `text-field` with `coalesce(name:en, name:latin, name)`;
      - removes points of interest (the `poi` source layer);
      - **hides boundary features with `disputed = 1`** (the OpenMapTiles `boundary` layer).

@@ -28,7 +28,7 @@
   <rect width="1440" height="900" fill="#F4F4F2"/>
   <ellipse cx="977" cy="450" rx="70" ry="160" fill="#D5E3EC" transform="rotate(8 977 450)"/>
   <text x="977" y="455" font-size="12" font-style="italic" fill="#4A7FA7" text-anchor="middle">Sea of Galilee</text>
-  <circle cx="977" cy="480" r="8" fill="#188038" stroke="#ffffff" stroke-width="2.5"/>
+  <circle cx="977" cy="480" r="8" fill="#0B6B2E" stroke="#ffffff" stroke-width="2.5"/>
 
   <g>
     <circle cx="925" cy="238" r="8" class="pin"/><text class="label" x="870" y="228">Chorazin</text>
