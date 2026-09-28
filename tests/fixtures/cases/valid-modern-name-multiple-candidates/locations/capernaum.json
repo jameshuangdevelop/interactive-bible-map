@@ -1,8 +1,8 @@
 {
   "id": "capernaum",
   "names": {
-    "ancient": ["Capernaum", "Kfar Nahum"],
-    "modern": "Kfar Nahum / Tell Hum",
+    "ancient": ["Capernaum"],
+    "modern": "Tell Hum",
     "alternate": []
   },
   "type": "city",

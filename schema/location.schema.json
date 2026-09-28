@@ -56,6 +56,17 @@
             "description": "One alternate name variant.",
             "minLength": 1
           }
+        },
+        "otherLanguages": {
+          "type": "array",
+          "description": "Names in other languages kept in data for reference and not used by the app.",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "description": "One name variant in another language.",
+            "minLength": 1,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$"
+          }
         }
       }
     },

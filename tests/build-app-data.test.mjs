@@ -112,3 +112,66 @@ test("buildAppData fails when validation fails", async () => {
     );
   });
 });
+
+test("buildAppData omits names.otherLanguages from index and place payload outputs", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    const outputDirectory = path.join(temporaryDirectory, "output");
+    await fs.mkdir(locationsDirectory, { recursive: true });
+    await fs.mkdir(mediaDirectory, { recursive: true });
+
+    const capernaum = JSON.parse(
+      await fs.readFile(
+        path.join(validCaseDirectory, "locations", "capernaum.json"),
+        "utf8"
+      )
+    );
+    capernaum.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: [],
+      otherLanguages: ["Kfar Nahum"]
+    };
+
+    const galilee = JSON.parse(
+      await fs.readFile(path.join(validCaseDirectory, "locations", "galilee.json"), "utf8")
+    );
+
+    await fs.writeFile(
+      path.join(locationsDirectory, "capernaum.json"),
+      `${JSON.stringify(capernaum, null, 2)}\n`,
+      "utf8"
+    );
+    await fs.writeFile(
+      path.join(locationsDirectory, "galilee.json"),
+      `${JSON.stringify(galilee, null, 2)}\n`,
+      "utf8"
+    );
+
+    await buildAppData({
+      locationsDirectory,
+      mediaDirectory,
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      outputDirectory
+    });
+
+    const indexPath = path.join(outputDirectory, "places.index.json");
+    const indexData = JSON.parse(await fs.readFile(indexPath, "utf8"));
+    const capernaumIndex = indexData.find((record) => record.id === "capernaum");
+    const galileeIndex = indexData.find((record) => record.id === "galilee");
+    const capernaumPlacePath = path.join(outputDirectory, "places", "capernaum.json");
+    const capernaumPlacePayload = JSON.parse(
+      await fs.readFile(capernaumPlacePath, "utf8")
+    );
+
+    assert.equal(Object.hasOwn(capernaumIndex.names, "otherLanguages"), false);
+    assert.equal(Object.hasOwn(galileeIndex.names, "otherLanguages"), false);
+    assert.equal(
+      Object.hasOwn(capernaumPlacePayload.location.names, "otherLanguages"),
+      false
+    );
+  });
+});

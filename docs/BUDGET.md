@@ -160,3 +160,4 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-28 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-08 schema follow-up: shared disputed-candidate check and word-boundary test | ~140k / ~10k | ~60 | ~30,529 |
 | 2026-09-28 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3-08 data, verification and PO doc commits | ~420k / ~18k | ~150 | ~30,679 |
 | 2026-09-28 | project-owner | Claude Opus 5.5 (Copilot CLI) | M3 build coordination: disputed-rule and modern-name rule edits, 4 cross-vendor reviews, stacking M3-02, M3-07 and M3-08 | ~700k / ~35k | ~700 | ~31,379 |
+| 2026-09-28 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-10 schema: add names.otherLanguages, validator checks, app-output filtering, tests and docs | ~460k / ~36k | ~260 | ~31,639 |

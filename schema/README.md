@@ -41,6 +41,16 @@ All example values below are **illustrative only** (not verified historical clai
 
 If any candidate has confidence `disputed`, the record must include at least **two** candidates.
 
+### Names
+- `names.ancient[0]` is the record title and should use the spelling most of these English Bible translations agree on: NIV, ESV, NLT, KJV, NKJV, and CSB.
+- `names.ancient` and `names.alternate` are display names and should be English-only in this phase: names used in English Bible translations (for example KJV `Melita` or NIV `Berea`) or in standard English reference works.
+- Other English Bible spellings, including the WEB's spelling, should also stay in `names.ancient` or `names.alternate` so search can still find them.
+- `names.otherLanguages` is optional and stores names in other languages and non-English ancient-language forms.
+- The app ignores `names.otherLanguages`: it does not display them and does not search them.
+- `names.otherLanguages` values must be unique, non-empty, and trimmed (no leading or trailing whitespace).
+- When `names.otherLanguages` is present, the validator treats `names.modern` as slash-delimited variants (`/`) and raises an error if any name appears more than once across `names.ancient`, `names.alternate`, `names.modern`, and `names.otherLanguages`, compared case-insensitively after Unicode normalization.
+- Scripture-linkage name matching still uses all configured names (`ancient`, `alternate`, `modern`, and `otherLanguages`).
+
 ### Modern names
 - `names.modern` is optional and, when present, must be the modern place name only.
 - Do not include country, state, province, political descriptors, or editorial notes in `names.modern`.
@@ -157,9 +167,10 @@ CI runs:
 {
   "id": "capernaum",
   "names": {
-    "ancient": ["Capernaum", "Kfar Nahum"],
-    "modern": "Kfar Nahum / Tell Hum",
-    "alternate": []
+    "ancient": ["Capernaum"],
+    "modern": "Tell Hum",
+    "alternate": [],
+    "otherLanguages": ["Kfar Nahum"]
   },
   "type": "city",
   "zoomTier": "city",

@@ -121,20 +121,88 @@ function normalizeText(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/gu, " ").trim();
 }
 
-function collectLocationNames(locationRecord) {
+function normalizeNameForDuplicateCheck(value) {
+  return value.normalize("NFC").toLowerCase();
+}
+
+function splitModernNameVariants(modernName) {
+  if (typeof modernName !== "string") {
+    return [];
+  }
+  return modernName.split("/");
+}
+
+function toTrimmedNonEmptyNameList(values) {
+  return values
+    .filter((value) => typeof value === "string")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+}
+
+function collectTrimmedLocationNames(locationRecord) {
   const names = [];
   if (Array.isArray(locationRecord.names?.ancient)) {
     names.push(...locationRecord.names.ancient);
   }
-  if (typeof locationRecord.names?.modern === "string") {
-    names.push(...locationRecord.names.modern.split("/"));
-  }
+  names.push(...splitModernNameVariants(locationRecord.names?.modern));
   if (Array.isArray(locationRecord.names?.alternate)) {
     names.push(...locationRecord.names.alternate);
   }
-  return names
-    .map((name) => name.trim())
-    .filter((name) => name.length > 0)
+  if (Array.isArray(locationRecord.names?.otherLanguages)) {
+    names.push(...locationRecord.names.otherLanguages);
+  }
+
+  return toTrimmedNonEmptyNameList(names);
+}
+
+function collectLocationNameEntries(locationRecord) {
+  const entries = [];
+
+  if (Array.isArray(locationRecord.names?.ancient)) {
+    locationRecord.names.ancient.forEach((name, index) => {
+      entries.push({
+        path: `$.names.ancient[${index}]`,
+        value: name
+      });
+    });
+  }
+
+  for (const modernVariant of splitModernNameVariants(locationRecord.names?.modern)) {
+    entries.push({
+      path: "$.names.modern",
+      value: modernVariant
+    });
+  }
+
+  if (Array.isArray(locationRecord.names?.alternate)) {
+    locationRecord.names.alternate.forEach((name, index) => {
+      entries.push({
+        path: `$.names.alternate[${index}]`,
+        value: name
+      });
+    });
+  }
+
+  if (Array.isArray(locationRecord.names?.otherLanguages)) {
+    locationRecord.names.otherLanguages.forEach((name, index) => {
+      entries.push({
+        path: `$.names.otherLanguages[${index}]`,
+        value: name
+      });
+    });
+  }
+
+  return entries
+    .filter((entry) => typeof entry.value === "string")
+    .map((entry) => ({
+      ...entry,
+      value: entry.value.trim()
+    }))
+    .filter((entry) => entry.value.length > 0);
+}
+
+function collectLocationNames(locationRecord) {
+  return collectTrimmedLocationNames(locationRecord)
     .map(normalizeText)
     .filter((name) => name.length > 0);
 }
@@ -758,6 +826,36 @@ export async function validateData(options = {}) {
           locationRecord.relativePath,
           "$.names.modern",
           "names.modern must be omitted when any candidate confidence is 'disputed'"
+        );
+      }
+    }
+
+    if (Array.isArray(data.names?.otherLanguages) && data.names.otherLanguages.length > 0) {
+      const namesByNormalizedValue = new Map();
+      for (const nameEntry of collectLocationNameEntries(data)) {
+        const normalizedName = normalizeNameForDuplicateCheck(nameEntry.value);
+        if (normalizedName.length === 0) {
+          continue;
+        }
+
+        const entries = namesByNormalizedValue.get(normalizedName) ?? [];
+        entries.push(nameEntry);
+        namesByNormalizedValue.set(normalizedName, entries);
+      }
+
+      for (const duplicateNameEntries of namesByNormalizedValue.values()) {
+        if (duplicateNameEntries.length < 2) {
+          continue;
+        }
+
+        const duplicateLocations = duplicateNameEntries
+          .map((entry) => `${entry.path} ('${entry.value}')`)
+          .join(", ");
+        recordError(
+          errors,
+          locationRecord.relativePath,
+          "$.names",
+          `Duplicate location name '${duplicateNameEntries[0].value}' appears more than once across names.ancient, names.alternate, names.modern, and names.otherLanguages: ${duplicateLocations}`
         );
       }
     }
