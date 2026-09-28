@@ -4,7 +4,7 @@
     "ancient": [
       "Tarsus"
     ],
-    "modern": "Tarsus (Mersin Province, Turkey)",
+    "modern": "Tarsus",
     "alternate": []
   },
   "type": "city",
@@ -67,5 +67,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "lastReviewed": "2026-09-28"
 }

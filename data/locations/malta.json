@@ -28,7 +28,7 @@
       ]
     },
     {
-      "label": "Mljet (Melite Illyrica), Croatia",
+      "label": "Mljet (Melite Illyrica)",
       "coordinates": [
         17.535,
         42.745
@@ -83,5 +83,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "lastReviewed": "2026-09-28"
 }

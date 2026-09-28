@@ -30,7 +30,6 @@
       "additionalProperties": false,
       "required": [
         "ancient",
-        "modern",
         "alternate"
       ],
       "properties": {

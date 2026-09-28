@@ -4,14 +4,14 @@
     "ancient": [
       "Salamis"
     ],
-    "modern": "Near Famagusta (Cyprus)",
+    "modern": "Near Famagusta",
     "alternate": []
   },
   "type": "city",
   "zoomTier": "city",
   "candidates": [
     {
-      "label": "Salamis archaeological site (Cyprus)",
+      "label": "Salamis archaeological site",
       "coordinates": [
         33.903589,
         35.175101
@@ -47,5 +47,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "lastReviewed": "2026-09-28"
 }

@@ -35,7 +35,7 @@ Show every place on an interactive map, the way `docs/design/VISUAL_SPEC.md` §2
    - Pins are coloured by type (spec §2) and are **keyboard-focusable buttons** named like "Capernaum, city".
    - Region and island records appear as clickable labels.
    - Visibility follows the `zoomTier` rules, and nearby pins cluster below zoom 7.
-   - Disputed places show a "?" pin below zoom 8, and lettered, dashed-outline candidate pins from zoom 8 or when selected.
+   - Places with several candidates show one pin below zoom 8, with a **"?" badge only if the place is disputed** (at least one candidate with confidence `disputed`; see `schema/README.md`). From zoom 8, or when selected, they show lettered, dashed-outline candidate pins.
    - The selected place gets a larger pin.
 5. **Selection:** clicking a pin, label or candidate selects it and zooms as spec §2 describes, jumping instead of flying when reduced motion is preferred. It updates `?place=` and `&candidate=` in the URL, and opening such a URL restores the selection. The panel content can remain a stub, since M3-04 builds it.
 6. **Controls:** zoom in and out, reset view (the Mediterranean overview), compact attribution, and a metric scale bar.

@@ -41,6 +41,18 @@ All example values below are **illustrative only** (not verified historical clai
 
 If any candidate has confidence `disputed`, the record must include at least **two** candidates.
 
+### Modern names
+- `names.modern` is optional and, when present, must be the modern place name only.
+- Do not include country, state, province, political descriptors, or editorial notes in `names.modern`.
+- A disputed place is a record with at least one candidate whose confidence is `disputed`.
+- For disputed places, leave out `names.modern`; candidate labels already carry the modern site names.
+- For other places with several candidates, give `names.modern` only when one neutral name covers every candidate; otherwise leave it out.
+- Region and island records should use a neutral geographic name when one exists; otherwise leave `names.modern` out. This takes precedence over the several-candidates rule above (for example, Malta keeps `Malta` although a low-confidence candidate is Mljet). Leave it out where every modern name in use carries a political meaning (Judea, Samaria) or no modern region matches (Galatia).
+- When an ancient site has no modern settlement of its own, `Near <town>` is allowed (for example `Near Denizli`).
+- Candidate `label` fields follow the same neutrality rule: no country, state or political descriptor.
+- The validator enforces the machine-checkable parts: `names.modern` must not contain the word `disputed`, and disputed places must omit `names.modern`.
+- Country/descriptor neutrality is reviewed by the Research Lead and Fact-Checker.
+
 ### Status workflow
 - `status: "draft"`: in-progress research; `verifiedBy` and `lastReviewed` are optional.
 - `status: "verified"`: reviewed and accepted; `verifiedBy` and `lastReviewed` are required.

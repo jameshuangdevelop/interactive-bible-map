@@ -5,7 +5,7 @@
       "Puteoli",
       "Dikaiarcheia"
     ],
-    "modern": "Pozzuoli (Italy)",
+    "modern": "Pozzuoli",
     "alternate": []
   },
   "type": "city",
@@ -56,5 +56,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "lastReviewed": "2026-09-28"
 }

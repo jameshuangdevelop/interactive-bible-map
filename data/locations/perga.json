@@ -5,7 +5,7 @@
       "Perga",
       "Perge"
     ],
-    "modern": "Near Antalya (Turkey)",
+    "modern": "Near Antalya",
     "alternate": []
   },
   "type": "city",
@@ -58,5 +58,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "lastReviewed": "2026-09-28"
 }

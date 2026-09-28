@@ -15,7 +15,7 @@
   "parentId": "jerusalem",
   "candidates": [
     {
-      "label": "Temple Mount",
+      "label": "Temple Mount / Haram al-Sharif",
       "coordinates": [
         35.235556,
         31.777778
@@ -118,5 +118,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "lastReviewed": "2026-09-28"
 }

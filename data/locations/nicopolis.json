@@ -5,7 +5,7 @@
       "Nicopolis",
       "Nicopolis in Epirus"
     ],
-    "modern": "Near Preveza (Greece)",
+    "modern": "Near Preveza",
     "alternate": []
   },
   "type": "city",
@@ -55,5 +55,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "lastReviewed": "2026-09-28"
 }

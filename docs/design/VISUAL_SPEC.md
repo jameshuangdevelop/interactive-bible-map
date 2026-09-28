@@ -41,7 +41,7 @@ The reserved areas are **not built in M3**. The wireframes show them with dashed
 **Decided:** Liberty, on 2026-09-28 (ADR-0022). The comparison is kept as the record of the choice.
 
 These are real renders, not wireframes. They are what the app's map will look like, drawn with MapLibre 6.10 from OpenFreeMap tiles, with all 63 of our places in the pin colours from this spec.
-- **Customizations the app will make:** English labels where the map data has them, no points of interest, clustering below zoom 7, a "?" pin for disputed places when zoomed out, and lettered candidates when zoomed in.
+- **Customizations the app will make:** English labels where the map data has them, no points of interest, clustering below zoom 7, a "?" badge on disputed places (for example Emmaus) when zoomed out, and lettered candidates for any place with several candidates when zoomed in.
 - **Borders:** hidden in these previews, so that no contested line is shown here. The app hides only disputed boundaries.
 - **Attribution:** each image carries the OpenFreeMap, OpenMapTiles and OpenStreetMap attribution in its corner.
 
@@ -76,10 +76,11 @@ The data's `zoomTier` decides when a place appears. The initial view shows the w
 | `city` | 4 | Nearby pins **cluster** into a count bubble below zoom 7. Clicking a bubble zooms in. |
 | `site` | 12 | Sites inside a city (Jerusalem's Temple Mount, pools and so on) appear only when zoomed in. |
 
-**Selecting a place zooms the map to it:** a city to about zoom 11, a site to about zoom 15, and a region to about zoom 7. A disputed place zooms to fit all its candidates. If the user prefers reduced motion, the map jumps instead of flying.
+**Selecting a place zooms the map to it:** a city to about zoom 11, a site to about zoom 15, and a region to about zoom 7. A place with several candidates zooms to fit all of them. If the user prefers reduced motion, the map jumps instead of flying.
 
-### Disputed places (several candidate sites)
-- **Below zoom 8:** one pin, placed at the first-listed candidate, with a **"?" badge**.
+### Places with several candidate sites
+A place is **disputed** when at least one of its candidates has confidence `disputed` (see `schema/README.md`), for example Emmaus, Bethsaida and Cana. Other places also have several candidates without being disputed: Jericho's Old Testament tell and Herodian city, or Malta with a low-confidence minority proposal.
+- **Below zoom 8:** one pin, placed at the first-listed candidate. **Disputed places add a "?" badge.**
 - **From zoom 8, or when the place is selected:** one pin per candidate, lettered **A, B, C …** in the data's order, with a **dashed** white outline. Every candidate pin looks the same except for its letter; the map never marks one candidate as "the" site.
 - Clicking any candidate opens the place, with that candidate highlighted in the panel.
 
@@ -92,8 +93,8 @@ The section order follows brief §1.4. Sections without data are left out.
    - under it, the modern name (see §8 for the neutrality rule);
    - then "Also known as …" with the other ancient and alternate names;
    - then a line with the type and parent, for example "City · Galilee", which links to the parent.
-3. **Location confidence:** a chip in words, never colour alone. "High confidence" appears for single-candidate places. Disputed places get a banner instead: **"Location disputed · 4 proposed sites"**.
-4. **Candidates** (disputed places only): a list A, B, C … Each entry has its label, a confidence chip and its support text (two lines, expandable), plus its sources. Selecting an entry centres the map on it.
+3. **Location confidence:** a chip in words, never colour alone. "High confidence" appears for single-candidate places. **Disputed places** get a banner instead: **"Location disputed · 4 proposed sites"**. Other places with several candidates get a neutral line, **"*n* sites"**, and each candidate carries its own confidence chip.
+4. **Candidates** (places with several candidates): a list A, B, C … Each entry has its label, a confidence chip and its support text (two lines, expandable), plus its sources. Selecting an entry centres the map on it.
 5. **Actions:** round buttons with labels: **Zoom to**, **Copy link** and **Sources**, which scrolls to the sources.
 6. **About:** the summary, then the history notes. Each factual statement ends with source markers such as [1] [2] that link to the Sources section.
 7. **In the Bible · *n* passages:** grouped by book in canonical order.
@@ -160,7 +161,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Touch targets** are at least 44 × 44 px. **Reduced motion** replaces every animation with a jump.
 
 ## 8. Neutrality in the interface
-- **Modern names** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels.
+- **Modern names** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
 - **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
 
@@ -187,7 +188,7 @@ The Ancient layer and timeline (M4), the Routes tab (M5), responsive polish (M7)
 ## Wireframes
 | File | Shows |
 |---|---|
-| [01-map-overview.svg](wireframes/01-map-overview.svg) | Opening view: the Mediterranean overview, search, pins, a cluster, region labels, a disputed "?" pin, controls and the reserved areas |
+| [01-map-overview.svg](wireframes/01-map-overview.svg) | Opening view: the Mediterranean overview, search, pins, a cluster, region labels, a sample disputed "?" pin, controls and the reserved areas |
 | [02-place-panel.svg](wireframes/02-place-panel.svg) | Capernaum selected: photos with credits, names, actions, About, In the Bible, OT connections |
 | [03-disputed-place.svg](wireframes/03-disputed-place.svg) | Emmaus selected: the disputed banner and four lettered candidates on the panel and the map |
 | [04-search.svg](wireframes/04-search.svg) | Search results for "Antioch" |

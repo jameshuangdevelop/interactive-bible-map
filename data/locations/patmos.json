@@ -4,7 +4,7 @@
     "ancient": [
       "Patmos"
     ],
-    "modern": "Patmos (Greece)",
+    "modern": "Patmos",
     "alternate": []
   },
   "type": "natural-feature",
@@ -47,5 +47,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-24"
+  "lastReviewed": "2026-09-28"
 }

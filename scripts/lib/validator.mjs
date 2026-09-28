@@ -643,6 +643,10 @@ export async function validateData(options = {}) {
       continue;
     }
 
+    const hasDisputedCandidate =
+      Array.isArray(data.candidates) &&
+      data.candidates.some((candidate) => candidate?.confidence === "disputed");
+
     if (typeof data.parentId === "string" && !locationIds.has(data.parentId)) {
       recordError(
         errors,
@@ -653,9 +657,6 @@ export async function validateData(options = {}) {
     }
 
     if (Array.isArray(data.candidates)) {
-      const hasDisputedCandidate = data.candidates.some(
-        (candidate) => candidate?.confidence === "disputed"
-      );
       if (hasDisputedCandidate && data.candidates.length < 2) {
         recordError(
           errors,
@@ -739,6 +740,26 @@ export async function validateData(options = {}) {
           }
         }
       });
+    }
+
+    if (typeof data.names?.modern === "string") {
+      if (/\bdisputed\b/iu.test(data.names.modern)) {
+        recordError(
+          errors,
+          locationRecord.relativePath,
+          "$.names.modern",
+          "names.modern must not contain the word 'disputed'"
+        );
+      }
+
+      if (hasDisputedCandidate) {
+        recordError(
+          errors,
+          locationRecord.relativePath,
+          "$.names.modern",
+          "names.modern must be omitted when any candidate confidence is 'disputed'"
+        );
+      }
     }
 
     validateSourceArray({
