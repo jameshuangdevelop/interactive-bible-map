@@ -151,3 +151,5 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-28 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-02 app scaffold | ~780k / ~60k | ~323 | ~28,399 |
 | 2026-09-28 | pr-reviewer | Claude Sonnet 5 (Copilot CLI subagent) | M3-02 review (app scaffold, data build, CI) | ~220k / ~16k | ~380 | ~28,779 |
 | 2026-09-28 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-02 follow-up fixes (router removal, workflow/doc/accessibility updates) | ~500k / ~40k | ~230 | ~29,009 |
+| 2026-09-28 | fact-checker | Claude Opus 5.5 (Copilot CLI subagent) | M3-07 basemap attribution (OpenFreeMap, OpenMapTiles, OSM, Liberty style lineage, fonts and sprites, Protomaps and VersaTiles fallbacks; Opus 5.5 rates +50%) | ~170k / ~40k | ~470 | ~29,479 |
+| 2026-09-28 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3-07 | ~320k / ~9k | ~130 | ~29,609 |
