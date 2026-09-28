@@ -7,8 +7,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP0 | M0 Setup & Plan | Plan, org chart, budget forecast | Approved 2026-09-23 | #2 |
 | CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Approved 2026-09-23 | #3–#7 |
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
-| CP3a | M3 MVP App | Low-fidelity visual spec and mockup | **Awaiting review** | |
-| CP3b | M3 MVP App | Working MVP deployed to a preview | Not started | |
+| CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
+| CP3b | M3 MVP App | Working MVP deployed to a preview | **In progress** | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
@@ -192,6 +192,8 @@ M3, the MVP app.
 ---
 
 ## CP3a — Visual spec
+
+**Outcome:** approved on 2026-09-28 (#16). Decision 1 is Liberty (ADR-0022), and decisions 2–5 are as recommended. The build (M3-02 to M3-08) has started.
 
 ### What was delivered
 - **[Visual spec](docs/design/VISUAL_SPEC.md):** layout, map, place panel, search, states, visual tokens, accessibility (WCAG 2.2 AA), neutrality rules, attribution, links and performance targets. The model is Google Maps on desktop, with the colourful OpenFreeMap Liberty basemap (decision 1).
