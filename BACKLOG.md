@@ -15,6 +15,9 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
 
+## Map
+- **Self-hosted Protomaps fallback** (M3-07's recommended option). M3 uses the VersaTiles public server as the outage-only fallback instead, because a regional Protomaps extract won't fit Cloudflare Pages' 25 MiB file limit. Hosting it on Cloudflare R2 (free up to 10 GB-month) needs an R2 bucket and a token with R2 permissions. Revisit if VersaTiles' terms change or if outages become frequent.
+
 ## Deferred review findings
 PR Reviewer findings that were not addressed in their PR, each with a reason.
 

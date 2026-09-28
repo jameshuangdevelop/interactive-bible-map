@@ -5,7 +5,7 @@
 | Agent | `frontend-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m3-map` |
-| Depends on | M3-02 (scaffold). It uses the attribution text from M3-07 if that has merged; otherwise it uses a placeholder, marked `TODO(M3-07)`. |
+| Depends on | M3-02 (scaffold) and M3-07 (attribution), both merged. Use M3-07's exact strings and obligations in `docs/LICENSES.md` → "Basemap (M3-07)". |
 | Parallel with | none |
 | Credit target | ~900 AI credits (session guard: 1,500) |
 
@@ -31,6 +31,7 @@ Show every place on an interactive map, the way `docs/design/VISUAL_SPEC.md` §2
    - Keep glyph, sprite and tile URLs pointing at OpenFreeMap.
    - Record the source style's license and where it came from in the PR.
 3. **Fallback:** a basemap from a **different provider or host** than OpenFreeMap, chosen from the options whose licenses M3-07 verifies (for example a self-hosted Protomaps extract, or another provider that needs no API key). It must also hide disputed boundaries. Configuration can select it, and after repeated tile errors the app switches to it automatically and shows the message from spec §5. Record the choice and why in the PR. OpenFreeMap's Bright and Liberty styles are not fallbacks, because they use the same servers.
+   - **PO decision (after M3-07):** use the **VersaTiles public server** with our own hosted copy of its Colorful style, following `docs/LICENSES.md` obligations F1, F2 and F6. Its terms allow it for outages only, which is exactly the fallback's role. A self-hosted Protomaps extract would need Cloudflare R2 storage, because Pages limits files to 25 MiB, and so a new token permission; it is in `BACKLOG.md`.
 4. **Places:**
    - Pins are coloured by type (spec §2) and are **keyboard-focusable buttons** named like "Capernaum, city".
    - Region and island records appear as clickable labels.
@@ -52,7 +53,7 @@ The place panel content (M3-04), search (M3-05), the Ancient layer and timeline 
 - [ ] Disputed boundaries are hidden, which the tests confirm.
 - [ ] The fallback works: it is on a different provider or host, and a test shows that simulated tile errors switch to it and show the message.
 - [ ] Pins, labels and controls can be reached and operated by keyboard, and have accessible names.
-- [ ] The attribution is visible, and uses M3-07's exact text if it has merged, or a marked placeholder if not.
+- [ ] The attribution is visible and uses M3-07's exact strings, switching to the VersaTiles strings while the fallback is showing.
 - [ ] CI passes. Committed as `feat(map): add map view with places, tiers and clustering`.
 
 ## Finish
