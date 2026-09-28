@@ -1,6 +1,6 @@
 # Licenses
 
-License decisions for this project. Maintained by the Fact-Checker & Licensing agent. Every upstream source and its required attribution is listed in [ATTRIBUTION.md](../ATTRIBUTION.md). Decisions below were made in M1-03 (`docs/verification/M1.md`), independently re-verifying every source's license on its own site on 2026-09-23.
+License decisions for this project. Maintained by the Fact-Checker & Licensing agent. Every upstream source and its required attribution is listed in [ATTRIBUTION.md](../ATTRIBUTION.md). Decisions below were made in M1-03 (`docs/verification/M1.md`), independently re-verifying every source's license on its own site on 2026-09-23. The basemap decisions were made in M3-07 (`docs/verification/M3-basemap.md`), reading every license on the provider's own pages on 2026-09-28.
 
 | Content | License | Status |
 |---|---|---|
@@ -10,7 +10,7 @@ License decisions for this project. Maintained by the Fact-Checker & Licensing a
 | `data/reference/` (WEB snapshot text and snapshot metadata) | **Public domain source text** (WEB `engwebp`) plus non-creative integrity metadata (`sha256`, source URL/date). This follows ADR-0012: WEB text remains public domain and is not relicensed under the project's CC BY-SA data layer. | Decided |
 | Bible text | World English Bible (WEB), Protestant-canon editions only (`engwebp`/`engwebpb`). Confirmed **public domain** on eBible.org's own pages; "World English Bible" is a **trademark** of eBible.org (not to be used to label a changed text). Public domain regardless of which JSON record the text sits inside — it is not covered by the project's CC BY-SA 4.0 data license. | Decided |
 | Images | Hotlinked, never committed. Each image keeps its own upstream license (read per file from Wikimedia Commons). Accepted licenses listed below. | Decided |
-| Map tiles (basemap) | Depends on the CP1 stack choice (`docs/research/STACK_OPTIONS.md`). All leading candidates (OpenFreeMap, self-hosted Protomaps PMTiles) trace back to OpenStreetMap data under ODbL 1.0, requiring an OSM attribution notice displayed via the map library's attribution control. Exact provider and wording finalized after CP1; see the placeholder row in `ATTRIBUTION.md`. | **Open (waits for CP1)** |
+| Map tiles (basemap) | **Main:** our modified, self-hosted copy of the OpenFreeMap **Liberty** style (ADR-0022) over OpenFreeMap's tiles. The tiles are OpenStreetMap data under **ODbL 1.0** in the OpenMapTiles schema (design **CC BY 4.0**). The style is **BSD 3-Clause + MIT** (code) and **CC BY 3.0 + CC BY 4.0** (design). The rendered map is an ODbL Produced Work, so ODbL does not extend to our code or data, and no basemap data enters `data/` or `content/`. **Fallback (M3-03 chooses):** a self-hosted Protomaps extract (recommended) or the VersaTiles public server (outage-only). Obligations and exact strings are under "Basemap (M3-07)" below. | **Decided (M3-07, 2026-09-28)** |
 
 ## Accepted image licenses
 Per Media Curator brief rule #5, the project accepts only:
@@ -32,6 +32,107 @@ Per Media Curator brief rule #5, the project accepts only:
 > Scripture quotations are from the **World English Bible (WEB)**, a public-domain translation of the Bible (66-book Protestant-canon edition, eBible.org). "World English Bible" is a trademark of eBible.org; this project is not produced, reviewed, or endorsed by eBible.org.
 
 This wording is edition-agnostic and works for either `engwebp` (US spelling, "LORD"/"GOD") or `engwebpb` (British/international spelling, "LORD"/"GOD") — both are public domain with identical trademark status, confirmed on their own eBible.org pages (read 2026-09-23). The edition itself (US vs. British spelling) is the human's choice at CP1; see `docs/verification/M1.md` §2 Q4. The Classic editions (`eng-web`/`eng-webbe`, which use "Yahweh" and include the Apocrypha) remain out of scope per the brief's 66-book canon rule.
+
+## Basemap (M3-07)
+Decided on 2026-09-28. The evidence for every line, with its source URL and date read, is in [`docs/verification/M3-basemap.md`](verification/M3-basemap.md). The main basemap is our modified copy of OpenFreeMap Liberty (ADR-0022). M3-03 chooses the fallback from the two acceptable candidates below (spec §2).
+
+### What each part is licensed under (main basemap)
+| Part | License | Credit required, and where |
+|---|---|---|
+| OpenStreetMap data in the tiles | ODbL 1.0. The rendered map is a Produced Work (ODbL §4.5(b)). | "OpenStreetMap", linked to `https://www.openstreetmap.org/copyright`, in a corner of the map (ODbL §4.3; OSMF Attribution Guidelines) |
+| OpenMapTiles vector tile schema | CC BY 4.0 (design), BSD 3-Clause (code) | "© OpenMapTiles", linked to openmaptiles.org, in a corner of the map |
+| OpenFreeMap (tile hosting, and the glyphs, sprite and relief tiles the style loads) | MIT (project); free public instance under its [Terms of Service](https://openfreemap.org/tos/) | "OpenFreeMap": optional, but shown |
+| Liberty style (OpenFreeMap Liberty ← OSM Liberty ← OSM Bright ← Mapbox Open Styles) | Code: BSD 3-Clause (Copyright (c) 2014, Mapbox; the OSM Bright and OSM Liberty modifications keep the same license) and MIT (OpenFreeMap's changes, Copyright (c) 2023 Zsolt Ero). Design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). | Not on the map. The notices travel with the style file (L2, L3), and the design credit is in "Sources & credits" (L5). |
+| Label glyphs: Noto Sans Regular, Bold and Italic | SIL Open Font License 1.1, Copyright 2022 The Noto Project Authors | None on screen. The copyright line and license go beside the glyph files only if we host them (L7). |
+| Sprite icons | Maki: CC0 1.0. Arrow: public domain. Other icons: the style's licenses above. | None |
+| Relief shading at low zoom | Natural Earth: public domain; the tiles are PDDL 1.0 | None (credited as a courtesy) |
+
+All of these are compatible with the project: the code stays MIT, and the basemap is a separate display layer, so none of its data or design enters the CC BY-SA 4.0 or ODbL data in `data/` and `content/`.
+
+### Obligations for the Frontend Engineer: main basemap (Liberty)
+- **L1. Attribution text.** In our hosted style, set the `attribution` property of the `openmaptiles` source to the exact control string below, so the credit does not depend on OpenFreeMap's TileJSON. Leave `ne2_shaded` without an attribution. Do not repeat these credits through `customAttribution`.
+- **L2. Notice inside the style file.** Set the style's `name` and `metadata` to the JSON given below. The upstream Liberty file has neither (OpenFreeMap's lint step removed OSM Liberty's `maputnik:license`), so we add them.
+- **L3. Notice file beside the style.** Keep a `LICENSE.txt` in the same folder as the hosted style JSON, in the repo and in the deploy. In this order, it contains: (a) the `interactive-bible-map:license` sentence from L2; (b) the openfreemap-styles [`LICENSE.md`](https://github.com/hyperknot/openfreemap-styles/blob/main/LICENSE.md), including its MIT notice, verbatim; (c) Liberty's [`styles/liberty/LICENSE.md`](https://github.com/hyperknot/openfreemap-styles/blob/main/styles/liberty/LICENSE.md) verbatim; (d) OSM Bright's [`styles/bright/LICENSE.md`](https://github.com/hyperknot/openfreemap-styles/blob/main/styles/bright/LICENSE.md) verbatim; (e) the Mapbox Open Styles [`LICENSE.md`](https://github.com/mapbox/mapbox-gl-styles/blob/master/LICENSE.md) verbatim. This keeps the copyright lines, conditions and disclaimers that BSD 3-Clause, MIT and CC BY require of a modified redistribution.
+- **L4. Visible when the map opens.** The attribution control must be expanded and legible when the map first appears. It may collapse to the ⓘ button only on dismiss, on map interaction (pan, zoom, click) or after 5 seconds, and ⓘ must reopen it (OSMF safe harbour). MapLibre's default behaviour meets this, so never configure it to start collapsed. Its text must meet the spec's WCAG 2.2 AA contrast (§7).
+- **L5. "Sources & credits".** Show the drawer text below, reachable from the map screen through the menu (spec §9). This is where the style's design credit lives: Mapbox and OpenMapTiles require it to be "reasonably accessible" from the map, not printed on it.
+- **L6. Hide disputed boundaries in the style only.** Remove the `boundary_disputed` layer, and keep the existing `disputed`/`claimed_by` exclusions on `boundary_2` and `boundary_3`. Never delete or filter features in the tile data itself (see the ruling below).
+- **L7. Fonts and sprite.** Keep loading the glyphs and sprite from OpenFreeMap; no extra notice is then needed. If we ever host copies of the glyph files, put the Noto Sans `OFL.txt`, with its copyright line, beside them (OFL condition 2).
+- **L8. OpenFreeMap's terms.** The person integrating OpenFreeMap must be at least 18 (ToS "Eligibility"). Do not bulk-download or scrape tiles from the public instance, which its ToS forbids ("collect data from the service in automated ways without permission").
+- **L9. No implied endorsement.** Do not name the style or the app in a way that suggests endorsement by Mapbox, OpenMapTiles, OpenFreeMap or OpenStreetMap (BSD clause 3; CC BY 3.0 §4(b)). Crediting them, as below, is fine.
+
+### Obligations for the fallback (M3-03)
+- **F1. Disputed boundaries.** The fallback style must hide them too. Protomaps: add `["!=", ["get", "disputed"], true]` to the `boundaries_country` and `boundaries` layers, because its default style draws every boundary. VersaTiles Colorful: remove the `boundary-country-disputed` layer and the disputed branch of `boundary-country:outline`.
+- **F2. Our own copy of the style,** with the fallback's own attribution string in its source `attribution`. The control must always show the string of the style currently displayed. The drawer may list the main and the fallback blocks all the time.
+- **F3. Protomaps: notice with the tiles.** Keep the extract's metadata `attribution` as built, keep the extract publicly readable at its URL, and store this `README.txt` beside it in the bucket, with the build date filled in: "This file contains OpenStreetMap data © OpenStreetMap contributors, available under the Open Database License 1.0 (https://opendatacommons.org/licenses/odbl/1-0/). It is an unmodified regional extract of the Protomaps Basemaps build of YYYY-MM-DD (https://maps.protomaps.com/builds). It also contains Natural Earth data (public domain) and ESA WorldCover 2020 data (CC BY 4.0)."
+- **F4. Protomaps: naming and notices.** Do not call our modified style or tiles "Protomaps"; the Protomaps rules require a fork to have a different name. Credit Protomaps instead (strings below). If the Protomaps fonts or sprite are copied to our host, put basemaps-assets' `fonts/OFL.txt` and the tangrams/icons MIT notice (Copyright (c) 2017 Mapzen, Linux Foundation) beside them. If the style is generated with the `@protomaps/basemaps` package, keep its BSD 3-Clause notice with our third-party notices.
+- **F5. Protomaps: landcover.** The Light flavor draws the `landcover` layer (ESA WorldCover 2020, CC BY 4.0), so the strings below credit ESA. If M3-03 removes that layer, delete the ESA part of both Protomaps strings.
+- **F6. VersaTiles: outage only.** VersaTiles offers its hosted tiles "for prototyping and small projects", so use them only while OpenFreeMap is failing, never as the primary basemap. Host our own copy of the Colorful style, since VersaTiles' hosted styles "may change". Keep the ESA WorldCover 2021 credit, because the hosted tileset always contains landcover.
+- **F7. Hosting limits.** Protomaps on R2 is free up to 10 GB-month of storage and 1 million Class A and 10 million Class B operations a month, with free egress. The size of a regional extract is unknown until M3-03 builds it.
+
+### Ruling: hiding disputed boundaries
+Hiding boundary features where `disputed = 1` (OpenMapTiles) or `disputed = true` (Protomaps, Shortbread) in **our hosted style** changes **no** attribution or license obligation. A filtered rendering is still an ODbL Produced Work (§4.5(b)); the style file contains no OpenStreetMap data; the §4.3 credit stays exactly as before; and the "modified" notice that Liberty's CC BY license already requires covers the change (the strings list it). This holds only while the filtering is done in the style. Deleting the features from the tile data and serving the result would create a Derivative Database, which must be released under the ODbL and offered in full or as an alteration file (§4.4, §4.6). Full reasoning: `docs/verification/M3-basemap.md` §3.
+
+### Basemap attribution strings
+Paste these exactly. The control strings are HTML for a style source's `attribution` property; MapLibre renders them in the attribution control. The drawer strings are Markdown: each `[text](url)` is a link.
+
+#### Main basemap: Liberty on OpenFreeMap
+**1. Attribution control** (the `attribution` of the `openmaptiles` source; identical to OpenFreeMap's own TileJSON string, read 2026-09-28):
+```html
+<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>
+```
+It reads: OpenFreeMap © OpenMapTiles Data from OpenStreetMap
+
+**2. "Sources & credits" drawer:**
+```markdown
+**Basemap**
+
+- Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/).
+- Vector tiles in the [OpenMapTiles](https://openmaptiles.org/) schema (© OpenMapTiles, design [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), served free by [OpenFreeMap](https://openfreemap.org).
+- Map style: our modified copy of [OpenFreeMap Liberty](https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), with English labels, no points of interest and disputed boundary lines hidden. Liberty is a fork of [OSM Liberty](https://github.com/maputnik/osm-liberty), which derives from [OSM Bright](https://github.com/openmaptiles/osm-bright-gl-style) by OpenMapTiles and from [Mapbox Open Styles](https://github.com/mapbox/mapbox-gl-styles) (© 2014 Mapbox). Style design: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Style code: BSD 3-Clause and MIT. License notices: [OpenFreeMap](https://github.com/hyperknot/openfreemap-styles/blob/main/LICENSE.md), [OSM Liberty](https://github.com/maputnik/osm-liberty/blob/gh-pages/LICENSE.md), [OSM Bright](https://github.com/openmaptiles/osm-bright-gl-style/blob/master/LICENSE.md), [Mapbox Open Styles](https://github.com/mapbox/mapbox-gl-styles/blob/master/LICENSE.md).
+- Relief shading from [Natural Earth](https://www.naturalearthdata.com/) (public domain). Labels in Noto Sans ([SIL Open Font License 1.1](https://openfontlicense.org/)). Icons from [Maki](https://github.com/mapbox/maki) (CC0 1.0).
+```
+
+**3. Style file `name` and `metadata`** (L2; top-level keys of the hosted style JSON):
+```json
+"name": "Interactive Bible Map basemap (modified from OpenFreeMap Liberty)",
+"metadata": {
+  "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: English labels, points of interest removed, disputed boundary lines hidden. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+}
+```
+
+#### Fallback A: self-hosted Protomaps extract (acceptable, recommended)
+**1. Attribution control:**
+```html
+<a href="https://github.com/protomaps/basemaps" target="_blank">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2020</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)
+```
+It reads: Protomaps © OpenStreetMap · © ESA WorldCover 2020 (CC BY 4.0)
+
+**2. "Sources & credits" drawer:**
+```markdown
+**Backup basemap** (shown only when the main map cannot load)
+
+- Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/).
+- Tiles and map style from [Protomaps Basemaps](https://github.com/protomaps/basemaps) (design [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/), code BSD 3-Clause), hosted by Interactive Bible Map. Our copy of the style is modified: English labels, no points of interest, disputed boundary lines hidden.
+- Land cover: © ESA WorldCover project 2020 / Contains modified Copernicus Sentinel data (2020) processed by ESA WorldCover consortium, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), via the Daylight Map Distribution.
+- Low-zoom data from [Natural Earth](https://www.naturalearthdata.com/) (public domain). Labels in Noto Sans ([SIL Open Font License 1.1](https://openfontlicense.org/)). Icons derived from [Mapzen tangrams/icons](https://github.com/tangrams/icons) (MIT).
+```
+
+#### Fallback B: VersaTiles public tile server (acceptable for outages only)
+**1. Attribution control:**
+```html
+<a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)
+```
+It reads: VersaTiles © OpenStreetMap contributors · © ESA WorldCover 2021 (CC BY 4.0)
+
+**2. "Sources & credits" drawer:**
+```markdown
+**Backup basemap** (shown only when the main map cannot load)
+
+- Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/).
+- Tiles served free by [VersaTiles](https://versatiles.org), in the [Shortbread](https://shortbread-tiles.org/) schema (CC0). Map style: our modified copy of VersaTiles Colorful ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)), with English labels, no points of interest and disputed boundary lines hidden.
+- Land cover: © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- Labels in Noto Sans ([SIL Open Font License 1.1](https://openfontlicense.org/)). Icons from VersaTiles ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)).
+```
 
 ## Source compatibility
 | Source | License (verified 2026-09-23) | Compatible with project? | Use |
@@ -69,4 +170,4 @@ This wording is edition-agnostic and works for either `engwebp` (US spelling, "L
 
 ## CP1 decisions needing the human
 1. **WEB edition:** `engwebp` (US spelling) vs. `engwebpb` (British/international spelling). Licensing is identical for both (public domain, same trademark status, both 66-book Protestant canon, both render God's name as "LORD"/"GOD"). Purely an editorial choice. **Recommendation:** `engwebp`, as the more common default for a US-hosted, English-first audience — but either is fully compliant.
-2. **Basemap/tile provider** (M1-02's stack recommendation: OpenFreeMap, runner-up self-hosted Protomaps PMTiles). Both trace back to OpenStreetMap ODbL data and require the same OSM attribution notice; the exact wording and any additional provider-specific credit (e.g. "OpenMapTiles") depends on which is chosen. See the placeholder row in `ATTRIBUTION.md`.
+2. **Basemap/tile provider** (M1-02's stack recommendation: OpenFreeMap, runner-up self-hosted Protomaps PMTiles). Both trace back to OpenStreetMap ODbL data and require the same OSM attribution notice; the exact wording and any additional provider-specific credit (e.g. "OpenMapTiles") depends on which is chosen. **Resolved:** CP1 chose OpenFreeMap (ADR-0009) and CP3a chose its Liberty style (ADR-0022). The wording is under "Basemap (M3-07)" above.
