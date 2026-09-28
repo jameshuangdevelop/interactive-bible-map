@@ -751,12 +751,15 @@ export async function validateData(options = {}) {
         );
       }
 
-      if (Array.isArray(data.candidates) && data.candidates.length > 1) {
+      if (
+        Array.isArray(data.candidates) &&
+        data.candidates.some((candidate) => candidate?.confidence === "disputed")
+      ) {
         recordError(
           errors,
           locationRecord.relativePath,
           "$.names.modern",
-          "names.modern must be omitted when a record has more than one candidate"
+          "names.modern must be omitted when any candidate confidence is 'disputed'"
         );
       }
     }

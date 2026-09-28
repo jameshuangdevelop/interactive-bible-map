@@ -12,7 +12,7 @@
       "label": "Tell Hum",
       "coordinates": [35.575, 32.88],
       "coordinateSource": "pleiades:678180",
-      "confidence": "disputed",
+      "confidence": "high",
       "support": "Illustrative primary candidate only.",
       "sources": ["pleiades:678180", "openbible:capernaum"]
     },

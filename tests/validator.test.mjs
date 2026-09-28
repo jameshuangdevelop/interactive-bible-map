@@ -520,20 +520,27 @@ test("names.modern cannot contain the word disputed", async () => {
   );
 });
 
-test("names.modern must be omitted for multiple-candidate records", async () => {
+test("names.modern must be omitted when a disputed-confidence candidate exists", async () => {
   const result = await runCase("invalid-modern-name-multiple-candidates");
   assert.ok(
     hasError(
       result,
       (error) =>
         error.path === "$.names.modern" &&
-        error.message.includes("must be omitted when a record has more than one candidate")
+        error.message.includes(
+          "must be omitted when any candidate confidence is 'disputed'"
+        )
     )
   );
 });
 
 test("disputed multi-candidate record may omit names.modern", async () => {
   const result = await runCase("valid-disputed-no-modern");
+  assert.equal(result.errors.length, 0);
+});
+
+test("multi-candidate non-disputed record may keep names.modern", async () => {
+  const result = await runCase("valid-modern-name-multiple-candidates");
   assert.equal(result.errors.length, 0);
 });
 
