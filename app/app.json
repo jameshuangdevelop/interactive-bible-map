@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Interactive Bible Map",
+    "slug": "interactive-bible-map",
+    "version": "1.0.0",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "scheme": "interactive-bible-map",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
