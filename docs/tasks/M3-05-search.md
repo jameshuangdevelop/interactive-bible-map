@@ -7,7 +7,7 @@
 | Branch | `feat/m3-search` |
 | Depends on | M3-03 (map and selection) |
 | Parallel with | M3-04 (place panel) |
-| Credit target | ~600 AI credits (session guard: 1,500) |
+| Credit target | ~600 AI credits (session guard: 10,000) |
 
 ## Goal
 Let users find any place by name, as `docs/design/VISUAL_SPEC.md` §4 describes. The search covers ancient, modern and alternate names only (brief §1.7).

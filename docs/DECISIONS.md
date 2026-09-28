@@ -152,3 +152,15 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Date:** 2026-09-28 · **Status:** Accepted · **By:** the human ("you can delete the remote branches as soon as they're merged")
 - **Decision:** In this repository, once a PR is merged, the PO deletes its remote branch without asking first, after checking that the branch's tip is in `main`. Branches that aren't fully merged stay until the human decides.
 - **Consequences:** The remote keeps only `main` and open work. Old branches from M0 to M3 were cleaned up the same day. `copilot/setup-and-plan-milestone-m0` stays, because it isn't merged.
+
+## ADR-0024 — An ancient-only physical basemap, with pins drawn by the map
+- **Date:** 2026-09-28 · **Status:** Accepted for the rendering change; the basemap details are Proposed, pending the human's confirmation · **By:** the human ("it's very confusing to have ancient and modern names in the same map ... For now, let's only display the ancient map"; "Zoom and drag both need to be very smooth"; the rendering plan: "sounds good") and the PO
+- **Context:** The first build of M3-03 showed Liberty's modern labels (countries, modern cities, Hebrew and Arabic street names) beside our ancient place names. Its pins were HTML elements repositioned by React on every frame, so they lagged a second behind every drag.
+- **Decision:** Until the Modern/Ancient toggle arrives (M4), the basemap is a physical version of Liberty: land, water, rivers, landcover and relief, with no labels, roads, borders, towns or buildings, and zoom stops at 14. Ancient empire, province and region names come from our own records (M3-11). Pins, labels and clusters are MapLibre layers drawn on the graphics card; keyboard and screen-reader users reach them through a list of the visible places. With 10,000 test points, dragging and zooming must cause no main-thread task over 50 ms and no DOM change.
+- **Consequences:** The map no longer depends on the basemap's labels, so English-only is automatic there. Map labels use the basemap's Noto Sans font instead of the UI font. M3-03 is reworked, and the "modified" notices in `docs/LICENSES.md` describe the physical treatment.
+
+## ADR-0025 — The session guard is 10,000 AI credits
+- **Date:** 2026-09-28 · **Status:** Accepted · **By:** the human ("you can have 10,000 AI credits per session")
+- **Context:** ADR-0005 set a 1,500-credit guard per session. M3-03's first build needed about 1,600, including three rounds of fixes, and a real browser check that caught a broken build.
+- **Decision:** The guard is 10,000 AI credits per agent session, for the PO and every specialist. It replaces the 1,500 figure in ADR-0005 and in the task cards. Credit targets on cards stay as forecasts.
+- **Consequences:** Agents can finish thorough rework in one session instead of handing off. The month cap (1,000,000) and the 80% and 95% stops don't change.

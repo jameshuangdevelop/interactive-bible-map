@@ -32,7 +32,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | Branch | `<prefix>/<slug>` |
 | Depends on | <IDs or checkpoint> |
 | Parallel with | <IDs or "none"> |
-| Credit target | ~<n> AI credits (session guard: 1,500) |
+| Credit target | ~<n> AI credits (session guard: 10,000) |
 
 ## Goal
 ## Inputs (read only these)

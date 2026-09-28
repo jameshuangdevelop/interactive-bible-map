@@ -8,7 +8,7 @@
 |---|---|---|
 | Soft stop (80%) | 800,000 per month | The PO starts no new milestone. Work in progress may finish. |
 | Hard stop (95%) | 950,000 per month | All agents stop at a clean handoff point and write the exact resume point in `docs/PROGRESS.md`. The PO prints a `gh issue create` command for a "Paused – budget" issue. |
-| Session guard | 1,500 per session | The agent stops at a clean point and hands off. A session this large is about 3× the forecast and usually means a loop or an oversized task. |
+| Session guard | 10,000 per agent session (ADR-0025) | The agent stops at a clean point and hands off. A session this large usually means a loop or an oversized task. |
 
 ## How to record usage
 - Every PR appends one row to the current month's ledger below. The PR Reviewer does not commit, so it puts its row in the review comment and the PO copies it here at the next checkpoint.
