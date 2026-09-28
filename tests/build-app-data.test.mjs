@@ -1,0 +1,114 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+
+import { buildAppData } from "../scripts/lib/app-data-builder.mjs";
+
+const testDirectory = path.dirname(fileURLToPath(import.meta.url));
+const fixturesDirectory = path.join(testDirectory, "fixtures");
+const validCaseDirectory = path.join(fixturesDirectory, "cases", "valid");
+const invalidCaseDirectory = path.join(fixturesDirectory, "cases", "invalid-missing-bib");
+const bibliographyFixturePath = path.join(fixturesDirectory, "bibliography.json");
+const webFixturePath = path.join(fixturesDirectory, "web", "engwebp-mini.vpl.txt");
+
+async function withTempDirectory(run) {
+  const tempDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-build-data-"));
+  try {
+    return await run(tempDirectory);
+  } finally {
+    await fs.rm(tempDirectory, { recursive: true, force: true });
+  }
+}
+
+test("buildAppData writes compact index fields and candidate fields", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      outputDirectory
+    });
+
+    const indexPath = path.join(outputDirectory, "places.index.json");
+    const indexData = JSON.parse(await fs.readFile(indexPath, "utf8"));
+
+    assert.equal(indexData.length, 2);
+
+    for (const place of indexData) {
+      assert.deepEqual(
+        Object.keys(place).sort(),
+        ["candidates", "id", "names", "parentId", "type", "zoomTier"]
+      );
+      for (const candidate of place.candidates) {
+        assert.deepEqual(Object.keys(candidate).sort(), [
+          "confidence",
+          "coordinates",
+          "label"
+        ]);
+      }
+    }
+  });
+});
+
+test("buildAppData writes one place file per location and resolves bibliography", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      outputDirectory
+    });
+
+    const placesDirectory = path.join(outputDirectory, "places");
+    const placeFiles = (await fs.readdir(placesDirectory)).filter((name) =>
+      name.endsWith(".json")
+    );
+
+    assert.deepEqual(placeFiles.sort(), ["capernaum.json", "galilee.json"]);
+
+    const capernaumPayload = JSON.parse(
+      await fs.readFile(path.join(placesDirectory, "capernaum.json"), "utf8")
+    );
+    assert.equal(capernaumPayload.location.id, "capernaum");
+    assert.equal(capernaumPayload.media.locationId, "capernaum");
+    assert.deepEqual(
+      capernaumPayload.bibliography.map((entry) => entry.id),
+      ["existing-bib-source"]
+    );
+
+    const galileePayload = JSON.parse(
+      await fs.readFile(path.join(placesDirectory, "galilee.json"), "utf8")
+    );
+    assert.equal(galileePayload.location.id, "galilee");
+    assert.equal(galileePayload.media, null);
+    assert.deepEqual(galileePayload.bibliography, []);
+  });
+});
+
+test("buildAppData fails when validation fails", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(invalidCaseDirectory, "locations"),
+          mediaDirectory: path.join(invalidCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          outputDirectory
+        }),
+      (error) => {
+        assert.match(error.message, /Data validation failed/u);
+        assert.ok(error.validationResult);
+        return true;
+      }
+    );
+  });
+});
