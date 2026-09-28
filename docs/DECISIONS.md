@@ -148,8 +148,13 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Decision:** The app hosts a customized copy of OpenFreeMap **Liberty**, with English labels, no points of interest, and disputed boundaries hidden. The fallback remains a different provider or host (ADR-0009).
 - **Consequences:** The map looks more like Google Maps and gives more modern context. To keep every pin at 3:1 contrast or better against Liberty's colours (spec §2), the natural-feature pin changes from `#188038` to `#0B6B2E`; the old colour reached only 2.7:1 on water.
 
-## ADR-0026 — English only: displayed names follow the WEB, other names are search-only
-- **Date:** 2026-09-28 · **Status:** Proposed; the PO applied the recommended option while the human was away, pending confirmation · **By:** the human ("for now, let's just make this map for english speakers only ... we don't need to have any spellings in foreign languages") and the PO
-- **Context:** The data mixed English Bible names with Hebrew, Greek, Latin, Arabic and Turkish forms, and the panel would have shown them all as "Also known as". Malta's title was the Latin "Melita", while the WEB says "Malta".
-- **Decision:** Titles use the WEB's spelling where the WEB names the place. `names.ancient` and `names.alternate` hold English names only. Other names move to a new `names.searchOnly` field, which search matches but the app never displays. Modern names and candidate labels stay, because they are the names of real places and sites today. Other languages remain in the backlog.
-- **Consequences:** M3-10 applies the rule to all 63 records. M3-04 shows the modern name as "Today: *name*", and M3-05 matches search-only names without showing them.
+## ADR-0026 — English only: names follow the most popular English Bibles
+- **Date:** 2026-09-28 · **Status:** Accepted · **By:** the human ("for now, let's just make this map for english speakers only"; "Search doesn't need to support other languages either. We just need to make sure that as readers go through the Bible, they can look up the english names of the places"; "let's use the spelling that most popular versions agree on") and the PO
+- **Context:** The data mixed English Bible names with Hebrew, Greek, Latin, Arabic and Turkish forms, and the panel and search would have used them all. Malta's title was the KJV's "Melita".
+- **Decision:**
+  - The title is the spelling most of the NIV, ESV, NLT, KJV, NKJV and CSB agree on. An even split falls back to the WEB, which is the text the app quotes.
+  - `names.ancient` and `names.alternate` hold English names only, including every version's spelling and the WEB's, and search covers exactly these.
+  - Other-language names move to `names.otherLanguages`, which the app never shows or searches; they stay only so the research isn't lost (the PO's default, pending the human's confirmation).
+  - Modern names and candidate labels are still shown in the panel but are not searched (also the PO's default, pending confirmation).
+  - The spelling comparison records spellings only, never verse text from copyrighted versions.
+- **Consequences:** M3-10 applies the rule to all 63 records, and M3-11's new records follow it. M3-04 shows the modern name as "Today: *name*". M3-05 searches English names only, so "Al-Quds", "Imwas" and "Alaşehir" no longer find anything. Other languages remain in the backlog.
