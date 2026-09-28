@@ -20,8 +20,8 @@ Today the field mixes several styles:
 ## The rule (confirmed at CP3a)
 - `names.modern` is the **modern place name only**: no country, state, province or political descriptor, and no editorial notes. Examples: "Yalvaç", "Antakya", "Tell Balata", "Kfar Nahum / Tell Hum".
 - For **disputed places** (at least one candidate with confidence `disputed`), leave out `names.modern`. The candidates' `label` fields already name the modern sites.
-- For **other places with several candidates** (for example Jericho or Malta), give a modern name only if one neutral name covers every candidate; otherwise leave it out.
-- For **region and island records**, use the modern geographic name if there is a neutral one (for example "Crete", "Malta" or "Sea of Galilee"); otherwise leave it out.
+- For **other places with several candidates** (for example Jericho, Derbe or Golgotha), give a modern name only if one neutral name covers every candidate; otherwise leave it out.
+- For **region and island records**, use the modern geographic name if there is a neutral one (for example "Crete", "Malta" or "Sea of Galilee"); otherwise leave it out. This rule takes precedence over the one above, because it names the record's own geography rather than picking one candidate site. So Malta keeps "Malta" even though a low-confidence candidate is Mljet. Judea and Samaria have no modern name, because every modern name in use for these areas carries a political meaning. Galatia has no modern name either, because no modern region matches it.
 - When an ancient site has no modern settlement of its own, **"Near *town*"** is allowed (for example "Near Denizli"). It locates the site without a political descriptor.
 - **Candidate `label` fields** follow the same rule, because the panel and search show them: no country, state or political descriptor. Geography stays, in neutral words; for example "Qasr al-Yahud (West Bank, opposite bank)" becomes "Qasr al-Yahud (west of the Jordan River)".
 - The wording stays sourced: a modern name must be one the record's sources support.

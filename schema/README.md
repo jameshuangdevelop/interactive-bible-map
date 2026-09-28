@@ -47,7 +47,7 @@ If any candidate has confidence `disputed`, the record must include at least **t
 - A disputed place is a record with at least one candidate whose confidence is `disputed`.
 - For disputed places, leave out `names.modern`; candidate labels already carry the modern site names.
 - For other places with several candidates, give `names.modern` only when one neutral name covers every candidate; otherwise leave it out.
-- Region and island records should use a neutral geographic name when one exists; otherwise leave `names.modern` out.
+- Region and island records should use a neutral geographic name when one exists; otherwise leave `names.modern` out. This takes precedence over the several-candidates rule above (for example, Malta keeps `Malta` although a low-confidence candidate is Mljet). Leave it out where every modern name in use carries a political meaning (Judea, Samaria) or no modern region matches (Galatia).
 - When an ancient site has no modern settlement of its own, `Near <town>` is allowed (for example `Near Denizli`).
 - Candidate `label` fields follow the same neutrality rule: no country, state or political descriptor.
 - The validator enforces the machine-checkable parts: `names.modern` must not contain the word `disputed`, and disputed places must omit `names.modern`.
