@@ -161,7 +161,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Touch targets** are at least 44 × 44 px. **Reduced motion** replaces every animation with a jump.
 
 ## 8. Neutrality in the interface
-- **Modern names** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels.
+- **Modern names** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
 - **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
 
