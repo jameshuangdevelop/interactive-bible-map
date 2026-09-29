@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T23:01:31.350Z",
+  "generatedAt": "2026-09-29T23:39:58.619Z",
   "machine": {
     "platform": "win32",
     "release": "10.0.22631",
@@ -9,7 +9,7 @@
   },
   "server": {
     "distDirectory": "Q:\\interactive-bible-map\\.worktrees\\m3-12\\app\\dist",
-    "baseUrl": "http://127.0.0.1:57351"
+    "baseUrl": "http://127.0.0.1:62638"
   },
   "options": {
     "mode": "headed",
@@ -39,25 +39,25 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "drag-overview",
                 "scenarioDescription": "2s drag at overview",
-                "firstMapPaintMs": 565.8999999761581,
-                "idleAfterGestureMs": 0,
+                "firstMapPaintMs": 529.6000000238419,
+                "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
                   "count": 364,
                   "p50Ms": 31.299999999999272,
-                  "p90Ms": 62.399999999999636,
-                  "p95Ms": 62.5,
-                  "p99Ms": 62.599999999998545,
-                  "maxMs": 62.600000000000364
+                  "p90Ms": 62.5,
+                  "p95Ms": 62.599999999999454,
+                  "p99Ms": 62.60000000000218,
+                  "maxMs": 93.80000000000018
                 },
                 "longTaskSummary": {
-                  "count": 9,
-                  "p95Ms": 58,
-                  "maxMs": 60
+                  "count": 63,
+                  "p95Ms": 63,
+                  "maxMs": 78
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 62.600000000000364,
+                "maxFrameIntervalMs": 93.80000000000018,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -96,16 +96,16 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "drag-galilee",
                 "scenarioDescription": "2s drag near Galilee",
-                "firstMapPaintMs": 467.5,
+                "firstMapPaintMs": 486.80000001192093,
                 "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 360,
-                  "p50Ms": 31.299999999999272,
+                  "count": 362,
+                  "p50Ms": 31.200000000000728,
                   "p90Ms": 31.30000000000109,
                   "p95Ms": 31.30000000000109,
-                  "p99Ms": 31.30000000000109,
-                  "maxMs": 31.400000000001455
+                  "p99Ms": 31.40000000000009,
+                  "maxMs": 62.5
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -114,7 +114,7 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 31.400000000001455,
+                "maxFrameIntervalMs": 62.5,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -153,16 +153,16 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "wheel-zoom-6in6out",
                 "scenarioDescription": "wheel zoom 6 steps in + 6 out",
-                "firstMapPaintMs": 425.0999999642372,
-                "idleAfterGestureMs": 0,
+                "firstMapPaintMs": 512.5,
+                "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 67,
-                  "p50Ms": 31.299999999999727,
+                  "count": 70,
+                  "p50Ms": 31.299999999999272,
                   "p90Ms": 62.5,
                   "p95Ms": 62.5,
-                  "p99Ms": 62.5,
-                  "maxMs": 62.599999999999454
+                  "p99Ms": 62.599999999999454,
+                  "maxMs": 62.600000000000364
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -171,12 +171,12 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 62.599999999999454,
+                "maxFrameIntervalMs": 62.600000000000364,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 9,
-                "tileKnownBytes": 985718,
+                "tileRequestCount": 7,
+                "tileKnownBytes": 761584,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
                 "webglRenderer": {
@@ -210,16 +210,16 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "ctrlwheel-pinch-6in6out",
                 "scenarioDescription": "trackpad-style pinch (Ctrl+wheel) 6 in + 6 out",
-                "firstMapPaintMs": 455.89999997615814,
-                "idleAfterGestureMs": 0.10000002384185791,
+                "firstMapPaintMs": 486.2000000476837,
+                "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 72,
+                  "count": 62,
                   "p50Ms": 31.299999999999727,
                   "p90Ms": 62.5,
                   "p95Ms": 62.5,
                   "p99Ms": 62.5,
-                  "maxMs": 62.5
+                  "maxMs": 62.59999999999991
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -228,7 +228,7 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 62.5,
+                "maxFrameIntervalMs": 62.59999999999991,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -267,30 +267,30 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "flyto-selection",
                 "scenarioDescription": "fly-to after selecting a place",
-                "firstMapPaintMs": 432,
-                "idleAfterGestureMs": 0,
-                "idleSignal": "already-idle",
+                "firstMapPaintMs": 443.9000000357628,
+                "idleAfterGestureMs": 2016.300000011921,
+                "idleSignal": "idle",
                 "frameSummary": {
-                  "count": 50,
-                  "p50Ms": 31.299999999999727,
-                  "p90Ms": 31.300000000000182,
-                  "p95Ms": 31.300000000000182,
-                  "p99Ms": 31.40000000000009,
-                  "maxMs": 62.5
+                  "count": 101,
+                  "p50Ms": 31.299999999999272,
+                  "p90Ms": 62.5,
+                  "p95Ms": 62.59999999999991,
+                  "p99Ms": 125,
+                  "maxMs": 125
                 },
                 "longTaskSummary": {
-                  "count": 1,
-                  "p95Ms": 69,
-                  "maxMs": 69
+                  "count": 8,
+                  "p95Ms": 109,
+                  "maxMs": 124
                 },
-                "mutationCount": 114,
+                "mutationCount": 126,
                 "firstMutationSample": "attributes:div:class",
-                "maxFrameIntervalMs": 62.5,
+                "maxFrameIntervalMs": 125,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 13,
-                "tileKnownBytes": 729307,
+                "tileRequestCount": 60,
+                "tileKnownBytes": 5692450,
                 "tileUnknownByteCount": 1,
                 "selectedEntryId": "place:capernaum",
                 "webglRenderer": {
@@ -309,7 +309,7 @@
                   "setStyleSwitchCallCount": 0,
                   "setStyleCalls": [
                     {
-                      "atMs": 3098.099999964237,
+                      "atMs": 3723.7999999523163,
                       "style": "[style-object]",
                       "argumentType": "object"
                     }
@@ -345,21 +345,21 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "drag-overview",
                 "scenarioDescription": "2s drag at overview",
-                "firstMapPaintMs": 85.90000003576279,
+                "firstMapPaintMs": 92.59999996423721,
                 "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 363,
+                  "count": 360,
                   "p50Ms": 62.5,
                   "p90Ms": 62.60000000000218,
-                  "p95Ms": 93.70000000000073,
-                  "p99Ms": 93.80000000000291,
+                  "p95Ms": 93.79999999999927,
+                  "p99Ms": 93.80000000000109,
                   "maxMs": 125
                 },
                 "longTaskSummary": {
-                  "count": 325,
-                  "p95Ms": 72,
-                  "maxMs": 80
+                  "count": 319,
+                  "p95Ms": 71,
+                  "maxMs": 81
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
@@ -402,25 +402,25 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "drag-galilee",
                 "scenarioDescription": "2s drag near Galilee",
-                "firstMapPaintMs": 90,
+                "firstMapPaintMs": 94.09999996423721,
                 "idleAfterGestureMs": 0.10000002384185791,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 360,
+                  "count": 359,
                   "p50Ms": 62.5,
                   "p90Ms": 93.79999999999927,
-                  "p95Ms": 93.80000000000018,
-                  "p99Ms": 93.80000000000291,
-                  "maxMs": 93.90000000000146
+                  "p95Ms": 93.79999999999927,
+                  "p99Ms": 93.80000000000018,
+                  "maxMs": 93.90000000000055
                 },
                 "longTaskSummary": {
                   "count": 320,
-                  "p95Ms": 79,
-                  "maxMs": 84
+                  "p95Ms": 77,
+                  "maxMs": 82
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 93.90000000000146,
+                "maxFrameIntervalMs": 93.90000000000055,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -459,25 +459,25 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "wheel-zoom-6in6out",
                 "scenarioDescription": "wheel zoom 6 steps in + 6 out",
-                "firstMapPaintMs": 83.80000001192093,
-                "idleAfterGestureMs": 0.10000002384185791,
+                "firstMapPaintMs": 106.60000002384186,
+                "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 46,
+                  "count": 51,
                   "p50Ms": 62.5,
-                  "p90Ms": 93.69999999999982,
-                  "p95Ms": 93.70000000000073,
-                  "p99Ms": 93.79999999999973,
-                  "maxMs": 93.80000000000018
+                  "p90Ms": 62.600000000000364,
+                  "p95Ms": 93.69999999999982,
+                  "p99Ms": 93.70000000000027,
+                  "maxMs": 93.79999999999973
                 },
                 "longTaskSummary": {
-                  "count": 42,
-                  "p95Ms": 78,
-                  "maxMs": 81
+                  "count": 48,
+                  "p95Ms": 77,
+                  "maxMs": 78
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 93.80000000000018,
+                "maxFrameIntervalMs": 93.79999999999973,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -516,25 +516,25 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "ctrlwheel-pinch-6in6out",
                 "scenarioDescription": "trackpad-style pinch (Ctrl+wheel) 6 in + 6 out",
-                "firstMapPaintMs": 100.69999998807907,
-                "idleAfterGestureMs": 0,
+                "firstMapPaintMs": 91.59999996423721,
+                "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
                   "count": 50,
                   "p50Ms": 62.5,
-                  "p90Ms": 93.80000000000018,
-                  "p95Ms": 93.80000000000018,
-                  "p99Ms": 93.80000000000018,
-                  "maxMs": 93.90000000000009
+                  "p90Ms": 62.59999999999991,
+                  "p95Ms": 93.69999999999982,
+                  "p99Ms": 93.79999999999973,
+                  "maxMs": 93.80000000000018
                 },
                 "longTaskSummary": {
                   "count": 46,
-                  "p95Ms": 77,
-                  "maxMs": 78
+                  "p95Ms": 74,
+                  "maxMs": 75
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 93.90000000000009,
+                "maxFrameIntervalMs": 93.80000000000018,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",

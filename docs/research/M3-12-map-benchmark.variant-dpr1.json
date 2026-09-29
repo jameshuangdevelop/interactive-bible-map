@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T23:10:21.652Z",
+  "generatedAt": "2026-09-29T23:45:10.559Z",
   "machine": {
     "platform": "win32",
     "release": "10.0.22631",
@@ -9,7 +9,7 @@
   },
   "server": {
     "distDirectory": "Q:\\interactive-bible-map\\.worktrees\\m3-12\\app\\dist",
-    "baseUrl": "http://127.0.0.1:50189"
+    "baseUrl": "http://127.0.0.1:49989"
   },
   "options": {
     "mode": "headed",
@@ -39,25 +39,25 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "drag-overview",
                 "scenarioDescription": "2s drag at overview",
-                "firstMapPaintMs": 441.60000002384186,
-                "idleAfterGestureMs": 0.19999998807907104,
+                "firstMapPaintMs": 536.5,
+                "idleAfterGestureMs": 0.10000002384185791,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 455,
+                  "count": 363,
                   "p50Ms": 31.299999999999272,
-                  "p90Ms": 31.30000000000109,
-                  "p95Ms": 62.399999999999636,
+                  "p90Ms": 62.399999999999636,
+                  "p95Ms": 62.5,
                   "p99Ms": 62.600000000000364,
-                  "maxMs": 62.60000000000218
+                  "maxMs": 62.600000000000364
                 },
                 "longTaskSummary": {
-                  "count": 10,
-                  "p95Ms": 55,
-                  "maxMs": 55
+                  "count": 4,
+                  "p95Ms": 51,
+                  "maxMs": 57
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 62.60000000000218,
+                "maxFrameIntervalMs": 62.600000000000364,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -96,25 +96,25 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "drag-galilee",
                 "scenarioDescription": "2s drag near Galilee",
-                "firstMapPaintMs": 472.80000001192093,
+                "firstMapPaintMs": 453.5,
                 "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 363,
-                  "p50Ms": 31.200000000000728,
+                  "count": 444,
+                  "p50Ms": 31.299999999999272,
                   "p90Ms": 31.30000000000109,
                   "p95Ms": 31.30000000000109,
-                  "p99Ms": 31.399999999999636,
-                  "maxMs": 31.40000000000009
+                  "p99Ms": 62.5,
+                  "maxMs": 62.600000000000364
                 },
                 "longTaskSummary": {
-                  "count": 0,
-                  "p95Ms": null,
-                  "maxMs": null
+                  "count": 3,
+                  "p95Ms": 52,
+                  "maxMs": 57
                 },
-                "mutationCount": 1,
-                "firstMutationSample": "attributes:div:class",
-                "maxFrameIntervalMs": 31.40000000000009,
+                "mutationCount": 0,
+                "firstMutationSample": null,
+                "maxFrameIntervalMs": 62.600000000000364,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -153,8 +153,8 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "wheel-zoom-6in6out",
                 "scenarioDescription": "wheel zoom 6 steps in + 6 out",
-                "firstMapPaintMs": 448.80000001192093,
-                "idleAfterGestureMs": 0.19999998807907104,
+                "firstMapPaintMs": 461.89999997615814,
+                "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
                   "count": 68,
@@ -162,7 +162,7 @@
                   "p90Ms": 62.5,
                   "p95Ms": 62.5,
                   "p99Ms": 62.5,
-                  "maxMs": 62.59999999999991
+                  "maxMs": 62.5
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -171,12 +171,12 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 62.59999999999991,
+                "maxFrameIntervalMs": 62.5,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 8,
-                "tileKnownBytes": 863990,
+                "tileRequestCount": 6,
+                "tileKnownBytes": 742634,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
                 "webglRenderer": {
@@ -210,16 +210,16 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "ctrlwheel-pinch-6in6out",
                 "scenarioDescription": "trackpad-style pinch (Ctrl+wheel) 6 in + 6 out",
-                "firstMapPaintMs": 469.4000000357628,
-                "idleAfterGestureMs": 0.10000002384185791,
+                "firstMapPaintMs": 492.10000002384186,
+                "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 66,
-                  "p50Ms": 31.299999999999727,
+                  "count": 65,
+                  "p50Ms": 31.300000000000182,
                   "p90Ms": 62.5,
                   "p95Ms": 62.5,
                   "p99Ms": 62.59999999999991,
-                  "maxMs": 62.59999999999991
+                  "maxMs": 62.600000000000364
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -228,7 +228,7 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 62.59999999999991,
+                "maxFrameIntervalMs": 62.600000000000364,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -267,30 +267,30 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "flyto-selection",
                 "scenarioDescription": "fly-to after selecting a place",
-                "firstMapPaintMs": 456.5999999642372,
+                "firstMapPaintMs": 521.2999999523163,
                 "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 52,
+                  "count": 49,
                   "p50Ms": 31.299999999999727,
                   "p90Ms": 31.300000000000182,
-                  "p95Ms": 31.300000000000182,
+                  "p95Ms": 31.399999999999636,
                   "p99Ms": 62.5,
-                  "maxMs": 93.70000000000005
+                  "maxMs": 62.600000000000136
                 },
                 "longTaskSummary": {
                   "count": 1,
-                  "p95Ms": 84,
-                  "maxMs": 84
+                  "p95Ms": 74,
+                  "maxMs": 74
                 },
                 "mutationCount": 114,
                 "firstMutationSample": "attributes:div:class",
-                "maxFrameIntervalMs": 93.70000000000005,
+                "maxFrameIntervalMs": 62.600000000000136,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 13,
-                "tileKnownBytes": 729307,
+                "tileRequestCount": 17,
+                "tileKnownBytes": 2353630,
                 "tileUnknownByteCount": 1,
                 "selectedEntryId": "place:capernaum",
                 "webglRenderer": {
@@ -309,7 +309,7 @@
                   "setStyleSwitchCallCount": 0,
                   "setStyleCalls": [
                     {
-                      "atMs": 3399.899999976158,
+                      "atMs": 3392.199999988079,
                       "style": "[style-object]",
                       "argumentType": "object"
                     }
