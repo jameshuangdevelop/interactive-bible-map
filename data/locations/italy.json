@@ -27,10 +27,12 @@
     }
   ],
   "summary": {
-    "text": "Italy was the peninsula, extending north to the Alps, that contained Rome itself. It was not one of the provinces Augustus divided between the Senate and himself in 27 BC; this project gives it the 'province' type only so that Rome and Puteoli have a parent below the Roman Empire. Acts names Italy as the destination of Paul's voyage as a prisoner and records his landing at Puteoli and his arrival in Rome, and Hebrews closes with the words 'The Italians greet you.'",
+    "text": "Italy was the peninsula, extending north to the Alps, that contained Rome itself. It was not formally a province: Roman law treated Italy and the provinces as separate parts of the state, and while the provinces received governors sent out from Rome, Italy was governed directly from Rome. Acts names Italy as the destination of Paul's voyage as a prisoner and records his landing at Puteoli and his arrival in Rome, and Hebrews closes with the words 'The Italians greet you.'",
     "sources": [
       "pleiades:1052",
       "wikidata:Q913582",
+      "bib:smith-dictionary-provincia",
+      "bib:strabo-geography",
       "wikipedia:Roman_Italy",
       "bib:cassius-dio-roman-history",
       "scripture:Acts 27:1",

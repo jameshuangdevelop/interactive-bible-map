@@ -5,7 +5,8 @@
       "Province of Judea"
     ],
     "alternate": [
-      "Judaea (Roman province)"
+      "Judea",
+      "Judaea"
     ]
   },
   "type": "province",
@@ -37,7 +38,13 @@
       "bib:josephus-antiquities",
       "bib:josephus-jewish-war",
       "scripture:Luke 3:1",
-      "scripture:Acts 12:19"
+      "scripture:Acts 12:19",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [

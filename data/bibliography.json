@@ -671,6 +671,19 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/M/melita.html",
       "accessed": "2026-09-28"
+    },
+    {
+      "id": "smith-dictionary-provincia",
+      "type": "chapter",
+      "title": "Provincia",
+      "authors": [
+        "George Long"
+      ],
+      "year": 1875,
+      "publisher": "John Murray",
+      "containerTitle": "A Dictionary of Greek and Roman Antiquities (William Smith, ed.), hosted on LacusCurtius",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Provincia.html",
+      "accessed": "2026-09-28"
     }
   ]
 }
