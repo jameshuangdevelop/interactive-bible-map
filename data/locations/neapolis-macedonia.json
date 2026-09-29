@@ -9,6 +9,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "macedonia",
   "candidates": [
     {
       "label": "Neapolis archaeological remains (Kavala)",
@@ -44,7 +45,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

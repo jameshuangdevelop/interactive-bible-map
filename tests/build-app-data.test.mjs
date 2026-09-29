@@ -38,6 +38,8 @@ test("buildAppData writes compact index fields and candidate fields", async () =
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This fixture predates the empire/province hierarchy (M3-11).
+      requireEmpireRoot: false,
       outputDirectory
     });
 
@@ -70,6 +72,8 @@ test("buildAppData writes one place file per location and resolves bibliography"
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This fixture predates the empire/province hierarchy (M3-11).
+      requireEmpireRoot: false,
       outputDirectory
     });
 
@@ -162,6 +166,8 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This fixture predates the empire/province hierarchy (M3-11).
+      requireEmpireRoot: false,
       outputDirectory
     });
 

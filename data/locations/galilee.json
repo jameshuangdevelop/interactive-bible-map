@@ -9,6 +9,7 @@
   },
   "type": "region",
   "zoomTier": "region",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Galilee (historical region)",
@@ -446,7 +447,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

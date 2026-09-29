@@ -1,0 +1,106 @@
+{
+  "id": "syria",
+  "names": {
+    "ancient": [
+      "Syria"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Syria (Roman province, capital Antioch, label point)",
+      "coordinates": [
+        36.15,
+        36.2
+      ],
+      "coordinateSource": "wikidata:Q207118",
+      "confidence": "high",
+      "support": "Syria's identity and extent as the Roman province covering the Levantine interior are undisputed; the coordinate is Wikidata's representative point for the province, near Antioch, its capital.",
+      "sources": [
+        "wikidata:Q207118",
+        "wikipedia:Syria_(Roman_province)"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Syria was a large imperial province governed by a legate from Antioch on the Orontes, guarded by several legions facing Parthia. Its territory at about AD 50 included Cilicia, in southern Asia Minor, and reached south to oversee events in Judea; the New Testament itself pairs the two regions, as when Paul writes that after his conversion he 'came into the regions of Syria and Cilicia.'",
+    "sources": [
+      "wikidata:Q207118",
+      "wikipedia:Syria_(Roman_province)",
+      "scripture:Galatians 1:21",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "Pompey annexed Syria to the Roman Republic in 64 BC; under the Empire it was governed by an imperial legate from Antioch, with several legions stationed there to guard the eastern frontier against Parthia.",
+      "sources": [
+        "wikipedia:Syria_(Roman_province)",
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "text": "Between about AD 37 and 41, Caligula gave parts of Cilicia to a client king and folded the rest, including the plain around Tarsus, into Syria; a separate, reunified province of Cilicia was not re-established until Vespasian did so in AD 72, so at AD 50 Cilicia's territory was administered as part of Syria.",
+      "sources": [
+        "wikipedia:Cilicia",
+        "wikidata:Q620864"
+      ]
+    },
+    {
+      "text": "The governor of Syria held a general oversight over the smaller province of Judea to its south; Josephus records, for example, that the legate Quirinius took a census in Judea when it first became a Roman province in AD 6, and that a later legate, Vitellius, marched into the region during the reign of Tiberius.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "wikipedia:Aretas_IV_Philopatris"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 4:24",
+      "book": "Matthew",
+      "textWEB": "The report about him went out into all Syria. They brought to him all who were sick, afflicted with various diseases and torments, possessed with demons, epileptics, and paralytics; and he healed them."
+    },
+    {
+      "ref": "Luke 2:2",
+      "book": "Luke",
+      "textWEB": "This was the first enrollment made when Quirinius was governor of Syria."
+    },
+    {
+      "ref": "Acts 15:23",
+      "book": "Acts",
+      "textWEB": "They wrote these things by their hand: “The apostles, the elders, and the brothers, to the brothers who are of the Gentiles in Antioch, Syria, and Cilicia: greetings."
+    },
+    {
+      "ref": "Acts 18:18",
+      "book": "Acts",
+      "textWEB": "Paul, having stayed after this many more days, took his leave of the brothers, and sailed from there for Syria, together with Priscilla and Aquila. He shaved his head in Cenchreae, for he had a vow."
+    },
+    {
+      "ref": "Galatians 1:21",
+      "book": "Galatians",
+      "textWEB": "Then I came to the regions of Syria and Cilicia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -64,
+      "toYear": 198,
+      "entity": "Imperial province of Syria, governed by a legate (in force at AD 50, then including Cilicia)",
+      "sources": [
+        "wikipedia:Syria_(Roman_province)",
+        "wikipedia:Cilicia",
+        "wikidata:Q207118"
+      ]
+    }
+  ],
+  "status": "draft"
+}

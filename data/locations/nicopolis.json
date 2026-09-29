@@ -10,6 +10,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "achaia",
   "candidates": [
     {
       "label": "Nicopolis archaeological site (Epirus)",
@@ -42,6 +43,13 @@
       "sources": [
         "bib:livius-actium"
       ]
+    },
+    {
+      "text": "When Augustus created the province of Achaia in 27 BC, he separated it, together with Thessaly and part of Epirus, from the province of Macedonia; Nicopolis lay in that part of Epirus. Epirus was only later organized as a separate province, so this record follows Achaia as Nicopolis's 'about AD 50' parent.",
+      "sources": [
+        "wikipedia:Achaia_(Roman_province)",
+        "bib:cassius-dio-roman-history"
+      ]
     }
   ],
   "scripture": [
@@ -53,7 +61,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

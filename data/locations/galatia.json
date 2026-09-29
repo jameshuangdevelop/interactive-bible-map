@@ -6,8 +6,9 @@
     ],
     "alternate": []
   },
-  "type": "region",
+  "type": "province",
   "zoomTier": "region",
+  "parentId": "roman-empire",
   "candidates": [
     {
       "label": "Galatia (region and Roman province, label point)",
@@ -98,7 +99,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

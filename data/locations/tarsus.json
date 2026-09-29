@@ -9,6 +9,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "syria",
   "candidates": [
     {
       "label": "Tarsus (modern city center)",
@@ -35,7 +36,15 @@
       "scripture:Acts 22:3"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Between about AD 37 and 41, Caligula gave parts of Cilicia to the client king Antiochus IV of Commagene and folded the rest, including the plain around Tarsus (Cilicia Pedias), into the province of Syria; a separate, reunified province of Cilicia was not re-established until Vespasian did so in AD 72. On this evidence, Tarsus's territory was administered as part of Syria at AD 50, matching the New Testament's own pairing of 'the regions of Syria and Cilicia' (Galatians 1:21; Acts 15:23, 41).",
+      "sources": [
+        "wikipedia:Cilicia",
+        "scripture:Galatians 1:21"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 9:11",
@@ -65,7 +74,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

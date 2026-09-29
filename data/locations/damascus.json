@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "syria",
   "candidates": [
     {
       "label": "Damascus (historic city center)",
@@ -45,7 +46,15 @@
       "bib:csb-2017-biblegateway"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Whether King Aretas IV of Nabataea ever held direct political control of Damascus, as opposed to merely having an official representing resident Nabataeans there, is disputed among scholars discussing Paul's escape from 'the ethnarch under King Aretas' in 2 Corinthians 11:32; proposals along both lines place any such Nabataean role within the reign of Caligula (AD 37-41) at the latest. Aretas IV died in AD 40, and this project follows the province's standard administration of Damascus as part of Syria for the 'about AD 50' convention, a decade after his death.",
+      "sources": [
+        "wikipedia:Aretas_IV_Philopatris",
+        "scripture:2 Corinthians 11:32"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 9:2",
@@ -163,7 +172,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

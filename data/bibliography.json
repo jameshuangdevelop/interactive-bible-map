@@ -424,6 +424,42 @@
       "publisher": "Holman Bible Publishers",
       "url": "https://www.biblegateway.com/versions/Christian-Standard-Bible-CSB/",
       "accessed": "2026-09-28"
+    },
+    {
+      "id": "cassius-dio-roman-history",
+      "type": "book",
+      "title": "Roman History (Loeb Classical Library translation by Earnest Cary, hosted on LacusCurtius)",
+      "authors": [
+        "Cassius Dio"
+      ],
+      "year": 1917,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "suetonius-twelve-caesars",
+      "type": "book",
+      "title": "The Lives of the Twelve Caesars (Loeb Classical Library translation by J. C. Rolfe, hosted on LacusCurtius)",
+      "authors": [
+        "Suetonius"
+      ],
+      "year": 1914,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Suetonius/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "josephus-antiquities",
+      "type": "book",
+      "title": "Antiquities of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
+      "authors": [
+        "Flavius Josephus"
+      ],
+      "year": 1737,
+      "publisher": "Christian Classics Ethereal Library",
+      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
+      "accessed": "2026-09-28"
     }
   ]
 }

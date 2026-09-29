@@ -9,7 +9,7 @@
   },
   "type": "site",
   "zoomTier": "city",
-  "parentId": "judea",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Al-Maghtas / Wadi al-Kharrar (east of the Jordan River)",
@@ -63,6 +63,13 @@
       "sources": [
         "bib:hutton-bethany-beyond-jordan"
       ]
+    },
+    {
+      "text": "This record's two candidate banks sit on opposite sides of a district boundary: the higher-confidence east-bank candidate lies in Perea, while the west-bank candidate lies within this project's 'Judea' district. Rather than take a side in that site dispute when assigning a parent, this record points to the Roman province directly, since by about AD 50 both banks lay within the same procuratorial province regardless of which candidate is correct.",
+      "sources": [
+        "wikidata:Q1003997",
+        "bib:rainey-notley-sacred-bridge"
+      ]
     }
   ],
   "scripture": [
@@ -108,7 +115,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

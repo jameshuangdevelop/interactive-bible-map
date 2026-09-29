@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parseReference } from "../scripts/lib/books.mjs";
-import { validateData } from "../scripts/lib/validator.mjs";
+import { validateData, REQUIRE_EMPIRE_ROOT } from "../scripts/lib/validator.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const fixturesDirectory = path.join(testDirectory, "fixtures");
@@ -59,6 +59,12 @@ async function runCase(caseName, options = {}) {
     webVplPath,
     bibliographyPath: bibliographyFixturePath,
     skipSnapshotChecksumCheck: true,
+    // These fixtures predate the empire/province hierarchy and were not
+    // built with an empire-rooted parentId chain; default to the pre-M3-11
+    // behavior here so unrelated tests are unaffected by REQUIRE_EMPIRE_ROOT
+    // now defaulting to true. Tests that exercise the empire-root rule pass
+    // requireEmpireRoot explicitly (see runWithTemporaryHierarchyCase below).
+    requireEmpireRoot: false,
     ...validationOptions
   });
 }
@@ -104,6 +110,9 @@ async function runWithTemporaryCase(mutateLocations, options = {}) {
       webVplPath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
+      // See the comment in runCase above: this fixture pair predates the
+      // empire/province hierarchy and has no empire-rooted parentId chain.
+      requireEmpireRoot: false,
       ...validationOptions
     });
   } finally {
@@ -610,16 +619,29 @@ test("region, province, and empire records must use zoomTier region", async () =
   );
 });
 
-test("empire-root chain rule is disabled by default", async () => {
-  const result = await runCase("valid");
-  assert.equal(
+test("empire-root chain rule is enabled by default", async () => {
+  assert.equal(REQUIRE_EMPIRE_ROOT, true);
+
+  // Bypass runCase's fixture-compatibility default (which pins
+  // requireEmpireRoot to false for fixtures that predate the empire/province
+  // hierarchy) so this test exercises the real module default with no
+  // requireEmpireRoot option supplied at all, the same way npm run
+  // validate:data calls validateData in production.
+  const result = await validateData({
+    locationsDirectory: path.join(validCaseDirectory, "locations"),
+    mediaDirectory: path.join(validCaseDirectory, "media"),
+    webVplPath: webFixturePath,
+    bibliographyPath: bibliographyFixturePath,
+    skipSnapshotChecksumCheck: true
+  });
+
+  assert.ok(
     hasError(
       result,
       (error) =>
         error.path === "$.parentId" &&
         error.message.includes("REQUIRE_EMPIRE_ROOT")
-    ),
-    false
+    )
   );
 });
 
@@ -823,7 +845,9 @@ test("names.modern word check respects word boundaries", async () => {
       mediaDirectory,
       webVplPath: webFixturePath,
       bibliographyPath: bibliographyFixturePath,
-      skipSnapshotChecksumCheck: true
+      skipSnapshotChecksumCheck: true,
+      // This ad hoc fixture predates the empire/province hierarchy (M3-11).
+      requireEmpireRoot: false
     });
 
     assert.equal(result.errors.length, 0);

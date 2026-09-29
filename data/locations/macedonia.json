@@ -1,0 +1,112 @@
+{
+  "id": "macedonia",
+  "names": {
+    "ancient": [
+      "Macedonia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Macedonia (Roman province, using Thessalonica, its capital, as label point)",
+      "coordinates": [
+        22.9355555555556,
+        40.6402777777778
+      ],
+      "coordinateSource": "wikidata:Q17151",
+      "confidence": "high",
+      "support": "Macedonia's Wikidata item for the Roman province carries no coordinate of its own, so this point is Wikidata's coordinate for Thessalonica, the province's capital throughout the Roman period; it sits about 1.5 km from this project's own 'thessalonica' record, a reasonable margin for a province-level label built from a capital-city point.",
+      "sources": [
+        "wikidata:Q17151",
+        "wikipedia:Macedonia_(Roman_province)"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Macedonia was the Roman province covering northern Greece, with its capital at Thessalonica. Acts describes Paul receiving a night vision of 'a man of Macedonia' begging him to come and help, after which he founded churches at Philippi, Thessalonica and Berea, all cities of this province; several of Paul's letters are addressed to or mention believers there.",
+    "sources": [
+      "wikidata:Q17151",
+      "wikipedia:Macedonia_(Roman_province)",
+      "scripture:Acts 16:9",
+      "scripture:Philippians 4:15",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "Macedonia became a Roman province in 146 BC, after Rome's final defeat of the Macedonian kingdom, with its capital at Thessalonica and a governor of proconsular rank.",
+      "sources": [
+        "wikipedia:Macedonia_(Roman_province)",
+        "wikidata:Q207497"
+      ]
+    },
+    {
+      "text": "Until AD 15, and again from AD 44 onward, Macedonia was a senatorial province governed by a proconsul; in between, Tiberius placed it under an imperial procurator jointly with Achaia. The senatorial arrangement that Claudius restored in AD 44 was still in force at AD 50.",
+      "sources": [
+        "wikipedia:Macedonia_(Roman_province)",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:9",
+      "book": "Acts",
+      "textWEB": "A vision appeared to Paul in the night. There was a man of Macedonia standing, begging him and saying, “Come over into Macedonia and help us.”"
+    },
+    {
+      "ref": "Acts 16:12",
+      "book": "Acts",
+      "textWEB": "and from there to Philippi, which is a city of Macedonia, the foremost of the district, a Roman colony. We were staying some days in this city."
+    },
+    {
+      "ref": "Philippians 4:15",
+      "book": "Philippians",
+      "textWEB": "You yourselves also know, you Philippians, that in the beginning of the Good News, when I departed from Macedonia, no assembly shared with me in the matter of giving and receiving but you only."
+    },
+    {
+      "ref": "1 Thessalonians 1:7",
+      "book": "1 Thessalonians",
+      "textWEB": "so that you became an example to all who believe in Macedonia and in Achaia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -146,
+      "toYear": 15,
+      "entity": "Senatorial province of Macedonia (first organization)",
+      "sources": [
+        "wikipedia:Macedonia_(Roman_province)",
+        "wikidata:Q207497"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "entity": "Imperial province administered jointly with Achaia under a procurator",
+      "sources": [
+        "wikipedia:Macedonia_(Roman_province)",
+        "wikidata:Q207497"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 306,
+      "entity": "Senatorial province of Macedonia restored by Claudius (in force at AD 50)",
+      "sources": [
+        "wikipedia:Macedonia_(Roman_province)",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "status": "draft"
+}

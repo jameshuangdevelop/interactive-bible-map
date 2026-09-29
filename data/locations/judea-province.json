@@ -1,0 +1,91 @@
+{
+  "id": "judea-province",
+  "names": {
+    "ancient": [
+      "Province of Judea"
+    ],
+    "alternate": [
+      "Judaea (Roman province)"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Roman province of Judea (Caesarea Maritima, its capital, label point)",
+      "coordinates": [
+        34.9,
+        32.5
+      ],
+      "coordinateSource": "wikidata:Q1003997",
+      "confidence": "high",
+      "support": "The province's identity and extent are undisputed; the coordinate is Wikidata's representative point for the Roman province of Judaea, which sits within a few hundred meters of this project's own 'caesarea-maritima' candidate point, the province's capital.",
+      "sources": [
+        "wikidata:Q1003997",
+        "wikipedia:Judaea_(Roman_province)"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The New Testament uses 'Judea' in two senses this project keeps as separate records: this project's 'judea' record is the district around Jerusalem, the sense most often meant; this record is the larger Roman province, administered from Caesarea Maritima rather than Jerusalem, which at times also governed Samaria, Galilee, and the region east of the Jordan. Rome created the province in AD 6, after deposing Herod Archelaus; after the client king Herod Agrippa I died in AD 44, his former kingdom, by then covering Judea, Samaria, Galilee and Perea, was placed under this same province's procurators rather than given at once to his son, the future Agrippa II, an arrangement still in force at AD 50.",
+    "sources": [
+      "wikidata:Q1003997",
+      "wikipedia:Judaea_(Roman_province)",
+      "bib:josephus-antiquities",
+      "bib:rainey-notley-sacred-bridge"
+    ]
+  },
+  "history": [
+    {
+      "text": "In AD 6, Rome deposed Herod Archelaus, ethnarch of Judea, Samaria and Idumea, and organized his territory as a Roman province under a prefect, later a procurator, based at Caesarea Maritima; the census this reorganization required, conducted by the Syrian legate Quirinius, is the same census Josephus and Luke's Gospel both associate with this period.",
+      "sources": [
+        "wikipedia:Judaea_(Roman_province)",
+        "bib:josephus-antiquities",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "text": "Herod Agrippa I, made king by Caligula and Claudius, reunited Judea, Samaria, Galilee, Perea and the former tetrarchy of Philip under one ruler by AD 41, restoring for a few years something like his grandfather Herod the Great's kingdom.",
+      "sources": [
+        "bib:rainey-notley-sacred-bridge",
+        "wikipedia:Judaea_(Roman_province)"
+      ]
+    },
+    {
+      "text": "After Agrippa I's death in AD 44, Josephus reports that Claudius, on account of the 'youth and unskilfulness' of Agrippa I's son, sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom' rather than letting the son inherit at once; this project's 'about AD 50' convention follows that arrangement, placing Judea, Samaria, Galilee and (so far as its territory reached) Perea and the former tetrarchy of Philip under this province rather than under a client king.",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "text": "Claudius did not grant Agrippa I's son (Agrippa II) any part of this territory until AD 50, when he received the small kingdom of Chalcis, and did not grant him 'the tetrarchy of Philip and Batanea, and...Trachonites, with Abila' until AD 53, three years after this project's convention date; Nero granted him parts of Galilee itself only later still, in his own first regnal year (AD 54/55).",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    }
+  ],
+  "scripture": [],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judea under prefects (Judea district and Idumea)",
+      "sources": [
+        "wikipedia:Judaea_(Roman_province)",
+        "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 66,
+      "entity": "Roman province of Judea under procurators, from AD 44 also covering Galilee, Samaria and (from AD 44 to 53) the former tetrarchy of Philip",
+      "sources": [
+        "bib:josephus-antiquities",
+        "wikipedia:Judaea_(Roman_province)"
+      ]
+    }
+  ],
+  "status": "draft"
+}

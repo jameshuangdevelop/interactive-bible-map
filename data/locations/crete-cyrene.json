@@ -1,0 +1,78 @@
+{
+  "id": "crete-cyrene",
+  "names": {
+    "ancient": [
+      "Crete and Cyrene"
+    ],
+    "alternate": [
+      "Crete and Cyrenaica"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Crete and Cyrenaica (Roman province, capital Gortyn, label point)",
+      "coordinates": [
+        24.946957,
+        35.062141
+      ],
+      "coordinateSource": "wikidata:Q692775",
+      "confidence": "high",
+      "support": "The province's identity and extent, combining the island of Crete with the Cyrenaica region of modern Libya, are undisputed; the coordinate is Wikidata's representative point for the province, near Gortyn on Crete, its capital.",
+      "sources": [
+        "wikidata:Q692775",
+        "wikipedia:Creta_et_Cyrenaica"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Crete and Cyrene, in Latin Creta et Cyrenaica, was a single senatorial province combining the island of Crete with the Cyrenaica region of North Africa (in modern Libya), governed by a proconsul from Gortyn on Crete. Of this project's places, only the island of Crete, visited by Paul's ship on the voyage to Rome, lies within this province; Cyrene itself, the province's other namesake city, does not appear among this project's places but is named several times in the New Testament, including as the home town of Simon, who was made to carry Jesus' cross.",
+    "sources": [
+      "wikidata:Q692775",
+      "wikipedia:Creta_et_Cyrenaica",
+      "scripture:Matthew 27:32",
+      "scripture:Acts 11:20"
+    ]
+  },
+  "history": [
+    {
+      "text": "Crete and Cyrenaica were combined into a single senatorial province in 67 BC, governed by a proconsul from Gortyn; Cassius Dio's account of Augustus's 27 BC settlement confirms 'Crete and the Cyrenaic portion of Libya' remained a single province assigned to the Senate, an arrangement in force at AD 50.",
+      "sources": [
+        "wikipedia:Creta_et_Cyrenaica",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 27:32",
+      "book": "Matthew",
+      "textWEB": "As they came out, they found a man of Cyrene, Simon by name, and they compelled him to go with them, that he might carry his cross."
+    },
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Acts 11:20",
+      "book": "Acts",
+      "textWEB": "But there were some of them, men of Cyprus and Cyrene, who, when they had come to Antioch, spoke to the Hellenists, preaching the Lord Jesus."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 267,
+      "entity": "Senatorial province of Crete and Cyrenaica, governed by a proconsul (in force at AD 50)",
+      "sources": [
+        "wikipedia:Creta_et_Cyrenaica",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft"
+}

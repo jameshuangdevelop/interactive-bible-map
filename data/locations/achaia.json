@@ -1,0 +1,117 @@
+{
+  "id": "achaia",
+  "names": {
+    "ancient": [
+      "Achaia"
+    ],
+    "alternate": [
+      "Greece"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Achaia (Roman province, label point)",
+      "coordinates": [
+        22.45,
+        37.89
+      ],
+      "coordinateSource": "wikidata:Q204772",
+      "confidence": "high",
+      "support": "Achaia's identity and extent as the Roman province covering southern and central Greece are undisputed; the coordinate is Wikidata's representative point for the province, near Corinth, its capital.",
+      "sources": [
+        "wikidata:Q204772",
+        "bib:worldhistory-corinth"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Achaia was the Roman province covering the Peloponnese, Attica and central Greece, with its capital and seat of government at Corinth. Acts records that the proconsul Gallio heard a case against Paul there, and Paul's letters address believers 'throughout Achaia' and elsewhere call the same region 'Greece.'",
+    "sources": [
+      "wikidata:Q204772",
+      "wikipedia:Achaia_(Roman_province)",
+      "bib:worldhistory-corinth",
+      "scripture:Acts 18:12",
+      "scripture:Acts 20:2",
+      "scripture:2 Corinthians 1:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "After defeating Antony and Cleopatra, Augustus separated Greece, Thessaly and part of Epirus from the province of Macedonia in 27 BC and made the new province, Achaia, a senatorial province governed by a proconsul.",
+      "sources": [
+        "wikipedia:Achaia_(Roman_province)",
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "text": "In AD 15, Tiberius made Achaia and Macedonia a single imperial province under a procurator, responding to complaints about the senatorial proconsuls' administration; Claudius separated the two again in AD 44 and restored them to the Senate, the arrangement in force at AD 50, when Gallio, addressed in Acts as proconsul of Achaia, is independently dated by an inscription from Delphi to about AD 51-52.",
+      "sources": [
+        "wikipedia:Achaia_(Roman_province)",
+        "bib:suetonius-twelve-caesars",
+        "bib:worldhistory-corinth"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 18:12",
+      "book": "Acts",
+      "textWEB": "But when Gallio was proconsul of Achaia, the Jews with one accord rose up against Paul and brought him before the judgment seat,"
+    },
+    {
+      "ref": "Acts 20:2",
+      "book": "Acts",
+      "textWEB": "When he had gone through those parts and had encouraged them with many words, he came into Greece."
+    },
+    {
+      "ref": "2 Corinthians 1:1",
+      "book": "2 Corinthians",
+      "textWEB": "Paul, an apostle of Christ Jesus through the will of God, and Timothy our brother, to the assembly of God which is at Corinth, with all the saints who are in the whole of Achaia:"
+    },
+    {
+      "ref": "1 Thessalonians 1:8",
+      "book": "1 Thessalonians",
+      "textWEB": "For from you the word of the Lord has been declared, not only in Macedonia and Achaia, but also in every place your faith toward God has gone out, so that we need not say anything."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "entity": "Senatorial province of Achaia (first organization, separated from Macedonia)",
+      "sources": [
+        "wikipedia:Achaia_(Roman_province)",
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "entity": "Imperial province administered jointly with Macedonia under a procurator",
+      "sources": [
+        "wikipedia:Achaia_(Roman_province)",
+        "wikidata:Q204772"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 67,
+      "entity": "Senatorial province of Achaia restored by Claudius (in force at AD 50)",
+      "sources": [
+        "wikipedia:Achaia_(Roman_province)",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "status": "draft"
+}

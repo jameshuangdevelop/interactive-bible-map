@@ -1,0 +1,99 @@
+{
+  "id": "asia",
+  "names": {
+    "ancient": [
+      "Asia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Asia (Roman province, label point)",
+      "coordinates": [
+        28.3,
+        38.4
+      ],
+      "coordinateSource": "wikidata:Q210718",
+      "confidence": "high",
+      "support": "Asia's identity and extent as the Roman province covering western Asia Minor are undisputed; the coordinate is Wikidata's representative point for the province, near its historic capitals Pergamon and Ephesus.",
+      "sources": [
+        "wikidata:Q210718",
+        "wikipedia:Asia_(Roman_province)"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Asia was the wealthy, densely urbanized Roman province covering western Asia Minor, first organized after Rome inherited the Attalid kingdom of Pergamum in 133 BC. Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia and Laodicea, the seven cities addressed in Revelation, together with Colossae, Hierapolis, Miletus and Troas, all lay within this province, and Acts records that 'all who lived in Asia,' both Jews and Greeks, heard Paul's preaching during his extended stay at Ephesus.",
+    "sources": [
+      "wikidata:Q210718",
+      "wikipedia:Asia_(Roman_province)",
+      "scripture:Acts 19:10",
+      "scripture:Revelation 1:4",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "The last Attalid king, Attalus III of Pergamum, bequeathed his kingdom to Rome on his death in 133 BC; after putting down a rival claimant, Rome organized the territory as the province of Asia.",
+      "sources": [
+        "wikipedia:Asia_(Roman_province)",
+        "wikidata:Q210718"
+      ]
+    },
+    {
+      "text": "Asia was, per this source, 'the most prestigious senatorial province,' governed by a proconsul, an arrangement Cassius Dio's account of Augustus's 27 BC settlement lists among the provinces assigned to the Senate and that remained in force at AD 50. The province included the Aegean islands close to the Anatolian coast, with the exception of Crete, which explains this project's placement of Patmos within Asia.",
+      "sources": [
+        "wikipedia:Asia_(Roman_province)",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:6",
+      "book": "Acts",
+      "textWEB": "When they had gone through the region of Phrygia and Galatia, they were forbidden by the Holy Spirit to speak the word in Asia."
+    },
+    {
+      "ref": "Acts 19:10",
+      "book": "Acts",
+      "textWEB": "This continued for two years, so that all those who lived in Asia heard the word of the Lord Jesus, both Jews and Greeks."
+    },
+    {
+      "ref": "Acts 20:16",
+      "book": "Acts",
+      "textWEB": "For Paul had determined to sail past Ephesus, that he might not have to spend time in Asia; for he was hastening, if it were possible for him, to be in Jerusalem on the day of Pentecost."
+    },
+    {
+      "ref": "1 Peter 1:1",
+      "book": "1 Peter",
+      "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    },
+    {
+      "ref": "Revelation 1:4",
+      "book": "Revelation",
+      "textWEB": "John, to the seven assemblies that are in Asia: Grace to you and peace from God, who is and who was and who is to come; and from the seven Spirits who are before his throne;"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -133,
+      "toYear": 293,
+      "entity": "Senatorial province of Asia, governed by a proconsul (in force at AD 50)",
+      "sources": [
+        "wikipedia:Asia_(Roman_province)",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft"
+}

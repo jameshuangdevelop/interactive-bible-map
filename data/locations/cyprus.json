@@ -1,0 +1,96 @@
+{
+  "id": "cyprus",
+  "names": {
+    "ancient": [
+      "Cyprus"
+    ],
+    "modern": "Cyprus",
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Cyprus (Roman province, label point)",
+      "coordinates": [
+        32.4263888888889,
+        34.7761111111111
+      ],
+      "coordinateSource": "wikidata:Q2967757",
+      "confidence": "high",
+      "support": "Cyprus's identity and extent as the Roman province covering the whole island are undisputed; the coordinate is Wikidata's representative point for the province.",
+      "sources": [
+        "wikidata:Q2967757",
+        "wikipedia:Roman_Cyprus"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cyprus was a senatorial province covering the whole island, governed by a proconsul from Paphos. Barnabas, Paul's companion on the first missionary journey, was a Levite from Cyprus; Acts records that the two preached across the island, from Salamis to Paphos, where the proconsul Sergius Paulus believed.",
+    "sources": [
+      "wikidata:Q2967757",
+      "wikipedia:Roman_Cyprus",
+      "scripture:Acts 4:36",
+      "scripture:Acts 13:7",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "Rome annexed Cyprus in 58 BC. In Augustus's 27 BC settlement it was at first retained under his own authority, together with Syria and Cilicia, per Cassius Dio's account, before being given to the Senate as a separate province in 22 BC; from then it was a senatorial province governed by a proconsul, matching the title Acts gives Sergius Paulus, an arrangement in force at AD 50.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "wikipedia:Roman_Cyprus"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 4:36",
+      "book": "Acts",
+      "textWEB": "Joses, who by the apostles was also called Barnabas (which is, being interpreted, Son of Encouragement), a Levite, a man of Cyprus by race,"
+    },
+    {
+      "ref": "Acts 11:19",
+      "book": "Acts",
+      "textWEB": "They therefore who were scattered abroad by the oppression that arose about Stephen traveled as far as Phoenicia, Cyprus, and Antioch, speaking the word to no one except to Jews only."
+    },
+    {
+      "ref": "Acts 13:4",
+      "book": "Acts",
+      "textWEB": "So, being sent out by the Holy Spirit, they went down to Seleucia. From there they sailed to Cyprus."
+    },
+    {
+      "ref": "Acts 13:7",
+      "book": "Acts",
+      "textWEB": "who was with the proconsul, Sergius Paulus, a man of understanding. This man summoned Barnabas and Saul, and sought to hear the word of God."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -58,
+      "toYear": -22,
+      "entity": "Under Caesar's authority, administered together with Cilicia",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": -22,
+      "toYear": 293,
+      "entity": "Senatorial province of Cyprus, governed by a proconsul (in force at AD 50)",
+      "sources": [
+        "wikipedia:Roman_Cyprus",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft"
+}

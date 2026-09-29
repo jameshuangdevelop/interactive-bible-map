@@ -13,6 +13,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Caesarea (coastal ruins south of Haifa)",
@@ -142,7 +143,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

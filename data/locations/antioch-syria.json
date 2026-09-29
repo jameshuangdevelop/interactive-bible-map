@@ -16,6 +16,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "syria",
   "candidates": [
     {
       "label": "Antakya (ancient Antioch on the Orontes)",
@@ -150,7 +151,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

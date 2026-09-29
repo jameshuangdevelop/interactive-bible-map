@@ -13,6 +13,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Banias (Paneas)",
@@ -45,7 +46,15 @@
       "bib:csb-2017-biblegateway"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Caesarea Philippi was the seat of the tetrarchy of Herod Philip until his death in AD 34; Rome then administered the territory directly for a few years before Caligula granted it, in AD 37, to Herod Agrippa I. After Agrippa I's death in AD 44, Josephus reports that Rome did not yet give his full territory to his young son (the future Agrippa II) but instead sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom,' an arrangement that, on this evidence, still held in AD 50. Claudius did not grant Agrippa II 'the tetrarchy of Philip and Batanea,' including this city, until AD 53, three years after this project's convention date, so this record's 'about AD 50' parent is the Roman province rather than Agrippa II's later kingdom.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "wikipedia:Judaea_(Roman_province)"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Matthew 16:13",
@@ -60,7 +69,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

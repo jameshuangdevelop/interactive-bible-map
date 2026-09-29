@@ -1,0 +1,63 @@
+{
+  "id": "sicily",
+  "names": {
+    "ancient": [
+      "Sicily"
+    ],
+    "modern": "Sicily",
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Sicily (Roman province, label point)",
+      "coordinates": [
+        14.015378,
+        37.599958
+      ],
+      "coordinateSource": "wikidata:Q691321",
+      "confidence": "high",
+      "support": "Sicily's identity and extent under Roman rule are undisputed; the coordinate is Wikidata's representative point for the Roman province of Sicilia, near the island's center.",
+      "sources": [
+        "wikidata:Q691321",
+        "wikipedia:Sicilia_(Roman_province)"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Sicily was Rome's first overseas province, and by AD 50 a senatorial province governed by a proconsul from Syracuse. Since 212 BC it had also administered the island of Malta, well south of Sicily itself, along with several smaller island groups. Acts records that Paul's ship, on the voyage to Rome, put in for three days at Syracuse.",
+    "sources": [
+      "wikidata:Q691321",
+      "wikipedia:Sicilia_(Roman_province)",
+      "bib:cassius-dio-roman-history",
+      "scripture:Acts 28:12"
+    ]
+  },
+  "history": [
+    {
+      "text": "Sicily became Rome's first province after the First Punic War in 241 BC; once the whole island came under direct rule in 212 BC, following the Second Punic War, the province also included Malta and the smaller Egadi, Lipari, Ustica and Pantelleria island groups.",
+      "sources": [
+        "wikipedia:Sicilia_(Roman_province)",
+        "wikidata:Q691321"
+      ]
+    },
+    {
+      "text": "In Augustus's 27 BC division of the provinces, Sicily was one of those assigned to the Senate, governed by a proconsul; Cassius Dio's list of the senatorial provinces from that settlement includes Sicily by name, an arrangement still in force at AD 50.",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:12",
+      "book": "Acts",
+      "textWEB": "Touching at Syracuse, we stayed there three days."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

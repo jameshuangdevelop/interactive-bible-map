@@ -115,7 +115,8 @@ export async function buildAppData(options = {}) {
     bibliographyPath,
     webVplPath: options.webVplPath,
     webSnapshotMetadataPath: options.webSnapshotMetadataPath,
-    skipSnapshotChecksumCheck: options.skipSnapshotChecksumCheck
+    skipSnapshotChecksumCheck: options.skipSnapshotChecksumCheck,
+    requireEmpireRoot: options.requireEmpireRoot
   });
 
   if (validationResult.errors.length > 0) {

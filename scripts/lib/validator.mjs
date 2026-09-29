@@ -57,7 +57,7 @@ export const PROJECT_BOUNDS = Object.freeze({
   minLat: -5,
   maxLat: 50
 });
-export const REQUIRE_EMPIRE_ROOT = false;
+export const REQUIRE_EMPIRE_ROOT = true;
 
 const CANONICAL_BOOK_SET = new Set(CANONICAL_BOOKS);
 const REGION_LEVEL_TYPES = new Set(["empire", "province", "region"]);
