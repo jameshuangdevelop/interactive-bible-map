@@ -25,6 +25,8 @@ const smoothnessRequireGpu = process.env.SMOOTHNESS_REQUIRE_GPU === "1";
 const syntheticPlaceIdPrefix = "synthetic-city-";
 const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
+const mainAttributionNeedle = "OpenFreeMap";
+const fallbackStylePathNeedle = "versatiles-colorful/style.json";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const requiredCapernaumPinLabels = ["Capernaum", "Chorazin", "Magdala"];
@@ -174,7 +176,20 @@ async function readWebGlRendererInfo(page) {
 async function waitForMapToSettle(page) {
   await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
   await page.waitForSelector("button[data-place-entry-id]", { timeout: 30_000 });
-  await page.waitForTimeout(8_000);
+  // A fixed delay isn't enough on a slow or busy machine (software WebGL on CI runners), so also
+  // wait until the camera has stopped and every tile has loaded, then allow for label placement.
+  await page.waitForFunction(
+    (testHookKey) => {
+      const map = window[testHookKey];
+      return Boolean(map && map.loaded() && !map.isMoving() && map.areTilesLoaded());
+    },
+    mapTestHookKey,
+    { timeout: 60_000, polling: 250 }
+  );
+  // One-time start-up changes, such as the attribution collapsing after 5 s (LICENSES.md L4),
+  // must finish before any gesture is measured, so settle no earlier than 8 s after navigation.
+  await page.waitForFunction(() => performance.now() >= 8_000, undefined, { timeout: 60_000, polling: 250 });
+  await page.waitForTimeout(1_500);
 }
 
 function searchContainsSelection(search) {
@@ -508,6 +523,89 @@ function assertFallbackAttributionText(text, scenarioLabel) {
         `${scenarioLabel}: expected attribution to include '${needle}', got '${text.trim()}'`
       );
     }
+  }
+}
+
+function assertMainAttributionText(text, scenarioLabel) {
+  if (!text.includes(mainAttributionNeedle)) {
+    throw new Error(
+      `${scenarioLabel}: expected attribution to include '${mainAttributionNeedle}', got '${text.trim()}'`
+    );
+  }
+
+  if (text.includes("VersaTiles")) {
+    throw new Error(
+      `${scenarioLabel}: expected attribution to stay on main style, got fallback attribution '${text.trim()}'`
+    );
+  }
+}
+
+async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuery) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  const requestUrls = [];
+  page.on("requestfinished", (request) => {
+    requestUrls.push(request.url());
+  });
+
+  try {
+    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+      timeout: 30_000
+    });
+    await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      window.__ibmSetStyleCalls = [];
+      const originalSetStyle = map.setStyle.bind(map);
+      map.setStyle = (...args) => {
+        const [style] = args;
+        window.__ibmSetStyleCalls.push(String(style ?? ""));
+        return originalSetStyle(...args);
+      };
+    }, mapTestHookKey);
+
+    await waitForMapToSettle(page);
+    await page.waitForTimeout(30_000);
+
+    const setStyleCalls = await page.evaluate(() => window.__ibmSetStyleCalls ?? []);
+    if (setStyleCalls.some((value) => value.includes(fallbackStylePathNeedle))) {
+      throw new Error(
+        `Normal load at '${pathWithQuery || "/"}' called setStyle with fallback style: ${JSON.stringify(setStyleCalls)}`
+      );
+    }
+
+    const fallbackNoticeCount = await page.getByText(fallbackStatusMessage, { exact: true }).count();
+    if (fallbackNoticeCount > 0) {
+      throw new Error(`Normal load at '${pathWithQuery || "/"}' showed fallback notice.`);
+    }
+
+    const attributionText = await readAttributionText(page);
+    assertMainAttributionText(attributionText, `Normal load ${pathWithQuery || "/"}`);
+
+    const versaTilesRequestCount = requestUrls.filter((url) =>
+      url.includes("tiles.versatiles.org")
+    ).length;
+    if (versaTilesRequestCount > 0) {
+      throw new Error(
+        `Normal load at '${pathWithQuery || "/"}' unexpectedly requested VersaTiles tiles (${versaTilesRequestCount}).`
+      );
+    }
+
+    return {
+      pathWithQuery,
+      setStyleCallCount: setStyleCalls.length,
+      versaTilesRequestCount,
+      attributionText
+    };
+  } finally {
+    await page.close();
+    await context.close();
   }
 }
 
@@ -863,7 +961,10 @@ async function verifyFallbackOutageMode({
   mode,
   screenshotPath
 }) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
   const requestUrls = [];
   const abortMode = mode;
 
@@ -873,16 +974,11 @@ async function verifyFallbackOutageMode({
       return route.continue();
     }
 
-    const requestPathname = new URL(requestUrl).pathname;
-
     if (abortMode === "all-requests") {
       return route.abort("failed");
     }
 
-    if (
-      abortMode === "pbf-only" &&
-      (requestUrl.includes(".pbf") || requestPathname === "/planet")
-    ) {
+    if (abortMode === "pbf-only" && requestUrl.includes(".pbf")) {
       return route.abort("failed");
     }
 
@@ -936,6 +1032,7 @@ async function verifyFallbackOutageMode({
   } finally {
     await page.unroute("**/*");
     await page.close();
+    await context.close();
   }
 }
 
@@ -946,7 +1043,10 @@ async function captureFallbackSelectionScreenshot({
   screenshotPath,
   panelHeading
 }) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
   await page.route("**/*", (route) => {
     const requestUrl = route.request().url();
     if (requestUrl.includes("tiles.openfreemap.org")) {
@@ -988,6 +1088,7 @@ async function captureFallbackSelectionScreenshot({
   } finally {
     await page.unroute("**/*");
     await page.close();
+    await context.close();
   }
 }
 
@@ -1566,7 +1667,7 @@ async function runSmoothnessCheck({
         expectation: syntheticCoverageExpectations?.["zoom8-unclustered"] ?? null
       }
     ];
-
+    const scenarioResults = {};
     const scenarioResults = {};
     for (const scenario of scenarios) {
       let scenarioResult = null;
@@ -1718,6 +1819,11 @@ async function run() {
   };
 
   try {
+    const normalLoadMainBasemapChecks = [
+      await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/"),
+      await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/?place=galilee")
+    ];
+
     await captureScenario(page, staticServer.baseUrl, screenshotPaths.overview);
     await captureScenario(
       page,
@@ -1884,6 +1990,7 @@ async function run() {
       pinLabelRegression,
       overviewAreaLabelFixtureCheck,
       overviewClusterOverlap,
+      normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
       galileePinOverlap,
       fallbackOutageChecks: {

@@ -27,6 +27,7 @@ import {
 } from "./constants";
 import {
   BasemapFallbackController,
+  MainSourceLoadTimeoutController,
   resolveInitialBasemapMode,
   type BasemapMode
 } from "./basemap-fallback";
@@ -1147,6 +1148,10 @@ function formatScaleDistance(valueMeters: number) {
   return `${Math.round(valueMeters)} m`;
 }
 
+function isMainSourceLoaded(map: MapLibreMap) {
+  return map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID) || map.areTilesLoaded();
+}
+
 export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -1164,8 +1169,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
   const attributionControlRef = useRef<AttributionControl | null>(null);
   const attributionModeRef = useRef<BasemapMode | null>(null);
   const mainSourceLoadTimeoutRef = useRef<number | null>(null);
-  const mainSourceHasLoadedTileRef = useRef(false);
-  const mainSourceMetadataLoadedRef = useRef(false);
+  const mainSourceLoadControllerRef = useRef(new MainSourceLoadTimeoutController());
   const mapKeyboardActiveRef = useRef(false);
   const tooltipTrackingEnabledRef = useRef(false);
 
@@ -1413,8 +1417,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       }
 
       clearMainSourceLoadTimeout();
-      mainSourceHasLoadedTileRef.current = true;
-      mainSourceMetadataLoadedRef.current = true;
+      mainSourceLoadControllerRef.current.markLoaded();
       styleReadyRef.current = false;
       syncAttributionControl(map, "fallback");
       map.setStyle(getStyleUrl("fallback"));
@@ -1430,14 +1433,19 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         return;
       }
 
-      mainSourceHasLoadedTileRef.current = false;
-      mainSourceMetadataLoadedRef.current = false;
+      const alreadyLoaded = isMainSourceLoaded(map);
+      mainSourceLoadControllerRef.current.arm({ alreadyLoaded });
+      if (alreadyLoaded) {
+        return;
+      }
+
       mainSourceLoadTimeoutRef.current = window.setTimeout(() => {
-        if (basemapController.getState().mode !== "main" || mainSourceHasLoadedTileRef.current) {
+        if (basemapController.getState().mode !== "main") {
           return;
         }
 
-        if (mainSourceMetadataLoadedRef.current) {
+        const currentlyLoaded = isMainSourceLoaded(map);
+        if (!mainSourceLoadControllerRef.current.shouldSwitchToFallback({ currentlyLoaded })) {
           clearMainSourceLoadTimeout();
           return;
         }
@@ -1639,6 +1647,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       sourceId?: string;
       sourceDataType?: string;
       tile?: unknown;
+      isSourceLoaded?: boolean;
     }) => {
       if (basemapController.getState().mode !== "main") {
         return;
@@ -1648,14 +1657,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         return;
       }
 
-      if (event.sourceDataType === "metadata") {
-        mainSourceMetadataLoadedRef.current = true;
-        clearMainSourceLoadTimeout();
-        return;
-      }
-
-      if (event.tile) {
-        mainSourceHasLoadedTileRef.current = true;
+      if (event.tile || event.isSourceLoaded === true || map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID)) {
+        mainSourceLoadControllerRef.current.markLoaded();
         clearMainSourceLoadTimeout();
       }
     };
