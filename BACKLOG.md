@@ -12,6 +12,9 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - Any period other than the first century (the timeline is designed to extend later)
 - Native iOS/Android app build (React Native Web keeps this path open)
 
+## Data
+- **Province histories for M4's timeline.** M3-11's Fact-Checker removed the `politicalHistory` entries of four provinces because their end years rested on Wikipedia alone. M4 rebuilds them from non-Wikipedia sources, since the timeline needs them.
+
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
 

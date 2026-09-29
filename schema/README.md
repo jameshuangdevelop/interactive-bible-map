@@ -35,7 +35,7 @@ All example values below are **illustrative only** (not verified historical clai
 
 ### Ancient area hierarchy (AD 50 convention until M4 timeline)
 - `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
-- `type: "province"` is a province-level area record (Roman province or client kingdom in the same hierarchy).
+- `type: "province"` is a province-level area record: a Roman province, a client kingdom in the same hierarchy, or an equivalent top-level division that wasn't formally a province (Italy, which was governed directly from Rome).
 - `type: "region"` remains for sub-province district/region records such as Galilee.
 - `empire`, `province`, and `region` records must all use `zoomTier: "region"`.
 - Parent chains are recorded with `parentId`: a place points to the smallest containing area, that area points to its province, and the province points to the empire.

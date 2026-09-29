@@ -29,14 +29,9 @@ Shared memory for all agents. Every session reads this first and updates its own
 
 ## Open questions
 - **M3-10, for the human (via the PO):** should Magdala's title stay "Magdala" (Fact-Checker's recommendation) or become "Magadan", which 4 of the 6 versions read in Matthew 15:39? Both options are in [docs/verification/M3-english-names.md](verification/M3-english-names.md#magdala). Please also confirm the Fact-Checker moving "Paneas" to `names.otherLanguages`, like the card's "Julias".
-- **M3-11, for the PO (CP3b):** six items are in [docs/verification/M3-ancient-regions.md](verification/M3-ancient-regions.md#items-for-the-po-and-the-human):
-  - the Judea model (recommended: keep `judea` and `judea-province`, titled "Province of Judea"; rename the alternate "Judaea (Roman province)" and perhaps add "Judea");
-  - Pamphylia, where the sources are split (Perga is kept in Galatia, with a note);
-  - three province labels that sit on city pins (Roman Empire, Syria, Province of Judea);
-  - related verses on areas the NT never names (Roman Empire, Sicily);
-  - `politicalHistory` removed on four provinces until M4;
-  - Italy's `province` type.
-
+- **M3-11, for the human (CP3b):** the PO decided four items (details in [docs/verification/M3-ancient-regions.md](verification/M3-ancient-regions.md#items-for-the-po-and-the-human)): the Judea model is kept, with "Province of Judea" alternating as "Judea" and "Judaea"; Italy keeps the `province` type, and its summary says it wasn't formally one; the four removed `politicalHistory` entries are in `BACKLOG.md` for M4; and Pamphylia stays with Galatia, with a note on the split sources. Two questions stay open:
+  - Should areas the NT never names (the Roman Empire, Sicily) keep related verses?
+  - Three province labels sit on city pins (Roman Empire, Syria, Province of Judea); the map offsets area labels, but the human may prefer other label points.
 ## Session log
 | Date | Agent | Task | Result |
 |---|---|---|---|
