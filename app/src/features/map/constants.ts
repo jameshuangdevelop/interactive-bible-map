@@ -10,9 +10,6 @@ export const MAIN_BASEMAP_ATTRIBUTION =
 export const FALLBACK_BASEMAP_ATTRIBUTION =
   '<a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)';
 
-export const MAIN_BASEMAP_NAME =
-  "Interactive Bible Map basemap (modified from OpenFreeMap Liberty)";
-
 export const DEFAULT_MAP_CENTER: Coordinates = [22.5, 35];
 export const DEFAULT_MAP_ZOOM = 4.7;
 export const MAX_MAP_ZOOM = 14;

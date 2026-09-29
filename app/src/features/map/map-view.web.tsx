@@ -35,7 +35,9 @@ import {
   type PlaceRenderData
 } from "./map-render-data";
 import {
+  CLUSTER_COLLISION_IMAGE_SIZE,
   CLUSTER_COUNT_LAYOUT,
+  PIN_COLLISION_IMAGE_SIZE,
   PIN_COLLISION_LAYOUT,
   QUESTION_BADGE_LAYOUT
 } from "./map-layer-layouts";
@@ -72,6 +74,7 @@ const layerKeyboardFocusId = "ibm-keyboard-focus";
 const questionBadgeImageId = "ibm-question-badge-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
+const mapTestHookKey = "__ibmMapForTests";
 
 const interactiveLayerIds = [
   layerClusterCircleId,
@@ -416,14 +419,14 @@ function ensureQuestionBadgeImage(map: MapLibreMap) {
 
 function ensureCollisionImages(map: MapLibreMap) {
   if (!map.hasImage(pinCollisionImageId)) {
-    const image = createTransparentCollisionImage(28);
+    const image = createTransparentCollisionImage(PIN_COLLISION_IMAGE_SIZE);
     if (image) {
       map.addImage(pinCollisionImageId, image.image, { pixelRatio: image.pixelRatio });
     }
   }
 
   if (!map.hasImage(clusterCollisionImageId)) {
-    const image = createTransparentCollisionImage(40);
+    const image = createTransparentCollisionImage(CLUSTER_COLLISION_IMAGE_SIZE);
     if (image) {
       map.addImage(clusterCollisionImageId, image.image, { pixelRatio: image.pixelRatio });
     }
@@ -599,6 +602,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": clusterCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -612,6 +618,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -625,6 +634,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -638,6 +650,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -1138,6 +1153,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     });
 
     mapRef.current = map;
+    (window as Window & { [mapTestHookKey]?: MapLibreMap })[mapTestHookKey] = map;
     map.addControl(new AttributionControl({ compact: true }), "bottom-right");
 
     const markGestureStarted = () => {
@@ -1206,6 +1222,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
 
       activateVisibleEntry(entry);
     };
+    const handleMouseMove = (event: { point: PointLike }) => {
+      handleTooltipAtPoint(event.point);
+    };
 
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
@@ -1216,7 +1235,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     map.on("zoomstart", markGestureStarted);
     map.on("dragend", markGestureFinished);
     map.on("zoomend", markGestureFinished);
-    map.on("mousemove", (event) => handleTooltipAtPoint(event.point));
+    map.on("mousemove", handleMouseMove);
     map.on("mouseout", hideTooltip);
     map.on("click", handleMapClick);
     map.on("error", handleError);
@@ -1241,12 +1260,14 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       map.off("zoomstart", markGestureStarted);
       map.off("dragend", markGestureFinished);
       map.off("zoomend", markGestureFinished);
+      map.off("mousemove", handleMouseMove);
       map.off("mouseout", hideTooltip);
       map.off("click", handleMapClick);
       map.off("error", handleError);
 
       map.remove();
       mapRef.current = null;
+      delete (window as Window & { [mapTestHookKey]?: MapLibreMap })[mapTestHookKey];
       styleReadyRef.current = false;
     };
   }, [

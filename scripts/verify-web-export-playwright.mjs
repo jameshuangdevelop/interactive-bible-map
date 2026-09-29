@@ -18,6 +18,12 @@ const generatedPlacesPath = path.join(
 );
 
 const smoothnessLongTaskLimitMs = 50;
+const syntheticPlaceIdPrefix = "synthetic-city-";
+const smoothnessLayerIds = {
+  clusters: "ibm-cluster-circle",
+  cityPins: "ibm-city-pin",
+  pinLabels: "ibm-pin-label"
+};
 
 function contentTypeFor(filePath) {
   const extension = path.extname(filePath).toLowerCase();
@@ -412,25 +418,33 @@ async function captureDeviceScaleCrop(browser, url, screenshotPath, options = {}
 
 function buildSyntheticPlaces(basePlaces, syntheticCount = 10_000) {
   const places = [...basePlaces];
-  const rowSize = 250;
+  const columns = 100;
+  const rows = Math.ceil(syntheticCount / columns);
+  const minLongitude = 10;
+  const maxLongitude = 34;
+  const minLatitude = 29;
+  const maxLatitude = 41;
+
   for (let index = 0; index < syntheticCount; index += 1) {
-    const row = Math.floor(index / rowSize);
-    const column = index % rowSize;
-    const longitude = -170 + (column / (rowSize - 1)) * 340;
-    const latitude = -60 + ((row % 80) / 79) * 40;
+    const row = Math.floor(index / columns);
+    const column = index % columns;
+    const rowRatio = rows <= 1 ? 0 : row / (rows - 1);
+    const columnRatio = columns <= 1 ? 0 : column / (columns - 1);
+    const longitude = minLongitude + columnRatio * (maxLongitude - minLongitude);
+    const latitude = minLatitude + rowRatio * (maxLatitude - minLatitude);
 
     places.push({
-      id: `synthetic-${index}`,
+      id: `${syntheticPlaceIdPrefix}${index}`,
       names: {
-        ancient: [`Synthetic ${index}`],
+        ancient: [`Synthetic City ${index}`],
         alternate: []
       },
-      type: "site",
-      zoomTier: "site",
+      type: "city",
+      zoomTier: "city",
       parentId: null,
       candidates: [
         {
-          label: `Synthetic candidate ${index}`,
+          label: `Synthetic City ${index}`,
           coordinates: [Number(longitude.toFixed(6)), Number(latitude.toFixed(6))],
           confidence: "low"
         }
@@ -439,6 +453,183 @@ function buildSyntheticPlaces(basePlaces, syntheticCount = 10_000) {
   }
 
   return places;
+}
+
+async function setMapView(page, { center, zoom }) {
+  await page.evaluate(
+    ({ centerCoordinates, targetZoom }) =>
+      new Promise((resolve, reject) => {
+        const map = window.__ibmMapForTests;
+        if (!map) {
+          reject(new Error("Map test hook is unavailable."));
+          return;
+        }
+
+        const currentCenter = map.getCenter();
+        const centerIsCurrent =
+          Math.abs(currentCenter.lng - centerCoordinates[0]) < 0.0001 &&
+          Math.abs(currentCenter.lat - centerCoordinates[1]) < 0.0001;
+        const zoomIsCurrent = Math.abs(map.getZoom() - targetZoom) < 0.0001;
+
+        if (centerIsCurrent && zoomIsCurrent) {
+          resolve();
+          return;
+        }
+
+        const handleIdle = () => {
+          map.off("idle", handleIdle);
+          resolve();
+        };
+
+        map.on("idle", handleIdle);
+        map.jumpTo({
+          center: centerCoordinates,
+          zoom: targetZoom
+        });
+      }),
+    { centerCoordinates: center, targetZoom: zoom }
+  );
+  await page.waitForTimeout(450);
+}
+
+async function collectRenderedCoverage(page) {
+  return page.evaluate(
+    ({ clustersLayerId, cityPinsLayerId, pinLabelsLayerId, syntheticPrefix }) => {
+      const map = window.__ibmMapForTests;
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const uniqueEntries = (features, keyBuilder) => {
+        const seen = new Set();
+        const result = [];
+        for (const feature of features) {
+          const key = keyBuilder(feature);
+          if (!seen.has(key)) {
+            seen.add(key);
+            result.push(feature);
+          }
+        }
+
+        return result;
+      };
+
+      const clustersRaw = map.queryRenderedFeatures(undefined, {
+        layers: [clustersLayerId]
+      });
+      const cityPinsRaw = map.queryRenderedFeatures(undefined, {
+        layers: [cityPinsLayerId]
+      });
+      const labelsRaw = map.queryRenderedFeatures(undefined, {
+        layers: [pinLabelsLayerId]
+      });
+
+      const clusters = uniqueEntries(
+        clustersRaw,
+        (feature) =>
+          `cluster:${feature.properties?.cluster_id ?? "unknown"}:${feature.geometry?.coordinates?.join(",") ?? ""}`
+      );
+      const cityPins = uniqueEntries(
+        cityPinsRaw,
+        (feature) => `city:${feature.properties?.entryId ?? feature.id ?? Math.random()}`
+      );
+      const labels = uniqueEntries(
+        labelsRaw,
+        (feature) => `label:${feature.properties?.entryId ?? feature.id ?? Math.random()}`
+      );
+
+      const syntheticPinCount = cityPins.filter((feature) =>
+        String(feature.properties?.placeId ?? "").startsWith(syntheticPrefix)
+      ).length;
+      const syntheticLabelCount = labels.filter((feature) =>
+        String(feature.properties?.placeId ?? "").startsWith(syntheticPrefix)
+      ).length;
+      const clusterPointTotal = clusters.reduce(
+        (sum, feature) => sum + Number(feature.properties?.point_count ?? 0),
+        0
+      );
+      const maxClusterPointCount = clusters.reduce(
+        (maximum, feature) => Math.max(maximum, Number(feature.properties?.point_count ?? 0)),
+        0
+      );
+      const syntheticVisibleEstimate = clusterPointTotal + syntheticPinCount;
+      const syntheticPlaceListEntries = document.querySelectorAll(
+        `button[data-place-entry-id^='place:${syntheticPrefix}']`
+      ).length;
+      const clusterPlaceListEntries = document.querySelectorAll(
+        "button[data-place-entry-id^='cluster:']"
+      ).length;
+
+      return {
+        zoom: map.getZoom(),
+        clusterFeatureCount: clusters.length,
+        clusterPointTotal,
+        maxClusterPointCount,
+        syntheticPinCount,
+        syntheticLabelCount,
+        syntheticVisibleEstimate,
+        syntheticPlaceListEntries,
+        clusterPlaceListEntries
+      };
+    },
+    {
+      clustersLayerId: smoothnessLayerIds.clusters,
+      cityPinsLayerId: smoothnessLayerIds.cityPins,
+      pinLabelsLayerId: smoothnessLayerIds.pinLabels,
+      syntheticPrefix: syntheticPlaceIdPrefix
+    }
+  );
+}
+
+function assertSyntheticCoverage(scenarioLabel, coverage, expectation) {
+  if (!expectation) {
+    return;
+  }
+
+  if (
+    typeof expectation.minimumVisibleEstimate === "number" &&
+    coverage.syntheticVisibleEstimate < expectation.minimumVisibleEstimate
+  ) {
+    throw new Error(
+      `${scenarioLabel}: expected syntheticVisibleEstimate >= ${expectation.minimumVisibleEstimate}, got ${coverage.syntheticVisibleEstimate}`
+    );
+  }
+
+  if (
+    typeof expectation.minimumSyntheticPins === "number" &&
+    coverage.syntheticPinCount < expectation.minimumSyntheticPins
+  ) {
+    throw new Error(
+      `${scenarioLabel}: expected syntheticPinCount >= ${expectation.minimumSyntheticPins}, got ${coverage.syntheticPinCount}`
+    );
+  }
+
+  if (
+    typeof expectation.minimumSyntheticLabels === "number" &&
+    coverage.syntheticLabelCount < expectation.minimumSyntheticLabels
+  ) {
+    throw new Error(
+      `${scenarioLabel}: expected syntheticLabelCount >= ${expectation.minimumSyntheticLabels}, got ${coverage.syntheticLabelCount}`
+    );
+  }
+
+  if (
+    typeof expectation.minimumClusterFeatures === "number" &&
+    coverage.clusterFeatureCount < expectation.minimumClusterFeatures
+  ) {
+    throw new Error(
+      `${scenarioLabel}: expected clusterFeatureCount >= ${expectation.minimumClusterFeatures}, got ${coverage.clusterFeatureCount}`
+    );
+  }
+
+  if (
+    typeof expectation.maximumClusterFeatures === "number" &&
+    coverage.clusterFeatureCount > expectation.maximumClusterFeatures
+  ) {
+    throw new Error(
+      `${scenarioLabel}: expected clusterFeatureCount <= ${expectation.maximumClusterFeatures}, got ${coverage.clusterFeatureCount}`
+    );
+  }
 }
 
 function percentile(sortedValues, fraction) {
@@ -680,6 +871,12 @@ function assertSmoothnessResult(label, result) {
   }
 }
 
+function assertSmoothnessScenarios(label, smoothnessRun) {
+  for (const [scenarioId, scenarioResult] of Object.entries(smoothnessRun.scenarios)) {
+    assertSmoothnessResult(`${label} (${scenarioId})`, scenarioResult);
+  }
+}
+
 async function runSmoothnessCheck({
   browser,
   baseUrl,
@@ -689,7 +886,8 @@ async function runSmoothnessCheck({
   workerUrls,
   workerConsoleEvents,
   workerErrors,
-  routeHandler = null
+  routeHandler = null,
+  syntheticCoverageExpectations = null
 }) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
 
@@ -726,13 +924,47 @@ async function runSmoothnessCheck({
   try {
     await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
     await waitForMapToSettle(page);
-    await installGestureMonitor(page);
-    const result = await runGestureSequence(page);
-    const frameSummary = summarizeFrameTimes(result.frameTimes);
+    await page.waitForFunction(() => Boolean(window.__ibmMapForTests), {
+      timeout: 30_000
+    });
+
+    const scenarios = [
+      {
+        id: "overview-clustered",
+        center: [22.5, 35],
+        zoom: 4.7,
+        expectation: syntheticCoverageExpectations?.["overview-clustered"] ?? null
+      },
+      {
+        id: "zoom8-unclustered",
+        center: [22.5, 35],
+        zoom: 8,
+        expectation: syntheticCoverageExpectations?.["zoom8-unclustered"] ?? null
+      }
+    ];
+
+    const scenarioResults = {};
+    for (const scenario of scenarios) {
+      await setMapView(page, {
+        center: scenario.center,
+        zoom: scenario.zoom
+      });
+
+      const coverage = await collectRenderedCoverage(page);
+      assertSyntheticCoverage(`Synthetic coverage ${scenario.id}`, coverage, scenario.expectation);
+
+      await installGestureMonitor(page);
+      const gestureResult = await runGestureSequence(page);
+
+      scenarioResults[scenario.id] = {
+        ...gestureResult,
+        frameSummary: summarizeFrameTimes(gestureResult.frameTimes),
+        coverage
+      };
+    }
 
     return {
-      ...result,
-      frameSummary
+      scenarios: scenarioResults
     };
   } finally {
     await page.close();
@@ -868,11 +1100,22 @@ async function run() {
           contentType: "application/json; charset=utf-8",
           body: JSON.stringify(syntheticPlaces)
         });
+      },
+      syntheticCoverageExpectations: {
+        "overview-clustered": {
+          minimumVisibleEstimate: 9_500,
+          minimumClusterFeatures: 1
+        },
+        "zoom8-unclustered": {
+          minimumSyntheticPins: 250,
+          minimumSyntheticLabels: 20,
+          maximumClusterFeatures: 0
+        }
       }
     });
 
-    assertSmoothnessResult("real-data smoothness", smoothnessReal);
-    assertSmoothnessResult("synthetic-data smoothness", smoothnessSynthetic);
+    assertSmoothnessScenarios("real-data smoothness", smoothnessReal);
+    assertSmoothnessScenarios("synthetic-data smoothness", smoothnessSynthetic);
 
     const tileRequestCount = requestUrls.filter(
       (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")

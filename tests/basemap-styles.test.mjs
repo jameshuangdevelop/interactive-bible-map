@@ -29,8 +29,48 @@ const versaTilesStylePath = path.join(
   "style.json"
 );
 
-const libertyAllowedSourceLayers = new Set(["landcover", "water", "waterway"]);
-const versaTilesAllowedSourceLayers = new Set(["land", "ocean", "water_lines", "water_polygons"]);
+const libertyAllowedLayerIds = new Set([
+  "background",
+  "natural_earth",
+  "landcover_wood",
+  "landcover_grass",
+  "landcover_ice",
+  "landcover_wetland",
+  "waterway_river",
+  "waterway_other",
+  "water",
+  "landcover_sand"
+]);
+
+const versaTilesAllowedLayerIds = new Set([
+  "background",
+  "slot-below-fills",
+  "slot-below-streets",
+  "water-ocean",
+  "water-river",
+  "water-canal",
+  "water-stream",
+  "water-ditch",
+  "water-area",
+  "water-area-river",
+  "water-area-small",
+  "land-rock",
+  "land-forest",
+  "land-grass",
+  "land-vegetation",
+  "land-sand",
+  "land-wetland",
+  "land-glacier"
+]);
+
+const versaTilesExpectedLandKindsByLayer = new Map([
+  ["land-rock", ["bare_rock", "scree", "shingle"]],
+  ["land-forest", ["forest"]],
+  ["land-grass", ["grass", "grassland", "meadow", "wet_meadow"]],
+  ["land-vegetation", ["heath", "scrub"]],
+  ["land-sand", ["beach", "sand"]],
+  ["land-wetland", ["bog", "marsh", "string_bog", "swamp"]]
+]);
 const removedSourceLayers = new Set([
   "aeroway",
   "aerialways",
@@ -76,17 +116,58 @@ function assertNoBoundaryLayers(style, styleName) {
   assert.equal(hasBoundaryLayer, false, `${styleName} must not include boundary layers`);
 }
 
-function assertSourceLayerAllowList(style, styleName, allowedSourceLayers) {
-  for (const layer of style.layers) {
-    const sourceLayer = layer["source-layer"];
-    if (!sourceLayer) {
-      continue;
-    }
+function assertLayerAllowList(style, styleName, allowedLayerIds) {
+  const actualLayerIds = style.layers.map((layer) => layer.id);
 
+  for (const layer of style.layers) {
     assert.equal(
-      allowedSourceLayers.has(sourceLayer),
+      allowedLayerIds.has(layer.id),
       true,
-      `${styleName} layer '${layer.id}' uses disallowed source-layer '${sourceLayer}'`
+      `${styleName} layer '${layer.id}' is not in the explicit allow-list`
+    );
+  }
+
+  for (const allowedLayerId of allowedLayerIds) {
+    assert.equal(
+      actualLayerIds.includes(allowedLayerId),
+      true,
+      `${styleName} allow-listed layer '${allowedLayerId}' is missing from generated style`
+    );
+  }
+}
+
+function kindFilterValues(filter) {
+  if (!Array.isArray(filter) || filter[0] !== "in") {
+    return null;
+  }
+
+  const getter = filter[1];
+  const literal = filter[2];
+  if (
+    !Array.isArray(getter) ||
+    getter[0] !== "get" ||
+    getter[1] !== "kind" ||
+    !Array.isArray(literal) ||
+    literal[0] !== "literal" ||
+    !Array.isArray(literal[1])
+  ) {
+    return null;
+  }
+
+  return literal[1];
+}
+
+function assertVersaTilesLandFilters(style) {
+  for (const [layerId, expectedKinds] of versaTilesExpectedLandKindsByLayer) {
+    const layer = style.layers.find((candidate) => candidate.id === layerId);
+    assert.ok(layer, `VersaTiles layer '${layerId}' must exist`);
+
+    const kinds = kindFilterValues(layer.filter);
+    assert.ok(kinds, `VersaTiles layer '${layerId}' must use a kind filter`);
+    assert.deepEqual(
+      [...kinds].sort(),
+      [...expectedKinds].sort(),
+      `VersaTiles layer '${layerId}' must keep only expected natural-land kinds`
     );
   }
 }
@@ -135,7 +216,7 @@ test("Liberty hosted style is physical-only and keeps required attribution", asy
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
   assertNoSymbolLayers(style, "Liberty");
   assertNoBoundaryLayers(style, "Liberty");
-  assertSourceLayerAllowList(style, "Liberty", libertyAllowedSourceLayers);
+  assertLayerAllowList(style, "Liberty", libertyAllowedLayerIds);
   assertRemovedSourceLayers(style, "Liberty");
   assertMaxZoom14(style, "Liberty");
 });
@@ -160,8 +241,8 @@ test("VersaTiles fallback hosted style is physical-only and keeps required attri
 
   assertNoSymbolLayers(style, "VersaTiles");
   assertNoBoundaryLayers(style, "VersaTiles");
-  assertSourceLayerAllowList(style, "VersaTiles", versaTilesAllowedSourceLayers);
+  assertLayerAllowList(style, "VersaTiles", versaTilesAllowedLayerIds);
+  assertVersaTilesLandFilters(style);
   assertRemovedSourceLayers(style, "VersaTiles");
   assertMaxZoom14(style, "VersaTiles");
 });
-

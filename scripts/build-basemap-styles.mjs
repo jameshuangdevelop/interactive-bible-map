@@ -47,8 +47,18 @@ Attribution string used in the vector source:
 ${versaTilesAttribution}
 `;
 
-const libertyAllowedSourceLayers = new Set(["landcover", "water", "waterway"]);
-const versaTilesAllowedSourceLayers = new Set(["land", "ocean", "water_lines", "water_polygons"]);
+const libertyAllowedLayerIds = new Set([
+  "background",
+  "natural_earth",
+  "landcover_wood",
+  "landcover_grass",
+  "landcover_ice",
+  "landcover_wetland",
+  "waterway_river",
+  "waterway_other",
+  "water",
+  "landcover_sand"
+]);
 const versaTilesAllowedLayerIds = new Set([
   "background",
   "slot-below-fills",
@@ -114,26 +124,7 @@ function buildLibertyStyle(upstreamStyle) {
   }
 
   removeDisallowedLayerTypes(style);
-  style.layers = style.layers.filter((layer) => {
-    if (layer.id === "background" || layer.id === "natural_earth") {
-      return true;
-    }
-
-    if (layer.type === "raster") {
-      return layer.id === "natural_earth";
-    }
-
-    const sourceLayer = layer["source-layer"];
-    if (!sourceLayer || !libertyAllowedSourceLayers.has(sourceLayer)) {
-      return false;
-    }
-
-    if (sourceLayer === "waterway") {
-      return !layer.id.includes("tunnel");
-    }
-
-    return true;
-  });
+  style.layers = style.layers.filter((layer) => libertyAllowedLayerIds.has(layer.id));
 
   clampVectorSourceMaxZoomTo14(style);
   normalizeMaxZoom(style);
@@ -157,26 +148,7 @@ function buildVersaTilesStyle(upstreamStyle) {
   }
 
   removeDisallowedLayerTypes(style);
-  style.layers = style.layers.filter((layer) => {
-    if (versaTilesAllowedLayerIds.has(layer.id)) {
-      return true;
-    }
-
-    const sourceLayer = layer["source-layer"];
-    if (!sourceLayer || !versaTilesAllowedSourceLayers.has(sourceLayer)) {
-      return false;
-    }
-
-    if (sourceLayer === "land") {
-      return layer.id.startsWith("land-");
-    }
-
-    if (sourceLayer === "water_lines" || sourceLayer === "water_polygons") {
-      return layer.id.startsWith("water-");
-    }
-
-    return sourceLayer === "ocean";
-  });
+  style.layers = style.layers.filter((layer) => versaTilesAllowedLayerIds.has(layer.id));
 
   clampVectorSourceMaxZoomTo14(style);
   normalizeMaxZoom(style);
@@ -253,4 +225,3 @@ buildStyles().catch((error) => {
   console.error("Failed to build basemap styles:", error.message);
   process.exitCode = 1;
 });
-
