@@ -528,6 +528,74 @@ async function verifyAreaLabelsAvoidPins(page, url) {
   return overlap;
 }
 
+async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 30_000
+  });
+
+  const overlap = await page.evaluate(
+    ({ testHookKey, areaLayerIds, clusterLayerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const clusters = map.queryRenderedFeatures(undefined, {
+        layers: [clusterLayerId]
+      });
+      const collisions = [];
+
+      for (const clusterFeature of clusters) {
+        if (clusterFeature.geometry?.type !== "Point") {
+          continue;
+        }
+
+        const [longitude, latitude] = clusterFeature.geometry.coordinates;
+        const point = map.project([longitude, latitude]);
+        const labelsAtCluster = map.queryRenderedFeatures(point, {
+          layers: areaLayerIds
+        });
+
+        if (labelsAtCluster.length > 0) {
+          collisions.push({
+            clusterId: clusterFeature.properties?.cluster_id ?? null,
+            pointCount: clusterFeature.properties?.point_count ?? null,
+            labelIds: labelsAtCluster.map(
+              (label) => label.properties?.entryId ?? label.id ?? "label"
+            )
+          });
+        }
+      }
+
+      return {
+        clusterCount: clusters.length,
+        collisionCount: collisions.length,
+        collisionSamples: collisions.slice(0, 8)
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      areaLayerIds: mapLayerIds.areaLabels,
+      clusterLayerId: mapLayerIds.clusterPins
+    }
+  );
+
+  if (overlap.clusterCount === 0) {
+    throw new Error("Overview cluster-overlap check was vacuous: no clusters were rendered.");
+  }
+
+  if (overlap.collisionCount > 0) {
+    throw new Error(
+      `Found area-label/cluster overlaps on overview: ${JSON.stringify(overlap.collisionSamples)}`
+    );
+  }
+
+  return overlap;
+}
+
 async function waitForMapStyleLoaded(page) {
   await page.waitForFunction((testHookKey) => {
     const map = window[testHookKey];
@@ -1604,6 +1672,10 @@ async function run() {
       screenshotPaths.emmausCrop3x,
       { panelHeading: "Emmaus" }
     );
+    const overviewClusterOverlap = await verifyAreaLabelsAvoidClustersOnOverview(
+      page,
+      staticServer.baseUrl
+    );
     const galileePinOverlap = await verifyAreaLabelsAvoidPins(
       page,
       `${staticServer.baseUrl}/?place=galilee`
@@ -1709,6 +1781,7 @@ async function run() {
       workerConsoleEvents,
       pinLabelRegression,
       overviewAreaLabelFixtureCheck,
+      overviewClusterOverlap,
       keyboardAndEscapeChecks,
       galileePinOverlap,
       fallbackOutageChecks: {
