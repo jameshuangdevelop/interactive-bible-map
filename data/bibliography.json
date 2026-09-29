@@ -366,13 +366,13 @@
       "accessed": "2026-09-28"
     },
     {
-      "id": "esv-2016-biblegateway",
+      "id": "esv-2025-biblegateway",
       "type": "web",
-      "title": "English Standard Version (ESV), 2016 text edition",
+      "title": "English Standard Version (ESV), 2025 text edition",
       "authors": [
         "Crossway"
       ],
-      "year": 2016,
+      "year": 2025,
       "publisher": "Crossway",
       "url": "https://www.biblegateway.com/versions/English-Standard-Version-ESV-Bible/",
       "accessed": "2026-09-28"
@@ -390,14 +390,14 @@
       "accessed": "2026-09-28"
     },
     {
-      "id": "kjv-1769-biblegateway",
+      "id": "kjv-1987-biblegateway",
       "type": "web",
-      "title": "King James Version (KJV), 1769 Oxford standard text",
+      "title": "King James Version (KJV), 1987 printing",
       "authors": [
         "Church of England"
       ],
-      "year": 1769,
-      "publisher": "Public domain (Crown copyright applies within the United Kingdom)",
+      "year": 1987,
+      "publisher": "Public domain in the United States",
       "url": "https://www.biblegateway.com/versions/King-James-Version-KJV-Bible/",
       "accessed": "2026-09-28"
     },

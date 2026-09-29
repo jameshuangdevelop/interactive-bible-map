@@ -5,7 +5,9 @@
       "Miletus"
     ],
     "modern": "Near Balat",
-    "alternate": [],
+    "alternate": [
+      "Miletum"
+    ],
     "otherLanguages": [
       "Milawanda"
     ]
@@ -39,9 +41,9 @@
       "scripture:Acts 20:18",
       "scripture:2 Timothy 4:20",
       "bib:niv-2011-biblegateway",
-      "bib:esv-2016-biblegateway",
+      "bib:esv-2025-biblegateway",
       "bib:nlt-2015-biblegateway",
-      "bib:kjv-1769-biblegateway",
+      "bib:kjv-1987-biblegateway",
       "bib:nkjv-1982-biblegateway",
       "bib:csb-2017-biblegateway"
     ]
@@ -66,5 +68,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

@@ -6,7 +6,9 @@
       "Bethlehem Ephrathah"
     ],
     "modern": "Bethlehem",
-    "alternate": [],
+    "alternate": [
+      "Bethlehem Ephratah"
+    ],
     "otherLanguages": [
       "Beit Lahm"
     ]
@@ -39,9 +41,9 @@
       "scripture:Matthew 2:1",
       "scripture:Luke 2:4",
       "bib:niv-2011-biblegateway",
-      "bib:esv-2016-biblegateway",
+      "bib:esv-2025-biblegateway",
       "bib:nlt-2015-biblegateway",
-      "bib:kjv-1769-biblegateway",
+      "bib:kjv-1987-biblegateway",
       "bib:nkjv-1982-biblegateway",
       "bib:csb-2017-biblegateway"
     ]
@@ -167,5 +169,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

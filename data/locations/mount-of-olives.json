@@ -37,9 +37,9 @@
       "openbible:mount-of-olives",
       "scripture:Luke 22:39",
       "bib:niv-2011-biblegateway",
-      "bib:esv-2016-biblegateway",
+      "bib:esv-2025-biblegateway",
       "bib:nlt-2015-biblegateway",
-      "bib:kjv-1769-biblegateway",
+      "bib:kjv-1987-biblegateway",
       "bib:nkjv-1982-biblegateway",
       "bib:csb-2017-biblegateway"
     ]
@@ -110,7 +110,7 @@
   "otConnections": [
     {
       "ref": "Zechariah 14:4",
-      "note": "Zechariah's prophecy that 'his feet will stand on the Mount of Olives' on a coming day of the Lord is widely noted as background for the mount's later Jewish and Christian eschatological associations.",
+      "note": "Zechariah's prophecy that 'his feet will stand in that day on the Mount of Olives' (a coming day of the Lord) is widely noted as background for the mount's later Jewish and Christian eschatological associations.",
       "sources": [
         "openbible:mount-of-olives"
       ]
@@ -124,5 +124,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

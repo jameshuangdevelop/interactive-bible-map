@@ -7,15 +7,14 @@ that names it (using the record's own `scripture` refs, or its `otConnections` r
 place is named only in an Old Testament connection), in six English Bible versions:
 
 - **NIV** — New International Version, 2011 text edition (Biblica)
-- **ESV** — English Standard Version, 2016 text edition (Crossway). BibleGateway's live page
-  for the ESV currently states "ESV Text Edition: 2025" in its copyright notice; the spelling
-  differences this table records (Cenchreae/Cenchrea, Colossae/Colosse) are unaffected by
-  that later text-edition update, but this is flagged for the Fact-Checker.
+- **ESV** — English Standard Version, 2025 text edition (Crossway): the text BibleGateway
+  serves, per the "ESV Text Edition: 2025" line in its copyright notice. (Corrected in
+  verification from "2016 text edition"; see `docs/verification/M3-english-names.md`.)
 - **NLT** — New Living Translation, 2015 text edition (Tyndale House Foundation / Tyndale
   House Publishers)
-- **KJV** — King James Version, 1769 Oxford standard text (the modern standard printing of
-  the 1611 Authorized Version; BibleGateway's own version-info page carries no copyright or
-  edition statement for the KJV, consistent with its public-domain status)
+- **KJV** — King James Version, 1987 printing: BibleGateway's version-info page states that
+  its KJV "matches the 1987 printing" and that the KJV is public domain in the United States.
+  (Corrected in verification from "1769 Oxford standard text", which that page does not state.)
 - **NKJV** — New King James Version, 1982 (Thomas Nelson)
 - **CSB** — Christian Standard Bible, 2017 (Holman Bible Publishers)
 
@@ -56,7 +55,7 @@ own (only the Temple Mount, in this dataset) are marked **not Bible-named**.
 | bethlehem | Matthew 2:1 | Bethlehem | Bethlehem | Bethlehem | Bethlehem | Bethlehem | Bethlehem | Bethlehem | Bethlehem | Unchanged (6/6). Moved "Beit Lahm" (Arabic) to otherLanguages. |
 | bethsaida | Matthew 11:21 | Bethsaida | Bethsaida | Bethsaida | Bethsaida | Bethsaida | Bethsaida | Bethsaida | Bethsaida | Unchanged (6/6). Moved "Julias" (the Herodian Greek/Latin honorific renaming) to otherLanguages, per the card's own example. |
 | caesarea-maritima | Acts 10:1 | Caesarea | Caesarea | Caesarea | Caesarea | Caesarea | Caesarea | Caesarea | Caesarea Maritima | Unchanged; the Bible just says "Caesarea" — "Maritima" is the record's own scholarly disambiguator from Caesarea Philippi. No other-language names present. |
-| caesarea-philippi | Matthew 16:13 | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Unchanged (6/6). **Borderline:** kept "Paneas" (the standard English form used by Pleiades and general scholarship for the pre-Roman sanctuary name). Moved "Panias" (a less-standard transliteration) to otherLanguages. |
+| caesarea-philippi | Matthew 16:13 | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Caesarea Philippi | Unchanged (6/6). **Borderline:** kept "Paneas" (the standard English form used by Pleiades and general scholarship for the pre-Roman sanctuary name). Moved "Panias" (a less-standard transliteration) to otherLanguages. **Overturned in verification:** "Paneas" also moved to otherLanguages (see `docs/verification/M3-english-names.md`). |
 | cana | John 2:1 | Cana in Galilee | Cana in Galilee | Cana in Galilee | Cana of Galilee | Cana of Galilee | Cana of Galilee | Cana of Galilee | Cana | Unchanged. Added "Cana in Galilee" (NIV/ESV/NLT) as alternate alongside the existing "Cana of Galilee." |
 | capernaum | Matthew 4:13 | Capernaum | Capernaum | Capernaum | Capernaum | Capernaum | Capernaum | Capernaum | Capernaum | Unchanged (6/6). Moved "Kfar Nahum" (Hebrew) and "Talhum" (Arabic) to otherLanguages — the card's own lead example. |
 | cenchreae | Acts 18:18 | Cenchreae | Cenchreae | Cenchrea | Cenchrea | Cenchrea | Cenchreae | Cenchreae | Cenchreae | Even split (3/3); WEB tiebreak keeps "Cenchreae." Added "Cenchrea" (NLT/KJV/NKJV) as alternate. **Borderline:** moved "Kenchreai" (a Greek transliteration not used by English reference works, which say "Cenchreae") to otherLanguages. |
@@ -99,9 +98,9 @@ own (only the Temple Mount, in this dataset) are marked **not Bible-named**.
 | puteoli | Acts 28:13 | Puteoli | Puteoli | Puteoli | Puteoli | Puteoli | Puteoli | Puteoli | Puteoli | Unchanged (6/6). Moved "Dikaiarcheia" (the city's earlier Greek name) to otherLanguages. |
 | rome | Acts 18:2 | Rome | Rome | Rome | Rome | Rome | Rome | Rome | Rome | Unchanged (6/6). Moved "Roma" (Latin/Italian) to otherLanguages. |
 | salamis-cyprus | Acts 13:5 | Salamis | Salamis | Salamis | Salamis | Salamis | Salamis | Salamis | Salamis | Unchanged (6/6). No other-language names present. |
-| samaria | John 4:5 | Samaria | Samaria | Samaria | Samaria | Samaria | Samaria | Samaria | Samaria | Unchanged (6/6). Moved "Shomron" (Hebrew) to otherLanguages. |
+| samaria | John 4:5 | Samaria | Samaria | — (not named; "Samaritan" village) | Samaria | Samaria | Samaria | Samaria | Samaria | Unchanged (5/5 versions that name it here; the NLT's John 4:5 does not). Moved "Shomron" (Hebrew) to otherLanguages. |
 | sardis | Revelation 3:1 | Sardis | Sardis | Sardis | Sardis | Sardis | Sardis | Sardis | Sardis | Unchanged (6/6). No other-language names present. |
-| sea-of-galilee | Matthew 4:18; John 6:1; Numbers 34:11 | Sea of Galilee / Sea of Tiberias / Sea of Galilee | Sea of Galilee / Sea of Tiberias / Sea of Chinnereth | Sea of Galilee / Sea of Tiberias / Sea of Galilee | sea of Galilee / sea of Tiberias / sea of Chinnereth | Sea of Galilee / Sea of Tiberias / Sea of Chinnereth | Sea of Galilee / Sea of Tiberias / Sea of Chinnereth | sea of Galilee / Sea of Tiberias / sea of Chinnereth | Sea of Galilee | Unchanged (6/6 on the main name). Kept "Sea of Tiberias" (John 6:1, 6/6) and "Sea of Chinnereth" (Numbers 34:11, 4/6 plus WEB). "Lake of Gennesaret" was already present and is authorized directly by ADR-0026's own text. Moved "Yam Kinneret" (Hebrew) to otherLanguages. |
+| sea-of-galilee | Matthew 4:18; John 6:1; Numbers 34:11 | Sea of Galilee / Sea of Tiberias / Sea of Galilee | Sea of Galilee / Sea of Tiberias / Sea of Chinnereth | Sea of Galilee / Sea of Tiberias / Sea of Galilee | sea of Galilee / sea of Tiberias / sea of Chinnereth | Sea of Galilee / Sea of Tiberias / Sea of Chinnereth | Sea of Galilee / (or) Tiberias / Sea of Chinnereth | sea of Galilee / Sea of Tiberias / sea of Chinnereth | Sea of Galilee | Unchanged (6/6 on the main name). Kept "Sea of Tiberias" (John 6:1: 5/6 in full; the CSB's "(or Tiberias)" gives the same name) and "Sea of Chinnereth" (Numbers 34:11, 4/6 plus WEB). "Lake of Gennesaret" was already present and is authorized directly by ADR-0026's own text. Moved "Yam Kinneret" (Hebrew) to otherLanguages. |
 | smyrna | Revelation 2:8 | Smyrna | Smyrna | Smyrna | Smyrna | Smyrna | Smyrna | Smyrna | Smyrna | Unchanged (6/6). No other-language names present. |
 | sychar | John 4:5 | Sychar | Sychar | Sychar | Sychar | Sychar | Sychar | Sychar | Sychar | Unchanged (6/6). No other-language names present. |
 | tarsus | Acts 9:11 | Tarsus | Tarsus | Tarsus | Tarsus | Tarsus | Tarsus | Tarsus | Tarsus | Unchanged (6/6). No other-language names present. |
@@ -115,3 +114,18 @@ own (only the Temple Mount, in this dataset) are marked **not Bible-named**.
 
 None. Every one of the 63 records has a row above; `temple-mount` is the only place the Bible
 does not name directly, and is marked accordingly.
+
+## Additions from verification
+
+The table above compares one verse per record. The Fact-Checker then compared every verse
+each record cites (`scripture` and `otConnections`, 561 distinct references) in all six
+versions, and added the spellings below, which those verses use for the same place. Details
+are in `docs/verification/M3-english-names.md`.
+
+| record | verse | version(s) | spelling added to `names.alternate` |
+|---|---|---|---|
+| bethlehem | Micah 5:2 | KJV | Bethlehem Ephratah |
+| golgotha | Matthew 27:33; Mark 15:22; John 19:17 | NIV, NLT, CSB | Place of the Skull |
+| judea | Luke 23:5; John 7:1 | KJV | Jewry |
+| miletus | 2 Timothy 4:20 | KJV | Miletum |
+| pool-of-siloam | Nehemiah 3:15 | KJV | Siloah |
