@@ -8,7 +8,7 @@
 |---|---|---|
 | Soft stop (80%) | 800,000 per month | The PO starts no new milestone. Work in progress may finish. |
 | Hard stop (95%) | 950,000 per month | All agents stop at a clean handoff point and write the exact resume point in `docs/PROGRESS.md`. The PO prints a `gh issue create` command for a "Paused – budget" issue. |
-| Session guard | 1,500 per session | The agent stops at a clean point and hands off. A session this large is about 3× the forecast and usually means a loop or an oversized task. |
+| Session guard | 10,000 per agent session (ADR-0025) | The agent stops at a clean point and hands off. A session this large usually means a loop or an oversized task. |
 
 ## How to record usage
 - Every PR appends one row to the current month's ledger below. The PR Reviewer does not commit, so it puts its row in the review comment and the PO copies it here at the next checkpoint.
@@ -160,3 +160,12 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | 2026-09-28 | gis-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-08 schema follow-up: shared disputed-candidate check and word-boundary test | ~140k / ~10k | ~60 | ~30,529 |
 | 2026-09-28 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3-08 data, verification and PO doc commits | ~420k / ~18k | ~150 | ~30,679 |
 | 2026-09-28 | project-owner | Claude Opus 5.5 (Copilot CLI) | M3 build coordination: disputed-rule and modern-name rule edits, 4 cross-vendor reviews, stacking M3-02, M3-07 and M3-08 | ~700k / ~35k | ~700 | ~31,379 |
+| 2026-09-28 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 map view (MapLibre 6, hosted Liberty + VersaTiles fallback styles, worker pipeline + imported worker assets, clustering/selection/URL state, keyboard/ESC/fallback-source fixes, lazy-loaded map chunk, Lighthouse checks, tests and strict browser verification) | ~1,600k / ~170k | ~1,980 | ~33,359 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 ADR-0024 rework (physical basemap styles, map-layer rendering for places, visible-places keyboard list, 10k smoothness verifier, CI/browser/Lighthouse re-checks) | ~2,900k / ~280k | ~3,200 | ~36,559 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 visual follow-up: badge offset/size, neutral default candidate pins, cluster-count overlap fix, label collision footprint reservation, region tier 6-9, re-export and Playwright screenshot recapture | ~880k / ~90k | ~1,050 | ~37,609 |
+| 2026-09-28 | pr-reviewer | Claude Sonnet 5 (Copilot CLI subagent) | Review M3-03 rework (75a0e1f) | ~600k / ~25k | ~250 | ~37,859 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 review follow-up: real 10k smoothness coverage assertions at clustered/unclustered zooms, fallback style allow-list fix, layer-level style tests, badge anchor correction, collision-mask coverage, cleanup fixes, fallback screenshots and full verification reruns | ~1,350k / ~145k | ~1,600 | ~39,459 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 outage follow-up: fallback on full OpenFreeMap outage (source errors + load timeout), attribution hardening, outage-mode Playwright checks, Galilee collision verification, full reruns and Lighthouse | ~1,100k / ~120k | ~1,250 | ~40,709 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 area-label overlap follow-up: variable-anchor label offset over pin collisions plus overlap fixture test | ~220k / ~25k | ~300 | ~41,009 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 label-regression follow-up: restore pin labels with collision-mask-safe layer ordering/source usage, add Playwright pin-label regression checks, recapture main/fallback screenshots, and rerun full validation | ~1,300k / ~140k | ~1,450 | ~42,459 |
+| 2026-09-29 | frontend-engineer | GPT-5.3-Codex (Copilot CLI subagent) | M3-03 urgent fallback-timeout regression fix: prevent false 10s fallback on healthy main basemap, add timeout unit regressions + 30s normal-load Playwright guardrails, and rerun full validation | ~700k / ~80k | ~900 | ~43,359 |

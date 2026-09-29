@@ -7,7 +7,7 @@
 | Branch | `feat/m3-preview-deploy` |
 | Depends on | M3-04 and M3-05 merged. The Cloudflare secrets were added on 2026-09-25 (see CHECKPOINTS.md → CP3a); this task's first preview deploy confirms that they work. |
 | Parallel with | none |
-| Credit target | ~600 AI credits (session guard: 1,500) |
+| Credit target | ~600 AI credits (session guard: 10,000) |
 
 ## Goal
 Deploy the MVP to Cloudflare Pages: a preview for every pull request and production from `main` (ADR-0010). Then confirm that the deployed app meets the spec's accessibility and performance targets, so the PO can write the CP3b summary.
