@@ -3,6 +3,7 @@ import {
   buildPlaceRenderData,
   candidateIconId
 } from "../src/features/map/map-render-data";
+import { AREA_LABEL_OFFSET_LAYOUT } from "../src/features/map/map-layer-layouts";
 import type { PlaceIndexRecord } from "../src/features/map/types";
 
 const fixtures: PlaceIndexRecord[] = [
@@ -132,5 +133,52 @@ describe("map render data", () => {
       isSelectedCandidate: false,
       iconId: "candidate-c5221f-default-b"
     });
+  });
+
+  test("keeps an area label renderable when it shares coordinates with a city pin", () => {
+    const overlapFixtures: PlaceIndexRecord[] = [
+      {
+        id: "syria-province",
+        names: { ancient: ["Syria"], alternate: [] },
+        type: "province",
+        zoomTier: "region",
+        parentId: "roman-empire",
+        candidates: [{ label: "Syria", coordinates: [36.181667, 36.204722], confidence: "high" }]
+      },
+      {
+        id: "antioch-syria",
+        names: { ancient: ["Antioch on the Orontes"], modern: "Antakya", alternate: [] },
+        type: "city",
+        zoomTier: "city",
+        parentId: "syria-province",
+        candidates: [
+          {
+            label: "Antakya",
+            coordinates: [36.181667, 36.204722],
+            confidence: "high"
+          }
+        ]
+      }
+    ];
+
+    const renderData = buildPlaceRenderData(overlapFixtures, null);
+    const areaLabel = renderData.areaLabels.features.find(
+      (feature) => feature.properties.placeId === "syria-province"
+    );
+    const cityPin = renderData.clusteredCityPins.features.find(
+      (feature) => feature.properties.placeId === "antioch-syria"
+    );
+
+    expect(areaLabel).toBeDefined();
+    expect(cityPin).toBeDefined();
+    expect(areaLabel?.geometry.coordinates).toEqual(cityPin?.geometry.coordinates);
+    expect(AREA_LABEL_OFFSET_LAYOUT["text-variable-anchor"]).toEqual([
+      "center",
+      "top",
+      "bottom",
+      "left",
+      "right"
+    ]);
+    expect(AREA_LABEL_OFFSET_LAYOUT["text-radial-offset"]).toBeGreaterThan(0);
   });
 });

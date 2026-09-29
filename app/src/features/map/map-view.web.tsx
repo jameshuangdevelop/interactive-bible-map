@@ -37,6 +37,7 @@ import {
   type PlaceRenderData
 } from "./map-render-data";
 import {
+  AREA_LABEL_OFFSET_LAYOUT,
   CLUSTER_COLLISION_IMAGE_SIZE,
   CLUSTER_COUNT_LAYOUT,
   PIN_COLLISION_IMAGE_SIZE,
@@ -643,7 +644,8 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
-        "text-optional": true
+        "text-optional": true,
+        ...AREA_LABEL_OFFSET_LAYOUT
       },
       paint: {
         "text-color": "#5F6368",

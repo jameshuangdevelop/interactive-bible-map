@@ -21,5 +21,17 @@ export const PIN_COLLISION_LAYOUT = {
   "icon-ignore-placement": false as const
 };
 
+export const AREA_LABEL_OFFSET_LAYOUT = {
+  "text-variable-anchor": ["center", "top", "bottom", "left", "right"] as [
+    "center",
+    "top",
+    "bottom",
+    "left",
+    "right"
+  ],
+  "text-radial-offset": 0.9,
+  "text-justify": "auto" as const
+};
+
 export const PIN_COLLISION_IMAGE_SIZE = 36;
 export const CLUSTER_COLLISION_IMAGE_SIZE = 44;
