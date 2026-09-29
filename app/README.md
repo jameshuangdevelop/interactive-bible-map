@@ -31,6 +31,22 @@ The copy runs automatically in `preexport:web` (`npm run prepare:maplibre-worker
 - User message on switch: _"The main map service isn't responding. Showing the backup map."_
 - Build-time override: `EXPO_PUBLIC_BASEMAP=fallback`
 
+## Runtime map-tuning variants (URL params)
+
+These harmless query params stay enabled in production so the human can compare map feel and tile behavior:
+
+- `?relief=0` — hide relief shading (`natural_earth`)
+- `?landcover=0` — hide natural-land layers (plain land + water)
+- `?fade=0` — disable symbol/tile fading
+- `?dpr=1` — cap map pixel ratio to 1
+- `?zoomrate=fast` — faster wheel/trackpad/pinch zoom rates
+- `?lite=1` — shortcut for all of the above
+
+You can combine them with normal location selection, for example:
+
+- `/?place=galilee&dpr=1`
+- `/?place=jerusalem&lite=1`
+
 ## Regenerating hosted style files
 
 Run from repository root:
@@ -74,4 +90,3 @@ npm run web --workspace interactive-bible-map-app
 - `app/public/generated/places/<location-id>.json`
 
 These generated payloads are gitignored.
-

@@ -32,14 +32,10 @@ const versaTilesStylePath = path.join(
 const libertyAllowedLayerIds = new Set([
   "background",
   "natural_earth",
-  "landcover_wood",
-  "landcover_grass",
-  "landcover_ice",
-  "landcover_wetland",
+  "landcover",
   "waterway_river",
   "waterway_other",
-  "water",
-  "landcover_sand"
+  "water"
 ]);
 
 const versaTilesAllowedLayerIds = new Set([
@@ -114,6 +110,60 @@ function assertNoBoundaryLayers(style, styleName) {
   });
 
   assert.equal(hasBoundaryLayer, false, `${styleName} must not include boundary layers`);
+}
+
+function assertInClassFilter(filter, expectedClasses, description) {
+  assert.ok(Array.isArray(filter), `${description}: filter must be an array expression`);
+  assert.equal(filter[0], "in", `${description}: filter must start with 'in'`);
+  assert.deepEqual(filter[1], ["get", "class"], `${description}: filter must read class`);
+  assert.ok(Array.isArray(filter[2]), `${description}: filter must use a literal class array`);
+  assert.equal(filter[2][0], "literal", `${description}: filter must use literal class values`);
+  assert.ok(Array.isArray(filter[2][1]), `${description}: literal class list must be an array`);
+  assert.deepEqual(
+    [...filter[2][1]].sort(),
+    [...expectedClasses].sort(),
+    `${description}: unexpected class values in filter`
+  );
+}
+
+function assertLibertyMergedLandcover(style) {
+  const layer = style.layers.find((candidate) => candidate.id === "landcover");
+  assert.ok(layer, "Liberty style must include merged landcover layer");
+  assert.equal(layer.type, "fill", "Liberty landcover must be a fill layer");
+  assert.equal(layer.source, "openmaptiles", "Liberty landcover must use openmaptiles source");
+  assert.equal(
+    layer["source-layer"],
+    "landcover",
+    "Liberty landcover must use landcover source-layer"
+  );
+  assert.equal(layer.minzoom, 5, "Liberty merged landcover should wait until zoom 5");
+
+  assertInClassFilter(
+    layer.filter,
+    ["wood", "grass", "ice", "wetland", "sand"],
+    "Liberty merged landcover"
+  );
+
+  assert.deepEqual(
+    layer.paint["fill-color"]?.slice(0, 2),
+    ["match", ["get", "class"]],
+    "Liberty merged landcover must map fill-color by class with a match expression"
+  );
+  assert.deepEqual(
+    layer.paint["fill-opacity"]?.slice(0, 2),
+    ["match", ["get", "class"]],
+    "Liberty merged landcover must map fill-opacity by class with a match expression"
+  );
+}
+
+function assertLibertyRasterFadeDisabled(style) {
+  const naturalEarthLayer = style.layers.find((layer) => layer.id === "natural_earth");
+  assert.ok(naturalEarthLayer, "Liberty natural_earth layer must exist");
+  assert.equal(
+    naturalEarthLayer.paint?.["raster-fade-duration"],
+    0,
+    "Liberty natural_earth raster fade must be disabled"
+  );
 }
 
 function assertLayerAllowList(style, styleName, allowedLayerIds) {
@@ -217,6 +267,8 @@ test("Liberty hosted style is physical-only and keeps required attribution", asy
   assertNoSymbolLayers(style, "Liberty");
   assertNoBoundaryLayers(style, "Liberty");
   assertLayerAllowList(style, "Liberty", libertyAllowedLayerIds);
+  assertLibertyMergedLandcover(style);
+  assertLibertyRasterFadeDisabled(style);
   assertRemovedSourceLayers(style, "Liberty");
   assertMaxZoom14(style, "Liberty");
 });

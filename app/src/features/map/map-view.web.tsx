@@ -44,6 +44,7 @@ import {
   PIN_COLLISION_LAYOUT,
   QUESTION_BADGE_LAYOUT
 } from "./map-layer-layouts";
+import { resolveMapRuntimeTuning } from "./map-runtime-options";
 import { planSelectionFocus } from "./selection-focus";
 import {
   PRIMARY_VECTOR_SOURCE_ID,
@@ -85,6 +86,17 @@ const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
 const gestureReleaseDelayMs = 1_000;
+const mainStyleReliefLayerId = "natural_earth";
+const mainStyleLandcoverLayerId = "landcover";
+const fallbackStyleLandcoverLayerIds = [
+  "land-rock",
+  "land-forest",
+  "land-grass",
+  "land-vegetation",
+  "land-sand",
+  "land-wetland",
+  "land-glacier"
+] as const;
 
 const interactiveLayerIds = [
   layerClusterCircleId,
@@ -133,6 +145,8 @@ const areaLabelOverviewOffsetLayout = {
   "text-radial-offset": 2.2,
   "text-justify": "auto" as const
 };
+
+type RuntimeTuning = ReturnType<typeof resolveMapRuntimeTuning>;
 
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
@@ -185,6 +199,7 @@ function prefersReducedMotion() {
 function flyOrJump(
   map: MapLibreMap,
   cameraOptions: Parameters<MapLibreMap["easeTo"]>[0],
+  durationMs: number,
   reducedMotion = prefersReducedMotion()
 ) {
   if (reducedMotion) {
@@ -197,7 +212,7 @@ function flyOrJump(
 
   map.easeTo({
     ...cameraOptions,
-    duration: 900
+    duration: durationMs
   });
 }
 
@@ -206,6 +221,7 @@ function fitBoundsForPlace(
   coordinates: Coordinates[],
   maxZoom: number,
   leftInset: number,
+  durationMs: number,
   reducedMotion = prefersReducedMotion()
 ) {
   const [first, ...rest] = coordinates;
@@ -226,7 +242,7 @@ function fitBoundsForPlace(
       left: leftInset + 64
     },
     maxZoom,
-    duration: reducedMotion ? 0 : 900
+    duration: reducedMotion ? 0 : durationMs
   });
 }
 
@@ -234,7 +250,8 @@ function focusSelection(
   map: MapLibreMap,
   place: PlaceIndexRecord,
   selection: PlaceSelection,
-  leftInset: number
+  leftInset: number,
+  durationMs: number
 ) {
   const focusPlan = planSelectionFocus(place, selection);
   if (!focusPlan) {
@@ -242,7 +259,7 @@ function focusSelection(
   }
 
   if (focusPlan.kind === "fit-bounds") {
-    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset);
+    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, durationMs);
     return;
   }
 
@@ -258,6 +275,7 @@ function focusSelection(
         left: leftInset + 64
       }
     },
+    durationMs,
     prefersReducedMotion()
   );
 }
@@ -306,6 +324,87 @@ function expandCompactAttributionOnFirstPaint(map: MapLibreMap, mapContainer: HT
     map.off("zoomstart", collapseOnInteraction);
     map.off("dragstart", collapseOnInteraction);
   };
+}
+
+function ensurePreconnectLink(href: string) {
+  const existing = document.head.querySelector<HTMLLinkElement>(
+    `link[rel="preconnect"][href="${href}"]`
+  );
+  if (existing) {
+    return;
+  }
+
+  const link = document.createElement("link");
+  link.rel = "preconnect";
+  link.href = href;
+  link.crossOrigin = "anonymous";
+  document.head.appendChild(link);
+}
+
+function ensureBasemapPreconnectLinks() {
+  ensurePreconnectLink("https://tiles.openfreemap.org");
+  ensurePreconnectLink("https://tiles.versatiles.org");
+}
+
+function resolveMapPixelRatio(cap: number) {
+  if (typeof window === "undefined") {
+    return cap;
+  }
+
+  const devicePixelRatio = Number.isFinite(window.devicePixelRatio)
+    ? Math.max(1, window.devicePixelRatio)
+    : 1;
+  return Math.min(cap, devicePixelRatio);
+}
+
+function setLayerVisibility(map: MapLibreMap, layerId: string, visible: boolean) {
+  if (!map.getLayer(layerId)) {
+    return;
+  }
+
+  map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
+}
+
+function applyBasemapLayerVariants(map: MapLibreMap, mode: BasemapMode, tuning: RuntimeTuning) {
+  if (mode === "main") {
+    setLayerVisibility(map, mainStyleReliefLayerId, !tuning.variants.disableRelief);
+    setLayerVisibility(map, mainStyleLandcoverLayerId, !tuning.variants.disableLandcover);
+  } else {
+    for (const layerId of fallbackStyleLandcoverLayerIds) {
+      setLayerVisibility(map, layerId, !tuning.variants.disableLandcover);
+    }
+  }
+
+  const rasterFadeDuration = tuning.rasterFadeDurationMs;
+  if (map.getLayer(mainStyleReliefLayerId)) {
+    map.setPaintProperty(mainStyleReliefLayerId, "raster-fade-duration", rasterFadeDuration);
+  }
+}
+
+function configureZoomGestures(map: MapLibreMap, tuning: RuntimeTuning) {
+  map.scrollZoom.setWheelZoomRate(tuning.zoomRates.wheel);
+  map.scrollZoom.setZoomRate(tuning.zoomRates.trackpad);
+  map.touchZoomRotate.setZoomRate(tuning.zoomRates.pinch);
+}
+
+function shouldHandleMapKeyboardEvent(event: KeyboardEvent) {
+  if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) {
+    return false;
+  }
+
+  const target = event.target;
+  if (!(target instanceof Element)) {
+    return true;
+  }
+
+  if (
+    target.closest("input, textarea, select, [contenteditable='true']") ||
+    target.matches("button")
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 function createEmptyFeatureCollection() {
@@ -496,10 +595,10 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: CLUSTER_MAX_ZOOM + 1,
       paint: {
-        "circle-radius": ["step", ["get", "point_count"], 14, 8, 16, 20, 18],
+        "circle-radius": ["step", ["get", "point_count"], 12, 8, 14, 20, 16],
         "circle-color": "#C5221F",
         "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 3
+        "circle-stroke-width": 2
       }
     });
   }
@@ -510,6 +609,7 @@ function ensureMapLayers(map: MapLibreMap) {
       source: sourceClusteredCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
+      minzoom: 5,
       maxzoom: CLUSTER_MAX_ZOOM + 1,
       layout: CLUSTER_COUNT_LAYOUT,
       paint: {
@@ -922,7 +1022,12 @@ function updateKeyboardFocusRing(
   });
 }
 
-function panPointOutFromPanel(map: MapLibreMap, coordinates: Coordinates, leftInset: number) {
+function panPointOutFromPanel(
+  map: MapLibreMap,
+  coordinates: Coordinates,
+  leftInset: number,
+  durationMs: number
+) {
   if (leftInset <= 0) {
     return;
   }
@@ -936,7 +1041,7 @@ function panPointOutFromPanel(map: MapLibreMap, coordinates: Coordinates, leftIn
   const targetCenter = map.unproject([minimumVisibleX, projected.y] as PointLike);
   flyOrJump(map, {
     center: [targetCenter.lng, targetCenter.lat]
-  });
+  }, durationMs);
 }
 
 function radians(value: number) {
@@ -994,6 +1099,16 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
   const mainSourceLoadTimeoutRef = useRef<number | null>(null);
   const mainSourceHasLoadedTileRef = useRef(false);
   const mainSourceMetadataLoadedRef = useRef(false);
+  const mapKeyboardActiveRef = useRef(false);
+  const tooltipTrackingEnabledRef = useRef(false);
+
+  const runtimeTuning = useMemo(
+    () =>
+      resolveMapRuntimeTuning(
+        typeof window === "undefined" ? "" : window.location.search
+      ),
+    []
+  );
 
   const basemapController = useMemo(
     () =>
@@ -1090,7 +1205,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
-      clusterRadius: 52
+      clusterRadius: 72
     });
     ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
     ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
@@ -1158,9 +1273,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
           bottom: 64,
           left: panelInset + 64
         }
-      });
+      }, runtimeTuning.controlZoomDurationMs);
     },
-    [panelInset]
+    [panelInset, runtimeTuning.controlZoomDurationMs]
   );
 
   const activateVisibleEntry = useCallback(
@@ -1184,9 +1299,14 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
 
       const focusRadius = entry.kind === "cluster" ? 16 : 13;
       updateKeyboardFocusRing(map, entry.coordinates, focusRadius);
-      panPointOutFromPanel(map, entry.coordinates, panelInset);
+      panPointOutFromPanel(
+        map,
+        entry.coordinates,
+        panelInset,
+        runtimeTuning.controlZoomDurationMs
+      );
     },
-    [panelInset]
+    [panelInset, runtimeTuning.controlZoomDurationMs]
   );
 
   const clearMainSourceLoadTimeout = useCallback(() => {
@@ -1262,19 +1382,33 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
   );
 
   useEffect(() => {
+    ensureBasemapPreconnectLinks();
+  }, []);
+
+  useEffect(() => {
     if (!mapContainerRef.current) {
       return undefined;
     }
 
+    const initialMode = basemapController.getState().mode;
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
-      style: getStyleUrl(basemapController.getState().mode),
+      style: getStyleUrl(initialMode),
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_MAP_ZOOM,
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
-      attributionControl: false
+      attributionControl: false,
+      fadeDuration: runtimeTuning.symbolFadeDurationMs,
+      pixelRatio: resolveMapPixelRatio(runtimeTuning.variants.pixelRatioCap),
+      maxTileCacheSize: runtimeTuning.maxTileCacheSize,
+      maxTileCacheZoomLevels: runtimeTuning.maxTileCacheZoomLevels,
+      cancelPendingTileRequestsWhileZooming: runtimeTuning.cancelPendingTileRequestsWhileZooming,
+      dragPan: runtimeTuning.dragPan,
+      keyboard: false,
+      doubleClickZoom: false
     });
+    configureZoomGestures(map, runtimeTuning);
 
     mapRef.current = map;
     (
@@ -1291,12 +1425,16 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     )[visibleEntryRefreshHookKey] = () => {
       refreshVisibleEntryState();
     };
-    syncAttributionControl(map, basemapController.getState().mode);
+    syncAttributionControl(map, initialMode);
 
     const markGestureStarted = () => {
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
         gestureReleaseTimeoutRef.current = null;
+      }
+      if (tooltipTrackingEnabledRef.current) {
+        map.off("mousemove", handleMouseMove);
+        tooltipTrackingEnabledRef.current = false;
       }
       gestureInProgressRef.current = true;
       hideTooltip();
@@ -1310,8 +1448,105 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       gestureReleaseTimeoutRef.current = window.setTimeout(() => {
         gestureInProgressRef.current = false;
         gestureReleaseTimeoutRef.current = null;
+        if (!tooltipTrackingEnabledRef.current) {
+          map.on("mousemove", handleMouseMove);
+          tooltipTrackingEnabledRef.current = true;
+        }
         scheduleVisibleEntryRefresh();
       }, gestureReleaseDelayMs);
+    };
+
+    const markMapKeyboardActive = () => {
+      mapKeyboardActiveRef.current = true;
+    };
+
+    const handleDocumentPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        mapKeyboardActiveRef.current = false;
+        return;
+      }
+
+      mapKeyboardActiveRef.current = Boolean(mapContainerRef.current?.contains(target));
+    };
+
+    const handleMapKeyboardShortcuts = (event: KeyboardEvent) => {
+      if (!mapKeyboardActiveRef.current || !shouldHandleMapKeyboardEvent(event)) {
+        return;
+      }
+
+      const reducedMotion = prefersReducedMotion();
+      const durationMs = reducedMotion ? 0 : runtimeTuning.controlZoomDurationMs;
+      const panStep = event.shiftKey
+        ? Math.round(runtimeTuning.keyboardPanStepPx * 1.5)
+        : runtimeTuning.keyboardPanStepPx;
+      const zoomStep = event.shiftKey
+        ? runtimeTuning.keyboardZoomStep * 2
+        : runtimeTuning.keyboardZoomStep;
+
+      switch (event.key) {
+        case "ArrowLeft":
+          event.preventDefault();
+          map.panBy([panStep, 0], { duration: durationMs });
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          map.panBy([-panStep, 0], { duration: durationMs });
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          map.panBy([0, panStep], { duration: durationMs });
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          map.panBy([0, -panStep], { duration: durationMs });
+          break;
+        case "+":
+        case "=":
+          event.preventDefault();
+          map.easeTo({
+            zoom: Math.min(map.getMaxZoom(), map.getZoom() + zoomStep),
+            duration: durationMs
+          });
+          break;
+        case "-":
+        case "_":
+          event.preventDefault();
+          map.easeTo({
+            zoom: Math.max(map.getMinZoom(), map.getZoom() - zoomStep),
+            duration: durationMs
+          });
+          break;
+        default:
+          break;
+      }
+    };
+
+    const handleDoubleClickZoom = (event: {
+      lngLat: { lng: number; lat: number };
+      originalEvent?: MouseEvent;
+      preventDefault?: () => void;
+    }) => {
+      event.preventDefault?.();
+      const zoomStep = event.originalEvent?.shiftKey
+        ? -runtimeTuning.doubleClickZoomStep
+        : runtimeTuning.doubleClickZoomStep;
+      const nextZoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), map.getZoom() + zoomStep));
+      const around = [event.lngLat.lng, event.lngLat.lat] as LngLatLike;
+
+      if (prefersReducedMotion()) {
+        map.jumpTo({
+          center: around,
+          zoom: nextZoom
+        });
+        return;
+      }
+
+      map.easeTo({
+        around,
+        zoom: nextZoom,
+        duration: runtimeTuning.controlZoomDurationMs
+      });
     };
 
     const handleError = (event: ErrorEvent) => {
@@ -1360,6 +1595,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
       syncAttributionControl(map, currentMode);
+      configureZoomGestures(map, runtimeTuning);
+      applyBasemapLayerVariants(map, currentMode, runtimeTuning);
       if (currentMode === "main") {
         scheduleMainSourceLoadTimeout(map);
       } else {
@@ -1394,13 +1631,22 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       handleTooltipAtPoint(event.point);
     };
 
+    document.addEventListener("pointerdown", handleDocumentPointerDown, true);
+    document.addEventListener("keydown", handleMapKeyboardShortcuts, true);
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
     map.on("moveend", scheduleVisibleEntryRefresh);
     map.on("resize", scheduleVisibleEntryRefresh);
     map.on("dragstart", markGestureStarted);
     map.on("dragend", markGestureFinished);
+    map.on("zoomstart", markGestureStarted);
+    map.on("zoomend", markGestureFinished);
+    map.on("mousedown", markMapKeyboardActive);
+    map.on("touchstart", markMapKeyboardActive);
+    map.on("wheel", markMapKeyboardActive);
+    map.on("dblclick", handleDoubleClickZoom);
     map.on("mousemove", handleMouseMove);
+    tooltipTrackingEnabledRef.current = true;
     map.on("mouseout", hideTooltip);
     map.on("click", handleMapClick);
     map.on("sourcedata", handleSourceData);
@@ -1417,13 +1663,24 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         window.clearTimeout(gestureReleaseTimeoutRef.current);
       }
 
+      document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+      document.removeEventListener("keydown", handleMapKeyboardShortcuts, true);
       map.off("load", handleStyleReady);
       map.off("style.load", handleStyleReady);
       map.off("moveend", scheduleVisibleEntryRefresh);
       map.off("resize", scheduleVisibleEntryRefresh);
       map.off("dragstart", markGestureStarted);
       map.off("dragend", markGestureFinished);
-      map.off("mousemove", handleMouseMove);
+      map.off("zoomstart", markGestureStarted);
+      map.off("zoomend", markGestureFinished);
+      map.off("mousedown", markMapKeyboardActive);
+      map.off("touchstart", markMapKeyboardActive);
+      map.off("wheel", markMapKeyboardActive);
+      map.off("dblclick", handleDoubleClickZoom);
+      if (tooltipTrackingEnabledRef.current) {
+        map.off("mousemove", handleMouseMove);
+        tooltipTrackingEnabledRef.current = false;
+      }
       map.off("mouseout", hideTooltip);
       map.off("click", handleMapClick);
       map.off("sourcedata", handleSourceData);
@@ -1450,6 +1707,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         }
       )[visibleEntryRefreshHookKey];
       styleReadyRef.current = false;
+      mapKeyboardActiveRef.current = false;
+      tooltipTrackingEnabledRef.current = false;
     };
   }, [
     activateVisibleEntry,
@@ -1463,7 +1722,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     switchToFallback,
     syncAttributionControl,
     syncSourcesAndLayers,
-    updateScaleBar
+    updateScaleBar,
+    runtimeTuning
   ]);
 
   useEffect(() => {
@@ -1497,8 +1757,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     }
 
     previousSelectionRef.current = selectionKey;
-    focusSelection(map, place, selection, panelInset);
-  }, [mapReadyVersion, panelInset, placeById, selection]);
+    focusSelection(map, place, selection, panelInset, runtimeTuning.flyToDurationMs);
+  }, [mapReadyVersion, panelInset, placeById, runtimeTuning.flyToDurationMs, selection]);
 
   const resetView = useCallback(() => {
     const map = mapRef.current;
@@ -1515,8 +1775,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         bottom: 64,
         left: panelInset + 64
       }
-    });
-  }, [panelInset]);
+    }, runtimeTuning.flyToDurationMs);
+  }, [panelInset, runtimeTuning.flyToDurationMs]);
 
   const zoomIn = useCallback(() => {
     const map = mapRef.current;
@@ -1525,9 +1785,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     }
 
     map.zoomIn({
-      duration: prefersReducedMotion() ? 0 : 220
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
-  }, []);
+  }, [runtimeTuning.controlZoomDurationMs]);
 
   const zoomOut = useCallback(() => {
     const map = mapRef.current;
@@ -1536,9 +1796,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     }
 
     map.zoomOut({
-      duration: prefersReducedMotion() ? 0 : 220
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
-  }, []);
+  }, [runtimeTuning.controlZoomDurationMs]);
 
   return (
     <div

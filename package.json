@@ -16,6 +16,7 @@
     "validate:data": "node scripts/validate-data.mjs",
     "build:data": "node scripts/build-app-data.mjs",
     "build:basemap-styles": "node scripts/build-basemap-styles.mjs",
+    "bench:map": "node scripts/bench-map.mjs",
     "lint": "npm run lint --workspace interactive-bible-map-app",
     "typecheck": "npm run typecheck --workspace interactive-bible-map-app",
     "test:app": "npm run test --workspace interactive-bible-map-app",

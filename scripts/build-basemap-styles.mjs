@@ -47,17 +47,28 @@ Attribution string used in the vector source:
 ${versaTilesAttribution}
 `;
 
-const libertyAllowedLayerIds = new Set([
-  "background",
-  "natural_earth",
+const libertySourceLandcoverLayerIds = new Set([
   "landcover_wood",
   "landcover_grass",
   "landcover_ice",
   "landcover_wetland",
+  "landcover_sand"
+]);
+const libertyPhysicalLayerIds = new Set([
+  "background",
+  "natural_earth",
   "waterway_river",
   "waterway_other",
   "water",
-  "landcover_sand"
+  ...libertySourceLandcoverLayerIds
+]);
+const libertyAllowedLayerIds = new Set([
+  "background",
+  "natural_earth",
+  "landcover",
+  "waterway_river",
+  "waterway_other",
+  "water"
 ]);
 const versaTilesAllowedLayerIds = new Set([
   "background",
@@ -102,6 +113,63 @@ function normalizeMaxZoom(style) {
   style.maxzoom = 14;
 }
 
+function createMergedLibertyLandcoverLayer() {
+  const classes = ["wood", "grass", "ice", "wetland", "sand"];
+  return {
+    id: "landcover",
+    type: "fill",
+    source: "openmaptiles",
+    "source-layer": "landcover",
+    minzoom: 5,
+    filter: ["in", ["get", "class"], ["literal", classes]],
+    paint: {
+      "fill-antialias": false,
+      "fill-color": [
+        "match",
+        ["get", "class"],
+        "wood",
+        "hsla(98,61%,72%,0.7)",
+        "grass",
+        "rgba(176, 213, 154, 1)",
+        "ice",
+        "rgba(224, 236, 236, 1)",
+        "wetland",
+        "rgba(173, 205, 176, 1)",
+        "sand",
+        "rgba(247, 239, 195, 1)",
+        "rgba(0, 0, 0, 0)"
+      ],
+      "fill-opacity": [
+        "match",
+        ["get", "class"],
+        "wood",
+        0.4,
+        "grass",
+        0.3,
+        "ice",
+        0.8,
+        "wetland",
+        0.45,
+        "sand",
+        1,
+        0
+      ]
+    }
+  };
+}
+
+function setLibertyRasterFadeDuration(style) {
+  const naturalEarthLayer = style.layers.find((layer) => layer.id === "natural_earth");
+  if (!naturalEarthLayer || naturalEarthLayer.type !== "raster") {
+    return;
+  }
+
+  naturalEarthLayer.paint = {
+    ...(naturalEarthLayer.paint ?? {}),
+    "raster-fade-duration": 0
+  };
+}
+
 function buildLibertyStyle(upstreamStyle) {
   const style = structuredClone(upstreamStyle);
   style.name = libertyName;
@@ -124,6 +192,17 @@ function buildLibertyStyle(upstreamStyle) {
   }
 
   removeDisallowedLayerTypes(style);
+  style.layers = style.layers.filter((layer) => libertyPhysicalLayerIds.has(layer.id));
+
+  const firstLandcoverLayerIndex = style.layers.findIndex((layer) =>
+    libertySourceLandcoverLayerIds.has(layer.id)
+  );
+  if (firstLandcoverLayerIndex >= 0) {
+    style.layers = style.layers.filter((layer) => !libertySourceLandcoverLayerIds.has(layer.id));
+    style.layers.splice(firstLandcoverLayerIndex, 0, createMergedLibertyLandcoverLayer());
+  }
+
+  setLibertyRasterFadeDuration(style);
   style.layers = style.layers.filter((layer) => libertyAllowedLayerIds.has(layer.id));
 
   clampVectorSourceMaxZoomTo14(style);

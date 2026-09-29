@@ -45,85 +45,71 @@
           0.6,
           6,
           0.1
+        ],
+        "raster-fade-duration": 0
+      }
+    },
+    {
+      "id": "landcover",
+      "type": "fill",
+      "source": "openmaptiles",
+      "source-layer": "landcover",
+      "minzoom": 5,
+      "filter": [
+        "in",
+        [
+          "get",
+          "class"
+        ],
+        [
+          "literal",
+          [
+            "wood",
+            "grass",
+            "ice",
+            "wetland",
+            "sand"
+          ]
         ]
-      }
-    },
-    {
-      "id": "landcover_wood",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "landcover",
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
-        ],
-        "wood"
       ],
       "paint": {
         "fill-antialias": false,
-        "fill-color": "hsla(98,61%,72%,0.7)",
-        "fill-opacity": 0.4
-      }
-    },
-    {
-      "id": "landcover_grass",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "landcover",
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          "wood",
+          "hsla(98,61%,72%,0.7)",
+          "grass",
+          "rgba(176, 213, 154, 1)",
+          "ice",
+          "rgba(224, 236, 236, 1)",
+          "wetland",
+          "rgba(173, 205, 176, 1)",
+          "sand",
+          "rgba(247, 239, 195, 1)",
+          "rgba(0, 0, 0, 0)"
         ],
-        "grass"
-      ],
-      "paint": {
-        "fill-antialias": false,
-        "fill-color": "rgba(176, 213, 154, 1)",
-        "fill-opacity": 0.3
-      }
-    },
-    {
-      "id": "landcover_ice",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "landcover",
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
-        ],
-        "ice"
-      ],
-      "paint": {
-        "fill-antialias": false,
-        "fill-color": "rgba(224, 236, 236, 1)",
-        "fill-opacity": 0.8
-      }
-    },
-    {
-      "id": "landcover_wetland",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "landcover",
-      "minzoom": 12,
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
-        ],
-        "wetland"
-      ],
-      "paint": {
-        "fill-antialias": true,
-        "fill-opacity": 0.8,
-        "fill-pattern": "wetland_bg_11",
-        "fill-translate-anchor": "map"
+        "fill-opacity": [
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          "wood",
+          0.4,
+          "grass",
+          0.3,
+          "ice",
+          0.8,
+          "wetland",
+          0.45,
+          "sand",
+          1,
+          0
+        ]
       }
     },
     {
@@ -231,23 +217,6 @@
       ],
       "paint": {
         "fill-color": "rgb(158,189,255)"
-      }
-    },
-    {
-      "id": "landcover_sand",
-      "type": "fill",
-      "source": "openmaptiles",
-      "source-layer": "landcover",
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
-        ],
-        "sand"
-      ],
-      "paint": {
-        "fill-color": "rgba(247, 239, 195, 1)"
       }
     }
   ],
