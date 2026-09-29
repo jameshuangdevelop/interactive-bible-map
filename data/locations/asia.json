@@ -18,20 +18,24 @@
       ],
       "coordinateSource": "wikidata:Q210718",
       "confidence": "high",
-      "support": "Asia's identity and extent as the Roman province covering western Asia Minor are undisputed; the coordinate is Wikidata's representative point for the province, near its historic capitals Pergamon and Ephesus.",
+      "support": "Asia's identity as the Roman province of western Asia Minor is undisputed. The label point is Wikidata's point for the province, inland between Sardis and Philadelphia, about 25 and 20 km from them. Pleiades' representative point for the province, from its Barrington Atlas location, lies about 46 km to the west.",
       "sources": [
         "wikidata:Q210718",
-        "wikipedia:Asia_(Roman_province)"
+        "pleiades:981509"
       ]
     }
   ],
   "summary": {
-    "text": "Asia was the wealthy, densely urbanized Roman province covering western Asia Minor, first organized after Rome inherited the Attalid kingdom of Pergamum in 133 BC. Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia and Laodicea, the seven cities addressed in Revelation, together with Colossae, Hierapolis, Miletus and Troas, all lay within this province, and Acts records that 'all who lived in Asia,' both Jews and Greeks, heard Paul's preaching during his extended stay at Ephesus.",
+    "text": "Asia was the wealthy Roman province covering most of western Asia Minor, formed from the kingdom that Attalus III of Pergamum left to Rome in 133 BC. Its governors were proconsuls, and its seat of government, first at Pergamum, moved to Ephesus under Augustus. The seven assemblies addressed in Revelation, at Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia and Laodicea, were 'in Asia,' and Acts records that over two years of Paul's teaching at Ephesus 'all those who lived in Asia heard the word of the Lord Jesus, both Jews and Greeks.'",
     "sources": [
       "wikidata:Q210718",
+      "pleiades:981509",
       "wikipedia:Asia_(Roman_province)",
+      "bib:isbe-asia",
+      "bib:cassius-dio-roman-history",
       "scripture:Acts 19:10",
       "scripture:Revelation 1:4",
+      "scripture:Revelation 1:11",
       "bib:niv-2011-biblegateway",
       "bib:esv-2025-biblegateway",
       "bib:nlt-2015-biblegateway",
@@ -42,17 +46,19 @@
   },
   "history": [
     {
-      "text": "The last Attalid king, Attalus III of Pergamum, bequeathed his kingdom to Rome on his death in 133 BC; after putting down a rival claimant, Rome organized the territory as the province of Asia.",
+      "text": "Attalus III of Pergamum left his kingdom to Rome when he died in 133 BC, and by 129 BC Rome had organized it as the province of Asia.",
       "sources": [
-        "wikipedia:Asia_(Roman_province)",
-        "wikidata:Q210718"
+        "bib:isbe-asia",
+        "wikipedia:Asia_(Roman_province)"
       ]
     },
     {
-      "text": "Asia was, per this source, 'the most prestigious senatorial province,' governed by a proconsul, an arrangement Cassius Dio's account of Augustus's 27 BC settlement lists among the provinces assigned to the Senate and that remained in force at AD 50. The province included the Aegean islands close to the Anatolian coast, with the exception of Crete, which explains this project's placement of Patmos within Asia.",
+      "text": "In Augustus's settlement of 27 BC, Asia was one of the provinces assigned to the Senate and governed by a proconsul, and Acts shows proconsuls still governing it in Paul's time. The province apparently included Patmos and other islands near its coast, which is why this project places Patmos in Asia.",
       "sources": [
-        "wikipedia:Asia_(Roman_province)",
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography",
+        "bib:isbe-asia",
+        "scripture:Acts 19:38"
       ]
     }
   ],
@@ -84,16 +90,8 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [
-    {
-      "fromYear": -133,
-      "toYear": 293,
-      "entity": "Senatorial province of Asia, governed by a proconsul (in force at AD 50)",
-      "sources": [
-        "wikipedia:Asia_(Roman_province)",
-        "bib:cassius-dio-roman-history"
-      ]
-    }
-  ],
-  "status": "draft"
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

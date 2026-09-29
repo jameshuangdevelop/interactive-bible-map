@@ -20,19 +20,20 @@
       ],
       "coordinateSource": "wikidata:Q204772",
       "confidence": "high",
-      "support": "Achaia's identity and extent as the Roman province covering southern and central Greece are undisputed; the coordinate is Wikidata's representative point for the province, near Corinth, its capital.",
+      "support": "Achaia's identity as the Roman province covering the Peloponnese and central Greece is undisputed. The label point is Wikidata's point for the province, about 38 km west of Corinth, its capital. Pleiades' representative point for the province, from its Barrington Atlas location, lies about 120 km to the northeast.",
       "sources": [
         "wikidata:Q204772",
-        "bib:worldhistory-corinth"
+        "pleiades:981502"
       ]
     }
   ],
   "summary": {
-    "text": "Achaia was the Roman province covering the Peloponnese, Attica and central Greece, with its capital and seat of government at Corinth. Acts records that the proconsul Gallio heard a case against Paul there, and Paul's letters address believers 'throughout Achaia' and elsewhere call the same region 'Greece.'",
+    "text": "Achaia was the Roman province covering the Peloponnese and central Greece, with its capital at Corinth. Acts records that the Jews at Corinth brought Paul before Gallio, 'proconsul of Achaia,' and Paul's second letter to the Corinthians is addressed also to 'all the saints who are in the whole of Achaia.' Acts 20:2, where Paul 'came into Greece,' uses 'Greece' for the same region.",
     "sources": [
       "wikidata:Q204772",
+      "pleiades:981502",
       "wikipedia:Achaia_(Roman_province)",
-      "bib:worldhistory-corinth",
+      "bib:isbe-achaia",
       "scripture:Acts 18:12",
       "scripture:Acts 20:2",
       "scripture:2 Corinthians 1:1",
@@ -46,18 +47,22 @@
   },
   "history": [
     {
-      "text": "After defeating Antony and Cleopatra, Augustus separated Greece, Thessaly and part of Epirus from the province of Macedonia in 27 BC and made the new province, Achaia, a senatorial province governed by a proconsul.",
+      "text": "Rome made Greece a province in 146 BC under the control of the governor of Macedonia. In Augustus's settlement of 27 BC, Achaia and Macedonia became two separate provinces, both assigned to the Senate and governed by proconsuls. Cassius Dio lists 'Greece with Epirus' among the Senate's provinces, and Strabo describes Achaia as reaching to Thessaly, Aetolia, Acarnania and some Epirote peoples bordering Macedonia.",
       "sources": [
-        "wikipedia:Achaia_(Roman_province)",
-        "bib:cassius-dio-roman-history"
+        "bib:isbe-macedonia",
+        "bib:isbe-achaia",
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
       ]
     },
     {
-      "text": "In AD 15, Tiberius made Achaia and Macedonia a single imperial province under a procurator, responding to complaints about the senatorial proconsuls' administration; Claudius separated the two again in AD 44 and restored them to the Senate, the arrangement in force at AD 50, when Gallio, addressed in Acts as proconsul of Achaia, is independently dated by an inscription from Delphi to about AD 51-52.",
+      "text": "In AD 15, after Achaia and Macedonia complained of heavy taxation, Tiberius took them from the Senate and placed them under the imperial legate who governed Moesia. Claudius restored both provinces to the Senate in AD 44, the arrangement in force at AD 50, when Acts calls Gallio 'proconsul of Achaia.'",
       "sources": [
-        "wikipedia:Achaia_(Roman_province)",
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia",
+        "bib:cassius-dio-roman-history",
         "bib:suetonius-twelve-caesars",
-        "bib:worldhistory-corinth"
+        "scripture:Acts 18:12"
       ]
     }
   ],
@@ -88,30 +93,37 @@
     {
       "fromYear": -27,
       "toYear": 15,
-      "entity": "Senatorial province of Achaia (first organization, separated from Macedonia)",
+      "entity": "Senatorial province of Achaia, governed by a proconsul",
       "sources": [
-        "wikipedia:Achaia_(Roman_province)",
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-macedonia",
+        "bib:tacitus-annals"
       ]
     },
     {
       "fromYear": 15,
       "toYear": 44,
-      "entity": "Imperial province administered jointly with Macedonia under a procurator",
+      "entity": "Imperial province, governed with Macedonia by the legate of Moesia",
       "sources": [
-        "wikipedia:Achaia_(Roman_province)",
-        "wikidata:Q204772"
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia",
+        "bib:cassius-dio-roman-history"
       ]
     },
     {
       "fromYear": 44,
       "toYear": 67,
-      "entity": "Senatorial province of Achaia restored by Claudius (in force at AD 50)",
+      "entity": "Senatorial province again, restored by Claudius (in force at AD 50) until Nero declared Greece free",
       "sources": [
-        "wikipedia:Achaia_(Roman_province)",
-        "bib:suetonius-twelve-caesars"
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "bib:isbe-macedonia",
+        "bib:worldhistory-corinth",
+        "wikipedia:Achaia_(Roman_province)"
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

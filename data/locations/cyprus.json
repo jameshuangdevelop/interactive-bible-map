@@ -12,27 +12,35 @@
   "parentId": "roman-empire",
   "candidates": [
     {
-      "label": "Cyprus (Roman province, label point)",
+      "label": "Cyprus (island, label point)",
       "coordinates": [
-        32.4263888888889,
-        34.7761111111111
+        33.222467,
+        34.995436
       ],
-      "coordinateSource": "wikidata:Q2967757",
+      "coordinateSource": "pleiades:707498",
       "confidence": "high",
-      "support": "Cyprus's identity and extent as the Roman province covering the whole island are undisputed; the coordinate is Wikidata's representative point for the province.",
+      "support": "The Roman province covered the whole island of Cyprus. Wikidata's point for the province lies at Paphos, its capital, about 3 km from this project's Paphos pin, so the label point is instead Pleiades' representative point for the island of Cyprus, in the island's interior, about 77 km from the Wikidata point.",
       "sources": [
-        "wikidata:Q2967757",
-        "wikipedia:Roman_Cyprus"
+        "pleiades:707498",
+        "pleiades:981516",
+        "wikidata:Q2967757"
       ]
     }
   ],
   "summary": {
-    "text": "Cyprus was a senatorial province covering the whole island, governed by a proconsul from Paphos. Barnabas, Paul's companion on the first missionary journey, was a Levite from Cyprus; Acts records that the two preached across the island, from Salamis to Paphos, where the proconsul Sergius Paulus believed.",
+    "text": "Cyprus was a senatorial province covering the whole island, governed by a proconsul from Paphos. Barnabas was 'a Levite, a man of Cyprus by race,' and Acts records that he and Saul sailed to Cyprus on their first journey and went through the island from Salamis to Paphos, where the proconsul Sergius Paulus believed.",
     "sources": [
       "wikidata:Q2967757",
+      "pleiades:981516",
       "wikipedia:Roman_Cyprus",
+      "bib:isbe-cyprus",
+      "bib:cassius-dio-roman-history",
       "scripture:Acts 4:36",
+      "scripture:Acts 13:4",
+      "scripture:Acts 13:5",
+      "scripture:Acts 13:6",
       "scripture:Acts 13:7",
+      "scripture:Acts 13:12",
       "bib:niv-2011-biblegateway",
       "bib:esv-2025-biblegateway",
       "bib:nlt-2015-biblegateway",
@@ -43,10 +51,11 @@
   },
   "history": [
     {
-      "text": "Rome annexed Cyprus in 58 BC. In Augustus's 27 BC settlement it was at first retained under his own authority, together with Syria and Cilicia, per Cassius Dio's account, before being given to the Senate as a separate province in 22 BC; from then it was a senatorial province governed by a proconsul, matching the title Acts gives Sergius Paulus, an arrangement in force at AD 50.",
+      "text": "Rome annexed Cyprus in 58 BC and attached it to the province of Cilicia. In Augustus's settlement of 27 BC it was one of the provinces he kept for himself, but in 22 BC he gave it to the Senate, and from then on it was governed by proconsuls, the title Acts gives Sergius Paulus.",
       "sources": [
+        "bib:isbe-cyprus",
         "bib:cassius-dio-roman-history",
-        "wikipedia:Roman_Cyprus"
+        "scripture:Acts 13:7"
       ]
     }
   ],
@@ -73,24 +82,8 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [
-    {
-      "fromYear": -58,
-      "toYear": -22,
-      "entity": "Under Caesar's authority, administered together with Cilicia",
-      "sources": [
-        "bib:cassius-dio-roman-history"
-      ]
-    },
-    {
-      "fromYear": -22,
-      "toYear": 293,
-      "entity": "Senatorial province of Cyprus, governed by a proconsul (in force at AD 50)",
-      "sources": [
-        "wikipedia:Roman_Cyprus",
-        "bib:cassius-dio-roman-history"
-      ]
-    }
-  ],
-  "status": "draft"
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

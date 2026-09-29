@@ -65,10 +65,12 @@
       ]
     },
     {
-      "text": "This record's two candidate banks sit on opposite sides of a district boundary: the higher-confidence east-bank candidate lies in Perea, while the west-bank candidate lies within this project's 'Judea' district. Rather than take a side in that site dispute when assigning a parent, this record points to the Roman province directly, since by about AD 50 both banks lay within the same procuratorial province regardless of which candidate is correct.",
+      "text": "This record's candidate sites lie on opposite banks of the Jordan: the east-bank candidate is in Perea, and the west-bank candidate is in this project's 'Judea' district. Rather than choose between them, this record's parent is the Roman province of Judea, which from AD 44 governed both Judea and the lands east of the Jordan; Josephus records the first procurator, Cuspius Fadus, dealing with a border quarrel between the Jews of Perea and the people of Philadelphia. The minority proposal in Batanea also lay in territory under the same procurators until AD 53.",
       "sources": [
-        "wikidata:Q1003997",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:livius-judaea",
+        "bib:josephus-antiquities",
+        "bib:rainey-notley-sacred-bridge",
+        "wikidata:Q1003997"
       ]
     }
   ],
@@ -115,5 +117,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

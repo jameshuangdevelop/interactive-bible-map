@@ -13,35 +13,41 @@
   "parentId": "roman-empire",
   "candidates": [
     {
-      "label": "Crete and Cyrenaica (Roman province, capital Gortyn, label point)",
+      "label": "Crete and Cyrene (Roman province, capital Gortyn, label point)",
       "coordinates": [
         24.946957,
         35.062141
       ],
       "coordinateSource": "wikidata:Q692775",
       "confidence": "high",
-      "support": "The province's identity and extent, combining the island of Crete with the Cyrenaica region of modern Libya, are undisputed; the coordinate is Wikidata's representative point for the province, near Gortyn on Crete, its capital.",
+      "support": "The province joined the island of Crete with Cyrene on the North African coast. The label point is Wikidata's point for the province, at Gortyn on Crete, its capital. Pleiades' representative point for the province, from its Barrington Atlas location, was not used because it lies offshore.",
       "sources": [
         "wikidata:Q692775",
-        "wikipedia:Creta_et_Cyrenaica"
+        "pleiades:981517"
       ]
     }
   ],
   "summary": {
-    "text": "Crete and Cyrene, in Latin Creta et Cyrenaica, was a single senatorial province combining the island of Crete with the Cyrenaica region of North Africa (in modern Libya), governed by a proconsul from Gortyn on Crete. Of this project's places, only the island of Crete, visited by Paul's ship on the voyage to Rome, lies within this province; Cyrene itself, the province's other namesake city, does not appear among this project's places but is named several times in the New Testament, including as the home town of Simon, who was made to carry Jesus' cross.",
+    "text": "Crete and Cyrene was a senatorial province joining the island of Crete with Cyrene and its territory on the North African coast, with its capital at Gortyn on Crete. Of this project's places only Crete, which Paul's ship sailed along on the voyage to Rome, lies in it. Cyrene is not one of this project's places, but the New Testament names it several times: Simon, who was compelled to carry Jesus' cross, was 'a man of Cyrene,' and Acts mentions 'the parts of Libya around Cyrene.'",
     "sources": [
       "wikidata:Q692775",
+      "pleiades:981517",
       "wikipedia:Creta_et_Cyrenaica",
+      "bib:isbe-crete",
+      "bib:cassius-dio-roman-history",
+      "scripture:Acts 27:7",
       "scripture:Matthew 27:32",
-      "scripture:Acts 11:20"
+      "scripture:Acts 2:10"
     ]
   },
   "history": [
     {
-      "text": "Crete and Cyrenaica were combined into a single senatorial province in 67 BC, governed by a proconsul from Gortyn; Cassius Dio's account of Augustus's 27 BC settlement confirms 'Crete and the Cyrenaic portion of Libya' remained a single province assigned to the Senate, an arrangement in force at AD 50.",
+      "text": "Rome annexed Crete in 67 BC and joined it with Cyrene as one province. In Augustus's settlement of 27 BC, Cassius Dio lists 'Crete and the Cyrenaic portion of Libya' among the provinces assigned to the Senate, and Strabo likewise lists Crete with Cyrenaea among the provinces of the Roman people.",
       "sources": [
-        "wikipedia:Creta_et_Cyrenaica",
-        "bib:cassius-dio-roman-history"
+        "bib:isbe-crete",
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography",
+        "wikipedia:Creta_et_Cyrenaica"
       ]
     }
   ],
@@ -63,16 +69,8 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [
-    {
-      "fromYear": -67,
-      "toYear": 267,
-      "entity": "Senatorial province of Crete and Cyrenaica, governed by a proconsul (in force at AD 50)",
-      "sources": [
-        "wikipedia:Creta_et_Cyrenaica",
-        "bib:cassius-dio-roman-history"
-      ]
-    }
-  ],
-  "status": "draft"
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

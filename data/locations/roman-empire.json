@@ -17,27 +17,30 @@
       ],
       "coordinateSource": "wikidata:Q2277",
       "confidence": "high",
-      "support": "The Roman Empire's identity and extent are undisputed; Wikidata's coordinate for the empire is the city of Rome, its capital, a reasonable representative point for an empire-level record that has no single natural label position.",
+      "support": "The Roman Empire has no single natural label position. Wikidata's point for the empire lies in the city of Rome, its capital, about 1 km from Pleiades' representative point for Rome, which Pleiades describes as the capital of the Roman Republic and Empire.",
       "sources": [
         "wikidata:Q2277",
-        "bib:cassius-dio-roman-history"
+        "pleiades:423025"
       ]
     }
   ],
   "summary": {
-    "text": "The Roman Empire was the Mediterranean-wide state ruled from Rome. Its provinces and client kingdoms form the top of this project's 'about AD 50' hierarchy: every place in this dataset lay within one of its provinces during Paul's journeys. Augustus (formerly Octavian) became its first emperor after his victory over Mark Antony and Cleopatra at the Battle of Actium in 31 BC. Luke's Gospel sets Jesus' birth under a census decree from 'Caesar Augustus,' and Acts records that Paul, as a Roman citizen, exercised his right to 'appeal to Caesar.'",
+    "text": "The Roman Empire was the state ruled from Rome by emperors, the first of whom was Augustus (formerly Octavian), after his victory over Mark Antony and Cleopatra at the Battle of Actium in 31 BC. In this project it is the top of the 'about AD 50' hierarchy, above the provinces and Italy. Luke records a decree 'from Caesar Augustus that all the world should be enrolled,' and Acts records Paul's words 'I appeal to Caesar!'",
     "sources": [
       "wikidata:Q2277",
+      "pleiades:423025",
       "bib:cassius-dio-roman-history",
+      "bib:livius-actium",
       "scripture:Luke 2:1",
       "scripture:Acts 25:11"
     ]
   },
   "history": [
     {
-      "text": "After defeating Mark Antony and Cleopatra at Actium in 31 BC, Octavian took the name Augustus and, in 27 BC, reorganized the Roman world into provinces he assigned to the Senate and provinces he retained for himself, the same broad division this project's 'about AD 50' provinces reflect.",
+      "text": "After defeating Mark Antony and Cleopatra at Actium in 31 BC, Octavian received the name Augustus and, in 27 BC, divided the provinces into those assigned to the Senate and those he kept for himself, the same broad division reflected in this project's 'about AD 50' provinces.",
       "sources": [
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:livius-actium"
       ]
     },
     {
@@ -95,5 +98,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

@@ -11,27 +11,31 @@
   "parentId": "roman-empire",
   "candidates": [
     {
-      "label": "Macedonia (Roman province, using Thessalonica, its capital, as label point)",
+      "label": "Macedonia (Roman province, label point)",
       "coordinates": [
-        22.9355555555556,
-        40.6402777777778
+        22.020662,
+        40.743844
       ],
-      "coordinateSource": "wikidata:Q17151",
+      "coordinateSource": "pleiades:981531",
       "confidence": "high",
-      "support": "Macedonia's Wikidata item for the Roman province carries no coordinate of its own, so this point is Wikidata's coordinate for Thessalonica, the province's capital throughout the Roman period; it sits about 1.5 km from this project's own 'thessalonica' record, a reasonable margin for a province-level label built from a capital-city point.",
+      "support": "Macedonia's identity as a Roman province is undisputed. Wikidata's item for the province has no coordinate, so the label point is Pleiades' representative point for the province, taken from its Barrington Atlas location. It lies inland, about 29 km from this project's Berea pin and about 80 km from Thessalonica, the capital.",
       "sources": [
-        "wikidata:Q17151",
-        "wikipedia:Macedonia_(Roman_province)"
+        "pleiades:981531",
+        "wikidata:Q207497"
       ]
     }
   ],
   "summary": {
-    "text": "Macedonia was the Roman province covering northern Greece, with its capital at Thessalonica. Acts describes Paul receiving a night vision of 'a man of Macedonia' begging him to come and help, after which he founded churches at Philippi, Thessalonica and Berea, all cities of this province; several of Paul's letters are addressed to or mention believers there.",
+    "text": "Macedonia was the Roman province north of Achaia, with its capital at Thessalonica. Acts describes Paul's night vision of 'a man of Macedonia' begging him, 'Come over into Macedonia and help us,' and calls Philippi 'a city of Macedonia'; Paul's letters mention the believers of Macedonia several times.",
     "sources": [
-      "wikidata:Q17151",
+      "wikidata:Q207497",
+      "pleiades:981531",
       "wikipedia:Macedonia_(Roman_province)",
+      "bib:isbe-macedonia",
       "scripture:Acts 16:9",
+      "scripture:Acts 16:12",
       "scripture:Philippians 4:15",
+      "scripture:1 Thessalonians 1:7",
       "bib:niv-2011-biblegateway",
       "bib:esv-2025-biblegateway",
       "bib:nlt-2015-biblegateway",
@@ -42,16 +46,20 @@
   },
   "history": [
     {
-      "text": "Macedonia became a Roman province in 146 BC, after Rome's final defeat of the Macedonian kingdom, with its capital at Thessalonica and a governor of proconsular rank.",
+      "text": "Rome made Macedonia a province after putting down the revolt of Andriscus in 148 BC; some reference works date the province from 146 BC.",
       "sources": [
-        "wikipedia:Macedonia_(Roman_province)",
-        "wikidata:Q207497"
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia",
+        "wikidata:Q207497",
+        "wikipedia:Macedonia_(Roman_province)"
       ]
     },
     {
-      "text": "Until AD 15, and again from AD 44 onward, Macedonia was a senatorial province governed by a proconsul; in between, Tiberius placed it under an imperial procurator jointly with Achaia. The senatorial arrangement that Claudius restored in AD 44 was still in force at AD 50.",
+      "text": "In Augustus's settlement of 27 BC, Macedonia and Achaia became separate provinces of the Senate, governed by proconsuls. In AD 15 Tiberius placed both under the imperial legate who governed Moesia, and in AD 44 Claudius restored them to the Senate, the arrangement in force at AD 50.",
       "sources": [
-        "wikipedia:Macedonia_(Roman_province)",
+        "bib:isbe-macedonia",
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-annals",
         "bib:suetonius-twelve-caesars"
       ]
     }
@@ -79,34 +87,8 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [
-    {
-      "fromYear": -146,
-      "toYear": 15,
-      "entity": "Senatorial province of Macedonia (first organization)",
-      "sources": [
-        "wikipedia:Macedonia_(Roman_province)",
-        "wikidata:Q207497"
-      ]
-    },
-    {
-      "fromYear": 15,
-      "toYear": 44,
-      "entity": "Imperial province administered jointly with Achaia under a procurator",
-      "sources": [
-        "wikipedia:Macedonia_(Roman_province)",
-        "wikidata:Q207497"
-      ]
-    },
-    {
-      "fromYear": 44,
-      "toYear": 306,
-      "entity": "Senatorial province of Macedonia restored by Claudius (in force at AD 50)",
-      "sources": [
-        "wikipedia:Macedonia_(Roman_province)",
-        "bib:suetonius-twelve-caesars"
-      ]
-    }
-  ],
-  "status": "draft"
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

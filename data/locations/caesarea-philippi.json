@@ -48,9 +48,10 @@
   },
   "history": [
     {
-      "text": "Caesarea Philippi was the seat of the tetrarchy of Herod Philip until his death in AD 34; Rome then administered the territory directly for a few years before Caligula granted it, in AD 37, to Herod Agrippa I. After Agrippa I's death in AD 44, Josephus reports that Rome did not yet give his full territory to his young son (the future Agrippa II) but instead sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom,' an arrangement that, on this evidence, still held in AD 50. Claudius did not grant Agrippa II 'the tetrarchy of Philip and Batanea,' including this city, until AD 53, three years after this project's convention date, so this record's 'about AD 50' parent is the Roman province rather than Agrippa II's later kingdom.",
+      "text": "Herod Philip built Caesarea at Paneas, in his tetrarchy. When Philip died in the twentieth year of Tiberius (about AD 34), Tiberius added his territory to the province of Syria, and Caligula then made Herod Agrippa I its king. After Agrippa I's death in AD 44, Claudius sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom,' and he gave 'the tetrarchy of Philip and Batanea' to Agrippa II only in AD 53. This project therefore places Caesarea Philippi in the Roman province of Judea for about AD 50.",
       "sources": [
         "bib:josephus-antiquities",
+        "bib:livius-judaea",
         "wikipedia:Judaea_(Roman_province)"
       ]
     }
@@ -69,5 +70,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

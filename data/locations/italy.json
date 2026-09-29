@@ -12,41 +12,43 @@
   "parentId": "roman-empire",
   "candidates": [
     {
-      "label": "Italy (Augustan Italy, label point)",
+      "label": "Italy (Roman Italy, label point)",
       "coordinates": [
-        12.5,
-        42
+        11.094951,
+        43.694151
       ],
-      "coordinateSource": "wikidata:Q913582",
+      "coordinateSource": "pleiades:1052",
       "confidence": "high",
-      "support": "Italy's identity and extent under Roman rule are undisputed; the coordinate is Wikidata's representative point for Roman Italy, near the peninsula's center.",
+      "support": "Italy's identity as the peninsula extending north to the Alps is undisputed. The label point is Pleiades' representative point for Italia, taken from its Barrington Atlas location in the north of the peninsula. Wikidata's point for Roman Italy (12.5, 42.0) lies about 220 km away, about 12 km from this project's Rome pin and close to the Roman Empire's label.",
       "sources": [
-        "wikidata:Q913582",
-        "wikipedia:Roman_Italy"
+        "pleiades:1052",
+        "wikidata:Q913582"
       ]
     }
   ],
   "summary": {
-    "text": "Italy was the Roman homeland, the peninsula containing Rome itself. Rather than being one of the senatorial or imperial provinces Augustus divided among the Senate and himself in 27 BC, it kept a privileged status as the home territory of Roman citizens. Rome, the capital, and Puteoli, a major port on Italy's southern coast where Paul's ship landed on the way to Rome, both appear in Acts, and Hebrews closes with a greeting 'from those in Italy.'",
+    "text": "Italy was the peninsula, extending north to the Alps, that contained Rome itself. It was not one of the provinces Augustus divided between the Senate and himself in 27 BC; this project gives it the 'province' type only so that Rome and Puteoli have a parent below the Roman Empire. Acts names Italy as the destination of Paul's voyage as a prisoner and records his landing at Puteoli and his arrival in Rome, and Hebrews closes with the words 'The Italians greet you.'",
     "sources": [
+      "pleiades:1052",
       "wikidata:Q913582",
       "wikipedia:Roman_Italy",
       "bib:cassius-dio-roman-history",
       "scripture:Acts 27:1",
       "scripture:Acts 28:13",
+      "scripture:Acts 28:16",
       "scripture:Hebrews 13:24"
     ]
   },
   "history": [
     {
-      "text": "Italy is absent from Cassius Dio's list of the provinces Augustus divided between the Senate and himself in 27 BC; per later scholarship, Augustus instead organized Italy itself into eleven regions, administered apart from the ordinary provincial system.",
+      "text": "Italy does not appear in Cassius Dio's list of the provinces that Augustus divided between the Senate and himself in 27 BC.",
       "sources": [
         "bib:cassius-dio-roman-history",
         "wikipedia:Roman_Italy"
       ]
     },
     {
-      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; Suetonius likewise reports that Claudius 'expelled' the Jews from Rome over disturbances instigated by 'Chrestus,' an edict most historians date to about AD 49, just before this project's 'about AD 50' date.",
+      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; Suetonius likewise reports that Claudius expelled the Jews from Rome because they 'constantly made disturbances at the instigation of Chrestus.'",
       "sources": [
         "scripture:Acts 18:2",
         "bib:suetonius-twelve-caesars"
@@ -65,11 +67,6 @@
       "textWEB": "When it was determined that we should sail for Italy, they delivered Paul and certain other prisoners to a centurion named Julius, of the Augustan band."
     },
     {
-      "ref": "Acts 28:13",
-      "book": "Acts",
-      "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
-    },
-    {
       "ref": "Hebrews 13:24",
       "book": "Hebrews",
       "textWEB": "Greet all of your leaders and all the saints. The Italians greet you."
@@ -77,5 +74,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }

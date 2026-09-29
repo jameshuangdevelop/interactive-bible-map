@@ -48,10 +48,13 @@
   },
   "history": [
     {
-      "text": "Whether King Aretas IV of Nabataea ever held direct political control of Damascus, as opposed to merely having an official representing resident Nabataeans there, is disputed among scholars discussing Paul's escape from 'the ethnarch under King Aretas' in 2 Corinthians 11:32; proposals along both lines place any such Nabataean role within the reign of Caligula (AD 37-41) at the latest. Aretas IV died in AD 40, and this project follows the province's standard administration of Damascus as part of Syria for the 'about AD 50' convention, a decade after his death.",
+      "text": "In 2 Corinthians 11:32 Paul writes: 'In Damascus the governor under King Aretas guarded the Damascenes’ city, desiring to arrest me.' How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, and Damascus had been part of the Roman province of Syria since Pompey's conquest in 64 BC, so this project places it in Syria for about AD 50.",
       "sources": [
+        "scripture:2 Corinthians 11:32",
+        "bib:isbe-aretas",
         "wikipedia:Aretas_IV_Philopatris",
-        "scripture:2 Corinthians 11:32"
+        "bib:livius-nabataeans",
+        "bib:livius-damascus"
       ]
     }
   ],
@@ -172,5 +175,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
 }
