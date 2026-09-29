@@ -3,6 +3,7 @@ export interface MapVariantOptions {
   disableLandcover: boolean;
   disableFade: boolean;
   pixelRatioCap: 1 | 2;
+  pixelRatioExplicit: boolean;
   zoomRatePreset: "default" | "fast";
   lite: boolean;
 }
@@ -36,6 +37,7 @@ const defaultVariantOptions: MapVariantOptions = {
   disableLandcover: false,
   disableFade: false,
   pixelRatioCap: 2,
+  pixelRatioExplicit: false,
   zoomRatePreset: "default",
   lite: false
 };
@@ -58,6 +60,7 @@ export function parseMapVariantOptions(search: string): MapVariantOptions {
   const reliefParameter = parameters.get("relief");
   const landcoverParameter = parameters.get("landcover");
   const fadeParameter = parameters.get("fade");
+  const dprParameter = parameters.get("dpr")?.trim() ?? null;
 
   const disableRelief =
     lite || (reliefParameter === null ? defaultVariantOptions.disableRelief : isDisabledZero(reliefParameter));
@@ -68,7 +71,19 @@ export function parseMapVariantOptions(search: string): MapVariantOptions {
       : isDisabledZero(landcoverParameter));
   const disableFade =
     lite || (fadeParameter === null ? defaultVariantOptions.disableFade : isDisabledZero(fadeParameter));
-  const pixelRatioCap: 1 | 2 = lite || isEnabledOne(parameters.get("dpr")) ? 1 : 2;
+  let pixelRatioCap: 1 | 2 = defaultVariantOptions.pixelRatioCap;
+  let pixelRatioExplicit = false;
+  if (dprParameter === "1") {
+    pixelRatioCap = 1;
+    pixelRatioExplicit = true;
+  } else if (dprParameter === "2") {
+    pixelRatioCap = 2;
+    pixelRatioExplicit = true;
+  }
+  if (lite) {
+    pixelRatioCap = 1;
+    pixelRatioExplicit = true;
+  }
   const zoomRatePreset: "default" | "fast" =
     lite || parameters.get("zoomrate")?.trim().toLowerCase() === "fast" ? "fast" : "default";
 
@@ -78,6 +93,7 @@ export function parseMapVariantOptions(search: string): MapVariantOptions {
     disableLandcover,
     disableFade,
     pixelRatioCap,
+    pixelRatioExplicit,
     zoomRatePreset,
     lite
   };

@@ -97,6 +97,7 @@ const fallbackStyleLandcoverLayerIds = [
   "land-wetland",
   "land-glacier"
 ] as const;
+const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa offscreen)/i;
 
 const interactiveLayerIds = [
   layerClusterCircleId,
@@ -147,6 +148,13 @@ const areaLabelOverviewOffsetLayout = {
 };
 
 type RuntimeTuning = ReturnType<typeof resolveMapRuntimeTuning>;
+interface WebGlRendererInfo {
+  vendor: string | null;
+  renderer: string | null;
+  unmaskedVendor: string | null;
+  unmaskedRenderer: string | null;
+  isSoftwareRenderer: boolean;
+}
 
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
@@ -355,6 +363,65 @@ function resolveMapPixelRatio(cap: number) {
     ? Math.max(1, window.devicePixelRatio)
     : 1;
   return Math.min(cap, devicePixelRatio);
+}
+
+function detectWebGlRendererInfo(): WebGlRendererInfo {
+  if (typeof document === "undefined") {
+    return {
+      vendor: null,
+      renderer: null,
+      unmaskedVendor: null,
+      unmaskedRenderer: null,
+      isSoftwareRenderer: false
+    };
+  }
+
+  const canvas = document.createElement("canvas");
+  const webglContext =
+    canvas.getContext("webgl2", { antialias: false, alpha: false }) ??
+    canvas.getContext("webgl", { antialias: false, alpha: false });
+
+  if (!webglContext) {
+    return {
+      vendor: null,
+      renderer: null,
+      unmaskedVendor: null,
+      unmaskedRenderer: null,
+      isSoftwareRenderer: false
+    };
+  }
+
+  const vendor = webglContext.getParameter(webglContext.VENDOR);
+  const renderer = webglContext.getParameter(webglContext.RENDERER);
+  const debugExtension = webglContext.getExtension("WEBGL_debug_renderer_info");
+  const unmaskedVendor = debugExtension
+    ? webglContext.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
+    : null;
+  const unmaskedRenderer = debugExtension
+    ? webglContext.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
+    : null;
+  const combinedRendererLabel = [vendor, renderer, unmaskedVendor, unmaskedRenderer]
+    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .join(" | ");
+
+  return {
+    vendor: typeof vendor === "string" ? vendor : null,
+    renderer: typeof renderer === "string" ? renderer : null,
+    unmaskedVendor: typeof unmaskedVendor === "string" ? unmaskedVendor : null,
+    unmaskedRenderer: typeof unmaskedRenderer === "string" ? unmaskedRenderer : null,
+    isSoftwareRenderer: softwareRendererPattern.test(combinedRendererLabel)
+  };
+}
+
+function resolveEffectivePixelRatioCap(
+  tuning: RuntimeTuning,
+  rendererInfo: WebGlRendererInfo
+) {
+  if (rendererInfo.isSoftwareRenderer && !tuning.variants.pixelRatioExplicit) {
+    return 1;
+  }
+
+  return tuning.variants.pixelRatioCap;
 }
 
 function setLayerVisibility(map: MapLibreMap, layerId: string, visible: boolean) {
@@ -1391,6 +1458,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     }
 
     const initialMode = basemapController.getState().mode;
+    const rendererInfo = detectWebGlRendererInfo();
+    const effectivePixelRatioCap = resolveEffectivePixelRatioCap(runtimeTuning, rendererInfo);
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode),
@@ -1400,7 +1469,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
       fadeDuration: runtimeTuning.symbolFadeDurationMs,
-      pixelRatio: resolveMapPixelRatio(runtimeTuning.variants.pixelRatioCap),
+      pixelRatio: resolveMapPixelRatio(effectivePixelRatioCap),
       maxTileCacheSize: runtimeTuning.maxTileCacheSize,
       maxTileCacheZoomLevels: runtimeTuning.maxTileCacheZoomLevels,
       cancelPendingTileRequestsWhileZooming: runtimeTuning.cancelPendingTileRequestsWhileZooming,

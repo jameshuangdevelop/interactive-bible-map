@@ -21,6 +21,7 @@ const visibilityThrottleGapMs = 900;
 const mapIdleTimeoutMs = 60_000;
 const mapReadyTimeoutMs = 120_000;
 const scenarioAttemptLimit = 4;
+const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa offscreen)/i;
 
 const mapBenchmarkTargets = {
   app: {
@@ -469,6 +470,51 @@ async function readFirstMapPaintMs(page) {
   return page.evaluate(() =>
     typeof window.__ibmBenchFirstMapPaintMs === "number" ? window.__ibmBenchFirstMapPaintMs : null
   );
+}
+
+async function readWebGlRendererInfo(page) {
+  return page.evaluate(({ patternSource, patternFlags }) => {
+    const pattern = new RegExp(patternSource, patternFlags);
+    const canvas = document.createElement("canvas");
+    const context =
+      canvas.getContext("webgl2", { antialias: false, alpha: false }) ??
+      canvas.getContext("webgl", { antialias: false, alpha: false });
+
+    if (!context) {
+      return {
+        vendor: null,
+        renderer: null,
+        unmaskedVendor: null,
+        unmaskedRenderer: null,
+        rendererString: "webgl unavailable",
+        isSoftwareRenderer: false
+      };
+    }
+
+    const vendor = context.getParameter(context.VENDOR);
+    const renderer = context.getParameter(context.RENDERER);
+    const debugExtension = context.getExtension("WEBGL_debug_renderer_info");
+    const unmaskedVendor = debugExtension
+      ? context.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
+      : null;
+    const unmaskedRenderer = debugExtension
+      ? context.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
+      : null;
+
+    const asString = (value) => (typeof value === "string" ? value : null);
+    const values = [asString(unmaskedRenderer), asString(renderer), asString(vendor)].filter(Boolean);
+    const rendererString = values.join(" | ") || "unknown renderer";
+    const isSoftwareRenderer = pattern.test(rendererString);
+
+    return {
+      vendor: asString(vendor),
+      renderer: asString(renderer),
+      unmaskedVendor: asString(unmaskedVendor),
+      unmaskedRenderer: asString(unmaskedRenderer),
+      rendererString,
+      isSoftwareRenderer
+    };
+  }, { patternSource: softwareRendererPattern.source, patternFlags: softwareRendererPattern.flags });
 }
 
 async function installGestureMonitor(page) {
@@ -932,6 +978,7 @@ async function runScenarioAttempt({
     const scenarioUrl = `${baseUrl}${scenario.path}`;
     await page.goto(scenarioUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapReady(page, target.mapHookKey);
+    const webglRenderer = await readWebGlRendererInfo(page);
 
     if (typeof scenario.prepare === "function") {
       await scenario.prepare(page, target.mapHookKey);
@@ -985,7 +1032,8 @@ async function runScenarioAttempt({
       tileRequestCount: tileResult.tileRequestCount,
       tileKnownBytes: tileResult.knownTileBytes,
       tileUnknownByteCount: tileResult.unknownTileBytes,
-      selectedEntryId: flyToSelectionEntryId
+      selectedEntryId: flyToSelectionEntryId,
+      webglRenderer
     };
   } finally {
     await context.close();
@@ -1046,10 +1094,14 @@ async function runTargetBenchmark({ browser, mode, baseUrl, target }) {
     scenarioResults[scenario.id] = run;
   }
 
+  const firstScenario = scenarios[0]?.id ? scenarioResults[scenarios[0].id] : null;
+  const targetWebglRenderer = firstScenario?.accepted?.webglRenderer ?? null;
+
   return {
     targetId: target.id,
     targetName: target.name,
     mode,
+    webglRenderer: targetWebglRenderer,
     scenarios: scenarioResults
   };
 }
@@ -1084,6 +1136,14 @@ function summarizeForMarkdown(benchmarkResult) {
           tileKnownBytes: accepted.tileKnownBytes,
           tileUnknownByteCount: accepted.tileUnknownByteCount,
           firstMapPaintMs: accepted.firstMapPaintMs,
+          webglRenderer:
+            targetResult.webglRenderer?.rendererString ??
+            accepted.webglRenderer?.rendererString ??
+            "unknown renderer",
+          softwareRenderer:
+            targetResult.webglRenderer?.isSoftwareRenderer ??
+            accepted.webglRenderer?.isSoftwareRenderer ??
+            false,
           discardedAttempts: scenarioResult.discardedAttempts.length,
           retainedDespiteThrottle: Boolean(accepted.retainedDespiteThrottle)
         });
@@ -1098,9 +1158,9 @@ function toMarkdownTable(benchmarkResult) {
   const rows = summarizeForMarkdown(benchmarkResult);
   const lines = [];
   lines.push(
-    "| Mode | Target | Scenario | Frame intervals | Long tasks | Idle after gesture | Tile requests | Tile bytes | First map paint | Notes |"
+    "| Mode | Target | WebGL renderer | Scenario | Frame intervals | Long tasks | Idle after gesture | Tile requests | Tile bytes | First map paint | Notes |"
   );
-  lines.push("|---|---|---|---|---|---:|---:|---:|---:|---|");
+  lines.push("|---|---|---|---|---|---|---:|---:|---:|---:|---|");
 
   for (const row of rows) {
     const notes = [];
@@ -1118,6 +1178,7 @@ function toMarkdownTable(benchmarkResult) {
       [
         row.mode,
         row.target,
+        row.webglRenderer,
         row.scenarioDescription,
         formatFrameSummary(row.frameSummary),
         `count ${row.longTaskSummary.count}, max ${formatMilliseconds(row.longTaskSummary.maxMs)} ms`,

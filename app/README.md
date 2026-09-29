@@ -39,8 +39,12 @@ These harmless query params stay enabled in production so the human can compare 
 - `?landcover=0` — hide natural-land layers (plain land + water)
 - `?fade=0` — disable symbol/tile fading
 - `?dpr=1` — cap map pixel ratio to 1
+- `?dpr=2` — force map pixel ratio cap back to 2
 - `?zoomrate=fast` — faster wheel/trackpad/pinch zoom rates
 - `?lite=1` — shortcut for all of the above
+
+By default, the app now auto-caps map pixel ratio to 1 when it detects a software WebGL renderer
+(for example SwiftShader on remote desktop / CI runners). Use `?dpr=2` to compare against full cap.
 
 You can combine them with normal location selection, for example:
 

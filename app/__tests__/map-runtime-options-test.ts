@@ -10,6 +10,7 @@ describe("map runtime URL variant options", () => {
       disableLandcover: false,
       disableFade: false,
       pixelRatioCap: 2,
+      pixelRatioExplicit: false,
       zoomRatePreset: "default",
       lite: false
     });
@@ -21,6 +22,7 @@ describe("map runtime URL variant options", () => {
       disableLandcover: true,
       disableFade: true,
       pixelRatioCap: 1,
+      pixelRatioExplicit: true,
       zoomRatePreset: "fast",
       lite: false
     });
@@ -32,6 +34,7 @@ describe("map runtime URL variant options", () => {
       disableLandcover: true,
       disableFade: true,
       pixelRatioCap: 1,
+      pixelRatioExplicit: true,
       zoomRatePreset: "fast",
       lite: true
     });
@@ -43,8 +46,21 @@ describe("map runtime URL variant options", () => {
       disableLandcover: true,
       disableFade: true,
       pixelRatioCap: 1,
+      pixelRatioExplicit: true,
       zoomRatePreset: "fast",
       lite: true
+    });
+  });
+
+  test("accepts dpr=2 as an explicit override", () => {
+    expect(parseMapVariantOptions("?dpr=2")).toEqual({
+      disableRelief: false,
+      disableLandcover: false,
+      disableFade: false,
+      pixelRatioCap: 2,
+      pixelRatioExplicit: true,
+      zoomRatePreset: "default",
+      lite: false
     });
   });
 
