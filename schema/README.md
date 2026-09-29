@@ -33,6 +33,16 @@ All example values below are **illustrative only** (not verified historical clai
 - `city`: city-level context.
 - `site`: local site/feature context.
 
+### Ancient area hierarchy (AD 50 convention until M4 timeline)
+- `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
+- `type: "province"` is a province-level area record (Roman province or client kingdom in the same hierarchy).
+- `type: "region"` remains for sub-province district/region records such as Galilee.
+- `empire`, `province`, and `region` records must all use `zoomTier: "region"`.
+- Parent chains are recorded with `parentId`: a place points to the smallest containing area, that area points to its province, and the province points to the empire.
+- In M3, parent assignments use the **about AD 50** convention for all records; M4 adds timeline-aware changes.
+- The panel uses this chain to show context in the format `Type · Province · Empire` (for example, `City · Achaia · Roman Empire`).
+- Validator switch: `scripts/lib/validator.mjs` exports `REQUIRE_EMPIRE_ROOT` (default `false` for the current data set) and accepts `validateData({ requireEmpireRoot: true })` to enforce that every chain ends at an empire record.
+
 ### Confidence meanings
 - `high`: broad scholarly agreement.
 - `medium`: good support with some uncertainty.

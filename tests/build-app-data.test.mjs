@@ -23,6 +23,13 @@ async function withTempDirectory(run) {
   }
 }
 
+function toDraftRecord(record) {
+  const draftRecord = { ...record, status: "draft" };
+  delete draftRecord.verifiedBy;
+  delete draftRecord.lastReviewed;
+  return draftRecord;
+}
+
 test("buildAppData writes compact index fields and candidate fields", async () => {
   await withTempDirectory(async (outputDirectory) => {
     await buildAppData({
@@ -173,5 +180,91 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
       Object.hasOwn(capernaumPlacePayload.location.names, "otherLanguages"),
       false
     );
+  });
+});
+
+test("buildAppData keeps empire/province types and parent chain in places.index", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    const outputDirectory = path.join(temporaryDirectory, "output");
+    await fs.mkdir(locationsDirectory, { recursive: true });
+    await fs.mkdir(mediaDirectory, { recursive: true });
+
+    const cityTemplate = JSON.parse(
+      await fs.readFile(
+        path.join(validCaseDirectory, "locations", "capernaum.json"),
+        "utf8"
+      )
+    );
+    const areaTemplate = JSON.parse(
+      await fs.readFile(path.join(validCaseDirectory, "locations", "galilee.json"), "utf8")
+    );
+
+    const city = toDraftRecord({
+      ...cityTemplate,
+      id: "athens",
+      names: {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: []
+      },
+      type: "city",
+      zoomTier: "city",
+      parentId: "achaia"
+    });
+    const province = toDraftRecord({
+      ...areaTemplate,
+      id: "achaia",
+      names: {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: []
+      },
+      type: "province",
+      zoomTier: "region",
+      parentId: "roman-empire"
+    });
+    const empire = toDraftRecord({
+      ...areaTemplate,
+      id: "roman-empire",
+      names: {
+        ancient: ["Roman Empire"],
+        modern: "Roman Empire",
+        alternate: []
+      },
+      type: "empire",
+      zoomTier: "region"
+    });
+    delete empire.parentId;
+
+    for (const locationRecord of [city, province, empire]) {
+      await fs.writeFile(
+        path.join(locationsDirectory, `${locationRecord.id}.json`),
+        `${JSON.stringify(locationRecord, null, 2)}\n`,
+        "utf8"
+      );
+    }
+
+    await buildAppData({
+      locationsDirectory,
+      mediaDirectory,
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      outputDirectory
+    });
+
+    const indexData = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "places.index.json"), "utf8")
+    );
+    const indexById = new Map(indexData.map((record) => [record.id, record]));
+
+    assert.equal(indexById.get("athens").type, "city");
+    assert.equal(indexById.get("athens").parentId, "achaia");
+    assert.equal(indexById.get("achaia").type, "province");
+    assert.equal(indexById.get("achaia").parentId, "roman-empire");
+    assert.equal(indexById.get("roman-empire").type, "empire");
+    assert.equal(indexById.get("roman-empire").parentId, null);
   });
 });

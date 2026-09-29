@@ -11,6 +11,7 @@ import { validateData } from "../scripts/lib/validator.mjs";
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const fixturesDirectory = path.join(testDirectory, "fixtures");
 const casesDirectory = path.join(fixturesDirectory, "cases");
+const validCaseDirectory = path.join(casesDirectory, "valid");
 const webFixturePath = path.join(fixturesDirectory, "web", "engwebp-mini.vpl.txt");
 const webFixtureMissingInteriorPath = path.join(
   fixturesDirectory,
@@ -50,16 +51,26 @@ const scriptureSourceRegex = new RegExp(
 
 async function runCase(caseName, options = {}) {
   const caseDirectory = path.join(casesDirectory, caseName);
+  const { webVplPath = webFixturePath, ...validationOptions } = options;
+
   return validateData({
     locationsDirectory: path.join(caseDirectory, "locations"),
     mediaDirectory: path.join(caseDirectory, "media"),
-    webVplPath: options.webVplPath ?? webFixturePath,
+    webVplPath,
     bibliographyPath: bibliographyFixturePath,
-    skipSnapshotChecksumCheck: true
+    skipSnapshotChecksumCheck: true,
+    ...validationOptions
   });
 }
 
-async function runWithTemporaryCase(mutateLocations) {
+function toDraftRecord(record) {
+  const draftRecord = { ...record, status: "draft" };
+  delete draftRecord.verifiedBy;
+  delete draftRecord.lastReviewed;
+  return draftRecord;
+}
+
+async function runWithTemporaryCase(mutateLocations, options = {}) {
   const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-"));
 
   try {
@@ -68,8 +79,8 @@ async function runWithTemporaryCase(mutateLocations) {
     fs.mkdirSync(locationsDirectory, { recursive: true });
     fs.mkdirSync(mediaDirectory, { recursive: true });
 
-    const capernaumPath = path.join(casesDirectory, "valid", "locations", "capernaum.json");
-    const galileePath = path.join(casesDirectory, "valid", "locations", "galilee.json");
+    const capernaumPath = path.join(validCaseDirectory, "locations", "capernaum.json");
+    const galileePath = path.join(validCaseDirectory, "locations", "galilee.json");
     const capernaumData = JSON.parse(fs.readFileSync(capernaumPath, "utf8"));
     const galileeData = JSON.parse(fs.readFileSync(galileePath, "utf8"));
 
@@ -86,12 +97,94 @@ async function runWithTemporaryCase(mutateLocations) {
       `${JSON.stringify(galileeData, null, 2)}\n`
     );
 
+    const { webVplPath = webFixturePath, ...validationOptions } = options;
     return await validateData({
       locationsDirectory,
       mediaDirectory,
-      webVplPath: webFixturePath,
+      webVplPath,
       bibliographyPath: bibliographyFixturePath,
-      skipSnapshotChecksumCheck: true
+      skipSnapshotChecksumCheck: true,
+      ...validationOptions
+    });
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
+async function runWithTemporaryHierarchyCase(mutateLocations, options = {}) {
+  const temporaryDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "ibm-validator-hierarchy-")
+  );
+
+  try {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+
+    const cityTemplate = JSON.parse(
+      fs.readFileSync(path.join(validCaseDirectory, "locations", "capernaum.json"), "utf8")
+    );
+    const areaTemplate = JSON.parse(
+      fs.readFileSync(path.join(validCaseDirectory, "locations", "galilee.json"), "utf8")
+    );
+
+    const cityData = toDraftRecord({
+      ...cityTemplate,
+      id: "athens",
+      names: {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: []
+      },
+      type: "city",
+      zoomTier: "city",
+      parentId: "achaia"
+    });
+    const provinceData = toDraftRecord({
+      ...areaTemplate,
+      id: "achaia",
+      names: {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: []
+      },
+      type: "province",
+      zoomTier: "region",
+      parentId: "roman-empire"
+    });
+    const empireData = toDraftRecord({
+      ...areaTemplate,
+      id: "roman-empire",
+      names: {
+        ancient: ["Roman Empire"],
+        modern: "Roman Empire",
+        alternate: []
+      },
+      type: "empire",
+      zoomTier: "region"
+    });
+    delete empireData.parentId;
+
+    if (typeof mutateLocations === "function") {
+      mutateLocations({ cityData, provinceData, empireData });
+    }
+
+    for (const locationData of [cityData, provinceData, empireData]) {
+      fs.writeFileSync(
+        path.join(locationsDirectory, `${locationData.id}.json`),
+        `${JSON.stringify(locationData, null, 2)}\n`
+      );
+    }
+
+    const { webVplPath = webFixturePath, ...validationOptions } = options;
+    return await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      webVplPath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true,
+      ...validationOptions
     });
   } finally {
     fs.rmSync(temporaryDirectory, { recursive: true, force: true });
@@ -412,6 +505,141 @@ test("parentId must point to an existing location", async () => {
         error.message.includes("does not match any location id")
     )
   );
+});
+
+test("parentId chains cannot contain cycles", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData, galileeData }) => {
+    capernaumData.parentId = "galilee";
+    galileeData.parentId = "capernaum";
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.parentId" &&
+        error.message.includes("must not contain cycles")
+    )
+  );
+});
+
+test("records of type empire must not define parentId", async () => {
+  const result = await runWithTemporaryHierarchyCase(({ empireData }) => {
+    empireData.parentId = "achaia";
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("roman-empire.json") &&
+        error.path === "$.parentId" &&
+        error.message.includes("must not define parentId")
+    )
+  );
+});
+
+test("records of type province must define parentId", async () => {
+  const result = await runWithTemporaryHierarchyCase(({ provinceData }) => {
+    delete provinceData.parentId;
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("achaia.json") &&
+        error.path === "$.parentId" &&
+        error.message.includes("must define parentId")
+    )
+  );
+});
+
+test("province parent must be an empire record", async () => {
+  const result = await runWithTemporaryHierarchyCase(({ provinceData }) => {
+    provinceData.parentId = "athens";
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("achaia.json") &&
+        error.path === "$.parentId" &&
+        error.message.includes("must reference a record of type 'empire'")
+    )
+  );
+});
+
+test("region, province, and empire records must use zoomTier region", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData, empireData }) => {
+      cityData.type = "region";
+      cityData.zoomTier = "city";
+      provinceData.zoomTier = "city";
+      empireData.zoomTier = "city";
+    }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.zoomTier" &&
+        error.message.includes("type 'region'")
+    )
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("achaia.json") &&
+        error.path === "$.zoomTier" &&
+        error.message.includes("type 'province'")
+    )
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("roman-empire.json") &&
+        error.path === "$.zoomTier" &&
+        error.message.includes("type 'empire'")
+    )
+  );
+});
+
+test("empire-root chain rule is disabled by default", async () => {
+  const result = await runCase("valid");
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.parentId" &&
+        error.message.includes("REQUIRE_EMPIRE_ROOT")
+    ),
+    false
+  );
+});
+
+test("empire-root chain rule can be enabled", async () => {
+  const result = await runCase("valid", { requireEmpireRoot: true });
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.parentId" &&
+        error.message.includes("REQUIRE_EMPIRE_ROOT")
+    )
+  );
+});
+
+test("empire-root chain rule passes when chains end at an empire", async () => {
+  const result = await runWithTemporaryHierarchyCase(undefined, {
+    requireEmpireRoot: true
+  });
+  assert.equal(result.errors.length, 0);
 });
 
 test("media locationId must point to an existing location", async () => {

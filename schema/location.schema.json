@@ -74,6 +74,8 @@
       "type": "string",
       "description": "Location category.",
       "enum": [
+        "empire",
+        "province",
         "region",
         "city",
         "town",
