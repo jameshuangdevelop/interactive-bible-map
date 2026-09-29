@@ -23,7 +23,7 @@ Today, `names.ancient` and `names.alternate` mix English Bible names ("Olivet", 
 - **Sources:** every name must be supported by the record's own sources (ADR-0017). Record the spelling comparison in `docs/research/M3-10-bible-spellings.md`: a table with each place, the verse checked, each version's spelling, and the chosen title. Add each version to `data/bibliography` as a cite-only `bib:` entry, and cite those entries for the spellings. **Never copy verse text from these versions:** they are copyrighted, and only the spelling of a name is recorded.
 
 ## Scope
-1. **GIS Engineer (done, `c0b1718`):** an optional `names.otherLanguages` field, left out of the app's data outputs; a validator error for a name repeated across `ancient`, `alternate`, `modern` and `otherLanguages`; `otherLanguages` included in the scripture-linkage check; `schema/README.md` updated; tests.
+1. **GIS Engineer (done, `c0b1718`):** an optional `names.otherLanguages` field, left out of the app's data outputs; a validator error for a name repeated across `ancient`, `alternate` and `otherLanguages` (`modern` may repeat an ancient name, as with Rome or Capernaum; fixed by the Research Lead in `aedde04`); `otherLanguages` included in the scripture-linkage check; `schema/README.md` updated; tests.
 2. **Research Lead:**
    - Look up every place's spelling in the six versions, using a reliable online source for each version (the publisher's site, or a site that shows the licensed text), and write the table.
    - Apply the rule to all 63 records, changing only `names.ancient` (its order and entries), `names.alternate` and `names.otherLanguages`, plus `sources` for the new `bib:` entries.
