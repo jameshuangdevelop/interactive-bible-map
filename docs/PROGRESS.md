@@ -28,10 +28,9 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-11 | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Done, PR pending review | — |
 
 ## Open questions
-- **M3-10, for the human (via the PO):** should Magdala's title stay "Magdala" (Fact-Checker's recommendation) or become "Magadan", which 4 of the 6 versions read in Matthew 15:39? Both options are in [docs/verification/M3-english-names.md](verification/M3-english-names.md#magdala). Please also confirm the Fact-Checker moving "Paneas" to `names.otherLanguages`, like the card's "Julias".
-- **M3-11, for the human (CP3b):** the PO decided four items (details in [docs/verification/M3-ancient-regions.md](verification/M3-ancient-regions.md#items-for-the-po-and-the-human)): the Judea model is kept, with "Province of Judea" alternating as "Judea" and "Judaea"; Italy keeps the `province` type, and its summary says it wasn't formally one; the four removed `politicalHistory` entries are in `BACKLOG.md` for M4; and Pamphylia stays with Galatia, with a note on the split sources. Two questions stay open:
-  - Should areas the NT never names (the Roman Empire, Sicily) keep related verses?
-  - Three province labels sit on city pins (Roman Empire, Syria, Province of Judea); the map offsets area labels, but the human may prefer other label points.
+- **Answered by the human (2026-09-29):** Magdala keeps its title; Paneas stays in `otherLanguages`; searching "Judah" should find Judea; the two Judea records stay; and well-known areas keep related verses. The data follow-ups ("Judah", and more well-known areas such as Egypt) are in `BACKLOG.md`.
+- **Still open, for the human:** should search also find modern names ("Today: Yalvaç") and candidate-site names ("Khirbet Qana"), which the panel shows? The PO explained this on 2026-09-29; the default is no.
+- **Smoothness first:** the human made dragging and zooming speed the top priority before further work (2026-09-29). The PO found that the human's machine is a remote desktop session with a 32 Hz display, which caps every map, ours and OpenFreeMap's alike, at about 32 frames per second. M3-12 works on smoothness, and the preview deploy (M3-06) lets the human test on a local device.
 ## Session log
 | Date | Agent | Task | Result |
 |---|---|---|---|

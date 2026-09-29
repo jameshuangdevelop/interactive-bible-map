@@ -13,6 +13,7 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - Native iOS/Android app build (React Native Web keeps this path open)
 
 ## Data
+- **Next data task, after the smoothness work (M3-12):** add "Judah" as a searchable name for Judea (the human asked for it on 2026-09-29), and add well-known areas the NT names that aren't on the map yet, such as Egypt, Arabia, Cappadocia, Pontus, Bithynia, Cilicia, Pamphylia, Phrygia, Illyricum, Libya and Mesopotamia. Also make "Greece" another name for Achaia, as in Acts 20:2. The human asked for well-known places with good information ("like Roman Empire, Greece, Egypt").
 - **Province histories for M4's timeline.** M3-11's Fact-Checker removed the `politicalHistory` entries of four provinces because their end years rested on Wikipedia alone. M4 rebuilds them from non-Wikipedia sources, since the timeline needs them.
 
 ## Process and tooling
