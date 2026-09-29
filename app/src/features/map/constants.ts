@@ -15,6 +15,7 @@ export const MAIN_BASEMAP_NAME =
 
 export const DEFAULT_MAP_CENTER: Coordinates = [22.5, 35];
 export const DEFAULT_MAP_ZOOM = 4.7;
+export const MAX_MAP_ZOOM = 14;
 
 export const CLUSTER_MAX_ZOOM = 6;
 export const CANDIDATE_PINS_MIN_ZOOM = 8;
@@ -30,5 +31,7 @@ export const PIN_COLORS: Record<PlaceType, string> = {
   village: "#C5221F",
   site: "#8430CE",
   "natural-feature": "#0B6B2E",
-  region: "#5F6368"
+  region: "#5F6368",
+  province: "#5F6368",
+  empire: "#5F6368"
 };

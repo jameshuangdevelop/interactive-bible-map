@@ -4,7 +4,9 @@ export type PlaceType =
   | "village"
   | "site"
   | "natural-feature"
-  | "region";
+  | "region"
+  | "province"
+  | "empire";
 
 export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";

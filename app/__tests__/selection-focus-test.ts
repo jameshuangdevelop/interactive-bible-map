@@ -42,6 +42,24 @@ const singleCandidatePlace: PlaceIndexRecord = {
   ]
 };
 
+const sitePlace: PlaceIndexRecord = {
+  id: "temple-mount",
+  names: {
+    ancient: ["Temple Mount"],
+    alternate: []
+  },
+  type: "site",
+  zoomTier: "site",
+  parentId: "jerusalem",
+  candidates: [
+    {
+      label: "Temple Mount / Haram al-Sharif",
+      coordinates: [35.235556, 31.777778],
+      confidence: "high"
+    }
+  ]
+};
+
 describe("planSelectionFocus", () => {
   test("fits all candidates when selecting the place without a candidate letter", () => {
     const selection: PlaceSelection = {
@@ -88,6 +106,19 @@ describe("planSelectionFocus", () => {
       kind: "center",
       coordinates: [35.57, 32.88],
       zoom: 11
+    });
+  });
+
+  test("uses zoom 14 for site-level selections", () => {
+    const focusPlan = planSelectionFocus(sitePlace, {
+      placeId: sitePlace.id,
+      candidateIndex: null
+    });
+
+    expect(focusPlan).toEqual({
+      kind: "center",
+      coordinates: [35.235556, 31.777778],
+      zoom: 14
     });
   });
 });

@@ -7,8 +7,6 @@ import { fileURLToPath } from "node:url";
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
 
-const englishCoalesce = ["coalesce", ["get", "name:en"], ["get", "name:latin"], ["get", "name"]];
-
 const libertyAttribution =
   '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
 const versaTilesAttribution =
@@ -30,110 +28,119 @@ const versaTilesStylePath = path.join(
   "versatiles-colorful",
   "style.json"
 );
-const upstreamWarningLayerFilters = {
-  "highway-shield-non-us": [
-    "all",
-    ["<=", ["get", "ref_length"], 6],
-    ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
-    ["match", ["get", "network"], ["us-highway", "us-interstate", "us-state"], false, true]
-  ],
-  "highway-shield-us-interstate": [
-    "all",
-    ["<=", ["get", "ref_length"], 6],
-    ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
-    ["match", ["get", "network"], ["us-interstate"], true, false]
-  ],
-  road_shield_us: [
-    "all",
-    ["<=", ["get", "ref_length"], 6],
-    ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
-    ["match", ["get", "network"], ["us-highway", "us-state"], true, false]
-  ]
-};
 
-function isNameFieldName(value) {
-  return (
-    typeof value === "string" &&
-    (value === "name" || value.startsWith("name:") || value.startsWith("name_"))
-  );
-}
-
-function referencesNameField(value) {
-  if (isNameFieldName(value)) {
-    return true;
-  }
-
-  if (typeof value === "string") {
-    return /\{name(?:[:_}]|$)/u.test(value);
-  }
-
-  if (!Array.isArray(value)) {
-    return false;
-  }
-
-  if (value[0] === "get" && value.length > 1 && isNameFieldName(value[1])) {
-    return true;
-  }
-
-  return value.some((item) => referencesNameField(item));
-}
-
-function includesClause(filter, clause) {
-  if (!Array.isArray(filter) || filter.length === 0) {
-    return false;
-  }
-
-  if (JSON.stringify(filter) === JSON.stringify(clause)) {
-    return true;
-  }
-
-  return filter.some((item) => includesClause(item, clause));
-}
+const libertyAllowedSourceLayers = new Set(["landcover", "water", "waterway"]);
+const versaTilesAllowedSourceLayers = new Set(["land", "ocean", "water_lines", "water_polygons"]);
+const removedSourceLayers = new Set([
+  "aeroway",
+  "aerialways",
+  "boundary",
+  "boundaries",
+  "boundary_labels",
+  "building",
+  "buildings",
+  "landuse",
+  "park",
+  "place",
+  "place_labels",
+  "streets",
+  "street_labels",
+  "street_labels_points",
+  "street_polygons",
+  "streets_polygons_labels",
+  "transportation",
+  "transportation_name"
+]);
 
 async function readStyle(stylePath) {
   return JSON.parse(await fs.readFile(stylePath, "utf8"));
 }
 
-test("Liberty hosted style keeps required attribution and transform rules", async () => {
+function assertNoSymbolLayers(style, styleName) {
+  assert.equal(
+    style.layers.some((layer) => layer.type === "symbol"),
+    false,
+    `${styleName} must not include symbol layers`
+  );
+}
+
+function assertNoBoundaryLayers(style, styleName) {
+  const hasBoundaryLayer = style.layers.some((layer) => {
+    const sourceLayer = layer["source-layer"];
+    return (
+      (typeof sourceLayer === "string" && sourceLayer.includes("boundar")) ||
+      layer.id.includes("boundary")
+    );
+  });
+
+  assert.equal(hasBoundaryLayer, false, `${styleName} must not include boundary layers`);
+}
+
+function assertSourceLayerAllowList(style, styleName, allowedSourceLayers) {
+  for (const layer of style.layers) {
+    const sourceLayer = layer["source-layer"];
+    if (!sourceLayer) {
+      continue;
+    }
+
+    assert.equal(
+      allowedSourceLayers.has(sourceLayer),
+      true,
+      `${styleName} layer '${layer.id}' uses disallowed source-layer '${sourceLayer}'`
+    );
+  }
+}
+
+function assertRemovedSourceLayers(style, styleName) {
+  for (const layer of style.layers) {
+    const sourceLayer = layer["source-layer"];
+    if (!sourceLayer) {
+      continue;
+    }
+
+    assert.equal(
+      removedSourceLayers.has(sourceLayer),
+      false,
+      `${styleName} layer '${layer.id}' must not use removed source-layer '${sourceLayer}'`
+    );
+  }
+}
+
+function assertMaxZoom14(style, styleName) {
+  assert.equal(style.maxzoom, 14, `${styleName} maxzoom must be 14`);
+  for (const [sourceId, source] of Object.entries(style.sources)) {
+    if (source.type !== "vector") {
+      continue;
+    }
+
+    assert.equal(
+      source.maxzoom,
+      14,
+      `${styleName} vector source '${sourceId}' must have maxzoom 14`
+    );
+  }
+}
+
+test("Liberty hosted style is physical-only and keeps required attribution", async () => {
   const style = await readStyle(libertyStylePath);
 
   assert.equal(
     style.name,
-    "Interactive Bible Map basemap (modified from OpenFreeMap Liberty)"
+    "Interactive Bible Map physical basemap (modified from OpenFreeMap Liberty)"
   );
   assert.equal(
     style.metadata["interactive-bible-map:license"],
-    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: English labels, points of interest removed, disputed boundary lines hidden. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: physical-map treatment only (relief shading, natural landcover, water, rivers and streams kept); all symbols, roads, railways, aeroways, boundaries, landuse, parks and buildings removed; max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   );
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
-
-  assert.equal(style.layers.some((layer) => layer.id === "boundary_disputed"), false);
-  assert.equal(style.layers.some((layer) => layer["source-layer"] === "poi"), false);
-
-  const disputedExclusionClause = ["!=", ["get", "disputed"], 1];
-  for (const layer of style.layers.filter((layer) => layer["source-layer"] === "boundary")) {
-    assert.equal(
-      includesClause(layer.filter, disputedExclusionClause),
-      true,
-      `Layer ${layer.id} must exclude disputed=1 features`
-    );
-  }
-
-  for (const layer of style.layers) {
-    const textField = layer.layout?.["text-field"];
-    if (!referencesNameField(textField)) {
-      continue;
-    }
-
-    assert.deepEqual(
-      textField,
-      englishCoalesce,
-      `Layer ${layer.id} must use coalesce(name:en, name:latin, name)`
-    );
-  }
+  assertNoSymbolLayers(style, "Liberty");
+  assertNoBoundaryLayers(style, "Liberty");
+  assertSourceLayerAllowList(style, "Liberty", libertyAllowedSourceLayers);
+  assertRemovedSourceLayers(style, "Liberty");
+  assertMaxZoom14(style, "Liberty");
 });
 
-test("VersaTiles fallback hosted style keeps required attribution and transform rules", async () => {
+test("VersaTiles fallback hosted style is physical-only and keeps required attribution", async () => {
   const style = await readStyle(versaTilesStylePath);
 
   const vectorSources = Object.values(style.sources).filter((source) => source.type === "vector");
@@ -142,52 +149,19 @@ test("VersaTiles fallback hosted style keeps required attribution and transform 
     assert.equal(source.attribution, versaTilesAttribution);
   }
 
-  assert.equal(style.layers.some((layer) => layer.id === "boundary-country-disputed"), false);
-  assert.equal(style.layers.some((layer) => layer["source-layer"] === "pois"), false);
-
-  const boundaryOutline = style.layers.find((layer) => layer.id === "boundary-country:outline");
-  assert.ok(boundaryOutline);
   assert.equal(
-    includesClause(boundaryOutline.filter, ["==", ["get", "disputed"], true]),
-    false,
-    "boundary-country:outline must not contain a disputed=true branch"
+    style.name,
+    "Interactive Bible Map backup physical basemap (modified from VersaTiles Colorful)"
+  );
+  assert.equal(
+    style.metadata["interactive-bible-map:notice"],
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: physical-map treatment only (natural landcover, water and waterways kept); all symbols, roads, railways, aeroways, boundaries, landuse, parks and buildings removed; max zoom set to 14."
   );
 
-  const disputedExclusionClause = ["!=", ["get", "disputed"], true];
-  for (const layer of style.layers.filter(
-    (layer) => layer["source-layer"] === "boundaries" && layer.type === "line"
-  )) {
-    assert.equal(
-      includesClause(layer.filter, disputedExclusionClause),
-      true,
-      `Layer ${layer.id} must exclude disputed=true features`
-    );
-  }
-
-  for (const layer of style.layers) {
-    const textField = layer.layout?.["text-field"];
-    if (!referencesNameField(textField)) {
-      continue;
-    }
-
-    assert.deepEqual(
-      textField,
-      englishCoalesce,
-      `Layer ${layer.id} must use coalesce(name:en, name:latin, name)`
-    );
-  }
+  assertNoSymbolLayers(style, "VersaTiles");
+  assertNoBoundaryLayers(style, "VersaTiles");
+  assertSourceLayerAllowList(style, "VersaTiles", versaTilesAllowedSourceLayers);
+  assertRemovedSourceLayers(style, "VersaTiles");
+  assertMaxZoom14(style, "VersaTiles");
 });
 
-test("Liberty transform preserves upstream shield filters that currently log style warnings", async () => {
-  const style = await readStyle(libertyStylePath);
-
-  for (const [layerId, expectedFilter] of Object.entries(upstreamWarningLayerFilters)) {
-    const layer = style.layers.find((item) => item.id === layerId);
-    assert.ok(layer, `Expected ${layerId} layer to exist in hosted Liberty style`);
-    assert.deepEqual(
-      layer.filter,
-      expectedFilter,
-      `${layerId} filter should match upstream Liberty to avoid transform regressions`
-    );
-  }
-});

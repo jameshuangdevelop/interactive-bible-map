@@ -1,55 +1,125 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type MutableRefObject
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AttributionControl,
   LngLatBounds,
   Map as MapLibreMapClass,
-  NavigationControl,
-  ScaleControl,
   setWorkerUrl,
   type ErrorEvent,
+  type FilterSpecification,
+  type GeoJSONSource,
   type LngLatLike,
-  type Map as MapLibreMap
+  type Map as MapLibreMap,
+  type MapGeoJSONFeature,
+  type PointLike
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
+  CLUSTER_MAX_ZOOM,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   FALLBACK_BASEMAP_STYLE_URL,
   MAP_WORKER_URL,
-  MAIN_BASEMAP_STYLE_URL,
-  PIN_COLORS
+  MAX_MAP_ZOOM,
+  MAIN_BASEMAP_STYLE_URL
 } from "./constants";
 import {
   BasemapFallbackController,
   resolveInitialBasemapMode,
   type BasemapMode
 } from "./basemap-fallback";
-import { clusterVisibleEntries, type RenderableMapEntry } from "./cluster-markers";
-import {
-  buildVisiblePlaceEntries,
-  type VisiblePlaceEntry
-} from "./place-visibility";
 import { getScaleControlLeftOffset } from "./map-layout";
 import {
-  resolveVisibleInlineLabelIds,
-  type LabelCollisionMarker
-} from "./label-collision";
+  MAX_VISIBLE_PLACE_LIST_ENTRIES,
+  buildPlaceRenderData,
+  type PlaceRenderData
+} from "./map-render-data";
 import { planSelectionFocus } from "./selection-focus";
 import { shouldCountTileErrorForFallback } from "./tile-error-filter";
-import { MapMarkerLayer, type ScreenMarker } from "./map-marker-layer.web";
 import type { MapViewProps } from "./map-view.types";
-import type { PlaceIndexRecord, PlaceSelection, PlaceType } from "./types";
+import type { Coordinates, PlaceIndexRecord, PlaceSelection } from "./types";
 
 setWorkerUrl(MAP_WORKER_URL);
 const configuredBasemapMode = resolveInitialBasemapMode(process.env.EXPO_PUBLIC_BASEMAP);
+
+const sourceClusteredCityPinsId = "ibm-clustered-city-pins";
+const sourceSitePinsId = "ibm-site-pins";
+const sourceCandidatePinsId = "ibm-candidate-pins";
+const sourceAreaLabelsId = "ibm-area-labels";
+const sourceKeyboardFocusId = "ibm-keyboard-focus";
+
+const layerClusterCircleId = "ibm-cluster-circle";
+const layerClusterCountId = "ibm-cluster-count";
+const layerCityPinShadowId = "ibm-city-pin-shadow";
+const layerCityPinId = "ibm-city-pin";
+const layerSitePinShadowId = "ibm-site-pin-shadow";
+const layerSitePinId = "ibm-site-pin";
+const layerQuestionBadgeId = "ibm-question-badge";
+const layerCandidatePinId = "ibm-candidate-pin";
+const layerPinLabelId = "ibm-pin-label";
+const layerAreaLabelId = "ibm-area-label";
+const layerKeyboardFocusId = "ibm-keyboard-focus";
+
+const questionBadgeImageId = "ibm-question-badge-image";
+
+const interactiveLayerIds = [
+  layerClusterCircleId,
+  layerCandidatePinId,
+  layerSitePinId,
+  layerCityPinId,
+  layerAreaLabelId
+] as const;
+
+const candidateVisibilityFilter = [
+  "all",
+  ["<", ["zoom"], ["get", "maxZoom"]],
+  ["any", [">=", ["zoom"], ["get", "minZoom"]], ["==", ["get", "isSelectedPlace"], true]]
+];
+
+const basePinVisibilityFilter = [
+  "all",
+  ["<", ["zoom"], ["get", "maxZoom"]],
+  [">=", ["zoom"], ["get", "minZoom"]],
+  [
+    "any",
+    ["==", ["get", "hasMultipleCandidates"], false],
+    ["all", ["==", ["get", "hasMultipleCandidates"], true], ["<", ["zoom"], 8]]
+  ]
+];
+
+const areaLabelVisibilityFilter = [
+  "all",
+  [">=", ["zoom"], ["get", "minZoom"]],
+  ["<", ["zoom"], ["get", "maxZoom"]]
+];
+
+type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
+type LayerFilter = FilterSpecification;
+
+function toLayerFilter(filter: unknown): LayerFilter {
+  return filter as LayerFilter;
+}
+
+interface VisibleClusterEntry {
+  id: string;
+  kind: "cluster";
+  coordinates: Coordinates;
+  accessibleName: string;
+  tooltipText: string;
+  clusterId: number;
+  pointCount: number;
+}
+
+interface VisiblePlaceEntry {
+  id: string;
+  kind: "place";
+  coordinates: Coordinates;
+  accessibleName: string;
+  tooltipText: string;
+  selection: PlaceSelection;
+}
+
+type VisibleListEntry = VisibleClusterEntry | VisiblePlaceEntry;
 
 function getStyleUrl(mode: BasemapMode) {
   if (mode === "fallback") {
@@ -57,22 +127,6 @@ function getStyleUrl(mode: BasemapMode) {
   }
 
   return MAIN_BASEMAP_STYLE_URL;
-}
-
-function mapEntryToSelection(entry: VisiblePlaceEntry): PlaceSelection {
-  if (entry.kind === "candidate-pin") {
-    return { placeId: entry.placeId, candidateIndex: entry.candidateIndex };
-  }
-
-  return { placeId: entry.placeId, candidateIndex: null };
-}
-
-function placeByIdMap(places: PlaceIndexRecord[]) {
-  return new Map(places.map((place) => [place.id, place]));
-}
-
-function placeOrderMap(places: PlaceIndexRecord[]) {
-  return new Map(places.map((place, index) => [place.id, index]));
 }
 
 function prefersReducedMotion() {
@@ -104,7 +158,7 @@ function flyOrJump(
 
 function fitBoundsForPlace(
   map: MapLibreMap,
-  coordinates: [number, number][],
+  coordinates: Coordinates[],
   maxZoom: number,
   leftInset: number,
   reducedMotion = prefersReducedMotion()
@@ -171,14 +225,10 @@ function collapseCompactAttribution(container: HTMLElement | null) {
   container.classList.remove("maplibregl-compact-show");
 }
 
-function expandCompactAttributionOnFirstPaint(
-  map: MapLibreMap,
-  mapContainerRef: MutableRefObject<HTMLDivElement | null>
-) {
-  const attributionElement = mapContainerRef.current?.querySelector<HTMLDivElement>(
-    ".maplibregl-ctrl-attrib.maplibregl-compact"
-  );
-
+function expandCompactAttributionOnFirstPaint(map: MapLibreMap, mapContainer: HTMLElement | null) {
+  const attributionElement =
+    mapContainer?.querySelector<HTMLDivElement>(".maplibregl-ctrl-attrib.maplibregl-compact") ??
+    null;
   if (!attributionElement) {
     return () => undefined;
   }
@@ -213,169 +263,786 @@ function expandCompactAttributionOnFirstPaint(
   };
 }
 
-function getEntryTitle(entry: RenderableMapEntry) {
-  if (entry.kind === "cluster") {
-    return `${entry.count} places`;
-  }
-
-  return entry.placeName;
+function createEmptyFeatureCollection() {
+  return {
+    type: "FeatureCollection" as const,
+    features: []
+  };
 }
 
-function entryColor(entry: RenderableMapEntry, placeById: Map<string, PlaceIndexRecord>) {
-  if (entry.kind === "cluster") {
-    return "#C5221F";
+function ensureGeoJsonSource(
+  map: MapLibreMap,
+  sourceId: string,
+  data: GeoJsonSourceData,
+  options: Partial<{
+    cluster: boolean;
+    clusterMaxZoom: number;
+    clusterRadius: number;
+  }> = {}
+) {
+  const existingSource = map.getSource(sourceId);
+  if (isGeoJsonSource(existingSource)) {
+    existingSource.setData(data);
+    return;
   }
 
-  if (entry.kind === "region-label") {
-    return "#5F6368";
-  }
-
-  const place = placeById.get(entry.placeId);
-  if (!place) {
-    return "#C5221F";
-  }
-
-  return PIN_COLORS[place.type];
-}
-
-function placeTypeLabel(placeType: PlaceType) {
-  return placeType.replace("-", " ");
-}
-
-function shouldShowInlinePinLabel(placeType: PlaceType) {
-  return placeType === "city" || placeType === "town" || placeType === "village";
-}
-
-interface ScreenMarkerRecord {
-  entry: RenderableMapEntry;
-  marker: ScreenMarker;
-}
-
-function screenMarkerData(
-  entries: RenderableMapEntry[],
-  map: MapLibreMap | null,
-  placeById: Map<string, PlaceIndexRecord>
-): ScreenMarkerRecord[] {
-  if (!map) {
-    return [];
-  }
-
-  return entries.map((entry) => {
-    const projected = map.project(entry.coordinates as LngLatLike);
-    const place = entry.kind === "cluster" ? null : placeById.get(entry.placeId) ?? null;
-    const typeLabel = place ? placeTypeLabel(place.type) : "place";
-
-    let markerTitle = getEntryTitle(entry);
-    if (entry.kind !== "cluster") {
-      markerTitle = `${entry.placeName}, ${typeLabel}`;
-    }
-
-    if (entry.kind === "candidate-pin") {
-      markerTitle = `${entry.placeName}, ${typeLabel}, candidate ${entry.candidateLetter}: ${entry.candidateLabel}`;
-    }
-
-    const marker: ScreenMarker = {
-      id: entry.id,
-      kind: entry.kind,
-      x: projected.x,
-      y: projected.y,
-      selected: entry.kind === "cluster" ? false : entry.selected,
-      accessibleName:
-        entry.kind === "cluster" ? `Cluster of ${entry.count} places` : entry.accessibleName,
-      title: markerTitle,
-      color: entryColor(entry, placeById),
-      inlineLabel:
-        entry.kind === "region-label"
-          ? entry.placeName
-          : place && entry.kind === "pin" && shouldShowInlinePinLabel(place.type)
-            ? entry.placeName
-            : undefined,
-      showQuestionBadge: entry.kind === "pin" ? entry.showQuestionBadge : false,
-      candidateLetter: entry.kind === "candidate-pin" ? entry.candidateLetter : undefined,
-      clusterCount: entry.kind === "cluster" ? entry.count : undefined
-    };
-
-    return { entry, marker };
+  map.addSource(sourceId, {
+    type: "geojson",
+    data,
+    ...options
   });
 }
 
-export function MapView({
-  places,
-  selection,
-  leftPanelWidth,
-  onSelectPlace
-}: MapViewProps) {
+function isGeoJsonSource(source: unknown): source is GeoJSONSource {
+  return (
+    typeof source === "object" &&
+    source !== null &&
+    "setData" in source &&
+    typeof source.setData === "function"
+  );
+}
+
+function createCanvasImage(
+  sizePx: number,
+  draw: (context: CanvasRenderingContext2D, canvasSize: number) => void
+) {
+  const pixelRatio = 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = sizePx * pixelRatio;
+  canvas.height = sizePx * pixelRatio;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    return null;
+  }
+
+  context.scale(pixelRatio, pixelRatio);
+  draw(context, sizePx);
+
+  return {
+    image: context.getImageData(0, 0, canvas.width, canvas.height),
+    pixelRatio
+  };
+}
+
+function createQuestionBadgeImage() {
+  return createCanvasImage(16, (context, size) => {
+    const center = size / 2;
+    context.fillStyle = "#FFFFFF";
+    context.strokeStyle = "#FFFFFF";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(center, center, 7, 0, Math.PI * 2);
+    context.fill();
+    context.stroke();
+
+    context.fillStyle = "#5F6368";
+    context.font =
+      '700 10px system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText("?", center, center + 0.5);
+  });
+}
+
+function createCandidateIconImage({
+  pinColor,
+  candidateLetter,
+  selected
+}: {
+  pinColor: string;
+  candidateLetter: string;
+  selected: boolean;
+}) {
+  const diameter = selected ? 21 : 16;
+  const canvasSize = selected ? 32 : 28;
+  const center = canvasSize / 2;
+  const radius = diameter / 2;
+
+  return createCanvasImage(canvasSize, (context) => {
+    if (selected) {
+      context.fillStyle = "rgba(60,64,67,0.42)";
+      context.beginPath();
+      context.arc(center, center + 2, radius + 1.5, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    context.fillStyle = pinColor;
+    context.beginPath();
+    context.arc(center, center, radius, 0, Math.PI * 2);
+    context.fill();
+
+    context.strokeStyle = "#FFFFFF";
+    context.lineWidth = 2;
+    context.setLineDash([2, 2]);
+    context.beginPath();
+    context.arc(center, center, radius - 1, 0, Math.PI * 2);
+    context.stroke();
+    context.setLineDash([]);
+
+    context.fillStyle = "#FFFFFF";
+    context.font = `700 ${selected ? 12 : 11}px "Noto Sans Bold", "Noto Sans Regular", sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(candidateLetter, center, center + 0.5);
+  });
+}
+
+function ensureQuestionBadgeImage(map: MapLibreMap) {
+  if (map.hasImage(questionBadgeImageId)) {
+    return;
+  }
+
+  const image = createQuestionBadgeImage();
+  if (!image) {
+    return;
+  }
+
+  map.addImage(questionBadgeImageId, image.image, { pixelRatio: image.pixelRatio });
+}
+
+function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
+  for (const feature of renderData.candidatePins.features) {
+    const iconId = feature.properties.iconId;
+    if (map.hasImage(iconId)) {
+      continue;
+    }
+
+    const image = createCandidateIconImage({
+      pinColor: feature.properties.pinColor,
+      candidateLetter: feature.properties.candidateLetter,
+      selected: feature.properties.isSelectedCandidate
+    });
+
+    if (!image) {
+      continue;
+    }
+
+    map.addImage(iconId, image.image, { pixelRatio: image.pixelRatio });
+  }
+}
+
+function ensureMapLayers(map: MapLibreMap) {
+  if (!map.getLayer(layerClusterCircleId)) {
+    map.addLayer({
+      id: layerClusterCircleId,
+      source: sourceClusteredCityPinsId,
+      type: "circle",
+      filter: toLayerFilter(["has", "point_count"]),
+      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      paint: {
+        "circle-radius": ["step", ["get", "point_count"], 14, 8, 16, 20, 18],
+        "circle-color": "#C5221F",
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": 3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerClusterCountId)) {
+    map.addLayer({
+      id: layerClusterCountId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter(["has", "point_count"]),
+      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      layout: {
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12
+      },
+      paint: {
+        "text-color": "#FFFFFF"
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCityPinShadowId)) {
+    map.addLayer({
+      id: layerCityPinShadowId,
+      source: sourceClusteredCityPinsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["==", ["get", "isSelectedPlace"], true]
+      ]),
+      paint: {
+        "circle-radius": 12,
+        "circle-color": "rgba(60,64,67,0.42)",
+        "circle-translate": [0, 2],
+        "circle-translate-anchor": "viewport",
+        "circle-blur": 0.2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCityPinId)) {
+    map.addLayer({
+      id: layerCityPinId,
+      source: sourceClusteredCityPinsId,
+      type: "circle",
+      filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
+      paint: {
+        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 10.5, 8],
+        "circle-color": ["get", "pinColor"],
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": 2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSitePinShadowId)) {
+    map.addLayer({
+      id: layerSitePinShadowId,
+      source: sourceSitePinsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        basePinVisibilityFilter,
+        ["==", ["get", "isSelectedPlace"], true]
+      ]),
+      paint: {
+        "circle-radius": 12,
+        "circle-color": "rgba(60,64,67,0.42)",
+        "circle-translate": [0, 2],
+        "circle-translate-anchor": "viewport",
+        "circle-blur": 0.2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSitePinId)) {
+    map.addLayer({
+      id: layerSitePinId,
+      source: sourceSitePinsId,
+      type: "circle",
+      filter: toLayerFilter(basePinVisibilityFilter),
+      paint: {
+        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 10.5, 8],
+        "circle-color": ["get", "pinColor"],
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": 2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerQuestionBadgeId)) {
+    map.addLayer({
+      id: layerQuestionBadgeId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["==", ["get", "hasMultipleCandidates"], true],
+        ["==", ["get", "isDisputed"], true]
+      ]),
+      layout: {
+        "icon-image": questionBadgeImageId,
+        "icon-size": 1,
+        "icon-offset": [0.7, -0.75],
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCandidatePinId)) {
+    map.addLayer({
+      id: layerCandidatePinId,
+      source: sourceCandidatePinsId,
+      type: "symbol",
+      filter: toLayerFilter(candidateVisibilityFilter),
+      layout: {
+        "icon-image": ["get", "iconId"],
+        "icon-size": 1,
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      }
+    });
+  }
+
+  if (!map.getLayer(layerPinLabelId)) {
+    map.addLayer({
+      id: layerPinLabelId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 12,
+        "text-offset": [1.2, 0],
+        "text-anchor": "left",
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAreaLabelId)) {
+    map.addLayer({
+      id: layerAreaLabelId,
+      source: sourceAreaLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(areaLabelVisibilityFilter),
+      layout: {
+        "text-field": ["get", "placeName"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["get", "areaFontSize"],
+        "text-letter-spacing": 0.18,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerKeyboardFocusId)) {
+    map.addLayer({
+      id: layerKeyboardFocusId,
+      source: sourceKeyboardFocusId,
+      type: "circle",
+      paint: {
+        "circle-radius": ["coalesce", ["get", "radius"], 12],
+        "circle-color": "rgba(0, 0, 0, 0)",
+        "circle-stroke-color": "#1A73E8",
+        "circle-stroke-width": 2
+      }
+    });
+  }
+}
+
+function tooltipTextFromPlaceProperties(properties: {
+  placeName: string;
+  typeLabel: string;
+}) {
+  return `${properties.placeName}, ${properties.typeLabel}`;
+}
+
+function asCoordinates(feature: MapGeoJSONFeature): Coordinates | null {
+  if (!feature.geometry || feature.geometry.type !== "Point") {
+    return null;
+  }
+
+  const coordinates = feature.geometry.coordinates;
+  if (!Array.isArray(coordinates) || coordinates.length < 2) {
+    return null;
+  }
+
+  const [longitude, latitude] = coordinates;
+  if (typeof longitude !== "number" || typeof latitude !== "number") {
+    return null;
+  }
+
+  return [longitude, latitude];
+}
+
+function asObject(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  return value as Record<string, unknown>;
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function asNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
+  const coordinates = asCoordinates(feature);
+  if (!coordinates) {
+    return null;
+  }
+
+  const properties = asObject(feature.properties);
+  if (!properties) {
+    return null;
+  }
+
+  const clusterId = asNumber(properties.cluster_id);
+  const pointCount = asNumber(properties.point_count);
+  if (clusterId !== null && pointCount !== null) {
+    return {
+      id: `cluster:${clusterId}`,
+      kind: "cluster",
+      coordinates,
+      accessibleName: `Cluster of ${pointCount} places`,
+      tooltipText: `${pointCount} places`,
+      clusterId,
+      pointCount
+    };
+  }
+
+  const entryId = asString(properties.entryId);
+  const placeId = asString(properties.placeId);
+  const placeName = asString(properties.placeName);
+  const typeLabel = asString(properties.typeLabel);
+  const accessibleName = asString(properties.accessibleName);
+
+  if (!entryId || !placeId || !placeName || !typeLabel || !accessibleName) {
+    return null;
+  }
+
+  const candidateIndex = asNumber(properties.candidateIndex);
+  const candidateLetter = asString(properties.candidateLetter);
+
+  return {
+    id: entryId,
+    kind: "place",
+    coordinates,
+    accessibleName,
+    tooltipText:
+      candidateIndex !== null && candidateLetter
+        ? `${tooltipTextFromPlaceProperties({ placeName, typeLabel })}, candidate ${candidateLetter}`
+        : tooltipTextFromPlaceProperties({ placeName, typeLabel }),
+    selection: {
+      placeId,
+      candidateIndex
+    }
+  };
+}
+
+function deduplicateVisibleEntries(entries: VisibleListEntry[]) {
+  const byId = new Map<string, VisibleListEntry>();
+  entries.forEach((entry) => {
+    if (!byId.has(entry.id)) {
+      byId.set(entry.id, entry);
+    }
+  });
+  return Array.from(byId.values());
+}
+
+function compareByReadingOrder(map: MapLibreMap, left: VisibleListEntry, right: VisibleListEntry) {
+  const leftPoint = map.project(left.coordinates as LngLatLike);
+  const rightPoint = map.project(right.coordinates as LngLatLike);
+
+  if (leftPoint.y !== rightPoint.y) {
+    return leftPoint.y - rightPoint.y;
+  }
+
+  if (leftPoint.x !== rightPoint.x) {
+    return leftPoint.x - rightPoint.x;
+  }
+
+  return left.id.localeCompare(right.id);
+}
+
+function updateKeyboardFocusRing(
+  map: MapLibreMap,
+  coordinates: Coordinates | null,
+  radius = 12
+) {
+  const source = map.getSource(sourceKeyboardFocusId);
+  if (!isGeoJsonSource(source)) {
+    return;
+  }
+
+  if (!coordinates) {
+    source.setData(createEmptyFeatureCollection());
+    return;
+  }
+
+  source.setData({
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates
+        },
+        properties: {
+          radius
+        }
+      }
+    ]
+  });
+}
+
+function panPointOutFromPanel(map: MapLibreMap, coordinates: Coordinates, leftInset: number) {
+  if (leftInset <= 0) {
+    return;
+  }
+
+  const projected = map.project(coordinates as LngLatLike);
+  const minimumVisibleX = leftInset + 32;
+  if (projected.x >= minimumVisibleX) {
+    return;
+  }
+
+  const targetCenter = map.unproject([minimumVisibleX, projected.y] as PointLike);
+  flyOrJump(map, {
+    center: [targetCenter.lng, targetCenter.lat]
+  });
+}
+
+function radians(value: number) {
+  return (value * Math.PI) / 180;
+}
+
+function distanceMeters(left: Coordinates, right: Coordinates) {
+  const earthRadiusMeters = 6_371_008.8;
+  const deltaLatitude = radians(right[1] - left[1]);
+  const deltaLongitude = radians(right[0] - left[0]);
+  const latitudeA = radians(left[1]);
+  const latitudeB = radians(right[1]);
+
+  const chord =
+    Math.sin(deltaLatitude / 2) ** 2 +
+    Math.cos(latitudeA) * Math.cos(latitudeB) * Math.sin(deltaLongitude / 2) ** 2;
+  const arc = 2 * Math.atan2(Math.sqrt(chord), Math.sqrt(1 - chord));
+  return earthRadiusMeters * arc;
+}
+
+function roundedDistanceMeters(value: number) {
+  const leading = [1, 2, 3, 5, 10];
+  const power = Math.pow(10, Math.floor(Math.log10(value)));
+  const normalized = value / power;
+  const candidate = leading.find((entry) => entry >= normalized) ?? 10;
+  return candidate * power;
+}
+
+function formatScaleDistance(valueMeters: number) {
+  if (valueMeters >= 1000) {
+    const kilometers = valueMeters / 1000;
+    const rounded = Number.isInteger(kilometers) ? kilometers.toString() : kilometers.toFixed(1);
+    return `${rounded} km`;
+  }
+
+  return `${Math.round(valueMeters)} m`;
+}
+
+export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
-  const requestFrameRef = useRef<number | null>(null);
-  const labelLayoutFrameRef = useRef<number | null>(null);
-  const expandedAttributionCleanupRef = useRef<(() => void) | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const scaleBarRef = useRef<HTMLDivElement | null>(null);
+  const scaleBarFillRef = useRef<HTMLDivElement | null>(null);
+  const scaleBarLabelRef = useRef<HTMLSpanElement | null>(null);
   const previousSelectionRef = useRef<string>("");
-  const screenMarkerRecordsRef = useRef<ScreenMarkerRecord[]>([]);
+  const cleanupAttributionRef = useRef<(() => void) | null>(null);
+  const styleReadyRef = useRef(false);
+  const gestureInProgressRef = useRef(false);
+  const gestureReleaseTimeoutRef = useRef<number | null>(null);
+  const visibleListRefreshFrameRef = useRef<number | null>(null);
+  const activeTooltipEntryIdRef = useRef<string | null>(null);
 
-  const [basemapController] = useState(
+  const basemapController = useMemo(
     () =>
       new BasemapFallbackController({
       initialMode: configuredBasemapMode
-      })
+      }),
+    []
   );
-  const [basemapState, setBasemapState] = useState<{
-    mode: BasemapMode;
-    message: string | null;
-  }>({
-    mode: configuredBasemapMode,
-    message: null
-  });
-  const [mapInstance, setMapInstance] = useState<MapLibreMap | null>(null);
-  const [zoom, setZoom] = useState(DEFAULT_MAP_ZOOM);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [renderTick, setRenderTick] = useState(0);
-  const [visibleInlineLabelIds, setVisibleInlineLabelIds] = useState<Set<string>>(
-    () => new Set<string>()
-  );
-
-  const placeById = useMemo(() => placeByIdMap(places), [places]);
-  const placeOrderById = useMemo(() => placeOrderMap(places), [places]);
   const panelInset = Math.max(0, leftPanelWidth);
+  const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
+  const renderData = useMemo(() => buildPlaceRenderData(places, selection), [places, selection]);
 
-  const recalculateInlineLabelVisibility = useCallback(() => {
-    const labelCollisionMarkers: LabelCollisionMarker[] = screenMarkerRecordsRef.current.map(
-      (markerRecord) => {
-        const place =
-          markerRecord.entry.kind === "cluster"
-            ? null
-            : placeById.get(markerRecord.entry.placeId) ?? null;
-        const dataOrder =
-          markerRecord.entry.kind === "cluster"
-            ? Number.MAX_SAFE_INTEGER
-            : placeOrderById.get(markerRecord.entry.placeId) ?? Number.MAX_SAFE_INTEGER;
+  const [basemapState, setBasemapState] = useState(() => basemapController.getState());
+  const [mapReadyVersion, setMapReadyVersion] = useState(0);
+  const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
+  const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
 
-        return {
-          id: markerRecord.marker.id,
-          kind: markerRecord.marker.kind,
-          x: markerRecord.marker.x,
-          y: markerRecord.marker.y,
-          selected: markerRecord.marker.selected,
-          inlineLabel: markerRecord.marker.inlineLabel,
-          placeType: place?.type,
-          dataOrder
-        };
-      }
-    );
-
-    setVisibleInlineLabelIds(resolveVisibleInlineLabelIds(labelCollisionMarkers));
-  }, [placeById, placeOrderById]);
-
-  const scheduleInlineLabelLayout = useCallback(() => {
-    if (labelLayoutFrameRef.current !== null) {
+  const hideTooltip = useCallback(() => {
+    const tooltip = tooltipRef.current;
+    if (!tooltip || tooltip.style.display === "none") {
       return;
     }
 
-    labelLayoutFrameRef.current = window.requestAnimationFrame(() => {
-      labelLayoutFrameRef.current = null;
-      recalculateInlineLabelVisibility();
+    tooltip.style.display = "none";
+    activeTooltipEntryIdRef.current = null;
+  }, []);
+
+  const updateScaleBar = useCallback(() => {
+    const map = mapRef.current;
+    const scaleBar = scaleBarRef.current;
+    const scaleFill = scaleBarFillRef.current;
+    const scaleLabel = scaleBarLabelRef.current;
+    if (!map || !scaleBar || !scaleFill || !scaleLabel) {
+      return;
+    }
+
+    const mapHeight = map.getContainer().clientHeight;
+    const maxWidth = 110;
+    const y = Math.max(32, mapHeight - 48);
+    const left = map.unproject([0, y] as PointLike);
+    const right = map.unproject([maxWidth, y] as PointLike);
+    const measuredMeters = distanceMeters([left.lng, left.lat], [right.lng, right.lat]);
+    const roundedMeters = roundedDistanceMeters(measuredMeters);
+    const width = Math.max(24, Math.min(maxWidth, Math.round((roundedMeters / measuredMeters) * maxWidth)));
+
+    scaleFill.style.width = `${width}px`;
+    scaleLabel.textContent = formatScaleDistance(roundedMeters);
+  }, []);
+
+  const refreshVisibleEntryState = useCallback(() => {
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+
+    const rendered = map.queryRenderedFeatures({
+      layers: [...interactiveLayerIds]
     });
-  }, [recalculateInlineLabelVisibility]);
+    const deduplicated = deduplicateVisibleEntries(
+      rendered.map(toVisibleEntry).filter((entry): entry is VisibleListEntry => entry !== null)
+    );
+    deduplicated.sort((left, right) => compareByReadingOrder(map, left, right));
+
+    const overflow = deduplicated.length > MAX_VISIBLE_PLACE_LIST_ENTRIES;
+    setVisibleEntryOverflow(overflow);
+    setVisibleEntries(deduplicated.slice(0, MAX_VISIBLE_PLACE_LIST_ENTRIES));
+  }, []);
+
+  const scheduleVisibleEntryRefresh = useCallback(() => {
+    if (gestureInProgressRef.current) {
+      return;
+    }
+
+    if (visibleListRefreshFrameRef.current !== null) {
+      return;
+    }
+
+    visibleListRefreshFrameRef.current = window.requestAnimationFrame(() => {
+      visibleListRefreshFrameRef.current = null;
+      if (gestureInProgressRef.current) {
+        return;
+      }
+
+      refreshVisibleEntryState();
+    });
+  }, [refreshVisibleEntryState]);
+
+  const syncSourcesAndLayers = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
+      cluster: true,
+      clusterMaxZoom: CLUSTER_MAX_ZOOM,
+      clusterRadius: 52
+    });
+    ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
+    ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
+    ensureGeoJsonSource(map, sourceAreaLabelsId, renderData.areaLabels);
+    ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
+
+    ensureQuestionBadgeImage(map);
+    ensureCandidateImages(map, renderData);
+    ensureMapLayers(map);
+  }, [renderData]);
+
+  const handleTooltipAtPoint = useCallback(
+    (point: PointLike) => {
+      const map = mapRef.current;
+      const tooltip = tooltipRef.current;
+      if (!map || !tooltip || gestureInProgressRef.current) {
+        return;
+      }
+
+      const features = map.queryRenderedFeatures(point, {
+        layers: [...interactiveLayerIds]
+      });
+      const entry = features.map(toVisibleEntry).find((candidate) => candidate !== null);
+      if (!entry) {
+        hideTooltip();
+        return;
+      }
+
+      const projected = map.project(entry.coordinates as LngLatLike);
+      if (activeTooltipEntryIdRef.current === entry.id) {
+        tooltip.style.left = `${projected.x}px`;
+        tooltip.style.top = `${projected.y - 22}px`;
+        return;
+      }
+
+      tooltip.textContent = entry.tooltipText;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${projected.x}px`;
+      tooltip.style.top = `${projected.y - 22}px`;
+      activeTooltipEntryIdRef.current = entry.id;
+    },
+    [hideTooltip]
+  );
+
+  const zoomToCluster = useCallback(
+    async (entry: VisibleClusterEntry) => {
+      const map = mapRef.current;
+      if (!map) {
+        return;
+      }
+
+      const source = map.getSource(sourceClusteredCityPinsId);
+      if (!isGeoJsonSource(source)) {
+        return;
+      }
+
+      const expansionZoom = await source.getClusterExpansionZoom(entry.clusterId);
+
+      flyOrJump(map, {
+        center: entry.coordinates,
+        zoom: Math.max(7, expansionZoom),
+        padding: {
+          top: 64,
+          right: 64,
+          bottom: 64,
+          left: panelInset + 64
+        }
+      });
+    },
+    [panelInset]
+  );
+
+  const activateVisibleEntry = useCallback(
+    (entry: VisibleListEntry) => {
+      if (entry.kind === "cluster") {
+        void zoomToCluster(entry);
+        return;
+      }
+
+      onSelectPlace(entry.selection);
+    },
+    [onSelectPlace, zoomToCluster]
+  );
+
+  const setVisibleEntryFocus = useCallback(
+    (entry: VisibleListEntry) => {
+      const map = mapRef.current;
+      if (!map) {
+        return;
+      }
+
+      const focusRadius = entry.kind === "cluster" ? 16 : 13;
+      updateKeyboardFocusRing(map, entry.coordinates, focusRadius);
+      panPointOutFromPanel(map, entry.coordinates, panelInset);
+    },
+    [panelInset]
+  );
 
   useEffect(() => {
     if (!mapContainerRef.current) {
@@ -384,48 +1051,36 @@ export function MapView({
 
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
-      style: getStyleUrl(configuredBasemapMode),
+      style: getStyleUrl(basemapController.getState().mode),
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_MAP_ZOOM,
+      minZoom: 3,
+      maxZoom: MAX_MAP_ZOOM,
       attributionControl: false
     });
-    mapRef.current = map;
-    setMapInstance(map);
 
-    map.addControl(
-      new NavigationControl({
-        showCompass: false
-      }),
-      "bottom-right"
-    );
-    map.addControl(new ScaleControl({ unit: "metric", maxWidth: 140 }), "bottom-left");
+    mapRef.current = map;
     map.addControl(new AttributionControl({ compact: true }), "bottom-right");
 
-    const scheduleRender = () => {
-      if (requestFrameRef.current !== null) {
-        return;
+    const markGestureStarted = () => {
+      if (gestureReleaseTimeoutRef.current !== null) {
+        window.clearTimeout(gestureReleaseTimeoutRef.current);
+        gestureReleaseTimeoutRef.current = null;
       }
-
-      requestFrameRef.current = window.requestAnimationFrame(() => {
-        requestFrameRef.current = null;
-        if (!mapRef.current) {
-          return;
-        }
-
-        setZoom(mapRef.current.getZoom());
-        setRenderTick((current) => current + 1);
-      });
+      gestureInProgressRef.current = true;
+      hideTooltip();
     };
 
-    const handleLoad = () => {
-      map.getCanvas().tabIndex = -1;
-      setMapLoaded(true);
-      scheduleRender();
-      scheduleInlineLabelLayout();
-      expandedAttributionCleanupRef.current = expandCompactAttributionOnFirstPaint(
-        map,
-        mapContainerRef
-      );
+    const markGestureFinished = () => {
+      if (gestureReleaseTimeoutRef.current !== null) {
+        window.clearTimeout(gestureReleaseTimeoutRef.current);
+      }
+
+      gestureReleaseTimeoutRef.current = window.setTimeout(() => {
+        gestureInProgressRef.current = false;
+        gestureReleaseTimeoutRef.current = null;
+        scheduleVisibleEntryRefresh();
+      }, 500);
     };
 
     const handleError = (event: ErrorEvent) => {
@@ -440,48 +1095,109 @@ export function MapView({
 
       const nextState = basemapController.registerTileError(Date.now());
       setBasemapState(nextState);
-
       if (nextState.mode === "fallback") {
-        map.setStyle(getStyleUrl(nextState.mode));
+        styleReadyRef.current = false;
+        map.setStyle(getStyleUrl("fallback"));
       }
     };
 
-    map.on("load", handleLoad);
-    map.on("move", scheduleRender);
-    map.on("zoom", scheduleRender);
-    map.on("resize", scheduleRender);
-    map.on("moveend", scheduleInlineLabelLayout);
-    map.on("zoomend", scheduleInlineLabelLayout);
-    map.on("resize", scheduleInlineLabelLayout);
+    const handleStyleReady = () => {
+      styleReadyRef.current = true;
+      map.getCanvas().tabIndex = -1;
+      syncSourcesAndLayers();
+      scheduleVisibleEntryRefresh();
+      updateScaleBar();
+      setMapReadyVersion((value) => value + 1);
+
+      if (!cleanupAttributionRef.current) {
+        cleanupAttributionRef.current = expandCompactAttributionOnFirstPaint(
+          map,
+          mapContainerRef.current
+        );
+      }
+    };
+
+    const handleMapClick = (event: { point: PointLike }) => {
+      const features = map.queryRenderedFeatures(event.point, {
+        layers: [...interactiveLayerIds]
+      });
+      const entry = features.map(toVisibleEntry).find((candidate) => candidate !== null);
+      if (!entry) {
+        return;
+      }
+
+      activateVisibleEntry(entry);
+    };
+
+    map.on("load", handleStyleReady);
+    map.on("style.load", handleStyleReady);
+    map.on("moveend", scheduleVisibleEntryRefresh);
+    map.on("idle", scheduleVisibleEntryRefresh);
+    map.on("resize", scheduleVisibleEntryRefresh);
+    map.on("dragstart", markGestureStarted);
+    map.on("zoomstart", markGestureStarted);
+    map.on("dragend", markGestureFinished);
+    map.on("zoomend", markGestureFinished);
+    map.on("mousemove", (event) => handleTooltipAtPoint(event.point));
+    map.on("mouseout", hideTooltip);
+    map.on("click", handleMapClick);
     map.on("error", handleError);
 
     return () => {
-      if (requestFrameRef.current !== null) {
-        window.cancelAnimationFrame(requestFrameRef.current);
+      cleanupAttributionRef.current?.();
+      cleanupAttributionRef.current = null;
+
+      if (visibleListRefreshFrameRef.current !== null) {
+        window.cancelAnimationFrame(visibleListRefreshFrameRef.current);
       }
-      if (labelLayoutFrameRef.current !== null) {
-        window.cancelAnimationFrame(labelLayoutFrameRef.current);
+      if (gestureReleaseTimeoutRef.current !== null) {
+        window.clearTimeout(gestureReleaseTimeoutRef.current);
       }
 
-      expandedAttributionCleanupRef.current?.();
-      map.off("moveend", scheduleInlineLabelLayout);
-      map.off("zoomend", scheduleInlineLabelLayout);
-      map.off("resize", scheduleInlineLabelLayout);
+      map.off("load", handleStyleReady);
+      map.off("style.load", handleStyleReady);
+      map.off("moveend", scheduleVisibleEntryRefresh);
+      map.off("idle", scheduleVisibleEntryRefresh);
+      map.off("resize", scheduleVisibleEntryRefresh);
+      map.off("dragstart", markGestureStarted);
+      map.off("zoomstart", markGestureStarted);
+      map.off("dragend", markGestureFinished);
+      map.off("zoomend", markGestureFinished);
+      map.off("mouseout", hideTooltip);
+      map.off("click", handleMapClick);
+      map.off("error", handleError);
+
       map.remove();
       mapRef.current = null;
-      setMapInstance(null);
-      setMapLoaded(false);
+      styleReadyRef.current = false;
     };
-  }, [basemapController, scheduleInlineLabelLayout]);
+  }, [
+    activateVisibleEntry,
+    basemapController,
+    handleTooltipAtPoint,
+    hideTooltip,
+    scheduleVisibleEntryRefresh,
+    syncSourcesAndLayers,
+    updateScaleBar
+  ]);
 
   useEffect(() => {
-    const map = mapRef.current;
-    if (!selection) {
-      previousSelectionRef.current = "";
+    if (!styleReadyRef.current) {
       return;
     }
 
-    if (!mapLoaded || !map) {
+    syncSourcesAndLayers();
+    scheduleVisibleEntryRefresh();
+  }, [scheduleVisibleEntryRefresh, syncSourcesAndLayers]);
+
+  useEffect(() => {
+    updateScaleBar();
+  }, [mapReadyVersion, panelInset, updateScaleBar]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!selection || !map || !styleReadyRef.current) {
+      previousSelectionRef.current = selection ? previousSelectionRef.current : "";
       return;
     }
 
@@ -490,84 +1206,14 @@ export function MapView({
       return;
     }
 
-    previousSelectionRef.current = selectionKey;
     const place = placeById.get(selection.placeId);
     if (!place) {
       return;
     }
 
+    previousSelectionRef.current = selectionKey;
     focusSelection(map, place, selection, panelInset);
-  }, [mapLoaded, panelInset, placeById, selection]);
-
-  const visibleEntries = useMemo(
-    () => buildVisiblePlaceEntries(places, zoom, selection),
-    [places, selection, zoom]
-  );
-  const clusteredEntries = useMemo(
-    () => clusterVisibleEntries(visibleEntries, zoom),
-    [visibleEntries, zoom]
-  );
-
-  const resolvedScreenMarkers = useMemo(() => {
-    void renderTick;
-    return screenMarkerData(clusteredEntries, mapInstance, placeById);
-  }, [clusteredEntries, mapInstance, placeById, renderTick]);
-
-  useEffect(() => {
-    screenMarkerRecordsRef.current = resolvedScreenMarkers;
-  }, [resolvedScreenMarkers]);
-
-  const markerIdentityKey = useMemo(
-    () =>
-      resolvedScreenMarkers
-        .map((markerRecord) => {
-          const marker = markerRecord.marker;
-          return `${marker.id}:${marker.kind}:${marker.selected ? "1" : "0"}:${marker.inlineLabel ?? ""}`;
-        })
-        .join("|"),
-    [resolvedScreenMarkers]
-  );
-
-  useEffect(() => {
-    if (!mapLoaded) {
-      return;
-    }
-
-    scheduleInlineLabelLayout();
-  }, [mapLoaded, markerIdentityKey, scheduleInlineLabelLayout]);
-
-  const entryByMarkerId = useMemo(
-    () =>
-      new Map(resolvedScreenMarkers.map((markerRecord) => [markerRecord.marker.id, markerRecord.entry])),
-    [resolvedScreenMarkers]
-  );
-
-  const onMarkerActivate = useCallback(
-    (marker: ScreenMarker) => {
-      const map = mapRef.current;
-      const entry = entryByMarkerId.get(marker.id);
-      if (!map || !entry) {
-        return;
-      }
-
-      if (entry.kind === "cluster") {
-        flyOrJump(map, {
-          center: entry.coordinates,
-          zoom: Math.max(7, entry.expansionZoom),
-          padding: {
-            top: 64,
-            right: 64,
-            bottom: 64,
-            left: panelInset + 64
-          }
-        });
-        return;
-      }
-
-      onSelectPlace(mapEntryToSelection(entry));
-    },
-    [entryByMarkerId, onSelectPlace, panelInset]
-  );
+  }, [mapReadyVersion, panelInset, placeById, selection]);
 
   const resetView = useCallback(() => {
     const map = mapRef.current;
@@ -587,6 +1233,28 @@ export function MapView({
     });
   }, [panelInset]);
 
+  const zoomIn = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    map.zoomIn({
+      duration: prefersReducedMotion() ? 0 : 220
+    });
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    map.zoomOut({
+      duration: prefersReducedMotion() ? 0 : 220
+    });
+  }, []);
+
   return (
     <div
       aria-label="Map"
@@ -597,9 +1265,16 @@ export function MapView({
       }}
     >
       <style>{`
-        .ibm-map-root .maplibregl-ctrl-bottom-left {
-          left: ${getScaleControlLeftOffset(panelInset)}px;
-          bottom: 16px;
+        .ibm-map-root .ibm-hidden-visible-places {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
         }
       `}</style>
       <div
@@ -609,6 +1284,112 @@ export function MapView({
           inset: 0
         }}
       />
+      <div
+        ref={tooltipRef}
+        role="tooltip"
+        style={{
+          display: "none",
+          position: "absolute",
+          transform: "translate(-50%, -100%)",
+          pointerEvents: "none",
+          backgroundColor: "rgba(32,33,36,0.96)",
+          color: "#FFFFFF",
+          borderRadius: "4px",
+          padding: "4px 8px",
+          fontFamily: '"Noto Sans Regular", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontSize: "12px",
+          lineHeight: 1.3,
+          zIndex: 20
+        }}
+      />
+      <div
+        ref={scaleBarRef}
+        data-map-scale="metric"
+        style={{
+          position: "absolute",
+          left: `${getScaleControlLeftOffset(panelInset)}px`,
+          bottom: "16px",
+          backgroundColor: "#FFFFFF",
+          border: "1px solid rgba(95,99,104,0.35)",
+          borderRadius: "4px",
+          padding: "4px 6px",
+          boxShadow: "0 1px 2px rgba(60,64,67,0.25)"
+        }}
+      >
+        <div
+          ref={scaleBarFillRef}
+          style={{
+            width: "40px",
+            height: "4px",
+            borderTop: "2px solid #5F6368"
+          }}
+        />
+        <span
+          ref={scaleBarLabelRef}
+          style={{
+            display: "block",
+            marginTop: "2px",
+            color: "#202124",
+            fontFamily:
+              '"Noto Sans Regular", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            fontSize: "11px"
+          }}
+        >
+          0 m
+        </span>
+      </div>
+      <button
+        aria-label="Zoom in"
+        data-map-control="zoom-in"
+        onClick={zoomIn}
+        style={{
+          position: "absolute",
+          right: "16px",
+          bottom: "248px",
+          width: "44px",
+          height: "44px",
+          borderRadius: "999px",
+          border: "1px solid #DADCE0",
+          backgroundColor: "#FFFFFF",
+          color: "#202124",
+          fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontSize: "22px",
+          lineHeight: 1,
+          boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
+          cursor: "pointer",
+          zIndex: 12
+        }}
+        title="Zoom in"
+        type="button"
+      >
+        +
+      </button>
+      <button
+        aria-label="Zoom out"
+        data-map-control="zoom-out"
+        onClick={zoomOut}
+        style={{
+          position: "absolute",
+          right: "16px",
+          bottom: "200px",
+          width: "44px",
+          height: "44px",
+          borderRadius: "999px",
+          border: "1px solid #DADCE0",
+          backgroundColor: "#FFFFFF",
+          color: "#202124",
+          fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          fontSize: "22px",
+          lineHeight: 1,
+          boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
+          cursor: "pointer",
+          zIndex: 12
+        }}
+        title="Zoom out"
+        type="button"
+      >
+        −
+      </button>
       <button
         aria-label="Reset view"
         data-map-control="reset-view"
@@ -627,22 +1408,31 @@ export function MapView({
           fontSize: "22px",
           lineHeight: 1,
           boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
-          cursor: "pointer"
+          cursor: "pointer",
+          zIndex: 12
         }}
         title="Reset view"
         type="button"
       >
         ⟳
       </button>
-      <MapMarkerLayer
-        markers={resolvedScreenMarkers.map((markerRecord) => ({
-          ...markerRecord.marker,
-          showInlineLabel: markerRecord.marker.inlineLabel
-            ? visibleInlineLabelIds.has(markerRecord.marker.id)
-            : false
-        }))}
-        onMarkerActivate={onMarkerActivate}
-      />
+      <div aria-label="Visible places on map" className="ibm-hidden-visible-places">
+        {visibleEntries.map((entry) => (
+          <button
+            key={entry.id}
+            aria-label={entry.accessibleName}
+            data-place-entry-id={entry.id}
+            onClick={() => activateVisibleEntry(entry)}
+            onFocus={() => setVisibleEntryFocus(entry)}
+            type="button"
+          >
+            {entry.accessibleName}
+          </button>
+        ))}
+        {visibleEntryOverflow ? (
+          <p role="note">Zoom in or search to reach more places</p>
+        ) : null}
+      </div>
       {basemapState.message ? (
         <div
           role="status"
@@ -658,7 +1448,8 @@ export function MapView({
             fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             fontSize: "13px",
             color: "#202124",
-            boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.15)"
+            boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.15)",
+            zIndex: 22
           }}
         >
           {basemapState.message}

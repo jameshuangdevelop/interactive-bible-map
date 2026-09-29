@@ -15,21 +15,14 @@ const libertyAttribution =
 const versaTilesAttribution =
   '<a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)';
 
-const libertyName = "Interactive Bible Map basemap (modified from OpenFreeMap Liberty)";
+const libertyName = "Interactive Bible Map physical basemap (modified from OpenFreeMap Liberty)";
 const libertyMetadataLicense =
-  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: English labels, points of interest removed, disputed boundary lines hidden. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
+  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: physical-map treatment only (relief shading, natural landcover, water, rivers and streams kept); all symbols, roads, railways, aeroways, boundaries, landuse, parks and buildings removed; max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
 
-const englishNameExpression = [
-  "coalesce",
-  ["get", "name:en"],
-  ["get", "name:latin"],
-  ["get", "name"]
-];
-
-const poiSourceLayers = new Set(["poi", "pois"]);
-const disputedOneExclusion = ["!=", ["get", "disputed"], 1];
-const disputedTrueExclusion = ["!=", ["get", "disputed"], true];
-const claimedByExclusion = ["!", ["has", "claimed_by"]];
+const versaTilesName =
+  "Interactive Bible Map backup physical basemap (modified from VersaTiles Colorful)";
+const versaTilesMetadataNotice =
+  "Modified for outage-only fallback use by Interactive Bible Map. Changes: physical-map treatment only (natural landcover, water and waterways kept); all symbols, roads, railways, aeroways, boundaries, landuse, parks and buildings removed; max zoom set to 14.";
 
 const libertyLicensePartUrls = [
   "https://raw.githubusercontent.com/hyperknot/openfreemap-styles/main/LICENSE.md",
@@ -46,86 +39,57 @@ Source style license: CC0 1.0 (metadata.license in upstream style)
 Fallback policy: use this style only when the primary OpenFreeMap Liberty basemap is unavailable.
 
 Modifications in this copy:
-- English labels via coalesce(name:en, name:latin, name)
-- Points of interest removed
-- Disputed boundary lines hidden (removed boundary-country-disputed and the disputed branch of boundary-country:outline)
+- Physical-map treatment only: keep natural landcover, water and waterways
+- Remove all symbols, roads, railways, aeroways, boundaries, landuse, parks and buildings
+- Max zoom set to 14
 
 Attribution string used in the vector source:
 ${versaTilesAttribution}
 `;
 
-function isNameFieldName(value) {
-  return (
-    typeof value === "string" &&
-    (value === "name" || value.startsWith("name:") || value.startsWith("name_"))
-  );
+const libertyAllowedSourceLayers = new Set(["landcover", "water", "waterway"]);
+const versaTilesAllowedSourceLayers = new Set(["land", "ocean", "water_lines", "water_polygons"]);
+const versaTilesAllowedLayerIds = new Set([
+  "background",
+  "slot-below-fills",
+  "slot-below-streets",
+  "water-ocean",
+  "water-river",
+  "water-canal",
+  "water-stream",
+  "water-ditch",
+  "water-area",
+  "water-area-river",
+  "water-area-small",
+  "land-rock",
+  "land-forest",
+  "land-grass",
+  "land-vegetation",
+  "land-sand",
+  "land-wetland",
+  "land-glacier"
+]);
+
+function removeDisallowedLayerTypes(style) {
+  style.layers = style.layers.filter((layer) => layer.type !== "symbol");
 }
 
-function referencesNameField(value) {
-  if (isNameFieldName(value)) {
-    return true;
-  }
-
-  if (typeof value === "string") {
-    return /\{name(?:[:_}]|$)/u.test(value);
-  }
-
-  if (!Array.isArray(value)) {
-    return false;
-  }
-
-  if (
-    value[0] === "get" &&
-    value.length > 1 &&
-    typeof value[1] === "string" &&
-    isNameFieldName(value[1])
-  ) {
-    return true;
-  }
-
-  return value.some((item) => referencesNameField(item));
-}
-
-function expressionEquals(left, right) {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
-
-function ensureAllFilterClauses(filter, clauses) {
-  if (!Array.isArray(filter) || filter.length === 0) {
-    return ["all", ...clauses];
-  }
-
-  if (filter[0] !== "all") {
-    return ["all", filter, ...clauses];
-  }
-
-  const nextFilter = [...filter];
-  for (const clause of clauses) {
-    if (!nextFilter.some((part) => expressionEquals(part, clause))) {
-      nextFilter.push(clause);
-    }
-  }
-
-  return nextFilter;
-}
-
-function applyEnglishLabels(style) {
-  for (const layer of style.layers) {
-    if (layer.type !== "symbol" || !layer.layout || !("text-field" in layer.layout)) {
+function clampVectorSourceMaxZoomTo14(style) {
+  for (const [sourceId, source] of Object.entries(style.sources)) {
+    if (source.type !== "vector") {
       continue;
     }
 
-    const textField = layer.layout["text-field"];
-    if (!referencesNameField(textField)) {
-      continue;
-    }
-
-    layer.layout = { ...layer.layout, "text-field": englishNameExpression };
+    style.sources[sourceId] = {
+      ...source,
+      maxzoom: 14
+    };
   }
 }
 
-function removePoiLayers(style) {
-  style.layers = style.layers.filter((layer) => !poiSourceLayers.has(layer["source-layer"]));
+function normalizeMaxZoom(style) {
+  style.zoom = Math.min(14, typeof style.zoom === "number" ? style.zoom : 14);
+  style.maxzoom = 14;
 }
 
 function buildLibertyStyle(upstreamStyle) {
@@ -149,37 +113,39 @@ function buildLibertyStyle(upstreamStyle) {
     style.sources.ne2_shaded = source;
   }
 
-  removePoiLayers(style);
-  style.layers = style.layers.filter((layer) => layer.id !== "boundary_disputed");
-
-  style.layers = style.layers.map((layer) => {
-    if (layer["source-layer"] !== "boundary") {
-      return layer;
+  removeDisallowedLayerTypes(style);
+  style.layers = style.layers.filter((layer) => {
+    if (layer.id === "background" || layer.id === "natural_earth") {
+      return true;
     }
 
-    const nextLayer = { ...layer };
-    const requiredClauses = [disputedOneExclusion];
-
-    if (layer.id === "boundary_2" || layer.id === "boundary_3") {
-      requiredClauses.push(claimedByExclusion);
+    if (layer.type === "raster") {
+      return layer.id === "natural_earth";
     }
 
-    nextLayer.filter = ensureAllFilterClauses(nextLayer.filter, requiredClauses);
-    return nextLayer;
+    const sourceLayer = layer["source-layer"];
+    if (!sourceLayer || !libertyAllowedSourceLayers.has(sourceLayer)) {
+      return false;
+    }
+
+    if (sourceLayer === "waterway") {
+      return !layer.id.includes("tunnel");
+    }
+
+    return true;
   });
 
-  applyEnglishLabels(style);
+  clampVectorSourceMaxZoomTo14(style);
+  normalizeMaxZoom(style);
   return style;
 }
 
 function buildVersaTilesStyle(upstreamStyle) {
   const style = structuredClone(upstreamStyle);
-  style.name = "Interactive Bible Map backup basemap (modified from VersaTiles Colorful)";
-
+  style.name = versaTilesName;
   style.metadata = {
     ...(style.metadata ?? {}),
-    "interactive-bible-map:notice":
-      "Modified for outage-only fallback use by Interactive Bible Map. Changes: English labels, no points of interest, disputed boundaries hidden."
+    "interactive-bible-map:notice": versaTilesMetadataNotice
   };
 
   for (const [sourceId, source] of Object.entries(style.sources)) {
@@ -190,33 +156,30 @@ function buildVersaTilesStyle(upstreamStyle) {
     style.sources[sourceId] = { ...source, attribution: versaTilesAttribution };
   }
 
-  removePoiLayers(style);
-  style.layers = style.layers.filter((layer) => layer.id !== "boundary-country-disputed");
-
-  style.layers = style.layers.map((layer) => {
-    if (layer.id === "boundary-country:outline") {
-      return {
-        ...layer,
-        filter: [
-          "all",
-          ["==", ["get", "admin_level"], 2],
-          disputedTrueExclusion,
-          ["!=", ["get", "maritime"], true]
-        ]
-      };
+  removeDisallowedLayerTypes(style);
+  style.layers = style.layers.filter((layer) => {
+    if (versaTilesAllowedLayerIds.has(layer.id)) {
+      return true;
     }
 
-    if (layer["source-layer"] !== "boundaries" || layer.type !== "line") {
-      return layer;
+    const sourceLayer = layer["source-layer"];
+    if (!sourceLayer || !versaTilesAllowedSourceLayers.has(sourceLayer)) {
+      return false;
     }
 
-    return {
-      ...layer,
-      filter: ensureAllFilterClauses(layer.filter, [disputedTrueExclusion])
-    };
+    if (sourceLayer === "land") {
+      return layer.id.startsWith("land-");
+    }
+
+    if (sourceLayer === "water_lines" || sourceLayer === "water_polygons") {
+      return layer.id.startsWith("water-");
+    }
+
+    return sourceLayer === "ocean";
   });
 
-  applyEnglishLabels(style);
+  clampVectorSourceMaxZoomTo14(style);
+  normalizeMaxZoom(style);
   return style;
 }
 
@@ -290,3 +253,4 @@ buildStyles().catch((error) => {
   console.error("Failed to build basemap styles:", error.message);
   process.exitCode = 1;
 });
+

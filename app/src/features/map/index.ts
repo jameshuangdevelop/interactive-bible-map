@@ -2,11 +2,10 @@ export { MapView } from "./map-view";
 export type { MapViewProps } from "./map-view.types";
 export type { PlaceIndexRecord, PlaceSelection } from "./types";
 export {
-  buildVisiblePlaceEntries,
   candidateIndexToLetter,
+  isAreaLabelType,
   isDisputedPlace,
-  isZoomTierVisible,
-  shouldExpandCandidatePins
+  isZoomTierVisible
 } from "./place-visibility";
 export { applySelectionToSearch, parseSelectionFromSearch } from "./selection-url";
 export {

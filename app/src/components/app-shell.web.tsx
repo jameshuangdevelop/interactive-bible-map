@@ -74,9 +74,9 @@ async function fetchPlaces() {
   return payload;
 }
 
-function markerSelectorById(markerId: string) {
-  const escaped = markerId.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
-  return `button[data-marker-id="${escaped}"]`;
+function visiblePlaceEntrySelectorById(entryId: string) {
+  const escaped = entryId.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
+  return `button[data-place-entry-id="${escaped}"]`;
 }
 
 function MapLoadingPlaceholder() {
@@ -107,7 +107,7 @@ export function AppShell() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const lastSelectionActivatorMarkerIdRef = useRef<string | null>(null);
+  const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
@@ -131,11 +131,11 @@ export function AppShell() {
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
         if (parsedSelection && !normalized) {
-          lastSelectionActivatorMarkerIdRef.current = null;
+          lastSelectionActivatorEntryIdRef.current = null;
           setStatusMessage("Place not found");
           writeSelectionToUrl(null);
         } else if (normalized) {
-          lastSelectionActivatorMarkerIdRef.current = null;
+          lastSelectionActivatorEntryIdRef.current = null;
           setSelection(normalized);
         }
 
@@ -175,20 +175,20 @@ export function AppShell() {
       const normalized = normalizeSelection(parsedSelection, placesById);
 
       if (!parsedSelection) {
-        lastSelectionActivatorMarkerIdRef.current = null;
+        lastSelectionActivatorEntryIdRef.current = null;
         setSelection(null);
         setStatusMessage(null);
         return;
       }
 
       if (!normalized) {
-        lastSelectionActivatorMarkerIdRef.current = null;
+        lastSelectionActivatorEntryIdRef.current = null;
         setSelection(null);
         setStatusMessage("Place not found");
         return;
       }
 
-      lastSelectionActivatorMarkerIdRef.current = null;
+      lastSelectionActivatorEntryIdRef.current = null;
       setStatusMessage(null);
       setSelection(normalized);
     };
@@ -207,13 +207,13 @@ export function AppShell() {
     }
 
     window.requestAnimationFrame(() => {
-      const markerId = lastSelectionActivatorMarkerIdRef.current;
-      if (markerId) {
-        const markerButton = document.querySelector<HTMLButtonElement>(
-          markerSelectorById(markerId)
+      const entryId = lastSelectionActivatorEntryIdRef.current;
+      if (entryId) {
+        const placeButton = document.querySelector<HTMLButtonElement>(
+          visiblePlaceEntrySelectorById(entryId)
         );
-        if (markerButton) {
-          markerButton.focus();
+        if (placeButton) {
+          placeButton.focus();
           return;
         }
       }
@@ -321,9 +321,9 @@ export function AppShell() {
               setStatusMessage(null);
 
               const activeElement = document.activeElement;
-              lastSelectionActivatorMarkerIdRef.current =
+              lastSelectionActivatorEntryIdRef.current =
                 activeElement instanceof HTMLElement
-                  ? activeElement.getAttribute("data-marker-id")
+                  ? activeElement.getAttribute("data-place-entry-id")
                   : null;
 
               setSelection(nextSelection);
