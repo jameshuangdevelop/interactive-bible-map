@@ -10,6 +10,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "achaia",
   "candidates": [
     {
       "label": "Nicopolis archaeological site (Epirus)",
@@ -41,6 +42,14 @@
       "text": "Augustus founded Nicopolis, near his former camp, as the largest of the monuments built to commemorate his victory at Actium in 31 BC.",
       "sources": [
         "bib:livius-actium"
+      ]
+    },
+    {
+      "text": "Nicopolis lay in Epirus. Cassius Dio lists 'Greece with Epirus' as one of the provinces assigned to the Senate in Augustus's settlement of 27 BC, and Tacitus calls Nicopolis an Achaian town when Germanicus arrived there in AD 18, so this project places Nicopolis in Achaia for about AD 50.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-annals",
+        "pleiades:531013"
       ]
     }
   ],

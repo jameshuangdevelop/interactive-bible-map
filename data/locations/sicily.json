@@ -1,0 +1,71 @@
+{
+  "id": "sicily",
+  "names": {
+    "ancient": [
+      "Sicily"
+    ],
+    "modern": "Sicily",
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Sicily (Roman province, label point)",
+      "coordinates": [
+        14.015378,
+        37.599958
+      ],
+      "coordinateSource": "wikidata:Q691321",
+      "confidence": "high",
+      "support": "Sicily's identity as a Roman province covering the island is undisputed. The label point is Wikidata's point for the province of Sicilia, near the island's center. Pleiades' representative point for the province, from its Barrington Atlas location, lies about 95 km to the east, at Catania.",
+      "sources": [
+        "wikidata:Q691321",
+        "pleiades:981549"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Sicily was a Roman province from 241 BC, and in Augustus's settlement of 27 BC one of the provinces assigned to the Senate, whose governors bore the title of proconsul; its capital was Syracuse. The province also included the island of Malta to the south. Acts records that Paul's ship, on the voyage to Rome, put in for three days at Syracuse.",
+    "sources": [
+      "wikidata:Q691321",
+      "pleiades:981549",
+      "wikipedia:Sicilia_(Roman_province)",
+      "bib:cassius-dio-roman-history",
+      "bib:strabo-geography",
+      "bib:isbe-melita",
+      "scripture:Acts 28:12"
+    ]
+  },
+  "history": [
+    {
+      "text": "Sicily was organized as a Roman province in 241 BC. Rome took Malta from Carthage in 218 BC and attached it to the province of Sicily, which is why this project's 'malta' record has Sicily as its parent.",
+      "sources": [
+        "pleiades:981549",
+        "wikidata:Q691321",
+        "bib:isbe-melita",
+        "wikipedia:Sicilia_(Roman_province)"
+      ]
+    },
+    {
+      "text": "Cassius Dio's list of the provinces assigned to the Senate in Augustus's settlement of 27 BC includes Sicily, and Strabo's Geography also lists it among the provinces of the Roman people.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:12",
+      "book": "Acts",
+      "textWEB": "Touching at Syracuse, we stayed there three days."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

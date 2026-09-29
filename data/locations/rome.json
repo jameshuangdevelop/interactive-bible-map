@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "italy",
   "candidates": [
     {
       "label": "Rome (historic center)",

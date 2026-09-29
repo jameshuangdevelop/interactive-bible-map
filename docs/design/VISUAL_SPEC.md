@@ -96,7 +96,7 @@ The section order follows brief §1.4. Sections without data are left out.
    - the title is the first ancient name, the spelling most popular English Bibles agree on, for example **Capernaum** (CP3a decision 2; ADR-0026);
    - under it, the modern name, labelled **"Today: *name*"** (see §8 for the neutrality rule);
    - then "Also known as …" with the other ancient and alternate names, which are English only. Names in `names.otherLanguages` are never shown;
-   - then a line with the type and parent, for example "City · Galilee", which links to the parent.
+   - then a line with the type, the region and the empire as of about AD 50 (ADR-0027), for example "City · Achaia · Roman Empire" or "Village · Galilee · Roman Empire". The region is the place's parent, and the empire is the end of its parent chain; each links to its own record. An empire record shows only its type.
 3. **Location confidence:** a chip in words, never colour alone. "High confidence" appears for single-candidate places. **Disputed places** get a banner instead: **"Location disputed · 4 proposed sites"**. Other places with several candidates get a neutral line, **"*n* sites"**, and each candidate carries its own confidence chip.
 4. **Candidates** (places with several candidates): a list A, B, C … Each entry has its label, a confidence chip and its support text (two lines, expandable), plus its sources. Selecting an entry centres the map on it.
 5. **Actions:** round buttons with labels: **Zoom to**, **Copy link** and **Sources**, which scrolls to the sources.

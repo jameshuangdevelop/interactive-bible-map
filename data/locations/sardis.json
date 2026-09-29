@@ -9,6 +9,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "asia",
   "candidates": [
     {
       "label": "Sardis archaeological site (Sart)",

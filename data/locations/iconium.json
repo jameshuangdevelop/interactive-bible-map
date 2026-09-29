@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "galatia",
   "candidates": [
     {
       "label": "Konya (ancient Iconium)",

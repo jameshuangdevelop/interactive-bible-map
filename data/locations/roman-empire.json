@@ -1,0 +1,104 @@
+{
+  "id": "roman-empire",
+  "names": {
+    "ancient": [
+      "Roman Empire"
+    ],
+    "alternate": []
+  },
+  "type": "empire",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Roman Empire (city of Rome, representative point)",
+      "coordinates": [
+        12.5,
+        41.9
+      ],
+      "coordinateSource": "wikidata:Q2277",
+      "confidence": "high",
+      "support": "The Roman Empire has no single natural label position. Wikidata's point for the empire lies in the city of Rome, its capital, about 1 km from Pleiades' representative point for Rome, which Pleiades describes as the capital of the Roman Republic and Empire.",
+      "sources": [
+        "wikidata:Q2277",
+        "pleiades:423025"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Roman Empire was the state ruled from Rome by emperors, the first of whom was Augustus (formerly Octavian), after his victory over Mark Antony and Cleopatra at the Battle of Actium in 31 BC. In this project it is the top of the 'about AD 50' hierarchy, above the provinces and Italy. Luke records a decree 'from Caesar Augustus that all the world should be enrolled,' and Acts records Paul's words 'I appeal to Caesar!'",
+    "sources": [
+      "wikidata:Q2277",
+      "pleiades:423025",
+      "bib:cassius-dio-roman-history",
+      "bib:livius-actium",
+      "scripture:Luke 2:1",
+      "scripture:Acts 25:11"
+    ]
+  },
+  "history": [
+    {
+      "text": "After defeating Mark Antony and Cleopatra at Actium in 31 BC, Octavian received the name Augustus and, in 27 BC, divided the provinces into those assigned to the Senate and those he kept for himself, the same broad division reflected in this project's 'about AD 50' provinces.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-actium"
+      ]
+    },
+    {
+      "text": "At AD 50, the reigning emperor was Claudius (AD 41-54), who succeeded Augustus (27 BC-AD 14), Tiberius (AD 14-37) and Gaius 'Caligula' (AD 37-41).",
+      "sources": [
+        "bib:suetonius-twelve-caesars",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 2:1",
+      "book": "Luke",
+      "textWEB": "Now in those days, a decree went out from Caesar Augustus that all the world should be enrolled."
+    },
+    {
+      "ref": "Acts 25:11",
+      "book": "Acts",
+      "textWEB": "For if I have done wrong and have committed anything worthy of death, I don’t refuse to die; but if none of those things is true that they accuse me of, no one can give me up to them. I appeal to Caesar!”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 14,
+      "entity": "Reign of Augustus, first Roman emperor",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 14,
+      "toYear": 37,
+      "entity": "Reign of Tiberius",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    },
+    {
+      "fromYear": 37,
+      "toYear": 41,
+      "entity": "Reign of Gaius (Caligula)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    },
+    {
+      "fromYear": 41,
+      "toYear": 54,
+      "entity": "Reign of Claudius (emperor at this project's 'about AD 50' date)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

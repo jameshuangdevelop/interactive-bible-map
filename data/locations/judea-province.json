@@ -1,0 +1,123 @@
+{
+  "id": "judea-province",
+  "names": {
+    "ancient": [
+      "Province of Judea"
+    ],
+    "alternate": [
+      "Judea",
+      "Judaea"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Roman province of Judea (Caesarea Maritima, its capital, label point)",
+      "coordinates": [
+        34.9,
+        32.5
+      ],
+      "coordinateSource": "wikidata:Q1003997",
+      "confidence": "high",
+      "support": "The label point is Wikidata's point for the Roman province of Judaea, at Caesarea Maritima, its capital, about 0.8 km from this project's Caesarea Maritima pin. Pleiades' record for the province has no location of its own.",
+      "sources": [
+        "wikidata:Q1003997",
+        "pleiades:981527"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The New Testament uses 'Judea' in two senses, which this project keeps as separate records: the 'judea' record is the district around Jerusalem, and this record is the larger Roman province, governed from Caesarea Maritima. Rome created the province in AD 6, when it deposed Herod Archelaus, whose territory included Judea, Samaria and Idumea. After King Herod Agrippa I died in AD 44, Claudius placed his whole kingdom, including Galilee and the lands east of the Jordan, under the province's procurators instead of giving it at once to his young son, the future Agrippa II; this was still the arrangement in AD 50. Luke refers to the province when he names 'Pontius Pilate being governor of Judea.'",
+    "sources": [
+      "wikidata:Q1003997",
+      "pleiades:981527",
+      "wikipedia:Judaea_(Roman_province)",
+      "bib:livius-judaea",
+      "bib:josephus-antiquities",
+      "bib:josephus-jewish-war",
+      "scripture:Luke 3:1",
+      "scripture:Acts 12:19",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "In AD 6 Rome deposed Herod Archelaus, ethnarch of Judea, Samaria and Idumea, and made his territory a province governed by a prefect based at Caesarea Maritima. Josephus records that Quirinius, whom Augustus had sent to Syria, also came into Judea to take an account of property.",
+      "sources": [
+        "bib:livius-judaea",
+        "bib:josephus-jewish-war",
+        "bib:josephus-antiquities",
+        "wikidata:Q1003997"
+      ]
+    },
+    {
+      "text": "Ancient writers also describe Judea as attached to Syria. Josephus says that in AD 6 Judea 'was now added to the province of Syria,' and Tacitus reports that after the deaths of their kings Sohaemus and Agrippa, Ituraea and Judea were attached to the province of Syria; Livius calls Judea both an autonomous part of Syria under its own governor and a small province. Pleiades and Wikidata classify it as a Roman province, and this project follows them, with the Roman Empire as its parent.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:tacitus-annals",
+        "bib:livius-judaea",
+        "pleiades:981527",
+        "wikidata:Q1003997"
+      ]
+    },
+    {
+      "text": "Caligula made Herod Agrippa I king of the former tetrarchy of Philip, and in AD 41 Claudius confirmed his kingdom and added Judea and Samaria to it. Agrippa I ruled until his death in AD 44.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ]
+    },
+    {
+      "text": "After Agrippa I's death in AD 44, Josephus reports that Claudius, considering Agrippa I's son too young to rule, sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom.' Livius adds that the procurators were also responsible for Galilee and the territories east of the Jordan. This project's 'about AD 50' convention follows that arrangement, placing Judea, Samaria, Galilee, Perea and the former tetrarchy of Philip under this province rather than under a client king.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ]
+    },
+    {
+      "text": "Claudius first gave Agrippa II the small kingdom of Chalcis, after the death of its king Herod, Agrippa I's brother. Only when Claudius had completed the twelfth year of his reign, in AD 53, did he give Agrippa II 'the tetrarchy of Philip and Batanea,' with Trachonitis and Abila, and in the first year of his reign (AD 54/55) Nero added Tiberias and Tarichaea in Galilee and Julias in Perea.",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Luke 3:1",
+      "book": "Luke",
+      "textWEB": "Now in the fifteenth year of the reign of Tiberius Caesar, Pontius Pilate being governor of Judea, and Herod being tetrarch of Galilee, and his brother Philip tetrarch of the region of Ituraea and Trachonitis, and Lysanias tetrarch of Abilene,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "entity": "Roman province of Judea under prefects (Judea, Samaria and Idumea)",
+      "sources": [
+        "bib:livius-judaea",
+        "bib:josephus-jewish-war",
+        "wikidata:Q1003997"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 66,
+      "entity": "Roman province of Judea under procurators, from AD 44 also covering Galilee and Perea (parts of both passed to Agrippa II in AD 54/55) and, until AD 53, the former tetrarchy of Philip",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

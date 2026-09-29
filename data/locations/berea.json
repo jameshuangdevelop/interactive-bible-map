@@ -10,6 +10,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "macedonia",
   "candidates": [
     {
       "label": "Veria",

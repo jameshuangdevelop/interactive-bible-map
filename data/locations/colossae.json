@@ -10,6 +10,7 @@
   },
   "type": "town",
   "zoomTier": "city",
+  "parentId": "asia",
   "candidates": [
     {
       "label": "Colossae mound, near Honaz",

@@ -1,0 +1,94 @@
+{
+  "id": "macedonia",
+  "names": {
+    "ancient": [
+      "Macedonia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Macedonia (Roman province, label point)",
+      "coordinates": [
+        22.020662,
+        40.743844
+      ],
+      "coordinateSource": "pleiades:981531",
+      "confidence": "high",
+      "support": "Macedonia's identity as a Roman province is undisputed. Wikidata's item for the province has no coordinate, so the label point is Pleiades' representative point for the province, taken from its Barrington Atlas location. It lies inland, about 29 km from this project's Berea pin and about 80 km from Thessalonica, the capital.",
+      "sources": [
+        "pleiades:981531",
+        "wikidata:Q207497"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Macedonia was the Roman province north of Achaia, with its capital at Thessalonica. Acts describes Paul's night vision of 'a man of Macedonia' begging him, 'Come over into Macedonia and help us,' and calls Philippi 'a city of Macedonia'; Paul's letters mention the believers of Macedonia several times.",
+    "sources": [
+      "wikidata:Q207497",
+      "pleiades:981531",
+      "wikipedia:Macedonia_(Roman_province)",
+      "bib:isbe-macedonia",
+      "scripture:Acts 16:9",
+      "scripture:Acts 16:12",
+      "scripture:Philippians 4:15",
+      "scripture:1 Thessalonians 1:7",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "Rome made Macedonia a province after putting down the revolt of Andriscus in 148 BC; some reference works date the province from 146 BC.",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia",
+        "wikidata:Q207497",
+        "wikipedia:Macedonia_(Roman_province)"
+      ]
+    },
+    {
+      "text": "In Augustus's settlement of 27 BC, Macedonia and Achaia became separate provinces of the Senate, governed by proconsuls. In AD 15 Tiberius placed both under the imperial legate who governed Moesia, and in AD 44 Claudius restored them to the Senate, the arrangement in force at AD 50.",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-annals",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:9",
+      "book": "Acts",
+      "textWEB": "A vision appeared to Paul in the night. There was a man of Macedonia standing, begging him and saying, “Come over into Macedonia and help us.”"
+    },
+    {
+      "ref": "Acts 16:12",
+      "book": "Acts",
+      "textWEB": "and from there to Philippi, which is a city of Macedonia, the foremost of the district, a Roman colony. We were staying some days in this city."
+    },
+    {
+      "ref": "Philippians 4:15",
+      "book": "Philippians",
+      "textWEB": "You yourselves also know, you Philippians, that in the beginning of the Good News, when I departed from Macedonia, no assembly shared with me in the matter of giving and receiving but you only."
+    },
+    {
+      "ref": "1 Thessalonians 1:7",
+      "book": "1 Thessalonians",
+      "textWEB": "so that you became an example to all who believe in Macedonia and in Achaia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "asia",
   "candidates": [
     {
       "label": "Pergamon archaeological site",

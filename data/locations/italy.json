@@ -1,0 +1,82 @@
+{
+  "id": "italy",
+  "names": {
+    "ancient": [
+      "Italy"
+    ],
+    "modern": "Italy",
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Italy (Roman Italy, label point)",
+      "coordinates": [
+        11.094951,
+        43.694151
+      ],
+      "coordinateSource": "pleiades:1052",
+      "confidence": "high",
+      "support": "Italy's identity as the peninsula extending north to the Alps is undisputed. The label point is Pleiades' representative point for Italia, taken from its Barrington Atlas location in the north of the peninsula. Wikidata's point for Roman Italy (12.5, 42.0) lies about 220 km away, about 12 km from this project's Rome pin and close to the Roman Empire's label.",
+      "sources": [
+        "pleiades:1052",
+        "wikidata:Q913582"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Italy was the peninsula, extending north to the Alps, that contained Rome itself. It was not formally a province and received no provincial governor: the Roman state had two distinct parts, Italy and the provinces, and Italy is absent from Cassius Dio's list of the provinces that Augustus divided between the Senate and himself in 27 BC. Acts names Italy as the destination of Paul's voyage as a prisoner and records his landing at Puteoli and his arrival in Rome, and Hebrews closes with the words 'The Italians greet you.'",
+    "sources": [
+      "pleiades:1052",
+      "wikidata:Q913582",
+      "bib:smith-dictionary-provincia",
+      "bib:strabo-geography",
+      "wikipedia:Roman_Italy",
+      "bib:cassius-dio-roman-history",
+      "scripture:Acts 27:1",
+      "scripture:Acts 28:13",
+      "scripture:Acts 28:16",
+      "scripture:Hebrews 13:24"
+    ]
+  },
+  "history": [
+    {
+      "text": "Italy does not appear in Cassius Dio's list of the provinces that Augustus divided between the Senate and himself in 27 BC.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "wikipedia:Roman_Italy"
+      ]
+    },
+    {
+      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; Suetonius likewise reports that Claudius expelled the Jews from Rome because they 'constantly made disturbances at the instigation of Chrestus.'",
+      "sources": [
+        "scripture:Acts 18:2",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 18:2",
+      "book": "Acts",
+      "textWEB": "He found a certain Jew named Aquila, a man of Pontus by race, who had recently come from Italy with his wife Priscilla, because Claudius had commanded all the Jews to depart from Rome. He came to them,"
+    },
+    {
+      "ref": "Acts 27:1",
+      "book": "Acts",
+      "textWEB": "When it was determined that we should sail for Italy, they delivered Paul and certain other prisoners to a centurion named Julius, of the Augustan band."
+    },
+    {
+      "ref": "Hebrews 13:24",
+      "book": "Hebrews",
+      "textWEB": "Greet all of your leaders and all the saints. The Italians greet you."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

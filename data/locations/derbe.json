@@ -11,6 +11,7 @@
   },
   "type": "town",
   "zoomTier": "city",
+  "parentId": "galatia",
   "candidates": [
     {
       "label": "Kerti Höyük",

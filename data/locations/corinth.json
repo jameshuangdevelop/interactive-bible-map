@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "achaia",
   "candidates": [
     {
       "label": "Ancient Corinth (Archaia Korinthos)",

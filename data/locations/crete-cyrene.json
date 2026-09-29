@@ -1,0 +1,76 @@
+{
+  "id": "crete-cyrene",
+  "names": {
+    "ancient": [
+      "Crete and Cyrene"
+    ],
+    "alternate": [
+      "Crete and Cyrenaica"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Crete and Cyrene (Roman province, capital Gortyn, label point)",
+      "coordinates": [
+        24.946957,
+        35.062141
+      ],
+      "coordinateSource": "wikidata:Q692775",
+      "confidence": "high",
+      "support": "The province joined the island of Crete with Cyrene on the North African coast. The label point is Wikidata's point for the province, at Gortyn on Crete, its capital. Pleiades' representative point for the province, from its Barrington Atlas location, was not used because it lies offshore.",
+      "sources": [
+        "wikidata:Q692775",
+        "pleiades:981517"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Crete and Cyrene was a senatorial province joining the island of Crete with Cyrene and its territory on the North African coast, with its capital at Gortyn on Crete. Of this project's places only Crete, which Paul's ship sailed along on the voyage to Rome, lies in it. Cyrene is not one of this project's places, but the New Testament names it several times: Simon, who was compelled to carry Jesus' cross, was 'a man of Cyrene,' and Acts mentions 'the parts of Libya around Cyrene.'",
+    "sources": [
+      "wikidata:Q692775",
+      "pleiades:981517",
+      "wikipedia:Creta_et_Cyrenaica",
+      "bib:isbe-crete",
+      "bib:cassius-dio-roman-history",
+      "scripture:Acts 27:7",
+      "scripture:Matthew 27:32",
+      "scripture:Acts 2:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "Rome annexed Crete in 67 BC and joined it with Cyrene as one province. In Augustus's settlement of 27 BC, Cassius Dio lists 'Crete and the Cyrenaic portion of Libya' among the provinces assigned to the Senate, and Strabo likewise lists Crete with Cyrenaea among the provinces of the Roman people.",
+      "sources": [
+        "bib:isbe-crete",
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography",
+        "wikipedia:Creta_et_Cyrenaica"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 27:32",
+      "book": "Matthew",
+      "textWEB": "As they came out, they found a man of Cyrene, Simon by name, and they compelled him to go with them, that he might carry his cross."
+    },
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Acts 11:20",
+      "book": "Acts",
+      "textWEB": "But there were some of them, men of Cyprus and Cyrene, who, when they had come to Antioch, spoke to the Hellenists, preaching the Lord Jesus."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

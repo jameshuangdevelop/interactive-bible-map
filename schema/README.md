@@ -33,6 +33,22 @@ All example values below are **illustrative only** (not verified historical clai
 - `city`: city-level context.
 - `site`: local site/feature context.
 
+### Ancient area hierarchy (AD 50 convention until M4 timeline)
+- `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
+- `type: "province"` is a province-level area record: a Roman province, a client kingdom in the same hierarchy, or an equivalent top-level division that wasn't formally a province (Italy, which was governed directly from Rome).
+- `type: "region"` remains for sub-province district/region records such as Galilee.
+- `empire`, `province`, and `region` records must all use `zoomTier: "region"`.
+- Parent chains are recorded with `parentId`: a place points to the smallest containing area, that area points to its province, and the province points to the empire.
+- Enforced invariants:
+  - an `empire` record has no `parentId`;
+  - a `province` record must have `parentId`, and that parent must be an `empire` record;
+  - parent chains must not contain cycles;
+  - `empire`, `province`, and `region` records must use `zoomTier: "region"`;
+  - with `REQUIRE_EMPIRE_ROOT` enabled (default `true`), every parent chain must end at an `empire` record.
+- In M3, parent assignments use the **about AD 50** convention for all records; M4 adds timeline-aware changes.
+- The panel uses this chain to show context in the format `Type · Province · Empire` (for example, `City · Achaia · Roman Empire`).
+- Validator switch: `scripts/lib/validator.mjs` exports `REQUIRE_EMPIRE_ROOT` (default `true`, enabled once every place's parentId chain reaches the Roman Empire) and accepts `validateData({ requireEmpireRoot: false })` to relax this for callers that intentionally work with partial data (for example, tests that predate this hierarchy).
+
 ### Confidence meanings
 - `high`: broad scholarly agreement.
 - `medium`: good support with some uncertainty.

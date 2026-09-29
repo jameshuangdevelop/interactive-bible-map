@@ -13,6 +13,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "asia",
   "candidates": [
     {
       "label": "Laodicea on the Lycus archaeological site",

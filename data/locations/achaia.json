@@ -1,0 +1,129 @@
+{
+  "id": "achaia",
+  "names": {
+    "ancient": [
+      "Achaia"
+    ],
+    "alternate": [
+      "Greece"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Achaia (Roman province, label point)",
+      "coordinates": [
+        22.45,
+        37.89
+      ],
+      "coordinateSource": "wikidata:Q204772",
+      "confidence": "high",
+      "support": "Achaia's identity as the Roman province covering the Peloponnese and central Greece is undisputed. The label point is Wikidata's point for the province, about 38 km west of Corinth, its capital. Pleiades' representative point for the province, from its Barrington Atlas location, lies about 120 km to the northeast.",
+      "sources": [
+        "wikidata:Q204772",
+        "pleiades:981502"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Achaia was the Roman province covering the Peloponnese and central Greece, with its capital at Corinth. Acts records that the Jews at Corinth brought Paul before Gallio, 'proconsul of Achaia,' and Paul's second letter to the Corinthians is addressed also to 'all the saints who are in the whole of Achaia.' Acts 20:2, where Paul 'came into Greece,' uses 'Greece' for the same region.",
+    "sources": [
+      "wikidata:Q204772",
+      "pleiades:981502",
+      "wikipedia:Achaia_(Roman_province)",
+      "bib:isbe-achaia",
+      "scripture:Acts 18:12",
+      "scripture:Acts 20:2",
+      "scripture:2 Corinthians 1:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "Rome made Greece a province in 146 BC under the control of the governor of Macedonia. In Augustus's settlement of 27 BC, Achaia and Macedonia became two separate provinces, both assigned to the Senate and governed by proconsuls. Cassius Dio lists 'Greece with Epirus' among the Senate's provinces, and Strabo describes Achaia as reaching to Thessaly, Aetolia, Acarnania and some Epirote peoples bordering Macedonia.",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:isbe-achaia",
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
+      ]
+    },
+    {
+      "text": "In AD 15, after Achaia and Macedonia complained of heavy taxation, Tiberius took them from the Senate and placed them under the imperial legate who governed Moesia. Claudius restored both provinces to the Senate in AD 44, the arrangement in force at AD 50, when Acts calls Gallio 'proconsul of Achaia.'",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia",
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "scripture:Acts 18:12"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 18:12",
+      "book": "Acts",
+      "textWEB": "But when Gallio was proconsul of Achaia, the Jews with one accord rose up against Paul and brought him before the judgment seat,"
+    },
+    {
+      "ref": "Acts 20:2",
+      "book": "Acts",
+      "textWEB": "When he had gone through those parts and had encouraged them with many words, he came into Greece."
+    },
+    {
+      "ref": "2 Corinthians 1:1",
+      "book": "2 Corinthians",
+      "textWEB": "Paul, an apostle of Christ Jesus through the will of God, and Timothy our brother, to the assembly of God which is at Corinth, with all the saints who are in the whole of Achaia:"
+    },
+    {
+      "ref": "1 Thessalonians 1:8",
+      "book": "1 Thessalonians",
+      "textWEB": "For from you the word of the Lord has been declared, not only in Macedonia and Achaia, but also in every place your faith toward God has gone out, so that we need not say anything."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "entity": "Senatorial province of Achaia, governed by a proconsul",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-macedonia",
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "entity": "Imperial province, governed with Macedonia by the legate of Moesia",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-macedonia",
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 67,
+      "entity": "Senatorial province again, restored by Claudius (in force at AD 50) until Nero declared Greece free",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "bib:isbe-macedonia",
+        "bib:worldhistory-corinth",
+        "wikipedia:Achaia_(Roman_province)"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

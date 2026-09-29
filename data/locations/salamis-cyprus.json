@@ -9,6 +9,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "cyprus",
   "candidates": [
     {
       "label": "Salamis archaeological site",

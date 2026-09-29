@@ -9,6 +9,7 @@
   },
   "type": "natural-feature",
   "zoomTier": "city",
+  "parentId": "asia",
   "candidates": [
     {
       "label": "Patmos (island)",

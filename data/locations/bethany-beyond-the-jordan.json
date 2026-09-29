@@ -9,7 +9,7 @@
   },
   "type": "site",
   "zoomTier": "city",
-  "parentId": "judea",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Al-Maghtas / Wadi al-Kharrar (east of the Jordan River)",
@@ -62,6 +62,15 @@
       "text": "Some scholars have proposed a location farther north and east, in the region historically called Batanea, as a better fit for the Gospel's geography and for John the Baptist's later arrest by Herod Antipas; this remains a minority academic view without a single agreed coordinate.",
       "sources": [
         "bib:hutton-bethany-beyond-jordan"
+      ]
+    },
+    {
+      "text": "This record's candidate sites lie on opposite banks of the Jordan: the east-bank candidate is in Perea, and the west-bank candidate is in this project's 'Judea' district. Rather than choose between them, this record's parent is the Roman province of Judea, which from AD 44 governed both Judea and the lands east of the Jordan; Josephus records the first procurator, Cuspius Fadus, dealing with a border quarrel between the Jews of Perea and the people of Philadelphia. The minority proposal in Batanea also lay in territory under the same procurators until AD 53.",
+      "sources": [
+        "bib:livius-judaea",
+        "bib:josephus-antiquities",
+        "bib:rainey-notley-sacred-bridge",
+        "wikidata:Q1003997"
       ]
     }
   ],

@@ -13,6 +13,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Banias (Paneas)",
@@ -45,7 +46,16 @@
       "bib:csb-2017-biblegateway"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Herod Philip built Caesarea at Paneas, in his tetrarchy. When Philip died in the twentieth year of Tiberius (about AD 34), Tiberius added his territory to the province of Syria, and Caligula then made Herod Agrippa I its king. After Agrippa I's death in AD 44, Claudius sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom,' and he gave 'the tetrarchy of Philip and Batanea' to Agrippa II only in AD 53. This project therefore places Caesarea Philippi in the Roman province of Judea for about AD 50.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea",
+        "wikipedia:Judaea_(Roman_province)"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Matthew 16:13",

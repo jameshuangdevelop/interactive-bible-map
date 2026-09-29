@@ -424,6 +424,279 @@
       "publisher": "Holman Bible Publishers",
       "url": "https://www.biblegateway.com/versions/Christian-Standard-Bible-CSB/",
       "accessed": "2026-09-28"
+    },
+    {
+      "id": "cassius-dio-roman-history",
+      "type": "book",
+      "title": "Roman History (Loeb Classical Library translation by Earnest Cary, hosted on LacusCurtius)",
+      "authors": [
+        "Cassius Dio"
+      ],
+      "year": 1917,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "suetonius-twelve-caesars",
+      "type": "book",
+      "title": "The Lives of the Twelve Caesars (Loeb Classical Library translation by J. C. Rolfe, hosted on LacusCurtius)",
+      "authors": [
+        "Suetonius"
+      ],
+      "year": 1914,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Suetonius/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "josephus-antiquities",
+      "type": "book",
+      "title": "Antiquities of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
+      "authors": [
+        "Flavius Josephus"
+      ],
+      "year": 1737,
+      "publisher": "Christian Classics Ethereal Library",
+      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "tacitus-annals",
+      "type": "book",
+      "title": "The Annals (Loeb Classical Library translation by John Jackson, hosted on LacusCurtius)",
+      "authors": [
+        "Tacitus"
+      ],
+      "year": 1931,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/Annals/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "tacitus-histories",
+      "type": "book",
+      "title": "The Histories (Loeb Classical Library translation by Clifford H. Moore, hosted on LacusCurtius)",
+      "authors": [
+        "Tacitus"
+      ],
+      "year": 1925,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/Histories/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "strabo-geography",
+      "type": "book",
+      "title": "Geography (Loeb Classical Library translation by Horace Leonard Jones, hosted on LacusCurtius)",
+      "authors": [
+        "Strabo"
+      ],
+      "year": 1932,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "josephus-jewish-war",
+      "type": "book",
+      "title": "The Wars of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
+      "authors": [
+        "Flavius Josephus"
+      ],
+      "year": 1737,
+      "publisher": "Christian Classics Ethereal Library",
+      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-cilicia",
+      "type": "web",
+      "title": "Cilicia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/cilicia/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-damascus",
+      "type": "web",
+      "title": "Damascus",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/damascus/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-judaea",
+      "type": "web",
+      "title": "Judaea",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/judaea/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-macedonia",
+      "type": "web",
+      "title": "Macedonia (8): The Roman age",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/macedonia/macedonia-8/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-nabataeans",
+      "type": "web",
+      "title": "Nabataeans",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/people/nabataeans/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-pamphylia",
+      "type": "web",
+      "title": "Pamphylia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/pamphylia/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-achaia",
+      "type": "chapter",
+      "title": "Achaia",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/achaia.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-aretas",
+      "type": "chapter",
+      "title": "Aretas",
+      "authors": [
+        "Henry E. Dosker"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/aretas.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-asia",
+      "type": "chapter",
+      "title": "Asia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/asia.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-crete",
+      "type": "chapter",
+      "title": "Crete",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/crete.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-cyprus",
+      "type": "chapter",
+      "title": "Cyprus",
+      "authors": [
+        "Marcus N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cyprus.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-macedonia",
+      "type": "chapter",
+      "title": "Macedonia",
+      "authors": [
+        "Marcus N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/macedonia.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-melita",
+      "type": "chapter",
+      "title": "Melita",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/melita.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "smith-dictionary-provincia",
+      "type": "chapter",
+      "title": "Provincia",
+      "authors": [
+        "George Long"
+      ],
+      "year": 1875,
+      "publisher": "John Murray",
+      "containerTitle": "A Dictionary of Greek and Roman Antiquities (William Smith, ed.), hosted on LacusCurtius",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Provincia.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-bethsaida",
+      "type": "chapter",
+      "title": "Bethsaida",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/B/bethsaida.html",
+      "accessed": "2026-09-28"
     }
   ]
 }

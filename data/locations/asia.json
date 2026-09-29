@@ -1,0 +1,97 @@
+{
+  "id": "asia",
+  "names": {
+    "ancient": [
+      "Asia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Asia (Roman province, label point)",
+      "coordinates": [
+        28.3,
+        38.4
+      ],
+      "coordinateSource": "wikidata:Q210718",
+      "confidence": "high",
+      "support": "Asia's identity as the Roman province of western Asia Minor is undisputed. The label point is Wikidata's point for the province, inland between Sardis and Philadelphia, about 25 and 20 km from them. Pleiades' representative point for the province, from its Barrington Atlas location, lies about 46 km to the west.",
+      "sources": [
+        "wikidata:Q210718",
+        "pleiades:981509"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Asia was the wealthy Roman province covering most of western Asia Minor, formed from the kingdom that Attalus III of Pergamum left to Rome in 133 BC. Its governors were proconsuls, and its seat of government, first at Pergamum, moved to Ephesus under Augustus. The seven assemblies addressed in Revelation, at Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia and Laodicea, were 'in Asia,' and Acts records that over two years of Paul's teaching at Ephesus 'all those who lived in Asia heard the word of the Lord Jesus, both Jews and Greeks.'",
+    "sources": [
+      "wikidata:Q210718",
+      "pleiades:981509",
+      "wikipedia:Asia_(Roman_province)",
+      "bib:isbe-asia",
+      "bib:cassius-dio-roman-history",
+      "scripture:Acts 19:10",
+      "scripture:Revelation 1:4",
+      "scripture:Revelation 1:11",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
+    ]
+  },
+  "history": [
+    {
+      "text": "Attalus III of Pergamum left his kingdom to Rome when he died in 133 BC, and by 129 BC Rome had organized it as the province of Asia.",
+      "sources": [
+        "bib:isbe-asia",
+        "wikipedia:Asia_(Roman_province)"
+      ]
+    },
+    {
+      "text": "In Augustus's settlement of 27 BC, Asia was one of the provinces assigned to the Senate and governed by a proconsul, and Acts shows proconsuls still governing it in Paul's time. The province apparently included Patmos and other islands near its coast, which is why this project places Patmos in Asia.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography",
+        "bib:isbe-asia",
+        "scripture:Acts 19:38"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:6",
+      "book": "Acts",
+      "textWEB": "When they had gone through the region of Phrygia and Galatia, they were forbidden by the Holy Spirit to speak the word in Asia."
+    },
+    {
+      "ref": "Acts 19:10",
+      "book": "Acts",
+      "textWEB": "This continued for two years, so that all those who lived in Asia heard the word of the Lord Jesus, both Jews and Greeks."
+    },
+    {
+      "ref": "Acts 20:16",
+      "book": "Acts",
+      "textWEB": "For Paul had determined to sail past Ephesus, that he might not have to spend time in Asia; for he was hastening, if it were possible for him, to be in Jerusalem on the day of Pentecost."
+    },
+    {
+      "ref": "1 Peter 1:1",
+      "book": "1 Peter",
+      "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    },
+    {
+      "ref": "Revelation 1:4",
+      "book": "Revelation",
+      "textWEB": "John, to the seven assemblies that are in Asia: Grace to you and peace from God, who is and who was and who is to come; and from the seven Spirits who are before his throne;"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-28"
+}

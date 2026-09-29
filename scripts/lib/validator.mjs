@@ -57,8 +57,10 @@ export const PROJECT_BOUNDS = Object.freeze({
   minLat: -5,
   maxLat: 50
 });
+export const REQUIRE_EMPIRE_ROOT = true;
 
 const CANONICAL_BOOK_SET = new Set(CANONICAL_BOOKS);
+const REGION_LEVEL_TYPES = new Set(["empire", "province", "region"]);
 
 function toPosixPath(value) {
   return value.replace(/\\/gu, "/");
@@ -468,6 +470,194 @@ async function validateWebSnapshotChecksum({
   }
 }
 
+function buildLocationRecordById(locationRecords) {
+  const locationRecordsById = new Map();
+
+  for (const locationRecord of locationRecords) {
+    const locationId = locationRecord.data?.id;
+    if (typeof locationId !== "string" || locationRecordsById.has(locationId)) {
+      continue;
+    }
+    locationRecordsById.set(locationId, locationRecord);
+  }
+
+  return locationRecordsById;
+}
+
+function getParentId(locationData) {
+  return typeof locationData?.parentId === "string" ? locationData.parentId : undefined;
+}
+
+function validateLocationHierarchy({
+  locationRecordsById,
+  requireEmpireRoot,
+  errors
+}) {
+  const provinceWithoutParentIds = new Set();
+
+  for (const locationRecord of locationRecordsById.values()) {
+    const { data, relativePath } = locationRecord;
+    const locationType = data?.type;
+    const parentId = getParentId(data);
+
+    if (REGION_LEVEL_TYPES.has(locationType) && data?.zoomTier !== "region") {
+      recordError(
+        errors,
+        relativePath,
+        "$.zoomTier",
+        `Records of type '${locationType}' must use zoomTier 'region'`
+      );
+    }
+
+    if (locationType === "empire" && parentId) {
+      recordError(
+        errors,
+        relativePath,
+        "$.parentId",
+        "Records of type 'empire' must not define parentId"
+      );
+    }
+
+    if (locationType === "province") {
+      if (!parentId) {
+        recordError(
+          errors,
+          relativePath,
+          "$.parentId",
+          "Records of type 'province' must define parentId pointing to an empire record"
+        );
+        if (typeof data?.id === "string") {
+          provinceWithoutParentIds.add(data.id);
+        }
+        continue;
+      }
+
+      const parentRecord = locationRecordsById.get(parentId);
+      if (parentRecord && parentRecord.data?.type !== "empire") {
+        recordError(
+          errors,
+          relativePath,
+          "$.parentId",
+          `Province parent '${parentId}' must reference a record of type 'empire'`
+        );
+      }
+    }
+  }
+
+  const reportedCycleSignatures = new Set();
+
+  for (const startId of locationRecordsById.keys()) {
+    const traversalPath = [];
+    const traversalIndexById = new Map();
+    let currentId = startId;
+
+    while (typeof currentId === "string") {
+      if (traversalIndexById.has(currentId)) {
+        const cycleStartIndex = traversalIndexById.get(currentId);
+        const cycleIds = traversalPath.slice(cycleStartIndex);
+        const cycleSignature = [...cycleIds].sort((a, b) => a.localeCompare(b)).join("|");
+
+        if (!reportedCycleSignatures.has(cycleSignature)) {
+          reportedCycleSignatures.add(cycleSignature);
+          const cyclePath = [...cycleIds, currentId].join(" -> ");
+
+          for (const cycleId of cycleIds) {
+            const cycleRecord = locationRecordsById.get(cycleId);
+            if (!cycleRecord) {
+              continue;
+            }
+            recordError(
+              errors,
+              cycleRecord.relativePath,
+              "$.parentId",
+              `parentId chain must not contain cycles (found: ${cyclePath})`
+            );
+          }
+        }
+
+        break;
+      }
+
+      traversalIndexById.set(currentId, traversalPath.length);
+      traversalPath.push(currentId);
+
+      const currentRecord = locationRecordsById.get(currentId);
+      if (!currentRecord) {
+        break;
+      }
+
+      const nextParentId = getParentId(currentRecord.data);
+      if (!nextParentId) {
+        break;
+      }
+      currentId = nextParentId;
+    }
+  }
+
+  if (!requireEmpireRoot) {
+    return;
+  }
+
+  for (const locationRecord of locationRecordsById.values()) {
+    const locationId = locationRecord.data?.id;
+    if (
+      typeof locationId === "string" &&
+      provinceWithoutParentIds.has(locationId)
+    ) {
+      continue;
+    }
+
+    let currentRecord = locationRecord;
+    const visitedIds = new Set();
+    let chainResolved = true;
+    let chainHasCycle = false;
+
+    while (currentRecord) {
+      const currentId = currentRecord.data?.id;
+      if (typeof currentId === "string") {
+        if (visitedIds.has(currentId)) {
+          chainHasCycle = true;
+          chainResolved = false;
+          break;
+        }
+        visitedIds.add(currentId);
+      }
+
+      const parentId = getParentId(currentRecord.data);
+      if (!parentId) {
+        break;
+      }
+
+      const parentRecord = locationRecordsById.get(parentId);
+      if (!parentRecord) {
+        chainResolved = false;
+        break;
+      }
+
+      currentRecord = parentRecord;
+    }
+
+    // If an ancestor chain reaches a cycle, the dedicated cycle pass above
+    // has already emitted that error, so skip duplicate empire-root errors.
+    if (chainHasCycle) {
+      continue;
+    }
+
+    if (!chainResolved || !currentRecord) {
+      continue;
+    }
+
+    if (currentRecord.data?.type !== "empire") {
+      recordError(
+        errors,
+        locationRecord.relativePath,
+        "$.parentId",
+        "parentId chain must end at an empire record when REQUIRE_EMPIRE_ROOT is enabled"
+      );
+    }
+  }
+}
+
 export async function validateData(options = {}) {
   const locationsDirectory = path.resolve(
     options.locationsDirectory ?? DEFAULT_LOCATION_DIRECTORY
@@ -495,6 +685,10 @@ export async function validateData(options = {}) {
     ? path.resolve(options.webVplPath)
     : path.resolve(DEFAULT_WEB_VPL_PATH);
   const skipSnapshotChecksumCheck = options.skipSnapshotChecksumCheck === true;
+  const requireEmpireRoot =
+    typeof options.requireEmpireRoot === "boolean"
+      ? options.requireEmpireRoot
+      : REQUIRE_EMPIRE_ROOT;
 
   const errors = [];
   const warnings = [];
@@ -680,6 +874,9 @@ export async function validateData(options = {}) {
       );
     }
   }
+
+  const locationRecordsById = buildLocationRecordById(locationRecords);
+  validateLocationHierarchy({ locationRecordsById, requireEmpireRoot, errors });
 
   let webVerseIndex;
   const hasScriptureSources = locationRecords.some((record) =>

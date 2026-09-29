@@ -11,6 +11,7 @@
   },
   "type": "region",
   "zoomTier": "region",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Samaria (historical hill-country region)",

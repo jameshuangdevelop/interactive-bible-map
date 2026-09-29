@@ -13,6 +13,7 @@
   },
   "type": "region",
   "zoomTier": "region",
+  "parentId": "crete-cyrene",
   "candidates": [
     {
       "label": "Crete (island, label point)",

@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "syria",
   "candidates": [
     {
       "label": "Damascus (historic city center)",
@@ -45,7 +46,18 @@
       "bib:csb-2017-biblegateway"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "In 2 Corinthians 11:32 Paul writes: 'In Damascus the governor under King Aretas guarded the Damascenes’ city, desiring to arrest me.' How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, and Damascus had been part of the Roman province of Syria since Pompey's conquest in 64 BC, so this project places it in Syria for about AD 50.",
+      "sources": [
+        "scripture:2 Corinthians 11:32",
+        "bib:isbe-aretas",
+        "wikipedia:Aretas_IV_Philopatris",
+        "bib:livius-nabataeans",
+        "bib:livius-damascus"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 9:2",

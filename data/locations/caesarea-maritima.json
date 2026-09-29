@@ -13,6 +13,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "Caesarea (coastal ruins south of Haifa)",
