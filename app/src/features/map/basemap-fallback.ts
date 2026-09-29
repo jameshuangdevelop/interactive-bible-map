@@ -18,6 +18,27 @@ export interface BasemapFallbackState {
   message: string | null;
 }
 
+export class MainSourceLoadTimeoutController {
+  private hasLoaded = false;
+
+  arm({ alreadyLoaded }: { alreadyLoaded: boolean }) {
+    this.hasLoaded = alreadyLoaded;
+  }
+
+  markLoaded() {
+    this.hasLoaded = true;
+  }
+
+  shouldSwitchToFallback({ currentlyLoaded }: { currentlyLoaded: boolean }) {
+    if (currentlyLoaded) {
+      this.hasLoaded = true;
+      return false;
+    }
+
+    return !this.hasLoaded;
+  }
+}
+
 export function resolveInitialBasemapMode(envValue: string | undefined): BasemapMode {
   if (envValue?.toLowerCase() === "fallback") {
     return "fallback";
