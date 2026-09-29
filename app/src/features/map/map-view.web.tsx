@@ -130,7 +130,7 @@ const areaLabelVariableAnchorFilter = [
 ];
 const areaLabelOverviewOffsetLayout = {
   "text-variable-anchor": ["top", "bottom"] as ["top", "bottom"],
-  "text-radial-offset": 0.9,
+  "text-radial-offset": 2.2,
   "text-justify": "auto" as const
 };
 
@@ -631,7 +631,10 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: CLUSTER_MAX_ZOOM + 1,
       layout: {
-        ...PIN_COLLISION_LAYOUT,
+        "icon-size": 1,
+        "icon-anchor": "center",
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
         "icon-image": clusterCollisionImageId
       }
     });
