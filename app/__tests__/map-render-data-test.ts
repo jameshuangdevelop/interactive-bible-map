@@ -73,7 +73,7 @@ describe("map render data", () => {
     expect(byId.get("galilee")).toMatchObject({
       areaKind: "region",
       areaFontSize: 12,
-      minZoom: 4,
+      minZoom: 6,
       maxZoom: 9.01
     });
   });
@@ -106,10 +106,31 @@ describe("map render data", () => {
     expect(candidateIconId("#C5221F", "A", false)).toBe("candidate-c5221f-default-a");
     expect(candidateIconId("#C5221F", "B", true)).toBe("candidate-c5221f-selected-b");
     expect(areaLabelSpecForType("city")).toEqual({
-      minZoom: 4,
+      minZoom: 6,
       maxZoom: 9.01,
       fontSize: 12
     });
   });
-});
 
+  test("keeps all candidates neutral when no candidate letter is selected", () => {
+    const renderData = buildPlaceRenderData(fixtures, {
+      placeId: "emmaus",
+      candidateIndex: null
+    });
+
+    const emmausCandidates = renderData.candidatePins.features.filter(
+      (feature) => feature.properties.placeId === "emmaus"
+    );
+    expect(emmausCandidates).toHaveLength(2);
+    expect(emmausCandidates[0].properties).toMatchObject({
+      isSelectedPlace: true,
+      isSelectedCandidate: false,
+      iconId: "candidate-c5221f-default-a"
+    });
+    expect(emmausCandidates[1].properties).toMatchObject({
+      isSelectedPlace: true,
+      isSelectedCandidate: false,
+      iconId: "candidate-c5221f-default-b"
+    });
+  });
+});

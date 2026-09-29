@@ -33,7 +33,7 @@ const AREA_FONT_SIZE_BY_TYPE = {
 const AREA_ZOOM_RANGE_BY_TYPE = {
   empire: { minZoom: 3, maxZoom: 5.01 },
   province: { minZoom: 4, maxZoom: 8.01 },
-  region: { minZoom: 4, maxZoom: 9.01 }
+  region: { minZoom: 6, maxZoom: 9.01 }
 } as const;
 
 const CITY_PIN_LABEL_TYPES = new Set<PlaceType>(["city", "town", "village"]);
@@ -220,8 +220,10 @@ function toCandidateFeature({
 }): CandidateFeature {
   const candidate = place.candidates[candidateIndex];
   const placeSelected = selection?.placeId === place.id;
-  const selectedCandidateIndex = selection?.candidateIndex ?? 0;
-  const selectedCandidate = placeSelected && selectedCandidateIndex === candidateIndex;
+  const selectedCandidate =
+    placeSelected &&
+    typeof selection?.candidateIndex === "number" &&
+    selection.candidateIndex === candidateIndex;
   const candidateLetter = candidateIndexToLetter(candidateIndex);
   const zoomRange = getPinTierZoomRange(place);
   const candidateMinZoom = Math.max(CANDIDATE_PINS_MIN_ZOOM, zoomRange.minZoom);

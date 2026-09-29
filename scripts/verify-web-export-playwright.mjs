@@ -351,6 +351,65 @@ async function captureScenario(page, url, screenshotPath, options = {}) {
   await page.screenshot({ fullPage: true, path: screenshotPath });
 }
 
+async function captureDeviceScaleCrop(browser, url, screenshotPath, options = {}) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 },
+    deviceScaleFactor: 3
+  });
+  const page = await context.newPage();
+
+  try {
+    await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+
+    if (options.panelHeading) {
+      await page.waitForSelector("section[aria-label='Place details'] h1", { timeout: 30_000 });
+      const heading = await page.$eval(
+        "section[aria-label='Place details'] h1",
+        (element) => element.textContent?.trim() ?? ""
+      );
+      if (heading !== options.panelHeading) {
+        throw new Error(`Expected panel heading '${options.panelHeading}', got '${heading}'.`);
+      }
+    }
+
+    const mapCanvas = page.locator("canvas.maplibregl-canvas");
+    const mapBounds = await mapCanvas.boundingBox();
+    if (!mapBounds) {
+      throw new Error("Could not capture crop: map canvas is not visible.");
+    }
+
+    const panelBounds = await page.locator("section[aria-label='Place details']").boundingBox();
+    const mapAreaLeft = panelBounds ? panelBounds.x + panelBounds.width : mapBounds.x;
+    const mapAreaWidth = mapBounds.width - (panelBounds?.width ?? 0);
+    const cropSize = 420;
+    const centerX = mapAreaLeft + mapAreaWidth / 2;
+    const centerY = mapBounds.y + mapBounds.height / 2;
+
+    const clipX = Math.min(
+      mapBounds.x + mapBounds.width - cropSize,
+      Math.max(mapBounds.x, centerX - cropSize / 2)
+    );
+    const clipY = Math.min(
+      mapBounds.y + mapBounds.height - cropSize,
+      Math.max(mapBounds.y, centerY - cropSize / 2)
+    );
+
+    await page.screenshot({
+      path: screenshotPath,
+      clip: {
+        x: clipX,
+        y: clipY,
+        width: cropSize,
+        height: cropSize
+      }
+    });
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
 function buildSyntheticPlaces(basePlaces, syntheticCount = 10_000) {
   const places = [...basePlaces];
   const rowSize = 250;
@@ -726,7 +785,9 @@ async function run() {
     capernaum: temporaryScreenshotPath("ibm-m3-03-capernaum.png"),
     galilee: temporaryScreenshotPath("ibm-m3-03-galilee.png"),
     emmaus: temporaryScreenshotPath("ibm-m3-03-emmaus.png"),
-    jerusalemSiteZoom: temporaryScreenshotPath("ibm-m3-03-jerusalem-site-zoom.png")
+    jerusalemSiteZoom: temporaryScreenshotPath("ibm-m3-03-jerusalem-site-zoom.png"),
+    canaCrop3x: temporaryScreenshotPath("ibm-m3-03-cana-crop-3x.png"),
+    emmausCrop3x: temporaryScreenshotPath("ibm-m3-03-emmaus-crop-3x.png")
   };
 
   try {
@@ -759,6 +820,18 @@ async function run() {
         panelHeading: "Jerusalem",
         zoomJerusalemToSiteLevel: true
       }
+    );
+    await captureDeviceScaleCrop(
+      browser,
+      `${staticServer.baseUrl}/?place=galilee`,
+      screenshotPaths.canaCrop3x,
+      { panelHeading: "Galilee" }
+    );
+    await captureDeviceScaleCrop(
+      browser,
+      `${staticServer.baseUrl}/?place=emmaus`,
+      screenshotPaths.emmausCrop3x,
+      { panelHeading: "Emmaus" }
     );
 
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(

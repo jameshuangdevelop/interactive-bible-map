@@ -34,6 +34,11 @@ import {
   buildPlaceRenderData,
   type PlaceRenderData
 } from "./map-render-data";
+import {
+  CLUSTER_COUNT_LAYOUT,
+  PIN_COLLISION_LAYOUT,
+  QUESTION_BADGE_LAYOUT
+} from "./map-layer-layouts";
 import { planSelectionFocus } from "./selection-focus";
 import { shouldCountTileErrorForFallback } from "./tile-error-filter";
 import type { MapViewProps } from "./map-view.types";
@@ -56,11 +61,17 @@ const layerSitePinShadowId = "ibm-site-pin-shadow";
 const layerSitePinId = "ibm-site-pin";
 const layerQuestionBadgeId = "ibm-question-badge";
 const layerCandidatePinId = "ibm-candidate-pin";
+const layerClusterCollisionMaskId = "ibm-cluster-collision-mask";
+const layerCityPinCollisionMaskId = "ibm-city-pin-collision-mask";
+const layerSitePinCollisionMaskId = "ibm-site-pin-collision-mask";
+const layerCandidatePinCollisionMaskId = "ibm-candidate-pin-collision-mask";
 const layerPinLabelId = "ibm-pin-label";
 const layerAreaLabelId = "ibm-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
 
 const questionBadgeImageId = "ibm-question-badge-image";
+const pinCollisionImageId = "ibm-pin-collision-image";
+const clusterCollisionImageId = "ibm-cluster-collision-image";
 
 const interactiveLayerIds = [
   layerClusterCircleId,
@@ -325,23 +336,26 @@ function createCanvasImage(
 }
 
 function createQuestionBadgeImage() {
-  return createCanvasImage(16, (context, size) => {
+  return createCanvasImage(14, (context, size) => {
     const center = size / 2;
     context.fillStyle = "#FFFFFF";
     context.strokeStyle = "#FFFFFF";
-    context.lineWidth = 2;
+    context.lineWidth = 1.5;
     context.beginPath();
-    context.arc(center, center, 7, 0, Math.PI * 2);
+    context.arc(center, center, 5.6, 0, Math.PI * 2);
     context.fill();
     context.stroke();
 
     context.fillStyle = "#5F6368";
-    context.font =
-      '700 10px system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+    context.font = '700 8.5px system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText("?", center, center + 0.5);
   });
+}
+
+function createTransparentCollisionImage(sizePx: number) {
+  return createCanvasImage(sizePx, () => undefined);
 }
 
 function createCandidateIconImage({
@@ -400,6 +414,22 @@ function ensureQuestionBadgeImage(map: MapLibreMap) {
   map.addImage(questionBadgeImageId, image.image, { pixelRatio: image.pixelRatio });
 }
 
+function ensureCollisionImages(map: MapLibreMap) {
+  if (!map.hasImage(pinCollisionImageId)) {
+    const image = createTransparentCollisionImage(28);
+    if (image) {
+      map.addImage(pinCollisionImageId, image.image, { pixelRatio: image.pixelRatio });
+    }
+  }
+
+  if (!map.hasImage(clusterCollisionImageId)) {
+    const image = createTransparentCollisionImage(40);
+    if (image) {
+      map.addImage(clusterCollisionImageId, image.image, { pixelRatio: image.pixelRatio });
+    }
+  }
+}
+
 function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
   for (const feature of renderData.candidatePins.features) {
     const iconId = feature.properties.iconId;
@@ -422,6 +452,8 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
 }
 
 function ensureMapLayers(map: MapLibreMap) {
+  ensureCollisionImages(map);
+
   if (!map.getLayer(layerClusterCircleId)) {
     map.addLayer({
       id: layerClusterCircleId,
@@ -445,11 +477,7 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: CLUSTER_MAX_ZOOM + 1,
-      layout: {
-        "text-field": ["get", "point_count_abbreviated"],
-        "text-font": ["Noto Sans Bold"],
-        "text-size": 12
-      },
+      layout: CLUSTER_COUNT_LAYOUT,
       paint: {
         "text-color": "#FFFFFF"
       }
@@ -540,11 +568,8 @@ function ensureMapLayers(map: MapLibreMap) {
         ["==", ["get", "isDisputed"], true]
       ]),
       layout: {
-        "icon-image": questionBadgeImageId,
-        "icon-size": 1,
-        "icon-offset": [0.7, -0.75],
-        "icon-allow-overlap": true,
-        "icon-ignore-placement": true
+        ...QUESTION_BADGE_LAYOUT,
+        "icon-image": questionBadgeImageId
       }
     });
   }
@@ -560,6 +585,59 @@ function ensureMapLayers(map: MapLibreMap) {
         "icon-size": 1,
         "icon-allow-overlap": true,
         "icon-ignore-placement": true
+      }
+    });
+  }
+
+  if (!map.getLayer(layerClusterCollisionMaskId)) {
+    map.addLayer({
+      id: layerClusterCollisionMaskId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter(["has", "point_count"]),
+      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": clusterCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCityPinCollisionMaskId)) {
+    map.addLayer({
+      id: layerCityPinCollisionMaskId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": pinCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSitePinCollisionMaskId)) {
+    map.addLayer({
+      id: layerSitePinCollisionMaskId,
+      source: sourceSitePinsId,
+      type: "symbol",
+      filter: toLayerFilter(basePinVisibilityFilter),
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": pinCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCandidatePinCollisionMaskId)) {
+    map.addLayer({
+      id: layerCandidatePinCollisionMaskId,
+      source: sourceCandidatePinsId,
+      type: "symbol",
+      filter: toLayerFilter(candidateVisibilityFilter),
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": pinCollisionImageId
       }
     });
   }

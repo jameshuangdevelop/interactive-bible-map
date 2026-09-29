@@ -76,7 +76,7 @@ The data's `zoomTier` decides when a place appears. The initial view shows the w
 
 | `zoomTier` | Visible from zoom | Notes |
 |---|---|---|
-| `region` | 4 to 9 | Labels only; they fade out as you zoom in. Within this tier, empire labels show from zoom 3 to 5, and province labels from 4 to 8. |
+| `region` | 6 to 9 | Labels only; they fade out as you zoom in. Within this tier, empire labels show from zoom 3 to 5, and province labels from 4 to 8. |
 | `city` | 4 | Nearby pins **cluster** into a count bubble below zoom 7. Clicking a bubble zooms in. |
 | `site` | 12 | Sites inside a city (Jerusalem's Temple Mount, pools and so on) appear only when zoomed in. |
 
