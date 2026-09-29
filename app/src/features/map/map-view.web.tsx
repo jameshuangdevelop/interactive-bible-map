@@ -18,8 +18,10 @@ import {
   CLUSTER_MAX_ZOOM,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
+  FALLBACK_BASEMAP_ATTRIBUTION,
   FALLBACK_BASEMAP_STYLE_URL,
   MAP_WORKER_URL,
+  MAIN_BASEMAP_ATTRIBUTION,
   MAX_MAP_ZOOM,
   MAIN_BASEMAP_STYLE_URL
 } from "./constants";
@@ -42,7 +44,10 @@ import {
   QUESTION_BADGE_LAYOUT
 } from "./map-layer-layouts";
 import { planSelectionFocus } from "./selection-focus";
-import { shouldCountTileErrorForFallback } from "./tile-error-filter";
+import {
+  PRIMARY_VECTOR_SOURCE_ID,
+  shouldCountTileErrorForFallback
+} from "./tile-error-filter";
 import type { MapViewProps } from "./map-view.types";
 import type { Coordinates, PlaceIndexRecord, PlaceSelection } from "./types";
 
@@ -75,6 +80,7 @@ const questionBadgeImageId = "ibm-question-badge-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const mapTestHookKey = "__ibmMapForTests";
+const mainSourceLoadTimeoutMs = 8_000;
 
 const interactiveLayerIds = [
   layerClusterCircleId,
@@ -141,6 +147,10 @@ function getStyleUrl(mode: BasemapMode) {
   }
 
   return MAIN_BASEMAP_STYLE_URL;
+}
+
+function getAttributionMarkup(mode: BasemapMode) {
+  return mode === "fallback" ? FALLBACK_BASEMAP_ATTRIBUTION : MAIN_BASEMAP_ATTRIBUTION;
 }
 
 function prefersReducedMotion() {
@@ -592,71 +602,6 @@ function ensureMapLayers(map: MapLibreMap) {
     });
   }
 
-  if (!map.getLayer(layerClusterCollisionMaskId)) {
-    map.addLayer({
-      id: layerClusterCollisionMaskId,
-      source: sourceClusteredCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
-      layout: {
-        ...PIN_COLLISION_LAYOUT,
-        "icon-image": clusterCollisionImageId
-      },
-      paint: {
-        "icon-opacity": 0
-      }
-    });
-  }
-
-  if (!map.getLayer(layerCityPinCollisionMaskId)) {
-    map.addLayer({
-      id: layerCityPinCollisionMaskId,
-      source: sourceClusteredCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
-      layout: {
-        ...PIN_COLLISION_LAYOUT,
-        "icon-image": pinCollisionImageId
-      },
-      paint: {
-        "icon-opacity": 0
-      }
-    });
-  }
-
-  if (!map.getLayer(layerSitePinCollisionMaskId)) {
-    map.addLayer({
-      id: layerSitePinCollisionMaskId,
-      source: sourceSitePinsId,
-      type: "symbol",
-      filter: toLayerFilter(basePinVisibilityFilter),
-      layout: {
-        ...PIN_COLLISION_LAYOUT,
-        "icon-image": pinCollisionImageId
-      },
-      paint: {
-        "icon-opacity": 0
-      }
-    });
-  }
-
-  if (!map.getLayer(layerCandidatePinCollisionMaskId)) {
-    map.addLayer({
-      id: layerCandidatePinCollisionMaskId,
-      source: sourceCandidatePinsId,
-      type: "symbol",
-      filter: toLayerFilter(candidateVisibilityFilter),
-      layout: {
-        ...PIN_COLLISION_LAYOUT,
-        "icon-image": pinCollisionImageId
-      },
-      paint: {
-        "icon-opacity": 0
-      }
-    });
-  }
-
   if (!map.getLayer(layerPinLabelId)) {
     map.addLayer({
       id: layerPinLabelId,
@@ -704,6 +649,59 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-color": "#5F6368",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerClusterCollisionMaskId)) {
+    map.addLayer({
+      id: layerClusterCollisionMaskId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter(["has", "point_count"]),
+      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": clusterCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCityPinCollisionMaskId)) {
+    map.addLayer({
+      id: layerCityPinCollisionMaskId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": pinCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSitePinCollisionMaskId)) {
+    map.addLayer({
+      id: layerSitePinCollisionMaskId,
+      source: sourceSitePinsId,
+      type: "symbol",
+      filter: toLayerFilter(basePinVisibilityFilter),
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": pinCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerCandidatePinCollisionMaskId)) {
+    map.addLayer({
+      id: layerCandidatePinCollisionMaskId,
+      source: sourceCandidatePinsId,
+      type: "symbol",
+      filter: toLayerFilter(candidateVisibilityFilter),
+      layout: {
+        ...PIN_COLLISION_LAYOUT,
+        "icon-image": pinCollisionImageId
       }
     });
   }
@@ -942,11 +940,16 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
   const gestureReleaseTimeoutRef = useRef<number | null>(null);
   const visibleListRefreshFrameRef = useRef<number | null>(null);
   const activeTooltipEntryIdRef = useRef<string | null>(null);
+  const attributionControlRef = useRef<AttributionControl | null>(null);
+  const attributionModeRef = useRef<BasemapMode | null>(null);
+  const mainSourceLoadTimeoutRef = useRef<number | null>(null);
+  const mainSourceHasLoadedTileRef = useRef(false);
+  const mainSourceMetadataLoadedRef = useRef(false);
 
   const basemapController = useMemo(
     () =>
       new BasemapFallbackController({
-      initialMode: configuredBasemapMode
+        initialMode: configuredBasemapMode
       }),
     []
   );
@@ -1137,6 +1140,78 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     [panelInset]
   );
 
+  const clearMainSourceLoadTimeout = useCallback(() => {
+    if (mainSourceLoadTimeoutRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(mainSourceLoadTimeoutRef.current);
+    mainSourceLoadTimeoutRef.current = null;
+  }, []);
+
+  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode) => {
+    if (attributionModeRef.current === mode && attributionControlRef.current) {
+      return;
+    }
+
+    if (attributionControlRef.current) {
+      map.removeControl(attributionControlRef.current);
+      attributionControlRef.current = null;
+    }
+
+    const control = new AttributionControl({
+      compact: true,
+      customAttribution: getAttributionMarkup(mode)
+    });
+    map.addControl(control, "bottom-right");
+    attributionControlRef.current = control;
+    attributionModeRef.current = mode;
+  }, []);
+
+  const switchToFallback = useCallback(
+    (map: MapLibreMap) => {
+      const nextState = basemapController.switchToFallback();
+      setBasemapState(nextState);
+      if (nextState.mode !== "fallback") {
+        return nextState;
+      }
+
+      clearMainSourceLoadTimeout();
+      mainSourceHasLoadedTileRef.current = true;
+      mainSourceMetadataLoadedRef.current = true;
+      styleReadyRef.current = false;
+      syncAttributionControl(map, "fallback");
+      map.setStyle(getStyleUrl("fallback"));
+      return nextState;
+    },
+    [basemapController, clearMainSourceLoadTimeout, syncAttributionControl]
+  );
+
+  const scheduleMainSourceLoadTimeout = useCallback(
+    (map: MapLibreMap) => {
+      clearMainSourceLoadTimeout();
+      if (basemapController.getState().mode !== "main") {
+        return;
+      }
+
+      mainSourceHasLoadedTileRef.current = false;
+      mainSourceMetadataLoadedRef.current = false;
+      mainSourceLoadTimeoutRef.current = window.setTimeout(() => {
+        if (basemapController.getState().mode !== "main" || mainSourceHasLoadedTileRef.current) {
+          return;
+        }
+
+        if (mainSourceMetadataLoadedRef.current) {
+          clearMainSourceLoadTimeout();
+          return;
+        }
+
+        switchToFallback(map);
+      }, mainSourceLoadTimeoutMs);
+    },
+    [basemapController, clearMainSourceLoadTimeout, switchToFallback]
+  );
+
   useEffect(() => {
     if (!mapContainerRef.current) {
       return undefined;
@@ -1154,7 +1229,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
 
     mapRef.current = map;
     (window as Window & { [mapTestHookKey]?: MapLibreMap })[mapTestHookKey] = map;
-    map.addControl(new AttributionControl({ compact: true }), "bottom-right");
+    syncAttributionControl(map, basemapController.getState().mode);
 
     const markGestureStarted = () => {
       if (gestureReleaseTimeoutRef.current !== null) {
@@ -1190,13 +1265,44 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       const nextState = basemapController.registerTileError(Date.now());
       setBasemapState(nextState);
       if (nextState.mode === "fallback") {
-        styleReadyRef.current = false;
-        map.setStyle(getStyleUrl("fallback"));
+        switchToFallback(map);
+      }
+    };
+
+    const handleSourceData = (event: {
+      sourceId?: string;
+      sourceDataType?: string;
+      tile?: unknown;
+    }) => {
+      if (basemapController.getState().mode !== "main") {
+        return;
+      }
+
+      if (event.sourceId !== PRIMARY_VECTOR_SOURCE_ID) {
+        return;
+      }
+
+      if (event.sourceDataType === "metadata") {
+        mainSourceMetadataLoadedRef.current = true;
+        clearMainSourceLoadTimeout();
+        return;
+      }
+
+      if (event.tile) {
+        mainSourceHasLoadedTileRef.current = true;
+        clearMainSourceLoadTimeout();
       }
     };
 
     const handleStyleReady = () => {
+      const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
+      syncAttributionControl(map, currentMode);
+      if (currentMode === "main") {
+        scheduleMainSourceLoadTimeout(map);
+      } else {
+        clearMainSourceLoadTimeout();
+      }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayers();
       scheduleVisibleEntryRefresh();
@@ -1238,6 +1344,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     map.on("mousemove", handleMouseMove);
     map.on("mouseout", hideTooltip);
     map.on("click", handleMapClick);
+    map.on("sourcedata", handleSourceData);
     map.on("error", handleError);
 
     return () => {
@@ -1263,8 +1370,15 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       map.off("mousemove", handleMouseMove);
       map.off("mouseout", hideTooltip);
       map.off("click", handleMapClick);
+      map.off("sourcedata", handleSourceData);
       map.off("error", handleError);
 
+      clearMainSourceLoadTimeout();
+      if (attributionControlRef.current) {
+        map.removeControl(attributionControlRef.current);
+        attributionControlRef.current = null;
+      }
+      attributionModeRef.current = null;
       map.remove();
       mapRef.current = null;
       delete (window as Window & { [mapTestHookKey]?: MapLibreMap })[mapTestHookKey];
@@ -1273,9 +1387,13 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
   }, [
     activateVisibleEntry,
     basemapController,
+    clearMainSourceLoadTimeout,
     handleTooltipAtPoint,
     hideTooltip,
+    scheduleMainSourceLoadTimeout,
     scheduleVisibleEntryRefresh,
+    switchToFallback,
+    syncAttributionControl,
     syncSourcesAndLayers,
     updateScaleBar
   ]);

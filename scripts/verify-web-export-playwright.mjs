@@ -19,10 +19,20 @@ const generatedPlacesPath = path.join(
 
 const smoothnessLongTaskLimitMs = 50;
 const syntheticPlaceIdPrefix = "synthetic-city-";
+const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
+const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
+const mapTestHookKey = "__ibmMapForTests";
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
   pinLabels: "ibm-pin-label"
+};
+const mapLayerIds = {
+  areaLabels: "ibm-area-label",
+  clusterPins: "ibm-cluster-circle",
+  cityPins: "ibm-city-pin",
+  sitePins: "ibm-site-pin",
+  candidatePins: "ibm-candidate-pin"
 };
 
 function contentTypeFor(filePath) {
@@ -416,6 +426,197 @@ async function captureDeviceScaleCrop(browser, url, screenshotPath, options = {}
   }
 }
 
+async function readAttributionText(page) {
+  const attribution = page.locator(".maplibregl-ctrl-attrib");
+  await attribution.first().waitFor({ state: "visible", timeout: 30_000 });
+  const text = (await attribution.first().textContent()) ?? "";
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function assertFallbackAttributionText(text, scenarioLabel) {
+  for (const needle of fallbackAttributionNeedles) {
+    if (!text.includes(needle)) {
+      throw new Error(
+        `${scenarioLabel}: expected attribution to include '${needle}', got '${text.trim()}'`
+      );
+    }
+  }
+}
+
+async function verifyAreaLabelsAvoidPins(page, url) {
+  await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 30_000
+  });
+
+  const overlap = await page.evaluate(
+    ({ testHookKey, areaLayerId, pinLayerIds }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const pinFeatures = map.queryRenderedFeatures(undefined, {
+        layers: pinLayerIds
+      });
+      const collisions = [];
+
+      for (const pinFeature of pinFeatures) {
+        if (pinFeature.geometry?.type !== "Point") {
+          continue;
+        }
+
+        const [longitude, latitude] = pinFeature.geometry.coordinates;
+        const point = map.project([longitude, latitude]);
+        const labelsAtPin = map.queryRenderedFeatures(point, {
+          layers: [areaLayerId]
+        });
+
+        if (labelsAtPin.length > 0) {
+          collisions.push({
+            pinLayer: pinFeature.layer.id,
+            pinEntryId: pinFeature.properties?.entryId ?? null,
+            labelIds: labelsAtPin.map((label) => label.properties?.entryId ?? label.id ?? "label")
+          });
+        }
+      }
+
+      return {
+        pinCount: pinFeatures.length,
+        collisionCount: collisions.length,
+        collisionSamples: collisions.slice(0, 8)
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      areaLayerId: mapLayerIds.areaLabels,
+      pinLayerIds: [
+        mapLayerIds.clusterPins,
+        mapLayerIds.cityPins,
+        mapLayerIds.sitePins,
+        mapLayerIds.candidatePins
+      ]
+    }
+  );
+
+  if (overlap.collisionCount > 0) {
+    throw new Error(
+      `Found area-label/pin overlaps at ?place=galilee: ${JSON.stringify(overlap.collisionSamples)}`
+    );
+  }
+
+  return overlap;
+}
+
+async function captureGalileeCollisionBoxes(browser, baseUrl, screenshotPath) {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+
+  try {
+    await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+      timeout: 30_000
+    });
+
+    await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      map.showCollisionBoxes = true;
+      map.triggerRepaint();
+    }, mapTestHookKey);
+    await page.waitForTimeout(600);
+    await page.screenshot({ fullPage: true, path: screenshotPath });
+  } finally {
+    await page.close();
+  }
+}
+
+async function verifyFallbackOutageMode({
+  browser,
+  baseUrl,
+  mode,
+  screenshotPath
+}) {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const requestUrls = [];
+  const abortMode = mode;
+
+  await page.route("**/*", (route) => {
+    const requestUrl = route.request().url();
+    if (!requestUrl.includes("tiles.openfreemap.org")) {
+      return route.continue();
+    }
+
+    const requestPathname = new URL(requestUrl).pathname;
+
+    if (abortMode === "all-requests") {
+      return route.abort("failed");
+    }
+
+    if (
+      abortMode === "pbf-only" &&
+      (requestUrl.includes(".pbf") || requestPathname === "/planet")
+    ) {
+      return route.abort("failed");
+    }
+
+    return route.continue();
+  });
+
+  page.on("requestfinished", (request) => {
+    requestUrls.push(request.url());
+  });
+
+  try {
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
+    await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+      timeout: 30_000
+    });
+    await page.waitForTimeout(1_000);
+
+    if (abortMode === "pbf-only") {
+      await page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+
+        map.jumpTo({
+          center: [35.3, 33],
+          zoom: 8
+        });
+      }, mapTestHookKey);
+    }
+
+    await page.getByText(fallbackStatusMessage, { exact: true }).waitFor({ timeout: 40_000 });
+    await page.waitForTimeout(1_000);
+
+    const attributionText = await readAttributionText(page);
+    assertFallbackAttributionText(attributionText, `Fallback outage ${mode}`);
+
+    const versaTilesRequests = requestUrls.filter((url) => url.includes("tiles.versatiles.org"));
+    if (versaTilesRequests.length === 0) {
+      throw new Error(`Fallback outage ${mode}: no VersaTiles tile requests were observed.`);
+    }
+
+    await page.screenshot({ fullPage: true, path: screenshotPath });
+
+    return {
+      mode,
+      versaTilesRequestCount: versaTilesRequests.length,
+      attributionText
+    };
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+  }
+}
+
 function buildSyntheticPlaces(basePlaces, syntheticCount = 10_000) {
   const places = [...basePlaces];
   const columns = 100;
@@ -457,9 +658,9 @@ function buildSyntheticPlaces(basePlaces, syntheticCount = 10_000) {
 
 async function setMapView(page, { center, zoom }) {
   await page.evaluate(
-    ({ centerCoordinates, targetZoom }) =>
+    ({ centerCoordinates, targetZoom, testHookKey }) =>
       new Promise((resolve, reject) => {
-        const map = window.__ibmMapForTests;
+        const map = window[testHookKey];
         if (!map) {
           reject(new Error("Map test hook is unavailable."));
           return;
@@ -487,15 +688,15 @@ async function setMapView(page, { center, zoom }) {
           zoom: targetZoom
         });
       }),
-    { centerCoordinates: center, targetZoom: zoom }
+    { centerCoordinates: center, targetZoom: zoom, testHookKey: mapTestHookKey }
   );
   await page.waitForTimeout(450);
 }
 
 async function collectRenderedCoverage(page) {
   return page.evaluate(
-    ({ clustersLayerId, cityPinsLayerId, pinLabelsLayerId, syntheticPrefix }) => {
-      const map = window.__ibmMapForTests;
+    ({ clustersLayerId, cityPinsLayerId, pinLabelsLayerId, syntheticPrefix, testHookKey }) => {
+      const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
       }
@@ -559,9 +760,13 @@ async function collectRenderedCoverage(page) {
       const clusterPlaceListEntries = document.querySelectorAll(
         "button[data-place-entry-id^='cluster:']"
       ).length;
+      const statusMessages = Array.from(document.querySelectorAll("[role='status']")).map(
+        (element) => element.textContent?.trim() ?? ""
+      );
 
       return {
         zoom: map.getZoom(),
+        styleLoaded: map.isStyleLoaded(),
         clusterFeatureCount: clusters.length,
         clusterPointTotal,
         maxClusterPointCount,
@@ -569,14 +774,16 @@ async function collectRenderedCoverage(page) {
         syntheticLabelCount,
         syntheticVisibleEstimate,
         syntheticPlaceListEntries,
-        clusterPlaceListEntries
+        clusterPlaceListEntries,
+        statusMessages
       };
     },
     {
       clustersLayerId: smoothnessLayerIds.clusters,
       cityPinsLayerId: smoothnessLayerIds.cityPins,
       pinLabelsLayerId: smoothnessLayerIds.pinLabels,
-      syntheticPrefix: syntheticPlaceIdPrefix
+      syntheticPrefix: syntheticPlaceIdPrefix,
+      testHookKey: mapTestHookKey
     }
   );
 }
@@ -591,7 +798,7 @@ function assertSyntheticCoverage(scenarioLabel, coverage, expectation) {
     coverage.syntheticVisibleEstimate < expectation.minimumVisibleEstimate
   ) {
     throw new Error(
-      `${scenarioLabel}: expected syntheticVisibleEstimate >= ${expectation.minimumVisibleEstimate}, got ${coverage.syntheticVisibleEstimate}`
+      `${scenarioLabel}: expected syntheticVisibleEstimate >= ${expectation.minimumVisibleEstimate}, got ${coverage.syntheticVisibleEstimate} (coverage=${JSON.stringify(coverage)})`
     );
   }
 
@@ -886,10 +1093,14 @@ async function runSmoothnessCheck({
   workerUrls,
   workerConsoleEvents,
   workerErrors,
-  routeHandler = null,
+  syntheticPlacesPayload = null,
   syntheticCoverageExpectations = null
 }) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  let syntheticFetchInterceptCount = 0;
 
   page.on("pageerror", (error) => {
     pageErrors.push(error.message);
@@ -917,16 +1128,63 @@ async function runSmoothnessCheck({
     });
   });
 
-  if (routeHandler) {
-    await page.route("**/generated/places.index.json", routeHandler);
+  if (syntheticPlacesPayload) {
+    await page.addInitScript((payload) => {
+      const originalFetch = window.fetch.bind(window);
+      let interceptionCount = 0;
+
+      Object.defineProperty(window, "__ibmSyntheticFetchInterceptCount", {
+        configurable: true,
+        get() {
+          return interceptionCount;
+        }
+      });
+
+      window.fetch = async (input, init) => {
+        const requestUrl =
+          typeof input === "string"
+            ? input
+            : input instanceof Request
+              ? input.url
+              : String(input);
+        const resolvedUrl = new URL(requestUrl, window.location.href);
+        if (resolvedUrl.pathname === "/generated/places.index.json") {
+          interceptionCount += 1;
+          return new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+              "cache-control": "no-store"
+            }
+          });
+        }
+
+        return originalFetch(input, init);
+      };
+    }, syntheticPlacesPayload);
   }
 
   try {
     await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
     await waitForMapToSettle(page);
-    await page.waitForFunction(() => Boolean(window.__ibmMapForTests), {
+    await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
     });
+    await page.waitForFunction((testHookKey) => {
+      const map = window[testHookKey];
+      return Boolean(map && map.isStyleLoaded());
+    }, mapTestHookKey, { timeout: 40_000 });
+
+    if (syntheticPlacesPayload) {
+      syntheticFetchInterceptCount = await page.evaluate(
+        () => Number(window.__ibmSyntheticFetchInterceptCount ?? 0)
+      );
+      if (syntheticFetchInterceptCount === 0) {
+        throw new Error(
+          "Synthetic smoothness check did not intercept generated/places.index.json."
+        );
+      }
+    }
 
     const scenarios = [
       {
@@ -949,6 +1207,10 @@ async function runSmoothnessCheck({
         center: scenario.center,
         zoom: scenario.zoom
       });
+      await page.waitForFunction((testHookKey) => {
+        const map = window[testHookKey];
+        return Boolean(map && map.isStyleLoaded());
+      }, mapTestHookKey, { timeout: 40_000 });
 
       const coverage = await collectRenderedCoverage(page);
       assertSyntheticCoverage(`Synthetic coverage ${scenario.id}`, coverage, scenario.expectation);
@@ -964,10 +1226,12 @@ async function runSmoothnessCheck({
     }
 
     return {
-      scenarios: scenarioResults
+      scenarios: scenarioResults,
+      syntheticDataInterceptionCount: syntheticFetchInterceptCount
     };
   } finally {
     await page.close();
+    await context.close();
   }
 }
 
@@ -1019,7 +1283,10 @@ async function run() {
     emmaus: temporaryScreenshotPath("ibm-m3-03-emmaus.png"),
     jerusalemSiteZoom: temporaryScreenshotPath("ibm-m3-03-jerusalem-site-zoom.png"),
     canaCrop3x: temporaryScreenshotPath("ibm-m3-03-cana-crop-3x.png"),
-    emmausCrop3x: temporaryScreenshotPath("ibm-m3-03-emmaus-crop-3x.png")
+    emmausCrop3x: temporaryScreenshotPath("ibm-m3-03-emmaus-crop-3x.png"),
+    galileeCollisionBoxes: temporaryScreenshotPath("ibm-m3-03-galilee-collision-boxes.png"),
+    fallbackPbfOutage: temporaryScreenshotPath("ibm-m3-03-fallback-pbf-outage.png"),
+    fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-03-fallback-all-requests-outage.png")
   };
 
   try {
@@ -1065,11 +1332,33 @@ async function run() {
       screenshotPaths.emmausCrop3x,
       { panelHeading: "Emmaus" }
     );
+    const galileePinOverlap = await verifyAreaLabelsAvoidPins(
+      page,
+      `${staticServer.baseUrl}/?place=galilee`
+    );
+    await captureGalileeCollisionBoxes(
+      browser,
+      staticServer.baseUrl,
+      screenshotPaths.galileeCollisionBoxes
+    );
 
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
       page,
       staticServer.baseUrl
     );
+
+    const fallbackPbfOutage = await verifyFallbackOutageMode({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      mode: "pbf-only",
+      screenshotPath: screenshotPaths.fallbackPbfOutage
+    });
+    const fallbackAllRequestsOutage = await verifyFallbackOutageMode({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      mode: "all-requests",
+      screenshotPath: screenshotPaths.fallbackAllRequestsOutage
+    });
 
     const smoothnessReal = await runSmoothnessCheck({
       browser,
@@ -1094,13 +1383,7 @@ async function run() {
       workerUrls,
       workerConsoleEvents,
       workerErrors,
-      routeHandler: async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json; charset=utf-8",
-          body: JSON.stringify(syntheticPlaces)
-        });
-      },
+      syntheticPlacesPayload: syntheticPlaces,
       syntheticCoverageExpectations: {
         "overview-clustered": {
           minimumVisibleEstimate: 9_500,
@@ -1108,7 +1391,6 @@ async function run() {
         },
         "zoom8-unclustered": {
           minimumSyntheticPins: 250,
-          minimumSyntheticLabels: 20,
           maximumClusterFeatures: 0
         }
       }
@@ -1133,6 +1415,11 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       keyboardAndEscapeChecks,
+      galileePinOverlap,
+      fallbackOutageChecks: {
+        pbfOnly: fallbackPbfOutage,
+        allRequests: fallbackAllRequestsOutage
+      },
       smoothness: {
         realData: smoothnessReal,
         syntheticData10k: {

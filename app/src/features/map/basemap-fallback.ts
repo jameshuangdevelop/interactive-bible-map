@@ -66,6 +66,14 @@ export class BasemapFallbackController {
     }
 
     if (this.recentErrorTimes.length >= this.threshold) {
+      this.switchToFallback();
+    }
+
+    return this.getState();
+  }
+
+  switchToFallback(): BasemapFallbackState {
+    if (this.mode !== "fallback") {
       this.mode = "fallback";
       this.message = this.fallbackMessage;
       this.recentErrorTimes.length = 0;

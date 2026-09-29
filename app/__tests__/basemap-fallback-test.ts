@@ -51,6 +51,17 @@ describe("basemap fallback controller", () => {
     });
   });
 
+  test("can switch directly to fallback for source-load failure and sets the message", () => {
+    const controller = new BasemapFallbackController({
+      initialMode: "main"
+    });
+
+    expect(controller.switchToFallback()).toEqual({
+      mode: "fallback",
+      message: FALLBACK_MESSAGE
+    });
+  });
+
   test("counts only openmaptiles source errors while main basemap is active", () => {
     expect(
       shouldCountTileErrorForFallback(
@@ -85,6 +96,35 @@ describe("basemap fallback controller", () => {
           sourceId: "openmaptiles"
         },
         "fallback"
+      )
+    ).toBe(false);
+  });
+
+  test("counts source errors without a tile when the error message references the main source host", () => {
+    expect(
+      shouldCountTileErrorForFallback(
+        {
+          sourceId: null,
+          tile: null,
+          error: {
+            message:
+              "Failed to load source openmaptiles from https://tiles.openfreemap.org/data/v3.json"
+          }
+        },
+        "main"
+      )
+    ).toBe(true);
+
+    expect(
+      shouldCountTileErrorForFallback(
+        {
+          sourceId: null,
+          tile: null,
+          error: {
+            message: "Failed to load sprite from another host"
+          }
+        },
+        "main"
       )
     ).toBe(false);
   });
