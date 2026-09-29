@@ -7,7 +7,7 @@
 | Branch | `feat/m3-search` |
 | Depends on | M3-03 (map and selection) |
 | Parallel with | M3-04 (place panel) |
-| Credit target | ~600 AI credits (session guard: 1,500) |
+| Credit target | ~600 AI credits (session guard: 10,000) |
 
 ## Goal
 Let users find any place by the English name their Bible uses, as `docs/design/VISUAL_SPEC.md` §4 describes. The search covers English place names only (brief §1.7; ADR-0026).

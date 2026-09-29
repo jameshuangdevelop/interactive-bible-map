@@ -7,7 +7,7 @@
 | Branch | `feat/m3-place-panel` |
 | Depends on | M3-03 (map and selection). Modern names are cleaned up in M3-08; display them as stored. |
 | Parallel with | M3-05 (search) |
-| Credit target | ~900 AI credits (session guard: 1,500) |
+| Credit target | ~900 AI credits (session guard: 10,000) |
 
 ## Goal
 Build the Google-Maps-style place panel exactly as `docs/design/VISUAL_SPEC.md` §3 describes, in its order: photos with credits, names, confidence, candidates, actions, About, In the Bible, OT connections, Places in, Sources, and the footer.
