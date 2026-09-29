@@ -29,7 +29,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 
 ## Open questions
 - **Answered by the human (2026-09-29):** Magdala keeps its title; Paneas stays in `otherLanguages`; searching "Judah" should find Judea; the two Judea records stay; and well-known areas keep related verses. The data follow-ups ("Judah", and more well-known areas such as Egypt) are in `BACKLOG.md`.
-- **Still open, for the human:** should search also find modern names ("Today: Yalvaç") and candidate-site names ("Khirbet Qana"), which the panel shows? The PO explained this on 2026-09-29; the default is no.
+- **Answered (2026-09-29):** search covers English Bible names and English historical names only (`ancient` and `alternate`), not modern names or candidate-site names.
 - **Smoothness first:** the human made dragging and zooming speed the top priority before further work (2026-09-29). The PO found that the human's machine is a remote desktop session with a 32 Hz display, which caps every map, ours and OpenFreeMap's alike, at about 32 frames per second. M3-12 works on smoothness, and the preview deploy (M3-06) lets the human test on a local device.
 ## Session log
 | Date | Agent | Task | Result |

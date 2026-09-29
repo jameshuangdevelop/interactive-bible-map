@@ -172,7 +172,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   - The title is the spelling most of the NIV, ESV, NLT, KJV, NKJV and CSB agree on. An even split falls back to the WEB, which is the text the app quotes. Where versions differ because of a manuscript variant rather than a spelling, the title follows the record's identification and the WEB, and the other reading stays searchable. So far only Magdala ("Magadan" in 4 of 6 versions at Matthew 15:39) is affected; the human confirmed this exception on 2026-09-29 ("keep").
   - `names.ancient` and `names.alternate` hold English names only, including every version's spelling and the WEB's, and search covers exactly these.
   - Other-language names move to `names.otherLanguages`, which the app never shows or searches; they stay only so the research isn't lost (the PO's default, pending the human's confirmation).
-  - Modern names and candidate labels are still shown in the panel but are not searched (also the PO's default, pending confirmation).
+  - Modern names and candidate labels are still shown in the panel but are not searched. The human confirmed on 2026-09-29: search covers "only english Bible names and historical names", meaning the English names in `ancient` and `alternate`.
   - The spelling comparison records spellings only, never verse text from copyrighted versions.
 - **Consequences:** M3-10 applies the rule to all 63 records, and M3-11's new records follow it. M3-04 shows the modern name as "Today: *name*". M3-05 searches English names only, so "Al-Quds", "Imwas" and "Alaşehir" no longer find anything. Other languages remain in the backlog.
 
