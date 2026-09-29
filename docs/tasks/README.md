@@ -21,6 +21,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-07](M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | In progress |
 | [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | In progress |
 | [M3-10](M3-10-english-names.md) | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | In progress |
+| [M3-11](M3-11-ancient-regions.md) | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | In progress |
 
 ## Template
 ```markdown

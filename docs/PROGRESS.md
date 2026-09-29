@@ -25,6 +25,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-07 | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Done, PR pending review | — |
 | M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Done, PR pending review | — |
 | M3-10 | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Done, PR pending review | — |
+| M3-11 | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | In progress (subagent) | — |
 
 ## Open questions
 - **M3-10, for the human (via the PO):** should Magdala's title stay "Magdala" (Fact-Checker's recommendation) or become "Magadan", which 4 of the 6 versions read in Matthew 15:39? Both options are in [docs/verification/M3-english-names.md](verification/M3-english-names.md#magdala). Please also confirm the Fact-Checker moving "Paneas" to `names.otherLanguages`, like the card's "Julias".

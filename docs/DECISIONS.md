@@ -158,3 +158,9 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   - Modern names and candidate labels are still shown in the panel but are not searched (also the PO's default, pending confirmation).
   - The spelling comparison records spellings only, never verse text from copyrighted versions.
 - **Consequences:** M3-10 applies the rule to all 63 records, and M3-11's new records follow it. M3-04 shows the modern name as "Today: *name*". M3-05 searches English names only, so "Al-Quds", "Imwas" and "Alaşehir" no longer find anything. Other languages remain in the backlog.
+
+## ADR-0027 — Ancient country and region names, as of about AD 50
+- **Date:** 2026-09-28 · **Status:** Accepted · **By:** the human ("I'd still want the country and the region. For example, for athens, would the country be the Roman Empire and the region be Greece?"; confirming the plan: "That's exactly what I want")
+- **Context:** The physical basemap (ADR-0024) no longer shows modern countries, and readers still need to know where a place was. In the first century, Athens was in the Roman Empire, in the province of Achaia, which the Bible also calls "Greece" once (Acts 20:2).
+- **Decision:** New record types `empire` and `province` hold the Roman Empire and its provinces, as they stood in about AD 50, the time of Paul's journeys, with names under ADR-0026. Every place's parent chain ends at the Roman Empire. The map shows them as labels, and the place panel shows a line such as "City · Achaia · Roman Empire". Borders, and changes over 4 BC – AD 100, come with M4's ancient layer and timeline.
+- **Consequences:** M3-11 adds about a dozen researched records and sets every place's parent. Judea's two meanings (the district and the Roman province) need a clear, sourced model.
