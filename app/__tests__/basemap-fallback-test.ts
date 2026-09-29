@@ -1,5 +1,6 @@
 import {
   BasemapFallbackController,
+  MainSourceLoadTimeoutController,
   resolveInitialBasemapMode
 } from "../src/features/map/basemap-fallback";
 import { FALLBACK_MESSAGE } from "../src/features/map/constants";
@@ -127,5 +128,20 @@ describe("basemap fallback controller", () => {
         "main"
       )
     ).toBe(false);
+  });
+
+  test("does not trigger timeout fallback when tiles were already loaded before arming", () => {
+    const controller = new MainSourceLoadTimeoutController();
+    controller.arm({ alreadyLoaded: true });
+
+    expect(controller.shouldSwitchToFallback({ currentlyLoaded: false })).toBe(false);
+  });
+
+  test("does not trigger timeout fallback when tiles load after arming", () => {
+    const controller = new MainSourceLoadTimeoutController();
+    controller.arm({ alreadyLoaded: false });
+    controller.markLoaded();
+
+    expect(controller.shouldSwitchToFallback({ currentlyLoaded: false })).toBe(false);
   });
 });
