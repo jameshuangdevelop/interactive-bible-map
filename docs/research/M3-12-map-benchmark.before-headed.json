@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T17:24:03.282Z",
+  "generatedAt": "2026-09-29T22:57:38.079Z",
   "machine": {
     "platform": "win32",
     "release": "10.0.22631",
@@ -9,7 +9,12 @@
   },
   "server": {
     "distDirectory": "Q:\\interactive-bible-map\\.worktrees\\m3-12\\app\\dist",
-    "baseUrl": "http://127.0.0.1:56763"
+    "baseUrl": "http://127.0.0.1:60950"
+  },
+  "options": {
+    "mode": "headed",
+    "target": "both",
+    "appQuery": ""
   },
   "modes": {
     "headed": {
@@ -18,6 +23,14 @@
           "targetId": "app",
           "targetName": "Interactive Bible Map",
           "mode": "headed",
+          "webglRenderer": {
+            "vendor": "WebKit",
+            "renderer": "WebKit WebGL",
+            "unmaskedVendor": "Google Inc. (Google)",
+            "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+            "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+            "isSoftwareRenderer": true
+          },
           "scenarios": {
             "drag-overview": {
               "accepted": {
@@ -26,32 +39,51 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "drag-overview",
                 "scenarioDescription": "2s drag at overview",
-                "firstMapPaintMs": 551.2999999523163,
-                "idleAfterGestureMs": 0.09999996423721313,
+                "firstMapPaintMs": 592.3000000119209,
+                "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 374,
-                  "p50Ms": 33.399999999999636,
-                  "p90Ms": 50.099999999998545,
-                  "p95Ms": 59.099999999998545,
-                  "p99Ms": 66.70000000000073,
-                  "maxMs": 466.59999999999854
+                  "count": 375,
+                  "p50Ms": 31.299999999999272,
+                  "p90Ms": 62.5,
+                  "p95Ms": 62.5,
+                  "p99Ms": 62.600000000000364,
+                  "maxMs": 62.600000000000364
                 },
                 "longTaskSummary": {
-                  "count": 29,
-                  "p95Ms": 69,
-                  "maxMs": 471
+                  "count": 12,
+                  "p95Ms": 53,
+                  "maxMs": 53
                 },
-                "mutationCount": 20,
-                "firstMutationSample": "childList:div:",
-                "maxFrameIntervalMs": 466.59999999999854,
+                "mutationCount": 0,
+                "firstMutationSample": null,
+                "maxFrameIntervalMs": 62.600000000000364,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 16,
-                "tileKnownBytes": 1339238,
+                "tileRequestCount": 18,
+                "tileKnownBytes": 3719323,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -64,32 +96,51 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "drag-galilee",
                 "scenarioDescription": "2s drag near Galilee",
-                "firstMapPaintMs": 416.30000001192093,
-                "idleAfterGestureMs": 0.09999996423721313,
+                "firstMapPaintMs": 467.10000002384186,
+                "idleAfterGestureMs": 0.10000002384185791,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 385,
-                  "p50Ms": 33.30000000000109,
-                  "p90Ms": 49.899999999999636,
-                  "p95Ms": 50,
-                  "p99Ms": 66.69999999999982,
-                  "maxMs": 183.39999999999964
+                  "count": 362,
+                  "p50Ms": 31.299999999999272,
+                  "p90Ms": 31.300000000000182,
+                  "p95Ms": 31.30000000000109,
+                  "p99Ms": 31.399999999999636,
+                  "maxMs": 62.399999999999636
                 },
                 "longTaskSummary": {
-                  "count": 6,
-                  "p95Ms": 130,
-                  "maxMs": 187
+                  "count": 0,
+                  "p95Ms": null,
+                  "maxMs": null
                 },
-                "mutationCount": 27,
-                "firstMutationSample": "childList:div:",
-                "maxFrameIntervalMs": 183.39999999999964,
+                "mutationCount": 0,
+                "firstMutationSample": null,
+                "maxFrameIntervalMs": 62.399999999999636,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 9,
-                "tileKnownBytes": 210524,
+                "tileRequestCount": 0,
+                "tileKnownBytes": 0,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -102,16 +153,16 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "wheel-zoom-6in6out",
                 "scenarioDescription": "wheel zoom 6 steps in + 6 out",
-                "firstMapPaintMs": 426.10000002384186,
+                "firstMapPaintMs": 461.19999998807907,
                 "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 77,
-                  "p50Ms": 33.30000000000018,
-                  "p90Ms": 33.400000000000546,
-                  "p95Ms": 33.400000000000546,
-                  "p99Ms": 33.400000000000546,
-                  "maxMs": 33.400000000000546
+                  "count": 72,
+                  "p50Ms": 31.299999999999727,
+                  "p90Ms": 62.5,
+                  "p95Ms": 62.5,
+                  "p99Ms": 62.600000000000364,
+                  "maxMs": 62.600000000000364
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -120,14 +171,33 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 33.400000000000546,
+                "maxFrameIntervalMs": 62.600000000000364,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 0,
-                "tileKnownBytes": 0,
+                "tileRequestCount": 3,
+                "tileKnownBytes": 361828,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -140,16 +210,16 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "ctrlwheel-pinch-6in6out",
                 "scenarioDescription": "trackpad-style pinch (Ctrl+wheel) 6 in + 6 out",
-                "firstMapPaintMs": 434.4000000357628,
-                "idleAfterGestureMs": 0.10000002384185791,
+                "firstMapPaintMs": 495.5,
+                "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 73,
-                  "p50Ms": 33.30000000000018,
-                  "p90Ms": 33.40000000000009,
-                  "p95Ms": 33.400000000000546,
-                  "p99Ms": 50,
-                  "maxMs": 50
+                  "count": 67,
+                  "p50Ms": 31.299999999999727,
+                  "p90Ms": 62.5,
+                  "p95Ms": 62.5,
+                  "p99Ms": 62.5,
+                  "maxMs": 62.59999999999991
                 },
                 "longTaskSummary": {
                   "count": 0,
@@ -158,7 +228,7 @@
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 50,
+                "maxFrameIntervalMs": 62.59999999999991,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -166,6 +236,25 @@
                 "tileKnownBytes": 0,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -178,32 +267,57 @@
                 "targetName": "Interactive Bible Map",
                 "scenarioId": "flyto-selection",
                 "scenarioDescription": "fly-to after selecting a place",
-                "firstMapPaintMs": 422.10000002384186,
-                "idleAfterGestureMs": 0,
-                "idleSignal": "already-idle",
+                "firstMapPaintMs": 507.60000002384186,
+                "idleAfterGestureMs": 1970.199999988079,
+                "idleSignal": "idle",
                 "frameSummary": {
-                  "count": 101,
-                  "p50Ms": 16.699999999999818,
-                  "p90Ms": 33.30000000000018,
-                  "p95Ms": 33.40000000000009,
-                  "p99Ms": 34.90000000000009,
-                  "maxMs": 50
+                  "count": 99,
+                  "p50Ms": 31.299999999999272,
+                  "p90Ms": 62.5,
+                  "p95Ms": 62.59999999999991,
+                  "p99Ms": 93.80000000000018,
+                  "maxMs": 125
                 },
                 "longTaskSummary": {
-                  "count": 1,
-                  "p95Ms": 53,
-                  "maxMs": 53
+                  "count": 8,
+                  "p95Ms": 97,
+                  "maxMs": 105
                 },
-                "mutationCount": 116,
+                "mutationCount": 126,
                 "firstMutationSample": "attributes:div:class",
-                "maxFrameIntervalMs": 50,
+                "maxFrameIntervalMs": 125,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 20,
-                "tileKnownBytes": 1443812,
+                "tileRequestCount": 63,
+                "tileKnownBytes": 6571316,
                 "tileUnknownByteCount": 1,
                 "selectedEntryId": "place:capernaum",
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 1,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [
+                    {
+                      "atMs": 3239.400000035763,
+                      "style": "[style-object]",
+                      "argumentType": "object"
+                    }
+                  ],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -215,6 +329,14 @@
           "targetId": "openfreemap",
           "targetName": "OpenFreeMap quick-start demo baseline",
           "mode": "headed",
+          "webglRenderer": {
+            "vendor": "WebKit",
+            "renderer": "WebKit WebGL",
+            "unmaskedVendor": "Google Inc. (Google)",
+            "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+            "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+            "isSoftwareRenderer": true
+          },
           "scenarios": {
             "drag-overview": {
               "accepted": {
@@ -223,25 +345,25 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "drag-overview",
                 "scenarioDescription": "2s drag at overview",
-                "firstMapPaintMs": 86.69999998807907,
-                "idleAfterGestureMs": 0,
+                "firstMapPaintMs": 102.10000002384186,
+                "idleAfterGestureMs": 0.09999996423721313,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 362,
-                  "p50Ms": 66.59999999999945,
-                  "p90Ms": 66.70000000000073,
-                  "p95Ms": 83.30000000000018,
-                  "p99Ms": 99.89999999999964,
-                  "maxMs": 116.69999999999891
+                  "count": 359,
+                  "p50Ms": 62.5,
+                  "p90Ms": 93.70000000000073,
+                  "p95Ms": 93.79999999999927,
+                  "p99Ms": 93.79999999999927,
+                  "maxMs": 125.09999999999854
                 },
                 "longTaskSummary": {
-                  "count": 334,
-                  "p95Ms": 80,
-                  "maxMs": 100
+                  "count": 321,
+                  "p95Ms": 75,
+                  "maxMs": 90
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 116.69999999999891,
+                "maxFrameIntervalMs": 125.09999999999854,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -249,6 +371,25 @@
                 "tileKnownBytes": 3719323,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "MapLibre | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -261,25 +402,25 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "drag-galilee",
                 "scenarioDescription": "2s drag near Galilee",
-                "firstMapPaintMs": 97.09999996423721,
-                "idleAfterGestureMs": 0,
+                "firstMapPaintMs": 94,
+                "idleAfterGestureMs": 0.10000002384185791,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 361,
-                  "p50Ms": 66.59999999999945,
-                  "p90Ms": 66.70000000000073,
-                  "p95Ms": 66.80000000000109,
-                  "p99Ms": 83.39999999999964,
-                  "maxMs": 83.40000000000146
+                  "count": 360,
+                  "p50Ms": 62.5,
+                  "p90Ms": 93.79999999999927,
+                  "p95Ms": 93.80000000000018,
+                  "p99Ms": 93.80000000000291,
+                  "maxMs": 93.90000000000146
                 },
                 "longTaskSummary": {
-                  "count": 323,
-                  "p95Ms": 71,
-                  "maxMs": 80
+                  "count": 326,
+                  "p95Ms": 81,
+                  "maxMs": 83
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 83.40000000000146,
+                "maxFrameIntervalMs": 93.90000000000146,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -287,6 +428,25 @@
                 "tileKnownBytes": 0,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "MapLibre | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -299,32 +459,51 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "wheel-zoom-6in6out",
                 "scenarioDescription": "wheel zoom 6 steps in + 6 out",
-                "firstMapPaintMs": 93.39999997615814,
+                "firstMapPaintMs": 97.19999998807907,
                 "idleAfterGestureMs": 0.10000002384185791,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 58,
-                  "p50Ms": 66.60000000000036,
-                  "p90Ms": 66.70000000000073,
-                  "p95Ms": 66.80000000000018,
-                  "p99Ms": 66.80000000000018,
-                  "maxMs": 83.30000000000018
+                  "count": 44,
+                  "p50Ms": 62.5,
+                  "p90Ms": 93.69999999999982,
+                  "p95Ms": 93.70000000000027,
+                  "p99Ms": 93.80000000000018,
+                  "maxMs": 93.80000000000018
                 },
                 "longTaskSummary": {
-                  "count": 53,
-                  "p95Ms": 71,
-                  "maxMs": 73
+                  "count": 41,
+                  "p95Ms": 79,
+                  "maxMs": 82
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 83.30000000000018,
+                "maxFrameIntervalMs": 93.80000000000018,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
-                "tileRequestCount": 0,
-                "tileKnownBytes": 0,
+                "tileRequestCount": 9,
+                "tileKnownBytes": 985718,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "MapLibre | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },
@@ -337,25 +516,25 @@
                 "targetName": "OpenFreeMap quick-start demo baseline",
                 "scenarioId": "ctrlwheel-pinch-6in6out",
                 "scenarioDescription": "trackpad-style pinch (Ctrl+wheel) 6 in + 6 out",
-                "firstMapPaintMs": 83.89999997615814,
+                "firstMapPaintMs": 108.79999995231628,
                 "idleAfterGestureMs": 0,
                 "idleSignal": "already-idle",
                 "frameSummary": {
-                  "count": 53,
-                  "p50Ms": 50.09999999999991,
-                  "p90Ms": 66.70000000000027,
-                  "p95Ms": 83.20000000000073,
-                  "p99Ms": 83.30000000000018,
-                  "maxMs": 83.40000000000055
+                  "count": 50,
+                  "p50Ms": 62.5,
+                  "p90Ms": 93.79999999999973,
+                  "p95Ms": 93.80000000000018,
+                  "p99Ms": 93.80000000000018,
+                  "maxMs": 93.80000000000018
                 },
                 "longTaskSummary": {
-                  "count": 41,
-                  "p95Ms": 72,
-                  "maxMs": 75
+                  "count": 46,
+                  "p95Ms": 79,
+                  "maxMs": 81
                 },
                 "mutationCount": 0,
                 "firstMutationSample": null,
-                "maxFrameIntervalMs": 83.40000000000055,
+                "maxFrameIntervalMs": 93.80000000000018,
                 "hiddenFrameCount": 0,
                 "hiddenVisibilitySampleCount": 0,
                 "visibilityStateAtStart": "visible",
@@ -363,6 +542,25 @@
                 "tileKnownBytes": 0,
                 "tileUnknownByteCount": 0,
                 "selectedEntryId": null,
+                "webglRenderer": {
+                  "vendor": "WebKit",
+                  "renderer": "WebKit WebGL",
+                  "unmaskedVendor": "Google Inc. (Google)",
+                  "unmaskedRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+                  "rendererString": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit",
+                  "isSoftwareRenderer": true
+                },
+                "mainStyleHealth": {
+                  "hasMainAttribution": true,
+                  "hasFallbackAttribution": false,
+                  "hasFallbackStyleNeedle": false,
+                  "setStyleCallCount": 0,
+                  "setStyleSwitchCallCount": 0,
+                  "setStyleCalls": [],
+                  "setStyleSwitchCalls": [],
+                  "attributionText": "MapLibre | OpenFreeMap © OpenMapTiles Data from OpenStreetMap",
+                  "styleSummary": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm | https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf | https://tiles.openfreemap.org/planet"
+                },
                 "attempt": 1,
                 "throttled": false
               },

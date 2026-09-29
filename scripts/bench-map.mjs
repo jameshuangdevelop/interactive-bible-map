@@ -22,6 +22,9 @@ const mapIdleTimeoutMs = 60_000;
 const mapReadyTimeoutMs = 120_000;
 const scenarioAttemptLimit = 4;
 const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa offscreen)/i;
+const mainAttributionNeedle = "OpenFreeMap";
+const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
+const fallbackStylePathNeedle = "versatiles-colorful/style.json";
 
 const mapBenchmarkTargets = {
   app: {
@@ -435,6 +438,134 @@ async function waitForMapIdle(page, mapHookKey, timeoutMs) {
       }),
     { hookKey: mapHookKey, timeout: timeoutMs }
   );
+}
+
+async function installSetStyleProbe(page, mapHookKey) {
+  const installed = await page.evaluate((hookKey) => {
+    const map = window[hookKey];
+    if (!map) {
+      return false;
+    }
+
+    if (window.__ibmBenchSetStyleProbe?.installed) {
+      return true;
+    }
+
+    const originalSetStyle = map.setStyle.bind(map);
+    const calls = [];
+
+    map.setStyle = (...args) => {
+      const firstArgument = args[0];
+      const styleLabel =
+        typeof firstArgument === "string"
+          ? firstArgument
+          : firstArgument && typeof firstArgument === "object" && typeof firstArgument.name === "string"
+            ? firstArgument.name
+            : "[style-object]";
+      calls.push({
+        atMs: performance.now(),
+        style: styleLabel,
+        argumentType: typeof firstArgument
+      });
+      return originalSetStyle(...args);
+    };
+
+    window.__ibmBenchSetStyleProbe = {
+      installed: true,
+      calls
+    };
+    return true;
+  }, mapHookKey);
+
+  if (!installed) {
+    throw new Error(`Could not install setStyle probe for map hook '${mapHookKey}'.`);
+  }
+}
+
+async function readMainStyleHealth(page, mapHookKey) {
+  return page.evaluate(
+    ({
+      hookKey,
+      mainNeedle,
+      fallbackNeedles,
+      fallbackStyleNeedle
+    }) => {
+      const map = window[hookKey];
+      const probe = window.__ibmBenchSetStyleProbe;
+      const setStyleCalls = Array.isArray(probe?.calls) ? probe.calls : [];
+      const attributionElement = document.querySelector(".maplibregl-ctrl-attrib");
+      const attributionText =
+        attributionElement?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+
+      const style = map?.getStyle?.() ?? null;
+      const sourceUrls = [];
+      if (style?.sources && typeof style.sources === "object") {
+        for (const source of Object.values(style.sources)) {
+          if (source && typeof source.url === "string") {
+            sourceUrls.push(source.url);
+          }
+        }
+      }
+
+      const sprite = typeof style?.sprite === "string" ? style.sprite : "";
+      const glyphs = typeof style?.glyphs === "string" ? style.glyphs : "";
+      const styleSummary = [sprite, glyphs, ...sourceUrls].filter(Boolean).join(" | ");
+      const hasMainAttribution = attributionText.includes(mainNeedle);
+      const hasFallbackAttribution = fallbackNeedles.some((needle) => attributionText.includes(needle));
+      const hasFallbackStyleNeedle =
+        styleSummary.includes(fallbackStyleNeedle) ||
+        sourceUrls.some((url) => /versatiles/i.test(url));
+      const setStyleSwitchCalls = setStyleCalls.filter((call) => {
+        if (call?.argumentType === "string") {
+          return true;
+        }
+
+        return typeof call?.style === "string" && call.style.includes(fallbackStyleNeedle);
+      });
+
+      return {
+        hasMainAttribution,
+        hasFallbackAttribution,
+        hasFallbackStyleNeedle,
+        setStyleCallCount: setStyleCalls.length,
+        setStyleSwitchCallCount: setStyleSwitchCalls.length,
+        setStyleCalls,
+        setStyleSwitchCalls,
+        attributionText,
+        styleSummary
+      };
+    },
+    {
+      hookKey: mapHookKey,
+      mainNeedle: mainAttributionNeedle,
+      fallbackNeedles: fallbackAttributionNeedles,
+      fallbackStyleNeedle: fallbackStylePathNeedle
+    }
+  );
+}
+
+function assertMainStyleHealth(target, scenario, health) {
+  if (target.id !== "app") {
+    return;
+  }
+
+  if (!health.hasMainAttribution) {
+    throw new Error(
+      `${target.name} ${scenario.id}: expected attribution containing '${mainAttributionNeedle}', got '${health.attributionText}'.`
+    );
+  }
+
+  if (health.setStyleSwitchCallCount > 0) {
+    throw new Error(
+      `${target.name} ${scenario.id}: expected no style-switch setStyle calls, observed ${health.setStyleSwitchCallCount} (${JSON.stringify(health.setStyleSwitchCalls)}).`
+    );
+  }
+
+  if (health.hasFallbackAttribution || health.hasFallbackStyleNeedle) {
+    throw new Error(
+      `${target.name} ${scenario.id}: fallback style signals detected (attribution='${health.attributionText}', style='${health.styleSummary}').`
+    );
+  }
 }
 
 async function installMapPaintProbe(page) {
@@ -979,6 +1110,7 @@ async function runScenarioAttempt({
     await page.goto(scenarioUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapReady(page, target.mapHookKey);
     const webglRenderer = await readWebGlRendererInfo(page);
+    await installSetStyleProbe(page, target.mapHookKey);
 
     if (typeof scenario.prepare === "function") {
       await scenario.prepare(page, target.mapHookKey);
@@ -1011,6 +1143,8 @@ async function runScenarioAttempt({
     await disposeGestureMonitor(page);
     const tileResult = await tileTracker.stop();
     const firstMapPaintMs = await readFirstMapPaintMs(page);
+    const mainStyleHealth = await readMainStyleHealth(page, target.mapHookKey);
+    assertMainStyleHealth(target, scenario, mainStyleHealth);
 
     return {
       mode,
@@ -1033,7 +1167,8 @@ async function runScenarioAttempt({
       tileKnownBytes: tileResult.knownTileBytes,
       tileUnknownByteCount: tileResult.unknownTileBytes,
       selectedEntryId: flyToSelectionEntryId,
-      webglRenderer
+      webglRenderer,
+      mainStyleHealth
     };
   } finally {
     await context.close();
@@ -1144,6 +1279,12 @@ function summarizeForMarkdown(benchmarkResult) {
             targetResult.webglRenderer?.isSoftwareRenderer ??
             accepted.webglRenderer?.isSoftwareRenderer ??
             false,
+          hasMainAttribution:
+            accepted.mainStyleHealth?.hasMainAttribution ?? null,
+          setStyleCallCount:
+            accepted.mainStyleHealth?.setStyleCallCount ?? null,
+          setStyleSwitchCallCount:
+            accepted.mainStyleHealth?.setStyleSwitchCallCount ?? null,
           discardedAttempts: scenarioResult.discardedAttempts.length,
           retainedDespiteThrottle: Boolean(accepted.retainedDespiteThrottle)
         });
@@ -1158,9 +1299,9 @@ function toMarkdownTable(benchmarkResult) {
   const rows = summarizeForMarkdown(benchmarkResult);
   const lines = [];
   lines.push(
-    "| Mode | Target | WebGL renderer | Scenario | Frame intervals | Long tasks | Idle after gesture | Tile requests | Tile bytes | First map paint | Notes |"
+    "| Mode | Target | WebGL renderer | Scenario | Main attribution | setStyle switches | Frame intervals | Long tasks | Idle after gesture | Tile requests | Tile bytes | First map paint | Notes |"
   );
-  lines.push("|---|---|---|---|---|---|---:|---:|---:|---:|---|");
+  lines.push("|---|---|---|---|---|---:|---|---|---:|---:|---:|---:|---|");
 
   for (const row of rows) {
     const notes = [];
@@ -1180,6 +1321,8 @@ function toMarkdownTable(benchmarkResult) {
         row.target,
         row.webglRenderer,
         row.scenarioDescription,
+        row.hasMainAttribution === null ? "n/a" : row.hasMainAttribution ? "yes" : "no",
+        row.setStyleSwitchCallCount === null ? "n/a" : String(row.setStyleSwitchCallCount),
         formatFrameSummary(row.frameSummary),
         `count ${row.longTaskSummary.count}, max ${formatMilliseconds(row.longTaskSummary.maxMs)} ms`,
         formatMilliseconds(row.idleAfterGestureMs),

@@ -1668,7 +1668,6 @@ async function runSmoothnessCheck({
       }
     ];
     const scenarioResults = {};
-    const scenarioResults = {};
     for (const scenario of scenarios) {
       let scenarioResult = null;
       let scenarioError = null;
