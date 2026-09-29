@@ -684,6 +684,19 @@
       "containerTitle": "A Dictionary of Greek and Roman Antiquities (William Smith, ed.), hosted on LacusCurtius",
       "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Provincia.html",
       "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-bethsaida",
+      "type": "chapter",
+      "title": "Bethsaida",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/B/bethsaida.html",
+      "accessed": "2026-09-28"
     }
   ]
 }

@@ -128,7 +128,7 @@ All 42 are correct for about AD 50. Unchanged parents (for example Jerusalem's s
 | judea-province | bethany-beyond-the-jordan, caesarea-maritima, caesarea-philippi, galilee, joppa, judea, samaria | Livius; Josephus (Joppa and Strato's Tower under Archelaus, *Antiquities* 17.320; Fadus over "the entire kingdom", 19.363); caesarea-maritima is the capital (Wikidata) |
 | roman-empire | the 10 areas above | ADR-0027 |
 
-Joppa and Caesarea Maritima go to the province rather than the district. That is safer: Acts 12:19 separates Caesarea from Judea, and both cities were in the province from AD 6. Bethsaida keeps `galilee` (John 12:21, "Bethsaida of Galilee"), although both of its candidates lie east of the Jordan, in the former tetrarchy of Philip. Its chain still ends in the province, which governed that land in AD 50.
+Joppa and Caesarea Maritima go to the province rather than the district. That is safer: Acts 12:19 separates Caesarea from Judea, and both cities were in the province from AD 6. In `213b727` Bethsaida kept `galilee` (John 12:21, "Bethsaida of Galilee"), although both of its candidates lie east of the Jordan, in the former tetrarchy of Philip. That did not follow the card's rule of the smallest containing area, as the PR review pointed out. The second follow-up moves it to `judea-province`; see "Follow-up: PR review".
 
 ## Validator and test changes
 
@@ -140,7 +140,7 @@ The Research Lead's changes are reasonable and **do not weaken coverage**:
 - "Enabled by default" asserts the constant and runs a no-option validation that must fail on the old fixture.
 - "Can be enabled" and "passes when chains end at an empire" cover both outcomes.
 
-Small gap, not a blocker: every `buildAppData` test passes `false`, so no test covers the builder forwarding `true`. The production build covers it on every run.
+The builder is covered too. `tests/build-app-data.test.mjs` ("keeps empire/province types and parent chain in places.index") runs `buildAppData` with the default setting on an Athens → Achaia → Roman Empire chain. The other builder tests pass `false` because their fixtures have no empire. (Corrected after the PR review; the first version of this report said every builder test passed `false`.)
 
 ## Results
 
@@ -177,15 +177,58 @@ The PO's decisions (2026-09-28) are recorded after each item.
 3. **Labels on pins:** Roman Empire (Rome), Syria (Antioch) and Province of Judea (Caesarea Maritima) have no sourced point clear of the pin. Crete and Cyrene's label is 28 km from Crete's. For M3-03: offset or hide these province labels at zooms where the pins show, or have the Research Lead source hand-placed points. *Decided: accepted; the map will offset area labels away from pins.*
 4. **Scripture on areas the NT never names:** roman-empire (Luke 2:1, Acts 25:11) and sicily (Acts 28:12, Syracuse) keep related verses. Keep them, or leave `scripture` empty? *Decided: kept for now; the PO puts the policy to the human at CP3b.*
 5. **`politicalHistory` removed** on macedonia, asia, cyprus and crete-cyrene. Their open-ended intervals had end years that rested on Wikipedia alone, and some called the provinces "senatorial" before 27 BC. The AD 50 status is in each record's history text. M4's timeline should add sourced intervals. *Decided: the PO adds a backlog item for M4.*
-6. **Italy has `type: "province"`** although it was not a province. The summary says so, and the panel will read "City · Italy · Roman Empire". *Decided: the type stays, and the PO documents in `schema/README.md` that `province` also covers equivalent top-level divisions such as Italy. The follow-up commit rewrites the summary to say plainly, with sources, that Italy was not formally a province and was governed directly from Rome (see "Follow-up: Italy's summary").*
+6. **Italy has `type: "province"`** although it was not a province. The summary says so, and the panel will read "City · Italy · Roman Empire". *Decided: the type stays, and the PO documents in `schema/README.md` that `province` also covers equivalent top-level divisions such as Italy. The follow-up commits rewrite the summary to say plainly, with sources, that Italy was not formally a province (see "Follow-up: Italy's summary").*
 
 ## Follow-up: Italy's summary
 
-The summary now reads: "It was not formally a province: Roman law treated Italy and the provinces as separate parts of the state, and while the provinces received governors sent out from Rome, Italy was governed directly from Rome." It replaces the sentence that explained the project's type choice, which the schema documentation will now cover. Sources:
+The first follow-up (`214701d`) said that "while the provinces received governors sent out from Rome, Italy was governed directly from Rome". No public-domain source I found states the last clause in those words: it rested on Wikipedia's "Roman Italy" (in Italy, Roman magistrates held civil authority) plus inference. The PR review flagged it. The second follow-up keeps only what the non-Wikipedia sources state. The summary now reads:
 
-- **Smith's *Dictionary of Greek and Roman Antiquities*, "Provincia" (George Long, 1875; new entry `bib:smith-dictionary-provincia`):** "The Roman State in its complete development consisted of two parts with a distinct organization, Italia and the Provinciae." It also describes a province as administered by "a governor annually sent from Rome".
-- **Strabo 17.3.24:** the Romans acquired Italy starting from Rome, and to the provinces they "send … praefects and collectors of tribute".
-- **Cassius Dio 53.12:** Italy is absent from Augustus's list of provinces.
-- **Wikipedia's "Roman Italy":** in Italy, Roman magistrates held civil authority, against military authority in the provinces.
+> It was not formally a province and received no provincial governor: the Roman state had two distinct parts, Italy and the provinces, and Italy is absent from Cassius Dio's list of the provinces that Augustus divided between the Senate and himself in 27 BC.
 
-No public-domain source I found states "governed directly from Rome" in those words. The clause rests on Wikipedia together with Smith and Strabo, who set Italy apart from provinces run by governors sent out from Rome. ISBE's "Italy" does not cover Italy's status.
+Sources:
+
+- **Smith's *Dictionary of Greek and Roman Antiquities*, "Provincia" (George Long, 1875; `bib:smith-dictionary-provincia`):** "The Roman State in its complete development consisted of two parts with a distinct organization, Italia and the Provinciae." It defines a province as a territory beyond Italy under Roman administration, run by "a governor annually sent from Rome". So Italy, not being a province, had no provincial governor.
+- **Cassius Dio 53.12–13:** Italy is absent from Augustus's list of provinces, and each of those provinces received governors.
+- **Strabo 17.3.24–25:** the Romans acquired Italy first and send "praefects and collectors of tribute" to the provinces.
+- **Wikipedia's "Roman Italy":** a pointer only.
+
+ISBE's "Italy" does not cover Italy's status.
+
+## Follow-up: PR review
+
+The GPT-5.4 data review (2026-09-28) raised two must-consider findings and one nit. This commit fixes all three.
+
+**Bethsaida (must fix).** `parentId` moves from `galilee` to `judea-province`. The card's rule is the smallest area containing the place in about AD 50:
+
+- Josephus places Bethsaida, which Philip raised to a city named Julias, "in the lower Gaulonitis" (*Jewish War* 2.168; *Antiquities* 18.28).
+- He gives Galilee's eastern border as "Hippeae and Gadaris, and also … Gaulonitis" (*Jewish War* 3.37).
+- Both candidates, et-Tell and el-Araj, are put forward as Bethsaida-Julias (the record's existing note).
+- The province governed Philip's former tetrarchy from AD 44 to 53 (*Antiquities* 19.363, 20.138).
+
+A new history note records that John 12:21 calls it "Bethsaida of Galilee". It adds that scholars discuss whether the wording reflects a wider use of "Galilee" for the land around the lake or points to a town on the Galilean shore, a possible second Bethsaida. Sources: John 12:21, Josephus, and ISBE's "Bethsaida" (W. Ewing, 1915; new entry `bib:isbe-bethsaida`), which sets out both views.
+
+Re-verifying the record turned up a related error. Its `politicalHistory` kept Bethsaida in the province for AD 44–70, but Claudius gave Philip's former tetrarchy to Agrippa II in AD 53 (*Antiquities* 20.138). The entry is now split into AD 44–53 (the province) and AD 53–70 (Agrippa II's kingdom; *Jewish War* 3.37 names "the kingdom of Agrippa" on Galilee's border during the war). **Pass.**
+
+**The other Galilee-lake places.**
+
+| Record | Position | Result |
+|---|---|---|
+| capernaum | Tell Hum, northwestern shore, west of the Jordan's inflow, about 4 km west of el-Araj | Galilee is right. Luke 4:31 calls it "a city of Galilee". **No change.** |
+| chorazin | Khirbet Karraza, in the hills north of Capernaum, west of the Jordan, about 6 km west of et-Tell | Galilee is right. **No change.** |
+| magdala | Migdal, western shore, about 11 km southwest of el-Araj | Galilee is right. **No change.** |
+| sea-of-galilee | The lake itself; its label point is mid-lake | The lake spans the boundary: its western shore was Galilee, and its northeastern and eastern shores were not. Only the Roman Empire contains all of it, so the smallest-area rule gives no useful parent. The parent stays `galilee`, following the lake's New Testament name and its existing `politicalHistory`. A new sourced note explains the exception: Josephus's eastern border of Galilee (*Jewish War* 3.37), and ISBE on Bethsaida and Gamala in Gaulanitis. **Pass; the PO may prefer another parent.** |
+
+Nain, Nazareth and Cana lie inland, west of the lake, so the question of which side of the Jordan they lie on doesn't arise. One separate point, outside this review: Cana's low-confidence candidate, Qana in southern Lebanon, lies north of Galilee proper. Its two main candidates are in Galilee, so the parent stands, but the PO may want the same kind of note there.
+
+**Italy (must fix).** See "Follow-up: Italy's summary". "Governed directly from Rome" is gone, and the sentence now says only what Smith, Dio and Strabo state. **Pass.**
+
+**Nit.** The "Validator and test changes" section now describes the builder test that runs with the default setting.
+
+**Semantic diff, final state against `1f73a0e`:**
+- `parentId`: 43 records (bethsaida added).
+- `history`: 8 records, all with appended entries (bethsaida and sea-of-galilee added).
+- `politicalHistory`: 1 record (bethsaida's split).
+- `type`: 1 record (galatia).
+- Bethsaida, sea-of-galilee and italy stay `verified` (fact-checker, 2026-09-28).
+
+**Checks:** `npm run validate:data` gives 0 errors and 106 warnings. `npm test` passes 72/72 (the GIS commit `4e9686e` added two tests). `npm run build:data` builds 73 places.

@@ -11,7 +11,7 @@
   },
   "type": "village",
   "zoomTier": "city",
-  "parentId": "galilee",
+  "parentId": "judea-province",
   "candidates": [
     {
       "label": "et-Tell",
@@ -71,6 +71,17 @@
       "text": "Two older candidates, el-Mes'adiye and the Tabgha area, were proposed in earlier twentieth-century surveys but receive little attention in recent scholarly literature, which has focused on the et-Tell/el-Araj debate.",
       "sources": [
         "openbible:bethsaida-1"
+      ]
+    },
+    {
+      "text": "John 12:21 calls Philip's home town 'Bethsaida of Galilee.' Josephus, however, places Bethsaida, which the tetrarch Philip raised to a city named Julias, in Lower Gaulanitis, and gives Galilee's eastern border as the territories of Hippos and Gadara and Gaulanitis. Scholars discuss whether John's wording reflects a wider use of 'Galilee' for the land around the lake or points to a town on the Galilean shore; some have proposed a second Bethsaida there. Both of this record's candidate sites are put forward as Bethsaida-Julias, so for about AD 50 this project places Bethsaida in the Roman province of Judea, which governed Philip's former tetrarchy from AD 44 until AD 53, rather than in the Galilee district.",
+      "sources": [
+        "scripture:John 12:21",
+        "bib:josephus-jewish-war",
+        "bib:josephus-antiquities",
+        "bib:isbe-bethsaida",
+        "bib:arav-bethsaida-et-tell",
+        "bib:notley-aviam-bethsaida-el-araj"
       ]
     }
   ],
@@ -147,11 +158,21 @@
     },
     {
       "fromYear": 44,
-      "toYear": 70,
-      "entity": "Roman province of Judaea (procuratorial rule)",
+      "toYear": 53,
+      "entity": "Roman province of Judaea (procuratorial rule), until Claudius gave Philip's former tetrarchy to Agrippa II",
       "sources": [
+        "bib:josephus-antiquities",
         "wikidata:Q1003997",
         "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "fromYear": 53,
+      "toYear": 70,
+      "entity": "Kingdom of Herod Agrippa II (Roman client king)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:josephus-jewish-war"
       ]
     }
   ],
