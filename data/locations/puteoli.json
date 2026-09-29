@@ -2,11 +2,13 @@
   "id": "puteoli",
   "names": {
     "ancient": [
-      "Puteoli",
-      "Dikaiarcheia"
+      "Puteoli"
     ],
     "modern": "Pozzuoli",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Dikaiarcheia"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -34,7 +36,13 @@
       "bib:bibleplaces-puteoli",
       "scripture:Acts 28:11",
       "scripture:Acts 28:13",
-      "scripture:Acts 28:14"
+      "scripture:Acts 28:14",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [

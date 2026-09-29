@@ -352,6 +352,78 @@
       "publisher": "Hill Museum & Manuscript Library, Saint John's University",
       "url": "https://hmml.org/stories/series-weather-contesting-saint-paul-s-shipwreck/",
       "accessed": "2026-09-24"
+    },
+    {
+      "id": "niv-2011-biblegateway",
+      "type": "web",
+      "title": "New International Version (NIV), 2011 text edition",
+      "authors": [
+        "Biblica"
+      ],
+      "year": 2011,
+      "publisher": "Biblica",
+      "url": "https://www.biblegateway.com/versions/New-International-Version-NIV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "esv-2025-biblegateway",
+      "type": "web",
+      "title": "English Standard Version (ESV), 2025 text edition",
+      "authors": [
+        "Crossway"
+      ],
+      "year": 2025,
+      "publisher": "Crossway",
+      "url": "https://www.biblegateway.com/versions/English-Standard-Version-ESV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "nlt-2015-biblegateway",
+      "type": "web",
+      "title": "New Living Translation (NLT), 2015 text edition",
+      "authors": [
+        "Tyndale House Foundation"
+      ],
+      "year": 2015,
+      "publisher": "Tyndale House Publishers",
+      "url": "https://www.biblegateway.com/versions/New-Living-Translation-NLT-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "kjv-1987-biblegateway",
+      "type": "web",
+      "title": "King James Version (KJV), 1987 printing",
+      "authors": [
+        "Church of England"
+      ],
+      "year": 1987,
+      "publisher": "Public domain in the United States",
+      "url": "https://www.biblegateway.com/versions/King-James-Version-KJV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "nkjv-1982-biblegateway",
+      "type": "web",
+      "title": "New King James Version (NKJV), 1982",
+      "authors": [
+        "Thomas Nelson"
+      ],
+      "year": 1982,
+      "publisher": "Thomas Nelson",
+      "url": "https://www.biblegateway.com/versions/New-King-James-Version-NKJV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "csb-2017-biblegateway",
+      "type": "web",
+      "title": "Christian Standard Bible (CSB), 2017",
+      "authors": [
+        "Holman Bible Publishers"
+      ],
+      "year": 2017,
+      "publisher": "Holman Bible Publishers",
+      "url": "https://www.biblegateway.com/versions/Christian-Standard-Bible-CSB/",
+      "accessed": "2026-09-28"
     }
   ]
 }

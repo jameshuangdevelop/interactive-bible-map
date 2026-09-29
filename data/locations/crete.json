@@ -2,11 +2,12 @@
   "id": "crete",
   "names": {
     "ancient": [
-      "Crete",
-      "Creta"
+      "Crete"
     ],
     "modern": "Crete",
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
+      "Creta",
       "Kriti"
     ]
   },
@@ -34,7 +35,13 @@
       "wikidata:Q34374",
       "scripture:Acts 27:7",
       "scripture:Acts 27:13",
-      "scripture:Titus 1:5"
+      "scripture:Titus 1:5",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

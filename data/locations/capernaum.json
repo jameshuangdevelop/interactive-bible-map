@@ -2,11 +2,12 @@
   "id": "capernaum",
   "names": {
     "ancient": [
-      "Capernaum",
-      "Kfar Nahum"
+      "Capernaum"
     ],
     "modern": "Kfar Nahum / Tell Hum",
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
+      "Kfar Nahum",
       "Talhum"
     ]
   },
@@ -37,7 +38,13 @@
       "wikidata:Q59174",
       "openbible:capernaum",
       "scripture:Mark 1:21",
-      "scripture:Mark 2:1"
+      "scripture:Mark 2:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [
@@ -187,5 +194,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "lastReviewed": "2026-09-28"
 }

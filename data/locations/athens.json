@@ -2,11 +2,13 @@
   "id": "athens",
   "names": {
     "ancient": [
-      "Athens",
-      "Athenae"
+      "Athens"
     ],
     "modern": "Athens",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Athenae"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -33,7 +35,13 @@
       "wikidata:Q1524",
       "openbible:athens",
       "scripture:Acts 17:16",
-      "scripture:Acts 17:22"
+      "scripture:Acts 17:22",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

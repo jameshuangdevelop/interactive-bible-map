@@ -70,10 +70,26 @@ function collectBibSourceIds(locationRecord) {
   return Array.from(bibliographyIds).sort((a, b) => a.localeCompare(b));
 }
 
+function toAppNames(names) {
+  if (!names || typeof names !== "object") {
+    return names;
+  }
+
+  const { otherLanguages: _otherLanguages, ...appNames } = names;
+  return appNames;
+}
+
+function toAppLocationRecord(locationRecord) {
+  return {
+    ...locationRecord,
+    names: toAppNames(locationRecord.names)
+  };
+}
+
 function toIndexRecord(locationRecord) {
   return {
     id: locationRecord.id,
-    names: locationRecord.names,
+    names: toAppNames(locationRecord.names),
     type: locationRecord.type,
     zoomTier: locationRecord.zoomTier,
     parentId: locationRecord.parentId ?? null,
@@ -154,7 +170,7 @@ export async function buildAppData(options = {}) {
     });
 
     const placePayload = {
-      location: locationRecord,
+      location: toAppLocationRecord(locationRecord),
       media: mediaByLocationId.get(locationRecord.id) ?? null,
       bibliography: resolvedBibliography
     };

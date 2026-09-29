@@ -2,11 +2,13 @@
   "id": "philadelphia-lydia",
   "names": {
     "ancient": [
-      "Philadelphia",
-      "Philadelpheia"
+      "Philadelphia"
     ],
     "modern": "Alaşehir",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Philadelpheia"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -31,7 +33,13 @@
     "sources": [
       "pleiades:550822",
       "wikidata:Q138280",
-      "scripture:Revelation 3:7-13"
+      "scripture:Revelation 3:7-13",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

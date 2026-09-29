@@ -3,11 +3,13 @@
   "names": {
     "ancient": [
       "Laodicea",
-      "Laodicea on the Lycus",
-      "Laodicea ad Lycum"
+      "Laodicea on the Lycus"
     ],
     "modern": "Near Denizli",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Laodicea ad Lycum"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -34,7 +36,13 @@
       "wikidata:Q849709",
       "scripture:Colossians 4:13",
       "scripture:Colossians 4:16",
-      "scripture:Revelation 3:15-17"
+      "scripture:Revelation 3:15-17",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

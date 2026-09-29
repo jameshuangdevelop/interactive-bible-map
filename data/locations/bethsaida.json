@@ -2,10 +2,12 @@
   "id": "bethsaida",
   "names": {
     "ancient": [
-      "Bethsaida",
-      "Julias"
+      "Bethsaida"
     ],
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Julias"
+    ]
   },
   "type": "village",
   "zoomTier": "city",
@@ -48,7 +50,13 @@
     "sources": [
       "openbible:bethsaida-1",
       "scripture:John 1:44",
-      "scripture:Luke 9:10"
+      "scripture:Luke 9:10",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [

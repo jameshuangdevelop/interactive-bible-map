@@ -3,7 +3,8 @@
   "names": {
     "ancient": [
       "Cana",
-      "Cana of Galilee"
+      "Cana of Galilee",
+      "Cana in Galilee"
     ],
     "alternate": []
   },
@@ -62,7 +63,13 @@
     "sources": [
       "openbible:cana",
       "scripture:John 2:1",
-      "scripture:John 4:46"
+      "scripture:John 4:46",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [

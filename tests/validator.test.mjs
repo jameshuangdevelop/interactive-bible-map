@@ -59,6 +59,45 @@ async function runCase(caseName, options = {}) {
   });
 }
 
+async function runWithTemporaryCase(mutateLocations) {
+  const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-"));
+
+  try {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+
+    const capernaumPath = path.join(casesDirectory, "valid", "locations", "capernaum.json");
+    const galileePath = path.join(casesDirectory, "valid", "locations", "galilee.json");
+    const capernaumData = JSON.parse(fs.readFileSync(capernaumPath, "utf8"));
+    const galileeData = JSON.parse(fs.readFileSync(galileePath, "utf8"));
+
+    if (typeof mutateLocations === "function") {
+      mutateLocations({ capernaumData, galileeData });
+    }
+
+    fs.writeFileSync(
+      path.join(locationsDirectory, "capernaum.json"),
+      `${JSON.stringify(capernaumData, null, 2)}\n`
+    );
+    fs.writeFileSync(
+      path.join(locationsDirectory, "galilee.json"),
+      `${JSON.stringify(galileeData, null, 2)}\n`
+    );
+
+    return await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      webVplPath: webFixturePath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true
+    });
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
 function hasError(result, predicate) {
   return result.errors.some(predicate);
 }
@@ -662,5 +701,117 @@ test("warning is emitted when scripture text has no location name", async () => 
         warning.path === "$.scripture[0].textWEB" &&
         warning.message.includes("contains none of this location's configured names")
     )
+  );
+});
+
+test("names.otherLanguages accepts unique trimmed names", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: [],
+      otherLanguages: ["Kfar Nahum", "Kefar Nahum"]
+    };
+  });
+
+  assert.equal(result.errors.length, 0);
+});
+
+test("names.otherLanguages rejects untrimmed values", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: [],
+      otherLanguages: [" Kfar Nahum"]
+    };
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.otherLanguages[0]" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("names.otherLanguages rejects exact duplicate entries", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: [],
+      otherLanguages: ["Kfar Nahum", "Kfar Nahum"]
+    };
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.otherLanguages" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("duplicate names across name fields fail after case-insensitive Unicode normalization", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: ["B\u00e9roea"],
+      otherLanguages: ["B\u0045\u0301ROEA"]
+    };
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names" &&
+        error.message.includes("Duplicate location name")
+    )
+  );
+});
+
+test("duplicate names in ancient/alternate fail even when names.otherLanguages is absent", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: ["capernaum"]
+    };
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names" &&
+        error.message.includes("Duplicate location name")
+    )
+  );
+});
+
+test("names.modern matching an ancient name is not a duplicate error (Rome case)", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Rome"],
+      modern: "Rome",
+      alternate: []
+    };
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names" &&
+        error.message.includes("Duplicate location name")
+    ),
+    false
   );
 });

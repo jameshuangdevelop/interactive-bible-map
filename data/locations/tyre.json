@@ -6,7 +6,8 @@
       "Tyrus"
     ],
     "modern": "Sour / Tyre",
-    "alternate": [
+    "alternate": [],
+    "otherLanguages": [
       "Sour"
     ]
   },
@@ -39,7 +40,13 @@
       "scripture:Mark 7:26",
       "scripture:Acts 21:3",
       "scripture:Acts 21:4",
-      "scripture:Acts 21:7"
+      "scripture:Acts 21:7",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

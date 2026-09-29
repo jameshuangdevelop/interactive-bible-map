@@ -2,11 +2,15 @@
   "id": "cenchreae",
   "names": {
     "ancient": [
-      "Cenchreae",
-      "Kenchreai"
+      "Cenchreae"
     ],
     "modern": "Kechries",
-    "alternate": []
+    "alternate": [
+      "Cenchrea"
+    ],
+    "otherLanguages": [
+      "Kenchreai"
+    ]
   },
   "type": "town",
   "zoomTier": "city",
@@ -33,7 +37,13 @@
       "pleiades:570347",
       "wikidata:Q111565756",
       "scripture:Acts 18:18",
-      "scripture:Romans 16:1"
+      "scripture:Romans 16:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

@@ -6,8 +6,10 @@
     ],
     "modern": "Near Hatunsaray",
     "alternate": [
-      "Khatun Serai",
       "Tel Lystra"
+    ],
+    "otherLanguages": [
+      "Khatun Serai"
     ]
   },
   "type": "town",
@@ -36,7 +38,13 @@
       "scripture:Acts 14:11",
       "scripture:Acts 14:19",
       "scripture:Acts 16:1",
-      "scripture:Acts 16:2"
+      "scripture:Acts 16:2",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

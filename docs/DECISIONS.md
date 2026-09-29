@@ -164,3 +164,14 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Context:** ADR-0005 set a 1,500-credit guard per session. M3-03's first build needed about 1,600, including three rounds of fixes, and a real browser check that caught a broken build.
 - **Decision:** The guard is 10,000 AI credits per agent session, for the PO and every specialist. It replaces the 1,500 figure in ADR-0005 and in the task cards. Credit targets on cards stay as forecasts.
 - **Consequences:** Agents can finish thorough rework in one session instead of handing off. The month cap (1,000,000) and the 80% and 95% stops don't change.
+
+## ADR-0026 — English only: names follow the most popular English Bibles
+- **Date:** 2026-09-28 · **Status:** Accepted · **By:** the human ("for now, let's just make this map for english speakers only"; "Search doesn't need to support other languages either. We just need to make sure that as readers go through the Bible, they can look up the english names of the places"; "let's use the spelling that most popular versions agree on") and the PO
+- **Context:** The data mixed English Bible names with Hebrew, Greek, Latin, Arabic and Turkish forms, and the panel and search would have used them all. Malta's title was the KJV's "Melita".
+- **Decision:**
+  - The title is the spelling most of the NIV, ESV, NLT, KJV, NKJV and CSB agree on. An even split falls back to the WEB, which is the text the app quotes. Where versions differ because of a manuscript variant rather than a spelling, the title follows the record's identification and the WEB, and the other reading stays searchable. So far only Magdala ("Magadan" in 4 of 6 versions at Matthew 15:39) is affected; this exception is the PO's proposal, pending the human's confirmation.
+  - `names.ancient` and `names.alternate` hold English names only, including every version's spelling and the WEB's, and search covers exactly these.
+  - Other-language names move to `names.otherLanguages`, which the app never shows or searches; they stay only so the research isn't lost (the PO's default, pending the human's confirmation).
+  - Modern names and candidate labels are still shown in the panel but are not searched (also the PO's default, pending confirmation).
+  - The spelling comparison records spellings only, never verse text from copyrighted versions.
+- **Consequences:** M3-10 applies the rule to all 63 records, and M3-11's new records follow it. M3-04 shows the modern name as "Today: *name*". M3-05 searches English names only, so "Al-Quds", "Imwas" and "Alaşehir" no longer find anything. Other languages remain in the backlog.

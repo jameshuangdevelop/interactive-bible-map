@@ -2,11 +2,13 @@
   "id": "damascus",
   "names": {
     "ancient": [
-      "Damascus",
-      "Darmeseq"
+      "Damascus"
     ],
     "modern": "Damascus",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Darmeseq"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -34,7 +36,13 @@
       "openbible:damascus",
       "scripture:Acts 9:3",
       "scripture:Acts 9:27",
-      "scripture:Isaiah 7:8"
+      "scripture:Isaiah 7:8",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

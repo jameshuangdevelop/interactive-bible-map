@@ -2,11 +2,13 @@
   "id": "rome",
   "names": {
     "ancient": [
-      "Rome",
-      "Roma"
+      "Rome"
     ],
     "modern": "Rome",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Roma"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -35,7 +37,13 @@
       "scripture:Acts 28:16",
       "scripture:Acts 28:30",
       "scripture:Romans 1:7",
-      "scripture:Romans 15:24"
+      "scripture:Romans 15:24",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],

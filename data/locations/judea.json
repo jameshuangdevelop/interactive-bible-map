@@ -5,7 +5,9 @@
       "Judea",
       "Judaea"
     ],
-    "alternate": []
+    "alternate": [
+      "Jewry"
+    ]
   },
   "type": "region",
   "zoomTier": "region",
@@ -29,7 +31,13 @@
     "text": "Judea was the southern part of the historical land of Israel in the first century AD, encompassing Jerusalem and the surrounding hill country, and gave its name to the Herodian and Roman administrative units that governed the area through the New Testament period.",
     "sources": [
       "wikidata:Q104028",
-      "bib:rainey-notley-sacred-bridge"
+      "bib:rainey-notley-sacred-bridge",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [

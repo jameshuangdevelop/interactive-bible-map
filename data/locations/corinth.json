@@ -2,11 +2,13 @@
   "id": "corinth",
   "names": {
     "ancient": [
-      "Corinth",
-      "Korinthos"
+      "Corinth"
     ],
     "modern": "Ancient Corinth",
-    "alternate": []
+    "alternate": [],
+    "otherLanguages": [
+      "Korinthos"
+    ]
   },
   "type": "city",
   "zoomTier": "city",
@@ -36,7 +38,13 @@
       "scripture:Acts 18:11",
       "scripture:Acts 18:12",
       "scripture:1 Corinthians 1:2",
-      "scripture:2 Corinthians 1:1"
+      "scripture:2 Corinthians 1:1",
+      "bib:niv-2011-biblegateway",
+      "bib:esv-2025-biblegateway",
+      "bib:nlt-2015-biblegateway",
+      "bib:kjv-1987-biblegateway",
+      "bib:nkjv-1982-biblegateway",
+      "bib:csb-2017-biblegateway"
     ]
   },
   "history": [],
