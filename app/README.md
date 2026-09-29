@@ -1,14 +1,54 @@
 # Interactive Bible Map app
 
-This app is an Expo + React Native Web shell for the Interactive Bible Map project.
+This Expo + React Native Web app now renders the M3 map view with MapLibre GL JS 6.10.
 
-- **Expo SDK:** 57 (latest stable as of 2026-09-28; SDK 58 is still in beta)
-- **Runtime target:** Web-first, with native-ready React Native components
-- **Routing/state:** Single-page shell with plain Expo entry; web URL state (`?place=...&candidate=...`) will be added in M3-04 using the History API and `URLSearchParams`.
+## Map architecture (web)
+
+- **Renderer:** MapLibre GL JS (lazy-loaded with `React.lazy` so shell UI paints before map code parses).
+- **Basemap styles (hosted + committed):**
+  - `app/public/styles/liberty/style.json` (main)
+  - `app/public/styles/versatiles-colorful/style.json` (outage-only fallback)
+- **Basemap treatment:** physical-only (relief, natural landcover, water, rivers/streams), max zoom 14.
+- **Places rendering:** MapLibre sources/layers (clustered city-tier source, circle/symbol layers, canvas images via `map.addImage` for dashed candidate pins and `?` badge).
+- **Keyboard/screen reader path:** hidden DOM list of currently visible places (`button[data-place-entry-id]`), updated on `moveend`/`idle`.
+- **Selection state:** URL-backed (`?place=` + `&candidate=`), restored on load.
+
+## Map worker and export
+
+MapLibre 6 runs tile/layout work in a web worker. Before web export, the app copies:
+
+- `node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs`
+- every static relative import used by that worker (currently `maplibre-gl-shared.mjs`)
+  → `app/public/`
+
+The copy runs automatically in `preexport:web` (`npm run prepare:maplibre-worker`). These files stay untracked so they always match the installed MapLibre version.
+
+## Basemap fallback
+
+- Default basemap: hosted Liberty copy (`/styles/liberty/style.json`)
+- Automatic fallback: hosted VersaTiles copy (`/styles/versatiles-colorful/style.json`)
+- Trigger: **3 main-vector tile errors (`openmaptiles`) within 30 seconds**
+- User message on switch: _"The main map service isn't responding. Showing the backup map."_
+- Build-time override: `EXPO_PUBLIC_BASEMAP=fallback`
+
+## Regenerating hosted style files
+
+Run from repository root:
+
+```bash
+npm run build:basemap-styles
+```
+
+This refetches upstream style JSON and rewrites:
+
+- `app/public/styles/liberty/style.json`
+- `app/public/styles/liberty/LICENSE.txt`
+- `app/public/styles/versatiles-colorful/style.json`
+- `app/public/styles/versatiles-colorful/NOTICE.txt`
 
 ## Commands
 
-Run these from the repository root:
+Run from repository root:
 
 ```bash
 npm run lint
@@ -16,20 +56,22 @@ npm run typecheck
 npm run test:app
 npm run build:data
 npm run export:web
+npm run verify:web:playwright
 ```
 
-To run the app locally:
+Local development:
 
 ```bash
 npm run start --workspace interactive-bible-map-app
 npm run web --workspace interactive-bible-map-app
 ```
 
-## Generated data
+## Generated place payloads
 
-`npm run build:data` validates `data/` first, then writes generated app data to:
+`npm run build:data` validates `data/` and writes:
 
 - `app/public/generated/places.index.json`
 - `app/public/generated/places/<location-id>.json`
 
-These files are generated artifacts and are gitignored.
+These generated payloads are gitignored.
+

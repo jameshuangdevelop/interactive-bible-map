@@ -29,16 +29,17 @@ The reserved areas are **not built in M3**. The wireframes show them with dashed
 ## 2. The map
 
 ### Basemap
-- **Style:** based on OpenFreeMap **Liberty** (chosen at CP3a; ADR-0022), a colourful style close to Google Maps. It is customized and **hosted by the app** as its own style file (OpenFreeMap requires hosting a customized style yourself):
-  - English labels where the data has them;
-  - points of interest removed;
-  - **disputed boundary lines hidden** (the OpenMapTiles `boundary` layer, where `disputed = 1`; ADR-0009).
-- **Fallback:** a basemap from a **different provider or host**, so that it still works if OpenFreeMap itself is down (ADR-0009). The app switches to it automatically after repeated tile errors, and configuration can also switch it. The fallback must hide disputed boundaries too. M3-03 chooses it from the options whose licenses M3-07 verifies, for example a self-hosted Protomaps extract or another provider that needs no API key. OpenFreeMap's Bright and Liberty styles use the same servers, so they are theme alternatives, not fallbacks.
-- **Considered at CP3a:** OpenFreeMap Positron, a muted grey style, was the PO's recommendation. The human chose Liberty after comparing the renders below.
+- **Style (ADR-0024): an ancient, physical map.** For now the app shows the ancient world only, in English. The basemap is derived from OpenFreeMap **Liberty** (ADR-0022) and **hosted by the app** (OpenFreeMap requires hosting a customized style yourself). It keeps only:
+  - the background, the relief shading (`ne2_shaded`), natural landcover (wood, grass, scrub, sand, rock, ice, wetland), water, and rivers and streams.
+
+  It has **no text labels, roads, railways, borders, towns, farmland, parks, buildings or points of interest**, so no modern name or border appears. The only labels on the map are our own records, in English: places, regions, provinces and empires (§2 "Places on the map"). A modern layer with today's names comes with the Modern/Ancient toggle (M4).
+- **Zoom:** from 3 (the whole Mediterranean) to **14** (neighbourhood level), where Jerusalem's sites are still clearly apart and a physical map has nothing more to show.
+- **Fallback:** a basemap from a **different provider or host**, so that it still works if OpenFreeMap itself is down (ADR-0009). M3-03 uses the VersaTiles public server with our own copy of its Colorful style, given the same physical treatment. The app switches to it automatically after repeated tile errors, and configuration can also switch it. OpenFreeMap's Bright and Liberty styles use the same servers, so they are theme alternatives, not fallbacks.
+- **Considered at CP3a:** OpenFreeMap Positron, a muted grey style, was the PO's recommendation. The human chose Liberty after comparing the renders below, then asked for an ancient-only map after the first build (ADR-0024).
 
 
 ### Basemap options: what Positron and Liberty look like (CP3a decision 1)
-**Decided:** Liberty, on 2026-09-28 (ADR-0022). The comparison is kept as the record of the choice.
+**Decided:** Liberty, on 2026-09-28 (ADR-0022). The comparison is kept as the record of the choice. **Since then,** the app draws a physical version of Liberty, without labels, roads, borders or towns (ADR-0024), so the finished map looks plainer than these renders.
 
 These are real renders, not wireframes. They are what the app's map will look like, drawn with MapLibre 6.10 from OpenFreeMap tiles, with all 63 of our places in the pin colours from this spec.
 - **Customizations the app will make:** English labels where the map data has them, no points of interest, clustering below zoom 7, a "?" badge on disputed places (for example Emmaus) when zoomed out, and lettered candidates for any place with several candidates when zoomed in.
@@ -60,23 +61,26 @@ These are real renders, not wireframes. They are what the app's map will look li
 | City, town, village | Round pin with a white 2 px outline; label beside it | Deep red `#C5221F` |
 | Site within a city (for example the Temple Mount) | Round pin | Purple `#8430CE` |
 | Natural feature (for example the Sea of Galilee) | Round pin | Dark green `#0B6B2E` |
-| Region or island record (for example Galilee or Crete) | **No pin:** a clickable label in spaced capitals, `#5F6368` | — |
+| Empire (`type: "empire"`, from M3-11; for example the Roman Empire) | **No pin:** a clickable label in spaced capitals, 15 px, `#5F6368` | — |
+| Province (`type: "province"`, from M3-11; for example Achaia or Macedonia) | **No pin:** a clickable label in spaced capitals, 13 px, `#5F6368` | — |
+| Region or island record (for example Galilee or Crete) | **No pin:** a clickable label in spaced capitals, 12 px, `#5F6368` | — |
 
+- **Drawn by the map (ADR-0024):** pins, labels, clusters, badges and candidate letters are MapLibre layers, drawn on the graphics card in the same frame as the map, so they never lag behind a drag or zoom. Labels that would overlap are hidden automatically; a hidden label still appears in the hover tooltip. The label priority is the selected place, then empires, provinces, regions, cities, towns, villages, sites and natural features, then the data's order. Map labels use the basemap's Noto Sans font.
 - **Contrast on Liberty:** every pin colour has at least 3:1 contrast against every Liberty background, park, wood, grass, building and water colour; the lowest is red on water, at 3.1:1. The natural-feature green was darkened from `#188038` because that colour reached only 2.7:1 on water, where pins such as the Sea of Galilee sit. The white outline separates each pin from the map.
 - **Selected place:** its pin grows by about 30% and gets a drop shadow; the other pins stay as they are.
 - **Hover** (on desktop): a tooltip with the name and type.
-- **Pins are real buttons**, so they can be reached by keyboard (see §7).
+- **Keyboard:** every place on the map can be reached by keyboard through the list of visible places (see §7).
 
 ### Zoom tiers
 The data's `zoomTier` decides when a place appears. The initial view shows the whole Mediterranean, from Rome to Damascus and down to the Nile delta.
 
 | `zoomTier` | Visible from zoom | Notes |
 |---|---|---|
-| `region` | 4 to 9 | Labels only; they fade out as you zoom in. |
+| `region` | 6 to 9 | Labels only; they fade out as you zoom in. Within this tier, empire labels show from zoom 3 to 5, and province labels from 4 to 8. |
 | `city` | 4 | Nearby pins **cluster** into a count bubble below zoom 7. Clicking a bubble zooms in. |
 | `site` | 12 | Sites inside a city (Jerusalem's Temple Mount, pools and so on) appear only when zoomed in. |
 
-**Selecting a place zooms the map to it:** a city to about zoom 11, a site to about zoom 15, and a region to about zoom 7. A place with several candidates zooms to fit all of them. If the user prefers reduced motion, the map jumps instead of flying.
+**Selecting a place zooms the map to it:** a city to about zoom 11, a site to zoom 14 (the closest zoom), a region or province to about zoom 7, and an empire to about zoom 4. A place with several candidates zooms to fit all of them. If the user prefers reduced motion, the map jumps instead of flying.
 
 ### Places with several candidate sites
 A place is **disputed** when at least one of its candidates has confidence `disputed` (see `schema/README.md`), for example Emmaus, Bethsaida and Cana. Other places also have several candidates without being disputed: Jericho's Old Testament tell and Herodian city, or Malta with a low-confidence minority proposal.
@@ -149,8 +153,8 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 7. Accessibility (WCAG 2.2 AA)
 - **Contrast:** text at least 4.5:1; pins, outlines and controls at least 3:1 against the basemap.
 - **Keyboard:**
-  - Everything is reachable, in this order: search, map controls, pins, then the panel.
-  - Pins are buttons named like "Capernaum, city".
+  - Everything is reachable, in this order: search, map controls, the places on the map, then the panel.
+  - The map draws its pins itself (ADR-0024), so keyboard and screen-reader users get a **list of the places currently on the map**, kept in step with it after each pan or zoom ends. Each entry is a button named like "Capernaum, city", or "Cluster of 7 places". Tab moves through the list in reading order (top to bottom, then left to right). A focus ring is drawn around the focused pin on the map, the map pans if the pin is hidden under the panel, and Enter selects the place or zooms into the cluster. The list is capped at 200 entries, with "Zoom in or search to reach more places" after them.
   - The focus ring is 2 px `#1A73E8` with a 2 px offset.
   - Esc closes search results and the panel.
 - **Screen readers:**
@@ -179,11 +183,12 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 
 ## 11. Performance targets
 - **Load speed:** measured with Lighthouse's **desktop preset on a cold cache** against the preview deploy, the Largest Contentful Paint must be **2.5 s or less**, and the Total Blocking Time **200 ms or less**. These are Lighthouse's "good" thresholds.
+- **Smooth dragging and zooming (ADR-0024):** pins, labels and clusters move with the map in the same frame, never behind it. With **10,000 test points** loaded, no main-thread task may exceed 50 ms while dragging or zooming, and the page's DOM may not change during the gesture.
 - **Data loading:** the map and search data (about 18 KB minified) load with the app. Each place's details load when it is opened; the largest, Jerusalem, is about 36 KB minified.
 - **Images:** load lazily, using Commons thumbnail URLs at panel size rather than full-resolution files.
 
 ## 12. Not in M3
-The Ancient layer and timeline (M4), the Routes tab (M5), responsive polish (M7), a native app build, offline use, other languages, and search by verse or person.
+The Ancient layer's borders and timeline (M4), the Modern/Ancient toggle and modern labels (M4), the Routes tab (M5), responsive polish (M7), a native app build, offline use, other languages, and search by verse or person.
 
 ## Wireframes
 | File | Shows |
