@@ -81,7 +81,9 @@ const questionBadgeImageId = "ibm-question-badge-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const mapTestHookKey = "__ibmMapForTests";
+const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
+const gestureReleaseDelayMs = 1_000;
 
 const interactiveLayerIds = [
   layerClusterCircleId,
@@ -603,58 +605,6 @@ function ensureMapLayers(map: MapLibreMap) {
     });
   }
 
-  if (!map.getLayer(layerPinLabelId)) {
-    map.addLayer({
-      id: layerPinLabelId,
-      source: sourceClusteredCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter([
-        "all",
-        ["!", ["has", "point_count"]],
-        basePinVisibilityFilter,
-        ["!=", ["get", "labelText"], null]
-      ]),
-      layout: {
-        "text-field": ["get", "labelText"],
-        "text-font": ["Noto Sans Regular"],
-        "text-size": 12,
-        "text-offset": [1.2, 0],
-        "text-anchor": "left",
-        "symbol-sort-key": ["get", "labelPriority"],
-        "text-optional": true
-      },
-      paint: {
-        "text-color": "#202124",
-        "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.3
-      }
-    });
-  }
-
-  if (!map.getLayer(layerAreaLabelId)) {
-    map.addLayer({
-      id: layerAreaLabelId,
-      source: sourceAreaLabelsId,
-      type: "symbol",
-      filter: toLayerFilter(areaLabelVisibilityFilter),
-      layout: {
-        "text-field": ["get", "placeName"],
-        "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
-        "text-size": ["get", "areaFontSize"],
-        "text-letter-spacing": 0.18,
-        "symbol-sort-key": ["get", "labelPriority"],
-        "text-optional": true,
-        ...AREA_LABEL_OFFSET_LAYOUT
-      },
-      paint: {
-        "text-color": "#5F6368",
-        "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.4
-      }
-    });
-  }
-
   if (!map.getLayer(layerClusterCollisionMaskId)) {
     map.addLayer({
       id: layerClusterCollisionMaskId,
@@ -704,6 +654,58 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      }
+    });
+  }
+
+  if (!map.getLayer(layerPinLabelId)) {
+    map.addLayer({
+      id: layerPinLabelId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [1.2, 0],
+        "text-anchor": "left",
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAreaLabelId)) {
+    map.addLayer({
+      id: layerAreaLabelId,
+      source: sourceAreaLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(areaLabelVisibilityFilter),
+      layout: {
+        "text-field": ["get", "placeName"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["get", "areaFontSize"],
+        "text-letter-spacing": 0.18,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true,
+        ...AREA_LABEL_OFFSET_LAYOUT
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
       }
     });
   }
@@ -1230,7 +1232,20 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     });
 
     mapRef.current = map;
-    (window as Window & { [mapTestHookKey]?: MapLibreMap })[mapTestHookKey] = map;
+    (
+      window as Window & {
+        [mapTestHookKey]?: MapLibreMap;
+        [visibleEntryRefreshHookKey]?: () => void;
+      }
+    )[mapTestHookKey] = map;
+    (
+      window as Window & {
+        [mapTestHookKey]?: MapLibreMap;
+        [visibleEntryRefreshHookKey]?: () => void;
+      }
+    )[visibleEntryRefreshHookKey] = () => {
+      refreshVisibleEntryState();
+    };
     syncAttributionControl(map, basemapController.getState().mode);
 
     const markGestureStarted = () => {
@@ -1251,7 +1266,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         gestureInProgressRef.current = false;
         gestureReleaseTimeoutRef.current = null;
         scheduleVisibleEntryRefresh();
-      }, 500);
+      }, gestureReleaseDelayMs);
     };
 
     const handleError = (event: ErrorEvent) => {
@@ -1307,7 +1322,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayers();
-      scheduleVisibleEntryRefresh();
+      refreshVisibleEntryState();
       updateScaleBar();
       setMapReadyVersion((value) => value + 1);
 
@@ -1337,12 +1352,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
     map.on("moveend", scheduleVisibleEntryRefresh);
-    map.on("idle", scheduleVisibleEntryRefresh);
     map.on("resize", scheduleVisibleEntryRefresh);
     map.on("dragstart", markGestureStarted);
-    map.on("zoomstart", markGestureStarted);
     map.on("dragend", markGestureFinished);
-    map.on("zoomend", markGestureFinished);
     map.on("mousemove", handleMouseMove);
     map.on("mouseout", hideTooltip);
     map.on("click", handleMapClick);
@@ -1363,12 +1375,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       map.off("load", handleStyleReady);
       map.off("style.load", handleStyleReady);
       map.off("moveend", scheduleVisibleEntryRefresh);
-      map.off("idle", scheduleVisibleEntryRefresh);
       map.off("resize", scheduleVisibleEntryRefresh);
       map.off("dragstart", markGestureStarted);
-      map.off("zoomstart", markGestureStarted);
       map.off("dragend", markGestureFinished);
-      map.off("zoomend", markGestureFinished);
       map.off("mousemove", handleMouseMove);
       map.off("mouseout", hideTooltip);
       map.off("click", handleMapClick);
@@ -1383,7 +1392,18 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       attributionModeRef.current = null;
       map.remove();
       mapRef.current = null;
-      delete (window as Window & { [mapTestHookKey]?: MapLibreMap })[mapTestHookKey];
+      delete (
+        window as Window & {
+          [mapTestHookKey]?: MapLibreMap;
+          [visibleEntryRefreshHookKey]?: () => void;
+        }
+      )[mapTestHookKey];
+      delete (
+        window as Window & {
+          [mapTestHookKey]?: MapLibreMap;
+          [visibleEntryRefreshHookKey]?: () => void;
+        }
+      )[visibleEntryRefreshHookKey];
       styleReadyRef.current = false;
     };
   }, [
@@ -1392,6 +1412,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     clearMainSourceLoadTimeout,
     handleTooltipAtPoint,
     hideTooltip,
+    refreshVisibleEntryState,
     scheduleMainSourceLoadTimeout,
     scheduleVisibleEntryRefresh,
     switchToFallback,
@@ -1406,8 +1427,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     }
 
     syncSourcesAndLayers();
-    scheduleVisibleEntryRefresh();
-  }, [scheduleVisibleEntryRefresh, syncSourcesAndLayers]);
+    refreshVisibleEntryState();
+  }, [refreshVisibleEntryState, syncSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBar();

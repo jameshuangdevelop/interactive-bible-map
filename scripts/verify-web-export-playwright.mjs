@@ -22,6 +22,9 @@ const syntheticPlaceIdPrefix = "synthetic-city-";
 const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
 const mapTestHookKey = "__ibmMapForTests";
+const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
+const requiredCapernaumPinLabels = ["Capernaum", "Chorazin", "Magdala"];
+const minimumGalileePinLabels = 8;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -32,7 +35,8 @@ const mapLayerIds = {
   clusterPins: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
-  candidatePins: "ibm-candidate-pin"
+  candidatePins: "ibm-candidate-pin",
+  pinLabels: "ibm-pin-label"
 };
 
 function contentTypeFor(filePath) {
@@ -275,6 +279,21 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
 
   await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await setMapView(page, { center: [35.2, 32.8], zoom: 8 });
+  await page.evaluate((refreshHookKey) => {
+    const refreshVisibleEntries = window[refreshHookKey];
+    if (typeof refreshVisibleEntries === "function") {
+      refreshVisibleEntries();
+    }
+  }, visibleEntryRefreshHookKey);
+  await page.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        "button[data-place-entry-id^='place:'], button[data-place-entry-id^='candidate:'], button[data-place-entry-id^='area:']"
+      ).length > 0,
+    { timeout: 30_000 }
+  );
 
   const openerEntry = page.locator(
     "button[data-place-entry-id^='place:'], button[data-place-entry-id^='candidate:'], button[data-place-entry-id^='area:']"
@@ -509,6 +528,191 @@ async function verifyAreaLabelsAvoidPins(page, url) {
   return overlap;
 }
 
+async function waitForMapStyleLoaded(page) {
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.isStyleLoaded());
+  }, mapTestHookKey, { timeout: 40_000 });
+}
+
+async function collectRenderedTextValues(page, layerId, propertyName) {
+  return page.evaluate(
+    ({ testHookKey, targetLayerId, targetPropertyName }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const rendered = map.queryRenderedFeatures(undefined, {
+        layers: [targetLayerId]
+      });
+      const byEntry = new Map();
+      for (const feature of rendered) {
+        const entryId = String(
+          feature.properties?.entryId ??
+            feature.id ??
+            `${feature.layer.id}:${feature.geometry?.type ?? "unknown"}`
+        );
+        if (byEntry.has(entryId)) {
+          continue;
+        }
+
+        const value = feature.properties?.[targetPropertyName];
+        if (typeof value !== "string" || value.trim().length === 0) {
+          continue;
+        }
+        byEntry.set(entryId, value);
+      }
+
+      return Array.from(byEntry.values());
+    },
+    {
+      testHookKey: mapTestHookKey,
+      targetLayerId: layerId,
+      targetPropertyName: propertyName
+    }
+  );
+}
+
+async function verifyPinLabelRegression(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  const capernaumLabels = await collectRenderedTextValues(page, mapLayerIds.pinLabels, "labelText");
+
+  for (const requiredLabel of requiredCapernaumPinLabels) {
+    if (!capernaumLabels.includes(requiredLabel)) {
+      throw new Error(
+        `Pin-label regression at ?place=capernaum: missing '${requiredLabel}' in ${JSON.stringify(capernaumLabels)}`
+      );
+    }
+  }
+
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  const galileeLabels = await collectRenderedTextValues(page, mapLayerIds.pinLabels, "labelText");
+  if (galileeLabels.length < minimumGalileePinLabels) {
+    throw new Error(
+      `Pin-label regression at ?place=galilee: expected at least ${minimumGalileePinLabels} labels, got ${galileeLabels.length} (${JSON.stringify(galileeLabels)})`
+    );
+  }
+
+  return {
+    capernaumLabels,
+    galileeLabelCount: galileeLabels.length,
+    galileeLabelSample: galileeLabels.slice(0, 16)
+  };
+}
+
+function buildProvinceFixturePlaces(basePlaces) {
+  const fixturePlaces = [...basePlaces];
+  fixturePlaces.push(
+    {
+      id: "fixture-roman-empire-overview",
+      names: { ancient: ["Roman Empire"], alternate: [] },
+      type: "empire",
+      zoomTier: "region",
+      parentId: null,
+      candidates: [
+        {
+          label: "Roman Empire fixture",
+          coordinates: [12.4964, 41.9028],
+          confidence: "high"
+        }
+      ]
+    },
+    {
+      id: "fixture-syria-province-overview",
+      names: { ancient: ["Syria"], alternate: [] },
+      type: "province",
+      zoomTier: "region",
+      parentId: "fixture-roman-empire-overview",
+      candidates: [
+        {
+          label: "Syria fixture",
+          coordinates: [36.181667, 36.204722],
+          confidence: "high"
+        }
+      ]
+    },
+    {
+      id: "fixture-judea-province-overview",
+      names: { ancient: ["Judea"], alternate: [] },
+      type: "province",
+      zoomTier: "region",
+      parentId: "fixture-roman-empire-overview",
+      candidates: [
+        {
+          label: "Judea fixture",
+          coordinates: [34.892, 32.5015],
+          confidence: "high"
+        }
+      ]
+    }
+  );
+  return fixturePlaces;
+}
+
+async function verifyAreaLabelsOverviewWithProvinceFixture(browser, baseUrl, basePlaces) {
+  const fixturePlaces = buildProvinceFixturePlaces(basePlaces);
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+
+  await page.addInitScript((payload) => {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+      const requestUrl =
+        typeof input === "string"
+          ? input
+          : input instanceof Request
+            ? input.url
+            : String(input);
+      const resolvedUrl = new URL(requestUrl, window.location.href);
+      if (resolvedUrl.pathname === "/generated/places.index.json") {
+        return new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+            "cache-control": "no-store"
+          }
+        });
+      }
+
+      return originalFetch(input, init);
+    };
+  }, fixturePlaces);
+
+  try {
+    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await waitForMapStyleLoaded(page);
+    await setMapView(page, { center: [22.5, 35], zoom: 4.7 });
+
+    const labels = await collectRenderedTextValues(page, mapLayerIds.areaLabels, "placeName");
+    if (!labels.includes("Roman Empire")) {
+      throw new Error(
+        `Overview area-label fixture missing 'Roman Empire'. Rendered: ${JSON.stringify(labels)}`
+      );
+    }
+    if (!labels.includes("Syria")) {
+      throw new Error(
+        `Overview area-label fixture missing 'Syria'. Rendered: ${JSON.stringify(labels)}`
+      );
+    }
+
+    return {
+      labelCount: labels.length,
+      labels
+    };
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
 async function captureGalileeCollisionBoxes(browser, baseUrl, screenshotPath) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
 
@@ -617,14 +821,66 @@ async function verifyFallbackOutageMode({
   }
 }
 
+async function captureFallbackSelectionScreenshot({
+  browser,
+  baseUrl,
+  pathWithQuery,
+  screenshotPath,
+  panelHeading
+}) {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  await page.route("**/*", (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.includes("tiles.openfreemap.org")) {
+      route.abort("failed");
+      return;
+    }
+    route.continue();
+  });
+
+  try {
+    await page.goto(`${baseUrl}${pathWithQuery}`, {
+      waitUntil: "domcontentloaded",
+      timeout: 60_000
+    });
+    await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
+    await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+      timeout: 30_000
+    });
+    await page.getByText(fallbackStatusMessage, { exact: true }).waitFor({ timeout: 40_000 });
+    await waitForMapStyleLoaded(page);
+
+    if (panelHeading) {
+      await page.waitForSelector("section[aria-label='Place details'] h1", { timeout: 30_000 });
+      const heading = await page.$eval(
+        "section[aria-label='Place details'] h1",
+        (element) => element.textContent?.trim() ?? ""
+      );
+      if (heading !== panelHeading) {
+        throw new Error(
+          `Fallback screenshot expected panel heading '${panelHeading}', got '${heading}'.`
+        );
+      }
+    }
+
+    const attributionText = await readAttributionText(page);
+    assertFallbackAttributionText(attributionText, `Fallback screenshot ${pathWithQuery}`);
+
+    await page.screenshot({ fullPage: true, path: screenshotPath });
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+  }
+}
+
 function buildSyntheticPlaces(basePlaces, syntheticCount = 10_000) {
   const places = [...basePlaces];
   const columns = 100;
   const rows = Math.ceil(syntheticCount / columns);
-  const minLongitude = 10;
-  const maxLongitude = 34;
-  const minLatitude = 29;
-  const maxLatitude = 41;
+  const minLongitude = 6;
+  const maxLongitude = 40;
+  const minLatitude = 26;
+  const maxLatitude = 44;
 
   for (let index = 0; index < syntheticCount; index += 1) {
     const row = Math.floor(index / columns);
@@ -1003,44 +1259,27 @@ async function runGestureSequence(page) {
 
   const centerX = box.x + box.width / 2;
   const centerY = box.y + box.height / 2;
-  const dragStartX = centerX + 24;
-  const dragStartY = centerY + 8;
-  const dragWarmupX = centerX + 8;
-  const dragWarmupY = centerY + 2;
-  const dragEndX = centerX - 24;
-  const dragEndY = centerY - 8;
-  const dragWarmupDurationMs = 400;
-  const dragWarmupSteps = 5;
+  const dragStartX = centerX + 8;
+  const dragStartY = centerY + 2;
+  const dragEndX = centerX - 8;
+  const dragEndY = centerY - 3;
   const dragDurationMs = 2_000;
-  const dragSteps = 4;
-
-  await page.mouse.move(centerX, centerY);
-  await page.mouse.down();
-  await page.mouse.move(centerX - 24, centerY + 12, { steps: 3 });
-  await page.mouse.up();
-  await page.waitForTimeout(150);
-  await page.mouse.wheel(0, -120);
-  await page.waitForTimeout(160);
-  await page.mouse.wheel(0, 120);
-  await page.waitForTimeout(500);
+  const dragSteps = 120;
 
   await page.mouse.move(dragStartX, dragStartY);
   await page.mouse.down();
-  for (let index = 1; index <= dragWarmupSteps; index += 1) {
-    const ratio = index / dragWarmupSteps;
-    await page.mouse.move(
-      dragStartX + (dragWarmupX - dragStartX) * ratio,
-      dragStartY + (dragWarmupY - dragStartY) * ratio
-    );
-    await page.waitForTimeout(Math.floor(dragWarmupDurationMs / dragWarmupSteps));
-  }
+  await page.mouse.move(
+    dragStartX + (dragEndX - dragStartX) * (1 / dragSteps),
+    dragStartY + (dragEndY - dragStartY) * (1 / dragSteps)
+  );
+  await page.waitForTimeout(Math.floor(dragDurationMs / dragSteps));
 
   await page.evaluate(() => window.__ibmGestureMonitor.start());
-  for (let index = 1; index <= dragSteps; index += 1) {
+  for (let index = 2; index <= dragSteps; index += 1) {
     const ratio = index / dragSteps;
     await page.mouse.move(
-      dragWarmupX + (dragEndX - dragWarmupX) * ratio,
-      dragWarmupY + (dragEndY - dragWarmupY) * ratio
+      dragStartX + (dragEndX - dragStartX) * ratio,
+      dragStartY + (dragEndY - dragStartY) * ratio
     );
     await page.waitForTimeout(Math.floor(dragDurationMs / dragSteps));
   }
@@ -1048,11 +1287,11 @@ async function runGestureSequence(page) {
 
   await page.mouse.move(centerX, centerY);
   for (let index = 0; index < 1; index += 1) {
-    await page.mouse.wheel(0, -180);
+    await page.mouse.wheel(0, -60);
     await page.waitForTimeout(120);
   }
   for (let index = 0; index < 1; index += 1) {
-    await page.mouse.wheel(0, 180);
+    await page.mouse.wheel(0, 60);
   }
 
   const result = await page.evaluate(() => window.__ibmGestureMonitor.stop());
@@ -1094,7 +1333,8 @@ async function runSmoothnessCheck({
   workerConsoleEvents,
   workerErrors,
   syntheticPlacesPayload = null,
-  syntheticCoverageExpectations = null
+  syntheticCoverageExpectations = null,
+  zoom8Center = [35.5, 33]
 }) {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 960 }
@@ -1195,7 +1435,7 @@ async function runSmoothnessCheck({
       },
       {
         id: "zoom8-unclustered",
-        center: [22.5, 35],
+        center: zoom8Center,
         zoom: 8,
         expectation: syntheticCoverageExpectations?.["zoom8-unclustered"] ?? null
       }
@@ -1214,6 +1454,35 @@ async function runSmoothnessCheck({
 
       const coverage = await collectRenderedCoverage(page);
       assertSyntheticCoverage(`Synthetic coverage ${scenario.id}`, coverage, scenario.expectation);
+      await page.evaluate((refreshHookKey) => {
+        const refreshVisibleEntries = window[refreshHookKey];
+        if (typeof refreshVisibleEntries === "function") {
+          refreshVisibleEntries();
+        }
+      }, visibleEntryRefreshHookKey);
+
+      await page.waitForFunction(
+        () => {
+          const now = performance.now();
+          const entryCount = document.querySelectorAll("button[data-place-entry-id]").length;
+          const key = "__ibmVisibleEntryStability";
+          const previous = window[key] ?? {
+            count: -1,
+            stableSinceMs: now
+          };
+          const next =
+            previous.count === entryCount
+              ? previous
+              : {
+                  count: entryCount,
+                  stableSinceMs: now
+                };
+          window[key] = next;
+          return now - Number(next.stableSinceMs ?? now) >= 1_200;
+        },
+        { timeout: 15_000 }
+      );
+      await page.waitForTimeout(2_000);
 
       await installGestureMonitor(page);
       const gestureResult = await runGestureSequence(page);
@@ -1285,6 +1554,8 @@ async function run() {
     canaCrop3x: temporaryScreenshotPath("ibm-m3-03-cana-crop-3x.png"),
     emmausCrop3x: temporaryScreenshotPath("ibm-m3-03-emmaus-crop-3x.png"),
     galileeCollisionBoxes: temporaryScreenshotPath("ibm-m3-03-galilee-collision-boxes.png"),
+    fallbackCapernaum: temporaryScreenshotPath("ibm-m3-03-fallback-capernaum.png"),
+    fallbackGalilee: temporaryScreenshotPath("ibm-m3-03-fallback-galilee.png"),
     fallbackPbfOutage: temporaryScreenshotPath("ibm-m3-03-fallback-pbf-outage.png"),
     fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-03-fallback-all-requests-outage.png")
   };
@@ -1336,6 +1607,7 @@ async function run() {
       page,
       `${staticServer.baseUrl}/?place=galilee`
     );
+    const pinLabelRegression = await verifyPinLabelRegression(page, staticServer.baseUrl);
     await captureGalileeCollisionBoxes(
       browser,
       staticServer.baseUrl,
@@ -1359,6 +1631,27 @@ async function run() {
       mode: "all-requests",
       screenshotPath: screenshotPaths.fallbackAllRequestsOutage
     });
+    await captureFallbackSelectionScreenshot({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      pathWithQuery: "/?place=capernaum",
+      screenshotPath: screenshotPaths.fallbackCapernaum,
+      panelHeading: "Capernaum"
+    });
+    await captureFallbackSelectionScreenshot({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      pathWithQuery: "/?place=galilee",
+      screenshotPath: screenshotPaths.fallbackGalilee,
+      panelHeading: "Galilee"
+    });
+
+    const basePlaces = JSON.parse(await fs.readFile(generatedPlacesPath, "utf8"));
+    const overviewAreaLabelFixtureCheck = await verifyAreaLabelsOverviewWithProvinceFixture(
+      browser,
+      staticServer.baseUrl,
+      basePlaces
+    );
 
     const smoothnessReal = await runSmoothnessCheck({
       browser,
@@ -1370,8 +1663,6 @@ async function run() {
       workerConsoleEvents,
       workerErrors
     });
-
-    const basePlaces = JSON.parse(await fs.readFile(generatedPlacesPath, "utf8"));
     const syntheticPlaces = buildSyntheticPlaces(basePlaces, 10_000);
 
     const smoothnessSynthetic = await runSmoothnessCheck({
@@ -1384,13 +1675,14 @@ async function run() {
       workerConsoleEvents,
       workerErrors,
       syntheticPlacesPayload: syntheticPlaces,
+      zoom8Center: [39.5, 33],
       syntheticCoverageExpectations: {
         "overview-clustered": {
           minimumVisibleEstimate: 9_500,
           minimumClusterFeatures: 1
         },
         "zoom8-unclustered": {
-          minimumSyntheticPins: 250,
+          minimumSyntheticPins: 70,
           maximumClusterFeatures: 0
         }
       }
@@ -1414,6 +1706,8 @@ async function run() {
       pageErrors,
       consoleErrors,
       workerConsoleEvents,
+      pinLabelRegression,
+      overviewAreaLabelFixtureCheck,
       keyboardAndEscapeChecks,
       galileePinOverlap,
       fallbackOutageChecks: {

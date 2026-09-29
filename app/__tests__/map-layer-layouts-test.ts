@@ -30,13 +30,13 @@ describe("map layer layouts", () => {
       "icon-allow-overlap": true,
       "icon-ignore-placement": false
     });
-    expect(PIN_COLLISION_IMAGE_SIZE).toBe(36);
+    expect(PIN_COLLISION_IMAGE_SIZE).toBe(20);
     expect(CLUSTER_COLLISION_IMAGE_SIZE).toBe(44);
   });
 
   test("offsets area labels from pin coordinates with variable anchors", () => {
     expect(AREA_LABEL_OFFSET_LAYOUT).toEqual({
-      "text-variable-anchor": ["center", "top", "bottom", "left", "right"],
+      "text-variable-anchor": ["top", "bottom", "left", "right"],
       "text-radial-offset": 0.9,
       "text-justify": "auto"
     });

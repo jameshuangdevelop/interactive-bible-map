@@ -173,7 +173,6 @@ describe("map render data", () => {
     expect(cityPin).toBeDefined();
     expect(areaLabel?.geometry.coordinates).toEqual(cityPin?.geometry.coordinates);
     expect(AREA_LABEL_OFFSET_LAYOUT["text-variable-anchor"]).toEqual([
-      "center",
       "top",
       "bottom",
       "left",
