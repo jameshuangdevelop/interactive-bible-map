@@ -532,6 +532,45 @@ test("parentId chains cannot contain cycles", async () => {
   );
 });
 
+test("self-referencing parentId is reported as a cycle", async () => {
+  const result = await runWithTemporaryHierarchyCase(({ cityData }) => {
+    cityData.parentId = cityData.id;
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.parentId" &&
+        error.message.includes("must not contain cycles")
+    )
+  );
+});
+
+test("three-hop parentId cycle is reported and validation terminates", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData, empireData }) => {
+      cityData.parentId = provinceData.id;
+
+      provinceData.type = "city";
+      provinceData.zoomTier = "city";
+      provinceData.parentId = empireData.id;
+
+      empireData.type = "city";
+      empireData.zoomTier = "city";
+      empireData.parentId = cityData.id;
+    }
+  );
+
+  const cycleErrorCount = result.errors.filter(
+    (error) =>
+      error.path === "$.parentId" &&
+      error.message.includes("must not contain cycles")
+  ).length;
+  assert.ok(cycleErrorCount >= 3);
+});
+
 test("records of type empire must not define parentId", async () => {
   const result = await runWithTemporaryHierarchyCase(({ empireData }) => {
     empireData.parentId = "achaia";
@@ -553,6 +592,11 @@ test("records of type province must define parentId", async () => {
     delete provinceData.parentId;
   });
 
+  const provinceParentErrors = result.errors.filter(
+    (error) => error.file.endsWith("achaia.json") && error.path === "$.parentId"
+  );
+
+  assert.equal(provinceParentErrors.length, 1);
   assert.ok(
     hasError(
       result,

@@ -493,6 +493,8 @@ function validateLocationHierarchy({
   requireEmpireRoot,
   errors
 }) {
+  const provinceWithoutParentIds = new Set();
+
   for (const locationRecord of locationRecordsById.values()) {
     const { data, relativePath } = locationRecord;
     const locationType = data?.type;
@@ -524,6 +526,9 @@ function validateLocationHierarchy({
           "$.parentId",
           "Records of type 'province' must define parentId pointing to an empire record"
         );
+        if (typeof data?.id === "string") {
+          provinceWithoutParentIds.add(data.id);
+        }
         continue;
       }
 
@@ -594,14 +599,24 @@ function validateLocationHierarchy({
   }
 
   for (const locationRecord of locationRecordsById.values()) {
+    const locationId = locationRecord.data?.id;
+    if (
+      typeof locationId === "string" &&
+      provinceWithoutParentIds.has(locationId)
+    ) {
+      continue;
+    }
+
     let currentRecord = locationRecord;
     const visitedIds = new Set();
     let chainResolved = true;
+    let chainHasCycle = false;
 
     while (currentRecord) {
       const currentId = currentRecord.data?.id;
       if (typeof currentId === "string") {
         if (visitedIds.has(currentId)) {
+          chainHasCycle = true;
           chainResolved = false;
           break;
         }
@@ -620,6 +635,12 @@ function validateLocationHierarchy({
       }
 
       currentRecord = parentRecord;
+    }
+
+    // If an ancestor chain reaches a cycle, the dedicated cycle pass above
+    // has already emitted that error, so skip duplicate empire-root errors.
+    if (chainHasCycle) {
+      continue;
     }
 
     if (!chainResolved || !currentRecord) {
