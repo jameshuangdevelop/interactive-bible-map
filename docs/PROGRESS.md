@@ -26,6 +26,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged | #20 |
 | M3-10 | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Done, PR pending review | — |
 | M3-11 | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Done, PR pending review | — |
+| M3-12 | Smoother dragging and zooming | frontend-engineer | `feat/m3-smooth-map` | In progress (subagent) | — |
 
 ## Open questions
 - **Answered by the human (2026-09-29):** Magdala keeps its title; Paneas stays in `otherLanguages`; searching "Judah" should find Judea; the two Judea records stay; and well-known areas keep related verses. The data follow-ups ("Judah", and more well-known areas such as Egypt) are in `BACKLOG.md`.
