@@ -989,6 +989,26 @@ test("names.otherLanguages rejects untrimmed values", async () => {
   );
 });
 
+test("names.otherLanguages rejects exact duplicate entries", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.names = {
+      ancient: ["Capernaum"],
+      modern: "Tell Hum",
+      alternate: [],
+      otherLanguages: ["Kfar Nahum", "Kfar Nahum"]
+    };
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.otherLanguages" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("duplicate names across name fields fail after case-insensitive Unicode normalization", async () => {
   const result = await runWithTemporaryCase(({ capernaumData }) => {
     capernaumData.names = {
@@ -1009,36 +1029,31 @@ test("duplicate names across name fields fail after case-insensitive Unicode nor
   );
 });
 
-test("duplicate-name error is skipped when names.otherLanguages is absent", async () => {
+test("duplicate names in ancient/alternate fail even when names.otherLanguages is absent", async () => {
   const result = await runWithTemporaryCase(({ capernaumData }) => {
     capernaumData.names = {
       ancient: ["Capernaum"],
-      modern: "Capernaum",
-      alternate: []
+      modern: "Tell Hum",
+      alternate: ["capernaum"]
     };
   });
 
-  assert.equal(
+  assert.ok(
     hasError(
       result,
       (error) =>
         error.path === "$.names" &&
         error.message.includes("Duplicate location name")
-    ),
-    false
+    )
   );
 });
 
-test("names.modern repeating an ancient or otherLanguages name is not a duplicate error", async () => {
-  // Many places (Rome, Jerusalem, Capernaum's "Kfar Nahum") are still known today by the
-  // same name they carried in antiquity or in another language; that repetition is expected
-  // and must not be flagged once names.otherLanguages is also present.
+test("names.modern matching an ancient name is not a duplicate error (Rome case)", async () => {
   const result = await runWithTemporaryCase(({ capernaumData }) => {
     capernaumData.names = {
-      ancient: ["Capernaum"],
-      modern: "Kfar Nahum",
-      alternate: [],
-      otherLanguages: ["Kfar Nahum"]
+      ancient: ["Rome"],
+      modern: "Rome",
+      alternate: []
     };
   });
 

@@ -151,6 +151,7 @@ function collectTrimmedLocationNames(locationRecord) {
     names.push(...locationRecord.names.alternate);
   }
   if (Array.isArray(locationRecord.names?.otherLanguages)) {
+    // Include non-app-visible names so scripture-linkage validation can still catch source-name mismatches.
     names.push(...locationRecord.names.otherLanguages);
   }
 
@@ -1004,34 +1005,32 @@ export async function validateData(options = {}) {
       }
     }
 
-    if (Array.isArray(data.names?.otherLanguages) && data.names.otherLanguages.length > 0) {
-      const namesByNormalizedValue = new Map();
-      for (const nameEntry of collectLocationNameEntries(data)) {
-        const normalizedName = normalizeNameForDuplicateCheck(nameEntry.value);
-        if (normalizedName.length === 0) {
-          continue;
-        }
-
-        const entries = namesByNormalizedValue.get(normalizedName) ?? [];
-        entries.push(nameEntry);
-        namesByNormalizedValue.set(normalizedName, entries);
+    const namesByNormalizedValue = new Map();
+    for (const nameEntry of collectLocationNameEntries(data)) {
+      const normalizedName = normalizeNameForDuplicateCheck(nameEntry.value);
+      if (normalizedName.length === 0) {
+        continue;
       }
 
-      for (const duplicateNameEntries of namesByNormalizedValue.values()) {
-        if (duplicateNameEntries.length < 2) {
-          continue;
-        }
+      const entries = namesByNormalizedValue.get(normalizedName) ?? [];
+      entries.push(nameEntry);
+      namesByNormalizedValue.set(normalizedName, entries);
+    }
 
-        const duplicateLocations = duplicateNameEntries
-          .map((entry) => `${entry.path} ('${entry.value}')`)
-          .join(", ");
-        recordError(
-          errors,
-          locationRecord.relativePath,
-          "$.names",
-          `Duplicate location name '${duplicateNameEntries[0].value}' appears more than once across names.ancient, names.alternate, and names.otherLanguages: ${duplicateLocations}`
-        );
+    for (const duplicateNameEntries of namesByNormalizedValue.values()) {
+      if (duplicateNameEntries.length < 2) {
+        continue;
       }
+
+      const duplicateLocations = duplicateNameEntries
+        .map((entry) => `${entry.path} ('${entry.value}')`)
+        .join(", ");
+      recordError(
+        errors,
+        locationRecord.relativePath,
+        "$.names",
+        `Duplicate location name '${duplicateNameEntries[0].value}' appears more than once across names.ancient, names.alternate, and names.otherLanguages: ${duplicateLocations}`
+      );
     }
 
     validateSourceArray({

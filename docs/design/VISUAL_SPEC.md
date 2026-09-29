@@ -91,7 +91,7 @@ The section order follows brief §1.4. Sections without data are left out.
 2. **Names:**
    - the title is the first ancient name, the spelling most popular English Bibles agree on, for example **Capernaum** (CP3a decision 2; ADR-0026);
    - under it, the modern name, labelled **"Today: *name*"** (see §8 for the neutrality rule);
-   - then "Also known as …" with the other ancient and alternate names, which are English only. Names in `names.searchOnly` are never shown;
+   - then "Also known as …" with the other ancient and alternate names, which are English only. Names in `names.otherLanguages` are never shown;
    - then a line with the type, the region and the empire as of about AD 50 (ADR-0027), for example "City · Achaia · Roman Empire" or "Village · Galilee · Roman Empire". The region is the place's parent, and the empire is the end of its parent chain; each links to its own record. An empire record shows only its type.
 3. **Location confidence:** a chip in words, never colour alone. "High confidence" appears for single-candidate places. **Disputed places** get a banner instead: **"Location disputed · 4 proposed sites"**. Other places with several candidates get a neutral line, **"*n* sites"**, and each candidate carries its own confidence chip.
 4. **Candidates** (places with several candidates): a list A, B, C … Each entry has its label, a confidence chip and its support text (two lines, expandable), plus its sources. Selecting an entry centres the map on it.
@@ -112,7 +112,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 
 ## 4. Search
 - **Placeholder:** "Search biblical places". The box searches **English place names only** (brief §1.7; ADR-0026): each record's `ancient` and `alternate` names, which include the spellings of the NIV, ESV, NLT, KJV, NKJV, CSB and WEB. So a reader can look up any place by the name their Bible uses; for example "Melita" (KJV) finds Malta. Modern names, candidate labels and names in other languages are not searched.
-- **Matching:** prefix and word-start matches, ignoring case and diacritics, so "alasehir" finds Alaşehir. It tolerates one typo in names of 5 letters or more.
+- **Matching:** prefix and word-start matches, ignoring case and diacritics, so "capernaum" finds Capernaum. It tolerates one typo in names of 5 letters or more.
 - **Results:** up to 8 appear as the user types. Each shows the title name with the match in bold, and a second line with the modern name and type.
   - Disputed places have no modern name, so their second line reads "Disputed · *n* proposed sites · *type*".
   - Records without a modern name show just the type.

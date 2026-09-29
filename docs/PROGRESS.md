@@ -2,13 +2,13 @@
 
 Shared memory for all agents. Every session reads this first and updates its own task row before committing.
 
-**Current milestone:** M3 – MVP App · **Status:** building the MVP (CP3a approved 2026-09-28, #16) · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 2.6% of the cap)
+**Current milestone:** M3 – MVP App · **Status:** building the MVP (CP3a approved 2026-09-28, #16) · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 3.3% of the cap)
 
 ## Resume point
-1. **Running in parallel, as subagents (ADR-0007):** M3-02 (the app scaffold), M3-07 (basemap attribution) and M3-08 (modern names; GIS Engineer, then Research Lead, then Fact-Checker).
-2. **Next:** M3-03 (the map) after M3-02, then M3-04 (the panel) and M3-05 (search) in parallel, then M3-06 (the preview deploy). Then the PO writes CP3b.
-3. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
-
+1. **Merged:** M3-02 (scaffold), M3-07 (basemap attribution) and M3-08 (modern names).
+2. **In review:** M3-03 (the map, reworked after the human's first look: a physical basemap and pins drawn by the map; ADR-0024) and M3-10 (English-only names; ADR-0026). **In progress:** M3-11 (the Roman Empire and its provinces, about AD 50; ADR-0027), stacked on M3-10.
+3. **Next:** M3-04 (the panel) and M3-05 (search) in parallel once M3-03, M3-10 and M3-11 merge, then M3-06 (the preview deploy). Then the PO writes CP3b.
+4. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
 |---|---|---|---|---|---|
