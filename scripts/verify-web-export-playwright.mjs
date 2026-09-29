@@ -31,7 +31,7 @@ const smoothnessLayerIds = {
   pinLabels: "ibm-pin-label"
 };
 const mapLayerIds = {
-  areaLabels: "ibm-area-label",
+  areaLabels: ["ibm-area-label-overview", "ibm-area-label"],
   clusterPins: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
@@ -470,7 +470,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
   });
 
   const overlap = await page.evaluate(
-    ({ testHookKey, areaLayerId, pinLayerIds }) => {
+    ({ testHookKey, areaLayerIds, pinLayerIds }) => {
       const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
@@ -489,7 +489,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
         const [longitude, latitude] = pinFeature.geometry.coordinates;
         const point = map.project([longitude, latitude]);
         const labelsAtPin = map.queryRenderedFeatures(point, {
-          layers: [areaLayerId]
+          layers: areaLayerIds
         });
 
         if (labelsAtPin.length > 0) {
@@ -509,7 +509,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
     },
     {
       testHookKey: mapTestHookKey,
-      areaLayerId: mapLayerIds.areaLabels,
+      areaLayerIds: mapLayerIds.areaLabels,
       pinLayerIds: [
         mapLayerIds.clusterPins,
         mapLayerIds.cityPins,
@@ -535,16 +535,17 @@ async function waitForMapStyleLoaded(page) {
   }, mapTestHookKey, { timeout: 40_000 });
 }
 
-async function collectRenderedTextValues(page, layerId, propertyName) {
+async function collectRenderedTextValues(page, layerIds, propertyName) {
+  const targetLayerIds = Array.isArray(layerIds) ? layerIds : [layerIds];
   return page.evaluate(
-    ({ testHookKey, targetLayerId, targetPropertyName }) => {
+    ({ testHookKey, targetLayerIds, targetPropertyName }) => {
       const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
       }
 
       const rendered = map.queryRenderedFeatures(undefined, {
-        layers: [targetLayerId]
+        layers: targetLayerIds
       });
       const byEntry = new Map();
       for (const feature of rendered) {
@@ -568,7 +569,7 @@ async function collectRenderedTextValues(page, layerId, propertyName) {
     },
     {
       testHookKey: mapTestHookKey,
-      targetLayerId: layerId,
+      targetLayerIds,
       targetPropertyName: propertyName
     }
   );

@@ -74,6 +74,7 @@ const layerCityPinCollisionMaskId = "ibm-city-pin-collision-mask";
 const layerSitePinCollisionMaskId = "ibm-site-pin-collision-mask";
 const layerCandidatePinCollisionMaskId = "ibm-candidate-pin-collision-mask";
 const layerPinLabelId = "ibm-pin-label";
+const layerAreaLabelOverviewId = "ibm-area-label-overview";
 const layerAreaLabelId = "ibm-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
 
@@ -90,6 +91,7 @@ const interactiveLayerIds = [
   layerCandidatePinId,
   layerSitePinId,
   layerCityPinId,
+  layerAreaLabelOverviewId,
   layerAreaLabelId
 ] as const;
 
@@ -115,6 +117,22 @@ const areaLabelVisibilityFilter = [
   [">=", ["zoom"], ["get", "minZoom"]],
   ["<", ["zoom"], ["get", "maxZoom"]]
 ];
+const areaLabelVariableAnchorMinZoom = 6;
+const areaLabelOverviewFilter = [
+  "all",
+  areaLabelVisibilityFilter,
+  ["<", ["zoom"], areaLabelVariableAnchorMinZoom]
+];
+const areaLabelVariableAnchorFilter = [
+  "all",
+  areaLabelVisibilityFilter,
+  [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
+];
+const areaLabelOverviewOffsetLayout = {
+  "text-variable-anchor": ["top", "bottom"] as ["top", "bottom"],
+  "text-radial-offset": 0.9,
+  "text-justify": "auto" as const
+};
 
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
@@ -686,12 +704,36 @@ function ensureMapLayers(map: MapLibreMap) {
     });
   }
 
+  if (!map.getLayer(layerAreaLabelOverviewId)) {
+    map.addLayer({
+      id: layerAreaLabelOverviewId,
+      source: sourceAreaLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(areaLabelOverviewFilter),
+      layout: {
+        "text-field": ["get", "placeName"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["get", "areaFontSize"],
+        "text-letter-spacing": 0.18,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true,
+        ...areaLabelOverviewOffsetLayout
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
   if (!map.getLayer(layerAreaLabelId)) {
     map.addLayer({
       id: layerAreaLabelId,
       source: sourceAreaLabelsId,
       type: "symbol",
-      filter: toLayerFilter(areaLabelVisibilityFilter),
+      filter: toLayerFilter(areaLabelVariableAnchorFilter),
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
