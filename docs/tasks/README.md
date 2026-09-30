@@ -22,6 +22,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged (#20) |
 | [M3-10](M3-10-english-names.md) | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Done, PR pending review |
 | [M3-11](M3-11-ancient-regions.md) | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Done, PR pending review |
+| [M3-12](M3-12-smooth-map.md) | Smoother dragging and zooming | frontend-engineer | `feat/m3-smooth-map` | In progress |
 
 ## Template
 ```markdown

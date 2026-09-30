@@ -35,6 +35,7 @@ const smoothnessLayerIds = {
 const mapLayerIds = {
   areaLabels: ["ibm-area-label-overview", "ibm-area-label"],
   clusterPins: "ibm-cluster-circle",
+  clusterCounts: "ibm-cluster-count",
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
   candidatePins: "ibm-candidate-pin",
@@ -635,7 +636,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
   });
 
   const overlap = await page.evaluate(
-    ({ testHookKey, areaLayerIds, clusterLayerId }) => {
+    ({ testHookKey, areaLayerIds, clusterLayerId, clusterCountLayerId }) => {
       const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
@@ -644,6 +645,14 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
       const clusters = map.queryRenderedFeatures(undefined, {
         layers: [clusterLayerId]
       });
+      const clusterIdsWithCounts = new Set(
+        map
+          .queryRenderedFeatures(undefined, { layers: [clusterCountLayerId] })
+          .map((feature) => feature.properties?.cluster_id)
+      );
+      const clustersWithoutCounts = clusters.filter(
+        (feature) => !clusterIdsWithCounts.has(feature.properties?.cluster_id)
+      );
       const collisions = [];
 
       for (const clusterFeature of clusters) {
@@ -670,6 +679,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
 
       return {
         clusterCount: clusters.length,
+        clustersWithoutCountCount: clustersWithoutCounts.length,
         collisionCount: collisions.length,
         collisionSamples: collisions.slice(0, 8)
       };
@@ -677,12 +687,20 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
     {
       testHookKey: mapTestHookKey,
       areaLayerIds: mapLayerIds.areaLabels,
-      clusterLayerId: mapLayerIds.clusterPins
+      clusterLayerId: mapLayerIds.clusterPins,
+      clusterCountLayerId: mapLayerIds.clusterCounts
     }
   );
 
   if (overlap.clusterCount === 0) {
     throw new Error("Overview cluster-overlap check was vacuous: no clusters were rendered.");
+  }
+
+  // Every count bubble must show its number (spec §2); a bubble without one is just a red dot.
+  if (overlap.clustersWithoutCountCount > 0) {
+    throw new Error(
+      `${overlap.clustersWithoutCountCount} of ${overlap.clusterCount} count bubbles on the overview show no number.`
+    );
   }
 
   if (overlap.collisionCount > 0) {
@@ -906,6 +924,13 @@ async function captureGalileeCollisionBoxes(browser, baseUrl, screenshotPath) {
   }
 }
 
+async function disablePageNetworkCache(page) {
+  const session = await page.context().newCDPSession(page);
+  await session.send("Network.enable");
+  await session.send("Network.setCacheDisabled", { cacheDisabled: true });
+  return session;
+}
+
 async function verifyFallbackOutageMode({
   browser,
   baseUrl,
@@ -916,7 +941,9 @@ async function verifyFallbackOutageMode({
     viewport: { width: 1440, height: 960 }
   });
   const page = await context.newPage();
+  const networkSession = await disablePageNetworkCache(page);
   const requestUrls = [];
+  const failedRequestUrls = [];
   const abortMode = mode;
 
   await page.route("**/*", (route) => {
@@ -938,6 +965,9 @@ async function verifyFallbackOutageMode({
 
   page.on("requestfinished", (request) => {
     requestUrls.push(request.url());
+  });
+  page.on("requestfailed", (request) => {
+    failedRequestUrls.push(request.url());
   });
 
   try {
@@ -962,7 +992,17 @@ async function verifyFallbackOutageMode({
       }, mapTestHookKey);
     }
 
-    await page.getByText(fallbackStatusMessage, { exact: true }).waitFor({ timeout: 40_000 });
+    try {
+      await page.getByText(fallbackStatusMessage, { exact: true }).waitFor({ timeout: 40_000 });
+    } catch (error) {
+      const attributionText = await readAttributionText(page);
+      const openFreeMapFinished = requestUrls.filter((url) => url.includes("tiles.openfreemap.org"));
+      const openFreeMapFailed = failedRequestUrls.filter((url) => url.includes("tiles.openfreemap.org"));
+      throw new Error(
+        `Fallback outage ${mode}: fallback notice did not appear. attribution='${attributionText}'. openfreemap finished=${openFreeMapFinished.length}, failed=${openFreeMapFailed.length}, finished sample=${JSON.stringify(openFreeMapFinished.slice(0, 5))}, failed sample=${JSON.stringify(openFreeMapFailed.slice(0, 5))}`,
+        { cause: error instanceof Error ? error : undefined }
+      );
+    }
     await page.waitForTimeout(1_000);
 
     const attributionText = await readAttributionText(page);
@@ -981,6 +1021,7 @@ async function verifyFallbackOutageMode({
       attributionText
     };
   } finally {
+    await networkSession.detach().catch(() => {});
     await page.unroute("**/*");
     await page.close();
     await context.close();
@@ -998,6 +1039,7 @@ async function captureFallbackSelectionScreenshot({
     viewport: { width: 1440, height: 960 }
   });
   const page = await context.newPage();
+  const networkSession = await disablePageNetworkCache(page);
   await page.route("**/*", (route) => {
     const requestUrl = route.request().url();
     if (requestUrl.includes("tiles.openfreemap.org")) {
@@ -1037,6 +1079,7 @@ async function captureFallbackSelectionScreenshot({
 
     await page.screenshot({ fullPage: true, path: screenshotPath });
   } finally {
+    await networkSession.detach().catch(() => {});
     await page.unroute("**/*");
     await page.close();
     await context.close();
@@ -1481,8 +1524,13 @@ async function detectWebGlRenderer(page) {
     if (!gl) {
       return "unavailable";
     }
-    const info = gl.getExtension("WEBGL_debug_renderer_info");
-    return String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    try {
+      const info = gl.getExtension("WEBGL_debug_renderer_info");
+      return String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    } finally {
+      const loseContext = gl.getExtension("WEBGL_lose_context");
+      loseContext?.loseContext();
+    }
   });
 }
 

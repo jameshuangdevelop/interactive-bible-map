@@ -32,14 +32,10 @@ const versaTilesStylePath = path.join(
 const libertyAllowedLayerIds = new Set([
   "background",
   "natural_earth",
-  "landcover_wood",
-  "landcover_grass",
-  "landcover_ice",
-  "landcover_wetland",
+  "landcover",
   "waterway_river",
   "waterway_other",
-  "water",
-  "landcover_sand"
+  "water"
 ]);
 
 const versaTilesAllowedLayerIds = new Set([
@@ -114,6 +110,140 @@ function assertNoBoundaryLayers(style, styleName) {
   });
 
   assert.equal(hasBoundaryLayer, false, `${styleName} must not include boundary layers`);
+}
+
+function assertInClassFilter(filter, expectedClasses, description) {
+  assert.ok(Array.isArray(filter), `${description}: filter must be an array expression`);
+  assert.equal(filter[0], "in", `${description}: filter must start with 'in'`);
+  assert.deepEqual(filter[1], ["get", "class"], `${description}: filter must read class`);
+  assert.ok(Array.isArray(filter[2]), `${description}: filter must use a literal class array`);
+  assert.equal(filter[2][0], "literal", `${description}: filter must use literal class values`);
+  assert.ok(Array.isArray(filter[2][1]), `${description}: literal class list must be an array`);
+  assert.deepEqual(
+    [...filter[2][1]].sort(),
+    [...expectedClasses].sort(),
+    `${description}: unexpected class values in filter`
+  );
+}
+
+function classOpacityByName(matchExpression, description) {
+  assert.ok(Array.isArray(matchExpression), `${description}: match expression must be an array`);
+  assert.equal(matchExpression[0], "match", `${description}: expected 'match' expression`);
+  assert.deepEqual(
+    matchExpression[1],
+    ["get", "class"],
+    `${description}: match expression must read class`
+  );
+
+  const opacities = new Map();
+  for (let index = 2; index < matchExpression.length - 1; index += 2) {
+    opacities.set(matchExpression[index], matchExpression[index + 1]);
+  }
+  return opacities;
+}
+
+function assertLibertyMergedLandcover(style) {
+  const layer = style.layers.find((candidate) => candidate.id === "landcover");
+  assert.ok(layer, "Liberty style must include merged landcover layer");
+  assert.equal(layer.type, "fill", "Liberty landcover must be a fill layer");
+  assert.equal(layer.source, "openmaptiles", "Liberty landcover must use openmaptiles source");
+  assert.equal(
+    layer["source-layer"],
+    "landcover",
+    "Liberty landcover must use landcover source-layer"
+  );
+  assert.equal(
+    layer.minzoom ?? 0,
+    0,
+    "Liberty merged landcover should keep wood, grass, ice and sand visible from zoom 0"
+  );
+
+  assertInClassFilter(
+    layer.filter,
+    ["wood", "grass", "ice", "wetland", "sand"],
+    "Liberty merged landcover"
+  );
+
+  assert.deepEqual(
+    layer.paint["fill-color"]?.slice(0, 2),
+    ["match", ["get", "class"]],
+    "Liberty merged landcover must map fill-color by class with a match expression"
+  );
+  assert.deepEqual(
+    layer.paint["fill-opacity"]?.slice(0, 2),
+    ["step", ["zoom"]],
+    "Liberty merged landcover must gate wetland opacity by zoom"
+  );
+
+  const fillOpacity = layer.paint["fill-opacity"];
+  assert.ok(Array.isArray(fillOpacity), "Liberty merged landcover fill-opacity must be an array");
+  assert.equal(fillOpacity[3], 12, "Liberty wetland opacity gate should start at zoom 12");
+  const lowZoomOpacityByClass = classOpacityByName(fillOpacity[2], "Liberty merged landcover low-zoom");
+  const highZoomOpacityByClass = classOpacityByName(
+    fillOpacity[4],
+    "Liberty merged landcover high-zoom"
+  );
+
+  assert.equal(
+    lowZoomOpacityByClass.get("wood"),
+    0.4,
+    "Liberty wood landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    lowZoomOpacityByClass.get("grass"),
+    0.3,
+    "Liberty grass landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    lowZoomOpacityByClass.get("ice"),
+    0.8,
+    "Liberty ice landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    lowZoomOpacityByClass.get("sand"),
+    1,
+    "Liberty sand landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("wood"),
+    0.4,
+    "Liberty wood landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("grass"),
+    0.3,
+    "Liberty grass landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("ice"),
+    0.8,
+    "Liberty ice landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("sand"),
+    1,
+    "Liberty sand landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.deepEqual(
+    lowZoomOpacityByClass.get("wetland"),
+    0,
+    "Liberty wetland landcover should stay hidden before zoom 12"
+  );
+  assert.deepEqual(
+    highZoomOpacityByClass.get("wetland"),
+    0.45,
+    "Liberty wetland landcover should keep its original zoom 12 visibility"
+  );
+}
+
+function assertLibertyRasterFadeDisabled(style) {
+  const naturalEarthLayer = style.layers.find((layer) => layer.id === "natural_earth");
+  assert.ok(naturalEarthLayer, "Liberty natural_earth layer must exist");
+  assert.equal(
+    naturalEarthLayer.paint?.["raster-fade-duration"],
+    0,
+    "Liberty natural_earth raster fade must be disabled"
+  );
 }
 
 function assertLayerAllowList(style, styleName, allowedLayerIds) {
@@ -217,6 +347,8 @@ test("Liberty hosted style is physical-only and keeps required attribution", asy
   assertNoSymbolLayers(style, "Liberty");
   assertNoBoundaryLayers(style, "Liberty");
   assertLayerAllowList(style, "Liberty", libertyAllowedLayerIds);
+  assertLibertyMergedLandcover(style);
+  assertLibertyRasterFadeDisabled(style);
   assertRemovedSourceLayers(style, "Liberty");
   assertMaxZoom14(style, "Liberty");
 });
