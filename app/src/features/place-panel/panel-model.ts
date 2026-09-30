@@ -84,6 +84,11 @@ const bookIndexByName: Map<string, number> = new Map(
   CANONICAL_BOOKS.map((book, index) => [book, index] as [string, number])
 );
 
+const HIERARCHY_LINE_EXCEPTIONS_BY_ID: Readonly<Record<string, string>> = Object.freeze({
+  italy: "Governed directly from Rome · Roman Empire",
+  arabia: "Client kingdom allied with Rome"
+});
+
 export interface GroupedScriptureBook {
   book: string;
   passages: ScriptureEntry[];
@@ -92,6 +97,10 @@ export interface GroupedScriptureBook {
 export interface HierarchyItem {
   label: string;
   placeId: string | null;
+}
+
+function isSameDisplayLabel(left: string, right: string) {
+  return left.localeCompare(right, undefined, { sensitivity: "accent", usage: "search" }) === 0;
 }
 
 function parseReference(reference: string) {
@@ -289,20 +298,19 @@ export function buildHierarchyItems(
       }
     ];
   }
-
   const { parent, empire } = resolveParentAndEmpire(place, placesById);
-
-  if (place.id === "italy") {
-    return [
-      {
-        label: "Governed directly from Rome",
-        placeId: null
-      },
-      {
-        label: empire ? getPrimaryPlaceName(empire) : "Roman Empire",
-        placeId: empire?.id ?? null
-      }
-    ];
+  const exceptionLine = HIERARCHY_LINE_EXCEPTIONS_BY_ID[place.id];
+  if (exceptionLine) {
+    const empireLabel = empire ? getPrimaryPlaceName(empire) : null;
+    return exceptionLine
+      .split("·")
+      .map((segment) => segment.trim())
+      .filter((segment) => segment.length > 0)
+      .map((label) => ({
+        label,
+        placeId:
+          empire && empireLabel && isSameDisplayLabel(label, empireLabel) ? empire.id : null
+      }));
   }
 
   const items: HierarchyItem[] = [

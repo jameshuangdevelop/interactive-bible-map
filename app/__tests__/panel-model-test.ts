@@ -54,6 +54,32 @@ describe("place panel model helpers", () => {
     ]);
   });
 
+  test("renders the Arabia hierarchy exception text without empire suffix", () => {
+    const arabia: PlaceIndexRecord = {
+      id: "arabia",
+      names: { ancient: ["Arabia"], alternate: [] },
+      type: "province",
+      zoomTier: "region",
+      parentId: "roman-empire",
+      candidates: [{ label: "Arabia", coordinates: [35.0, 30.0], confidence: "high" }]
+    };
+
+    const items = buildHierarchyItems(
+      arabia,
+      new Map([
+        [romanEmpire.id, romanEmpire],
+        [arabia.id, arabia]
+      ])
+    );
+
+    expect(items).toEqual([
+      {
+        label: "Client kingdom allied with Rome",
+        placeId: null
+      }
+    ]);
+  });
+
   test("renders type, parent, and empire for city records", () => {
     const corinth: PlaceIndexRecord = {
       id: "corinth",
