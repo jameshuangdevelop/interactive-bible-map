@@ -2,14 +2,14 @@
 
 Independent verification of the Research Lead's commit `21ef125` ("data(locations): add well-known New Testament areas") against the card (`docs/tasks/M3-13-well-known-areas.md`), ADR-0017, ADR-0026, ADR-0027 and ADR-0013, and the PO's ruling on parents that cross province lines (2026-09-30). The baseline is `1805178`. Reviewed 2026-09-30.
 
-**Result:** 89 of 90 records are `verified`. **Elam fails** the card's condition for adding it (good information for about AD 50) and stays `draft` for the PO. All 17 new records needed changes, and this commit fixes 16 of them with sources I opened. The most common problems were:
+**Result:** all 89 records are `verified`. The Research Lead added 17 new records. All of them needed changes, and the first verification commit (`9a31087`) fixed 16 with sources I opened. **Elam failed** the card's condition for adding it (good information for about AD 50). The PO removed it in the follow-up commit; see "Follow-up: the PO's decisions". The most common problems were:
 
 - quotations that were not the WEB, or ISBE's words attributed to Acts;
 - clauses that no cited source states;
 - two statements contradicted by the sources (Mysia joining Asia in 190 BC, and AD 50 falling inside a peace that ISBE says began under Nero);
 - a Livius sentence quoted word for word, although Livius is cite-only.
 
-Following the PO's ruling, four parents changed: Antioch in Pisidia and Iconium go back to Galatia, Tarsus goes back to Syria, and Troas goes back to Asia. Cilicia moves to the Roman Empire because it was split between Syria and a client king. One label point moved: Pisidia's, which was 15 km from Antioch's pin. Seven items need a decision from the PO or the human (see the end of this report).
+Following the PO's ruling, four parents changed: Antioch in Pisidia and Iconium go back to Galatia, Tarsus goes back to Syria, and Troas goes back to Asia. Cilicia moves to the Roman Empire because it was split between Syria and a client king. One label point moved: Pisidia's, which was 15 km from Antioch's pin. The PO has decided the seven items raised for the PO and the human; the decisions are recorded under each item.
 
 ## Method
 
@@ -37,7 +37,7 @@ Following the PO's ruling, four parents changed: Antioch in Pisidia and Iconium 
 - appended history notes on antioch-pisidia, iconium and judea;
 - the status fields.
 
-The commit body says the history changes were "appended notes only". In fact, **perga's and tarsus's existing, verified history notes were edited in place.** This commit restores both to their verified text. Neither needed the edit: Perga is still in Galatia through Pamphylia, and Tarsus is back under Syria.
+The commit body says the history changes were "appended notes only". In fact, **perga's and tarsus's existing, verified history notes were edited in place.** The first verification commit restores both to their verified text. Neither needed the edit: Perga is still in Galatia through Pamphylia, and Tarsus is back under Syria.
 
 **Final state against `1805178`:**
 
@@ -51,7 +51,7 @@ The commit body says the history changes were "appended notes only". In fact, **
 | tarsus | parent and history unchanged |
 | all of the above | `lastReviewed` 2026-09-30 |
 
-Every record except elam is `verified` by `fact-checker`.
+Every record is `verified` by `fact-checker`. The new records are the 16 that remain after Elam's removal.
 
 ## Parents across province lines (the PO's ruling)
 
@@ -83,7 +83,7 @@ Unchanged cities in the new regions: Colossae, Laodicea and Hierapolis are in As
 
 ## Verdicts: new records
 
-Every record below was **needs-change** at `21ef125`. All except elam are a **pass** after the fixes in this commit.
+Every record below was **needs-change** at `21ef125`. All except elam are a **pass** after the fixes in `9a31087`. Elam was removed in the follow-up commit.
 
 | Record | What was wrong | Fix and sources |
 |---|---|---|
@@ -103,7 +103,7 @@ Every record below was **needs-change** at `21ef125`. All except elam are a **pa
 | mesopotamia | A Livius sentence was quoted word for word; Livius is cite-only (LICENSES.md). "First applied by … Arrian" follows Livius but is contradicted by Strabo (16.1) and by Acts 2:9 and 7:2, which use the word before Arrian wrote, so "first" is dropped. "Trajan … first invaded Parthia": ISBE doesn't say "first", and Crassus invaded in 53 BC. "Associated local kingdoms" had no source. The OT note said Haran lay in "the same broad region Stephen later calls Mesopotamia", which Acts 7:2 doesn't say, and "Ur of the Chaldeans" is not the WEB. | Paraphrased. ISBE "Parthians" now also supports Parthian rule in the first century (Jewish settlements in Mesopotamia; a massacre under Artabanus III, AD 16–42). OT note quotes Genesis 11:31 and Acts 7:2 exactly. `pleiades:874602` (Mesopotamia, Barrington map label, 514 km away) added as the cross-check. |
 | parthian-empire | "This project's about AD 50 date falls within that decades-long peace, a few years before Nero's reign" contradicts itself: ISBE says the Armenian contest was settled *under Nero* (AD 54 onward). "Fought repeatedly over Armenia, from Crassus's defeat … onward" misreads ISBE, which describes Crassus's war as an invasion of Parthia and says that after Augustus "peace was not seriously disturbed … until the reign of Trajan". The history credited Tiridates with founding the Arsacid dynasty, but ISBE credits Arsaces I, and Livius says neither. "This project takes" [Parthians] "to mean Jews or proselytes": that is ISBE's inference. | Rewritten from ISBE and Livius. The date differences between the two (Mithridates I, 165–132 against 174–137 BC; the end in AD 224 against 226) are now stated. |
 | media | "It remained part of the Parthian Empire through the first century AD" had no source. "Its chief city at Ecbatana": ISBE lists three chief cities. | Now sourced to Strabo 16.1.19 ("the Parthians rule over the Medes and the Babylonians") and Tacitus, *Annals* 12.14, AD 49 ("Vonones, then viceroy of Media, was called to the throne"). That meets the card's condition for about AD 50. |
-| **elam** | **Fails the card's condition.** "It remained under Parthian rule through the first century AD" has no source: Livius "Elam" covers only "the Hellenistic age". The one first-century source I found points the other way. Strabo 16.1.18 says the Elymaean king "refuses to be subject to the king of the Parthians like the other tribes". Strabo treats Susians and Elymaeans as separate peoples, and Tacitus, *Annals* 6.44 (AD 36), counts the Elymaeans among nations that could be raised in a Parthian succession war. So the parent, `parthian-empire`, and the summary's "had long been part of the Parthian Empire" are unsupported for about AD 50. The label point (Susa, `pleiades:912936`) and the names are fine. | **Stays `draft`.** No edit: the fix is a content decision (item 1). |
+| **elam** | **Fails the card's condition.** "It remained under Parthian rule through the first century AD" has no source: Livius "Elam" covers only "the Hellenistic age". The one first-century source I found points the other way. Strabo 16.1.18 says the Elymaean king "refuses to be subject to the king of the Parthians like the other tribes". Strabo treats Susians and Elymaeans as separate peoples, and Tacitus, *Annals* 6.44 (AD 36), counts the Elymaeans among nations that could be raised in a Parthian succession war. So the parent, `parthian-empire`, and the summary's "had long been part of the Parthian Empire" are unsupported for about AD 50. The label point (Susa, `pleiades:912936`) and the names are fine. | **Removed** in the follow-up commit, on the PO's decision (item 1). |
 
 **Names (ADR-0026).** All 66 cells of the spelling table match BibleGateway:
 
@@ -111,7 +111,7 @@ Every record below was **needs-change** at `21ef125`. All except elam are a **pa
 - Acts 14:6: "Lycaonian" in the NIV and CSB, "Lycaonia" in the other four.
 - Acts 2:9–10, Galatians 1:17, Acts 16:7, Romans 15:19, 2 Timothy 4:10, Acts 14:24, Acts 15:41 and Acts 20:2: unanimous.
 
-"Parthian Empire", "Media" and "Elam" are standard reference names for areas the verse names only through a people ("Parthians", "Medes", "Elamites"). Each demonym is kept as an alternate name, which is correct. No new record has `names.modern`. That is right, because "Egypt" and "Libya" are now country names with political meaning.
+"Parthian Empire" and "Media" are standard reference names for areas the verse names only through a people ("Parthians", "Medes"). Each demonym is kept as an alternate name, which is correct. No new record has `names.modern`. That is right, because "Egypt" and "Libya" are now country names with political meaning.
 
 **Confidence.** Every candidate is `high`. That fits: each area's identity is undisputed, and the point only positions a label.
 
@@ -141,8 +141,7 @@ Every point is on land and inside its area as the sources describe it. None come
 | libya | 20.871743, 32.499653 | `pleiades:373777` (computed) | `wikidata:Q165198`, 75 km | crete-cyrene label 472 km | Pass. About 19 km inland from the coast between Tocra and Ptolemais. |
 | mesopotamia | 43.5, 33.7 | `wikidata:Q11767` | `pleiades:874602` (map label), 514 km, in the far north of the region | parthian-empire label 121 km | Pass. The region is broad; Pleiades describes it as covering most of Iraq, which includes the point. |
 | parthian-empire | 44.580833, 33.093611 | `wikidata:Q1986139` (Ctesiphon) | `pleiades:893976` Ctesiphon, 0.13 km | mesopotamia 121 km | Pass. Strabo 16.1.16: the Parthian kings wintered at Ctesiphon. |
-| media | 48.919331, 35.048241 | `pleiades:903080` | none | elam 324 km | Pass |
-| elam | 48.253537, 32.189934 | `pleiades:912936` (Susa) | none | media 324 km | Point fine; record stays draft |
+| media | 48.919331, 35.048241 | `pleiades:903080` | none | parthian-empire label 455 km | Pass |
 
 ## The uncertain cases
 
@@ -151,13 +150,13 @@ Every point is on land and inside its area as the sources describe it. None come
 - **Arabia's extent (Galatians 4:25).** Now set out without taking a side: ISBE's view of NT usage, the extent of the Nabataean kingdom (Livius), and the Aretas link (ISBE, Livius). The record does not say where Paul went. **Pass.**
 - **Illyricum and Dalmatia as one record.** Supported. ISBE "Illyricum" says the province "later … came to be known as Dalmatia", and ISBE "Dalmatia" judges that sense "most probable" in 2 Timothy 4:10. Pleiades agrees: its "Illyricum" (481865) ends in AD 10, and its "Dalmatia" (981522) is the province under Trajan. Dio 53.12 lists "the Dalmatian … districts" among the Senate's provinces in 27 BC. **Pass.**
 - **Media: included.** Strabo 16.1.19 and Tacitus, *Annals* 12.14 (AD 49) give the information for about AD 50 that the card requires. Josephus, *Antiquities* 20.74 (Vologeses gave Media to Pacorus) agrees but is not needed. **Pass.**
-- **Elam: not included as it stands.** See the verdict above and item 1. **Fail; draft.**
+- **Elam: removed.** See the verdict above and item 1. **Fail; the PO removed the record.**
 
 ## Results
 
 - `npm run validate:data`: **0 errors, 106 warnings**, the same as at `1805178` and `21ef125`. The Research Lead's net-zero explanation is correct: libya's Matthew 27:32 adds a warning and judea's Luke 1:39 loses one. My changes add and remove no warnings.
 - `npm test`: **75/75 pass.**
-- `npm run build:data`: **90 places.**
+- `npm run build:data`: **90 places** (89 after Elam's removal; see the follow-up).
 
 ## Licensing
 
@@ -169,13 +168,23 @@ Every point is on land and inside its area as the sources describe it. None come
 
 ## Items for the PO and the human
 
-1. **Elam (blocks "all records verified").** No cited source gives Elam's status in about AD 50, and Strabo 16.1.18 says the Elymaean king refused to be subject to the Parthian king. Either remove `elam` (Acts 2:9's "Elamites" would then find no record), or send it back to the Research Lead. The Research Lead would need a first-century source for Susiana or Elymais, for example a scholarly reference on Elymais. It would also need to decide whether Elam's parent can be the Parthian Empire, or whether Elam is a semi-independent kingdom that fits no empire chain.
-2. **Troas.** It stays under asia, because the Troad was counted as part of Mysia only by "some authors" (ISBE). If the PO reads ISBE's listing of Troas among Mysia's cities as enough, the parent can be `mysia`.
-3. **Pergamum** was not reparented by the Research Lead. ISBE "Asia" calls Pergamum "the old capital of Mysia", but ISBE "Mysia" does not list it among Mysia's cities. It stays under asia, so the PO's rule of keeping the province when region membership is uncertain covers it.
-4. **Arabia (and Polemon's Pontus) under the Roman Empire.** Livius calls the Nabataeans an "independent ally". The chain "Arabia · Roman Empire" follows the card and the schema, which let `province` hold client kingdoms, but it can suggest more Roman control than there was. The record's text says the kingdom was not annexed until AD 106. Should the panel word client kingdoms differently?
-5. **Label positions.** Pamphylia's label is 9 km from Perga's pin; M3-11's label-offset decision applies. Egypt's label is in the desert east of the Nile. If the PO wants it in the Nile valley, that needs a hand-placed, sourced point.
+1. **Elam.** No cited source gives Elam's status in about AD 50, and Strabo 16.1.18 says the Elymaean king refused to be subject to the Parthian king. Either remove `elam` (Acts 2:9's "Elamites" would then find no record), or send it back to the Research Lead. The Research Lead would need a first-century source for Susiana or Elymais, for example a scholarly reference on Elymais. It would also need to decide whether Elam's parent can be the Parthian Empire, or whether Elam is a semi-independent kingdom that fits no empire chain. *Decided: remove the record (follow-up commit).*
+2. **Troas.** It stays under asia, because the Troad was counted as part of Mysia only by "some authors" (ISBE). If the PO reads ISBE's listing of Troas among Mysia's cities as enough, the parent can be `mysia`. *Decided: Troas stays under Asia.*
+3. **Pergamum** was not reparented by the Research Lead. ISBE "Asia" calls Pergamum "the old capital of Mysia", but ISBE "Mysia" does not list it among Mysia's cities. It stays under asia, so the PO's rule of keeping the province when region membership is uncertain covers it. *Decided: Pergamum stays under Asia.*
+4. **Arabia (and Polemon's Pontus) under the Roman Empire.** Livius calls the Nabataeans an "independent ally". The chain "Arabia · Roman Empire" follows the card and the schema, which let `province` hold client kingdoms, but it can suggest more Roman control than there was. The record's text says the kingdom was not annexed until AD 106. Should the panel word client kingdoms differently? *Decided: arabia stays `type: "province"` under the Roman Empire, as ADR-0027 allows. The panel (M3-04) will describe it as "Client kingdom allied with Rome", as it does for Italy. The summary now says plainly, with sources, that the kingdom was allied with Rome but not a province in about AD 50. A BACKLOG item covers modeling client kingdoms with M4's timeline.*
+5. **Label positions.** Pamphylia's label is 9 km from Perga's pin; M3-11's label-offset decision applies. Egypt's label is in the desert east of the Nile. If the PO wants it in the Nile valley, that needs a hand-placed, sourced point. *Decided: Egypt's label point stays.*
 6. **Research Lead process.** Three recurring slips are worth adding to the Research Lead's instructions:
    - ISBE's own wording presented as a quotation from Acts (Phrygia, Lycaonia);
    - verified history notes edited in place although the commit body said "appended only" (Perga, Tarsus);
    - Livius quoted word for word.
 7. **Egypt's type.** Tacitus calls Egypt "the province", so `province` stands. Jackson's Loeb note to *Annals* 2.59 says it was "never a province in the true sense … but a private imperial domain". The summary's "unusual arrangement" covers this; no change is proposed.
+
+## Follow-up: the PO's decisions
+
+The PO decided the items above on 2026-09-30. The follow-up commit makes these changes:
+
+- **Elam is removed.** `data/locations/elam.json` is deleted, along with `bib:livius-elam`, which only that record cited. The Elamites row is also removed from `docs/research/M3-13-bible-spellings.md`, which now notes the removal. The card allowed Elam only if the sources gave good information for about AD 50, and they don't (see the verdict above). The mentions of Elam that stay are historical: the Media and Parthian Empire notes list Elam among Mithradates I's conquests, and Acts 2:9's WEB text names "Elamites". As a result, searching for "Elamites" finds no record until a first-century source is found. `BACKLOG.md` has an item for this.
+- **Arabia's summary** now says plainly that in Paul's time the Nabataean kingdom "was allied with Rome but was not a Roman province: it became one only when Trajan annexed it in AD 106." Sources: Livius "Nabataeans" (an independent ally from 63 BC; made a province by Trajan in AD 106), ISBE "Arabia" (first in alliance with the Romans, later subject to them), and Wikidata `Q11029653` (dissolved in 106). `BACKLOG.md` has an item for modeling client-kingdom status with M4's timeline.
+- **Troas, Pergamum and Egypt's label point** are unchanged.
+
+**Checks after the follow-up:** `npm run validate:data` gives 0 errors and 106 warnings (unchanged). Acts 2:9 names "Elamites", so Elam never had a warning. `npm test` passes 75/75. `npm run build:data` builds 89 places. All 89 records are `verified`.

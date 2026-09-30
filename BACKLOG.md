@@ -13,6 +13,8 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - Native iOS/Android app build (React Native Web keeps this path open)
 
 ## Data
+- **Elam ("Elamites", Acts 2:9).** M3-13 removed the Elam record because no source gave its status in about AD 50. Strabo 16.1.18 even says the Elymaean king refused to be subject to the Parthian king. Add it back when a first-century source gives the status of Susiana and Elymais, and decide whether its parent is the Parthian Empire or whether it was a semi-independent kingdom (`docs/verification/M3-well-known-areas.md`).
+- **Client-kingdom status in M4's timeline.** `arabia` (the Nabataean kingdom) is `type: "province"` under the Roman Empire, as ADR-0027 allows, and the panel calls it "Client kingdom allied with Rome". M4 should model client kingdoms properly, with dates of alliance and annexation: the Nabataean kingdom, Polemon's Pontus, and Antiochus's Commagene and coastal Cilicia.
 - **Province histories for M4's timeline.** M3-11's Fact-Checker removed the `politicalHistory` entries of four provinces because their end years rested on Wikipedia alone. M4 rebuilds them from non-Wikipedia sources, since the timeline needs them.
 
 ## Process and tooling

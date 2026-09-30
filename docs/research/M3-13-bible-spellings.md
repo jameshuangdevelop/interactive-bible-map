@@ -29,7 +29,7 @@ never the surrounding sentence.
 
 ## New area records
 
-Acts 2:9-10 alone gives a spelling check for ten of the seventeen new records (all six versions
+Acts 2:9-10 alone gives a spelling check for nine of the sixteen new records (all six versions
 agree on every name in both verses):
 
 | record | verse | NIV | ESV | NLT | KJV | NKJV | CSB | chosen title | note |
@@ -43,7 +43,8 @@ agree on every name in both verses):
 | mesopotamia | Acts 2:9 | Mesopotamia | Mesopotamia | Mesopotamia | Mesopotamia | Mesopotamia | Mesopotamia | Mesopotamia | Unchanged (6/6). |
 | parthian-empire | Acts 2:9 | Parthians | Parthians | Parthians | Parthians | Parthians | Parthians | Parthian Empire | **Not Bible-named as a phrase**, like `roman-empire` in M3-11: no verse names "the Parthian Empire." All six versions agree on the demonym "Parthians" (kept as an alternate); "Parthian Empire" is the standard English name in the sources (Wikidata, ISBE, Livius.org). |
 | media | Acts 2:9 | Medes | Medes | Medes | Medes | Medes | Medes | Media | **Demonym, not a place name, in the verse.** All six versions read "Medes." The record's title, "Media," is the standard English place name (ISBE, Wikidata); "Medes" is kept as an alternate so a reader searching the Pentecost list can still find the record. |
-| elam | Acts 2:9 | Elamites | Elamites | Elamites | Elamites | Elamites | Elamites | Elam | **Demonym, not a place name, in the verse.** All six versions read "Elamites." The title "Elam" is the standard English place name (ISBE, Livius.org); "Elamites" is kept as an alternate for the same reason as Media. |
+
+**Elam removed.** The Research Lead also checked "Elamites" (Acts 2:9; 6/6 versions) for an Elam record. The PO removed that record on 2026-09-30, because no source gave its status in about AD 50 (see `docs/verification/M3-well-known-areas.md`).
 
 The remaining seven new records were checked against their own verses:
 

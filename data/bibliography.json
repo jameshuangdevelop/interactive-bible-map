@@ -942,18 +942,6 @@
       "publisher": "Livius.org",
       "url": "https://www.livius.org/articles/place/mesopotamia/",
       "accessed": "2026-09-30"
-    },
-    {
-      "id": "livius-elam",
-      "type": "web",
-      "title": "Elam",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/elam/",
-      "accessed": "2026-09-30"
     }
   ]
 }

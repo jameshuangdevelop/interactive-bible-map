@@ -27,10 +27,11 @@
     }
   ],
   "summary": {
-    "text": "This record shows the Nabataean kingdom, which Livius.org calls Arabia Nabataea: a kingdom with its capital at Petra, ruled by its own kings as an ally of Rome in Paul's time. Paul writes that he 'went away into Arabia' and then returned to Damascus, and that in Damascus 'the governor under King Aretas' tried to arrest him.",
+    "text": "This record shows the Nabataean kingdom, which Livius.org calls Arabia Nabataea: a kingdom with its capital at Petra, ruled by its own kings. In Paul's time it was allied with Rome but was not a Roman province: it became one only when Trajan annexed it in AD 106. Paul writes that he 'went away into Arabia' and then returned to Damascus, and that in Damascus 'the governor under King Aretas' tried to arrest him.",
     "sources": [
       "wikidata:Q11029653",
       "bib:livius-nabataeans",
+      "bib:isbe-arabia",
       "scripture:Galatians 1:17",
       "scripture:2 Corinthians 11:32"
     ]
