@@ -10,6 +10,7 @@ export type PlaceType =
 
 export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";
+export type SourceId = string;
 
 export type Coordinates = [number, number];
 
@@ -17,6 +18,12 @@ export interface PlaceCandidate {
   label: string;
   coordinates: Coordinates;
   confidence: Confidence;
+}
+
+export interface PlaceLocationCandidate extends PlaceCandidate {
+  coordinateSource: SourceId;
+  support: string;
+  sources: SourceId[];
 }
 
 export interface PlaceNames {
@@ -42,4 +49,77 @@ export interface PlaceSelection {
 export interface LoadedPlacesState {
   places: PlaceIndexRecord[];
   errorMessage: string | null;
+}
+
+export interface SourcedTextEntry {
+  text: string;
+  sources: SourceId[];
+}
+
+export interface ScriptureEntry {
+  ref: string;
+  book: string;
+  textWEB: string;
+}
+
+export interface OtConnectionEntry {
+  ref: string;
+  note: string;
+  sources: SourceId[];
+}
+
+export interface PoliticalHistoryEntry {
+  fromYear: number;
+  toYear: number;
+  entity: string;
+  sources: SourceId[];
+}
+
+export interface PlaceRecord extends PlaceIndexRecord {
+  candidates: PlaceLocationCandidate[];
+  summary: SourcedTextEntry;
+  history: SourcedTextEntry[];
+  scripture: ScriptureEntry[];
+  otConnections: OtConnectionEntry[];
+  politicalHistory: PoliticalHistoryEntry[];
+  status: "draft" | "verified";
+  verifiedBy?: string;
+  lastReviewed?: string;
+}
+
+export interface MediaImageRecord {
+  id: string;
+  url: string;
+  author: string;
+  license: string;
+  licenseUrl: string;
+  sourcePage: string;
+  caption: string;
+  aiGenerated: boolean;
+}
+
+export interface MediaRecord {
+  locationId: string;
+  images: MediaImageRecord[];
+}
+
+export interface BibliographyEntry {
+  id: string;
+  type: "book" | "article" | "chapter" | "web" | "dataset";
+  title: string;
+  authors: string[];
+  year: number;
+  publisher?: string;
+  journal?: string;
+  containerTitle?: string;
+  doi?: string;
+  isbn?: string;
+  url?: string;
+  accessed?: string;
+}
+
+export interface PlaceDetailsPayload {
+  location: PlaceRecord;
+  media: MediaRecord | null;
+  bibliography: BibliographyEntry[];
 }

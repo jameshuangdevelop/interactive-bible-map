@@ -90,6 +90,9 @@ const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
 const gestureReleaseDelayMs = 1_000;
+const mapLabelPaddingTop = 80;
+const mapLabelPaddingEdge = 16;
+const focusPaddingTop = 96;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
 const fallbackStyleLandcoverLayerIds = [
@@ -146,8 +149,13 @@ const areaLabelVariableAnchorFilter = [
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const areaLabelOverviewOffsetLayout = {
-  "text-variable-anchor": ["top", "bottom"] as ["top", "bottom"],
-  "text-radial-offset": 2.2,
+  "text-variable-anchor": ["top", "bottom", "left", "right"] as [
+    "top",
+    "bottom",
+    "left",
+    "right"
+  ],
+  "text-radial-offset": 3.5,
   "text-justify": "auto" as const
 };
 
@@ -248,7 +256,7 @@ function fitBoundsForPlace(
 
   map.fitBounds(bounds, {
     padding: {
-      top: 64,
+      top: focusPaddingTop,
       right: 64,
       bottom: 64,
       left: leftInset + 64
@@ -281,7 +289,7 @@ function focusSelection(
       center: focusPlan.coordinates,
       zoom: focusPlan.zoom,
       padding: {
-        top: 64,
+        top: focusPaddingTop,
         right: 64,
         bottom: 64,
         left: leftInset + 64
@@ -290,6 +298,15 @@ function focusSelection(
     durationMs,
     prefersReducedMotion()
   );
+}
+
+function getMapLabelPadding(leftInset: number) {
+  return {
+    top: mapLabelPaddingTop,
+    right: mapLabelPaddingEdge,
+    bottom: mapLabelPaddingEdge,
+    left: leftInset + mapLabelPaddingEdge
+  };
 }
 
 function collapseCompactAttribution(container: HTMLElement | null) {
@@ -564,7 +581,10 @@ function createQuestionBadgeImage() {
 }
 
 function createTransparentCollisionImage(sizePx: number) {
-  return createCanvasImage(sizePx, () => undefined);
+  return createCanvasImage(sizePx, (context, size) => {
+    context.fillStyle = "#000000";
+    context.fillRect(0, 0, size, size);
+  });
 }
 
 function createCandidateIconImage({
@@ -811,6 +831,9 @@ function ensureMapLayers(map: MapLibreMap) {
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "icon-image": clusterCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -824,6 +847,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -837,6 +863,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }
@@ -1159,14 +1188,20 @@ function isMainSourceLoaded(map: MapLibreMap) {
   return map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID);
 }
 
-export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: MapViewProps) {
+export function MapView({
+  places,
+  selection,
+  leftPanelWidth,
+  focusRequestToken,
+  onSelectPlace
+}: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const scaleBarRef = useRef<HTMLDivElement | null>(null);
   const scaleBarFillRef = useRef<HTMLDivElement | null>(null);
   const scaleBarLabelRef = useRef<HTMLSpanElement | null>(null);
-  const previousSelectionRef = useRef<string>("");
+  const previousFocusRequestRef = useRef<string>("");
   const cleanupAttributionRef = useRef<(() => void) | null>(null);
   const styleReadyRef = useRef(false);
   const gestureInProgressRef = useRef(false);
@@ -1179,6 +1214,12 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
   const mainSourceLoadControllerRef = useRef(new MainSourceLoadTimeoutController());
   const mapKeyboardActiveRef = useRef(false);
   const tooltipTrackingEnabledRef = useRef(false);
+  const activateVisibleEntryRef = useRef<(entry: VisibleListEntry) => void>(() => undefined);
+  const handleTooltipAtPointRef = useRef<(point: PointLike) => void>(() => undefined);
+  const refreshVisibleEntryStateRef = useRef<() => void>(() => undefined);
+  const scheduleVisibleEntryRefreshRef = useRef<() => void>(() => undefined);
+  const syncSourcesAndLayersRef = useRef<() => void>(() => undefined);
+  const updateScaleBarRef = useRef<() => void>(() => undefined);
 
   const runtimeTuning = useMemo(
     () =>
@@ -1346,7 +1387,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         center: entry.coordinates,
         zoom: Math.max(7, expansionZoom),
         padding: {
-          top: 64,
+          top: focusPaddingTop,
           right: 64,
           bottom: 64,
           left: panelInset + 64
@@ -1386,6 +1427,30 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     },
     [panelInset, runtimeTuning.controlZoomDurationMs]
   );
+
+  useEffect(() => {
+    activateVisibleEntryRef.current = activateVisibleEntry;
+  }, [activateVisibleEntry]);
+
+  useEffect(() => {
+    handleTooltipAtPointRef.current = handleTooltipAtPoint;
+  }, [handleTooltipAtPoint]);
+
+  useEffect(() => {
+    refreshVisibleEntryStateRef.current = refreshVisibleEntryState;
+  }, [refreshVisibleEntryState]);
+
+  useEffect(() => {
+    scheduleVisibleEntryRefreshRef.current = scheduleVisibleEntryRefresh;
+  }, [scheduleVisibleEntryRefresh]);
+
+  useEffect(() => {
+    syncSourcesAndLayersRef.current = syncSourcesAndLayers;
+  }, [syncSourcesAndLayers]);
+
+  useEffect(() => {
+    updateScaleBarRef.current = updateScaleBar;
+  }, [updateScaleBar]);
 
   const clearMainSourceLoadTimeout = useCallback(() => {
     if (mainSourceLoadTimeoutRef.current === null) {
@@ -1497,7 +1562,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         effectiveRuntimeTuning.cancelPendingTileRequestsWhileZooming,
       dragPan: effectiveRuntimeTuning.dragPan,
       keyboard: false,
-      doubleClickZoom: false
+      doubleClickZoom: false,
+      crossSourceCollisions: true
     });
     configureZoomGestures(map, effectiveRuntimeTuning);
 
@@ -1514,7 +1580,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         [visibleEntryRefreshHookKey]?: () => void;
       }
     )[visibleEntryRefreshHookKey] = () => {
-      refreshVisibleEntryState();
+      refreshVisibleEntryStateRef.current();
     };
     syncAttributionControl(map, initialMode);
 
@@ -1543,7 +1609,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
           map.on("mousemove", handleMouseMove);
           tooltipTrackingEnabledRef.current = true;
         }
-        scheduleVisibleEntryRefresh();
+        scheduleVisibleEntryRefreshRef.current();
       }, gestureReleaseDelayMs);
     };
 
@@ -1689,9 +1755,9 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         clearMainSourceLoadTimeout();
       }
       map.getCanvas().tabIndex = -1;
-      syncSourcesAndLayers();
-      refreshVisibleEntryState();
-      updateScaleBar();
+      syncSourcesAndLayersRef.current();
+      refreshVisibleEntryStateRef.current();
+      updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
 
       if (!cleanupAttributionRef.current) {
@@ -1711,18 +1777,24 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         return;
       }
 
-      activateVisibleEntry(entry);
+      activateVisibleEntryRef.current(entry);
     };
     const handleMouseMove = (event: { point: PointLike }) => {
-      handleTooltipAtPoint(event.point);
+      handleTooltipAtPointRef.current(event.point);
+    };
+    const handleMoveEnd = () => {
+      scheduleVisibleEntryRefreshRef.current();
+    };
+    const handleResize = () => {
+      scheduleVisibleEntryRefreshRef.current();
     };
 
     document.addEventListener("pointerdown", handleDocumentPointerDown, true);
     document.addEventListener("keydown", handleMapKeyboardShortcuts, true);
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
-    map.on("moveend", scheduleVisibleEntryRefresh);
-    map.on("resize", scheduleVisibleEntryRefresh);
+    map.on("moveend", handleMoveEnd);
+    map.on("resize", handleResize);
     map.on("dragstart", markGestureStarted);
     map.on("dragend", markGestureFinished);
     map.on("zoomstart", markGestureStarted);
@@ -1754,8 +1826,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       document.removeEventListener("keydown", handleMapKeyboardShortcuts, true);
       map.off("load", handleStyleReady);
       map.off("style.load", handleStyleReady);
-      map.off("moveend", scheduleVisibleEntryRefresh);
-      map.off("resize", scheduleVisibleEntryRefresh);
+      map.off("moveend", handleMoveEnd);
+      map.off("resize", handleResize);
       map.off("dragstart", markGestureStarted);
       map.off("dragend", markGestureFinished);
       map.off("zoomstart", markGestureStarted);
@@ -1798,18 +1870,12 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       tooltipTrackingEnabledRef.current = false;
     };
   }, [
-    activateVisibleEntry,
     basemapController,
     clearMainSourceLoadTimeout,
-    handleTooltipAtPoint,
     hideTooltip,
-    refreshVisibleEntryState,
     scheduleMainSourceLoadTimeout,
-    scheduleVisibleEntryRefresh,
     switchToFallback,
     syncAttributionControl,
-    syncSourcesAndLayers,
-    updateScaleBar,
     runtimeTuning
   ]);
 
@@ -1828,13 +1894,23 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!selection || !map || !styleReadyRef.current) {
-      previousSelectionRef.current = selection ? previousSelectionRef.current : "";
+    if (!map || !styleReadyRef.current) {
       return;
     }
 
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}`;
-    if (selectionKey === previousSelectionRef.current) {
+    map.setPadding(getMapLabelPadding(panelInset));
+    refreshVisibleEntryState();
+  }, [panelInset, refreshVisibleEntryState]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!selection || !map || !styleReadyRef.current) {
+      previousFocusRequestRef.current = selection ? previousFocusRequestRef.current : "";
+      return;
+    }
+
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${focusRequestToken}`;
+    if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
 
@@ -1843,9 +1919,16 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       return;
     }
 
-    previousSelectionRef.current = selectionKey;
+    previousFocusRequestRef.current = selectionKey;
     focusSelection(map, place, selection, panelInset, runtimeTuning.flyToDurationMs);
-  }, [mapReadyVersion, panelInset, placeById, runtimeTuning.flyToDurationMs, selection]);
+  }, [
+    focusRequestToken,
+    mapReadyVersion,
+    panelInset,
+    placeById,
+    runtimeTuning.flyToDurationMs,
+    selection
+  ]);
 
   const resetView = useCallback(() => {
     const map = mapRef.current;
@@ -1857,7 +1940,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_MAP_ZOOM,
       padding: {
-        top: 64,
+        top: focusPaddingTop,
         right: 64,
         bottom: 64,
         left: panelInset + 64
