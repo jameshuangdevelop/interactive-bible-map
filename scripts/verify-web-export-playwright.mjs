@@ -17,6 +17,7 @@ const generatedPlacesPath = path.join(
   "generated",
   "places.index.json"
 );
+const licensesDocumentPath = path.join(repositoryRoot, "docs", "LICENSES.md");
 
 const smoothnessLongTaskLimitMs = 50;
 const syntheticPlaceIdPrefix = "synthetic-city-";
@@ -30,6 +31,8 @@ const requiredCapernaumPinLabels = ["Capernaum", "Chorazin", "Magdala"];
 const minimumGalileePinLabels = 8;
 const searchNoResultsSuffix = "Search covers place names only.";
 const expectedAntiochSelections = new Set(["antioch-pisidia", "antioch-syria"]);
+const fullLicenseDetailsUrl =
+  "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -372,6 +375,104 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
   };
 }
 
+function normalizeTextContent(value) {
+  return value.replace(/\s+/gu, " ").trim();
+}
+
+function removeLeadingMarkdownHeadingLine(markdown) {
+  const lines = markdown.replace(/\r\n/gu, "\n").trim().split("\n");
+  const firstNonEmptyIndex = lines.findIndex((line) => line.trim().length > 0);
+  if (firstNonEmptyIndex >= 0) {
+    const firstLine = lines[firstNonEmptyIndex].trim();
+    if (/^\*\*[^*]+\*\*(?:\s+\(.*\))?$/u.test(firstLine)) {
+      lines.splice(firstNonEmptyIndex, 1);
+    }
+  }
+
+  return lines.join("\n").trim();
+}
+
+function stripInlineMarkdownSyntax(text) {
+  return text
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/gu, "$1")
+    .replace(/\*\*([^*]+)\*\*/gu, "$1")
+    .replace(/`([^`]+)`/gu, "$1");
+}
+
+function stripMarkdownForTextComparison(markdown, options = {}) {
+  const body = options.stripLeadingHeadingLine
+    ? removeLeadingMarkdownHeadingLine(markdown)
+    : markdown.replace(/\r\n/gu, "\n").trim();
+
+  const lines = body.split("\n");
+  const content = lines
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => line.replace(/^- /u, ""))
+    .map((line) => stripInlineMarkdownSyntax(line));
+
+  return normalizeTextContent(content.join(" "));
+}
+
+function extractMarkdownCodeBlock(source, sectionHeading) {
+  const sectionStart = source.indexOf(sectionHeading);
+  if (sectionStart < 0) {
+    throw new Error(`Could not extract markdown block for section '${sectionHeading}'.`);
+  }
+
+  const drawerHeading = '**2. "Sources & credits" drawer:**';
+  const drawerStart = source.indexOf(drawerHeading, sectionStart);
+  if (drawerStart < 0) {
+    throw new Error(`Could not find drawer heading for section '${sectionHeading}'.`);
+  }
+
+  const fenceStart = source.indexOf("```markdown", drawerStart);
+  if (fenceStart < 0) {
+    throw new Error(`Could not find markdown fence for section '${sectionHeading}'.`);
+  }
+
+  const blockStart = source.indexOf("\n", fenceStart);
+  if (blockStart < 0) {
+    throw new Error(`Could not find markdown content start for section '${sectionHeading}'.`);
+  }
+
+  const fenceEnd = source.indexOf("```", blockStart + 1);
+  if (fenceEnd < 0) {
+    throw new Error(`Could not find markdown content end for section '${sectionHeading}'.`);
+  }
+
+  return source.slice(blockStart + 1, fenceEnd).trimEnd();
+}
+
+async function loadExpectedDrawerTextFromLicenses() {
+  const licensesDocument = await fs.readFile(licensesDocumentPath, "utf8");
+  const webNoticeMatch = licensesDocument.match(
+    /## WEB \(Bible text\) attribution wording\s*> ([^\n]+)/u
+  );
+  if (!webNoticeMatch) {
+    throw new Error("Could not find WEB notice in docs/LICENSES.md.");
+  }
+
+  const mainMapMarkdown = extractMarkdownCodeBlock(
+    licensesDocument,
+    "#### Main basemap: Liberty on OpenFreeMap"
+  );
+  const backupMapMarkdown = extractMarkdownCodeBlock(
+    licensesDocument,
+    "#### Fallback B: VersaTiles public tile server (acceptable for outages only)"
+  );
+
+  return {
+    webNoticeText: stripMarkdownForTextComparison(webNoticeMatch[1]),
+    mainMapText: stripMarkdownForTextComparison(mainMapMarkdown, {
+      stripLeadingHeadingLine: true
+    }),
+    backupMapText: stripMarkdownForTextComparison(backupMapMarkdown, {
+      stripLeadingHeadingLine: true
+    })
+  };
+}
+
 function toSeriousOrCriticalViolations(violations) {
   return violations.filter(
     (violation) => violation.impact === "serious" || violation.impact === "critical"
@@ -400,7 +501,13 @@ async function runA11yCheck(page, selector, scenarioLabel) {
   };
 }
 
-async function verifySearchMenuAndAccessibility(page, baseUrl, screenshotPath) {
+async function verifySearchMenuAndAccessibility(
+  page,
+  baseUrl,
+  screenshotPath,
+  drawerScreenshotPath,
+  expectedDrawerText
+) {
   await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
 
@@ -521,8 +628,89 @@ async function verifySearchMenuAndAccessibility(page, baseUrl, screenshotPath) {
   await page.waitForSelector("[data-testid='app-menu-drawer']", { timeout: 30_000 });
   await page.getByRole("button", { name: "About this map" }).waitFor({ timeout: 30_000 });
   await page.getByRole("button", { name: "Sources & credits" }).waitFor({ timeout: 30_000 });
-  await page.getByRole("link", { name: "Report an issue" }).waitFor({ timeout: 30_000 });
-  await page.getByRole("link", { name: "View on GitHub" }).waitFor({ timeout: 30_000 });
+  const reportIssueLink = page.getByRole("link", { name: "Report an issue" });
+  const viewOnGitHubLink = page.getByRole("link", { name: "View on GitHub" });
+  await reportIssueLink.waitFor({ timeout: 30_000 });
+  await viewOnGitHubLink.waitFor({ timeout: 30_000 });
+
+  await page.getByRole("heading", { name: "Map", exact: true }).waitFor({ timeout: 30_000 });
+  await page
+    .getByRole("heading", {
+      name: "Backup map (shown only when the main map can't load)",
+      exact: true
+    })
+    .waitFor({ timeout: 30_000 });
+
+  const drawerText = normalizeTextContent(
+    await page.$eval("[data-testid='app-menu-drawer']", (element) => element.textContent ?? "")
+  );
+  if (drawerText.includes("**Basemap**") || drawerText.includes("[OpenStreetMap](")) {
+    throw new Error("Sources drawer still shows raw Markdown syntax.");
+  }
+
+  const dataLicenseHref = await page
+    .getByRole("link", { name: "full licence details" })
+    .getAttribute("href");
+  if (dataLicenseHref !== fullLicenseDetailsUrl) {
+    throw new Error(
+      `Data-license details link mismatch: expected '${fullLicenseDetailsUrl}', got '${dataLicenseHref ?? "null"}'.`
+    );
+  }
+
+  const navEntryTexts = await page.$$eval("nav[aria-label='Menu entries'] button, nav[aria-label='Menu entries'] a", (elements) =>
+    elements.map((element) => (element.textContent ?? "").trim())
+  );
+  if (navEntryTexts.some((text) => text.includes("[") || text.includes("**"))) {
+    throw new Error(`Menu entries contain raw Markdown: ${JSON.stringify(navEntryTexts)}`);
+  }
+
+  const mapMarkdownRenderedText = normalizeTextContent(
+    await page.$eval("[data-testid='credits-map-markdown']", (element) => {
+      const blockTexts = Array.from(element.querySelectorAll("p, li")).map(
+        (block) => block.textContent ?? ""
+      );
+      return blockTexts.join(" ");
+    })
+  );
+  const backupMapMarkdownRenderedText = normalizeTextContent(
+    await page.$eval("[data-testid='credits-backup-map-markdown']", (element) => {
+      const blockTexts = Array.from(element.querySelectorAll("p, li")).map(
+        (block) => block.textContent ?? ""
+      );
+      return blockTexts.join(" ");
+    })
+  );
+  const webNoticeRenderedText = normalizeTextContent(
+    await page.$eval("[data-testid='credits-web-notice']", (element) => element.textContent ?? "")
+  );
+
+  if (mapMarkdownRenderedText !== expectedDrawerText.mainMapText) {
+    throw new Error(
+      `Map credits text mismatch.\nExpected: ${expectedDrawerText.mainMapText}\nReceived: ${mapMarkdownRenderedText}`
+    );
+  }
+  if (backupMapMarkdownRenderedText !== expectedDrawerText.backupMapText) {
+    throw new Error(
+      `Backup map credits text mismatch.\nExpected: ${expectedDrawerText.backupMapText}\nReceived: ${backupMapMarkdownRenderedText}`
+    );
+  }
+  if (webNoticeRenderedText !== expectedDrawerText.webNoticeText) {
+    throw new Error(
+      `WEB notice text mismatch.\nExpected: ${expectedDrawerText.webNoticeText}\nReceived: ${webNoticeRenderedText}`
+    );
+  }
+
+  await page.locator("[data-testid='app-menu-drawer']").screenshot({
+    path: drawerScreenshotPath
+  });
+
+  const reportIssueRel = await reportIssueLink.getAttribute("rel");
+  const viewOnGitHubRel = await viewOnGitHubLink.getAttribute("rel");
+  if (reportIssueRel !== "noopener noreferrer" || viewOnGitHubRel !== "noopener noreferrer") {
+    throw new Error(
+      `External links in menu entries must use rel='noopener noreferrer'. Report='${reportIssueRel}', View='${viewOnGitHubRel}'.`
+    );
+  }
 
   const drawerA11y = await runA11yCheck(
     page,
@@ -535,6 +723,12 @@ async function verifySearchMenuAndAccessibility(page, baseUrl, screenshotPath) {
     selectedAntiochPlaceId: selectionAfterEnter,
     noResultsText,
     mapStableWhileTyping,
+    drawerScreenshotPath,
+    renderedDrawerText: {
+      webNotice: webNoticeRenderedText,
+      map: mapMarkdownRenderedText,
+      backupMap: backupMapMarkdownRenderedText
+    },
     accessibility: {
       comboboxOpen: comboboxA11y,
       menuDrawerOpen: drawerA11y
@@ -1970,6 +2164,7 @@ async function run() {
   const screenshotPaths = {
     overview: temporaryScreenshotPath("ibm-m3-03-overview.png"),
     searchResults: temporaryScreenshotPath("ibm-m3-05-search-results.png"),
+    creditsDrawer: temporaryScreenshotPath("ibm-m3-05-credits-drawer.png"),
     capernaum: temporaryScreenshotPath("ibm-m3-03-capernaum.png"),
     galilee: temporaryScreenshotPath("ibm-m3-03-galilee.png"),
     emmaus: temporaryScreenshotPath("ibm-m3-03-emmaus.png"),
@@ -1984,6 +2179,8 @@ async function run() {
   };
 
   try {
+    const expectedDrawerText = await loadExpectedDrawerTextFromLicenses();
+
     const normalLoadMainBasemapChecks = [
       await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/"),
       await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/?place=galilee")
@@ -2053,7 +2250,9 @@ async function run() {
     const searchAndMenuChecks = await verifySearchMenuAndAccessibility(
       page,
       staticServer.baseUrl,
-      screenshotPaths.searchResults
+      screenshotPaths.searchResults,
+      screenshotPaths.creditsDrawer,
+      expectedDrawerText
     );
 
     const fallbackPbfOutage = await verifyFallbackOutageMode({

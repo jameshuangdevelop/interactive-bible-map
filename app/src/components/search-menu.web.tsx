@@ -20,10 +20,15 @@ import {
   CITE_ONLY_BIBLE_VERSIONS,
   DATA_LICENSE_TEXT,
   FALLBACK_VERSATILES_SOURCES_CREDITS_MARKDOWN,
+  LICENSE_DETAILS_URL,
   MAIN_BASEMAP_SOURCES_CREDITS_MARKDOWN,
   UPSTREAM_SOURCES,
   WEB_NOTICE_TEXT
 } from "../features/search/sources-credits-content";
+import {
+  parseSafeMarkdownBlocks,
+  renderInlineSafeMarkdown
+} from "../features/search/safe-markdown";
 import { tokens } from "../theme/tokens";
 
 const SEARCH_RESULTS_LIMIT = 8;
@@ -77,6 +82,50 @@ function isEditableTarget(target: EventTarget | null, searchInput: HTMLInputElem
   }
 
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+}
+
+function renderMarkdownBlocks(
+  markdown: string,
+  keyPrefix: string,
+  options?: { stripLeadingHeadingLine?: boolean }
+) {
+  const blocks = parseSafeMarkdownBlocks(markdown, options);
+  return blocks.map((block, blockIndex) => {
+    if (block.kind === "paragraph") {
+      return (
+        <p
+          key={`${keyPrefix}-paragraph-${blockIndex}`}
+          style={{
+            margin: blockIndex === 0 ? 0 : `${tokens.spacing.xs}px 0 0`,
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`
+          }}
+        >
+          {renderInlineSafeMarkdown(block.text, `${keyPrefix}-paragraph-inline-${blockIndex}`)}
+        </p>
+      );
+    }
+
+    return (
+      <ul
+        key={`${keyPrefix}-list-${blockIndex}`}
+        style={{
+          margin: `${tokens.spacing.xs}px 0 0`,
+          paddingLeft: "18px",
+          color: tokens.color.textSecondary,
+          fontSize: `${tokens.typography.captionSize}px`,
+          lineHeight: `${tokens.typography.captionLineHeight}px`
+        }}
+      >
+        {block.items.map((item, itemIndex) => (
+          <li key={`${keyPrefix}-list-${blockIndex}-item-${itemIndex}`}>
+            {renderInlineSafeMarkdown(item, `${keyPrefix}-list-inline-${blockIndex}-${itemIndex}`)}
+          </li>
+        ))}
+      </ul>
+    );
+  });
 }
 
 export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps) {
@@ -611,7 +660,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                 </button>
                 <a
                   href="https://github.com/jameshuangdevelop/interactive-bible-map/issues/new"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   style={{
                     borderRadius: "999px",
                     border: `1px solid ${tokens.color.divider}`,
@@ -625,7 +674,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                 </a>
                 <a
                   href="https://github.com/jameshuangdevelop/interactive-bible-map"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   style={{
                     borderRadius: "999px",
                     border: `1px solid ${tokens.color.divider}`,
@@ -684,6 +733,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                   Sources & credits
                 </h3>
                 <p
+                  data-testid="credits-data-license"
                   style={{
                     margin: `${tokens.spacing.sm}px 0 0`,
                     color: tokens.color.textSecondary,
@@ -691,9 +741,15 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  {DATA_LICENSE_TEXT}
+                  {DATA_LICENSE_TEXT}{" "}
+                  (
+                  <a href={LICENSE_DETAILS_URL} rel="noopener noreferrer" target="_blank">
+                    full licence details
+                  </a>
+                  ).
                 </p>
                 <p
+                  data-testid="credits-web-notice"
                   style={{
                     margin: `${tokens.spacing.sm}px 0 0`,
                     color: tokens.color.textSecondary,
@@ -701,7 +757,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  {WEB_NOTICE_TEXT}
+                  {renderInlineSafeMarkdown(WEB_NOTICE_TEXT, "web-notice")}
                 </p>
                 <h4
                   style={{
@@ -711,20 +767,18 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  Main basemap (docs/LICENSES.md verbatim)
+                  Map
                 </h4>
-                <pre
+                <div
+                  data-testid="credits-map-markdown"
                   style={{
-                    margin: 0,
-                    whiteSpace: "pre-wrap",
-                    color: tokens.color.textSecondary,
-                    fontFamily: tokens.typography.uiFont,
-                    fontSize: `${tokens.typography.captionSize}px`,
-                    lineHeight: `${tokens.typography.captionLineHeight}px`
+                    margin: 0
                   }}
                 >
-                  {MAIN_BASEMAP_SOURCES_CREDITS_MARKDOWN}
-                </pre>
+                  {renderMarkdownBlocks(MAIN_BASEMAP_SOURCES_CREDITS_MARKDOWN, "map-markdown", {
+                    stripLeadingHeadingLine: true
+                  })}
+                </div>
                 <h4
                   style={{
                     margin: `${tokens.spacing.md}px 0 ${tokens.spacing.xs}px`,
@@ -733,20 +787,22 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  Backup basemap (VersaTiles; docs/LICENSES.md verbatim)
+                  Backup map (shown only when the main map can&apos;t load)
                 </h4>
-                <pre
+                <div
+                  data-testid="credits-backup-map-markdown"
                   style={{
-                    margin: 0,
-                    whiteSpace: "pre-wrap",
-                    color: tokens.color.textSecondary,
-                    fontFamily: tokens.typography.uiFont,
-                    fontSize: `${tokens.typography.captionSize}px`,
-                    lineHeight: `${tokens.typography.captionLineHeight}px`
+                    margin: 0
                   }}
                 >
-                  {FALLBACK_VERSATILES_SOURCES_CREDITS_MARKDOWN}
-                </pre>
+                  {renderMarkdownBlocks(
+                    FALLBACK_VERSATILES_SOURCES_CREDITS_MARKDOWN,
+                    "backup-map-markdown",
+                    {
+                      stripLeadingHeadingLine: true
+                    }
+                  )}
+                </div>
                 <h4
                   style={{
                     margin: `${tokens.spacing.md}px 0 ${tokens.spacing.xs}px`,
@@ -769,11 +825,15 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                   {UPSTREAM_SOURCES.map((source) => (
                     <li key={source.name}>
                       {source.url ? (
-                        <a href={source.url} rel="noreferrer" target="_blank">
-                          {source.name}
-                        </a>
+                        renderInlineSafeMarkdown(
+                          `[${source.name}](${source.url})`,
+                          `upstream-source-${source.name}`
+                        )
                       ) : (
-                        source.name
+                        renderInlineSafeMarkdown(
+                          source.name,
+                          `upstream-source-${source.name}`
+                        )
                       )}
                       {source.note ? ` — ${source.note}` : ""}
                     </li>
