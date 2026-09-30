@@ -920,18 +920,6 @@
       "accessed": "2026-09-30"
     },
     {
-      "id": "livius-cappadocia",
-      "type": "web",
-      "title": "Cappadocia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/cappadocia/",
-      "accessed": "2026-09-30"
-    },
-    {
       "id": "livius-parthia",
       "type": "web",
       "title": "Parthia",

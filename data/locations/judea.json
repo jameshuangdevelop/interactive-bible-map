@@ -52,7 +52,7 @@
       ]
     },
     {
-      "text": "'Judah' and 'Juda' are added here as alternate, searchable spellings of Judea's name. The WEB itself uses 'Judah' for this district twice, quoting Micah's prophecy as 'Bethlehem, land of Judah' in Matthew 2:6 and naming 'a city of Judah' in Luke 1:39 (Mary's visit to Elizabeth, traditionally located in the Judean hill country). Comparison with NIV, ESV, NLT, NKJV and CSB found the same 'Judah' spelling at Matthew 2:6; only the KJV instead reads 'Juda,' which is added alongside it.",
+      "text": "'Judah' and 'Juda' are alternate, searchable spellings of Judea's name. The WEB uses the older name 'Judah' for this land in Matthew 2:6, quoting the prophet's words 'Bethlehem, land of Judah,' and in Luke 1:39, where Mary goes 'into the hill country' to 'a city of Judah.' At Matthew 2:6 the NIV, ESV, NLT, NKJV and CSB also read 'Judah'; only the KJV reads 'Juda.'",
       "sources": [
         "scripture:Matthew 2:6",
         "scripture:Luke 1:39",
@@ -380,5 +380,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

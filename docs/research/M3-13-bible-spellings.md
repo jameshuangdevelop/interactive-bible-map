@@ -80,10 +80,12 @@ that the check was made and the existing record already satisfies it.
 
 ## Existing records reparented (not re-checked for spelling)
 
-Seven existing city records changed `parentId` only (or `parentId` plus a new history note) in this
-batch: `antioch-pisidia`, `iconium` (both now under the new `phrygia` record instead of `galatia`),
-`lystra`, `derbe` (now under the new `lycaonia` record instead of `galatia`), `perga` (now under the
-new `pamphylia` record instead of `galatia`), `tarsus` (now under the new `cilicia` record instead of
-`syria`), and `troas` (now under the new `mysia` record instead of `asia`). None of these records'
-own titles or alternate names changed in this batch, so their spellings were not re-checked; M3-10
-and M3-11 already verified them.
+The Research Lead's commit changed `parentId` on seven existing city records. After the Fact-Checker applied the PO's ruling on regions that cross province lines (`docs/verification/M3-well-known-areas.md`), four of them keep their earlier parent:
+
+- `lystra` and `derbe` are under the new `lycaonia` record (was `galatia`);
+- `perga` is under the new `pamphylia` record (was `galatia`);
+- `antioch-pisidia` and `iconium` stay under `galatia`, because Phrygia was split between Asia and Galatia;
+- `tarsus` stays under `syria`, because Cilicia was split between Syria and a client king;
+- `troas` stays under `asia`, because the sources count the Troad as part of Mysia only in some authors.
+
+None of these records' titles or alternate names changed in this batch, so their spellings were not re-checked; M3-10 and M3-11 already verified them.

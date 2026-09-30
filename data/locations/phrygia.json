@@ -26,7 +26,7 @@
     }
   ],
   "summary": {
-    "text": "Phrygia was a large, mountainous region of central Asia Minor. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia' at Pentecost, and records that Paul 'traversed the country' twice more on later journeys. By the first century, Phrygia was divided between two Roman provinces, so this project's Phrygia record sits directly under the Roman Empire rather than under either province alone.",
+    "text": "Phrygia was a large, mountainous region of central Asia Minor. Acts names Phrygia among the homelands of the Pentecost crowd, and records that Paul went through 'the region of Phrygia and Galatia' on one journey and 'the region of Galatia and Phrygia' on a later one. In Paul's time Phrygia was divided between two Roman provinces, so this project's Phrygia record sits directly under the Roman Empire rather than under either province.",
     "sources": [
       "pleiades:609502",
       "bib:isbe-phrygia",
@@ -37,7 +37,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia states plainly that 'in Roman times, however, when Paul journeyed there, the country was divided into two parts, one of which was known as Galatian Phrygia, and the other as Asian Phrygia, because it was a part of the Roman province of Asia.' Galatian Phrygia was the smaller portion, extending along the Pisidian mountains, and included Antioch (in Pisidia) and Iconium among its important cities.",
+      "text": "The International Standard Bible Encyclopedia states plainly that 'in Roman times, however, when Paul journeyed there, the country was divided into two parts, one of which was known as Galatian Phrygia, and the other as Asian Phrygia, because it was a part of the Roman province of Asia.' Galatian Phrygia was the smaller portion, extending along the Pisidian mountains, and included Antioch (in Pisidia) and Iconium among its important cities. Because of that division, this project places cities in Phrygia, such as Antioch and Iconium in its Galatian part, under their province rather than under this record.",
       "sources": [
         "bib:isbe-phrygia"
       ]
@@ -62,5 +62,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

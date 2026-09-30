@@ -16,7 +16,7 @@
   },
   "type": "city",
   "zoomTier": "city",
-  "parentId": "phrygia",
+  "parentId": "galatia",
   "candidates": [
     {
       "label": "Yalvaç (ancient Antioch in Pisidia)",
@@ -51,9 +51,11 @@
   },
   "history": [
     {
-      "text": "Although called 'Antioch of Pisidia' in Acts and often 'Pisidian Antioch' in English, the city itself lay just across Pisidia's border, in the district of Phrygia; the International Standard Bible Encyclopedia explains that the name reflects Antioch's closeness to Pisidia and its role as the base of the Roman military system that pacified the Pisidian highlands, not its own location. This project therefore places Antioch under its Phrygia record rather than under Pisidia.",
+      "text": "Although Acts calls it 'Antioch of Pisidia,' the International Standard Bible Encyclopedia explains that the city lay in Galatian Phrygia, near Pisidia's northern border, and took the name from its closeness to Pisidia and its role as the base of the Roman military system that pacified the Pisidian highlands. Phrygia was then divided between the provinces of Asia and Galatia, and Antioch lay in the Galatian part, so this project gives the province of Galatia as its parent.",
       "sources": [
-        "bib:isbe-pisidia"
+        "bib:isbe-pisidia",
+        "bib:isbe-phrygia",
+        "scripture:Acts 13:14"
       ]
     }
   ],
@@ -81,5 +83,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

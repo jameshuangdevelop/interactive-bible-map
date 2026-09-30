@@ -18,7 +18,7 @@
       ],
       "coordinateSource": "pleiades:639034",
       "confidence": "high",
-      "support": "Pamphylia's identity as the narrow coastal region of southern Asia Minor is undisputed. The label point is Pleiades' dedicated entry for the region; because Pamphylia is a small coastal strip 'scarcely more than 20 miles long' per the International Standard Bible Encyclopedia, the point necessarily falls close to several of its cities, including this project's Perga pin about 10 km away.",
+      "support": "Pamphylia's identity as the coastal plain of southern Asia Minor, with Lycia to the west and the mountains of Pisidia to the north, is undisputed. The label point is Pleiades' entry for the region. Because the region is small, the point falls about 9 km from this project's Perga pin.",
       "sources": [
         "pleiades:639034",
         "bib:isbe-pamphylia"
@@ -26,7 +26,7 @@
     }
   ],
   "summary": {
-    "text": "Pamphylia was a narrow, fertile strip of coastline in southern Asia Minor. Paul and Barnabas sailed there on the first missionary journey, landing at Perga, and Paul's later voyage to Rome passed 'across the sea which is off Cilicia and Pamphylia.' As this project's existing Perga record describes, sources differ on which province held Pamphylia at about AD 50.",
+    "text": "Pamphylia was a narrow, fertile coastal plain in southern Asia Minor. Paul and his company sailed from Paphos and 'came to Perga in Pamphylia,' and Paul's later voyage to Rome crossed 'the sea which is off Cilicia and Pamphylia.' As this project's Perga record describes, sources differ on which province held Pamphylia at about AD 50.",
     "sources": [
       "pleiades:639034",
       "bib:isbe-pamphylia",
@@ -45,9 +45,10 @@
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia notes a further, later change to Pamphylia's extent: the highland district once called 'Pisidia' was made part of Pamphylia by the Romans in AD 70, after this project's about AD 50 date.",
+      "text": "The International Standard Bible Encyclopedia notes a later change to Pamphylia's extent: the Romans made the highland district once called 'Pisidia' part of Pamphylia in AD 70, after this project's about AD 50 date. Its article on Pisidia dates the transfer of southern Pisidia to the new province of Lycia and Pamphylia to AD 74.",
       "sources": [
-        "bib:isbe-pamphylia"
+        "bib:isbe-pamphylia",
+        "bib:isbe-pisidia"
       ]
     }
   ],
@@ -65,5 +66,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

@@ -18,20 +18,21 @@
       ],
       "coordinateSource": "wikidata:Q202311",
       "confidence": "high",
-      "support": "Egypt's identity as the Roman province along the Nile is undisputed. The label point is Wikidata's point for the province, in the Nile valley south of the Delta, away from the project's other pins.",
+      "support": "Egypt's identity as the Roman province along the Nile is undisputed. The label point is Wikidata's point for the province, in the desert east of the Nile valley and far from the project's other pins. Pleiades' entry for the province has no location of its own; its representative point is Alexandria, about 410 km to the northwest.",
       "sources": [
         "wikidata:Q202311",
-        "pleiades:727070"
+        "pleiades:766"
       ]
     }
   ],
   "summary": {
-    "text": "Egypt was a Roman province governed from Alexandria under an unusual arrangement: Cassius Dio records that after Augustus made it tributary, he gave it in charge of Cornelius Gallus rather than a senator, and, given Egypt's grain supply and wealth, did not even allow a senator to live there without his personal permission. In Matthew's account Joseph takes the infant Jesus to Egypt to escape Herod, and Peter's Pentecost list of hearers includes people 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia, Pamphylia, Egypt, and the parts of Libya around Cyrene.'",
+    "text": "Egypt was a Roman province governed from Alexandria under an unusual arrangement: Cassius Dio records that after Augustus made it tributary, he gave it in charge of Cornelius Gallus rather than a senator, and, given Egypt's grain supply and wealth, did not even allow a senator to live there without his personal permission. In Matthew's account an angel tells Joseph to flee into Egypt with the child and his mother, because Herod will seek to destroy the child, and at Pentecost the crowd in Jerusalem includes people 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene.'",
     "sources": [
       "wikidata:Q202311",
-      "pleiades:727070",
+      "pleiades:766",
       "bib:cassius-dio-roman-history",
       "scripture:Matthew 2:13",
+      "scripture:Acts 2:9",
       "scripture:Acts 2:10"
     ]
   },
@@ -43,9 +44,10 @@
       ]
     },
     {
-      "text": "Tacitus records that when Germanicus visited Egypt in AD 19, Tiberius rebuked him sharply for entering Alexandria without imperial consent, because Augustus, among the other secrets of his rule, had forbidden senators and high-ranking knights from entering the country without permission, so that Italy's grain supply could not be threatened by anyone who seized the province and its land and sea approaches. This special, closely guarded status was still in force at the time of this project's about AD 50 convention.",
+      "text": "Tacitus records that when Germanicus visited Egypt in AD 19, Tiberius rebuked him sharply for entering Alexandria without imperial consent, because Augustus, among the other secrets of his rule, had forbidden senators and high-ranking knights from entering the country without permission, so that no one who seized the province and its land and sea approaches could starve Italy. Writing of AD 69, Tacitus adds that Egypt had been managed 'from the time of the deified Augustus by Roman knights in place of their former kings,' so the arrangement still held at this project's about AD 50 date.",
       "sources": [
-        "bib:tacitus-annals"
+        "bib:tacitus-annals",
+        "bib:tacitus-histories"
       ]
     }
   ],
@@ -64,7 +66,7 @@
   "otConnections": [
     {
       "ref": "Hosea 11:1",
-      "note": "Matthew explicitly links Jesus' return from Egypt to Hosea's words, 'out of Egypt I called my son.'",
+      "note": "Matthew 2:15 applies the prophet's words 'Out of Egypt I called my son' to the family's stay in Egypt until Herod's death; in Hosea 11:1 God says he 'called my son out of Egypt.'",
       "sources": [
         "scripture:Hosea 11:1",
         "scripture:Matthew 2:15"
@@ -72,5 +74,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

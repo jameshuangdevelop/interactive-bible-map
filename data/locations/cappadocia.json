@@ -26,17 +26,19 @@
     }
   ],
   "summary": {
-    "text": "Cappadocia was a Roman province in eastern Asia Minor, formerly an independent client kingdom. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia' at Pentecost, and Peter addresses his first letter to believers scattered through 'Pontus, Galatia, Cappadocia, Asia, and Bithynia.'",
+    "text": "Cappadocia was a Roman province in eastern Asia Minor, a kingdom until Rome annexed it in AD 17. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia' at Pentecost, and the letter 1 Peter is addressed to those 'living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia.'",
     "sources": [
       "wikidata:Q33490",
       "pleiades:628949",
+      "bib:isbe-cappadocia",
+      "bib:tacitus-annals",
       "scripture:Acts 2:9",
       "scripture:1 Peter 1:1"
     ]
   },
   "history": [
     {
-      "text": "Tacitus records that King Archelaus held Cappadocia for fifty years as a client king, until Tiberius, to whom Archelaus had given offense, lured him to Rome. Shortly afterward, per Tacitus, 'Cappadocia, reduced to the rank of a province, received Quintus Veranius as governor,' and some of the kingdom's former tribute payments were lowered to encourage the population's acceptance of Roman rule. The International Standard Bible Encyclopedia gives this annexation the date AD 17.",
+      "text": "Tacitus records that King Archelaus held Cappadocia for fifty years, until Tiberius, to whom Archelaus had given offense, lured him to Rome. Shortly afterward, per Tacitus, 'Cappadocia, reduced to the rank of a province, received Quintus Veranius as governor,' and some of the kingdom's former tribute payments were lowered to encourage the population's acceptance of Roman rule. The International Standard Bible Encyclopedia gives this annexation the date AD 17.",
       "sources": [
         "bib:tacitus-annals",
         "bib:isbe-cappadocia"
@@ -57,5 +59,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

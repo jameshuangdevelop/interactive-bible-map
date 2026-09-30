@@ -13,20 +13,21 @@
     {
       "label": "Pisidia (label point)",
       "coordinates": [
-        31.016667,
-        38.3
+        31.014588,
+        37.470801
       ],
-      "coordinateSource": "wikidata:Q621805",
+      "coordinateSource": "pleiades:639060",
       "confidence": "high",
-      "support": "Pisidia's identity as the mountain block of southern Asia Minor is undisputed. The label point is Wikidata's point for the region; Pleiades has no separate coordinate-bearing entry for Pisidia as a whole, only for Antioch in Pisidia, this project's existing city pin.",
+      "support": "Pisidia's identity as the mountain block of southern Asia Minor, north of the Pamphylian coast, is undisputed. The label point is Pleiades' label location for the region, after the Barrington Atlas, in the Pisidian highlands about 58 km from Perga's pin. Wikidata's point for Pisidia lies about 92 km to the north, at the latitude of Antioch and 15 km from its pin, near or beyond Pisidia's northern border.",
       "sources": [
+        "pleiades:639060",
         "wikidata:Q621805",
         "bib:isbe-pisidia"
       ]
     }
   ],
   "summary": {
-    "text": "Pisidia was the block of rugged mountain country stretching north from the Taurus range above the Pamphylian coast. Acts records that Paul and Barnabas 'passed through Pisidia and came to Pamphylia' on the return leg of the first missionary journey, having first travelled the same route in the other direction to reach Antioch in Pisidia.",
+    "text": "Pisidia was the block of rugged mountain country stretching north from the Taurus range above the Pamphylian coast. Acts records that Paul and Barnabas 'passed through Pisidia and came to Pamphylia' on the way back from their first journey, having crossed it in the other direction, from Perga to Antioch, on the way out.",
     "sources": [
       "wikidata:Q621805",
       "bib:isbe-pisidia",
@@ -42,9 +43,10 @@
       ]
     },
     {
-      "text": "Despite its name, the city of Antioch, called 'Antioch in Pisidia' in Acts 13:14, lay just across Pisidia's northern border, in the district of Phrygia; the International Standard Bible Encyclopedia explains that Antioch took its epithet from its closeness to Pisidia and its role as the base for the Roman military system that pacified the Pisidian highlands, not from its own location. This project's Antioch in Pisidia and Iconium records are therefore placed under its separate Phrygia record rather than under Pisidia.",
+      "text": "Despite its name, the city called 'Antioch of Pisidia' in Acts 13:14 lay in Galatian Phrygia, near Pisidia's northern border; the International Standard Bible Encyclopedia explains that Antioch took its epithet from its closeness to Pisidia and its role as the base for the Roman military system that pacified the Pisidian highlands. This project therefore places Antioch under the province of Galatia, not under Pisidia.",
       "sources": [
-        "bib:isbe-pisidia"
+        "bib:isbe-pisidia",
+        "scripture:Acts 13:14"
       ]
     }
   ],
@@ -62,5 +64,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

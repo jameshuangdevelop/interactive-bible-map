@@ -28,18 +28,22 @@
     }
   ],
   "summary": {
-    "text": "Media lay west and southwest of the Caspian Sea, with its chief city at Ecbatana. Acts lists 'Medes' among the peoples present in Jerusalem at Pentecost. By this project's about AD 50 date, Media had long been part of the Parthian Empire.",
+    "text": "Media lay west and southwest of the Caspian Sea, reaching to the Zagros Mountains; its chief cities included Ecbatana. Acts lists 'Medes' among the peoples present in Jerusalem at Pentecost. By this project's about AD 50 date, Media had long been part of the Parthian Empire.",
     "sources": [
       "pleiades:903080",
       "bib:isbe-media",
+      "bib:livius-parthia",
+      "bib:tacitus-annals",
       "scripture:Acts 2:9"
     ]
   },
   "history": [
     {
-      "text": "Livius.org records that the Parthian king Mithridates I (r. 165-132 BC) conquered Media, along with Babylonia and Elam, bringing it under Parthian rule; it remained part of the Parthian Empire through the first century AD.",
+      "text": "Livius.org records that the Parthian king Mithradates I (r. 165-132 BC) conquered Media, along with Babylonia and Elam. Strabo says that 'the Parthians rule over the Medes and the Babylonians,' and in his account of AD 49 Tacitus records that when the Parthian king Gotarzes died, 'Vonones, then viceroy of Media, was called to the throne.'",
       "sources": [
-        "bib:livius-parthia"
+        "bib:livius-parthia",
+        "bib:strabo-geography",
+        "bib:tacitus-annals"
       ]
     }
   ],
@@ -52,5 +56,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

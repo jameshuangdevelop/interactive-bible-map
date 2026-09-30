@@ -20,7 +20,7 @@
       ],
       "coordinateSource": "wikidata:Q753824",
       "confidence": "high",
-      "support": "Identified with the Roman province along the eastern Adriatic, governed from Salona. The label point is Wikidata's point for the province, about 65 km from Pleiades' independent point for the same province under its later name, 'Dalmatia.'",
+      "support": "Identified with the Roman province along the eastern Adriatic, governed from Salona. The label point is Wikidata's point for the province, about 74 km from Pleiades' point for the same province under its later name, 'Dalmatia', which lies at Salona.",
       "sources": [
         "wikidata:Q753824",
         "pleiades:981522"
@@ -28,7 +28,7 @@
     }
   ],
   "summary": {
-    "text": "Illyricum was a Roman province along the eastern shore of the Adriatic Sea. Paul writes to the Romans that he has 'fully preached the Good News of Christ' from Jerusalem 'all the way around to Illyricum,' and he later reports sending Titus 'to Dalmatia.' The International Standard Bible Encyclopedia treats these as the same province under two names, one earlier and one later.",
+    "text": "Illyricum was a Roman province along the eastern shore of the Adriatic Sea. Paul writes to the Romans that 'from Jerusalem and around as far as to Illyricum, I have fully preached the Good News of Christ,' and 2 Timothy says that Titus went 'to Dalmatia.' The International Standard Bible Encyclopedia treats these as the same province under an earlier and a later name.",
     "sources": [
       "wikidata:Q753824",
       "pleiades:981522",
@@ -39,7 +39,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that the province Paul calls Illyricum in its 'narrower and more precise' sense was 'finally organized' by Augustus, and that it 'later came to be known as Dalmatia,' citing Tacitus's Annals, Josephus's Jewish War, and Cassius Dio as ancient authorities who use the name Dalmatia for the same province. The companion International Standard Bible Encyclopedia article on Dalmatia agrees that Paul's use of that name in 2 Timothy 4:10 'most probably' refers to the whole province, the same one named Illyricum in Romans 15:19.",
+      "text": "The International Standard Bible Encyclopedia records that the province Paul calls Illyricum, in its 'narrower and more precise' sense, was 'finally organized' by Augustus in AD 10, and that 'later it came to be known as Dalmatia,' citing Tacitus's Annals, Josephus's Jewish War and Cassius Dio for that name. Its article on Dalmatia explains that the name first meant the land of the Dalmatae, then the southern part of the province, and later the whole province, and it judges it 'most probable' that 2 Timothy 4:10 uses the name in that last sense. The two names are therefore kept on one record.",
       "sources": [
         "bib:isbe-illyricum",
         "bib:isbe-dalmatia"
@@ -66,5 +66,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

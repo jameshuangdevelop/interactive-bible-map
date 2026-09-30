@@ -28,7 +28,7 @@
     }
   ],
   "summary": {
-    "text": "The Parthian Empire was, per the International Standard Bible Encyclopedia, a state stretching from the Euphrates to the borders of India, and for centuries the rival of Rome. Acts lists 'Parthians' among the peoples present in Jerusalem at Pentecost, a reference this project takes to mean Jews or proselytes from within the Parthian Empire's territory.",
+    "text": "The Parthian Empire was, per the International Standard Bible Encyclopedia, a state stretching from the Euphrates to the borders of India, and for centuries the rival of Rome. Acts lists 'Parthians' among the peoples present in Jerusalem at Pentecost, which the same encyclopedia takes to mean Jews or proselytes from the regions of the Parthian Empire.",
     "sources": [
       "wikidata:Q1986139",
       "pleiades:893976",
@@ -38,13 +38,14 @@
   },
   "history": [
     {
-      "text": "Per Livius.org, the Parthians began as the Parni, a nomadic people who seized the Seleucid satrapy of Parthia in the third century BC under the leader Tiridates, founding the Arsacid dynasty. Under Mithridates I (r. 165-132 BC) they conquered Media, Babylonia, and Elam, and the empire lasted until it was overthrown by the Sassanid dynasty in AD 224.",
+      "text": "Per Livius.org, the Parthians began as the Parni, nomads from the steppes of Central Asia who seized the Seleucid satrapy of Parthia in the third century BC and took its name. Under Mithradates I (r. 165-132 BC) they conquered Media, Babylonia and Elam, and the empire lasted until AD 224, when the Sasanian Empire succeeded it. The International Standard Bible Encyclopedia gives slightly different dates for Mithridates I (174-137 BC) and for the empire's fall (AD 226).",
       "sources": [
-        "bib:livius-parthia"
+        "bib:livius-parthia",
+        "bib:isbe-parthians"
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia records that Rome and Parthia fought repeatedly over control of Armenia, from Crassus's defeat and death in 53 BC onward, but that the contest over Armenia 'was settled in the days of Nero in a manner satisfactory to both parties, so that peace was not broken for 50 years.' This project's about AD 50 date falls within that decades-long peace, a few years before Nero's reign began in AD 54.",
+      "text": "The International Standard Bible Encyclopedia records that Crassus's invasion of Parthia ended with his defeat and death in 53 BC, and that Augustus later recovered Crassus's lost standards and made peace. Despite rivalry over Armenia, which the same article says was settled under Nero, it describes the peace as not seriously disturbed until Trajan's reign, so this project's about AD 50 date falls within it.",
       "sources": [
         "bib:isbe-parthians"
       ]
@@ -59,5 +60,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

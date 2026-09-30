@@ -11,14 +11,14 @@
   "parentId": "roman-empire",
   "candidates": [
     {
-      "label": "Bithynia et Pontus (Roman province, label point)",
+      "label": "Bithynia and Pontus (Roman province, label point)",
       "coordinates": [
         32.164919,
         40.812102
       ],
       "coordinateSource": "pleiades:981512",
       "confidence": "high",
-      "support": "Bithynia's identity as a Roman province in northwestern Asia Minor is undisputed. The label point is Pleiades' point for the joint province 'Bithynia et Pontus,' cross-checked against Wikidata's own, more generic point for Bithynia about 110 km to the southwest.",
+      "support": "Bithynia's identity as a Roman province in northwestern Asia Minor is undisputed. The label point is Pleiades' point for the joint province of Bithynia and Pontus, about 104 km from Wikidata's more general point for Bithynia.",
       "sources": [
         "pleiades:981512",
         "wikidata:Q373189"
@@ -26,8 +26,9 @@
     }
   ],
   "summary": {
-    "text": "Bithynia was a coastal province in northwestern Asia Minor, bequeathed to Rome by its last king, Nicomedes IV, in 74 BC. Luke records that when Paul and his companions 'had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn't allow them,' and Peter addresses his first letter to believers scattered through 'Pontus, Galatia, Cappadocia, Asia, and Bithynia.'",
+    "text": "Bithynia was a coastal province in northwestern Asia Minor, bequeathed to Rome by its last king in 74 BC. Acts records that when Paul and his companions 'had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn't allow them,' and the letter 1 Peter is addressed to those 'living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia.'",
     "sources": [
+      "pleiades:981512",
       "bib:isbe-bithynia",
       "scripture:Acts 16:7",
       "scripture:1 Peter 1:1"
@@ -35,9 +36,10 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that Nicomedes IV, the last king of Bithynia, 'weary of the incessant strife among the peoples of Asia Minor,' bequeathed his kingdom to Rome in 74 BC. Afterward, 'the Black Sea littoral as far as Amisus was more or less closely joined with Bithynia in administration,' reflecting the merger with the western part of Pontus described in this project's Pontus record.",
+      "text": "The International Standard Bible Encyclopedia records that the last king of Bithynia, 'weary of the incessant strife among the peoples of Asia Minor,' bequeathed his kingdom to Rome, ending a line of kings that ruled until 74 BC; Pleiades also dates the annexation to 74 BC. Afterward, 'the Black Sea littoral as far as Amisus was more or less closely joined with Bithynia in administration': the western part of Pontus described in this project's Pontus record.",
       "sources": [
-        "bib:isbe-bithynia"
+        "bib:isbe-bithynia",
+        "pleiades:981512"
       ]
     }
   ],
@@ -55,5 +57,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

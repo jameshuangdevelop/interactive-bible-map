@@ -8,17 +8,17 @@
   },
   "type": "region",
   "zoomTier": "region",
-  "parentId": "syria",
+  "parentId": "roman-empire",
   "candidates": [
     {
-      "label": "Cilicia (Roman province, label point)",
+      "label": "Cilicia (label point)",
       "coordinates": [
         34.18127,
         37.038152
       ],
       "coordinateSource": "pleiades:981514",
       "confidence": "high",
-      "support": "Cilicia's identity as the region of southeastern Asia Minor between the Taurus Mountains and the Mediterranean is undisputed. The label point is Pleiades' point for the Roman province, about 73 km from this project's Tarsus pin.",
+      "support": "Cilicia's identity as the region of southeastern Asia Minor between the Taurus Mountains and the Mediterranean is undisputed. The label point is Pleiades' representative point for its entry on the Roman province of Cilicia, which has no location of its own; it lies inland, about 65 km west of this project's Tarsus pin.",
       "sources": [
         "pleiades:981514",
         "wikidata:Q4819648"
@@ -26,20 +26,25 @@
     }
   ],
   "summary": {
-    "text": "Cilicia was the region of southeastern Asia Minor enclosed by the Taurus Mountains and the sea, and the home region of Paul, who calls himself 'a Jew from Tarsus in Cilicia.' Barnabas and Silas both travel through 'the regions of Syria and Cilicia' in Acts and Galatians, and at this project's about AD 50 date its plain was administered together with Syria.",
+    "text": "Cilicia was the region of southeastern Asia Minor enclosed by the Taurus Mountains and the sea, and the home region of Paul, who says, 'I am a Jew from Tarsus in Cilicia.' Paul writes that he 'came to the regions of Syria and Cilicia,' and Acts records that he later 'went through Syria and Cilicia, strengthening the assemblies.' At this project's about AD 50 date Cilicia was divided: its eastern plain was governed with the province of Syria, while part of its western, mountainous coast belonged to a client king.",
     "sources": [
       "pleiades:981514",
       "bib:isbe-cilicia",
-      "scripture:Acts 15:41",
-      "scripture:Galatians 1:21"
+      "bib:livius-cilicia",
+      "bib:tacitus-annals",
+      "scripture:Acts 21:39",
+      "scripture:Galatians 1:21",
+      "scripture:Acts 15:41"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that Cilicia 'was by degrees incorporated in the Roman administration,' with Cicero serving as its governor in 51-50 BC. As this project's existing Syria and Tarsus records describe, after Augustus became sole ruler the Cilician plain was attached to the province of Syria, and it became a separate province again only when Vespasian reunited it in AD 72, so at this project's about AD 50 date Cilicia was governed from Syria.",
+      "text": "The International Standard Bible Encyclopedia records that Cilicia 'was by degrees incorporated in the Roman administration,' with Cicero serving as its governor in 51-50 BC, and that it was divided by nature into a mountainous western part, Tracheia, and a broad plain to the east. Livius.org adds that after Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, until Vespasian reunited Cilicia in AD 72. Cassius Dio records that Caligula gave Antiochus of Commagene the coast region of Cilicia, and that Claudius restored Commagene to him; Tacitus, describing a revolt of Cilician hill tribes in AD 52, says their part of the coast lay in Antiochus's kingdom. Because Cilicia was split between Syria and a client kingdom in about AD 50, this project places it directly under the Roman Empire, and Tarsus, in the plain, under Syria.",
       "sources": [
         "bib:isbe-cilicia",
-        "bib:livius-cilicia"
+        "bib:livius-cilicia",
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-annals"
       ]
     }
   ],
@@ -57,5 +62,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

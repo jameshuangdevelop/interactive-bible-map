@@ -10,7 +10,7 @@
   },
   "type": "city",
   "zoomTier": "city",
-  "parentId": "mysia",
+  "parentId": "asia",
   "candidates": [
     {
       "label": "Alexandria Troas archaeological site",
@@ -38,7 +38,16 @@
       "scripture:2 Timothy 4:13"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Acts says that Paul's company, 'passing by Mysia,' came down to Troas. The International Standard Bible Encyclopedia names Troas among the cities of Mysia but notes that only some authors counted the Troad as part of Mysia, and its article on the province of Asia lists Mysia and the Troad separately among the lands the province included. This project therefore gives Troas the province of Asia as its parent rather than the Mysia region.",
+      "sources": [
+        "scripture:Acts 16:8",
+        "bib:isbe-mysia",
+        "bib:isbe-asia"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 16:8",
@@ -73,5 +82,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

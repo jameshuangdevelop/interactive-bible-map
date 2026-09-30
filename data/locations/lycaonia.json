@@ -18,15 +18,16 @@
       ],
       "coordinateSource": "wikidata:Q622598",
       "confidence": "high",
-      "support": "Lycaonia's identity as the region containing Lystra and Derbe is undisputed. The label point is Wikidata's point for the region; Pleiades independently records the region under the same name, citing Cicero and Strabo, though without a coordinate of its own.",
+      "support": "Lycaonia's identity as the region containing Lystra and Derbe is undisputed. The label point is Wikidata's point for the region, in the Lycaonian plain north of Lystra and Derbe and about 47 km from Iconium's pin. Pleiades' 'Lykaonia', after the Barrington Atlas, has only an approximate point about 70 km to the southwest, near Lystra's pin.",
       "sources": [
         "wikidata:Q622598",
-        "pleiades:982262"
+        "pleiades:1001911",
+        "bib:isbe-lycaonia"
       ]
     }
   ],
   "summary": {
-    "text": "Lycaonia was a plain in the central-southern part of Asia Minor. Acts records that after Paul and Barnabas were driven out of Iconium, they 'fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region,' where the residents spoke 'the speech of Lycaonia.' This project's Lycaonia record reflects the western, Roman part of the region, where Lystra and Derbe lay.",
+    "text": "Lycaonia was a plain in the central-southern part of Asia Minor. Acts records that after Paul and Barnabas were driven out of Iconium, they 'fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region,' where the residents spoke 'the language of Lycaonia.' This project's Lycaonia record reflects the western, Roman part of the region, where Lystra and Derbe lay.",
     "sources": [
       "wikidata:Q622598",
       "bib:isbe-lycaonia",
@@ -56,5 +57,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }

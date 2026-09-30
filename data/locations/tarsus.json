@@ -9,7 +9,7 @@
   },
   "type": "city",
   "zoomTier": "city",
-  "parentId": "cilicia",
+  "parentId": "syria",
   "candidates": [
     {
       "label": "Tarsus (modern city center)",
@@ -38,7 +38,7 @@
   },
   "history": [
     {
-      "text": "Tarsus lay in the plain of Cilicia. After Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, and Cilicia became a separate province again only when Vespasian reunited it in AD 72. This project therefore places Tarsus in Cilicia, this project's region record for the Cilician plain, which in turn sits under Syria for about AD 50, matching the New Testament's pairing of 'the regions of Syria and Cilicia' (Galatians 1:21).",
+      "text": "Tarsus lay in the plain of Cilicia. After Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, and Cilicia became a separate province again only when Vespasian reunited it in AD 72. This project therefore places Tarsus in Syria for about AD 50, matching the New Testament's pairing of 'the regions of Syria and Cilicia' (Galatians 1:21).",
       "sources": [
         "pleiades:648789",
         "bib:livius-cilicia",
@@ -76,5 +76,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
 }
