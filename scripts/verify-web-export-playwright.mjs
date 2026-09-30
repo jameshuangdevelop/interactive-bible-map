@@ -35,6 +35,7 @@ const smoothnessLayerIds = {
 const mapLayerIds = {
   areaLabels: ["ibm-area-label-overview", "ibm-area-label"],
   clusterPins: "ibm-cluster-circle",
+  clusterCounts: "ibm-cluster-count",
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
   candidatePins: "ibm-candidate-pin",
@@ -635,7 +636,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
   });
 
   const overlap = await page.evaluate(
-    ({ testHookKey, areaLayerIds, clusterLayerId }) => {
+    ({ testHookKey, areaLayerIds, clusterLayerId, clusterCountLayerId }) => {
       const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
@@ -644,6 +645,14 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
       const clusters = map.queryRenderedFeatures(undefined, {
         layers: [clusterLayerId]
       });
+      const clusterIdsWithCounts = new Set(
+        map
+          .queryRenderedFeatures(undefined, { layers: [clusterCountLayerId] })
+          .map((feature) => feature.properties?.cluster_id)
+      );
+      const clustersWithoutCounts = clusters.filter(
+        (feature) => !clusterIdsWithCounts.has(feature.properties?.cluster_id)
+      );
       const collisions = [];
 
       for (const clusterFeature of clusters) {
@@ -670,6 +679,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
 
       return {
         clusterCount: clusters.length,
+        clustersWithoutCountCount: clustersWithoutCounts.length,
         collisionCount: collisions.length,
         collisionSamples: collisions.slice(0, 8)
       };
@@ -677,12 +687,20 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
     {
       testHookKey: mapTestHookKey,
       areaLayerIds: mapLayerIds.areaLabels,
-      clusterLayerId: mapLayerIds.clusterPins
+      clusterLayerId: mapLayerIds.clusterPins,
+      clusterCountLayerId: mapLayerIds.clusterCounts
     }
   );
 
   if (overlap.clusterCount === 0) {
     throw new Error("Overview cluster-overlap check was vacuous: no clusters were rendered.");
+  }
+
+  // Every count bubble must show its number (spec §2); a bubble without one is just a red dot.
+  if (overlap.clustersWithoutCountCount > 0) {
+    throw new Error(
+      `${overlap.clustersWithoutCountCount} of ${overlap.clusterCount} count bubbles on the overview show no number.`
+    );
   }
 
   if (overlap.collisionCount > 0) {

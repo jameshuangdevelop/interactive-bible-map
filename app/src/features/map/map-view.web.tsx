@@ -677,7 +677,6 @@ function ensureMapLayers(map: MapLibreMap) {
       source: sourceClusteredCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
-      minzoom: 5,
       maxzoom: CLUSTER_MAX_ZOOM + 1,
       layout: CLUSTER_COUNT_LAYOUT,
       paint: {
