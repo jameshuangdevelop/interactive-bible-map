@@ -18,10 +18,6 @@ const generatedPlacesPath = path.join(
 );
 
 const smoothnessLongTaskLimitMs = 50;
-const smoothnessLongTaskToleranceMs = 1;
-const smoothnessScenarioAttempts = 3;
-const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa offscreen)/i;
-const smoothnessRequireGpu = process.env.SMOOTHNESS_REQUIRE_GPU === "1";
 const syntheticPlaceIdPrefix = "synthetic-city-";
 const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
@@ -126,51 +122,6 @@ async function startStaticServer(rootDirectory) {
 
 function temporaryScreenshotPath(fileName) {
   return path.join(process.env.TEMP ?? os.tmpdir(), fileName);
-}
-
-async function readWebGlRendererInfo(page) {
-  return page.evaluate(({ patternSource, patternFlags }) => {
-    const pattern = new RegExp(patternSource, patternFlags);
-    const canvas = document.createElement("canvas");
-    const context =
-      canvas.getContext("webgl2", { antialias: false, alpha: false }) ??
-      canvas.getContext("webgl", { antialias: false, alpha: false });
-
-    if (!context) {
-      return {
-        vendor: null,
-        renderer: null,
-        unmaskedVendor: null,
-        unmaskedRenderer: null,
-        rendererString: "webgl unavailable",
-        isSoftwareRenderer: false
-      };
-    }
-
-    const vendor = context.getParameter(context.VENDOR);
-    const renderer = context.getParameter(context.RENDERER);
-    const debugExtension = context.getExtension("WEBGL_debug_renderer_info");
-    const unmaskedVendor = debugExtension
-      ? context.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
-      : null;
-    const unmaskedRenderer = debugExtension
-      ? context.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
-      : null;
-
-    const asString = (value) => (typeof value === "string" ? value : null);
-    const values = [asString(unmaskedRenderer), asString(renderer), asString(vendor)].filter(Boolean);
-    const rendererString = values.join(" | ") || "unknown renderer";
-    const isSoftwareRenderer = pattern.test(rendererString);
-
-    return {
-      vendor: asString(vendor),
-      renderer: asString(renderer),
-      unmaskedVendor: asString(unmaskedVendor),
-      unmaskedRenderer: asString(unmaskedRenderer),
-      rendererString,
-      isSoftwareRenderer
-    };
-  }, { patternSource: softwareRendererPattern.source, patternFlags: softwareRendererPattern.flags });
 }
 
 async function waitForMapToSettle(page) {
@@ -1519,32 +1470,52 @@ async function runGestureSequence(page) {
   return result;
 }
 
-function assertSmoothnessResult(label, result, { enforceLongTaskLimit } = { enforceLongTaskLimit: true }) {
+// Software WebGL (SwiftShader on GPU-less CI runners, llvmpipe, Microsoft Basic Render Driver)
+// draws every frame on the CPU, so long tasks there measure the machine, not the app.
+const softwareRendererPattern = /swiftshader|llvmpipe|softpipe|basic render driver|software/i;
+
+async function detectWebGlRenderer(page) {
+  return page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    if (!gl) {
+      return "unavailable";
+    }
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    return String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+  });
+}
+
+function assertSmoothnessResult(label, result) {
   if (result.mutationCount > 0) {
     throw new Error(
       `${label}: observed ${result.mutationCount} DOM mutations during gestures (${result.firstMutationSample ?? "unknown"}).`
     );
   }
 
-  if (!enforceLongTaskLimit) {
+  const longTasksOverLimit = result.longTasks.filter((duration) => duration > smoothnessLongTaskLimitMs);
+  const softwareRenderer = softwareRendererPattern.test(result.renderer ?? "");
+  if (softwareRenderer && process.env.SMOOTHNESS_REQUIRE_GPU !== "1") {
+    if (longTasksOverLimit.length > 0) {
+      console.warn(
+        `${label}: ${longTasksOverLimit.length} long task(s) over ${smoothnessLongTaskLimitMs} ms reported but not enforced, because WebGL runs in software here (${result.renderer}). Run on a GPU machine, or set SMOOTHNESS_REQUIRE_GPU=1 to enforce.`
+      );
+    }
     return;
   }
 
-  const longTasksOverLimit = result.longTasks.filter(
-    (duration) => duration > smoothnessLongTaskLimitMs + smoothnessLongTaskToleranceMs
-  );
   if (longTasksOverLimit.length > 0) {
     throw new Error(
-      `${label}: observed long tasks over ${smoothnessLongTaskLimitMs}+${smoothnessLongTaskToleranceMs} ms tolerance: ${longTasksOverLimit
+      `${label}: observed long tasks over ${smoothnessLongTaskLimitMs} ms: ${longTasksOverLimit
         .map((value) => value.toFixed(2))
         .join(", ")} samples=${JSON.stringify(result.longTaskSamples)}`
     );
   }
 }
 
-function assertSmoothnessScenarios(label, smoothnessRun, options) {
+function assertSmoothnessScenarios(label, smoothnessRun) {
   for (const [scenarioId, scenarioResult] of Object.entries(smoothnessRun.scenarios)) {
-    assertSmoothnessResult(`${label} (${scenarioId})`, scenarioResult, options);
+    assertSmoothnessResult(`${label} (${scenarioId})`, scenarioResult);
   }
 }
 
@@ -1639,8 +1610,6 @@ async function runSmoothnessCheck({
       const map = window[testHookKey];
       return Boolean(map && map.isStyleLoaded());
     }, mapTestHookKey, { timeout: 40_000 });
-    const webglRenderer = await readWebGlRendererInfo(page);
-    const enforceLongTaskLimit = smoothnessRequireGpu || !webglRenderer.isSoftwareRenderer;
 
     if (syntheticPlacesPayload) {
       syntheticFetchInterceptCount = await page.evaluate(
@@ -1667,93 +1636,65 @@ async function runSmoothnessCheck({
         expectation: syntheticCoverageExpectations?.["zoom8-unclustered"] ?? null
       }
     ];
+
     const scenarioResults = {};
+    const renderer = await detectWebGlRenderer(page);
     for (const scenario of scenarios) {
-      let scenarioResult = null;
-      let scenarioError = null;
+      await setMapView(page, {
+        center: scenario.center,
+        zoom: scenario.zoom
+      });
+      await page.waitForFunction((testHookKey) => {
+        const map = window[testHookKey];
+        return Boolean(map && map.isStyleLoaded());
+      }, mapTestHookKey, { timeout: 40_000 });
 
-      for (let attempt = 1; attempt <= smoothnessScenarioAttempts; attempt += 1) {
-        await setMapView(page, {
-          center: scenario.center,
-          zoom: scenario.zoom
-        });
-        await page.waitForFunction((testHookKey) => {
-          const map = window[testHookKey];
-          return Boolean(map && map.isStyleLoaded());
-        }, mapTestHookKey, { timeout: 40_000 });
-
-        const coverage = await collectRenderedCoverage(page);
-        assertSyntheticCoverage(`Synthetic coverage ${scenario.id}`, coverage, scenario.expectation);
-        await page.evaluate((refreshHookKey) => {
-          const refreshVisibleEntries = window[refreshHookKey];
-          if (typeof refreshVisibleEntries === "function") {
-            refreshVisibleEntries();
-          }
-        }, visibleEntryRefreshHookKey);
-
-        await page.waitForFunction(
-          () => {
-            const now = performance.now();
-            const entryCount = document.querySelectorAll("button[data-place-entry-id]").length;
-            const key = "__ibmVisibleEntryStability";
-            const previous = window[key] ?? {
-              count: -1,
-              stableSinceMs: now
-            };
-            const next =
-              previous.count === entryCount
-                ? previous
-                : {
-                    count: entryCount,
-                    stableSinceMs: now
-                  };
-            window[key] = next;
-            return now - Number(next.stableSinceMs ?? now) >= 1_200;
-          },
-          { timeout: 15_000 }
-        );
-        await page.waitForTimeout(2_000);
-
-        await installGestureMonitor(page);
-        const gestureResult = await runGestureSequence(page);
-        const candidateResult = {
-          ...gestureResult,
-          frameSummary: summarizeFrameTimes(gestureResult.frameTimes),
-          coverage,
-          attempt
-        };
-
-        try {
-          assertSmoothnessResult(`smoothness retry probe (${scenario.id})`, candidateResult, {
-            enforceLongTaskLimit
-          });
-          scenarioResult = candidateResult;
-          scenarioError = null;
-          break;
-        } catch (error) {
-          scenarioResult = candidateResult;
-          scenarioError = error;
-          if (attempt < smoothnessScenarioAttempts) {
-            await page.waitForTimeout(500);
-          }
+      const coverage = await collectRenderedCoverage(page);
+      assertSyntheticCoverage(`Synthetic coverage ${scenario.id}`, coverage, scenario.expectation);
+      await page.evaluate((refreshHookKey) => {
+        const refreshVisibleEntries = window[refreshHookKey];
+        if (typeof refreshVisibleEntries === "function") {
+          refreshVisibleEntries();
         }
-      }
+      }, visibleEntryRefreshHookKey);
 
-      if (!scenarioResult) {
-        throw new Error(`Failed to collect smoothness results for scenario '${scenario.id}'.`);
-      }
-      if (scenarioError) {
-        throw scenarioError;
-      }
+      await page.waitForFunction(
+        () => {
+          const now = performance.now();
+          const entryCount = document.querySelectorAll("button[data-place-entry-id]").length;
+          const key = "__ibmVisibleEntryStability";
+          const previous = window[key] ?? {
+            count: -1,
+            stableSinceMs: now
+          };
+          const next =
+            previous.count === entryCount
+              ? previous
+              : {
+                  count: entryCount,
+                  stableSinceMs: now
+                };
+          window[key] = next;
+          return now - Number(next.stableSinceMs ?? now) >= 1_200;
+        },
+        { timeout: 15_000 }
+      );
+      await page.waitForTimeout(2_000);
 
-      scenarioResults[scenario.id] = scenarioResult;
+      await installGestureMonitor(page);
+      const gestureResult = await runGestureSequence(page);
+
+      scenarioResults[scenario.id] = {
+        ...gestureResult,
+        frameSummary: summarizeFrameTimes(gestureResult.frameTimes),
+        coverage,
+        renderer
+      };
     }
 
     return {
       scenarios: scenarioResults,
-      syntheticDataInterceptionCount: syntheticFetchInterceptCount,
-      webglRenderer,
-      enforceLongTaskLimit
+      syntheticDataInterceptionCount: syntheticFetchInterceptCount
     };
   } finally {
     await page.close();
@@ -1954,22 +1895,8 @@ async function run() {
       }
     });
 
-    const webglRenderer = smoothnessReal.webglRenderer ?? smoothnessSynthetic.webglRenderer ?? null;
-    const softwareRendererDetected = Boolean(webglRenderer?.isSoftwareRenderer);
-    const enforceLongTaskLimit =
-      smoothnessReal.enforceLongTaskLimit && smoothnessSynthetic.enforceLongTaskLimit;
-    if (!enforceLongTaskLimit) {
-      console.warn(
-        `Software renderer detected (${webglRenderer?.rendererString ?? "unknown"}); long-task limit is reported but not enforced. Set SMOOTHNESS_REQUIRE_GPU=1 to enforce.`
-      );
-    }
-
-    assertSmoothnessScenarios("real-data smoothness", smoothnessReal, {
-      enforceLongTaskLimit
-    });
-    assertSmoothnessScenarios("synthetic-data smoothness", smoothnessSynthetic, {
-      enforceLongTaskLimit
-    });
+    assertSmoothnessScenarios("real-data smoothness", smoothnessReal);
+    assertSmoothnessScenarios("synthetic-data smoothness", smoothnessSynthetic);
 
     const tileRequestCount = requestUrls.filter(
       (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
@@ -1997,14 +1924,6 @@ async function run() {
         allRequests: fallbackAllRequestsOutage
       },
       smoothness: {
-        enforcement: {
-          longTaskLimitMs: smoothnessLongTaskLimitMs,
-          longTaskToleranceMs: smoothnessLongTaskToleranceMs,
-          enforceLongTaskLimit,
-          softwareRendererDetected,
-          smoothnessRequireGpu,
-          webglRenderer
-        },
         realData: smoothnessReal,
         syntheticData10k: {
           ...smoothnessSynthetic,
