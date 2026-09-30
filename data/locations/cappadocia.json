@@ -1,0 +1,61 @@
+{
+  "id": "cappadocia",
+  "names": {
+    "ancient": [
+      "Cappadocia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Cappadocia (Roman province, label point)",
+      "coordinates": [
+        34.839167,
+        38.670556
+      ],
+      "coordinateSource": "wikidata:Q33490",
+      "confidence": "high",
+      "support": "Cappadocia's identity as the Roman province in eastern Asia Minor is undisputed. The label point is Wikidata's point for the province; Pleiades' independent 'Cappadocia (region)' entry lies about 90 km to the east, a reasonable margin for a large province label.",
+      "sources": [
+        "wikidata:Q33490",
+        "pleiades:628949"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cappadocia was a Roman province in eastern Asia Minor, formerly an independent client kingdom. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia' at Pentecost, and Peter addresses his first letter to believers scattered through 'Pontus, Galatia, Cappadocia, Asia, and Bithynia.'",
+    "sources": [
+      "wikidata:Q33490",
+      "pleiades:628949",
+      "scripture:Acts 2:9",
+      "scripture:1 Peter 1:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "Tacitus records that King Archelaus held Cappadocia for fifty years as a client king, until Tiberius, to whom Archelaus had given offense, lured him to Rome. Shortly afterward, per Tacitus, 'Cappadocia, reduced to the rank of a province, received Quintus Veranius as governor,' and some of the kingdom's former tribute payments were lowered to encourage the population's acceptance of Roman rule. The International Standard Bible Encyclopedia gives this annexation the date AD 17.",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-cappadocia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    },
+    {
+      "ref": "1 Peter 1:1",
+      "book": "1 Peter",
+      "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

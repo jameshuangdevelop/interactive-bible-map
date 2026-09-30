@@ -1,0 +1,61 @@
+{
+  "id": "libya",
+  "names": {
+    "ancient": [
+      "Libya"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "crete-cyrene",
+  "candidates": [
+    {
+      "label": "Libya, the Cyrenaican district (label point)",
+      "coordinates": [
+        20.871743,
+        32.499653
+      ],
+      "coordinateSource": "pleiades:373777",
+      "confidence": "high",
+      "support": "Acts 2:10 names 'the parts of Libya around Cyrene,' the fertile North African district around the Greek city of Cyrene, which this project's existing Crete and Cyrene province record already covers. The label point is Pleiades' entry for Cyrenaica, cross-checked against Wikidata's own point about 75 km to the east.",
+      "sources": [
+        "pleiades:373777",
+        "wikidata:Q165198",
+        "scripture:Acts 2:10"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Acts lists among the Pentecost crowd people from 'Egypt, the parts of Libya around Cyrene.' The International Standard Bible Encyclopedia notes that Greek and Roman writers used 'Libya' broadly for the African continent, generally excluding Egypt, but that here it names specifically the fertile district around the Greek city of Cyrene, which by this project's about AD 50 date was part of the Roman province this project records as Crete and Cyrene.",
+    "sources": [
+      "pleiades:373777",
+      "bib:isbe-libya",
+      "scripture:Acts 2:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Jewish settlement in this district went back to the early Ptolemies, who 'transported Jews to this and other cities of Libya,' so that by the New Testament period Jews from Cyrene were numerous enough to have their own synagogue in Jerusalem and to be named individually in Acts, including Simon of Cyrene, who carried Jesus' cross, and Lucius of Cyrene, a prophet in the early Antioch church.",
+      "sources": [
+        "bib:isbe-cyrene",
+        "scripture:Matthew 27:32"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Matthew 27:32",
+      "book": "Matthew",
+      "textWEB": "As they came out, they found a man of Cyrene, Simon by name, and they compelled him to go with them, that he might carry his cross."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

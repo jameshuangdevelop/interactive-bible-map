@@ -1,0 +1,66 @@
+{
+  "id": "phrygia",
+  "names": {
+    "ancient": [
+      "Phrygia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Phrygia (label point)",
+      "coordinates": [
+        30.473011,
+        38.78304
+      ],
+      "coordinateSource": "pleiades:609502",
+      "confidence": "high",
+      "support": "Phrygia's identity as the large region of central Asia Minor is undisputed, though, as the history note below describes, its first-century borders were divided between two Roman provinces. The label point is Pleiades' dedicated entry for the region.",
+      "sources": [
+        "pleiades:609502",
+        "wikidata:Q16142051"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Phrygia was a large, mountainous region of central Asia Minor. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia' at Pentecost, and records that Paul 'traversed the country' twice more on later journeys. By the first century, Phrygia was divided between two Roman provinces, so this project's Phrygia record sits directly under the Roman Empire rather than under either province alone.",
+    "sources": [
+      "pleiades:609502",
+      "bib:isbe-phrygia",
+      "scripture:Acts 2:10",
+      "scripture:Acts 16:6",
+      "scripture:Acts 18:23"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia states plainly that 'in Roman times, however, when Paul journeyed there, the country was divided into two parts, one of which was known as Galatian Phrygia, and the other as Asian Phrygia, because it was a part of the Roman province of Asia.' Galatian Phrygia was the smaller portion, extending along the Pisidian mountains, and included Antioch (in Pisidia) and Iconium among its important cities.",
+      "sources": [
+        "bib:isbe-phrygia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Acts 16:6",
+      "book": "Acts",
+      "textWEB": "When they had gone through the region of Phrygia and Galatia, they were forbidden by the Holy Spirit to speak the word in Asia."
+    },
+    {
+      "ref": "Acts 18:23",
+      "book": "Acts",
+      "textWEB": "Having spent some time there, he departed and went through the region of Galatia and Phrygia, in order, establishing all the disciples."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

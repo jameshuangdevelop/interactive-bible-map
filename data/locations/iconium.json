@@ -12,7 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
-  "parentId": "galatia",
+  "parentId": "phrygia",
   "candidates": [
     {
       "label": "Konya (ancient Iconium)",
@@ -45,7 +45,14 @@
       "bib:csb-2017-biblegateway"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Ancient writers disagreed on whether Iconium belonged to Phrygia or Lycaonia. The International Standard Bible Encyclopedia notes that 'the majority of our ancient authorities (e.g. Cicero, Strabo, Pliny), writing from the point of view of Roman provincial administration, give Iconium to Lycaonia,' but that Xenophon 'calls Iconium the last city of Phrygia,' and that Acts 14:6 implies the same, by describing Paul and Barnabas as fleeing from Iconium to 'the cities of Lycaonia,' Lystra and Derbe. The same source concludes that in the apostolic period Iconium 'probably belonged to the \"Phrygian region\" mentioned in Ac 16:6,' the reading this project follows for Iconium's parent.",
+      "sources": [
+        "bib:isbe-iconium"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 13:51",
@@ -80,7 +87,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

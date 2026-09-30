@@ -14,7 +14,7 @@
   },
   "type": "town",
   "zoomTier": "city",
-  "parentId": "galatia",
+  "parentId": "lycaonia",
   "candidates": [
     {
       "label": "Tel Lystra, near Hatunsaray",
@@ -83,7 +83,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

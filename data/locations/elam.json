@@ -1,0 +1,57 @@
+{
+  "id": "elam",
+  "names": {
+    "ancient": [
+      "Elam"
+    ],
+    "alternate": [
+      "Elamites"
+    ]
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "parthian-empire",
+  "candidates": [
+    {
+      "label": "Elam (Susa, label point)",
+      "coordinates": [
+        48.253537,
+        32.189934
+      ],
+      "coordinateSource": "pleiades:912936",
+      "confidence": "high",
+      "support": "Elam's capital was Susa, per Livius.org, so this project uses Susa as Elam's label point. Pleiades independently identifies Susa at the same coordinates.",
+      "sources": [
+        "pleiades:912936",
+        "bib:livius-elam"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Elam, also known as Susiana after its capital Susa, lay in what is now southwestern Iran. Acts lists 'Elamites' among the peoples present in Jerusalem at Pentecost. By this project's about AD 50 date, Elam had long been part of the Parthian Empire.",
+    "sources": [
+      "pleiades:912936",
+      "bib:livius-elam",
+      "scripture:Acts 2:9"
+    ]
+  },
+  "history": [
+    {
+      "text": "Livius.org records that in the Hellenistic age, Susiana (Elam) was part first of the Seleucid Empire and then of the Parthian Empire, following the Parthian king Mithridates I's conquest of Media, Babylonia, and Elam in the second century BC; it remained under Parthian rule through the first century AD.",
+      "sources": [
+        "bib:livius-elam",
+        "bib:livius-parthia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

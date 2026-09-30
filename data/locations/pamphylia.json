@@ -1,0 +1,69 @@
+{
+  "id": "pamphylia",
+  "names": {
+    "ancient": [
+      "Pamphylia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "galatia",
+  "candidates": [
+    {
+      "label": "Pamphylia (label point)",
+      "coordinates": [
+        30.94796,
+        36.921938
+      ],
+      "coordinateSource": "pleiades:639034",
+      "confidence": "high",
+      "support": "Pamphylia's identity as the narrow coastal region of southern Asia Minor is undisputed. The label point is Pleiades' dedicated entry for the region; because Pamphylia is a small coastal strip 'scarcely more than 20 miles long' per the International Standard Bible Encyclopedia, the point necessarily falls close to several of its cities, including this project's Perga pin about 10 km away.",
+      "sources": [
+        "pleiades:639034",
+        "bib:isbe-pamphylia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Pamphylia was a narrow, fertile strip of coastline in southern Asia Minor. Paul and Barnabas sailed there on the first missionary journey, landing at Perga, and Paul's later voyage to Rome passed 'across the sea which is off Cilicia and Pamphylia.' As this project's existing Perga record describes, sources differ on which province held Pamphylia at about AD 50.",
+    "sources": [
+      "pleiades:639034",
+      "bib:isbe-pamphylia",
+      "scripture:Acts 13:13",
+      "scripture:Acts 27:5"
+    ]
+  },
+  "history": [
+    {
+      "text": "Sources differ on Pamphylia's province in about AD 50. Cassius Dio reports that in AD 43 Claudius incorporated the Lycians into the district of Pamphylia, but Tacitus records that under Galba (AD 68-69) the provinces of Galatia and Pamphylia had a single governor, and Livius and Pleiades describe Pamphylia as part of Galatia until Vespasian created the joint province of Lycia and Pamphylia after AD 70. Following the reasoning already recorded on this project's Perga record, this project treats Pamphylia as part of Galatia at about AD 50.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-histories",
+        "bib:livius-pamphylia",
+        "pleiades:981530"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia notes a further, later change to Pamphylia's extent: the highland district once called 'Pisidia' was made part of Pamphylia by the Romans in AD 70, after this project's about AD 50 date.",
+      "sources": [
+        "bib:isbe-pamphylia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 13:13",
+      "book": "Acts",
+      "textWEB": "Now Paul and his company set sail from Paphos and came to Perga in Pamphylia. John departed from them and returned to Jerusalem."
+    },
+    {
+      "ref": "Acts 27:5",
+      "book": "Acts",
+      "textWEB": "When we had sailed across the sea which is off Cilicia and Pamphylia, we came to Myra, a city of Lycia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

@@ -1,0 +1,59 @@
+{
+  "id": "bithynia",
+  "names": {
+    "ancient": [
+      "Bithynia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Bithynia et Pontus (Roman province, label point)",
+      "coordinates": [
+        32.164919,
+        40.812102
+      ],
+      "coordinateSource": "pleiades:981512",
+      "confidence": "high",
+      "support": "Bithynia's identity as a Roman province in northwestern Asia Minor is undisputed. The label point is Pleiades' point for the joint province 'Bithynia et Pontus,' cross-checked against Wikidata's own, more generic point for Bithynia about 110 km to the southwest.",
+      "sources": [
+        "pleiades:981512",
+        "wikidata:Q373189"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Bithynia was a coastal province in northwestern Asia Minor, bequeathed to Rome by its last king, Nicomedes IV, in 74 BC. Luke records that when Paul and his companions 'had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn't allow them,' and Peter addresses his first letter to believers scattered through 'Pontus, Galatia, Cappadocia, Asia, and Bithynia.'",
+    "sources": [
+      "bib:isbe-bithynia",
+      "scripture:Acts 16:7",
+      "scripture:1 Peter 1:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Nicomedes IV, the last king of Bithynia, 'weary of the incessant strife among the peoples of Asia Minor,' bequeathed his kingdom to Rome in 74 BC. Afterward, 'the Black Sea littoral as far as Amisus was more or less closely joined with Bithynia in administration,' reflecting the merger with the western part of Pontus described in this project's Pontus record.",
+      "sources": [
+        "bib:isbe-bithynia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:7",
+      "book": "Acts",
+      "textWEB": "When they had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn’t allow them."
+    },
+    {
+      "ref": "1 Peter 1:1",
+      "book": "1 Peter",
+      "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

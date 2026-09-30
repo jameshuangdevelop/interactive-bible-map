@@ -1,0 +1,68 @@
+{
+  "id": "arabia",
+  "names": {
+    "ancient": [
+      "Arabia"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Arabia (Nabataean kingdom, label point)",
+      "coordinates": [
+        35.441944,
+        30.328611
+      ],
+      "coordinateSource": "wikidata:Q11029653",
+      "confidence": "high",
+      "support": "The New Testament's 'Arabia' in Galatians 1:17 is identified by reference works with the Nabataean kingdom, whose capital was Petra. The label point is Wikidata's point for the kingdom, at Petra.",
+      "sources": [
+        "wikidata:Q11029653",
+        "bib:isbe-arabia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Arabia here is the Nabataean kingdom, an Arab client kingdom allied with Rome whose capital, per the International Standard Bible Encyclopedia, was Petra. After his conversion, Paul writes that he 'went away into Arabia' before returning to Damascus, a city that, per 2 Corinthians 11:32, was for a time guarded by 'the governor under King Aretas.'",
+    "sources": [
+      "wikidata:Q11029653",
+      "bib:isbe-arabia",
+      "scripture:Galatians 1:17",
+      "scripture:2 Corinthians 11:32"
+    ]
+  },
+  "history": [
+    {
+      "text": "The Nabataeans were, per the International Standard Bible Encyclopedia, an Aramaic-speaking people not generally counted among the Arabian tribes, who founded a kingdom in Arabia with its capital at Petra. Livius.org records that this kingdom was ruled by its own kings, allied with but not annexed by Rome, until Trajan annexed it in AD 106, decades after this project's about AD 50 convention.",
+      "sources": [
+        "bib:isbe-arabia",
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "text": "The extent of 'Arabia' as the New Testament uses the word is not settled. Paul's own usage in Galatians 4:25, where he calls 'Mount Sinai' a mountain 'in Arabia,' shows that he could use the name for territory well to the south of Nabataea's core around Petra and Damascus, and commentators differ on how far Paul's journey of Galatians 1:17 took him into the kingdom.",
+      "sources": [
+        "scripture:Galatians 4:25",
+        "scripture:Galatians 1:17"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Galatians 1:17",
+      "book": "Galatians",
+      "textWEB": "nor did I go up to Jerusalem to those who were apostles before me, but I went away into Arabia. Then I returned to Damascus."
+    },
+    {
+      "ref": "Galatians 4:25",
+      "book": "Galatians",
+      "textWEB": "For this Hagar is Mount Sinai in Arabia, and answers to the Jerusalem that exists now, for she is in bondage with her children."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

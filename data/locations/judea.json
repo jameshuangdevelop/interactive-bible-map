@@ -6,7 +6,9 @@
       "Judaea"
     ],
     "alternate": [
-      "Jewry"
+      "Jewry",
+      "Judah",
+      "Juda"
     ]
   },
   "type": "region",
@@ -47,6 +49,19 @@
       "sources": [
         "wikidata:Q1003997",
         "bib:rainey-notley-sacred-bridge"
+      ]
+    },
+    {
+      "text": "'Judah' and 'Juda' are added here as alternate, searchable spellings of Judea's name. The WEB itself uses 'Judah' for this district twice, quoting Micah's prophecy as 'Bethlehem, land of Judah' in Matthew 2:6 and naming 'a city of Judah' in Luke 1:39 (Mary's visit to Elizabeth, traditionally located in the Judean hill country). Comparison with NIV, ESV, NLT, NKJV and CSB found the same 'Judah' spelling at Matthew 2:6; only the KJV instead reads 'Juda,' which is added alongside it.",
+      "sources": [
+        "scripture:Matthew 2:6",
+        "scripture:Luke 1:39",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
       ]
     }
   ],
@@ -365,7 +380,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

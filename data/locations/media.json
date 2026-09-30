@@ -1,0 +1,56 @@
+{
+  "id": "media",
+  "names": {
+    "ancient": [
+      "Media"
+    ],
+    "alternate": [
+      "Medes"
+    ]
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "parthian-empire",
+  "candidates": [
+    {
+      "label": "Media (label point)",
+      "coordinates": [
+        48.919331,
+        35.048241
+      ],
+      "coordinateSource": "pleiades:903080",
+      "confidence": "high",
+      "support": "Media's location west and southwest of the Caspian Sea, reaching to the Zagros Mountains, is undisputed and described by the International Standard Bible Encyclopedia. The label point is Pleiades' point for the region.",
+      "sources": [
+        "pleiades:903080",
+        "bib:isbe-media"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Media lay west and southwest of the Caspian Sea, with its chief city at Ecbatana. Acts lists 'Medes' among the peoples present in Jerusalem at Pentecost. By this project's about AD 50 date, Media had long been part of the Parthian Empire.",
+    "sources": [
+      "pleiades:903080",
+      "bib:isbe-media",
+      "scripture:Acts 2:9"
+    ]
+  },
+  "history": [
+    {
+      "text": "Livius.org records that the Parthian king Mithridates I (r. 165-132 BC) conquered Media, along with Babylonia and Elam, bringing it under Parthian rule; it remained part of the Parthian Empire through the first century AD.",
+      "sources": [
+        "bib:livius-parthia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

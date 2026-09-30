@@ -1,0 +1,60 @@
+{
+  "id": "mysia",
+  "names": {
+    "ancient": [
+      "Mysia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Mysia (label point)",
+      "coordinates": [
+        27.834001,
+        39.599688
+      ],
+      "coordinateSource": "pleiades:550759",
+      "confidence": "high",
+      "support": "Mysia's identity as the region in the northwestern corner of Asia Minor is undisputed. The label point is Pleiades' dedicated entry for the region, cross-checked against Wikidata's own point about 75 km to the east.",
+      "sources": [
+        "pleiades:550759",
+        "wikidata:Q622319"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Mysia was a region in the northwestern part of Asia Minor, including the cities of Assos, Troas, and Adramyttium. Acts records that on the second missionary journey, 'when they had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn't allow them,' so 'passing by Mysia, they came down to Troas.'",
+    "sources": [
+      "pleiades:550759",
+      "bib:isbe-mysia",
+      "scripture:Acts 16:7",
+      "scripture:Acts 16:8"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia states that Mysia 'formed an important part of the Roman province of Asia,' a status it had held since the Romans first organized Asia as a province in 190 BC, so that at this project's about AD 50 date Mysia, including the city of Troas, lay entirely within the province of Asia.",
+      "sources": [
+        "bib:isbe-mysia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:7",
+      "book": "Acts",
+      "textWEB": "When they had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn’t allow them."
+    },
+    {
+      "ref": "Acts 16:8",
+      "book": "Acts",
+      "textWEB": "Passing by Mysia, they came down to Troas."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

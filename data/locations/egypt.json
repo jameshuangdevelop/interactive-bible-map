@@ -1,0 +1,76 @@
+{
+  "id": "egypt",
+  "names": {
+    "ancient": [
+      "Egypt"
+    ],
+    "alternate": []
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Egypt (Roman province, label point)",
+      "coordinates": [
+        32.1,
+        28
+      ],
+      "coordinateSource": "wikidata:Q202311",
+      "confidence": "high",
+      "support": "Egypt's identity as the Roman province along the Nile is undisputed. The label point is Wikidata's point for the province, in the Nile valley south of the Delta, away from the project's other pins.",
+      "sources": [
+        "wikidata:Q202311",
+        "pleiades:727070"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Egypt was a Roman province governed from Alexandria under an unusual arrangement: Cassius Dio records that after Augustus made it tributary, he gave it in charge of Cornelius Gallus rather than a senator, and, given Egypt's grain supply and wealth, did not even allow a senator to live there without his personal permission. In Matthew's account Joseph takes the infant Jesus to Egypt to escape Herod, and Peter's Pentecost list of hearers includes people 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia, Pamphylia, Egypt, and the parts of Libya around Cyrene.'",
+    "sources": [
+      "wikidata:Q202311",
+      "pleiades:727070",
+      "bib:cassius-dio-roman-history",
+      "scripture:Matthew 2:13",
+      "scripture:Acts 2:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "After his victory over Antony and Cleopatra, Augustus made Egypt tributary and placed it under Cornelius Gallus rather than a senator. Cassius Dio explains that, given the size of its cities and population, its fickle character, and the extent of its grain supply and wealth, Augustus would not even grant a senator permission to live there except by his own personal concession.",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "text": "Tacitus records that when Germanicus visited Egypt in AD 19, Tiberius rebuked him sharply for entering Alexandria without imperial consent, because Augustus, among the other secrets of his rule, had forbidden senators and high-ranking knights from entering the country without permission, so that Italy's grain supply could not be threatened by anyone who seized the province and its land and sea approaches. This special, closely guarded status was still in force at the time of this project's about AD 50 convention.",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 2:13",
+      "book": "Matthew",
+      "textWEB": "Now when they had departed, behold, an angel of the Lord appeared to Joseph in a dream, saying, “Arise and take the young child and his mother, and flee into Egypt, and stay there until I tell you, for Herod will seek the young child to destroy him.”"
+    },
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Hosea 11:1",
+      "note": "Matthew explicitly links Jesus' return from Egypt to Hosea's words, 'out of Egypt I called my son.'",
+      "sources": [
+        "scripture:Hosea 11:1",
+        "scripture:Matthew 2:15"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "draft"
+}

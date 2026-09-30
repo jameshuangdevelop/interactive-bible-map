@@ -1,0 +1,75 @@
+{
+  "id": "mesopotamia",
+  "names": {
+    "ancient": [
+      "Mesopotamia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "parthian-empire",
+  "candidates": [
+    {
+      "label": "Mesopotamia (label point)",
+      "coordinates": [
+        43.5,
+        33.7
+      ],
+      "coordinateSource": "wikidata:Q11767",
+      "confidence": "high",
+      "support": "Mesopotamia, 'the country between the rivers' Euphrates and Tigris per Livius.org, is a broad historical region rather than a single site. The label point is Wikidata's coordinate for the region, in its central part between the two rivers.",
+      "sources": [
+        "wikidata:Q11767",
+        "bib:livius-mesopotamia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Mesopotamia is the land between the Euphrates and Tigris rivers. Acts lists 'people from Mesopotamia' among those present in Jerusalem at Pentecost, and in his speech before the council Stephen says that 'the God of glory appeared to our father Abraham when he was in Mesopotamia, before he lived in Haran.' At this project's about AD 50 date, Mesopotamia lay within the Parthian Empire, not Rome.",
+    "sources": [
+      "wikidata:Q11767",
+      "bib:livius-mesopotamia",
+      "scripture:Acts 2:9",
+      "scripture:Acts 7:2"
+    ]
+  },
+  "history": [
+    {
+      "text": "Livius.org explains that the Greek term 'Mesopotamia' was first applied by the historian Arrian to the area now called the Jezira, in what is now eastern Syria and northern Iraq, and that 'when the Romans conquered land east of the Euphrates, they called this new province Mesopotamia, even though they had not subdued the south.'",
+      "sources": [
+        "bib:livius-mesopotamia"
+      ]
+    },
+    {
+      "text": "Rome did not hold Mesopotamia at this project's about AD 50 date. The International Standard Bible Encyclopedia records that it was Trajan who first invaded Parthia and 'took Upper Mesopotamia,' decades later, and that the conquered territory was restored by his successor Hadrian; until then the region remained under Parthian rule and its associated local kingdoms.",
+      "sources": [
+        "bib:isbe-parthians"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    },
+    {
+      "ref": "Acts 7:2",
+      "book": "Acts",
+      "textWEB": "He said, “Brothers and fathers, listen. The God of glory appeared to our father Abraham when he was in Mesopotamia, before he lived in Haran,"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 11:31",
+      "note": "Genesis records that Abraham's family journeyed from Ur of the Chaldeans toward Canaan and settled in Haran, in the same broad region Stephen later calls Mesopotamia.",
+      "sources": [
+        "scripture:Genesis 11:31",
+        "scripture:Acts 7:2"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "draft"
+}

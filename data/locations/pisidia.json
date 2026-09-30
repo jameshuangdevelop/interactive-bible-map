@@ -1,0 +1,66 @@
+{
+  "id": "pisidia",
+  "names": {
+    "ancient": [
+      "Pisidia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "galatia",
+  "candidates": [
+    {
+      "label": "Pisidia (label point)",
+      "coordinates": [
+        31.016667,
+        38.3
+      ],
+      "coordinateSource": "wikidata:Q621805",
+      "confidence": "high",
+      "support": "Pisidia's identity as the mountain block of southern Asia Minor is undisputed. The label point is Wikidata's point for the region; Pleiades has no separate coordinate-bearing entry for Pisidia as a whole, only for Antioch in Pisidia, this project's existing city pin.",
+      "sources": [
+        "wikidata:Q621805",
+        "bib:isbe-pisidia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Pisidia was the block of rugged mountain country stretching north from the Taurus range above the Pamphylian coast. Acts records that Paul and Barnabas 'passed through Pisidia and came to Pamphylia' on the return leg of the first missionary journey, having first travelled the same route in the other direction to reach Antioch in Pisidia.",
+    "sources": [
+      "wikidata:Q621805",
+      "bib:isbe-pisidia",
+      "scripture:Acts 13:14",
+      "scripture:Acts 14:24"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Rome entrusted the pacification of Pisidia to the Galatian king Amyntas, and that 'at his death in 25 BC, Pisidia passed with the rest of his possessions into the Roman province Galatia,' remaining part of Galatia until 74 AD, after this project's about AD 50 date, when its southern part was assigned to a new joint province of Lycia and Pamphylia.",
+      "sources": [
+        "bib:isbe-pisidia"
+      ]
+    },
+    {
+      "text": "Despite its name, the city of Antioch, called 'Antioch in Pisidia' in Acts 13:14, lay just across Pisidia's northern border, in the district of Phrygia; the International Standard Bible Encyclopedia explains that Antioch took its epithet from its closeness to Pisidia and its role as the base for the Roman military system that pacified the Pisidian highlands, not from its own location. This project's Antioch in Pisidia and Iconium records are therefore placed under its separate Phrygia record rather than under Pisidia.",
+      "sources": [
+        "bib:isbe-pisidia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 13:14",
+      "book": "Acts",
+      "textWEB": "But they, passing on from Perga, came to Antioch of Pisidia. They went into the synagogue on the Sabbath day and sat down."
+    },
+    {
+      "ref": "Acts 14:24",
+      "book": "Acts",
+      "textWEB": "They passed through Pisidia and came to Pamphylia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}

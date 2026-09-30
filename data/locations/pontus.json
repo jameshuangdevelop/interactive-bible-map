@@ -1,0 +1,66 @@
+{
+  "id": "pontus",
+  "names": {
+    "ancient": [
+      "Pontus"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Pontus (label point)",
+      "coordinates": [
+        37.83,
+        40.68
+      ],
+      "coordinateSource": "wikidata:Q621672",
+      "confidence": "high",
+      "support": "Pontus lay along the southern shore of the Black Sea. The label point is Wikidata's point for the region, inland from the coast. Pleiades' separate 'Pontus Polemoniacus' entry lies about 185 km to the north, representing only the later, narrower eastern portion described in the history note below.",
+      "sources": [
+        "wikidata:Q621672",
+        "pleiades:981546"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Pontus lay along the south shore of the Black Sea in northeastern Asia Minor. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia' at Pentecost, names Paul's associate Aquila as 'a man of Pontus by race,' and Peter addresses his first letter to believers scattered through 'Pontus, Galatia, Cappadocia, Asia, and Bithynia.' At this project's about AD 50 date, Pontus itself was not a single administrative unit.",
+    "sources": [
+      "wikidata:Q621672",
+      "bib:isbe-pontus",
+      "scripture:Acts 2:9",
+      "scripture:Acts 18:2",
+      "scripture:1 Peter 1:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "After Rome finally defeated King Mithridates VI of Pontus under Pompey in 66 BC, the International Standard Bible Encyclopedia records that Pontus was divided three ways for administrative purposes: 'most of Pontus was for administrative purposes united by the Romans with the province of Bithynia, though the eastern part subsisted as a separate kingdom under Polemon and his house, 36 BC to 63 AD, and the southwestern portion was incorporated with the province of Galatia.' At this project's about AD 50 date, the eastern client kingdom under Polemon's dynasty had not yet been annexed as a province; that did not happen until Nero's reign, after 63 AD.",
+      "sources": [
+        "bib:isbe-pontus"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    },
+    {
+      "ref": "Acts 18:2",
+      "book": "Acts",
+      "textWEB": "He found a certain Jew named Aquila, a man of Pontus by race, who had recently come from Italy with his wife Priscilla, because Claudius had commanded all the Jews to depart from Rome. He came to them,"
+    },
+    {
+      "ref": "1 Peter 1:1",
+      "book": "1 Peter",
+      "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "draft"
+}
