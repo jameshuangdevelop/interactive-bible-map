@@ -18,7 +18,7 @@
       ],
       "coordinateSource": "pleiades:981514",
       "confidence": "high",
-      "support": "Cilicia's identity as the region of southeastern Asia Minor between the Taurus Mountains and the Mediterranean is undisputed. The label point is Pleiades' representative point for its entry on the Roman province of Cilicia, which has no location of its own; it lies inland, about 65 km west of this project's Tarsus pin.",
+      "support": "Cilicia's identity as the region of southeastern Asia Minor bounded by the Taurus Mountains and the sea is undisputed. The label point is Pleiades' representative point for its entry on the Roman province of Cilicia, which has no location of its own; it lies inland, about 65 km west of this project's Tarsus pin.",
       "sources": [
         "pleiades:981514",
         "wikidata:Q4819648"
@@ -39,7 +39,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that Cilicia 'was by degrees incorporated in the Roman administration,' with Cicero serving as its governor in 51-50 BC, and that it was divided by nature into a mountainous western part, Tracheia, and a broad plain to the east. Livius.org adds that after Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, until Vespasian reunited Cilicia in AD 72. Cassius Dio records that Caligula gave Antiochus of Commagene the coast region of Cilicia, and that Claudius restored Commagene to him; Tacitus, describing a revolt of Cilician hill tribes in AD 52, says their part of the coast lay in Antiochus's kingdom. Because Cilicia was split between Syria and a client kingdom in about AD 50, this project places it directly under the Roman Empire, and Tarsus, in the plain, under Syria.",
+      "text": "The International Standard Bible Encyclopedia records that Cilicia came under Roman administration step by step, with Cicero serving as its governor in 51-50 BC, and that its land fell naturally into two parts: the mountains of Tracheia in the west and a broad plain in the east. Livius.org adds that after Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, until Vespasian reunited Cilicia in AD 72. Cassius Dio records that Caligula gave Antiochus of Commagene the coastal part of Cilicia, and that Claudius restored Commagene to him; Tacitus, describing a revolt of Cilician hill tribes in AD 52, says their part of the coast lay in Antiochus's kingdom. Because Cilicia was split between Syria and a client kingdom in about AD 50, this project places it directly under the Roman Empire, and Tarsus, in the plain, under Syria.",
       "sources": [
         "bib:isbe-cilicia",
         "bib:livius-cilicia",

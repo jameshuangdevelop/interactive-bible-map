@@ -37,9 +37,10 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia states plainly that 'in Roman times, however, when Paul journeyed there, the country was divided into two parts, one of which was known as Galatian Phrygia, and the other as Asian Phrygia, because it was a part of the Roman province of Asia.' Galatian Phrygia was the smaller portion, extending along the Pisidian mountains, and included Antioch (in Pisidia) and Iconium among its important cities. Because of that division, this project places cities in Phrygia, such as Antioch and Iconium in its Galatian part, under their province rather than under this record.",
+      "text": "The International Standard Bible Encyclopedia says that in Paul's time Phrygia was divided in two. The larger part, 'Asian Phrygia', belonged to the Roman province of Asia; the smaller part, 'Galatian Phrygia', ran along the Pisidian mountains, counted as a region of the province of Galatia, and included Antioch (in Pisidia) and Iconium. The line between the two parts was never sharply drawn. Because of that division, this project places cities in Phrygia, such as Antioch and Iconium in its Galatian part, under their province rather than under this record.",
       "sources": [
-        "bib:isbe-phrygia"
+        "bib:isbe-phrygia",
+        "bib:isbe-lycaonia"
       ]
     }
   ],

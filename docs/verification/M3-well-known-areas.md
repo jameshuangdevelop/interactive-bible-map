@@ -188,3 +188,50 @@ The PO decided the items above on 2026-09-30. The follow-up commit makes these c
 - **Troas, Pergamum and Egypt's label point** are unchanged.
 
 **Checks after the follow-up:** `npm run validate:data` gives 0 errors and 106 warnings (unchanged). Acts 2:9 names "Elamites", so Elam never had a warning. `npm test` passes 75/75. `npm run build:data` builds 89 places. All 89 records are `verified`.
+
+## Follow-up: PR review
+
+The GPT-5.4 review (2026-09-30) raised one must-consider finding, one suggestion and one nit. The review commit fixes the first two. The PO has put the nit, Egypt's label point, on the backlog.
+
+**Dead Tacitus links (must fix).** `bib:tacitus-annals` and `bib:tacitus-histories` pointed to `Tacitus/Annals/home.html` and `Tacitus/Histories/home.html` on LacusCurtius. Both now return 404. LacusCurtius keeps the contents of both works on one page, `https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html`. That page loads, is marked public domain, and links to every book page the records cite: *Annals* 2B, 2C, 12A and 12B, and *Histories* 1A, each of which returns 200. Both entries now use that URL, with `accessed` set to 2026-09-30, and the `bib:` IDs are unchanged. No other file used the old URLs.
+
+**Other links.** I fetched every URL in `data/bibliography.json` (65 with a URL):
+
+- Every URL this branch added or cites returns 200, except the two Tacitus URLs fixed above.
+- `rainey-notley-sacred-bridge` is a printed book and has no URL.
+- Seven older URLs return 403: five UNESCO pages, parks.org.il (Korazim), and BiblePlaces (Puteoli). A retry with browser headers got bot-challenge pages, so the sites are up but block scripts. No record on this branch cites them, so they are left as they are.
+
+**Long quotations (suggestion).** I paraphrased every source quotation of more than five words in the new records and in the appended notes on Iconium, Antioch in Pisidia, Troas and Judea. The records now use the project's own words, and every clause keeps its source.
+
+- **ISBE.** The longest were Phrygia's two-part division (40 words), Lycaonia's two parts (41) and Pontus's three-way split (46). The others were on Bithynia, Cilicia, Pisidia, Mysia, Illyricum, Libya and Iconium.
+- **Loeb translations.** Tacitus on Egypt (*Histories* 1.11) and on Cappadocia (*Annals* 2.56), and Strabo on Media.
+
+Only short terms where the wording itself matters stay in quotation marks:
+
+- 'Asian Phrygia' and 'Galatian Phrygia';
+- 'regions', ISBE's term for the divisions of Galatia;
+- 'most probable', ISBE's own hedge on Dalmatia;
+- 'viceroy of Media', Tacitus's title for Vonones;
+- 'took Upper Mesopotamia', which is ISBE;
+- 'the last city of Phrygia', Xenophon's claim as ISBE reports it.
+
+WEB quotations are unchanged. Phrygia's note now also cites ISBE "Lycaonia", which calls Phrygia "another region of Galatia", for the clause that Galatian Phrygia was a region of that province.
+
+To catch close paraphrase as well as quotation, I compared every text field in these records with the cited ISBE, Livius and Loeb pages, looking for runs of six or more words they share outside WEB quotations. I then reworded all the longer shared runs:
+
+- Lycaonia (12 words), Iconium (11), Pisidia (10), Mysia (9), Media (9), Arabia and Pontus (8);
+- Egypt's close rendering of Dio 51.17;
+- Pisidia's, Media's and Libya's opening descriptions;
+- Livius's "conquered Media, Babylonia and Elam" in Media and the Parthian Empire.
+
+Only one run of seven or more words is left: Iconium's WEB quotation of Acts 14:6, "the cities of Lycaonia", together with the words around it.
+
+**Re-verification.** I checked each rewritten clause against its source again:
+
+- The meaning is unchanged, except in three places where a sharper paraphrase came out more accurate:
+  - Pontus now mentions its inland valleys and plains, as ISBE does, so the inland label point fits;
+  - Pisidia now reaches north *from* the Taurus range;
+  - Media now covers both the western and southwestern sides of the Caspian.
+- The 16 changed records are re-set to `verified`: arabia, bithynia, cappadocia, cilicia, egypt, iconium, illyricum, libya, lycaonia, media, mysia, pamphylia, parthian-empire, phrygia, pisidia and pontus.
+
+**Checks after the review fixes:** `npm run validate:data` gives 0 errors and 106 warnings (unchanged). `npm test` passes 75/75. `npm run build:data` builds 89 places. All 89 records are `verified`.

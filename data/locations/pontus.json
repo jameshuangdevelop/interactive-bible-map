@@ -18,7 +18,7 @@
       ],
       "coordinateSource": "wikidata:Q621672",
       "confidence": "high",
-      "support": "Pontus lay along the southern shore of the Black Sea. The label point is Wikidata's point for the region, inland from the coast, about 52 km from the label location Pleiades gives for Pontus after the Barrington Atlas.",
+      "support": "Pontus was the country of northeastern Asia Minor on the southern side of the Black Sea. The label point is Wikidata's point for the region, inland from the coast, about 52 km from the label location Pleiades gives for Pontus after the Barrington Atlas.",
       "sources": [
         "wikidata:Q621672",
         "pleiades:857287"
@@ -26,7 +26,7 @@
     }
   ],
   "summary": {
-    "text": "Pontus lay along the south shore of the Black Sea in northeastern Asia Minor. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia' at Pentecost and names Paul's associate Aquila as 'a man of Pontus by race,' and the letter 1 Peter is addressed to those 'living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia.' At this project's about AD 50 date, Pontus itself was not a single administrative unit.",
+    "text": "Pontus was the country of northeastern Asia Minor on the southern side of the Black Sea: a narrow coast backed by mountains, with fertile valleys and plains inland. Acts lists visitors 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia' at Pentecost and names Paul's associate Aquila as 'a man of Pontus by race,' and the letter 1 Peter is addressed to those 'living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia.' At this project's about AD 50 date, Pontus itself was not a single administrative unit.",
     "sources": [
       "wikidata:Q621672",
       "bib:isbe-pontus",
@@ -37,7 +37,7 @@
   },
   "history": [
     {
-      "text": "After Pompey, appointed in 66 BC, finally defeated King Mithridates VI of Pontus, the International Standard Bible Encyclopedia records that Pontus was divided three ways: 'most of Pontus was for administrative purposes united by the Romans with the province of Bithynia, though the eastern part subsisted as a separate kingdom under Polemon and his house, 36 BC to 63 AD, and the southwestern portion was incorporated with the province of Galatia.' At this project's about AD 50 date, the eastern part was therefore still a separate kingdom. Suetonius records that Nero added 'the realm of Pontus' to the provinces when Polemon gave it up.",
+      "text": "After Pompey, appointed in 66 BC, finally defeated King Mithridates VI of Pontus, the International Standard Bible Encyclopedia says Rome divided Pontus three ways. Most of it was joined to the province of Bithynia for administration and the southwestern part to the province of Galatia, while the eastern part stayed a kingdom of its own, ruled by Polemon and his descendants from 36 BC to AD 63. At this project's about AD 50 date, the eastern part was therefore still a separate kingdom. Suetonius records that Nero made Polemon's kingdom of Pontus a province when Polemon gave it up.",
       "sources": [
         "bib:isbe-pontus",
         "bib:suetonius-twelve-caesars"
