@@ -153,6 +153,8 @@ export function AppShell() {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
+  const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
+  const unmountedRef = useRef(false);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
@@ -217,6 +219,12 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      unmountedRef.current = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!selectedPlace) {
       return;
     }
@@ -230,12 +238,15 @@ export function AppShell() {
       return;
     }
 
-    let cancelled = false;
+    const requestGeneration =
+      (placeDetailsRequestGenerationByIdRef.current.get(placeId) ?? 0) + 1;
+    placeDetailsRequestGenerationByIdRef.current.set(placeId, requestGeneration);
     loadingPlaceDetailsIdsRef.current.add(placeId);
 
     void fetchPlaceDetails(placeId)
       .then((payload) => {
-        if (cancelled) {
+        const latestGeneration = placeDetailsRequestGenerationByIdRef.current.get(placeId);
+        if (unmountedRef.current || latestGeneration !== requestGeneration) {
           return;
         }
 
@@ -249,7 +260,8 @@ export function AppShell() {
         });
       })
       .catch((error: unknown) => {
-        if (cancelled) {
+        const latestGeneration = placeDetailsRequestGenerationByIdRef.current.get(placeId);
+        if (unmountedRef.current || latestGeneration !== requestGeneration) {
           return;
         }
 
@@ -263,12 +275,11 @@ export function AppShell() {
         }));
       })
       .finally(() => {
-        loadingPlaceDetailsIdsRef.current.delete(placeId);
+        const latestGeneration = placeDetailsRequestGenerationByIdRef.current.get(placeId);
+        if (latestGeneration === requestGeneration) {
+          loadingPlaceDetailsIdsRef.current.delete(placeId);
+        }
       });
-
-    return () => {
-      cancelled = true;
-    };
   }, [placeDetailsById, placeDetailsErrorsById, selectedPlace]);
 
   useEffect(() => {

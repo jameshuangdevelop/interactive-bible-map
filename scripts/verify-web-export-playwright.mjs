@@ -370,6 +370,290 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
   };
 }
 
+async function verifyKeyboardDisclosureControls(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const candidateToggle = page
+    .locator("section[aria-label='Place details'] button[data-candidate-support-toggle='true']")
+    .first();
+  await candidateToggle.waitFor({ state: "visible", timeout: 30_000 });
+  await candidateToggle.focus();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
+    );
+    return button instanceof HTMLButtonElement && button.getAttribute("aria-expanded") === "true";
+  });
+  const emmausExpanded = await candidateToggle.getAttribute("aria-expanded");
+  const candidateSupportControlId = await candidateToggle.getAttribute("aria-controls");
+
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
+    );
+    return button instanceof HTMLButtonElement && button.getAttribute("aria-expanded") === "false";
+  });
+  const emmausCollapsed = await candidateToggle.getAttribute("aria-expanded");
+
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const showAllButton = page.locator(
+    "section[aria-label='Place details'] [data-show-all-passages='true']"
+  );
+  await showAllButton.first().waitFor({ state: "visible", timeout: 30_000 });
+  await showAllButton.first().focus();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] [data-show-all-passages='true']"
+    );
+    if (!(button instanceof HTMLButtonElement)) {
+      return false;
+    }
+    if (button.getAttribute("aria-expanded") !== "true") {
+      return false;
+    }
+    const section = document.querySelector(
+      "section[aria-label='Place details'] [data-panel-section='in-bible']"
+    );
+    return Boolean(section && section.querySelectorAll("article").length > 5);
+  }, undefined, { timeout: 120_000, polling: 250 });
+  const jerusalemExpanded = await showAllButton.first().getAttribute("aria-expanded");
+  const jerusalemControlId = await showAllButton.first().getAttribute("aria-controls");
+
+  return {
+    emmaus: {
+      controlId: candidateSupportControlId,
+      expandedAfterEnter: emmausExpanded,
+      collapsedAfterSpace: emmausCollapsed
+    },
+    jerusalem: {
+      controlId: jerusalemControlId,
+      expandedAfterEnter: jerusalemExpanded
+    }
+  };
+}
+
+async function verifyCandidateSelectionUpdatesUrl(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const candidateButtons = page.locator(
+    "section[aria-label='Place details'] button[aria-label^='Candidate ']"
+  );
+  const candidateButtonCount = await candidateButtons.count();
+  if (candidateButtonCount < 2) {
+    throw new Error(
+      `Candidate-selection URL check expected at least 2 candidate buttons, got ${candidateButtonCount}.`
+    );
+  }
+
+  await candidateButtons.nth(1).click();
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "emmaus" && parameters.get("candidate") === "b";
+  }, undefined, { timeout: 30_000, polling: 100 });
+
+  return {
+    search: await page.evaluate(() => window.location.search)
+  };
+}
+
+async function verifyCopyLinkAction(browser, baseUrl) {
+  const clipboardContext = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const clipboardPage = await clipboardContext.newPage();
+
+  try {
+    await clipboardPage.goto(`${baseUrl}/?place=capernaum`, {
+      waitUntil: "networkidle",
+      timeout: 60_000
+    });
+    await waitForMapToSettle(clipboardPage);
+    await clipboardPage.evaluate(() => {
+      window.__copiedViaClipboard = [];
+      const captureWriteText = async (value) => {
+        window.__copiedViaClipboard.push(String(value));
+      };
+
+      if (navigator.clipboard && typeof navigator.clipboard === "object") {
+        try {
+          navigator.clipboard.writeText = captureWriteText;
+          return;
+        } catch {
+          // fall through to defineProperty path
+        }
+      }
+
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: captureWriteText
+        }
+      });
+    });
+
+    await clipboardPage.getByRole("button", { name: "Copy link" }).click();
+    await clipboardPage.getByText("Link copied", { exact: true }).waitFor({ timeout: 10_000 });
+
+    const clipboardResult = await clipboardPage.evaluate(() => ({
+      copiedText: window.__copiedViaClipboard[0] ?? null,
+      href: window.location.href
+    }));
+
+    if (clipboardResult.copiedText !== clipboardResult.href) {
+      throw new Error(
+        `Copy-link clipboard path mismatch: copied='${clipboardResult.copiedText}', href='${clipboardResult.href}'.`
+      );
+    }
+
+    const fallbackContext = await browser.newContext({
+      viewport: { width: 1440, height: 960 }
+    });
+    const fallbackPage = await fallbackContext.newPage();
+
+    try {
+      await fallbackPage.goto(`${baseUrl}/?place=capernaum`, {
+        waitUntil: "networkidle",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(fallbackPage);
+      await fallbackPage.evaluate(() => {
+        window.__copiedViaFallback = [];
+
+        if (navigator.clipboard && typeof navigator.clipboard === "object") {
+          try {
+            navigator.clipboard.writeText = undefined;
+          } catch {
+            // Continue and try defineProperty fallback below.
+          }
+        }
+
+        try {
+          Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
+        } catch {
+          // writeText override above is enough to force fallback when clipboard exists.
+        }
+
+        const originalExecCommand = document.execCommand.bind(document);
+        document.execCommand = (commandId) => {
+          if (commandId === "copy") {
+            const textarea = document.querySelector("textarea");
+            window.__copiedViaFallback.push(
+              textarea instanceof HTMLTextAreaElement ? textarea.value : null
+            );
+            return true;
+          }
+          return originalExecCommand(commandId);
+        };
+      });
+
+      await fallbackPage.getByRole("button", { name: "Copy link" }).click();
+      await fallbackPage.getByText("Link copied", { exact: true }).waitFor({ timeout: 10_000 });
+
+      const fallbackResult = await fallbackPage.evaluate(() => ({
+        copiedText: window.__copiedViaFallback[0] ?? null,
+        fallbackCallCount: window.__copiedViaFallback.length,
+        href: window.location.href
+      }));
+      if (fallbackResult.fallbackCallCount === 0) {
+        throw new Error("Copy-link fallback path was vacuous: document.execCommand('copy') was not called.");
+      }
+
+      if (fallbackResult.copiedText !== fallbackResult.href) {
+        throw new Error(
+          `Copy-link fallback path mismatch: copied='${fallbackResult.copiedText}', href='${fallbackResult.href}'.`
+        );
+      }
+
+      return {
+        clipboardResult,
+        fallbackResult
+      };
+    } finally {
+      await fallbackPage.close();
+      await fallbackContext.close();
+    }
+  } finally {
+    if (!clipboardPage.isClosed()) {
+      await clipboardPage.close();
+    }
+    await clipboardContext.close();
+  }
+}
+
+async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  let capernaumRequestCount = 0;
+  let emmausRequestCount = 0;
+
+  await page.route("**/generated/places/*.json", async (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.endsWith("/generated/places/capernaum.json")) {
+      capernaumRequestCount += 1;
+      if (capernaumRequestCount === 1) {
+        await new Promise((resolve) => setTimeout(resolve, 900));
+      }
+    } else if (requestUrl.endsWith("/generated/places/emmaus.json")) {
+      emmausRequestCount += 1;
+    }
+    await route.continue();
+  });
+
+  try {
+    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+
+    await page.evaluate(() => {
+      const applySearch = (search) => {
+        window.history.pushState({}, "", `${window.location.pathname}${search}${window.location.hash}`);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      };
+
+      applySearch("?place=capernaum");
+      window.setTimeout(() => applySearch("?place=emmaus"), 40);
+      window.setTimeout(() => applySearch("?place=capernaum"), 80);
+    });
+
+    await page.waitForSelector("section[aria-label='Place details']", {
+      state: "visible",
+      timeout: 30_000
+    });
+    await page.waitForFunction(() => {
+      const heading = document.querySelector("section[aria-label='Place details'] h1");
+      return heading?.textContent?.trim() === "Capernaum";
+    }, undefined, { timeout: 30_000, polling: 100 });
+    await page.waitForSelector(
+      "section[aria-label='Place details'] [data-panel-section='about']",
+      { timeout: 30_000 }
+    );
+
+    const stillLoading = await page
+      .locator("section[aria-label='Place details'] [data-place-panel-skeleton='true']")
+      .count();
+    if (stillLoading > 0) {
+      throw new Error("Place-details race recovery failed: panel is still stuck on loading skeleton.");
+    }
+
+    return {
+      capernaumRequestCount,
+      emmausRequestCount
+    };
+  } finally {
+    await page.unroute("**/generated/places/*.json");
+    await page.close();
+    await context.close();
+  }
+}
+
 async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
   await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
@@ -664,7 +948,11 @@ async function verifyShowAllPassages(page, baseUrl) {
       }
       const renderedCount = section.querySelectorAll("article").length;
       const showAllButton = section.querySelector("[data-show-all-passages='true']");
-      return renderedCount >= expectedCount && !showAllButton;
+      return (
+        renderedCount >= expectedCount &&
+        showAllButton instanceof HTMLButtonElement &&
+        showAllButton.getAttribute("aria-expanded") === "true"
+      );
     },
     { expectedCount: totalPassages },
     { timeout: 120_000, polling: 250 }
@@ -691,33 +979,123 @@ async function verifyPanelAccessibility(browser, baseUrl) {
   const page = await context.newPage();
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
-    await waitForMapToSettle(page);
-    await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='about']", {
-      timeout: 30_000
-    });
+    const runScenarioAnalysis = async ({
+      name,
+      pathWithQuery,
+      beforeAnalyze
+    }) => {
+      await page.goto(`${baseUrl}${pathWithQuery}`, {
+        waitUntil: "networkidle",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(page);
+      await page.waitForSelector(
+        "section[aria-label='Place details'] [data-panel-section='about']",
+        {
+          timeout: 30_000
+        }
+      );
 
-    const analysis = await new AxeBuilder({ page })
-      .include("section[aria-label='Place details']")
-      .analyze();
-    const seriousOrCritical = analysis.violations.filter(
-      (violation) => violation.impact === "serious" || violation.impact === "critical"
+      if (beforeAnalyze) {
+        await beforeAnalyze();
+      }
+
+      const analysis = await new AxeBuilder({ page })
+        .include("section[aria-label='Place details']")
+        .analyze();
+      const seriousOrCritical = analysis.violations.filter(
+        (violation) => violation.impact === "serious" || violation.impact === "critical"
+      );
+
+      return {
+        name,
+        violationCount: analysis.violations.length,
+        seriousOrCriticalCount: seriousOrCritical.length,
+        seriousOrCriticalSummary: seriousOrCritical.map((violation) => ({
+          id: violation.id,
+          impact: violation.impact,
+          nodes: violation.nodes.length
+        }))
+      };
+    };
+
+    const scenarios = [];
+    scenarios.push(
+      await runScenarioAnalysis({
+        name: "capernaum-default",
+        pathWithQuery: "/?place=capernaum"
+      })
+    );
+    scenarios.push(
+      await runScenarioAnalysis({
+        name: "emmaus-disputed-candidates-expanded",
+        pathWithQuery: "/?place=emmaus",
+        beforeAnalyze: async () => {
+          const supportToggle = page
+            .locator("section[aria-label='Place details'] button[data-candidate-support-toggle='true']")
+            .first();
+          await supportToggle.waitFor({ state: "visible", timeout: 30_000 });
+          await supportToggle.focus();
+          await page.keyboard.press("Enter");
+          await page.waitForFunction(() => {
+            const button = document.querySelector(
+              "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
+            );
+            return (
+              button instanceof HTMLButtonElement &&
+              button.getAttribute("aria-expanded") === "true"
+            );
+          });
+        }
+      })
+    );
+    scenarios.push(
+      await runScenarioAnalysis({
+        name: "jerusalem-show-all-expanded",
+        pathWithQuery: "/?place=jerusalem",
+        beforeAnalyze: async () => {
+          const showAllButton = page.locator(
+            "section[aria-label='Place details'] [data-show-all-passages='true']"
+          );
+          await showAllButton.first().waitFor({ state: "visible", timeout: 30_000 });
+          await showAllButton.first().focus();
+          await page.keyboard.press("Enter");
+          await page.waitForFunction(() => {
+            const button = document.querySelector(
+              "section[aria-label='Place details'] [data-show-all-passages='true']"
+            );
+            if (!(button instanceof HTMLButtonElement)) {
+              return false;
+            }
+            if (button.getAttribute("aria-expanded") !== "true") {
+              return false;
+            }
+
+            const section = document.querySelector(
+              "section[aria-label='Place details'] [data-panel-section='in-bible']"
+            );
+            return Boolean(section && section.querySelectorAll("article").length > 5);
+          }, undefined, { timeout: 120_000, polling: 250 });
+        }
+      })
     );
 
-    if (seriousOrCritical.length > 0) {
-      const summary = seriousOrCritical.map((violation) => ({
-        id: violation.id,
-        impact: violation.impact,
-        nodes: violation.nodes.length
-      }));
+    const seriousOrCriticalScenarios = scenarios.filter(
+      (scenario) => scenario.seriousOrCriticalCount > 0
+    );
+    if (seriousOrCriticalScenarios.length > 0) {
       throw new Error(
-        `Panel accessibility scan reported serious/critical issues: ${JSON.stringify(summary)}`
+        `Panel accessibility scan reported serious/critical issues: ${JSON.stringify(seriousOrCriticalScenarios)}`
       );
     }
 
     return {
-      violationCount: analysis.violations.length,
-      seriousOrCriticalCount: seriousOrCritical.length
+      scenarios,
+      violationCount: scenarios.reduce((sum, scenario) => sum + scenario.violationCount, 0),
+      seriousOrCriticalCount: scenarios.reduce(
+        (sum, scenario) => sum + scenario.seriousOrCriticalCount,
+        0
+      )
     };
   } finally {
     await page.close();
@@ -1269,7 +1647,7 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
       throw new Error("Search box rect is outside the map viewport.");
     }
 
-    const labels = map.queryRenderedFeatures(
+    const labelsInsideSearchBox = map.queryRenderedFeatures(
       [
         [minX, minY],
         [maxX, maxY]
@@ -1279,9 +1657,22 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
       }
     );
 
-    const distinctLabels = Array.from(
+    const allLabels = map.queryRenderedFeatures(undefined, {
+      layers: [...areaLayerIds, pinLabelsLayerId]
+    });
+
+    const distinctLabelsInsideSearchBox = Array.from(
       new Set(
-        labels
+        labelsInsideSearchBox
+          .map((feature) =>
+            String(feature.properties?.placeName ?? feature.properties?.labelText ?? "").trim()
+          )
+          .filter((value) => value.length > 0)
+      )
+    );
+    const distinctLabelsOverall = Array.from(
+      new Set(
+        allLabels
           .map((feature) =>
             String(feature.properties?.placeName ?? feature.properties?.labelText ?? "").trim()
           )
@@ -1290,8 +1681,10 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
     );
 
     return {
-      labelCount: labels.length,
-      labels: distinctLabels,
+      labelCount: labelsInsideSearchBox.length,
+      labels: distinctLabelsInsideSearchBox,
+      overallLabelCount: allLabels.length,
+      overallLabels: distinctLabelsOverall.slice(0, 24),
       searchRect: {
         x: minX,
         y: minY,
@@ -1308,6 +1701,12 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
   if (overlap.labelCount > 0) {
     throw new Error(
       `Found map labels under the search box on overview: ${JSON.stringify(overlap)}`
+    );
+  }
+
+  if (overlap.overallLabelCount === 0) {
+    throw new Error(
+      "Search-box overlap check was vacuous: no labels were rendered outside the search-box query."
     );
   }
 
@@ -2685,6 +3084,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const candidateSelectionCheck = await verifyCandidateSelectionUpdatesUrl(
+      page,
+      staticServer.baseUrl
+    );
     await captureGalileeCollisionBoxes(
       browser,
       staticServer.baseUrl,
@@ -2693,6 +3096,15 @@ async function run() {
 
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
       page,
+      staticServer.baseUrl
+    );
+    const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
+      page,
+      staticServer.baseUrl
+    );
+    const copyLinkCheck = await verifyCopyLinkAction(browser, staticServer.baseUrl);
+    const placeDetailsRaceCheck = await verifyPlaceDetailsFetchRaceRecovery(
+      browser,
       staticServer.baseUrl
     );
 
@@ -2803,11 +3215,15 @@ async function run() {
       panelMapDomStability,
       pinLabelRegression,
       candidatePinColorCheck,
+      candidateSelectionCheck,
       overviewAreaLabelFixtureCheck,
       overviewClusterOverlap,
       overviewSearchBoxLabelOverlap,
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
+      keyboardDisclosureChecks,
+      copyLinkCheck,
+      placeDetailsRaceCheck,
       galileePinOverlap,
       fallbackOutageChecks: {
         pbfOnly: fallbackPbfOutage,

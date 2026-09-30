@@ -1,4 +1,5 @@
 import type { BibliographyEntry } from "../map/types";
+import { OPENBIBLE_IDS_BY_SLUG } from "./openbible-ids.generated";
 
 export interface SourceCitation {
   id: string;
@@ -13,6 +14,17 @@ function normalizeWikiTitle(value: string) {
 function bibliographyLabel(entry: BibliographyEntry) {
   const authorLabel = entry.authors.join(", ");
   return `${authorLabel}, ${entry.title} (${entry.year})`;
+}
+
+const openBibleAtlasUrl = "https://www.openbible.info/geo/";
+
+function openBibleCitationUrlForSlug(slug: string) {
+  const openBibleId = OPENBIBLE_IDS_BY_SLUG[slug];
+  if (!openBibleId) {
+    return openBibleAtlasUrl;
+  }
+
+  return `https://www.openbible.info/geo/ancient/${openBibleId}/${encodeURIComponent(slug)}`;
 }
 
 export function formatSourceCitation(
@@ -54,7 +66,7 @@ export function formatSourceCitation(
       return {
         id: sourceId,
         label: `OpenBible ${value}`,
-        url: `https://www.openbible.info/geo/${value}`
+        url: openBibleCitationUrlForSlug(value)
       };
     case "osm":
       return {
@@ -99,7 +111,7 @@ export function formatSourceCitation(
       return {
         id: sourceId,
         label: `Perseus ${value}`,
-        url: `https://www.perseus.tufts.edu/hopper/searchresults?q=${encodeURIComponent(value)}`
+        url: `https://www.perseus.tufts.edu/hopper/text?doc=${encodeURIComponent(value)}`
       };
     case "scripture":
       return {

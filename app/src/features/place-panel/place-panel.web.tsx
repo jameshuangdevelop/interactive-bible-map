@@ -30,6 +30,12 @@ const PANEL_SECTION_GAP = tokens.spacing.lg;
 const SCRIPTURE_INITIAL_COUNT = 5;
 const SCRIPTURE_CHUNK_SIZE = 24;
 const SOURCE_SECTION_ANCHOR_ID = "place-panel-sources";
+const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC"
+});
 
 interface PlacePanelProps {
   selectedPlace: PlaceIndexRecord;
@@ -47,6 +53,36 @@ interface PlacePanelProps {
   onSelectCandidate: (candidateIndex: number) => void;
   onZoomTo: () => void;
   onCopyLink: () => void | Promise<void>;
+}
+
+function toSafeHttpUrl(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
+function formatReviewedDate(lastReviewed: string | undefined) {
+  if (!lastReviewed) {
+    return "unknown";
+  }
+
+  const parsedDate = new Date(lastReviewed);
+  if (Number.isNaN(parsedDate.valueOf())) {
+    return "unknown";
+  }
+
+  return reviewedDateFormatter.format(parsedDate);
 }
 
 function typeChipStyle(confidence: Confidence) {
@@ -89,8 +125,12 @@ function WikimediaImage({
   failed: boolean;
   onError: () => void;
 }) {
-  const imageUrl = buildCommonsThumbnailUrl(image.url, displayWidthHint);
-  const imageSrcSet = buildCommonsThumbnailSrcSet(image.url);
+  const safeImageUrl = toSafeHttpUrl(image.url);
+  const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
+  const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
+  const imageUrl = safeImageUrl ? buildCommonsThumbnailUrl(safeImageUrl, displayWidthHint) : null;
+  const imageSrcSet = safeImageUrl ? buildCommonsThumbnailSrcSet(safeImageUrl) : null;
+  const showFallback = failed || !imageUrl;
 
   return (
     <div>
@@ -107,7 +147,7 @@ function WikimediaImage({
           justifyContent: "center"
         }}
       >
-        {failed ? (
+        {showFallback ? (
           <span
             style={{
               color: tokens.color.textSecondary,
@@ -179,13 +219,21 @@ function WikimediaImage({
         }}
       >
         Photo: {image.author} ·{" "}
-        <a href={image.licenseUrl} rel="noreferrer" target="_blank">
-          {image.license}
-        </a>{" "}
+        {safeLicenseUrl ? (
+          <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+            {image.license}
+          </a>
+        ) : (
+          image.license
+        )}{" "}
         ·{" "}
-        <a href={image.sourcePage} rel="noreferrer" target="_blank">
-          Wikimedia Commons
-        </a>
+        {safeSourcePageUrl ? (
+          <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
+            Wikimedia Commons
+          </a>
+        ) : (
+          "Wikimedia Commons"
+        )}
       </p>
       <p
         style={{
@@ -287,7 +335,7 @@ function SkeletonPanelBody() {
   );
 
   return (
-    <div aria-hidden="true">
+    <div aria-hidden="true" data-place-panel-skeleton="true">
       <div
         style={{
           width: "100%",
@@ -731,50 +779,61 @@ export function PlacePanel({
                 const support = candidate.support;
                 const supportCanExpand = support.length > 170;
                 const letter = candidateIndexToLetter(candidateIndex);
+                const supportTextId = `candidate-support-${selectedPlace.id}-${candidateIndex}`;
 
                 return (
-                  <button
-                    aria-label={`Candidate ${letter}: ${candidate.label}`}
+                  <div
                     key={`${candidate.label}:${candidateIndex}`}
-                    onClick={() => onSelectCandidate(candidateIndex)}
                     style={{
                       border: selected
                         ? `1px solid ${tokens.color.accent}`
                         : `1px solid ${tokens.color.divider}`,
                       borderRadius: `${tokens.radius.panel}px`,
                       backgroundColor: selected ? "#E8F0FE" : tokens.color.surface,
-                      textAlign: "left",
-                      padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
-                      cursor: "pointer"
+                      padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`
                     }}
-                    type="button"
                   >
-                    <div
+                    <button
+                      aria-label={`Candidate ${letter}: ${candidate.label}`}
+                      onClick={() => onSelectCandidate(candidateIndex)}
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: `${tokens.spacing.sm}px`
+                        border: "none",
+                        background: "transparent",
+                        width: "100%",
+                        padding: 0,
+                        cursor: "pointer",
+                        textAlign: "left"
                       }}
+                      type="button"
                     >
-                      <strong style={{ color: tokens.color.textPrimary }}>
-                        {letter}. {candidate.label}
-                      </strong>
-                      <span
+                      <div
                         style={{
-                          borderRadius: "999px",
-                          padding: "2px 8px",
-                          fontSize: `${tokens.typography.captionSize}px`,
-                          lineHeight: `${tokens.typography.captionLineHeight}px`,
-                          fontWeight: 600,
-                          color: chip.color,
-                          backgroundColor: chip.backgroundColor
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: `${tokens.spacing.sm}px`
                         }}
                       >
-                        {confidenceLabel(candidate.confidence, false)}
-                      </span>
-                    </div>
+                        <strong style={{ color: tokens.color.textPrimary }}>
+                          {letter}. {candidate.label}
+                        </strong>
+                        <span
+                          style={{
+                            borderRadius: "999px",
+                            padding: "2px 8px",
+                            fontSize: `${tokens.typography.captionSize}px`,
+                            lineHeight: `${tokens.typography.captionLineHeight}px`,
+                            fontWeight: 600,
+                            color: chip.color,
+                            backgroundColor: chip.backgroundColor
+                          }}
+                        >
+                          {confidenceLabel(candidate.confidence, false)}
+                        </span>
+                      </div>
+                    </button>
                     <p
+                      id={supportTextId}
                       style={{
                         marginTop: `${tokens.spacing.sm}px`,
                         marginBottom: `${tokens.spacing.xs}px`,
@@ -798,17 +857,22 @@ export function PlacePanel({
                       />
                     </p>
                     {supportCanExpand ? (
-                      <span
+                      <button
+                        aria-controls={supportTextId}
+                        aria-expanded={expanded}
+                        data-candidate-support-toggle="true"
                         style={{
+                          border: "none",
+                          background: "transparent",
+                          padding: 0,
+                          cursor: "pointer",
                           color: tokens.color.accent,
                           fontSize: `${tokens.typography.captionSize}px`,
                           lineHeight: `${tokens.typography.captionLineHeight}px`,
                           textDecoration: "underline",
                           textUnderlineOffset: "2px"
                         }}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
+                        onClick={() => {
                           setExpandedCandidateSupport((current) => {
                             if (current[candidateIndex]) {
                               const { [candidateIndex]: _removed, ...rest } = current;
@@ -820,11 +884,12 @@ export function PlacePanel({
                             };
                           });
                         }}
+                        type="button"
                       >
                         {expanded ? "Show less" : "Show more"}
-                      </span>
+                      </button>
                     ) : null}
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -885,65 +950,72 @@ export function PlacePanel({
                   In the Bible · {sortedScripture.length}{" "}
                   {sortedScripture.length === 1 ? "passage" : "passages"}
                 </h2>
-                {groupedScripture.map((group) => (
-                  <div key={group.book} style={{ marginBottom: `${tokens.spacing.md}px` }}>
-                    <h3
-                      style={{
-                        marginTop: 0,
-                        marginBottom: `${tokens.spacing.sm}px`,
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                        color: tokens.color.textSecondary,
-                        fontSize: `${tokens.typography.captionSize}px`,
-                        lineHeight: `${tokens.typography.captionLineHeight}px`,
-                        fontWeight: 600
-                      }}
-                    >
-                      {group.book}
-                    </h3>
-                    {group.passages.map((passage) => (
-                      <article
-                        key={passage.ref}
+                <div id={`scripture-passages-${selectedPlace.id}`}>
+                  {groupedScripture.map((group) => (
+                    <div key={group.book} style={{ marginBottom: `${tokens.spacing.md}px` }}>
+                      <h3
                         style={{
-                          marginBottom: `${tokens.spacing.sm}px`
+                          marginTop: 0,
+                          marginBottom: `${tokens.spacing.sm}px`,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: tokens.color.textSecondary,
+                          fontSize: `${tokens.typography.captionSize}px`,
+                          lineHeight: `${tokens.typography.captionLineHeight}px`,
+                          fontWeight: 600
                         }}
                       >
-                        <p
+                        {group.book}
+                      </h3>
+                      {group.passages.map((passage) => (
+                        <article
+                          key={passage.ref}
                           style={{
-                            marginTop: 0,
-                            marginBottom: "2px",
-                            color: tokens.color.textPrimary,
-                            fontSize: `${tokens.typography.bodySize}px`,
-                            lineHeight: `${tokens.typography.bodyLineHeight}px`,
-                            fontWeight: 700
+                            marginBottom: `${tokens.spacing.sm}px`
                           }}
                         >
-                          {passage.ref}
-                        </p>
-                        <p
-                          style={{
-                            marginTop: 0,
-                            marginBottom: 0,
-                            color: tokens.color.textPrimary,
-                            fontSize: `${tokens.typography.scriptureSize}px`,
-                            lineHeight: `${tokens.typography.scriptureLineHeight}px`,
-                            fontFamily: tokens.typography.scriptureFont
-                          }}
-                        >
-                          {passage.textWEB}
-                        </p>
-                      </article>
-                    ))}
-                  </div>
-                ))}
-                {!showAllScripture && sortedScripture.length > SCRIPTURE_INITIAL_COUNT ? (
+                          <p
+                            style={{
+                              marginTop: 0,
+                              marginBottom: "2px",
+                              color: tokens.color.textPrimary,
+                              fontSize: `${tokens.typography.bodySize}px`,
+                              lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                              fontWeight: 700
+                            }}
+                          >
+                            {passage.ref}
+                          </p>
+                          <p
+                            style={{
+                              marginTop: 0,
+                              marginBottom: 0,
+                              color: tokens.color.textPrimary,
+                              fontSize: `${tokens.typography.scriptureSize}px`,
+                              lineHeight: `${tokens.typography.scriptureLineHeight}px`,
+                              fontFamily: tokens.typography.scriptureFont
+                            }}
+                          >
+                            {passage.textWEB}
+                          </p>
+                        </article>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                {sortedScripture.length > SCRIPTURE_INITIAL_COUNT ? (
                   <button
+                    aria-controls={`scripture-passages-${selectedPlace.id}`}
+                    aria-expanded={showAllScripture}
                     data-show-all-passages="true"
+                    disabled={showAllScripture}
                     onClick={() => setShowAllScripture(true)}
                     style={textActionStyle}
                     type="button"
                   >
-                    Show all {sortedScripture.length} passages
+                    {showAllScripture
+                      ? `Showing all ${sortedScripture.length} passages`
+                      : `Show all ${sortedScripture.length} passages`}
                   </button>
                 ) : null}
                 {showAllScripture && visibleScriptureCount < sortedScripture.length ? (
@@ -1015,25 +1087,28 @@ export function PlacePanel({
                     color: tokens.color.textSecondary
                   }}
                 >
-                  {sourceCitations.map((citation, index) => (
-                    <li
-                      id={`source-${index + 1}`}
-                      key={citation.id}
-                      style={{
-                        marginBottom: `${tokens.spacing.sm}px`,
-                        fontSize: `${tokens.typography.bodySize}px`,
-                        lineHeight: `${tokens.typography.bodyLineHeight}px`
-                      }}
-                    >
-                      {citation.url ? (
-                        <a href={citation.url} rel="noreferrer" target="_blank">
-                          {citation.label}
-                        </a>
-                      ) : (
-                        citation.label
-                      )}
-                    </li>
-                  ))}
+                  {sourceCitations.map((citation, index) => {
+                    const safeCitationUrl = toSafeHttpUrl(citation.url);
+                    return (
+                      <li
+                        id={`source-${index + 1}`}
+                        key={citation.id}
+                        style={{
+                          marginBottom: `${tokens.spacing.sm}px`,
+                          fontSize: `${tokens.typography.bodySize}px`,
+                          lineHeight: `${tokens.typography.bodyLineHeight}px`
+                        }}
+                      >
+                        {safeCitationUrl ? (
+                          <a href={safeCitationUrl} rel="noopener noreferrer" target="_blank">
+                            {citation.label}
+                          </a>
+                        ) : (
+                          citation.label
+                        )}
+                      </li>
+                    );
+                  })}
                 </ol>
               </section>
             ) : null}
@@ -1042,11 +1117,11 @@ export function PlacePanel({
               <hr style={sectionDividerStyle} />
               <p style={secondaryTextStyle}>
                 Checked by the project&apos;s Fact-Checker · last reviewed{" "}
-                {location.lastReviewed ?? "unknown"}
+                {formatReviewedDate(location.lastReviewed)}
               </p>
               <a
                 href={`https://github.com/jameshuangdevelop/interactive-bible-map/issues/new?title=${encodeURIComponent(`Place: ${selectedPlace.id}`)}`}
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 style={{
                   color: tokens.color.accent,
                   fontSize: `${tokens.typography.bodySize}px`

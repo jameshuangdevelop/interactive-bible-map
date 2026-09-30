@@ -20,7 +20,7 @@ describe("source citation formatting", () => {
     {
       sourceId: "openbible:capernaum",
       expectedLabel: "OpenBible capernaum",
-      expectedUrl: "https://www.openbible.info/geo/capernaum"
+      expectedUrl: "https://www.openbible.info/geo/ancient/af2161c/capernaum"
     },
     {
       sourceId: "pleiades:678231",
@@ -70,8 +70,7 @@ describe("source citation formatting", () => {
     {
       sourceId: "perseus:urn:cts:greekLit:tlg0526",
       expectedLabel: "Perseus urn:cts:greekLit:tlg0526",
-      expectedUrl:
-        "https://www.perseus.tufts.edu/hopper/searchresults?q=urn%3Acts%3AgreekLit%3Atlg0526"
+      expectedUrl: "https://www.perseus.tufts.edu/hopper/text?doc=urn%3Acts%3AgreekLit%3Atlg0526"
     },
     {
       sourceId: "scripture:Mark 1:21",
@@ -88,5 +87,10 @@ describe("source citation formatting", () => {
     const citation = formatSourceCitation("bib:sample-book", bibliographyById);
     expect(citation.label).toBe("Author One, Author Two, Sample Book (2026)");
     expect(citation.url).toBe("https://example.com/sample-book");
+  });
+
+  test("falls back to the OpenBible atlas page when slug mapping is missing", () => {
+    const citation = formatSourceCitation("openbible:missing-slug", bibliographyById);
+    expect(citation.url).toBe("https://www.openbible.info/geo/");
   });
 });
