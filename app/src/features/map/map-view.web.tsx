@@ -45,7 +45,10 @@ import {
   PIN_COLLISION_LAYOUT,
   QUESTION_BADGE_LAYOUT
 } from "./map-layer-layouts";
-import { resolveMapRuntimeTuning } from "./map-runtime-options";
+import {
+  resolveEffectiveMapVariantOptions,
+  resolveMapRuntimeTuning
+} from "./map-runtime-options";
 import { planSelectionFocus } from "./selection-focus";
 import {
   PRIMARY_VECTOR_SOURCE_ID,
@@ -392,26 +395,31 @@ function detectWebGlRendererInfo(): WebGlRendererInfo {
     };
   }
 
-  const vendor = webglContext.getParameter(webglContext.VENDOR);
-  const renderer = webglContext.getParameter(webglContext.RENDERER);
-  const debugExtension = webglContext.getExtension("WEBGL_debug_renderer_info");
-  const unmaskedVendor = debugExtension
-    ? webglContext.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
-    : null;
-  const unmaskedRenderer = debugExtension
-    ? webglContext.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
-    : null;
-  const combinedRendererLabel = [vendor, renderer, unmaskedVendor, unmaskedRenderer]
-    .filter((value): value is string => typeof value === "string" && value.length > 0)
-    .join(" | ");
+  try {
+    const vendor = webglContext.getParameter(webglContext.VENDOR);
+    const renderer = webglContext.getParameter(webglContext.RENDERER);
+    const debugExtension = webglContext.getExtension("WEBGL_debug_renderer_info");
+    const unmaskedVendor = debugExtension
+      ? webglContext.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
+      : null;
+    const unmaskedRenderer = debugExtension
+      ? webglContext.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
+      : null;
+    const combinedRendererLabel = [vendor, renderer, unmaskedVendor, unmaskedRenderer]
+      .filter((value): value is string => typeof value === "string" && value.length > 0)
+      .join(" | ");
 
-  return {
-    vendor: typeof vendor === "string" ? vendor : null,
-    renderer: typeof renderer === "string" ? renderer : null,
-    unmaskedVendor: typeof unmaskedVendor === "string" ? unmaskedVendor : null,
-    unmaskedRenderer: typeof unmaskedRenderer === "string" ? unmaskedRenderer : null,
-    isSoftwareRenderer: softwareRendererPattern.test(combinedRendererLabel)
-  };
+    return {
+      vendor: typeof vendor === "string" ? vendor : null,
+      renderer: typeof renderer === "string" ? renderer : null,
+      unmaskedVendor: typeof unmaskedVendor === "string" ? unmaskedVendor : null,
+      unmaskedRenderer: typeof unmaskedRenderer === "string" ? unmaskedRenderer : null,
+      isSoftwareRenderer: softwareRendererPattern.test(combinedRendererLabel)
+    };
+  } finally {
+    const loseContext = webglContext.getExtension("WEBGL_lose_context");
+    loseContext?.loseContext();
+  }
 }
 
 function resolveEffectivePixelRatioCap(
@@ -663,10 +671,10 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: CLUSTER_MAX_ZOOM + 1,
       paint: {
-        "circle-radius": ["step", ["get", "point_count"], 12, 8, 14, 20, 16],
+        "circle-radius": ["step", ["get", "point_count"], 14, 8, 16, 20, 18],
         "circle-color": "#C5221F",
         "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 2
+        "circle-stroke-width": 3
       }
     });
   }
@@ -1148,7 +1156,7 @@ function formatScaleDistance(valueMeters: number) {
 }
 
 function isMainSourceLoaded(map: MapLibreMap) {
-  return map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID) || map.areTilesLoaded();
+  return map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID);
 }
 
 export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: MapViewProps) {
@@ -1275,7 +1283,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
-      clusterRadius: 72
+      clusterRadius: 52
     });
     ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
     ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
@@ -1466,7 +1474,13 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
 
     const initialMode = basemapController.getState().mode;
     const rendererInfo = detectWebGlRendererInfo();
-    const effectivePixelRatioCap = resolveEffectivePixelRatioCap(runtimeTuning, rendererInfo);
+    const effectiveRuntimeTuning: RuntimeTuning = {
+      ...runtimeTuning,
+      variants: resolveEffectiveMapVariantOptions(runtimeTuning.variants, {
+        isSoftwareRenderer: rendererInfo.isSoftwareRenderer
+      })
+    };
+    const effectivePixelRatioCap = resolveEffectivePixelRatioCap(effectiveRuntimeTuning, rendererInfo);
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode),
@@ -1475,16 +1489,17 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
-      fadeDuration: runtimeTuning.symbolFadeDurationMs,
+      fadeDuration: effectiveRuntimeTuning.symbolFadeDurationMs,
       pixelRatio: resolveMapPixelRatio(effectivePixelRatioCap),
-      maxTileCacheSize: runtimeTuning.maxTileCacheSize,
-      maxTileCacheZoomLevels: runtimeTuning.maxTileCacheZoomLevels,
-      cancelPendingTileRequestsWhileZooming: runtimeTuning.cancelPendingTileRequestsWhileZooming,
-      dragPan: runtimeTuning.dragPan,
+      maxTileCacheSize: effectiveRuntimeTuning.maxTileCacheSize,
+      maxTileCacheZoomLevels: effectiveRuntimeTuning.maxTileCacheZoomLevels,
+      cancelPendingTileRequestsWhileZooming:
+        effectiveRuntimeTuning.cancelPendingTileRequestsWhileZooming,
+      dragPan: effectiveRuntimeTuning.dragPan,
       keyboard: false,
       doubleClickZoom: false
     });
-    configureZoomGestures(map, runtimeTuning);
+    configureZoomGestures(map, effectiveRuntimeTuning);
 
     mapRef.current = map;
     (
@@ -1656,7 +1671,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
         return;
       }
 
-      if (event.tile || event.isSourceLoaded === true || map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID)) {
+      if (event.isSourceLoaded === true || map.isSourceLoaded(PRIMARY_VECTOR_SOURCE_ID)) {
         mainSourceLoadControllerRef.current.markLoaded();
         clearMainSourceLoadTimeout();
       }
@@ -1666,8 +1681,8 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
       syncAttributionControl(map, currentMode);
-      configureZoomGestures(map, runtimeTuning);
-      applyBasemapLayerVariants(map, currentMode, runtimeTuning);
+      configureZoomGestures(map, effectiveRuntimeTuning);
+      applyBasemapLayerVariants(map, currentMode, effectiveRuntimeTuning);
       if (currentMode === "main") {
         scheduleMainSourceLoadTimeout(map);
       } else {
@@ -1722,6 +1737,7 @@ export function MapView({ places, selection, leftPanelWidth, onSelectPlace }: Ma
     map.on("click", handleMapClick);
     map.on("sourcedata", handleSourceData);
     map.on("error", handleError);
+    scheduleMainSourceLoadTimeout(map);
 
     return () => {
       cleanupAttributionRef.current?.();

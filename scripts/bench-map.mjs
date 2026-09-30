@@ -622,29 +622,34 @@ async function readWebGlRendererInfo(page) {
       };
     }
 
-    const vendor = context.getParameter(context.VENDOR);
-    const renderer = context.getParameter(context.RENDERER);
-    const debugExtension = context.getExtension("WEBGL_debug_renderer_info");
-    const unmaskedVendor = debugExtension
-      ? context.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
-      : null;
-    const unmaskedRenderer = debugExtension
-      ? context.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
-      : null;
+    try {
+      const vendor = context.getParameter(context.VENDOR);
+      const renderer = context.getParameter(context.RENDERER);
+      const debugExtension = context.getExtension("WEBGL_debug_renderer_info");
+      const unmaskedVendor = debugExtension
+        ? context.getParameter(debugExtension.UNMASKED_VENDOR_WEBGL)
+        : null;
+      const unmaskedRenderer = debugExtension
+        ? context.getParameter(debugExtension.UNMASKED_RENDERER_WEBGL)
+        : null;
 
-    const asString = (value) => (typeof value === "string" ? value : null);
-    const values = [asString(unmaskedRenderer), asString(renderer), asString(vendor)].filter(Boolean);
-    const rendererString = values.join(" | ") || "unknown renderer";
-    const isSoftwareRenderer = pattern.test(rendererString);
+      const asString = (value) => (typeof value === "string" ? value : null);
+      const values = [asString(unmaskedRenderer), asString(renderer), asString(vendor)].filter(Boolean);
+      const rendererString = values.join(" | ") || "unknown renderer";
+      const isSoftwareRenderer = pattern.test(rendererString);
 
-    return {
-      vendor: asString(vendor),
-      renderer: asString(renderer),
-      unmaskedVendor: asString(unmaskedVendor),
-      unmaskedRenderer: asString(unmaskedRenderer),
-      rendererString,
-      isSoftwareRenderer
-    };
+      return {
+        vendor: asString(vendor),
+        renderer: asString(renderer),
+        unmaskedVendor: asString(unmaskedVendor),
+        unmaskedRenderer: asString(unmaskedRenderer),
+        rendererString,
+        isSoftwareRenderer
+      };
+    } finally {
+      const loseContext = context.getExtension("WEBGL_lose_context");
+      loseContext?.loseContext();
+    }
   }, { patternSource: softwareRendererPattern.source, patternFlags: softwareRendererPattern.flags });
 }
 

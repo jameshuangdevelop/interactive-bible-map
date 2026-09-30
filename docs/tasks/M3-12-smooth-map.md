@@ -55,10 +55,10 @@ The human made the speed and feel of dragging and zooming the top priority befor
 The panel (M3-04), search (M3-05) and the deploy (M3-06). Don't change the data.
 
 ## Acceptance criteria
-- [ ] `docs/research/M3-12-map-benchmark.md` gives before-and-after numbers for every scenario, and the OpenFreeMap baseline.
-- [ ] Every default change is backed by a measurement, and none makes any metric worse without a stated reason.
-- [ ] The URL variants work, and are documented.
-- [ ] CI passes, and all existing checks stay green. Committed as `perf(map): make dragging and zooming smoother`.
+- [x] `docs/research/M3-12-map-benchmark.md` gives before-and-after numbers for every scenario, and the OpenFreeMap baseline.
+- [x] Every default change is backed by a measurement, and none makes any metric worse without a stated reason.
+- [x] The URL variants work, and are documented.
+- [x] CI passes, and all existing checks stay green. Committed as `perf(map): make dragging and zooming smoother`.
 
 ## Finish
 Follow the session protocol in `.github/agents/frontend-engineer.agent.md`. PR title: `perf(map): smoother dragging and zooming`.

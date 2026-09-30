@@ -1,5 +1,6 @@
 export interface MapVariantOptions {
   disableRelief: boolean;
+  reliefExplicit: boolean;
   disableLandcover: boolean;
   disableFade: boolean;
   pixelRatioCap: 1 | 2;
@@ -34,6 +35,7 @@ export interface MapRuntimeTuning {
 
 const defaultVariantOptions: MapVariantOptions = {
   disableRelief: false,
+  reliefExplicit: false,
   disableLandcover: false,
   disableFade: false,
   pixelRatioCap: 2,
@@ -57,13 +59,18 @@ function isDisabledZero(value: string | null) {
 export function parseMapVariantOptions(search: string): MapVariantOptions {
   const parameters = parseSearchParameters(search);
   const lite = isEnabledOne(parameters.get("lite"));
-  const reliefParameter = parameters.get("relief");
+  const reliefParameter = parameters.get("relief")?.trim() ?? null;
   const landcoverParameter = parameters.get("landcover");
   const fadeParameter = parameters.get("fade");
   const dprParameter = parameters.get("dpr")?.trim() ?? null;
+  const reliefExplicit = isEnabledOne(reliefParameter) || isDisabledZero(reliefParameter);
 
   const disableRelief =
-    lite || (reliefParameter === null ? defaultVariantOptions.disableRelief : isDisabledZero(reliefParameter));
+    lite
+      ? true
+      : reliefExplicit
+        ? isDisabledZero(reliefParameter)
+        : defaultVariantOptions.disableRelief;
   const disableLandcover =
     lite ||
     (landcoverParameter === null
@@ -90,12 +97,23 @@ export function parseMapVariantOptions(search: string): MapVariantOptions {
   return {
     ...defaultVariantOptions,
     disableRelief,
+    reliefExplicit,
     disableLandcover,
     disableFade,
     pixelRatioCap,
     pixelRatioExplicit,
     zoomRatePreset,
     lite
+  };
+}
+
+export function resolveEffectiveMapVariantOptions(
+  variants: MapVariantOptions,
+  options: { isSoftwareRenderer: boolean }
+): MapVariantOptions {
+  return {
+    ...variants,
+    disableRelief: variants.disableRelief || (options.isSoftwareRenderer && !variants.reliefExplicit)
   };
 }
 

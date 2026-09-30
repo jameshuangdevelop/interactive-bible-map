@@ -115,12 +115,13 @@ function normalizeMaxZoom(style) {
 
 function createMergedLibertyLandcoverLayer() {
   const classes = ["wood", "grass", "ice", "wetland", "sand"];
+  const wetlandMinZoom = 12;
   return {
     id: "landcover",
     type: "fill",
     source: "openmaptiles",
     "source-layer": "landcover",
-    minzoom: 5,
+    minzoom: 0,
     filter: ["in", ["get", "class"], ["literal", classes]],
     paint: {
       "fill-antialias": false,
@@ -140,19 +141,39 @@ function createMergedLibertyLandcoverLayer() {
         "rgba(0, 0, 0, 0)"
       ],
       "fill-opacity": [
-        "match",
-        ["get", "class"],
-        "wood",
-        0.4,
-        "grass",
-        0.3,
-        "ice",
-        0.8,
-        "wetland",
-        0.45,
-        "sand",
-        1,
-        0
+        "step",
+        ["zoom"],
+        [
+          "match",
+          ["get", "class"],
+          "wood",
+          0.4,
+          "grass",
+          0.3,
+          "ice",
+          0.8,
+          "wetland",
+          0,
+          "sand",
+          1,
+          0
+        ],
+        wetlandMinZoom,
+        [
+          "match",
+          ["get", "class"],
+          "wood",
+          0.4,
+          "grass",
+          0.3,
+          "ice",
+          0.8,
+          "wetland",
+          0.45,
+          "sand",
+          1,
+          0
+        ]
       ]
     }
   };

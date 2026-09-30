@@ -126,6 +126,22 @@ function assertInClassFilter(filter, expectedClasses, description) {
   );
 }
 
+function classOpacityByName(matchExpression, description) {
+  assert.ok(Array.isArray(matchExpression), `${description}: match expression must be an array`);
+  assert.equal(matchExpression[0], "match", `${description}: expected 'match' expression`);
+  assert.deepEqual(
+    matchExpression[1],
+    ["get", "class"],
+    `${description}: match expression must read class`
+  );
+
+  const opacities = new Map();
+  for (let index = 2; index < matchExpression.length - 1; index += 2) {
+    opacities.set(matchExpression[index], matchExpression[index + 1]);
+  }
+  return opacities;
+}
+
 function assertLibertyMergedLandcover(style) {
   const layer = style.layers.find((candidate) => candidate.id === "landcover");
   assert.ok(layer, "Liberty style must include merged landcover layer");
@@ -136,7 +152,11 @@ function assertLibertyMergedLandcover(style) {
     "landcover",
     "Liberty landcover must use landcover source-layer"
   );
-  assert.equal(layer.minzoom, 5, "Liberty merged landcover should wait until zoom 5");
+  assert.equal(
+    layer.minzoom ?? 0,
+    0,
+    "Liberty merged landcover should keep wood, grass, ice and sand visible from zoom 0"
+  );
 
   assertInClassFilter(
     layer.filter,
@@ -151,8 +171,68 @@ function assertLibertyMergedLandcover(style) {
   );
   assert.deepEqual(
     layer.paint["fill-opacity"]?.slice(0, 2),
-    ["match", ["get", "class"]],
-    "Liberty merged landcover must map fill-opacity by class with a match expression"
+    ["step", ["zoom"]],
+    "Liberty merged landcover must gate wetland opacity by zoom"
+  );
+
+  const fillOpacity = layer.paint["fill-opacity"];
+  assert.ok(Array.isArray(fillOpacity), "Liberty merged landcover fill-opacity must be an array");
+  assert.equal(fillOpacity[3], 12, "Liberty wetland opacity gate should start at zoom 12");
+  const lowZoomOpacityByClass = classOpacityByName(fillOpacity[2], "Liberty merged landcover low-zoom");
+  const highZoomOpacityByClass = classOpacityByName(
+    fillOpacity[4],
+    "Liberty merged landcover high-zoom"
+  );
+
+  assert.equal(
+    lowZoomOpacityByClass.get("wood"),
+    0.4,
+    "Liberty wood landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    lowZoomOpacityByClass.get("grass"),
+    0.3,
+    "Liberty grass landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    lowZoomOpacityByClass.get("ice"),
+    0.8,
+    "Liberty ice landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    lowZoomOpacityByClass.get("sand"),
+    1,
+    "Liberty sand landcover should remain visible from zoom 0"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("wood"),
+    0.4,
+    "Liberty wood landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("grass"),
+    0.3,
+    "Liberty grass landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("ice"),
+    0.8,
+    "Liberty ice landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.equal(
+    highZoomOpacityByClass.get("sand"),
+    1,
+    "Liberty sand landcover opacity should stay unchanged at zoom 12+"
+  );
+  assert.deepEqual(
+    lowZoomOpacityByClass.get("wetland"),
+    0,
+    "Liberty wetland landcover should stay hidden before zoom 12"
+  );
+  assert.deepEqual(
+    highZoomOpacityByClass.get("wetland"),
+    0.45,
+    "Liberty wetland landcover should keep its original zoom 12 visibility"
   );
 }
 

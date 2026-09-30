@@ -1,26 +1,23 @@
 # M3-12 map benchmark (dragging + zooming)
 
-This report is the post-merge rerun after merging `main` (`13d4bb1`, includes #21, #22, #23 and the false-fallback timeout fix).
+Final rerun after review fixes (`dcf57e5` base), including:
 
-## Environment and measurement notes
+- merged-landcover overview visibility restored,
+- unmeasured cluster tuning reverted (radius/stroke/clusterRadius),
+- software-renderer default now auto-disables relief (`?relief=1` forces old look back on).
 
-- **Host renderer:** `ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit`
-- **Display path:** remote desktop at ~32 Hz (headed frame intervals quantize around ~31.3 ms and dropped frames appear as ~62.5+ ms)
-- **Headed anti-throttle step:** `page.bringToFront()` before measured gestures
-- **Main-style guard (every app scenario):**
-  1. attribution contains `OpenFreeMap`,
-  2. fallback attribution/style needles are absent,
-  3. style-switch `setStyle(...)` calls are zero.
-- **Guard result:** pass on all checks during the 3-run variant sweep (**120/120 scenario checks**).
+## Environment and guardrails
 
-## Committed benchmark artifacts
+- **WebGL renderer:** `ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) | WebKit WebGL | WebKit`
+- **Renderer class:** software (`SwiftShader`), so this host is CPU-rendered (no GPU acceleration). A GPU-backed device should be materially faster.
+- **Display path:** remote desktop at about 32 Hz.
+- **Mode:** headed, with `page.bringToFront()` before measured gestures.
+- **Main-style guard (all runs):** attribution includes `OpenFreeMap`, no fallback signals, and zero style-switch `setStyle(...)` calls.
+- **Guard result:** pass (**45/45 scenario checks**) in this final rerun.
 
-- Consolidated report: `docs/research/M3-12-map-benchmark.md`
-- Compact machine-readable summary: `docs/research/M3-12-map-benchmark.final.json`
+## Historical benchmark context (pre-follow-up comparison)
 
-Per-variant and before/after raw run artifacts were used for measurement, then summarized here.
-
-## Headed comparison (single rerun snapshot)
+This card already captured before/after + OpenFreeMap baseline in the post-merge sweep; those numbers are retained here for context.
 
 | Scenario | Before (app) | After (app) | OpenFreeMap baseline |
 |---|---:|---:|---:|
@@ -30,27 +27,28 @@ Per-variant and before/after raw run artifacts were used for measurement, then s
 | Trackpad-style pinch (Ctrl+wheel) | p50 31.3 / p95 62.5 ms; long 0 | p50 31.3 / p95 62.5 ms; long 0 | p50 62.5 / p95 93.7 ms; long 46 (max 75 ms) |
 | Fly-to after selection | p50 31.3 / p95 62.6 ms; long 8 (max 128 ms) | p50 31.3 / p95 62.6 ms; long 8 (max 124 ms) | n/a |
 
-On this software-rendered remote host, run-to-run variance is high; for decisions, the 3-run variant medians/ranges are the stronger signal.
+## Final rerun requested by PO (3 runs each, headed, drag overview)
 
-## Variant sweep (3 runs each, headed app)
+Metric: **drag overview (2 s)**.
 
-Metric below is **drag overview (2 s)**.
+| Variant | p95 median (range) | Long-task count median (range) | Long-task max median (range) |
+|---|---:|---:|---:|
+| Default (software auto relief off) | 33.4 ms (33.4–33.4) | 0 (0–0) | 0 ms (0–0) |
+| `?relief=1` (old look) | 33.4 ms (33.4–49.9) | 0 (0–0) | 0 ms (0–0) |
+| `?lite=1` | 33.4 ms (33.4–33.4) | 0 (0–0) | 0 ms (0–0) |
 
-| Variant | p95 median (range) | Long-task count median (range) | Main-style guard |
-|---|---:|---:|---|
-| Default | 50.0 ms (50.0–50.0) | 2 (0–2) | pass |
-| `?relief=0` | 33.4 ms (33.4–33.4) | 0 (0–0) | pass |
-| `?landcover=0` | 50.0 ms (50.0–50.0) | 2 (1–2) | pass |
-| `?fade=0` | 50.0 ms (50.0–50.0) | 0 (0–1) | pass |
-| `?dpr=1` | 46.8 ms (46.3–49.9) | 1 (0–4) | pass |
-| `?dpr=2` | 47.6 ms (46.5–50.0) | 2 (0–3) | pass |
-| `?zoomrate=fast` | 46.7 ms (46.0–48.5) | 1 (0–1) | pass |
-| `?lite=1` | 38.9 ms (36.4–39.5) | 0 (0–0) | pass |
+## What this means on SwiftShader
 
-## Recommendation for human feel-testing on this host
+- With software-renderer auto-relief-off enabled by default, **default** and **lite** are effectively identical on this drag metric.
+- In this final rerun, forcing relief back on (`?relief=1`) did not increase median long-task counts, but it did show a worse p95 range (one 49.9 ms outlier).
+- Combined with earlier sweeps, this keeps relief-off as the safer default on this SwiftShader host, while the PO still asks for human feel confirmation in Edge.
 
-1. **Try first:** `?relief=0` (best and most repeatable drag-overview improvement).
-2. **Then compare:** `?lite=1` (second-best p95 with repeatable zero long tasks).
-3. **DPR check:** compare `?dpr=1` vs `?dpr=2` directly (`dpr=1` had better long-task median/range here).
-4. `?zoomrate=fast` is mainly interaction feel; use it after picking visual/perf toggles.
-5. Re-test on a GPU-backed local machine; ranking can change materially with hardware acceleration.
+## Notes on `prefetchZoomDelta` and `cancelPendingTileRequestsWhileZooming`
+
+- **`prefetchZoomDelta`:** not available in MapLibre GL JS 6.10 map options (`maplibre-gl.d.ts` has no `prefetchZoomDelta` field), so no production change was shipped for it.
+- **`cancelPendingTileRequestsWhileZooming`:** tested during M3-12 tuning; enabling it did not produce a repeatable smoothness win on this software-rendered host and increased tile churn during fast zoom interactions, so the shipped default remains `false`.
+
+## Committed benchmark artifacts
+
+- `docs/research/M3-12-map-benchmark.md` (this report)
+- `docs/research/M3-12-map-benchmark.final.json` (compact machine-readable summary of the final rerun)

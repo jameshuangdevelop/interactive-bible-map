@@ -35,16 +35,19 @@ The copy runs automatically in `preexport:web` (`npm run prepare:maplibre-worker
 
 These harmless query params stay enabled in production so the human can compare map feel and tile behavior:
 
-- `?relief=0` — hide relief shading (`natural_earth`)
+- `?relief=0` — force relief shading off (`natural_earth`)
+- `?relief=1` — force relief shading on
 - `?landcover=0` — hide natural-land layers (plain land + water)
-- `?fade=0` — disable symbol/tile fading
+- `?fade=0` — disable symbol fade transitions
 - `?dpr=1` — cap map pixel ratio to 1
 - `?dpr=2` — force map pixel ratio cap back to 2
 - `?zoomrate=fast` — faster wheel/trackpad/pinch zoom rates
 - `?lite=1` — shortcut for all of the above
 
 By default, the app now auto-caps map pixel ratio to 1 when it detects a software WebGL renderer
-(for example SwiftShader on remote desktop / CI runners). Use `?dpr=2` to compare against full cap.
+(for example SwiftShader on remote desktop / CI runners), and also defaults relief shading off there.
+GPU-backed devices keep the original defaults (pixel-ratio cap 2, relief on). Use `?dpr=2` and
+`?relief=1` to compare against the original look.
 
 You can combine them with normal location selection, for example:
 
