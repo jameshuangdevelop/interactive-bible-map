@@ -8,12 +8,12 @@ import {
   useState
 } from "react";
 
+import { SearchMenu } from "./search-menu";
 import { getPrimaryPlaceName } from "../features/map/place-visibility";
 import { applySelectionToSearch, parseSelectionFromSearch } from "../features/map/selection-url";
 import type { PlaceIndexRecord, PlaceSelection } from "../features/map/types";
 import { tokens } from "../theme/tokens";
 
-const SEARCH_DESKTOP_WIDTH = 400;
 const PANEL_WIDTH = 408;
 const SEARCH_TOP_OFFSET = tokens.spacing.md;
 const SEARCH_HEIGHT = 48;
@@ -251,6 +251,24 @@ export function AppShell() {
       ? selectedPlace.candidates[selection.candidateIndex].label
       : null;
 
+  const handleMapSelection = useCallback((nextSelection: PlaceSelection) => {
+    setStatusMessage(null);
+
+    const activeElement = document.activeElement;
+    lastSelectionActivatorEntryIdRef.current =
+      activeElement instanceof HTMLElement
+        ? activeElement.getAttribute("data-place-entry-id")
+        : null;
+
+    setSelection(nextSelection);
+  }, []);
+
+  const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
+    setStatusMessage(null);
+    lastSelectionActivatorEntryIdRef.current = null;
+    setSelection(nextSelection);
+  }, []);
+
   return (
     <div
       style={{
@@ -262,54 +280,11 @@ export function AppShell() {
         fontFamily: tokens.typography.uiFont
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          top: `${SEARCH_TOP_OFFSET}px`,
-          left: `${tokens.spacing.md}px`,
-          width: `${SEARCH_DESKTOP_WIDTH}px`,
-          height: `${SEARCH_HEIGHT}px`,
-          borderRadius: "999px",
-          border: `1px solid ${tokens.color.divider}`,
-          backgroundColor: tokens.color.surface,
-          display: "flex",
-          alignItems: "center",
-          gap: `${tokens.spacing.sm}px`,
-          paddingInline: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
-          boxShadow: "0 1px 2px rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15)",
-          zIndex: 30
-        }}
-      >
-        <button
-          aria-label="Open app menu"
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "20px",
-            border: `1px solid ${tokens.color.divider}`,
-            backgroundColor: tokens.color.surface,
-            color: tokens.color.textPrimary,
-            cursor: "pointer"
-          }}
-          type="button"
-        >
-          ☰
-        </button>
-        <input
-          aria-label="Search biblical places"
-          placeholder="Search biblical places"
-          readOnly
-          ref={searchInputRef}
-          style={{
-            border: "none",
-            flex: 1,
-            color: tokens.color.textSecondary,
-            backgroundColor: "transparent",
-            fontFamily: tokens.typography.uiFont,
-            fontSize: `${tokens.typography.bodySize}px`
-          }}
-        />
-      </div>
+      <SearchMenu
+        inputRef={searchInputRef}
+        onSelectPlace={handleSearchSelection}
+        places={places}
+      />
 
       {loading ? (
         <MapLoadingPlaceholder />
@@ -317,17 +292,7 @@ export function AppShell() {
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
             leftPanelWidth={selectedPlace ? PANEL_WIDTH : 0}
-            onSelectPlace={(nextSelection) => {
-              setStatusMessage(null);
-
-              const activeElement = document.activeElement;
-              lastSelectionActivatorEntryIdRef.current =
-                activeElement instanceof HTMLElement
-                  ? activeElement.getAttribute("data-place-entry-id")
-                  : null;
-
-              setSelection(nextSelection);
-            }}
+            onSelectPlace={handleMapSelection}
             places={places}
             selection={selection}
           />

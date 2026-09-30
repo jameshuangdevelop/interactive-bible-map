@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +28,8 @@ const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const requiredCapernaumPinLabels = ["Capernaum", "Chorazin", "Magdala"];
 const minimumGalileePinLabels = 8;
+const searchNoResultsSuffix = "Search covers place names only.";
+const expectedAntiochSelections = new Set(["antioch-pisidia", "antioch-syria"]);
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -366,6 +369,176 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
   return {
     tabSequence,
     postEscapeFocus
+  };
+}
+
+function toSeriousOrCriticalViolations(violations) {
+  return violations.filter(
+    (violation) => violation.impact === "serious" || violation.impact === "critical"
+  );
+}
+
+async function runA11yCheck(page, selector, scenarioLabel) {
+  const axeResult = await new AxeBuilder({ page }).include(selector).analyze();
+  const blockingViolations = toSeriousOrCriticalViolations(axeResult.violations);
+
+  if (blockingViolations.length > 0) {
+    const summary = blockingViolations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      nodes: violation.nodes.length
+    }));
+    throw new Error(
+      `${scenarioLabel}: found serious/critical accessibility violations in '${selector}': ${JSON.stringify(summary)}`
+    );
+  }
+
+  return {
+    selector,
+    totalViolations: axeResult.violations.length,
+    seriousOrCriticalViolations: 0
+  };
+}
+
+async function verifySearchMenuAndAccessibility(page, baseUrl, screenshotPath) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable for search verification.");
+    }
+
+    window.__ibmMapIdentityForSearchTest = map;
+  }, mapTestHookKey);
+
+  await page.keyboard.press("/");
+  await page.waitForFunction(() => {
+    const active = document.activeElement;
+    return Boolean(active && active.matches("input[aria-label='Search biblical places']"));
+  });
+
+  await page.keyboard.type("Antioch");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  await page.waitForFunction(
+    () => document.querySelectorAll("[data-testid='search-results-list'] [role='option']").length >= 2,
+    { timeout: 30_000 }
+  );
+
+  const antiochResults = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+
+  if (!antiochResults.some((entry) => entry.includes("Antioch on the Orontes"))) {
+    throw new Error(`Search list for Antioch is missing Antioch on the Orontes: ${JSON.stringify(antiochResults)}`);
+  }
+  if (!antiochResults.some((entry) => entry.includes("Antioch in Pisidia"))) {
+    throw new Error(`Search list for Antioch is missing Antioch in Pisidia: ${JSON.stringify(antiochResults)}`);
+  }
+
+  await page.locator("[data-testid='search-results-list']").screenshot({
+    path: screenshotPath
+  });
+
+  const mapStableWhileTyping = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && window.__ibmMapIdentityForSearchTest === map);
+  }, mapTestHookKey);
+  if (!mapStableWhileTyping) {
+    throw new Error("Map instance changed while typing in search.");
+  }
+
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("section[aria-label='Place details']", {
+    state: "visible",
+    timeout: 30_000
+  });
+
+  const selectionAfterEnter = await page.evaluate(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("place");
+  });
+  if (!selectionAfterEnter || !expectedAntiochSelections.has(selectionAfterEnter)) {
+    throw new Error(
+      `Search keyboard Enter did not select an Antioch result. place='${selectionAfterEnter ?? "null"}'.`
+    );
+  }
+
+  const searchInput = page.locator("input[aria-label='Search biblical places']");
+  await searchInput.focus();
+  await searchInput.fill("John 3:16");
+  await page.waitForSelector("[data-testid='search-no-results']", { timeout: 30_000 });
+  const noResultsText = await page.$eval(
+    "[data-testid='search-no-results']",
+    (element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim()
+  );
+  if (!noResultsText.includes("No places match 'John 3:16'.")) {
+    throw new Error(`No-results state is missing the query line: '${noResultsText}'.`);
+  }
+  if (!noResultsText.includes(searchNoResultsSuffix)) {
+    throw new Error(`No-results state is missing the suffix '${searchNoResultsSuffix}'.`);
+  }
+
+  await page.keyboard.press("Escape");
+  const panelStillOpen = await page.locator("section[aria-label='Place details']").isVisible();
+  if (!panelStillOpen) {
+    throw new Error("First Escape from open search results closed the panel; it should clear search first.");
+  }
+
+  const queryAfterFirstEscape = await searchInput.inputValue();
+  if (queryAfterFirstEscape.length !== 0) {
+    throw new Error(`First Escape should clear the search query, found '${queryAfterFirstEscape}'.`);
+  }
+
+  const visibleSearchPanelsAfterFirstEscape = await page.locator(
+    "[data-testid='search-results-list'], [data-testid='search-no-results']"
+  ).count();
+  if (visibleSearchPanelsAfterFirstEscape > 0) {
+    throw new Error("Search result panel remained open after first Escape.");
+  }
+
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("section[aria-label='Place details']", {
+    state: "detached",
+    timeout: 30_000
+  });
+
+  await page.keyboard.press("/");
+  await page.keyboard.type("Antioch");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+
+  const comboboxA11y = await runA11yCheck(
+    page,
+    "[data-testid='search-shell']",
+    "Search combobox accessibility"
+  );
+
+  await page.click("button[aria-label='Open app menu']");
+  await page.waitForSelector("[data-testid='app-menu-drawer']", { timeout: 30_000 });
+  await page.getByRole("button", { name: "About this map" }).waitFor({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Sources & credits" }).waitFor({ timeout: 30_000 });
+  await page.getByRole("link", { name: "Report an issue" }).waitFor({ timeout: 30_000 });
+  await page.getByRole("link", { name: "View on GitHub" }).waitFor({ timeout: 30_000 });
+
+  const drawerA11y = await runA11yCheck(
+    page,
+    "[data-testid='app-menu-drawer']",
+    "Menu drawer accessibility"
+  );
+
+  return {
+    antiochResults,
+    selectedAntiochPlaceId: selectionAfterEnter,
+    noResultsText,
+    mapStableWhileTyping,
+    accessibility: {
+      comboboxOpen: comboboxA11y,
+      menuDrawerOpen: drawerA11y
+    }
   };
 }
 
@@ -1753,7 +1926,10 @@ async function runSmoothnessCheck({
 async function run() {
   const staticServer = await startStaticServer(distDirectory);
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
 
   const pageErrors = [];
   const consoleErrors = [];
@@ -1793,6 +1969,7 @@ async function run() {
 
   const screenshotPaths = {
     overview: temporaryScreenshotPath("ibm-m3-03-overview.png"),
+    searchResults: temporaryScreenshotPath("ibm-m3-05-search-results.png"),
     capernaum: temporaryScreenshotPath("ibm-m3-03-capernaum.png"),
     galilee: temporaryScreenshotPath("ibm-m3-03-galilee.png"),
     emmaus: temporaryScreenshotPath("ibm-m3-03-emmaus.png"),
@@ -1872,6 +2049,11 @@ async function run() {
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
       page,
       staticServer.baseUrl
+    );
+    const searchAndMenuChecks = await verifySearchMenuAndAccessibility(
+      page,
+      staticServer.baseUrl,
+      screenshotPaths.searchResults
     );
 
     const fallbackPbfOutage = await verifyFallbackOutageMode({
@@ -1966,6 +2148,7 @@ async function run() {
       overviewClusterOverlap,
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
+      searchAndMenuChecks,
       galileePinOverlap,
       fallbackOutageChecks: {
         pbfOnly: fallbackPbfOutage,
@@ -1996,6 +2179,7 @@ async function run() {
     }
   } finally {
     await page.close();
+    await context.close();
     await browser.close();
     await staticServer.close();
   }

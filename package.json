@@ -29,6 +29,7 @@
     "ajv-formats": "3.0.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "playwright": "1.63.0"
   }
 }
