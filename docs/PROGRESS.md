@@ -5,9 +5,9 @@ Shared memory for all agents. Every session reads this first and updates its own
 **Current milestone:** M3 – MVP App · **Status:** building the MVP (CP3a approved 2026-09-28, #16) · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 3.3% of the cap)
 
 ## Resume point
-1. **Merged:** M3-02 (scaffold), M3-07 (basemap attribution) and M3-08 (modern names).
-2. **In review:** M3-03 (the map, reworked after the human's first look: a physical basemap and pins drawn by the map; ADR-0024) and M3-10 (English-only names; ADR-0026). **In progress:** M3-11 (the Roman Empire and its provinces, about AD 50; ADR-0027), stacked on M3-10.
-3. **Next:** M3-04 (the panel) and M3-05 (search) in parallel once M3-03, M3-10 and M3-11 merge, then M3-06 (the preview deploy). Then the PO writes CP3b.
+1. **Merged:** M3-02 to M3-12 (#18 to #24). The map is ancient-only and physical, is drawn on the GPU, has English names and the Roman provinces of about AD 50, and is tuned for machines without a GPU.
+2. **In progress, in parallel (subagents):** M3-04 (the place panel), M3-05 (search and the menu) and M3-13 (well-known New Testament areas, "Judah" and "Greece").
+3. **Next:** M3-06 (the preview deploy) once M3-04 and M3-05 merge, then the PO writes CP3b.
 4. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
@@ -18,15 +18,16 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-01 | Low-fidelity visual spec and wireframes (CP3a) | project-owner | `docs/cp3a-visual-spec` | Merged (CP3a approved) | #16 |
 | M3-09 | Record CP3a and start the build | project-owner | `docs/m3-build-kickoff` | Merged | #17 |
 | M3-02 | App scaffold, data build and CI | frontend-engineer | `feat/m3-app-scaffold` | Merged | #18 |
-| M3-03 | Map view | frontend-engineer | `feat/m3-map` | Done (ADR-0024 rework + outage fallback hardening + area-label offset over pin overlaps + false fallback timeout regression fix), PR pending review | — |
-| M3-04 | Place panel | frontend-engineer | `feat/m3-place-panel` | Card ready, waits for M3-03 | — |
-| M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Card ready, waits for M3-03 | — |
+| M3-03 | Map view | frontend-engineer | `feat/m3-map` | Merged | #21 |
+| M3-04 | Place panel | frontend-engineer | `feat/m3-place-panel` | In progress (subagent) | — |
+| M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | In progress (subagent) | — |
 | M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Card ready, waits for M3-04 and M3-05 (secrets added) | — |
 | M3-07 | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Merged | #19 |
 | M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged | #20 |
-| M3-10 | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Done, PR pending review | — |
-| M3-11 | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Done, PR pending review | — |
-| M3-12 | Smoother dragging and zooming | frontend-engineer | `feat/m3-smooth-map` | Done, PR pending review | Added benchmark harness + report, runtime tuning variants, map/style performance tuning, and SwiftShader-aware defaults; then applied PR-review follow-ups (overview landcover visibility restored while keeping merged layer, cluster visuals reverted to spec values, software renderer now defaults relief off with `?relief=1` override, WebGL detection context release), reran 3x headed measurements for default/`?relief=1`/`?lite=1` with main-style guards, and refreshed the final report + compact JSON summary. |
+| M3-10 | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Merged | #22 |
+| M3-11 | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Merged | #23 |
+| M3-12 | Smoother dragging and zooming | frontend-engineer | `feat/m3-smooth-map` | Merged | #24 |
+| M3-13 | Well-known areas and more English names | research-lead → fact-checker | `data/m3-well-known-areas` | In progress (subagent) | — |
 
 ## Open questions
 - **Answered by the human (2026-09-29):** Magdala keeps its title; Paneas stays in `otherLanguages`; searching "Judah" should find Judea; the two Judea records stay; and well-known areas keep related verses. The data follow-ups ("Judah", and more well-known areas such as Egypt) are in `BACKLOG.md`.
