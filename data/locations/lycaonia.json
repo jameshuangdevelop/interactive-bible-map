@@ -1,0 +1,63 @@
+{
+  "id": "lycaonia",
+  "names": {
+    "ancient": [
+      "Lycaonia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "galatia",
+  "candidates": [
+    {
+      "label": "Lycaonia (label point)",
+      "coordinates": [
+        33,
+        38
+      ],
+      "coordinateSource": "wikidata:Q622598",
+      "confidence": "high",
+      "support": "Lycaonia's identity as the region containing Lystra and Derbe is undisputed. The label point is Wikidata's point for the region, in the Lycaonian plain north of Lystra and Derbe and about 47 km from Iconium's pin. Pleiades' 'Lykaonia', after the Barrington Atlas, has only an approximate point about 70 km to the southwest, near Lystra's pin.",
+      "sources": [
+        "wikidata:Q622598",
+        "pleiades:1001911",
+        "bib:isbe-lycaonia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Lycaonia was a plain in the central-southern part of Asia Minor. Acts records that after Paul and Barnabas were driven out of Iconium, they 'fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region,' where the residents spoke 'the language of Lycaonia.' This project's Lycaonia record reflects the western, Roman part of the region, where Lystra and Derbe lay.",
+    "sources": [
+      "wikidata:Q622598",
+      "bib:isbe-lycaonia",
+      "scripture:Acts 14:6",
+      "scripture:Acts 14:11"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia explains that in Paul's time Lycaonia had two parts. The western part was one of the 'regions' into which the Roman province of Galatia was divided. The eastern part, known as Lycaonia Antiochiana, had been placed under Antiochus of Commagene in AD 37. Acts 14:6, which names only Lystra and Derbe, describes the western, Roman part, and this record follows that sense; the eastern part lay outside the province at this project's about AD 50 date.",
+      "sources": [
+        "bib:isbe-lycaonia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 14:6",
+      "book": "Acts",
+      "textWEB": "they became aware of it and fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region."
+    },
+    {
+      "ref": "Acts 14:11",
+      "book": "Acts",
+      "textWEB": "When the multitude saw what Paul had done, they lifted up their voice, saying in the language of Lycaonia, “The gods have come down to us in the likeness of men!”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
+}

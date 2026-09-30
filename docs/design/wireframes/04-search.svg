@@ -40,7 +40,7 @@
 
   <path class="leader" d="M300,104 L440,96"/><text class="note" x="446" y="100">The match is in bold; the second line shows the modern name and type (no country)</text>
   <path class="leader" d="M300,160 L440,140"/><text class="note" x="446" y="144">Same-named places are listed separately</text>
-  <text class="note" x="446" y="184">Matches ancient, modern and alternate names, ignoring case and diacritics,</text>
+  <text class="note" x="446" y="184">Matches English Bible and historical names only (not modern names), ignoring case,</text>
   <text class="note" x="446" y="200">with one typo tolerated in names of 5 letters or more; up to 8 results</text>
 
   <!-- B: no results -->

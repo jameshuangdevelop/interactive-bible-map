@@ -1,0 +1,72 @@
+{
+  "id": "illyricum",
+  "names": {
+    "ancient": [
+      "Illyricum"
+    ],
+    "alternate": [
+      "Dalmatia"
+    ]
+  },
+  "type": "province",
+  "zoomTier": "region",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Illyricum (Roman province, label point)",
+      "coordinates": [
+        17.329379,
+        43.804412
+      ],
+      "coordinateSource": "wikidata:Q753824",
+      "confidence": "high",
+      "support": "Identified with the Roman province along the eastern Adriatic, governed from Salona. The label point is Wikidata's point for the province, about 74 km from Pleiades' point for the same province under its later name, 'Dalmatia', which lies at Salona.",
+      "sources": [
+        "wikidata:Q753824",
+        "pleiades:981522"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Illyricum was a Roman province along the eastern shore of the Adriatic Sea. Paul writes to the Romans that 'from Jerusalem and around as far as to Illyricum, I have fully preached the Good News of Christ,' and 2 Timothy says that Titus went 'to Dalmatia.' The International Standard Bible Encyclopedia treats these as the same province under an earlier and a later name.",
+    "sources": [
+      "wikidata:Q753824",
+      "pleiades:981522",
+      "bib:isbe-illyricum",
+      "scripture:Romans 15:19",
+      "scripture:2 Timothy 4:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia says that Paul uses 'Illyricum' in its narrower sense: a single Roman province, which Augustus finally organized in AD 10 and which later came to be called Dalmatia, the name used for it by Tacitus's Annals, Josephus's Jewish War and Cassius Dio. Its article on Dalmatia explains that the name first meant the land of the Dalmatae, then the southern part of the province, and later the whole province, and it judges it 'most probable' that 2 Timothy 4:10 uses the name in that last sense. The two names are therefore kept on one record.",
+      "sources": [
+        "bib:isbe-illyricum",
+        "bib:isbe-dalmatia"
+      ]
+    },
+    {
+      "text": "The province was governed by an imperial legate residing at Salona, on the Dalmatian coast, and the International Standard Bible Encyclopedia dates Paul's own travel toward its frontier, described in Romans 15:19, to his third missionary journey, during his second visit to Macedonia.",
+      "sources": [
+        "bib:isbe-illyricum"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Romans 15:19",
+      "book": "Romans",
+      "textWEB": "in the power of signs and wonders, in the power of God’s Spirit; so that from Jerusalem and around as far as to Illyricum, I have fully preached the Good News of Christ;"
+    },
+    {
+      "ref": "2 Timothy 4:10",
+      "book": "2 Timothy",
+      "textWEB": "for Demas left me, having loved this present world, and went to Thessalonica; Crescens to Galatia; and Titus to Dalmatia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
+}

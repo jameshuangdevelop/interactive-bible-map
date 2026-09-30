@@ -470,8 +470,8 @@
       ],
       "year": 1931,
       "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/Annals/home.html",
-      "accessed": "2026-09-28"
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html",
+      "accessed": "2026-09-30"
     },
     {
       "id": "tacitus-histories",
@@ -482,8 +482,8 @@
       ],
       "year": 1925,
       "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/Histories/home.html",
-      "accessed": "2026-09-28"
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html",
+      "accessed": "2026-09-30"
     },
     {
       "id": "strabo-geography",
@@ -697,6 +697,251 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/B/bethsaida.html",
       "accessed": "2026-09-28"
+    },
+    {
+      "id": "isbe-arabia",
+      "type": "chapter",
+      "title": "Arabia",
+      "authors": [
+        "James Orr"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/arabia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-cappadocia",
+      "type": "chapter",
+      "title": "Cappadocia",
+      "authors": [
+        "G. E. White"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cappadocia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-pontus",
+      "type": "chapter",
+      "title": "Pontus",
+      "authors": [
+        "G. E. White"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/pontus.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-bithynia",
+      "type": "chapter",
+      "title": "Bithynia",
+      "authors": [
+        "G. E. White"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/B/bithynia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-cilicia",
+      "type": "chapter",
+      "title": "Cilicia",
+      "authors": [
+        "G. E. White"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cilicia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-pamphylia",
+      "type": "chapter",
+      "title": "Pamphylia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/pamphylia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-phrygia",
+      "type": "chapter",
+      "title": "Phrygia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/phrygia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-lycaonia",
+      "type": "chapter",
+      "title": "Lycaonia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lycaonia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-pisidia",
+      "type": "chapter",
+      "title": "Pisidia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/pisidia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-iconium",
+      "type": "chapter",
+      "title": "Iconium",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/I/iconium.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-mysia",
+      "type": "chapter",
+      "title": "Mysia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/mysia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-illyricum",
+      "type": "chapter",
+      "title": "Illyricum",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/I/illyricum.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-dalmatia",
+      "type": "chapter",
+      "title": "Dalmatia",
+      "authors": [
+        "Marcus N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/dalmatia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-libya",
+      "type": "chapter",
+      "title": "Libya; Libyans",
+      "authors": [
+        "International Standard Bible Encyclopedia"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/libya-libyans.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-cyrene",
+      "type": "chapter",
+      "title": "Cyrene",
+      "authors": [
+        "M. G. Kyle"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cyrene.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-parthians",
+      "type": "chapter",
+      "title": "Parthians",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/parthians.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-media",
+      "type": "chapter",
+      "title": "Media",
+      "authors": [
+        "W. St. Clair Tisdall"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/media.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "livius-parthia",
+      "type": "web",
+      "title": "Parthia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/parthia/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "livius-mesopotamia",
+      "type": "web",
+      "title": "Mesopotamia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/mesopotamia/",
+      "accessed": "2026-09-30"
     }
   ]
 }

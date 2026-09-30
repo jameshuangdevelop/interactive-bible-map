@@ -1,0 +1,70 @@
+{
+  "id": "pisidia",
+  "names": {
+    "ancient": [
+      "Pisidia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "galatia",
+  "candidates": [
+    {
+      "label": "Pisidia (label point)",
+      "coordinates": [
+        31.014588,
+        37.470801
+      ],
+      "coordinateSource": "pleiades:639060",
+      "confidence": "high",
+      "support": "Pisidia's identity as the mountain block of southern Asia Minor, north of the Pamphylian coast, is undisputed. The label point is Pleiades' label location for the region, after the Barrington Atlas, in the Pisidian highlands about 58 km from Perga's pin. Wikidata's point for Pisidia lies about 92 km to the north, at the latitude of Antioch and 15 km from its pin, near or beyond Pisidia's northern border.",
+      "sources": [
+        "pleiades:639060",
+        "wikidata:Q621805",
+        "bib:isbe-pisidia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Pisidia was the rugged mountain country of southern Asia Minor, reaching north from the Taurus range behind the Pamphylian coast. Acts records that Paul and Barnabas 'passed through Pisidia and came to Pamphylia' on the way back from their first journey, having crossed it in the other direction, from Perga to Antioch, on the way out.",
+    "sources": [
+      "wikidata:Q621805",
+      "bib:isbe-pisidia",
+      "scripture:Acts 13:14",
+      "scripture:Acts 14:24"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Rome left the task of subduing Pisidia to the Galatian king Amyntas, and that on his death in 25 BC his lands, Pisidia among them, became part of the Roman province of Galatia. It stayed in Galatia until AD 74, after this project's about AD 50 date, when its southern part was assigned to the new joint province of Lycia and Pamphylia.",
+      "sources": [
+        "bib:isbe-pisidia"
+      ]
+    },
+    {
+      "text": "Despite its name, the city called 'Antioch of Pisidia' in Acts 13:14 lay in Galatian Phrygia, near Pisidia's northern border; the International Standard Bible Encyclopedia explains that Antioch took its epithet from its closeness to Pisidia and its role as the base for the Roman military system that pacified the Pisidian highlands. This project therefore places Antioch under the province of Galatia, not under Pisidia.",
+      "sources": [
+        "bib:isbe-pisidia",
+        "scripture:Acts 13:14"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 13:14",
+      "book": "Acts",
+      "textWEB": "But they, passing on from Perga, came to Antioch of Pisidia. They went into the synagogue on the Sabbath day and sat down."
+    },
+    {
+      "ref": "Acts 14:24",
+      "book": "Acts",
+      "textWEB": "They passed through Pisidia and came to Pamphylia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
+}
