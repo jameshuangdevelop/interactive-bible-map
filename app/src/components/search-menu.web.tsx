@@ -365,6 +365,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
   return (
     <>
       <div
+        data-map-search-shell="true"
         data-testid="search-shell"
         style={{
           position: "absolute",

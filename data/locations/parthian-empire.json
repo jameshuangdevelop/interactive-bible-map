@@ -1,0 +1,66 @@
+{
+  "id": "parthian-empire",
+  "names": {
+    "ancient": [
+      "Parthian Empire"
+    ],
+    "alternate": [
+      "Parthia",
+      "Parthians"
+    ]
+  },
+  "type": "empire",
+  "zoomTier": "region",
+  "candidates": [
+    {
+      "label": "Parthian Empire (Ctesiphon, representative point)",
+      "coordinates": [
+        44.580833,
+        33.093611
+      ],
+      "coordinateSource": "wikidata:Q1986139",
+      "confidence": "high",
+      "support": "The Parthian Empire, like the Roman Empire, has no single natural label position. Wikidata's point for the empire is at Ctesiphon, on the Tigris, which Pleiades independently identifies at almost the same coordinates.",
+      "sources": [
+        "wikidata:Q1986139",
+        "pleiades:893976"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "The Parthian Empire, the International Standard Bible Encyclopedia says, reached from the Euphrates to the borders of India and was Rome's rival for centuries. Acts lists 'Parthians' among the peoples present in Jerusalem at Pentecost, which the same encyclopedia takes to mean Jews or proselytes who lived in Parthian lands.",
+    "sources": [
+      "wikidata:Q1986139",
+      "pleiades:893976",
+      "bib:isbe-parthians",
+      "scripture:Acts 2:9"
+    ]
+  },
+  "history": [
+    {
+      "text": "Per Livius.org, the Parthians began as the Parni, nomads from the steppes of Central Asia who seized the Seleucid satrapy of Parthia in the third century BC and took its name. Under Mithradates I (r. 165-132 BC) they took Media, Babylonia and Elam, and the empire lasted until AD 224, when the Sasanian Empire succeeded it. The International Standard Bible Encyclopedia gives slightly different dates for Mithridates I (174-137 BC) and for the empire's fall (AD 226).",
+      "sources": [
+        "bib:livius-parthia",
+        "bib:isbe-parthians"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia records that Crassus's invasion of Parthia ended with his defeat and death in 53 BC, and that Augustus later recovered Crassus's lost standards and made peace. Despite rivalry over Armenia, which the same article says was settled under Nero, it describes no serious break in the peace until Trajan's reign, so this project's about AD 50 date falls within it.",
+      "sources": [
+        "bib:isbe-parthians"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
+}

@@ -5,13 +5,18 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
+  type CSSProperties
 } from "react";
 
 import { SearchMenu } from "./search-menu";
-import { getPrimaryPlaceName } from "../features/map/place-visibility";
+import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { applySelectionToSearch, parseSelectionFromSearch } from "../features/map/selection-url";
-import type { PlaceIndexRecord, PlaceSelection } from "../features/map/types";
+import type {
+  PlaceDetailsPayload,
+  PlaceIndexRecord,
+  PlaceSelection
+} from "../features/map/types";
 import { tokens } from "../theme/tokens";
 
 const PANEL_WIDTH = 408;
@@ -19,6 +24,8 @@ const SEARCH_TOP_OFFSET = tokens.spacing.md;
 const SEARCH_HEIGHT = 48;
 const PANEL_CONTENT_TOP_PADDING = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + tokens.spacing.md;
 const MAP_PLACEHOLDER_COLOR = "#F1EEE4";
+const SMALL_SCREEN_BREAKPOINT = 768;
+const COPY_LINK_STATUS_TIMEOUT_MS = 2_000;
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -74,6 +81,18 @@ async function fetchPlaces() {
   return payload;
 }
 
+async function fetchPlaceDetails(placeId: string) {
+  const response = await fetch(`/generated/places/${encodeURIComponent(placeId)}.json`, {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not load place details for '${placeId}' (${response.status})`);
+  }
+
+  return (await response.json()) as PlaceDetailsPayload;
+}
+
 function visiblePlaceEntrySelectorById(entryId: string) {
   const escaped = entryId.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
   return `button[data-place-entry-id="${escaped}"]`;
@@ -99,18 +118,60 @@ function MapLoadingPlaceholder() {
   );
 }
 
+function fallbackCopyToClipboard(value: string) {
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.append(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  return copied;
+}
+
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
+  const [focusRequestToken, setFocusRequestToken] = useState(0);
   const [loading, setLoading] = useState(true);
   const [urlStateReady, setUrlStateReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [copyStatusMessage, setCopyStatusMessage] = useState<string | null>(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(
+    typeof window !== "undefined" ? window.innerWidth < SMALL_SCREEN_BREAKPOINT : false
+  );
+  const [isSmallScreenPanelExpanded, setIsSmallScreenPanelExpanded] = useState(false);
+  const [placeDetailsById, setPlaceDetailsById] = useState<Record<string, PlaceDetailsPayload>>(
+    {}
+  );
+  const [placeDetailsErrorsById, setPlaceDetailsErrorsById] = useState<Record<string, string>>(
+    {}
+  );
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
+  const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
+  const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
+  const unmountedRef = useRef(false);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const onResize = () => {
+      setIsSmallScreen(window.innerWidth < SMALL_SCREEN_BREAKPOINT);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,6 +219,70 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      unmountedRef.current = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPlace) {
+      return;
+    }
+
+    const placeId = selectedPlace.id;
+    if (
+      placeDetailsById[placeId] ||
+      placeDetailsErrorsById[placeId] ||
+      loadingPlaceDetailsIdsRef.current.has(placeId)
+    ) {
+      return;
+    }
+
+    const requestGeneration =
+      (placeDetailsRequestGenerationByIdRef.current.get(placeId) ?? 0) + 1;
+    placeDetailsRequestGenerationByIdRef.current.set(placeId, requestGeneration);
+    loadingPlaceDetailsIdsRef.current.add(placeId);
+
+    void fetchPlaceDetails(placeId)
+      .then((payload) => {
+        const latestGeneration = placeDetailsRequestGenerationByIdRef.current.get(placeId);
+        if (unmountedRef.current || latestGeneration !== requestGeneration) {
+          return;
+        }
+
+        setPlaceDetailsById((previous) => ({
+          ...previous,
+          [placeId]: payload
+        }));
+        setPlaceDetailsErrorsById((previous) => {
+          const { [placeId]: _removed, ...rest } = previous;
+          return rest;
+        });
+      })
+      .catch((error: unknown) => {
+        const latestGeneration = placeDetailsRequestGenerationByIdRef.current.get(placeId);
+        if (unmountedRef.current || latestGeneration !== requestGeneration) {
+          return;
+        }
+
+        const message =
+          error instanceof Error
+            ? error.message
+            : `Failed to load details for '${selectedPlace.id}'.`;
+        setPlaceDetailsErrorsById((previous) => ({
+          ...previous,
+          [placeId]: message
+        }));
+      })
+      .finally(() => {
+        const latestGeneration = placeDetailsRequestGenerationByIdRef.current.get(placeId);
+        if (latestGeneration === requestGeneration) {
+          loadingPlaceDetailsIdsRef.current.delete(placeId);
+        }
+      });
+  }, [placeDetailsById, placeDetailsErrorsById, selectedPlace]);
+
+  useEffect(() => {
     if (!urlStateReady) {
       return;
     }
@@ -201,6 +326,7 @@ export function AppShell() {
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
+    setIsSmallScreenPanelExpanded(false);
 
     if (!restoreFocus) {
       return;
@@ -242,17 +368,22 @@ export function AppShell() {
     };
   }, [closePanel, selectedPlace]);
 
-  const selectedCandidateLabel =
-    selectedPlace &&
-    selection?.candidateIndex !== null &&
-    selection?.candidateIndex !== undefined &&
-    selection.candidateIndex >= 0 &&
-    selection.candidateIndex < selectedPlace.candidates.length
-      ? selectedPlace.candidates[selection.candidateIndex].label
-      : null;
+  useEffect(() => {
+    if (!copyStatusMessage) {
+      return undefined;
+    }
 
-  const handleMapSelection = useCallback((nextSelection: PlaceSelection) => {
+    const timer = window.setTimeout(() => {
+      setCopyStatusMessage(null);
+    }, COPY_LINK_STATUS_TIMEOUT_MS);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [copyStatusMessage]);
+
+  const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
+    setIsSmallScreenPanelExpanded(false);
 
     const activeElement = document.activeElement;
     lastSelectionActivatorEntryIdRef.current =
@@ -263,11 +394,103 @@ export function AppShell() {
     setSelection(nextSelection);
   }, []);
 
+  const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
+    setStatusMessage(null);
+    setIsSmallScreenPanelExpanded(false);
+    setSelection(nextSelection);
+  }, []);
+
+  const handlePanelSelectCandidate = useCallback(
+    (candidateIndex: number) => {
+      if (!selection) {
+        return;
+      }
+
+      setSelection({
+        placeId: selection.placeId,
+        candidateIndex
+      });
+    },
+    [selection]
+  );
+
+  const handleCopyLink = useCallback(async () => {
+    const url = window.location.href;
+
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(url);
+      } else if (!fallbackCopyToClipboard(url)) {
+        throw new Error("Could not copy link to clipboard.");
+      }
+      setCopyStatusMessage("Link copied");
+    } catch {
+      setCopyStatusMessage("Copy failed");
+    }
+  }, []);
+
+  const handleZoomToSelection = useCallback(() => {
+    if (!selectedPlace || !selection) {
+      return;
+    }
+
+    if (selectedPlace.candidates.length > 1 && selection.candidateIndex !== null) {
+      setSelection({
+        placeId: selection.placeId,
+        candidateIndex: null
+      });
+    }
+
+    setFocusRequestToken((value) => value + 1);
+  }, [selectedPlace, selection]);
+
+  const selectedPlaceDetails = selectedPlace ? placeDetailsById[selectedPlace.id] ?? null : null;
+  const selectedPlaceLoading = selectedPlace
+    ? !selectedPlaceDetails && !placeDetailsErrorsById[selectedPlace.id]
+    : false;
+  const selectedPlaceLoadError = selectedPlace ? placeDetailsErrorsById[selectedPlace.id] ?? null : null;
+  const panelWidthForMap = selectedPlace && !isSmallScreen ? PANEL_WIDTH : 0;
+
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
+    setIsSmallScreenPanelExpanded(false);
     lastSelectionActivatorEntryIdRef.current = null;
     setSelection(nextSelection);
   }, []);
+
+  const panelStyle: CSSProperties | null = selectedPlace
+    ? isSmallScreen
+      ? {
+          position: "absolute",
+          left: `${tokens.spacing.md}px`,
+          right: `${tokens.spacing.md}px`,
+          bottom: `${tokens.spacing.md}px`,
+          height: isSmallScreenPanelExpanded ? "calc(100% - 32px)" : "40%",
+          maxHeight: "calc(100% - 32px)",
+          boxSizing: "border-box" as const,
+          backgroundColor: tokens.color.surface,
+          border: `1px solid ${tokens.color.divider}`,
+          borderRadius: "16px",
+          padding: `${tokens.spacing.md}px`,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          overflowY: "auto",
+          zIndex: 20
+        }
+      : {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: `${PANEL_WIDTH}px`,
+          boxSizing: "border-box" as const,
+          backgroundColor: tokens.color.surface,
+          borderRight: `1px solid ${tokens.color.divider}`,
+          padding: `${PANEL_CONTENT_TOP_PADDING}px ${tokens.spacing.lg}px ${tokens.spacing.lg}px`,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          overflowY: "auto",
+          zIndex: 20
+        }
+    : null;
 
   return (
     <div
@@ -292,85 +515,37 @@ export function AppShell() {
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
-            leftPanelWidth={selectedPlace ? PANEL_WIDTH : 0}
-            onSelectPlace={handleMapSelection}
+            focusRequestToken={focusRequestToken}
+            leftPanelWidth={panelWidthForMap}
+            onSelectPlace={handleSelectFromMap}
             places={places}
             selection={selection}
           />
         </Suspense>
       )}
 
-      {selectedPlace ? (
-        <section
-          aria-label="Place details"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            width: `${PANEL_WIDTH}px`,
-            boxSizing: "border-box",
-            backgroundColor: tokens.color.surface,
-            borderRight: `1px solid ${tokens.color.divider}`,
-            padding: `${PANEL_CONTENT_TOP_PADDING}px ${tokens.spacing.lg}px ${tokens.spacing.lg}px`,
-            boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
-            zIndex: 20
-          }}
-        >
-          <button
-            aria-label="Close place panel"
-            onClick={() => closePanel(false)}
-            style={{
-              position: "absolute",
-              top: `${PANEL_CONTENT_TOP_PADDING}px`,
-              right: `${tokens.spacing.md}px`,
-              width: "32px",
-              height: "32px",
-              borderRadius: "16px",
-              border: `1px solid ${tokens.color.divider}`,
-              backgroundColor: tokens.color.surface,
-              cursor: "pointer"
-            }}
-            type="button"
-          >
-            ×
-          </button>
-          <h1
-            style={{
-              margin: 0,
-              paddingRight: "48px",
-              color: tokens.color.textPrimary,
-              fontSize: `${tokens.typography.titleSize}px`,
-              lineHeight: `${tokens.typography.titleLineHeight}px`,
-              fontWeight: 600
-            }}
-          >
-            {getPrimaryPlaceName(selectedPlace)}
-          </h1>
-          <p
-            style={{
-              marginTop: `${tokens.spacing.md}px`,
-              marginBottom: 0,
-              color: tokens.color.textSecondary,
-              fontSize: `${tokens.typography.bodySize}px`,
-              lineHeight: `${tokens.typography.bodyLineHeight}px`
-            }}
-          >
-            Place panel content is in progress (M3-04).
-          </p>
-          {selectedCandidateLabel ? (
-            <p
-              style={{
-                marginTop: `${tokens.spacing.sm}px`,
-                marginBottom: 0,
-                color: tokens.color.textSecondary,
-                fontSize: `${tokens.typography.bodySize}px`,
-                lineHeight: `${tokens.typography.bodyLineHeight}px`
-              }}
-            >
-              Candidate: {selectedCandidateLabel}
-            </p>
-          ) : null}
+      {selectedPlace && panelStyle ? (
+        <section aria-label="Place details" style={panelStyle}>
+          <PlacePanel
+            key={selectedPlace.id}
+            isLoading={selectedPlaceLoading}
+            isSmallScreen={isSmallScreen}
+            isSmallScreenExpanded={isSmallScreenPanelExpanded}
+            loadErrorMessage={selectedPlaceLoadError}
+            onClose={() => closePanel(false)}
+            onCopyLink={handleCopyLink}
+            onSelectCandidate={handlePanelSelectCandidate}
+            onSelectPlace={handlePanelSelectPlace}
+            onToggleSmallScreenExpanded={() =>
+              setIsSmallScreenPanelExpanded((current) => !current)
+            }
+            onZoomTo={handleZoomToSelection}
+            placeDetails={selectedPlaceDetails}
+            places={places}
+            placesById={placesById}
+            selectedPlace={selectedPlace}
+            selection={selection ?? { placeId: selectedPlace.id, candidateIndex: null }}
+          />
         </section>
       ) : null}
 
@@ -392,6 +567,27 @@ export function AppShell() {
           }}
         >
           {statusMessage}
+        </div>
+      ) : null}
+
+      {copyStatusMessage ? (
+        <div
+          role="status"
+          style={{
+            position: "absolute",
+            right: "16px",
+            bottom: "112px",
+            backgroundColor: tokens.color.surface,
+            border: `1px solid ${tokens.color.divider}`,
+            borderRadius: "8px",
+            padding: "8px 12px",
+            color: tokens.color.textPrimary,
+            fontSize: `${tokens.typography.captionSize}px`,
+            boxShadow: "0 1px 2px rgba(60,64,67,.3), 0 2px 6px rgba(60,64,67,.15)",
+            zIndex: 25
+          }}
+        >
+          {copyStatusMessage}
         </div>
       ) : null}
 
