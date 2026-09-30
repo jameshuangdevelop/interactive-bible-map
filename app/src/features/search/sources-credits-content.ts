@@ -5,10 +5,10 @@ export interface UpstreamSourceItem {
 }
 
 export const ABOUT_THIS_MAP_TEXT =
-  "Interactive Bible Map is a neutral, scholarly map of New Testament places. It shows ancient place names in English, disputed sites with multiple candidates, and World English Bible (WEB) scripture references.";
+  "Interactive Bible Map shows the places of the New Testament on a map of the ancient world, with their English Bible names, candidate sites where the location is uncertain, and the passages that mention them (World English Bible).";
 
 export const DATA_LICENSE_TEXT =
-  "Data license: all non-reference data and content are CC BY-SA 4.0. OSM- and AWMC-derived geometry is ODbL 1.0.";
+  "Data license: all non-reference data and content are CC BY-SA 4.0. No OSM- or AWMC-derived geometry is included yet; when added in M4, that geometry will be ODbL 1.0.";
 
 export const LICENSE_DETAILS_URL =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";

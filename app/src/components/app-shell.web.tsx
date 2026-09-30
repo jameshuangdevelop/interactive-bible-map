@@ -271,6 +271,7 @@ export function AppShell() {
 
   return (
     <div
+      data-app-shell-root
       style={{
         position: "relative",
         width: "100vw",

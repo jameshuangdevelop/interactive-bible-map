@@ -1,4 +1,4 @@
-import { isDisputedPlace } from "../map/place-visibility";
+import { getPrimaryPlaceName, isDisputedPlace } from "../map/place-visibility";
 import type { PlaceIndexRecord, PlaceType } from "../map/types";
 
 type MatchRank = 0 | 1 | 2;
@@ -203,6 +203,25 @@ function isTypoMatch(foldedQueryLetters: string, name: string) {
   return false;
 }
 
+function findTypoHighlightRange(name: string, foldedQueryLetters: string): HighlightRange {
+  const wordMatcher = new RegExp(wordPattern.source, "gu");
+  let match = wordMatcher.exec(name);
+
+  while (match) {
+    const word = match[0];
+    const foldedWordLetters = normalizeLettersOnly(word);
+    if (foldedWordLetters.length >= 5 && isWithinOneEdit(foldedQueryLetters, foldedWordLetters)) {
+      const start = match.index;
+      const end = start + word.length;
+      return [start, end];
+    }
+
+    match = wordMatcher.exec(name);
+  }
+
+  return [0, Math.max(1, name.length)];
+}
+
 function evaluateNameMatch(name: string, foldedQuery: string, foldedQueryLetters: string): NameMatch | null {
   const foldMap = foldTextWithMap(name);
   if (foldMap.folded.length === 0) {
@@ -254,7 +273,7 @@ function evaluateNameMatch(name: string, foldedQuery: string, foldedQueryLetters
     matchKind: "typo",
     rank: 2,
     prefixRank: 0,
-    highlightRange: [0, Math.max(1, name.length)]
+    highlightRange: findTypoHighlightRange(name, foldedQueryLetters)
   };
 }
 
@@ -275,10 +294,6 @@ function buildSubtitle(place: PlaceIndexRecord) {
   }
 
   return typeLabel;
-}
-
-function getTitle(place: PlaceIndexRecord) {
-  return place.names.ancient[0] ?? place.names.modern ?? place.id;
 }
 
 function uniqueSearchNames(place: PlaceIndexRecord) {
@@ -331,7 +346,7 @@ function rankPlaceMatch(place: PlaceIndexRecord, query: string): RankedResult | 
     return null;
   }
 
-  const title = getTitle(place);
+  const title = getPrimaryPlaceName(place);
   const matches = uniqueSearchNames(place)
     .map((name) => evaluateNameMatch(name, foldedQuery, foldedQueryLetters))
     .filter((match): match is NameMatch => match !== null);
@@ -398,4 +413,3 @@ export function searchPlacesByName(
     alsoNameHighlightRange: entry.matchedNameIsTitle ? null : entry.nameMatch.highlightRange
   }));
 }
-

@@ -35,6 +35,8 @@ const SEARCH_RESULTS_LIMIT = 8;
 const MENU_DRAWER_TITLE_ID = "app-menu-title";
 const SOURCES_SECTION_ID = "app-menu-sources";
 const ABOUT_SECTION_ID = "app-menu-about";
+const drawerFocusableSelector =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 interface SearchMenuProps {
   places: PlaceIndexRecord[];
@@ -82,6 +84,12 @@ function isEditableTarget(target: EventTarget | null, searchInput: HTMLInputElem
   }
 
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+}
+
+function getFocusableDrawerElements(drawerElement: HTMLElement) {
+  return Array.from(drawerElement.querySelectorAll<HTMLElement>(drawerFocusableSelector)).filter(
+    (element) => !element.closest("[inert]")
+  );
 }
 
 function renderMarkdownBlocks(
@@ -136,7 +144,10 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
 
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const menuCloseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const drawerDialogRef = useRef<HTMLDivElement | null>(null);
+  const drawerOverlayRef = useRef<HTMLDivElement | null>(null);
   const drawerContentRef = useRef<HTMLDivElement | null>(null);
+  const backgroundInertElementsRef = useRef<HTMLElement[]>([]);
 
   const listboxId = useId();
   const searchQuery = query.trim();
@@ -187,10 +198,64 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
       return undefined;
     }
 
+    const restoreBackgroundInteractivity = () => {
+      for (const element of backgroundInertElementsRef.current) {
+        element.removeAttribute("inert");
+        element.removeAttribute("aria-hidden");
+      }
+      backgroundInertElementsRef.current = [];
+    };
+
+    const appShellRoot = menuButtonRef.current?.closest<HTMLElement>("[data-app-shell-root]");
+    const drawerOverlayElement = drawerOverlayRef.current;
+    if (appShellRoot && drawerOverlayElement) {
+      const inertTargets = Array.from(appShellRoot.children).filter(
+        (child): child is HTMLElement =>
+          child instanceof HTMLElement && !child.contains(drawerOverlayElement)
+      );
+      for (const element of inertTargets) {
+        element.setAttribute("inert", "");
+        element.setAttribute("aria-hidden", "true");
+      }
+      backgroundInertElementsRef.current = inertTargets;
+    }
+
     menuCloseButtonRef.current?.focus();
 
-    const handleEscape = (event: KeyboardEvent) => {
+    const handleDrawerKeyboard = (event: KeyboardEvent) => {
       if (event.key !== "Escape") {
+        if (event.key !== "Tab") {
+          return;
+        }
+
+        const drawerElement = drawerDialogRef.current;
+        if (!drawerElement) {
+          return;
+        }
+
+        const focusableElements = getFocusableDrawerElements(drawerElement);
+        if (focusableElements.length === 0) {
+          event.preventDefault();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        const focusInsideDrawer = activeElement ? drawerElement.contains(activeElement) : false;
+
+        if (event.shiftKey) {
+          if (!focusInsideDrawer || activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+          }
+          return;
+        }
+
+        if (!focusInsideDrawer || activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
         return;
       }
 
@@ -199,9 +264,10 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
       closeMenu();
     };
 
-    window.addEventListener("keydown", handleEscape, true);
+    window.addEventListener("keydown", handleDrawerKeyboard, true);
     return () => {
-      window.removeEventListener("keydown", handleEscape, true);
+      window.removeEventListener("keydown", handleDrawerKeyboard, true);
+      restoreBackgroundInteractivity();
     };
   }, [closeMenu, menuOpen]);
 
@@ -346,6 +412,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
             aria-autocomplete="list"
             aria-controls={listboxExpanded ? listboxId : undefined}
             aria-expanded={listboxExpanded}
+            aria-haspopup="listbox"
             aria-label="Search biblical places"
             onBlur={() => {
               setInputFocused(false);
@@ -537,6 +604,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
 
       {menuOpen ? (
         <div
+          ref={drawerOverlayRef}
           onClick={closeMenu}
           style={{
             position: "absolute",
@@ -545,13 +613,14 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
             zIndex: 45
           }}
         >
-          <aside
+          <div
             aria-labelledby={MENU_DRAWER_TITLE_ID}
             aria-modal="true"
             data-testid="app-menu-drawer"
             onClick={(event) => {
               event.stopPropagation();
             }}
+            ref={drawerDialogRef}
             role="dialog"
             style={{
               position: "absolute",
@@ -744,7 +813,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                   {DATA_LICENSE_TEXT}{" "}
                   (
                   <a href={LICENSE_DETAILS_URL} rel="noopener noreferrer" target="_blank">
-                    full licence details
+                    full license details
                   </a>
                   ).
                 </p>
@@ -811,7 +880,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  Upstream sources (from ATTRIBUTION.md)
+                  Data sources
                 </h4>
                 <ul
                   style={{
@@ -864,7 +933,7 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
                 </ul>
               </section>
             </div>
-          </aside>
+          </div>
         </div>
       ) : null}
     </>

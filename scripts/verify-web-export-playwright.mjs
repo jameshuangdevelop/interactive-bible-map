@@ -33,6 +33,8 @@ const searchNoResultsSuffix = "Search covers place names only.";
 const expectedAntiochSelections = new Set(["antioch-pisidia", "antioch-syria"]);
 const fullLicenseDetailsUrl =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
+const drawerFocusableSelector =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -479,8 +481,20 @@ function toSeriousOrCriticalViolations(violations) {
   );
 }
 
-async function runA11yCheck(page, selector, scenarioLabel) {
+async function runA11yCheck(page, selector, scenarioLabel, options = {}) {
   const axeResult = await new AxeBuilder({ page }).include(selector).analyze();
+  const requireZeroViolations = options.requireZeroViolations === true;
+  if (requireZeroViolations && axeResult.violations.length > 0) {
+    const summary = axeResult.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      nodes: violation.nodes.length
+    }));
+    throw new Error(
+      `${scenarioLabel}: found accessibility violations in '${selector}': ${JSON.stringify(summary)}`
+    );
+  }
+
   const blockingViolations = toSeriousOrCriticalViolations(axeResult.violations);
 
   if (blockingViolations.length > 0) {
@@ -499,6 +513,39 @@ async function runA11yCheck(page, selector, scenarioLabel) {
     totalViolations: axeResult.violations.length,
     seriousOrCriticalViolations: 0
   };
+}
+
+async function getDrawerFocusState(page) {
+  return page.evaluate((focusableSelector) => {
+    const drawer = document.querySelector("[data-testid='app-menu-drawer']");
+    if (!(drawer instanceof HTMLElement)) {
+      return {
+        missingDrawer: true
+      };
+    }
+
+    const getDescriptor = (element) =>
+      element.getAttribute("aria-label") ??
+      element.textContent?.replace(/\s+/gu, " ").trim() ??
+      element.tagName.toLowerCase();
+
+    const focusables = Array.from(drawer.querySelectorAll(focusableSelector)).filter(
+      (element) => element instanceof HTMLElement && !element.closest("[inert]")
+    );
+    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const activeIndex = activeElement ? focusables.indexOf(activeElement) : -1;
+
+    return {
+      missingDrawer: false,
+      focusableCount: focusables.length,
+      activeIndex,
+      activeInsideDrawer: Boolean(activeElement && drawer.contains(activeElement)),
+      activeDescriptor: activeElement ? getDescriptor(activeElement) : "none",
+      firstDescriptor: focusables.length > 0 ? getDescriptor(focusables[0]) : "none",
+      lastDescriptor:
+        focusables.length > 0 ? getDescriptor(focusables[focusables.length - 1]) : "none"
+    };
+  }, drawerFocusableSelector);
 }
 
 async function verifySearchMenuAndAccessibility(
@@ -626,6 +673,11 @@ async function verifySearchMenuAndAccessibility(
 
   await page.click("button[aria-label='Open app menu']");
   await page.waitForSelector("[data-testid='app-menu-drawer']", { timeout: 30_000 });
+  await page.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Close app menu",
+    undefined,
+    { timeout: 30_000 }
+  );
   await page.getByRole("button", { name: "About this map" }).waitFor({ timeout: 30_000 });
   await page.getByRole("button", { name: "Sources & credits" }).waitFor({ timeout: 30_000 });
   const reportIssueLink = page.getByRole("link", { name: "Report an issue" });
@@ -633,10 +685,91 @@ async function verifySearchMenuAndAccessibility(
   await reportIssueLink.waitFor({ timeout: 30_000 });
   await viewOnGitHubLink.waitFor({ timeout: 30_000 });
 
+  const inertBackgroundState = await page.evaluate(() => {
+    const root = document.querySelector("[data-app-shell-root]");
+    const drawer = document.querySelector("[data-testid='app-menu-drawer']");
+    if (!(root instanceof HTMLElement) || !(drawer instanceof HTMLElement)) {
+      return {
+        hasRoot: root instanceof HTMLElement,
+        hasDrawer: drawer instanceof HTMLElement,
+        backgroundCount: 0,
+        inertCount: 0,
+        ariaHiddenCount: 0
+      };
+    }
+
+    const backgroundElements = Array.from(root.children).filter(
+      (child) => child instanceof HTMLElement && !child.contains(drawer)
+    );
+    const inertCount = backgroundElements.filter((element) => element.hasAttribute("inert")).length;
+    const ariaHiddenCount = backgroundElements.filter(
+      (element) => element.getAttribute("aria-hidden") === "true"
+    ).length;
+
+    return {
+      hasRoot: true,
+      hasDrawer: true,
+      backgroundCount: backgroundElements.length,
+      inertCount,
+      ariaHiddenCount
+    };
+  });
+
+  if (!inertBackgroundState.hasRoot || !inertBackgroundState.hasDrawer) {
+    throw new Error("Menu drawer test could not locate app-shell root and/or drawer.");
+  }
+  if (inertBackgroundState.backgroundCount === 0) {
+    throw new Error("Menu drawer inert test found no background elements.");
+  }
+  if (inertBackgroundState.inertCount !== inertBackgroundState.backgroundCount) {
+    throw new Error(
+      `Expected all background elements to be inert. state=${JSON.stringify(inertBackgroundState)}`
+    );
+  }
+  if (inertBackgroundState.ariaHiddenCount !== inertBackgroundState.backgroundCount) {
+    throw new Error(
+      `Expected all background elements to be aria-hidden while drawer is open. state=${JSON.stringify(inertBackgroundState)}`
+    );
+  }
+
+  await page.keyboard.press("Shift+Tab");
+  const shiftedFocusState = await getDrawerFocusState(page);
+  if (shiftedFocusState.missingDrawer) {
+    throw new Error("Menu drawer focus trap test could not locate drawer.");
+  }
+  if (!shiftedFocusState.activeInsideDrawer) {
+    throw new Error("Shift+Tab moved focus outside the drawer.");
+  }
+  if (shiftedFocusState.activeIndex !== shiftedFocusState.focusableCount - 1) {
+    throw new Error(
+      `Shift+Tab did not wrap to the last focusable drawer element. state=${JSON.stringify(shiftedFocusState)}`
+    );
+  }
+
+  await page.keyboard.press("Tab");
+  const wrappedFocusState = await getDrawerFocusState(page);
+  if (wrappedFocusState.missingDrawer) {
+    throw new Error("Menu drawer focus trap test could not locate drawer after Tab.");
+  }
+  if (!wrappedFocusState.activeInsideDrawer) {
+    throw new Error("Tab moved focus outside the drawer.");
+  }
+  if (wrappedFocusState.activeIndex !== 0) {
+    throw new Error(
+      `Tab did not wrap back to the first focusable drawer element. state=${JSON.stringify(wrappedFocusState)}`
+    );
+  }
+
   await page.getByRole("heading", { name: "Map", exact: true }).waitFor({ timeout: 30_000 });
   await page
     .getByRole("heading", {
       name: "Backup map (shown only when the main map can't load)",
+      exact: true
+    })
+    .waitFor({ timeout: 30_000 });
+  await page
+    .getByRole("heading", {
+      name: "Data sources",
       exact: true
     })
     .waitFor({ timeout: 30_000 });
@@ -649,7 +782,7 @@ async function verifySearchMenuAndAccessibility(
   }
 
   const dataLicenseHref = await page
-    .getByRole("link", { name: "full licence details" })
+    .getByRole("link", { name: "full license details" })
     .getAttribute("href");
   if (dataLicenseHref !== fullLicenseDetailsUrl) {
     throw new Error(
@@ -715,8 +848,28 @@ async function verifySearchMenuAndAccessibility(
   const drawerA11y = await runA11yCheck(
     page,
     "[data-testid='app-menu-drawer']",
-    "Menu drawer accessibility"
+    "Menu drawer accessibility",
+    {
+      requireZeroViolations: true
+    }
   );
+
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("[data-testid='app-menu-drawer']", {
+    state: "detached",
+    timeout: 30_000
+  });
+  await page.waitForFunction(
+    () => document.activeElement?.matches("button[aria-label='Open app menu']"),
+    undefined,
+    { timeout: 30_000 }
+  );
+  const inertAfterClose = await page
+    .locator("[data-testid='search-shell']")
+    .getAttribute("inert");
+  if (inertAfterClose !== null) {
+    throw new Error("Search shell remained inert after the menu drawer closed.");
+  }
 
   return {
     antiochResults,
