@@ -20,6 +20,10 @@ import {
   sortScriptureByCanonicalOrder
 } from "./panel-model";
 import { formatSourceCitation } from "./source-format";
+import {
+  buildCommonsThumbnailSrcSet,
+  buildCommonsThumbnailUrl
+} from "./commons-thumbnail";
 import { tokens } from "../../theme/tokens";
 
 const PANEL_SECTION_GAP = tokens.spacing.lg;
@@ -72,16 +76,21 @@ function typeChipStyle(confidence: Confidence) {
 
 function WikimediaImage({
   image,
-  thumbnailWidth,
+  displayWidthHint,
+  thumbnailSizes,
+  counterText,
   failed,
   onError
 }: {
   image: MediaImageRecord;
-  thumbnailWidth: number;
+  displayWidthHint: number;
+  thumbnailSizes: string;
+  counterText: string | null;
   failed: boolean;
   onError: () => void;
 }) {
-  const imageUrl = commonsThumbnailUrl(image.url, thumbnailWidth);
+  const imageUrl = buildCommonsThumbnailUrl(image.url, displayWidthHint);
+  const imageSrcSet = buildCommonsThumbnailSrcSet(image.url);
 
   return (
     <div>
@@ -110,8 +119,11 @@ function WikimediaImage({
         ) : (
           <img
             alt={image.caption}
+            data-panel-photo-image="true"
             onError={onError}
             src={imageUrl}
+            srcSet={imageSrcSet ?? undefined}
+            sizes={thumbnailSizes}
             style={{
               width: "100%",
               height: "100%",
@@ -120,6 +132,24 @@ function WikimediaImage({
             }}
           />
         )}
+        {counterText ? (
+          <span
+            style={{
+              position: "absolute",
+              bottom: `${tokens.spacing.sm}px`,
+              right: `${tokens.spacing.sm}px`,
+              backgroundColor: "rgba(32,33,36,0.76)",
+              color: "#FFFFFF",
+              borderRadius: "999px",
+              padding: "2px 8px",
+              fontSize: `${tokens.typography.captionSize}px`,
+              lineHeight: `${tokens.typography.captionLineHeight}px`,
+              pointerEvents: "none"
+            }}
+          >
+            {counterText}
+          </span>
+        ) : null}
         {image.aiGenerated ? (
           <span
             style={{
@@ -240,35 +270,6 @@ function LinkLikeButton({
       {label}
     </button>
   );
-}
-
-function commonsThumbnailUrl(originalUrl: string, width: number) {
-  const safeWidth = Math.max(256, Math.min(1200, width));
-
-  try {
-    const parsed = new URL(originalUrl);
-    parsed.search = "";
-    const commonsPrefix = "/wikipedia/commons/";
-    if (!parsed.pathname.startsWith(commonsPrefix)) {
-      return parsed.toString();
-    }
-
-    if (parsed.pathname.startsWith("/wikipedia/commons/thumb/")) {
-      return parsed.toString();
-    }
-
-    const relativePath = parsed.pathname.slice(commonsPrefix.length);
-    const segments = relativePath.split("/");
-    const fileName = segments[segments.length - 1];
-    if (!fileName || segments.length < 3) {
-      return parsed.toString();
-    }
-
-    parsed.pathname = `${commonsPrefix}thumb/${relativePath}/${safeWidth}px-${fileName}`;
-    return parsed.toString();
-  } catch {
-    return originalUrl;
-  }
 }
 
 function SkeletonPanelBody() {
@@ -446,12 +447,10 @@ export function PlacePanel({
   const visibleScripture = sortedScripture.slice(0, visibleScriptureCount);
   const groupedScripture = groupScriptureByBook(visibleScripture);
 
-  const imageWidth = isSmallScreen
-    ? Math.max(
-        360,
-        Math.min(900, (typeof window === "undefined" ? 600 : window.innerWidth) * 2)
-      )
-    : 816;
+  const imageDisplayWidthHint = isSmallScreen
+    ? Math.max(330, (typeof window === "undefined" ? 360 : window.innerWidth) - 32)
+    : 408;
+  const imageSizes = isSmallScreen ? "(max-width: 767px) calc(100vw - 32px), 408px" : "408px";
   const selectedImage = images[activeImageIndex] ?? null;
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
   const modernName = placeForDisplay.names.modern;
@@ -636,6 +635,8 @@ export function PlacePanel({
           <section data-panel-section="photos">
             <div style={{ position: "relative" }}>
               <WikimediaImage
+                counterText={images.length > 1 ? `${activeImageIndex + 1} / ${images.length}` : null}
+                displayWidthHint={imageDisplayWidthHint}
                 failed={Boolean(failedImages[selectedImage.id])}
                 image={selectedImage}
                 onError={() =>
@@ -644,7 +645,7 @@ export function PlacePanel({
                     [selectedImage.id]: true
                   }))
                 }
-                thumbnailWidth={imageWidth}
+                thumbnailSizes={imageSizes}
               />
               {images.length > 1 ? (
                 <>
@@ -671,20 +672,6 @@ export function PlacePanel({
                   >
                     ›
                   </button>
-                  <span
-                    style={{
-                      position: "absolute",
-                      bottom: `${tokens.spacing.sm}px`,
-                      right: `${tokens.spacing.sm}px`,
-                      backgroundColor: "rgba(32,33,36,0.76)",
-                      color: "#FFFFFF",
-                      borderRadius: "999px",
-                      padding: "2px 8px",
-                      fontSize: `${tokens.typography.captionSize}px`
-                    }}
-                  >
-                    {activeImageIndex + 1} / {images.length}
-                  </span>
                 </>
               ) : null}
             </div>

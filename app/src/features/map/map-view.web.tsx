@@ -879,6 +879,9 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         ...PIN_COLLISION_LAYOUT,
         "icon-image": pinCollisionImageId
+      },
+      paint: {
+        "icon-opacity": 0
       }
     });
   }

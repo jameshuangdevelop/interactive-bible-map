@@ -1,0 +1,40 @@
+import {
+  COMMONS_THUMBNAIL_WIDTHS,
+  buildCommonsThumbnailSrcSet,
+  buildCommonsThumbnailUrl,
+  selectCommonsThumbnailWidth
+} from "../src/features/place-panel/commons-thumbnail";
+
+describe("commons thumbnail helpers", () => {
+  test("uses allow-listed widths and strips query/hash from Commons URLs", () => {
+    const url =
+      "https://upload.wikimedia.org/wikipedia/commons/0/0b/Kafarnaum_BW_7.JPG?utm_source=test#ignored";
+
+    expect(selectCommonsThumbnailWidth(408)).toBe(500);
+    expect(selectCommonsThumbnailWidth(816)).toBe(960);
+    expect(buildCommonsThumbnailUrl(url, 408)).toBe(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Kafarnaum_BW_7.JPG/500px-Kafarnaum_BW_7.JPG"
+    );
+  });
+
+  test("builds thumbnails for non-JPEG Commons files", () => {
+    const pngUrl = "https://upload.wikimedia.org/wikipedia/commons/a/aa/Example_Map.png?utm_source=foo";
+
+    expect(buildCommonsThumbnailUrl(pngUrl, 900)).toBe(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Example_Map.png/960px-Example_Map.png"
+    );
+  });
+
+  test("builds responsive srcset from allow-listed widths", () => {
+    const url = "https://upload.wikimedia.org/wikipedia/commons/f/f0/Filename.jpg?utm_source=source";
+    const srcSet = buildCommonsThumbnailSrcSet(url);
+
+    expect(srcSet).not.toBeNull();
+    for (const width of COMMONS_THUMBNAIL_WIDTHS) {
+      expect(srcSet).toContain(
+        `https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Filename.jpg/${width}px-Filename.jpg ${width}w`
+      );
+    }
+    expect(srcSet).not.toContain("utm_source=");
+  });
+});

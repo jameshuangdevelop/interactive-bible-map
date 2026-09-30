@@ -441,6 +441,44 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
   };
 }
 
+async function verifyCapernaumLeadImageLoads(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+    timeout: 30_000
+  });
+  await page.waitForFunction(() => {
+    const image = document.querySelector("[data-panel-photo-image='true']");
+    return (
+      image instanceof HTMLImageElement &&
+      image.complete &&
+      image.naturalWidth > 0 &&
+      image.naturalHeight > 0
+    );
+  });
+
+  const imageState = await page.$eval("[data-panel-photo-image='true']", (element) => {
+    if (!(element instanceof HTMLImageElement)) {
+      throw new Error("Lead photo element is not an image.");
+    }
+
+    return {
+      src: element.getAttribute("src") ?? "",
+      currentSrc: element.currentSrc,
+      naturalWidth: element.naturalWidth,
+      naturalHeight: element.naturalHeight
+    };
+  });
+
+  if (!/(?:^|\/)(?:330|500|960|1280)px-[^/]+$/u.test(new URL(imageState.currentSrc).pathname)) {
+    throw new Error(
+      `Lead photo did not use an allow-listed Commons thumbnail width: '${imageState.currentSrc}'.`
+    );
+  }
+
+  return imageState;
+}
+
 async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 960 }
@@ -1352,6 +1390,132 @@ async function verifyPinLabelRegression(page, baseUrl) {
     galileeLabelCount: galileeLabels.length,
     galileeLabelSample: galileeLabels.slice(0, 16)
   };
+}
+
+async function verifyCandidatePinColorRendering(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 30_000
+  });
+
+  const sample = await page.evaluate(
+    ({ testHookKey, candidateLayerId }) =>
+      new Promise((resolve, reject) => {
+        const map = window[testHookKey];
+        if (!map) {
+          reject(new Error("Map test hook is unavailable."));
+          return;
+        }
+
+        const features = map.queryRenderedFeatures(undefined, {
+          layers: [candidateLayerId]
+        });
+        if (features.length === 0) {
+          reject(new Error("Candidate-pin color check was vacuous: no candidate pins were rendered."));
+          return;
+        }
+
+        const target =
+          features.find((feature) => Number(feature.properties?.candidateIndex) === 0) ?? features[0];
+        if (target.geometry?.type !== "Point") {
+          reject(new Error("Candidate-pin color check target did not have point geometry."));
+          return;
+        }
+
+        const [longitude, latitude] = target.geometry.coordinates;
+        const point = map.project([longitude, latitude]);
+        const mapCanvas = map.getCanvas();
+        const scaleX = mapCanvas.width / mapCanvas.clientWidth;
+        const scaleY = mapCanvas.height / mapCanvas.clientHeight;
+        const centerX = Math.round(point.x * scaleX);
+        const centerY = Math.round(point.y * scaleY);
+        const sampleRadius = 11;
+
+        const sampleOnNextRender = () => {
+          try {
+            const gl = map.painter?.context?.gl;
+            if (!gl || typeof gl.readPixels !== "function") {
+              throw new Error("WebGL context is unavailable for candidate-pin pixel sampling.");
+            }
+
+            const left = Math.max(0, centerX - sampleRadius);
+            const right = Math.min(mapCanvas.width - 1, centerX + sampleRadius);
+            const top = Math.max(0, centerY - sampleRadius);
+            const bottom = Math.min(mapCanvas.height - 1, centerY + sampleRadius);
+            const sampleWidth = right - left + 1;
+            const sampleHeight = bottom - top + 1;
+            const glY = mapCanvas.height - bottom - 1;
+            const pixels = new Uint8Array(sampleWidth * sampleHeight * 4);
+            gl.readPixels(left, glY, sampleWidth, sampleHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+            let opaquePixelCount = 0;
+            let redOrWhitePixelCount = 0;
+            let blackPixelCount = 0;
+
+            for (let index = 0; index < pixels.length; index += 4) {
+              const red = pixels[index];
+              const green = pixels[index + 1];
+              const blue = pixels[index + 2];
+              const alpha = pixels[index + 3];
+              if (alpha <= 40) {
+                continue;
+              }
+
+              opaquePixelCount += 1;
+              const isRedish = red > 140 && green < 115 && blue < 115;
+              const isWhiteish = red > 210 && green > 210 && blue > 210;
+              const isBlackish = red < 35 && green < 35 && blue < 35;
+              if (isRedish || isWhiteish) {
+                redOrWhitePixelCount += 1;
+              }
+              if (isBlackish) {
+                blackPixelCount += 1;
+              }
+            }
+
+            resolve({
+              candidateCount: features.length,
+              iconId: String(target.properties?.iconId ?? ""),
+              opaquePixelCount,
+              redOrWhitePixelCount,
+              blackPixelCount
+            });
+          } catch (error) {
+            reject(error instanceof Error ? error : new Error(String(error)));
+          }
+        };
+
+        map.once("render", sampleOnNextRender);
+        map.triggerRepaint();
+      }),
+    {
+    testHookKey: mapTestHookKey,
+    candidateLayerId: mapLayerIds.candidatePins
+    }
+  );
+
+  if (sample.opaquePixelCount < 40) {
+    throw new Error(
+      `Candidate-pin color check sampled too few opaque pixels (${sample.opaquePixelCount}).`
+    );
+  }
+
+  if (sample.redOrWhitePixelCount < 24) {
+    throw new Error(
+      `Candidate-pin color check expected red/white icon pixels, got ${sample.redOrWhitePixelCount} in sample ${JSON.stringify(sample)}.`
+    );
+  }
+
+  const allowedBlackPixels = Math.max(12, Math.floor(sample.opaquePixelCount * 0.3));
+  if (sample.blackPixelCount > allowedBlackPixels) {
+    throw new Error(
+      `Candidate-pin color check found too many black pixels (${sample.blackPixelCount}/${sample.opaquePixelCount}) around icon ${sample.iconId}.`
+    );
+  }
+
+  return sample;
 }
 
 function buildProvinceFixturePlaces(basePlaces) {
@@ -2489,6 +2653,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const capernaumLeadImageLoadCheck = await verifyCapernaumLeadImageLoads(
+      page,
+      staticServer.baseUrl
+    );
     const imageFailurePlaceholderCheck = await verifyImageFailurePlaceholderKeepsCredit(
       browser,
       staticServer.baseUrl
@@ -2513,6 +2681,10 @@ async function run() {
       `${staticServer.baseUrl}/?place=galilee`
     );
     const pinLabelRegression = await verifyPinLabelRegression(page, staticServer.baseUrl);
+    const candidatePinColorCheck = await verifyCandidatePinColorRendering(
+      page,
+      staticServer.baseUrl
+    );
     await captureGalileeCollisionBoxes(
       browser,
       staticServer.baseUrl,
@@ -2623,12 +2795,14 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       panelSectionAndCreditChecks,
+      capernaumLeadImageLoadCheck,
       imageFailurePlaceholderCheck,
       disputedAndHierarchyChecks,
       showAllPassagesCheck,
       panelAccessibilityCheck,
       panelMapDomStability,
       pinLabelRegression,
+      candidatePinColorCheck,
       overviewAreaLabelFixtureCheck,
       overviewClusterOverlap,
       overviewSearchBoxLabelOverlap,
