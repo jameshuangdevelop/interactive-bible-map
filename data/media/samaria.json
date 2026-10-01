@@ -3,14 +3,14 @@
   "images": [
     {
       "id": "samaria-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Deir-Istiya-to-Havat-Yair-1832.jpg",
-      "width": 2592,
-      "height": 1788,
-      "author": "Bukvoed",
-      "license": "CC BY 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Deir-Istiya-to-Havat-Yair-1832.jpg",
-      "caption": "Hills and olive groves of the Samaria region, West Bank",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Mizpe_lunz.jpg",
+      "width": 3264,
+      "height": 2448,
+      "author": "Daniel Ventura",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Mizpe_lunz.jpg",
+      "caption": "Nablus and the slopes of Mount Ebal, seen from Mount Gerizim in the hill country of Samaria, West Bank",
       "kind": "modern",
       "aiGenerated": false
     }
