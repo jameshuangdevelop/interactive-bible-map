@@ -100,6 +100,8 @@ const IMAGE_KIND_LABEL_BY_KIND: Readonly<Record<NonNullable<MediaImageRecord["ki
 
 const IMAGE_PROMPTS_BASE_URL =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts";
+// Keep raw source IDs in data only; readers get a single brief link label.
+export const AI_BASED_ON_LABEL = "research brief";
 
 export interface GroupedScriptureBook {
   book: string;
@@ -381,11 +383,6 @@ export function isAiReconstructionImage(
   image: Pick<MediaImageRecord, "kind" | "aiGenerated">
 ) {
   return image.kind === "ai-reconstruction" || image.aiGenerated;
-}
-
-export function formatAiBasedOnSources(sourceIds: SourceId[] | undefined) {
-  void sourceIds;
-  return "research brief";
 }
 
 export function buildImagePromptBriefUrl(locationId: string, promptRef?: string) {

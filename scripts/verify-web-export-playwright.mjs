@@ -36,6 +36,7 @@ const fullLicenseDetailsUrl =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const minimumControlHitAreaPx = 44;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -431,6 +432,21 @@ function assertBoundsWithinPanel(panelBounds, elementBounds, elementLabel, scena
   }
 }
 
+function assertMinimumHitArea(elementBounds, elementLabel, scenarioLabel) {
+  if (!elementBounds) {
+    throw new Error(`${scenarioLabel}: missing bounds for ${elementLabel}.`);
+  }
+
+  if (
+    elementBounds.width < minimumControlHitAreaPx - 0.5 ||
+    elementBounds.height < minimumControlHitAreaPx - 0.5
+  ) {
+    throw new Error(
+      `${scenarioLabel}: ${elementLabel} hit area is below ${minimumControlHitAreaPx}px (${elementBounds.width.toFixed(2)}x${elementBounds.height.toFixed(2)}).`
+    );
+  }
+}
+
 function assertGalleryLabelContrast(labelStyle, scenarioLabel) {
   if (!labelStyle) {
     throw new Error(`${scenarioLabel}: missing gallery label style.`);
@@ -544,12 +560,14 @@ function assertGalleryPanelBoundsAndOverflow(snapshot, scenarioLabel) {
     "previous image button",
     scenarioLabel
   );
+  assertMinimumHitArea(snapshot.previousButtonBounds, "previous image button", scenarioLabel);
   assertBoundsWithinPanel(
     snapshot.panelBounds,
     snapshot.nextButtonBounds,
     "next image button",
     scenarioLabel
   );
+  assertMinimumHitArea(snapshot.nextButtonBounds, "next image button", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.counterBounds, "counter", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.kindLabelBounds, "kind label", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditBounds, "credit line", scenarioLabel);
@@ -595,6 +613,66 @@ function assertSelectedThumbnailInView(snapshot, scenarioLabel) {
       `${scenarioLabel}: thumbnail row did not scroll for a later selected image (scrollLeft=${snapshot.rowScrollLeft.toFixed(2)}).`
     );
   }
+}
+
+async function captureViewerControlLayoutSnapshot(page) {
+  return page.evaluate(() => {
+    const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+    const closeButton = dialog?.querySelector("button[aria-label='Close image viewer']");
+    const previousButton = dialog?.querySelector("button[aria-label='Previous image']");
+    const nextButton = dialog?.querySelector("button[aria-label='Next image']");
+
+    const toBounds = (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return null;
+      }
+
+      const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
+      return {
+        left,
+        right,
+        top,
+        bottom,
+        width,
+        height
+      };
+    };
+
+    return {
+      dialogBounds: toBounds(dialog),
+      closeButtonBounds: toBounds(closeButton),
+      previousButtonBounds: toBounds(previousButton),
+      nextButtonBounds: toBounds(nextButton)
+    };
+  });
+}
+
+function assertViewerControlLayout(snapshot, scenarioLabel) {
+  if (!snapshot.dialogBounds) {
+    throw new Error(`${scenarioLabel}: missing image viewer dialog bounds.`);
+  }
+
+  assertBoundsWithinPanel(
+    snapshot.dialogBounds,
+    snapshot.closeButtonBounds,
+    "viewer close button",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(
+    snapshot.dialogBounds,
+    snapshot.previousButtonBounds,
+    "viewer previous image button",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(
+    snapshot.dialogBounds,
+    snapshot.nextButtonBounds,
+    "viewer next image button",
+    scenarioLabel
+  );
+  assertMinimumHitArea(snapshot.closeButtonBounds, "viewer close button", scenarioLabel);
+  assertMinimumHitArea(snapshot.previousButtonBounds, "viewer previous image button", scenarioLabel);
+  assertMinimumHitArea(snapshot.nextButtonBounds, "viewer next image button", scenarioLabel);
 }
 
 async function verifyGalleryFixtureBoundsAtViewport(
@@ -1973,6 +2051,31 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       state: "visible",
       timeout: 30_000
     });
+    const viewerBackgroundInertCheck = await page.evaluate(() => {
+      const appShellRoot = document.querySelector("[data-app-shell-root]");
+      const overlay = document.querySelector("[data-image-viewer-overlay='true']");
+      if (!(appShellRoot instanceof HTMLElement) || !(overlay instanceof HTMLElement)) {
+        return null;
+      }
+
+      const backgroundChildren = Array.from(appShellRoot.children).filter(
+        (child) => child instanceof HTMLElement && !child.contains(overlay)
+      );
+      return {
+        backgroundChildCount: backgroundChildren.length,
+        nonInertChildCount: backgroundChildren.filter((child) => !child.hasAttribute("inert"))
+          .length
+      };
+    });
+    if (
+      !viewerBackgroundInertCheck ||
+      viewerBackgroundInertCheck.backgroundChildCount === 0 ||
+      viewerBackgroundInertCheck.nonInertChildCount !== 0
+    ) {
+      throw new Error(
+        `Image viewer should set inert on the app-shell background, got ${JSON.stringify(viewerBackgroundInertCheck)}.`
+      );
+    }
     await page.locator("[data-image-viewer-dialog='true']").screenshot({
       path: screenshotPaths.viewer
     });
@@ -1987,6 +2090,8 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
         `Viewer should show AI kind label, got '${viewerKindLabel}'.`
       );
     }
+    const viewerControlSnapshot = await captureViewerControlLayoutSnapshot(page);
+    assertViewerControlLayout(viewerControlSnapshot, "Viewer controls 1440x960");
 
     await page.waitForTimeout(600);
     const width1280AfterViewerOpen = imageRequests
@@ -2030,6 +2135,34 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       }
     }
 
+    await page.keyboard.press("/");
+    const slashShortcutCheck = await page.evaluate(() => {
+      const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+      const searchInput = document.querySelector("input[aria-label='Search biblical places']");
+      const activeElement = document.activeElement;
+
+      return {
+        dialogOpen: Boolean(dialog),
+        focusInsideDialog:
+          dialog instanceof HTMLElement &&
+          activeElement instanceof HTMLElement &&
+          dialog.contains(activeElement),
+        searchFocused:
+          searchInput instanceof HTMLElement &&
+          activeElement instanceof HTMLElement &&
+          activeElement === searchInput
+      };
+    });
+    if (!slashShortcutCheck.dialogOpen) {
+      throw new Error("Pressing '/' unexpectedly closed the image viewer dialog.");
+    }
+    if (!slashShortcutCheck.focusInsideDialog) {
+      throw new Error("Pressing '/' moved focus outside the image viewer dialog.");
+    }
+    if (slashShortcutCheck.searchFocused) {
+      throw new Error("Pressing '/' while the image viewer is open focused the search input.");
+    }
+
     const fixturePanelA11y = await runA11yCheck(
       page,
       "section[aria-label='Place details']",
@@ -2061,6 +2194,21 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     if (!focusRestored) {
       throw new Error("Esc should close the image viewer and restore focus to the opener.");
     }
+    const lingeringInertBackground = await page.evaluate(() => {
+      const appShellRoot = document.querySelector("[data-app-shell-root]");
+      if (!(appShellRoot instanceof HTMLElement)) {
+        return null;
+      }
+
+      return Array.from(appShellRoot.children).filter(
+        (child) => child instanceof HTMLElement && child.hasAttribute("inert")
+      ).length;
+    });
+    if (typeof lingeringInertBackground === "number" && lingeringInertBackground > 0) {
+      throw new Error(
+        `Image viewer left background elements inert after close (${lingeringInertBackground}).`
+      );
+    }
 
     const layoutNarrowViewportCheck = await verifyGalleryFixtureBoundsAtViewport(
       browser,
@@ -2077,6 +2225,11 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       width1280AfterViewerOpen,
       aiCreditText,
       aiBriefHref,
+      modalChecks: {
+        viewerBackgroundInert: viewerBackgroundInertCheck,
+        slashShortcut: slashShortcutCheck,
+        lingeringInertBackground
+      },
       layoutChecks: {
         desktop1440: {
           labelContrast: labelContrastDesktop,

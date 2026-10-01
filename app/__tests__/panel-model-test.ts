@@ -1,9 +1,9 @@
 import {
+  AI_BASED_ON_LABEL,
   buildImageKindLabel,
   buildImagePromptBriefUrl,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
-  formatAiBasedOnSources,
   groupScriptureByBook,
   imageIndexesToLoad,
   isAiReconstructionImage,
@@ -193,15 +193,14 @@ describe("place panel model helpers", () => {
     expect(buildImageKindLabel(undefined)).toBeNull();
   });
 
-  test("builds AI research-brief links and source text", () => {
+  test("builds AI research-brief links and uses a fixed source label", () => {
     expect(buildImagePromptBriefUrl("capernaum")).toBe(
       "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md"
     );
     expect(buildImagePromptBriefUrl("capernaum", "Prompt 1: Market overview")).toBe(
       "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-market-overview"
     );
-    expect(formatAiBasedOnSources(["wikidata:Q1", "bib:sample"])).toBe("research brief");
-    expect(formatAiBasedOnSources(undefined)).toBe("research brief");
+    expect(AI_BASED_ON_LABEL).toBe("research brief");
   });
 
   test("computes cyclical image indices and thumbnail-row visibility", () => {

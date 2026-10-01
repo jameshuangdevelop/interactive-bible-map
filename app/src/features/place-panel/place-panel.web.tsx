@@ -19,13 +19,13 @@ import type {
   SourceId
 } from "../map/types";
 import {
+  AI_BASED_ON_LABEL,
   buildAlsoKnownAs,
   buildImageKindLabel,
   buildImagePromptBriefUrl,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
   confidenceLabel,
-  formatAiBasedOnSources,
   groupScriptureByBook,
   imageIndexesToLoad,
   isAiReconstructionImage,
@@ -253,7 +253,7 @@ function WikimediaImage({
   const licenseLabel = image.license?.trim() || "License pending";
   const authorLabel = image.author?.trim() || "Unknown author";
   const aiBriefUrl = buildImagePromptBriefUrl(locationId, image.promptRef);
-  const aiSourcesText = formatAiBasedOnSources(image.basedOn);
+  const aiSourcesText = AI_BASED_ON_LABEL;
 
   return (
     <div
@@ -739,6 +739,7 @@ export function PlacePanel({
   const sourceSectionRef = useRef<HTMLElement | null>(null);
   const imageViewerRef = useRef<HTMLDivElement | null>(null);
   const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
+  const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
@@ -885,6 +886,47 @@ export function PlacePanel({
     isImageViewerOpen,
     normalizedActiveImageIndex
   ]);
+
+  useEffect(() => {
+    if (!isImageViewerOpen) {
+      for (const element of imageViewerInertTargetsRef.current) {
+        element.removeAttribute("inert");
+      }
+      imageViewerInertTargetsRef.current = [];
+      return undefined;
+    }
+
+    const appShellRoot = imageViewerRef.current?.closest<HTMLElement>("[data-app-shell-root]");
+    const imageViewerOverlay = imageViewerRef.current?.closest<HTMLElement>(
+      "[data-image-viewer-overlay='true']"
+    );
+
+    if (!appShellRoot || !imageViewerOverlay) {
+      return undefined;
+    }
+
+    const inertTargets = Array.from(appShellRoot.children).filter(
+      (child): child is HTMLElement =>
+        child instanceof HTMLElement && !child.contains(imageViewerOverlay)
+    );
+    const newlyInertTargets: HTMLElement[] = [];
+    for (const element of inertTargets) {
+      if (element.hasAttribute("inert")) {
+        continue;
+      }
+
+      element.setAttribute("inert", "");
+      newlyInertTargets.push(element);
+    }
+
+    imageViewerInertTargetsRef.current = newlyInertTargets;
+    return () => {
+      for (const element of imageViewerInertTargetsRef.current) {
+        element.removeAttribute("inert");
+      }
+      imageViewerInertTargetsRef.current = [];
+    };
+  }, [isImageViewerOpen]);
 
   useEffect(() => {
     if (!isImageViewerOpen) {
@@ -1768,8 +1810,8 @@ const imageViewerCloseButtonStyle: CSSProperties = {
   position: "absolute",
   top: `${tokens.spacing.sm}px`,
   right: `${tokens.spacing.sm}px`,
-  width: "32px",
-  height: "32px",
+  width: "44px",
+  height: "44px",
   borderRadius: "999px",
   border: `1px solid ${tokens.color.divider}`,
   backgroundColor: "rgba(255,255,255,0.92)",
@@ -1796,8 +1838,8 @@ function carouselButtonStyle(side: "left" | "right"): CSSProperties {
     top: "50%",
     transform: "translateY(-50%)",
     [side]: `${tokens.spacing.sm}px`,
-    width: "32px",
-    height: "32px",
+    width: "44px",
+    height: "44px",
     borderRadius: "999px",
     border: "none",
     backgroundColor: "rgba(255,255,255,0.88)",
