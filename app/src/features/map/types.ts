@@ -10,14 +10,8 @@ export type PlaceType =
 
 export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";
-export type PlaceProminence = "major" | "standard";
-export type MediaImageKind =
-  | "modern"
-  | "historical"
-  | "site"
-  | "reconstruction"
-  | "ai-reconstruction";
 export type SourceId = string;
+export type PlaceProminence = "major" | "standard";
 
 export type Coordinates = [number, number];
 
@@ -44,8 +38,8 @@ export interface PlaceIndexRecord {
   names: PlaceNames;
   type: PlaceType;
   zoomTier: ZoomTier;
-  prominence: PlaceProminence;
   parentId: string | null;
+  prominence: PlaceProminence;
   candidates: PlaceCandidate[];
 }
 
@@ -95,24 +89,58 @@ export interface PlaceRecord extends PlaceIndexRecord {
   lastReviewed?: string;
 }
 
-export interface MediaImageRecord {
+export type MediaImageKind =
+  | "modern"
+  | "historical"
+  | "site"
+  | "reconstruction"
+  | "ai-reconstruction";
+
+export type CommonsMediaImageKind = Exclude<MediaImageKind, "ai-reconstruction">;
+
+export interface MediaImageGenerator {
+  tool: string;
+  model: string;
+  date: string;
+}
+
+interface MediaImageRecordBase {
   id: string;
   url: string;
+  width?: number;
+  height?: number;
+  caption: string;
+}
+
+export interface CommonsMediaImageRecord extends MediaImageRecordBase {
+  kind: CommonsMediaImageKind;
+  aiGenerated: false;
+  width: number;
+  height: number;
   author: string;
   license: string;
   licenseUrl: string;
   sourcePage: string;
-  caption: string;
-  kind: MediaImageKind;
-  aiGenerated: boolean;
-  generator?: {
-    tool: string;
-    model: string;
-    date: string;
-  };
-  promptRef?: string;
-  basedOn?: SourceId[];
+  generator?: undefined;
+  promptRef?: undefined;
+  basedOn?: undefined;
 }
+
+export interface AiMediaImageRecord extends MediaImageRecordBase {
+  kind: "ai-reconstruction";
+  aiGenerated: true;
+  width?: number;
+  height?: number;
+  author?: string;
+  license?: string;
+  licenseUrl?: string;
+  sourcePage?: string;
+  generator: MediaImageGenerator;
+  promptRef: string;
+  basedOn: SourceId[];
+}
+
+export type MediaImageRecord = CommonsMediaImageRecord | AiMediaImageRecord;
 
 export interface MediaRecord {
   locationId: string;
