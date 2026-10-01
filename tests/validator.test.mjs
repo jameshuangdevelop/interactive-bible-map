@@ -504,6 +504,16 @@ test("image prompt source IDs and file naming fail on unresolved references", as
         error.message.includes("was not found in data/bibliography.json")
     )
   );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("content/image-prompts/unknown-place.md") &&
+        error.message.includes("bib:missing-grouped-source") &&
+        !error.message.includes(";")
+    ),
+    "each id in a semicolon-separated citation is checked on its own"
+  );
 });
 
 test("scripture source accepts single verse reference", async () => {

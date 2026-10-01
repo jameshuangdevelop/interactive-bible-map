@@ -702,13 +702,16 @@ async function validateImagePromptSources({
       continue;
     }
 
+    // Briefs cite as "[bib:a; pleiades:123; scripture:John 5:2]", so each bracket can hold several ids.
     const sourceIds = [];
     for (const match of markdown.matchAll(IMAGE_PROMPT_SOURCE_ID_PATTERN)) {
-      const sourceId = match[1]?.trim();
-      if (!sourceId || !/^[a-z]+:/iu.test(sourceId)) {
-        continue;
+      for (const part of match[1].split(";")) {
+        const sourceId = part.trim();
+        if (!sourceId || !/^[a-z]+:/iu.test(sourceId)) {
+          continue;
+        }
+        sourceIds.push(sourceId);
       }
-      sourceIds.push(sourceId);
     }
 
     validateSourceArray({
