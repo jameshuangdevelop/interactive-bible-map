@@ -47,11 +47,11 @@
     },
     {
       "id": "crete-05",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Crete_Nasa.jpg",
-      "author": "NASA",
-      "license": "Public domain",
-      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Crete_Nasa.jpg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Crete_satellite.jpg",
+      "author": "European Space Agency",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Crete_satellite.jpg",
       "caption": "Satellite image of the island of Crete",
       "kind": "modern",
       "aiGenerated": false
