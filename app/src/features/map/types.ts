@@ -11,7 +11,12 @@ export type PlaceType =
 export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";
 export type PlaceProminence = "major" | "standard";
-export type MediaImageKind = "modern" | "site" | "reconstruction" | "ai-reconstruction";
+export type MediaImageKind =
+  | "modern"
+  | "historical"
+  | "site"
+  | "reconstruction"
+  | "ai-reconstruction";
 export type SourceId = string;
 
 export type Coordinates = [number, number];

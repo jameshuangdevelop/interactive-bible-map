@@ -94,6 +94,7 @@
           "description": "Image type for gallery presentation.",
           "enum": [
             "modern",
+            "historical",
             "site",
             "reconstruction"
           ]
