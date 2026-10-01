@@ -194,9 +194,7 @@ describe("place panel model helpers", () => {
     expect(buildImagePromptBriefUrl("capernaum", "Prompt 1: Market overview")).toBe(
       "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-market-overview"
     );
-    expect(formatAiBasedOnSources(["wikidata:Q1", "bib:sample"])).toBe(
-      "wikidata:Q1, bib:sample"
-    );
+    expect(formatAiBasedOnSources(["wikidata:Q1", "bib:sample"])).toBe("research brief");
     expect(formatAiBasedOnSources(undefined)).toBe("research brief");
   });
 

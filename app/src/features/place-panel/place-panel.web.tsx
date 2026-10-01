@@ -256,7 +256,13 @@ function WikimediaImage({
   const aiSourcesText = formatAiBasedOnSources(image.basedOn);
 
   return (
-    <div>
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: 0
+      }}
+    >
       <div
         style={{
           width: "100%",
@@ -311,6 +317,7 @@ function WikimediaImage({
         ) : null}
         {counterText ? (
           <span
+            data-photo-counter="true"
             style={{
               position: "absolute",
               bottom: `${tokens.spacing.sm}px`,
@@ -381,7 +388,8 @@ function WikimediaImage({
           marginBottom: 0,
           color: tokens.color.textSecondary,
           fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`
+          lineHeight: `${tokens.typography.captionLineHeight}px`,
+          overflowWrap: "anywhere"
         }}
       >
         {isAiImage ? (
@@ -427,7 +435,8 @@ function WikimediaImage({
           marginBottom: 0,
           color: tokens.color.textSecondary,
           fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`
+          lineHeight: `${tokens.typography.captionLineHeight}px`,
+          overflowWrap: "anywhere"
         }}
       >
         {image.caption}
@@ -449,15 +458,40 @@ function GalleryThumbnails({
   onRequestFailure: (requestUrl: string) => void;
   onSelectImage: (nextIndex: number) => void;
 }) {
+  const rowRef = useRef<HTMLDivElement | null>(null);
+  const buttonRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    const row = rowRef.current;
+    const selectedButton = buttonRefs.current[activeImageIndex];
+    if (!row || !selectedButton) {
+      return;
+    }
+
+    selectedButton.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: "auto"
+    });
+  }, [activeImageIndex, images.length]);
+
   return (
     <div
+      aria-label="Image thumbnails"
       data-thumbnail-row="true"
+      ref={rowRef}
       style={{
         display: "flex",
         gap: `${tokens.spacing.sm}px`,
         marginTop: `${tokens.spacing.sm}px`,
         overflowX: "auto",
-        paddingBottom: `${tokens.spacing.xs}px`
+        overflowY: "hidden",
+        paddingBottom: `${tokens.spacing.xs}px`,
+        width: "100%",
+        minWidth: 0,
+        maxWidth: "100%",
+        boxSizing: "border-box",
+        overscrollBehaviorX: "contain"
       }}
     >
       {images.map((image, imageIndex) => {
@@ -472,6 +506,9 @@ function GalleryThumbnails({
             data-gallery-thumbnail={selected ? "selected" : "idle"}
             key={image.id}
             onClick={() => onSelectImage(imageIndex)}
+            ref={(element) => {
+              buttonRefs.current[imageIndex] = element;
+            }}
             style={{
               width: "72px",
               minWidth: "72px",
@@ -1036,7 +1073,7 @@ export function PlacePanel({
   }
 
   return (
-    <div>
+    <div style={{ minWidth: 0, maxWidth: "100%" }}>
       <header
         style={{
           display: "flex",
@@ -1074,9 +1111,17 @@ export function PlacePanel({
         </button>
       </header>
 
-      <div style={{ display: "grid", gap: `${PANEL_SECTION_GAP}px` }}>
+      <div
+        style={{
+          display: "grid",
+          gap: `${PANEL_SECTION_GAP}px`,
+          minWidth: 0,
+          maxWidth: "100%",
+          overflowX: "hidden"
+        }}
+      >
         {selectedImage ? (
-          <section data-panel-section="photos">
+          <section data-panel-section="photos" style={{ minWidth: 0, maxWidth: "100%", width: "100%" }}>
             <WikimediaImage
               counterText={
                 images.length > 1

@@ -50,10 +50,23 @@ const mapLayerIds = {
   candidatePins: "ibm-candidate-pin",
   pinLabels: "ibm-pin-label"
 };
-const fixtureImagePng = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAADUlEQVR4nGP8z8DwHwAFAAH/e+m+7wAAAABJRU5ErkJggg==",
-  "base64"
-);
+const fixtureImageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="45%" stop-color="#b8c5d4"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#g)"/>
+  <rect x="28" y="28" width="216" height="128" fill="#f9fafb"/>
+  <rect x="396" y="36" width="216" height="128" fill="#0f172a"/>
+  <rect x="52" y="232" width="248" height="132" fill="#1f2937"/>
+  <rect x="332" y="232" width="248" height="132" fill="#f3f4f6"/>
+  <path d="M0 346 L640 232" stroke="#0b0f1a" stroke-width="20" stroke-opacity="0.5"/>
+  <path d="M-24 196 L664 328" stroke="#ffffff" stroke-width="14" stroke-opacity="0.45"/>
+</svg>`;
+const fixtureImageBuffer = Buffer.from(fixtureImageSvg, "utf8");
 
 function contentTypeFor(filePath) {
   const extension = path.extname(filePath).toLowerCase();
@@ -317,6 +330,327 @@ function buildGalleryFixturePayload(basePayload) {
       images: fixtureImages
     }
   };
+}
+
+async function routeGalleryFixtureRequests(page, galleryFixturePayload, imageRequests = null) {
+  await page.route("**/*", async (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.endsWith("/generated/places/capernaum.json")) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify(galleryFixturePayload)
+      });
+      return;
+    }
+
+    if (
+      requestUrl.includes("upload.wikimedia.org/wikipedia/commons") ||
+      requestUrl.includes("/media/ai/")
+    ) {
+      imageRequests?.push(requestUrl);
+      await route.fulfill({
+        status: 200,
+        headers: {
+          "Content-Type": "image/svg+xml; charset=utf-8",
+          "Cache-Control": "no-cache"
+        },
+        body: fixtureImageBuffer
+      });
+      return;
+    }
+
+    await route.continue();
+  });
+}
+
+function parseCssRgbColor(colorValue) {
+  const match = colorValue
+    .replace(/\s+/gu, "")
+    .match(/^rgba?\((?<r>\d+),(?<g>\d+),(?<b>\d+)(?:,(?<a>\d*\.?\d+))?\)$/u);
+  if (!match?.groups) {
+    return null;
+  }
+
+  const alpha = match.groups.a ? Number.parseFloat(match.groups.a) : 1;
+  return {
+    r: Number.parseInt(match.groups.r, 10),
+    g: Number.parseInt(match.groups.g, 10),
+    b: Number.parseInt(match.groups.b, 10),
+    a: Number.isFinite(alpha) ? alpha : 1
+  };
+}
+
+function blendOverBackground(foreground, background) {
+  const alpha = Math.min(1, Math.max(0, foreground.a));
+  return {
+    r: foreground.r * alpha + background.r * (1 - alpha),
+    g: foreground.g * alpha + background.g * (1 - alpha),
+    b: foreground.b * alpha + background.b * (1 - alpha)
+  };
+}
+
+function srgbChannelToLinear(channelValue) {
+  const normalized = channelValue / 255;
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(color) {
+  return (
+    0.2126 * srgbChannelToLinear(color.r) +
+    0.7152 * srgbChannelToLinear(color.g) +
+    0.0722 * srgbChannelToLinear(color.b)
+  );
+}
+
+function contrastRatio(left, right) {
+  const leftLuminance = relativeLuminance(left);
+  const rightLuminance = relativeLuminance(right);
+  const lighter = Math.max(leftLuminance, rightLuminance);
+  const darker = Math.min(leftLuminance, rightLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function assertBoundsWithinPanel(panelBounds, elementBounds, elementLabel, scenarioLabel) {
+  if (!elementBounds) {
+    throw new Error(`${scenarioLabel}: missing bounds for ${elementLabel}.`);
+  }
+
+  const tolerance = 0.5;
+  if (
+    elementBounds.left < panelBounds.left - tolerance ||
+    elementBounds.right > panelBounds.right + tolerance ||
+    elementBounds.top < panelBounds.top - tolerance ||
+    elementBounds.bottom > panelBounds.bottom + tolerance
+  ) {
+    throw new Error(
+      `${scenarioLabel}: ${elementLabel} is outside panel bounds. panel=${JSON.stringify(panelBounds)} element=${JSON.stringify(elementBounds)}`
+    );
+  }
+}
+
+function assertGalleryLabelContrast(labelStyle, scenarioLabel) {
+  if (!labelStyle) {
+    throw new Error(`${scenarioLabel}: missing gallery label style.`);
+  }
+
+  const textColor = parseCssRgbColor(labelStyle.color);
+  const labelBackground = parseCssRgbColor(labelStyle.backgroundColor);
+  if (!textColor || !labelBackground) {
+    throw new Error(`${scenarioLabel}: could not parse gallery label colors.`);
+  }
+
+  const compositeOnWhite = blendOverBackground(labelBackground, { r: 255, g: 255, b: 255 });
+  const compositeOnBlack = blendOverBackground(labelBackground, { r: 0, g: 0, b: 0 });
+  const contrastOnWhite = contrastRatio(textColor, compositeOnWhite);
+  const contrastOnBlack = contrastRatio(textColor, compositeOnBlack);
+  const minimumContrast = Math.min(contrastOnWhite, contrastOnBlack);
+
+  if (minimumContrast < 3) {
+    throw new Error(
+      `${scenarioLabel}: gallery label contrast is below 3:1 (white=${contrastOnWhite.toFixed(2)}, black=${contrastOnBlack.toFixed(2)}).`
+    );
+  }
+
+  return {
+    contrastOnWhite,
+    contrastOnBlack,
+    minimumContrast
+  };
+}
+
+async function captureGalleryPanelLayoutSnapshot(page) {
+  return page.evaluate(() => {
+    const panel = document.querySelector("section[aria-label='Place details']");
+    const photosSection = panel?.querySelector("[data-panel-section='photos']");
+    const mainImage = photosSection?.querySelector("[data-panel-photo-image='true']");
+    const previousButton = photosSection?.querySelector("button[aria-label='Previous image']");
+    const nextButton = photosSection?.querySelector("button[aria-label='Next image']");
+    const counter = photosSection?.querySelector("[data-photo-counter='true']");
+    const kindLabel = photosSection?.querySelector("[data-photo-kind-label='true']");
+    const credit = photosSection?.querySelector("[data-photo-credit='true']");
+    const thumbnailRow = photosSection?.querySelector("[data-thumbnail-row='true']");
+    const selectedThumbnail = photosSection?.querySelector(
+      "[data-thumbnail-row='true'] button[data-gallery-thumbnail='selected']"
+    );
+
+    const toBounds = (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return null;
+      }
+
+      const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
+      return {
+        left,
+        right,
+        top,
+        bottom,
+        width,
+        height
+      };
+    };
+
+    const labelStyle =
+      kindLabel instanceof HTMLElement
+        ? {
+            color: window.getComputedStyle(kindLabel).color,
+            backgroundColor: window.getComputedStyle(kindLabel).backgroundColor
+          }
+        : null;
+
+    const horizontalOverflow =
+      Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth;
+
+    const rowScrollLeft = thumbnailRow instanceof HTMLElement ? thumbnailRow.scrollLeft : null;
+    const rowScrollableWidth =
+      thumbnailRow instanceof HTMLElement ? thumbnailRow.scrollWidth - thumbnailRow.clientWidth : null;
+
+    return {
+      panelBounds: toBounds(panel),
+      photosSectionBounds: toBounds(photosSection),
+      mainImageBounds: toBounds(mainImage),
+      previousButtonBounds: toBounds(previousButton),
+      nextButtonBounds: toBounds(nextButton),
+      counterBounds: toBounds(counter),
+      kindLabelBounds: toBounds(kindLabel),
+      creditBounds: toBounds(credit),
+      thumbnailRowBounds: toBounds(thumbnailRow),
+      selectedThumbnailBounds: toBounds(selectedThumbnail),
+      rowScrollLeft,
+      rowScrollableWidth,
+      horizontalOverflow,
+      labelStyle
+    };
+  });
+}
+
+function assertGalleryPanelBoundsAndOverflow(snapshot, scenarioLabel) {
+  if (!snapshot.panelBounds) {
+    throw new Error(`${scenarioLabel}: missing panel bounds.`);
+  }
+
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.photosSectionBounds,
+    "photos section",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.mainImageBounds, "main image", scenarioLabel);
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.previousButtonBounds,
+    "previous image button",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.nextButtonBounds,
+    "next image button",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.counterBounds, "counter", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.kindLabelBounds, "kind label", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditBounds, "credit line", scenarioLabel);
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.thumbnailRowBounds,
+    "thumbnail row container",
+    scenarioLabel
+  );
+
+  if (snapshot.horizontalOverflow > 0.5) {
+    throw new Error(
+      `${scenarioLabel}: page has horizontal overflow (${snapshot.horizontalOverflow.toFixed(2)} px).`
+    );
+  }
+}
+
+function assertSelectedThumbnailInView(snapshot, scenarioLabel) {
+  if (!snapshot.thumbnailRowBounds || !snapshot.selectedThumbnailBounds) {
+    throw new Error(`${scenarioLabel}: missing thumbnail-row bounds.`);
+  }
+
+  const tolerance = 0.5;
+  const selectedInsideRow =
+    snapshot.selectedThumbnailBounds.left >= snapshot.thumbnailRowBounds.left - tolerance &&
+    snapshot.selectedThumbnailBounds.right <= snapshot.thumbnailRowBounds.right + tolerance &&
+    snapshot.selectedThumbnailBounds.top >= snapshot.thumbnailRowBounds.top - tolerance &&
+    snapshot.selectedThumbnailBounds.bottom <= snapshot.thumbnailRowBounds.bottom + tolerance;
+
+  if (!selectedInsideRow) {
+    throw new Error(
+      `${scenarioLabel}: selected thumbnail is not fully visible in the row viewport. row=${JSON.stringify(snapshot.thumbnailRowBounds)} selected=${JSON.stringify(snapshot.selectedThumbnailBounds)}`
+    );
+  }
+
+  if (
+    typeof snapshot.rowScrollableWidth === "number" &&
+    snapshot.rowScrollableWidth > 0 &&
+    typeof snapshot.rowScrollLeft === "number" &&
+    snapshot.rowScrollLeft <= 0.5
+  ) {
+    throw new Error(
+      `${scenarioLabel}: thumbnail row did not scroll for a later selected image (scrollLeft=${snapshot.rowScrollLeft.toFixed(2)}).`
+    );
+  }
+}
+
+async function verifyGalleryFixtureBoundsAtViewport(
+  browser,
+  baseUrl,
+  galleryFixturePayload,
+  viewport
+) {
+  const context = await browser.newContext({ viewport });
+  const page = await context.newPage();
+
+  await routeGalleryFixtureRequests(page, galleryFixturePayload);
+
+  try {
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+      timeout: 30_000
+    });
+
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("AI-generated reconstruction", { exact: true })
+      .waitFor({ timeout: 30_000 });
+
+    const aiLayoutSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    const viewportLabel = `${viewport.width}x${viewport.height}`;
+    assertGalleryPanelBoundsAndOverflow(aiLayoutSnapshot, `Gallery bounds ${viewportLabel}`);
+    const labelContrast = assertGalleryLabelContrast(
+      aiLayoutSnapshot.labelStyle,
+      `Gallery label contrast ${viewportLabel}`
+    );
+
+    for (let index = 0; index < 5; index += 1) {
+      await page.getByRole("button", { name: "Next image" }).click();
+    }
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos']")
+      .getByText("10 / 10", { exact: true })
+      .waitFor({ timeout: 30_000 });
+
+    const endOfRowSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    assertSelectedThumbnailInView(endOfRowSnapshot, `Gallery selected thumbnail ${viewportLabel}`);
+
+    return {
+      viewport,
+      labelContrast,
+      rowScrollLeft: endOfRowSnapshot.rowScrollLeft,
+      rowScrollableWidth: endOfRowSnapshot.rowScrollableWidth
+    };
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+    await context.close();
+  }
 }
 
 async function waitForMapToSettle(page) {
@@ -1504,36 +1838,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
 
   const capernaumPayload = await readGeneratedPlacePayload("capernaum");
   const galleryFixturePayload = buildGalleryFixturePayload(capernaumPayload);
-
-  await page.route("**/*", async (route) => {
-    const requestUrl = route.request().url();
-    if (requestUrl.endsWith("/generated/places/capernaum.json")) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json; charset=utf-8",
-        body: JSON.stringify(galleryFixturePayload)
-      });
-      return;
-    }
-
-    if (
-      requestUrl.includes("upload.wikimedia.org/wikipedia/commons") ||
-      requestUrl.includes("/media/ai/")
-    ) {
-      imageRequests.push(requestUrl);
-      await route.fulfill({
-        status: 200,
-        headers: {
-          "Content-Type": "image/png",
-          "Cache-Control": "no-cache"
-        },
-        body: fixtureImagePng
-      });
-      return;
-    }
-
-    await route.continue();
-  });
+  await routeGalleryFixtureRequests(page, galleryFixturePayload, imageRequests);
 
   try {
     await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
@@ -1621,7 +1926,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       !aiCreditText.includes("AI-generated reconstruction") ||
       !aiCreditText.includes("DALL·E") ||
       !aiCreditText.includes("CC BY-SA 4.0") ||
-      !aiCreditText.includes("Based on: wikidata:Q59174, bib:murphy-oconnor-holy-land-guide")
+      !aiCreditText.includes("Based on: research brief")
     ) {
       throw new Error(`AI credit line mismatch: '${aiCreditText}'.`);
     }
@@ -1639,43 +1944,27 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       );
     }
     await photosSection.screenshot({ path: screenshotPaths.aiLabel });
+    const layoutDesktopSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    assertGalleryPanelBoundsAndOverflow(layoutDesktopSnapshot, "Gallery bounds 1440x960");
+    const labelContrastDesktop = assertGalleryLabelContrast(
+      layoutDesktopSnapshot.labelStyle,
+      "Gallery label contrast 1440x960"
+    );
 
-    const layoutCheck = await page.evaluate(() => {
-      const section = document.querySelector(
-        "section[aria-label='Place details'] [data-panel-section='photos']"
-      );
-      const label = section?.querySelector("[data-photo-kind-label='true']");
-      const credit = section?.querySelector("[data-photo-credit='true']");
-      const thumbnailRow = section?.querySelector("[data-thumbnail-row='true']");
-
-      const toBounds = (element) => {
-        if (!(element instanceof HTMLElement)) {
-          return null;
-        }
-        const { top, bottom } = element.getBoundingClientRect();
-        return { top, bottom };
-      };
-
-      return {
-        labelBounds: toBounds(label),
-        creditBounds: toBounds(credit),
-        thumbnailBounds: toBounds(thumbnailRow)
-      };
-    });
-
-    if (
-      !layoutCheck.labelBounds ||
-      !layoutCheck.creditBounds ||
-      !layoutCheck.thumbnailBounds
-    ) {
-      throw new Error("Could not collect gallery bounds for overlap checks.");
+    for (let index = 0; index < 5; index += 1) {
+      await page.getByRole("button", { name: "Next image" }).click();
     }
-    if (layoutCheck.labelBounds.bottom >= layoutCheck.creditBounds.top) {
-      throw new Error("AI kind label overlaps the photo credit line.");
+    await photosSection.getByText("10 / 10", { exact: true }).waitFor({ timeout: 30_000 });
+    const selectedThumbnailDesktopSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    assertSelectedThumbnailInView(
+      selectedThumbnailDesktopSnapshot,
+      "Gallery selected thumbnail 1440x960"
+    );
+
+    for (let index = 0; index < 5; index += 1) {
+      await page.getByRole("button", { name: "Previous image" }).click();
     }
-    if (layoutCheck.thumbnailBounds.top < layoutCheck.creditBounds.bottom) {
-      throw new Error("Thumbnail row overlaps the photo credit line.");
-    }
+    await photosSection.getByText("5 / 10", { exact: true }).waitFor({ timeout: 30_000 });
 
     const opener = page.locator("[data-image-viewer-open='true']");
     await opener.focus();
@@ -1773,6 +2062,13 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       throw new Error("Esc should close the image viewer and restore focus to the opener.");
     }
 
+    const layoutNarrowViewportCheck = await verifyGalleryFixtureBoundsAtViewport(
+      browser,
+      baseUrl,
+      galleryFixturePayload,
+      { width: 1024, height: 768 }
+    );
+
     return {
       screenshotPaths,
       thumbnailCount,
@@ -1781,6 +2077,14 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       width1280AfterViewerOpen,
       aiCreditText,
       aiBriefHref,
+      layoutChecks: {
+        desktop1440: {
+          labelContrast: labelContrastDesktop,
+          rowScrollLeft: selectedThumbnailDesktopSnapshot.rowScrollLeft,
+          rowScrollableWidth: selectedThumbnailDesktopSnapshot.rowScrollableWidth
+        },
+        desktop1024: layoutNarrowViewportCheck
+      },
       accessibility: {
         fixturePanel: fixturePanelA11y,
         fixtureViewer: fixtureViewerA11y

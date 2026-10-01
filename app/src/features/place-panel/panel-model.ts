@@ -384,11 +384,8 @@ export function isAiReconstructionImage(
 }
 
 export function formatAiBasedOnSources(sourceIds: SourceId[] | undefined) {
-  if (!Array.isArray(sourceIds) || sourceIds.length === 0) {
-    return "research brief";
-  }
-
-  return sourceIds.join(", ");
+  void sourceIds;
+  return "research brief";
 }
 
 export function buildImagePromptBriefUrl(locationId: string, promptRef?: string) {

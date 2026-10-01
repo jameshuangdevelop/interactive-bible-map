@@ -473,6 +473,7 @@ export function AppShell() {
           borderRadius: "16px",
           padding: `${tokens.spacing.md}px`,
           boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          overflowX: "hidden",
           overflowY: "auto",
           zIndex: 20
         }
@@ -487,6 +488,7 @@ export function AppShell() {
           borderRight: `1px solid ${tokens.color.divider}`,
           padding: `${PANEL_CONTENT_TOP_PADDING}px ${tokens.spacing.lg}px ${tokens.spacing.lg}px`,
           boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          overflowX: "hidden",
           overflowY: "auto",
           zIndex: 20
         }
