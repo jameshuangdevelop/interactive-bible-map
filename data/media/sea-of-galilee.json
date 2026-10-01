@@ -4,6 +4,8 @@
     {
       "id": "sea-of-galilee-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sea_of_Galilee_and_Tiberias.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Юкатан",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -15,6 +17,8 @@
     {
       "id": "sea-of-galilee-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/On_the_Sea_of_Galilee%2C_Tiberias%2C_1891.jpg",
+      "width": 300,
+      "height": 224,
       "author": "Kimberlyblaker",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",

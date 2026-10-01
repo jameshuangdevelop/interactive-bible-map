@@ -4,6 +4,8 @@
     {
       "id": "nicopolis-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Nicopolis_nymphaeum.jpg",
+      "width": 1024,
+      "height": 606,
       "author": "Marsyas",
       "license": "CC BY 2.5",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
@@ -15,6 +17,8 @@
     {
       "id": "nicopolis-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/20140413_nikopolis014.JPG",
+      "width": 3872,
+      "height": 2592,
       "author": "Jean Housen",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
