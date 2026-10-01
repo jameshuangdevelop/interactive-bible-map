@@ -9,6 +9,7 @@
   },
   "type": "site",
   "zoomTier": "city",
+  "prominence": "major",
   "parentId": "judea-province",
   "candidates": [
     {

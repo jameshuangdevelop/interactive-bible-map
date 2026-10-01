@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Perge_city_overview.jpg",
       "caption": "View over the ruins of ancient Perga from the acropolis",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Antique_city_Perge_-_panoramio.jpg",
       "caption": "General view of the archaeological site of ancient Perga",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Jonenines_kolonos.JPG",
       "caption": "Ionic columns at the site of ancient Perga",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

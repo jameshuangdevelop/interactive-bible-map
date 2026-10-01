@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:20110222_0151_Banias_Springs_(5540435622).jpg",
       "caption": "Banias Springs, at the site of ancient Caesarea Philippi.",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:0052מקדש_לאל_פאן_במפלי_הבניאס_שברמת_הגולן.jpg",
       "caption": "Temple ruins at Banias (Caesarea Philippi) in the Golan Heights.",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Banias_(2).jpg",
       "caption": "The Banias site, ancient Caesarea Philippi.",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

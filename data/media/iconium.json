@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Konya_view_from_Seljuk_Tower_3998.jpg",
       "caption": "View of Konya (ancient Iconium) from the Seljuk Tower, Turkey.",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Alâeddin_hill,_Konya.jpg",
       "caption": "Alaeddin Hill in Konya, the ancient city of Iconium.",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

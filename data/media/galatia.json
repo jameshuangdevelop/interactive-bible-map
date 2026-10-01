@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Galacia-mapa.png",
       "caption": "Historical map of ancient Galatia and its tetrarchies, 277-179 BC",
+      "kind": "reconstruction",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Galatia_Map.svg",
       "caption": "Map of the Roman province of Galatia in the 2nd century AD",
+      "kind": "reconstruction",
       "aiGenerated": false
     }
   ]

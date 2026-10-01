@@ -11,6 +11,7 @@
   },
   "type": "village",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "judea-province",
   "candidates": [
     {

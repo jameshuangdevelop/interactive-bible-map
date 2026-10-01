@@ -92,6 +92,7 @@ function toIndexRecord(locationRecord) {
     names: toAppNames(locationRecord.names),
     type: locationRecord.type,
     zoomTier: locationRecord.zoomTier,
+    prominence: locationRecord.prominence,
     parentId: locationRecord.parentId ?? null,
     candidates: (locationRecord.candidates ?? []).map((candidate) => ({
       label: candidate.label,

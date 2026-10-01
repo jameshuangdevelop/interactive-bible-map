@@ -13,6 +13,7 @@
   },
   "type": "natural-feature",
   "zoomTier": "site",
+  "prominence": "major",
   "parentId": "jerusalem",
   "candidates": [
     {

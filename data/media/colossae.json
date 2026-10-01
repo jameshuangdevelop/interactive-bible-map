@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae'den_Honaz_görünüm.jpg",
       "caption": "View from the Colossae site toward Mount Honaz, Turkey.",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:C+B-Galatia-Map.JPG",
       "caption": "Map of Asia Minor c. 50 AD, showing Colossae and surrounding ancient regions.",
+      "kind": "reconstruction",
       "aiGenerated": false
     }
   ]
