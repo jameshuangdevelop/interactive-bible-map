@@ -4,31 +4,40 @@
     {
       "id": "joppa-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/100351_jaffa_beach_PikiWiki_Israel.jpg",
+      "width": 1600,
+      "height": 1940,
       "author": "יקוב בנאור",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:100351_jaffa_beach_PikiWiki_Israel.jpg",
       "caption": "Beach at Jaffa (ancient Joppa), Israel.",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "joppa-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/100353_jaffa_-_bosphorus_street_PikiWiki_Israel.jpg",
+      "width": 1600,
+      "height": 1080,
       "author": "Unknown authorUnknown author",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:100353_jaffa_-_bosphorus_street_PikiWiki_Israel.jpg",
       "caption": "Street view of Jaffa (ancient Joppa).",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "joppa-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/%28%D8%A8%D8%AD%D8%B1_%D9%8A%D8%A7%D9%81%D8%A7%29.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "نغم بدر",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:(بحر_يافا).jpg",
       "caption": "Seascape of Jaffa (ancient Joppa).",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

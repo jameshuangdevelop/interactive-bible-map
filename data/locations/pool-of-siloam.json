@@ -15,6 +15,7 @@
   },
   "type": "site",
   "zoomTier": "site",
+  "prominence": "standard",
   "parentId": "jerusalem",
   "candidates": [
     {

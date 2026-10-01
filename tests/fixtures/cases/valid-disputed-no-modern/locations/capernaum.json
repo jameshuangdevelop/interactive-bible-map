@@ -1,37 +1,58 @@
 {
   "id": "capernaum",
   "names": {
-    "ancient": ["Capernaum", "Kfar Nahum"],
+    "ancient": [
+      "Capernaum",
+      "Kfar Nahum"
+    ],
     "alternate": []
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "standard",
   "candidates": [
     {
       "label": "Tell Hum",
-      "coordinates": [35.575, 32.88],
+      "coordinates": [
+        35.575,
+        32.88
+      ],
       "coordinateSource": "pleiades:678180",
       "confidence": "disputed",
       "support": "Illustrative disputed candidate only.",
-      "sources": ["pleiades:678180", "openbible:capernaum"]
+      "sources": [
+        "pleiades:678180",
+        "openbible:capernaum"
+      ]
     },
     {
       "label": "Khan Minya",
-      "coordinates": [35.545, 32.872],
+      "coordinates": [
+        35.545,
+        32.872
+      ],
       "coordinateSource": "wikidata:Q6404332",
       "confidence": "medium",
       "support": "Illustrative alternate disputed candidate only.",
-      "sources": ["wikidata:Q6404332", "openbible:capernaum"]
+      "sources": [
+        "wikidata:Q6404332",
+        "openbible:capernaum"
+      ]
     }
   ],
   "summary": {
     "text": "Illustrative summary for fixture testing only.",
-    "sources": ["openbible:capernaum", "bib:existing-bib-source"]
+    "sources": [
+      "openbible:capernaum",
+      "bib:existing-bib-source"
+    ]
   },
   "history": [
     {
       "text": "Illustrative history statement for tests only.",
-      "sources": ["pleiades:678231"]
+      "sources": [
+        "pleiades:678231"
+      ]
     }
   ],
   "scripture": [
@@ -45,7 +66,9 @@
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative Old Testament connection only.",
-      "sources": ["openbible:capernaum"]
+      "sources": [
+        "openbible:capernaum"
+      ]
     }
   ],
   "politicalHistory": [
@@ -53,7 +76,9 @@
       "fromYear": -4,
       "toYear": 39,
       "entity": "Tetrarchy of Herod Antipas (illustrative only).",
-      "sources": ["pleiades:678231"]
+      "sources": [
+        "pleiades:678231"
+      ]
     }
   ],
   "status": "draft"

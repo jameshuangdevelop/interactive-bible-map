@@ -25,6 +25,20 @@ describe("commons thumbnail helpers", () => {
     );
   });
 
+  test("builds SVG thumbnails with Commons .png raster suffix", () => {
+    const svgUrl = "https://upload.wikimedia.org/wikipedia/commons/e/ed/Galatia_Map.svg?utm_source=foo";
+
+    expect(buildCommonsThumbnailUrl(svgUrl, 500)).toBe(
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Galatia_Map.svg/500px-Galatia_Map.svg.png"
+    );
+    const srcSet = buildCommonsThumbnailSrcSet(svgUrl);
+    for (const width of COMMONS_THUMBNAIL_WIDTHS) {
+      expect(srcSet).toContain(
+        `https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Galatia_Map.svg/${width}px-Galatia_Map.svg.png ${width}w`
+      );
+    }
+  });
+
   test("builds responsive srcset from allow-listed widths", () => {
     const url = "https://upload.wikimedia.org/wikipedia/commons/f/f0/Filename.jpg?utm_source=source";
     const srcSet = buildCommonsThumbnailSrcSet(url);

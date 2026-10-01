@@ -4,31 +4,40 @@
     {
       "id": "thyatira-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Columns_of_Thiatira.jpg",
+      "width": 4032,
+      "height": 3024,
       "author": "Pragdon",
       "license": "CC0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Columns_of_Thiatira.jpg",
       "caption": "Ancient Thyatira",
+      "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "thyatira-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Akhisar_ruins_Tempemezari_1.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Quintucket",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Akhisar_ruins_Tempemezari_1.jpg",
       "caption": "Ancient Thyatira",
+      "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "thyatira-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Akhisar_ruins_Tempemezari_2.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Quintucket",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Akhisar_ruins_Tempemezari_2.jpg",
       "caption": "Ancient Thyatira",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

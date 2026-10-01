@@ -8,11 +8,17 @@ import { fileURLToPath } from "node:url";
 import { buildAppData } from "../scripts/lib/app-data-builder.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = path.resolve(testDirectory, "..");
 const fixturesDirectory = path.join(testDirectory, "fixtures");
 const validCaseDirectory = path.join(fixturesDirectory, "cases", "valid");
 const invalidCaseDirectory = path.join(fixturesDirectory, "cases", "invalid-missing-bib");
 const bibliographyFixturePath = path.join(fixturesDirectory, "bibliography.json");
 const webFixturePath = path.join(fixturesDirectory, "web", "engwebp-mini.vpl.txt");
+const repositoryImagePromptsDirectory = path.join(
+  repositoryRoot,
+  "content",
+  "image-prompts"
+);
 
 async function withTempDirectory(run) {
   const tempDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-build-data-"));
@@ -51,7 +57,7 @@ test("buildAppData writes compact index fields and candidate fields", async () =
     for (const place of indexData) {
       assert.deepEqual(
         Object.keys(place).sort(),
-        ["candidates", "id", "names", "parentId", "type", "zoomTier"]
+        ["candidates", "id", "names", "parentId", "prominence", "type", "zoomTier"]
       );
       for (const candidate of place.candidates) {
         assert.deepEqual(Object.keys(candidate).sort(), [
@@ -89,6 +95,8 @@ test("buildAppData writes one place file per location and resolves bibliography"
     );
     assert.equal(capernaumPayload.location.id, "capernaum");
     assert.equal(capernaumPayload.media.locationId, "capernaum");
+    assert.equal(capernaumPayload.media.images[0].width, 1600);
+    assert.equal(capernaumPayload.media.images[0].height, 1200);
     assert.deepEqual(
       capernaumPayload.bibliography.map((entry) => entry.id),
       ["existing-bib-source"]
@@ -101,6 +109,55 @@ test("buildAppData writes one place file per location and resolves bibliography"
     assert.equal(galileePayload.media, null);
     assert.deepEqual(galileePayload.bibliography, []);
   });
+});
+
+test("buildAppData with fixture directories is isolated from repository prompt briefs", async () => {
+  const poisonFileName = `__tmp-validator-isolation-${Date.now()}-${process.pid}.md`;
+  const poisonPromptPath = path.join(repositoryImagePromptsDirectory, poisonFileName);
+  const promptDirectoryExistedBefore = await fs
+    .stat(repositoryImagePromptsDirectory)
+    .then(() => true)
+    .catch((error) => {
+      if (error?.code === "ENOENT") {
+        return false;
+      }
+      throw error;
+    });
+
+  try {
+    await fs.mkdir(repositoryImagePromptsDirectory, { recursive: true });
+    await fs.writeFile(
+      poisonPromptPath,
+      "# Temporary isolation probe\n\n[bib:missing-isolation-check]\n",
+      "utf8"
+    );
+
+    await withTempDirectory(async (outputDirectory) => {
+      await buildAppData({
+        locationsDirectory: path.join(validCaseDirectory, "locations"),
+        mediaDirectory: path.join(validCaseDirectory, "media"),
+        bibliographyPath: bibliographyFixturePath,
+        webVplPath: webFixturePath,
+        skipSnapshotChecksumCheck: true,
+        // This fixture predates the empire/province hierarchy (M3-11).
+        requireEmpireRoot: false,
+        outputDirectory
+      });
+
+      const indexPath = path.join(outputDirectory, "places.index.json");
+      const indexData = JSON.parse(await fs.readFile(indexPath, "utf8"));
+      assert.equal(indexData.length, 2);
+    });
+  } finally {
+    await fs.rm(poisonPromptPath, { force: true });
+    if (!promptDirectoryExistedBefore) {
+      await fs.rmdir(repositoryImagePromptsDirectory).catch((error) => {
+        if (error?.code !== "ENOENT" && error?.code !== "ENOTEMPTY") {
+          throw error;
+        }
+      });
+    }
+  }
 });
 
 test("buildAppData fails when validation fails", async () => {

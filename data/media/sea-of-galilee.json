@@ -4,21 +4,27 @@
     {
       "id": "sea-of-galilee-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sea_of_Galilee_and_Tiberias.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Юкатан",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Sea_of_Galilee_and_Tiberias.jpg",
       "caption": "Sea of Galilee with Tiberias on the shore",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "sea-of-galilee-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/On_the_Sea_of_Galilee%2C_Tiberias%2C_1891.jpg",
+      "width": 300,
+      "height": 224,
       "author": "Kimberlyblaker",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:On_the_Sea_of_Galilee,_Tiberias,_1891.jpg",
       "caption": "Historical photograph of the Sea of Galilee near Tiberias from 1891",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

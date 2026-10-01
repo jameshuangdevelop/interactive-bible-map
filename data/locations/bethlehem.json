@@ -15,6 +15,7 @@
   },
   "type": "town",
   "zoomTier": "city",
+  "prominence": "major",
   "parentId": "judea",
   "candidates": [
     {

@@ -1,0 +1,18 @@
+{
+  "locationId": "capernaum",
+  "images": [
+    {
+      "id": "capernaum-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg",
+      "width": 2500,
+      "height": 1000,
+      "author": "Example Author",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Example.jpg",
+      "caption": "Illustrative fixture image.",
+      "kind": "site",
+      "aiGenerated": false
+    }
+  ]
+}
