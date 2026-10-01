@@ -410,6 +410,19 @@ test("Commons media URL fixture rejects wrong hash folders", async () => {
   );
 });
 
+test("Commons media URL fixture rejects malformed percent encoding in file names", async () => {
+  const result = await runCase("invalid-media-commons-url-bad-escape");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].url" &&
+        error.message.includes("not validly percent-encoded")
+    )
+  );
+});
+
 test("Commons media URL fixture rejects URL/sourcePage filename mismatches", async () => {
   const result = await runCase("invalid-media-sourcepage-mismatch");
   assert.ok(
@@ -437,6 +450,107 @@ test("AI media fixture rejects over-width hosted WebP file", async () => {
         error.file.endsWith("media/capernaum.json") &&
         error.path === "$.images[0].url" &&
         error.message.includes("limit is 1600px")
+    )
+  );
+});
+
+test("AI media fixture rejects oversized hosted WebP file", async () => {
+  // The fixture uses a minimal valid WebP header padded past 400 KB so this
+  // branch can be tested without external image tooling.
+  const result = await runCase("invalid-media-ai-image-too-large");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].url" &&
+        error.message.includes("limit is 409600 bytes")
+    )
+  );
+});
+
+test("AI media fixture rejects non-WebP payloads even with .webp extension", async () => {
+  const result = await runCase("invalid-media-ai-image-not-webp");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].url" &&
+        error.message.includes("must be a valid WebP file")
+    )
+  );
+});
+
+test("AI media fixture rejects missing hosted files", async () => {
+  const result = await runCase("invalid-media-ai-image-missing-file");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].url" &&
+        error.message.includes("was not found")
+    )
+  );
+});
+
+test("AI media fixture accepts VP8-hosted WebP file", async () => {
+  const result = await runCase("valid-media-ai-image-vp8");
+  assert.equal(result.errors.length, 0);
+});
+
+test("AI media fixture accepts VP8L-hosted WebP file", async () => {
+  const result = await runCase("valid-media-ai-image-vp8l");
+  assert.equal(result.errors.length, 0);
+});
+
+test("AI media fixture rejects recorded dimensions that do not match hosted WebP", async () => {
+  const result = await runCase("invalid-media-ai-image-size-mismatch");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].width" &&
+        error.message.includes("must match hosted file width")
+    )
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].height" &&
+        error.message.includes("must match hosted file height")
+    )
+  );
+});
+
+test("lead panorama images emit a warning", async () => {
+  const result = await runCase("warning-media-lead-panorama");
+  assert.equal(result.errors.length, 0);
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("media/capernaum.json") &&
+        warning.path === "$.images[0]" &&
+        warning.message.includes("lead image is a panorama")
+    )
+  );
+});
+
+test("narrow Commons images emit a warning", async () => {
+  const result = await runCase("warning-media-narrow-commons");
+  assert.equal(result.errors.length, 0);
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("media/capernaum.json") &&
+        warning.path === "$.images[0].width" &&
+        warning.message.includes("prefer at least 1200px")
     )
   );
 });
@@ -513,6 +627,33 @@ test("image prompt source IDs and file naming fail on unresolved references", as
         !error.message.includes(";")
     ),
     "each id in a semicolon-separated citation is checked on its own"
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("content/image-prompts/unknown-place.md") &&
+        error.message.includes("pleiades:missing-format")
+    ),
+    "grouped citations still validate bad source-id formats"
+  );
+  assert.ok(
+    !hasError(
+      result,
+      (error) =>
+        error.file.endsWith("content/image-prompts/unknown-place.md") &&
+        error.message.includes("Note: ask the Research Lead")
+    ),
+    "editorial bracket notes are ignored"
+  );
+  assert.ok(
+    !hasError(
+      result,
+      (error) =>
+        error.file.endsWith("content/image-prompts/unknown-place.md") &&
+        error.message.includes("Wikipedia: Capernaum")
+    ),
+    "non-citation bracket text with uppercase labels is ignored"
   );
 });
 

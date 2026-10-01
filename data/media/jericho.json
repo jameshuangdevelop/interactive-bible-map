@@ -4,6 +4,8 @@
     {
       "id": "jericho-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Jericho_city.jpg",
+      "width": 1280,
+      "height": 720,
       "author": "Randa107",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -15,6 +17,8 @@
     {
       "id": "jericho-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Jericho_-_Tel_Es-Sultan1.jpg",
+      "width": 2514,
+      "height": 1728,
       "author": "Tamarah",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
@@ -26,6 +30,8 @@
     {
       "id": "jericho-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/By_Ovedc_-_Tulul_al-Alaiq%2C_Herod%27s_winter_palaces%2C_Jericho_03.jpg",
+      "width": 4000,
+      "height": 3000,
       "author": "Ovedc",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -37,6 +43,8 @@
     {
       "id": "jericho-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Jericho_-_panoramio.jpg",
+      "width": 3776,
+      "height": 2520,
       "author": "Mujaddara",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -48,6 +56,8 @@
     {
       "id": "jericho-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Jericho_cityscape_from_wall_ruins.jpg",
+      "width": 6077,
+      "height": 2232,
       "author": "Daniel Case",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",

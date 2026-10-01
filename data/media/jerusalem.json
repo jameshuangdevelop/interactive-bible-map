@@ -4,6 +4,8 @@
     {
       "id": "jerusalem-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Dome_of_the_Rock_seen_from_the_Mount_of_Olives_%2812395649153%29_%28cropped%29.jpg",
+      "width": 3412,
+      "height": 1729,
       "author": "askii",
       "license": "CC BY-SA 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
@@ -15,6 +17,8 @@
     {
       "id": "jerusalem-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Jerusalem_old_city_panorama_.jpg",
+      "width": 7974,
+      "height": 1383,
       "author": "Nettadi",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -26,6 +30,8 @@
     {
       "id": "jerusalem-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Jerusalem_view_from_citadel.jpg",
+      "width": 14427,
+      "height": 3438,
       "author": "Chrissie",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -37,6 +43,8 @@
     {
       "id": "jerusalem-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Aechaeological_park_-_panoramio.jpg",
+      "width": 3648,
+      "height": 2736,
       "author": "Mujaddara",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -48,6 +56,8 @@
     {
       "id": "jerusalem-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Absalom%27s_Memorial_in_late_Summer.jpg",
+      "width": 3648,
+      "height": 2432,
       "author": "Davidbena",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -59,6 +69,8 @@
     {
       "id": "jerusalem-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Holyland_Jerusalem_model_panorama_from_southwest.jpg",
+      "width": 6160,
+      "height": 2497,
       "author": "Daniel Case",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",

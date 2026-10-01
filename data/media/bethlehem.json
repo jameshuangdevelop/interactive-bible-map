@@ -4,6 +4,8 @@
     {
       "id": "bethlehem-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Palestine-06314_-_West_Bank_%2834121979493%29.jpg",
+      "width": 6000,
+      "height": 4000,
       "author": "Dennis G. Jarvis",
       "license": "CC BY-SA 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
@@ -15,6 +17,8 @@
     {
       "id": "bethlehem-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Church_of_the_Nativity_%287703592746%29.jpg",
+      "width": 4288,
+      "height": 2848,
       "author": "Neil Ward",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
@@ -26,6 +30,8 @@
     {
       "id": "bethlehem-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Bethlehem_-_Mittelschiff_der_Geburtskirche_%C3%BCber_der_Geburtsgrotte.jpg",
+      "width": 2832,
+      "height": 4256,
       "author": "Dirk D.",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -37,6 +43,8 @@
     {
       "id": "bethlehem-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/138275_tel_herodion_PikiWiki_Israel.jpg",
+      "width": 1818,
+      "height": 1228,
       "author": "Ronnie Kenigsberg",
       "license": "CC BY 2.5",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
@@ -48,6 +56,8 @@
     {
       "id": "bethlehem-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Bethlehem_by_Mujaddara_-_panoramio_%282813%29.jpg",
+      "width": 4912,
+      "height": 1080,
       "author": "Mujaddara",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",

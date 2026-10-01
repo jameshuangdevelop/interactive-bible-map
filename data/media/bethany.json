@@ -4,6 +4,8 @@
     {
       "id": "bethany-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/AlEizariyaMay232023.jpg",
+      "width": 4000,
+      "height": 2668,
       "author": "Hagai Agmon-Snir",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -15,6 +17,8 @@
     {
       "id": "bethany-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Bethani%C3%AB_Ingang_van_de_grafkelder_van_Lazarus%2C_Bestanddeelnr_255-5405.jpg",
+      "width": 2620,
+      "height": 2616,
       "author": "Willem van de Poll",
       "license": "CC0",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
@@ -26,6 +30,8 @@
     {
       "id": "bethany-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Larry_Koester%2C_Facade_of_the_Church_of_St_Lazarus.jpg",
+      "width": 4608,
+      "height": 3072,
       "author": "Larry Koester",
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
@@ -37,6 +43,8 @@
     {
       "id": "bethany-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Monastery_of_St._Martha_and_Mary_%28Bethany%29%2C_2019_%2801%29.jpg",
+      "width": 4787,
+      "height": 3829,
       "author": "Bahnfrend",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -48,6 +56,8 @@
     {
       "id": "bethany-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Bethany_Stone_church_with_silver_dome.jpg",
+      "width": 4000,
+      "height": 3000,
       "author": "Utilisateur:Djampa",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",

@@ -4,6 +4,8 @@
     {
       "id": "nazareth-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Habsora_from_selezian.jpg",
+      "width": 2016,
+      "height": 1512,
       "author": "Almog",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/File:Habsora_from_selezian.jpg",
@@ -15,6 +17,8 @@
     {
       "id": "nazareth-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/AnnunciationChurchNazarethOutside1.jpg",
+      "width": 4320,
+      "height": 2880,
       "author": "כובש המלפפונים",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -26,6 +30,8 @@
     {
       "id": "nazareth-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Buildings_in_Nazareth_P1020552.JPG",
+      "width": 4000,
+      "height": 2860,
       "author": "Deror Avi",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -37,6 +43,8 @@
     {
       "id": "nazareth-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/127767_nazareth-synagogue_church_PikiWiki_Israel.jpg",
+      "width": 4032,
+      "height": 3024,
       "author": "Shlomo Roded",
       "license": "CC BY 2.5",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
@@ -48,6 +56,8 @@
     {
       "id": "nazareth-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Nazareth_Altstadt.JPG",
+      "width": 4478,
+      "height": 2353,
       "author": "Zairon",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",

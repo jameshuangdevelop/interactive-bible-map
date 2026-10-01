@@ -4,6 +4,8 @@
     {
       "id": "gethsemane-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Getsemane2.JPG",
+      "width": 3648,
+      "height": 2736,
       "author": "Mewasul",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -15,6 +17,8 @@
     {
       "id": "gethsemane-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Church_of_all_Nations.jpg",
+      "width": 1280,
+      "height": 960,
       "author": "Karsten Müller",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
@@ -26,6 +30,8 @@
     {
       "id": "gethsemane-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/20110224_East_Jerusalem_0289_Jerusalem_%285540460214%29.jpg",
+      "width": 3648,
+      "height": 2736,
       "author": "Dan Lundberg",
       "license": "CC BY-SA 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
@@ -37,6 +43,8 @@
     {
       "id": "gethsemane-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Church_of_All_Nations_%2825801318941%29.jpg",
+      "width": 2988,
+      "height": 5312,
       "author": "Konrad Summers",
       "license": "CC BY-SA 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
@@ -48,6 +56,8 @@
     {
       "id": "gethsemane-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/121282-Jerusalem-Mount-of-Olives_%2827563160356%29.jpg",
+      "width": 6016,
+      "height": 4016,
       "author": "Xiquinho Silva",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
