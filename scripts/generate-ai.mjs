@@ -7,10 +7,12 @@ import {
   REQUIRED_ENV_VARS_BY_PROVIDER,
   SUPPORTED_AI_PROVIDERS,
   generateImageWithProvider,
+  redactErrorCauseChain,
   redactSecrets
 } from "./lib/ai-providers.mjs";
 import {
   DEFAULT_AI_INCOMING_DIRECTORY,
+  findExistingCandidateFiles,
   getEnvironmentVariable,
   loadPromptTextForPromptId,
   parseGenerateAiArguments,
@@ -79,7 +81,19 @@ export async function runGenerateAi(argv = process.argv.slice(2)) {
   }
 
   const { promptText, promptFilePath } = await loadPromptTextForPromptId(options.promptId);
-  const { credentials } = await resolveProviderCredentials(options.provider);
+  const existingCandidates = await findExistingCandidateFiles({
+    incomingDirectory: DEFAULT_AI_INCOMING_DIRECTORY,
+    promptId: options.promptId,
+    round: options.round,
+    variants: options.variants
+  });
+  if (existingCandidates.length > 0) {
+    throw new Error(
+      `Round ${options.round} of ${options.promptId} already has candidates (${existingCandidates.join(", ")}); use another --round.`
+    );
+  }
+
+  const { credentials, secrets } = await resolveProviderCredentials(options.provider);
   const writtenCandidates = [];
 
   console.log(`Prompt file: ${relativeToRepository(promptFilePath)}`);
@@ -88,35 +102,41 @@ export async function runGenerateAi(argv = process.argv.slice(2)) {
   console.log(`Variants: ${options.variants}`);
   console.log(`Round: ${options.round}`);
 
-  for (let variant = 1; variant <= options.variants; variant += 1) {
-    const seed =
-      typeof options.seed === "number" ? options.seed + (variant - 1) : randomSeed();
-    const response = await generateImageWithProvider({
-      provider: options.provider,
-      model,
-      prompt: promptText,
-      seed,
-      credentials
-    });
+  try {
+    for (let variant = 1; variant <= options.variants; variant += 1) {
+      const seed =
+        typeof options.seed === "number" ? options.seed + (variant - 1) : randomSeed();
+      const response = await generateImageWithProvider({
+        provider: options.provider,
+        model,
+        prompt: promptText,
+        seed,
+        credentials
+      });
 
-    const written = await writeAiCandidateAndSidecar({
-      incomingDirectory: DEFAULT_AI_INCOMING_DIRECTORY,
-      promptId: options.promptId,
-      round: options.round,
-      variant,
-      imageBuffer: response.imageBuffer,
-      provider: options.provider,
-      model,
-      seed,
-      promptText
-    });
-    writtenCandidates.push(written);
+      const written = await writeAiCandidateAndSidecar({
+        incomingDirectory: DEFAULT_AI_INCOMING_DIRECTORY,
+        promptId: options.promptId,
+        round: options.round,
+        variant,
+        imageBuffer: response.imageBuffer,
+        provider: options.provider,
+        model,
+        seed,
+        promptText
+      });
+      writtenCandidates.push(written);
 
-    console.log(
-      `Saved ${relativeToRepository(written.imagePath)} and ${relativeToRepository(
-        written.sidecarPath
-      )}`
-    );
+      console.log(
+        `Saved ${relativeToRepository(written.imagePath)} and ${relativeToRepository(
+          written.sidecarPath
+        )}`
+      );
+    }
+  } catch (error) {
+    // Keys may come from the Windows registry fallback rather than process.env, so redact
+    // with the resolved values before the error reaches the top-level handler.
+    throw redactErrorCauseChain(error, secrets);
   }
 
   return {

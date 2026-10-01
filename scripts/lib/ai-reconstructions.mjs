@@ -216,6 +216,38 @@ function candidateAlreadyExistsError(promptId, round, variant) {
   );
 }
 
+/**
+ * Lists files in the incoming folder that already belong to variants 1..variants of a round.
+ * generate:ai calls this before contacting a provider, so a rerun never pays for an image
+ * that writeAiCandidateAndSidecar would then refuse to save.
+ */
+export async function findExistingCandidateFiles({
+  incomingDirectory = DEFAULT_AI_INCOMING_DIRECTORY,
+  promptId,
+  round,
+  variants,
+  readdirImpl = fs.readdir
+}) {
+  ensurePromptId(promptId);
+  let fileNames;
+  try {
+    fileNames = await readdirImpl(path.resolve(incomingDirectory));
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+
+  const prefixes = Array.from(
+    { length: variants },
+    (_, index) => `${promptId}-r${round}-v${index + 1}.`
+  );
+  return fileNames
+    .filter((fileName) => prefixes.some((prefix) => fileName.startsWith(prefix)))
+    .sort();
+}
+
 export async function writeAiCandidateAndSidecar({
   incomingDirectory = DEFAULT_AI_INCOMING_DIRECTORY,
   promptId,

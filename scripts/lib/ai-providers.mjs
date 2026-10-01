@@ -78,7 +78,7 @@ export function redactSecrets(value, secrets = []) {
   return result;
 }
 
-function redactErrorCauseChain(error, secrets, seen = new Set()) {
+export function redactErrorCauseChain(error, secrets, seen = new Set()) {
   if (!error || (typeof error !== "object" && typeof error !== "function")) {
     return typeof error === "string" ? redactSecrets(error, secrets) : error;
   }

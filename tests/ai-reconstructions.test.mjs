@@ -14,6 +14,7 @@ import {
 import {
   derivePromptIdFromCandidateFileName,
   extractPromptTextFromMarkdown,
+  findExistingCandidateFiles,
   publishAiCandidate,
   sha256Hex,
   writeAiCandidateAndSidecar
@@ -111,6 +112,40 @@ test("prompt extraction supports CRLF line endings", () => {
 
   const prompt = extractPromptTextFromMarkdown(markdown, "capernaum-ai-01");
   assert.equal(prompt, "First paragraph.\n\nSecond paragraph.");
+});
+
+test("findExistingCandidateFiles finds only the requested round's variants", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    assert.deepEqual(
+      await findExistingCandidateFiles({
+        incomingDirectory: path.join(temporaryDirectory, "missing"),
+        promptId: "capernaum-ai-01",
+        round: 1,
+        variants: 2
+      }),
+      []
+    );
+
+    for (const fileName of [
+      "capernaum-ai-01-r1-v2.jpg",
+      "capernaum-ai-01-r1-v2.jpg.json",
+      "capernaum-ai-01-r1-v3.jpg",
+      "capernaum-ai-01-r2-v1.jpg",
+      "capernaum-ai-010-r1-v1.jpg"
+    ]) {
+      await fs.writeFile(path.join(temporaryDirectory, fileName), "x");
+    }
+
+    assert.deepEqual(
+      await findExistingCandidateFiles({
+        incomingDirectory: temporaryDirectory,
+        promptId: "capernaum-ai-01",
+        round: 1,
+        variants: 2
+      }),
+      ["capernaum-ai-01-r1-v2.jpg", "capernaum-ai-01-r1-v2.jpg.json"]
+    );
+  });
 });
 
 test("writeAiCandidateAndSidecar writes expected file names and metadata", async () => {
