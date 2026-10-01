@@ -3,6 +3,15 @@ const COMMONS_THUMB_PREFIX = "/wikipedia/commons/thumb/";
 
 export const COMMONS_THUMBNAIL_WIDTHS = [330, 500, 960, 1280] as const;
 
+interface CommonsThumbnailWidthForFrameInput {
+  renderedWidth: number;
+  renderedHeight: number;
+  devicePixelRatio: number;
+  fitMode?: "cover" | "contain";
+  originalWidth?: number;
+  originalHeight?: number;
+}
+
 function toCommonsOriginalPathname(pathname: string) {
   if (pathname.startsWith(COMMONS_THUMB_PREFIX)) {
     const relativePath = pathname.slice(COMMONS_THUMB_PREFIX.length);
@@ -49,6 +58,64 @@ export function selectCommonsThumbnailWidth(targetWidth: number) {
   }
 
   return COMMONS_THUMBNAIL_WIDTHS[COMMONS_THUMBNAIL_WIDTHS.length - 1];
+}
+
+export function selectCommonsThumbnailWidthForFrame({
+  renderedWidth,
+  renderedHeight,
+  devicePixelRatio,
+  fitMode = "cover",
+  originalWidth,
+  originalHeight
+}: CommonsThumbnailWidthForFrameInput) {
+  const safeRenderedWidth = Number.isFinite(renderedWidth)
+    ? Math.max(1, renderedWidth)
+    : COMMONS_THUMBNAIL_WIDTHS[0];
+  const safeRenderedHeight = Number.isFinite(renderedHeight)
+    ? Math.max(1, renderedHeight)
+    : safeRenderedWidth;
+  const safeDevicePixelRatio =
+    Number.isFinite(devicePixelRatio) && devicePixelRatio > 0 ? devicePixelRatio : 1;
+
+  const hasOriginalDimensions =
+    typeof originalWidth === "number" &&
+    Number.isFinite(originalWidth) &&
+    originalWidth > 0 &&
+    typeof originalHeight === "number" &&
+    Number.isFinite(originalHeight) &&
+    originalHeight > 0;
+
+  const maxAllowedWidth = hasOriginalDimensions
+    ? Math.min(
+        COMMONS_THUMBNAIL_WIDTHS[COMMONS_THUMBNAIL_WIDTHS.length - 1],
+        Math.floor(originalWidth)
+      )
+    : COMMONS_THUMBNAIL_WIDTHS[COMMONS_THUMBNAIL_WIDTHS.length - 1];
+  const candidates = COMMONS_THUMBNAIL_WIDTHS.filter((width) => width <= maxAllowedWidth);
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const requiredDeviceWidth = safeRenderedWidth * safeDevicePixelRatio;
+  const requiredWidth = hasOriginalDimensions
+    ? (() => {
+        const requiredFromHeight =
+          safeRenderedHeight * safeDevicePixelRatio * (originalWidth / originalHeight);
+        if (fitMode === "contain") {
+          return Math.min(requiredDeviceWidth, requiredFromHeight);
+        }
+
+        return Math.max(requiredDeviceWidth, requiredFromHeight);
+      })()
+    : requiredDeviceWidth;
+
+  for (const width of candidates) {
+    if (width >= requiredWidth) {
+      return width;
+    }
+  }
+
+  return candidates[candidates.length - 1];
 }
 
 export function buildCommonsThumbnailUrl(originalUrl: string, targetWidth: number) {

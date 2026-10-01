@@ -3,19 +3,6 @@
   "images": [
     {
       "id": "crete-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Crete_Nasa.jpg",
-      "width": 1022,
-      "height": 452,
-      "author": "NASA",
-      "license": "Public domain",
-      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Crete_Nasa.jpg",
-      "caption": "Satellite image of the island of Crete",
-      "kind": "modern",
-      "aiGenerated": false
-    },
-    {
-      "id": "crete-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
       "width": 4479,
       "height": 2730,
@@ -23,12 +10,64 @@
       "license": "CC0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
-      "caption": "The Mount Ida chain and Messara plain seen from Phaistos, Crete",
+      "caption": "The Mount Ida chain and Messara plain seen from Phaistos, Crete.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "crete-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Kali_Limenes_04.jpg",
+      "width": 4608,
+      "height": 3452,
+      "author": "Olaf Tausch",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kali_Limenes_04.jpg",
+      "caption": "The bay of Kali Limenes (Fair Havens) on Crete's south coast, near Lasea, where Paul's ship put in (Acts 27:8).",
       "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "crete-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Antikes_Gortyn_01.jpg",
+      "width": 4608,
+      "height": 3452,
+      "author": "Olaf Tausch",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Antikes_Gortyn_01.jpg",
+      "caption": "Remains of Gortyn, the leading Roman-period city of Crete.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "crete-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Colline_Gortyne.jpg",
+      "width": 4592,
+      "height": 3056,
+      "author": "Jebulon",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colline_Gortyne.jpg",
+      "caption": "Olive-planted hills near Gortyn, in the Messara plain.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "crete-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Crete_satellite.jpg",
+      "width": 1441,
+      "height": 1081,
+      "author": "European Space Agency",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Crete_satellite.jpg",
+      "caption": "Satellite image of the island of Crete.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "crete-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Agios_Nikolaos%2C_Crete_%E2%80%93_Harbour_2019a.jpg",
       "width": 6192,
       "height": 3501,
@@ -36,7 +75,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Agios_Nikolaos,_Crete_%E2%80%93_Harbour_2019a.jpg",
-      "caption": "Harbour of Agios Nikolaos on the island of Crete",
+      "caption": "The harbor of Agios Nikolaos, a modern town on Crete.",
       "kind": "modern",
       "aiGenerated": false
     }

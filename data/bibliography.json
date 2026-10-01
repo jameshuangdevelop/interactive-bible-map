@@ -1041,6 +1041,343 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/H/house.html",
       "accessed": "2026-10-01"
+    },
+    {
+      "id": "ramsay-seven-churches",
+      "type": "book",
+      "title": "The Letters to the Seven Churches of Asia and Their Place in the Plan of the Apocalypse",
+      "authors": [
+        "W. M. Ramsay"
+      ],
+      "year": 1904,
+      "publisher": "Hodder and Stoughton",
+      "url": "https://archive.org/details/letterstosevench00rams"
+    },
+    {
+      "id": "worldhistory-pergamon",
+      "type": "web",
+      "title": "Pergamon",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pergamon/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-about",
+      "type": "web",
+      "title": "About Sardis",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-sardis",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-bath-gymnasium",
+      "type": "web",
+      "title": "The Bath-Gymnasium Complex",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-bath-gym",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-artemis-temple",
+      "type": "web",
+      "title": "The Temple of Artemis",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-artemis-temple",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "pau-laodikeia-kazisi",
+      "type": "web",
+      "title": "Laodikeia Kazısı (Laodicea Excavation)",
+      "authors": [
+        "Pamukkale University Laodicea Excavation"
+      ],
+      "year": 2026,
+      "publisher": "Pamukkale University",
+      "url": "https://laodikeia.pau.edu.tr/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-rome",
+      "type": "chapter",
+      "title": "Rome",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/R/rome.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-corinth",
+      "type": "chapter",
+      "title": "Corinth",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/corinth.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-antioch-syria",
+      "type": "chapter",
+      "title": "Antioch, in Syria",
+      "authors": [
+        "C. H. Thomson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antioch-in-syria.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-ephesus",
+      "type": "chapter",
+      "title": "Ephesus",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/E/ephesus.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-philippi",
+      "type": "chapter",
+      "title": "Philippi",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/philippi.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-thessalonica",
+      "type": "chapter",
+      "title": "Thessalonica",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/thessalonica.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-athens",
+      "type": "chapter",
+      "title": "Athens",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/athens.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-caesarea",
+      "type": "chapter",
+      "title": "Caesarea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/caesarea.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-damascus",
+      "type": "chapter",
+      "title": "Damascus",
+      "authors": [
+        "C. H. Thomson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/damascus.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-galatia",
+      "type": "chapter",
+      "title": "Galatia",
+      "authors": [
+        "W. M. Ramsay"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/galatia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "platner-ashby-topographical-dictionary",
+      "type": "book",
+      "title": "A Topographical Dictionary of Ancient Rome (hosted on LacusCurtius)",
+      "authors": [
+        "Samuel Ball Platner",
+        "Thomas Ashby"
+      ],
+      "year": 1929,
+      "publisher": "Oxford University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Gazetteer/Places/Europe/Italy/Lazio/Roma/Rome/_Texts/PLATOP*/home.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "unesco-ephesus",
+      "type": "web",
+      "title": "Ephesus",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1018/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-appii-forum",
+      "type": "chapter",
+      "title": "Appii Forum",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/appii-forum.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-antioch-pisidia",
+      "type": "chapter",
+      "title": "Antioch of Pisidia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antioch-of-pisidia.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "oeaw-celsus-library",
+      "type": "web",
+      "title": "Austrian researchers start conservation of the Celsus Library in Ephesos",
+      "authors": [
+        "Austrian Academy of Sciences (ÖAW)"
+      ],
+      "year": 2024,
+      "publisher": "Austrian Academy of Sciences",
+      "url": "https://www.oeaw.ac.at/en/news/preserving-world-cultural-heritage-austrian-researchers-start-conservation-of-the-celsus-library-in-ephesos-1",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-philippi",
+      "type": "web",
+      "title": "Philippoi: Description",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=2387",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-thessaloniki-forum",
+      "type": "web",
+      "title": "Ancient Agora of Thessaloniki: History",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2457",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-galerius-palace",
+      "type": "web",
+      "title": "Palatial complex of Galerius: Description",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=423",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "unesco-damascus",
+      "type": "web",
+      "title": "Ancient City of Damascus",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/20/",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-colossae",
+      "type": "chapter",
+      "title": "Colossae",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/colossae.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "bas-colossae-yener",
+      "type": "web",
+      "title": "Colossae: A Biblical City of the Classical World (interview with excavation director Barış Yener)",
+      "authors": [
+        "Lauren K. McCormick"
+      ],
+      "year": 2026,
+      "publisher": "Biblical Archaeology Society, Bible History Daily",
+      "url": "https://www.biblicalarchaeology.org/daily/archaeology-today/colossae-a-biblical-city-of-classical-world/",
+      "accessed": "2026-10-01"
     }
   ]
 }

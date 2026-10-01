@@ -3,6 +3,19 @@
   "images": [
     {
       "id": "sychar-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/%D9%83%D9%86%D9%8A%D8%B3%D8%A9_%D8%A8%D8%A6%D8%B1_%D9%8A%D8%B9%D9%82%D9%88%D8%A8-_%D9%86%D8%A7%D8%A8%D9%84%D8%B3.jpg",
+      "width": 2429,
+      "height": 1625,
+      "author": "Jamal Aruri",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:كنيسة_بئر_يعقوب-_نابلس.jpg",
+      "caption": "The Greek Orthodox church over the traditional Jacob's Well at Balata, Nablus, near the proposed sites of Sychar",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "sychar-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Jacob%27s_Well_in_2013.jpg",
       "width": 3000,
       "height": 4000,
@@ -10,7 +23,7 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Jacob%27s_Well_in_2013.jpg",
-      "caption": "Jacob's Well (Sychar) interior, Balata (Nablus), West Bank.",
+      "caption": "The wellhead of the traditional Jacob's Well in the crypt of the church at Balata (Nablus), West Bank.",
       "kind": "modern",
       "aiGenerated": false
     }
