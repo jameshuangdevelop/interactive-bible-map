@@ -1,9 +1,17 @@
 import {
+  AI_BASED_ON_LABEL,
+  buildImageKindLabel,
+  buildImagePromptBriefUrl,
+  buildImageCreditFields,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
-  groupScriptureByBook
+  groupScriptureByBook,
+  imageIndexesToLoad,
+  isAiReconstructionImage,
+  nextImageIndex,
+  shouldRenderThumbnailRow
 } from "../src/features/place-panel/panel-model";
-import type { PlaceIndexRecord, PlaceRecord } from "../src/features/map/types";
+import type { MediaImageRecord, PlaceIndexRecord, PlaceRecord } from "../src/features/map/types";
 
 describe("place panel model helpers", () => {
   const romanEmpire: PlaceIndexRecord = {
@@ -176,5 +184,79 @@ describe("place panel model helpers", () => {
       "bib:sample",
       "scripture:Isaiah 9:1"
     ]);
+  });
+
+  test("maps image kinds to labels and keeps missing kind unlabeled", () => {
+    expect(buildImageKindLabel("modern")).toBe("Today");
+    expect(buildImageKindLabel("historical")).toBe("Historical view");
+    expect(buildImageKindLabel("site")).toBe("Excavated site");
+    expect(buildImageKindLabel("reconstruction")).toBe("Reconstruction");
+    expect(buildImageKindLabel("ai-reconstruction")).toBe("AI-generated reconstruction");
+    expect(buildImageKindLabel(undefined)).toBeNull();
+  });
+
+  test("builds AI research-brief links and uses a fixed source label", () => {
+    expect(buildImagePromptBriefUrl("capernaum")).toBe(
+      "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md"
+    );
+    expect(buildImagePromptBriefUrl("capernaum", "Prompt 1: Market overview")).toBe(
+      "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-market-overview"
+    );
+    expect(AI_BASED_ON_LABEL).toBe("research brief");
+  });
+
+  test("supports AI records without Commons-only credit fields", () => {
+    const aiImageWithoutCommonsCredits: MediaImageRecord = {
+      id: "capernaum-ai-01",
+      url: "media/ai/capernaum-ai-01.webp",
+      caption: "AI overview reconstruction",
+      kind: "ai-reconstruction",
+      aiGenerated: true,
+      generator: {
+        tool: "DALL·E",
+        model: "gpt-image-1",
+        date: "2026-10-01"
+      },
+      promptRef: "Prompt 2: Synagogue and harbour",
+      basedOn: ["wikidata:Q59174"]
+    };
+
+    expect(buildImageCreditFields(aiImageWithoutCommonsCredits)).toEqual({
+      authorLabel: null,
+      licenseLabel: null,
+      toolLabel: "DALL·E"
+    });
+  });
+
+  test("computes cyclical image indices and thumbnail-row visibility", () => {
+    expect(nextImageIndex(0, 10, 1)).toBe(1);
+    expect(nextImageIndex(0, 10, -1)).toBe(9);
+    expect(nextImageIndex(9, 10, 1)).toBe(0);
+    expect(imageIndexesToLoad(0, 10)).toEqual([0, 1]);
+    expect(imageIndexesToLoad(9, 10)).toEqual([9, 0]);
+    expect(imageIndexesToLoad(0, 1)).toEqual([0]);
+    expect(shouldRenderThumbnailRow(3)).toBe(false);
+    expect(shouldRenderThumbnailRow(4)).toBe(true);
+  });
+
+  test("treats ai-reconstruction kind and aiGenerated flag as AI images", () => {
+    expect(
+      isAiReconstructionImage({
+        kind: "ai-reconstruction",
+        aiGenerated: true
+      })
+    ).toBe(true);
+    expect(
+      isAiReconstructionImage({
+        kind: "modern",
+        aiGenerated: true
+      })
+    ).toBe(true);
+    expect(
+      isAiReconstructionImage({
+        kind: "modern",
+        aiGenerated: false
+      })
+    ).toBe(false);
   });
 });

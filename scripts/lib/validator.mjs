@@ -64,7 +64,7 @@ export const PROJECT_BOUNDS = Object.freeze({
   maxLat: 50
 });
 export const REQUIRE_EMPIRE_ROOT = true;
-export const REQUIRE_MAJOR_IMAGES = false;
+export const REQUIRE_MAJOR_IMAGES = true;
 export const MAJOR_PLACE_MIN_IMAGE_COUNT = 5;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
 export const MAX_AI_IMAGE_WIDTH_PX = 1600;

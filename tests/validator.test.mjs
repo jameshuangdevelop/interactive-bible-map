@@ -573,8 +573,8 @@ test("standard places cannot have more than three images", async () => {
   );
 });
 
-test("major places with fewer than five images emit a warning by default", async () => {
-  const result = await runCase("valid-major-few-images");
+test("major places with fewer than five images emit only a warning when REQUIRE_MAJOR_IMAGES is off", async () => {
+  const result = await runCase("valid-major-few-images", { requireMajorImages: false });
   assert.equal(result.errors.length, 0);
   assert.ok(
     hasWarning(
@@ -583,6 +583,19 @@ test("major places with fewer than five images emit a warning by default", async
         warning.file.endsWith("media/capernaum.json") &&
         warning.path === "$.images" &&
         warning.message.includes("at least 5 images")
+    )
+  );
+});
+
+test("major places with fewer than five images fail by default", async () => {
+  const defaultResult = await runCase("valid-major-few-images");
+  assert.ok(
+    hasError(
+      defaultResult,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images" &&
+        error.message.includes("at least 5 images")
     )
   );
 });

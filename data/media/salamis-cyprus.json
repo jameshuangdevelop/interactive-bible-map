@@ -3,13 +3,13 @@
   "images": [
     {
       "id": "salamis-cyprus-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Salamis.jpg",
-      "width": 879,
-      "height": 560,
-      "author": "Gustavobw",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Salamis.jpg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/62/Roman_Theatre%2C_Salamis_%2846121539812%29.jpg",
+      "width": 7800,
+      "height": 4749,
+      "author": "Mike McBey",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_Theatre,_Salamis_(46121539812).jpg",
       "caption": "Ruins of the ancient theatre at Salamis, Cyprus",
       "kind": "site",
       "aiGenerated": false

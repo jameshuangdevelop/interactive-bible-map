@@ -1,6 +1,7 @@
 import { getPrimaryPlaceName } from "../map/place-visibility";
 import type {
   Confidence,
+  MediaImageRecord,
   PlaceIndexRecord,
   PlaceNames,
   PlaceRecord,
@@ -89,6 +90,20 @@ const HIERARCHY_LINE_EXCEPTIONS_BY_ID: Readonly<Record<string, string>> = Object
   arabia: "Client kingdom allied with Rome"
 });
 
+const IMAGE_KIND_LABEL_BY_KIND: Readonly<Record<NonNullable<MediaImageRecord["kind"]>, string>> =
+  Object.freeze({
+    modern: "Today",
+    historical: "Historical view",
+    site: "Excavated site",
+    reconstruction: "Reconstruction",
+    "ai-reconstruction": "AI-generated reconstruction"
+  });
+
+const IMAGE_PROMPTS_BASE_URL =
+  "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts";
+// Keep raw source IDs in data only; readers get a single brief link label.
+export const AI_BASED_ON_LABEL = "research brief";
+
 export interface GroupedScriptureBook {
   book: string;
   passages: ScriptureEntry[];
@@ -97,6 +112,41 @@ export interface GroupedScriptureBook {
 export interface HierarchyItem {
   label: string;
   placeId: string | null;
+}
+
+export interface ImageCreditFields {
+  authorLabel: string | null;
+  licenseLabel: string | null;
+  toolLabel: string | null;
+}
+
+function githubHeadingAnchor(heading: string) {
+  return heading
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/gu, "")
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
+    .trim()
+    .replace(/\s+/gu, "-");
+}
+
+function normalizeOptionalText(value: string | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizeCircularIndex(index: number, imageCount: number) {
+  if (!Number.isFinite(index) || imageCount <= 0) {
+    return 0;
+  }
+
+  const normalized = Math.trunc(index) % imageCount;
+  return normalized >= 0 ? normalized : normalized + imageCount;
 }
 
 function isSameDisplayLabel(left: string, right: string) {
@@ -335,4 +385,64 @@ export function buildHierarchyItems(
   }
 
   return items;
+}
+
+export function buildImageKindLabel(kind: MediaImageRecord["kind"] | undefined) {
+  if (!kind) {
+    return null;
+  }
+
+  return IMAGE_KIND_LABEL_BY_KIND[kind] ?? null;
+}
+
+export function isAiReconstructionImage(
+  image: Pick<MediaImageRecord, "kind" | "aiGenerated">
+) {
+  return image.kind === "ai-reconstruction" || image.aiGenerated;
+}
+
+export function buildImageCreditFields(
+  image: Pick<MediaImageRecord, "author" | "license" | "generator">
+): ImageCreditFields {
+  return {
+    authorLabel: normalizeOptionalText(image.author),
+    licenseLabel: normalizeOptionalText(image.license),
+    toolLabel: normalizeOptionalText(image.generator?.tool)
+  };
+}
+
+export function buildImagePromptBriefUrl(locationId: string, promptRef?: string) {
+  const baseUrl = `${IMAGE_PROMPTS_BASE_URL}/${encodeURIComponent(locationId)}.md`;
+  if (!promptRef) {
+    return baseUrl;
+  }
+
+  const anchor = githubHeadingAnchor(promptRef);
+  return anchor.length > 0 ? `${baseUrl}#${anchor}` : baseUrl;
+}
+
+export function nextImageIndex(activeIndex: number, imageCount: number, step: number) {
+  if (imageCount <= 0) {
+    return 0;
+  }
+
+  return normalizeCircularIndex(activeIndex + step, imageCount);
+}
+
+export function imageIndexesToLoad(activeIndex: number, imageCount: number) {
+  if (imageCount <= 0) {
+    return [] as number[];
+  }
+
+  if (imageCount === 1) {
+    return [0];
+  }
+
+  const current = normalizeCircularIndex(activeIndex, imageCount);
+  const next = nextImageIndex(current, imageCount, 1);
+  return [current, next];
+}
+
+export function shouldRenderThumbnailRow(imageCount: number) {
+  return imageCount > 3;
 }

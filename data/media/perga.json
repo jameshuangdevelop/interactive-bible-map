@@ -26,19 +26,6 @@
       "caption": "General view of the archaeological site of ancient Perga",
       "kind": "site",
       "aiGenerated": false
-    },
-    {
-      "id": "perga-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Jonenines_kolonos.JPG",
-      "width": 1024,
-      "height": 768,
-      "author": "Andrius v110",
-      "license": "Public domain",
-      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jonenines_kolonos.JPG",
-      "caption": "Ionic columns at the site of ancient Perga",
-      "kind": "site",
-      "aiGenerated": false
     }
   ]
 }

@@ -10,8 +10,8 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Getsemane2.JPG",
-      "caption": "Olive trees at the traditional site of the Garden of Gethsemane, Jerusalem.",
-      "kind": "site",
+      "caption": "Olive trees at the traditional site of the Garden of Gethsemane, Jerusalem",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -23,8 +23,47 @@
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_all_Nations.jpg",
-      "caption": "The Church of All Nations, at the traditional site of Gethsemane, Jerusalem.",
-      "kind": "site",
+      "caption": "The Church of All Nations, at the traditional site of Gethsemane, Jerusalem",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "gethsemane-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/20110224_East_Jerusalem_0289_Jerusalem_%285540460214%29.jpg",
+      "width": 3648,
+      "height": 2736,
+      "author": "Dan Lundberg",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:20110224_East_Jerusalem_0289_Jerusalem_(5540460214).jpg",
+      "caption": "Olive trees in Gethsemane, with the Dome of the Rock visible on the Temple Mount beyond",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "gethsemane-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Church_of_All_Nations_%2825801318941%29.jpg",
+      "width": 2988,
+      "height": 5312,
+      "author": "Konrad Summers",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_All_Nations_(25801318941).jpg",
+      "caption": "The Franciscan-custodied garden surrounding the Church of All Nations at Gethsemane",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "gethsemane-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/121282-Jerusalem-Mount-of-Olives_%2827563160356%29.jpg",
+      "width": 6016,
+      "height": 4016,
+      "author": "Xiquinho Silva",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:121282-Jerusalem-Mount-of-Olives_(27563160356).jpg",
+      "caption": "The Russian Orthodox Church of Mary Magdalene, near a second traditional site of Gethsemane",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

@@ -28,6 +28,7 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Egypt's label point** sits in the Eastern Desert rather than the Nile valley most readers associate with Roman Egypt (M3-13 review nit). Revisit in a sourced label-point pass.
 - **Self-hosted Protomaps fallback** (M3-07's recommended option). M3 uses the VersaTiles public server as the outage-only fallback instead, because a regional Protomaps extract won't fit Cloudflare Pages' 25 MiB file limit. Hosting it on Cloudflare R2 (free up to 10 GB-month) needs an R2 bucket and a token with R2 permissions. Revisit if VersaTiles' terms change or if outages become frequent.
 - **Colossae is no longer unexcavated.** Its location record still says it has never been excavated, but excavation has begun (Biblical Archaeology Society interview, July 2026; found by the M3.5-03 Fact-Checker). After CP3.5, a small sourced data task updates the record.
+- **Flickr Commons "No restrictions" images.** Many Internet Archive book scans on Commons carry only this license, which `docs/LICENSES.md` doesn't list, so higher-resolution scans of public-domain plates can't be used (for example a 2,256 px scan of Allom's 1836 Philadelphia plate; M3.5-04). The Fact-Checker decides whether to accept it for works that are public domain by age, and if so how to record the license.
 
 ## Deferred review findings
 PR Reviewer findings that were not addressed in their PR, each with a reason.
@@ -36,3 +37,5 @@ PR Reviewer findings that were not addressed in their PR, each with a reason.
 |---|---|---|---|---|
 | 2026-09-24 | M2-06 | `tests/validator.test.mjs`: the cross-file duplicate-image-id fixture also trips the prefix rule; add a comment explaining why a fully isolated duplicate case is impossible | nit | The test is correct as it is. Add the comment the next time the validator tests are touched. |
 | 2026-09-24 | M2-05 | `data/media/philadelphia-lydia.json`: `-02` is close in subject and framing to `-01`; a more distinct city or site view would add variety | nit | The lead image is fine. Revisit during the M6 media passes. |
+| 2026-10-01 | M3.5-06 | AI thumbnails currently reuse the full repo-hosted AI file instead of a resized derivative | nit | Fixture-only for now; revisit in M3.5-07 when real AI images land. |
+| 2026-10-01 | M3.5-06 | `export:web` copies any `.webp` in `media/ai/` without checking whether a place payload references it | nit | Fixture-only for now; revisit in M3.5-07 when real AI images land. |
