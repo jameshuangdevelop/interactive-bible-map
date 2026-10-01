@@ -34,3 +34,11 @@ A mixed Jewish-and-Gentile port population whose tensions, per the Encyclopedia,
 Josephus does not give exact measurements for the theatre's or amphitheatre's seating capacity, and no source used here specifies the governor's palace's appearance in detail, so these buildings should be shown as generic but grand Herodian Roman architecture in white stone rather than with invented decorative specifics [bib:josephus-antiquities].
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt caesarea-maritima-ai-01
+A wide establishing shot of Caesarea's harbor, about AD 58, seen from a ship approaching from the sea at midday under a bright sky. In frame: a great artificial harbor enclosed by a stone mole built of huge sunken blocks, towers along the breakwater, a temple on a raised platform at the harbor's center holding statues of Roma and Caesar, and beyond the harbor the white-stone city with Herod's palace, a theatre, and public buildings rising along the shore; merchant ships and small boats move in the harbor, with small mid-ground figures working the docks. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: keep the temple's sculptural decoration generic beyond the statues of Roma and Caesar Josephus names; the exact architectural detail of the harbor towers beyond their general form is not specified by the sources used here.
+
+### AI-generated reconstruction — prompt caesarea-maritima-ai-02
+A wide establishing shot of Caesarea's theatre and the governor's palace district, about AD 58, seen from a low rise at the edge of the city in late-afternoon light, evoking Paul's hearings before Felix and Festus. In frame: a white-stone theatre built into a gentle slope facing the sea, a grand colonnaded palace complex nearby on a promontory jutting into the water, and small mid-ground figures — a few soldiers and officials in Roman dress — moving between the buildings. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: keep the palace's interior arrangement and decoration generic, since no source used here describes it in detail beyond its grandeur.
