@@ -78,6 +78,35 @@ export function redactSecrets(value, secrets = []) {
   return result;
 }
 
+function redactErrorCauseChain(error, secrets, seen = new Set()) {
+  if (!error || (typeof error !== "object" && typeof error !== "function")) {
+    return typeof error === "string" ? redactSecrets(error, secrets) : error;
+  }
+
+  if (seen.has(error)) {
+    return error;
+  }
+  seen.add(error);
+
+  if (typeof error.message === "string") {
+    error.message = redactSecrets(error.message, secrets);
+  }
+  if (typeof error.stack === "string") {
+    error.stack = redactSecrets(error.stack, secrets);
+  }
+
+  if ("cause" in error) {
+    const redactedCause = redactErrorCauseChain(error.cause, secrets, seen);
+    try {
+      error.cause = redactedCause;
+    } catch {
+      // Keep the original cause when it is not writable.
+    }
+  }
+
+  return error;
+}
+
 function parseJsonIfPossible(text) {
   if (typeof text !== "string" || text.trim().length === 0) {
     return null;
@@ -191,6 +220,7 @@ async function fetchCloudflareImage({
     };
 
     if (provider === "cloudflare-flux") {
+      // Live call on 2026-10-01 confirmed multipart field names prompt/width/height/seed; Cloudflare's public schema documents only the multipart wrapper.
       requestBody = new FormData();
       requestBody.append("prompt", prompt);
       requestBody.append("width", String(CLOUDFLARE_IMAGE_WIDTH));
@@ -501,13 +531,16 @@ export async function generateImageWithProvider(options) {
     });
   } catch (error) {
     if (error instanceof AiProviderError) {
-      error.message = redactSecrets(error.message, secrets);
+      redactErrorCauseChain(error, secrets);
       throw error;
     }
 
-    throw new AiProviderError(
+    redactErrorCauseChain(error, secrets);
+    const wrappedError = new AiProviderError(
       redactSecrets(toErrorMessage(error), secrets),
       { provider, cause: error }
     );
+    redactErrorCauseChain(wrappedError, secrets);
+    throw wrappedError;
   }
 }

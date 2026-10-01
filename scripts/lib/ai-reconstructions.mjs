@@ -198,6 +198,24 @@ export function detectImageExtensionFromBuffer(buffer) {
   throw new Error("Unsupported image format: expected PNG, JPEG, or WebP bytes.");
 }
 
+async function filePathExists(filePath, statImpl) {
+  try {
+    await statImpl(filePath);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return false;
+    }
+    throw error;
+  }
+}
+
+function candidateAlreadyExistsError(promptId, round, variant) {
+  return new Error(
+    `AI candidate already exists; use another --round (promptId='${promptId}', round=${round}, variant=${variant}).`
+  );
+}
+
 export async function writeAiCandidateAndSidecar({
   incomingDirectory = DEFAULT_AI_INCOMING_DIRECTORY,
   promptId,
@@ -208,7 +226,10 @@ export async function writeAiCandidateAndSidecar({
   model,
   seed,
   promptText,
-  now = new Date()
+  now = new Date(),
+  writeFileImpl = fs.writeFile,
+  statImpl = fs.stat,
+  unlinkImpl = fs.unlink
 }) {
   ensurePromptId(promptId);
   if (!Number.isInteger(round) || round < 1) {
@@ -249,8 +270,45 @@ export async function writeAiCandidateAndSidecar({
     promptSha256
   };
 
-  await fs.writeFile(imagePath, imageBuffer);
-  await fs.writeFile(sidecarPath, `${JSON.stringify(sidecar, null, 2)}\n`, "utf8");
+  const [imagePathExists, sidecarPathExists] = await Promise.all([
+    filePathExists(imagePath, statImpl),
+    filePathExists(sidecarPath, statImpl)
+  ]);
+  if (imagePathExists || sidecarPathExists) {
+    throw candidateAlreadyExistsError(promptId, round, variant);
+  }
+
+  try {
+    await writeFileImpl(sidecarPath, `${JSON.stringify(sidecar, null, 2)}\n`, {
+      encoding: "utf8",
+      flag: "wx"
+    });
+  } catch (error) {
+    if (error?.code === "EEXIST") {
+      throw candidateAlreadyExistsError(promptId, round, variant);
+    }
+    throw error;
+  }
+
+  try {
+    await writeFileImpl(imagePath, imageBuffer, { flag: "wx" });
+  } catch (error) {
+    try {
+      await unlinkImpl(sidecarPath);
+    } catch (unlinkError) {
+      if (unlinkError?.code !== "ENOENT") {
+        throw new Error(
+          `Failed to write AI candidate image and could not clean up side-car: ${unlinkError.message}`,
+          { cause: error }
+        );
+      }
+    }
+
+    if (error?.code === "EEXIST") {
+      throw candidateAlreadyExistsError(promptId, round, variant);
+    }
+    throw error;
+  }
 
   return {
     imagePath,

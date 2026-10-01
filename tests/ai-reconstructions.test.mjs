@@ -35,6 +35,18 @@ async function withTempDirectory(run) {
   }
 }
 
+async function pathExists(targetPath) {
+  try {
+    await fs.stat(targetPath);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return false;
+    }
+    throw error;
+  }
+}
+
 function jsonResponse(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
     status,
@@ -93,6 +105,14 @@ Third paragraph.
   );
 });
 
+test("prompt extraction supports CRLF line endings", () => {
+  const markdown =
+    "### AI-generated reconstruction — prompt capernaum-ai-01\r\n\r\nFirst paragraph.\r\n\r\nSecond paragraph.\r\n\r\nKeep out / keep vague: no modern buildings.\r\n";
+
+  const prompt = extractPromptTextFromMarkdown(markdown, "capernaum-ai-01");
+  assert.equal(prompt, "First paragraph.\n\nSecond paragraph.");
+});
+
 test("writeAiCandidateAndSidecar writes expected file names and metadata", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const imageBuffer = await sharp({
@@ -131,6 +151,122 @@ test("writeAiCandidateAndSidecar writes expected file names and metadata", async
     assert.equal(sidecar.promptId, "capernaum-ai-01");
     assert.equal(sidecar.prompt, promptText);
     assert.equal(sidecar.promptSha256, sha256Hex(promptText));
+  });
+});
+
+test("writeAiCandidateAndSidecar refuses to overwrite existing candidate files", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await sharp({
+      create: {
+        width: 16,
+        height: 16,
+        channels: 3,
+        background: { r: 120, g: 70, b: 30 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const args = {
+      incomingDirectory: temporaryDirectory,
+      promptId: "capernaum-ai-01",
+      round: 1,
+      variant: 1,
+      imageBuffer,
+      provider: "openai",
+      model: "gpt-image-2.5-flare",
+      seed: 11,
+      promptText: "Prompt text."
+    };
+
+    await writeAiCandidateAndSidecar(args);
+
+    await assert.rejects(
+      () => writeAiCandidateAndSidecar(args),
+      /candidate already exists; use another --round/u
+    );
+  });
+});
+
+test("writeAiCandidateAndSidecar checks side-car path before writing image", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await sharp({
+      create: {
+        width: 16,
+        height: 16,
+        channels: 3,
+        background: { r: 20, g: 100, b: 160 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const imagePath = path.join(temporaryDirectory, "capernaum-ai-01-r1-v1.png");
+    const sidecarPath = `${imagePath}.json`;
+    await fs.writeFile(sidecarPath, "{\"existing\":true}\n", "utf8");
+
+    await assert.rejects(
+      () =>
+        writeAiCandidateAndSidecar({
+          incomingDirectory: temporaryDirectory,
+          promptId: "capernaum-ai-01",
+          round: 1,
+          variant: 1,
+          imageBuffer,
+          provider: "openai",
+          model: "gpt-image-2.5-flare",
+          seed: 42,
+          promptText: "Prompt text."
+        }),
+      /candidate already exists; use another --round/u
+    );
+    assert.equal(await pathExists(imagePath), false);
+  });
+});
+
+test("writeAiCandidateAndSidecar writes side-car first and leaves no orphan image on side-car failure", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await sharp({
+      create: {
+        width: 16,
+        height: 16,
+        channels: 3,
+        background: { r: 80, g: 130, b: 180 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const imagePath = path.join(temporaryDirectory, "capernaum-ai-01-r2-v1.png");
+    const sidecarPath = `${imagePath}.json`;
+    const writeTargets = [];
+
+    await assert.rejects(
+      () =>
+        writeAiCandidateAndSidecar({
+          incomingDirectory: temporaryDirectory,
+          promptId: "capernaum-ai-01",
+          round: 2,
+          variant: 1,
+          imageBuffer,
+          provider: "openai",
+          model: "gpt-image-2.5-flare",
+          seed: 99,
+          promptText: "Prompt text.",
+          writeFileImpl: async (targetPath, content, options) => {
+            writeTargets.push(path.basename(targetPath));
+            if (targetPath === sidecarPath) {
+              throw new Error("simulated side-car write failure");
+            }
+            return fs.writeFile(targetPath, content, options);
+          }
+        }),
+      /simulated side-car write failure/u
+    );
+
+    assert.deepEqual(writeTargets, ["capernaum-ai-01-r2-v1.png.json"]);
+    assert.equal(await pathExists(imagePath), false);
+    assert.equal(await pathExists(sidecarPath), false);
   });
 });
 
@@ -397,6 +533,39 @@ test("provider errors redact secrets from thrown messages", async () => {
     (error) => {
       assert.equal(error.message.includes(secret), false);
       assert.equal(error.message.includes("***"), true);
+      return true;
+    }
+  );
+});
+
+test("provider errors redact secrets from nested cause chains", async () => {
+  const secret = "nested-openai-secret-token";
+  const inner = new Error(`inner cause leaked ${secret}`);
+  const middle = new Error("middle cause");
+  middle.cause = inner;
+  const outer = new Error("outer network failure");
+  outer.cause = middle;
+
+  await assert.rejects(
+    () =>
+      generateImageWithProvider({
+        provider: "openai",
+        model: DEFAULT_AI_MODELS.openai,
+        prompt: "Nested secret redaction test",
+        seed: 708,
+        credentials: {
+          openaiApiKey: secret
+        },
+        fetchImpl: async () => {
+          throw outer;
+        }
+      }),
+    (error) => {
+      assert.equal(error.message.includes(secret), false);
+      assert.equal(error.cause instanceof Error, true);
+      assert.equal(error.cause.cause instanceof Error, true);
+      assert.equal(error.cause.cause.cause instanceof Error, true);
+      assert.equal(error.cause.cause.cause.message.includes(secret), false);
       return true;
     }
   );
