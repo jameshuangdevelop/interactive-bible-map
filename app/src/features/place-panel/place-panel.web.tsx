@@ -5,6 +5,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
   type RefObject
 } from "react";
 
@@ -21,6 +22,7 @@ import type {
 import {
   AI_BASED_ON_LABEL,
   buildAlsoKnownAs,
+  buildImageCreditFields,
   buildImageKindLabel,
   buildImagePromptBriefUrl,
   buildHierarchyItems,
@@ -174,6 +176,20 @@ function cycleDialogFocus(event: ReactKeyboardEvent<HTMLElement>) {
   focusable[targetIndex]?.focus();
 }
 
+interface CreditSegment {
+  key: string;
+  content: ReactNode;
+}
+
+function renderCreditSegments(segments: CreditSegment[]) {
+  return segments.map((segment, index) => (
+    <span key={segment.key}>
+      {index > 0 ? " · " : null}
+      {segment.content}
+    </span>
+  ));
+}
+
 function formatReviewedDate(lastReviewed: string | undefined) {
   if (!lastReviewed) {
     return "unknown";
@@ -249,11 +265,67 @@ function WikimediaImage({
   const showFallback = !imageUrl || Boolean(failedImageRequests[imageUrl]);
   const kindLabel = buildImageKindLabel(image.kind);
   const isAiImage = isAiReconstructionImage(image);
-  const toolLabel = image.generator?.tool?.trim() || "Unknown tool";
-  const licenseLabel = image.license?.trim() || "License pending";
-  const authorLabel = image.author?.trim() || "Unknown author";
+  const { authorLabel, licenseLabel, toolLabel } = buildImageCreditFields(image);
   const aiBriefUrl = buildImagePromptBriefUrl(locationId, image.promptRef);
   const aiSourcesText = AI_BASED_ON_LABEL;
+  const aiCreditSegments: CreditSegment[] = [{ key: "ai-label", content: "AI-generated reconstruction" }];
+  if (toolLabel) {
+    aiCreditSegments.push({
+      key: "tool",
+      content: toolLabel
+    });
+  }
+  if (licenseLabel) {
+    aiCreditSegments.push({
+      key: "license",
+      content: safeLicenseUrl ? (
+        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+          {licenseLabel}
+        </a>
+      ) : (
+        licenseLabel
+      )
+    });
+  }
+  aiCreditSegments.push({
+    key: "based-on",
+    content: (
+      <>
+        Based on:{" "}
+        <a href={aiBriefUrl} rel="noopener noreferrer" target="_blank">
+          {aiSourcesText}
+        </a>
+      </>
+    )
+  });
+  const commonsCreditSegments: CreditSegment[] = [
+    {
+      key: "photo",
+      content: authorLabel ? `Photo: ${authorLabel}` : "Photo"
+    }
+  ];
+  if (licenseLabel) {
+    commonsCreditSegments.push({
+      key: "license",
+      content: safeLicenseUrl ? (
+        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+          {licenseLabel}
+        </a>
+      ) : (
+        licenseLabel
+      )
+    });
+  }
+  commonsCreditSegments.push({
+    key: "source",
+    content: safeSourcePageUrl ? (
+      <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
+        Wikimedia Commons
+      </a>
+    ) : (
+      "Wikimedia Commons"
+    )
+  });
 
   return (
     <div
@@ -393,39 +465,9 @@ function WikimediaImage({
         }}
       >
         {isAiImage ? (
-          <>
-            AI-generated reconstruction · {toolLabel} ·{" "}
-            {safeLicenseUrl ? (
-              <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-                {licenseLabel}
-              </a>
-            ) : (
-              licenseLabel
-            )}{" "}
-            · Based on:{" "}
-            <a href={aiBriefUrl} rel="noopener noreferrer" target="_blank">
-              {aiSourcesText}
-            </a>
-          </>
+          renderCreditSegments(aiCreditSegments)
         ) : (
-          <>
-            Photo: {authorLabel} ·{" "}
-            {safeLicenseUrl ? (
-              <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-                {licenseLabel}
-              </a>
-            ) : (
-              licenseLabel
-            )}{" "}
-            ·{" "}
-            {safeSourcePageUrl ? (
-              <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
-                Wikimedia Commons
-              </a>
-            ) : (
-              "Wikimedia Commons"
-            )}
-          </>
+          renderCreditSegments(commonsCreditSegments)
         )}
       </p>
       <p

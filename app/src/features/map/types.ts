@@ -95,26 +95,45 @@ export type MediaImageKind =
   | "reconstruction"
   | "ai-reconstruction";
 
+export type CommonsMediaImageKind = Exclude<MediaImageKind, "ai-reconstruction">;
+
 export interface MediaImageGenerator {
   tool: string;
   model: string;
   date: string;
 }
 
-export interface MediaImageRecord {
+interface MediaImageRecordBase {
   id: string;
   url: string;
+  caption: string;
+}
+
+export interface CommonsMediaImageRecord extends MediaImageRecordBase {
+  kind: CommonsMediaImageKind;
+  aiGenerated: false;
   author: string;
   license: string;
   licenseUrl: string;
   sourcePage: string;
-  caption: string;
-  kind: MediaImageKind;
-  aiGenerated: boolean;
-  generator?: MediaImageGenerator;
-  promptRef?: string;
-  basedOn?: SourceId[];
+  generator?: undefined;
+  promptRef?: undefined;
+  basedOn?: undefined;
 }
+
+export interface AiMediaImageRecord extends MediaImageRecordBase {
+  kind: "ai-reconstruction";
+  aiGenerated: true;
+  author?: string;
+  license?: string;
+  licenseUrl?: string;
+  sourcePage?: string;
+  generator: MediaImageGenerator;
+  promptRef: string;
+  basedOn: SourceId[];
+}
+
+export type MediaImageRecord = CommonsMediaImageRecord | AiMediaImageRecord;
 
 export interface MediaRecord {
   locationId: string;

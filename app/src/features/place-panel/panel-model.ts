@@ -113,6 +113,12 @@ export interface HierarchyItem {
   placeId: string | null;
 }
 
+export interface ImageCreditFields {
+  authorLabel: string | null;
+  licenseLabel: string | null;
+  toolLabel: string | null;
+}
+
 function githubHeadingAnchor(heading: string) {
   return heading
     .trim()
@@ -122,6 +128,15 @@ function githubHeadingAnchor(heading: string) {
     .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
     .trim()
     .replace(/\s+/gu, "-");
+}
+
+function normalizeOptionalText(value: string | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 function normalizeCircularIndex(index: number, imageCount: number) {
@@ -383,6 +398,16 @@ export function isAiReconstructionImage(
   image: Pick<MediaImageRecord, "kind" | "aiGenerated">
 ) {
   return image.kind === "ai-reconstruction" || image.aiGenerated;
+}
+
+export function buildImageCreditFields(
+  image: Pick<MediaImageRecord, "author" | "license" | "generator">
+): ImageCreditFields {
+  return {
+    authorLabel: normalizeOptionalText(image.author),
+    licenseLabel: normalizeOptionalText(image.license),
+    toolLabel: normalizeOptionalText(image.generator?.tool)
+  };
 }
 
 export function buildImagePromptBriefUrl(locationId: string, promptRef?: string) {

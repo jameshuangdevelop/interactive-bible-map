@@ -2,6 +2,7 @@ import {
   AI_BASED_ON_LABEL,
   buildImageKindLabel,
   buildImagePromptBriefUrl,
+  buildImageCreditFields,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
   groupScriptureByBook,
@@ -10,7 +11,7 @@ import {
   nextImageIndex,
   shouldRenderThumbnailRow
 } from "../src/features/place-panel/panel-model";
-import type { PlaceIndexRecord, PlaceRecord } from "../src/features/map/types";
+import type { MediaImageRecord, PlaceIndexRecord, PlaceRecord } from "../src/features/map/types";
 
 describe("place panel model helpers", () => {
   const romanEmpire: PlaceIndexRecord = {
@@ -201,6 +202,29 @@ describe("place panel model helpers", () => {
       "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-market-overview"
     );
     expect(AI_BASED_ON_LABEL).toBe("research brief");
+  });
+
+  test("supports AI records without Commons-only credit fields", () => {
+    const aiImageWithoutCommonsCredits: MediaImageRecord = {
+      id: "capernaum-ai-01",
+      url: "media/ai/capernaum-ai-01.webp",
+      caption: "AI overview reconstruction",
+      kind: "ai-reconstruction",
+      aiGenerated: true,
+      generator: {
+        tool: "DALL·E",
+        model: "gpt-image-1",
+        date: "2026-10-01"
+      },
+      promptRef: "Prompt 2: Synagogue and harbour",
+      basedOn: ["wikidata:Q59174"]
+    };
+
+    expect(buildImageCreditFields(aiImageWithoutCommonsCredits)).toEqual({
+      authorLabel: null,
+      licenseLabel: null,
+      toolLabel: "DALL·E"
+    });
   });
 
   test("computes cyclical image indices and thumbnail-row visibility", () => {
