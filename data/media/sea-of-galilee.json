@@ -3,19 +3,45 @@
   "images": [
     {
       "id": "sea-of-galilee-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/%D7%96%D7%A8%D7%99%D7%97%D7%94_%D7%A2%D7%9C_%D7%94%D7%9B%D7%A0%D7%A8%D7%AA.jpg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/View_of_the_Sea_of_Galilee_%2814633578504%29.jpg",
       "width": 5184,
-      "height": 3888,
-      "author": "Elai1948",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:%D7%96%D7%A8%D7%99%D7%97%D7%94_%D7%A2%D7%9C_%D7%94%D7%9B%D7%A0%D7%A8%D7%AA.jpg",
-      "caption": "Sunrise over the Sea of Galilee",
+      "height": 3456,
+      "author": "Jesse Davis from Kingston, Canada",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:View_of_the_Sea_of_Galilee_(14633578504).jpg",
+      "caption": "The Sea of Galilee in its basin, seen from Mount Arbel above the western shore, with the hills of the eastern shore across the water",
       "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "sea-of-galilee-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Mount_of_Beatitude_Capernaum_200704.JPG",
+      "width": 2592,
+      "height": 1944,
+      "author": "gugganij",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Mount_of_Beatitude_Capernaum_200704.JPG",
+      "caption": "The north shore at Capernaum, seen from the Mount of Beatitudes",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "sea-of-galilee-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Israel_Egypt_2009_4092581463_2de87bc5dd_P1250241_O_%289198117883%29.jpg",
+      "width": 3648,
+      "height": 2736,
+      "author": "someone10x",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Israel_Egypt_2009_4092581463_2de87bc5dd_P1250241_O_(9198117883).jpg",
+      "caption": "The steep eastern shore, seen across the water from Tabgha on the northwest shore",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "sea-of-galilee-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sea_of_Galilee_and_Tiberias.jpg",
       "width": 1600,
       "height": 1200,
@@ -28,7 +54,20 @@
       "aiGenerated": false
     },
     {
-      "id": "sea-of-galilee-03",
+      "id": "sea-of-galilee-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Izrael%2C_imgp9389_%282017-10%29.jpg",
+      "width": 2907,
+      "height": 1938,
+      "author": "Jiří Bubeníček",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Izrael,_imgp9389_(2017-10).jpg",
+      "caption": "A wooden tourist boat crossing the Sea of Galilee",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "sea-of-galilee-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Ancient_Boat_of_Sea_of_Galilee.jpg",
       "width": 2941,
       "height": 3642,
@@ -36,34 +75,8 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Boat_of_Sea_of_Galilee.jpg",
-      "caption": "The Ancient Galilee Boat, a 1st-century fishing boat found in 1986 on the lake's northwest shore",
+      "caption": "The Ancient Galilee Boat, a 1st-century fishing boat found in 1986 on the lake's northwest shore, now in the Yigal Allon Centre at Ginosar",
       "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "sea-of-galilee-04",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Holy_Land_2016_P0397_Views_from_the_Sea_of_Galilee.jpg",
-      "width": 5184,
-      "height": 3456,
-      "author": "Fallaner",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Holy_Land_2016_P0397_Views_from_the_Sea_of_Galilee.jpg",
-      "caption": "A green, tree-lined stretch of the Sea of Galilee's shore",
-      "kind": "modern",
-      "aiGenerated": false
-    },
-    {
-      "id": "sea-of-galilee-05",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/7/76/Shore_of_Lake_Kinnaret_%28Sea_of_Galilee%29_-_Israel_-_01_%285710144441%29.jpg",
-      "width": 2304,
-      "height": 3456,
-      "author": "Adam Jones",
-      "license": "CC BY-SA 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Shore_of_Lake_Kinnaret_(Sea_of_Galilee)_-_Israel_-_01_(5710144441).jpg",
-      "caption": "Reed beds along the Sea of Galilee's shore",
-      "kind": "modern",
       "aiGenerated": false
     }
   ]
