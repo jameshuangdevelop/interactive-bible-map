@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:SubmergedEgyptianHarbour_TyreSour_Lebanon_RomanDeckert04112019.jpg",
       "caption": "Submerged ancient columns at the Egyptian Harbour excavation site in Tyre, Lebanon",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_Hippodrome,_Tyre,_Lebanon.jpg",
       "caption": "The Roman-era hippodrome at the archaeological site of Tyre",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

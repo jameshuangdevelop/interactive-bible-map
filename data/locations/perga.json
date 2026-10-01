@@ -10,6 +10,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "pamphylia",
   "candidates": [
     {

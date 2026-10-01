@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Salamis.jpg",
       "caption": "Ruins of the ancient theatre at Salamis, Cyprus",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:383Zypern_Salamis_Gymnasium_(14227776424).jpg",
       "caption": "Ruins of the gymnasium at Salamis, Cyprus",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

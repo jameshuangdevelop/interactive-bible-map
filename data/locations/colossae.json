@@ -10,6 +10,7 @@
   },
   "type": "town",
   "zoomTier": "city",
+  "prominence": "major",
   "parentId": "asia",
   "candidates": [
     {

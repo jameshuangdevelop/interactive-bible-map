@@ -18,6 +18,7 @@ describe("place panel model helpers", () => {
     names: { ancient: ["Roman Empire"], alternate: [] },
     type: "empire",
     zoomTier: "region",
+    prominence: "standard",
     parentId: null,
     candidates: [{ label: "Rome", coordinates: [12.5, 41.9], confidence: "high" }]
   };
@@ -27,6 +28,7 @@ describe("place panel model helpers", () => {
     names: { ancient: ["Achaia"], alternate: [] },
     type: "province",
     zoomTier: "region",
+    prominence: "standard",
     parentId: "roman-empire",
     candidates: [{ label: "Achaia", coordinates: [22.45, 37.89], confidence: "high" }]
   };
@@ -37,6 +39,7 @@ describe("place panel model helpers", () => {
       names: { ancient: ["Italy"], modern: "Italy", alternate: [] },
       type: "province",
       zoomTier: "region",
+      prominence: "standard",
       parentId: "roman-empire",
       candidates: [{ label: "Italy", coordinates: [11.09, 43.69], confidence: "high" }]
     };
@@ -67,6 +70,7 @@ describe("place panel model helpers", () => {
       names: { ancient: ["Arabia"], alternate: [] },
       type: "province",
       zoomTier: "region",
+      prominence: "standard",
       parentId: "roman-empire",
       candidates: [{ label: "Arabia", coordinates: [35.0, 30.0], confidence: "high" }]
     };
@@ -93,6 +97,7 @@ describe("place panel model helpers", () => {
       names: { ancient: ["Corinth"], alternate: [] },
       type: "city",
       zoomTier: "city",
+      prominence: "standard",
       parentId: "achaia",
       candidates: [{ label: "Corinth", coordinates: [22.88, 37.9], confidence: "high" }]
     };
@@ -135,6 +140,7 @@ describe("place panel model helpers", () => {
       names: { ancient: ["Example"], alternate: [] },
       type: "city",
       zoomTier: "city",
+      prominence: "standard",
       parentId: null,
       candidates: [
         {

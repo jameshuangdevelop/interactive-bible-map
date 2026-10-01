@@ -39,7 +39,7 @@ export interface PlaceIndexRecord {
   type: PlaceType;
   zoomTier: ZoomTier;
   parentId: string | null;
-  prominence?: PlaceProminence;
+  prominence: PlaceProminence;
   candidates: PlaceCandidate[];
 }
 
@@ -109,8 +109,8 @@ export interface MediaImageRecord {
   licenseUrl: string;
   sourcePage: string;
   caption: string;
+  kind: MediaImageKind;
   aiGenerated: boolean;
-  kind?: MediaImageKind;
   generator?: MediaImageGenerator;
   promptRef?: string;
   basedOn?: SourceId[];

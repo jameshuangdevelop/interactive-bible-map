@@ -12,6 +12,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "galatia",
   "candidates": [
     {

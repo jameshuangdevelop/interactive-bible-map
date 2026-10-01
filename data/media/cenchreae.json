@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Remains_of_an_early_Christian_Basilica_and_Temple_of_Isis_at_the_ancient_harbour_at_Kenchreai,_one_of_the_two_ports_of_the_inland_city-state_of_Corinth,_Greece_(14079053672).jpg",
       "caption": "Remains of the ancient harbour and an early Christian basilica at Kenchreai (Cenchreae)",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:The_tower_guarding_the_entrance_to_the_port_of_ancient_Kechries_on_January_10,_2020.jpg",
       "caption": "Tower guarding the harbour entrance at ancient Kenchreai (Cenchreae)",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]
