@@ -10,12 +10,25 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki_Ancient_Agora_(1).jpg",
-      "caption": "Remains of the Ancient Agora in Thessaloniki.",
+      "caption": "Remains of the Roman forum (Ancient Agora) of Thessaloniki; this forum dates from building work of the late 2nd century AD, which replaced an earlier one.",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "thessalonica-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Forum_Romanum_Thessaloniki.jpg",
+      "width": 3000,
+      "height": 2250,
+      "author": "Elke Brüser",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Forum_Romanum_Thessaloniki.jpg",
+      "caption": "The excavated Roman forum of Thessaloniki, built from the late 2nd century AD, set among the modern city's apartment blocks.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "thessalonica-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Thessaloniki%2C_Greece%2C_Feb_2023_-_Western_Walls.jpg",
       "width": 4032,
       "height": 3024,
@@ -23,7 +36,33 @@
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki,_Greece,_Feb_2023_-_Western_Walls.jpg",
-      "caption": "Western walls of the Old City in Thessaloniki.",
+      "caption": "Part of Thessaloniki's city walls, which in their surviving form date from the 4th century AD and later.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "thessalonica-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Thessaloniki_Arch_of_Galerius_from_the_west.jpg",
+      "width": 6008,
+      "height": 4008,
+      "author": "Ymblanter",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki_Arch_of_Galerius_from_the_west.jpg",
+      "caption": "The Arch of Galerius in Thessaloniki, built around AD 300, about two and a half centuries after Paul's visit.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "thessalonica-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Thessaloniki_beach_promenade.jpg",
+      "width": 9870,
+      "height": 3917,
+      "author": "Johannesjom",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thessaloniki_beach_promenade.jpg",
+      "caption": "Thessaloniki on the Thermaic Gulf, seen from the sea.",
       "kind": "modern",
       "aiGenerated": false
     }
