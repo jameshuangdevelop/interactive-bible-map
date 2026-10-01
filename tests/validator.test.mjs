@@ -397,6 +397,11 @@ test("Commons media URL fixture with valid hash folders passes", async () => {
   assert.equal(result.errors.length, 0);
 });
 
+test("historical Commons image kind passes validation", async () => {
+  const result = await runCase("valid-media-historical");
+  assert.equal(result.errors.length, 0);
+});
+
 test("Commons media URL fixture rejects wrong hash folders", async () => {
   const result = await runCase("invalid-media-commons-url-hash");
   assert.ok(
