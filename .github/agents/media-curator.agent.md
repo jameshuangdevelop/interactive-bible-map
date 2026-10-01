@@ -17,6 +17,7 @@ You find freely licensed images for locations and write prompts for AI reconstru
 
 ## Images
 - Find images on Wikimedia Commons or public-domain art that clearly show the place: **5–10 for a major place and 1–3 for a standard one** (the record's `prominence`; ADR-0029). Major places need a mix of `kind`s: the place today (`modern`), its excavated remains (`site`) and, where one exists, a freely licensed model, drawing or painting of the ancient place (`reconstruction`).
+- Tag old photographs, engravings and paintings that show the place as it looked when they were made as `historical`, not `modern`.
 - **Show the overall feel of the place, not fragments:** wide views of the city in its landscape, a whole theatre, street or harbour, the modern skyline. Skip close-ups of single stones, inscriptions or fragments unless that object is what the place is famous for. Prefer originals at least 1,600 px wide.
 - Confirm the license on the Commons file page itself, not from search results. Accept only licenses that `docs/LICENSES.md` allows. Reject non-free, fair-use, "all rights reserved" or unclear files.
 - **Start from Wikidata** (ADR-0020): open the place's Wikidata item (its QID is in the record's `sources`), and use its main image (P18) and Commons category (P373) as the first candidates. Make sure the item is the ancient or archaeological site, not a modern town with the same name.
