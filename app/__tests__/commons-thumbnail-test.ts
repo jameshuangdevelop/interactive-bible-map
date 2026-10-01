@@ -37,4 +37,10 @@ describe("commons thumbnail helpers", () => {
     }
     expect(srcSet).not.toContain("utm_source=");
   });
+
+  test("keeps repo-hosted AI image paths unchanged", () => {
+    const aiPath = "media/ai/capernaum-ai-01.webp";
+    expect(buildCommonsThumbnailUrl(aiPath, 1280)).toBe(aiPath);
+    expect(buildCommonsThumbnailSrcSet(aiPath)).toBeNull();
+  });
 });

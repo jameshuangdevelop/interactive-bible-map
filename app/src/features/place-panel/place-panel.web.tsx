@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type RefObject
+} from "react";
 
 import { candidateIndexToLetter, getPrimaryPlaceName } from "../map/place-visibility";
 import type {
@@ -12,11 +20,18 @@ import type {
 } from "../map/types";
 import {
   buildAlsoKnownAs,
+  buildImageKindLabel,
+  buildImagePromptBriefUrl,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
   confidenceLabel,
+  formatAiBasedOnSources,
   groupScriptureByBook,
+  imageIndexesToLoad,
+  isAiReconstructionImage,
   isDisputedRecord,
+  nextImageIndex,
+  shouldRenderThumbnailRow,
   sortScriptureByCanonicalOrder
 } from "./panel-model";
 import { formatSourceCitation } from "./source-format";
@@ -30,6 +45,9 @@ const PANEL_SECTION_GAP = tokens.spacing.lg;
 const SCRIPTURE_INITIAL_COUNT = 5;
 const SCRIPTURE_CHUNK_SIZE = 24;
 const SOURCE_SECTION_ANCHOR_ID = "place-panel-sources";
+const VIEWER_IMAGE_WIDTH_HINT = 1280;
+const DIALOG_FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -72,6 +90,90 @@ function toSafeHttpUrl(url: string | null | undefined) {
   }
 }
 
+function toSafeImageUrl(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  const trimmed = url.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+
+    return parsed.toString();
+  } catch {
+    if (/^[a-z][a-z0-9+.-]*:/iu.test(trimmed) || trimmed.startsWith("//")) {
+      return null;
+    }
+
+    const normalized = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    try {
+      const parsed = new URL(normalized, "https://interactive-bible-map.local");
+      return `${parsed.pathname}${parsed.search}`;
+    } catch {
+      return null;
+    }
+  }
+}
+
+function resolveDisplayImageRequest(
+  imageUrl: string,
+  widthHint: number,
+  includeResponsiveSrcSet: boolean
+) {
+  const safeImageUrl = toSafeImageUrl(imageUrl);
+  if (!safeImageUrl) {
+    return {
+      requestUrl: null,
+      srcSet: null as string | null
+    };
+  }
+
+  return {
+    requestUrl: buildCommonsThumbnailUrl(safeImageUrl, widthHint),
+    srcSet: includeResponsiveSrcSet ? buildCommonsThumbnailSrcSet(safeImageUrl) : null
+  };
+}
+
+function focusableElementsInDialog(container: HTMLElement) {
+  return Array.from(container.querySelectorAll<HTMLElement>(DIALOG_FOCUSABLE_SELECTOR)).filter(
+    (element) => !element.hasAttribute("disabled")
+  );
+}
+
+function cycleDialogFocus(event: ReactKeyboardEvent<HTMLElement>) {
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const container = event.currentTarget;
+  const focusable = focusableElementsInDialog(container);
+  if (focusable.length === 0) {
+    event.preventDefault();
+    return;
+  }
+
+  const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const currentIndex = activeElement ? focusable.indexOf(activeElement) : -1;
+  const movingBackward = event.shiftKey;
+  let targetIndex = 0;
+
+  if (movingBackward) {
+    targetIndex = currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1;
+  } else {
+    targetIndex = currentIndex < 0 || currentIndex >= focusable.length - 1 ? 0 : currentIndex + 1;
+  }
+
+  event.preventDefault();
+  focusable[targetIndex]?.focus();
+}
+
 function formatReviewedDate(lastReviewed: string | undefined) {
   if (!lastReviewed) {
     return "unknown";
@@ -112,25 +214,46 @@ function typeChipStyle(confidence: Confidence) {
 
 function WikimediaImage({
   image,
+  locationId,
   displayWidthHint,
   thumbnailSizes,
   counterText,
-  failed,
-  onError
+  failedImageRequests,
+  onRequestFailure,
+  onOpenViewer,
+  openViewerTargetRef,
+  onPreviousImage,
+  onNextImage,
+  includeResponsiveSrcSet
 }: {
   image: MediaImageRecord;
+  locationId: string;
   displayWidthHint: number;
   thumbnailSizes: string;
   counterText: string | null;
-  failed: boolean;
-  onError: () => void;
+  failedImageRequests: Record<string, true>;
+  onRequestFailure: (requestUrl: string) => void;
+  onOpenViewer?: () => void;
+  openViewerTargetRef?: RefObject<HTMLButtonElement | null>;
+  onPreviousImage?: () => void;
+  onNextImage?: () => void;
+  includeResponsiveSrcSet: boolean;
 }) {
-  const safeImageUrl = toSafeHttpUrl(image.url);
+  const { requestUrl: imageUrl, srcSet: imageSrcSet } = resolveDisplayImageRequest(
+    image.url,
+    displayWidthHint,
+    includeResponsiveSrcSet
+  );
   const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
   const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
-  const imageUrl = safeImageUrl ? buildCommonsThumbnailUrl(safeImageUrl, displayWidthHint) : null;
-  const imageSrcSet = safeImageUrl ? buildCommonsThumbnailSrcSet(safeImageUrl) : null;
-  const showFallback = failed || !imageUrl;
+  const showFallback = !imageUrl || Boolean(failedImageRequests[imageUrl]);
+  const kindLabel = buildImageKindLabel(image.kind);
+  const isAiImage = isAiReconstructionImage(image);
+  const toolLabel = image.generator?.tool?.trim() || "Unknown tool";
+  const licenseLabel = image.license?.trim() || "License pending";
+  const authorLabel = image.author?.trim() || "Unknown author";
+  const aiBriefUrl = buildImagePromptBriefUrl(locationId, image.promptRef);
+  const aiSourcesText = formatAiBasedOnSources(image.basedOn);
 
   return (
     <div>
@@ -160,7 +283,11 @@ function WikimediaImage({
           <img
             alt={image.caption}
             data-panel-photo-image="true"
-            onError={onError}
+            onError={() => {
+              if (imageUrl) {
+                onRequestFailure(imageUrl);
+              }
+            }}
             src={imageUrl}
             srcSet={imageSrcSet ?? undefined}
             sizes={thumbnailSizes}
@@ -172,6 +299,16 @@ function WikimediaImage({
             }}
           />
         )}
+        {onOpenViewer ? (
+          <button
+            aria-label="Open image viewer"
+            data-image-viewer-open="true"
+            onClick={onOpenViewer}
+            ref={openViewerTargetRef}
+            style={imageViewerOpenButtonStyle}
+            type="button"
+          />
+        ) : null}
         {counterText ? (
           <span
             style={{
@@ -184,28 +321,57 @@ function WikimediaImage({
               padding: "2px 8px",
               fontSize: `${tokens.typography.captionSize}px`,
               lineHeight: `${tokens.typography.captionLineHeight}px`,
-              pointerEvents: "none"
+              pointerEvents: "none",
+              zIndex: 1
             }}
           >
             {counterText}
           </span>
         ) : null}
-        {image.aiGenerated ? (
+        {kindLabel ? (
           <span
+            data-photo-kind-label="true"
             style={{
               position: "absolute",
               top: `${tokens.spacing.sm}px`,
               left: `${tokens.spacing.sm}px`,
               borderRadius: "999px",
               padding: "4px 8px",
-              backgroundColor: "rgba(0,0,0,0.7)",
+              backgroundColor: "rgba(32,33,36,0.92)",
               color: "#FFFFFF",
               fontSize: `${tokens.typography.captionSize}px`,
-              lineHeight: `${tokens.typography.captionLineHeight}px`
+              lineHeight: `${tokens.typography.captionLineHeight}px`,
+              zIndex: 1
             }}
           >
-            AI-generated reconstruction
+            {kindLabel}
           </span>
+        ) : null}
+        {onPreviousImage && onNextImage ? (
+          <>
+            <button
+              aria-label="Previous image"
+              onClick={(event) => {
+                event.stopPropagation();
+                onPreviousImage();
+              }}
+              style={carouselButtonStyle("left")}
+              type="button"
+            >
+              ‹
+            </button>
+            <button
+              aria-label="Next image"
+              onClick={(event) => {
+                event.stopPropagation();
+                onNextImage();
+              }}
+              style={carouselButtonStyle("right")}
+              type="button"
+            >
+              ›
+            </button>
+          </>
         ) : null}
       </div>
       <p
@@ -218,24 +384,44 @@ function WikimediaImage({
           lineHeight: `${tokens.typography.captionLineHeight}px`
         }}
       >
-        Photo: {image.author} ·{" "}
-        {safeLicenseUrl ? (
-          <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-            {image.license}
-          </a>
+        {isAiImage ? (
+          <>
+            AI-generated reconstruction · {toolLabel} ·{" "}
+            {safeLicenseUrl ? (
+              <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+                {licenseLabel}
+              </a>
+            ) : (
+              licenseLabel
+            )}{" "}
+            · Based on:{" "}
+            <a href={aiBriefUrl} rel="noopener noreferrer" target="_blank">
+              {aiSourcesText}
+            </a>
+          </>
         ) : (
-          image.license
-        )}{" "}
-        ·{" "}
-        {safeSourcePageUrl ? (
-          <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
-            Wikimedia Commons
-          </a>
-        ) : (
-          "Wikimedia Commons"
+          <>
+            Photo: {authorLabel} ·{" "}
+            {safeLicenseUrl ? (
+              <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+                {licenseLabel}
+              </a>
+            ) : (
+              licenseLabel
+            )}{" "}
+            ·{" "}
+            {safeSourcePageUrl ? (
+              <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
+                Wikimedia Commons
+              </a>
+            ) : (
+              "Wikimedia Commons"
+            )}
+          </>
         )}
       </p>
       <p
+        data-photo-caption="true"
         style={{
           marginTop: `${tokens.spacing.xs}px`,
           marginBottom: 0,
@@ -246,6 +432,97 @@ function WikimediaImage({
       >
         {image.caption}
       </p>
+    </div>
+  );
+}
+
+function GalleryThumbnails({
+  images,
+  activeImageIndex,
+  failedImageRequests,
+  onRequestFailure,
+  onSelectImage
+}: {
+  images: MediaImageRecord[];
+  activeImageIndex: number;
+  failedImageRequests: Record<string, true>;
+  onRequestFailure: (requestUrl: string) => void;
+  onSelectImage: (nextIndex: number) => void;
+}) {
+  return (
+    <div
+      data-thumbnail-row="true"
+      style={{
+        display: "flex",
+        gap: `${tokens.spacing.sm}px`,
+        marginTop: `${tokens.spacing.sm}px`,
+        overflowX: "auto",
+        paddingBottom: `${tokens.spacing.xs}px`
+      }}
+    >
+      {images.map((image, imageIndex) => {
+        const thumbnail = resolveDisplayImageRequest(image.url, 330, false);
+        const isFailed =
+          !thumbnail.requestUrl || Boolean(failedImageRequests[thumbnail.requestUrl]);
+        const selected = imageIndex === activeImageIndex;
+
+        return (
+          <button
+            aria-label={`Show image ${imageIndex + 1} of ${images.length}`}
+            data-gallery-thumbnail={selected ? "selected" : "idle"}
+            key={image.id}
+            onClick={() => onSelectImage(imageIndex)}
+            style={{
+              width: "72px",
+              minWidth: "72px",
+              height: "48px",
+              borderRadius: `${tokens.radius.panel}px`,
+              border: selected
+                ? `2px solid ${tokens.color.accent}`
+                : `1px solid ${tokens.color.divider}`,
+              backgroundColor: tokens.color.subtleSurface,
+              overflow: "hidden",
+              padding: 0,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            type="button"
+          >
+            {isFailed ? (
+              <span
+                style={{
+                  color: tokens.color.textSecondary,
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  lineHeight: `${tokens.typography.captionLineHeight}px`,
+                  padding: `0 ${tokens.spacing.xs}px`,
+                  textAlign: "center"
+                }}
+              >
+                -
+              </span>
+            ) : (
+              <img
+                alt={image.caption}
+                loading="lazy"
+                onError={() => {
+                  if (thumbnail.requestUrl) {
+                    onRequestFailure(thumbnail.requestUrl);
+                  }
+                }}
+                src={thumbnail.requestUrl}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block"
+                }}
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -423,14 +700,17 @@ export function PlacePanel({
   onCopyLink
 }: PlacePanelProps) {
   const sourceSectionRef = useRef<HTMLElement | null>(null);
+  const imageViewerRef = useRef<HTMLDivElement | null>(null);
+  const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [failedImages, setFailedImages] = useState<Record<string, true>>({});
+  const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
 
   const location = placeDetails?.location ?? null;
-  const images = placeDetails?.media?.images ?? [];
+  const images = useMemo(() => placeDetails?.media?.images ?? [], [placeDetails?.media?.images]);
   const bibliographyById = useMemo(
     () => new Map((placeDetails?.bibliography ?? []).map((entry) => [entry.id, entry] as const)),
     [placeDetails?.bibliography]
@@ -499,10 +779,126 @@ export function PlacePanel({
     ? Math.max(330, (typeof window === "undefined" ? 360 : window.innerWidth) - 32)
     : 408;
   const imageSizes = isSmallScreen ? "(max-width: 767px) calc(100vw - 32px), 408px" : "408px";
-  const selectedImage = images[activeImageIndex] ?? null;
+  const viewerImageSizes = `${VIEWER_IMAGE_WIDTH_HINT}px`;
+  const normalizedActiveImageIndex =
+    images.length === 0 ? 0 : Math.min(activeImageIndex, images.length - 1);
+  const selectedImage = images[normalizedActiveImageIndex] ?? null;
+  const showThumbnailStrip = shouldRenderThumbnailRow(images.length);
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
   const modernName = placeForDisplay.names.modern;
   const titleName = getPrimaryPlaceName(placeForDisplay);
+
+  useEffect(() => {
+    if (!selectedImage || images.length <= 1) {
+      return;
+    }
+
+    const [, nextIndex] = imageIndexesToLoad(normalizedActiveImageIndex, images.length);
+    if (typeof nextIndex !== "number") {
+      return;
+    }
+
+    const nextImage = images[nextIndex];
+    const nextRequest = resolveDisplayImageRequest(nextImage.url, imageDisplayWidthHint, false);
+    if (!nextRequest.requestUrl || failedImageRequests[nextRequest.requestUrl]) {
+      return;
+    }
+
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.src = nextRequest.requestUrl;
+  }, [
+    activeImageIndex,
+    failedImageRequests,
+    imageDisplayWidthHint,
+    images,
+    images.length,
+    normalizedActiveImageIndex,
+    selectedImage
+  ]);
+
+  useEffect(() => {
+    if (!isImageViewerOpen || images.length <= 1) {
+      return;
+    }
+
+    const [, nextIndex] = imageIndexesToLoad(normalizedActiveImageIndex, images.length);
+    if (typeof nextIndex !== "number") {
+      return;
+    }
+
+    const nextImage = images[nextIndex];
+    const nextViewerRequest = resolveDisplayImageRequest(
+      nextImage.url,
+      VIEWER_IMAGE_WIDTH_HINT,
+      false
+    );
+    if (!nextViewerRequest.requestUrl || failedImageRequests[nextViewerRequest.requestUrl]) {
+      return;
+    }
+
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.src = nextViewerRequest.requestUrl;
+  }, [
+    activeImageIndex,
+    failedImageRequests,
+    images,
+    images.length,
+    isImageViewerOpen,
+    normalizedActiveImageIndex
+  ]);
+
+  useEffect(() => {
+    if (!isImageViewerOpen) {
+      return;
+    }
+
+    const dialog = imageViewerRef.current;
+    if (!dialog) {
+      return;
+    }
+
+    const focusable = focusableElementsInDialog(dialog);
+    if (focusable.length > 0) {
+      focusable[0].focus();
+      return;
+    }
+
+    dialog.focus();
+  }, [isImageViewerOpen]);
+
+  const moveImageBy = (step: number) => {
+    setActiveImageIndex((currentIndex) => nextImageIndex(currentIndex, images.length, step));
+  };
+
+  const markImageRequestFailed = (requestUrl: string) => {
+    setFailedImageRequests((current) => {
+      if (current[requestUrl]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [requestUrl]: true
+      };
+    });
+  };
+
+  const openImageViewer = () => {
+    if (!selectedImage) {
+      return;
+    }
+
+    setIsImageViewerOpen(true);
+  };
+
+  const closeImageViewer = () => {
+    setIsImageViewerOpen(false);
+    window.requestAnimationFrame(() => {
+      imageViewerOpenTargetRef.current?.focus();
+    });
+  };
 
   const confidenceRow = (() => {
     if (hasMultipleCandidates && isDisputed) {
@@ -681,48 +1077,45 @@ export function PlacePanel({
       <div style={{ display: "grid", gap: `${PANEL_SECTION_GAP}px` }}>
         {selectedImage ? (
           <section data-panel-section="photos">
-            <div style={{ position: "relative" }}>
-              <WikimediaImage
-                counterText={images.length > 1 ? `${activeImageIndex + 1} / ${images.length}` : null}
-                displayWidthHint={imageDisplayWidthHint}
-                failed={Boolean(failedImages[selectedImage.id])}
-                image={selectedImage}
-                onError={() =>
-                  setFailedImages((current) => ({
-                    ...current,
-                    [selectedImage.id]: true
-                  }))
-                }
-                thumbnailSizes={imageSizes}
+            <WikimediaImage
+              counterText={
+                images.length > 1
+                  ? `${normalizedActiveImageIndex + 1} / ${images.length}`
+                  : null
+              }
+              displayWidthHint={imageDisplayWidthHint}
+              failedImageRequests={failedImageRequests}
+              image={selectedImage}
+              includeResponsiveSrcSet
+              locationId={placeForDisplay.id}
+              onNextImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(1);
+                    }
+                  : undefined
+              }
+              onOpenViewer={openImageViewer}
+              onPreviousImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(-1);
+                    }
+                  : undefined
+              }
+              onRequestFailure={markImageRequestFailed}
+              openViewerTargetRef={imageViewerOpenTargetRef}
+              thumbnailSizes={imageSizes}
+            />
+            {showThumbnailStrip ? (
+              <GalleryThumbnails
+                activeImageIndex={normalizedActiveImageIndex}
+                failedImageRequests={failedImageRequests}
+                images={images}
+                onRequestFailure={markImageRequestFailed}
+                onSelectImage={setActiveImageIndex}
               />
-              {images.length > 1 ? (
-                <>
-                  <button
-                    aria-label="Previous photo"
-                    onClick={() =>
-                      setActiveImageIndex(
-                        (currentIndex) =>
-                          (currentIndex - 1 + images.length) % images.length
-                      )
-                    }
-                    style={carouselButtonStyle("left")}
-                    type="button"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    aria-label="Next photo"
-                    onClick={() =>
-                      setActiveImageIndex((currentIndex) => (currentIndex + 1) % images.length)
-                    }
-                    style={carouselButtonStyle("right")}
-                    type="button"
-                  >
-                    ›
-                  </button>
-                </>
-              ) : null}
-            </div>
+            ) : null}
           </section>
         ) : null}
 
@@ -1135,6 +1528,88 @@ export function PlacePanel({
         ) : null}
       </div>
 
+      {selectedImage && isImageViewerOpen ? (
+        <div
+          data-image-viewer-overlay="true"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              closeImageViewer();
+            }
+          }}
+          style={imageViewerOverlayStyle}
+        >
+          <div
+            aria-label="Image viewer"
+            aria-modal="true"
+            data-image-viewer-dialog="true"
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                closeImageViewer();
+                return;
+              }
+
+              if (event.key === "ArrowRight") {
+                event.preventDefault();
+                moveImageBy(1);
+                return;
+              }
+
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                moveImageBy(-1);
+                return;
+              }
+
+              cycleDialogFocus(event);
+            }}
+            ref={imageViewerRef}
+            role="dialog"
+            style={imageViewerDialogStyle}
+            tabIndex={-1}
+          >
+            <button
+              aria-label="Close image viewer"
+              data-image-viewer-close="true"
+              onClick={closeImageViewer}
+              style={imageViewerCloseButtonStyle}
+              type="button"
+            >
+              ×
+            </button>
+            <WikimediaImage
+              counterText={
+                images.length > 1
+                  ? `${normalizedActiveImageIndex + 1} / ${images.length}`
+                  : null
+              }
+              displayWidthHint={VIEWER_IMAGE_WIDTH_HINT}
+              failedImageRequests={failedImageRequests}
+              image={selectedImage}
+              includeResponsiveSrcSet={false}
+              locationId={placeForDisplay.id}
+              onNextImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(1);
+                    }
+                  : undefined
+              }
+              onPreviousImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(-1);
+                    }
+                  : undefined
+              }
+              onRequestFailure={markImageRequestFailed}
+              thumbnailSizes={viewerImageSizes}
+            />
+          </div>
+        </div>
+      ) : null}
+
       {loadErrorMessage ? (
         <div
           role="alert"
@@ -1222,6 +1697,54 @@ const closeButtonStyle: CSSProperties = {
   lineHeight: 1
 };
 
+const imageViewerOverlayStyle: CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  backgroundColor: "rgba(32,33,36,0.76)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: `${tokens.spacing.md}px`,
+  zIndex: 40
+};
+
+const imageViewerDialogStyle: CSSProperties = {
+  width: "min(1280px, calc(100vw - 32px))",
+  maxHeight: "calc(100vh - 32px)",
+  overflowY: "auto",
+  backgroundColor: tokens.color.surface,
+  borderRadius: `${tokens.radius.panel}px`,
+  padding: `${tokens.spacing.md}px`,
+  position: "relative",
+  boxShadow: tokens.shadow.box
+};
+
+const imageViewerCloseButtonStyle: CSSProperties = {
+  position: "absolute",
+  top: `${tokens.spacing.sm}px`,
+  right: `${tokens.spacing.sm}px`,
+  width: "32px",
+  height: "32px",
+  borderRadius: "999px",
+  border: `1px solid ${tokens.color.divider}`,
+  backgroundColor: "rgba(255,255,255,0.92)",
+  color: tokens.color.textSecondary,
+  cursor: "pointer",
+  fontSize: "18px",
+  lineHeight: 1,
+  zIndex: 1
+};
+
+const imageViewerOpenButtonStyle: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  border: "none",
+  background: "transparent",
+  cursor: "zoom-in",
+  padding: 0,
+  zIndex: 0
+};
+
 function carouselButtonStyle(side: "left" | "right"): CSSProperties {
   return {
     position: "absolute",
@@ -1236,7 +1759,8 @@ function carouselButtonStyle(side: "left" | "right"): CSSProperties {
     color: tokens.color.textSecondary,
     cursor: "pointer",
     fontSize: "18px",
-    lineHeight: 1
+    lineHeight: 1,
+    zIndex: 2
   };
 }
 

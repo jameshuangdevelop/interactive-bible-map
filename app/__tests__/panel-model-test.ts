@@ -1,7 +1,14 @@
 import {
+  buildImageKindLabel,
+  buildImagePromptBriefUrl,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
-  groupScriptureByBook
+  formatAiBasedOnSources,
+  groupScriptureByBook,
+  imageIndexesToLoad,
+  isAiReconstructionImage,
+  nextImageIndex,
+  shouldRenderThumbnailRow
 } from "../src/features/place-panel/panel-model";
 import type { PlaceIndexRecord, PlaceRecord } from "../src/features/map/types";
 
@@ -170,5 +177,58 @@ describe("place panel model helpers", () => {
       "bib:sample",
       "scripture:Isaiah 9:1"
     ]);
+  });
+
+  test("maps image kinds to labels and keeps missing kind unlabeled", () => {
+    expect(buildImageKindLabel("modern")).toBe("Today");
+    expect(buildImageKindLabel("site")).toBe("Excavated site");
+    expect(buildImageKindLabel("reconstruction")).toBe("Reconstruction");
+    expect(buildImageKindLabel("ai-reconstruction")).toBe("AI-generated reconstruction");
+    expect(buildImageKindLabel(undefined)).toBeNull();
+  });
+
+  test("builds AI research-brief links and source text", () => {
+    expect(buildImagePromptBriefUrl("capernaum")).toBe(
+      "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md"
+    );
+    expect(buildImagePromptBriefUrl("capernaum", "Prompt 1: Market overview")).toBe(
+      "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-market-overview"
+    );
+    expect(formatAiBasedOnSources(["wikidata:Q1", "bib:sample"])).toBe(
+      "wikidata:Q1, bib:sample"
+    );
+    expect(formatAiBasedOnSources(undefined)).toBe("research brief");
+  });
+
+  test("computes cyclical image indices and thumbnail-row visibility", () => {
+    expect(nextImageIndex(0, 10, 1)).toBe(1);
+    expect(nextImageIndex(0, 10, -1)).toBe(9);
+    expect(nextImageIndex(9, 10, 1)).toBe(0);
+    expect(imageIndexesToLoad(0, 10)).toEqual([0, 1]);
+    expect(imageIndexesToLoad(9, 10)).toEqual([9, 0]);
+    expect(imageIndexesToLoad(0, 1)).toEqual([0]);
+    expect(shouldRenderThumbnailRow(3)).toBe(false);
+    expect(shouldRenderThumbnailRow(4)).toBe(true);
+  });
+
+  test("treats ai-reconstruction kind and aiGenerated flag as AI images", () => {
+    expect(
+      isAiReconstructionImage({
+        kind: "ai-reconstruction",
+        aiGenerated: true
+      })
+    ).toBe(true);
+    expect(
+      isAiReconstructionImage({
+        kind: "modern",
+        aiGenerated: true
+      })
+    ).toBe(true);
+    expect(
+      isAiReconstructionImage({
+        kind: "modern",
+        aiGenerated: false
+      })
+    ).toBe(false);
   });
 });

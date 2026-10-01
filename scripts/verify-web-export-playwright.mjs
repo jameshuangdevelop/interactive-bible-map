@@ -21,6 +21,7 @@ const licensesDocumentPath = path.join(repositoryRoot, "docs", "LICENSES.md");
 
 const smoothnessLongTaskLimitMs = 50;
 const syntheticPlaceIdPrefix = "synthetic-city-";
+const galleryScreenshotDirectoryName = "ibm-m35-gallery";
 const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
 const mainAttributionNeedle = "OpenFreeMap";
@@ -49,6 +50,10 @@ const mapLayerIds = {
   candidatePins: "ibm-candidate-pin",
   pinLabels: "ibm-pin-label"
 };
+const fixtureImagePng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAADUlEQVR4nGP8z8DwHwAFAAH/e+m+7wAAAABJRU5ErkJggg==",
+  "base64"
+);
 
 function contentTypeFor(filePath) {
   const extension = path.extname(filePath).toLowerCase();
@@ -64,6 +69,8 @@ function contentTypeFor(filePath) {
       return "application/json; charset=utf-8";
     case ".ico":
       return "image/x-icon";
+    case ".webp":
+      return "image/webp";
     case ".txt":
       return "text/plain; charset=utf-8";
     default:
@@ -131,6 +138,185 @@ async function startStaticServer(rootDirectory) {
 
 function temporaryScreenshotPath(fileName) {
   return path.join(process.env.TEMP ?? os.tmpdir(), fileName);
+}
+
+function temporaryGalleryScreenshotPath(fileName) {
+  return path.join(process.env.TEMP ?? os.tmpdir(), galleryScreenshotDirectoryName, fileName);
+}
+
+function parseCommonsThumbnailRequest(requestUrl) {
+  try {
+    const { pathname } = new URL(requestUrl);
+    const match = pathname.match(/\/(?<width>330|500|960|1280)px-(?<fileName>[^/]+)$/u);
+    if (!match?.groups?.width || !match.groups.fileName) {
+      return null;
+    }
+
+    return {
+      width: Number.parseInt(match.groups.width, 10),
+      fileName: match.groups.fileName
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function readGeneratedPlacePayload(placeId) {
+  const candidatePaths = [
+    path.join(distDirectory, "generated", "places", `${placeId}.json`),
+    path.join(repositoryRoot, "app", "public", "generated", "places", `${placeId}.json`)
+  ];
+
+  for (const payloadPath of candidatePaths) {
+    try {
+      const content = await fs.readFile(payloadPath, "utf8");
+      return JSON.parse(content);
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`Could not load generated payload for place '${placeId}'.`);
+}
+
+function buildGalleryFixturePayload(basePayload) {
+  const fixtureImages = [
+    {
+      id: "capernaum-01",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/0/0a/M3_5_Fixture_Capernaum_Modern_01.jpg",
+      author: "Fixture Photographer 1",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Modern_01.jpg",
+      caption: "Modern Capernaum shoreline",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-02",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/1/1a/M3_5_Fixture_Capernaum_Modern_02.jpg",
+      author: "Fixture Photographer 2",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Modern_02.jpg",
+      caption: "Modern town and lake",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-03",
+      kind: "site",
+      url: "https://upload.wikimedia.org/wikipedia/commons/2/2a/M3_5_Fixture_Capernaum_Site_01.jpg",
+      author: "Fixture Photographer 3",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_01.jpg",
+      caption: "Synagogue excavation area",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-04",
+      kind: "reconstruction",
+      url: "https://upload.wikimedia.org/wikipedia/commons/3/3a/M3_5_Fixture_Capernaum_Reconstruction_01.jpg",
+      author: "Fixture Artist 1",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Reconstruction_01.jpg",
+      caption: "Illustrated harbour reconstruction",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-ai-01",
+      kind: "ai-reconstruction",
+      url: "media/ai/capernaum-ai-01.webp",
+      author: "Interactive Bible Map",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md",
+      caption: "AI overview reconstruction of first-century Capernaum",
+      aiGenerated: true,
+      generator: {
+        tool: "DALL·E",
+        model: "gpt-image-1",
+        date: "2026-09-30"
+      },
+      promptRef: "Prompt 2: Synagogue and harbour",
+      basedOn: ["wikidata:Q59174", "bib:murphy-oconnor-holy-land-guide"]
+    },
+    {
+      id: "capernaum-06",
+      kind: "site",
+      url: "https://upload.wikimedia.org/wikipedia/commons/4/4a/M3_5_Fixture_Capernaum_Site_02.jpg",
+      author: "Fixture Photographer 4",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_02.jpg",
+      caption: "Street remains near the lakeshore",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-07",
+      kind: "reconstruction",
+      url: "https://upload.wikimedia.org/wikipedia/commons/5/5a/M3_5_Fixture_Capernaum_Reconstruction_02.jpg",
+      author: "Fixture Artist 2",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Reconstruction_02.jpg",
+      caption: "Streetscape reconstruction",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-08",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/6/6a/M3_5_Fixture_Capernaum_Modern_03.jpg",
+      author: "Fixture Photographer 5",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Modern_03.jpg",
+      caption: "Modern lakeside panorama",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-09",
+      kind: "site",
+      url: "https://upload.wikimedia.org/wikipedia/commons/7/7a/M3_5_Fixture_Capernaum_Site_03.jpg",
+      author: "Fixture Photographer 6",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_03.jpg",
+      caption: "Excavated structure cluster",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-10",
+      kind: "reconstruction",
+      url: "https://upload.wikimedia.org/wikipedia/commons/8/8a/M3_5_Fixture_Capernaum_Reconstruction_03.jpg",
+      author: "Fixture Artist 3",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Reconstruction_03.jpg",
+      caption: "Market-quarter reconstruction",
+      aiGenerated: false
+    }
+  ];
+
+  return {
+    ...basePayload,
+    media: {
+      locationId: "capernaum",
+      images: fixtureImages
+    }
+  };
 }
 
 async function waitForMapToSettle(page) {
@@ -1273,11 +1459,11 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     throw new Error(`Missing required photo credit text on lead image: '${firstCreditText.trim()}'`);
   }
 
-  const nextPhoto = page.locator("button[aria-label='Next photo']");
-  const hasCarousel = (await nextPhoto.count()) > 0;
+  const nextImage = page.locator("button[aria-label='Next image']");
+  const hasCarousel = (await nextImage.count()) > 0;
   let secondCreditText = null;
   if (hasCarousel) {
-    await nextPhoto.first().click();
+    await nextImage.first().click();
     await page.waitForTimeout(200);
     secondCreditText =
       (await page
@@ -1299,6 +1485,312 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     firstCreditText: firstCreditText.trim(),
     secondCreditText: secondCreditText?.trim() ?? null
   };
+}
+
+async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  const screenshotPaths = {
+    panel: temporaryGalleryScreenshotPath("gallery-10-image-place.png"),
+    thumbnails: temporaryGalleryScreenshotPath("gallery-thumbnail-row.png"),
+    viewer: temporaryGalleryScreenshotPath("gallery-viewer-open.png"),
+    aiLabel: temporaryGalleryScreenshotPath("gallery-ai-label.png")
+  };
+  const imageRequests = [];
+
+  await fs.mkdir(path.dirname(screenshotPaths.panel), { recursive: true });
+
+  const capernaumPayload = await readGeneratedPlacePayload("capernaum");
+  const galleryFixturePayload = buildGalleryFixturePayload(capernaumPayload);
+
+  await page.route("**/*", async (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.endsWith("/generated/places/capernaum.json")) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify(galleryFixturePayload)
+      });
+      return;
+    }
+
+    if (
+      requestUrl.includes("upload.wikimedia.org/wikipedia/commons") ||
+      requestUrl.includes("/media/ai/")
+    ) {
+      imageRequests.push(requestUrl);
+      await route.fulfill({
+        status: 200,
+        headers: {
+          "Content-Type": "image/png",
+          "Cache-Control": "no-cache"
+        },
+        body: fixtureImagePng
+      });
+      return;
+    }
+
+    await route.continue();
+  });
+
+  try {
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+      timeout: 30_000
+    });
+
+    const photosSection = page.locator(
+      "section[aria-label='Place details'] [data-panel-section='photos']"
+    );
+    await photosSection.getByRole("button", { name: "Previous image" }).waitFor({ timeout: 30_000 });
+    await photosSection.getByRole("button", { name: "Next image" }).waitFor({ timeout: 30_000 });
+    await photosSection.getByText("1 / 10", { exact: true }).waitFor({ timeout: 30_000 });
+    await photosSection.screenshot({ path: screenshotPaths.panel });
+
+    const thumbnails = page.locator("[data-thumbnail-row='true'] button[data-gallery-thumbnail]");
+    const thumbnailCount = await thumbnails.count();
+    if (thumbnailCount !== 10) {
+      throw new Error(`Fixture gallery should render 10 thumbnails, got ${thumbnailCount}.`);
+    }
+    await page.locator("[data-thumbnail-row='true']").screenshot({
+      path: screenshotPaths.thumbnails
+    });
+
+    const initialKindLabel = normalizeTextContent(
+      (await page
+        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (initialKindLabel !== "Today") {
+      throw new Error(`Expected first fixture image kind label to be 'Today', got '${initialKindLabel}'.`);
+    }
+
+    await page.waitForTimeout(600);
+    const commonsRequestsBeforeViewer = imageRequests
+      .map((requestUrl) => parseCommonsThumbnailRequest(requestUrl))
+      .filter((entry) => entry !== null);
+    const fullSizeBeforeViewer = new Set(
+      commonsRequestsBeforeViewer
+        .filter((entry) => entry.width > 330)
+        .map((entry) => entry.fileName)
+    );
+    if (fullSizeBeforeViewer.size !== 2) {
+      throw new Error(
+        `Expected only current+next full-size panel images before opening viewer, got ${JSON.stringify(Array.from(fullSizeBeforeViewer))}.`
+      );
+    }
+    for (const expectedFileName of [
+      "M3_5_Fixture_Capernaum_Modern_01.jpg",
+      "M3_5_Fixture_Capernaum_Modern_02.jpg"
+    ]) {
+      if (!fullSizeBeforeViewer.has(expectedFileName)) {
+        throw new Error(
+          `Fixture full-size preloads should include '${expectedFileName}', got ${JSON.stringify(Array.from(fullSizeBeforeViewer))}.`
+        );
+      }
+    }
+
+    const thumbnailCommonsBeforeViewer = new Set(
+      commonsRequestsBeforeViewer
+        .filter((entry) => entry.width === 330)
+        .map((entry) => entry.fileName)
+    );
+    if (thumbnailCommonsBeforeViewer.size < 9) {
+      throw new Error(
+        `Expected 330px thumbnail requests for the 9 Commons fixture images, got ${thumbnailCommonsBeforeViewer.size}.`
+      );
+    }
+    const width1280BeforeViewer = commonsRequestsBeforeViewer.filter(
+      (entry) => entry.width === 1280
+    ).length;
+
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("AI-generated reconstruction", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    const aiCreditText = normalizeTextContent(
+      (await page
+        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
+        .textContent()) ?? ""
+    );
+    if (
+      !aiCreditText.includes("AI-generated reconstruction") ||
+      !aiCreditText.includes("DALL·E") ||
+      !aiCreditText.includes("CC BY-SA 4.0") ||
+      !aiCreditText.includes("Based on: wikidata:Q59174, bib:murphy-oconnor-holy-land-guide")
+    ) {
+      throw new Error(`AI credit line mismatch: '${aiCreditText}'.`);
+    }
+    const aiBriefHref = await page
+      .locator(
+        "section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true'] a"
+      )
+      .last()
+      .getAttribute("href");
+    const expectedAiBriefHref =
+      "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-2-synagogue-and-harbour";
+    if (aiBriefHref !== expectedAiBriefHref) {
+      throw new Error(
+        `AI source link mismatch. expected='${expectedAiBriefHref}', got='${aiBriefHref ?? "null"}'.`
+      );
+    }
+    await photosSection.screenshot({ path: screenshotPaths.aiLabel });
+
+    const layoutCheck = await page.evaluate(() => {
+      const section = document.querySelector(
+        "section[aria-label='Place details'] [data-panel-section='photos']"
+      );
+      const label = section?.querySelector("[data-photo-kind-label='true']");
+      const credit = section?.querySelector("[data-photo-credit='true']");
+      const thumbnailRow = section?.querySelector("[data-thumbnail-row='true']");
+
+      const toBounds = (element) => {
+        if (!(element instanceof HTMLElement)) {
+          return null;
+        }
+        const { top, bottom } = element.getBoundingClientRect();
+        return { top, bottom };
+      };
+
+      return {
+        labelBounds: toBounds(label),
+        creditBounds: toBounds(credit),
+        thumbnailBounds: toBounds(thumbnailRow)
+      };
+    });
+
+    if (
+      !layoutCheck.labelBounds ||
+      !layoutCheck.creditBounds ||
+      !layoutCheck.thumbnailBounds
+    ) {
+      throw new Error("Could not collect gallery bounds for overlap checks.");
+    }
+    if (layoutCheck.labelBounds.bottom >= layoutCheck.creditBounds.top) {
+      throw new Error("AI kind label overlaps the photo credit line.");
+    }
+    if (layoutCheck.thumbnailBounds.top < layoutCheck.creditBounds.bottom) {
+      throw new Error("Thumbnail row overlaps the photo credit line.");
+    }
+
+    const opener = page.locator("[data-image-viewer-open='true']");
+    await opener.focus();
+    await page.keyboard.press("Enter");
+    await page.waitForSelector("[data-image-viewer-dialog='true']", {
+      state: "visible",
+      timeout: 30_000
+    });
+    await page.locator("[data-image-viewer-dialog='true']").screenshot({
+      path: screenshotPaths.viewer
+    });
+
+    const viewerKindLabel = normalizeTextContent(
+      (await page
+        .locator("[data-image-viewer-dialog='true'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (viewerKindLabel !== "AI-generated reconstruction") {
+      throw new Error(
+        `Viewer should show AI kind label, got '${viewerKindLabel}'.`
+      );
+    }
+
+    await page.waitForTimeout(600);
+    const width1280AfterViewerOpen = imageRequests
+      .map((requestUrl) => parseCommonsThumbnailRequest(requestUrl))
+      .filter((entry) => entry !== null && entry.width === 1280).length;
+    if (width1280AfterViewerOpen <= width1280BeforeViewer) {
+      throw new Error(
+        `Viewer should request 1280px images only when opened (before=${width1280BeforeViewer}, after=${width1280AfterViewerOpen}).`
+      );
+    }
+
+    await page.keyboard.press("ArrowRight");
+    await page
+      .locator("[data-image-viewer-dialog='true']")
+      .getByText("6 / 10", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    await page.keyboard.press("ArrowLeft");
+    await page
+      .locator("[data-image-viewer-dialog='true']")
+      .getByText("5 / 10", { exact: true })
+      .waitFor({ timeout: 30_000 });
+
+    for (let index = 0; index < 12; index += 1) {
+      await page.keyboard.press("Tab");
+      const focusInsideDialog = await page.evaluate(() => {
+        const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+        return !!dialog && dialog.contains(document.activeElement);
+      });
+      if (!focusInsideDialog) {
+        throw new Error("Tab moved focus outside the image viewer dialog.");
+      }
+    }
+    for (let index = 0; index < 4; index += 1) {
+      await page.keyboard.press("Shift+Tab");
+      const focusInsideDialog = await page.evaluate(() => {
+        const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+        return !!dialog && dialog.contains(document.activeElement);
+      });
+      if (!focusInsideDialog) {
+        throw new Error("Shift+Tab moved focus outside the image viewer dialog.");
+      }
+    }
+
+    const fixturePanelA11y = await runA11yCheck(
+      page,
+      "section[aria-label='Place details']",
+      "Fixture gallery panel accessibility",
+      {
+        requireZeroViolations: true
+      }
+    );
+    const fixtureViewerA11y = await runA11yCheck(
+      page,
+      "[data-image-viewer-dialog='true']",
+      "Fixture gallery viewer accessibility",
+      {
+        requireZeroViolations: true
+      }
+    );
+
+    await page.keyboard.press("Escape");
+    await page.waitForSelector("[data-image-viewer-dialog='true']", {
+      state: "detached",
+      timeout: 30_000
+    });
+    const focusRestored = await page.evaluate(() => {
+      const active = document.activeElement;
+      return (
+        active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true"
+      );
+    });
+    if (!focusRestored) {
+      throw new Error("Esc should close the image viewer and restore focus to the opener.");
+    }
+
+    return {
+      screenshotPaths,
+      thumbnailCount,
+      fullSizeBeforeViewer: Array.from(fullSizeBeforeViewer).sort((a, b) => a.localeCompare(b)),
+      width1280BeforeViewer,
+      width1280AfterViewerOpen,
+      aiCreditText,
+      aiBriefHref,
+      accessibility: {
+        fixturePanel: fixturePanelA11y,
+        fixtureViewer: fixtureViewerA11y
+      }
+    };
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+    await context.close();
+  }
 }
 
 async function verifyCapernaumLeadImageLoads(page, baseUrl) {
@@ -3635,6 +4127,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const galleryFixtureChecks = await verifyGalleryFixtureWithViewer(
+      browser,
+      staticServer.baseUrl
+    );
     const capernaumLeadImageLoadCheck = await verifyCapernaumLeadImageLoads(
       page,
       staticServer.baseUrl
@@ -3797,6 +4293,7 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       panelSectionAndCreditChecks,
+      galleryFixtureChecks,
       capernaumLeadImageLoadCheck,
       imageFailurePlaceholderCheck,
       disputedAndHierarchyChecks,

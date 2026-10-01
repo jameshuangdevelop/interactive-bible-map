@@ -35,7 +35,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3.5-03 | Images, batch B: Paul's letters and the capitals | research-lead → media-curator → fact-checker | `data/m3.5-images-b` | In progress (briefs) | — |
 | M3.5-04 | Images, batch C: the churches of Revelation | research-lead → media-curator → fact-checker | `data/m3.5-images-c` | In progress (briefs) | — |
 | M3.5-05 | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Card ready, waits for M3.5-01 | — |
-| M3.5-06 | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | In progress | — |
+| M3.5-06 | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Done, PR pending review | — |
 | M3.5-07 | AI reconstructions: generate, check and publish | fact-checker → the human → media-curator → fact-checker | `data/m3.5-ai-images` | Waits for the batches and the human's choice of generator | — |
 
 ## Open questions
@@ -48,6 +48,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 ## Session log
 | Date | Agent | Task | Result |
 |---|---|---|---|
+| 2026-10-01 | frontend-engineer | M3.5-06 | Built the larger place-panel gallery: image kind labels, thumbnail strip, AI credit/source formatting, keyboard-accessible viewer with focus trap and Esc restore, and "Previous image"/"Next image" controls. Added fixture-backed Playwright checks for a 10-image gallery (including AI), viewer behavior, loading rules and zero-violation axe checks; screenshots now save under `%TEMP%\\ibm-m35-gallery\\`. Added a web-export wrapper that copies `media/ai/*.webp` into `app/dist/media/ai` when present. Re-ran full validation chain (`lint`, `typecheck`, `test:all`, `validate:data`, `build:data`, `export:web`, `verify:web:playwright`). |
 | 2026-09-22 | project-owner | M0-01 | Created M0 files and the M1 cards |
 | 2026-09-23 | project-owner | M1 | Ran M1 as subagents, with reviews; CP1 approved (#3–#7) |
 | 2026-09-23 | project-owner | M2-00 to M2-04 | Schema and batches 1–2; #8–#11 merged |
