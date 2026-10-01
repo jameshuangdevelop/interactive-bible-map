@@ -3,12 +3,12 @@
   "images": [
     {
       "id": "jericho-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Jericho_cityscape_from_wall_ruins.jpg",
-      "author": "Daniel Case",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_cityscape_from_wall_ruins.jpg",
-      "caption": "Modern Jericho seen from the ancient city's excavated walls",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Jericho_city.jpg",
+      "author": "Randa107",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_city.jpg",
+      "caption": "Jericho's irrigated oasis fields against the dry Jordan Valley, seen from Mount Quarantania",
       "kind": "modern",
       "aiGenerated": false
     },
@@ -36,17 +36,6 @@
     },
     {
       "id": "jericho-04",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Jericho_city.jpg",
-      "author": "Randa107",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_city.jpg",
-      "caption": "Jericho's irrigated oasis fields against the dry Jordan Valley, seen from Mount Quarantania",
-      "kind": "modern",
-      "aiGenerated": false
-    },
-    {
-      "id": "jericho-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Jericho_-_panoramio.jpg",
       "author": "Mujaddara",
       "license": "CC BY-SA 3.0",
@@ -54,6 +43,17 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_-_panoramio.jpg",
       "caption": "Excavation trenches at Tell es-Sultan, with modern Jericho beyond",
       "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "jericho-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Jericho_cityscape_from_wall_ruins.jpg",
+      "author": "Daniel Case",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_cityscape_from_wall_ruins.jpg",
+      "caption": "Modern Jericho seen from the ancient city's excavated walls",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]
