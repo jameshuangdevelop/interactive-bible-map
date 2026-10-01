@@ -151,7 +151,8 @@ Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists 
 - For Commons images, `url` and `sourcePage` must point to the same file name.
 - Commons images must record the original file dimensions as `width` and `height` (integers, in pixels). Run `npm run fill:image-sizes` to fill or refresh them from the Commons API.
 - `images[].id` is this project's stable image name. Commons images use `<location-id>-NN` in display order, where `-01` is the lead image shown first in the details panel.
-- `images[].kind` is required and must be one of `modern`, `site`, `reconstruction`, or `ai-reconstruction`.
+- `images[].kind` is required and must be one of `modern`, `historical`, `site`, `reconstruction`, or `ai-reconstruction`.
+- `historical` is for period photographs/engravings/paintings that document how a place looked when the image was created (not a present-day view and not an antiquity reconstruction).
 - AI reconstructions use IDs in the `<location-id>-ai-NN` pattern and hosted URLs in `media/ai/<location-id>-ai-NN.webp`. They require `generator`, `promptRef`, and `basedOn`.
 - AI image `width` and `height` are optional placeholders for now; when present, the validator checks they match the hosted WebP file dimensions.
 - AI branch note (M3.5-01): `author`, `license`, `licenseUrl`, and `sourcePage` are optional placeholders for now and become required in M3.5-07 after the licensing ADR.

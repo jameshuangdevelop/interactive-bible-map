@@ -91,6 +91,7 @@ export interface PlaceRecord extends PlaceIndexRecord {
 
 export type MediaImageKind =
   | "modern"
+  | "historical"
   | "site"
   | "reconstruction"
   | "ai-reconstruction";
