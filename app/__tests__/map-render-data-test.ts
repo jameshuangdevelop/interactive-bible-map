@@ -12,6 +12,7 @@ const fixtures: PlaceIndexRecord[] = [
     names: { ancient: ["Roman Empire"], alternate: [] },
     type: "empire",
     zoomTier: "region",
+    prominence: "standard",
     parentId: null,
     candidates: [{ label: "Roman Empire", coordinates: [19.5, 40], confidence: "high" }]
   },
@@ -20,6 +21,7 @@ const fixtures: PlaceIndexRecord[] = [
     names: { ancient: ["Achaia"], alternate: [] },
     type: "province",
     zoomTier: "region",
+    prominence: "standard",
     parentId: "roman-empire",
     candidates: [{ label: "Achaia", coordinates: [22.2, 37.9], confidence: "high" }]
   },
@@ -28,6 +30,7 @@ const fixtures: PlaceIndexRecord[] = [
     names: { ancient: ["Galilee"], alternate: [] },
     type: "region",
     zoomTier: "region",
+    prominence: "standard",
     parentId: null,
     candidates: [{ label: "Galilee", coordinates: [35.3, 33], confidence: "high" }]
   },
@@ -36,6 +39,7 @@ const fixtures: PlaceIndexRecord[] = [
     names: { ancient: ["Capernaum"], modern: "Kfar Nahum", alternate: [] },
     type: "city",
     zoomTier: "city",
+    prominence: "standard",
     parentId: "galilee",
     candidates: [{ label: "Tell Hum", coordinates: [35.575, 32.881111], confidence: "high" }]
   },
@@ -44,6 +48,7 @@ const fixtures: PlaceIndexRecord[] = [
     names: { ancient: ["Emmaus"], alternate: [] },
     type: "village",
     zoomTier: "city",
+    prominence: "standard",
     parentId: "judea",
     candidates: [
       { label: "Emmaus A", coordinates: [34.989458, 31.8393], confidence: "disputed" },
@@ -142,6 +147,7 @@ describe("map render data", () => {
         names: { ancient: ["Syria"], alternate: [] },
         type: "province",
         zoomTier: "region",
+        prominence: "standard",
         parentId: "roman-empire",
         candidates: [{ label: "Syria", coordinates: [36.181667, 36.204722], confidence: "high" }]
       },
@@ -150,6 +156,7 @@ describe("map render data", () => {
         names: { ancient: ["Antioch on the Orontes"], modern: "Antakya", alternate: [] },
         type: "city",
         zoomTier: "city",
+        prominence: "standard",
         parentId: "syria-province",
         candidates: [
           {

@@ -27,6 +27,7 @@ describe("place visibility helpers", () => {
       },
       type: "village",
       zoomTier: "city",
+      prominence: "standard",
       parentId: "judea",
       candidates: [
         {
@@ -51,6 +52,7 @@ describe("place visibility helpers", () => {
       names: { ancient: ["Roman Empire"], alternate: [] },
       type: "empire",
       zoomTier: "region",
+      prominence: "standard",
       parentId: null,
       candidates: [{ label: "Roman Empire", coordinates: [20, 38], confidence: "high" }]
     };
@@ -90,4 +92,3 @@ describe("place visibility helpers", () => {
     expect(candidateIndexToLetter(3)).toBe("D");
   });
 });
-
