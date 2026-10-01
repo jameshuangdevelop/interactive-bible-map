@@ -14,17 +14,28 @@
     },
     {
       "id": "philadelphia-lydia-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Biblical_Philadelphia%2C_Ala%C5%9Fehir%2C_Turkey_%28%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D%29_%2851967240638%29.jpg",
-      "author": "Sharon Hahn Darlin",
-      "license": "CC BY 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Biblical_Philadelphia,_Ala%C5%9Fehir,_Turkey_(%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D)_(51967240638).jpg",
-      "caption": "Three brick-and-stone piers of the Byzantine Church of St John, Alaşehir's largest standing ruin",
-      "kind": "site",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Asie_Mineure._Philadelphia_-_%28Ka.IV.23_%3B_165%29.jpg",
+      "author": "Unknown photographer",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Asie_Mineure._Philadelphia_-_(Ka.IV.23_;_165).jpg",
+      "caption": "A wide early-20th-century view of Alaşehir (Philadelphia) in its plain below the Bozdağ range",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "philadelphia-lydia-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Philadelphia%2C_called_by_the_Turks_Allah_Sher%2C_the_city_of_God_-_Walsh_Robert_%26_Allom_Thomas_-_1836.jpg",
+      "author": "Thomas Allom",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Philadelphia,_called_by_the_Turks_Allah_Sher,_the_city_of_God_-_Walsh_Robert_%26_Allom_Thomas_-_1836.jpg",
+      "caption": "An 1836 engraving of Alaşehir's ruined walls and the town below the Bozdağ range, not an ancient reconstruction",
+      "kind": "reconstruction",
+      "aiGenerated": false
+    },
+    {
+      "id": "philadelphia-lydia-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Ala%C5%9Fehir_Church_of_St._John_2.jpg",
       "author": "simonjenkins",
       "license": "CC BY-SA 2.0",
@@ -35,24 +46,13 @@
       "aiGenerated": false
     },
     {
-      "id": "philadelphia-lydia-04",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Biblical_Philadelphia%2C_Ala%C5%9Fehir%2C_Turkey_%28%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D%29_%2851966474147%29.jpg",
+      "id": "philadelphia-lydia-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Biblical_Philadelphia%2C_Ala%C5%9Fehir%2C_Turkey_%28%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D%29_%2851967240638%29.jpg",
       "author": "Sharon Hahn Darlin",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Biblical_Philadelphia,_Ala%C5%9Fehir,_Turkey_(%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D)_(51966474147).jpg",
-      "caption": "The piers of the Byzantine Church of St John, with modern Alaşehir behind",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "philadelphia-lydia-05",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Ala%C5%9Fehir_Church_of_St._John.jpg",
-      "author": "simonjenkins",
-      "license": "CC BY-SA 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ala%C5%9Fehir_Church_of_St._John.jpg",
-      "caption": "The ruined piers of the Byzantine Church of St John, set among Alaşehir's streets",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Biblical_Philadelphia,_Ala%C5%9Fehir,_Turkey_(%E2%80%9CSeven_Churches_of_Revelation%E2%80%9D)_(51967240638).jpg",
+      "caption": "Three brick-and-stone piers of the Byzantine Church of St John, Alaşehir's largest standing ruin",
       "kind": "site",
       "aiGenerated": false
     }
