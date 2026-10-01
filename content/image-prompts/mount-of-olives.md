@@ -7,7 +7,7 @@ The Mount of Olives is the ridge east of Jerusalem's Old City, separated from th
 The Mount of Olives was not built up with monuments in this period: no source describes temples, churches or other major structures there, and the later Byzantine churches of the Ascension and Eleona were built centuries afterward and should not appear in a reconstruction. The valley at its base, the Kidron, already held monumental rock-cut tombs by the first century, including ones Josephus names in passing when describing nearby city walls, consistent with the area's long use as a burial ground [bib:josephus-jewish-war].
 
 ## Materials and colours
-The slope was terraced with dry-stone retaining walls characteristic of Judean hill-country agriculture, in pale local limestone [bib:rainey-notley-sacred-bridge]. Its name reflects its most visible planting: olive trees, grey-green and gnarled, covering the terraces [wikidata:Q205976].
+The slope was terraced with dry-stone retaining walls, in pale local limestone; terracing hillsides for cultivation was standard practice in this hill country [bib:isbe-agriculture; bib:rainey-notley-sacred-bridge]. Its name reflects its most visible planting: olive trees, grey-green and gnarled, covering the terraces [wikidata:Q205976].
 
 ## Landscape and plants
 Olive groves dominated the slope, with other fruit trees including figs also present; the Gospels record Jesus encountering a fig tree on this route near Bethany [scripture:Mark 11:12-13]. The hillside would have looked brown and dry through the long rainless summer and greener after the autumn and winter rains, typical of this climate zone [bib:rainey-notley-sacred-bridge].

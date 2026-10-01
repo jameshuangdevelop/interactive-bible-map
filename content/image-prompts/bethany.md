@@ -4,10 +4,10 @@
 Bethany was a village on the eastern slope of the Mount of Olives, about fifteen stadia (roughly 2.7 km) from Jerusalem, on the approach to the city from Jericho [scripture:John 11:18; scripture:Mark 10:46; scripture:Mark 11:1; wikidata:Q7818622]. It lay in the same hill-country zone as Jerusalem's immediate surroundings, with the terrain beginning to turn toward the drier Judean wilderness further east and south [bib:rainey-notley-sacred-bridge].
 
 ## What stood then
-The Gospel of John identifies Bethany as the home of Lazarus, Martha and Mary, and the site of Lazarus's raising from death [scripture:John 11:1; scripture:John 11:43]. Rock-cut family tombs, the standard Judean burial form of the period, were likely cut into the hillside around the village, consistent with John's description of Lazarus's tomb as "a cave, and a stone lay against it" [scripture:John 11:38]. The modern tomb venerated as Lazarus's has been rebuilt many times since at least the fourth century and does not preserve its first-century form [bib:murphy-oconnor-holy-land-guide].
+The Gospel of John identifies Bethany as the home of Lazarus, Martha and Mary, and the site of Lazarus's raising from death [scripture:John 11:1; scripture:John 11:43]. Rock-cut family tombs, the standard Judean burial form of the period, were likely cut into the hillside around the village, consistent with John's description of Lazarus's tomb as "a cave, and a stone lay against it" [scripture:John 11:38]. The modern tomb venerated as Lazarus's stands beneath a site with a long building history: Franciscan excavations found the remains of three successive churches, beginning with a fourth-century church built as part of a memorial complex near the tomb, destroyed by an earthquake and rebuilt farther east in the fifth century, then transformed again under Crusader patronage, when a chapel was built directly over the tomb itself; so the present structure does not preserve its first-century form [bib:custodia-bethany; bib:murphy-oconnor-holy-land-guide].
 
 ## Materials and colours
-Houses were built of the pale Judean limestone common to villages around Jerusalem, in modest, simple plans [bib:rainey-notley-sacred-bridge]. The Gospel account of a banquet in the house of "Simon the leper," with a woman anointing Jesus from "an alabaster jar" of costly perfume, suggests at least one household of some means in the village [scripture:Mark 14:3].
+Houses were built of the pale Judean limestone common to villages in this hill country, in modest, simple plans [bib:isbe-house; bib:rainey-notley-sacred-bridge]. The Gospel account of a banquet in the house of "Simon the leper," with a woman anointing Jesus from "an alabaster jar" of costly perfume, suggests at least one household of some means in the village [scripture:Mark 14:3].
 
 ## Landscape and plants
 The village's slope continued the olive-terraced character of the wider Mount of Olives, with the terrain beginning to transition toward the more arid Judean wilderness further toward Jericho [bib:rainey-notley-sacred-bridge].
@@ -21,7 +21,7 @@ Bethany's residents included the household of Lazarus, Martha and Mary, and Simo
 3. The road descending from the Mount of Olives ridge toward Jericho, passing near the village.
 
 ## Not known
-The exact tomb identified with Lazarus today has been rebuilt repeatedly since antiquity and does not preserve an intact first-century structure, so its present appearance should not be treated as historical [bib:murphy-oconnor-holy-land-guide]. The full layout and extent of the ancient village beyond its general location are not recovered in detail.
+The exact tomb identified with Lazarus today has been rebuilt repeatedly since antiquity and does not preserve an intact first-century structure, so its present appearance should not be treated as historical [bib:custodia-bethany; bib:murphy-oconnor-holy-land-guide]. The full layout and extent of the ancient village beyond its general location are not recovered in detail.
 
 ## Prompts (Media Curator)
 

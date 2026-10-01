@@ -955,6 +955,92 @@
       "doi": "10.1016/j.jas.2014.10.011",
       "url": "https://www.sciencedirect.com/science/article/pii/S0305440314003811",
       "accessed": "2026-09-30"
+    },
+    {
+      "id": "origen-commentary-john",
+      "type": "book",
+      "title": "Commentary on the Gospel of John, Book VI (Ante-Nicene Fathers translation, hosted by New Advent)",
+      "authors": [
+        "Origen"
+      ],
+      "year": 1896,
+      "publisher": "Christian Literature Publishing Co.",
+      "url": "https://www.newadvent.org/fathers/101506.htm",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-capernaum",
+      "type": "web",
+      "title": "Capernaum",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/capernaum",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-nazareth",
+      "type": "web",
+      "title": "Nazareth",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/nazareth",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-bethany",
+      "type": "web",
+      "title": "Bethany",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/bethany",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-gethsemane",
+      "type": "web",
+      "title": "Gethsemane",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/gethsemane",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-agriculture",
+      "type": "chapter",
+      "title": "Agriculture",
+      "authors": [
+        "James Orr"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/agriculture.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-house",
+      "type": "chapter",
+      "title": "House",
+      "authors": [
+        "James Orr"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/H/house.html",
+      "accessed": "2026-10-01"
     }
   ]
 }
