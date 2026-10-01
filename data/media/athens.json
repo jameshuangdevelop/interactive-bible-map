@@ -4,6 +4,8 @@
     {
       "id": "athens-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Akropolis_2015.jpg",
+      "width": 9648,
+      "height": 5587,
       "author": "Thomas Wolf, www.foto-tw.de",
       "license": "CC BY-SA 3.0 de",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
@@ -15,6 +17,8 @@
     {
       "id": "athens-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/View_of_the_Areopagus_from_the_Acropolis_in_Athens%2C_20240531_1329_9684.jpg",
+      "width": 4540,
+      "height": 3031,
       "author": "Jakub Hałun",
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
@@ -26,6 +30,8 @@
     {
       "id": "athens-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Ancient_Agora_Panorama_%28208938095%29.jpeg",
+      "width": 2048,
+      "height": 646,
       "author": "Georgios Liakopoulos",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -37,6 +43,8 @@
     {
       "id": "athens-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Temple_of_Zeus_Olympian%2C_Athens%2C_Greece.jpg",
+      "width": 4547,
+      "height": 3026,
       "author": "Jebulon",
       "license": "CC0",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
@@ -48,6 +56,8 @@
     {
       "id": "athens-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Panoramic_view_of_Athens_from_Mount_Lycabettus.jpg",
+      "width": 2048,
+      "height": 1536,
       "author": "Salwa Farwaneh Dameh",
       "license": "CC0",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",

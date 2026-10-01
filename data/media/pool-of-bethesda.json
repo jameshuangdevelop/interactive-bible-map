@@ -4,6 +4,8 @@
     {
       "id": "pool-of-bethesda-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Jerusalem_Bethesda_BW_1.JPG",
+      "width": 2592,
+      "height": 3872,
       "author": "Berthold Werner",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/File:Jerusalem_Bethesda_BW_1.JPG",
@@ -15,6 +17,8 @@
     {
       "id": "pool-of-bethesda-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Pool_of_Bethesda1.jpg",
+      "width": 1641,
+      "height": 752,
       "author": "Ariely",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
@@ -26,6 +30,8 @@
     {
       "id": "pool-of-bethesda-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/2Pool_of_Bethesda.JPG",
+      "width": 960,
+      "height": 1280,
       "author": "Krupski Oleg",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
