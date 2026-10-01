@@ -88,6 +88,49 @@ function relativeFromRepositoryRoot(filePath) {
   return toPosixPath(path.relative(repositoryRoot, filePath));
 }
 
+function isDirectoryAncestor(ancestorPath, targetPath) {
+  const relativePath = path.relative(ancestorPath, targetPath);
+  return (
+    relativePath === "" ||
+    (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))
+  );
+}
+
+function commonAncestorDirectory(firstPath, secondPath) {
+  const firstRoot = path.parse(firstPath).root.toLowerCase();
+  const secondRoot = path.parse(secondPath).root.toLowerCase();
+
+  if (firstRoot !== secondRoot) {
+    return null;
+  }
+
+  let ancestorPath = firstPath;
+  while (!isDirectoryAncestor(ancestorPath, secondPath)) {
+    const parentPath = path.dirname(ancestorPath);
+    if (parentPath === ancestorPath) {
+      return null;
+    }
+    ancestorPath = parentPath;
+  }
+
+  return ancestorPath;
+}
+
+function inferDataRootFromDirectory(directoryPath, expectedLeafDirectoryName) {
+  const directoryName = path.basename(directoryPath).toLowerCase();
+  if (directoryName === expectedLeafDirectoryName) {
+    return path.dirname(directoryPath);
+  }
+
+  return directoryPath;
+}
+
+function inferValidationContentRoot(locationsDirectory, mediaDirectory) {
+  const locationRoot = inferDataRootFromDirectory(locationsDirectory, "locations");
+  const mediaRoot = inferDataRootFromDirectory(mediaDirectory, "media");
+  return commonAncestorDirectory(locationRoot, mediaRoot) ?? repositoryRoot;
+}
+
 function pointerToJsonPath(pointer, missingProperty) {
   let pathValue = "$";
   if (pointer) {
@@ -1073,10 +1116,25 @@ export async function validateData(options = {}) {
     options.locationsDirectory ?? DEFAULT_LOCATION_DIRECTORY
   );
   const mediaDirectory = path.resolve(options.mediaDirectory ?? DEFAULT_MEDIA_DIRECTORY);
-  const imagePromptsDirectory = path.resolve(
-    options.imagePromptsDirectory ?? DEFAULT_IMAGE_PROMPTS_DIRECTORY
+  const usingRepositoryDataDirectories =
+    locationsDirectory === path.resolve(DEFAULT_LOCATION_DIRECTORY) &&
+    mediaDirectory === path.resolve(DEFAULT_MEDIA_DIRECTORY);
+  const validationContentRoot = inferValidationContentRoot(
+    locationsDirectory,
+    mediaDirectory
   );
-  const aiMediaDirectory = path.resolve(options.aiMediaDirectory ?? DEFAULT_AI_MEDIA_DIRECTORY);
+  const imagePromptsDirectory = path.resolve(
+    options.imagePromptsDirectory ??
+      (usingRepositoryDataDirectories
+        ? DEFAULT_IMAGE_PROMPTS_DIRECTORY
+        : path.join(validationContentRoot, "content", "image-prompts"))
+  );
+  const aiMediaDirectory = path.resolve(
+    options.aiMediaDirectory ??
+      (usingRepositoryDataDirectories
+        ? DEFAULT_AI_MEDIA_DIRECTORY
+        : path.join(validationContentRoot, "media", "ai"))
+  );
   const locationSchemaPath = path.resolve(
     options.locationSchemaPath ?? DEFAULT_LOCATION_SCHEMA_PATH
   );
