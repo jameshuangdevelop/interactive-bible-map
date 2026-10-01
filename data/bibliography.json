@@ -942,6 +942,161 @@
       "publisher": "Livius.org",
       "url": "https://www.livius.org/articles/place/mesopotamia/",
       "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-rome",
+      "type": "chapter",
+      "title": "Rome",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/R/rome.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-corinth",
+      "type": "chapter",
+      "title": "Corinth",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/corinth.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-antioch-syria",
+      "type": "chapter",
+      "title": "Antioch, in Syria",
+      "authors": [
+        "C. H. Thomson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antioch-in-syria.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-ephesus",
+      "type": "chapter",
+      "title": "Ephesus",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/E/ephesus.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-philippi",
+      "type": "chapter",
+      "title": "Philippi",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/philippi.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-thessalonica",
+      "type": "chapter",
+      "title": "Thessalonica",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/thessalonica.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-athens",
+      "type": "chapter",
+      "title": "Athens",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/athens.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-caesarea",
+      "type": "chapter",
+      "title": "Caesarea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/caesarea.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-damascus",
+      "type": "chapter",
+      "title": "Damascus",
+      "authors": [
+        "C. H. Thomson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/damascus.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-galatia",
+      "type": "chapter",
+      "title": "Galatia",
+      "authors": [
+        "W. M. Ramsay"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/galatia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "platner-ashby-topographical-dictionary",
+      "type": "book",
+      "title": "A Topographical Dictionary of Ancient Rome (hosted on LacusCurtius)",
+      "authors": [
+        "Samuel Ball Platner",
+        "Thomas Ashby"
+      ],
+      "year": 1929,
+      "publisher": "Oxford University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Gazetteer/Places/Europe/Italy/Lazio/Roma/Rome/_Texts/PLATOP*/home.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "unesco-ephesus",
+      "type": "web",
+      "title": "Ephesus",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1018/",
+      "accessed": "2026-09-30"
     }
   ]
 }
