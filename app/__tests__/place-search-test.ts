@@ -21,6 +21,7 @@ function loadPlacesFromDataRecords(): PlaceIndexRecord[] {
       names: { ancient?: string[]; modern?: string; alternate?: string[] };
       type: PlaceIndexRecord["type"];
       zoomTier: PlaceIndexRecord["zoomTier"];
+      prominence: PlaceIndexRecord["prominence"];
       parentId?: string;
       candidates?: PlaceIndexRecord["candidates"];
     };
@@ -34,6 +35,7 @@ function loadPlacesFromDataRecords(): PlaceIndexRecord[] {
       },
       type: payload.type,
       zoomTier: payload.zoomTier,
+      prominence: payload.prominence,
       parentId: payload.parentId ?? null,
       candidates: payload.candidates ?? []
     };
@@ -107,6 +109,7 @@ describe("place-name search", () => {
       },
       type: "city",
       zoomTier: "city",
+      prominence: "standard",
       parentId: null,
       candidates: [{ label: "Capernaüm", coordinates: [35.5, 32.9], confidence: "high" }]
     };
