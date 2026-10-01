@@ -3,6 +3,17 @@
   "images": [
     {
       "id": "ephesus-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Great_Theatre%2C_Ephesus.jpg",
+      "author": "Austrian Archaeological Institute",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Great_Theatre,_Ephesus.jpg",
+      "caption": "The Great Theatre of Ephesus, cut into the hillside above the ancient harbor street.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "ephesus-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Terrace_Houses_of_Ephesus%2C_Ephesus_Archaeological_Site%2C_Selcuk%2C_Turkiye_%2853528102764%29.jpg",
       "author": "Warren LeMay from Chicago, IL, United States",
       "license": "CC BY-SA 2.0",
@@ -10,6 +21,50 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Terrace_Houses_of_Ephesus,_Ephesus_Archaeological_Site,_Selcuk,_Turkiye_(53528102764).jpg",
       "caption": "Terrace Houses, Ephesus archaeological site, Selçuk, Turkey.",
       "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "ephesus-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Ephesus_Celsus_Library_Fa%C3%A7ade.jpg",
+      "author": "Benh LIEU SONG",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ephesus_Celsus_Library_Fa%C3%A7ade.jpg",
+      "caption": "The Library of Celsus; it was built in the early 2nd century AD, decades after Paul's time in Ephesus.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "ephesus-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Ephesus_Temple_of_Artemis_2.jpg",
+      "author": "simonjenkins' photos",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ephesus_Temple_of_Artemis_2.jpg",
+      "caption": "The marshy field holding the scant remains of the Temple of Artemis, one of the Seven Wonders of the ancient world.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "ephesus-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Model_of_the_Artemisium_-_Ephesus_Museum.JPG",
+      "author": "José Luiz",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Model_of_the_Artemisium_-_Ephesus_Museum.JPG",
+      "caption": "A scale model of the Temple of Artemis (the Artemision), Ephesus Archaeological Museum.",
+      "kind": "reconstruction",
+      "aiGenerated": false
+    },
+    {
+      "id": "ephesus-06",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Ayasuluk_Castle%2C_Selcuk.jpg",
+      "author": "Hugh Llewelyn",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ayasuluk_Castle,_Selcuk.jpg",
+      "caption": "Ayasuluk Hill above modern Selçuk, overlooking the valley where ancient Ephesus stood.",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

@@ -34,3 +34,11 @@ Unlike most cities on Paul's route, Philippi had very few resident Jews and no s
 Most of Philippi's monumental forum and standing ruins visible today date from the 2nd century AD and later rebuilding campaigns, not from Paul's time, so this brief cannot specify the mid-1st-century forum's exact layout; any forum or civic building shown should stay generic Roman-colonial in form rather than copying the later remains [bib:isbe-philippi].
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt philippi-ai-01
+A wide establishing shot of Philippi, about AD 49, seen from the Via Egnatia as it descends the pass of Mt Symbolum toward the city, in late afternoon light. In frame: a young Roman colonial town of brick and plastered stone on a fertile, partly marshy plain, its forum and public buildings modest in scale, the bulk of Mt Pangaeus rising to the west and the road continuing south over another low pass toward the sea at Neapolis; small mid-ground figures — a mounted courier and a few travelers with walking staffs — move along the paved road. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no 2nd-century-and-later marble forum, octagonal church, or rebuilt theatre; keep Philippi's civic buildings modest and generic, since almost nothing is recorded about the town between 358 BC and Paul's visit.
+
+### AI-generated reconstruction — prompt philippi-ai-02
+A ground-level establishing shot of the riverbank outside Philippi's walls, about AD 49, in soft early morning light, evoking the place of prayer of Acts 16:13. In frame: a slow, reed-lined river crossing a partly marshy plain, a small group of women in modest dress gathered at the water's edge, simple woven baskets and cloth goods nearby evoking the cloth trade, with the city's walls and a gate visible in the distance and Mt Pangaeus on the horizon. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no synagogue building, since the brief notes Philippi had none; no specific identified structure at the riverbank beyond a generic gathering place.

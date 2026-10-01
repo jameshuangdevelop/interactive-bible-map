@@ -8,30 +8,74 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Philippi.jpg",
-      "caption": "Ruins of the ancient city of Philippi.",
+      "caption": "The forum of ancient Philippi, with the hills of eastern Macedonia behind.",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "philippi-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
-      "author": "Berthold Werner",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
-      "caption": "Archaeological site of Philippi, Greece.",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/%D0%A4%D0%B8%D0%BB%D0%B8%D0%BF%D0%B8_%D0%BF%D1%80%D0%B5%D0%B7_2007.jpg",
+      "author": "Batr41",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:%D0%A4%D0%B8%D0%BB%D0%B8%D0%BF%D0%B8_%D0%BF%D1%80%D0%B5%D0%B7_2007.jpg",
+      "caption": "The ancient theatre of Philippi, first built under Philip II and rebuilt under Rome.",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "philippi-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
+      "author": "Berthold Werner",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
+      "caption": "An arched gateway at the archaeological site of Philippi.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "philippi-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Archaeological_site_of_Philippi_BW_2017-10-05_12-47-21.jpg",
       "author": "Berthold Werner",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Archaeological_site_of_Philippi_BW_2017-10-05_12-47-21.jpg",
-      "caption": "Ancient structures at the Philippi archaeological site.",
+      "caption": "Ionic columns at the forum of ancient Philippi.",
       "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "philippi-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Lydia_-_baptismal_in_the_creek.jpg",
+      "author": "DocWoKav",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Lydia_-_baptismal_in_the_creek.jpg",
+      "caption": "The creek outside Philippi traditionally linked to Lydia's baptism (Acts 16:13-15); the seating and chapel are modern.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "philippi-06",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Kavala_001.jpg",
+      "author": "Klausweingartner",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kavala_001.jpg",
+      "caption": "The modern harbor of Kavala, built over ancient Neapolis, Philippi's port.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "philippi-07",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Pangaion_from_Philippi.jpg",
+      "author": "Marsyas",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pangaion_from_Philippi.jpg",
+      "caption": "Mt Pangaeus, seen from the plain of Philippi.",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]
