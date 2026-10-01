@@ -942,6 +942,19 @@
       "publisher": "Livius.org",
       "url": "https://www.livius.org/articles/place/mesopotamia/",
       "accessed": "2026-09-30"
+    },
+    {
+      "id": "bernabei-gethsemane-olive-trees",
+      "type": "article",
+      "title": "The age of the olive trees in the Garden of Gethsemane",
+      "authors": [
+        "M. Bernabei"
+      ],
+      "year": 2015,
+      "journal": "Journal of Archaeological Science",
+      "doi": "10.1016/j.jas.2014.10.011",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0305440314003811",
+      "accessed": "2026-09-30"
     }
   ]
 }
