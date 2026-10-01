@@ -9,14 +9,18 @@ import sharp from "sharp";
 
 import {
   DEFAULT_AI_MODELS,
+  GEMINI_SERVICE_TIERS,
+  estimateGeminiCostUsd,
   generateImageWithProvider
 } from "../scripts/lib/ai-providers.mjs";
 import {
   derivePromptIdFromCandidateFileName,
   extractPromptTextFromMarkdown,
   findExistingCandidateFiles,
+  parseAiCandidateFileName,
   publishAiCandidate,
   sha256Hex,
+  summarizeAiIncomingCosts,
   writeAiCandidateAndSidecar
 } from "../scripts/lib/ai-reconstructions.mjs";
 import { MAX_AI_IMAGE_BYTES, validateData } from "../scripts/lib/validator.mjs";
@@ -48,11 +52,12 @@ async function pathExists(targetPath) {
   }
 }
 
-function jsonResponse(payload, status = 200) {
+function jsonResponse(payload, status = 200, headers = {}) {
   return new Response(JSON.stringify(payload), {
     status,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...headers
     }
   });
 }
@@ -186,6 +191,66 @@ test("writeAiCandidateAndSidecar writes expected file names and metadata", async
     assert.equal(sidecar.promptId, "capernaum-ai-01");
     assert.equal(sidecar.prompt, promptText);
     assert.equal(sidecar.promptSha256, sha256Hex(promptText));
+  });
+});
+
+test("writeAiCandidateAndSidecar records Gemini cost, tier, usage and edit metadata", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await sharp({
+      create: {
+        width: 24,
+        height: 16,
+        channels: 3,
+        background: { r: 61, g: 70, b: 120 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const instructionText = "Make the city gate less crowded and adjust morning light.";
+    const usageMetadata = {
+      promptTokenCount: 1_000,
+      candidatesTokenCount: 500,
+      thoughtsTokenCount: 1_500
+    };
+    const estimatedCostUsd = estimateGeminiCostUsd({
+      serviceTier: GEMINI_SERVICE_TIERS.FLEX,
+      usageMetadata,
+      inputImageCount: 1,
+      outputImageCount: 1
+    });
+
+    const result = await writeAiCandidateAndSidecar({
+      incomingDirectory: temporaryDirectory,
+      promptId: "jerusalem-ai-01",
+      round: 3,
+      variant: 1,
+      imageBuffer,
+      provider: "gemini",
+      model: "gemini-3-pro-image",
+      seed: 888,
+      promptText: instructionText,
+      serviceTier: GEMINI_SERVICE_TIERS.FLEX,
+      usageMetadata,
+      estimatedCostUsd,
+      parentCandidate: "jerusalem-ai-01-r2-v1.png",
+      instructionText
+    });
+
+    assert.deepEqual(parseAiCandidateFileName(result.imagePath), {
+      promptId: "jerusalem-ai-01",
+      round: 3,
+      variant: 1,
+      extension: "png"
+    });
+
+    const sidecar = JSON.parse(await fs.readFile(result.sidecarPath, "utf8"));
+    assert.equal(sidecar.serviceTier, "flex");
+    assert.deepEqual(sidecar.usageMetadata, usageMetadata);
+    assert.equal(sidecar.estimatedCostUsd, estimatedCostUsd);
+    assert.equal(sidecar.parentCandidate, "jerusalem-ai-01-r2-v1.png");
+    assert.equal(sidecar.instruction, instructionText);
+    assert.equal(sidecar.instructionSha256, sha256Hex(instructionText));
   });
 });
 
@@ -427,18 +492,26 @@ test("openai request shape and response parsing", async () => {
 test("gemini request shape and response parsing", async () => {
   const expectedBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0a]);
   const calls = [];
+  const usageMetadata = {
+    promptTokenCount: 1_000,
+    candidatesTokenCount: 600,
+    thoughtsTokenCount: 400
+  };
+  const customDispatcher = { name: "custom-dispatcher" };
 
   const result = await generateImageWithProvider({
     provider: "gemini",
     model: DEFAULT_AI_MODELS.gemini,
     prompt: "Ancient road entering a city gate",
     seed: 404,
+    geminiDispatcher: customDispatcher,
     credentials: {
       geminiApiKey: "gemini-secret"
     },
     fetchImpl: async (url, init) => {
       calls.push({ url, init });
       return jsonResponse({
+        usageMetadata,
         candidates: [
           {
             content: {
@@ -453,6 +526,8 @@ test("gemini request shape and response parsing", async () => {
             }
           }
         ]
+      }, 200, {
+        "x-gemini-service-tier": "flex"
       });
     }
   });
@@ -466,9 +541,12 @@ test("gemini request shape and response parsing", async () => {
   assert.equal(call.init.method, "POST");
   assert.equal(call.init.headers["x-goog-api-key"], "gemini-secret");
   assert.equal(call.init.headers["Content-Type"], "application/json");
+  assert.equal(call.init.headers["X-Server-Timeout"], "900");
+  assert.equal(call.init.dispatcher, customDispatcher);
 
   const requestPayload = JSON.parse(call.init.body);
   assert.equal(requestPayload.contents[0].parts[0].text, "Ancient road entering a city gate");
+  assert.equal(requestPayload.service_tier, "flex");
   assert.deepEqual(requestPayload.generationConfig.responseModalities, ["IMAGE"]);
   assert.deepEqual(requestPayload.generationConfig.imageConfig, {
     aspectRatio: "16:9",
@@ -476,6 +554,215 @@ test("gemini request shape and response parsing", async () => {
   });
   assert.equal(requestPayload.generationConfig.seed, 404);
   assert.deepEqual(result.imageBuffer, expectedBuffer);
+  assert.equal(result.serviceTier, "flex");
+  assert.deepEqual(result.usageMetadata, usageMetadata);
+  assert.equal(result.estimatedCostUsd, 0.074);
+});
+
+test("gemini standard tier opt-out sets service_tier to standard", async () => {
+  const calls = [];
+
+  await generateImageWithProvider({
+    provider: "gemini",
+    model: DEFAULT_AI_MODELS.gemini,
+    prompt: "City at dawn",
+    seed: 405,
+    tier: GEMINI_SERVICE_TIERS.STANDARD,
+    credentials: {
+      geminiApiKey: "gemini-secret"
+    },
+    fetchImpl: async (url, init) => {
+      calls.push({ url, init });
+      return jsonResponse({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: "image/png",
+                    data: Buffer.from([0x89, 0x50, 0x4e, 0x47]).toString("base64")
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }, 200, {
+        "x-gemini-service-tier": "standard"
+      });
+    }
+  });
+
+  const requestPayload = JSON.parse(calls[0].init.body);
+  assert.equal(requestPayload.service_tier, "standard");
+});
+
+test("gemini 503 retries and succeeds", async () => {
+  let callCount = 0;
+  const sleepCalls = [];
+  const retryEvents = [];
+
+  const result = await generateImageWithProvider({
+    provider: "gemini",
+    model: DEFAULT_AI_MODELS.gemini,
+    prompt: "Retry test",
+    seed: 406,
+    credentials: {
+      geminiApiKey: "gemini-secret"
+    },
+    fetchImpl: async () => {
+      callCount += 1;
+      if (callCount === 1) {
+        return jsonResponse(
+          {
+            error: { message: "Service temporarily unavailable" }
+          },
+          503
+        );
+      }
+      return jsonResponse({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: "image/png",
+                    data: Buffer.from([0x89, 0x50, 0x4e, 0x47]).toString("base64")
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      });
+    },
+    sleepImpl: async (milliseconds) => {
+      sleepCalls.push(milliseconds);
+    },
+    randomImpl: () => 0,
+    onGeminiRetry: (event) => {
+      retryEvents.push(event);
+    }
+  });
+
+  assert.equal(callCount, 2);
+  assert.deepEqual(sleepCalls, [30_000]);
+  assert.equal(retryEvents.length, 1);
+  assert.equal(retryEvents[0].status, 503);
+  assert.equal(result.imageBuffer.length > 0, true);
+});
+
+test("gemini 429 retries are bounded", async () => {
+  let callCount = 0;
+  const sleepCalls = [];
+
+  await assert.rejects(
+    () =>
+      generateImageWithProvider({
+        provider: "gemini",
+        model: DEFAULT_AI_MODELS.gemini,
+        prompt: "Busy tier test",
+        seed: 407,
+        credentials: {
+          geminiApiKey: "gemini-secret"
+        },
+        fetchImpl: async () => {
+          callCount += 1;
+          return jsonResponse(
+            {
+              error: { message: "Resource exhausted" }
+            },
+            429
+          );
+        },
+        sleepImpl: async (milliseconds) => {
+          sleepCalls.push(milliseconds);
+        },
+        randomImpl: () => 0
+      }),
+    /after 5 attempts/u
+  );
+
+  assert.equal(callCount, 5);
+  assert.deepEqual(sleepCalls, [30_000, 60_000, 120_000, 240_000]);
+});
+
+test("gemini 400 is not retried", async () => {
+  let callCount = 0;
+
+  await assert.rejects(
+    () =>
+      generateImageWithProvider({
+        provider: "gemini",
+        model: DEFAULT_AI_MODELS.gemini,
+        prompt: "Bad request test",
+        seed: 408,
+        credentials: {
+          geminiApiKey: "gemini-secret"
+        },
+        fetchImpl: async () => {
+          callCount += 1;
+          return jsonResponse(
+            {
+              error: { message: "Bad request" }
+            },
+            400
+          );
+        }
+      }),
+    /400/u
+  );
+
+  assert.equal(callCount, 1);
+});
+
+test("gemini edit-mode request sends inlineData and instruction text", async () => {
+  const calls = [];
+  const editImage = Buffer.from([0xff, 0xd8, 0xff, 0xdb, 0x00]);
+
+  await generateImageWithProvider({
+    provider: "gemini",
+    model: DEFAULT_AI_MODELS.gemini,
+    seed: 409,
+    credentials: {
+      geminiApiKey: "gemini-secret"
+    },
+    editInput: {
+      imageBuffer: editImage,
+      mimeType: "image/jpeg",
+      instruction: "Remove modern scaffolding and make the market quieter."
+    },
+    fetchImpl: async (url, init) => {
+      calls.push({ url, init });
+      return jsonResponse({
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: "image/png",
+                    data: Buffer.from([0x89, 0x50, 0x4e, 0x47]).toString("base64")
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      });
+    }
+  });
+
+  const requestPayload = JSON.parse(calls[0].init.body);
+  const userParts = requestPayload.contents[0].parts;
+  assert.equal(userParts[0].inlineData.mimeType, "image/jpeg");
+  assert.equal(userParts[0].inlineData.data, editImage.toString("base64"));
+  assert.equal(
+    userParts[1].text,
+    "Remove modern scaffolding and make the market quieter."
+  );
 });
 
 test("cloudflare 429 with code 4006 stops immediately without retry", async () => {
@@ -603,6 +890,89 @@ test("provider errors redact secrets from nested cause chains", async () => {
       assert.equal(error.cause.cause.cause.message.includes(secret), false);
       return true;
     }
+  );
+});
+
+test("summarizeAiIncomingCosts prints per-place totals from side-cars", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const incomingDirectory = path.join(temporaryDirectory, "media", "ai-incoming");
+    await fs.mkdir(incomingDirectory, { recursive: true });
+
+    const sidecars = [
+      {
+        fileName: "capernaum-ai-01-r1-v1.png.json",
+        payload: {
+          promptId: "capernaum-ai-01",
+          estimatedCostUsd: 0.067
+        }
+      },
+      {
+        fileName: "capernaum-ai-01-r2-v1.png.json",
+        payload: {
+          promptId: "capernaum-ai-01",
+          estimatedCostUsd: 0.082
+        }
+      },
+      {
+        fileName: "jerusalem-ai-01-r1-v1.jpg.json",
+        payload: {
+          promptId: "jerusalem-ai-01",
+          estimatedCostUsd: 0.134
+        }
+      }
+    ];
+
+    for (const sidecar of sidecars) {
+      await fs.writeFile(
+        path.join(incomingDirectory, sidecar.fileName),
+        `${JSON.stringify(sidecar.payload, null, 2)}\n`,
+        "utf8"
+      );
+    }
+
+    const summary = await summarizeAiIncomingCosts({ incomingDirectory });
+    assert.deepEqual(summary.rows, [
+      {
+        locationId: "capernaum",
+        candidates: 2,
+        totalCostUsd: 0.149
+      },
+      {
+        locationId: "jerusalem",
+        candidates: 1,
+        totalCostUsd: 0.134
+      }
+    ]);
+    assert.equal(summary.totalCandidates, 3);
+    assert.equal(summary.totalCostUsd, 0.283);
+  });
+});
+
+test("estimateGeminiCostUsd computes flex and standard costs from usage metadata", () => {
+  const usageMetadata = {
+    promptTokenCount: 1_000,
+    candidatesTokenCount: 1_000,
+    thoughtsTokenCount: 1_000,
+    promptTokensDetails: [{ modality: "IMAGE", tokenCount: 256 }]
+  };
+
+  assert.equal(
+    estimateGeminiCostUsd({
+      serviceTier: GEMINI_SERVICE_TIERS.FLEX,
+      usageMetadata,
+      inputImageCount: 1,
+      outputImageCount: 1
+    }),
+    0.0806
+  );
+  assert.equal(
+    estimateGeminiCostUsd({
+      serviceTier: GEMINI_SERVICE_TIERS.STANDARD,
+      usageMetadata,
+      inputImageCount: 1,
+      outputImageCount: 1
+    }),
+    0.1612
   );
 });
 

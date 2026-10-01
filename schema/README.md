@@ -164,15 +164,17 @@ Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists 
 Generate candidate images from a prompt brief heading:
 
 ```bash
-npm run generate:ai -- <prompt-id> [--provider cloudflare-flux|cloudflare-lucid|openai|gemini] [--model <id>] [--variants N] [--round N] [--seed S]
+npm run generate:ai -- <prompt-id> [--provider cloudflare-flux|cloudflare-lucid|openai|gemini] [--model <id>] [--variants N] [--round N] [--seed S] [--tier flex|standard] [--edit-from <candidate-file> --instruction "<text>"]
 ```
 
 - Prompt text is read from `content/image-prompts/<location-id>.md` under `### AI-generated reconstruction — prompt <prompt-id>`, and stops before `Keep out / keep vague:`.
+- For Gemini (`--provider gemini`), the default tier is **Flex** (`service_tier: "flex"`); use `--tier standard` to opt out. Flex retries `429`/`503` with backoff because capacity can be temporarily busy.
+- Edit mode is Gemini-only: `--edit-from` sends the parent candidate image plus `--instruction` text and saves the result to the next round (`-r<N+1>-v1`).
 - Required environment variables:
   - Cloudflare: `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_AI_TOKEN`
   - OpenAI: `OPENAI_API_KEY`
   - Gemini: `GEMINI_API_KEY`
-- Candidates are written to `media/ai-incoming/<prompt-id>-r<round>-v<k>.<ext>` plus a side-car JSON containing provider/model/date/seed/round/prompt data and prompt SHA-256.
+- Candidates are written to `media/ai-incoming/<prompt-id>-r<round>-v<k>.<ext>` plus a side-car JSON containing provider/model/date/seed/round/prompt data and prompt SHA-256. Gemini side-cars also record the actual service tier from `x-gemini-service-tier`, `usageMetadata`, estimated USD cost, and (for edits) parent candidate + instruction hash.
 - `media/ai-incoming/` is Git-ignored; candidate files are working artifacts and are not committed.
 
 Publish one candidate to a hosted AI image:
@@ -184,6 +186,14 @@ npm run publish:ai -- <candidate-file> [--id <prompt-id>]
 - Converts the candidate to `media/ai/<prompt-id>.webp` using WebP quality steps until it is at most 1,600 px wide and 400 KB.
 - Fails if the file cannot fit under 400 KB at quality 60 or above.
 - Prints final width/height/bytes and generator metadata derived from the candidate side-car for use in the media entry.
+
+Summarize estimated Gemini spend from incoming side-cars:
+
+```bash
+npm run ai-costs
+```
+
+- Prints a per-place and total USD estimate from `media/ai-incoming/*.json` side-cars.
 
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
