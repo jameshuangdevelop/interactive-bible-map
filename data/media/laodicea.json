@@ -19,34 +19,23 @@
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Ruins_of_Laodicea_engraving_by_William_Miller_after_T_Allom.jpg",
-      "caption": "A 19th-century engraving of Laodicea's ruins in the Lycus valley, with Mount Cadmus behind",
-      "kind": "reconstruction",
-      "aiGenerated": false
-    },
-    {
-      "id": "laodicea-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/The_Central_Agora_built_in_the_Roman_Imperial_period%2C_Laodicea_on_the_Lycus%2C_Phrygia%2C_Turkey_%2832117083025%29.jpg",
-      "author": "Carole Raddato from FRANKFURT, Germany",
-      "license": "CC BY-SA 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Central_Agora_built_in_the_Roman_Imperial_period,_Laodicea_on_the_Lycus,_Phrygia,_Turkey_(32117083025).jpg",
-      "caption": "The colonnaded Central Agora of Laodicea, with the Lycus valley's hills on the horizon",
+      "caption": "An 1847 engraving of Laodicea's ruins in the Lycus valley, including its western theatre",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "laodicea-04",
+      "id": "laodicea-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Laodicea_Ancient_City_2026%2C_15.jpg",
       "author": "Biologg",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Laodicea_Ancient_City_2026,_15.jpg",
-      "caption": "Syria Street, one of Laodicea's main colonnaded thoroughfares",
+      "caption": "One of Laodicea's excavated colonnaded streets, with its stone paving and standing columns",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "laodicea-05",
+      "id": "laodicea-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Stadium_Street%2C_The_North-South_Street_extending_south_from_the_western_end_of_the_Syria_Street%2C_Laodicea_on_the_Lycus%2C_Phrygia%2C_Turkey_%2831957861892%29.jpg",
       "author": "Carole Raddato from FRANKFURT, Germany",
       "license": "CC BY-SA 2.0",
@@ -57,29 +46,29 @@
       "aiGenerated": false
     },
     {
-      "id": "laodicea-06",
+      "id": "laodicea-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Laodikeia_ad_Lycum_West_Theatre_4779.jpg",
       "author": "Dosseman",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Laodikeia_ad_Lycum_West_Theatre_4779.jpg",
-      "caption": "One of Laodicea's two Roman theatres, its grassed-over seating cut into the hillside",
+      "caption": "Laodicea's West Theatre, one of its two theatres, its grassed-over seating cut into the hillside",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "laodicea-07",
+      "id": "laodicea-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Laodicea_Stadium.jpg",
       "author": "Blcksprt",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Laodicea_Stadium.jpg",
-      "caption": "The long, grass-covered mound of Laodicea's Roman stadium, overlooking the Lycus valley",
+      "caption": "The long, grass-grown hollow of Laodicea's stadium, dedicated to the emperor Titus in AD 79",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "laodicea-08",
+      "id": "laodicea-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Denizli_view_from_a_surrounding_hill_-_panoramio.jpg",
       "author": "Melih Rustu CALIKOGL…",
       "license": "CC BY-SA 3.0",

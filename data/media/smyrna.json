@@ -8,7 +8,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Izmir_view_from_citadel_2397.jpg",
-      "caption": "İzmir's bay and modern skyline, seen from Kadifekale on the slopes of ancient Smyrna's acropolis hill, Mount Pagus",
+      "caption": "İzmir's bay and modern skyline, seen from Kadifekale on Mount Pagus, the hill of ancient Smyrna's walled upper city",
       "kind": "modern",
       "aiGenerated": false
     },
@@ -19,7 +19,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:%C4%B0zmir_aqoras%C4%B1_202210_(7).jpg",
-      "caption": "A row of marble columns in the colonnaded Agora of ancient Smyrna, rebuilt after the 178 AD earthquake",
+      "caption": "Re-erected marble columns of the colonnaded Agora of ancient Smyrna, in today's İzmir",
       "kind": "site",
       "aiGenerated": false
     },
@@ -30,7 +30,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Izmir_agora_north_of_Northwest_Basilica_6668.jpg",
-      "caption": "Standing walls of the Agora's North Basilica, with modern İzmir rising on the hillside behind",
+      "caption": "Walls and standing columns on the north side of Smyrna's Agora, seen from the exit of its vaulted substructure",
       "kind": "site",
       "aiGenerated": false
     },
@@ -52,8 +52,8 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Kadifekale_qalas%C4%B1_(7).jpg",
-      "caption": "The fortress of Kadifekale, built on Mount Pagus, the acropolis hill that crowned ancient Smyrna",
-      "kind": "site",
+      "caption": "The walls of Kadifekale on Mount Pagus, the hill of ancient Smyrna's upper city; the castle seen today is medieval",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -65,17 +65,6 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_Bath_of_Smyrna_in_%C4%B0zmir_Agora.jpg",
       "caption": "An elevated view of the Roman bath within Smyrna's agora, set below İzmir's hillside neighborhoods",
       "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "smyrna-07",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/IZMIR_basilique_mod%C3%A8le_3d_basique.jpg",
-      "author": "Franck devedjian",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:IZMIR_basilique_mod%C3%A8le_3d_basique.jpg",
-      "caption": "A 3D model reconstruction of the colonnaded interior of the Agora's basilica hall in antiquity",
-      "kind": "reconstruction",
       "aiGenerated": false
     }
   ]

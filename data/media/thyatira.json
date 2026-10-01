@@ -8,7 +8,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:G%C3%BCn%C3%BCm%C3%BCzden_Akhisar_Genel_G%C3%B6r%C3%BCn%C3%BCm.jpg",
-      "caption": "An aerial view of modern Akhisar, built over most of ancient Thyatira",
+      "caption": "An aerial view of modern Akhisar, the town on the site of ancient Thyatira",
       "kind": "modern",
       "aiGenerated": false
     },
@@ -19,7 +19,7 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:ThyatiraBasilika.jpg",
-      "caption": "The excavated precinct of ancient Thyatira, with modern Akhisar's buildings close behind",
+      "caption": "Walls and piers of a basilica in the excavated precinct of ancient Thyatira, with modern Akhisar's buildings close behind",
       "kind": "site",
       "aiGenerated": false
     },
@@ -41,23 +41,12 @@
       "license": "CC0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Columns_of_Thiatira.jpg",
-      "caption": "Column bases and masonry from the small excavated precinct of ancient Thyatira",
+      "caption": "Re-erected columns and arches in Thyatira's excavated precinct, floodlit at night among Akhisar's modern buildings",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "thyatira-05",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Thyatira_Basilica_%288691956539%29.jpg",
-      "author": "simonjenkins",
-      "license": "CC BY-SA 2.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Thyatira_Basilica_(8691956539).jpg",
-      "caption": "A gateway through Thyatira's excavated remains in modern-day Akhisar",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "thyatira-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Akhisar_ruins_Tempemezari_2.jpg",
       "author": "Quintucket",
       "license": "CC BY-SA 4.0",
