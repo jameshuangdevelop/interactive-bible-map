@@ -34,3 +34,11 @@ Paul found a synagogue and, over three Sabbaths, reasoned from the Scriptures; s
 The exact course of the mid-1st-century city wall and the detailed appearance of Thessalonica's own forum or agora in Paul's time are not specified by the sources consulted here; the well-preserved Roman forum visible in modern Thessaloniki today was substantially rebuilt under later emperors, so images should keep Thessalonica's 1st-century civic buildings generic rather than copying that later forum [bib:isbe-thessalonica].
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt thessalonica-ai-01
+A wide establishing shot of Thessalonica, about AD 50, seen from a low hill east of the city looking west over the rooftops toward the Thermaic Gulf, in clear midday light. In frame: a walled Greek port city of stone and plastered-brick buildings along the Via Egnatia, harbor installations and merchant ships along the waterfront, the plain of the Vardar's mouth stretching away to the west, and small mid-ground figures in tunics and cloaks moving along the harborside street. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no Arch of Galerius or Rotunda (built around AD 300); keep the city wall's exact course and the harbor buildings generic, since the sources used here do not detail them.
+
+### AI-generated reconstruction — prompt thessalonica-ai-02
+A ground-level establishing shot of the Via Egnatia as it runs through Thessalonica as the city's principal street, about AD 50, in late-afternoon light. In frame: a paved colonnaded street lined with shops and stoas, an inscribed archway at the western end of the street evoking the politarchs' gate, with small mid-ground figures — merchants, a couple of Roman officials in togas, and ordinary residents in tunics — moving along the street, and the Thermaic Gulf glimpsed at the street's end. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: keep the arch's inscription itself illegible/generic rather than reproducing specific lettering; the exact 1st-century form of the gate is not detailed by the sources used here.

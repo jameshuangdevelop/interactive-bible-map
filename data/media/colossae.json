@@ -3,6 +3,17 @@
   "images": [
     {
       "id": "colossae-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Colossae_Antik_Kenti.jpg",
+      "author": "Sakaryonca",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae_Antik_Kenti.jpg",
+      "caption": "The unexcavated mound of Colossae, looking across the Lycus valley toward Mt Cadmus (Honaz Dağı).",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "colossae-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Colossae%27den_Honaz_g%C3%B6r%C3%BCn%C3%BCm.jpg",
       "author": "Gülhan Nurhan",
       "license": "CC BY-SA 4.0",
@@ -13,14 +24,36 @@
       "aiGenerated": false
     },
     {
-      "id": "colossae-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/C%2BB-Galatia-Map.JPG",
-      "author": "no idea - see source",
-      "license": "Public domain",
-      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:C+B-Galatia-Map.JPG",
-      "caption": "Map of Asia Minor c. 50 AD, showing Colossae and surrounding ancient regions.",
-      "kind": "reconstruction",
+      "id": "colossae-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Colossae_Antik_Tiyatrosu.jpg",
+      "author": "Sakaryonca",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae_Antik_Tiyatrosu.jpg",
+      "caption": "The grassed-over depression marking Colossae's theatre, still almost entirely unexcavated.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "colossae-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Ancient_City_of_Laodicea%2C_2019_10.jpg",
+      "author": "Gargarapalvin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_City_of_Laodicea,_2019_10.jpg",
+      "caption": "Ruins at neighboring Laodicea on the Lycus, addressed alongside Colossae in the New Testament (not Colossae itself).",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "colossae-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Pamukkale_Hierapolis_Travertine_pools.JPG",
+      "author": "Pvasiliadis",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pamukkale_Hierapolis_Travertine_pools.JPG",
+      "caption": "The travertine terraces of neighboring Hierapolis, across the Lycus valley from Colossae (not Colossae itself).",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

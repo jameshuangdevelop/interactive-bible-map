@@ -34,3 +34,11 @@ Crete already had a large resident Jewish population by Paul's day; Cretans are 
 Neither Acts nor Titus names which Cretan city or cities Titus organized, so no single urban "capital" should be shown as definitive. This brief and its images favor the island's landscape and a generic Roman-Cretan townscape over an invented, specifically named city's architecture [scripture:Titus 1:5].
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt crete-ai-01
+A wide establishing shot of Crete's southern coast near Fair Havens, about AD 59, seen from offshore on a merchant ship's deck at midday under a mostly clear sky with a few building clouds on the horizon. In frame: a small natural bay with a rocky headland, a single-masted Roman grain ship riding at anchor with its sail partly furled, the rugged mountain spine of the island rising inland, and a scatter of small fishing boats closer to shore; a few small mid-ground figures in tunics work the ship's rigging. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no named city or specific harbor installation at Fair Havens itself, since the sources used here describe it only as a small, exposed anchorage; keep the coastline generic beyond its rocky, sheltering shape.
+
+### AI-generated reconstruction — prompt crete-ai-02
+A wide establishing shot of a generic Roman-period Cretan harbor town representing Gortyna or Cydonia, about AD 59, seen from a hillside above the town in late-afternoon light. In frame: a Mediterranean limestone townscape of modest civic buildings and houses around a small harbor, terraced olive groves and vineyards on the slopes behind, and the rugged line of Crete's mountain spine on the horizon; small mid-ground figures in tunics move through the streets and along the shore. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no specific named temple, forum, or public building, since neither Acts nor Titus names a single capital city and no detailed building-by-building description is used here; keep the architecture generically Roman-provincial Greek.

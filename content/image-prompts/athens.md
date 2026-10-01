@@ -34,3 +34,15 @@ Paul was "provoked" at seeing a city "full of idols," having passed altars along
 The exact appearance of the altar or altars "to an unknown god" that Paul references is not specified by any source used here beyond the scripture text itself, so any altar shown should be generic rather than a specific reconstructed inscription [scripture:Acts 17:23].
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt athens-ai-01
+A wide establishing shot of Athens, about AD 50, seen from the Agora looking up at the Acropolis in clear midday light. In frame: the Propylaea gateway and the Parthenon crowning the rock in gleaming Pentelic marble, the small Erechtheum and Temple of Athena Nike visible alongside, the Agora below ringed with colonnaded stoas including the Painted Portico, and narrow, crooked streets of flat-roofed houses spreading around its base; small mid-ground figures in tunics and cloaks walk and talk beneath the stoas. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: keep the Agora's altars generic rather than depicting a specific inscribed "unknown god" altar, since no source used here details its exact appearance.
+
+### AI-generated reconstruction — prompt athens-ai-02
+A ground-level establishing shot of the Areopagus (Mars Hill), about AD 50, seen from its rock outcrop looking toward the Acropolis and the Agora below, in warm afternoon light. In frame: the bare limestone outcrop with its worn rock-cut steps, a small group of Athenians and visiting philosophers as small mid-ground figures in cloaks gathered to listen to a speaker, the Acropolis rising behind crowned by the Parthenon, and the city's rooftops spreading below toward Piraeus. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no specific identifiable faces; keep the speaker as a small, generic mid-ground figure rather than a detailed portrait.
+
+### AI-generated reconstruction — prompt athens-ai-03
+A wide establishing shot of the Temple of Olympian Zeus, about AD 50, seen from the plain below in early morning light, shown unfinished as Acts 17 implies. In frame: a vast temple platform with only part of its tall Corinthian colonnade erected, scaffolding and stacked column drums around the incomplete sections, the Acropolis visible in the distance, and small mid-ground figures of workers and a few onlookers near the base. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: do not complete the colonnade; keep the unfinished portions' construction state generic, since the sources used here do not detail the site's exact mid-1st-century progress.
