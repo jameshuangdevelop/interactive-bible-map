@@ -17,6 +17,10 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Client-kingdom status in M4's timeline.** `arabia` (the Nabataean kingdom) is `type: "province"` under the Roman Empire, as ADR-0027 allows, and the panel calls it "Client kingdom allied with Rome". M4 should model client kingdoms properly, with dates of alliance and annexation: the Nabataean kingdom, Polemon's Pontus, and Antiochus's Commagene and coastal Cilicia.
 - **Province histories for M4's timeline.** M3-11's Fact-Checker removed the `politicalHistory` entries of four provinces because their end years rested on Wikipedia alone. M4 rebuilds them from non-Wikipedia sources, since the timeline needs them.
 
+- **Images for area records** (provinces and regions such as Egypt or Cappadocia). M3.5 covers places, and Galatia and Crete as major areas; other areas have no images yet.
+- **Countries in candidate labels.** ADR-0028 keeps M3-08's country-free candidate labels for now; the record's "Today" line says where the proposed sites are.
+- **Hosting AI images on Cloudflare R2** if `media/ai/` grows past about 50 MB. Until then they live in the repository and deploy with the site (ADR-0029).
+
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
 

@@ -183,3 +183,46 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Decision:** New record types `empire` and `province` hold the Roman Empire and its provinces, as they stood in about AD 50, the time of Paul's journeys, with names under ADR-0026. Every place's parent chain ends at the Roman Empire. The map shows them as labels, and the place panel shows a line such as "City · Achaia · Roman Empire". Borders, and changes over 4 BC – AD 100, come with M4's ancient layer and timeline.
 - **Consequences:** M3-11 adds about a dozen researched records and sets every place's parent. Judea's two meanings (the district and the Roman province) need a clear, sourced model.
 - **Confirmed by the human (2026-09-29):** the two Judea records ("That's fine"), and related verses for well-known areas the NT doesn't name directly, such as the Roman Empire ("for places that people generally know and can provide good information, we should have them").
+
+## ADR-0028 — Modern names show the country
+- **Date:** 2026-09-30 · **Status:** Accepted · **By:** the human ("For the modern names, let's add a country after all. Overall, let's prioritize 'usefulness for Bible readers' over 'let's avoid controversy'. For instance, when you click on Ephesus and it says 'Today: Selcuk,' I bet 95% of the people will have no idea that it's in Turkiye") and the PO (the format and the rules for special cases)
+- **Context:** CP3a decision 3 and M3-08 kept modern names free of any country, so that the panel would never take a side on a disputed border. The result is that "Today: Selçuk" tells most readers nothing. The physical basemap (ADR-0024) shows no countries either.
+- **Decision:** This replaces CP3a decision 3, M3-08's no-country rule and the old §8 of the visual spec.
+  - Every record gets `names.modernCountries`: the present-day country or countries the place or area lies in, as English short names from one allow-list in the schema (for example "Türkiye", "Greece", "Italy", "Israel", "Syria").
+  - Places outside any one country's undisputed territory use the territory name most English news and reference works use: **"West Bank"** (for example Bethlehem, Jericho and Al-Eizariya) and **"Golan Heights"** (for example Banias). This describes where the place is, not who should rule it.
+  - **Jerusalem and the places inside it** (the Temple Mount, Golgotha, Gethsemane and so on) take no country: their modern name already says "Jerusalem", which every reader can place, and its status is the most disputed of all. Empires take no country either.
+  - **The panel shows** "Today: Selçuk, Türkiye", or "Today: Near Denizli, Türkiye". Areas get a short orienting phrase as their modern name, such as "Central Türkiye" or "Parts of Greece, North Macedonia and Albania", and the country isn't repeated when the phrase already names it. Places with disputed locations show where the proposed sites are, for example "Today: proposed sites in Israel and the West Bank".
+  - Search still covers English Bible and historical names only (ADR-0026). Search results show the modern name with its country as their second line.
+  - Candidate labels keep M3-08's form for now.
+- **Consequences:** After CP3.5 (ADR-0029), a data task adds the field to all records (GIS Engineer, then Research Lead, then Fact-Checker), and a panel task shows it. The "West Bank", "Golan Heights" and Jerusalem rules are the PO's defaults until the human confirms them.
+
+## ADR-0029 — Images first: milestone M3.5
+- **Date:** 2026-09-30 · **Status:** Accepted · **By:** the human ("the images need to be a much bigger focus because that's how most Bible readers get their very first impressions on a lot of cities. This can be its own milestone and should be done before adding more cities"; "Assassin's creed level image is what I'm looking for"; "just start working on the images. ... let's not add anything else before we resolve the images milestone") and the PO (the milestone's shape and the major-place list)
+- **Context:** Places have 1–3 photos, and some show little more than stones (Laodicea). Five image links are broken, Rome's among them. AI reconstructions existed only as an idea: agents may write prompts, and the human generates images later (brief §2.5).
+- **Decision:**
+  1. **A new milestone, M3.5 "Images",** starts now, and nothing else is added until it ends at checkpoint **CP3.5**. M3's remaining work (the preview deploy, M3-06, and CP3b) and the changes from ADR-0028, ADR-0030 and the longer "About" follow after it. Later milestones keep their numbers.
+  2. **Major places** get the full treatment; every other place is standard. Records carry `prominence: "major"` or `"standard"`. The human's three groups, plus the seven churches of Revelation (the PO's addition, since each is addressed by name in Revelation 2–3), give 31 major places:
+     - **Jerusalem and the Gospels (13):** Jerusalem, the Temple Mount, Golgotha, Gethsemane, the Mount of Olives, Bethlehem, Nazareth, Capernaum, the Sea of Galilee, Cana, Jericho, Bethany, and Bethany beyond the Jordan.
+     - **Paul's letters and the capitals (12):** Rome, Corinth, Galatia, Ephesus, Philippi, Colossae, Thessalonica, Crete (Titus), Athens, Antioch on the Orontes, Caesarea Maritima and Damascus.
+     - **Revelation's churches (6, with Ephesus above):** Smyrna, Pergamum, Thyatira, Sardis, Philadelphia and Laodicea.
+  3. **How many images:** major places get **5 to 10**, standard places **1 to 3** (1–2 is enough, and a good third image stays).
+  4. **A mix of kinds**, each image tagged with its `kind`: `modern` (the place today), `site` (the excavated remains), `reconstruction` (a freely licensed model, drawing or painting of the ancient place) and `ai-reconstruction`. A major place should have at least one of each of the first two, plus a reconstruction where possible.
+  5. **The overall feel of a place, not fragments:** wide views of the city in its landscape, a whole theatre, street or harbour, the modern skyline. Close-ups of single stones, inscriptions or fragments are dropped unless that object is what the place is famous for. Every current image that fails this rule is replaced.
+  6. **Every image must load:** the validator checks each Commons address offline, and a link check loads every image at the sizes the app uses, on media changes and weekly.
+  7. **AI reconstructions, made the way historical games make theirs:** studios such as Ubisoft work from historians' advice, excavation plans, ancient descriptions, coins and frescoes, and fill the gaps with informed guesses. Here:
+     1. the Research Lead writes a **cited research brief** for each major place, covering its layout, the buildings that stood in about AD 30–60, materials and colours, landscape and plants, people and dress, and a list of what is unknown;
+     2. the Media Curator turns it into 1–3 prompts: an overview of the city and its key sites;
+     3. the Fact-Checker checks the brief and prompts for anachronisms;
+     4. **the human generates the images** with a tool whose terms allow us to publish them for anyone to reuse, since the project's content license (CC BY-SA 4.0) allows reuse, including commercial;
+     5. the Fact-Checker checks each image against its brief and rejects any that contradict it;
+     6. the project hosts the accepted images itself, as compressed WebP files of up to 1,600 px. On the image they carry the label **"AI-generated reconstruction"**, with a "Based on" note linking to the brief's sources.
+
+     There are no more than 3 AI images per place, and they never replace a real photo of what survives.
+  8. **The panel's gallery** grows to fit: a larger viewer, labels for each kind of image, and photos that load only when needed, so the map stays smooth.
+- **Consequences:** Cards M3.5-01 to M3.5-07 cover the schema and link fixes, three research-and-image batches, a pass over standard places, the panel's gallery, and the AI images. The human's open choice is which image generator to use; the Fact-Checker reviews its terms and the license we release the images under. Brief §2.5 and §5 are updated to match.
+- **Next, after CP3.5 (the human, 2026-09-30):** a longer "About" for major places: 250–450 words in 3–5 short paragraphs, each factual clause cited (ADR-0017). The research briefs written for M3.5 feed it.
+
+## ADR-0030 — A simpler panel header
+- **Date:** 2026-09-30 · **Status:** Accepted · **By:** the human ("The 'zoom to,' 'copy link', 'sources' bar isn't really that helpful and it doesn't look very good. Remove them altogether"; "move the 'High confidence' or 'disputed' to right by 'Today:...' so that it's easier to see what the 'high confidence' is about")
+- **Decision:** The panel has no action bar. Opening a place still frames all its candidate sites on the map, the address bar still holds the place's link, and the Sources list stays at the end of the panel. The location-confidence chip, or the "Location disputed" or "*n* sites" note, sits on the "Today: …" line, right after the modern name.
+- **Consequences:** After CP3.5 (ADR-0029), a panel task removes the bar and its tests, moves the chip, and updates visual spec §3 and §10 and wireframe 02.

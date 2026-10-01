@@ -2,13 +2,14 @@
 
 Shared memory for all agents. Every session reads this first and updates its own task row before committing.
 
-**Current milestone:** M3 – MVP App · **Status:** building the MVP (CP3a approved 2026-09-28, #16) · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 3.3% of the cap)
+**Current milestone:** M3.5 – Images (ADR-0029; nothing else is added until CP3.5) · **Status:** starting · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 6.8% of the cap)
 
 ## Resume point
 1. **Merged:** M3-02 to M3-12 (#18 to #24). The map is ancient-only and physical, is drawn on the GPU, has English names and the Roman provinces of about AD 50, and is tuned for machines without a GPU.
-2. **In progress, in parallel (subagents):** M3-04 (the place panel), M3-05 (search and the menu) and M3-13 (well-known New Testament areas, "Judah" and "Greece").
-3. **Next:** M3-06 (the preview deploy) once M3-04 and M3-05 merge, then the PO writes CP3b.
-4. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
+2. **Done, waiting for the human's approval to push:** M3-13, M3-04 and M3-05, stacked on the PO's `docs/m3-next`.
+3. **Now: M3.5 – Images.** The human's review on 2026-09-30 made images the priority: "let's not add anything else before we resolve the images milestone". `docs/m3-feedback` holds the plan (ADR-0028 to ADR-0030, cards M3.5-01 to M3.5-07). In parallel: M3.5-01 (schema and link fixes), the research briefs for batches A–C, and M3.5-06 (the gallery). The Media Curator's phases start when M3.5-01 is done. M3.5-07 (AI images) waits for the human's choice of image generator.
+4. **After CP3.5:** countries in modern names (ADR-0028), the simpler panel header (ADR-0030), a longer "About" for major places, then M3-06 (the preview deploy) and CP3b.
+5. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
 |---|---|---|---|---|---|
@@ -21,15 +22,26 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-03 | Map view | frontend-engineer | `feat/m3-map` | Merged | #21 |
 | M3-04 | Place panel | frontend-engineer | `feat/m3-place-panel` | Done, PR pending review | — |
 | M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Done, PR pending review | — |
-| M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Card ready, waits for M3-04 and M3-05 (secrets added) | — |
+| M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits until after CP3.5 (ADR-0029) | — |
 | M3-07 | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Merged | #19 |
 | M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged | #20 |
 | M3-10 | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Merged | #22 |
 | M3-11 | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Merged | #23 |
 | M3-12 | Smoother dragging and zooming | frontend-engineer | `feat/m3-smooth-map` | Merged | #24 |
 | M3-13 | Well-known areas and more English names | research-lead → fact-checker | `data/m3-well-known-areas` | Done, PR pending review (Elam removed on the PO's decision) | — |
+| M3.5-00 | Plan M3.5 – Images; record the human's review (ADR-0028 to ADR-0030) | project-owner | `docs/m3-feedback` | Done | — |
+| M3.5-01 | Image schema, broken links and link checks | gis-engineer | `data/m3.5-image-schema` | In progress | — |
+| M3.5-02 | Images, batch A: Jerusalem and the Gospels | research-lead → media-curator → fact-checker | `data/m3.5-images-a` | In progress (briefs) | — |
+| M3.5-03 | Images, batch B: Paul's letters and the capitals | research-lead → media-curator → fact-checker | `data/m3.5-images-b` | In progress (briefs) | — |
+| M3.5-04 | Images, batch C: the churches of Revelation | research-lead → media-curator → fact-checker | `data/m3.5-images-c` | In progress (briefs) | — |
+| M3.5-05 | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Card ready, waits for M3.5-01 | — |
+| M3.5-06 | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | In progress | — |
+| M3.5-07 | AI reconstructions: generate, check and publish | fact-checker → the human → media-curator → fact-checker | `data/m3.5-ai-images` | Waits for the batches and the human's choice of generator | — |
 
 ## Open questions
+- **For the human (M3.5-07):** which image generator to use for the AI reconstructions, and whether you'll generate them by hand from our prompts or give the project an API key to script it. The Fact-Checker checks the tool's terms first.
+- **For the human (ADR-0029):** the 31 major places include the seven churches of Revelation, which the PO added to your three groups.
+- **For the human (ADR-0028, after CP3.5):** the PO's defaults for places whose status is disputed: "West Bank" (Bethlehem, Jericho, Bethany), "Golan Heights" (Banias), and no country for Jerusalem and the places inside it.
 - **Answered by the human (2026-09-29):** Magdala keeps its title; Paneas stays in `otherLanguages`; searching "Judah" should find Judea; the two Judea records stay; and well-known areas keep related verses. The data follow-ups ("Judah", and more well-known areas such as Egypt) are in `BACKLOG.md`.
 - **Answered (2026-09-29):** search covers English Bible names and English historical names only (`ancient` and `alternate`), not modern names or candidate-site names.
 - **Smoothness first:** the human made dragging and zooming speed the top priority before further work (2026-09-29). The PO found that the human's machine is a remote desktop session with a 32 Hz display, which caps every map, ours and OpenFreeMap's alike, at about 32 frames per second. M3-12 works on smoothness, and the preview deploy (M3-06) lets the human test on a local device.
@@ -57,3 +69,4 @@ Shared memory for all agents. Every session reads this first and updates its own
 | 2026-09-30 | frontend-engineer | M3-04 (PO review fixes) | Fixed three review blockers: Commons images now use allow-listed thumbnail widths via responsive `srcset`/`sizes` (with query-string stripping and URL-builder tests), candidate pins no longer render as black squares (candidate collision-mask symbols are now invisible), and the photo counter moved fully inside the image frame so credits remain unobstructed. Extended Playwright with a lead-image load assertion (`naturalWidth > 0`) and a rendered candidate-pin color sampling check (red/white pixels present, black square regression blocked). Reran the full required chain (`lint`, `typecheck`, `test:all`, `validate:data`, `build:data`, `export:web`, `verify:web:playwright`) clean. |
 | 2026-09-30 | frontend-engineer | M3-04 (PR review remediation) | Fixed dead OpenBible links by generating and committing a 47-slug `openbible-ids` lookup (`data/reference/openbible-ids.json`) from the OpenBible dataset with live 200 checks, then formatting `openbible:` citations to `/geo/ancient/<id>/<slug>` with atlas fallback for missing slugs. Added schema-level coverage that every in-data `openbible:` slug is mapped. Addressed accessibility and interaction gaps by making candidate support toggles real disclosure buttons (`aria-expanded`/`aria-controls`), adding `aria-expanded` to "Show all passages," expanding axe scans to Capernaum/Emmaus/Jerusalem scenarios, adding keyboard disclosure checks, candidate URL update checks, and copy-link clipboard+fallback checks. Fixed the place-details fetch race (A→B→A) with per-place request generations and added a Playwright race regression. Hardened link/image rendering with `http(s)` guards and `rel="noopener noreferrer"`, made the search-box overlap check non-vacuous, updated Perseus citations to a working text URL template, and formatted footer review dates as human-readable `en-GB`. Reran `lint`, `typecheck`, `test:all`, `validate:data`, `build:data`, `export:web`, and `verify:web:playwright` successfully. |
 | 2026-09-30 | frontend-engineer | M3-05 | Added place-name search (English `names.ancient` + `names.alternate`, case/diacritic folding, one-typo support, ranking, keyboard combobox behavior, and no-results state), menu drawer with About/Sources/links, and Sources & credits content rendered as safe rich text from `docs/LICENSES.md` with automated text-drift checks. Added modal drawer focus trapping (`Tab`/`Shift+Tab` wrap), background `inert` behavior, focus return to ☰, and expanded Playwright checks for search/menu keyboard flow plus drawer accessibility (0 violations on the open drawer). Reran `lint`, `typecheck`, `test:all`, `validate:data`, `build:data`, `export:web`, and `verify:web:playwright`. |
+| 2026-09-30 | project-owner | M3.5-00 | Recorded the human's review of the panel, search and regions stack: images first (ADR-0029: milestone M3.5, 31 major places with 5–10 images, standard places 1–3, the overall-feel rule, link checks, and cited AI reconstructions the human generates and the Fact-Checker checks), countries in modern names (ADR-0028) and a simpler panel header (ADR-0030), both after CP3.5. Found the cause of Rome's missing photos: five Commons addresses (Rome ×3, Berea, Tarsus) use the wrong hash folder. Wrote cards M3.5-01 to M3.5-07, and updated brief §2.5 and §5, the visual spec and the Media Curator's instructions. |

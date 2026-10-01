@@ -91,7 +91,14 @@ A place is **disputed** when at least one of its candidates has confidence `disp
 ## 3. Place panel
 The section order follows brief §1.4. Sections without data are left out.
 
-1. **Photos** (1–3, about 408 × 240 px). With 2–3 photos, there are arrows and a "1 / 3" counter. **Directly under each photo, always visible:** "Photo: *author* · *license* · Wikimedia Commons". The license links to its legal text, and "Wikimedia Commons" links to the file page. The alt text is the caption, and the caption appears in small type below the credit. AI reconstructions (later) carry a visible **"AI-generated reconstruction"** badge on the image itself.
+**Coming after CP3.5:** the modern name gains its country (ADR-0028), the action bar goes, and the confidence chip moves onto the "Today" line (ADR-0030). Items 2, 3 and 5 below describe the panel until then.
+
+1. **Images** (ADR-0029, built in M3.5-06). Major places have 5–10 images and standard places 1–3, about 408 × 240 px in the panel.
+   - With several images, there are arrows and a "1 / 7" counter, plus a row of small thumbnails under the image when there are more than 3.
+   - **A label on each image for its kind:** "Today", "Excavated site", "Reconstruction", or **"AI-generated reconstruction"**, which is always visible.
+   - **Directly under each image, always visible:** "Photo: *author* · *license* · Wikimedia Commons". The license links to its legal text, and "Wikimedia Commons" links to the file page. AI images read "AI-generated reconstruction · *tool* · *license* · Based on: *sources*", linking to the research brief.
+   - The alt text is the caption, and the caption appears in small type below the credit.
+   - Selecting the image opens a large viewer (a dialog) with the same arrows, label, credit and caption. ← and → move between images, and Esc closes it.
 2. **Names:**
    - the title is the first ancient name, the spelling most popular English Bibles agree on, for example **Capernaum** (CP3a decision 2; ADR-0026);
    - under it, the modern name, labelled **"Today: *name*"** (see §8 for the neutrality rule);
@@ -160,12 +167,12 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Screen readers:**
   - The panel is a labelled region, with the place name as its level-1 heading.
   - Search follows the ARIA combobox pattern.
-  - The carousel buttons are labelled "Previous photo" and "Next photo".
+  - The carousel buttons are labelled "Previous image" and "Next image", and the viewer is a labelled dialog.
 - **Meaning is never carried by colour alone:** type and confidence always appear as text too.
 - **Touch targets** are at least 44 × 44 px. **Reduced motion** replaces every animation with a jump.
 
 ## 8. Neutrality in the interface
-- **Modern names** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
+- **Modern names (until CP3.5; ADR-0028 adds the country after it)** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
 - **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
 
@@ -185,7 +192,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Load speed:** measured with Lighthouse's **desktop preset on a cold cache** against the preview deploy, the Largest Contentful Paint must be **2.5 s or less**, and the Total Blocking Time **200 ms or less**. These are Lighthouse's "good" thresholds.
 - **Smooth dragging and zooming (ADR-0024):** pins, labels and clusters move with the map in the same frame, never behind it. With **10,000 test points** loaded, no main-thread task may exceed 50 ms while dragging or zooming, and the page's DOM may not change during the gesture.
 - **Data loading:** the map and search data (about 18 KB minified) load with the app. Each place's details load when it is opened; the largest, Jerusalem, is about 36 KB minified.
-- **Images:** load lazily, using Commons thumbnail URLs at panel size rather than full-resolution files.
+- **Images:** load lazily: only the image shown and the next one. They use Commons thumbnail URLs at Commons' standard widths (330, 500, 960 and 1,280 px), never full-resolution files: the panel uses the width nearest its size, the thumbnail row 330 px, and the viewer 1,280 px only when it opens. AI images are WebP files of at most 1,600 px and 400 KB, served by the site.
 
 ## 12. Not in M3
 The Ancient layer's borders and timeline (M4), the Modern/Ancient toggle and modern labels (M4), the Routes tab (M5), responsive polish (M7), a native app build, offline use, other languages, and search by verse or person.
