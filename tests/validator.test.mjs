@@ -505,6 +505,56 @@ test("AI media fixture accepts VP8L-hosted WebP file", async () => {
   assert.equal(result.errors.length, 0);
 });
 
+test("AI media fixture rejects recorded dimensions that do not match hosted WebP", async () => {
+  const result = await runCase("invalid-media-ai-image-size-mismatch");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].width" &&
+        error.message.includes("must match hosted file width")
+    )
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].height" &&
+        error.message.includes("must match hosted file height")
+    )
+  );
+});
+
+test("lead panorama images emit a warning", async () => {
+  const result = await runCase("warning-media-lead-panorama");
+  assert.equal(result.errors.length, 0);
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("media/capernaum.json") &&
+        warning.path === "$.images[0]" &&
+        warning.message.includes("lead image is a panorama")
+    )
+  );
+});
+
+test("narrow Commons images emit a warning", async () => {
+  const result = await runCase("warning-media-narrow-commons");
+  assert.equal(result.errors.length, 0);
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("media/capernaum.json") &&
+        warning.path === "$.images[0].width" &&
+        warning.message.includes("prefer at least 1200px")
+    )
+  );
+});
+
 test("standard places cannot have more than three images", async () => {
   const result = await runCase("invalid-standard-too-many-images");
   assert.ok(

@@ -10,8 +10,9 @@ All example values below are **illustrative only** (not verified historical clai
 - `source-id.schema.json`: allowed source-ID prefixes and patterns (including `bib:`)
 - `bibliography.schema.json`: structure for `data/bibliography.json`
 - `scripts/fill-scripture-text.mjs`: fills `scripture[].textWEB` from the WEB source text
+- `scripts/fill-image-sizes.mjs`: fills or corrects Commons `width`/`height` fields from the Commons API
 - `scripts/validate-data.mjs`: schema + cross-file + scripture + checksum checks used by CI
-- `scripts/check-images.mjs`: online image checks (Commons originals + panel thumbnail widths, and hosted AI files)
+- `scripts/check-images.mjs`: online image checks (Commons originals + panel thumbnail widths + recorded size match, and hosted AI files)
 
 ## Core conventions
 
@@ -148,12 +149,15 @@ Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists 
 - Location images are hotlinked from Wikimedia Commons and keep their Commons file names. Keep `url` and `sourcePage` pointing to Commons, and do not download, rename, or commit those image files into this repository.
 - Commons `url` values must be plain original-file URLs in the exact form `https://upload.wikimedia.org/wikipedia/commons/<a>/<ab>/<file>` (no query string), and `<a>/<ab>` must match the MD5 hash folders for `<file>`.
 - For Commons images, `url` and `sourcePage` must point to the same file name.
+- Commons images must record the original file dimensions as `width` and `height` (integers, in pixels). Run `npm run fill:image-sizes` to fill or refresh them from the Commons API.
 - `images[].id` is this project's stable image name. Commons images use `<location-id>-NN` in display order, where `-01` is the lead image shown first in the details panel.
 - `images[].kind` is required and must be one of `modern`, `site`, `reconstruction`, or `ai-reconstruction`.
 - AI reconstructions use IDs in the `<location-id>-ai-NN` pattern and hosted URLs in `media/ai/<location-id>-ai-NN.webp`. They require `generator`, `promptRef`, and `basedOn`.
+- AI image `width` and `height` are optional placeholders for now; when present, the validator checks they match the hosted WebP file dimensions.
 - AI branch note (M3.5-01): `author`, `license`, `licenseUrl`, and `sourcePage` are optional placeholders for now and become required in M3.5-07 after the licensing ADR.
 - `content/image-prompts/<location-id>.md` files are validated: file names must match location IDs, and each cited source ID in square brackets must resolve like location data sources.
 - Hosted AI files are validated as WebP, at most 1,600 px wide and at most 400 KB.
+- Validator warnings: lead images (`-01`) wider than 2.2:1 are flagged as panoramas, and Commons images narrower than 1,200 px are flagged as likely too small for crisp panel crops.
 
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
@@ -179,6 +183,7 @@ The script auto-builds `scripture[].textWEB` from `scripture[].ref`. Verse range
 ## Validation commands
 
 ```bash
+npm run fill:image-sizes
 npm run validate:data
 npm test
 npm run check:images

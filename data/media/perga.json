@@ -4,6 +4,8 @@
     {
       "id": "perga-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/Perge_city_overview.jpg",
+      "width": 4062,
+      "height": 2708,
       "author": "Saffron Blaze",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
@@ -15,6 +17,8 @@
     {
       "id": "perga-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Antique_city_Perge_-_panoramio.jpg",
+      "width": 1300,
+      "height": 865,
       "author": "Валерий Дед",
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
@@ -26,6 +30,8 @@
     {
       "id": "perga-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Jonenines_kolonos.JPG",
+      "width": 1024,
+      "height": 768,
       "author": "Andrius v110",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",

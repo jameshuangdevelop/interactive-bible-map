@@ -4,6 +4,8 @@
     {
       "id": "gethsemane-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Getsemane2.JPG",
+      "width": 3648,
+      "height": 2736,
       "author": "Mewasul",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -15,6 +17,8 @@
     {
       "id": "gethsemane-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Church_of_all_Nations.jpg",
+      "width": 1280,
+      "height": 960,
       "author": "Karsten Müller",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",

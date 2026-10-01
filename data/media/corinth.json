@@ -4,6 +4,8 @@
     {
       "id": "corinth-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Temple_d%27Apollon_%C3%A0_Corinthe.jpg",
+      "width": 3024,
+      "height": 4032,
       "author": "Van Der Meulen Christofle",
       "license": "CC0",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
@@ -15,6 +17,8 @@
     {
       "id": "corinth-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/2007_Greece_Acrocorinth_%26_Ancient_Corinth_01.jpg",
+      "width": 2747,
+      "height": 2060,
       "author": "Nicholas Hartmann",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",

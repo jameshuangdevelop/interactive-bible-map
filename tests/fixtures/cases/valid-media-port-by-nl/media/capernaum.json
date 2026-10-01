@@ -4,6 +4,8 @@
     {
       "id": "capernaum-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Example Author",
       "license": "CC BY 3.0 nl",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/nl/deed.en",

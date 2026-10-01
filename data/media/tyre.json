@@ -4,6 +4,8 @@
     {
       "id": "tyre-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/SubmergedEgyptianHarbour_TyreSour_Lebanon_RomanDeckert04112019.jpg",
+      "width": 4000,
+      "height": 3000,
       "author": "RomanDeckert",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -15,6 +17,8 @@
     {
       "id": "tyre-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Roman_Hippodrome%2C_Tyre%2C_Lebanon.jpg",
+      "width": 4000,
+      "height": 2248,
       "author": "Vyacheslav Argenberg",
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",

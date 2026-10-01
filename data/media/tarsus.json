@@ -4,6 +4,8 @@
     {
       "id": "tarsus-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Tarsus_in_2011_0961.jpg",
+      "width": 4256,
+      "height": 2832,
       "author": "Dosseman",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
@@ -15,6 +17,8 @@
     {
       "id": "tarsus-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Roman_road_in_Tarsus%2C_Mersin_Province.jpg",
+      "width": 3005,
+      "height": 2254,
       "author": "Nedim Ardoğa",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -26,6 +30,8 @@
     {
       "id": "tarsus-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Saint_Paul%27s_Church%2C_Tarsus_02.jpg",
+      "width": 3000,
+      "height": 4000,
       "author": "Jordi Gili",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
