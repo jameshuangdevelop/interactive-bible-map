@@ -9,6 +9,7 @@
   },
   "type": "natural-feature",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "asia",
   "candidates": [
     {

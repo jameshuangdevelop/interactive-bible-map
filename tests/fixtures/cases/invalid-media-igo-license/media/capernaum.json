@@ -3,12 +3,13 @@
   "images": [
     {
       "id": "capernaum-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/example.jpg",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Example.jpg",
       "author": "Example Author",
       "license": "CC BY-SA IGO",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/igo/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Example.jpg",
       "caption": "Illustrative image fixture only.",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

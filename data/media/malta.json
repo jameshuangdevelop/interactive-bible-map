@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Selmunett_Island.jpg",
       "caption": "St Paul's Island (Selmunett) off the coast of Malta, traditionally associated with Paul's shipwreck (Acts 28)",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Malta,_2010_-_panoramio_-_Bengt_Nyman_(23).jpg",
       "caption": "View of Marsamxett Harbour and Valletta on the island of Malta",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Dingli_Cliffs_2009.JPG",
       "caption": "The Dingli Cliffs, the highest point on the island of Malta",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Roman_market_place_and_Serapis_temple_panorama_-_Pozzuoli_-_Campania_-_Italy_-_July_11th_2013.jpg",
       "caption": "Ruins of the Macellum, the ancient market of Puteoli once mistaken for a Temple of Serapis",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Macellum_de_Pozzuoli_01.JPG",
       "caption": "Columns of the Macellum, the ancient marketplace of Puteoli",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Coast_of_Pozzuoli_01.jpg",
       "caption": "The coastline of Pozzuoli, ancient Puteoli, on the Bay of Naples",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

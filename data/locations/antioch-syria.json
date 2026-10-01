@@ -16,6 +16,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "major",
   "parentId": "syria",
   "candidates": [
     {

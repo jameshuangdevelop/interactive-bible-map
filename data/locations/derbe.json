@@ -11,6 +11,7 @@
   },
   "type": "town",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "lycaonia",
   "candidates": [
     {

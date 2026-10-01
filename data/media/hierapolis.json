@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Roman_theatre,_built_in_the_2nd_century_AD_under_Hadrian_on_the_ruins_of_an_earlier_theatre,_later_renovated_under_Septimius_Severus,_Hierapolis,_Turkey_-_17033895960.jpg",
       "caption": "The Roman theatre at the archaeological site of Hierapolis",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Hierapolis_Frontinus_Gate_5037.jpg",
       "caption": "The Frontinus Gate and colonnaded street at Hierapolis",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Hierapolis_Eastern_Necropolis_4901.jpg",
       "caption": "Tombs of the necropolis at Hierapolis",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

@@ -1,30 +1,43 @@
 {
   "id": "duplicate-id",
   "names": {
-    "ancient": ["Duplicate B"],
+    "ancient": [
+      "Duplicate B"
+    ],
     "modern": "Duplicate B",
     "alternate": []
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "standard",
   "candidates": [
     {
       "label": "Example B",
-      "coordinates": [35.2, 32.2],
+      "coordinates": [
+        35.2,
+        32.2
+      ],
       "coordinateSource": "wikidata:Q1384",
       "confidence": "high",
       "support": "Illustrative only.",
-      "sources": ["wikidata:Q1384", "openbible:galilee"]
+      "sources": [
+        "wikidata:Q1384",
+        "openbible:galilee"
+      ]
     }
   ],
   "summary": {
     "text": "Illustrative summary.",
-    "sources": ["wikipedia:Galilee"]
+    "sources": [
+      "wikipedia:Galilee"
+    ]
   },
   "history": [
     {
       "text": "Illustrative history.",
-      "sources": ["wikipedia:Galilee"]
+      "sources": [
+        "wikipedia:Galilee"
+      ]
     }
   ],
   "scripture": [
@@ -38,7 +51,9 @@
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative note.",
-      "sources": ["wikipedia:Galilee"]
+      "sources": [
+        "wikipedia:Galilee"
+      ]
     }
   ],
   "politicalHistory": [
@@ -46,7 +61,9 @@
       "fromYear": -63,
       "toYear": 135,
       "entity": "Illustrative only.",
-      "sources": ["wikipedia:Galilee"]
+      "sources": [
+        "wikipedia:Galilee"
+      ]
     }
   ],
   "status": "draft"
