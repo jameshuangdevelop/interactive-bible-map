@@ -2,7 +2,8 @@ import {
   COMMONS_THUMBNAIL_WIDTHS,
   buildCommonsThumbnailSrcSet,
   buildCommonsThumbnailUrl,
-  selectCommonsThumbnailWidth
+  selectCommonsThumbnailWidth,
+  selectCommonsThumbnailWidthForFrame
 } from "../src/features/place-panel/commons-thumbnail";
 
 describe("commons thumbnail helpers", () => {
@@ -56,5 +57,89 @@ describe("commons thumbnail helpers", () => {
     const aiPath = "media/ai/capernaum-ai-01.webp";
     expect(buildCommonsThumbnailUrl(aiPath, 1280)).toBe(aiPath);
     expect(buildCommonsThumbnailSrcSet(aiPath)).toBeNull();
+  });
+
+  test("picks shape-aware widths from rendered frame height and DPR", () => {
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        originalWidth: 4032,
+        originalHeight: 3024
+      })
+    ).toBe(330);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        originalWidth: 4032,
+        originalHeight: 3024
+      })
+    ).toBe(960);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        originalWidth: 4000,
+        originalHeight: 2250
+      })
+    ).toBe(500);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        originalWidth: 4000,
+        originalHeight: 2250
+      })
+    ).toBe(960);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        originalWidth: 13068,
+        originalHeight: 2516
+      })
+    ).toBe(1280);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        originalWidth: 13068,
+        originalHeight: 2516
+      })
+    ).toBe(1280);
+  });
+
+  test("caps shape-aware widths to original width and falls back when tiny", () => {
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        originalWidth: 420,
+        originalHeight: 315
+      })
+    ).toBe(330);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        originalWidth: 260,
+        originalHeight: 200
+      })
+    ).toBeNull();
   });
 });

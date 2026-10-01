@@ -106,12 +106,16 @@ export interface MediaImageGenerator {
 interface MediaImageRecordBase {
   id: string;
   url: string;
+  width?: number;
+  height?: number;
   caption: string;
 }
 
 export interface CommonsMediaImageRecord extends MediaImageRecordBase {
   kind: CommonsMediaImageKind;
   aiGenerated: false;
+  width: number;
+  height: number;
   author: string;
   license: string;
   licenseUrl: string;
@@ -124,6 +128,8 @@ export interface CommonsMediaImageRecord extends MediaImageRecordBase {
 export interface AiMediaImageRecord extends MediaImageRecordBase {
   kind: "ai-reconstruction";
   aiGenerated: true;
+  width?: number;
+  height?: number;
   author?: string;
   license?: string;
   licenseUrl?: string;

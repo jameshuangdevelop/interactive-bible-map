@@ -199,6 +199,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-01",
       kind: "modern",
       url: "https://upload.wikimedia.org/wikipedia/commons/0/0a/M3_5_Fixture_Capernaum_Modern_01.jpg",
+      width: 13068,
+      height: 2516,
       author: "Fixture Photographer 1",
       license: "CC BY-SA 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -211,6 +213,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-02",
       kind: "modern",
       url: "https://upload.wikimedia.org/wikipedia/commons/1/1a/M3_5_Fixture_Capernaum_Modern_02.jpg",
+      width: 4032,
+      height: 3024,
       author: "Fixture Photographer 2",
       license: "CC BY 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
@@ -223,6 +227,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-03",
       kind: "site",
       url: "https://upload.wikimedia.org/wikipedia/commons/2/2a/M3_5_Fixture_Capernaum_Site_01.jpg",
+      width: 3600,
+      height: 2400,
       author: "Fixture Photographer 3",
       license: "CC BY-SA 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -235,6 +241,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-04",
       kind: "reconstruction",
       url: "https://upload.wikimedia.org/wikipedia/commons/3/3a/M3_5_Fixture_Capernaum_Reconstruction_01.jpg",
+      width: 3200,
+      height: 1800,
       author: "Fixture Artist 1",
       license: "CC BY 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
@@ -266,6 +274,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-06",
       kind: "site",
       url: "https://upload.wikimedia.org/wikipedia/commons/4/4a/M3_5_Fixture_Capernaum_Site_02.jpg",
+      width: 3600,
+      height: 2400,
       author: "Fixture Photographer 4",
       license: "CC BY-SA 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -278,6 +288,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-07",
       kind: "reconstruction",
       url: "https://upload.wikimedia.org/wikipedia/commons/5/5a/M3_5_Fixture_Capernaum_Reconstruction_02.jpg",
+      width: 3200,
+      height: 2000,
       author: "Fixture Artist 2",
       license: "CC BY 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
@@ -290,6 +302,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-08",
       kind: "modern",
       url: "https://upload.wikimedia.org/wikipedia/commons/6/6a/M3_5_Fixture_Capernaum_Modern_03.jpg",
+      width: 3840,
+      height: 2160,
       author: "Fixture Photographer 5",
       license: "CC BY 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
@@ -302,6 +316,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-09",
       kind: "site",
       url: "https://upload.wikimedia.org/wikipedia/commons/7/7a/M3_5_Fixture_Capernaum_Site_03.jpg",
+      width: 3072,
+      height: 2048,
       author: "Fixture Photographer 6",
       license: "CC BY-SA 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -314,6 +330,8 @@ function buildGalleryFixturePayload(basePayload) {
       id: "capernaum-10",
       kind: "reconstruction",
       url: "https://upload.wikimedia.org/wikipedia/commons/8/8a/M3_5_Fixture_Capernaum_Reconstruction_03.jpg",
+      width: 3600,
+      height: 2400,
       author: "Fixture Artist 3",
       license: "CC BY 4.0",
       licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
@@ -1955,25 +1973,58 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     const commonsRequestsBeforeViewer = imageRequests
       .map((requestUrl) => parseCommonsThumbnailRequest(requestUrl))
       .filter((entry) => entry !== null);
-    const fullSizeBeforeViewer = new Set(
+    const aboveThumbnailFilesBeforeViewer = new Set(
       commonsRequestsBeforeViewer
         .filter((entry) => entry.width > 330)
         .map((entry) => entry.fileName)
     );
-    if (fullSizeBeforeViewer.size !== 2) {
+    if (aboveThumbnailFilesBeforeViewer.size > 2) {
       throw new Error(
-        `Expected only current+next full-size panel images before opening viewer, got ${JSON.stringify(Array.from(fullSizeBeforeViewer))}.`
+        `Expected at most two above-thumbnail Commons requests before opening viewer, got ${JSON.stringify(Array.from(aboveThumbnailFilesBeforeViewer))}.`
       );
     }
-    for (const expectedFileName of [
-      "M3_5_Fixture_Capernaum_Modern_01.jpg",
-      "M3_5_Fixture_Capernaum_Modern_02.jpg"
-    ]) {
-      if (!fullSizeBeforeViewer.has(expectedFileName)) {
-        throw new Error(
-          `Fixture full-size preloads should include '${expectedFileName}', got ${JSON.stringify(Array.from(fullSizeBeforeViewer))}.`
-        );
+    const panoramaFileName = "M3_5_Fixture_Capernaum_Modern_01.jpg";
+    const panoramaPanelRequestWidths = commonsRequestsBeforeViewer
+      .filter((entry) => entry.fileName === panoramaFileName && entry.width > 330)
+      .map((entry) => entry.width);
+    if (panoramaPanelRequestWidths.length === 0) {
+      throw new Error("Expected a panel Commons thumbnail request above 330px for the panorama fixture.");
+    }
+    const panoramaPanelRequestWidth = Math.max(...panoramaPanelRequestWidths);
+    if (panoramaPanelRequestWidth < 1280) {
+      throw new Error(
+        `Expected panorama panel request width >= 1280, got ${panoramaPanelRequestWidth}.`
+      );
+    }
+    const panelRenderState = await page.evaluate(() => {
+      const image = document.querySelector(
+        "section[aria-label='Place details'] [data-panel-section='photos'] [data-panel-photo-image='true']"
+      );
+      if (!(image instanceof HTMLElement)) {
+        return null;
       }
+      const rect = image.getBoundingClientRect();
+      return {
+        width: rect.width,
+        height: rect.height,
+        devicePixelRatio: window.devicePixelRatio || 1
+      };
+    });
+    if (!panelRenderState) {
+      throw new Error("Could not read panel image render bounds for panorama quality checks.");
+    }
+    const panoramaRequestHeight = (panoramaPanelRequestWidth * 2516) / 13068;
+    const renderedDeviceWidth = panelRenderState.width * panelRenderState.devicePixelRatio;
+    const renderedDeviceHeight = panelRenderState.height * panelRenderState.devicePixelRatio;
+    if (renderedDeviceWidth > panoramaPanelRequestWidth + 1) {
+      throw new Error(
+        `Panorama panel image is upscaled horizontally (rendered=${renderedDeviceWidth.toFixed(2)} request=${panoramaPanelRequestWidth}).`
+      );
+    }
+    if (renderedDeviceHeight > panoramaRequestHeight + 1) {
+      throw new Error(
+        `Panorama panel image is upscaled vertically (rendered=${renderedDeviceHeight.toFixed(2)} request=${panoramaRequestHeight.toFixed(2)}).`
+      );
     }
 
     const thumbnailCommonsBeforeViewer = new Set(
@@ -2220,7 +2271,16 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     return {
       screenshotPaths,
       thumbnailCount,
-      fullSizeBeforeViewer: Array.from(fullSizeBeforeViewer).sort((a, b) => a.localeCompare(b)),
+      fullSizeBeforeViewer: Array.from(aboveThumbnailFilesBeforeViewer).sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      panoramaPanelRequestWidth,
+      panoramaUpscaleCheck: {
+        requestWidth: panoramaPanelRequestWidth,
+        requestHeight: panoramaRequestHeight,
+        renderedDeviceWidth,
+        renderedDeviceHeight
+      },
       width1280BeforeViewer,
       width1280AfterViewerOpen,
       aiCreditText,

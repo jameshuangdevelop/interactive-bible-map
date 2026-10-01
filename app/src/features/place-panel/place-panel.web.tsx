@@ -38,8 +38,8 @@ import {
 } from "./panel-model";
 import { formatSourceCitation } from "./source-format";
 import {
-  buildCommonsThumbnailSrcSet,
-  buildCommonsThumbnailUrl
+  buildCommonsThumbnailUrl,
+  selectCommonsThumbnailWidthForFrame
 } from "./commons-thumbnail";
 import { tokens } from "../../theme/tokens";
 
@@ -47,7 +47,13 @@ const PANEL_SECTION_GAP = tokens.spacing.lg;
 const SCRIPTURE_INITIAL_COUNT = 5;
 const SCRIPTURE_CHUNK_SIZE = 24;
 const SOURCE_SECTION_ANCHOR_ID = "place-panel-sources";
-const VIEWER_IMAGE_WIDTH_HINT = 1280;
+const PANEL_IMAGE_ASPECT_RATIO = 17 / 10;
+const PANEL_IMAGE_DESKTOP_WIDTH = 408;
+const THUMBNAIL_IMAGE_WIDTH = 72;
+const THUMBNAIL_IMAGE_HEIGHT = 48;
+const VIEWER_DIALOG_MAX_WIDTH = 1280;
+const VIEWER_DIALOG_VIEWPORT_MARGIN = 32;
+const VIEWER_DIALOG_PADDING = tokens.spacing.md * 2;
 const DIALOG_FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -124,22 +130,37 @@ function toSafeImageUrl(url: string | null | undefined) {
   }
 }
 
-function resolveDisplayImageRequest(
-  imageUrl: string,
-  widthHint: number,
-  includeResponsiveSrcSet: boolean
-) {
-  const safeImageUrl = toSafeImageUrl(imageUrl);
+function resolveDisplayImageRequest({
+  image,
+  frameWidth,
+  frameHeight,
+  devicePixelRatio
+}: {
+  image: Pick<MediaImageRecord, "url" | "width" | "height">;
+  frameWidth: number;
+  frameHeight: number;
+  devicePixelRatio: number;
+}) {
+  const safeImageUrl = toSafeImageUrl(image.url);
   if (!safeImageUrl) {
     return {
-      requestUrl: null,
-      srcSet: null as string | null
+      requestUrl: null as string | null
     };
   }
 
+  const selectedWidth = selectCommonsThumbnailWidthForFrame({
+    renderedWidth: frameWidth,
+    renderedHeight: frameHeight,
+    devicePixelRatio,
+    originalWidth: image.width,
+    originalHeight: image.height
+  });
+
   return {
-    requestUrl: buildCommonsThumbnailUrl(safeImageUrl, widthHint),
-    srcSet: includeResponsiveSrcSet ? buildCommonsThumbnailSrcSet(safeImageUrl) : null
+    requestUrl:
+      typeof selectedWidth === "number"
+        ? buildCommonsThumbnailUrl(safeImageUrl, selectedWidth)
+        : safeImageUrl
   };
 }
 
@@ -231,21 +252,24 @@ function typeChipStyle(confidence: Confidence) {
 function WikimediaImage({
   image,
   locationId,
-  displayWidthHint,
-  thumbnailSizes,
+  frameWidth,
+  frameHeight,
+  devicePixelRatio,
+  imageObjectFit,
   counterText,
   failedImageRequests,
   onRequestFailure,
   onOpenViewer,
   openViewerTargetRef,
   onPreviousImage,
-  onNextImage,
-  includeResponsiveSrcSet
+  onNextImage
 }: {
   image: MediaImageRecord;
   locationId: string;
-  displayWidthHint: number;
-  thumbnailSizes: string;
+  frameWidth: number;
+  frameHeight: number;
+  devicePixelRatio: number;
+  imageObjectFit: "cover" | "contain";
   counterText: string | null;
   failedImageRequests: Record<string, true>;
   onRequestFailure: (requestUrl: string) => void;
@@ -253,13 +277,13 @@ function WikimediaImage({
   openViewerTargetRef?: RefObject<HTMLButtonElement | null>;
   onPreviousImage?: () => void;
   onNextImage?: () => void;
-  includeResponsiveSrcSet: boolean;
 }) {
-  const { requestUrl: imageUrl, srcSet: imageSrcSet } = resolveDisplayImageRequest(
-    image.url,
-    displayWidthHint,
-    includeResponsiveSrcSet
-  );
+  const { requestUrl: imageUrl } = resolveDisplayImageRequest({
+    image,
+    frameWidth,
+    frameHeight,
+    devicePixelRatio
+  });
   const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
   const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
   const showFallback = !imageUrl || Boolean(failedImageRequests[imageUrl]);
@@ -338,7 +362,7 @@ function WikimediaImage({
       <div
         style={{
           width: "100%",
-          aspectRatio: "17 / 10",
+          height: `${Math.max(1, Math.round(frameHeight))}px`,
           backgroundColor: tokens.color.subtleSurface,
           borderRadius: `${tokens.radius.panel}px`,
           overflow: "hidden",
@@ -367,12 +391,12 @@ function WikimediaImage({
               }
             }}
             src={imageUrl}
-            srcSet={imageSrcSet ?? undefined}
-            sizes={thumbnailSizes}
+            width={typeof image.width === "number" ? image.width : undefined}
+            height={typeof image.height === "number" ? image.height : undefined}
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: imageObjectFit,
               display: "block"
             }}
           />
@@ -490,12 +514,14 @@ function WikimediaImage({
 function GalleryThumbnails({
   images,
   activeImageIndex,
+  devicePixelRatio,
   failedImageRequests,
   onRequestFailure,
   onSelectImage
 }: {
   images: MediaImageRecord[];
   activeImageIndex: number;
+  devicePixelRatio: number;
   failedImageRequests: Record<string, true>;
   onRequestFailure: (requestUrl: string) => void;
   onSelectImage: (nextIndex: number) => void;
@@ -537,7 +563,12 @@ function GalleryThumbnails({
       }}
     >
       {images.map((image, imageIndex) => {
-        const thumbnail = resolveDisplayImageRequest(image.url, 330, false);
+        const thumbnail = resolveDisplayImageRequest({
+          image,
+          frameWidth: THUMBNAIL_IMAGE_WIDTH,
+          frameHeight: THUMBNAIL_IMAGE_HEIGHT,
+          devicePixelRatio
+        });
         const isFailed =
           !thumbnail.requestUrl || Boolean(failedImageRequests[thumbnail.requestUrl]);
         const selected = imageIndex === activeImageIndex;
@@ -552,9 +583,9 @@ function GalleryThumbnails({
               buttonRefs.current[imageIndex] = element;
             }}
             style={{
-              width: "72px",
-              minWidth: "72px",
-              height: "48px",
+              width: `${THUMBNAIL_IMAGE_WIDTH}px`,
+              minWidth: `${THUMBNAIL_IMAGE_WIDTH}px`,
+              height: `${THUMBNAIL_IMAGE_HEIGHT}px`,
               borderRadius: `${tokens.radius.panel}px`,
               border: selected
                 ? `2px solid ${tokens.color.accent}`
@@ -590,7 +621,7 @@ function GalleryThumbnails({
                     onRequestFailure(thumbnail.requestUrl);
                   }
                 }}
-                src={thumbnail.requestUrl}
+                src={thumbnail.requestUrl ?? undefined}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -855,14 +886,41 @@ export function PlacePanel({
   const visibleScripture = sortedScripture.slice(0, visibleScriptureCount);
   const groupedScripture = groupScriptureByBook(visibleScripture);
 
-  const imageDisplayWidthHint = isSmallScreen
-    ? Math.max(330, (typeof window === "undefined" ? 360 : window.innerWidth) - 32)
-    : 408;
-  const imageSizes = isSmallScreen ? "(max-width: 767px) calc(100vw - 32px), 408px" : "408px";
-  const viewerImageSizes = `${VIEWER_IMAGE_WIDTH_HINT}px`;
   const normalizedActiveImageIndex =
     images.length === 0 ? 0 : Math.min(activeImageIndex, images.length - 1);
   const selectedImage = images[normalizedActiveImageIndex] ?? null;
+  const viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth;
+  const viewportHeight = typeof window === "undefined" ? 960 : window.innerHeight;
+  const devicePixelRatio =
+    typeof window === "undefined"
+      ? 1
+      : Number.isFinite(window.devicePixelRatio) && window.devicePixelRatio > 0
+        ? window.devicePixelRatio
+        : 1;
+  const panelFrameWidth = isSmallScreen
+    ? Math.max(330, viewportWidth - VIEWER_DIALOG_VIEWPORT_MARGIN)
+    : PANEL_IMAGE_DESKTOP_WIDTH;
+  const panelFrameHeight = panelFrameWidth / PANEL_IMAGE_ASPECT_RATIO;
+  const selectedImageAspectRatio =
+    selectedImage &&
+    typeof selectedImage.width === "number" &&
+    selectedImage.width > 0 &&
+    typeof selectedImage.height === "number" &&
+    selectedImage.height > 0
+      ? selectedImage.width / selectedImage.height
+      : PANEL_IMAGE_ASPECT_RATIO;
+  const viewerDialogWidth = Math.min(
+    VIEWER_DIALOG_MAX_WIDTH,
+    Math.max(320, viewportWidth - VIEWER_DIALOG_VIEWPORT_MARGIN)
+  );
+  const viewerDialogHeight = Math.max(320, viewportHeight - VIEWER_DIALOG_VIEWPORT_MARGIN);
+  const viewerContentWidth = Math.max(1, viewerDialogWidth - VIEWER_DIALOG_PADDING);
+  const viewerContentHeight = Math.max(1, viewerDialogHeight - VIEWER_DIALOG_PADDING);
+  const viewerFrameHeight = Math.min(
+    viewerContentHeight,
+    viewerContentWidth / selectedImageAspectRatio
+  );
+  const viewerFrameWidth = viewerFrameHeight * selectedImageAspectRatio;
   const showThumbnailStrip = shouldRenderThumbnailRow(images.length);
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
   const modernName = placeForDisplay.names.modern;
@@ -879,7 +937,12 @@ export function PlacePanel({
     }
 
     const nextImage = images[nextIndex];
-    const nextRequest = resolveDisplayImageRequest(nextImage.url, imageDisplayWidthHint, false);
+    const nextRequest = resolveDisplayImageRequest({
+      image: nextImage,
+      frameWidth: panelFrameWidth,
+      frameHeight: panelFrameHeight,
+      devicePixelRatio
+    });
     if (!nextRequest.requestUrl || failedImageRequests[nextRequest.requestUrl]) {
       return;
     }
@@ -889,11 +952,13 @@ export function PlacePanel({
     preload.src = nextRequest.requestUrl;
   }, [
     activeImageIndex,
+    devicePixelRatio,
     failedImageRequests,
-    imageDisplayWidthHint,
     images,
     images.length,
     normalizedActiveImageIndex,
+    panelFrameHeight,
+    panelFrameWidth,
     selectedImage
   ]);
 
@@ -908,11 +973,12 @@ export function PlacePanel({
     }
 
     const nextImage = images[nextIndex];
-    const nextViewerRequest = resolveDisplayImageRequest(
-      nextImage.url,
-      VIEWER_IMAGE_WIDTH_HINT,
-      false
-    );
+    const nextViewerRequest = resolveDisplayImageRequest({
+      image: nextImage,
+      frameWidth: viewerFrameWidth,
+      frameHeight: viewerFrameHeight,
+      devicePixelRatio
+    });
     if (!nextViewerRequest.requestUrl || failedImageRequests[nextViewerRequest.requestUrl]) {
       return;
     }
@@ -922,11 +988,14 @@ export function PlacePanel({
     preload.src = nextViewerRequest.requestUrl;
   }, [
     activeImageIndex,
+    devicePixelRatio,
     failedImageRequests,
     images,
     images.length,
     isImageViewerOpen,
-    normalizedActiveImageIndex
+    normalizedActiveImageIndex,
+    viewerFrameHeight,
+    viewerFrameWidth
   ]);
 
   useEffect(() => {
@@ -1212,10 +1281,12 @@ export function PlacePanel({
                   ? `${normalizedActiveImageIndex + 1} / ${images.length}`
                   : null
               }
-              displayWidthHint={imageDisplayWidthHint}
+              devicePixelRatio={devicePixelRatio}
               failedImageRequests={failedImageRequests}
+              frameHeight={panelFrameHeight}
+              frameWidth={panelFrameWidth}
               image={selectedImage}
-              includeResponsiveSrcSet
+              imageObjectFit="cover"
               locationId={placeForDisplay.id}
               onNextImage={
                 images.length > 1
@@ -1234,11 +1305,11 @@ export function PlacePanel({
               }
               onRequestFailure={markImageRequestFailed}
               openViewerTargetRef={imageViewerOpenTargetRef}
-              thumbnailSizes={imageSizes}
             />
             {showThumbnailStrip ? (
               <GalleryThumbnails
                 activeImageIndex={normalizedActiveImageIndex}
+                devicePixelRatio={devicePixelRatio}
                 failedImageRequests={failedImageRequests}
                 images={images}
                 onRequestFailure={markImageRequestFailed}
@@ -1713,10 +1784,12 @@ export function PlacePanel({
                   ? `${normalizedActiveImageIndex + 1} / ${images.length}`
                   : null
               }
-              displayWidthHint={VIEWER_IMAGE_WIDTH_HINT}
+              devicePixelRatio={devicePixelRatio}
               failedImageRequests={failedImageRequests}
+              frameHeight={viewerFrameHeight}
+              frameWidth={viewerFrameWidth}
               image={selectedImage}
-              includeResponsiveSrcSet={false}
+              imageObjectFit="contain"
               locationId={placeForDisplay.id}
               onNextImage={
                 images.length > 1
@@ -1733,7 +1806,6 @@ export function PlacePanel({
                   : undefined
               }
               onRequestFailure={markImageRequestFailed}
-              thumbnailSizes={viewerImageSizes}
             />
           </div>
         </div>
