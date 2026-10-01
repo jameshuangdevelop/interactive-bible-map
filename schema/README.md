@@ -160,6 +160,32 @@ Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists 
 - Hosted AI files are validated as WebP, at most 1,600 px wide and at most 400 KB.
 - Validator warnings: lead images (`-01`) wider than 2.2:1 are flagged as panoramas, and Commons images narrower than 1,200 px are flagged as likely too small for crisp panel crops.
 
+### AI reconstruction generation/publish scripts (M3.5-07)
+
+Generate candidate images from a prompt brief heading:
+
+```bash
+npm run generate:ai -- <prompt-id> [--provider cloudflare-flux|cloudflare-lucid|openai|gemini] [--model <id>] [--variants N] [--round N] [--seed S]
+```
+
+- Prompt text is read from `content/image-prompts/<location-id>.md` under `### AI-generated reconstruction — prompt <prompt-id>`, and stops before `Keep out / keep vague:`.
+- Required environment variables:
+  - Cloudflare: `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_AI_TOKEN`
+  - OpenAI: `OPENAI_API_KEY`
+  - Gemini: `GEMINI_API_KEY`
+- Candidates are written to `media/ai-incoming/<prompt-id>-r<round>-v<k>.<ext>` plus a side-car JSON containing provider/model/date/seed/round/prompt data and prompt SHA-256.
+- `media/ai-incoming/` is Git-ignored; candidate files are working artifacts and are not committed.
+
+Publish one candidate to a hosted AI image:
+
+```bash
+npm run publish:ai -- <candidate-file> [--id <prompt-id>]
+```
+
+- Converts the candidate to `media/ai/<prompt-id>.webp` using WebP quality steps until it is at most 1,600 px wide and 400 KB.
+- Fails if the file cannot fit under 400 KB at quality 60 or above.
+- Prints final width/height/bytes and generator metadata derived from the candidate side-car for use in the media entry.
+
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
 - Source URL: `https://eBible.org/Scriptures/engwebp_vpl.zip`
