@@ -17,7 +17,9 @@ const PROMPT_ID_PATTERN = /^([a-z0-9]+(?:-[a-z0-9]+)*)-ai-[0-9]{2}$/u;
 const HEADING_KEEP_OUT_PATTERN = /^Keep out \/ keep vague:/iu;
 const MARKDOWN_HEADING_PATTERN = /^#{1,6}\s+/u;
 const AI_CANDIDATE_FILE_PATTERN =
-  /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r[1-9][0-9]*-v[1-9][0-9]*\.[a-z0-9]+$/u;
+  /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r([1-9][0-9]*)-v([1-9][0-9]*)\.([a-z0-9]+)$/u;
+const AI_CANDIDATE_SIDECAR_FILE_PATTERN =
+  /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r([1-9][0-9]*)-v([1-9][0-9]*)\.[a-z0-9]+\.json$/u;
 
 export const DEFAULT_IMAGE_PROMPTS_DIRECTORY = path.join(
   repositoryRoot,
@@ -258,6 +260,11 @@ export async function writeAiCandidateAndSidecar({
   model,
   seed,
   promptText,
+  serviceTier,
+  usageMetadata,
+  estimatedCostUsd,
+  parentCandidate,
+  instructionText,
   now = new Date(),
   writeFileImpl = fs.writeFile,
   statImpl = fs.stat,
@@ -282,6 +289,33 @@ export async function writeAiCandidateAndSidecar({
   if (typeof promptText !== "string" || promptText.trim().length === 0) {
     throw new Error("promptText is required.");
   }
+  if (serviceTier !== undefined && (typeof serviceTier !== "string" || serviceTier.length === 0)) {
+    throw new Error("serviceTier must be a non-empty string when provided.");
+  }
+  if (
+    usageMetadata !== undefined &&
+    (typeof usageMetadata !== "object" || usageMetadata === null || Array.isArray(usageMetadata))
+  ) {
+    throw new Error("usageMetadata must be a JSON object when provided.");
+  }
+  if (
+    estimatedCostUsd !== undefined &&
+    (typeof estimatedCostUsd !== "number" || !Number.isFinite(estimatedCostUsd) || estimatedCostUsd < 0)
+  ) {
+    throw new Error("estimatedCostUsd must be a finite number >= 0 when provided.");
+  }
+  if (
+    parentCandidate !== undefined &&
+    (typeof parentCandidate !== "string" || parentCandidate.trim().length === 0)
+  ) {
+    throw new Error("parentCandidate must be a non-empty string when provided.");
+  }
+  if (
+    instructionText !== undefined &&
+    (typeof instructionText !== "string" || instructionText.trim().length === 0)
+  ) {
+    throw new Error("instructionText must be a non-empty string when provided.");
+  }
 
   const extension = detectImageExtensionFromBuffer(imageBuffer);
   const directoryPath = path.resolve(incomingDirectory);
@@ -301,6 +335,22 @@ export async function writeAiCandidateAndSidecar({
     prompt: promptText,
     promptSha256
   };
+  if (typeof serviceTier === "string") {
+    sidecar.serviceTier = serviceTier;
+  }
+  if (usageMetadata !== undefined) {
+    sidecar.usageMetadata = usageMetadata;
+  }
+  if (typeof estimatedCostUsd === "number") {
+    sidecar.estimatedCostUsd = Number(estimatedCostUsd.toFixed(6));
+  }
+  if (typeof parentCandidate === "string") {
+    sidecar.parentCandidate = parentCandidate;
+  }
+  if (typeof instructionText === "string") {
+    sidecar.instruction = instructionText;
+    sidecar.instructionSha256 = sha256Hex(instructionText);
+  }
 
   const [imagePathExists, sidecarPathExists] = await Promise.all([
     filePathExists(imagePath, statImpl),
@@ -466,6 +516,33 @@ export function parseGenerateAiArguments(argv) {
       continue;
     }
 
+    const tierOption = parseLongOptionValue(argument, argv[index + 1], "--tier");
+    if (tierOption) {
+      options.tier = String(tierOption.value).trim().toLowerCase();
+      if (tierOption.consumedNext) {
+        index += 1;
+      }
+      continue;
+    }
+
+    const editFromOption = parseLongOptionValue(argument, argv[index + 1], "--edit-from");
+    if (editFromOption) {
+      options.editFrom = path.resolve(String(editFromOption.value));
+      if (editFromOption.consumedNext) {
+        index += 1;
+      }
+      continue;
+    }
+
+    const instructionOption = parseLongOptionValue(argument, argv[index + 1], "--instruction");
+    if (instructionOption) {
+      options.instruction = String(instructionOption.value);
+      if (instructionOption.consumedNext) {
+        index += 1;
+      }
+      continue;
+    }
+
     if (argument.startsWith("--")) {
       throw new Error(`Unknown argument: ${argument}`);
     }
@@ -478,8 +555,20 @@ export function parseGenerateAiArguments(argv) {
 
   if (!options.promptId) {
     throw new Error(
-      "Usage: npm run generate:ai -- <prompt-id> [--provider cloudflare-flux|cloudflare-lucid|openai|gemini] [--model <id>] [--variants N] [--round N] [--seed S]"
+      "Usage: npm run generate:ai -- <prompt-id> [--provider cloudflare-flux|cloudflare-lucid|openai|gemini] [--model <id>] [--variants N] [--round N] [--seed S] [--tier flex|standard] [--edit-from <candidate-file> --instruction \"<text>\"]"
     );
+  }
+
+  if (options.tier && !["flex", "standard"].includes(options.tier)) {
+    throw new Error("--tier must be either 'flex' or 'standard'.");
+  }
+
+  if (options.editFrom) {
+    if (typeof options.instruction !== "string" || options.instruction.trim().length === 0) {
+      throw new Error("--instruction is required when using --edit-from.");
+    }
+  } else if (typeof options.instruction === "string") {
+    throw new Error("--instruction requires --edit-from.");
   }
 
   ensurePromptId(options.promptId);
@@ -522,10 +611,24 @@ export function parsePublishAiArguments(argv) {
   return options;
 }
 
-export function derivePromptIdFromCandidateFileName(candidatePath) {
+export function parseAiCandidateFileName(candidatePath) {
   const baseName = path.basename(candidatePath);
   const match = AI_CANDIDATE_FILE_PATTERN.exec(baseName);
-  return match ? match[1] : null;
+  if (!match) {
+    return null;
+  }
+
+  return {
+    promptId: match[1],
+    round: Number.parseInt(match[2], 10),
+    variant: Number.parseInt(match[3], 10),
+    extension: match[4]
+  };
+}
+
+export function derivePromptIdFromCandidateFileName(candidatePath) {
+  const parsed = parseAiCandidateFileName(candidatePath);
+  return parsed ? parsed.promptId : null;
 }
 
 export async function readCandidateSidecar(sidecarPath) {
@@ -568,6 +671,99 @@ export function mediaEntryGeneratorFromSidecar(sidecarData) {
     tool: sidecarData.provider,
     model: sidecarData.model,
     date: formatDateOnly(sidecarData.date)
+  };
+}
+
+export async function summarizeAiIncomingCosts({
+  incomingDirectory = DEFAULT_AI_INCOMING_DIRECTORY,
+  readdirImpl = fs.readdir,
+  readFileImpl = fs.readFile
+} = {}) {
+  let fileNames;
+  try {
+    fileNames = await readdirImpl(path.resolve(incomingDirectory));
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return {
+        rows: [],
+        totalCandidates: 0,
+        totalCostUsd: 0
+      };
+    }
+    throw error;
+  }
+
+  const sidecarFileNames = fileNames
+    .filter((fileName) => AI_CANDIDATE_SIDECAR_FILE_PATTERN.test(fileName))
+    .sort();
+
+  const perLocation = new Map();
+  let totalCandidates = 0;
+  let totalCostUsd = 0;
+
+  for (const sidecarFileName of sidecarFileNames) {
+    const sidecarPath = path.join(path.resolve(incomingDirectory), sidecarFileName);
+    let sidecarText;
+    try {
+      sidecarText = await readFileImpl(sidecarPath, "utf8");
+    } catch (error) {
+      throw new Error(`Failed to read AI side-car '${sidecarPath}': ${error.message}`);
+    }
+
+    let sidecar;
+    try {
+      sidecar = JSON.parse(sidecarText);
+    } catch (error) {
+      throw new Error(`AI side-car '${sidecarPath}' is not valid JSON: ${error.message}`);
+    }
+
+    const promptId =
+      typeof sidecar?.promptId === "string" && sidecar.promptId.length > 0
+        ? sidecar.promptId
+        : derivePromptIdFromCandidateFileName(sidecarFileName.slice(0, -".json".length));
+    if (!promptId || !PROMPT_ID_PATTERN.test(promptId)) {
+      continue;
+    }
+
+    let locationId;
+    try {
+      locationId = promptIdToLocationId(promptId);
+    } catch {
+      continue;
+    }
+
+    const estimatedCostUsd =
+      typeof sidecar?.estimatedCostUsd === "number" && Number.isFinite(sidecar.estimatedCostUsd)
+        ? sidecar.estimatedCostUsd
+        : 0;
+
+    totalCandidates += 1;
+    totalCostUsd += estimatedCostUsd;
+
+    const existing =
+      perLocation.get(locationId) ??
+      {
+        locationId,
+        candidates: 0,
+        totalCostUsd: 0
+      };
+    existing.candidates += 1;
+    existing.totalCostUsd += estimatedCostUsd;
+    perLocation.set(locationId, existing);
+  }
+
+  const rows = [...perLocation.values()]
+    .map((row) => ({
+      locationId: row.locationId,
+      candidates: row.candidates,
+      totalCostUsd: Number(row.totalCostUsd.toFixed(6))
+    }))
+    .sort((a, b) => a.locationId.localeCompare(b.locationId));
+
+  return {
+    rows,
+    totalCandidates,
+    totalCostUsd: Number(totalCostUsd.toFixed(6))
   };
 }
 
