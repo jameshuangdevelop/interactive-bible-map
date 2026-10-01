@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:20_–_Sardis,_The_Roman_Colonnaded_Avenue_(51175357203).jpg",
       "caption": "Ancient Sardis",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:21_–_Sardis,_The_Roman_Colonnaded_Avenue_(51176226120).jpg",
       "caption": "Ancient Sardis",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Sardis_acropolis.jpg",
       "caption": "The acropolis hill of ancient Sardis",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

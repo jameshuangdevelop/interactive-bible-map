@@ -1,0 +1,499 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = path.resolve(moduleDirectory, "..");
+const mediaDirectory = path.join(repositoryRoot, "data", "media");
+const commonsThumbnailSourcePath = path.join(
+  repositoryRoot,
+  "app",
+  "src",
+  "features",
+  "place-panel",
+  "commons-thumbnail.ts"
+);
+const aiMediaDirectory = path.join(repositoryRoot, "media", "ai");
+
+const COMMONS_PREFIX = "/wikipedia/commons/";
+const COMMONS_THUMB_PREFIX = "/wikipedia/commons/thumb/";
+const REQUEST_CONCURRENCY = 2;
+const RETRY_DELAYS_MS = [0, 2000, 5000, 10000, 20000];
+const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
+const MIN_REQUEST_INTERVAL_MS = 500;
+const USER_AGENT =
+  "InteractiveBibleMapImageCheck/1.0 (+https://github.com/jameshuangdevelop/interactive-bible-map; contact: repo issues)";
+const MAX_AI_IMAGE_WIDTH_PX = 1600;
+const MAX_AI_IMAGE_BYTES = 400 * 1024;
+const AI_MEDIA_URL_PATTERN =
+  /^media\/ai\/([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})\.webp$/u;
+
+function toCommonsOriginalPathname(pathname) {
+  if (pathname.startsWith(COMMONS_THUMB_PREFIX)) {
+    const relativePath = pathname.slice(COMMONS_THUMB_PREFIX.length);
+    const segments = relativePath.split("/").filter((segment) => segment.length > 0);
+    if (segments.length < 4) {
+      return null;
+    }
+
+    const originalPathSegments = segments.slice(0, -1);
+    const fileName = originalPathSegments[originalPathSegments.length - 1];
+    const thumbnailFileName = segments[segments.length - 1];
+    const expectedSvgThumbnailFileName = `${fileName}.png`;
+    if (
+      !fileName ||
+      !thumbnailFileName ||
+      !/^[1-9][0-9]*px-/u.test(thumbnailFileName) ||
+      !(
+        thumbnailFileName.endsWith(fileName) ||
+        thumbnailFileName.endsWith(expectedSvgThumbnailFileName)
+      )
+    ) {
+      return null;
+    }
+
+    return `${COMMONS_PREFIX}${originalPathSegments.join("/")}`;
+  }
+
+  if (pathname.startsWith(COMMONS_PREFIX)) {
+    return pathname;
+  }
+
+  return null;
+}
+
+function buildCommonsThumbnailUrl(originalUrl, width) {
+  const parsed = new URL(originalUrl);
+  parsed.search = "";
+  parsed.hash = "";
+
+  const commonsOriginalPath = toCommonsOriginalPathname(parsed.pathname);
+  if (!commonsOriginalPath) {
+    throw new Error("Not a Commons original URL");
+  }
+
+  const relativePath = commonsOriginalPath.slice(COMMONS_PREFIX.length);
+  const segments = relativePath.split("/").filter((segment) => segment.length > 0);
+  const fileName = segments[segments.length - 1];
+  if (!fileName || segments.length < 3) {
+    throw new Error("Invalid Commons original path");
+  }
+
+  const thumbnailFileName = /\.svg$/iu.test(fileName) ? `${fileName}.png` : fileName;
+  parsed.pathname = `${COMMONS_THUMB_PREFIX}${relativePath}/${width}px-${thumbnailFileName}`;
+  return parsed.toString();
+}
+
+function readUInt24LE(buffer, offset) {
+  return buffer[offset] + (buffer[offset + 1] << 8) + (buffer[offset + 2] << 16);
+}
+
+function parseWebpDimensions(buffer) {
+  if (buffer.length < 16) {
+    return null;
+  }
+
+  if (
+    buffer.toString("ascii", 0, 4) !== "RIFF" ||
+    buffer.toString("ascii", 8, 12) !== "WEBP"
+  ) {
+    return null;
+  }
+
+  let offset = 12;
+  while (offset + 8 <= buffer.length) {
+    const chunkType = buffer.toString("ascii", offset, offset + 4);
+    const chunkSize = buffer.readUInt32LE(offset + 4);
+    const chunkDataStart = offset + 8;
+    const chunkDataEnd = chunkDataStart + chunkSize;
+
+    if (chunkDataEnd > buffer.length) {
+      return null;
+    }
+
+    if (chunkType === "VP8X") {
+      if (chunkSize < 10) {
+        return null;
+      }
+      const width = readUInt24LE(buffer, chunkDataStart + 4) + 1;
+      const height = readUInt24LE(buffer, chunkDataStart + 7) + 1;
+      return { width, height };
+    }
+
+    if (chunkType === "VP8 ") {
+      if (chunkSize < 10) {
+        return null;
+      }
+      const width = buffer.readUInt16LE(chunkDataStart + 6) & 0x3fff;
+      const height = buffer.readUInt16LE(chunkDataStart + 8) & 0x3fff;
+      return { width, height };
+    }
+
+    if (chunkType === "VP8L") {
+      if (chunkSize < 5 || buffer[chunkDataStart] !== 0x2f) {
+        return null;
+      }
+
+      const packed = buffer.readUInt32LE(chunkDataStart + 1);
+      const width = (packed & 0x3fff) + 1;
+      const height = ((packed >> 14) & 0x3fff) + 1;
+      return { width, height };
+    }
+
+    offset = chunkDataEnd + (chunkSize % 2);
+  }
+
+  return null;
+}
+
+async function loadCommonsThumbnailWidths() {
+  const sourceText = await fs.readFile(commonsThumbnailSourcePath, "utf8");
+  const match = /COMMONS_THUMBNAIL_WIDTHS\s*=\s*\[([^\]]+)\]/u.exec(sourceText);
+  if (!match) {
+    throw new Error(
+      "Could not find COMMONS_THUMBNAIL_WIDTHS in app/src/features/place-panel/commons-thumbnail.ts"
+    );
+  }
+
+  const widths = match[1]
+    .split(",")
+    .map((segment) => Number.parseInt(segment.trim(), 10))
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  if (widths.length === 0) {
+    throw new Error("No thumbnail widths were parsed from commons-thumbnail.ts");
+  }
+
+  return widths;
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+let lastRequestStartAt = 0;
+let requestGate = Promise.resolve();
+
+async function waitForRequestSlot() {
+  const nextGate = requestGate.then(async () => {
+    const now = Date.now();
+    const waitMilliseconds = Math.max(0, MIN_REQUEST_INTERVAL_MS - (now - lastRequestStartAt));
+    if (waitMilliseconds > 0) {
+      await delay(waitMilliseconds);
+    }
+    lastRequestStartAt = Date.now();
+  });
+
+  requestGate = nextGate.catch(() => {});
+  await nextGate;
+}
+
+function retryDelayFromHeaders(response) {
+  const retryAfterHeader = response.headers.get("retry-after");
+  if (!retryAfterHeader) {
+    return null;
+  }
+
+  const asSeconds = Number.parseInt(retryAfterHeader, 10);
+  if (Number.isFinite(asSeconds) && asSeconds >= 0) {
+    return asSeconds * 1000;
+  }
+
+  const asDate = Date.parse(retryAfterHeader);
+  if (!Number.isFinite(asDate)) {
+    return null;
+  }
+
+  return Math.max(0, asDate - Date.now());
+}
+
+async function requestImageAvailability(url) {
+  const headers = {
+    "User-Agent": USER_AGENT,
+    Accept: "image/*,*/*;q=0.8"
+  };
+  await waitForRequestSlot();
+  const response = await fetch(url, {
+    method: "HEAD",
+    headers,
+    redirect: "follow"
+  });
+
+  if (response.status === 405 || response.status === 501) {
+    await waitForRequestSlot();
+    const fallbackResponse = await fetch(url, {
+      method: "GET",
+      headers: {
+        ...headers,
+        Range: "bytes=0-0"
+      },
+      redirect: "follow"
+    });
+    await fallbackResponse.arrayBuffer();
+    return fallbackResponse;
+  }
+
+  return response;
+}
+
+async function checkUrlWithRetry(task) {
+  let lastFailure = null;
+  for (let attemptIndex = 0; attemptIndex < RETRY_DELAYS_MS.length; attemptIndex += 1) {
+    if (attemptIndex > 0) {
+      const waitMilliseconds = RETRY_DELAYS_MS[attemptIndex];
+      if (waitMilliseconds > 0) {
+        await delay(waitMilliseconds);
+      }
+    }
+
+    try {
+      const response = await requestImageAvailability(task.url);
+      if (response.status >= 200 && response.status < 400) {
+        return null;
+      }
+
+      lastFailure = {
+        ...task,
+        status: response.status,
+        message: `HTTP ${response.status}`
+      };
+
+      if (!RETRYABLE_STATUS_CODES.has(response.status)) {
+        return lastFailure;
+      }
+
+      const retryAfterMilliseconds = retryDelayFromHeaders(response);
+      if (
+        retryAfterMilliseconds &&
+        attemptIndex + 1 < RETRY_DELAYS_MS.length &&
+        retryAfterMilliseconds > RETRY_DELAYS_MS[attemptIndex + 1]
+      ) {
+        await delay(retryAfterMilliseconds);
+      }
+    } catch (error) {
+      lastFailure = {
+        ...task,
+        status: "network-error",
+        message: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+
+  return lastFailure;
+}
+
+async function runWithConcurrency(items, concurrency, worker) {
+  const workerCount = Math.max(1, Math.min(concurrency, items.length));
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function runWorker() {
+    while (true) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      if (currentIndex >= items.length) {
+        return;
+      }
+
+      results[currentIndex] = await worker(items[currentIndex], currentIndex);
+    }
+  }
+
+  await Promise.all(Array.from({ length: workerCount }, () => runWorker()));
+  return results;
+}
+
+async function loadMediaRecords() {
+  const mediaFiles = (await fs.readdir(mediaDirectory))
+    .filter((name) => name.endsWith(".json"))
+    .sort();
+
+  return Promise.all(
+    mediaFiles.map(async (name) => {
+      const filePath = path.join(mediaDirectory, name);
+      const record = JSON.parse(await fs.readFile(filePath, "utf8"));
+      return {
+        fileName: name,
+        ...record
+      };
+    })
+  );
+}
+
+async function validateAiImage(task) {
+  const failures = [];
+  const match = AI_MEDIA_URL_PATTERN.exec(task.image.url);
+  if (!match) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "invalid-url",
+      message: "AI image url must use media/ai/<location-id>-ai-NN.webp",
+      url: task.image.url
+    });
+    return failures;
+  }
+
+  const expectedFileId = match[1];
+  if (expectedFileId !== task.image.id) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "id-mismatch",
+      message: `AI image url file id '${expectedFileId}' must match image id '${task.image.id}'`,
+      url: task.image.url
+    });
+  }
+
+  const filePath = path.join(aiMediaDirectory, path.basename(task.image.url));
+  let stats;
+  try {
+    stats = await fs.stat(filePath);
+  } catch (error) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "missing-file",
+      message: error instanceof Error ? error.message : String(error),
+      url: task.image.url
+    });
+    return failures;
+  }
+
+  if (!stats.isFile()) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "not-a-file",
+      message: "AI media path is not a file",
+      url: task.image.url
+    });
+    return failures;
+  }
+
+  if (stats.size > MAX_AI_IMAGE_BYTES) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "too-large",
+      message: `File is ${stats.size} bytes; limit is ${MAX_AI_IMAGE_BYTES}`,
+      url: task.image.url
+    });
+  }
+
+  const buffer = await fs.readFile(filePath);
+  const dimensions = parseWebpDimensions(buffer);
+  if (!dimensions) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "invalid-webp",
+      message: "File is not a valid WebP image",
+      url: task.image.url
+    });
+    return failures;
+  }
+
+  if (dimensions.width > MAX_AI_IMAGE_WIDTH_PX) {
+    failures.push({
+      locationId: task.locationId,
+      imageId: task.image.id,
+      variant: "ai-file",
+      status: "too-wide",
+      message: `Image width is ${dimensions.width}px; limit is ${MAX_AI_IMAGE_WIDTH_PX}px`,
+      url: task.image.url
+    });
+  }
+
+  return failures;
+}
+
+function summarizeFailureRows(failures) {
+  return failures.map((failure) => ({
+    location: failure.locationId,
+    image: failure.imageId,
+    variant: failure.variant,
+    status: failure.status,
+    message: failure.message,
+    url: failure.url
+  }));
+}
+
+async function main() {
+  const thumbnailWidths = await loadCommonsThumbnailWidths();
+  const mediaRecords = await loadMediaRecords();
+
+  const commonsTasks = [];
+  const aiTasks = [];
+
+  for (const mediaRecord of mediaRecords) {
+    const locationId = mediaRecord.locationId;
+    const images = Array.isArray(mediaRecord.images) ? mediaRecord.images : [];
+
+    for (const image of images) {
+      if (!image || typeof image !== "object" || typeof image.url !== "string") {
+        continue;
+      }
+
+      if (image.kind === "ai-reconstruction" || image.aiGenerated === true) {
+        aiTasks.push({ locationId, image });
+        continue;
+      }
+
+      const parsed = new URL(image.url);
+      parsed.search = "";
+      parsed.hash = "";
+      const originalUrl = parsed.toString();
+
+      commonsTasks.push({
+        locationId,
+        imageId: image.id,
+        variant: "original",
+        url: originalUrl
+      });
+
+      for (const width of thumbnailWidths) {
+        commonsTasks.push({
+          locationId,
+          imageId: image.id,
+          variant: `${width}px`,
+          url: buildCommonsThumbnailUrl(originalUrl, width)
+        });
+      }
+    }
+  }
+
+  const commonsFailures = (
+    await runWithConcurrency(commonsTasks, REQUEST_CONCURRENCY, (task) =>
+      checkUrlWithRetry(task)
+    )
+  ).filter((failure) => Boolean(failure));
+
+  const aiFailures = (
+    await Promise.all(aiTasks.map(async (task) => validateAiImage(task)))
+  ).flat();
+
+  const failures = [...commonsFailures, ...aiFailures];
+  console.log(
+    `Checked ${commonsTasks.length} Commons URLs (original + ${thumbnailWidths.join(", ")}px) and ${aiTasks.length} AI files.`
+  );
+
+  if (failures.length > 0) {
+    console.error(`Found ${failures.length} image check failure(s).`);
+    console.table(summarizeFailureRows(failures));
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log("All image checks passed.");
+}
+
+await main();

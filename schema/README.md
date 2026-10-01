@@ -11,6 +11,7 @@ All example values below are **illustrative only** (not verified historical clai
 - `bibliography.schema.json`: structure for `data/bibliography.json`
 - `scripts/fill-scripture-text.mjs`: fills `scripture[].textWEB` from the WEB source text
 - `scripts/validate-data.mjs`: schema + cross-file + scripture + checksum checks used by CI
+- `scripts/check-images.mjs`: online image checks (Commons originals + panel thumbnail widths, and hosted AI files)
 
 ## Core conventions
 
@@ -32,6 +33,14 @@ All example values below are **illustrative only** (not verified historical clai
 - `region`: province/region-level context.
 - `city`: city-level context.
 - `site`: local site/feature context.
+
+### Prominence
+- `prominence: "major"` marks one of the ADR-0029 major places, which target 5 to 10 images.
+- `prominence: "standard"` marks every other place, which target 1 to 3 images.
+- The validator enforces the machine-checkable limits:
+  - standard places must have at most 3 images;
+  - major places with fewer than 5 images raise a warning by default;
+  - setting `REQUIRE_MAJOR_IMAGES=true` turns that warning into an error.
 
 ### Ancient area hierarchy (AD 50 convention until M4 timeline)
 - `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
@@ -137,8 +146,14 @@ Jurisdiction ports and `IGO` are mutually exclusive. When either variant exists 
 
 ### Image IDs and storage
 - Location images are hotlinked from Wikimedia Commons and keep their Commons file names. Keep `url` and `sourcePage` pointing to Commons, and do not download, rename, or commit those image files into this repository.
-- `images[].id` is this project's stable image name. It uses `<location-id>-NN` in display order, where `-01` is the lead image shown first in the details panel.
-- The pattern `<location-id>-ai-NN` is reserved for future AI reconstructions. Those are the only images this project will host itself, saved as `<id>.<ext>`, and prompts in `content/image-prompts/<location-id>.md` will use the same IDs. The current media schema does not accept AI IDs yet.
+- Commons `url` values must be plain original-file URLs in the exact form `https://upload.wikimedia.org/wikipedia/commons/<a>/<ab>/<file>` (no query string), and `<a>/<ab>` must match the MD5 hash folders for `<file>`.
+- For Commons images, `url` and `sourcePage` must point to the same file name.
+- `images[].id` is this project's stable image name. Commons images use `<location-id>-NN` in display order, where `-01` is the lead image shown first in the details panel.
+- `images[].kind` is required and must be one of `modern`, `site`, `reconstruction`, or `ai-reconstruction`.
+- AI reconstructions use IDs in the `<location-id>-ai-NN` pattern and hosted URLs in `media/ai/<location-id>-ai-NN.webp`. They require `generator`, `promptRef`, and `basedOn`.
+- AI branch note (M3.5-01): `author`, `license`, `licenseUrl`, and `sourcePage` are optional placeholders for now and become required in M3.5-07 after the licensing ADR.
+- `content/image-prompts/<location-id>.md` files are validated: file names must match location IDs, and each cited source ID in square brackets must resolve like location data sources.
+- Hosted AI files are validated as WebP, at most 1,600 px wide and at most 400 KB.
 
 ## Scripture text workflow (WEB only)
 - Edition: **WEB `engwebp`** (ADR-0013).
@@ -166,6 +181,7 @@ The script auto-builds `scripture[].textWEB` from `scripture[].ref`. Verse range
 ```bash
 npm run validate:data
 npm test
+npm run check:images
 ```
 
 CI runs:
@@ -190,6 +206,7 @@ CI runs:
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "major",
   "parentId": "galilee",
   "candidates": [
     {

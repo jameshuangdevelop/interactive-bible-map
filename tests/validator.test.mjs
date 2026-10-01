@@ -56,6 +56,8 @@ async function runCase(caseName, options = {}) {
   return validateData({
     locationsDirectory: path.join(caseDirectory, "locations"),
     mediaDirectory: path.join(caseDirectory, "media"),
+    imagePromptsDirectory: path.join(caseDirectory, "content", "image-prompts"),
+    aiMediaDirectory: path.join(caseDirectory, "media", "ai"),
     webVplPath,
     bibliographyPath: bibliographyFixturePath,
     skipSnapshotChecksumCheck: true,
@@ -107,6 +109,8 @@ async function runWithTemporaryCase(mutateLocations, options = {}) {
     return await validateData({
       locationsDirectory,
       mediaDirectory,
+      imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
+      aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
@@ -190,6 +194,8 @@ async function runWithTemporaryHierarchyCase(mutateLocations, options = {}) {
     return await validateData({
       locationsDirectory,
       mediaDirectory,
+      imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
+      aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
@@ -382,6 +388,120 @@ test("duplicate image IDs across media files fail", async () => {
       (error) =>
         error.path === "$.images[0].id" &&
         error.message.includes("Duplicate image id 'capernaum-01'")
+    )
+  );
+});
+
+test("Commons media URL fixture with valid hash folders passes", async () => {
+  const result = await runCase("valid-media-commons-url");
+  assert.equal(result.errors.length, 0);
+});
+
+test("Commons media URL fixture rejects wrong hash folders", async () => {
+  const result = await runCase("invalid-media-commons-url-hash");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].url" &&
+        error.message.includes("hash folders must match md5")
+    )
+  );
+});
+
+test("Commons media URL fixture rejects URL/sourcePage filename mismatches", async () => {
+  const result = await runCase("invalid-media-sourcepage-mismatch");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].sourcePage" &&
+        error.message.includes("must match url file")
+    )
+  );
+});
+
+test("AI media fixture accepts valid hosted WebP file", async () => {
+  const result = await runCase("valid-media-ai-image");
+  assert.equal(result.errors.length, 0);
+});
+
+test("AI media fixture rejects over-width hosted WebP file", async () => {
+  const result = await runCase("invalid-media-ai-image-too-wide");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images[0].url" &&
+        error.message.includes("limit is 1600px")
+    )
+  );
+});
+
+test("standard places cannot have more than three images", async () => {
+  const result = await runCase("invalid-standard-too-many-images");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images" &&
+        error.message.includes("at most 3 images")
+    )
+  );
+});
+
+test("major places with fewer than five images emit a warning by default", async () => {
+  const result = await runCase("valid-major-few-images");
+  assert.equal(result.errors.length, 0);
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("media/capernaum.json") &&
+        warning.path === "$.images" &&
+        warning.message.includes("at least 5 images")
+    )
+  );
+});
+
+test("major places with fewer than five images fail when REQUIRE_MAJOR_IMAGES is enabled", async () => {
+  const result = await runCase("valid-major-few-images", { requireMajorImages: true });
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images" &&
+        error.message.includes("at least 5 images")
+    )
+  );
+});
+
+test("image prompt source IDs pass when they resolve", async () => {
+  const result = await runCase("valid-image-prompts");
+  assert.equal(result.errors.length, 0);
+});
+
+test("image prompt source IDs and file naming fail on unresolved references", async () => {
+  const result = await runCase("invalid-image-prompts");
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("content/image-prompts/unknown-place.md") &&
+        error.message.includes("does not match any existing location id")
+    )
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("content/image-prompts/unknown-place.md") &&
+        error.message.includes("was not found in data/bibliography.json")
     )
   );
 });

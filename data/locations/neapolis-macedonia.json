@@ -9,6 +9,7 @@
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "macedonia",
   "candidates": [
     {

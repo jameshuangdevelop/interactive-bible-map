@@ -8,6 +8,7 @@
   },
   "type": "village",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "judea",
   "candidates": [
     {

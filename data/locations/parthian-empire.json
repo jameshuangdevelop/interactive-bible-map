@@ -11,6 +11,7 @@
   },
   "type": "empire",
   "zoomTier": "region",
+  "prominence": "standard",
   "candidates": [
     {
       "label": "Parthian Empire (Ctesiphon, representative point)",
