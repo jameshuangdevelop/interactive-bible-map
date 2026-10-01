@@ -24,7 +24,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_the_Nativity_(7703592746).jpg",
       "caption": "The Church of the Nativity, at the traditional site of Jesus' birth in Bethlehem",
-      "kind": "site",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -37,20 +37,20 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethlehem_-_Mittelschiff_der_Geburtskirche_%C3%BCber_der_Geburtsgrotte.jpg",
       "caption": "The nave of the Church of the Nativity, above the cave venerated as Jesus' birthplace",
-      "kind": "site",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "bethlehem-04",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/138275_tel_herodion_PikiWiki_Israel.jpg",
-      "width": 1818,
-      "height": 1228,
-      "author": "Ronnie Kenigsberg",
-      "license": "CC BY 2.5",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:138275_tel_herodion_PikiWiki_Israel.jpg",
-      "caption": "Herodium, Herod the Great's hilltop palace-fortress visible from Bethlehem",
-      "kind": "site",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Bethlehem_by_Mujaddara_-_panoramio_%283437%29.jpg",
+      "width": 3648,
+      "height": 2736,
+      "author": "Mujaddara",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethlehem_by_Mujaddara_-_panoramio_(3437).jpg",
+      "caption": "Stone houses and a church bell tower on Bethlehem's ridge",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -64,6 +64,19 @@
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethlehem_by_Mujaddara_-_panoramio_(2813).jpg",
       "caption": "Terraced hillsides on Bethlehem's edge, typical of Judean hill-country farming",
       "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethlehem-06",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Church_of_the_Nativity_mosaic_floor_2010.jpg",
+      "width": 4272,
+      "height": 2848,
+      "author": "Wknight94",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_the_Nativity_mosaic_floor_2010.jpg",
+      "caption": "Fourth-century mosaic floor of the first Church of the Nativity, seen through openings in the present church's floor",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

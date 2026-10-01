@@ -23,7 +23,7 @@
       "license": "CC0",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethani%C3%AB_Ingang_van_de_grafkelder_van_Lazarus,_Bestanddeelnr_255-5405.jpg",
-      "caption": "The rock-cut entrance to the traditional Tomb of Lazarus in Bethany",
+      "caption": "The rock-cut entrance to the traditional Tomb of Lazarus in Bethany, photographed in 1953",
       "kind": "site",
       "aiGenerated": false
     },
@@ -37,7 +37,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Larry_Koester,_Facade_of_the_Church_of_St_Lazarus.jpg",
       "caption": "The Roman Catholic Church of St. Lazarus, at the traditional site of Bethany",
-      "kind": "site",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -50,7 +50,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Monastery_of_St._Martha_and_Mary_(Bethany),_2019_(01).jpg",
       "caption": "The Greek Orthodox Monastery of Martha and Mary, a second commemorative site in Bethany",
-      "kind": "site",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -63,7 +63,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethany_Stone_church_with_silver_dome.jpg",
       "caption": "A domed Greek Orthodox church in the old streets of Bethany",
-      "kind": "site",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]
