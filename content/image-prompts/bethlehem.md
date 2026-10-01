@@ -24,3 +24,13 @@ Bethlehem's population in this period were rural Judean villagers and shepherds,
 The precise layout and boundary of first-century Bethlehem are not well recovered archaeologically, since the town has been continuously inhabited and built over [bib:murphy-oconnor-holy-land-guide]. No first-century structure survives at the traditional birth site beneath the later church to show directly; images should depict a generic cave-and-house dwelling rather than the present-day church interior.
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt bethlehem-ai-01
+An establishing view of Bethlehem around AD 5, seen from a nearby hillside at sunset. The small Judean hill-country town sits on a ridge, its flat-roofed houses built of pale cream limestone, a few incorporating natural caves as lower rooms or animal shelters. Surrounding slopes are terraced with olive trees and grapevines, and grain fields cover the gentler ground below. In the far distance, the hilltop silhouette of Herodium, Herod's palace-fortress, catches the last light on a separate hill to the southeast. In the foreground, a shepherd and a small flock of sheep rest on a terraced hillside as the light fades. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no Church of the Nativity or any later building, and keep the exact street layout of the town generic, since the first-century town's plan is not well recovered archaeologically.
+
+### AI-generated reconstruction — prompt bethlehem-ai-02
+A close establishing view of a simple Judean hill-country house around AD 5, built of rough pale limestone with a flat roof of timber beams, brushwood and packed earth, its lower level opening into a natural cave used to shelter animals. A simple wooden feeding trough sits just inside the cave opening. Outside, terraced ground nearby carries young grapevines and olive trees, and the hillside falls away toward the wider Bethlehem valley in soft, early morning light. No figures are shown, keeping the focus on the dwelling itself. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no modern religious ornamentation or shrine, and no specific claim that this is the exact birth site, since no first-century structure survives there to show directly.

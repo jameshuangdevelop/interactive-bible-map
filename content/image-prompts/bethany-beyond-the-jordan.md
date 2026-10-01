@@ -24,3 +24,13 @@ John the Baptist's clothing is described as "camel's hair, with a leather belt a
 Which bank of the river, if either exactly, hosted the Gospel events is not settled, nor is it certain that "Bethany" named any fixed hamlet at all rather than a general locality [bib:hutton-bethany-beyond-jordan]. The river's ancient course may have shifted over the centuries, so today's riverbed does not necessarily match the first-century channel precisely. No first-century structure is attested at either site; images should show only the natural riverside setting.
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt bethany-beyond-the-jordan-ai-01
+An establishing view of a bend in the Jordan River around AD 28, photographed at midday. The river is modest and greenish, lined with dense tamarisk, willow and reed beds that form a green ribbon against the surrounding tan, scrubby desert hills of the Jordan Valley. A few date palms grow near a small spring just back from the riverbank. No built structures are visible along the banks, only the natural riverside setting. In the water, a man dressed in rough camel-hair clothing with a leather belt stands waist-deep as a small line of people wait on the bank nearby, dressed in plain travel clothing, as tiny, distant figures. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no churches, chapels or any built structure on either bank; no specific identification with either the Jordan's east or west bank, since which side — or whether "Bethany" named a fixed hamlet at all — is not settled; keep the river's exact course and width schematic, since it may have shifted since antiquity.
+
+### AI-generated reconstruction — prompt bethany-beyond-the-jordan-ai-02
+A close establishing view of a quiet stretch of the Jordan River's bank around AD 28, in the soft light of early morning. Reeds and low tamarisk bushes line the muddy, greenish water's edge, with a shallow, pebbly entry point into the river. A worn path leads down to the water through dry, sandy ground. No figures are shown in this close view, keeping the focus on the natural riverside setting itself. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no built structures of any kind, and no reference to either modern candidate site's present-day appearance or to a specific bank.

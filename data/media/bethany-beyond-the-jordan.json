@@ -3,23 +3,56 @@
   "images": [
     {
       "id": "bethany-beyond-the-jordan-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Al-Maghtas%2C_2019_%2801%29.jpg",
-      "author": "Bahnfrend",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Al-Maghtas,_2019_(01).jpg",
-      "caption": "Al-Maghtas (Wadi al-Kharrar), one proposed site of Bethany beyond the Jordan",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/127027_qasr_al-yahud_-_baptismal_site_in_jordan_PikiWiki_Israel.jpg",
+      "author": "שלמה רודד",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:127027_qasr_al-yahud_-_baptismal_site_in_jordan_PikiWiki_Israel.jpg",
+      "caption": "The Jordan River between the two traditional baptism sites, Qasr al-Yahud and Al-Maghtas",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "bethany-beyond-the-jordan-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Al-Maghtas%2C_2019_%2801%29.jpg",
+      "author": "Bahnfrend",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Al-Maghtas,_2019_(01).jpg",
+      "caption": "Al-Maghtas (Wadi al-Kharrar) in Jordan, one proposed site of Bethany beyond the Jordan",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-beyond-the-jordan-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Bethany_Beyond_the_Jordan_-_8343997758.jpg",
       "author": "krebsmaus07",
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethany_Beyond_the_Jordan_-_8343997758.jpg",
-      "caption": "Archaeological site at Bethany Beyond the Jordan in Jordan",
+      "caption": "The Greek Orthodox Church of John the Baptist at Al-Maghtas, Jordan",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-beyond-the-jordan-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Atar_Hatvila_-_Qaser_Al_Yahud_P1020017.JPG",
+      "author": "Deror Avi",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Atar_Hatvila_-_Qaser_Al_Yahud_P1020017.JPG",
+      "caption": "Palm trees near Qasr al-Yahud, a second proposed site on the Jordan's west bank",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-beyond-the-jordan-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Baptism_Site-Jordan_River.jpg",
+      "author": "Faraheed",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Baptism_Site-Jordan_River.jpg",
+      "caption": "The Jordan River's bank at Al-Maghtas, framed by a reed-thatched pilgrim shelter",
       "kind": "site",
       "aiGenerated": false
     }

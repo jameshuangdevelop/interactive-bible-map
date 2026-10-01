@@ -24,3 +24,13 @@ Nazareth's residents were rural Galilean farmers and craftsmen; Jesus is identif
 The full street plan and total extent of the first-century village beyond the limited excavated areas are not established, and its population size is only estimated as small [bib:dark-nazareth-archaeology]. No first-century synagogue structure has been identified at the site, so its appearance should be left generic or out of frame rather than invented in detail.
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt nazareth-ai-01
+An establishing view of Nazareth around AD 20, a small village set in a natural bowl among the hills of Lower Galilee, photographed at mid-morning. Simple one- and two-room houses of rough local limestone, some built directly against natural caves cut into the hillside, cluster closely together with flat timber-and-earth roofs. Terraced slopes around the village carry olive trees, grapevines and grain. In the distance, across intervening hills, the larger silhouette of Sepphoris's developing skyline is just visible on its own hilltop. A small group of villagers works a terrace in the middle distance, dressed in plain wool and linen tunics. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no Basilica of the Annunciation or any later church; no synagogue building shown in detail, since its first-century form is not recovered; keep the village's full extent and population generic.
+
+### AI-generated reconstruction — prompt nazareth-ai-02
+A close establishing view of a small Galilean village dwelling around AD 20, combining a rough limestone exterior wall with a natural cave forming one room, its opening framed by small cut stones. A shared courtyard between two or three such houses holds a stone cistern and a simple wooden cart. A terraced hillside with olive and fig trees rises just behind the houses, in the soft light of early evening. A carpenter's set of simple wooden and iron tools rests beside a low workbench near one doorway. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no modern buildings or paving, and no specific named house, since the full extent and plan of the first-century village beyond a few excavated areas is not established.

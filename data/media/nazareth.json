@@ -3,12 +3,56 @@
   "images": [
     {
       "id": "nazareth-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Habsora_from_selezian.jpg",
+      "author": "Almog",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Habsora_from_selezian.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Habsora_from_selezian.jpg",
+      "caption": "Nazareth nestled in the hills of Lower Galilee, with the Basilica of the Annunciation at its center",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "nazareth-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/AnnunciationChurchNazarethOutside1.jpg",
+      "author": "כובש המלפפונים",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:AnnunciationChurchNazarethOutside1.jpg",
+      "caption": "The Basilica of the Annunciation, at the traditional site of Jesus' childhood home in Nazareth",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "nazareth-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Buildings_in_Nazareth_P1020552.JPG",
+      "author": "Deror Avi",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Buildings_in_Nazareth_P1020552.JPG",
+      "caption": "An archway in Nazareth's old town, with church domes and hillside houses beyond",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "nazareth-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/127767_nazareth-synagogue_church_PikiWiki_Israel.jpg",
+      "author": "Shlomo Roded",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:127767_nazareth-synagogue_church_PikiWiki_Israel.jpg",
+      "caption": "The vaulted interior of the Synagogue Church, built over a traditional site of Nazareth's ancient synagogue",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "nazareth-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Nazareth_Altstadt.JPG",
       "author": "Zairon",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Nazareth_Altstadt.JPG",
-      "caption": "Old city of Nazareth",
+      "caption": "A street in Nazareth's old city",
       "kind": "modern",
       "aiGenerated": false
     }

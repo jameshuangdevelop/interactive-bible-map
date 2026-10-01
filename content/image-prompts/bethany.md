@@ -24,3 +24,13 @@ Bethany's residents included the household of Lazarus, Martha and Mary, and Simo
 The exact tomb identified with Lazarus today has been rebuilt repeatedly since antiquity and does not preserve an intact first-century structure, so its present appearance should not be treated as historical [bib:murphy-oconnor-holy-land-guide]. The full layout and extent of the ancient village beyond its general location are not recovered in detail.
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt bethany-ai-01
+An establishing view of the village of Bethany on the Mount of Olives' eastern slope around AD 30, photographed in the golden light of late afternoon. Modest pale limestone houses with flat roofs cluster on a terraced hillside, with rock-cut family tombs visible in the rocky outcrops just beyond the village's edge. The terrain begins to transition from olive-terraced slopes toward the drier, more barren hills further toward Jericho in the distance. A small group of mourners in plain, dark wool garments gathers quietly near one of the tomb entrances in the middle distance. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no later churches or monasteries; no specific tomb identified as Lazarus's, since the modern venerated tomb has been rebuilt repeatedly and does not preserve its first-century form; keep the village's full layout generic.
+
+### AI-generated reconstruction — prompt bethany-ai-02
+A close establishing view of a modest but comfortable stone house's courtyard in Bethany around AD 30, in warm evening lamplight. A low table is set for a meal, with simple clay dishes and an alabaster jar resting nearby. Plain woven mats and cushions surround the table. The courtyard opens onto a terraced hillside with olive trees just visible in the fading light beyond a low wall. No figures are shown, keeping the focus on the setting itself. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no specific identification with "Simon the leper's" house beyond a generic comfortable village dwelling, and no modern building elements.

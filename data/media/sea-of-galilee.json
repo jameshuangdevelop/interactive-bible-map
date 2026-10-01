@@ -3,23 +3,56 @@
   "images": [
     {
       "id": "sea-of-galilee-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sea_of_Galilee_and_Tiberias.jpg",
-      "author": "Юкатан",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Sea_of_Galilee_and_Tiberias.jpg",
-      "caption": "Sea of Galilee with Tiberias on the shore",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/%D7%96%D7%A8%D7%99%D7%97%D7%94_%D7%A2%D7%9C_%D7%94%D7%9B%D7%A0%D7%A8%D7%AA.jpg",
+      "author": "Elai1948",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:%D7%96%D7%A8%D7%99%D7%97%D7%94_%D7%A2%D7%9C_%D7%94%D7%9B%D7%A0%D7%A8%D7%AA.jpg",
+      "caption": "Sunrise over the Sea of Galilee",
       "kind": "modern",
       "aiGenerated": false
     },
     {
       "id": "sea-of-galilee-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/On_the_Sea_of_Galilee%2C_Tiberias%2C_1891.jpg",
-      "author": "Kimberlyblaker",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sea_of_Galilee_and_Tiberias.jpg",
+      "author": "Юкатан",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:On_the_Sea_of_Galilee,_Tiberias,_1891.jpg",
-      "caption": "Historical photograph of the Sea of Galilee near Tiberias from 1891",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Sea_of_Galilee_and_Tiberias.jpg",
+      "caption": "The Sea of Galilee with Tiberias on its southwest shore",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "sea-of-galilee-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Ancient_Boat_of_Sea_of_Galilee.jpg",
+      "author": "Warfieldian",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_Boat_of_Sea_of_Galilee.jpg",
+      "caption": "The Ancient Galilee Boat, a 1st-century fishing boat recovered from the lakebed near Ginosar",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "sea-of-galilee-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Holy_Land_2016_P0397_Views_from_the_Sea_of_Galilee.jpg",
+      "author": "Fallaner",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Holy_Land_2016_P0397_Views_from_the_Sea_of_Galilee.jpg",
+      "caption": "A green, tree-lined stretch of the Sea of Galilee's shore",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "sea-of-galilee-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/76/Shore_of_Lake_Kinnaret_%28Sea_of_Galilee%29_-_Israel_-_01_%285710144441%29.jpg",
+      "author": "Adam Jones",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Shore_of_Lake_Kinnaret_(Sea_of_Galilee)_-_Israel_-_01_(5710144441).jpg",
+      "caption": "Reed beds along the Sea of Galilee's shore",
       "kind": "modern",
       "aiGenerated": false
     }

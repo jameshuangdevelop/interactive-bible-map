@@ -8,7 +8,7 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_cityscape_from_wall_ruins.jpg",
-      "caption": "Panorama of Jericho from the ancient city walls",
+      "caption": "Modern Jericho seen from the ancient city's excavated walls",
       "kind": "modern",
       "aiGenerated": false
     },
@@ -19,7 +19,40 @@
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_-_Tel_Es-Sultan1.jpg",
-      "caption": "Tell es-Sultan archaeological site, ancient Jericho",
+      "caption": "Tell es-Sultan, the Old Testament-era mound of ancient Jericho",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "jericho-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/By_Ovedc_-_Tulul_al-Alaiq%2C_Herod%27s_winter_palaces%2C_Jericho_03.jpg",
+      "author": "Ovedc",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:By_Ovedc_-_Tulul_al-Alaiq,_Herod's_winter_palaces,_Jericho_03.jpg",
+      "caption": "Excavated walls of Herod the Great's winter palace complex at Tulul Abu al-Alayiq, Jericho",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "jericho-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Jericho_city.jpg",
+      "author": "Randa107",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_city.jpg",
+      "caption": "Jericho's irrigated oasis fields against the dry Jordan Valley, seen from Mount Quarantania",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "jericho-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Jericho_-_panoramio.jpg",
+      "author": "Mujaddara",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jericho_-_panoramio.jpg",
+      "caption": "Excavation trenches at Tell es-Sultan, with modern Jericho beyond",
       "kind": "site",
       "aiGenerated": false
     }

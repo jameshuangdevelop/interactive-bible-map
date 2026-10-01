@@ -24,3 +24,13 @@ Pilgrims travelling to Jerusalem's festivals crossed the ridge on the Jericho ro
 No source describes any built structure standing on the summit or slopes themselves in this period; images should show only terraced cultivation and open hillside, not any identifiable building. The precise field boundaries and the full extent of the Second Temple-period burial ground in the Kidron Valley are not completely mapped.
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt mount-of-olives-ai-01
+An establishing view from the summit of the Mount of Olives looking west across the Kidron Valley toward Jerusalem's Temple Mount, around AD 30, in clear midday light. Terraced olive groves in grey-green rows step down the ridge's slope on dry-stone retaining walls, with a scatter of fig trees among them. At the base of the valley, a cluster of rock-cut tomb facades is visible among the lower terraces. Across the valley, Jerusalem's Temple Mount rises behind its pale limestone retaining walls, its white sanctuary and colonnaded courts catching the sun, with the Upper City's houses climbing the far hillside beyond. A dirt road crosses the ridge in the foreground, carrying a few small, distant figures and a donkey, dressed in plain wool and linen garments. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no churches or monuments on the summit or slopes (no Church of the Ascension, no Eleona), no Dome of the Rock, and keep the exact extent of the Kidron Valley's burial ground vague.
+
+### AI-generated reconstruction — prompt mount-of-olives-ai-02
+A ground-level establishing view on the Mount of Olives' eastern slope around AD 30, in the warm light of late afternoon. Dry-stone terraces carry rows of grey-green olive trees down the hillside, with a dusty road descending toward the Judean wilderness and, in the far distance, the hazy lowlands toward Jericho. A solitary fig tree stands beside the road. Small figures of travelers, dressed in plain tunics and cloaks and leading a laden donkey, make their way along the road in the middle distance. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no built structures of any kind on the slope, no modern path paving, and keep the village of Bethany and Bethphage out of frame or only suggested at the far edge.

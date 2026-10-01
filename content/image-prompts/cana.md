@@ -24,3 +24,13 @@ The Gospel describes a village wedding with a feast, wine and a bridegroom's hou
 Which candidate site, if either exactly, is the historical Cana is not settled among scholars, and this project does not choose between them [bib:mccollough-khirbet-qana]. The specific house associated with the wedding is not identified or preserved at either site. Population and the precise extent of either village in this period are only broadly estimated.
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt cana-ai-01
+An establishing view of a small Galilean hillside village around AD 30, representative of the setting shared by Cana's candidate sites, photographed in the soft light of late afternoon. Simple one- and two-room limestone houses, pale grey to cream, cluster around shared courtyards on a gentle hillside. Terraced slopes nearby carry vineyards, olive trees and grain fields typical of Lower Galilee. In a courtyard in the middle distance, large stone water jars stand near a doorway, and a small group of villagers in plain wool and linen dress with simple festive touches gathers for what appears to be a wedding celebration. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no specific real-world landscape feature identifiable as either Khirbet Qana or Kafr Kanna, no wedding-miracle moment depicted directly (no water becoming wine shown), and keep the village's exact layout and size generic.
+
+### AI-generated reconstruction — prompt cana-ai-02
+A close establishing view of a village courtyard in Lower Galilee around AD 30, in warm midday light. Several large stone water jars, each roughly waist-height, stand along a plain limestone wall, their surfaces plain and unpolished, consistent with stone vessels used for Jewish ceremonial washing. A simple wooden table nearby holds a few clay cups and a jug. Vineyard terraces are visible on the hillside beyond the courtyard's low wall. No figures are shown in this close view. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no specific building identifiable as the Gospel's wedding house, since no such structure is excavated or identified at either candidate site, and no modern church architecture.

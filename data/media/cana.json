@@ -8,7 +8,51 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:IHM_פיצול_עם_שביל_כחול_לחורבת_קנה_1.jpeg",
-      "caption": "Landscape at Khirbet Qana, one candidate site proposed for biblical Cana of Galilee (identification not settled).",
+      "caption": "Hillside landscape at Khirbet Qana, one candidate site proposed for biblical Cana of Galilee",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "cana-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Catholic_Wedding_Church_%28Kafr_Kana%29_%2802%29.jpg",
+      "author": "Chris06",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Catholic_Wedding_Church_(Kafr_Kana)_(02).jpg",
+      "caption": "The Catholic Wedding Church at Kafr Kanna, a second candidate site proposed for biblical Cana of Galilee",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "cana-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/ISRAEL%2C_Cana_Galilei_%28Kafr_Kanna%29_%28Olive_garden%29.JPG",
+      "author": "Britchi Mirela",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:ISRAEL,_Cana_Galilei_(Kafr_Kanna)_(Olive_garden).JPG",
+      "caption": "An olive grove on the edge of Kafr Kanna, typical of Lower Galilee village agriculture",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "cana-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Church_of_Bartholomew_%28Kafr_Kanna%29_%2801%29.jpg",
+      "author": "Chris06",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Church_of_Bartholomew_(Kafr_Kanna)_(01).jpg",
+      "caption": "The Church of Bartholomew (Nathanael) in Kafr Kanna, a second commemorative church at this candidate site",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "cana-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Kafr_Kanna_BW_1.JPG",
+      "author": "Berthold Werner",
+      "license": "Public domain",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Kafr_Kanna_BW_1.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kafr_Kanna_BW_1.JPG",
+      "caption": "Pilgrims outside the Catholic Wedding Church in Kafr Kanna",
       "kind": "site",
       "aiGenerated": false
     }

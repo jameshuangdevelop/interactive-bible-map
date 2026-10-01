@@ -3,24 +3,57 @@
   "images": [
     {
       "id": "golgotha-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Jerusalem_Holy_Sepulchre_BW_19.JPG",
-      "author": "Berthold Werner",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_Holy_Sepulchre_BW_19.JPG",
-      "caption": "Church of the Holy Sepulchre (traditional site), one proposed site of Golgotha",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/The_Church_of_the_Holy_Sepulchre-Jerusalem.JPG",
+      "author": "Jorge Láscar",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Church_of_the_Holy_Sepulchre-Jerusalem.JPG",
+      "caption": "The Church of the Holy Sepulchre's courtyard at dawn, one proposed site of Golgotha",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "golgotha-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Jerusalem-Garden-Tomb-KTM-1262.jpg",
-      "author": "Bukvoed",
-      "license": "CC BY 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem-Garden-Tomb-KTM-1262.jpg",
-      "caption": "Garden Tomb (Gordon's Calvary), one proposed site of Golgotha",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Jerusalem_Garden_Tomb_%2843300924231%29.jpg",
+      "author": "Gary Todd",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_Garden_Tomb_(43300924231).jpg",
+      "caption": "The Garden Tomb, a rock-cut tomb and garden, one proposed site of Golgotha",
       "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "golgotha-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Jerusalem_Holy_Sepulchre_BW_19.JPG",
+      "author": "Berthold Werner",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_Holy_Sepulchre_BW_19.JPG",
+      "caption": "Visitors in the Church of the Holy Sepulchre's courtyard, one proposed site of Golgotha",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "golgotha-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Entrance_to_the_Garden_Tomb_1_%284015106152%29.jpg",
+      "author": "Ian Scott",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Entrance_to_the_Garden_Tomb_1_(4015106152).jpg",
+      "caption": "The rock-cut entrance of the Garden Tomb, one proposed site of Golgotha",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "golgotha-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Golgota_Jerozolima_model.jpg",
+      "author": "Jacek555",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Golgota_Jerozolima_model.jpg",
+      "caption": "The Holyland Model's depiction of Jerusalem's wall and the ground just outside it in the Second Temple period",
+      "kind": "reconstruction",
       "aiGenerated": false
     }
   ]

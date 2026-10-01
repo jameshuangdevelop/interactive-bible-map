@@ -3,12 +3,56 @@
   "images": [
     {
       "id": "bethany-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Gezicht_op_het_graf_van_Lazarus_in_Al-Eizariya_met_mensen_en_kinderen_ervoor_Tomb_of_Lazarus_%28titel_op_object%29%2C_RP-F-2001-7-559B-4.jpg",
-      "author": "Rijksmuseum",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/AlEizariyaMay232023.jpg",
+      "author": "Hagai Agmon-Snir",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:AlEizariyaMay232023.jpg",
+      "caption": "Al-Eizariya, the modern town on the site of Bethany, on the Mount of Olives' eastern slope",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Bethani%C3%AB_Ingang_van_de_grafkelder_van_Lazarus%2C_Bestanddeelnr_255-5405.jpg",
+      "author": "Willem van de Poll",
       "license": "CC0",
       "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Gezicht_op_het_graf_van_Lazarus_in_Al-Eizariya_met_mensen_en_kinderen_ervoor_Tomb_of_Lazarus_(titel_op_object),_RP-F-2001-7-559B-4.jpg",
-      "caption": "Tomb of Lazarus, Al-Eizariya",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethani%C3%AB_Ingang_van_de_grafkelder_van_Lazarus,_Bestanddeelnr_255-5405.jpg",
+      "caption": "The rock-cut entrance to the traditional Tomb of Lazarus in Bethany",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Larry_Koester%2C_Facade_of_the_Church_of_St_Lazarus.jpg",
+      "author": "Larry Koester",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Larry_Koester,_Facade_of_the_Church_of_St_Lazarus.jpg",
+      "caption": "The Roman Catholic Church of St. Lazarus, at the traditional site of Bethany",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Monastery_of_St._Martha_and_Mary_%28Bethany%29%2C_2019_%2801%29.jpg",
+      "author": "Bahnfrend",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Monastery_of_St._Martha_and_Mary_(Bethany),_2019_(01).jpg",
+      "caption": "The Greek Orthodox Monastery of Martha and Mary, a second commemorative site in Bethany",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "bethany-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Bethany_Stone_church_with_silver_dome.jpg",
+      "author": "Utilisateur:Djampa",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bethany_Stone_church_with_silver_dome.jpg",
+      "caption": "A domed Greek Orthodox church in the old streets of Bethany",
       "kind": "site",
       "aiGenerated": false
     }

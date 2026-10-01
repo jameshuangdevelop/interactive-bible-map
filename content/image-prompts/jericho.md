@@ -24,3 +24,13 @@ Jericho sat on a trade route, and its valuable balsam crop made it an economical
 The winter palace complex's full decorative scheme and precise layout beyond excavated foundations are not completely recovered [bib:murphy-oconnor-holy-land-guide]. The exact boundary between episodes set at the old mound and those set at the Herodian-period city is not always distinguishable in the Gospel text itself, though the Gospel-era episodes are set at or near the Herodian site [openbible:jericho-2].
 
 ## Prompts (Media Curator)
+
+### AI-generated reconstruction — prompt jericho-ai-01
+An establishing view of Jericho's Herodian-period oasis around AD 20, photographed at sunset. Herod's winter palace complex spreads across the valley floor beside a dry streambed, its courtyards, bathing pools and grand colonnades built in a Roman style with pale plastered walls catching the warm light. Dense groves of date palms and balsam trees, fed by irrigation channels from a nearby spring, surround the complex, with cypress trees scattered among them. Beyond the lush plantations, barren, dry mountains rise sharply in the distance under a darkening sky. A small caravan with a few travelers and loaded donkeys moves along a track at the oasis's edge, in plain travel dress. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no Tell es-Sultan mound in the immediate foreground, since the Gospel-era city is the separate Herodian site to its south; keep the palace complex's full decorative scheme and precise layout generic beyond its broad Roman-style courtyards and pools.
+
+### AI-generated reconstruction — prompt jericho-ai-02
+An establishing view of the road climbing west out of the Jericho oasis toward the Judean wilderness and Jerusalem, around AD 30, in the harsh light of midday. The road is a rough dirt track winding between barren, rocky hills, with the last palm and balsam groves of the oasis receding in the valley behind. A solitary traveler in a plain wool tunic walks along the road in the middle distance, with the dry wilderness stretching ahead. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+
+Keep out / keep vague: no modern road paving or markers, and keep the exact course of the ancient road schematic rather than tied to today's route.

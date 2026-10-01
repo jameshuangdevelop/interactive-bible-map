@@ -3,13 +3,68 @@
   "images": [
     {
       "id": "jerusalem-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Dome_of_the_Rock_seen_from_the_Mount_of_Olives_%2812395649153%29_%28cropped%29.jpg",
+      "author": "askii",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Dome_of_the_Rock_seen_from_the_Mount_of_Olives_(12395649153)_(cropped).jpg",
+      "caption": "The Old City of Jerusalem and the Temple Mount, seen from the Mount of Olives",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "jerusalem-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Jerusalem_old_city_panorama_.jpg",
       "author": "Nettadi",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_old_city_panorama_.jpg",
-      "caption": "Panorama of Jerusalem's Old City",
+      "caption": "Jerusalem's Old City walls illuminated at night",
       "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "jerusalem-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Jerusalem_view_from_citadel.jpg",
+      "author": "Chrissie",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Jerusalem_view_from_citadel.jpg",
+      "caption": "The Old City of Jerusalem seen from the Tower of David citadel",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "jerusalem-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Aechaeological_park_-_panoramio.jpg",
+      "author": "Mujaddara",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Aechaeological_park_-_panoramio.jpg",
+      "caption": "Excavated Herodian-period stones below the Temple Mount's southern wall, Jerusalem Archaeological Park",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "jerusalem-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Absalom%27s_Memorial_in_late_Summer.jpg",
+      "author": "Davidbena",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Absalom's_Memorial_in_late_Summer.jpg",
+      "caption": "Absalom's Tomb, a Second Temple-period monument cut into the rock of the Kidron Valley",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "jerusalem-06",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Holyland_Jerusalem_model_panorama_from_southwest.jpg",
+      "author": "Daniel Case",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Holyland_Jerusalem_model_panorama_from_southwest.jpg",
+      "caption": "The Holyland Model of Jerusalem, a Second Temple-period scale reconstruction at the Israel Museum",
+      "kind": "reconstruction",
       "aiGenerated": false
     }
   ]
