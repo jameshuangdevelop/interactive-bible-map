@@ -69,6 +69,8 @@ export const MAJOR_PLACE_MIN_IMAGE_COUNT = 5;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
 export const MAX_AI_IMAGE_WIDTH_PX = 1600;
 export const MAX_AI_IMAGE_BYTES = 400 * 1024;
+export const MIN_COMMONS_IMAGE_WIDTH_PX = 1200;
+export const LEAD_IMAGE_MAX_ASPECT_RATIO = 2.2;
 
 const CANONICAL_BOOK_SET = new Set(CANONICAL_BOOKS);
 const REGION_LEVEL_TYPES = new Set(["empire", "province", "region"]);
@@ -709,6 +711,10 @@ async function validateAiImageFile({
   aiMediaDirectory,
   file,
   pathValue,
+  widthPath,
+  heightPath,
+  expectedWidth,
+  expectedHeight,
   errors
 }) {
   const relativePath = repositoryRelativePath.replace(/\//gu, path.sep);
@@ -782,6 +788,24 @@ async function validateAiImageFile({
       file,
       pathValue,
       `AI image '${repositoryRelativePath}' is ${dimensions.width}px wide; the limit is ${MAX_AI_IMAGE_WIDTH_PX}px`
+    );
+  }
+
+  if (Number.isInteger(expectedWidth) && expectedWidth !== dimensions.width) {
+    recordError(
+      errors,
+      file,
+      widthPath,
+      `AI image width must match hosted file width (${dimensions.width}px)`
+    );
+  }
+
+  if (Number.isInteger(expectedHeight) && expectedHeight !== dimensions.height) {
+    recordError(
+      errors,
+      file,
+      heightPath,
+      `AI image height must match hosted file height (${dimensions.height}px)`
     );
   }
 }
@@ -1789,6 +1813,8 @@ export async function validateData(options = {}) {
         const isAiGenerated = image.aiGenerated === true;
         const imageKindPath = `$.images[${imageIndex}].kind`;
         const imageUrlPath = `$.images[${imageIndex}].url`;
+        const imageWidthPath = `$.images[${imageIndex}].width`;
+        const imageHeightPath = `$.images[${imageIndex}].height`;
 
         if (isAiGenerated && imageKind !== "ai-reconstruction") {
           recordError(
@@ -1832,6 +1858,10 @@ export async function validateData(options = {}) {
               aiMediaDirectory,
               file: mediaRecord.relativePath,
               pathValue: imageUrlPath,
+              widthPath: imageWidthPath,
+              heightPath: imageHeightPath,
+              expectedWidth: image.width,
+              expectedHeight: image.height,
               errors
             });
           }
@@ -1848,6 +1878,31 @@ export async function validateData(options = {}) {
           });
 
           continue;
+        }
+
+        if (Number.isInteger(image.width) && image.width < MIN_COMMONS_IMAGE_WIDTH_PX) {
+          recordWarning(
+            warnings,
+            mediaRecord.relativePath,
+            imageWidthPath,
+            `Commons image is ${image.width}px wide; prefer at least ${MIN_COMMONS_IMAGE_WIDTH_PX}px`
+          );
+        }
+
+        if (
+          typeof image.id === "string" &&
+          /-01$/u.test(image.id) &&
+          Number.isInteger(image.width) &&
+          Number.isInteger(image.height) &&
+          image.height > 0 &&
+          image.width / image.height > LEAD_IMAGE_MAX_ASPECT_RATIO
+        ) {
+          recordWarning(
+            warnings,
+            mediaRecord.relativePath,
+            `$.images[${imageIndex}]`,
+            "lead image is a panorama; prefer a 4:3–2:1 view as the lead"
+          );
         }
 
         if (typeof image.url === "string") {

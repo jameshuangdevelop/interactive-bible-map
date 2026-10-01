@@ -95,6 +95,8 @@ test("buildAppData writes one place file per location and resolves bibliography"
     );
     assert.equal(capernaumPayload.location.id, "capernaum");
     assert.equal(capernaumPayload.media.locationId, "capernaum");
+    assert.equal(capernaumPayload.media.images[0].width, 1600);
+    assert.equal(capernaumPayload.media.images[0].height, 1200);
     assert.deepEqual(
       capernaumPayload.bibliography.map((entry) => entry.id),
       ["existing-bib-source"]

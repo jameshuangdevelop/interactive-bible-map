@@ -4,6 +4,8 @@
     {
       "id": "crete-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Crete_Nasa.jpg",
+      "width": 1022,
+      "height": 452,
       "author": "NASA",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
@@ -15,6 +17,8 @@
     {
       "id": "crete-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
+      "width": 4479,
+      "height": 2730,
       "author": "Jebulon",
       "license": "CC0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
@@ -26,6 +30,8 @@
     {
       "id": "crete-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Agios_Nikolaos%2C_Crete_%E2%80%93_Harbour_2019a.jpg",
+      "width": 6192,
+      "height": 3501,
       "author": "Cayambe",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",

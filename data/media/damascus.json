@@ -4,6 +4,8 @@
     {
       "id": "damascus-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Umayyad_Mosque%2C_Damascus.jpg",
+      "width": 3056,
+      "height": 2054,
       "author": "Bernard Gagnon",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
@@ -15,6 +17,8 @@
     {
       "id": "damascus-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Damascus%2C_Syria%2C_Panoramic_view_of_Damascus.jpg",
+      "width": 4000,
+      "height": 2248,
       "author": "Vyacheslav Argenberg",
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
@@ -26,6 +30,8 @@
     {
       "id": "damascus-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Golden_art_inside_the_Umayyad_Mosque_in_Damascus.jpg",
+      "width": 4080,
+      "height": 1824,
       "author": "Shahdddddddd",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",

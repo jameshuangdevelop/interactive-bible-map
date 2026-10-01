@@ -2,6 +2,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  fetchCommonsImageSizes,
+  parseCommonsFileNameFromUploadUrl
+} from "./lib/commons-image-sizes.mjs";
+
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
 const mediaDirectory = path.join(repositoryRoot, "data", "media");
@@ -432,6 +437,7 @@ async function main() {
   const mediaRecords = await loadMediaRecords();
 
   const commonsTasks = [];
+  const commonsSizeChecks = [];
   const aiTasks = [];
 
   for (const mediaRecord of mediaRecords) {
@@ -452,6 +458,27 @@ async function main() {
       parsed.search = "";
       parsed.hash = "";
       const originalUrl = parsed.toString();
+      const commonsFileName = parseCommonsFileNameFromUploadUrl(originalUrl);
+
+      if (!commonsFileName) {
+        commonsSizeChecks.push({
+          locationId,
+          imageId: image.id,
+          variant: "size-metadata",
+          status: "invalid-commons-url",
+          message: "Could not parse Commons file name from image url",
+          url: originalUrl
+        });
+      } else {
+        commonsSizeChecks.push({
+          locationId,
+          imageId: image.id,
+          fileName: commonsFileName,
+          width: image.width,
+          height: image.height,
+          url: originalUrl
+        });
+      }
 
       commonsTasks.push({
         locationId,
@@ -471,7 +498,63 @@ async function main() {
     }
   }
 
-  const commonsFailures = (
+  const sizeFailures = [];
+  const sizeLookupFileNames = Array.from(
+    new Set(
+      commonsSizeChecks
+        .map((entry) => entry.fileName)
+        .filter((fileName) => typeof fileName === "string" && fileName.length > 0)
+    )
+  );
+  const commonsSizeByFileName = await fetchCommonsImageSizes(sizeLookupFileNames, {
+    userAgent: USER_AGENT,
+    maxConcurrency: REQUEST_CONCURRENCY
+  });
+
+  for (const check of commonsSizeChecks) {
+    if (check.status === "invalid-commons-url") {
+      sizeFailures.push(check);
+      continue;
+    }
+
+    if (!Number.isInteger(check.width) || !Number.isInteger(check.height)) {
+      sizeFailures.push({
+        locationId: check.locationId,
+        imageId: check.imageId,
+        variant: "size-metadata",
+        status: "missing-dimensions",
+        message: "width/height are missing or invalid on the media record",
+        url: check.url
+      });
+      continue;
+    }
+
+    const actualSize = commonsSizeByFileName.get(check.fileName);
+    if (!actualSize) {
+      sizeFailures.push({
+        locationId: check.locationId,
+        imageId: check.imageId,
+        variant: "size-metadata",
+        status: "size-not-found",
+        message: `No Commons size metadata found for File:${check.fileName}`,
+        url: check.url
+      });
+      continue;
+    }
+
+    if (actualSize.width !== check.width || actualSize.height !== check.height) {
+      sizeFailures.push({
+        locationId: check.locationId,
+        imageId: check.imageId,
+        variant: "size-metadata",
+        status: "size-mismatch",
+        message: `Recorded ${check.width}x${check.height} but Commons reports ${actualSize.width}x${actualSize.height}`,
+        url: check.url
+      });
+    }
+  }
+
+  const urlFailures = (
     await runWithConcurrency(commonsTasks, REQUEST_CONCURRENCY, (task) =>
       checkUrlWithRetry(task)
     )
@@ -481,9 +564,9 @@ async function main() {
     await Promise.all(aiTasks.map(async (task) => validateAiImage(task)))
   ).flat();
 
-  const failures = [...commonsFailures, ...aiFailures];
+  const failures = [...sizeFailures, ...urlFailures, ...aiFailures];
   console.log(
-    `Checked ${commonsTasks.length} Commons URLs (original + ${thumbnailWidths.join(", ")}px) and ${aiTasks.length} AI files.`
+    `Checked ${commonsTasks.length} Commons URLs (original + ${thumbnailWidths.join(", ")}px), ${commonsSizeChecks.length} Commons size records, and ${aiTasks.length} AI files.`
   );
 
   if (failures.length > 0) {

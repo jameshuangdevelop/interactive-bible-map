@@ -4,6 +4,8 @@
     {
       "id": "thyatira-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/G%C3%BCn%C3%BCm%C3%BCzden_Akhisar_Genel_G%C3%B6r%C3%BCn%C3%BCm.jpg",
+      "width": 5280,
+      "height": 2970,
       "author": "Barisgezici",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -15,6 +17,8 @@
     {
       "id": "thyatira-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/ThyatiraBasilika.jpg",
+      "width": 5184,
+      "height": 3456,
       "author": "Klaus-Peter Simon",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
@@ -26,6 +30,8 @@
     {
       "id": "thyatira-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Akhisar_ruins_Tempemezari_1.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Quintucket",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -37,6 +43,8 @@
     {
       "id": "thyatira-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Columns_of_Thiatira.jpg",
+      "width": 4032,
+      "height": 3024,
       "author": "Pragdon",
       "license": "CC0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
@@ -48,6 +56,8 @@
     {
       "id": "thyatira-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Akhisar_ruins_Tempemezari_2.jpg",
+      "width": 1600,
+      "height": 1200,
       "author": "Quintucket",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",

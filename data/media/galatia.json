@@ -4,6 +4,8 @@
     {
       "id": "galatia-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Galacia-mapa.png",
+      "width": 1564,
+      "height": 1000,
       "author": "Jolle",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
@@ -15,6 +17,8 @@
     {
       "id": "galatia-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Galatia_Map.svg",
+      "width": 2180,
+      "height": 1600,
       "author": "ArdadN",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
