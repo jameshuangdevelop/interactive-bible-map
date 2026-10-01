@@ -3,15 +3,15 @@
   "images": [
     {
       "id": "galilee-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Map_of_Galilee.svg",
-      "width": 512,
-      "height": 512,
-      "author": "AdrianAbdulBaha",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Map_of_Galilee.svg",
-      "caption": "Map of the Galilee region",
-      "kind": "reconstruction",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Lemon_Orchard_in_the_Galilee_by_David_Shankbone.jpg",
+      "width": 3264,
+      "height": 2448,
+      "author": "David Shankbone",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Lemon_Orchard_in_the_Galilee_by_David_Shankbone.jpg",
+      "caption": "Rolling hills of the Galilee region, Israel",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

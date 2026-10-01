@@ -26,19 +26,6 @@
       "caption": "Model of the Pool of Bethesda at the Israel Museum",
       "kind": "reconstruction",
       "aiGenerated": false
-    },
-    {
-      "id": "pool-of-bethesda-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/2Pool_of_Bethesda.JPG",
-      "width": 960,
-      "height": 1280,
-      "author": "Krupski Oleg",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:2Pool_of_Bethesda.JPG",
-      "caption": "Byzantine church ruins at the Pool of Bethesda archaeological site",
-      "kind": "site",
-      "aiGenerated": false
     }
   ]
 }

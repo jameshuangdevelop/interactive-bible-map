@@ -3,14 +3,27 @@
   "images": [
     {
       "id": "paphos-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Entrance_Nea_Paphos_Archaeological_Site%2C_Cyprus-DSC09581.jpg",
-      "width": 3421,
-      "height": 1986,
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Odeon_and_lighthouse%2C_Nea_Paphos_Archeological_Site%2C_Cyprus-DSC00183.jpg",
+      "width": 5907,
+      "height": 3893,
       "author": "Arjuno3",
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Entrance_Nea_Paphos_Archaeological_Site,_Cyprus-DSC09581.jpg",
-      "caption": "Entrance to the Nea Paphos archaeological site, Kato Paphos, Cyprus.",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Odeon_and_lighthouse,_Nea_Paphos_Archeological_Site,_Cyprus-DSC00183.jpg",
+      "caption": "The Odeon and lighthouse at the Nea Paphos archaeological site, Cyprus.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "paphos-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Paphos_Archeological_Park_-_view.jpg",
+      "width": 4000,
+      "height": 3000,
+      "author": "tomasz przechlewski",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Paphos_Archeological_Park_-_view.jpg",
+      "caption": "Excavated house foundations at the Nea Paphos archaeological park, Cyprus.",
       "kind": "site",
       "aiGenerated": false
     }
