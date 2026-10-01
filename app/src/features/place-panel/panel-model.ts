@@ -93,6 +93,7 @@ const HIERARCHY_LINE_EXCEPTIONS_BY_ID: Readonly<Record<string, string>> = Object
 const IMAGE_KIND_LABEL_BY_KIND: Readonly<Record<NonNullable<MediaImageRecord["kind"]>, string>> =
   Object.freeze({
     modern: "Today",
+    historical: "Historical view",
     site: "Excavated site",
     reconstruction: "Reconstruction",
     "ai-reconstruction": "AI-generated reconstruction"

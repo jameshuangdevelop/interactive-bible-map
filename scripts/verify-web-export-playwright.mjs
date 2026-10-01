@@ -272,7 +272,7 @@ function buildGalleryFixturePayload(basePayload) {
     },
     {
       id: "capernaum-06",
-      kind: "site",
+      kind: "historical",
       url: "https://upload.wikimedia.org/wikipedia/commons/4/4a/M3_5_Fixture_Capernaum_Site_02.jpg",
       width: 3600,
       height: 2400,
@@ -281,7 +281,7 @@ function buildGalleryFixturePayload(basePayload) {
       licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
       sourcePage:
         "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_02.jpg",
-      caption: "Street remains near the lakeshore",
+      caption: "Historical photograph of lakeshore ruins",
       aiGenerated: false
     },
     {
@@ -1996,6 +1996,19 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
         `Expected panorama panel request width >= 1280, got ${panoramaPanelRequestWidth}.`
       );
     }
+    const fourByThreeFileName = "M3_5_Fixture_Capernaum_Modern_02.jpg";
+    const fourByThreePanelRequestWidths = commonsRequestsBeforeViewer
+      .filter((entry) => entry.fileName === fourByThreeFileName && entry.width > 330)
+      .map((entry) => entry.width);
+    if (fourByThreePanelRequestWidths.length === 0) {
+      throw new Error("Expected a panel Commons thumbnail request above 330px for the 4:3 fixture image.");
+    }
+    const fourByThreePanelRequestWidth = Math.max(...fourByThreePanelRequestWidths);
+    if (fourByThreePanelRequestWidth < 500) {
+      throw new Error(
+        `Expected 4:3 panel request width >= 500, got ${fourByThreePanelRequestWidth}.`
+      );
+    }
     const panelRenderState = await page.evaluate(() => {
       const image = document.querySelector(
         "section[aria-label='Place details'] [data-panel-section='photos'] [data-panel-photo-image='true']"
@@ -2016,6 +2029,15 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     const panoramaRequestHeight = (panoramaPanelRequestWidth * 2516) / 13068;
     const renderedDeviceWidth = panelRenderState.width * panelRenderState.devicePixelRatio;
     const renderedDeviceHeight = panelRenderState.height * panelRenderState.devicePixelRatio;
+    const fourByThreeRequiredCoverWidth = Math.max(
+      renderedDeviceWidth,
+      renderedDeviceHeight * (4032 / 3024)
+    );
+    if (fourByThreePanelRequestWidth + 1 < fourByThreeRequiredCoverWidth) {
+      throw new Error(
+        `4:3 panel image request is too small for cover-fit rendering (request=${fourByThreePanelRequestWidth}, required=${fourByThreeRequiredCoverWidth.toFixed(2)}).`
+      );
+    }
     if (renderedDeviceWidth > panoramaPanelRequestWidth + 1) {
       throw new Error(
         `Panorama panel image is upscaled horizontally (rendered=${renderedDeviceWidth.toFixed(2)} request=${panoramaPanelRequestWidth}).`
@@ -2072,6 +2094,26 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
         `AI source link mismatch. expected='${expectedAiBriefHref}', got='${aiBriefHref ?? "null"}'.`
       );
     }
+    await page.getByRole("button", { name: "Show image 6 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("Historical view", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    const historicalPanelKindLabel = normalizeTextContent(
+      (await page
+        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (historicalPanelKindLabel !== "Historical view") {
+      throw new Error(
+        `Expected historical fixture label in panel, got '${historicalPanelKindLabel}'.`
+      );
+    }
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("AI-generated reconstruction", { exact: true })
+      .waitFor({ timeout: 30_000 });
     await photosSection.screenshot({ path: screenshotPaths.aiLabel });
     const layoutDesktopSnapshot = await captureGalleryPanelLayoutSnapshot(page);
     assertGalleryPanelBoundsAndOverflow(layoutDesktopSnapshot, "Gallery bounds 1440x960");
@@ -2159,6 +2201,14 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       .locator("[data-image-viewer-dialog='true']")
       .getByText("6 / 10", { exact: true })
       .waitFor({ timeout: 30_000 });
+    const viewerHistoricalKindLabel = normalizeTextContent(
+      (await page
+        .locator("[data-image-viewer-dialog='true'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (viewerHistoricalKindLabel !== "Historical view") {
+      throw new Error(`Viewer should show historical kind label, got '${viewerHistoricalKindLabel}'.`);
+    }
     await page.keyboard.press("ArrowLeft");
     await page
       .locator("[data-image-viewer-dialog='true']")
@@ -2275,6 +2325,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
         a.localeCompare(b)
       ),
       panoramaPanelRequestWidth,
+      fourByThreePanelRequestWidth,
       panoramaUpscaleCheck: {
         requestWidth: panoramaPanelRequestWidth,
         requestHeight: panoramaRequestHeight,

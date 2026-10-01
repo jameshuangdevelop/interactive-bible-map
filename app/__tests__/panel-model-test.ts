@@ -188,6 +188,7 @@ describe("place panel model helpers", () => {
 
   test("maps image kinds to labels and keeps missing kind unlabeled", () => {
     expect(buildImageKindLabel("modern")).toBe("Today");
+    expect(buildImageKindLabel("historical")).toBe("Historical view");
     expect(buildImageKindLabel("site")).toBe("Excavated site");
     expect(buildImageKindLabel("reconstruction")).toBe("Reconstruction");
     expect(buildImageKindLabel("ai-reconstruction")).toBe("AI-generated reconstruction");

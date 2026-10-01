@@ -7,6 +7,7 @@ interface CommonsThumbnailWidthForFrameInput {
   renderedWidth: number;
   renderedHeight: number;
   devicePixelRatio: number;
+  fitMode?: "cover" | "contain";
   originalWidth?: number;
   originalHeight?: number;
 }
@@ -63,6 +64,7 @@ export function selectCommonsThumbnailWidthForFrame({
   renderedWidth,
   renderedHeight,
   devicePixelRatio,
+  fitMode = "cover",
   originalWidth,
   originalHeight
 }: CommonsThumbnailWidthForFrameInput) {
@@ -94,10 +96,18 @@ export function selectCommonsThumbnailWidthForFrame({
     return null;
   }
 
-  const requiredDeviceHeight = safeRenderedHeight * safeDevicePixelRatio;
+  const requiredDeviceWidth = safeRenderedWidth * safeDevicePixelRatio;
   const requiredWidth = hasOriginalDimensions
-    ? (requiredDeviceHeight * originalWidth) / originalHeight
-    : safeRenderedWidth * safeDevicePixelRatio;
+    ? (() => {
+        const requiredFromHeight =
+          safeRenderedHeight * safeDevicePixelRatio * (originalWidth / originalHeight);
+        if (fitMode === "contain") {
+          return Math.min(requiredDeviceWidth, requiredFromHeight);
+        }
+
+        return Math.max(requiredDeviceWidth, requiredFromHeight);
+      })()
+    : requiredDeviceWidth;
 
   for (const width of candidates) {
     if (width >= requiredWidth) {

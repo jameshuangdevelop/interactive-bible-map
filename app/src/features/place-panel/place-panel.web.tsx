@@ -134,12 +134,14 @@ function resolveDisplayImageRequest({
   image,
   frameWidth,
   frameHeight,
-  devicePixelRatio
+  devicePixelRatio,
+  fitMode
 }: {
   image: Pick<MediaImageRecord, "url" | "width" | "height">;
   frameWidth: number;
   frameHeight: number;
   devicePixelRatio: number;
+  fitMode: "cover" | "contain";
 }) {
   const safeImageUrl = toSafeImageUrl(image.url);
   if (!safeImageUrl) {
@@ -152,6 +154,7 @@ function resolveDisplayImageRequest({
     renderedWidth: frameWidth,
     renderedHeight: frameHeight,
     devicePixelRatio,
+    fitMode,
     originalWidth: image.width,
     originalHeight: image.height
   });
@@ -282,7 +285,8 @@ function WikimediaImage({
     image,
     frameWidth,
     frameHeight,
-    devicePixelRatio
+    devicePixelRatio,
+    fitMode: imageObjectFit
   });
   const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
   const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
@@ -567,7 +571,8 @@ function GalleryThumbnails({
           image,
           frameWidth: THUMBNAIL_IMAGE_WIDTH,
           frameHeight: THUMBNAIL_IMAGE_HEIGHT,
-          devicePixelRatio
+          devicePixelRatio,
+          fitMode: "cover"
         });
         const isFailed =
           !thumbnail.requestUrl || Boolean(failedImageRequests[thumbnail.requestUrl]);
@@ -941,7 +946,8 @@ export function PlacePanel({
       image: nextImage,
       frameWidth: panelFrameWidth,
       frameHeight: panelFrameHeight,
-      devicePixelRatio
+      devicePixelRatio,
+      fitMode: "cover"
     });
     if (!nextRequest.requestUrl || failedImageRequests[nextRequest.requestUrl]) {
       return;
@@ -977,7 +983,8 @@ export function PlacePanel({
       image: nextImage,
       frameWidth: viewerFrameWidth,
       frameHeight: viewerFrameHeight,
-      devicePixelRatio
+      devicePixelRatio,
+      fitMode: "contain"
     });
     if (!nextViewerRequest.requestUrl || failedImageRequests[nextViewerRequest.requestUrl]) {
       return;
