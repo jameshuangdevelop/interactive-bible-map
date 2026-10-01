@@ -3,35 +3,79 @@
   "images": [
     {
       "id": "pergamum-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/View_from_Asclepion_of_Countryside_with_Acropolis_-_Bergama_%28Pergamon%29_-_Turkey_%285747783732%29.jpg",
+      "author": "Adam Jones from Kelowna, BC, Canada",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:View_from_Asclepion_of_Countryside_with_Acropolis_-_Bergama_(Pergamon)_-_Turkey_(5747783732).jpg",
+      "caption": "Pergamon's acropolis hill rising above the Bakırçay (Caicus) plain, seen from the Asklepieion",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/The_Acropolis_at_Pergamum._%28Reconstruction%29._Wellcome_M0005009.jpg",
+      "author": "Wellcome Collection",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Acropolis_at_Pergamum._(Reconstruction)._Wellcome_M0005009.jpg",
+      "caption": "A scholarly reconstruction drawing of Pergamon's acropolis, showing its temples, altar and theatre",
+      "kind": "reconstruction",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Pergamon_Theatre_and_Trajan_Temple_0063.jpg",
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pergamon_Theatre_and_Trajan_Temple_0063.jpg",
+      "caption": "Pergamon's steep Hellenistic theatre, with the later Temple of Trajan on the terrace above",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Temple_of_Trajan%2C_Pergamon_01.jpg",
       "author": "Bernard Gagnon",
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Temple_of_Trajan,_Pergamon_01.jpg",
-      "caption": "Columns of the Temple of Trajan on the acropolis of Pergamon",
+      "caption": "Standing columns of the Temple of Trajan, a 2nd-century addition to Pergamon's acropolis",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "pergamum-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Pergamon_ancient_city_1.jpg",
-      "author": "Burakoskay1",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pergamon_ancient_city_1.jpg",
-      "caption": "Ruins of the ancient city of Pergamon",
+      "id": "pergamum-05",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/The_Temple_of_Athena%2C_Pergamon.jpg",
+      "author": "Hugh Llewelyn",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_Temple_of_Athena,_Pergamon.jpg",
+      "caption": "Remains of the Temple of Athena, part of the Hellenistic sanctuary and library on Pergamon's acropolis",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "pergamum-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Portals_of_Pergamon.jpg",
-      "author": "Ayratayrat",
+      "id": "pergamum-06",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Entrance_Courtyard%2C_Pergamon_Asklepieion%2C_Aeolis%2C_Turkey.jpg",
+      "author": "Carole Raddato",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Entrance_Courtyard,_Pergamon_Asklepieion,_Aeolis,_Turkey.jpg",
+      "caption": "The colonnaded entrance courtyard of the Asklepieion, Pergamon's sanctuary of healing",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "pergamum-07",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Bergama_town_from_the_Acropolis_Hill_1424.jpg",
+      "author": "Dosseman",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Portals_of_Pergamon.jpg",
-      "caption": "Ancient gateways at the archaeological site of Pergamon",
-      "kind": "site",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Bergama_town_from_the_Acropolis_Hill_1424.jpg",
+      "caption": "Modern Bergama spreading across the plain below Pergamon's acropolis",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]
