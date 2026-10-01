@@ -10,25 +10,12 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae_Antik_Kenti.jpg",
-      "caption": "The unexcavated mound of Colossae, looking across the Lycus valley toward Mt Cadmus (Honaz Dağı).",
+      "caption": "The mound of Colossae, still almost unexcavated in 2025, looking south toward Honaz Dağı.",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "colossae-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Colossae%27den_Honaz_g%C3%B6r%C3%BCn%C3%BCm.jpg",
-      "width": 4672,
-      "height": 3164,
-      "author": "Gülhan Nurhan",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae'den_Honaz_görünüm.jpg",
-      "caption": "View from the Colossae site toward Mount Honaz, Turkey.",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "colossae-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Colossae_Antik_Tiyatrosu.jpg",
       "width": 4080,
       "height": 3060,
@@ -36,12 +23,38 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae_Antik_Tiyatrosu.jpg",
-      "caption": "The grassed-over depression marking Colossae's theatre, still almost entirely unexcavated.",
+      "caption": "The grassed-over hollow of Colossae's theatre, still almost entirely buried in 2025.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "colossae-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/1_longuner_-_panoramio.jpg",
+      "width": 3664,
+      "height": 2748,
+      "author": "longuner",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:1_longuner_-_panoramio.jpg",
+      "caption": "Cut stone blocks lying in the fields of the Colossae site in 2012, with the mountains behind.",
       "kind": "site",
       "aiGenerated": false
     },
     {
       "id": "colossae-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Colossae%27den_Honaz_g%C3%B6r%C3%BCn%C3%BCm.jpg",
+      "width": 4672,
+      "height": 3164,
+      "author": "Gülhan Nurhan",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Colossae'den_Honaz_görünüm.jpg",
+      "caption": "Honaz Dağı and the town of Honaz, seen across the plain near Colossae.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "colossae-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Ancient_City_of_Laodicea%2C_2019_10.jpg",
       "width": 3648,
       "height": 2736,
@@ -49,12 +62,12 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Ancient_City_of_Laodicea,_2019_10.jpg",
-      "caption": "Ruins at neighboring Laodicea on the Lycus, addressed alongside Colossae in the New Testament (not Colossae itself).",
+      "caption": "Ruins at Laodicea on the Lycus, about 14 km west of Colossae and named with it in Colossians 4:13-16 (not Colossae itself).",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "colossae-05",
+      "id": "colossae-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Pamukkale_Hierapolis_Travertine_pools.JPG",
       "width": 2848,
       "height": 2136,
@@ -62,8 +75,8 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Pamukkale_Hierapolis_Travertine_pools.JPG",
-      "caption": "The travertine terraces of neighboring Hierapolis, across the Lycus valley from Colossae (not Colossae itself).",
-      "kind": "site",
+      "caption": "The travertine terraces at Pamukkale, beside Hierapolis, about 20 km from Colossae across the Lycus valley (not Colossae itself).",
+      "kind": "modern",
       "aiGenerated": false
     }
   ]

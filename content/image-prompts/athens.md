@@ -4,19 +4,19 @@ Period shown: about AD 50, Paul's single recorded visit (Acts 17:16-34), when At
 
 ## Setting and layout
 
-Athens lies a few miles inland from its port Piraeus, to which two long walls once connected it, and is dominated by the Acropolis, a steep rock about 200 ft high at the city's center [bib:isbe-athens; pleiades:579885; wikidata:Q1524]. Paul would have entered along the road from the harbor, passing the Ceramicus burial ground before reaching the Agora just north of the Acropolis [bib:isbe-athens].
+Athens lies inland from its port Piraeus, to which two long walls once connected it, and is dominated by the Acropolis, a steep rock about 200 ft high at the city's center [bib:isbe-athens; pleiades:579885; wikidata:Q1524]. ISBE traces Paul's route up from the sea by a road lined with altars of unknown gods, into the city from the west past the Ceramicus burial ground and the "Theseum", to the Agora just north of the Acropolis [bib:isbe-athens].
 
 ## What stood then
 
-The Acropolis already carried its classical 5th-century BC monuments essentially intact: the Propylaea gateway (437–432 BC), the Parthenon with Phidias's great gold-and-ivory statue of Athena inside, the Erechtheum, and the small temple of Athena Nike ("Wingless Victory") [bib:isbe-athens]. Below it, the Agora was ringed by colonnaded porticoes (stoas), among them the Stoa Poikile ("Painted Portico"), where Paul disputed daily with Stoic philosophers, and nearby stood the Council chamber and the Areopagus, the rock outcrop where Paul addressed the city (Acts 17:19-22) [bib:isbe-athens; scripture:Acts 17:17; scripture:Acts 17:22]. The vast Temple of Olympian Zeus, begun centuries earlier and left unfinished since an attempt by Antiochus Epiphanes, still stood incomplete in Paul's day — the emperor Hadrian did not finish it until decades later — so only part of its columns rose from an unfinished platform [bib:isbe-athens].
+The Acropolis already carried its classical 5th-century BC monuments essentially intact: the Propylaea gateway (437–432 BC), the Parthenon with Phidias's great gold-and-ivory statue of Athena inside, the Erechtheum, and the small temple of Athena Nike ("Wingless Victory") [bib:isbe-athens]. In and around the Agora stood many porticoes (stoas), among them the Stoa Poikile ("Painted Portico"), whose walls carried historical paintings; ISBE places Paul's daily disputes with the Stoics there [bib:isbe-athens; scripture:Acts 17:17]. Paul spoke "in the middle of the Areopagus" (Acts 17:22); ISBE locates the Senate Chamber and "the Court of the Areopagus" in the same vicinity, near the Agora [bib:isbe-athens; scripture:Acts 17:22]. The sources used here do not settle whether Paul spoke on the rocky hill called the Areopagus or before the council of that name meeting elsewhere. The vast Temple of Olympian Zeus, on a sub-basement built under Pisistratus and taken up again by Antiochus Epiphanes [bib:isbe-athens], was still unfinished under Augustus, when allied kings planned to pay for its completion [bib:suetonius-twelve-caesars]; Hadrian completed it [bib:cassius-dio-roman-history]. So it stood unfinished in Paul's day; the sources used here do not say how much of it had been built.
 
 ## Materials and colours
 
-The Acropolis temples were built of Pentelic marble, and the lower town's streets were narrow and crooked, lined with flat-roofed houses [bib:isbe-athens].
+The lower town's streets were "exceedingly narrow and crooked", and the roofs of the houses were flat [bib:isbe-athens]. The sources used here do not describe the temples' stone or colours.
 
 ## Landscape and plants
 
-Mt Hymettus rises to the east of the city, in a dry Attic landscape typical of the southern Aegean [bib:isbe-athens].
+Mt Hymettus, a range about 3,000 ft high, rises to the east of the city [bib:isbe-athens]. The sources used here do not describe the vegetation.
 
 ## People and daily life
 
@@ -26,8 +26,8 @@ Paul was "provoked" at seeing a city "full of idols," having passed altars along
 
 1. The Acropolis crowned by the Propylaea and the Parthenon [bib:isbe-athens].
 2. The Agora with its surrounding stoas, including the Painted Portico [bib:isbe-athens].
-3. The Areopagus rock below the Acropolis, where Paul addressed the city [bib:isbe-athens; scripture:Acts 17:22].
-4. The still-unfinished Temple of Olympian Zeus, shown with only part of its colonnade standing [bib:isbe-athens].
+3. The Areopagus hill below the Acropolis, shown as a place, not as the settled scene of Paul's speech [bib:isbe-athens; scripture:Acts 17:22].
+4. The still-unfinished Temple of Olympian Zeus [bib:suetonius-twelve-caesars; bib:cassius-dio-roman-history].
 
 ## Not known
 
@@ -36,13 +36,13 @@ The exact appearance of the altar or altars "to an unknown god" that Paul refere
 ## Prompts (Media Curator)
 
 ### AI-generated reconstruction — prompt athens-ai-01
-A wide establishing shot of Athens, about AD 50, seen from the Agora looking up at the Acropolis in clear midday light. In frame: the Propylaea gateway and the Parthenon crowning the rock in gleaming Pentelic marble, the small Erechtheum and Temple of Athena Nike visible alongside, the Agora below ringed with colonnaded stoas including the Painted Portico, and narrow, crooked streets of flat-roofed houses spreading around its base; small mid-ground figures in tunics and cloaks walk and talk beneath the stoas. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+A wide establishing shot of Athens, about AD 50, seen from the Agora looking up at the Acropolis in clear midday light. In frame: the Propylaea gateway and the Parthenon crowning the rock in pale stone, the small Erechtheum and Temple of Athena Nike visible alongside, the Agora below ringed with colonnaded stoas including the Painted Portico, and narrow, crooked streets of flat-roofed houses spreading around its base; small mid-ground figures in tunics and cloaks walk and talk beneath the stoas. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
 Keep out / keep vague: keep the Agora's altars generic rather than depicting a specific inscribed "unknown god" altar, since no source used here details its exact appearance.
 
 ### AI-generated reconstruction — prompt athens-ai-02
-A ground-level establishing shot of the Areopagus (Mars Hill), about AD 50, seen from its rock outcrop looking toward the Acropolis and the Agora below, in warm afternoon light. In frame: the bare limestone outcrop with its worn rock-cut steps, a small group of Athenians and visiting philosophers as small mid-ground figures in cloaks gathered to listen to a speaker, the Acropolis rising behind crowned by the Parthenon, and the city's rooftops spreading below toward Piraeus. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
-Keep out / keep vague: no specific identifiable faces; keep the speaker as a small, generic mid-ground figure rather than a detailed portrait.
+A ground-level establishing shot of the Areopagus (Mars Hill), about AD 50, seen from its rock outcrop looking toward the Acropolis and the Agora below, in warm afternoon light. In frame: the bare rocky outcrop, a few small mid-ground figures in cloaks crossing it, the Acropolis rising behind crowned by the Parthenon, and the city's rooftops spreading below. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: no speech scene or identifiable faces, since the sources used here do not settle whether Paul spoke on this hill or before the council of the Areopagus elsewhere.
 
 ### AI-generated reconstruction — prompt athens-ai-03
-A wide establishing shot of the Temple of Olympian Zeus, about AD 50, seen from the plain below in early morning light, shown unfinished as Acts 17 implies. In frame: a vast temple platform with only part of its tall Corinthian colonnade erected, scaffolding and stacked column drums around the incomplete sections, the Acropolis visible in the distance, and small mid-ground figures of workers and a few onlookers near the base. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
-Keep out / keep vague: do not complete the colonnade; keep the unfinished portions' construction state generic, since the sources used here do not detail the site's exact mid-1st-century progress.
+A wide establishing shot of the Temple of Olympian Zeus, about AD 50, seen from the plain below in early morning light, shown unfinished, as it stood until Hadrian completed it. In frame: a vast temple platform with an incomplete colonnade, the Acropolis visible in the distance, and a few small mid-ground onlookers near the base. Photorealistic, cinematic establishing shot in the style of a historically researched video game, 16:9 landscape, no text, no modern objects.
+Keep out / keep vague: do not complete the temple, and show no active building work; keep the unfinished state generic, since the sources used here do not say how much of it stood in the mid-1st century.

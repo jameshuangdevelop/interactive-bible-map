@@ -1097,6 +1097,117 @@
       "publisher": "UNESCO",
       "url": "https://whc.unesco.org/en/list/1018/",
       "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-appii-forum",
+      "type": "chapter",
+      "title": "Appii Forum",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/appii-forum.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-antioch-pisidia",
+      "type": "chapter",
+      "title": "Antioch of Pisidia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antioch-of-pisidia.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "oeaw-celsus-library",
+      "type": "web",
+      "title": "Austrian researchers start conservation of the Celsus Library in Ephesos",
+      "authors": [
+        "Austrian Academy of Sciences (ÖAW)"
+      ],
+      "year": 2024,
+      "publisher": "Austrian Academy of Sciences",
+      "url": "https://www.oeaw.ac.at/en/news/preserving-world-cultural-heritage-austrian-researchers-start-conservation-of-the-celsus-library-in-ephesos-1",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-philippi",
+      "type": "web",
+      "title": "Philippoi: Description",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=2387",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-thessaloniki-forum",
+      "type": "web",
+      "title": "Ancient Agora of Thessaloniki: History",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2457",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-galerius-palace",
+      "type": "web",
+      "title": "Palatial complex of Galerius: Description",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=423",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "unesco-damascus",
+      "type": "web",
+      "title": "Ancient City of Damascus",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/20/",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-colossae",
+      "type": "chapter",
+      "title": "Colossae",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/colossae.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "bas-colossae-yener",
+      "type": "web",
+      "title": "Colossae: A Biblical City of the Classical World (interview with excavation director Barış Yener)",
+      "authors": [
+        "Lauren K. McCormick"
+      ],
+      "year": 2026,
+      "publisher": "Biblical Archaeology Society, Bible History Daily",
+      "url": "https://www.biblicalarchaeology.org/daily/archaeology-today/colossae-a-biblical-city-of-classical-world/",
+      "accessed": "2026-10-01"
     }
   ]
 }

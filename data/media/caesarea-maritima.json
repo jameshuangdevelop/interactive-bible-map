@@ -42,6 +42,19 @@
     },
     {
       "id": "caesarea-maritima-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/The_hippodrome%2C_built_by_Herod_the_Great_for_the_inauguration_of_the_city_in_9-10_BC%2C_it_was_the_venue_of_the_Actian_Games_instituted_by_King_Herod_in_honor_of_emperor_Augustus_and_held_every_4_years%2C_Caesarea_%2815572622871%29.jpg",
+      "width": 4891,
+      "height": 3239,
+      "author": "Carole Raddato from FRANKFURT, Germany",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_hippodrome,_built_by_Herod_the_Great_for_the_inauguration_of_the_city_in_9-10_BC,_it_was_the_venue_of_the_Actian_Games_instituted_by_King_Herod_in_honor_of_emperor_Augustus_and_held_every_4_years,_Caesarea_(15572622871).jpg",
+      "caption": "The seaside hippodrome of Caesarea Maritima, built under Herod the Great.",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "caesarea-maritima-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/124996_caesarea_national_park_PikiWiki_Israel.jpg",
       "width": 1499,
       "height": 1000,
@@ -49,12 +62,12 @@
       "license": "CC BY 2.5",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:124996_caesarea_national_park_PikiWiki_Israel.jpg",
-      "caption": "Byzantine-period street and harborside ruins at Caesarea Maritima national park.",
+      "caption": "Excavated ruins beside the harbor in Caesarea Maritima national park.",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "caesarea-maritima-05",
+      "id": "caesarea-maritima-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Panoramic_view_from_south_Caesarea.jpg",
       "width": 8282,
       "height": 1713,

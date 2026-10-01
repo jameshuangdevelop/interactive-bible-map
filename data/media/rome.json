@@ -36,7 +36,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Appian_Way.jpg",
-      "caption": "The Via Appia (Appian Way), the road south of Rome by which Paul's guard brought him into the city.",
+      "caption": "The Via Appia (Appian Way) south of Rome, the road along which believers from Rome came out to meet Paul (Acts 28:15).",
       "kind": "site",
       "aiGenerated": false
     },
@@ -62,7 +62,7 @@
       "license": "CC BY 2.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Maquette_de_Rome_(mus%C3%A9e_de_la_civilisation_romaine,_Rome)_(5911810278).jpg",
-      "caption": "A scale model of the Capitoline Hill and its Temple of Jupiter, Museo della Civiltà Romana.",
+      "caption": "The Capitoline Hill and its Temple of Jupiter in Italo Gismondi's scale model of Rome as it stood under Constantine (early 4th century AD), Museo della Civiltà Romana.",
       "kind": "reconstruction",
       "aiGenerated": false
     },
@@ -89,7 +89,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Colosseum_in_Rome,_Italy_-_April_2007.jpg",
       "caption": "The Colosseum in Rome today; it opened in AD 80, about two decades after Paul's time in the city.",
-      "kind": "modern",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

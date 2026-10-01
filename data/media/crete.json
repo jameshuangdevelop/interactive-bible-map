@@ -10,7 +10,7 @@
       "license": "CC0",
       "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
-      "caption": "The Mount Ida chain and Messara plain seen from Phaistos, Crete",
+      "caption": "The Mount Ida chain and Messara plain seen from Phaistos, Crete.",
       "kind": "modern",
       "aiGenerated": false
     },
@@ -23,8 +23,8 @@
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Kali_Limenes_04.jpg",
-      "caption": "The bay of Kali Limenes (Fair Havens), near Lasea on Crete's south coast, where Paul's ship sheltered (Acts 27:8).",
-      "kind": "site",
+      "caption": "The bay of Kali Limenes (Fair Havens) on Crete's south coast, near Lasea, where Paul's ship put in (Acts 27:8).",
+      "kind": "modern",
       "aiGenerated": false
     },
     {
@@ -62,7 +62,7 @@
       "license": "CC BY 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Crete_satellite.jpg",
-      "caption": "Satellite image of the island of Crete",
+      "caption": "Satellite image of the island of Crete.",
       "kind": "modern",
       "aiGenerated": false
     },
@@ -75,7 +75,7 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Agios_Nikolaos,_Crete_%E2%80%93_Harbour_2019a.jpg",
-      "caption": "Harbour of Agios Nikolaos on the island of Crete",
+      "caption": "The harbor of Agios Nikolaos, a modern town on Crete.",
       "kind": "modern",
       "aiGenerated": false
     }
