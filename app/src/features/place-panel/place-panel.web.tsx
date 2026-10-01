@@ -540,11 +540,16 @@ function GalleryThumbnails({
       return;
     }
 
-    selectedButton.scrollIntoView({
-      block: "nearest",
-      inline: "nearest",
-      behavior: "auto"
-    });
+    // Scroll only the thumbnail row. scrollIntoView would also move Chromium's sequential focus
+    // navigation starting point to the thumbnail, so the first Tab after opening a place from a
+    // link would skip the search box and land in the gallery.
+    const rowBounds = row.getBoundingClientRect();
+    const buttonBounds = selectedButton.getBoundingClientRect();
+    if (buttonBounds.left < rowBounds.left) {
+      row.scrollLeft -= rowBounds.left - buttonBounds.left;
+    } else if (buttonBounds.right > rowBounds.right) {
+      row.scrollLeft += buttonBounds.right - rowBounds.right;
+    }
   }, [activeImageIndex, images.length]);
 
   return (
