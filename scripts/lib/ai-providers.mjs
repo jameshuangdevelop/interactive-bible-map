@@ -301,6 +301,20 @@ function countModalityEntries(details, modalityName) {
   return count;
 }
 
+function sumModalityTokens(details, modalityName) {
+  if (!Array.isArray(details)) {
+    return 0;
+  }
+
+  let total = 0;
+  for (const detail of details) {
+    if (normalizeModality(detail?.modality) === modalityName) {
+      total += ensureNonNegativeNumber(detail?.tokenCount, 0);
+    }
+  }
+  return total;
+}
+
 export function estimateGeminiCostUsd({
   serviceTier = DEFAULT_GEMINI_SERVICE_TIER,
   usageMetadata,
@@ -311,10 +325,19 @@ export function estimateGeminiCostUsd({
   const pricing = GEMINI_IMAGE_PRICING[resolvedTier];
   const metadata = usageMetadata && typeof usageMetadata === "object" ? usageMetadata : {};
 
-  const inputTextTokens = ensureNonNegativeNumber(metadata.promptTokenCount, 0);
+  // Image tokens are priced per image below, so they are taken out of the token counts, which
+  // Gemini reports with text, thinking and image tokens together.
+  const inputTextTokens = Math.max(
+    0,
+    ensureNonNegativeNumber(metadata.promptTokenCount, 0) -
+      sumModalityTokens(metadata.promptTokensDetails, "IMAGE")
+  );
   const outputTextAndThinkingTokens =
-    ensureNonNegativeNumber(metadata.candidatesTokenCount, 0) +
-    ensureNonNegativeNumber(metadata.thoughtsTokenCount, 0);
+    Math.max(
+      0,
+      ensureNonNegativeNumber(metadata.candidatesTokenCount, 0) -
+        sumModalityTokens(metadata.candidatesTokensDetails, "IMAGE")
+    ) + ensureNonNegativeNumber(metadata.thoughtsTokenCount, 0);
 
   const inputImageEntriesFromMetadata = countModalityEntries(
     metadata.promptTokensDetails,

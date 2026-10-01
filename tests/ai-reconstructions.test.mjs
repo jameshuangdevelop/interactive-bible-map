@@ -559,6 +559,33 @@ test("gemini request shape and response parsing", async () => {
   assert.equal(result.estimatedCostUsd, 0.074);
 });
 
+test("gemini cost estimate does not charge image tokens twice", () => {
+  // An edit: 300 text + 560 image tokens in; 200 text + 1,120 image tokens out, plus 400 thinking.
+  const usageMetadata = {
+    promptTokenCount: 860,
+    promptTokensDetails: [
+      { modality: "TEXT", tokenCount: 300 },
+      { modality: "IMAGE", tokenCount: 560 }
+    ],
+    candidatesTokenCount: 1_320,
+    candidatesTokensDetails: [
+      { modality: "TEXT", tokenCount: 200 },
+      { modality: "IMAGE", tokenCount: 1_120 }
+    ],
+    thoughtsTokenCount: 400
+  };
+
+  // 300 × $1/M + (200 + 400) × $6/M + 1 input image × $0.0006 + 1 output image × $0.067
+  assert.equal(
+    estimateGeminiCostUsd({ serviceTier: "flex", usageMetadata, inputImageCount: 1 }),
+    0.0715
+  );
+  assert.equal(
+    estimateGeminiCostUsd({ serviceTier: "standard", usageMetadata, inputImageCount: 1 }),
+    0.143
+  );
+});
+
 test("gemini standard tier opt-out sets service_tier to standard", async () => {
   const calls = [];
 
@@ -956,6 +983,8 @@ test("estimateGeminiCostUsd computes flex and standard costs from usage metadata
     promptTokensDetails: [{ modality: "IMAGE", tokenCount: 256 }]
   };
 
+  // 744 text input tokens (1,000 minus the 256 image tokens, which the per-image price covers),
+  // 2,000 output and thinking tokens, one input image and one output image.
   assert.equal(
     estimateGeminiCostUsd({
       serviceTier: GEMINI_SERVICE_TIERS.FLEX,
@@ -963,7 +992,7 @@ test("estimateGeminiCostUsd computes flex and standard costs from usage metadata
       inputImageCount: 1,
       outputImageCount: 1
     }),
-    0.0806
+    0.080344
   );
   assert.equal(
     estimateGeminiCostUsd({
@@ -972,7 +1001,7 @@ test("estimateGeminiCostUsd computes flex and standard costs from usage metadata
       inputImageCount: 1,
       outputImageCount: 1
     }),
-    0.1612
+    0.160688
   );
 });
 
