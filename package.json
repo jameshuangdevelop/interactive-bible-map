@@ -24,7 +24,7 @@
     "typecheck": "npm run typecheck --workspace interactive-bible-map-app",
     "test:app": "npm run test --workspace interactive-bible-map-app",
     "test:all": "npm test && npm run test:app",
-    "export:web": "npm run export:web --workspace interactive-bible-map-app",
+    "export:web": "node scripts/export-web.mjs",
     "verify:web:playwright": "node scripts/verify-web-export-playwright.mjs"
   },
   "dependencies": {
