@@ -362,6 +362,71 @@ function locationHasScriptureSources(locationData) {
   return false;
 }
 
+function sourceIdPrefixFromPattern(pattern) {
+  if (typeof pattern !== "string") {
+    return null;
+  }
+
+  const match = /^\^([a-z0-9]+):/u.exec(pattern);
+  return match ? match[1] : null;
+}
+
+function listKnownSourceIdPrefixes(sourceIdSchema) {
+  const prefixes = new Set();
+  const schemaDefinitions = sourceIdSchema?.$defs;
+  const sourceIdVariants = sourceIdSchema?.$defs?.sourceId?.oneOf;
+
+  if (Array.isArray(sourceIdVariants)) {
+    for (const variant of sourceIdVariants) {
+      if (typeof variant?.$ref !== "string") {
+        continue;
+      }
+
+      const referenceMatch = /^#\/\$defs\/([A-Za-z0-9_-]+)$/u.exec(variant.$ref);
+      if (!referenceMatch) {
+        continue;
+      }
+
+      const schemaDefinition = schemaDefinitions?.[referenceMatch[1]];
+      const prefix = sourceIdPrefixFromPattern(schemaDefinition?.pattern);
+      if (prefix) {
+        prefixes.add(prefix);
+      }
+    }
+  }
+
+  if (prefixes.size > 0 || !schemaDefinitions || typeof schemaDefinitions !== "object") {
+    return prefixes;
+  }
+
+  for (const schemaDefinition of Object.values(schemaDefinitions)) {
+    const prefix = sourceIdPrefixFromPattern(schemaDefinition?.pattern);
+    if (prefix) {
+      prefixes.add(prefix);
+    }
+  }
+
+  return prefixes;
+}
+
+function hasKnownSourceIdPrefix(sourceId, knownSourceIdPrefixes) {
+  if (typeof sourceId !== "string") {
+    return false;
+  }
+
+  if (!(knownSourceIdPrefixes instanceof Set) || knownSourceIdPrefixes.size === 0) {
+    return /^[a-z]+:/u.test(sourceId);
+  }
+
+  const separatorIndex = sourceId.indexOf(":");
+  if (separatorIndex <= 0) {
+    return false;
+  }
+
+  const prefix = sourceId.slice(0, separatorIndex);
+  return knownSourceIdPrefixes.has(prefix);
+}
+
 function validateSourceArray({
   sourceIds,
   file,
@@ -465,7 +530,11 @@ function validateSourceArray({
 }
 
 function normalizeCommonsFileName(fileName) {
-  return decodeURIComponent(fileName).replace(/ /gu, "_");
+  try {
+    return decodeURIComponent(fileName).replace(/ /gu, "_");
+  } catch {
+    return null;
+  }
 }
 
 function parseCommonsOriginalUrl(url) {
@@ -489,11 +558,18 @@ function parseCommonsOriginalUrl(url) {
     return null;
   }
 
+  const normalizedFileName = normalizeCommonsFileName(match[3]);
+  if (!normalizedFileName) {
+    return {
+      invalidFileNameEncoding: true
+    };
+  }
+
   return {
     hashFirst: match[1].toLowerCase(),
     hashFirstTwo: match[2].toLowerCase(),
     fileNameSegment: match[3],
-    normalizedFileName: normalizeCommonsFileName(match[3])
+    normalizedFileName
   };
 }
 
@@ -673,6 +749,7 @@ async function validateImagePromptSources({
   bibliographyIds,
   webVerseIndex,
   validateSourceIdSchema,
+  knownSourceIdPrefixes,
   errors
 }) {
   const promptFiles = await listMarkdownFiles(imagePromptsDirectory);
@@ -707,7 +784,7 @@ async function validateImagePromptSources({
     for (const match of markdown.matchAll(IMAGE_PROMPT_SOURCE_ID_PATTERN)) {
       for (const part of match[1].split(";")) {
         const sourceId = part.trim();
-        if (!sourceId || !/^[a-z]+:/iu.test(sourceId)) {
+        if (!sourceId || !hasKnownSourceIdPrefix(sourceId, knownSourceIdPrefixes)) {
           continue;
         }
         sourceIds.push(sourceId);
@@ -1054,6 +1131,7 @@ export async function validateData(options = {}) {
   const validateSourceIdSchema = ajv.compile({
     $ref: "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
   });
+  const knownSourceIdPrefixes = listKnownSourceIdPrefixes(sourceIdSchema);
 
   let bibliographyData = { entries: [] };
   const bibliographyRelativePath = relativeFromRepositoryRoot(bibliographyPath);
@@ -1556,6 +1634,7 @@ export async function validateData(options = {}) {
     bibliographyIds,
     webVerseIndex,
     validateSourceIdSchema,
+    knownSourceIdPrefixes,
     errors
   });
 
@@ -1721,6 +1800,16 @@ export async function validateData(options = {}) {
               mediaRecord.relativePath,
               imageUrlPath,
               "Commons url must be a plain https://upload.wikimedia.org/wikipedia/commons/<a>/<ab>/<file> address with no query string"
+            );
+            continue;
+          }
+
+          if (parsedCommonsUrl.invalidFileNameEncoding) {
+            recordError(
+              errors,
+              mediaRecord.relativePath,
+              imageUrlPath,
+              "Commons url file name is not validly percent-encoded"
             );
             continue;
           }
