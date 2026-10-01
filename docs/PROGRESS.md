@@ -31,7 +31,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-13 | Well-known areas and more English names | research-lead → fact-checker | `data/m3-well-known-areas` | Done, PR pending review (Elam removed on the PO's decision) | — |
 | M3.5-00 | Plan M3.5 – Images; record the human's review (ADR-0028 to ADR-0030) | project-owner | `docs/m3-feedback` | Done | — |
 | M3.5-01 | Image schema, broken links and link checks | gis-engineer | `data/m3.5-image-schema` | Done, PR pending review | — |
-| M3.5-02 | Images, batch A: Jerusalem and the Gospels | research-lead → media-curator → fact-checker | `data/m3.5-images-a` | Verification open item 2 closed (briefs now cite openable sources); items 1 and 3 still wait on the PO (`docs/verification/M3.5-images-a.md`); PR pending review | — |
+| M3.5-02 | Images, batch A: Jerusalem and the Gospels | research-lead → media-curator → fact-checker | `data/m3.5-images-a` | Done (verification open items closed: briefs cite openable sources; PO accepted the Gethsemane note and Cana's lead), PR pending review | — |
 | M3.5-03 | Images, batch B: Paul's letters and the capitals | research-lead → media-curator → fact-checker | `data/m3.5-images-b` | In progress (briefs) | — |
 | M3.5-04 | Images, batch C: the churches of Revelation | research-lead → media-curator → fact-checker | `data/m3.5-images-c` | In progress (briefs) | — |
 | M3.5-05 | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Card ready, waits for M3.5-01 | — |
