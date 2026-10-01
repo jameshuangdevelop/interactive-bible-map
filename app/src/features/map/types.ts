@@ -10,6 +10,8 @@ export type PlaceType =
 
 export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";
+export type PlaceProminence = "major" | "standard";
+export type MediaImageKind = "modern" | "site" | "reconstruction" | "ai-reconstruction";
 export type SourceId = string;
 
 export type Coordinates = [number, number];
@@ -37,6 +39,7 @@ export interface PlaceIndexRecord {
   names: PlaceNames;
   type: PlaceType;
   zoomTier: ZoomTier;
+  prominence: PlaceProminence;
   parentId: string | null;
   candidates: PlaceCandidate[];
 }
@@ -95,7 +98,15 @@ export interface MediaImageRecord {
   licenseUrl: string;
   sourcePage: string;
   caption: string;
+  kind: MediaImageKind;
   aiGenerated: boolean;
+  generator?: {
+    tool: string;
+    model: string;
+    date: string;
+  };
+  promptRef?: string;
+  basedOn?: SourceId[];
 }
 
 export interface MediaRecord {

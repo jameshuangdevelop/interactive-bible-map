@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:A_Road_in_Alexandria_Troas.jpg",
       "caption": "Ancient Alexandria Troas",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Alexandria_Troas_-_2.jpg",
       "caption": "Ancient Alexandria Troas",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Alexandria_Troas_2025-08-31_10-24-54.jpg",
       "caption": "Ancient Alexandria Troas",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

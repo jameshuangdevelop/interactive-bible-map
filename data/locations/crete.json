@@ -13,6 +13,7 @@
   },
   "type": "region",
   "zoomTier": "region",
+  "prominence": "major",
   "parentId": "crete-cyrene",
   "candidates": [
     {

@@ -1,6 +1,5 @@
 {
   "id": "sychar",
-  "parentId": "samaria",
   "names": {
     "ancient": [
       "Sychar"
@@ -10,6 +9,8 @@
   },
   "type": "village",
   "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "samaria",
   "candidates": [
     {
       "label": "Shechem (Tell Balata)",

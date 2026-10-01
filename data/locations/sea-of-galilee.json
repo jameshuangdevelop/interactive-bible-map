@@ -15,6 +15,7 @@
   },
   "type": "natural-feature",
   "zoomTier": "city",
+  "prominence": "major",
   "parentId": "galilee",
   "candidates": [
     {

@@ -14,11 +14,15 @@ function toCommonsOriginalPathname(pathname: string) {
     const originalPathSegments = segments.slice(0, -1);
     const fileName = originalPathSegments[originalPathSegments.length - 1];
     const thumbnailFileName = segments[segments.length - 1];
+    const expectedSvgThumbnailFileName = `${fileName}.png`;
     if (
       !fileName ||
       !thumbnailFileName ||
       !/^[1-9][0-9]*px-/u.test(thumbnailFileName) ||
-      !thumbnailFileName.endsWith(fileName)
+      !(
+        thumbnailFileName.endsWith(fileName) ||
+        thumbnailFileName.endsWith(expectedSvgThumbnailFileName)
+      )
     ) {
       return null;
     }
@@ -65,8 +69,11 @@ export function buildCommonsThumbnailUrl(originalUrl: string, targetWidth: numbe
       return parsed.toString();
     }
 
+    const thumbnailFileName = /\.svg$/iu.test(fileName)
+      ? `${fileName}.png`
+      : fileName;
     const width = selectCommonsThumbnailWidth(targetWidth);
-    parsed.pathname = `${COMMONS_THUMB_PREFIX}${relativePath}/${width}px-${fileName}`;
+    parsed.pathname = `${COMMONS_THUMB_PREFIX}${relativePath}/${width}px-${thumbnailFileName}`;
     return parsed.toString();
   } catch {
     return originalUrl;

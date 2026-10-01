@@ -9,6 +9,7 @@
   },
   "type": "village",
   "zoomTier": "city",
+  "prominence": "standard",
   "parentId": "galilee",
   "candidates": [
     {

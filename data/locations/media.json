@@ -10,6 +10,7 @@
   },
   "type": "region",
   "zoomTier": "region",
+  "prominence": "standard",
   "parentId": "parthian-empire",
   "candidates": [
     {

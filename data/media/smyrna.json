@@ -9,6 +9,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Izmir_agora_north_of_Northwest_Basilica_6668.jpg",
       "caption": "Substructure of the agora of ancient Smyrna, Izmir",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -19,6 +20,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_Bath_of_Smyrna_in_%C4%B0zmir_Agora.jpg",
       "caption": "Remains of the Roman bath within the agora of ancient Smyrna",
+      "kind": "site",
       "aiGenerated": false
     },
     {
@@ -29,6 +31,7 @@
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Agora_of_Smyrna,_built_during_the_Hellenistic_era_at_the_base_of_Pagos_Hill_and_totally_rebuilt_under_Marcus_Aurelius_after_the_destructive_178_AD_earthquake,_Izmir,_Turkey_(18511982670).jpg",
       "caption": "Ruins of the Roman-era agora of ancient Smyrna, Izmir",
+      "kind": "site",
       "aiGenerated": false
     }
   ]

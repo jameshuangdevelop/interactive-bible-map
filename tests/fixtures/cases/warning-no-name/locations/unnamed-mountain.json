@@ -1,30 +1,43 @@
 {
   "id": "unnamed-mountain",
   "names": {
-    "ancient": ["Unknown Peak"],
+    "ancient": [
+      "Unknown Peak"
+    ],
     "modern": "Unknown Mountain",
     "alternate": []
   },
   "type": "natural-feature",
   "zoomTier": "site",
+  "prominence": "standard",
   "candidates": [
     {
       "label": "Illustrative summit",
-      "coordinates": [35.3, 32.7],
+      "coordinates": [
+        35.3,
+        32.7
+      ],
       "coordinateSource": "wikidata:Q1384",
       "confidence": "low",
       "support": "Illustrative only.",
-      "sources": ["wikidata:Q1384", "openbible:galilee"]
+      "sources": [
+        "wikidata:Q1384",
+        "openbible:galilee"
+      ]
     }
   ],
   "summary": {
     "text": "Illustrative summary.",
-    "sources": ["openbible:galilee"]
+    "sources": [
+      "openbible:galilee"
+    ]
   },
   "history": [
     {
       "text": "Illustrative history.",
-      "sources": ["pleiades:678231"]
+      "sources": [
+        "pleiades:678231"
+      ]
     }
   ],
   "scripture": [
@@ -38,7 +51,9 @@
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative note.",
-      "sources": ["openbible:galilee"]
+      "sources": [
+        "openbible:galilee"
+      ]
     }
   ],
   "politicalHistory": [
@@ -46,7 +61,9 @@
       "fromYear": -63,
       "toYear": 135,
       "entity": "Illustrative only.",
-      "sources": ["pleiades:678231"]
+      "sources": [
+        "pleiades:678231"
+      ]
     }
   ],
   "status": "draft"

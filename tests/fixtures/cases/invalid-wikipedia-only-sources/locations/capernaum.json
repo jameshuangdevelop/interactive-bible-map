@@ -1,30 +1,43 @@
 {
   "id": "capernaum",
   "names": {
-    "ancient": ["Capernaum"],
+    "ancient": [
+      "Capernaum"
+    ],
     "modern": "Kfar Nahum",
     "alternate": []
   },
   "type": "city",
   "zoomTier": "city",
+  "prominence": "standard",
   "candidates": [
     {
       "label": "Tell Hum",
-      "coordinates": [35.575, 32.88],
+      "coordinates": [
+        35.575,
+        32.88
+      ],
       "coordinateSource": "pleiades:678231",
       "confidence": "high",
       "support": "Illustrative only.",
-      "sources": ["pleiades:678231", "openbible:capernaum"]
+      "sources": [
+        "pleiades:678231",
+        "openbible:capernaum"
+      ]
     }
   ],
   "summary": {
     "text": "Illustrative summary.",
-    "sources": ["wikipedia:Capernaum"]
+    "sources": [
+      "wikipedia:Capernaum"
+    ]
   },
   "history": [
     {
       "text": "Illustrative history.",
-      "sources": ["pleiades:678231"]
+      "sources": [
+        "pleiades:678231"
+      ]
     }
   ],
   "scripture": [
@@ -38,7 +51,9 @@
     {
       "ref": "Isaiah 9:1",
       "note": "Illustrative note.",
-      "sources": ["openbible:capernaum"]
+      "sources": [
+        "openbible:capernaum"
+      ]
     }
   ],
   "politicalHistory": [
@@ -46,7 +61,9 @@
       "fromYear": -4,
       "toYear": 39,
       "entity": "Illustrative only.",
-      "sources": ["pleiades:678231"]
+      "sources": [
+        "pleiades:678231"
+      ]
     }
   ],
   "status": "draft"
