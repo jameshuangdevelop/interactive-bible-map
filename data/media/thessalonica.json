@@ -2,7 +2,32 @@
   "locationId": "thessalonica",
   "images": [
     {
-      "id": "thessalonica-01",
+      "id": "thessalonica-ai-01",
+      "url": "media/ai/thessalonica-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Thessalonica in about AD 30–60: the port city and the Via Egnatia seen from a hill, with houses clustering around a busy harbourfront.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt thessalonica-ai-01",
+      "basedOn": [
+        "bib:isbe-thessalonica",
+        "bib:odysseus-thessaloniki-forum",
+        "bib:odysseus-galerius-palace",
+        "pleiades:491741",
+        "wikidata:Q17151"
+      ]
+    },
+    {
+      "id": "thessalonica-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Thessaloniki_Ancient_Agora_%281%29.jpg",
       "width": 4032,
       "height": 3024,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "thessalonica-02",
+      "id": "thessalonica-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Forum_Romanum_Thessaloniki.jpg",
       "width": 3000,
       "height": 2250,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "thessalonica-03",
+      "id": "thessalonica-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Thessaloniki%2C_Greece%2C_Feb_2023_-_Western_Walls.jpg",
       "width": 4032,
       "height": 3024,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "thessalonica-04",
+      "id": "thessalonica-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Thessaloniki_Arch_of_Galerius_from_the_west.jpg",
       "width": 6008,
       "height": 4008,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "thessalonica-05",
+      "id": "thessalonica-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Thessaloniki_beach_promenade.jpg",
       "width": 9870,
       "height": 3917,

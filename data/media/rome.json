@@ -2,7 +2,34 @@
   "locationId": "rome",
   "images": [
     {
-      "id": "rome-01",
+      "id": "rome-ai-01",
+      "url": "media/ai/rome-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Rome in about AD 30–60: the Forum valley viewed from the Capitoline with temples, porticoes and crowded insulae lining the narrow streets.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt rome-ai-01",
+      "basedOn": [
+        "bib:isbe-rome",
+        "bib:platner-ashby-topographical-dictionary",
+        "bib:isbe-appii-forum",
+        "bib:tacitus-annals",
+        "bib:suetonius-twelve-caesars",
+        "pleiades:423025",
+        "wikidata:Q220"
+      ]
+    },
+    {
+      "id": "rome-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Ruins_on_Palatine_Hill%2C_Rome%2C_Italy.jpg",
       "width": 8207,
       "height": 4616,
@@ -15,7 +42,7 @@
       "aiGenerated": false
     },
     {
-      "id": "rome-02",
+      "id": "rome-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Forum_Romanum_%2814%29.jpg",
       "width": 13068,
       "height": 2516,
@@ -28,7 +55,7 @@
       "aiGenerated": false
     },
     {
-      "id": "rome-03",
+      "id": "rome-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Appian_Way.jpg",
       "width": 6016,
       "height": 4000,
@@ -41,7 +68,7 @@
       "aiGenerated": false
     },
     {
-      "id": "rome-04",
+      "id": "rome-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Panorama_Circus_Maximus.JPG",
       "width": 9065,
       "height": 2109,
@@ -54,7 +81,7 @@
       "aiGenerated": false
     },
     {
-      "id": "rome-05",
+      "id": "rome-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Maquette_de_Rome_%28mus%C3%A9e_de_la_civilisation_romaine%2C_Rome%29_%285911810278%29.jpg",
       "width": 1481,
       "height": 1093,
@@ -67,7 +94,7 @@
       "aiGenerated": false
     },
     {
-      "id": "rome-06",
+      "id": "rome-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Rome_Skyline_%288012016319%29.jpg",
       "width": 5982,
       "height": 3988,
@@ -80,7 +107,7 @@
       "aiGenerated": false
     },
     {
-      "id": "rome-07",
+      "id": "rome-08",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Colosseum_in_Rome%2C_Italy_-_April_2007.jpg",
       "width": 4827,
       "height": 2833,

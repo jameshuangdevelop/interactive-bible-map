@@ -2,7 +2,34 @@
   "locationId": "golgotha",
   "images": [
     {
-      "id": "golgotha-01",
+      "id": "golgotha-ai-01",
+      "url": "media/ai/golgotha-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Golgotha in about AD 30–60: a disused limestone quarry and garden-like slope with low rolling-stone tombs and rough paths across a bare hill.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt golgotha-ai-01",
+      "basedOn": [
+        "bib:josephus-jewish-war",
+        "bib:taylor-golgotha-reconsideration",
+        "bib:ritmeyer-temple-mount-quest",
+        "bib:isbe-agriculture",
+        "bib:rainey-notley-sacred-bridge",
+        "wikidata:Q187702",
+        "wikidata:Q1494672"
+      ]
+    },
+    {
+      "id": "golgotha-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/The_Church_of_the_Holy_Sepulchre-Jerusalem.JPG",
       "width": 4288,
       "height": 2848,
@@ -15,7 +42,7 @@
       "aiGenerated": false
     },
     {
-      "id": "golgotha-02",
+      "id": "golgotha-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Jerusalem_Garden_Tomb_%2843300924231%29.jpg",
       "width": 6000,
       "height": 4000,
@@ -28,7 +55,7 @@
       "aiGenerated": false
     },
     {
-      "id": "golgotha-03",
+      "id": "golgotha-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Jerusalem_%2824843262446%29.jpg",
       "width": 5184,
       "height": 3456,
@@ -41,7 +68,7 @@
       "aiGenerated": false
     },
     {
-      "id": "golgotha-04",
+      "id": "golgotha-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Entrance_to_the_Garden_Tomb_1_%284015106152%29.jpg",
       "width": 4000,
       "height": 3000,
@@ -54,7 +81,7 @@
       "aiGenerated": false
     },
     {
-      "id": "golgotha-05",
+      "id": "golgotha-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Golgota_Jerozolima_model.jpg",
       "width": 4288,
       "height": 2848,

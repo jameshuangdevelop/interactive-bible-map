@@ -37,6 +37,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3.5-05 | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Done, PR pending review | — |
 | M3.5-06 | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Done, PR pending review | — |
 | M3.5-07 | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker (check loop) → the human (approval) → media-curator → fact-checker | `data/m3.5-ai-images` | In progress (images checked; 16 edits for the PO) | — |
+| M3.5-07 | AI reconstructions: publish and media entries (31 images), added AI entries first in each gallery | media-curator | `data/m3.5-ai-images` | Done | — |
 
 ## Open questions
 - **For the human (M3.5-07):** please choose the image generator for the AI reconstructions. The Fact-Checker compared the current terms in [`docs/research/M3.5-ai-generators.md`](research/M3.5-ai-generators.md) and recommends, in order:

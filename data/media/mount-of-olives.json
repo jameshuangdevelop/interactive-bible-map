@@ -2,7 +2,32 @@
   "locationId": "mount-of-olives",
   "images": [
     {
-      "id": "mount-of-olives-01",
+      "id": "mount-of-olives-ai-01",
+      "url": "media/ai/mount-of-olives-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of the Mount of Olives in about AD 30–60: the ridge looking west across the Kidron Valley toward Jerusalem, with olive trees on the slopes and tombs below.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt mount-of-olives-ai-01",
+      "basedOn": [
+        "bib:rainey-notley-sacred-bridge",
+        "bib:josephus-jewish-war",
+        "bib:isbe-agriculture",
+        "openbible:mount-of-olives",
+        "wikidata:Q205976"
+      ]
+    },
+    {
+      "id": "mount-of-olives-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/2013-Aerial-Mount_of_Olives.jpg",
       "width": 5000,
       "height": 2767,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "mount-of-olives-02",
+      "id": "mount-of-olives-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Bnei_Hazir_tomb_and_Tomb_of_Zechariah_2019.jpg",
       "width": 4608,
       "height": 2592,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "mount-of-olives-03",
+      "id": "mount-of-olives-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Jerozolima_Gora_Oliwna_widok_na_Stare_Miasto_i_Doline_Cedronu_2009.jpg",
       "width": 5736,
       "height": 840,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "mount-of-olives-04",
+      "id": "mount-of-olives-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flora_on_Mt_of_Olives_2196_%28508055355%29.jpg",
       "width": 3264,
       "height": 2448,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "mount-of-olives-05",
+      "id": "mount-of-olives-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/4_009_Jewish_Cemetery_in_East_Jerusalem.jpg",
       "width": 1544,
       "height": 1024,

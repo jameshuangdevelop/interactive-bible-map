@@ -2,7 +2,37 @@
   "locationId": "jerusalem",
   "images": [
     {
-      "id": "jerusalem-01",
+      "id": "jerusalem-ai-01",
+      "url": "media/ai/jerusalem-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Jerusalem in about AD 30–60: the city seen from the Mount of Olives with a raised temple sanctuary and courts amid flat-roofed houses on the ridge.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt jerusalem-ai-01",
+      "basedOn": [
+        "bib:rainey-notley-sacred-bridge",
+        "bib:josephus-jewish-war",
+        "bib:josephus-antiquities",
+        "bib:ritmeyer-temple-mount-quest",
+        "bib:isbe-agriculture",
+        "bib:freedman-anchor-bible-dictionary",
+        "bib:taylor-golgotha-reconsideration",
+        "pleiades:687928",
+        "wikidata:Q1218",
+        "wikidata:Q1003997"
+      ]
+    },
+    {
+      "id": "jerusalem-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Dome_of_the_Rock_seen_from_the_Mount_of_Olives_%2812395649153%29_%28cropped%29.jpg",
       "width": 3412,
       "height": 1729,
@@ -15,7 +45,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jerusalem-02",
+      "id": "jerusalem-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Aerial_view_Temple_Mount_Silwan_Kidron_Valley_City_of_David.jpeg",
       "width": 4348,
       "height": 2657,
@@ -28,7 +58,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jerusalem-03",
+      "id": "jerusalem-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Jerusalem_view_from_citadel.jpg",
       "width": 14427,
       "height": 3438,
@@ -41,7 +71,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jerusalem-04",
+      "id": "jerusalem-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Aechaeological_park_-_panoramio.jpg",
       "width": 3648,
       "height": 2736,
@@ -54,7 +84,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jerusalem-05",
+      "id": "jerusalem-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Absalom%27s_Memorial_in_late_Summer.jpg",
       "width": 3648,
       "height": 2432,
@@ -67,7 +97,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jerusalem-06",
+      "id": "jerusalem-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Holyland_Jerusalem_model_panorama_from_southwest.jpg",
       "width": 6160,
       "height": 2497,

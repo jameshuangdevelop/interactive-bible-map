@@ -2,7 +2,35 @@
   "locationId": "gethsemane",
   "images": [
     {
-      "id": "gethsemane-01",
+      "id": "gethsemane-ai-01",
+      "url": "media/ai/gethsemane-ai-01.webp",
+      "width": 1600,
+      "height": 866,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Gethsemane in about AD 30–60: a terraced olive grove on the Mount of Olives' lower slopes, with mixed-age trees and a narrow path toward the city.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt gethsemane-ai-01",
+      "basedOn": [
+        "bib:bdag-greek-lexicon",
+        "bib:custodia-gethsemane",
+        "bib:murphy-oconnor-holy-land-guide",
+        "bib:bernabei-gethsemane-olive-trees",
+        "bib:isbe-agriculture",
+        "bib:rainey-notley-sacred-bridge",
+        "openbible:gethsemane",
+        "wikidata:Q205333"
+      ]
+    },
+    {
+      "id": "gethsemane-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Getsemane2.JPG",
       "width": 3648,
       "height": 2736,
@@ -15,7 +43,7 @@
       "aiGenerated": false
     },
     {
-      "id": "gethsemane-02",
+      "id": "gethsemane-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Church_of_all_Nations.jpg",
       "width": 1280,
       "height": 960,
@@ -28,7 +56,7 @@
       "aiGenerated": false
     },
     {
-      "id": "gethsemane-03",
+      "id": "gethsemane-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/20110224_East_Jerusalem_0289_Jerusalem_%285540460214%29.jpg",
       "width": 3648,
       "height": 2736,
@@ -41,7 +69,7 @@
       "aiGenerated": false
     },
     {
-      "id": "gethsemane-04",
+      "id": "gethsemane-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Church_of_All_Nations_%2825801318941%29.jpg",
       "width": 2988,
       "height": 5312,
@@ -54,7 +82,7 @@
       "aiGenerated": false
     },
     {
-      "id": "gethsemane-05",
+      "id": "gethsemane-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/121282-Jerusalem-Mount-of-Olives_%2827563160356%29.jpg",
       "width": 6016,
       "height": 4016,

@@ -2,7 +2,32 @@
   "locationId": "jericho",
   "images": [
     {
-      "id": "jericho-01",
+      "id": "jericho-ai-01",
+      "url": "media/ai/jericho-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Jericho in about AD 30–60: an oasis town beside palm plantations, with a royal villa complex and gardens set against the bare limestone hills.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt jericho-ai-01",
+      "basedOn": [
+        "bib:josephus-jewish-war",
+        "bib:murphy-oconnor-holy-land-guide",
+        "openbible:jericho-2",
+        "wikidata:Q5687",
+        "wikidata:Q2460244"
+      ]
+    },
+    {
+      "id": "jericho-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Jericho_city.jpg",
       "width": 1280,
       "height": 720,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jericho-02",
+      "id": "jericho-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/Jericho_-_Tel_Es-Sultan1.jpg",
       "width": 2514,
       "height": 1728,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jericho-03",
+      "id": "jericho-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/By_Ovedc_-_Tulul_al-Alaiq%2C_Herod%27s_winter_palaces%2C_Jericho_03.jpg",
       "width": 4000,
       "height": 3000,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jericho-04",
+      "id": "jericho-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Jericho_-_panoramio.jpg",
       "width": 3776,
       "height": 2520,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "jericho-05",
+      "id": "jericho-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Jericho_cityscape_from_wall_ruins.jpg",
       "width": 6077,
       "height": 2232,

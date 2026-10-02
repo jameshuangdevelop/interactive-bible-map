@@ -2,7 +2,33 @@
   "locationId": "pergamum",
   "images": [
     {
-      "id": "pergamum-01",
+      "id": "pergamum-ai-01",
+      "url": "media/ai/pergamum-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Pergamum in about AD 30–60: the acropolis and its theatre high above the plain, with the Great Altar's terrace and the city spreading below.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt pergamum-ai-01",
+      "basedOn": [
+        "bib:strabo-geography",
+        "bib:worldhistory-pergamon",
+        "bib:unesco-pergamon",
+        "bib:ramsay-seven-churches",
+        "bib:tacitus-annals",
+        "wikidata:Q18986"
+      ]
+    },
+    {
+      "id": "pergamum-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/View_from_Asclepion_of_Countryside_with_Acropolis_-_Bergama_%28Pergamon%29_-_Turkey_%285747783732%29.jpg",
       "width": 3456,
       "height": 2304,
@@ -15,7 +41,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-02",
+      "id": "pergamum-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/The_Acropolis_at_Pergamum._%28Reconstruction%29._Wellcome_M0005009.jpg",
       "width": 1776,
       "height": 1262,
@@ -28,7 +54,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-03",
+      "id": "pergamum-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Pergamon_Theatre_and_Trajan_Temple_0063.jpg",
       "width": 6399,
       "height": 4239,
@@ -41,7 +67,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-04",
+      "id": "pergamum-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Temple_of_Trajan%2C_Pergamon_01.jpg",
       "width": 3982,
       "height": 2882,
@@ -54,7 +80,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-05",
+      "id": "pergamum-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/The_Temple_of_Athena%2C_Pergamon.jpg",
       "width": 4592,
       "height": 3056,
@@ -67,7 +93,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-06",
+      "id": "pergamum-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Entrance_Courtyard%2C_Pergamon_Asklepieion%2C_Aeolis%2C_Turkey.jpg",
       "width": 6016,
       "height": 4016,
@@ -80,7 +106,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-07",
+      "id": "pergamum-08",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Bergama_town_from_the_Acropolis_Hill_1424.jpg",
       "width": 2560,
       "height": 1920,

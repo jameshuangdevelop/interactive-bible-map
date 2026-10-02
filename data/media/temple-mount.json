@@ -2,7 +2,32 @@
   "locationId": "temple-mount",
   "images": [
     {
-      "id": "temple-mount-01",
+      "id": "temple-mount-ai-01",
+      "url": "media/ai/temple-mount-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of the Temple in about AD 30–60: the raised platform and sanctuary gates seen across the Kidron Valley, with the Antonia fortress at the platform corner.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt temple-mount-ai-01",
+      "basedOn": [
+        "bib:josephus-jewish-war",
+        "bib:ritmeyer-temple-mount-quest",
+        "bib:josephus-antiquities",
+        "bib:rainey-notley-sacred-bridge",
+        "wikidata:Q193163"
+      ]
+    },
+    {
+      "id": "temple-mount-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Jerusalem-2013%282%29-Aerial-Temple_Mount-%28south_exposure%29.jpg",
       "width": 7500,
       "height": 5632,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "temple-mount-02",
+      "id": "temple-mount-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/The_Western_Wall_and_Dome_of_the_rock_in_the_old_city_of_Jerusalem.jpg",
       "width": 4271,
       "height": 2847,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "temple-mount-03",
+      "id": "temple-mount-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Jerusalem_Dome_of_the_rock_BW_13.JPG",
       "width": 3812,
       "height": 2556,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "temple-mount-04",
+      "id": "temple-mount-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Davidson_Center_-_Jerusalem_Archaeological_Park_-_The_Southern_Wall_IMG_6073.JPG",
       "width": 5184,
       "height": 3456,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "temple-mount-05",
+      "id": "temple-mount-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/20110225_Israel_0413_Jerusalem_%285539905325%29.jpg",
       "width": 3648,
       "height": 2736,

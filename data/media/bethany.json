@@ -2,7 +2,32 @@
   "locationId": "bethany",
   "images": [
     {
-      "id": "bethany-01",
+      "id": "bethany-ai-01",
+      "url": "media/ai/bethany-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Bethany in about AD 30–60: a small hillside village with clustered houses and nearby rock-cut tombs on the slope toward the Mount of Olives.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt bethany-ai-01",
+      "basedOn": [
+        "bib:rainey-notley-sacred-bridge",
+        "bib:custodia-bethany",
+        "bib:murphy-oconnor-holy-land-guide",
+        "bib:isbe-house",
+        "wikidata:Q7818622"
+      ]
+    },
+    {
+      "id": "bethany-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/AlEizariyaMay232023.jpg",
       "width": 4000,
       "height": 2668,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-02",
+      "id": "bethany-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Bethani%C3%AB_Ingang_van_de_grafkelder_van_Lazarus%2C_Bestanddeelnr_255-5405.jpg",
       "width": 2620,
       "height": 2616,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-03",
+      "id": "bethany-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Lazarus_Tomb_Bethany_2006_Lee.jpeg",
       "width": 3072,
       "height": 2048,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-04",
+      "id": "bethany-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Larry_Koester%2C_Facade_of_the_Church_of_St_Lazarus.jpg",
       "width": 4608,
       "height": 3072,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-05",
+      "id": "bethany-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Monastery_of_St._Martha_and_Mary_%28Bethany%29%2C_2019_%2801%29.jpg",
       "width": 4787,
       "height": 3829,
@@ -67,7 +92,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-06",
+      "id": "bethany-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Bethany_Stone_church_with_silver_dome.jpg",
       "width": 4000,
       "height": 3000,

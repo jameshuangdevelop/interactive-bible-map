@@ -2,7 +2,32 @@
   "locationId": "cana",
   "images": [
     {
-      "id": "cana-01",
+      "id": "cana-ai-01",
+      "url": "media/ai/cana-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Cana in about AD 30–60: a village courtyard with water jars, courtyards and plain domestic houses where a small wedding gathering takes place.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt cana-ai-01",
+      "basedOn": [
+        "bib:mccollough-khirbet-qana",
+        "bib:rainey-notley-sacred-bridge",
+        "bib:isbe-house",
+        "bib:isbe-agriculture",
+        "wikidata:Q17199012"
+      ]
+    },
+    {
+      "id": "cana-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/IHM_%D7%A4%D7%99%D7%A6%D7%95%D7%9C_%D7%A2%D7%9D_%D7%A9%D7%91%D7%99%D7%9C_%D7%9B%D7%97%D7%95%D7%9C_%D7%9C%D7%97%D7%95%D7%A8%D7%91%D7%AA_%D7%A7%D7%A0%D7%94_1.jpeg",
       "width": 1600,
       "height": 1200,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "cana-02",
+      "id": "cana-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Catholic_Wedding_Church_%28Kafr_Kana%29_%2802%29.jpg",
       "width": 3000,
       "height": 4000,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "cana-03",
+      "id": "cana-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/ISRAEL%2C_Cana_Galilei_%28Kafr_Kanna%29_%28Olive_garden%29.JPG",
       "width": 3648,
       "height": 2736,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "cana-04",
+      "id": "cana-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Church_of_Bartholomew_%28Kafr_Kanna%29_%2801%29.jpg",
       "width": 3000,
       "height": 4000,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "cana-05",
+      "id": "cana-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Khirbet_Qana_-_Columbarium.jpg",
       "width": 3024,
       "height": 4032,

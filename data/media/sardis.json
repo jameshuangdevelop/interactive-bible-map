@@ -2,7 +2,33 @@
   "locationId": "sardis",
   "images": [
     {
-      "id": "sardis-01",
+      "id": "sardis-ai-01",
+      "url": "media/ai/sardis-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Sardis in about AD 30–60: the acropolis above the Hermus plain with scattered terraces and ruined buildings, Mount Tmolus rising behind.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt sardis-ai-01",
+      "basedOn": [
+        "bib:strabo-geography",
+        "bib:sardis-expedition-about",
+        "bib:tacitus-annals",
+        "bib:sardis-expedition-bath-gymnasium",
+        "bib:sardis-expedition-artemis-temple",
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "id": "sardis-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/The_Temple_of_Artemis%2C_originally_built_in_300_BC%2C_renovated_by_the_Romans_in_the_2nd_century_AD%2C_Sardis%2C_Lydia_%2831790527530%29.jpg",
       "width": 4867,
       "height": 3215,
@@ -15,7 +41,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sardis-02",
+      "id": "sardis-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Sardis_citadel.jpg",
       "width": 1785,
       "height": 1196,
@@ -28,7 +54,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sardis-03",
+      "id": "sardis-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/2_%E2%80%93_Sardis%2C_Temple_of_Artemis%2C_View_from_West_toward_East._The_Cella_%2851153008057%29.jpg",
       "width": 7262,
       "height": 4847,
@@ -41,7 +67,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sardis-04",
+      "id": "sardis-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Artemis_Tap%C4%B1na%C4%9F%C4%B1_-_Sardes_Antik_Kenti.jpg",
       "width": 6000,
       "height": 4000,
@@ -54,7 +80,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sardis-05",
+      "id": "sardis-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Sardes_Antik_Kenti%2C_Manisa%2C_T%C3%BArkiya.jpg",
       "width": 3072,
       "height": 4080,
@@ -67,7 +93,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sardis-06",
+      "id": "sardis-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Gediz-Graben_10_05_1974_bei_Sardes_Erosion_Tmolos-Schutt.jpg",
       "width": 5346,
       "height": 3555,
