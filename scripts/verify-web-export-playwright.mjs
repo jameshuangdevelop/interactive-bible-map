@@ -17,6 +17,7 @@ const generatedPlacesPath = path.join(
   "generated",
   "places.index.json"
 );
+const licensesDocumentPath = path.join(repositoryRoot, "docs", "LICENSES.md");
 
 const smoothnessLongTaskLimitMs = 50;
 const syntheticPlaceIdPrefix = "synthetic-city-";
@@ -28,6 +29,12 @@ const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const requiredCapernaumPinLabels = ["Capernaum", "Chorazin", "Magdala"];
 const minimumGalileePinLabels = 8;
+const searchNoResultsSuffix = "Search covers place names only.";
+const expectedAntiochSelections = new Set(["antioch-pisidia", "antioch-syria"]);
+const fullLicenseDetailsUrl =
+  "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
+const drawerFocusableSelector =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -367,6 +374,575 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
   return {
     tabSequence,
     postEscapeFocus
+  };
+}
+
+function normalizeTextContent(value) {
+  return value.replace(/\s+/gu, " ").trim();
+}
+
+function removeLeadingMarkdownHeadingLine(markdown) {
+  const lines = markdown.replace(/\r\n/gu, "\n").trim().split("\n");
+  const firstNonEmptyIndex = lines.findIndex((line) => line.trim().length > 0);
+  if (firstNonEmptyIndex >= 0) {
+    const firstLine = lines[firstNonEmptyIndex].trim();
+    if (/^\*\*[^*]+\*\*(?:\s+\(.*\))?$/u.test(firstLine)) {
+      lines.splice(firstNonEmptyIndex, 1);
+    }
+  }
+
+  return lines.join("\n").trim();
+}
+
+function stripInlineMarkdownSyntax(text) {
+  return text
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/gu, "$1")
+    .replace(/\*\*([^*]+)\*\*/gu, "$1")
+    .replace(/`([^`]+)`/gu, "$1");
+}
+
+function stripMarkdownForTextComparison(markdown, options = {}) {
+  const body = options.stripLeadingHeadingLine
+    ? removeLeadingMarkdownHeadingLine(markdown)
+    : markdown.replace(/\r\n/gu, "\n").trim();
+
+  const lines = body.split("\n");
+  const content = lines
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => line.replace(/^- /u, ""))
+    .map((line) => stripInlineMarkdownSyntax(line));
+
+  return normalizeTextContent(content.join(" "));
+}
+
+function extractMarkdownCodeBlock(source, sectionHeading) {
+  const sectionStart = source.indexOf(sectionHeading);
+  if (sectionStart < 0) {
+    throw new Error(`Could not extract markdown block for section '${sectionHeading}'.`);
+  }
+
+  const drawerHeading = '**2. "Sources & credits" drawer:**';
+  const drawerStart = source.indexOf(drawerHeading, sectionStart);
+  if (drawerStart < 0) {
+    throw new Error(`Could not find drawer heading for section '${sectionHeading}'.`);
+  }
+
+  const fenceStart = source.indexOf("```markdown", drawerStart);
+  if (fenceStart < 0) {
+    throw new Error(`Could not find markdown fence for section '${sectionHeading}'.`);
+  }
+
+  const blockStart = source.indexOf("\n", fenceStart);
+  if (blockStart < 0) {
+    throw new Error(`Could not find markdown content start for section '${sectionHeading}'.`);
+  }
+
+  const fenceEnd = source.indexOf("```", blockStart + 1);
+  if (fenceEnd < 0) {
+    throw new Error(`Could not find markdown content end for section '${sectionHeading}'.`);
+  }
+
+  return source.slice(blockStart + 1, fenceEnd).trimEnd();
+}
+
+async function loadExpectedDrawerTextFromLicenses() {
+  const licensesDocument = await fs.readFile(licensesDocumentPath, "utf8");
+  const webNoticeMatch = licensesDocument.match(
+    /## WEB \(Bible text\) attribution wording\s*> ([^\n]+)/u
+  );
+  if (!webNoticeMatch) {
+    throw new Error("Could not find WEB notice in docs/LICENSES.md.");
+  }
+
+  const mainMapMarkdown = extractMarkdownCodeBlock(
+    licensesDocument,
+    "#### Main basemap: Liberty on OpenFreeMap"
+  );
+  const backupMapMarkdown = extractMarkdownCodeBlock(
+    licensesDocument,
+    "#### Fallback B: VersaTiles public tile server (acceptable for outages only)"
+  );
+
+  return {
+    webNoticeText: stripMarkdownForTextComparison(webNoticeMatch[1]),
+    mainMapText: stripMarkdownForTextComparison(mainMapMarkdown, {
+      stripLeadingHeadingLine: true
+    }),
+    backupMapText: stripMarkdownForTextComparison(backupMapMarkdown, {
+      stripLeadingHeadingLine: true
+    })
+  };
+}
+
+function toSeriousOrCriticalViolations(violations) {
+  return violations.filter(
+    (violation) => violation.impact === "serious" || violation.impact === "critical"
+  );
+}
+
+async function runA11yCheck(page, selector, scenarioLabel, options = {}) {
+  const axeResult = await new AxeBuilder({ page }).include(selector).analyze();
+  const requireZeroViolations = options.requireZeroViolations === true;
+  if (requireZeroViolations && axeResult.violations.length > 0) {
+    const summary = axeResult.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      nodes: violation.nodes.length
+    }));
+    throw new Error(
+      `${scenarioLabel}: found accessibility violations in '${selector}': ${JSON.stringify(summary)}`
+    );
+  }
+
+  const blockingViolations = toSeriousOrCriticalViolations(axeResult.violations);
+
+  if (blockingViolations.length > 0) {
+    const summary = blockingViolations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      nodes: violation.nodes.length
+    }));
+    throw new Error(
+      `${scenarioLabel}: found serious/critical accessibility violations in '${selector}': ${JSON.stringify(summary)}`
+    );
+  }
+
+  return {
+    selector,
+    totalViolations: axeResult.violations.length,
+    seriousOrCriticalViolations: 0
+  };
+}
+
+async function getDrawerFocusState(page) {
+  return page.evaluate((focusableSelector) => {
+    const drawer = document.querySelector("[data-testid='app-menu-drawer']");
+    if (!(drawer instanceof HTMLElement)) {
+      return {
+        missingDrawer: true
+      };
+    }
+
+    const getDescriptor = (element) =>
+      element.getAttribute("aria-label") ??
+      element.textContent?.replace(/\s+/gu, " ").trim() ??
+      element.tagName.toLowerCase();
+
+    const focusables = Array.from(drawer.querySelectorAll(focusableSelector)).filter(
+      (element) => element instanceof HTMLElement && !element.closest("[inert]")
+    );
+    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const activeIndex = activeElement ? focusables.indexOf(activeElement) : -1;
+
+    return {
+      missingDrawer: false,
+      focusableCount: focusables.length,
+      activeIndex,
+      activeInsideDrawer: Boolean(activeElement && drawer.contains(activeElement)),
+      activeDescriptor: activeElement ? getDescriptor(activeElement) : "none",
+      firstDescriptor: focusables.length > 0 ? getDescriptor(focusables[0]) : "none",
+      lastDescriptor:
+        focusables.length > 0 ? getDescriptor(focusables[focusables.length - 1]) : "none"
+    };
+  }, drawerFocusableSelector);
+}
+
+async function verifySearchMenuAndAccessibility(
+  page,
+  baseUrl,
+  screenshotPath,
+  drawerScreenshotPath,
+  expectedDrawerText
+) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable for search verification.");
+    }
+
+    window.__ibmMapIdentityForSearchTest = map;
+  }, mapTestHookKey);
+
+  await page.keyboard.press("/");
+  await page.waitForFunction(() => {
+    const active = document.activeElement;
+    return Boolean(active && active.matches("input[aria-label='Search biblical places']"));
+  });
+
+  await page.keyboard.type("Antioch");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  await page.waitForFunction(
+    () => document.querySelectorAll("[data-testid='search-results-list'] [role='option']").length >= 2,
+    { timeout: 30_000 }
+  );
+
+  const antiochResults = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+
+  if (!antiochResults.some((entry) => entry.includes("Antioch on the Orontes"))) {
+    throw new Error(
+      `Search list for Antioch is missing Antioch on the Orontes: ${JSON.stringify(antiochResults)}`
+    );
+  }
+  if (!antiochResults.some((entry) => entry.includes("Antioch in Pisidia"))) {
+    throw new Error(
+      `Search list for Antioch is missing Antioch in Pisidia: ${JSON.stringify(antiochResults)}`
+    );
+  }
+
+  await page.locator("[data-testid='search-results-list']").screenshot({
+    path: screenshotPath
+  });
+
+  const mapStableWhileTyping = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && window.__ibmMapIdentityForSearchTest === map);
+  }, mapTestHookKey);
+  if (!mapStableWhileTyping) {
+    throw new Error("Map instance changed while typing in search.");
+  }
+
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("section[aria-label='Place details']", {
+    state: "visible",
+    timeout: 30_000
+  });
+
+  const selectionAfterEnter = await page.evaluate(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("place");
+  });
+  if (!selectionAfterEnter || !expectedAntiochSelections.has(selectionAfterEnter)) {
+    throw new Error(
+      `Search keyboard Enter did not select an Antioch result. place='${selectionAfterEnter ?? "null"}'.`
+    );
+  }
+
+  const searchInput = page.locator("input[aria-label='Search biblical places']");
+  await searchInput.focus();
+  await searchInput.fill("John 3:16");
+  await page.waitForSelector("[data-testid='search-no-results']", { timeout: 30_000 });
+  const noResultsText = await page.$eval(
+    "[data-testid='search-no-results']",
+    (element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim()
+  );
+  if (!noResultsText.includes("No places match 'John 3:16'.")) {
+    throw new Error(`No-results state is missing the query line: '${noResultsText}'.`);
+  }
+  if (!noResultsText.includes(searchNoResultsSuffix)) {
+    throw new Error(`No-results state is missing the suffix '${searchNoResultsSuffix}'.`);
+  }
+
+  await page.keyboard.press("Escape");
+  const panelStillOpen = await page.locator("section[aria-label='Place details']").isVisible();
+  if (!panelStillOpen) {
+    throw new Error(
+      "First Escape from open search results closed the panel; it should clear search first."
+    );
+  }
+
+  const queryAfterFirstEscape = await searchInput.inputValue();
+  if (queryAfterFirstEscape.length !== 0) {
+    throw new Error(`First Escape should clear the search query, found '${queryAfterFirstEscape}'.`);
+  }
+
+  const visibleSearchPanelsAfterFirstEscape = await page.locator(
+    "[data-testid='search-results-list'], [data-testid='search-no-results']"
+  ).count();
+  if (visibleSearchPanelsAfterFirstEscape > 0) {
+    throw new Error("Search result panel remained open after first Escape.");
+  }
+
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("section[aria-label='Place details']", {
+    state: "detached",
+    timeout: 30_000
+  });
+
+  await searchInput.focus();
+  await searchInput.fill("Judah");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  const judahResults = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  if (!judahResults.some((entry) => entry.includes("Judea"))) {
+    throw new Error(`'Judah' search should include Judea, got ${JSON.stringify(judahResults)}.`);
+  }
+
+  await searchInput.fill("Greece");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  const greeceResults = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  if (!greeceResults.some((entry) => entry.includes("Achaia"))) {
+    throw new Error(`'Greece' search should include Achaia, got ${JSON.stringify(greeceResults)}.`);
+  }
+
+  await searchInput.fill("Egypt");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  const egyptResults = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  if (!egyptResults.some((entry) => entry.includes("Egypt"))) {
+    throw new Error(`'Egypt' search should include Egypt, got ${JSON.stringify(egyptResults)}.`);
+  }
+
+  await searchInput.fill("Parthian");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  const parthianResults = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  if (!parthianResults.some((entry) => entry.includes("Parthian Empire"))) {
+    throw new Error(
+      `'Parthian' search should include Parthian Empire, got ${JSON.stringify(parthianResults)}.`
+    );
+  }
+
+  await searchInput.fill("Antioch");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+
+  const comboboxA11y = await runA11yCheck(
+    page,
+    "[data-testid='search-shell']",
+    "Search combobox accessibility"
+  );
+
+  await page.click("button[aria-label='Open app menu']");
+  await page.waitForSelector("[data-testid='app-menu-drawer']", { timeout: 30_000 });
+  await page.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Close app menu",
+    undefined,
+    { timeout: 30_000 }
+  );
+  await page.getByRole("button", { name: "About this map" }).waitFor({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Sources & credits" }).waitFor({ timeout: 30_000 });
+  const reportIssueLink = page.getByRole("link", { name: "Report an issue" });
+  const viewOnGitHubLink = page.getByRole("link", { name: "View on GitHub" });
+  await reportIssueLink.waitFor({ timeout: 30_000 });
+  await viewOnGitHubLink.waitFor({ timeout: 30_000 });
+
+  const inertBackgroundState = await page.evaluate(() => {
+    const root = document.querySelector("[data-app-shell-root]");
+    const drawer = document.querySelector("[data-testid='app-menu-drawer']");
+    if (!(root instanceof HTMLElement) || !(drawer instanceof HTMLElement)) {
+      return {
+        hasRoot: root instanceof HTMLElement,
+        hasDrawer: drawer instanceof HTMLElement,
+        backgroundCount: 0,
+        inertCount: 0,
+        ariaHiddenCount: 0
+      };
+    }
+
+    const backgroundElements = Array.from(root.children).filter(
+      (child) => child instanceof HTMLElement && !child.contains(drawer)
+    );
+    const inertCount = backgroundElements.filter((element) => element.hasAttribute("inert")).length;
+    const ariaHiddenCount = backgroundElements.filter(
+      (element) => element.getAttribute("aria-hidden") === "true"
+    ).length;
+
+    return {
+      hasRoot: true,
+      hasDrawer: true,
+      backgroundCount: backgroundElements.length,
+      inertCount,
+      ariaHiddenCount
+    };
+  });
+
+  if (!inertBackgroundState.hasRoot || !inertBackgroundState.hasDrawer) {
+    throw new Error("Menu drawer test could not locate app-shell root and/or drawer.");
+  }
+  if (inertBackgroundState.backgroundCount === 0) {
+    throw new Error("Menu drawer inert test found no background elements.");
+  }
+  if (inertBackgroundState.inertCount !== inertBackgroundState.backgroundCount) {
+    throw new Error(
+      `Expected all background elements to be inert. state=${JSON.stringify(inertBackgroundState)}`
+    );
+  }
+  if (inertBackgroundState.ariaHiddenCount !== inertBackgroundState.backgroundCount) {
+    throw new Error(
+      `Expected all background elements to be aria-hidden while drawer is open. state=${JSON.stringify(inertBackgroundState)}`
+    );
+  }
+
+  await page.keyboard.press("Shift+Tab");
+  const shiftedFocusState = await getDrawerFocusState(page);
+  if (shiftedFocusState.missingDrawer) {
+    throw new Error("Menu drawer focus trap test could not locate drawer.");
+  }
+  if (!shiftedFocusState.activeInsideDrawer) {
+    throw new Error("Shift+Tab moved focus outside the drawer.");
+  }
+  if (shiftedFocusState.activeIndex !== shiftedFocusState.focusableCount - 1) {
+    throw new Error(
+      `Shift+Tab did not wrap to the last focusable drawer element. state=${JSON.stringify(shiftedFocusState)}`
+    );
+  }
+
+  await page.keyboard.press("Tab");
+  const wrappedFocusState = await getDrawerFocusState(page);
+  if (wrappedFocusState.missingDrawer) {
+    throw new Error("Menu drawer focus trap test could not locate drawer after Tab.");
+  }
+  if (!wrappedFocusState.activeInsideDrawer) {
+    throw new Error("Tab moved focus outside the drawer.");
+  }
+  if (wrappedFocusState.activeIndex !== 0) {
+    throw new Error(
+      `Tab did not wrap back to the first focusable drawer element. state=${JSON.stringify(wrappedFocusState)}`
+    );
+  }
+
+  await page.getByRole("heading", { name: "Map", exact: true }).waitFor({ timeout: 30_000 });
+  await page
+    .getByRole("heading", {
+      name: "Backup map (shown only when the main map can't load)",
+      exact: true
+    })
+    .waitFor({ timeout: 30_000 });
+  await page
+    .getByRole("heading", {
+      name: "Data sources",
+      exact: true
+    })
+    .waitFor({ timeout: 30_000 });
+
+  const drawerText = normalizeTextContent(
+    await page.$eval("[data-testid='app-menu-drawer']", (element) => element.textContent ?? "")
+  );
+  if (drawerText.includes("**Basemap**") || drawerText.includes("[OpenStreetMap](")) {
+    throw new Error("Sources drawer still shows raw Markdown syntax.");
+  }
+
+  const dataLicenseHref = await page
+    .getByRole("link", { name: "full license details" })
+    .getAttribute("href");
+  if (dataLicenseHref !== fullLicenseDetailsUrl) {
+    throw new Error(
+      `Data-license details link mismatch: expected '${fullLicenseDetailsUrl}', got '${dataLicenseHref ?? "null"}'.`
+    );
+  }
+
+  const navEntryTexts = await page.$$eval(
+    "nav[aria-label='Menu entries'] button, nav[aria-label='Menu entries'] a",
+    (elements) => elements.map((element) => (element.textContent ?? "").trim())
+  );
+  if (navEntryTexts.some((text) => text.includes("[") || text.includes("**"))) {
+    throw new Error(`Menu entries contain raw Markdown: ${JSON.stringify(navEntryTexts)}`);
+  }
+
+  const mapMarkdownRenderedText = normalizeTextContent(
+    await page.$eval("[data-testid='credits-map-markdown']", (element) => {
+      const blockTexts = Array.from(element.querySelectorAll("p, li")).map(
+        (block) => block.textContent ?? ""
+      );
+      return blockTexts.join(" ");
+    })
+  );
+  const backupMapMarkdownRenderedText = normalizeTextContent(
+    await page.$eval("[data-testid='credits-backup-map-markdown']", (element) => {
+      const blockTexts = Array.from(element.querySelectorAll("p, li")).map(
+        (block) => block.textContent ?? ""
+      );
+      return blockTexts.join(" ");
+    })
+  );
+  const webNoticeRenderedText = normalizeTextContent(
+    await page.$eval("[data-testid='credits-web-notice']", (element) => element.textContent ?? "")
+  );
+
+  if (mapMarkdownRenderedText !== expectedDrawerText.mainMapText) {
+    throw new Error(
+      `Map credits text mismatch.\nExpected: ${expectedDrawerText.mainMapText}\nReceived: ${mapMarkdownRenderedText}`
+    );
+  }
+  if (backupMapMarkdownRenderedText !== expectedDrawerText.backupMapText) {
+    throw new Error(
+      `Backup map credits text mismatch.\nExpected: ${expectedDrawerText.backupMapText}\nReceived: ${backupMapMarkdownRenderedText}`
+    );
+  }
+  if (webNoticeRenderedText !== expectedDrawerText.webNoticeText) {
+    throw new Error(
+      `WEB notice text mismatch.\nExpected: ${expectedDrawerText.webNoticeText}\nReceived: ${webNoticeRenderedText}`
+    );
+  }
+
+  await page.locator("[data-testid='app-menu-drawer']").screenshot({
+    path: drawerScreenshotPath
+  });
+
+  const reportIssueRel = await reportIssueLink.getAttribute("rel");
+  const viewOnGitHubRel = await viewOnGitHubLink.getAttribute("rel");
+  if (reportIssueRel !== "noopener noreferrer" || viewOnGitHubRel !== "noopener noreferrer") {
+    throw new Error(
+      `External links in menu entries must use rel='noopener noreferrer'. Report='${reportIssueRel}', View='${viewOnGitHubRel}'.`
+    );
+  }
+
+  const drawerA11y = await runA11yCheck(
+    page,
+    "[data-testid='app-menu-drawer']",
+    "Menu drawer accessibility",
+    {
+      requireZeroViolations: true
+    }
+  );
+
+  await page.keyboard.press("Escape");
+  await page.waitForSelector("[data-testid='app-menu-drawer']", {
+    state: "detached",
+    timeout: 30_000
+  });
+  await page.waitForFunction(
+    () => document.activeElement?.matches("button[aria-label='Open app menu']"),
+    undefined,
+    { timeout: 30_000 }
+  );
+  const inertAfterClose = await page
+    .locator("[data-testid='search-shell']")
+    .getAttribute("inert");
+  if (inertAfterClose !== null) {
+    throw new Error("Search shell remained inert after the menu drawer closed.");
+  }
+
+  return {
+    antiochResults,
+    judahResults,
+    greeceResults,
+    egyptResults,
+    parthianResults,
+    selectedAntiochPlaceId: selectionAfterEnter,
+    noResultsText,
+    mapStableWhileTyping,
+    drawerScreenshotPath,
+    renderedDrawerText: {
+      webNotice: webNoticeRenderedText,
+      map: mapMarkdownRenderedText,
+      backupMap: backupMapMarkdownRenderedText
+    },
+    accessibility: {
+      comboboxOpen: comboboxA11y,
+      menuDrawerOpen: drawerA11y
+    }
   };
 }
 
@@ -2947,7 +3523,10 @@ async function runPanelOpenSmoothnessCheck({
 async function run() {
   const staticServer = await startStaticServer(distDirectory);
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
 
   const pageErrors = [];
   const consoleErrors = [];
@@ -2987,6 +3566,8 @@ async function run() {
 
   const screenshotPaths = {
     overview: temporaryScreenshotPath("ibm-m3-04-overview.png"),
+    searchResults: temporaryScreenshotPath("ibm-m3-05-search-results.png"),
+    creditsDrawer: temporaryScreenshotPath("ibm-m3-05-credits-drawer.png"),
     capernaum: temporaryScreenshotPath("ibm-m3-04-capernaum.png"),
     galilee: temporaryScreenshotPath("ibm-m3-04-galilee.png"),
     emmaus: temporaryScreenshotPath("ibm-m3-04-emmaus.png"),
@@ -3001,6 +3582,8 @@ async function run() {
   };
 
   try {
+    const expectedDrawerText = await loadExpectedDrawerTextFromLicenses();
+
     const normalLoadMainBasemapChecks = [
       await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/"),
       await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/?place=galilee")
@@ -3097,6 +3680,13 @@ async function run() {
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
       page,
       staticServer.baseUrl
+    );
+    const searchAndMenuChecks = await verifySearchMenuAndAccessibility(
+      page,
+      staticServer.baseUrl,
+      screenshotPaths.searchResults,
+      screenshotPaths.creditsDrawer,
+      expectedDrawerText
     );
     const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
       page,
@@ -3221,6 +3811,7 @@ async function run() {
       overviewSearchBoxLabelOverlap,
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
+      searchAndMenuChecks,
       keyboardDisclosureChecks,
       copyLinkCheck,
       placeDetailsRaceCheck,
@@ -3255,6 +3846,7 @@ async function run() {
     }
   } finally {
     await page.close();
+    await context.close();
     await browser.close();
     await staticServer.close();
   }

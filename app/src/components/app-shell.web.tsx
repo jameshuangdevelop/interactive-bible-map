@@ -9,6 +9,7 @@ import {
   type CSSProperties
 } from "react";
 
+import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { applySelectionToSearch, parseSelectionFromSearch } from "../features/map/selection-url";
 import type {
@@ -18,7 +19,6 @@ import type {
 } from "../features/map/types";
 import { tokens } from "../theme/tokens";
 
-const SEARCH_DESKTOP_WIDTH = 400;
 const PANEL_WIDTH = 408;
 const SEARCH_TOP_OFFSET = tokens.spacing.md;
 const SEARCH_HEIGHT = 48;
@@ -450,7 +450,14 @@ export function AppShell() {
     : false;
   const selectedPlaceLoadError = selectedPlace ? placeDetailsErrorsById[selectedPlace.id] ?? null : null;
   const panelWidthForMap = selectedPlace && !isSmallScreen ? PANEL_WIDTH : 0;
-  const searchWidth = isSmallScreen ? "calc(100vw - 32px)" : `${SEARCH_DESKTOP_WIDTH}px`;
+
+  const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
+    setStatusMessage(null);
+    setIsSmallScreenPanelExpanded(false);
+    lastSelectionActivatorEntryIdRef.current = null;
+    setSelection(nextSelection);
+  }, []);
+
   const panelStyle: CSSProperties | null = selectedPlace
     ? isSmallScreen
       ? {
@@ -487,6 +494,7 @@ export function AppShell() {
 
   return (
     <div
+      data-app-shell-root
       style={{
         position: "relative",
         width: "100vw",
@@ -496,56 +504,11 @@ export function AppShell() {
         fontFamily: tokens.typography.uiFont
       }}
     >
-      <div
-        data-map-search-shell="true"
-        style={{
-          position: "absolute",
-          top: `${SEARCH_TOP_OFFSET}px`,
-          left: `${tokens.spacing.md}px`,
-          width: searchWidth,
-          maxWidth: "calc(100vw - 32px)",
-          height: `${SEARCH_HEIGHT}px`,
-          borderRadius: "999px",
-          border: `1px solid ${tokens.color.divider}`,
-          backgroundColor: tokens.color.surface,
-          display: "flex",
-          alignItems: "center",
-          gap: `${tokens.spacing.sm}px`,
-          paddingInline: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
-          boxShadow: "0 1px 2px rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15)",
-          zIndex: 30
-        }}
-      >
-        <button
-          aria-label="Open app menu"
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "20px",
-            border: `1px solid ${tokens.color.divider}`,
-            backgroundColor: tokens.color.surface,
-            color: tokens.color.textPrimary,
-            cursor: "pointer"
-          }}
-          type="button"
-        >
-          ☰
-        </button>
-        <input
-          aria-label="Search biblical places"
-          placeholder="Search biblical places"
-          readOnly
-          ref={searchInputRef}
-          style={{
-            border: "none",
-            flex: 1,
-            color: tokens.color.textSecondary,
-            backgroundColor: "transparent",
-            fontFamily: tokens.typography.uiFont,
-            fontSize: `${tokens.typography.bodySize}px`
-          }}
-        />
-      </div>
+      <SearchMenu
+        inputRef={searchInputRef}
+        onSelectPlace={handleSearchSelection}
+        places={places}
+      />
 
       {loading ? (
         <MapLoadingPlaceholder />
