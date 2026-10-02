@@ -31,7 +31,7 @@ describe("map layer layouts", () => {
       "icon-ignore-placement": false
     });
     expect(PIN_COLLISION_IMAGE_SIZE).toBe(20);
-    expect(CLUSTER_COLLISION_IMAGE_SIZE).toBe(44);
+    expect(CLUSTER_COLLISION_IMAGE_SIZE).toBe(64);
   });
 
   test("offsets area labels from pin coordinates with variable anchors", () => {

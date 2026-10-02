@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -369,6 +370,888 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
   };
 }
 
+async function verifyKeyboardDisclosureControls(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const candidateToggle = page
+    .locator("section[aria-label='Place details'] button[data-candidate-support-toggle='true']")
+    .first();
+  await candidateToggle.waitFor({ state: "visible", timeout: 30_000 });
+  await candidateToggle.focus();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
+    );
+    return button instanceof HTMLButtonElement && button.getAttribute("aria-expanded") === "true";
+  });
+  const emmausExpanded = await candidateToggle.getAttribute("aria-expanded");
+  const candidateSupportControlId = await candidateToggle.getAttribute("aria-controls");
+
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
+    );
+    return button instanceof HTMLButtonElement && button.getAttribute("aria-expanded") === "false";
+  });
+  const emmausCollapsed = await candidateToggle.getAttribute("aria-expanded");
+
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const showAllButton = page.locator(
+    "section[aria-label='Place details'] [data-show-all-passages='true']"
+  );
+  await showAllButton.first().waitFor({ state: "visible", timeout: 30_000 });
+  await showAllButton.first().focus();
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] [data-show-all-passages='true']"
+    );
+    if (!(button instanceof HTMLButtonElement)) {
+      return false;
+    }
+    if (button.getAttribute("aria-expanded") !== "true") {
+      return false;
+    }
+    const section = document.querySelector(
+      "section[aria-label='Place details'] [data-panel-section='in-bible']"
+    );
+    return Boolean(section && section.querySelectorAll("article").length > 5);
+  }, undefined, { timeout: 120_000, polling: 250 });
+  const jerusalemExpanded = await showAllButton.first().getAttribute("aria-expanded");
+  const jerusalemControlId = await showAllButton.first().getAttribute("aria-controls");
+
+  return {
+    emmaus: {
+      controlId: candidateSupportControlId,
+      expandedAfterEnter: emmausExpanded,
+      collapsedAfterSpace: emmausCollapsed
+    },
+    jerusalem: {
+      controlId: jerusalemControlId,
+      expandedAfterEnter: jerusalemExpanded
+    }
+  };
+}
+
+async function verifyCandidateSelectionUpdatesUrl(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const candidateButtons = page.locator(
+    "section[aria-label='Place details'] button[aria-label^='Candidate ']"
+  );
+  const candidateButtonCount = await candidateButtons.count();
+  if (candidateButtonCount < 2) {
+    throw new Error(
+      `Candidate-selection URL check expected at least 2 candidate buttons, got ${candidateButtonCount}.`
+    );
+  }
+
+  await candidateButtons.nth(1).click();
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "emmaus" && parameters.get("candidate") === "b";
+  }, undefined, { timeout: 30_000, polling: 100 });
+
+  return {
+    search: await page.evaluate(() => window.location.search)
+  };
+}
+
+async function verifyCopyLinkAction(browser, baseUrl) {
+  const clipboardContext = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const clipboardPage = await clipboardContext.newPage();
+
+  try {
+    await clipboardPage.goto(`${baseUrl}/?place=capernaum`, {
+      waitUntil: "networkidle",
+      timeout: 60_000
+    });
+    await waitForMapToSettle(clipboardPage);
+    await clipboardPage.evaluate(() => {
+      window.__copiedViaClipboard = [];
+      const captureWriteText = async (value) => {
+        window.__copiedViaClipboard.push(String(value));
+      };
+
+      if (navigator.clipboard && typeof navigator.clipboard === "object") {
+        try {
+          navigator.clipboard.writeText = captureWriteText;
+          return;
+        } catch {
+          // fall through to defineProperty path
+        }
+      }
+
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: captureWriteText
+        }
+      });
+    });
+
+    await clipboardPage.getByRole("button", { name: "Copy link" }).click();
+    await clipboardPage.getByText("Link copied", { exact: true }).waitFor({ timeout: 10_000 });
+
+    const clipboardResult = await clipboardPage.evaluate(() => ({
+      copiedText: window.__copiedViaClipboard[0] ?? null,
+      href: window.location.href
+    }));
+
+    if (clipboardResult.copiedText !== clipboardResult.href) {
+      throw new Error(
+        `Copy-link clipboard path mismatch: copied='${clipboardResult.copiedText}', href='${clipboardResult.href}'.`
+      );
+    }
+
+    const fallbackContext = await browser.newContext({
+      viewport: { width: 1440, height: 960 }
+    });
+    const fallbackPage = await fallbackContext.newPage();
+
+    try {
+      await fallbackPage.goto(`${baseUrl}/?place=capernaum`, {
+        waitUntil: "networkidle",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(fallbackPage);
+      await fallbackPage.evaluate(() => {
+        window.__copiedViaFallback = [];
+
+        if (navigator.clipboard && typeof navigator.clipboard === "object") {
+          try {
+            navigator.clipboard.writeText = undefined;
+          } catch {
+            // Continue and try defineProperty fallback below.
+          }
+        }
+
+        try {
+          Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
+        } catch {
+          // writeText override above is enough to force fallback when clipboard exists.
+        }
+
+        const originalExecCommand = document.execCommand.bind(document);
+        document.execCommand = (commandId) => {
+          if (commandId === "copy") {
+            const textarea = document.querySelector("textarea");
+            window.__copiedViaFallback.push(
+              textarea instanceof HTMLTextAreaElement ? textarea.value : null
+            );
+            return true;
+          }
+          return originalExecCommand(commandId);
+        };
+      });
+
+      await fallbackPage.getByRole("button", { name: "Copy link" }).click();
+      await fallbackPage.getByText("Link copied", { exact: true }).waitFor({ timeout: 10_000 });
+
+      const fallbackResult = await fallbackPage.evaluate(() => ({
+        copiedText: window.__copiedViaFallback[0] ?? null,
+        fallbackCallCount: window.__copiedViaFallback.length,
+        href: window.location.href
+      }));
+      if (fallbackResult.fallbackCallCount === 0) {
+        throw new Error("Copy-link fallback path was vacuous: document.execCommand('copy') was not called.");
+      }
+
+      if (fallbackResult.copiedText !== fallbackResult.href) {
+        throw new Error(
+          `Copy-link fallback path mismatch: copied='${fallbackResult.copiedText}', href='${fallbackResult.href}'.`
+        );
+      }
+
+      return {
+        clipboardResult,
+        fallbackResult
+      };
+    } finally {
+      await fallbackPage.close();
+      await fallbackContext.close();
+    }
+  } finally {
+    if (!clipboardPage.isClosed()) {
+      await clipboardPage.close();
+    }
+    await clipboardContext.close();
+  }
+}
+
+async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  let capernaumRequestCount = 0;
+  let emmausRequestCount = 0;
+
+  await page.route("**/generated/places/*.json", async (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.endsWith("/generated/places/capernaum.json")) {
+      capernaumRequestCount += 1;
+      if (capernaumRequestCount === 1) {
+        await new Promise((resolve) => setTimeout(resolve, 900));
+      }
+    } else if (requestUrl.endsWith("/generated/places/emmaus.json")) {
+      emmausRequestCount += 1;
+    }
+    await route.continue();
+  });
+
+  try {
+    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+
+    await page.evaluate(() => {
+      const applySearch = (search) => {
+        window.history.pushState({}, "", `${window.location.pathname}${search}${window.location.hash}`);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      };
+
+      applySearch("?place=capernaum");
+      window.setTimeout(() => applySearch("?place=emmaus"), 40);
+      window.setTimeout(() => applySearch("?place=capernaum"), 80);
+    });
+
+    await page.waitForSelector("section[aria-label='Place details']", {
+      state: "visible",
+      timeout: 30_000
+    });
+    await page.waitForFunction(() => {
+      const heading = document.querySelector("section[aria-label='Place details'] h1");
+      return heading?.textContent?.trim() === "Capernaum";
+    }, undefined, { timeout: 30_000, polling: 100 });
+    await page.waitForSelector(
+      "section[aria-label='Place details'] [data-panel-section='about']",
+      { timeout: 30_000 }
+    );
+
+    const stillLoading = await page
+      .locator("section[aria-label='Place details'] [data-place-panel-skeleton='true']")
+      .count();
+    if (stillLoading > 0) {
+      throw new Error("Place-details race recovery failed: panel is still stuck on loading skeleton.");
+    }
+
+    return {
+      capernaumRequestCount,
+      emmausRequestCount
+    };
+  } finally {
+    await page.unroute("**/generated/places/*.json");
+    await page.close();
+    await context.close();
+  }
+}
+
+async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='about']", {
+    timeout: 30_000
+  });
+
+  const sectionIds = await page.$$eval(
+    "section[aria-label='Place details'] [data-panel-section]",
+    (elements) => elements.map((element) => element.getAttribute("data-panel-section") ?? "")
+  );
+  const canonicalOrder = [
+    "photos",
+    "names",
+    "candidates",
+    "actions",
+    "about",
+    "in-bible",
+    "ot-connections",
+    "places-in",
+    "sources",
+    "footer"
+  ];
+  const canonicalIndex = new Map(canonicalOrder.map((entry, index) => [entry, index]));
+  let last = -1;
+  for (const sectionId of sectionIds) {
+    const currentIndex = canonicalIndex.get(sectionId);
+    if (typeof currentIndex !== "number") {
+      throw new Error(`Unknown panel section '${sectionId}' in rendered panel order.`);
+    }
+    if (currentIndex < last) {
+      throw new Error(`Panel sections are out of order: ${sectionIds.join(" -> ")}`);
+    }
+    last = currentIndex;
+  }
+
+  const firstCreditText =
+    (await page.locator("section[aria-label='Place details'] [data-photo-credit='true']").textContent()) ??
+    "";
+  if (!firstCreditText.includes("Photo:") || !firstCreditText.includes("Wikimedia Commons")) {
+    throw new Error(`Missing required photo credit text on lead image: '${firstCreditText.trim()}'`);
+  }
+
+  const nextPhoto = page.locator("button[aria-label='Next photo']");
+  const hasCarousel = (await nextPhoto.count()) > 0;
+  let secondCreditText = null;
+  if (hasCarousel) {
+    await nextPhoto.first().click();
+    await page.waitForTimeout(200);
+    secondCreditText =
+      (await page
+        .locator("section[aria-label='Place details'] [data-photo-credit='true']")
+        .textContent()) ?? "";
+    if (
+      !secondCreditText.includes("Photo:") ||
+      !secondCreditText.includes("Wikimedia Commons")
+    ) {
+      throw new Error(
+        `Photo credit did not render after switching images: '${secondCreditText.trim()}'`
+      );
+    }
+  }
+
+  return {
+    sectionIds,
+    hasCarousel,
+    firstCreditText: firstCreditText.trim(),
+    secondCreditText: secondCreditText?.trim() ?? null
+  };
+}
+
+async function verifyCapernaumLeadImageLoads(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+    timeout: 30_000
+  });
+  await page.waitForFunction(() => {
+    const image = document.querySelector("[data-panel-photo-image='true']");
+    return (
+      image instanceof HTMLImageElement &&
+      image.complete &&
+      image.naturalWidth > 0 &&
+      image.naturalHeight > 0
+    );
+  });
+
+  const imageState = await page.$eval("[data-panel-photo-image='true']", (element) => {
+    if (!(element instanceof HTMLImageElement)) {
+      throw new Error("Lead photo element is not an image.");
+    }
+
+    return {
+      src: element.getAttribute("src") ?? "",
+      currentSrc: element.currentSrc,
+      naturalWidth: element.naturalWidth,
+      naturalHeight: element.naturalHeight
+    };
+  });
+
+  if (!/(?:^|\/)(?:330|500|960|1280)px-[^/]+$/u.test(new URL(imageState.currentSrc).pathname)) {
+    throw new Error(
+      `Lead photo did not use an allow-listed Commons thumbnail width: '${imageState.currentSrc}'.`
+    );
+  }
+
+  return imageState;
+}
+
+async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  let blockedImageCount = 0;
+
+  await page.route("**/*", (route) => {
+    const requestUrl = route.request().url();
+    if (
+      requestUrl.includes("upload.wikimedia.org/wikipedia/commons") &&
+      /\.(?:jpg|jpeg|png|webp)(?:\?|$)/iu.test(requestUrl)
+    ) {
+      blockedImageCount += 1;
+      route.abort("failed");
+      return;
+    }
+
+    route.continue();
+  });
+
+  try {
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForSelector("section[aria-label='Place details']", {
+      state: "visible",
+      timeout: 30_000
+    });
+    await page.waitForSelector("section[aria-label='Place details'] [data-photo-credit='true']", {
+      timeout: 30_000
+    });
+    await page.waitForSelector("section[aria-label='Place details'] >> text=Image unavailable", {
+      timeout: 30_000
+    });
+
+    const creditText =
+      (await page
+        .locator("section[aria-label='Place details'] [data-photo-credit='true']")
+        .textContent()) ?? "";
+    if (!creditText.includes("Photo:") || !creditText.includes("Wikimedia Commons")) {
+      throw new Error(
+        `Photo credit must remain visible when images fail to load, got '${creditText.trim()}'.`
+      );
+    }
+    if (blockedImageCount === 0) {
+      throw new Error("Image-failure placeholder check was vacuous: no Commons images were blocked.");
+    }
+
+    return {
+      blockedImageCount,
+      creditText: creditText.trim()
+    };
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+    await context.close();
+  }
+}
+
+async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector("section[aria-label='Place details'] [data-disputed-banner='true']", {
+    timeout: 30_000
+  });
+
+  const disputedBanner =
+    (await page
+      .locator("section[aria-label='Place details'] [data-disputed-banner='true']")
+      .textContent()) ?? "";
+  if (!disputedBanner.includes("Location disputed") || !disputedBanner.includes("4 proposed sites")) {
+    throw new Error(`Disputed-place banner mismatch: '${disputedBanner.trim()}'`);
+  }
+
+  const modernNameLineCount = await page
+    .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
+    .count();
+  if (modernNameLineCount !== 0) {
+    throw new Error("Disputed places must not render a modern-name line.");
+  }
+
+  const candidateCount = await page
+    .locator("section[aria-label='Place details'] button[aria-label^='Candidate ']")
+    .count();
+  if (candidateCount !== 4) {
+    throw new Error(`Expected 4 Emmaus candidate entries, got ${candidateCount}.`);
+  }
+
+  await page.goto(`${baseUrl}/?place=jericho`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const jerichoNamesText =
+    (await page
+      .locator("section[aria-label='Place details'] [data-panel-section='names']")
+      .textContent()) ?? "";
+  if (!jerichoNamesText.includes("2 sites")) {
+    throw new Error(`Jericho should render the neutral multi-site line, got '${jerichoNamesText.trim()}'.`);
+  }
+  const jerichoDisputedBannerCount = await page
+    .locator("section[aria-label='Place details'] [data-disputed-banner='true']")
+    .count();
+  if (jerichoDisputedBannerCount > 0) {
+    throw new Error("Jericho should not render a disputed banner.");
+  }
+
+  await page.goto(`${baseUrl}/?place=italy`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const italyNamesText =
+    (await page
+      .locator("section[aria-label='Place details'] [data-panel-section='names']")
+      .textContent()) ?? "";
+  if (!italyNamesText.includes("Governed directly from Rome · Roman Empire")) {
+    throw new Error(
+      `Italy hierarchy line must use the Rome-governance exception, got '${italyNamesText.trim()}'.`
+    );
+  }
+
+  await page.goto(`${baseUrl}/?place=roman-empire`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const empireNamesText =
+    (await page
+      .locator("section[aria-label='Place details'] [data-panel-section='names']")
+      .textContent()) ?? "";
+  if (!empireNamesText.includes("Empire")) {
+    throw new Error(`Empire record must render the 'Empire' hierarchy line, got '${empireNamesText.trim()}'.`);
+  }
+
+  await page.goto(`${baseUrl}/?place=achaia`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const achaiaNamesText =
+    (await page
+      .locator("section[aria-label='Place details'] [data-panel-section='names']")
+      .textContent()) ?? "";
+  if (!achaiaNamesText.includes("Province · Roman Empire")) {
+    throw new Error(`Achaia hierarchy line mismatch: '${achaiaNamesText.trim()}'.`);
+  }
+
+  return {
+    disputedBanner: disputedBanner.trim(),
+    candidateCount,
+    jerichoNamesText: jerichoNamesText.trim(),
+    italyNamesText: italyNamesText.trim(),
+    empireNamesText: empireNamesText.trim(),
+    achaiaNamesText: achaiaNamesText.trim()
+  };
+}
+
+async function verifyShowAllPassages(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='in-bible']", {
+    timeout: 30_000
+  });
+
+  const headingText =
+    (await page
+      .locator("section[aria-label='Place details'] [data-panel-section='in-bible'] h2")
+      .textContent()) ?? "";
+  const match = /In the Bible · (?<count>[0-9]+) passages/u.exec(headingText);
+  const totalPassages = match?.groups?.count ? Number.parseInt(match.groups.count, 10) : 0;
+  if (!Number.isFinite(totalPassages) || totalPassages < 5) {
+    throw new Error(`Could not parse Jerusalem passage count from heading: '${headingText.trim()}'.`);
+  }
+
+  const scriptureArticleLocator = page.locator(
+    "section[aria-label='Place details'] [data-panel-section='in-bible'] article"
+  );
+  const initialCount = await scriptureArticleLocator.count();
+  if (initialCount !== 5) {
+    throw new Error(`Expected 5 passages before expansion, got ${initialCount}.`);
+  }
+
+  await page
+    .locator("section[aria-label='Place details'] [data-show-all-passages='true']")
+    .click();
+
+  await page.waitForFunction(
+    ({ expectedCount }) => {
+      const section = document.querySelector(
+        "section[aria-label='Place details'] [data-panel-section='in-bible']"
+      );
+      if (!section) {
+        return false;
+      }
+      const renderedCount = section.querySelectorAll("article").length;
+      const showAllButton = section.querySelector("[data-show-all-passages='true']");
+      return (
+        renderedCount >= expectedCount &&
+        showAllButton instanceof HTMLButtonElement &&
+        showAllButton.getAttribute("aria-expanded") === "true"
+      );
+    },
+    { expectedCount: totalPassages },
+    { timeout: 120_000, polling: 250 }
+  );
+
+  const finalCount = await scriptureArticleLocator.count();
+  if (finalCount < totalPassages) {
+    throw new Error(
+      `Expected all passages after expansion (${totalPassages}), got ${finalCount}.`
+    );
+  }
+
+  return {
+    totalPassages,
+    initialCount,
+    finalCount
+  };
+}
+
+async function verifyPanelAccessibility(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+
+  try {
+    const runScenarioAnalysis = async ({
+      name,
+      pathWithQuery,
+      beforeAnalyze
+    }) => {
+      await page.goto(`${baseUrl}${pathWithQuery}`, {
+        waitUntil: "networkidle",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(page);
+      await page.waitForSelector(
+        "section[aria-label='Place details'] [data-panel-section='about']",
+        {
+          timeout: 30_000
+        }
+      );
+
+      if (beforeAnalyze) {
+        await beforeAnalyze();
+      }
+
+      const analysis = await new AxeBuilder({ page })
+        .include("section[aria-label='Place details']")
+        .analyze();
+      const seriousOrCritical = analysis.violations.filter(
+        (violation) => violation.impact === "serious" || violation.impact === "critical"
+      );
+
+      return {
+        name,
+        violationCount: analysis.violations.length,
+        seriousOrCriticalCount: seriousOrCritical.length,
+        seriousOrCriticalSummary: seriousOrCritical.map((violation) => ({
+          id: violation.id,
+          impact: violation.impact,
+          nodes: violation.nodes.length
+        }))
+      };
+    };
+
+    const scenarios = [];
+    scenarios.push(
+      await runScenarioAnalysis({
+        name: "capernaum-default",
+        pathWithQuery: "/?place=capernaum"
+      })
+    );
+    scenarios.push(
+      await runScenarioAnalysis({
+        name: "emmaus-disputed-candidates-expanded",
+        pathWithQuery: "/?place=emmaus",
+        beforeAnalyze: async () => {
+          const supportToggle = page
+            .locator("section[aria-label='Place details'] button[data-candidate-support-toggle='true']")
+            .first();
+          await supportToggle.waitFor({ state: "visible", timeout: 30_000 });
+          await supportToggle.focus();
+          await page.keyboard.press("Enter");
+          await page.waitForFunction(() => {
+            const button = document.querySelector(
+              "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
+            );
+            return (
+              button instanceof HTMLButtonElement &&
+              button.getAttribute("aria-expanded") === "true"
+            );
+          });
+        }
+      })
+    );
+    scenarios.push(
+      await runScenarioAnalysis({
+        name: "jerusalem-show-all-expanded",
+        pathWithQuery: "/?place=jerusalem",
+        beforeAnalyze: async () => {
+          const showAllButton = page.locator(
+            "section[aria-label='Place details'] [data-show-all-passages='true']"
+          );
+          await showAllButton.first().waitFor({ state: "visible", timeout: 30_000 });
+          await showAllButton.first().focus();
+          await page.keyboard.press("Enter");
+          await page.waitForFunction(() => {
+            const button = document.querySelector(
+              "section[aria-label='Place details'] [data-show-all-passages='true']"
+            );
+            if (!(button instanceof HTMLButtonElement)) {
+              return false;
+            }
+            if (button.getAttribute("aria-expanded") !== "true") {
+              return false;
+            }
+
+            const section = document.querySelector(
+              "section[aria-label='Place details'] [data-panel-section='in-bible']"
+            );
+            return Boolean(section && section.querySelectorAll("article").length > 5);
+          }, undefined, { timeout: 120_000, polling: 250 });
+        }
+      })
+    );
+
+    const seriousOrCriticalScenarios = scenarios.filter(
+      (scenario) => scenario.seriousOrCriticalCount > 0
+    );
+    if (seriousOrCriticalScenarios.length > 0) {
+      throw new Error(
+        `Panel accessibility scan reported serious/critical issues: ${JSON.stringify(seriousOrCriticalScenarios)}`
+      );
+    }
+
+    return {
+      scenarios,
+      violationCount: scenarios.reduce((sum, scenario) => sum + scenario.violationCount, 0),
+      seriousOrCriticalCount: scenarios.reduce(
+        (sum, scenario) => sum + scenario.seriousOrCriticalCount,
+        0
+      )
+    };
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
+async function verifyPanelDoesNotMutateMapDom(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.evaluate((refreshHookKey) => {
+    const refreshVisibleEntries = window[refreshHookKey];
+    if (typeof refreshVisibleEntries === "function") {
+      refreshVisibleEntries();
+    }
+  }, visibleEntryRefreshHookKey);
+
+  await page.waitForFunction(
+    () =>
+      document.querySelectorAll("button[data-place-entry-id^='place:'], button[data-place-entry-id^='candidate:']")
+        .length > 0,
+    { timeout: 30_000 }
+  );
+
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const container = map.getContainer();
+    const canvas = container.querySelector("canvas.maplibregl-canvas");
+    window.__ibmPanelDomStabilityBaseline = {
+      map,
+      canvas
+    };
+  }, mapTestHookKey);
+
+  const opener = page.locator(
+    "button[data-place-entry-id^='place:'], button[data-place-entry-id^='candidate:']"
+  );
+  await opener.first().focus();
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("section[aria-label='Place details']", {
+    state: "visible",
+    timeout: 30_000
+  });
+  await waitForMapToSettle(page);
+
+  const openStability = await page.evaluate((testHookKey) => {
+    const baseline = window.__ibmPanelDomStabilityBaseline;
+    const map = window[testHookKey];
+    if (!baseline || !map) {
+      throw new Error("Panel-open stability baseline is unavailable.");
+    }
+
+    const currentCanvas = map.getContainer().querySelector("canvas.maplibregl-canvas");
+    return {
+      sameMap: map === baseline.map,
+      sameCanvas: currentCanvas === baseline.canvas
+    };
+  }, mapTestHookKey);
+  if (!openStability.sameMap || !openStability.sameCanvas) {
+    throw new Error(
+      `Map was remounted while opening the panel (sameMap=${openStability.sameMap}, sameCanvas=${openStability.sameCanvas}).`
+    );
+  }
+
+  await page.evaluate((testHookKey) => {
+    const baseline = window.__ibmPanelDomStabilityBaseline;
+    const map = window[testHookKey];
+    if (!baseline || !map) {
+      throw new Error("Panel-scroll stability baseline is unavailable.");
+    }
+
+    const container = map.getContainer();
+    const state = {
+      mutationCount: 0,
+      firstMutationSample: null
+    };
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        state.mutationCount += 1;
+        if (!state.firstMutationSample) {
+          const target = mutation.target;
+          const targetName = target instanceof Element ? target.tagName.toLowerCase() : "node";
+          state.firstMutationSample = `${mutation.type}:${targetName}:${mutation.attributeName ?? ""}`;
+        }
+      }
+    });
+    observer.observe(container, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      characterData: true
+    });
+
+    window.__ibmPanelDomStability = {
+      stop() {
+        observer.disconnect();
+        const currentMap = window[testHookKey];
+        const currentCanvas = currentMap
+          ? currentMap.getContainer().querySelector("canvas.maplibregl-canvas")
+          : null;
+        return {
+          mutationCount: state.mutationCount,
+          firstMutationSample: state.firstMutationSample,
+          sameMap: currentMap === baseline.map,
+          sameCanvas: currentCanvas === baseline.canvas
+        };
+      }
+    };
+  }, mapTestHookKey);
+
+  await page.evaluate(() => {
+    const panel = document.querySelector("section[aria-label='Place details']");
+    if (!panel) {
+      throw new Error("Place panel is not visible.");
+    }
+    panel.scrollTop = panel.scrollHeight;
+  });
+  await page.waitForTimeout(200);
+  await page.evaluate(() => {
+    const panel = document.querySelector("section[aria-label='Place details']");
+    if (!panel) {
+      throw new Error("Place panel is not visible.");
+    }
+    panel.scrollTop = 0;
+  });
+  await page.waitForTimeout(200);
+
+  const result = await page.evaluate(() => {
+    const monitor = window.__ibmPanelDomStability;
+    if (!monitor || typeof monitor.stop !== "function") {
+      throw new Error("Panel DOM stability monitor is unavailable.");
+    }
+    const report = monitor.stop();
+    delete window.__ibmPanelDomStability;
+    delete window.__ibmPanelDomStabilityBaseline;
+    return report;
+  });
+
+  if (result.mutationCount > 0) {
+    throw new Error(
+      `Map DOM changed while opening/scrolling the panel: ${result.mutationCount} mutation(s), first='${result.firstMutationSample ?? "unknown"}'.`
+    );
+  }
+  if (!result.sameMap || !result.sameCanvas) {
+    throw new Error(
+      `Map was remounted while opening/scrolling the panel (sameMap=${result.sameMap}, sameCanvas=${result.sameCanvas}).`
+    );
+  }
+
+  return result;
+}
+
 async function captureScenario(page, url, screenshotPath, options = {}) {
   await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
@@ -662,18 +1545,40 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
 
         const [longitude, latitude] = clusterFeature.geometry.coordinates;
         const point = map.project([longitude, latitude]);
-        const labelsAtCluster = map.queryRenderedFeatures(point, {
-          layers: areaLayerIds
-        });
+        const pointCount = Number(clusterFeature.properties?.point_count ?? 0);
+        const circleRadius = pointCount >= 20 ? 18 : pointCount >= 8 ? 16 : 14;
+        // The rendered bubble includes a 3px white stroke; probe just outside that edge.
+        const probeRadius = circleRadius + 4;
+        const diagonal = Math.round(probeRadius * 0.72);
+        const probeOffsets = [
+          [0, 0],
+          [probeRadius, 0],
+          [-probeRadius, 0],
+          [0, probeRadius],
+          [0, -probeRadius],
+          [diagonal, diagonal],
+          [diagonal, -diagonal],
+          [-diagonal, diagonal],
+          [-diagonal, -diagonal]
+        ];
 
-        if (labelsAtCluster.length > 0) {
+        for (const [offsetX, offsetY] of probeOffsets) {
+          const labelsAtProbe = map.queryRenderedFeatures([point.x + offsetX, point.y + offsetY], {
+            layers: areaLayerIds
+          });
+          if (labelsAtProbe.length === 0) {
+            continue;
+          }
+
           collisions.push({
             clusterId: clusterFeature.properties?.cluster_id ?? null,
             pointCount: clusterFeature.properties?.point_count ?? null,
-            labelIds: labelsAtCluster.map(
+            sampleOffsetPx: [offsetX, offsetY],
+            labelIds: labelsAtProbe.map(
               (label) => label.properties?.entryId ?? label.id ?? "label"
             )
           });
+          break;
         }
       }
 
@@ -706,6 +1611,102 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
   if (overlap.collisionCount > 0) {
     throw new Error(
       `Found area-label/cluster overlaps on overview: ${JSON.stringify(overlap.collisionSamples)}`
+    );
+  }
+
+  return overlap;
+}
+
+async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 30_000
+  });
+
+  const overlap = await page.evaluate(({ testHookKey, areaLayerIds, pinLabelsLayerId }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const searchBox = document.querySelector("[data-map-search-shell='true']");
+    if (!(searchBox instanceof HTMLElement)) {
+      throw new Error("Search box element was not found.");
+    }
+
+    const mapRect = map.getContainer().getBoundingClientRect();
+    const searchRect = searchBox.getBoundingClientRect();
+    const paddingPx = 4;
+    const minX = Math.max(0, searchRect.left - mapRect.left + paddingPx);
+    const minY = Math.max(0, searchRect.top - mapRect.top + paddingPx);
+    const maxX = Math.min(mapRect.width, searchRect.right - mapRect.left - paddingPx);
+    const maxY = Math.min(mapRect.height, searchRect.bottom - mapRect.top - paddingPx);
+    if (maxX <= minX || maxY <= minY) {
+      throw new Error("Search box rect is outside the map viewport.");
+    }
+
+    const labelsInsideSearchBox = map.queryRenderedFeatures(
+      [
+        [minX, minY],
+        [maxX, maxY]
+      ],
+      {
+        layers: [...areaLayerIds, pinLabelsLayerId]
+      }
+    );
+
+    const allLabels = map.queryRenderedFeatures(undefined, {
+      layers: [...areaLayerIds, pinLabelsLayerId]
+    });
+
+    const distinctLabelsInsideSearchBox = Array.from(
+      new Set(
+        labelsInsideSearchBox
+          .map((feature) =>
+            String(feature.properties?.placeName ?? feature.properties?.labelText ?? "").trim()
+          )
+          .filter((value) => value.length > 0)
+      )
+    );
+    const distinctLabelsOverall = Array.from(
+      new Set(
+        allLabels
+          .map((feature) =>
+            String(feature.properties?.placeName ?? feature.properties?.labelText ?? "").trim()
+          )
+          .filter((value) => value.length > 0)
+      )
+    );
+
+    return {
+      labelCount: labelsInsideSearchBox.length,
+      labels: distinctLabelsInsideSearchBox,
+      overallLabelCount: allLabels.length,
+      overallLabels: distinctLabelsOverall.slice(0, 24),
+      searchRect: {
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY
+      }
+    };
+  }, {
+    testHookKey: mapTestHookKey,
+    areaLayerIds: mapLayerIds.areaLabels,
+    pinLabelsLayerId: mapLayerIds.pinLabels
+  });
+
+  if (overlap.labelCount > 0) {
+    throw new Error(
+      `Found map labels under the search box on overview: ${JSON.stringify(overlap)}`
+    );
+  }
+
+  if (overlap.overallLabelCount === 0) {
+    throw new Error(
+      "Search-box overlap check was vacuous: no labels were rendered outside the search-box query."
     );
   }
 
@@ -788,6 +1789,132 @@ async function verifyPinLabelRegression(page, baseUrl) {
     galileeLabelCount: galileeLabels.length,
     galileeLabelSample: galileeLabels.slice(0, 16)
   };
+}
+
+async function verifyCandidatePinColorRendering(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 30_000
+  });
+
+  const sample = await page.evaluate(
+    ({ testHookKey, candidateLayerId }) =>
+      new Promise((resolve, reject) => {
+        const map = window[testHookKey];
+        if (!map) {
+          reject(new Error("Map test hook is unavailable."));
+          return;
+        }
+
+        const features = map.queryRenderedFeatures(undefined, {
+          layers: [candidateLayerId]
+        });
+        if (features.length === 0) {
+          reject(new Error("Candidate-pin color check was vacuous: no candidate pins were rendered."));
+          return;
+        }
+
+        const target =
+          features.find((feature) => Number(feature.properties?.candidateIndex) === 0) ?? features[0];
+        if (target.geometry?.type !== "Point") {
+          reject(new Error("Candidate-pin color check target did not have point geometry."));
+          return;
+        }
+
+        const [longitude, latitude] = target.geometry.coordinates;
+        const point = map.project([longitude, latitude]);
+        const mapCanvas = map.getCanvas();
+        const scaleX = mapCanvas.width / mapCanvas.clientWidth;
+        const scaleY = mapCanvas.height / mapCanvas.clientHeight;
+        const centerX = Math.round(point.x * scaleX);
+        const centerY = Math.round(point.y * scaleY);
+        const sampleRadius = 11;
+
+        const sampleOnNextRender = () => {
+          try {
+            const gl = map.painter?.context?.gl;
+            if (!gl || typeof gl.readPixels !== "function") {
+              throw new Error("WebGL context is unavailable for candidate-pin pixel sampling.");
+            }
+
+            const left = Math.max(0, centerX - sampleRadius);
+            const right = Math.min(mapCanvas.width - 1, centerX + sampleRadius);
+            const top = Math.max(0, centerY - sampleRadius);
+            const bottom = Math.min(mapCanvas.height - 1, centerY + sampleRadius);
+            const sampleWidth = right - left + 1;
+            const sampleHeight = bottom - top + 1;
+            const glY = mapCanvas.height - bottom - 1;
+            const pixels = new Uint8Array(sampleWidth * sampleHeight * 4);
+            gl.readPixels(left, glY, sampleWidth, sampleHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+            let opaquePixelCount = 0;
+            let redOrWhitePixelCount = 0;
+            let blackPixelCount = 0;
+
+            for (let index = 0; index < pixels.length; index += 4) {
+              const red = pixels[index];
+              const green = pixels[index + 1];
+              const blue = pixels[index + 2];
+              const alpha = pixels[index + 3];
+              if (alpha <= 40) {
+                continue;
+              }
+
+              opaquePixelCount += 1;
+              const isRedish = red > 140 && green < 115 && blue < 115;
+              const isWhiteish = red > 210 && green > 210 && blue > 210;
+              const isBlackish = red < 35 && green < 35 && blue < 35;
+              if (isRedish || isWhiteish) {
+                redOrWhitePixelCount += 1;
+              }
+              if (isBlackish) {
+                blackPixelCount += 1;
+              }
+            }
+
+            resolve({
+              candidateCount: features.length,
+              iconId: String(target.properties?.iconId ?? ""),
+              opaquePixelCount,
+              redOrWhitePixelCount,
+              blackPixelCount
+            });
+          } catch (error) {
+            reject(error instanceof Error ? error : new Error(String(error)));
+          }
+        };
+
+        map.once("render", sampleOnNextRender);
+        map.triggerRepaint();
+      }),
+    {
+    testHookKey: mapTestHookKey,
+    candidateLayerId: mapLayerIds.candidatePins
+    }
+  );
+
+  if (sample.opaquePixelCount < 40) {
+    throw new Error(
+      `Candidate-pin color check sampled too few opaque pixels (${sample.opaquePixelCount}).`
+    );
+  }
+
+  if (sample.redOrWhitePixelCount < 24) {
+    throw new Error(
+      `Candidate-pin color check expected red/white icon pixels, got ${sample.redOrWhitePixelCount} in sample ${JSON.stringify(sample)}.`
+    );
+  }
+
+  const allowedBlackPixels = Math.max(12, Math.floor(sample.opaquePixelCount * 0.3));
+  if (sample.blackPixelCount > allowedBlackPixels) {
+    throw new Error(
+      `Candidate-pin color check found too many black pixels (${sample.blackPixelCount}/${sample.opaquePixelCount}) around icon ${sample.iconId}.`
+    );
+  }
+
+  return sample;
 }
 
 function buildProvinceFixturePlaces(basePlaces) {
@@ -1750,6 +2877,73 @@ async function runSmoothnessCheck({
   }
 }
 
+async function runPanelOpenSmoothnessCheck({
+  browser,
+  baseUrl,
+  requestUrls,
+  pageErrors,
+  consoleErrors,
+  workerUrls,
+  workerConsoleEvents,
+  workerErrors
+}) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+
+  page.on("pageerror", (error) => {
+    pageErrors.push(error.message);
+  });
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
+  });
+  page.on("requestfinished", (request) => {
+    requestUrls.push(request.url());
+  });
+  page.on("worker", (worker) => {
+    workerUrls.push(worker.url());
+    worker.on("console", (message) => {
+      const entry = {
+        type: message.type(),
+        text: message.text(),
+        url: worker.url()
+      };
+      workerConsoleEvents.push(entry);
+      if (message.type() === "error") {
+        workerErrors.push(entry);
+      }
+    });
+  });
+
+  try {
+    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForSelector("section[aria-label='Place details']", {
+      state: "visible",
+      timeout: 30_000
+    });
+    await page.waitForFunction((testHookKey) => {
+      const map = window[testHookKey];
+      return Boolean(map && map.isStyleLoaded());
+    }, mapTestHookKey, { timeout: 40_000 });
+
+    await installGestureMonitor(page);
+    const gestureResult = await runGestureSequence(page);
+    const renderer = await detectWebGlRenderer(page);
+    return {
+      ...gestureResult,
+      frameSummary: summarizeFrameTimes(gestureResult.frameTimes),
+      renderer
+    };
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
 async function run() {
   const staticServer = await startStaticServer(distDirectory);
   const browser = await chromium.launch({ headless: true });
@@ -1792,18 +2986,18 @@ async function run() {
   });
 
   const screenshotPaths = {
-    overview: temporaryScreenshotPath("ibm-m3-03-overview.png"),
-    capernaum: temporaryScreenshotPath("ibm-m3-03-capernaum.png"),
-    galilee: temporaryScreenshotPath("ibm-m3-03-galilee.png"),
-    emmaus: temporaryScreenshotPath("ibm-m3-03-emmaus.png"),
-    jerusalemSiteZoom: temporaryScreenshotPath("ibm-m3-03-jerusalem-site-zoom.png"),
-    canaCrop3x: temporaryScreenshotPath("ibm-m3-03-cana-crop-3x.png"),
-    emmausCrop3x: temporaryScreenshotPath("ibm-m3-03-emmaus-crop-3x.png"),
-    galileeCollisionBoxes: temporaryScreenshotPath("ibm-m3-03-galilee-collision-boxes.png"),
-    fallbackCapernaum: temporaryScreenshotPath("ibm-m3-03-fallback-capernaum.png"),
-    fallbackGalilee: temporaryScreenshotPath("ibm-m3-03-fallback-galilee.png"),
-    fallbackPbfOutage: temporaryScreenshotPath("ibm-m3-03-fallback-pbf-outage.png"),
-    fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-03-fallback-all-requests-outage.png")
+    overview: temporaryScreenshotPath("ibm-m3-04-overview.png"),
+    capernaum: temporaryScreenshotPath("ibm-m3-04-capernaum.png"),
+    galilee: temporaryScreenshotPath("ibm-m3-04-galilee.png"),
+    emmaus: temporaryScreenshotPath("ibm-m3-04-emmaus.png"),
+    jerusalemSiteZoom: temporaryScreenshotPath("ibm-m3-04-jerusalem-site-zoom.png"),
+    canaCrop3x: temporaryScreenshotPath("ibm-m3-04-cana-crop-3x.png"),
+    emmausCrop3x: temporaryScreenshotPath("ibm-m3-04-emmaus-crop-3x.png"),
+    galileeCollisionBoxes: temporaryScreenshotPath("ibm-m3-04-galilee-collision-boxes.png"),
+    fallbackCapernaum: temporaryScreenshotPath("ibm-m3-04-fallback-capernaum.png"),
+    fallbackGalilee: temporaryScreenshotPath("ibm-m3-04-fallback-galilee.png"),
+    fallbackPbfOutage: temporaryScreenshotPath("ibm-m3-04-fallback-pbf-outage.png"),
+    fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-04-fallback-all-requests-outage.png")
   };
 
   try {
@@ -1854,7 +3048,30 @@ async function run() {
       screenshotPaths.emmausCrop3x,
       { panelHeading: "Emmaus" }
     );
+    const panelSectionAndCreditChecks = await verifyPanelSectionOrderAndPhotoCredits(
+      page,
+      staticServer.baseUrl
+    );
+    const capernaumLeadImageLoadCheck = await verifyCapernaumLeadImageLoads(
+      page,
+      staticServer.baseUrl
+    );
+    const imageFailurePlaceholderCheck = await verifyImageFailurePlaceholderKeepsCredit(
+      browser,
+      staticServer.baseUrl
+    );
+    const disputedAndHierarchyChecks = await verifyDisputedAndHierarchyLayouts(
+      page,
+      staticServer.baseUrl
+    );
+    const showAllPassagesCheck = await verifyShowAllPassages(page, staticServer.baseUrl);
+    const panelAccessibilityCheck = await verifyPanelAccessibility(browser, staticServer.baseUrl);
+    const panelMapDomStability = await verifyPanelDoesNotMutateMapDom(page, staticServer.baseUrl);
     const overviewClusterOverlap = await verifyAreaLabelsAvoidClustersOnOverview(
+      page,
+      staticServer.baseUrl
+    );
+    const overviewSearchBoxLabelOverlap = await verifyLabelsAvoidSearchBoxOnOverview(
       page,
       staticServer.baseUrl
     );
@@ -1863,6 +3080,14 @@ async function run() {
       `${staticServer.baseUrl}/?place=galilee`
     );
     const pinLabelRegression = await verifyPinLabelRegression(page, staticServer.baseUrl);
+    const candidatePinColorCheck = await verifyCandidatePinColorRendering(
+      page,
+      staticServer.baseUrl
+    );
+    const candidateSelectionCheck = await verifyCandidateSelectionUpdatesUrl(
+      page,
+      staticServer.baseUrl
+    );
     await captureGalileeCollisionBoxes(
       browser,
       staticServer.baseUrl,
@@ -1871,6 +3096,15 @@ async function run() {
 
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
       page,
+      staticServer.baseUrl
+    );
+    const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
+      page,
+      staticServer.baseUrl
+    );
+    const copyLinkCheck = await verifyCopyLinkAction(browser, staticServer.baseUrl);
+    const placeDetailsRaceCheck = await verifyPlaceDetailsFetchRaceRecovery(
+      browser,
       staticServer.baseUrl
     );
 
@@ -1945,6 +3179,17 @@ async function run() {
 
     assertSmoothnessScenarios("real-data smoothness", smoothnessReal);
     assertSmoothnessScenarios("synthetic-data smoothness", smoothnessSynthetic);
+    const panelOpenSmoothness = await runPanelOpenSmoothnessCheck({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      requestUrls,
+      pageErrors,
+      consoleErrors,
+      workerUrls,
+      workerConsoleEvents,
+      workerErrors
+    });
+    assertSmoothnessResult("panel-open smoothness", panelOpenSmoothness);
 
     const tileRequestCount = requestUrls.filter(
       (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
@@ -1961,11 +3206,24 @@ async function run() {
       pageErrors,
       consoleErrors,
       workerConsoleEvents,
+      panelSectionAndCreditChecks,
+      capernaumLeadImageLoadCheck,
+      imageFailurePlaceholderCheck,
+      disputedAndHierarchyChecks,
+      showAllPassagesCheck,
+      panelAccessibilityCheck,
+      panelMapDomStability,
       pinLabelRegression,
+      candidatePinColorCheck,
+      candidateSelectionCheck,
       overviewAreaLabelFixtureCheck,
       overviewClusterOverlap,
+      overviewSearchBoxLabelOverlap,
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
+      keyboardDisclosureChecks,
+      copyLinkCheck,
+      placeDetailsRaceCheck,
       galileePinOverlap,
       fallbackOutageChecks: {
         pbfOnly: fallbackPbfOutage,
@@ -1973,6 +3231,7 @@ async function run() {
       },
       smoothness: {
         realData: smoothnessReal,
+        panelOpen: panelOpenSmoothness,
         syntheticData10k: {
           ...smoothnessSynthetic,
           syntheticPlacesAdded: syntheticPlaces.length - basePlaces.length

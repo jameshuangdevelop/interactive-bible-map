@@ -33,4 +33,4 @@ export const AREA_LABEL_OFFSET_LAYOUT = {
 };
 
 export const PIN_COLLISION_IMAGE_SIZE = 20;
-export const CLUSTER_COLLISION_IMAGE_SIZE = 44;
+export const CLUSTER_COLLISION_IMAGE_SIZE = 64;

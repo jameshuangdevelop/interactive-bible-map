@@ -82,6 +82,8 @@ npm run export:web
 npm run verify:web:playwright
 ```
 
+`npm run verify:web:playwright` now also validates the place panel (section order/content, lead-image load, image-credit persistence, and disputed/single-site layouts), checks candidate-pin rendered colors and overview label-overlap regressions, and runs an axe accessibility scan on the open panel (fails on any serious or critical issues).
+
 Local development:
 
 ```bash
