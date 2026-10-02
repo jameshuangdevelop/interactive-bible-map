@@ -38,7 +38,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3.5-07 | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker (check loop) → the human (approval) → media-curator → fact-checker | `data/m3.5-ai-images` | Merged (the human approved the 31 images on 2026-10-02) | #36 |
 | M3.5-08 | CP3.5 summary, and cards M3-14 to M3-16 | project-owner | `docs/cp3.5-summary` | Merged (CP3.5 approved 2026-10-02) | #37 |
 | M3-17 | Record CP3.5 and start the rest of M3 | project-owner | `docs/m3-cp35-kickoff` | Done | — |
-| M3-14 | Countries in modern names (ADR-0028) | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | In progress (schema done `<hash>`; Research Lead next) | — |
+| M3-14 | Countries in modern names (ADR-0028) | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | In progress (schema done `25b3b8d`; Research Lead next) | — |
 | M3-15 | A simpler panel header, with countries (ADR-0028, ADR-0030) | frontend-engineer | `feat/m3-panel-header` | Waits for M3-14's schema commit | — |
 | M3-16 | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | In progress (Research Lead: half 1) | — |
 
