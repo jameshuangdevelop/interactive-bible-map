@@ -27,15 +27,15 @@ Tell every reader which country a place is in today. "Today: Selçuk" means litt
   - **empires** (`type: "empire"`).
 - **Disputed territory** (CP3.5 decision 1): places outside any one country's undisputed territory use the name most English news and reference works use. Examples include "West Bank" for Bethlehem, Jericho, Bethany (Al-Eizariya), Sychar (Tell Balata) and Qasr al-Yahud, and "Golan Heights" for Banias and both Bethsaida candidates (et-Tell and el-Araj). The name describes where the place is, not who should rule it. If a site's status is unclear in the sources, for example Emmaus Nicopolis in the former Latrun no-man's land, the Research Lead flags it for the PO rather than choosing.
 - **Places with several candidates** list the countries of all their candidates, for example Cana: "Israel", "Lebanon"; Bethany beyond the Jordan: "Jordan", "West Bank".
-- **Areas** (provinces, regions and other area records) get a short orienting phrase as `names.modern`, such as "Central Türkiye", "Western Türkiye" or "Parts of Greece, North Macedonia and Albania", plus their countries in `names.modernCountries`. This replaces M3-08's rule that left Judea, Samaria and Galatia without a modern name. An area that spans many countries lists the main ones (at most 6), and the phrase gives the rest of the picture.
-- **Everything else stays as it is.** Non-area `names.modern` values stay the place name only, with no country in them, because the panel adds the country itself. Disputed places still have no `names.modern`. Candidate labels keep M3-08's form.
+- **Areas** are the records of type `province` or `region` (29 today). Each gets a short orienting phrase as `names.modern`, such as "Central Türkiye", "Western Türkiye" or "Parts of Greece, North Macedonia and Albania", plus its countries in `names.modernCountries`. An area may keep a plain geographic name where one already orients the reader ("Crete", "Galilee", "Italy"). This replaces M3-08's rule that left Judea, Samaria and Galatia without a modern name. An area that spans many countries lists the main ones (at most 6), and the phrase gives the rest of the picture. Natural features (`type: "natural-feature"`, such as Malta, Patmos and the Sea of Galilee) are not areas: they keep their names and get countries like any other place.
+- **Everything else stays as it is.** Other records' `names.modern` stays the place name only, with no country added to it, because the panel adds the country itself. A name that is also a country's name (Malta, Cyprus) is fine. Disputed places still have no `names.modern`. Candidate labels keep M3-08's form.
 - **Sources:** each country must follow from the record's coordinates and a cited source (a dataset ID such as Wikidata or Pleiades, or a `bib:` entry). Add the source to the record's `summary.sources` only if no existing source supports it.
 
 ## Scope
 1. **GIS Engineer:**
-   - Add `names.modernCountries` (an array of unique strings from the allow-list) to `schema/location.schema.json`.
-   - **Validator errors:** a non-exempt record without it; an exempt record (an empire, or a record inside Jerusalem) with it; a value outside the allow-list.
-   - Change the `names.modern` word check so that area records (`province`, `region`) may name a country in their orienting phrase; other records still may not.
+   - Add `names.modernCountries` (an array of at least one unique string from the allow-list) to `schema/location.schema.json`.
+   - **New validator errors:** a non-exempt record without it; an exempt record (an empire, or a record whose parent chain includes `jerusalem`) with it; an area record (`province` or `region`) without `names.modern`.
+   - Keep the existing check that `names.modern` never contains "disputed", and the rule that disputed places omit `names.modern`. Don't add a rule against country names in `names.modern`: some places share a country's name (Malta, Cyprus, Italy), so the Fact-Checker checks this instead.
    - Add tests for each rule, and update `schema/README.md` → "Modern names".
    - Add the field, as optional, to the app's `PlaceNames` type (`app/src/features/map/types.ts`), and make sure `npm run build:data` carries it into the place index that search reads, so M3-15 can use it.
    - Commit: `feat(schema): add modern countries to place names`.
@@ -46,8 +46,8 @@ Tell every reader which country a place is in today. "Today: Selçuk" means litt
 Showing the field in the app (M3-15), candidate labels, any other field.
 
 ## Acceptance criteria
-- [ ] Every record except the empires and the places inside Jerusalem has `names.modernCountries`, and every value is on the allow-list.
-- [ ] Every area record has an orienting phrase as `names.modern`.
+- [ ] Every record except the empires and the places inside Jerusalem has at least one `names.modernCountries` value, and every value is on the allow-list (the schema enforces this).
+- [ ] Every area record (`province` or `region`) has an orienting `names.modern`.
 - [ ] The validator enforces the machine-checkable parts, and has tests for them.
 - [ ] Each special case is listed in the research note, and anything left unclear is flagged for the PO.
 - [ ] All 89 records are `verified` again, and CI passes.

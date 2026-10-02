@@ -28,7 +28,7 @@ Make the top of the place panel quicker to read, following the human's review on
    - the Sources list stays at the end of the panel.
 2. **The "Today" line** shows the modern name, then the countries, then the location chip, all on one line (wrapping on narrow panels):
    - **One site:** "Today: Selçuk, Türkiye", then the "High confidence" chip (or the record's own confidence).
-   - **Countries already in the name:** an area's phrase may name its countries ("Central Türkiye"). Add only the countries the phrase doesn't already contain, compared case-insensitively.
+   - **Countries already in the name:** a modern name may already contain a country: an area's phrase ("Central Türkiye", "Italy") or a place that shares its country's name (Malta). Add only the countries the name doesn't already contain, compared case-insensitively.
    - **No modern name but countries** (disputed places, and other places with several candidates that have no single name): "Today: Israel and the West Bank". For disputed places, the "Location disputed · 4 proposed sites" chip follows; for the others, the "*n* sites" note.
    - **Countries joined** as "A", "A and B", or "A, B and C".
    - **No countries** (Jerusalem and the places inside it, and empires): the modern name alone, then the chip. With neither a modern name nor countries, the chip sits alone where the line would be.

@@ -263,7 +263,7 @@ The spec and cards cost about 900 AI credits. M3 is forecast at about 7,000–9,
 - **Major places (31):** 6 to 8 images each, 213 in all. Each gallery opens with the AI reconstruction, so a reader's first impression is the place as it looked in Bible times, and then shows the place today and its excavated remains.
 - **Standard places (31):** 1 to 3 images each, 62 in all.
 - **By kind:** 121 excavated site, 107 today, 31 AI reconstruction, 8 historical view (an old photo or engraving) and 8 reconstruction (a model or painting).
-- **Without images:** Lystra (no freely licensed photo exists; CP2 decision 4) and the 27 area records (provinces, regions and empires), as M3.5-05 planned.
+- **Without images:** Lystra (no freely licensed photo exists; CP2 decision 4) and the 26 area records (provinces, regions and empires), as M3.5-05 planned.
 - **The "few stones" rule:** close-ups of fragments were replaced with wide views of each place in its landscape (ADR-0029 §5), Laodicea's among them.
 
 ### How quality was checked
@@ -297,7 +297,7 @@ The spec and cards cost about 900 AI credits. M3 is forecast at about 7,000–9,
 - **Repository size.** The AI images add 10.5 MB. At the limit of 3 per major place, they would add about 30 MB.
 
 ### Budget
-M3.5 used about **64,650 AI credits**, under its cards' combined targets of about 82,000. About 7,100 of it fell in September. The Fact-Checker's image-batch verifications on Claude Opus 5.5 (5,000–7,000 each) were the largest items. September closed at about 75,500 credits (7.6%), and October stands at about **57,550 of 1,000,000 (5.8%)**. See [BUDGET.md](docs/BUDGET.md).
+M3.5 used about **64,850 AI credits**, under its cards' combined targets of about 82,000. About 7,100 of it fell in September. The Fact-Checker's image-batch verifications on Claude Opus 5.5 (5,000–7,000 each) were the largest items. September closed at about 75,500 credits (7.6%), and October stands at about **57,750 of 1,000,000 (5.8%)**. See [BUDGET.md](docs/BUDGET.md).
 - These figures are the ledger's estimates. GitHub's billing report is the authority (ADR-0005), but the agents' GitHub token can't read it, so a look at your Copilot usage page would confirm them.
 - The Gemini images are billed by Google, not in Copilot credits.
 

@@ -67,7 +67,7 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 
 > **Forecast revision (CP2):** M2 cost about 22,666 credits against a forecast of about 4,000, because batches 1–2 needed 3–4 verification rounds each. With the Media Curator on Claude Sonnet 5 and the Fact-Checker on Claude Opus 5.5 (ADR-0020, ADR-0021), batch 3 cost about 3,500 against 5,100 and 6,700 for batches 1–2 (agent and review rows only, not the PO's coordination). Plan on about 3,500–5,000 credits per 20-place batch. That puts M6 (about 240 more places, 12 batches) at about 45,000–60,000 credits, under 6% of one month's cap.
 
-> **Forecast revision (CP3.5):** M3.5 cost about 64,650 credits, under its cards' combined targets of about 82,000. The largest items were the Fact-Checker's image-batch verifications on Claude Opus 5.5, at 5,000–7,000 credits each. The 50 Gemini images cost about US$3.49, billed by Google and not in Copilot credits. For the rest of M3 (M3-06 and M3-14 to M3-16, with reviews), plan on about 30,000 credits.
+> **Forecast revision (CP3.5):** M3.5 cost about 64,850 credits, under its cards' combined targets of about 82,000. The largest items were the Fact-Checker's image-batch verifications on Claude Opus 5.5, at 5,000–7,000 credits each. The 50 Gemini images cost about US$3.49, billed by Google and not in Copilot credits. For the rest of M3 (M3-06 and M3-14 to M3-16, with reviews), plan on about 30,000 credits.
 
 ## Rollups
 | Checkpoint | Month | Credits this milestone | Month total | % of cap |
@@ -76,7 +76,7 @@ US$ per 1M tokens, from [Models and pricing](https://docs.github.com/en/copilot/
 | CP1 | 2026-09 | ~2,760 | ~3,260 | ~0.3% |
 | CP2 | 2026-09 | ~22,666 | ~25,926 | ~2.6% |
 | CP3a | 2026-09 | ~2,560 | ~28,490 | ~2.8% |
-| CP3.5 | 2026-10 | ~64,650 (about 7,100 of it on 2026-09-30) | ~57,550 | ~5.8% |
+| CP3.5 | 2026-10 | ~64,835 (about 7,100 of it on 2026-09-30) | ~57,735 | ~5.8% |
 
 September closed at about **75,500 credits (7.6% of that month's cap)**. That covered M3's build (M3-02 to M3-13, counted at CP3b) and the start of M3.5.
 
@@ -263,3 +263,4 @@ September closed at about **75,500 credits (7.6% of that month's cap)**. That co
 | 2026-10-01 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3.5-05 (standard places); the review recorded no row, so the PO estimated it at CP3.5 | ~900k / ~15k | ~300 | ~56,045 |
 | 2026-10-02 | project-owner | Claude Opus 5.5 (Copilot CLI) | M3.5 push: 12 PRs (#25–#36) with their reviews, screenshots and contact sheets attached, CI rerun after Wikimedia rate limits, check of the rolled Cloudflare token | ~2,500k (mostly cached) / ~25k | ~600 | ~56,645 |
 | 2026-10-02 | project-owner | Claude Opus 5.5 (Copilot CLI) | M3.5-08 CP3.5: worktree and branch cleanup after the merges, image and About statistics, CP3.5 summary, cards M3-14 to M3-16, M3-06 update, task index, ledger reconciliation | ~3,500k (mostly cached) / ~45k | ~900 | ~57,545 |
+| 2026-10-02 | pr-reviewer | GPT-5.4 (Copilot CLI subagent) | Review M3.5-08 (CP3.5) (copied from the review) | ~450k / ~15k | ~190 | ~57,735 |
