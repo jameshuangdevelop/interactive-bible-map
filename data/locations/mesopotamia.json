@@ -1,0 +1,79 @@
+{
+  "id": "mesopotamia",
+  "names": {
+    "ancient": [
+      "Mesopotamia"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "parthian-empire",
+  "candidates": [
+    {
+      "label": "Mesopotamia (label point)",
+      "coordinates": [
+        43.5,
+        33.7
+      ],
+      "coordinateSource": "wikidata:Q11767",
+      "confidence": "high",
+      "support": "Mesopotamia, the land between the Euphrates and the Tigris, is a broad historical region rather than a single site. The label point is Wikidata's point for the region, between the two rivers in its central part. Pleiades' label location for Mesopotamia, after the Barrington Atlas, is about 510 km to the northwest, in the north of a region Pleiades describes as covering most of modern Iraq and parts of Syria and Turkey.",
+      "sources": [
+        "wikidata:Q11767",
+        "pleiades:874602",
+        "bib:livius-mesopotamia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Mesopotamia is the land between the Euphrates and Tigris rivers. Acts lists 'people from Mesopotamia' among those present in Jerusalem at Pentecost, and in his speech before the council Stephen says that 'the God of glory appeared to our father Abraham when he was in Mesopotamia, before he lived in Haran.' At this project's about AD 50 date, Mesopotamia lay within the Parthian Empire, not Rome.",
+    "sources": [
+      "wikidata:Q11767",
+      "bib:livius-mesopotamia",
+      "bib:isbe-parthians",
+      "scripture:Acts 2:9",
+      "scripture:Acts 7:2"
+    ]
+  },
+  "history": [
+    {
+      "text": "Livius.org explains that the Greek name means the country between the rivers, and that Arrian, writing about Alexander's campaigns, applied it to the northern part, the Jezira of today's eastern Syria and northern Iraq. The province Rome later formed east of the Euphrates also took the name, even though that province did not reach the south.",
+      "sources": [
+        "bib:livius-mesopotamia"
+      ]
+    },
+    {
+      "text": "Rome did not hold Mesopotamia at this project's about AD 50 date. The International Standard Bible Encyclopedia records that Trajan, decades later, invaded Parthia and 'took Upper Mesopotamia,' and that Hadrian gave the conquered provinces back. It also describes large Jewish settlements in Mesopotamia under Parthian rule, and a massacre of Jewish settlers there under the Parthian king Artabanus III (AD 16-42).",
+      "sources": [
+        "bib:isbe-parthians"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:9",
+      "book": "Acts",
+      "textWEB": "Parthians, Medes, Elamites, and people from Mesopotamia, Judea, Cappadocia, Pontus, Asia,"
+    },
+    {
+      "ref": "Acts 7:2",
+      "book": "Acts",
+      "textWEB": "He said, “Brothers and fathers, listen. The God of glory appeared to our father Abraham when he was in Mesopotamia, before he lived in Haran,"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 11:31",
+      "note": "Genesis records that Terah's family, including Abram, went from Ur of the Chaldees to go into the land of Canaan and settled in Haran. Stephen says that God appeared to Abraham 'when he was in Mesopotamia, before he lived in Haran.'",
+      "sources": [
+        "scripture:Genesis 11:31",
+        "scripture:Acts 7:2"
+      ]
+    }
+  ],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
+}

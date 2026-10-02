@@ -1,0 +1,67 @@
+{
+  "id": "libya",
+  "names": {
+    "ancient": [
+      "Libya"
+    ],
+    "alternate": []
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "parentId": "crete-cyrene",
+  "candidates": [
+    {
+      "label": "Libya, the Cyrenaican district (label point)",
+      "coordinates": [
+        20.871743,
+        32.499653
+      ],
+      "coordinateSource": "pleiades:373777",
+      "confidence": "high",
+      "support": "Acts 2:10 names 'the parts of Libya around Cyrene,' the district around the Greek city of Cyrene, which this project's Crete and Cyrene province record already covers. The label point is Pleiades' representative point for Cyrenaica, which has no location of its own, cross-checked against Wikidata's own point about 75 km to the east.",
+      "sources": [
+        "pleiades:373777",
+        "wikidata:Q165198",
+        "scripture:Acts 2:10"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Acts lists among the Pentecost crowd people from 'Egypt, the parts of Libya around Cyrene.' The International Standard Bible Encyclopedia notes that in Greek and Roman writers 'Libya' usually meant Africa apart from Egypt; here the phrase names the district around the Greek city of Cyrene, whose soil the same encyclopedia calls fertile. The last of Cyrene's Ptolemaic rulers willed it to Rome, and Cassius Dio lists Crete together with the Cyrenaic part of Libya as a single province: the one this project records as Crete and Cyrene.",
+    "sources": [
+      "pleiades:373777",
+      "bib:isbe-libya",
+      "bib:isbe-cyrene",
+      "bib:cassius-dio-roman-history",
+      "scripture:Acts 2:10"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Ptolemy I moved Jews to Cyrene and other Libyan cities, and that from then on Jews were numerous there. In the New Testament, Simon of Cyrene carries Jesus' cross, Cyrenians are named among the synagogue members who disputed with Stephen, and Lucius of Cyrene is one of the prophets and teachers of the church at Antioch.",
+      "sources": [
+        "bib:isbe-cyrene",
+        "scripture:Matthew 27:32",
+        "scripture:Acts 6:9",
+        "scripture:Acts 13:1"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 2:10",
+      "book": "Acts",
+      "textWEB": "Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene, visitors from Rome, both Jews and proselytes,"
+    },
+    {
+      "ref": "Matthew 27:32",
+      "book": "Matthew",
+      "textWEB": "As they came out, they found a man of Cyrene, Simon by name, and they compelled him to go with them, that he might carry his cross."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-09-30"
+}

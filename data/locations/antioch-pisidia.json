@@ -49,7 +49,16 @@
       "bib:csb-2017-biblegateway"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Although Acts calls it 'Antioch of Pisidia,' the International Standard Bible Encyclopedia explains that the city lay in Galatian Phrygia, near Pisidia's northern border, and took the name from its closeness to Pisidia and its role as the base of the Roman military system that pacified the Pisidian highlands. Phrygia was then divided between the provinces of Asia and Galatia, and Antioch lay in the Galatian part, so this project gives the province of Galatia as its parent.",
+      "sources": [
+        "bib:isbe-pisidia",
+        "bib:isbe-phrygia",
+        "scripture:Acts 13:14"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 13:14",
@@ -76,5 +85,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-09-30"
 }

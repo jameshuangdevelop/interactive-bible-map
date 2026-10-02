@@ -10,7 +10,7 @@
   },
   "type": "city",
   "zoomTier": "city",
-  "parentId": "galatia",
+  "parentId": "pamphylia",
   "candidates": [
     {
       "label": "Perge archaeological site",
@@ -70,5 +70,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-09-30"
 }
