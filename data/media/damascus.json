@@ -3,6 +3,58 @@
   "images": [
     {
       "id": "damascus-01",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Damascus-Bab_Kisan.jpg",
+      "width": 2034,
+      "height": 1518,
+      "author": "Heretiq",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Damascus-Bab_Kisan.jpg",
+      "caption": "Bab Kisan, a gate in Damascus's old city wall traditionally linked to Paul's escape in a basket (2 Corinthians 11:33).",
+      "kind": "site",
+      "aiGenerated": false
+    },
+    {
+      "id": "damascus-02",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Damascus_along_the_Barada_River_1542.jpg",
+      "width": 4256,
+      "height": 2832,
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Damascus_along_the_Barada_River_1542.jpg",
+      "caption": "The Barada river running through Damascus, with the bare hills beyond the oasis plain.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "damascus-03",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Damascus_Old_Town_Midhat_Pasha_Street.jpg",
+      "width": 2368,
+      "height": 4224,
+      "author": "Amani Sharaa",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Damascus_Old_Town_Midhat_Pasha_Street.jpg",
+      "caption": "Midhat Pasha Street, the modern street following the course of the old Street Called Straight (Acts 9:11).",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "damascus-04",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/%27De_straat_genaamd_de_rechte%27_darb_al_moestaqiem_met_rechts_het_huis_van_Anan%2C_Bestanddeelnr_255-5873.jpg",
+      "width": 2608,
+      "height": 2622,
+      "author": "Willem van de Poll",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:'De_straat_genaamd_de_rechte'_darb_al_moestaqiem_met_rechts_het_huis_van_Anan,_Bestanddeelnr_255-5873.jpg",
+      "caption": "The Street Called Straight in 1950, near the traditional house of Ananias (Acts 9:11).",
+      "kind": "historical",
+      "aiGenerated": false
+    },
+    {
+      "id": "damascus-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Umayyad_Mosque%2C_Damascus.jpg",
       "width": 3056,
       "height": 2054,
@@ -10,12 +62,25 @@
       "license": "CC BY-SA 3.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Umayyad_Mosque,_Damascus.jpg",
-      "caption": "The Umayyad Mosque in Damascus, Syria.",
+      "caption": "The Umayyad Mosque (Great Mosque) of Damascus, built under the Umayyad caliphs on the site of a Roman temple, long after Paul's time.",
       "kind": "modern",
       "aiGenerated": false
     },
     {
-      "id": "damascus-02",
+      "id": "damascus-06",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Damascus_Azem_Palace_large_courtyard_5103.jpg",
+      "width": 4256,
+      "height": 2832,
+      "author": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Damascus_Azem_Palace_large_courtyard_5103.jpg",
+      "caption": "The courtyard and fountain of the Azm Palace, a traditional Damascene courtyard house.",
+      "kind": "modern",
+      "aiGenerated": false
+    },
+    {
+      "id": "damascus-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Damascus%2C_Syria%2C_Panoramic_view_of_Damascus.jpg",
       "width": 4000,
       "height": 2248,
@@ -23,20 +88,7 @@
       "license": "CC BY 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Damascus,_Syria,_Panoramic_view_of_Damascus.jpg",
-      "caption": "Panoramic view of Damascus, Syria.",
-      "kind": "modern",
-      "aiGenerated": false
-    },
-    {
-      "id": "damascus-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Golden_art_inside_the_Umayyad_Mosque_in_Damascus.jpg",
-      "width": 4080,
-      "height": 1824,
-      "author": "Shahdddddddd",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Golden_art_inside_the_Umayyad_Mosque_in_Damascus.jpg",
-      "caption": "Golden interior decoration of the Umayyad Mosque in Damascus.",
+      "caption": "Aerial panoramic view of modern Damascus, one of the world's oldest continuously inhabited cities.",
       "kind": "modern",
       "aiGenerated": false
     }
