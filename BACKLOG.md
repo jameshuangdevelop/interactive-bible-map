@@ -37,3 +37,5 @@ PR Reviewer findings that were not addressed in their PR, each with a reason.
 |---|---|---|---|---|
 | 2026-09-24 | M2-06 | `tests/validator.test.mjs`: the cross-file duplicate-image-id fixture also trips the prefix rule; add a comment explaining why a fully isolated duplicate case is impossible | nit | The test is correct as it is. Add the comment the next time the validator tests are touched. |
 | 2026-09-24 | M2-05 | `data/media/philadelphia-lydia.json`: `-02` is close in subject and framing to `-01`; a more distinct city or site view would add variety | nit | The lead image is fine. Revisit during the M6 media passes. |
+| 2026-10-01 | M3.5-06 | AI thumbnails currently reuse the full repo-hosted AI file instead of a resized derivative | nit | Fixture-only for now; revisit in M3.5-07 when real AI images land. |
+| 2026-10-01 | M3.5-06 | `export:web` copies any `.webp` in `media/ai/` without checking whether a place payload references it | nit | Fixture-only for now; revisit in M3.5-07 when real AI images land. |

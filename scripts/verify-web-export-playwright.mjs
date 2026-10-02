@@ -21,6 +21,7 @@ const licensesDocumentPath = path.join(repositoryRoot, "docs", "LICENSES.md");
 
 const smoothnessLongTaskLimitMs = 50;
 const syntheticPlaceIdPrefix = "synthetic-city-";
+const galleryScreenshotDirectoryName = "ibm-m35-gallery";
 const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
 const mainAttributionNeedle = "OpenFreeMap";
@@ -35,6 +36,7 @@ const fullLicenseDetailsUrl =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const minimumControlHitAreaPx = 44;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -49,6 +51,23 @@ const mapLayerIds = {
   candidatePins: "ibm-candidate-pin",
   pinLabels: "ibm-pin-label"
 };
+const fixtureImageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="45%" stop-color="#b8c5d4"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#g)"/>
+  <rect x="28" y="28" width="216" height="128" fill="#f9fafb"/>
+  <rect x="396" y="36" width="216" height="128" fill="#0f172a"/>
+  <rect x="52" y="232" width="248" height="132" fill="#1f2937"/>
+  <rect x="332" y="232" width="248" height="132" fill="#f3f4f6"/>
+  <path d="M0 346 L640 232" stroke="#0b0f1a" stroke-width="20" stroke-opacity="0.5"/>
+  <path d="M-24 196 L664 328" stroke="#ffffff" stroke-width="14" stroke-opacity="0.45"/>
+</svg>`;
+const fixtureImageBuffer = Buffer.from(fixtureImageSvg, "utf8");
 
 function contentTypeFor(filePath) {
   const extension = path.extname(filePath).toLowerCase();
@@ -64,6 +83,8 @@ function contentTypeFor(filePath) {
       return "application/json; charset=utf-8";
     case ".ico":
       return "image/x-icon";
+    case ".webp":
+      return "image/webp";
     case ".txt":
       return "text/plain; charset=utf-8";
     default:
@@ -131,6 +152,601 @@ async function startStaticServer(rootDirectory) {
 
 function temporaryScreenshotPath(fileName) {
   return path.join(process.env.TEMP ?? os.tmpdir(), fileName);
+}
+
+function temporaryGalleryScreenshotPath(fileName) {
+  return path.join(process.env.TEMP ?? os.tmpdir(), galleryScreenshotDirectoryName, fileName);
+}
+
+function parseCommonsThumbnailRequest(requestUrl) {
+  try {
+    const { pathname } = new URL(requestUrl);
+    const match = pathname.match(/\/(?<width>330|500|960|1280)px-(?<fileName>[^/]+)$/u);
+    if (!match?.groups?.width || !match.groups.fileName) {
+      return null;
+    }
+
+    return {
+      width: Number.parseInt(match.groups.width, 10),
+      fileName: match.groups.fileName
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function readGeneratedPlacePayload(placeId) {
+  const candidatePaths = [
+    path.join(distDirectory, "generated", "places", `${placeId}.json`),
+    path.join(repositoryRoot, "app", "public", "generated", "places", `${placeId}.json`)
+  ];
+
+  for (const payloadPath of candidatePaths) {
+    try {
+      const content = await fs.readFile(payloadPath, "utf8");
+      return JSON.parse(content);
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error(`Could not load generated payload for place '${placeId}'.`);
+}
+
+function buildGalleryFixturePayload(basePayload) {
+  const fixtureImages = [
+    {
+      id: "capernaum-01",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/0/0a/M3_5_Fixture_Capernaum_Modern_01.jpg",
+      width: 13068,
+      height: 2516,
+      author: "Fixture Photographer 1",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Modern_01.jpg",
+      caption: "Modern Capernaum shoreline",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-02",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/1/1a/M3_5_Fixture_Capernaum_Modern_02.jpg",
+      width: 4032,
+      height: 3024,
+      author: "Fixture Photographer 2",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Modern_02.jpg",
+      caption: "Modern town and lake",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-03",
+      kind: "site",
+      url: "https://upload.wikimedia.org/wikipedia/commons/2/2a/M3_5_Fixture_Capernaum_Site_01.jpg",
+      width: 3600,
+      height: 2400,
+      author: "Fixture Photographer 3",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_01.jpg",
+      caption: "Synagogue excavation area",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-04",
+      kind: "reconstruction",
+      url: "https://upload.wikimedia.org/wikipedia/commons/3/3a/M3_5_Fixture_Capernaum_Reconstruction_01.jpg",
+      width: 3200,
+      height: 1800,
+      author: "Fixture Artist 1",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Reconstruction_01.jpg",
+      caption: "Illustrated harbour reconstruction",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-ai-01",
+      kind: "ai-reconstruction",
+      url: "media/ai/capernaum-ai-01.webp",
+      author: "Interactive Bible Map",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md",
+      caption: "AI overview reconstruction of first-century Capernaum",
+      aiGenerated: true,
+      generator: {
+        tool: "DALL·E",
+        model: "gpt-image-1",
+        date: "2026-09-30"
+      },
+      promptRef: "Prompt 2: Synagogue and harbour",
+      basedOn: ["wikidata:Q59174", "bib:murphy-oconnor-holy-land-guide"]
+    },
+    {
+      id: "capernaum-06",
+      kind: "historical",
+      url: "https://upload.wikimedia.org/wikipedia/commons/4/4a/M3_5_Fixture_Capernaum_Site_02.jpg",
+      width: 3600,
+      height: 2400,
+      author: "Fixture Photographer 4",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_02.jpg",
+      caption: "Historical photograph of lakeshore ruins",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-07",
+      kind: "reconstruction",
+      url: "https://upload.wikimedia.org/wikipedia/commons/5/5a/M3_5_Fixture_Capernaum_Reconstruction_02.jpg",
+      width: 3200,
+      height: 2000,
+      author: "Fixture Artist 2",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Reconstruction_02.jpg",
+      caption: "Streetscape reconstruction",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-08",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/6/6a/M3_5_Fixture_Capernaum_Modern_03.jpg",
+      width: 3840,
+      height: 2160,
+      author: "Fixture Photographer 5",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Modern_03.jpg",
+      caption: "Modern lakeside panorama",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-09",
+      kind: "site",
+      url: "https://upload.wikimedia.org/wikipedia/commons/7/7a/M3_5_Fixture_Capernaum_Site_03.jpg",
+      width: 3072,
+      height: 2048,
+      author: "Fixture Photographer 6",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Site_03.jpg",
+      caption: "Excavated structure cluster",
+      aiGenerated: false
+    },
+    {
+      id: "capernaum-10",
+      kind: "reconstruction",
+      url: "https://upload.wikimedia.org/wikipedia/commons/8/8a/M3_5_Fixture_Capernaum_Reconstruction_03.jpg",
+      width: 3600,
+      height: 2400,
+      author: "Fixture Artist 3",
+      license: "CC BY 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+      sourcePage:
+        "https://commons.wikimedia.org/wiki/File:M3_5_Fixture_Capernaum_Reconstruction_03.jpg",
+      caption: "Market-quarter reconstruction",
+      aiGenerated: false
+    }
+  ];
+
+  return {
+    ...basePayload,
+    media: {
+      locationId: "capernaum",
+      images: fixtureImages
+    }
+  };
+}
+
+async function routeGalleryFixtureRequests(page, galleryFixturePayload, imageRequests = null) {
+  await page.route("**/*", async (route) => {
+    const requestUrl = route.request().url();
+    if (requestUrl.endsWith("/generated/places/capernaum.json")) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify(galleryFixturePayload)
+      });
+      return;
+    }
+
+    if (
+      requestUrl.includes("upload.wikimedia.org/wikipedia/commons") ||
+      requestUrl.includes("/media/ai/")
+    ) {
+      imageRequests?.push(requestUrl);
+      await route.fulfill({
+        status: 200,
+        headers: {
+          "Content-Type": "image/svg+xml; charset=utf-8",
+          "Cache-Control": "no-cache"
+        },
+        body: fixtureImageBuffer
+      });
+      return;
+    }
+
+    await route.continue();
+  });
+}
+
+function parseCssRgbColor(colorValue) {
+  const match = colorValue
+    .replace(/\s+/gu, "")
+    .match(/^rgba?\((?<r>\d+),(?<g>\d+),(?<b>\d+)(?:,(?<a>\d*\.?\d+))?\)$/u);
+  if (!match?.groups) {
+    return null;
+  }
+
+  const alpha = match.groups.a ? Number.parseFloat(match.groups.a) : 1;
+  return {
+    r: Number.parseInt(match.groups.r, 10),
+    g: Number.parseInt(match.groups.g, 10),
+    b: Number.parseInt(match.groups.b, 10),
+    a: Number.isFinite(alpha) ? alpha : 1
+  };
+}
+
+function blendOverBackground(foreground, background) {
+  const alpha = Math.min(1, Math.max(0, foreground.a));
+  return {
+    r: foreground.r * alpha + background.r * (1 - alpha),
+    g: foreground.g * alpha + background.g * (1 - alpha),
+    b: foreground.b * alpha + background.b * (1 - alpha)
+  };
+}
+
+function srgbChannelToLinear(channelValue) {
+  const normalized = channelValue / 255;
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(color) {
+  return (
+    0.2126 * srgbChannelToLinear(color.r) +
+    0.7152 * srgbChannelToLinear(color.g) +
+    0.0722 * srgbChannelToLinear(color.b)
+  );
+}
+
+function contrastRatio(left, right) {
+  const leftLuminance = relativeLuminance(left);
+  const rightLuminance = relativeLuminance(right);
+  const lighter = Math.max(leftLuminance, rightLuminance);
+  const darker = Math.min(leftLuminance, rightLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function assertBoundsWithinPanel(panelBounds, elementBounds, elementLabel, scenarioLabel) {
+  if (!elementBounds) {
+    throw new Error(`${scenarioLabel}: missing bounds for ${elementLabel}.`);
+  }
+
+  const tolerance = 0.5;
+  if (
+    elementBounds.left < panelBounds.left - tolerance ||
+    elementBounds.right > panelBounds.right + tolerance ||
+    elementBounds.top < panelBounds.top - tolerance ||
+    elementBounds.bottom > panelBounds.bottom + tolerance
+  ) {
+    throw new Error(
+      `${scenarioLabel}: ${elementLabel} is outside panel bounds. panel=${JSON.stringify(panelBounds)} element=${JSON.stringify(elementBounds)}`
+    );
+  }
+}
+
+function assertMinimumHitArea(elementBounds, elementLabel, scenarioLabel) {
+  if (!elementBounds) {
+    throw new Error(`${scenarioLabel}: missing bounds for ${elementLabel}.`);
+  }
+
+  if (
+    elementBounds.width < minimumControlHitAreaPx - 0.5 ||
+    elementBounds.height < minimumControlHitAreaPx - 0.5
+  ) {
+    throw new Error(
+      `${scenarioLabel}: ${elementLabel} hit area is below ${minimumControlHitAreaPx}px (${elementBounds.width.toFixed(2)}x${elementBounds.height.toFixed(2)}).`
+    );
+  }
+}
+
+function assertGalleryLabelContrast(labelStyle, scenarioLabel) {
+  if (!labelStyle) {
+    throw new Error(`${scenarioLabel}: missing gallery label style.`);
+  }
+
+  const textColor = parseCssRgbColor(labelStyle.color);
+  const labelBackground = parseCssRgbColor(labelStyle.backgroundColor);
+  if (!textColor || !labelBackground) {
+    throw new Error(`${scenarioLabel}: could not parse gallery label colors.`);
+  }
+
+  const compositeOnWhite = blendOverBackground(labelBackground, { r: 255, g: 255, b: 255 });
+  const compositeOnBlack = blendOverBackground(labelBackground, { r: 0, g: 0, b: 0 });
+  const contrastOnWhite = contrastRatio(textColor, compositeOnWhite);
+  const contrastOnBlack = contrastRatio(textColor, compositeOnBlack);
+  const minimumContrast = Math.min(contrastOnWhite, contrastOnBlack);
+
+  if (minimumContrast < 3) {
+    throw new Error(
+      `${scenarioLabel}: gallery label contrast is below 3:1 (white=${contrastOnWhite.toFixed(2)}, black=${contrastOnBlack.toFixed(2)}).`
+    );
+  }
+
+  return {
+    contrastOnWhite,
+    contrastOnBlack,
+    minimumContrast
+  };
+}
+
+async function captureGalleryPanelLayoutSnapshot(page) {
+  return page.evaluate(() => {
+    const panel = document.querySelector("section[aria-label='Place details']");
+    const photosSection = panel?.querySelector("[data-panel-section='photos']");
+    const mainImage = photosSection?.querySelector("[data-panel-photo-image='true']");
+    const previousButton = photosSection?.querySelector("button[aria-label='Previous image']");
+    const nextButton = photosSection?.querySelector("button[aria-label='Next image']");
+    const counter = photosSection?.querySelector("[data-photo-counter='true']");
+    const kindLabel = photosSection?.querySelector("[data-photo-kind-label='true']");
+    const credit = photosSection?.querySelector("[data-photo-credit='true']");
+    const thumbnailRow = photosSection?.querySelector("[data-thumbnail-row='true']");
+    const selectedThumbnail = photosSection?.querySelector(
+      "[data-thumbnail-row='true'] button[data-gallery-thumbnail='selected']"
+    );
+
+    const toBounds = (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return null;
+      }
+
+      const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
+      return {
+        left,
+        right,
+        top,
+        bottom,
+        width,
+        height
+      };
+    };
+
+    const labelStyle =
+      kindLabel instanceof HTMLElement
+        ? {
+            color: window.getComputedStyle(kindLabel).color,
+            backgroundColor: window.getComputedStyle(kindLabel).backgroundColor
+          }
+        : null;
+
+    const horizontalOverflow =
+      Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth;
+
+    const rowScrollLeft = thumbnailRow instanceof HTMLElement ? thumbnailRow.scrollLeft : null;
+    const rowScrollableWidth =
+      thumbnailRow instanceof HTMLElement ? thumbnailRow.scrollWidth - thumbnailRow.clientWidth : null;
+
+    return {
+      panelBounds: toBounds(panel),
+      photosSectionBounds: toBounds(photosSection),
+      mainImageBounds: toBounds(mainImage),
+      previousButtonBounds: toBounds(previousButton),
+      nextButtonBounds: toBounds(nextButton),
+      counterBounds: toBounds(counter),
+      kindLabelBounds: toBounds(kindLabel),
+      creditBounds: toBounds(credit),
+      thumbnailRowBounds: toBounds(thumbnailRow),
+      selectedThumbnailBounds: toBounds(selectedThumbnail),
+      rowScrollLeft,
+      rowScrollableWidth,
+      horizontalOverflow,
+      labelStyle
+    };
+  });
+}
+
+function assertGalleryPanelBoundsAndOverflow(snapshot, scenarioLabel) {
+  if (!snapshot.panelBounds) {
+    throw new Error(`${scenarioLabel}: missing panel bounds.`);
+  }
+
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.photosSectionBounds,
+    "photos section",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.mainImageBounds, "main image", scenarioLabel);
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.previousButtonBounds,
+    "previous image button",
+    scenarioLabel
+  );
+  assertMinimumHitArea(snapshot.previousButtonBounds, "previous image button", scenarioLabel);
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.nextButtonBounds,
+    "next image button",
+    scenarioLabel
+  );
+  assertMinimumHitArea(snapshot.nextButtonBounds, "next image button", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.counterBounds, "counter", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.kindLabelBounds, "kind label", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditBounds, "credit line", scenarioLabel);
+  assertBoundsWithinPanel(
+    snapshot.panelBounds,
+    snapshot.thumbnailRowBounds,
+    "thumbnail row container",
+    scenarioLabel
+  );
+
+  if (snapshot.horizontalOverflow > 0.5) {
+    throw new Error(
+      `${scenarioLabel}: page has horizontal overflow (${snapshot.horizontalOverflow.toFixed(2)} px).`
+    );
+  }
+}
+
+function assertSelectedThumbnailInView(snapshot, scenarioLabel) {
+  if (!snapshot.thumbnailRowBounds || !snapshot.selectedThumbnailBounds) {
+    throw new Error(`${scenarioLabel}: missing thumbnail-row bounds.`);
+  }
+
+  const tolerance = 0.5;
+  const selectedInsideRow =
+    snapshot.selectedThumbnailBounds.left >= snapshot.thumbnailRowBounds.left - tolerance &&
+    snapshot.selectedThumbnailBounds.right <= snapshot.thumbnailRowBounds.right + tolerance &&
+    snapshot.selectedThumbnailBounds.top >= snapshot.thumbnailRowBounds.top - tolerance &&
+    snapshot.selectedThumbnailBounds.bottom <= snapshot.thumbnailRowBounds.bottom + tolerance;
+
+  if (!selectedInsideRow) {
+    throw new Error(
+      `${scenarioLabel}: selected thumbnail is not fully visible in the row viewport. row=${JSON.stringify(snapshot.thumbnailRowBounds)} selected=${JSON.stringify(snapshot.selectedThumbnailBounds)}`
+    );
+  }
+
+  if (
+    typeof snapshot.rowScrollableWidth === "number" &&
+    snapshot.rowScrollableWidth > 0 &&
+    typeof snapshot.rowScrollLeft === "number" &&
+    snapshot.rowScrollLeft <= 0.5
+  ) {
+    throw new Error(
+      `${scenarioLabel}: thumbnail row did not scroll for a later selected image (scrollLeft=${snapshot.rowScrollLeft.toFixed(2)}).`
+    );
+  }
+}
+
+async function captureViewerControlLayoutSnapshot(page) {
+  return page.evaluate(() => {
+    const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+    const closeButton = dialog?.querySelector("button[aria-label='Close image viewer']");
+    const previousButton = dialog?.querySelector("button[aria-label='Previous image']");
+    const nextButton = dialog?.querySelector("button[aria-label='Next image']");
+
+    const toBounds = (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return null;
+      }
+
+      const { left, right, top, bottom, width, height } = element.getBoundingClientRect();
+      return {
+        left,
+        right,
+        top,
+        bottom,
+        width,
+        height
+      };
+    };
+
+    return {
+      dialogBounds: toBounds(dialog),
+      closeButtonBounds: toBounds(closeButton),
+      previousButtonBounds: toBounds(previousButton),
+      nextButtonBounds: toBounds(nextButton)
+    };
+  });
+}
+
+function assertViewerControlLayout(snapshot, scenarioLabel) {
+  if (!snapshot.dialogBounds) {
+    throw new Error(`${scenarioLabel}: missing image viewer dialog bounds.`);
+  }
+
+  assertBoundsWithinPanel(
+    snapshot.dialogBounds,
+    snapshot.closeButtonBounds,
+    "viewer close button",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(
+    snapshot.dialogBounds,
+    snapshot.previousButtonBounds,
+    "viewer previous image button",
+    scenarioLabel
+  );
+  assertBoundsWithinPanel(
+    snapshot.dialogBounds,
+    snapshot.nextButtonBounds,
+    "viewer next image button",
+    scenarioLabel
+  );
+  assertMinimumHitArea(snapshot.closeButtonBounds, "viewer close button", scenarioLabel);
+  assertMinimumHitArea(snapshot.previousButtonBounds, "viewer previous image button", scenarioLabel);
+  assertMinimumHitArea(snapshot.nextButtonBounds, "viewer next image button", scenarioLabel);
+}
+
+async function verifyGalleryFixtureBoundsAtViewport(
+  browser,
+  baseUrl,
+  galleryFixturePayload,
+  viewport
+) {
+  const context = await browser.newContext({ viewport });
+  const page = await context.newPage();
+
+  await routeGalleryFixtureRequests(page, galleryFixturePayload);
+
+  try {
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+      timeout: 30_000
+    });
+
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("AI-generated reconstruction", { exact: true })
+      .waitFor({ timeout: 30_000 });
+
+    const aiLayoutSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    const viewportLabel = `${viewport.width}x${viewport.height}`;
+    assertGalleryPanelBoundsAndOverflow(aiLayoutSnapshot, `Gallery bounds ${viewportLabel}`);
+    const labelContrast = assertGalleryLabelContrast(
+      aiLayoutSnapshot.labelStyle,
+      `Gallery label contrast ${viewportLabel}`
+    );
+
+    for (let index = 0; index < 5; index += 1) {
+      await page.getByRole("button", { name: "Next image" }).click();
+    }
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos']")
+      .getByText("10 / 10", { exact: true })
+      .waitFor({ timeout: 30_000 });
+
+    const endOfRowSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    assertSelectedThumbnailInView(endOfRowSnapshot, `Gallery selected thumbnail ${viewportLabel}`);
+
+    return {
+      viewport,
+      labelContrast,
+      rowScrollLeft: endOfRowSnapshot.rowScrollLeft,
+      rowScrollableWidth: endOfRowSnapshot.rowScrollableWidth
+    };
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+    await context.close();
+  }
 }
 
 async function waitForMapToSettle(page) {
@@ -1273,11 +1889,11 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     throw new Error(`Missing required photo credit text on lead image: '${firstCreditText.trim()}'`);
   }
 
-  const nextPhoto = page.locator("button[aria-label='Next photo']");
-  const hasCarousel = (await nextPhoto.count()) > 0;
+  const nextImage = page.locator("button[aria-label='Next image']");
+  const hasCarousel = (await nextImage.count()) > 0;
   let secondCreditText = null;
   if (hasCarousel) {
-    await nextPhoto.first().click();
+    await nextImage.first().click();
     await page.waitForTimeout(200);
     secondCreditText =
       (await page
@@ -1299,6 +1915,450 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     firstCreditText: firstCreditText.trim(),
     secondCreditText: secondCreditText?.trim() ?? null
   };
+}
+
+async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  const page = await context.newPage();
+  const screenshotPaths = {
+    panel: temporaryGalleryScreenshotPath("gallery-10-image-place.png"),
+    thumbnails: temporaryGalleryScreenshotPath("gallery-thumbnail-row.png"),
+    viewer: temporaryGalleryScreenshotPath("gallery-viewer-open.png"),
+    aiLabel: temporaryGalleryScreenshotPath("gallery-ai-label.png")
+  };
+  const imageRequests = [];
+
+  await fs.mkdir(path.dirname(screenshotPaths.panel), { recursive: true });
+
+  const capernaumPayload = await readGeneratedPlacePayload("capernaum");
+  const galleryFixturePayload = buildGalleryFixturePayload(capernaumPayload);
+  await routeGalleryFixtureRequests(page, galleryFixturePayload, imageRequests);
+
+  try {
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+      timeout: 30_000
+    });
+
+    const photosSection = page.locator(
+      "section[aria-label='Place details'] [data-panel-section='photos']"
+    );
+    await photosSection.getByRole("button", { name: "Previous image" }).waitFor({ timeout: 30_000 });
+    await photosSection.getByRole("button", { name: "Next image" }).waitFor({ timeout: 30_000 });
+    await photosSection.getByText("1 / 10", { exact: true }).waitFor({ timeout: 30_000 });
+    await photosSection.screenshot({ path: screenshotPaths.panel });
+
+    const thumbnails = page.locator("[data-thumbnail-row='true'] button[data-gallery-thumbnail]");
+    const thumbnailCount = await thumbnails.count();
+    if (thumbnailCount !== 10) {
+      throw new Error(`Fixture gallery should render 10 thumbnails, got ${thumbnailCount}.`);
+    }
+    await page.locator("[data-thumbnail-row='true']").screenshot({
+      path: screenshotPaths.thumbnails
+    });
+
+    const initialKindLabel = normalizeTextContent(
+      (await page
+        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (initialKindLabel !== "Today") {
+      throw new Error(`Expected first fixture image kind label to be 'Today', got '${initialKindLabel}'.`);
+    }
+
+    await page.waitForTimeout(600);
+    const commonsRequestsBeforeViewer = imageRequests
+      .map((requestUrl) => parseCommonsThumbnailRequest(requestUrl))
+      .filter((entry) => entry !== null);
+    const aboveThumbnailFilesBeforeViewer = new Set(
+      commonsRequestsBeforeViewer
+        .filter((entry) => entry.width > 330)
+        .map((entry) => entry.fileName)
+    );
+    if (aboveThumbnailFilesBeforeViewer.size > 2) {
+      throw new Error(
+        `Expected at most two above-thumbnail Commons requests before opening viewer, got ${JSON.stringify(Array.from(aboveThumbnailFilesBeforeViewer))}.`
+      );
+    }
+    const panoramaFileName = "M3_5_Fixture_Capernaum_Modern_01.jpg";
+    const panoramaPanelRequestWidths = commonsRequestsBeforeViewer
+      .filter((entry) => entry.fileName === panoramaFileName && entry.width > 330)
+      .map((entry) => entry.width);
+    if (panoramaPanelRequestWidths.length === 0) {
+      throw new Error("Expected a panel Commons thumbnail request above 330px for the panorama fixture.");
+    }
+    const panoramaPanelRequestWidth = Math.max(...panoramaPanelRequestWidths);
+    if (panoramaPanelRequestWidth < 1280) {
+      throw new Error(
+        `Expected panorama panel request width >= 1280, got ${panoramaPanelRequestWidth}.`
+      );
+    }
+    const fourByThreeFileName = "M3_5_Fixture_Capernaum_Modern_02.jpg";
+    const fourByThreePanelRequestWidths = commonsRequestsBeforeViewer
+      .filter((entry) => entry.fileName === fourByThreeFileName && entry.width > 330)
+      .map((entry) => entry.width);
+    if (fourByThreePanelRequestWidths.length === 0) {
+      throw new Error("Expected a panel Commons thumbnail request above 330px for the 4:3 fixture image.");
+    }
+    const fourByThreePanelRequestWidth = Math.max(...fourByThreePanelRequestWidths);
+    if (fourByThreePanelRequestWidth < 500) {
+      throw new Error(
+        `Expected 4:3 panel request width >= 500, got ${fourByThreePanelRequestWidth}.`
+      );
+    }
+    const panelRenderState = await page.evaluate(() => {
+      const image = document.querySelector(
+        "section[aria-label='Place details'] [data-panel-section='photos'] [data-panel-photo-image='true']"
+      );
+      if (!(image instanceof HTMLElement)) {
+        return null;
+      }
+      const rect = image.getBoundingClientRect();
+      return {
+        width: rect.width,
+        height: rect.height,
+        devicePixelRatio: window.devicePixelRatio || 1
+      };
+    });
+    if (!panelRenderState) {
+      throw new Error("Could not read panel image render bounds for panorama quality checks.");
+    }
+    const panoramaRequestHeight = (panoramaPanelRequestWidth * 2516) / 13068;
+    const renderedDeviceWidth = panelRenderState.width * panelRenderState.devicePixelRatio;
+    const renderedDeviceHeight = panelRenderState.height * panelRenderState.devicePixelRatio;
+    const fourByThreeRequiredCoverWidth = Math.max(
+      renderedDeviceWidth,
+      renderedDeviceHeight * (4032 / 3024)
+    );
+    if (fourByThreePanelRequestWidth + 1 < fourByThreeRequiredCoverWidth) {
+      throw new Error(
+        `4:3 panel image request is too small for cover-fit rendering (request=${fourByThreePanelRequestWidth}, required=${fourByThreeRequiredCoverWidth.toFixed(2)}).`
+      );
+    }
+    if (renderedDeviceWidth > panoramaPanelRequestWidth + 1) {
+      throw new Error(
+        `Panorama panel image is upscaled horizontally (rendered=${renderedDeviceWidth.toFixed(2)} request=${panoramaPanelRequestWidth}).`
+      );
+    }
+    if (renderedDeviceHeight > panoramaRequestHeight + 1) {
+      throw new Error(
+        `Panorama panel image is upscaled vertically (rendered=${renderedDeviceHeight.toFixed(2)} request=${panoramaRequestHeight.toFixed(2)}).`
+      );
+    }
+
+    const thumbnailCommonsBeforeViewer = new Set(
+      commonsRequestsBeforeViewer
+        .filter((entry) => entry.width === 330)
+        .map((entry) => entry.fileName)
+    );
+    if (thumbnailCommonsBeforeViewer.size < 9) {
+      throw new Error(
+        `Expected 330px thumbnail requests for the 9 Commons fixture images, got ${thumbnailCommonsBeforeViewer.size}.`
+      );
+    }
+    const width1280BeforeViewer = commonsRequestsBeforeViewer.filter(
+      (entry) => entry.width === 1280
+    ).length;
+
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("AI-generated reconstruction", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    const aiCreditText = normalizeTextContent(
+      (await page
+        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
+        .textContent()) ?? ""
+    );
+    if (
+      !aiCreditText.includes("AI-generated reconstruction") ||
+      !aiCreditText.includes("DALL·E") ||
+      !aiCreditText.includes("CC BY-SA 4.0") ||
+      !aiCreditText.includes("Based on: research brief")
+    ) {
+      throw new Error(`AI credit line mismatch: '${aiCreditText}'.`);
+    }
+    const aiBriefHref = await page
+      .locator(
+        "section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true'] a"
+      )
+      .last()
+      .getAttribute("href");
+    const expectedAiBriefHref =
+      "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-2-synagogue-and-harbour";
+    if (aiBriefHref !== expectedAiBriefHref) {
+      throw new Error(
+        `AI source link mismatch. expected='${expectedAiBriefHref}', got='${aiBriefHref ?? "null"}'.`
+      );
+    }
+    await page.getByRole("button", { name: "Show image 6 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("Historical view", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    const historicalPanelKindLabel = normalizeTextContent(
+      (await page
+        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (historicalPanelKindLabel !== "Historical view") {
+      throw new Error(
+        `Expected historical fixture label in panel, got '${historicalPanelKindLabel}'.`
+      );
+    }
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
+      .getByText("AI-generated reconstruction", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    await photosSection.screenshot({ path: screenshotPaths.aiLabel });
+    const layoutDesktopSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    assertGalleryPanelBoundsAndOverflow(layoutDesktopSnapshot, "Gallery bounds 1440x960");
+    const labelContrastDesktop = assertGalleryLabelContrast(
+      layoutDesktopSnapshot.labelStyle,
+      "Gallery label contrast 1440x960"
+    );
+
+    for (let index = 0; index < 5; index += 1) {
+      await page.getByRole("button", { name: "Next image" }).click();
+    }
+    await photosSection.getByText("10 / 10", { exact: true }).waitFor({ timeout: 30_000 });
+    const selectedThumbnailDesktopSnapshot = await captureGalleryPanelLayoutSnapshot(page);
+    assertSelectedThumbnailInView(
+      selectedThumbnailDesktopSnapshot,
+      "Gallery selected thumbnail 1440x960"
+    );
+
+    for (let index = 0; index < 5; index += 1) {
+      await page.getByRole("button", { name: "Previous image" }).click();
+    }
+    await photosSection.getByText("5 / 10", { exact: true }).waitFor({ timeout: 30_000 });
+
+    const opener = page.locator("[data-image-viewer-open='true']");
+    await opener.focus();
+    await page.keyboard.press("Enter");
+    await page.waitForSelector("[data-image-viewer-dialog='true']", {
+      state: "visible",
+      timeout: 30_000
+    });
+    const viewerBackgroundInertCheck = await page.evaluate(() => {
+      const appShellRoot = document.querySelector("[data-app-shell-root]");
+      const overlay = document.querySelector("[data-image-viewer-overlay='true']");
+      if (!(appShellRoot instanceof HTMLElement) || !(overlay instanceof HTMLElement)) {
+        return null;
+      }
+
+      const backgroundChildren = Array.from(appShellRoot.children).filter(
+        (child) => child instanceof HTMLElement && !child.contains(overlay)
+      );
+      return {
+        backgroundChildCount: backgroundChildren.length,
+        nonInertChildCount: backgroundChildren.filter((child) => !child.hasAttribute("inert"))
+          .length
+      };
+    });
+    if (
+      !viewerBackgroundInertCheck ||
+      viewerBackgroundInertCheck.backgroundChildCount === 0 ||
+      viewerBackgroundInertCheck.nonInertChildCount !== 0
+    ) {
+      throw new Error(
+        `Image viewer should set inert on the app-shell background, got ${JSON.stringify(viewerBackgroundInertCheck)}.`
+      );
+    }
+    await page.locator("[data-image-viewer-dialog='true']").screenshot({
+      path: screenshotPaths.viewer
+    });
+
+    const viewerKindLabel = normalizeTextContent(
+      (await page
+        .locator("[data-image-viewer-dialog='true'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (viewerKindLabel !== "AI-generated reconstruction") {
+      throw new Error(
+        `Viewer should show AI kind label, got '${viewerKindLabel}'.`
+      );
+    }
+    const viewerControlSnapshot = await captureViewerControlLayoutSnapshot(page);
+    assertViewerControlLayout(viewerControlSnapshot, "Viewer controls 1440x960");
+
+    await page.waitForTimeout(600);
+    const width1280AfterViewerOpen = imageRequests
+      .map((requestUrl) => parseCommonsThumbnailRequest(requestUrl))
+      .filter((entry) => entry !== null && entry.width === 1280).length;
+    if (width1280AfterViewerOpen <= width1280BeforeViewer) {
+      throw new Error(
+        `Viewer should request 1280px images only when opened (before=${width1280BeforeViewer}, after=${width1280AfterViewerOpen}).`
+      );
+    }
+
+    await page.keyboard.press("ArrowRight");
+    await page
+      .locator("[data-image-viewer-dialog='true']")
+      .getByText("6 / 10", { exact: true })
+      .waitFor({ timeout: 30_000 });
+    const viewerHistoricalKindLabel = normalizeTextContent(
+      (await page
+        .locator("[data-image-viewer-dialog='true'] [data-photo-kind-label='true']")
+        .textContent()) ?? ""
+    );
+    if (viewerHistoricalKindLabel !== "Historical view") {
+      throw new Error(`Viewer should show historical kind label, got '${viewerHistoricalKindLabel}'.`);
+    }
+    await page.keyboard.press("ArrowLeft");
+    await page
+      .locator("[data-image-viewer-dialog='true']")
+      .getByText("5 / 10", { exact: true })
+      .waitFor({ timeout: 30_000 });
+
+    for (let index = 0; index < 12; index += 1) {
+      await page.keyboard.press("Tab");
+      const focusInsideDialog = await page.evaluate(() => {
+        const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+        return !!dialog && dialog.contains(document.activeElement);
+      });
+      if (!focusInsideDialog) {
+        throw new Error("Tab moved focus outside the image viewer dialog.");
+      }
+    }
+    for (let index = 0; index < 4; index += 1) {
+      await page.keyboard.press("Shift+Tab");
+      const focusInsideDialog = await page.evaluate(() => {
+        const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+        return !!dialog && dialog.contains(document.activeElement);
+      });
+      if (!focusInsideDialog) {
+        throw new Error("Shift+Tab moved focus outside the image viewer dialog.");
+      }
+    }
+
+    await page.keyboard.press("/");
+    const slashShortcutCheck = await page.evaluate(() => {
+      const dialog = document.querySelector("[data-image-viewer-dialog='true']");
+      const searchInput = document.querySelector("input[aria-label='Search biblical places']");
+      const activeElement = document.activeElement;
+
+      return {
+        dialogOpen: Boolean(dialog),
+        focusInsideDialog:
+          dialog instanceof HTMLElement &&
+          activeElement instanceof HTMLElement &&
+          dialog.contains(activeElement),
+        searchFocused:
+          searchInput instanceof HTMLElement &&
+          activeElement instanceof HTMLElement &&
+          activeElement === searchInput
+      };
+    });
+    if (!slashShortcutCheck.dialogOpen) {
+      throw new Error("Pressing '/' unexpectedly closed the image viewer dialog.");
+    }
+    if (!slashShortcutCheck.focusInsideDialog) {
+      throw new Error("Pressing '/' moved focus outside the image viewer dialog.");
+    }
+    if (slashShortcutCheck.searchFocused) {
+      throw new Error("Pressing '/' while the image viewer is open focused the search input.");
+    }
+
+    const fixturePanelA11y = await runA11yCheck(
+      page,
+      "section[aria-label='Place details']",
+      "Fixture gallery panel accessibility",
+      {
+        requireZeroViolations: true
+      }
+    );
+    const fixtureViewerA11y = await runA11yCheck(
+      page,
+      "[data-image-viewer-dialog='true']",
+      "Fixture gallery viewer accessibility",
+      {
+        requireZeroViolations: true
+      }
+    );
+
+    await page.keyboard.press("Escape");
+    await page.waitForSelector("[data-image-viewer-dialog='true']", {
+      state: "detached",
+      timeout: 30_000
+    });
+    const focusRestored = await page.evaluate(() => {
+      const active = document.activeElement;
+      return (
+        active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true"
+      );
+    });
+    if (!focusRestored) {
+      throw new Error("Esc should close the image viewer and restore focus to the opener.");
+    }
+    const lingeringInertBackground = await page.evaluate(() => {
+      const appShellRoot = document.querySelector("[data-app-shell-root]");
+      if (!(appShellRoot instanceof HTMLElement)) {
+        return null;
+      }
+
+      return Array.from(appShellRoot.children).filter(
+        (child) => child instanceof HTMLElement && child.hasAttribute("inert")
+      ).length;
+    });
+    if (typeof lingeringInertBackground === "number" && lingeringInertBackground > 0) {
+      throw new Error(
+        `Image viewer left background elements inert after close (${lingeringInertBackground}).`
+      );
+    }
+
+    const layoutNarrowViewportCheck = await verifyGalleryFixtureBoundsAtViewport(
+      browser,
+      baseUrl,
+      galleryFixturePayload,
+      { width: 1024, height: 768 }
+    );
+
+    return {
+      screenshotPaths,
+      thumbnailCount,
+      fullSizeBeforeViewer: Array.from(aboveThumbnailFilesBeforeViewer).sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      panoramaPanelRequestWidth,
+      fourByThreePanelRequestWidth,
+      panoramaUpscaleCheck: {
+        requestWidth: panoramaPanelRequestWidth,
+        requestHeight: panoramaRequestHeight,
+        renderedDeviceWidth,
+        renderedDeviceHeight
+      },
+      width1280BeforeViewer,
+      width1280AfterViewerOpen,
+      aiCreditText,
+      aiBriefHref,
+      modalChecks: {
+        viewerBackgroundInert: viewerBackgroundInertCheck,
+        slashShortcut: slashShortcutCheck,
+        lingeringInertBackground
+      },
+      layoutChecks: {
+        desktop1440: {
+          labelContrast: labelContrastDesktop,
+          rowScrollLeft: selectedThumbnailDesktopSnapshot.rowScrollLeft,
+          rowScrollableWidth: selectedThumbnailDesktopSnapshot.rowScrollableWidth
+        },
+        desktop1024: layoutNarrowViewportCheck
+      },
+      accessibility: {
+        fixturePanel: fixturePanelA11y,
+        fixtureViewer: fixtureViewerA11y
+      }
+    };
+  } finally {
+    await page.unroute("**/*");
+    await page.close();
+    await context.close();
+  }
 }
 
 async function verifyCapernaumLeadImageLoads(page, baseUrl) {
@@ -3635,6 +4695,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const galleryFixtureChecks = await verifyGalleryFixtureWithViewer(
+      browser,
+      staticServer.baseUrl
+    );
     const capernaumLeadImageLoadCheck = await verifyCapernaumLeadImageLoads(
       page,
       staticServer.baseUrl
@@ -3797,6 +4861,7 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       panelSectionAndCreditChecks,
+      galleryFixtureChecks,
       capernaumLeadImageLoadCheck,
       imageFailurePlaceholderCheck,
       disputedAndHierarchyChecks,

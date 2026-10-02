@@ -86,6 +86,10 @@ function isEditableTarget(target: EventTarget | null, searchInput: HTMLInputElem
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
 }
 
+function hasOpenModalDialog() {
+  return document.querySelector("[aria-modal='true']") instanceof HTMLElement;
+}
+
 function getFocusableDrawerElements(drawerElement: HTMLElement) {
   return Array.from(drawerElement.querySelectorAll<HTMLElement>(drawerFocusableSelector)).filter(
     (element) => !element.closest("[inert]")
@@ -274,6 +278,11 @@ export function SearchMenu({ places, inputRef, onSelectPlace }: SearchMenuProps)
   useEffect(() => {
     const focusSearchFromSlash = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (hasOpenModalDialog()) {
+        event.preventDefault();
         return;
       }
 

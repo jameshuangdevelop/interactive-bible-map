@@ -2,7 +2,8 @@ import {
   COMMONS_THUMBNAIL_WIDTHS,
   buildCommonsThumbnailSrcSet,
   buildCommonsThumbnailUrl,
-  selectCommonsThumbnailWidth
+  selectCommonsThumbnailWidth,
+  selectCommonsThumbnailWidthForFrame
 } from "../src/features/place-panel/commons-thumbnail";
 
 describe("commons thumbnail helpers", () => {
@@ -50,5 +51,162 @@ describe("commons thumbnail helpers", () => {
       );
     }
     expect(srcSet).not.toContain("utm_source=");
+  });
+
+  test("keeps repo-hosted AI image paths unchanged", () => {
+    const aiPath = "media/ai/capernaum-ai-01.webp";
+    expect(buildCommonsThumbnailUrl(aiPath, 1280)).toBe(aiPath);
+    expect(buildCommonsThumbnailSrcSet(aiPath)).toBeNull();
+  });
+
+  test("picks cover-fit widths for common aspect ratios at DPR 1 and 2", () => {
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        fitMode: "cover",
+        originalWidth: 4032,
+        originalHeight: 3024
+      })
+    ).toBe(500);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 4032,
+        originalHeight: 3024
+      })
+    ).toBe(960);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        fitMode: "cover",
+        originalWidth: 4500,
+        originalHeight: 3000
+      })
+    ).toBe(500);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 4500,
+        originalHeight: 3000
+      })
+    ).toBe(960);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        fitMode: "cover",
+        originalWidth: 2400,
+        originalHeight: 3200
+      })
+    ).toBe(500);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 2400,
+        originalHeight: 3200
+      })
+    ).toBe(960);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        fitMode: "cover",
+        originalWidth: 4000,
+        originalHeight: 2250
+      })
+    ).toBe(500);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 4000,
+        originalHeight: 2250
+      })
+    ).toBe(960);
+  });
+
+  test("keeps wide panoramas sharp for cover-fit requests", () => {
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        fitMode: "cover",
+        originalWidth: 13068,
+        originalHeight: 2516
+      })
+    ).toBe(1280);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 13068,
+        originalHeight: 2516
+      })
+    ).toBe(1280);
+  });
+
+  test("supports contain-fit width selection for viewer images", () => {
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 1,
+        fitMode: "contain",
+        originalWidth: 4032,
+        originalHeight: 3024
+      })
+    ).toBe(330);
+  });
+
+  test("caps shape-aware widths to original width and falls back when tiny", () => {
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 420,
+        originalHeight: 315
+      })
+    ).toBe(330);
+
+    expect(
+      selectCommonsThumbnailWidthForFrame({
+        renderedWidth: 408,
+        renderedHeight: 240,
+        devicePixelRatio: 2,
+        fitMode: "cover",
+        originalWidth: 260,
+        originalHeight: 200
+      })
+    ).toBeNull();
   });
 });

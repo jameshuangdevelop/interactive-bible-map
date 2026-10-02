@@ -1,4 +1,13 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
+  type RefObject
+} from "react";
 
 import { candidateIndexToLetter, getPrimaryPlaceName } from "../map/place-visibility";
 import type {
@@ -11,18 +20,26 @@ import type {
   SourceId
 } from "../map/types";
 import {
+  AI_BASED_ON_LABEL,
   buildAlsoKnownAs,
+  buildImageCreditFields,
+  buildImageKindLabel,
+  buildImagePromptBriefUrl,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
   confidenceLabel,
   groupScriptureByBook,
+  imageIndexesToLoad,
+  isAiReconstructionImage,
   isDisputedRecord,
+  nextImageIndex,
+  shouldRenderThumbnailRow,
   sortScriptureByCanonicalOrder
 } from "./panel-model";
 import { formatSourceCitation } from "./source-format";
 import {
-  buildCommonsThumbnailSrcSet,
-  buildCommonsThumbnailUrl
+  buildCommonsThumbnailUrl,
+  selectCommonsThumbnailWidthForFrame
 } from "./commons-thumbnail";
 import { tokens } from "../../theme/tokens";
 
@@ -30,6 +47,15 @@ const PANEL_SECTION_GAP = tokens.spacing.lg;
 const SCRIPTURE_INITIAL_COUNT = 5;
 const SCRIPTURE_CHUNK_SIZE = 24;
 const SOURCE_SECTION_ANCHOR_ID = "place-panel-sources";
+const PANEL_IMAGE_ASPECT_RATIO = 17 / 10;
+const PANEL_IMAGE_DESKTOP_WIDTH = 408;
+const THUMBNAIL_IMAGE_WIDTH = 72;
+const THUMBNAIL_IMAGE_HEIGHT = 48;
+const VIEWER_DIALOG_MAX_WIDTH = 1280;
+const VIEWER_DIALOG_VIEWPORT_MARGIN = 32;
+const VIEWER_DIALOG_PADDING = tokens.spacing.md * 2;
+const DIALOG_FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -72,6 +98,122 @@ function toSafeHttpUrl(url: string | null | undefined) {
   }
 }
 
+function toSafeImageUrl(url: string | null | undefined) {
+  if (!url) {
+    return null;
+  }
+
+  const trimmed = url.trim();
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+
+    return parsed.toString();
+  } catch {
+    if (/^[a-z][a-z0-9+.-]*:/iu.test(trimmed) || trimmed.startsWith("//")) {
+      return null;
+    }
+
+    const normalized = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    try {
+      const parsed = new URL(normalized, "https://interactive-bible-map.local");
+      return `${parsed.pathname}${parsed.search}`;
+    } catch {
+      return null;
+    }
+  }
+}
+
+function resolveDisplayImageRequest({
+  image,
+  frameWidth,
+  frameHeight,
+  devicePixelRatio,
+  fitMode
+}: {
+  image: Pick<MediaImageRecord, "url" | "width" | "height">;
+  frameWidth: number;
+  frameHeight: number;
+  devicePixelRatio: number;
+  fitMode: "cover" | "contain";
+}) {
+  const safeImageUrl = toSafeImageUrl(image.url);
+  if (!safeImageUrl) {
+    return {
+      requestUrl: null as string | null
+    };
+  }
+
+  const selectedWidth = selectCommonsThumbnailWidthForFrame({
+    renderedWidth: frameWidth,
+    renderedHeight: frameHeight,
+    devicePixelRatio,
+    fitMode,
+    originalWidth: image.width,
+    originalHeight: image.height
+  });
+
+  return {
+    requestUrl:
+      typeof selectedWidth === "number"
+        ? buildCommonsThumbnailUrl(safeImageUrl, selectedWidth)
+        : safeImageUrl
+  };
+}
+
+function focusableElementsInDialog(container: HTMLElement) {
+  return Array.from(container.querySelectorAll<HTMLElement>(DIALOG_FOCUSABLE_SELECTOR)).filter(
+    (element) => !element.hasAttribute("disabled")
+  );
+}
+
+function cycleDialogFocus(event: ReactKeyboardEvent<HTMLElement>) {
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const container = event.currentTarget;
+  const focusable = focusableElementsInDialog(container);
+  if (focusable.length === 0) {
+    event.preventDefault();
+    return;
+  }
+
+  const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const currentIndex = activeElement ? focusable.indexOf(activeElement) : -1;
+  const movingBackward = event.shiftKey;
+  let targetIndex = 0;
+
+  if (movingBackward) {
+    targetIndex = currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1;
+  } else {
+    targetIndex = currentIndex < 0 || currentIndex >= focusable.length - 1 ? 0 : currentIndex + 1;
+  }
+
+  event.preventDefault();
+  focusable[targetIndex]?.focus();
+}
+
+interface CreditSegment {
+  key: string;
+  content: ReactNode;
+}
+
+function renderCreditSegments(segments: CreditSegment[]) {
+  return segments.map((segment, index) => (
+    <span key={segment.key}>
+      {index > 0 ? " · " : null}
+      {segment.content}
+    </span>
+  ));
+}
+
 function formatReviewedDate(lastReviewed: string | undefined) {
   if (!lastReviewed) {
     return "unknown";
@@ -112,32 +254,119 @@ function typeChipStyle(confidence: Confidence) {
 
 function WikimediaImage({
   image,
-  displayWidthHint,
-  thumbnailSizes,
+  locationId,
+  frameWidth,
+  frameHeight,
+  devicePixelRatio,
+  imageObjectFit,
   counterText,
-  failed,
-  onError
+  failedImageRequests,
+  onRequestFailure,
+  onOpenViewer,
+  openViewerTargetRef,
+  onPreviousImage,
+  onNextImage
 }: {
   image: MediaImageRecord;
-  displayWidthHint: number;
-  thumbnailSizes: string;
+  locationId: string;
+  frameWidth: number;
+  frameHeight: number;
+  devicePixelRatio: number;
+  imageObjectFit: "cover" | "contain";
   counterText: string | null;
-  failed: boolean;
-  onError: () => void;
+  failedImageRequests: Record<string, true>;
+  onRequestFailure: (requestUrl: string) => void;
+  onOpenViewer?: () => void;
+  openViewerTargetRef?: RefObject<HTMLButtonElement | null>;
+  onPreviousImage?: () => void;
+  onNextImage?: () => void;
 }) {
-  const safeImageUrl = toSafeHttpUrl(image.url);
+  const { requestUrl: imageUrl } = resolveDisplayImageRequest({
+    image,
+    frameWidth,
+    frameHeight,
+    devicePixelRatio,
+    fitMode: imageObjectFit
+  });
   const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
   const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
-  const imageUrl = safeImageUrl ? buildCommonsThumbnailUrl(safeImageUrl, displayWidthHint) : null;
-  const imageSrcSet = safeImageUrl ? buildCommonsThumbnailSrcSet(safeImageUrl) : null;
-  const showFallback = failed || !imageUrl;
+  const showFallback = !imageUrl || Boolean(failedImageRequests[imageUrl]);
+  const kindLabel = buildImageKindLabel(image.kind);
+  const isAiImage = isAiReconstructionImage(image);
+  const { authorLabel, licenseLabel, toolLabel } = buildImageCreditFields(image);
+  const aiBriefUrl = buildImagePromptBriefUrl(locationId, image.promptRef);
+  const aiSourcesText = AI_BASED_ON_LABEL;
+  const aiCreditSegments: CreditSegment[] = [{ key: "ai-label", content: "AI-generated reconstruction" }];
+  if (toolLabel) {
+    aiCreditSegments.push({
+      key: "tool",
+      content: toolLabel
+    });
+  }
+  if (licenseLabel) {
+    aiCreditSegments.push({
+      key: "license",
+      content: safeLicenseUrl ? (
+        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+          {licenseLabel}
+        </a>
+      ) : (
+        licenseLabel
+      )
+    });
+  }
+  aiCreditSegments.push({
+    key: "based-on",
+    content: (
+      <>
+        Based on:{" "}
+        <a href={aiBriefUrl} rel="noopener noreferrer" target="_blank">
+          {aiSourcesText}
+        </a>
+      </>
+    )
+  });
+  const commonsCreditSegments: CreditSegment[] = [
+    {
+      key: "photo",
+      content: authorLabel ? `Photo: ${authorLabel}` : "Photo"
+    }
+  ];
+  if (licenseLabel) {
+    commonsCreditSegments.push({
+      key: "license",
+      content: safeLicenseUrl ? (
+        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
+          {licenseLabel}
+        </a>
+      ) : (
+        licenseLabel
+      )
+    });
+  }
+  commonsCreditSegments.push({
+    key: "source",
+    content: safeSourcePageUrl ? (
+      <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
+        Wikimedia Commons
+      </a>
+    ) : (
+      "Wikimedia Commons"
+    )
+  });
 
   return (
-    <div>
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "100%",
+        minWidth: 0
+      }}
+    >
       <div
         style={{
           width: "100%",
-          aspectRatio: "17 / 10",
+          height: `${Math.max(1, Math.round(frameHeight))}px`,
           backgroundColor: tokens.color.subtleSurface,
           borderRadius: `${tokens.radius.panel}px`,
           overflow: "hidden",
@@ -160,20 +389,35 @@ function WikimediaImage({
           <img
             alt={image.caption}
             data-panel-photo-image="true"
-            onError={onError}
+            onError={() => {
+              if (imageUrl) {
+                onRequestFailure(imageUrl);
+              }
+            }}
             src={imageUrl}
-            srcSet={imageSrcSet ?? undefined}
-            sizes={thumbnailSizes}
+            width={typeof image.width === "number" ? image.width : undefined}
+            height={typeof image.height === "number" ? image.height : undefined}
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              objectFit: imageObjectFit,
               display: "block"
             }}
           />
         )}
+        {onOpenViewer ? (
+          <button
+            aria-label="Open image viewer"
+            data-image-viewer-open="true"
+            onClick={onOpenViewer}
+            ref={openViewerTargetRef}
+            style={imageViewerOpenButtonStyle}
+            type="button"
+          />
+        ) : null}
         {counterText ? (
           <span
+            data-photo-counter="true"
             style={{
               position: "absolute",
               bottom: `${tokens.spacing.sm}px`,
@@ -184,28 +428,57 @@ function WikimediaImage({
               padding: "2px 8px",
               fontSize: `${tokens.typography.captionSize}px`,
               lineHeight: `${tokens.typography.captionLineHeight}px`,
-              pointerEvents: "none"
+              pointerEvents: "none",
+              zIndex: 1
             }}
           >
             {counterText}
           </span>
         ) : null}
-        {image.aiGenerated ? (
+        {kindLabel ? (
           <span
+            data-photo-kind-label="true"
             style={{
               position: "absolute",
               top: `${tokens.spacing.sm}px`,
               left: `${tokens.spacing.sm}px`,
               borderRadius: "999px",
               padding: "4px 8px",
-              backgroundColor: "rgba(0,0,0,0.7)",
+              backgroundColor: "rgba(32,33,36,0.92)",
               color: "#FFFFFF",
               fontSize: `${tokens.typography.captionSize}px`,
-              lineHeight: `${tokens.typography.captionLineHeight}px`
+              lineHeight: `${tokens.typography.captionLineHeight}px`,
+              zIndex: 1
             }}
           >
-            AI-generated reconstruction
+            {kindLabel}
           </span>
+        ) : null}
+        {onPreviousImage && onNextImage ? (
+          <>
+            <button
+              aria-label="Previous image"
+              onClick={(event) => {
+                event.stopPropagation();
+                onPreviousImage();
+              }}
+              style={carouselButtonStyle("left")}
+              type="button"
+            >
+              ‹
+            </button>
+            <button
+              aria-label="Next image"
+              onClick={(event) => {
+                event.stopPropagation();
+                onNextImage();
+              }}
+              style={carouselButtonStyle("right")}
+              type="button"
+            >
+              ›
+            </button>
+          </>
         ) : null}
       </div>
       <p
@@ -215,37 +488,161 @@ function WikimediaImage({
           marginBottom: 0,
           color: tokens.color.textSecondary,
           fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`
+          lineHeight: `${tokens.typography.captionLineHeight}px`,
+          overflowWrap: "anywhere"
         }}
       >
-        Photo: {image.author} ·{" "}
-        {safeLicenseUrl ? (
-          <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-            {image.license}
-          </a>
+        {isAiImage ? (
+          renderCreditSegments(aiCreditSegments)
         ) : (
-          image.license
-        )}{" "}
-        ·{" "}
-        {safeSourcePageUrl ? (
-          <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
-            Wikimedia Commons
-          </a>
-        ) : (
-          "Wikimedia Commons"
+          renderCreditSegments(commonsCreditSegments)
         )}
       </p>
       <p
+        data-photo-caption="true"
         style={{
           marginTop: `${tokens.spacing.xs}px`,
           marginBottom: 0,
           color: tokens.color.textSecondary,
           fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`
+          lineHeight: `${tokens.typography.captionLineHeight}px`,
+          overflowWrap: "anywhere"
         }}
       >
         {image.caption}
       </p>
+    </div>
+  );
+}
+
+function GalleryThumbnails({
+  images,
+  activeImageIndex,
+  devicePixelRatio,
+  failedImageRequests,
+  onRequestFailure,
+  onSelectImage
+}: {
+  images: MediaImageRecord[];
+  activeImageIndex: number;
+  devicePixelRatio: number;
+  failedImageRequests: Record<string, true>;
+  onRequestFailure: (requestUrl: string) => void;
+  onSelectImage: (nextIndex: number) => void;
+}) {
+  const rowRef = useRef<HTMLDivElement | null>(null);
+  const buttonRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    const row = rowRef.current;
+    const selectedButton = buttonRefs.current[activeImageIndex];
+    if (!row || !selectedButton) {
+      return;
+    }
+
+    // Scroll only the thumbnail row. scrollIntoView would also move Chromium's sequential focus
+    // navigation starting point to the thumbnail, so the first Tab after opening a place from a
+    // link would skip the search box and land in the gallery.
+    const rowBounds = row.getBoundingClientRect();
+    const buttonBounds = selectedButton.getBoundingClientRect();
+    if (buttonBounds.left < rowBounds.left) {
+      row.scrollLeft -= rowBounds.left - buttonBounds.left;
+    } else if (buttonBounds.right > rowBounds.right) {
+      row.scrollLeft += buttonBounds.right - rowBounds.right;
+    }
+  }, [activeImageIndex, images.length]);
+
+  return (
+    <div
+      aria-label="Image thumbnails"
+      data-thumbnail-row="true"
+      ref={rowRef}
+      style={{
+        display: "flex",
+        gap: `${tokens.spacing.sm}px`,
+        marginTop: `${tokens.spacing.sm}px`,
+        overflowX: "auto",
+        overflowY: "hidden",
+        paddingBottom: `${tokens.spacing.xs}px`,
+        width: "100%",
+        minWidth: 0,
+        maxWidth: "100%",
+        boxSizing: "border-box",
+        overscrollBehaviorX: "contain"
+      }}
+    >
+      {images.map((image, imageIndex) => {
+        const thumbnail = resolveDisplayImageRequest({
+          image,
+          frameWidth: THUMBNAIL_IMAGE_WIDTH,
+          frameHeight: THUMBNAIL_IMAGE_HEIGHT,
+          devicePixelRatio,
+          fitMode: "cover"
+        });
+        const isFailed =
+          !thumbnail.requestUrl || Boolean(failedImageRequests[thumbnail.requestUrl]);
+        const selected = imageIndex === activeImageIndex;
+
+        return (
+          <button
+            aria-label={`Show image ${imageIndex + 1} of ${images.length}`}
+            data-gallery-thumbnail={selected ? "selected" : "idle"}
+            key={image.id}
+            onClick={() => onSelectImage(imageIndex)}
+            ref={(element) => {
+              buttonRefs.current[imageIndex] = element;
+            }}
+            style={{
+              width: `${THUMBNAIL_IMAGE_WIDTH}px`,
+              minWidth: `${THUMBNAIL_IMAGE_WIDTH}px`,
+              height: `${THUMBNAIL_IMAGE_HEIGHT}px`,
+              borderRadius: `${tokens.radius.panel}px`,
+              border: selected
+                ? `2px solid ${tokens.color.accent}`
+                : `1px solid ${tokens.color.divider}`,
+              backgroundColor: tokens.color.subtleSurface,
+              overflow: "hidden",
+              padding: 0,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            type="button"
+          >
+            {isFailed ? (
+              <span
+                style={{
+                  color: tokens.color.textSecondary,
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  lineHeight: `${tokens.typography.captionLineHeight}px`,
+                  padding: `0 ${tokens.spacing.xs}px`,
+                  textAlign: "center"
+                }}
+              >
+                -
+              </span>
+            ) : (
+              <img
+                alt={image.caption}
+                loading="lazy"
+                onError={() => {
+                  if (thumbnail.requestUrl) {
+                    onRequestFailure(thumbnail.requestUrl);
+                  }
+                }}
+                src={thumbnail.requestUrl ?? undefined}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block"
+                }}
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -423,14 +820,18 @@ export function PlacePanel({
   onCopyLink
 }: PlacePanelProps) {
   const sourceSectionRef = useRef<HTMLElement | null>(null);
+  const imageViewerRef = useRef<HTMLDivElement | null>(null);
+  const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
+  const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [failedImages, setFailedImages] = useState<Record<string, true>>({});
+  const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
 
   const location = placeDetails?.location ?? null;
-  const images = placeDetails?.media?.images ?? [];
+  const images = useMemo(() => placeDetails?.media?.images ?? [], [placeDetails?.media?.images]);
   const bibliographyById = useMemo(
     () => new Map((placeDetails?.bibliography ?? []).map((entry) => [entry.id, entry] as const)),
     [placeDetails?.bibliography]
@@ -495,14 +896,211 @@ export function PlacePanel({
   const visibleScripture = sortedScripture.slice(0, visibleScriptureCount);
   const groupedScripture = groupScriptureByBook(visibleScripture);
 
-  const imageDisplayWidthHint = isSmallScreen
-    ? Math.max(330, (typeof window === "undefined" ? 360 : window.innerWidth) - 32)
-    : 408;
-  const imageSizes = isSmallScreen ? "(max-width: 767px) calc(100vw - 32px), 408px" : "408px";
-  const selectedImage = images[activeImageIndex] ?? null;
+  const normalizedActiveImageIndex =
+    images.length === 0 ? 0 : Math.min(activeImageIndex, images.length - 1);
+  const selectedImage = images[normalizedActiveImageIndex] ?? null;
+  const viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth;
+  const viewportHeight = typeof window === "undefined" ? 960 : window.innerHeight;
+  const devicePixelRatio =
+    typeof window === "undefined"
+      ? 1
+      : Number.isFinite(window.devicePixelRatio) && window.devicePixelRatio > 0
+        ? window.devicePixelRatio
+        : 1;
+  const panelFrameWidth = isSmallScreen
+    ? Math.max(330, viewportWidth - VIEWER_DIALOG_VIEWPORT_MARGIN)
+    : PANEL_IMAGE_DESKTOP_WIDTH;
+  const panelFrameHeight = panelFrameWidth / PANEL_IMAGE_ASPECT_RATIO;
+  const selectedImageAspectRatio =
+    selectedImage &&
+    typeof selectedImage.width === "number" &&
+    selectedImage.width > 0 &&
+    typeof selectedImage.height === "number" &&
+    selectedImage.height > 0
+      ? selectedImage.width / selectedImage.height
+      : PANEL_IMAGE_ASPECT_RATIO;
+  const viewerDialogWidth = Math.min(
+    VIEWER_DIALOG_MAX_WIDTH,
+    Math.max(320, viewportWidth - VIEWER_DIALOG_VIEWPORT_MARGIN)
+  );
+  const viewerDialogHeight = Math.max(320, viewportHeight - VIEWER_DIALOG_VIEWPORT_MARGIN);
+  const viewerContentWidth = Math.max(1, viewerDialogWidth - VIEWER_DIALOG_PADDING);
+  const viewerContentHeight = Math.max(1, viewerDialogHeight - VIEWER_DIALOG_PADDING);
+  const viewerFrameHeight = Math.min(
+    viewerContentHeight,
+    viewerContentWidth / selectedImageAspectRatio
+  );
+  const viewerFrameWidth = viewerFrameHeight * selectedImageAspectRatio;
+  const showThumbnailStrip = shouldRenderThumbnailRow(images.length);
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
   const modernName = placeForDisplay.names.modern;
   const titleName = getPrimaryPlaceName(placeForDisplay);
+
+  useEffect(() => {
+    if (!selectedImage || images.length <= 1) {
+      return;
+    }
+
+    const [, nextIndex] = imageIndexesToLoad(normalizedActiveImageIndex, images.length);
+    if (typeof nextIndex !== "number") {
+      return;
+    }
+
+    const nextImage = images[nextIndex];
+    const nextRequest = resolveDisplayImageRequest({
+      image: nextImage,
+      frameWidth: panelFrameWidth,
+      frameHeight: panelFrameHeight,
+      devicePixelRatio,
+      fitMode: "cover"
+    });
+    if (!nextRequest.requestUrl || failedImageRequests[nextRequest.requestUrl]) {
+      return;
+    }
+
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.src = nextRequest.requestUrl;
+  }, [
+    activeImageIndex,
+    devicePixelRatio,
+    failedImageRequests,
+    images,
+    images.length,
+    normalizedActiveImageIndex,
+    panelFrameHeight,
+    panelFrameWidth,
+    selectedImage
+  ]);
+
+  useEffect(() => {
+    if (!isImageViewerOpen || images.length <= 1) {
+      return;
+    }
+
+    const [, nextIndex] = imageIndexesToLoad(normalizedActiveImageIndex, images.length);
+    if (typeof nextIndex !== "number") {
+      return;
+    }
+
+    const nextImage = images[nextIndex];
+    const nextViewerRequest = resolveDisplayImageRequest({
+      image: nextImage,
+      frameWidth: viewerFrameWidth,
+      frameHeight: viewerFrameHeight,
+      devicePixelRatio,
+      fitMode: "contain"
+    });
+    if (!nextViewerRequest.requestUrl || failedImageRequests[nextViewerRequest.requestUrl]) {
+      return;
+    }
+
+    const preload = new Image();
+    preload.decoding = "async";
+    preload.src = nextViewerRequest.requestUrl;
+  }, [
+    activeImageIndex,
+    devicePixelRatio,
+    failedImageRequests,
+    images,
+    images.length,
+    isImageViewerOpen,
+    normalizedActiveImageIndex,
+    viewerFrameHeight,
+    viewerFrameWidth
+  ]);
+
+  useEffect(() => {
+    if (!isImageViewerOpen) {
+      for (const element of imageViewerInertTargetsRef.current) {
+        element.removeAttribute("inert");
+      }
+      imageViewerInertTargetsRef.current = [];
+      return undefined;
+    }
+
+    const appShellRoot = imageViewerRef.current?.closest<HTMLElement>("[data-app-shell-root]");
+    const imageViewerOverlay = imageViewerRef.current?.closest<HTMLElement>(
+      "[data-image-viewer-overlay='true']"
+    );
+
+    if (!appShellRoot || !imageViewerOverlay) {
+      return undefined;
+    }
+
+    const inertTargets = Array.from(appShellRoot.children).filter(
+      (child): child is HTMLElement =>
+        child instanceof HTMLElement && !child.contains(imageViewerOverlay)
+    );
+    const newlyInertTargets: HTMLElement[] = [];
+    for (const element of inertTargets) {
+      if (element.hasAttribute("inert")) {
+        continue;
+      }
+
+      element.setAttribute("inert", "");
+      newlyInertTargets.push(element);
+    }
+
+    imageViewerInertTargetsRef.current = newlyInertTargets;
+    return () => {
+      for (const element of imageViewerInertTargetsRef.current) {
+        element.removeAttribute("inert");
+      }
+      imageViewerInertTargetsRef.current = [];
+    };
+  }, [isImageViewerOpen]);
+
+  useEffect(() => {
+    if (!isImageViewerOpen) {
+      return;
+    }
+
+    const dialog = imageViewerRef.current;
+    if (!dialog) {
+      return;
+    }
+
+    const focusable = focusableElementsInDialog(dialog);
+    if (focusable.length > 0) {
+      focusable[0].focus();
+      return;
+    }
+
+    dialog.focus();
+  }, [isImageViewerOpen]);
+
+  const moveImageBy = (step: number) => {
+    setActiveImageIndex((currentIndex) => nextImageIndex(currentIndex, images.length, step));
+  };
+
+  const markImageRequestFailed = (requestUrl: string) => {
+    setFailedImageRequests((current) => {
+      if (current[requestUrl]) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [requestUrl]: true
+      };
+    });
+  };
+
+  const openImageViewer = () => {
+    if (!selectedImage) {
+      return;
+    }
+
+    setIsImageViewerOpen(true);
+  };
+
+  const closeImageViewer = () => {
+    setIsImageViewerOpen(false);
+    window.requestAnimationFrame(() => {
+      imageViewerOpenTargetRef.current?.focus();
+    });
+  };
 
   const confidenceRow = (() => {
     if (hasMultipleCandidates && isDisputed) {
@@ -640,7 +1238,7 @@ export function PlacePanel({
   }
 
   return (
-    <div>
+    <div style={{ minWidth: 0, maxWidth: "100%" }}>
       <header
         style={{
           display: "flex",
@@ -678,51 +1276,58 @@ export function PlacePanel({
         </button>
       </header>
 
-      <div style={{ display: "grid", gap: `${PANEL_SECTION_GAP}px` }}>
+      <div
+        style={{
+          display: "grid",
+          gap: `${PANEL_SECTION_GAP}px`,
+          minWidth: 0,
+          maxWidth: "100%",
+          overflowX: "hidden"
+        }}
+      >
         {selectedImage ? (
-          <section data-panel-section="photos">
-            <div style={{ position: "relative" }}>
-              <WikimediaImage
-                counterText={images.length > 1 ? `${activeImageIndex + 1} / ${images.length}` : null}
-                displayWidthHint={imageDisplayWidthHint}
-                failed={Boolean(failedImages[selectedImage.id])}
-                image={selectedImage}
-                onError={() =>
-                  setFailedImages((current) => ({
-                    ...current,
-                    [selectedImage.id]: true
-                  }))
-                }
-                thumbnailSizes={imageSizes}
+          <section data-panel-section="photos" style={{ minWidth: 0, maxWidth: "100%", width: "100%" }}>
+            <WikimediaImage
+              counterText={
+                images.length > 1
+                  ? `${normalizedActiveImageIndex + 1} / ${images.length}`
+                  : null
+              }
+              devicePixelRatio={devicePixelRatio}
+              failedImageRequests={failedImageRequests}
+              frameHeight={panelFrameHeight}
+              frameWidth={panelFrameWidth}
+              image={selectedImage}
+              imageObjectFit="cover"
+              locationId={placeForDisplay.id}
+              onNextImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(1);
+                    }
+                  : undefined
+              }
+              onOpenViewer={openImageViewer}
+              onPreviousImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(-1);
+                    }
+                  : undefined
+              }
+              onRequestFailure={markImageRequestFailed}
+              openViewerTargetRef={imageViewerOpenTargetRef}
+            />
+            {showThumbnailStrip ? (
+              <GalleryThumbnails
+                activeImageIndex={normalizedActiveImageIndex}
+                devicePixelRatio={devicePixelRatio}
+                failedImageRequests={failedImageRequests}
+                images={images}
+                onRequestFailure={markImageRequestFailed}
+                onSelectImage={setActiveImageIndex}
               />
-              {images.length > 1 ? (
-                <>
-                  <button
-                    aria-label="Previous photo"
-                    onClick={() =>
-                      setActiveImageIndex(
-                        (currentIndex) =>
-                          (currentIndex - 1 + images.length) % images.length
-                      )
-                    }
-                    style={carouselButtonStyle("left")}
-                    type="button"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    aria-label="Next photo"
-                    onClick={() =>
-                      setActiveImageIndex((currentIndex) => (currentIndex + 1) % images.length)
-                    }
-                    style={carouselButtonStyle("right")}
-                    type="button"
-                  >
-                    ›
-                  </button>
-                </>
-              ) : null}
-            </div>
+            ) : null}
           </section>
         ) : null}
 
@@ -1135,6 +1740,89 @@ export function PlacePanel({
         ) : null}
       </div>
 
+      {selectedImage && isImageViewerOpen ? (
+        <div
+          data-image-viewer-overlay="true"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              closeImageViewer();
+            }
+          }}
+          style={imageViewerOverlayStyle}
+        >
+          <div
+            aria-label="Image viewer"
+            aria-modal="true"
+            data-image-viewer-dialog="true"
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                closeImageViewer();
+                return;
+              }
+
+              if (event.key === "ArrowRight") {
+                event.preventDefault();
+                moveImageBy(1);
+                return;
+              }
+
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                moveImageBy(-1);
+                return;
+              }
+
+              cycleDialogFocus(event);
+            }}
+            ref={imageViewerRef}
+            role="dialog"
+            style={imageViewerDialogStyle}
+            tabIndex={-1}
+          >
+            <button
+              aria-label="Close image viewer"
+              data-image-viewer-close="true"
+              onClick={closeImageViewer}
+              style={imageViewerCloseButtonStyle}
+              type="button"
+            >
+              ×
+            </button>
+            <WikimediaImage
+              counterText={
+                images.length > 1
+                  ? `${normalizedActiveImageIndex + 1} / ${images.length}`
+                  : null
+              }
+              devicePixelRatio={devicePixelRatio}
+              failedImageRequests={failedImageRequests}
+              frameHeight={viewerFrameHeight}
+              frameWidth={viewerFrameWidth}
+              image={selectedImage}
+              imageObjectFit="contain"
+              locationId={placeForDisplay.id}
+              onNextImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(1);
+                    }
+                  : undefined
+              }
+              onPreviousImage={
+                images.length > 1
+                  ? () => {
+                      moveImageBy(-1);
+                    }
+                  : undefined
+              }
+              onRequestFailure={markImageRequestFailed}
+            />
+          </div>
+        </div>
+      ) : null}
+
       {loadErrorMessage ? (
         <div
           role="alert"
@@ -1222,21 +1910,70 @@ const closeButtonStyle: CSSProperties = {
   lineHeight: 1
 };
 
+const imageViewerOverlayStyle: CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  backgroundColor: "rgba(32,33,36,0.76)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: `${tokens.spacing.md}px`,
+  zIndex: 40
+};
+
+const imageViewerDialogStyle: CSSProperties = {
+  width: "min(1280px, calc(100vw - 32px))",
+  maxHeight: "calc(100vh - 32px)",
+  overflowY: "auto",
+  backgroundColor: tokens.color.surface,
+  borderRadius: `${tokens.radius.panel}px`,
+  padding: `${tokens.spacing.md}px`,
+  position: "relative",
+  boxShadow: tokens.shadow.box
+};
+
+const imageViewerCloseButtonStyle: CSSProperties = {
+  position: "absolute",
+  top: `${tokens.spacing.sm}px`,
+  right: `${tokens.spacing.sm}px`,
+  width: "44px",
+  height: "44px",
+  borderRadius: "999px",
+  border: `1px solid ${tokens.color.divider}`,
+  backgroundColor: "rgba(255,255,255,0.92)",
+  color: tokens.color.textSecondary,
+  cursor: "pointer",
+  fontSize: "18px",
+  lineHeight: 1,
+  zIndex: 1
+};
+
+const imageViewerOpenButtonStyle: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  border: "none",
+  background: "transparent",
+  cursor: "zoom-in",
+  padding: 0,
+  zIndex: 0
+};
+
 function carouselButtonStyle(side: "left" | "right"): CSSProperties {
   return {
     position: "absolute",
     top: "50%",
     transform: "translateY(-50%)",
     [side]: `${tokens.spacing.sm}px`,
-    width: "32px",
-    height: "32px",
+    width: "44px",
+    height: "44px",
     borderRadius: "999px",
     border: "none",
     backgroundColor: "rgba(255,255,255,0.88)",
     color: tokens.color.textSecondary,
     cursor: "pointer",
     fontSize: "18px",
-    lineHeight: 1
+    lineHeight: 1,
+    zIndex: 2
   };
 }
 
