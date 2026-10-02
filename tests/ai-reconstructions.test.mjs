@@ -17,6 +17,7 @@ import {
   derivePromptIdFromCandidateFileName,
   extractPromptTextFromMarkdown,
   findExistingCandidateFiles,
+  mediaEntryGeneratorFromSidecar,
   parseAiCandidateFileName,
   parseGenerateAiArguments,
   parsePublishAiArguments,
@@ -178,6 +179,73 @@ test("prompt extraction supports CRLF line endings", () => {
 
   const prompt = extractPromptTextFromMarkdown(markdown, "capernaum-ai-01");
   assert.equal(prompt, "First paragraph.\n\nSecond paragraph.");
+});
+
+test("mediaEntryGeneratorFromSidecar maps provider and model to readable tool names", () => {
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "gemini",
+      model: "gemini-3-pro-image",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Google Gemini API (Nano Banana Pro)",
+      model: "gemini-3-pro-image",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "cloudflare-flux",
+      model: "@cf/black-forest-labs/flux-2-klein-4b",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Cloudflare Workers AI (FLUX.2 klein)",
+      model: "@cf/black-forest-labs/flux-2-klein-4b",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "cloudflare-lucid",
+      model: "@cf/leonardo/lucid-origin",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Cloudflare Workers AI (Lucid Origin)",
+      model: "@cf/leonardo/lucid-origin",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "openai",
+      model: "gpt-image-2.5-flare",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "OpenAI API (gpt-image-2.5-flare)",
+      model: "gpt-image-2.5-flare",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "gemini",
+      model: "gemini-experimental-image",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Google Gemini API (gemini-experimental-image)",
+      model: "gemini-experimental-image",
+      date: "2026-10-01"
+    }
+  );
 });
 
 test("findExistingCandidateFiles finds only the requested round's variants", async () => {
@@ -1483,7 +1551,7 @@ test("publishAiCandidate writes valid WebP under 400 KB and validateData accepts
     assert.equal(publishResult.trim.left, 0);
     assert.equal(publishResult.trim.right, 0);
     assert.deepEqual(publishResult.mediaEntryGenerator, {
-      tool: "openai",
+      tool: "OpenAI API (gpt-image-2.5-flare)",
       model: "gpt-image-2.5-flare",
       date: "2026-10-01"
     });

@@ -28,6 +28,30 @@ const EDGE_HARD_EDGE_MEAN_JUMP_MIN = 16;
 const EDGE_NEAR_BLACK_RATIO = 0.98;
 const EDGE_TRIM_MIN_PX = 4;
 const EDGE_TRIM_MAX_SIDE_RATIO = 0.2;
+const GENERATOR_TOOL_DISPLAY_LOOKUP = Object.freeze({
+  gemini: Object.freeze({
+    providerDisplayName: "Google Gemini API",
+    models: Object.freeze({
+      "gemini-3-pro-image": "Google Gemini API (Nano Banana Pro)"
+    })
+  }),
+  "cloudflare-flux": Object.freeze({
+    providerDisplayName: "Cloudflare Workers AI",
+    models: Object.freeze({
+      "@cf/black-forest-labs/flux-2-klein-4b": "Cloudflare Workers AI (FLUX.2 klein)"
+    })
+  }),
+  "cloudflare-lucid": Object.freeze({
+    providerDisplayName: "Cloudflare Workers AI",
+    models: Object.freeze({
+      "@cf/leonardo/lucid-origin": "Cloudflare Workers AI (Lucid Origin)"
+    })
+  }),
+  openai: Object.freeze({
+    providerDisplayName: "OpenAI API",
+    models: Object.freeze({})
+  })
+});
 
 export const DEFAULT_IMAGE_PROMPTS_DIRECTORY = path.join(
   repositoryRoot,
@@ -678,8 +702,14 @@ export function mediaEntryGeneratorFromSidecar(sidecarData) {
     throw new Error("Candidate side-car is missing date.");
   }
 
+  const providerLookup = GENERATOR_TOOL_DISPLAY_LOOKUP[sidecarData.provider];
+  const providerDisplayName = providerLookup?.providerDisplayName ?? sidecarData.provider;
+  const displayTool =
+    providerLookup?.models?.[sidecarData.model] ??
+    `${providerDisplayName} (${sidecarData.model})`;
+
   return {
-    tool: sidecarData.provider,
+    tool: displayTool,
     model: sidecarData.model,
     date: formatDateOnly(sidecarData.date)
   };
