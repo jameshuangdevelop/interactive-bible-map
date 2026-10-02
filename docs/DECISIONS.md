@@ -197,7 +197,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** After CP3.5 (ADR-0029), a data task adds the field to all records (GIS Engineer, then Research Lead, then Fact-Checker), and a panel task shows it. The "West Bank", "Golan Heights" and Jerusalem rules are the PO's defaults until the human confirms them.
 - **Update (CP3.5, the PO):**
   - **Display:** disputed places show only their countries, as in "Today: Israel and the West Bank". The "Location disputed · *n* proposed sites" chip follows on the same line (ADR-0030), so "proposed sites" isn't said twice.
-  - **Defaults:** they also cover Sychar (Tell Balata) and Qasr al-Yahud ("West Bank"), and both Bethsaida sites ("Golan Heights"). They go to the human as CP3.5 decision 1.
+  - **Defaults:** they also cover Sychar (Tell Balata) and Qasr al-Yahud ("West Bank"), and both Bethsaida sites ("Golan Heights"). The human approved them as CP3.5 decision 1 on 2026-10-02 (#37), so they are no longer provisional.
   - Cards M3-14 (data) and M3-15 (panel) carry the decision out.
 
 ## ADR-0029 — Images first: milestone M3.5

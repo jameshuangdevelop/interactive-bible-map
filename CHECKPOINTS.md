@@ -8,8 +8,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Approved 2026-09-23 | #3–#7 |
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
-| CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | **Awaiting approval** | #29–#36, and this summary |
-| CP3b | M3 MVP App | Working MVP deployed to a preview | Next, after CP3.5 (M3-04, M3-05 and M3-13 merged as #26–#28) | |
+| CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
+| CP3b | M3 MVP App | Working MVP deployed to a preview | **In progress** (M3-06 and M3-14 to M3-16) | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
@@ -247,7 +247,7 @@ The spec and cards cost about 900 AI credits. M3 is forecast at about 7,000–9,
 
 ## CP3.5 — Images
 
-**Status:** awaiting your approval. M3.5's work is merged (#29–#36). This summary records it and plans the rest of M3.
+**Outcome:** approved as recommended on 2026-10-02 (#37). Decision 1 confirms the disputed-territory defaults of ADR-0028. Under decision 2, the preview deploy (M3-06) runs alongside M3-14 and M3-16.
 
 ### What was delivered
 | Task | Output | PR |

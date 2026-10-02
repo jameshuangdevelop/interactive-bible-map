@@ -2,12 +2,12 @@
 
 Shared memory for all agents. Every session reads this first and updates its own task row before committing.
 
-**Current milestone:** M3.5 – Images (ADR-0029), done and merged (#29–#36) · **Status:** CP3.5 is open for the human's approval; all agents pause until then · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 5.8% of October's cap; September closed at about 7.6%)
+**Current milestone:** M3 – MVP App, the rest after CP3.5 (approved 2026-10-02, #37) · **Status:** M3-06, M3-14 and M3-16 in progress; M3-15 starts from M3-14's schema commit · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 5.8% of October's cap; September closed at about 7.6%)
 
 ## Resume point
 1. **Merged:** M3-02 to M3-13 (#18 to #28) and M3.5-00 to M3.5-07 (#29 to #36); #25 to #36 merged on 2026-10-02. The map is ancient-only and physical, with English names, the Roman provinces of about AD 50, a place panel, search, and 275 images: 6 to 8 for each of the 31 major places, each gallery led by an approved AI reconstruction.
-2. **Now: CP3.5** (`docs/cp3.5-summary`, task M3.5-08). [CHECKPOINTS.md → CP3.5](../CHECKPOINTS.md#cp35--images) asks the human for two decisions: the countries for places in disputed territory, and starting the preview deploy now.
-3. **After CP3.5:** M3-06 (preview deploy), M3-14 (countries) and M3-16 (longer "About") start at once; M3-15 (panel header) starts from M3-14's schema commit. CP3b follows once all four have merged.
+2. **CP3.5 approved (2026-10-02, #37)** with both decisions as recommended: the disputed-territory defaults for countries (ADR-0028), and the preview deploy now, alongside the other tasks.
+3. **Now:** M3-06 (preview deploy), M3-14 (countries) and M3-16 (longer "About"), each in its own worktree and branch, stacked on the PO's `docs/m3-cp35-kickoff`. M3-15 (panel header) starts from M3-14's schema commit. CP3b follows once all four have merged.
 4. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
@@ -21,7 +21,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-03 | Map view | frontend-engineer | `feat/m3-map` | Merged | #21 |
 | M3-04 | Place panel | frontend-engineer | `feat/m3-place-panel` | Merged | #27 |
 | M3-05 | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Merged | #28 |
-| M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for CP3.5; then runs alongside M3-14 and M3-16 (CP3.5 decision 2) | — |
+| M3-06 | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | In progress (alongside M3-14 and M3-16; CP3.5 decision 2) | — |
 | M3-07 | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Merged | #19 |
 | M3-08 | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged | #20 |
 | M3-10 | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Merged | #22 |
@@ -36,10 +36,11 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3.5-05 | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Merged | #34 |
 | M3.5-06 | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Merged | #31 |
 | M3.5-07 | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker (check loop) → the human (approval) → media-curator → fact-checker | `data/m3.5-ai-images` | Merged (the human approved the 31 images on 2026-10-02) | #36 |
-| M3.5-08 | CP3.5 summary, and cards M3-14 to M3-16 | project-owner | `docs/cp3.5-summary` | Done, awaiting the human's approval (CP3.5) | — |
-| M3-14 | Countries in modern names (ADR-0028) | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | Waits for CP3.5 | — |
-| M3-15 | A simpler panel header, with countries (ADR-0028, ADR-0030) | frontend-engineer | `feat/m3-panel-header` | Waits for CP3.5 and M3-14's schema commit | — |
-| M3-16 | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | Waits for CP3.5 | — |
+| M3.5-08 | CP3.5 summary, and cards M3-14 to M3-16 | project-owner | `docs/cp3.5-summary` | Merged (CP3.5 approved 2026-10-02) | #37 |
+| M3-17 | Record CP3.5 and start the rest of M3 | project-owner | `docs/m3-cp35-kickoff` | Done | — |
+| M3-14 | Countries in modern names (ADR-0028) | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | In progress (GIS Engineer: schema) | — |
+| M3-15 | A simpler panel header, with countries (ADR-0028, ADR-0030) | frontend-engineer | `feat/m3-panel-header` | Waits for M3-14's schema commit | — |
+| M3-16 | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | In progress (Research Lead: half 1) | — |
 
 ## Open questions
 - **Answered by the human (2026-10-01, M3.5-07):** Google's Gemini API (Nano Banana Pro), scripted with an API key, one image per major place, released under CC0 1.0 (ADR-0029 §7, `docs/LICENSES.md`). The label is shown on each image in the app; the files carry Google's invisible SynthID mark and nothing is burned in. The original question follows. The Fact-Checker compared the current terms in [`docs/research/M3.5-ai-generators.md`](research/M3.5-ai-generators.md) and recommends, in order:
@@ -55,7 +56,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 - **Answered by the human (2026-10-01, M3.5-07):** which image generator to use, and whether to generate by hand or by script. See the answer above.
 - **Answered by the PO (2026-10-01, M3.5-04):** dated historical views get the new `historical` kind ("Historical view" in the gallery), and `reconstruction` stays for depictions of the place in antiquity. Batch C re-tagged Philadelphia's 1880s photograph and 1836 engraving and Laodicea's 1847 engraving; batch A's `sea-of-galilee-02` (1891) is that batch's to re-tag.
 - **For the human (ADR-0029):** the 31 major places include the seven churches of Revelation, which the PO added to your three groups. *Delivered with #29–#36; CP3.5 lists it for information.*
-- **For the human (ADR-0028), now CP3.5 decision 1:** the PO's defaults for places in disputed territory: "West Bank" (Bethlehem, Jericho, Bethany, Sychar, Qasr al-Yahud), "Golan Heights" (Banias, both Bethsaida sites), and no country for Jerusalem and the places inside it.
+- **Answered by the human (2026-10-02, CP3.5 decision 1, #37):** the PO's defaults for places in disputed territory are approved: "West Bank" (Bethlehem, Jericho, Bethany, Sychar, Qasr al-Yahud), "Golan Heights" (Banias, both Bethsaida sites), and no country for Jerusalem and the places inside it. M3-14 applies them.
 - **Answered by the human (2026-09-29):** Magdala keeps its title; Paneas stays in `otherLanguages`; searching "Judah" should find Judea; the two Judea records stay; and well-known areas keep related verses. The data follow-ups ("Judah", and more well-known areas such as Egypt) are in `BACKLOG.md`.
 - **Answered (2026-09-29):** search covers English Bible names and English historical names only (`ancient` and `alternate`), not modern names or candidate-site names.
 - **For the PO (M3.5-02, from `docs/verification/M3.5-images-a.md`), all closed 2026-10-01:** (1) **Accepted by the PO:** Gethsemane has no freely licensed photo of excavated remains, so all five of its images are `modern`, with a note in the report; the Grotto of Gethsemane is not counted as `site`. (2) **Closed:** the Research Lead opened a source for every flagged clause (see the session log) and updated the report. (3) **Accepted by the PO:** Cana's lead image is the Khirbet Qana trail view, and Kafr Kanna has 3 of the 5 images; this is the most balance Commons allows.
@@ -130,3 +131,4 @@ Shared memory for all agents. Every session reads this first and updates its own
 | 2026-10-01 | project-owner | M3.5-07 (final checks) | Spot-checked captions against four images and trimmed two claims the images don't show (Pergamum, Sardis). Merged the review fixes. The export check assumed Capernaum's first image was a Commons photo; it now expects each image's own credit, checks that the AI image loads from the exported `media/ai/`, and blocks both kinds in the failed-image check. The full check chain passes. |
 | 2026-10-02 | project-owner | M3.5-07 (approval) and the push | The human approved the 31 AI images from the contact sheets and app screenshots, and said "push it". Recorded the approval, closed the two answered generator questions, and pushed the 12-branch M3 and M3.5 stack as 12 PRs with their reviews. |
 | 2026-10-02 | project-owner | M3.5-08 (CP3.5) | The human merged #25 to #36. Removed the merged worktrees and local branches, keeping the Gemini candidates in the ignored `media/ai-incoming/`. Wrote the CP3.5 summary, cards M3-14 (countries), M3-15 (panel header) and M3-16 (longer "About"), and moved M3-06 to run alongside them (CP3.5 decision 2). Brought the task index up to date. Reconciled the ledger: October rows now have their own section, 11 review rows were added (6 of them PO estimates, since those reviews recorded none), and CP3a and CP3.5 have rollups. |
+| 2026-10-02 | project-owner | M3-17 (kickoff after CP3.5) | The human approved CP3.5 and both decisions (#37). Recorded the approval (CHECKPOINTS, ADR-0028, open questions), added run notes to M3-06 (no local Cloudflare secrets; software WebGL on CI runners; Pages file limits), and started M3-06, M3-14 (GIS Engineer phase) and M3-16 (Research Lead, half 1) in their own worktrees, stacked on `docs/m3-cp35-kickoff`. Deleted the 12 merged branches of #25–#36 and `docs/cp3.5-summary` on GitHub. |
