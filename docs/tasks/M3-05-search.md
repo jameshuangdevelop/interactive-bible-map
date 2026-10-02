@@ -5,9 +5,9 @@
 | Agent | `frontend-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m3-search` |
-| Depends on | M3-03 (map and selection) |
-| Parallel with | M3-04 (place panel) |
-| Credit target | ~600 AI credits (session guard: 10,000) |
+| Depends on | M3-03, M3-10 and M3-12, all merged |
+| Parallel with | M3-04 (place panel) and M3-13 (data). M3-04 also edits the app shell; keep your changes to the shell small and well separated. |
+| Credit target | ~1,500 AI credits (session guard: 10,000) |
 
 ## Goal
 Let users find any place by the English name their Bible uses, as `docs/design/VISUAL_SPEC.md` §4 describes. The search covers English place names only (brief §1.7; ADR-0026).
@@ -30,10 +30,10 @@ Let users find any place by the English name their Bible uses, as `docs/design/V
    - Records without a modern name show just the type.
    - A match found through a name other than the title adds "also: *name*", for example "Malta — also: Melita".
    - Same-named places are listed separately (for example, "Antioch" returns two places).
-4. **Accessibility:** follow the ARIA 1.2 combobox pattern. ↓ and ↑ move, Enter opens, and Esc clears. Pressing "/" anywhere focuses the box. The list has accessible names, and the result count is announced.
+4. **Accessibility:** follow the ARIA 1.2 combobox pattern. ↓ and ↑ move, Enter opens, and Esc clears. When results are open, Esc closes them first; only the next Esc closes the panel (spec §7; the panel's Esc already exists from M3-03). Pressing "/" anywhere focuses the box. The list has accessible names, and the result count is announced. Typing must not re-render the map.
 5. **Behaviour:** opening a result selects the place through M3-03's selection, which zooms the map and updates the URL. The no-results state reads: "No places match '*query*'. Search covers place names only."
 6. **Menu:** the ☰ button in the search box opens a drawer with About this map, Sources & credits, Report an issue, and View on GitHub.
-   - **Sources & credits** shows the data license, the WEB notice word for word from `docs/LICENSES.md`, and the upstream sources from `ATTRIBUTION.md`.
+   - **Sources & credits** shows the data license, the WEB notice word for word from `docs/LICENSES.md`, the upstream sources from `ATTRIBUTION.md`, and the basemap credits: the "Sources & credits" text for the main basemap and the backup (VersaTiles), exactly as `docs/LICENSES.md` → "Basemap attribution strings" gives them (obligation L5). The six Bible versions used only for spellings are listed as cite-only.
    - The other entries are short static text or links.
 7. **Tests:**
    - "Antioch" returns two places;

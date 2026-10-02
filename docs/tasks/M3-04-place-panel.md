@@ -5,9 +5,9 @@
 | Agent | `frontend-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m3-place-panel` |
-| Depends on | M3-03 (map and selection). Modern names are cleaned up in M3-08; display them as stored. |
-| Parallel with | M3-05 (search) |
-| Credit target | ~900 AI credits (session guard: 10,000) |
+| Depends on | M3-03, M3-08, M3-10, M3-11 and M3-12, all merged. Modern names are cleaned up in M3-08; display them as stored. |
+| Parallel with | M3-05 (search) and M3-13 (data). M3-05 also edits the app shell; keep your changes to the shell small and well separated. |
+| Credit target | ~2,000 AI credits (session guard: 10,000) |
 
 ## Goal
 Build the Google-Maps-style place panel exactly as `docs/design/VISUAL_SPEC.md` §3 describes, in its order: photos with credits, names, confidence, candidates, actions, About, In the Bible, OT connections, Places in, Sources, and the footer.
@@ -26,7 +26,7 @@ Build the Google-Maps-style place panel exactly as `docs/design/VISUAL_SPEC.md` 
    - Put the credit line under every image: "Photo: author · license (linked to `licenseUrl`) · Wikimedia Commons (linked to `sourcePage`)". The caption is the alt text and appears below the credit.
    - Show a placeholder when an image fails to load, keeping the credit.
 3. **Names and confidence:**
-   - The title is the first ancient name, the spelling most popular English Bibles agree on (ADR-0026). Below it come the modern name labelled "Today: *name*" (hidden for disputed places), "Also known as …" with the other `ancient` and `alternate` names (English only; never `otherLanguages`), and the line "*Type* · *parent* · *empire*", for example "City · Achaia · Roman Empire" (spec §3; ADR-0027), with the parent and the empire linked to their records.
+   - The title is the first ancient name, the spelling most popular English Bibles agree on (ADR-0026). Below it come the modern name labelled "Today: *name*" (hidden for disputed places), "Also known as …" with the other `ancient` and `alternate` names (English only; never `otherLanguages`), and the line "*Type* · *parent* · *empire*", for example "City · Achaia · Roman Empire" (spec §3; ADR-0027), with the parent and the empire linked to their records. **Italy** was not a province: its record has `type: "province"` only for the hierarchy, so show its line as "Governed directly from Rome · Roman Empire" (key the exception on the record id, and test it). Empire records show only "Empire".
    - Show a confidence chip in words for single-candidate places, the "Location disputed · *n* proposed sites" banner for **disputed** places (at least one candidate with confidence `disputed`), and a neutral "*n* sites" line for other places with several candidates (for example Jericho).
 4. **Candidates** (places with several candidates): a lettered list with a chip, support text (two lines, expandable) and sources for each. Selecting one centres the map on it and updates `&candidate=`.
 5. **Actions:** Zoom to (Fit all sites for places with several candidates), Copy link, and Sources, which scrolls to the list.
@@ -50,6 +50,12 @@ Build the Google-Maps-style place panel exactly as `docs/design/VISUAL_SPEC.md` 
     - source formatting for each prefix;
     - that credits always render;
     - keyboard use: Esc closes the panel and focus returns to the pin.
+
+14. **Map polish** (found by the PO on `main`):
+    - At the opening overview, the ROMAN EMPIRE label touches the Rome count bubble. Make the cluster collision reservation cover the whole bubble, so area labels move clear of it.
+    - The ITALY label sits partly under the search box. Keep map labels clear of the search box, for example with MapLibre's `padding` for label placement, or by reserving that screen area.
+    - Add Playwright checks for both.
+15. **Performance** (ADR-0024; spec §11): opening a place or scrolling the panel must not re-render the map, and dragging the map while the panel is open must keep the smoothness gate: no DOM change and no long tasks on GPU machines. Long passage lists (Jerusalem, 174 passages) render in chunks or lazily.
 
 ## Out of scope
 Search (M3-05), the timeline and political history display (M4), and routes (M5).
