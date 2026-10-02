@@ -77,16 +77,16 @@ If any candidate has confidence `disputed`, the record must include at least **t
 - Scripture-linkage name matching still uses all configured names (`ancient`, `alternate`, `modern`, and `otherLanguages`).
 
 ### Modern names
-- `names.modern` is optional and, when present, must be the modern place name only.
-- Do not include country, state, province, political descriptors, or editorial notes in `names.modern`.
-- A disputed place is a record with at least one candidate whose confidence is `disputed`.
-- For disputed places, leave out `names.modern`; candidate labels already carry the modern site names.
-- For other places with several candidates, give `names.modern` only when one neutral name covers every candidate; otherwise leave it out.
-- Region and island records should use a neutral geographic name when one exists; otherwise leave `names.modern` out. This takes precedence over the several-candidates rule above (for example, Malta keeps `Malta` although a low-confidence candidate is Mljet). Leave it out where every modern name in use carries a political meaning (Judea, Samaria) or no modern region matches (Galatia).
-- When an ancient site has no modern settlement of its own, `Near <town>` is allowed (for example `Near Denizli`).
+- `names.modernCountries` is the ordered list of present-day country or territory names for reader orientation.
+- `names.modernCountries` values come from one allow-list in `schema/location.schema.json` (`$defs.modernCountry`). If a needed value is missing, the Research Lead adds it in the same commit as the data that needs it, and the Fact-Checker reviews that addition.
+- Exempt records must omit `names.modernCountries`: records of type `empire`, the record `jerusalem`, and any record whose `parentId` chain includes `jerusalem`.
+- Every other record must have at least one `names.modernCountries` value. The validator currently reports this as a warning because the dataset is being filled; setting `REQUIRE_MODERN_COUNTRIES=true` (or `validateData({ requireModernCountries: true })`) upgrades it to an error.
+- `names.modern` remains the modern place or area phrase only (no editorial notes). For ordinary places, keep it to the place name; country context now lives in `names.modernCountries`.
+- Area records (`type: "province"` or `type: "region"`) should use short orienting phrases in `names.modern` (for example `Central Türkiye` or `Parts of Greece, North Macedonia and Albania`) plus `names.modernCountries`. The area-name requirement yields to the disputed-place rule below.
+- A disputed place is a record with at least one candidate whose confidence is `disputed`. Disputed places must omit `names.modern`, and `names.modern` must never contain the word `disputed`.
+- For disputed territory names such as `West Bank` or `Golan Heights`, the name describes present-day location only, not sovereignty.
+- Country names are allowed in `names.modern` when that is the place name itself (for example `Malta`, `Cyprus`, `Italy`).
 - Candidate `label` fields follow the same neutrality rule: no country, state or political descriptor.
-- The validator enforces the machine-checkable parts: `names.modern` must not contain the word `disputed`, and disputed places must omit `names.modern`.
-- Country/descriptor neutrality is reviewed by the Research Lead and Fact-Checker.
 
 ### Status workflow
 - `status: "draft"`: in-progress research; `verifiedBy` and `lastReviewed` are optional.
