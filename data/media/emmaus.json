@@ -3,14 +3,14 @@
   "images": [
     {
       "id": "emmaus-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Emmaus_Nicopolis_basilica.JPG",
-      "width": 480,
-      "height": 480,
-      "author": "Emmaus",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Emmaus_Nicopolis_basilica.JPG",
-      "caption": "Emmaus Nicopolis basilica, one proposed site of Emmaus",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Emmaus_Nicopolis_Church_Lateran_Avney_Moreshet_d735a69d.jpg",
+      "width": 1280,
+      "height": 960,
+      "author": "Peace be with you (איתם שלום)",
+      "license": "CC BY 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Emmaus_Nicopolis_Church_Lateran_Avney_Moreshet_d735a69d.jpg",
+      "caption": "Excavated basilica at Emmaus Nicopolis, one proposed site of Emmaus",
       "kind": "site",
       "aiGenerated": false
     }

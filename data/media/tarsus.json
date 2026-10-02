@@ -10,25 +10,12 @@
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:Tarsus_in_2011_0961.jpg",
-      "caption": "City view of Tarsus, Turkey.",
-      "kind": "modern",
-      "aiGenerated": false
-    },
-    {
-      "id": "tarsus-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Roman_road_in_Tarsus%2C_Mersin_Province.jpg",
-      "width": 3005,
-      "height": 2254,
-      "author": "Nedim Ardoğa",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Roman_road_in_Tarsus,_Mersin_Province.jpg",
-      "caption": "Roman road remains in Tarsus, Mersin Province, Turkey.",
+      "caption": "The excavated Roman road in the centre of Tarsus, with the modern town behind.",
       "kind": "site",
       "aiGenerated": false
     },
     {
-      "id": "tarsus-03",
+      "id": "tarsus-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Saint_Paul%27s_Church%2C_Tarsus_02.jpg",
       "width": 3000,
       "height": 4000,

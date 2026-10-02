@@ -3,27 +3,14 @@
   "images": [
     {
       "id": "nicopolis-01",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Nicopolis_nymphaeum.jpg",
-      "width": 1024,
-      "height": 606,
-      "author": "Marsyas",
-      "license": "CC BY 2.5",
-      "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nicopolis_nymphaeum.jpg",
-      "caption": "Roman nymphaeum near the west gate of ancient Nicopolis in Epirus",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "nicopolis-02",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/20140413_nikopolis014.JPG",
-      "width": 3872,
-      "height": 2592,
-      "author": "Jean Housen",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:20140413_nikopolis014.JPG",
-      "caption": "View of the ancient ruins of Nicopolis in Epirus",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Nikopolis_-_Ancient_Theatre_06.jpg",
+      "width": 3200,
+      "height": 2135,
+      "author": "Mboesch",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Nikopolis_-_Ancient_Theatre_06.jpg",
+      "caption": "The Roman theatre of Nicopolis in Epirus, with the low coast and distant hills beyond",
       "kind": "site",
       "aiGenerated": false
     }
