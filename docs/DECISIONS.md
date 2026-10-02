@@ -195,6 +195,10 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   - Search still covers English Bible and historical names only (ADR-0026). Search results show the modern name with its country as their second line.
   - Candidate labels keep M3-08's form for now.
 - **Consequences:** After CP3.5 (ADR-0029), a data task adds the field to all records (GIS Engineer, then Research Lead, then Fact-Checker), and a panel task shows it. The "West Bank", "Golan Heights" and Jerusalem rules are the PO's defaults until the human confirms them.
+- **Update (CP3.5, the PO):**
+  - **Display:** disputed places show only their countries, as in "Today: Israel and the West Bank". The "Location disputed · *n* proposed sites" chip follows on the same line (ADR-0030), so "proposed sites" isn't said twice.
+  - **Defaults:** they also cover Sychar (Tell Balata) and Qasr al-Yahud ("West Bank"), and both Bethsaida sites ("Golan Heights"). They go to the human as CP3.5 decision 1.
+  - Cards M3-14 (data) and M3-15 (panel) carry the decision out.
 
 ## ADR-0029 — Images first: milestone M3.5
 - **Date:** 2026-09-30 · **Status:** Accepted · **By:** the human ("the images need to be a much bigger focus because that's how most Bible readers get their very first impressions on a lot of cities. This can be its own milestone and should be done before adding more cities"; "Assassin's creed level image is what I'm looking for"; "just start working on the images. ... let's not add anything else before we resolve the images milestone") and the PO (the milestone's shape and the major-place list)

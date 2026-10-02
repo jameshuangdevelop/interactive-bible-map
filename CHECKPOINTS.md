@@ -8,7 +8,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP1 | M1 Research & Options | Source inventory with licenses; stack options with pricing; human picks the stack; ADRs recorded | Approved 2026-09-23 | #3–#7 |
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
-| CP3b | M3 MVP App | Working MVP deployed to a preview | **In progress** | |
+| CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | **Awaiting approval** | #29–#36, and this summary |
+| CP3b | M3 MVP App | Working MVP deployed to a preview | Next, after CP3.5 (M3-04, M3-05 and M3-13 merged as #26–#28) | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
@@ -241,3 +242,72 @@ Cloudflare's token screen had changed, so the token was created through the Clou
 
 ### Budget
 The spec and cards cost about 900 AI credits. M3 is forecast at about 7,000–9,000 credits: five Frontend Engineer sessions, M3-07 and M3-08, and their reviews. The month total is about 27,100 of 1,000,000 (2.7%). See [BUDGET.md](docs/BUDGET.md).
+
+---
+
+## CP3.5 — Images
+
+**Status:** awaiting your approval. M3.5's work is merged (#29–#36). This summary records it and plans the rest of M3.
+
+### What was delivered
+| Task | Output | PR |
+|---|---|---|
+| M3.5-00 | The plan from your review on 2026-09-30: ADR-0028 to ADR-0030 and cards M3.5-01 to M3.5-07 | #29 |
+| M3.5-01 | `prominence` and image `kind` in the schema; the five broken links fixed (Rome's three among them); `check:images`, which loads every image at the sizes the app uses, on every media change and weekly | #30 |
+| M3.5-06 | A larger gallery: a bigger viewer, a label for each kind of image, a row of thumbnails, sharp crops for wide and tall photos, keyboard use, and photos that load only when needed | #31 |
+| M3.5-02 to M3.5-04 | 31 cited research briefs, and photos for the major places in three batches: Jerusalem and the Gospels (13, [verification](docs/verification/M3.5-images-a.md)), Paul's letters and the capitals (12, [verification](docs/verification/M3.5-images-b.md)), and Revelation's churches (6, [verification](docs/verification/M3.5-images-c.md)) | #35, #32, #33 |
+| M3.5-05 | A pass over the 31 standard places with images: weak or duplicate photos replaced, region maps swapped for landscapes ([verification](docs/verification/M3.5-images-standard.md)) | #34 |
+| M3.5-07 | 31 AI reconstructions, one per major place, which you approved on 2026-10-02 ([checks](docs/verification/M3.5-ai-images.md)) | #36 |
+
+**The images now:** 275, up from 131 at CP2.
+- **Major places (31):** 6 to 8 images each, 213 in all. Each gallery opens with the AI reconstruction, so a reader's first impression is the place as it looked in Bible times, and then shows the place today and its excavated remains.
+- **Standard places (31):** 1 to 3 images each, 62 in all.
+- **By kind:** 121 excavated site, 107 today, 31 AI reconstruction, 8 historical view (an old photo or engraving) and 8 reconstruction (a model or painting).
+- **Without images:** Lystra (no freely licensed photo exists; CP2 decision 4) and the 27 area records (provinces, regions and empires), as M3.5-05 planned.
+- **The "few stones" rule:** close-ups of fragments were replaced with wide views of each place in its landscape (ADR-0029 §5), Laodicea's among them.
+
+### How quality was checked
+- **One chain per batch:** the Research Lead wrote a cited brief for each place, the Media Curator chose photos and wrote prompts, and the Fact-Checker opened every source and checked every image's license, place, kind and caption. A reviewer from the other vendor then reviewed each PR.
+- **Photos were viewed, not just searched.** The Media Curator's first runs, on a lighter model, chose junk: Bethlehem Steel, basketball videos and PDFs. They were redone on Claude Sonnet 5, viewing every thumbnail before accepting it.
+- **Every link loads:** the validator checks each Commons address offline, and the link check loads each image at the app's sizes.
+- **AI images, checked as the games do it:** each prompt was written from the place's brief and checked against it before generating. Free models dropped historical details (glazed windows, chimneys, a shrunken Temple), so you chose Google's Gemini (Nano Banana Pro). The Fact-Checker viewed every image at full size: 15 passed and 16 had errors, such as later church towers, radio masts, painted boats, or famous buildings drawn as today's ruins. Each was fixed with one edit of the same image. The PO's own check found 3 more, each fixed with one more edit. You approved the final set.
+
+### Decisions needed from you
+**Merging this PR approves CP3.5 with the recommendations below.** To choose differently, comment on the PR.
+
+| # | Decision | Recommendation | Alternative |
+|---|---|---|---|
+| 1 | Countries for places in disputed territory (ADR-0028) | **The territory's common English name:** "West Bank" for Bethlehem, Jericho, Bethany (Al-Eizariya), Sychar (Tell Balata) and Qasr al-Yahud; "Golan Heights" for Banias and both Bethsaida sites; no country for Jerusalem and the places inside it. This says where a place is, not who should rule it. Unclear cases, such as Emmaus Nicopolis in the former Latrun no-man's land, come back to you. | Name a country for these too, and say which |
+| 2 | The order of the rest of M3 | **Start the preview deploy (M3-06) now, alongside the countries (M3-14) and the longer "About" (M3-16);** the panel header (M3-15) follows M3-14's schema step. You can then try each change on a preview link on your own device, not over remote desktop. CP3b follows once all four have merged. | Deploy last, once the other three have merged |
+
+**For your information:**
+- **The seven churches of Revelation** are among the 31 major places (ADR-0029), as delivered.
+- **AI images:** one per major place, as you asked. The briefs keep 40 more prompts for later. The 50 paid images (31, plus 19 edits) cost about US$3.49 of the US$20 you set aside.
+- **Gethsemane** has no photo of excavated remains, because none is freely licensed; all its photos show the garden and church today.
+
+### Concepts for you
+- **Lazy loading.** A photo loads only when it is about to be seen, so a place with 8 images doesn't slow the map. [MDN: Lazy loading](https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Lazy_loading)
+- **Rate limiting (HTTP 429).** Wikimedia refuses requests that come too fast. The link check spaces its requests. When several checks run at once, one can still fail, and rerunning it clears the failure. [MDN: 429 Too Many Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429)
+- **WebP.** An image format smaller than JPEG at the same quality. Each AI image is a WebP of at most 1,600 px and 400 KB, hosted in the repository. [Google: WebP](https://developers.google.com/speed/webp)
+- **SynthID.** An invisible watermark Google puts in every image its models make, so tools can tell that the image is AI-generated. We show our own label as well. [Google DeepMind: SynthID](https://deepmind.google/models/synthid/)
+
+### Risks
+- **Photos can change upstream.** Commons files can be renamed, deleted or relicensed. The weekly link check finds broken ones, and each image keeps its Commons page for re-checking.
+- **AI reconstructions are informed guesses.** Each one shows its label, a "Based on" link to the cited brief, and the "Report an issue" link. The Fact-Checker checked each against its brief.
+- **Repository size.** The AI images add 10.5 MB. At the limit of 3 per major place, they would add about 30 MB.
+
+### Budget
+M3.5 used about **64,650 AI credits**, under its cards' combined targets of about 82,000. About 7,100 of it fell in September. The Fact-Checker's image-batch verifications on Claude Opus 5.5 (5,000–7,000 each) were the largest items. September closed at about 75,500 credits (7.6%), and October stands at about **57,550 of 1,000,000 (5.8%)**. See [BUDGET.md](docs/BUDGET.md).
+- These figures are the ledger's estimates. GitHub's billing report is the authority (ADR-0005), but the agents' GitHub token can't read it, so a look at your Copilot usage page would confirm them.
+- The Gemini images are billed by Google, not in Copilot credits.
+
+### Next (after you approve)
+The rest of M3, then CP3b.
+
+| ID | Task | Agent | Starts after |
+|---|---|---|---|
+| [M3-06](docs/tasks/M3-06-preview-deploy.md) | Preview deploy, accessibility and performance checks | frontend-engineer | CP3.5 |
+| [M3-14](docs/tasks/M3-14-modern-countries.md) | Countries in modern names (ADR-0028, decision 1) | gis-engineer → research-lead → fact-checker | CP3.5 |
+| [M3-15](docs/tasks/M3-15-panel-header.md) | A simpler panel header, with countries (ADR-0028, ADR-0030) | frontend-engineer | M3-14's schema commit |
+| [M3-16](docs/tasks/M3-16-longer-about.md) | A longer "About" for the 31 major places: 250–450 cited words each, up from a median of 75 | research-lead → fact-checker | CP3.5 |
+| CP3b | Working MVP deployed to a preview | project-owner | M3-06 and M3-14 to M3-16 merged |

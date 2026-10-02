@@ -5,9 +5,9 @@
 | Agent | `frontend-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m3-preview-deploy` |
-| Depends on | M3-04 and M3-05 merged. The Cloudflare secrets were added on 2026-09-25 (see CHECKPOINTS.md → CP3a); this task's first preview deploy confirms that they work. |
-| Parallel with | none |
-| Credit target | ~600 AI credits (session guard: 10,000) |
+| Depends on | CP3.5 approved (M3-04 and M3-05 are merged). The Cloudflare secrets were added on 2026-09-25 (see CHECKPOINTS.md → CP3a); this task's first preview deploy confirms that they work. |
+| Parallel with | M3-14, M3-15 and M3-16 (CP3.5 decision 2). Once this merges, their PRs get preview links too. |
+| Credit target | ~3,000 AI credits (session guard: 10,000; ADR-0025) |
 
 ## Goal
 Deploy the MVP to Cloudflare Pages: a preview for every pull request and production from `main` (ADR-0010). Then confirm that the deployed app meets the spec's accessibility and performance targets, so the PO can write the CP3b summary.
@@ -26,7 +26,11 @@ Deploy the MVP to Cloudflare Pages: a preview for every pull request and product
    - **Push to `main`:** deploy to production.
    - Deploy jobs **skip, and do not fail**, when the secrets are missing (for example on a fork).
    - Use only `secrets.CLOUDFLARE_API_TOKEN` and `secrets.CLOUDFLARE_ACCOUNT_ID`. Never print them.
-2. **Smoke test on the deployed preview:** a scripted browser check, such as Playwright, run in CI against the preview URL. It checks that the map loads, that selecting Capernaum shows the panel with a credit line, that searching "Antioch" gives two results, and that opening `?place=emmaus` shows the disputed layout.
+2. **Smoke test on the deployed preview:** a scripted browser check, such as Playwright, run in CI against the preview URL. It checks that:
+   - the map loads;
+   - selecting Capernaum shows the panel, and both its lead AI image (served from the deploy's `media/ai/`) and a Wikimedia Commons photo load, each with its credit line;
+   - searching "Antioch" gives two results;
+   - opening `?place=emmaus` shows the disputed layout.
 3. **Accessibility check:** run an automated check (for example axe) on the preview for the overview, an open place panel and the search box, and fix every serious or critical issue.
 4. **Performance check:** run Lighthouse with the **desktop preset on a cold cache** against the preview (in CI, for example with Lighthouse CI), and assert the spec §11 gates: Largest Contentful Paint of 2.5 s or less and Total Blocking Time of 200 ms or less. Report the numbers in the PR.
 5. **Docs:** add `docs/DEPLOY.md`, explaining how deploys work, where to find the preview URL, how to roll back, what to do if tiles fail (the ADR-0009 fallback), and how to renew the Cloudflare token with `scripts/setup-cloudflare-token.ps1`. The token expires on about 2027-09-25.
@@ -43,4 +47,4 @@ New features, custom domains, and analytics.
 - [ ] Committed as `feat(deploy): add Cloudflare Pages preview and production deploys`.
 
 ## Finish
-Follow the session protocol in `.github/agents/frontend-engineer.agent.md`. PR title: `feat(deploy): Cloudflare Pages previews and production`. After it merges, the PO writes the CP3b summary.
+Follow the session protocol in `.github/agents/frontend-engineer.agent.md`. PR title: `feat(deploy): Cloudflare Pages previews and production`. The PO writes the CP3b summary once this task, M3-14, M3-15 and M3-16 have merged.

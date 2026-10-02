@@ -15,15 +15,25 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M2-06](M2-06-image-ids.md) | Stable image IDs and lead images | gis-engineer → media-curator → fact-checker | `feat/m2-image-ids` | Merged (#12) |
 | [M3-02](M3-02-app-scaffold.md) | App scaffold, data build and CI | frontend-engineer | `feat/m3-app-scaffold` | Merged (#18) |
 | [M3-03](M3-03-map-view.md) | Map view | frontend-engineer | `feat/m3-map` | Merged (#21) |
-| [M3-04](M3-04-place-panel.md) | Place panel | frontend-engineer | `feat/m3-place-panel` | In progress |
-| [M3-05](M3-05-search.md) | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | In progress |
-| [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for M3-04 and M3-05 |
+| [M3-04](M3-04-place-panel.md) | Place panel | frontend-engineer | `feat/m3-place-panel` | Merged (#27) |
+| [M3-05](M3-05-search.md) | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Merged (#28) |
+| [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for CP3.5 |
 | [M3-07](M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Merged (#19) |
-| [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged (#20) |
+| [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged (#20); its no-country rule is replaced by ADR-0028 and M3-14 |
 | [M3-10](M3-10-english-names.md) | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Merged (#22) |
 | [M3-11](M3-11-ancient-regions.md) | Ancient empire and provinces (about AD 50) | gis-engineer → research-lead → fact-checker | `data/m3-ancient-regions` | Merged (#23) |
 | [M3-12](M3-12-smooth-map.md) | Smoother dragging and zooming | frontend-engineer | `feat/m3-smooth-map` | Merged (#24) |
-| [M3-13](M3-13-well-known-areas.md) | Well-known areas and more English names | research-lead → fact-checker | `data/m3-well-known-areas` | In progress |
+| [M3-13](M3-13-well-known-areas.md) | Well-known areas and more English names | research-lead → fact-checker | `data/m3-well-known-areas` | Merged (#26) |
+| [M3.5-01](M3.5-01-image-schema.md) | Image schema, broken links and link checks | gis-engineer | `data/m3.5-image-schema` | Merged (#30) |
+| [M3.5-02](M3.5-02-batch-a-jerusalem-gospels.md) | Images, batch A: Jerusalem and the Gospels | research-lead → media-curator → fact-checker | `data/m3.5-images-a` | Merged (#35) |
+| [M3.5-03](M3.5-03-batch-b-paul-capitals.md) | Images, batch B: Paul's letters and the capitals | research-lead → media-curator → fact-checker | `data/m3.5-images-b` | Merged (#32) |
+| [M3.5-04](M3.5-04-batch-c-revelation-churches.md) | Images, batch C: the churches of Revelation | research-lead → media-curator → fact-checker | `data/m3.5-images-c` | Merged (#33) |
+| [M3.5-05](M3.5-05-standard-places.md) | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Merged (#34) |
+| [M3.5-06](M3.5-06-gallery.md) | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Merged (#31) |
+| [M3.5-07](M3.5-07-ai-reconstructions.md) | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker → the human → media-curator → fact-checker | `data/m3.5-ai-images` | Merged (#36) |
+| [M3-14](M3-14-modern-countries.md) | Countries in modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | Waits for CP3.5 |
+| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | Waits for CP3.5 and M3-14's schema commit |
+| [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | Waits for CP3.5 |
 
 ## Template
 ```markdown
