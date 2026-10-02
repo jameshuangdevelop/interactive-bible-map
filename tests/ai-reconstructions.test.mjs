@@ -17,7 +17,9 @@ import {
   derivePromptIdFromCandidateFileName,
   extractPromptTextFromMarkdown,
   findExistingCandidateFiles,
+  mediaEntryGeneratorFromSidecar,
   parseAiCandidateFileName,
+  parseGenerateAiArguments,
   parsePublishAiArguments,
   publishAiCandidate,
   sha256Hex,
@@ -179,6 +181,73 @@ test("prompt extraction supports CRLF line endings", () => {
   assert.equal(prompt, "First paragraph.\n\nSecond paragraph.");
 });
 
+test("mediaEntryGeneratorFromSidecar maps provider and model to readable tool names", () => {
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "gemini",
+      model: "gemini-3-pro-image",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Google Gemini API (Nano Banana Pro)",
+      model: "gemini-3-pro-image",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "cloudflare-flux",
+      model: "@cf/black-forest-labs/flux-2-klein-4b",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Cloudflare Workers AI (FLUX.2 klein)",
+      model: "@cf/black-forest-labs/flux-2-klein-4b",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "cloudflare-lucid",
+      model: "@cf/leonardo/lucid-origin",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Cloudflare Workers AI (Lucid Origin)",
+      model: "@cf/leonardo/lucid-origin",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "openai",
+      model: "gpt-image-2.5-flare",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "OpenAI API (gpt-image-2.5-flare)",
+      model: "gpt-image-2.5-flare",
+      date: "2026-10-01"
+    }
+  );
+
+  assert.deepEqual(
+    mediaEntryGeneratorFromSidecar({
+      provider: "gemini",
+      model: "gemini-experimental-image",
+      date: "2026-10-01T18:00:00.000Z"
+    }),
+    {
+      tool: "Google Gemini API (gemini-experimental-image)",
+      model: "gemini-experimental-image",
+      date: "2026-10-01"
+    }
+  );
+});
+
 test("findExistingCandidateFiles finds only the requested round's variants", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     assert.deepEqual(
@@ -314,6 +383,40 @@ test("writeAiCandidateAndSidecar records Gemini cost, tier, usage and edit metad
   });
 });
 
+test("writeAiCandidateAndSidecar treats null usageMetadata as absent", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await sharp({
+      create: {
+        width: 24,
+        height: 16,
+        channels: 3,
+        background: { r: 61, g: 70, b: 120 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const result = await writeAiCandidateAndSidecar({
+      incomingDirectory: temporaryDirectory,
+      promptId: "damascus-ai-01",
+      round: 1,
+      variant: 1,
+      imageBuffer,
+      provider: "gemini",
+      model: "gemini-3-pro-image",
+      seed: 889,
+      promptText: "A dusk scene near Damascus.",
+      serviceTier: GEMINI_SERVICE_TIERS.FLEX,
+      usageMetadata: null,
+      estimatedCostUsd: 0.067
+    });
+
+    const sidecar = JSON.parse(await fs.readFile(result.sidecarPath, "utf8"));
+    assert.equal("usageMetadata" in sidecar, false);
+    assert.equal(sidecar.estimatedCostUsd, 0.067);
+  });
+});
+
 test("writeAiCandidateAndSidecar refuses to overwrite existing candidate files", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const imageBuffer = await sharp({
@@ -384,7 +487,7 @@ test("writeAiCandidateAndSidecar checks side-car path before writing image", asy
   });
 });
 
-test("writeAiCandidateAndSidecar writes side-car first and leaves no orphan image on side-car failure", async () => {
+test("writeAiCandidateAndSidecar writes image first and keeps it when side-car writing fails", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const imageBuffer = await sharp({
       create: {
@@ -424,8 +527,8 @@ test("writeAiCandidateAndSidecar writes side-car first and leaves no orphan imag
       /simulated side-car write failure/u
     );
 
-    assert.deepEqual(writeTargets, ["capernaum-ai-01-r2-v1.png.json"]);
-    assert.equal(await pathExists(imagePath), false);
+    assert.deepEqual(writeTargets, ["capernaum-ai-01-r2-v1.png", "capernaum-ai-01-r2-v1.png.json"]);
+    assert.equal(await pathExists(imagePath), true);
     assert.equal(await pathExists(sidecarPath), false);
   });
 });
@@ -441,11 +544,28 @@ test("parsePublishAiArguments supports --no-trim", () => {
   assert.equal(parsed.promptId, "athens-ai-01");
 });
 
-test("publishAiCandidate removes top and bottom letterbox bars", async () => {
+test("parseGenerateAiArguments rejects --round together with --edit-from", () => {
+  assert.throws(
+    () =>
+      parseGenerateAiArguments([
+        "jerusalem-ai-01",
+        "--edit-from",
+        "media/ai-incoming/jerusalem-ai-01-r2-v1.png",
+        "--instruction",
+        "Reduce crowd density and keep the same architecture.",
+        "--round",
+        "9"
+      ]),
+    /--round cannot be used with --edit-from/u
+  );
+});
+
+test("publishAiCandidate trims near-uniform black letterbox bars with a hard edge", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const imageBuffer = await createPngBuffer(120, 80, (x, y) => {
       if (x >= 0 && (y < 10 || y >= 68)) {
-        return [0, 0, 0];
+        const barValue = (x + y) % 4;
+        return [barValue, barValue, barValue];
       }
       return [120, 150, 190];
     });
@@ -471,11 +591,13 @@ test("publishAiCandidate removes top and bottom letterbox bars", async () => {
   });
 });
 
-test("publishAiCandidate keeps dark non-black sky at the top", async () => {
+test("publishAiCandidate keeps a dark night sky with noise and gradual brightening", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const imageBuffer = await createPngBuffer(100, 60, (x, y) => {
-      if (x >= 0 && y < 8) {
-        return [24, 12, 8];
+      if (x >= 0 && y < 12) {
+        const noise = ((x * 37) + (y * 17)) % 7;
+        const value = Math.min(16, 7 + noise + Math.floor(y / 4));
+        return [value, Math.max(0, value - 1), Math.max(0, value - 2)];
       }
       return [140, 110, 90];
     });
@@ -498,6 +620,37 @@ test("publishAiCandidate keeps dark non-black sky at the top", async () => {
     });
     assert.equal(result.output.width, 100);
     assert.equal(result.output.height, 60);
+  });
+});
+
+test("publishAiCandidate keeps deep textured shadow that touches an edge", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await createPngBuffer(120, 80, (x, y) => {
+      if (x < 12) {
+        const value = ((x * 29) + (y * 31)) % 17;
+        return [value, Math.max(0, value - 1), Math.max(0, value - 2)];
+      }
+      return [150, 165, 180];
+    });
+    const { candidatePath } = await writeCandidateWithSidecar({
+      temporaryDirectory,
+      promptId: "nazareth-ai-01",
+      fileName: "nazareth-ai-01-r1-v1.png",
+      imageBuffer
+    });
+
+    const outputDirectory = path.join(temporaryDirectory, "media", "ai");
+    const result = await publishAiCandidate({ candidatePath, outputDirectory });
+    assert.deepEqual(result.trim, {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      enabled: true,
+      applied: false
+    });
+    assert.equal(result.output.width, 120);
+    assert.equal(result.output.height, 80);
   });
 });
 
@@ -784,6 +937,81 @@ test("gemini request shape and response parsing", async () => {
   assert.equal(result.estimatedCostUsd, 0.074);
 });
 
+test("gemini success without usageMetadata still writes candidate and side-car", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const calls = [];
+    const generatedPng = await sharp({
+      create: {
+        width: 16,
+        height: 10,
+        channels: 3,
+        background: { r: 20, g: 30, b: 40 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const providerResult = await generateImageWithProvider({
+      provider: "gemini",
+      model: DEFAULT_AI_MODELS.gemini,
+      prompt: "Damascus at dusk, market street view.",
+      seed: 410,
+      credentials: {
+        geminiApiKey: "gemini-secret"
+      },
+      fetchImpl: async (url, init) => {
+        calls.push({ url, init });
+        return jsonResponse(
+          {
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      inlineData: {
+                        mimeType: "image/png",
+                        data: generatedPng.toString("base64")
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          200,
+          {
+            "x-gemini-service-tier": "flex"
+          }
+        );
+      }
+    });
+
+    assert.equal(calls.length, 1);
+    assert.equal(providerResult.usageMetadata, undefined);
+    assert.equal(providerResult.estimatedCostUsd, 0.067);
+
+    const written = await writeAiCandidateAndSidecar({
+      incomingDirectory: temporaryDirectory,
+      promptId: "damascus-ai-01",
+      round: 1,
+      variant: 1,
+      imageBuffer: providerResult.imageBuffer,
+      provider: "gemini",
+      model: DEFAULT_AI_MODELS.gemini,
+      seed: 410,
+      promptText: "Damascus at dusk, market street view.",
+      serviceTier: providerResult.serviceTier,
+      usageMetadata: providerResult.usageMetadata,
+      estimatedCostUsd: providerResult.estimatedCostUsd
+    });
+
+    assert.equal(await pathExists(written.imagePath), true);
+    const sidecar = JSON.parse(await fs.readFile(written.sidecarPath, "utf8"));
+    assert.equal("usageMetadata" in sidecar, false);
+    assert.equal(sidecar.estimatedCostUsd, 0.067);
+  });
+});
+
 test("gemini cost estimate does not charge image tokens twice", () => {
   // An edit: 300 text + 560 image tokens in; 200 text + 1,120 image tokens out, plus 400 thinking.
   const usageMetadata = {
@@ -800,14 +1028,14 @@ test("gemini cost estimate does not charge image tokens twice", () => {
     thoughtsTokenCount: 400
   };
 
-  // 300 × $1/M + (200 + 400) × $6/M + 1 input image × $0.0006 + 1 output image × $0.067
+  // 300 × $1/M + (200 + 400) × $6/M + 1 input image × $0.00056 + 1 output image × $0.067
   assert.equal(
     estimateGeminiCostUsd({ serviceTier: "flex", usageMetadata, inputImageCount: 1 }),
-    0.0715
+    0.07146
   );
   assert.equal(
     estimateGeminiCostUsd({ serviceTier: "standard", usageMetadata, inputImageCount: 1 }),
-    0.143
+    0.14292
   );
 });
 
@@ -968,6 +1196,38 @@ test("gemini 400 is not retried", async () => {
   );
 
   assert.equal(callCount, 1);
+});
+
+test("gemini transport errors warn about possible billing and redact secrets", async () => {
+  const secret = "gemini-transport-secret";
+
+  await assert.rejects(
+    () =>
+      generateImageWithProvider({
+        provider: "gemini",
+        model: DEFAULT_AI_MODELS.gemini,
+        prompt: "Transport error warning test",
+        seed: 409,
+        credentials: {
+          geminiApiKey: secret
+        },
+        fetchImpl: async () => {
+          throw new Error(`socket closed while sending with key ${secret}`);
+        }
+      }),
+    (error) => {
+      assert.match(
+        error.message,
+        /The connection to Gemini closed before a response arrived\./u
+      );
+      assert.match(
+        error.message,
+        /Google may still have billed this image; check usage in Google AI Studio before running it again\./u
+      );
+      assert.equal(error.message.includes(secret), false);
+      return true;
+    }
+  );
 });
 
 test("gemini edit-mode request sends inlineData and instruction text", async () => {
@@ -1217,7 +1477,7 @@ test("estimateGeminiCostUsd computes flex and standard costs from usage metadata
       inputImageCount: 1,
       outputImageCount: 1
     }),
-    0.080344
+    0.080304
   );
   assert.equal(
     estimateGeminiCostUsd({
@@ -1226,7 +1486,7 @@ test("estimateGeminiCostUsd computes flex and standard costs from usage metadata
       inputImageCount: 1,
       outputImageCount: 1
     }),
-    0.160688
+    0.160608
   );
 });
 
@@ -1287,12 +1547,11 @@ test("publishAiCandidate writes valid WebP under 400 KB and validateData accepts
     assert.equal(publishResult.output.bytes <= MAX_AI_IMAGE_BYTES, true);
     assert.equal(publishResult.output.width <= 1600, true);
     assert.equal(publishResult.mediaUrl, "media/ai/capernaum-ai-01.webp");
-    assert.equal(publishResult.trim.top > 0, true);
-    assert.equal(publishResult.trim.bottom > 0, true);
+    assert.equal(publishResult.trim.enabled, true);
     assert.equal(publishResult.trim.left, 0);
     assert.equal(publishResult.trim.right, 0);
     assert.deepEqual(publishResult.mediaEntryGenerator, {
-      tool: "openai",
+      tool: "OpenAI API (gpt-image-2.5-flare)",
       model: "gpt-image-2.5-flare",
       date: "2026-10-01"
     });

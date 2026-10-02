@@ -20,10 +20,38 @@ const AI_CANDIDATE_FILE_PATTERN =
   /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r([1-9][0-9]*)-v([1-9][0-9]*)\.([a-z0-9]+)$/u;
 const AI_CANDIDATE_SIDECAR_FILE_PATTERN =
   /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r([1-9][0-9]*)-v([1-9][0-9]*)\.[a-z0-9]+\.json$/u;
-const NEAR_BLACK_CHANNEL_MAX = 16;
+const EDGE_NEAR_BLACK_CHANNEL_MAX = 16;
+const EDGE_NEAR_BLACK_MEAN_MAX = 8;
+const EDGE_NEAR_BLACK_STD_DEV_MAX = 4.5;
+// Bars should end with a clear luminance step into real content.
+const EDGE_HARD_EDGE_MEAN_JUMP_MIN = 16;
 const EDGE_NEAR_BLACK_RATIO = 0.98;
 const EDGE_TRIM_MIN_PX = 4;
 const EDGE_TRIM_MAX_SIDE_RATIO = 0.2;
+const GENERATOR_TOOL_DISPLAY_LOOKUP = Object.freeze({
+  gemini: Object.freeze({
+    providerDisplayName: "Google Gemini API",
+    models: Object.freeze({
+      "gemini-3-pro-image": "Google Gemini API (Nano Banana Pro)"
+    })
+  }),
+  "cloudflare-flux": Object.freeze({
+    providerDisplayName: "Cloudflare Workers AI",
+    models: Object.freeze({
+      "@cf/black-forest-labs/flux-2-klein-4b": "Cloudflare Workers AI (FLUX.2 klein)"
+    })
+  }),
+  "cloudflare-lucid": Object.freeze({
+    providerDisplayName: "Cloudflare Workers AI",
+    models: Object.freeze({
+      "@cf/leonardo/lucid-origin": "Cloudflare Workers AI (Lucid Origin)"
+    })
+  }),
+  openai: Object.freeze({
+    providerDisplayName: "OpenAI API",
+    models: Object.freeze({})
+  })
+});
 
 export const DEFAULT_IMAGE_PROMPTS_DIRECTORY = path.join(
   repositoryRoot,
@@ -271,8 +299,7 @@ export async function writeAiCandidateAndSidecar({
   instructionText,
   now = new Date(),
   writeFileImpl = fs.writeFile,
-  statImpl = fs.stat,
-  unlinkImpl = fs.unlink
+  statImpl = fs.stat
 }) {
   ensurePromptId(promptId);
   if (!Number.isInteger(round) || round < 1) {
@@ -281,6 +308,32 @@ export async function writeAiCandidateAndSidecar({
   if (!Number.isInteger(variant) || variant < 1) {
     throw new Error("variant must be an integer >= 1.");
   }
+
+  const extension = detectImageExtensionFromBuffer(imageBuffer);
+  const directoryPath = path.resolve(incomingDirectory);
+  await fs.mkdir(directoryPath, { recursive: true });
+
+  const baseName = `${promptId}-r${round}-v${variant}`;
+  const imagePath = path.join(directoryPath, `${baseName}.${extension}`);
+  const sidecarPath = `${imagePath}.json`;
+
+  const [imagePathExists, sidecarPathExists] = await Promise.all([
+    filePathExists(imagePath, statImpl),
+    filePathExists(sidecarPath, statImpl)
+  ]);
+  if (imagePathExists || sidecarPathExists) {
+    throw candidateAlreadyExistsError(promptId, round, variant);
+  }
+
+  try {
+    await writeFileImpl(imagePath, imageBuffer, { flag: "wx" });
+  } catch (error) {
+    if (error?.code === "EEXIST") {
+      throw candidateAlreadyExistsError(promptId, round, variant);
+    }
+    throw error;
+  }
+
   if (typeof provider !== "string" || provider.length === 0) {
     throw new Error("provider is required.");
   }
@@ -297,8 +350,8 @@ export async function writeAiCandidateAndSidecar({
     throw new Error("serviceTier must be a non-empty string when provided.");
   }
   if (
-    usageMetadata !== undefined &&
-    (typeof usageMetadata !== "object" || usageMetadata === null || Array.isArray(usageMetadata))
+    usageMetadata != null &&
+    (typeof usageMetadata !== "object" || Array.isArray(usageMetadata))
   ) {
     throw new Error("usageMetadata must be a JSON object when provided.");
   }
@@ -321,13 +374,6 @@ export async function writeAiCandidateAndSidecar({
     throw new Error("instructionText must be a non-empty string when provided.");
   }
 
-  const extension = detectImageExtensionFromBuffer(imageBuffer);
-  const directoryPath = path.resolve(incomingDirectory);
-  await fs.mkdir(directoryPath, { recursive: true });
-
-  const baseName = `${promptId}-r${round}-v${variant}`;
-  const imagePath = path.join(directoryPath, `${baseName}.${extension}`);
-  const sidecarPath = `${imagePath}.json`;
   const promptSha256 = sha256Hex(promptText);
   const sidecar = {
     provider,
@@ -342,7 +388,7 @@ export async function writeAiCandidateAndSidecar({
   if (typeof serviceTier === "string") {
     sidecar.serviceTier = serviceTier;
   }
-  if (usageMetadata !== undefined) {
+  if (usageMetadata != null) {
     sidecar.usageMetadata = usageMetadata;
   }
   if (typeof estimatedCostUsd === "number") {
@@ -356,40 +402,12 @@ export async function writeAiCandidateAndSidecar({
     sidecar.instructionSha256 = sha256Hex(instructionText);
   }
 
-  const [imagePathExists, sidecarPathExists] = await Promise.all([
-    filePathExists(imagePath, statImpl),
-    filePathExists(sidecarPath, statImpl)
-  ]);
-  if (imagePathExists || sidecarPathExists) {
-    throw candidateAlreadyExistsError(promptId, round, variant);
-  }
-
   try {
     await writeFileImpl(sidecarPath, `${JSON.stringify(sidecar, null, 2)}\n`, {
       encoding: "utf8",
       flag: "wx"
     });
   } catch (error) {
-    if (error?.code === "EEXIST") {
-      throw candidateAlreadyExistsError(promptId, round, variant);
-    }
-    throw error;
-  }
-
-  try {
-    await writeFileImpl(imagePath, imageBuffer, { flag: "wx" });
-  } catch (error) {
-    try {
-      await unlinkImpl(sidecarPath);
-    } catch (unlinkError) {
-      if (unlinkError?.code !== "ENOENT") {
-        throw new Error(
-          `Failed to write AI candidate image and could not clean up side-car: ${unlinkError.message}`,
-          { cause: error }
-        );
-      }
-    }
-
     if (error?.code === "EEXIST") {
       throw candidateAlreadyExistsError(promptId, round, variant);
     }
@@ -468,9 +486,9 @@ export async function getEnvironmentVariable(variableName, options = {}) {
 export function parseGenerateAiArguments(argv) {
   const options = {
     provider: "cloudflare-flux",
-    variants: 1,
-    round: 1
+    variants: 1
   };
+  let roundWasSpecified = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -505,6 +523,7 @@ export function parseGenerateAiArguments(argv) {
     const roundOption = parseLongOptionValue(argument, argv[index + 1], "--round");
     if (roundOption) {
       options.round = parseIntegerFlag("--round", roundOption.value, { min: 1 });
+      roundWasSpecified = true;
       if (roundOption.consumedNext) {
         index += 1;
       }
@@ -568,6 +587,11 @@ export function parseGenerateAiArguments(argv) {
   }
 
   if (options.editFrom) {
+    if (roundWasSpecified) {
+      throw new Error(
+        "--round cannot be used with --edit-from because edit mode always uses the parent round plus one."
+      );
+    }
     if (typeof options.instruction !== "string" || options.instruction.trim().length === 0) {
       throw new Error("--instruction is required when using --edit-from.");
     }
@@ -575,6 +599,7 @@ export function parseGenerateAiArguments(argv) {
     throw new Error("--instruction requires --edit-from.");
   }
 
+  options.round ??= 1;
   ensurePromptId(options.promptId);
   return options;
 }
@@ -677,8 +702,14 @@ export function mediaEntryGeneratorFromSidecar(sidecarData) {
     throw new Error("Candidate side-car is missing date.");
   }
 
+  const providerLookup = GENERATOR_TOOL_DISPLAY_LOOKUP[sidecarData.provider];
+  const providerDisplayName = providerLookup?.providerDisplayName ?? sidecarData.provider;
+  const displayTool =
+    providerLookup?.models?.[sidecarData.model] ??
+    `${providerDisplayName} (${sidecarData.model})`;
+
   return {
-    tool: sidecarData.provider,
+    tool: displayTool,
     model: sidecarData.model,
     date: formatDateOnly(sidecarData.date)
   };
@@ -784,27 +815,63 @@ function maxRgbChannelForPixel(rawBuffer, pixelOffset, channels) {
   return Math.max(red, green, blue);
 }
 
-function isNearBlackRow(rawBuffer, width, channels, rowIndex) {
+function summarizeRow(rawBuffer, width, channels, rowIndex) {
   let nearBlackPixels = 0;
+  let channelMaxSum = 0;
+  let channelMaxSquareSum = 0;
   const rowOffset = rowIndex * width * channels;
   for (let x = 0; x < width; x += 1) {
     const pixelOffset = rowOffset + (x * channels);
-    if (maxRgbChannelForPixel(rawBuffer, pixelOffset, channels) <= NEAR_BLACK_CHANNEL_MAX) {
+    const channelMax = maxRgbChannelForPixel(rawBuffer, pixelOffset, channels);
+    if (channelMax <= EDGE_NEAR_BLACK_CHANNEL_MAX) {
       nearBlackPixels += 1;
     }
+    channelMaxSum += channelMax;
+    channelMaxSquareSum += channelMax * channelMax;
   }
-  return nearBlackPixels / width >= EDGE_NEAR_BLACK_RATIO;
+
+  const mean = channelMaxSum / width;
+  const variance = Math.max(0, (channelMaxSquareSum / width) - (mean * mean));
+  return {
+    mean,
+    stdDev: Math.sqrt(variance),
+    nearBlackRatio: nearBlackPixels / width
+  };
 }
 
-function isNearBlackColumn(rawBuffer, width, height, channels, columnIndex) {
+function summarizeColumn(rawBuffer, width, height, channels, columnIndex) {
   let nearBlackPixels = 0;
+  let channelMaxSum = 0;
+  let channelMaxSquareSum = 0;
   for (let y = 0; y < height; y += 1) {
     const pixelOffset = ((y * width) + columnIndex) * channels;
-    if (maxRgbChannelForPixel(rawBuffer, pixelOffset, channels) <= NEAR_BLACK_CHANNEL_MAX) {
+    const channelMax = maxRgbChannelForPixel(rawBuffer, pixelOffset, channels);
+    if (channelMax <= EDGE_NEAR_BLACK_CHANNEL_MAX) {
       nearBlackPixels += 1;
     }
+    channelMaxSum += channelMax;
+    channelMaxSquareSum += channelMax * channelMax;
   }
-  return nearBlackPixels / height >= EDGE_NEAR_BLACK_RATIO;
+
+  const mean = channelMaxSum / height;
+  const variance = Math.max(0, (channelMaxSquareSum / height) - (mean * mean));
+  return {
+    mean,
+    stdDev: Math.sqrt(variance),
+    nearBlackRatio: nearBlackPixels / height
+  };
+}
+
+function isNearUniformBlackBand(stats) {
+  return (
+    stats.nearBlackRatio >= EDGE_NEAR_BLACK_RATIO &&
+    stats.mean <= EDGE_NEAR_BLACK_MEAN_MAX &&
+    stats.stdDev <= EDGE_NEAR_BLACK_STD_DEV_MAX
+  );
+}
+
+function hasHardBrightnessEdge(bandMean, inwardMean) {
+  return inwardMean - bandMean >= EDGE_HARD_EDGE_MEAN_JUMP_MIN;
 }
 
 function normalizeTrimRun(runPixels, maxAllowedPixels) {
@@ -817,44 +884,99 @@ function detectEdgeNearBlackTrim(rawBuffer, width, height, channels) {
   const maxLeftOrRight = Math.floor(width * EDGE_TRIM_MAX_SIDE_RATIO);
 
   let topRun = 0;
+  let topBandMeanTotal = 0;
   while (topRun < maxTopOrBottom && topRun < height) {
-    if (!isNearBlackRow(rawBuffer, width, channels, topRun)) {
+    const rowStats = summarizeRow(rawBuffer, width, channels, topRun);
+    if (!isNearUniformBlackBand(rowStats)) {
       break;
     }
+    topBandMeanTotal += rowStats.mean;
     topRun += 1;
   }
+  const topBandMean = topRun > 0 ? topBandMeanTotal / topRun : 0;
+  const topInwardRowStats =
+    topRun < height ? summarizeRow(rawBuffer, width, channels, topRun) : null;
 
   let bottomRun = 0;
+  let bottomBandMeanTotal = 0;
   while (bottomRun < maxTopOrBottom && bottomRun < height - topRun) {
     const rowIndex = height - 1 - bottomRun;
-    if (!isNearBlackRow(rawBuffer, width, channels, rowIndex)) {
+    const rowStats = summarizeRow(rawBuffer, width, channels, rowIndex);
+    if (!isNearUniformBlackBand(rowStats)) {
       break;
     }
+    bottomBandMeanTotal += rowStats.mean;
     bottomRun += 1;
   }
+  const bottomBandMean = bottomRun > 0 ? bottomBandMeanTotal / bottomRun : 0;
+  const bottomInwardRowIndex = height - 1 - bottomRun;
+  const bottomInwardRowStats =
+    bottomRun < height - topRun && bottomInwardRowIndex >= 0
+      ? summarizeRow(rawBuffer, width, channels, bottomInwardRowIndex)
+      : null;
 
   let leftRun = 0;
+  let leftBandMeanTotal = 0;
   while (leftRun < maxLeftOrRight && leftRun < width) {
-    if (!isNearBlackColumn(rawBuffer, width, height, channels, leftRun)) {
+    const columnStats = summarizeColumn(rawBuffer, width, height, channels, leftRun);
+    if (!isNearUniformBlackBand(columnStats)) {
       break;
     }
+    leftBandMeanTotal += columnStats.mean;
     leftRun += 1;
   }
+  const leftBandMean = leftRun > 0 ? leftBandMeanTotal / leftRun : 0;
+  const leftInwardColumnStats =
+    leftRun < width ? summarizeColumn(rawBuffer, width, height, channels, leftRun) : null;
 
   let rightRun = 0;
+  let rightBandMeanTotal = 0;
   while (rightRun < maxLeftOrRight && rightRun < width - leftRun) {
     const columnIndex = width - 1 - rightRun;
-    if (!isNearBlackColumn(rawBuffer, width, height, channels, columnIndex)) {
+    const columnStats = summarizeColumn(rawBuffer, width, height, channels, columnIndex);
+    if (!isNearUniformBlackBand(columnStats)) {
       break;
     }
+    rightBandMeanTotal += columnStats.mean;
     rightRun += 1;
   }
+  const rightBandMean = rightRun > 0 ? rightBandMeanTotal / rightRun : 0;
+  const rightInwardColumnIndex = width - 1 - rightRun;
+  const rightInwardColumnStats =
+    rightRun < width - leftRun && rightInwardColumnIndex >= 0
+      ? summarizeColumn(rawBuffer, width, height, channels, rightInwardColumnIndex)
+      : null;
+
+  const topTrim =
+    topRun > 0 &&
+    topInwardRowStats &&
+    hasHardBrightnessEdge(topBandMean, topInwardRowStats.mean)
+      ? normalizeTrimRun(topRun, maxTopOrBottom)
+      : 0;
+  const bottomTrim =
+    bottomRun > 0 &&
+    bottomInwardRowStats &&
+    hasHardBrightnessEdge(bottomBandMean, bottomInwardRowStats.mean)
+      ? normalizeTrimRun(bottomRun, maxTopOrBottom)
+      : 0;
+  const leftTrim =
+    leftRun > 0 &&
+    leftInwardColumnStats &&
+    hasHardBrightnessEdge(leftBandMean, leftInwardColumnStats.mean)
+      ? normalizeTrimRun(leftRun, maxLeftOrRight)
+      : 0;
+  const rightTrim =
+    rightRun > 0 &&
+    rightInwardColumnStats &&
+    hasHardBrightnessEdge(rightBandMean, rightInwardColumnStats.mean)
+      ? normalizeTrimRun(rightRun, maxLeftOrRight)
+      : 0;
 
   return {
-    top: normalizeTrimRun(topRun, maxTopOrBottom),
-    bottom: normalizeTrimRun(bottomRun, maxTopOrBottom),
-    left: normalizeTrimRun(leftRun, maxLeftOrRight),
-    right: normalizeTrimRun(rightRun, maxLeftOrRight)
+    top: topTrim,
+    bottom: bottomTrim,
+    left: leftTrim,
+    right: rightTrim
   };
 }
 

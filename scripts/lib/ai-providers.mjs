@@ -29,19 +29,30 @@ export const GEMINI_SERVICE_TIERS = Object.freeze({
 });
 
 export const DEFAULT_GEMINI_SERVICE_TIER = GEMINI_SERVICE_TIERS.FLEX;
+const GEMINI_INPUT_IMAGE_TOKENS = 560;
+const GEMINI_INPUT_TOKEN_PRICING_PER_MILLION_USD = Object.freeze({
+  [GEMINI_SERVICE_TIERS.FLEX]: 1,
+  [GEMINI_SERVICE_TIERS.STANDARD]: 2
+});
 
 const GEMINI_IMAGE_PRICING = Object.freeze({
   [GEMINI_SERVICE_TIERS.FLEX]: Object.freeze({
     outputImageUsd: 0.067,
     outputTextAndThinkingPerMillionUsd: 6,
     inputTextPerMillionUsd: 1,
-    inputImageUsd: 0.0006
+    inputImageUsd:
+      (GEMINI_INPUT_IMAGE_TOKENS *
+        GEMINI_INPUT_TOKEN_PRICING_PER_MILLION_USD[GEMINI_SERVICE_TIERS.FLEX]) /
+      1_000_000
   }),
   [GEMINI_SERVICE_TIERS.STANDARD]: Object.freeze({
     outputImageUsd: 0.134,
     outputTextAndThinkingPerMillionUsd: 12,
     inputTextPerMillionUsd: 2,
-    inputImageUsd: 0.0012
+    inputImageUsd:
+      (GEMINI_INPUT_IMAGE_TOKENS *
+        GEMINI_INPUT_TOKEN_PRICING_PER_MILLION_USD[GEMINI_SERVICE_TIERS.STANDARD]) /
+      1_000_000
   })
 });
 
@@ -654,6 +665,7 @@ async function fetchGeminiImage({
         headers: {
           "x-goog-api-key": geminiApiKey,
           "Content-Type": "application/json",
+          // Google's Python SDK also sends X-Server-Timeout when a timeout is configured.
           "X-Server-Timeout": String(GEMINI_SERVER_TIMEOUT_SECONDS)
         },
         body: JSON.stringify(requestPayload),
@@ -661,7 +673,7 @@ async function fetchGeminiImage({
       });
     } catch (error) {
       throw new AiProviderError(
-        `Gemini request failed before receiving a response: ${toErrorMessage(error)}`,
+        "The connection to Gemini closed before a response arrived. Google may still have billed this image; check usage in Google AI Studio before running it again.",
         { provider: "gemini", cause: error }
       );
     }
@@ -686,9 +698,11 @@ async function fetchGeminiImage({
       );
       const effectiveServiceTier = serviceTierFromResponse ?? serviceTier;
       const usageMetadata =
-        payload?.usageMetadata && typeof payload.usageMetadata === "object"
+        payload?.usageMetadata &&
+        typeof payload.usageMetadata === "object" &&
+        !Array.isArray(payload.usageMetadata)
           ? payload.usageMetadata
-          : null;
+          : undefined;
 
       return {
         imageBuffer: decodeBase64Image(imagePart.inlineData.data, "gemini"),
