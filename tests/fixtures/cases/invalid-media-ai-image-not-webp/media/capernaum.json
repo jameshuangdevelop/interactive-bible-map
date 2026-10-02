@@ -1,0 +1,22 @@
+{
+  "locationId": "capernaum",
+  "images": [
+    {
+      "id": "capernaum-ai-01",
+      "url": "media/ai/capernaum-ai-01.webp",
+      "caption": "AI reconstruction fixture image.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "FixtureTool",
+        "model": "FixtureModel v1",
+        "date": "2026-09-30"
+      },
+      "promptRef": "## Overview",
+      "basedOn": [
+        "openbible:capernaum",
+        "bib:existing-bib-source"
+      ]
+    }
+  ]
+}

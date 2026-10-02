@@ -8,6 +8,7 @@
   },
   "type": "province",
   "zoomTier": "region",
+  "prominence": "major",
   "parentId": "roman-empire",
   "candidates": [
     {

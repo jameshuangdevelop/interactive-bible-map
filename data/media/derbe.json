@@ -4,11 +4,14 @@
     {
       "id": "derbe-01",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/DAVIS%281879%29_p329_SITE_OF_DERBE%2C_KARAJH_DAGH_MOUNTAINS_IN_THE_DISTANCE.jpg",
+      "width": 1981,
+      "height": 1320,
       "author": "Unknown",
       "license": "Public domain",
       "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
       "sourcePage": "https://commons.wikimedia.org/wiki/File:DAVIS(1879)_p329_SITE_OF_DERBE,_KARAJH_DAGH_MOUNTAINS_IN_THE_DISTANCE.jpg",
       "caption": "19th century engraving of the site of ancient Derbe.",
+      "kind": "reconstruction",
       "aiGenerated": false
     }
   ]
