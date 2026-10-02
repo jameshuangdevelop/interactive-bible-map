@@ -944,6 +944,77 @@
       "accessed": "2026-09-30"
     },
     {
+      "id": "ramsay-seven-churches",
+      "type": "book",
+      "title": "The Letters to the Seven Churches of Asia and Their Place in the Plan of the Apocalypse",
+      "authors": [
+        "W. M. Ramsay"
+      ],
+      "year": 1904,
+      "publisher": "Hodder and Stoughton",
+      "url": "https://archive.org/details/letterstosevench00rams"
+    },
+    {
+      "id": "worldhistory-pergamon",
+      "type": "web",
+      "title": "Pergamon",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pergamon/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-about",
+      "type": "web",
+      "title": "About Sardis",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-sardis",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-bath-gymnasium",
+      "type": "web",
+      "title": "The Bath-Gymnasium Complex",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-bath-gym",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-artemis-temple",
+      "type": "web",
+      "title": "The Temple of Artemis",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-artemis-temple",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "pau-laodikeia-kazisi",
+      "type": "web",
+      "title": "Laodikeia Kazısı (Laodicea Excavation)",
+      "authors": [
+        "Pamukkale University Laodicea Excavation"
+      ],
+      "year": 2026,
+      "publisher": "Pamukkale University",
+      "url": "https://laodikeia.pau.edu.tr/",
+      "accessed": "2026-09-30"
+    },
+    {
       "id": "isbe-rome",
       "type": "chapter",
       "title": "Rome",
