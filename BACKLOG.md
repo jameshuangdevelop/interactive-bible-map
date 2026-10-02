@@ -17,12 +17,18 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Client-kingdom status in M4's timeline.** `arabia` (the Nabataean kingdom) is `type: "province"` under the Roman Empire, as ADR-0027 allows, and the panel calls it "Client kingdom allied with Rome". M4 should model client kingdoms properly, with dates of alliance and annexation: the Nabataean kingdom, Polemon's Pontus, and Antiochus's Commagene and coastal Cilicia.
 - **Province histories for M4's timeline.** M3-11's Fact-Checker removed the `politicalHistory` entries of four provinces because their end years rested on Wikipedia alone. M4 rebuilds them from non-Wikipedia sources, since the timeline needs them.
 
+- **Images for area records** (provinces and regions such as Egypt or Cappadocia). M3.5 covers places, and Galatia and Crete as major areas; other areas have no images yet.
+- **Countries in candidate labels.** ADR-0028 keeps M3-08's country-free candidate labels for now; the record's "Today" line says where the proposed sites are.
+- **Hosting AI images on Cloudflare R2** if `media/ai/` grows past about 50 MB. Until then they live in the repository and deploy with the site (ADR-0029).
+
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
 
 ## Map
 - **Egypt's label point** sits in the Eastern Desert rather than the Nile valley most readers associate with Roman Egypt (M3-13 review nit). Revisit in a sourced label-point pass.
 - **Self-hosted Protomaps fallback** (M3-07's recommended option). M3 uses the VersaTiles public server as the outage-only fallback instead, because a regional Protomaps extract won't fit Cloudflare Pages' 25 MiB file limit. Hosting it on Cloudflare R2 (free up to 10 GB-month) needs an R2 bucket and a token with R2 permissions. Revisit if VersaTiles' terms change or if outages become frequent.
+- **Colossae is no longer unexcavated.** Its location record still says it has never been excavated, but excavation has begun (Biblical Archaeology Society interview, July 2026; found by the M3.5-03 Fact-Checker). After CP3.5, a small sourced data task updates the record.
+- **Flickr Commons "No restrictions" images.** Many Internet Archive book scans on Commons carry only this license, which `docs/LICENSES.md` doesn't list, so higher-resolution scans of public-domain plates can't be used (for example a 2,256 px scan of Allom's 1836 Philadelphia plate; M3.5-04). The Fact-Checker decides whether to accept it for works that are public domain by age, and if so how to record the license.
 
 ## Deferred review findings
 PR Reviewer findings that were not addressed in their PR, each with a reason.
