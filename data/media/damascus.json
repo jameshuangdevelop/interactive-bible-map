@@ -2,7 +2,34 @@
   "locationId": "damascus",
   "images": [
     {
-      "id": "damascus-01",
+      "id": "damascus-ai-01",
+      "url": "media/ai/damascus-ai-01.webp",
+      "width": 1600,
+      "height": 866,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Damascus in about AD 33–37: the walled city and its green oasis seen from the surrounding hills, a colonnaded street crossing the huddle of flat-roofed houses, with orchards along the Barada River's channels and barren desert hills beyond.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt damascus-ai-01",
+      "basedOn": [
+        "bib:isbe-damascus",
+        "bib:unesco-damascus",
+        "bib:livius-damascus",
+        "bib:isbe-aretas",
+        "bib:livius-nabataeans",
+        "pleiades:678106",
+        "wikidata:Q3678596"
+      ]
+    },
+    {
+      "id": "damascus-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Damascus-Bab_Kisan.jpg",
       "width": 2034,
       "height": 1518,
@@ -15,7 +42,7 @@
       "aiGenerated": false
     },
     {
-      "id": "damascus-02",
+      "id": "damascus-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Damascus_along_the_Barada_River_1542.jpg",
       "width": 4256,
       "height": 2832,
@@ -28,7 +55,7 @@
       "aiGenerated": false
     },
     {
-      "id": "damascus-03",
+      "id": "damascus-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Damascus_Old_Town_Midhat_Pasha_Street.jpg",
       "width": 2368,
       "height": 4224,
@@ -41,7 +68,7 @@
       "aiGenerated": false
     },
     {
-      "id": "damascus-04",
+      "id": "damascus-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/%27De_straat_genaamd_de_rechte%27_darb_al_moestaqiem_met_rechts_het_huis_van_Anan%2C_Bestanddeelnr_255-5873.jpg",
       "width": 2608,
       "height": 2622,
@@ -54,7 +81,7 @@
       "aiGenerated": false
     },
     {
-      "id": "damascus-05",
+      "id": "damascus-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Umayyad_Mosque%2C_Damascus.jpg",
       "width": 3056,
       "height": 2054,
@@ -67,7 +94,7 @@
       "aiGenerated": false
     },
     {
-      "id": "damascus-06",
+      "id": "damascus-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Damascus_Azem_Palace_large_courtyard_5103.jpg",
       "width": 4256,
       "height": 2832,
@@ -80,7 +107,7 @@
       "aiGenerated": false
     },
     {
-      "id": "damascus-07",
+      "id": "damascus-08",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Damascus%2C_Syria%2C_Panoramic_view_of_Damascus.jpg",
       "width": 4000,
       "height": 2248,

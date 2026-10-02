@@ -2,7 +2,31 @@
   "locationId": "philippi",
   "images": [
     {
-      "id": "philippi-01",
+      "id": "philippi-ai-01",
+      "url": "media/ai/philippi-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Philippi in about AD 49–50: the walled city rises from the plain to a fortified acropolis below Mt Pangaeus, with a modest forum inside the walls and travelers on the paved road from Neapolis, one on horseback.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt philippi-ai-01",
+      "basedOn": [
+        "bib:isbe-philippi",
+        "bib:odysseus-philippi",
+        "pleiades:501482",
+        "wikidata:Q379652"
+      ]
+    },
+    {
+      "id": "philippi-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Ancient_Philippi.jpg",
       "width": 3452,
       "height": 2100,
@@ -15,7 +39,7 @@
       "aiGenerated": false
     },
     {
-      "id": "philippi-02",
+      "id": "philippi-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/%D0%A4%D0%B8%D0%BB%D0%B8%D0%BF%D0%B8_%D0%BF%D1%80%D0%B5%D0%B7_2007.jpg",
       "width": 2816,
       "height": 2112,
@@ -28,7 +52,7 @@
       "aiGenerated": false
     },
     {
-      "id": "philippi-03",
+      "id": "philippi-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Archaeological_site_of_Philippi_BW_2017-10-05_13-35-57.jpg",
       "width": 4000,
       "height": 6016,
@@ -41,7 +65,7 @@
       "aiGenerated": false
     },
     {
-      "id": "philippi-04",
+      "id": "philippi-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Archaeological_site_of_Philippi_BW_2017-10-05_12-47-21.jpg",
       "width": 3832,
       "height": 5972,
@@ -54,7 +78,7 @@
       "aiGenerated": false
     },
     {
-      "id": "philippi-05",
+      "id": "philippi-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Lydia_-_baptismal_in_the_creek.jpg",
       "width": 4224,
       "height": 2376,
@@ -67,7 +91,7 @@
       "aiGenerated": false
     },
     {
-      "id": "philippi-06",
+      "id": "philippi-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Kavala_001.jpg",
       "width": 1224,
       "height": 816,
@@ -80,7 +104,7 @@
       "aiGenerated": false
     },
     {
-      "id": "philippi-07",
+      "id": "philippi-08",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Pangaion_from_Philippi.jpg",
       "width": 2558,
       "height": 1407,

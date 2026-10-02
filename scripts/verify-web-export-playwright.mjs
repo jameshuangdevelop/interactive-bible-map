@@ -193,6 +193,31 @@ async function readGeneratedPlacePayload(placeId) {
   throw new Error(`Could not load generated payload for place '${placeId}'.`);
 }
 
+function isAiPayloadImage(image) {
+  return image?.kind === "ai-reconstruction" || image?.aiGenerated === true;
+}
+
+// Each image kind has its own credit line under the photo (visual spec §3), so the
+// checks below read the place's images to know which line to expect.
+function expectedCreditMarkers(image) {
+  return isAiPayloadImage(image)
+    ? ["AI-generated reconstruction", "Based on:"]
+    : ["Photo:", "Wikimedia Commons"];
+}
+
+function creditMatchesImage(creditText, image) {
+  return expectedCreditMarkers(image).every((marker) => creditText.includes(marker));
+}
+
+async function readCapernaumImages() {
+  const payload = await readGeneratedPlacePayload("capernaum");
+  const images = payload?.media?.images;
+  if (!Array.isArray(images) || images.length < 2) {
+    throw new Error("Capernaum's generated payload should have at least two images.");
+  }
+  return images;
+}
+
 function buildGalleryFixturePayload(basePayload) {
   const fixtureImages = [
     {
@@ -1882,10 +1907,11 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     last = currentIndex;
   }
 
+  const capernaumImages = await readCapernaumImages();
   const firstCreditText =
     (await page.locator("section[aria-label='Place details'] [data-photo-credit='true']").textContent()) ??
     "";
-  if (!firstCreditText.includes("Photo:") || !firstCreditText.includes("Wikimedia Commons")) {
+  if (!creditMatchesImage(firstCreditText, capernaumImages[0])) {
     throw new Error(`Missing required photo credit text on lead image: '${firstCreditText.trim()}'`);
   }
 
@@ -1899,10 +1925,7 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
       (await page
         .locator("section[aria-label='Place details'] [data-photo-credit='true']")
         .textContent()) ?? "";
-    if (
-      !secondCreditText.includes("Photo:") ||
-      !secondCreditText.includes("Wikimedia Commons")
-    ) {
+    if (!creditMatchesImage(secondCreditText, capernaumImages[1])) {
       throw new Error(
         `Photo credit did not render after switching images: '${secondCreditText.trim()}'`
       );
@@ -2361,25 +2384,25 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
   }
 }
 
-async function verifyCapernaumLeadImageLoads(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
-  await waitForMapToSettle(page);
-  await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
-    timeout: 30_000
-  });
-  await page.waitForFunction(() => {
-    const image = document.querySelector("[data-panel-photo-image='true']");
-    return (
-      image instanceof HTMLImageElement &&
-      image.complete &&
-      image.naturalWidth > 0 &&
-      image.naturalHeight > 0
-    );
-  });
+async function readLoadedPanelImageState(page, previousSrc = null) {
+  await page.waitForFunction(
+    (priorSrc) => {
+      const image = document.querySelector("[data-panel-photo-image='true']");
+      return (
+        image instanceof HTMLImageElement &&
+        image.complete &&
+        image.naturalWidth > 0 &&
+        image.naturalHeight > 0 &&
+        image.currentSrc !== priorSrc
+      );
+    },
+    previousSrc,
+    { timeout: 30_000 }
+  );
 
-  const imageState = await page.$eval("[data-panel-photo-image='true']", (element) => {
+  return page.$eval("[data-panel-photo-image='true']", (element) => {
     if (!(element instanceof HTMLImageElement)) {
-      throw new Error("Lead photo element is not an image.");
+      throw new Error("Panel photo element is not an image.");
     }
 
     return {
@@ -2389,14 +2412,51 @@ async function verifyCapernaumLeadImageLoads(page, baseUrl) {
       naturalHeight: element.naturalHeight
     };
   });
+}
 
-  if (!/(?:^|\/)(?:330|500|960|1280)px-[^/]+$/u.test(new URL(imageState.currentSrc).pathname)) {
-    throw new Error(
-      `Lead photo did not use an allow-listed Commons thumbnail width: '${imageState.currentSrc}'.`
-    );
+// Loads Capernaum's images in gallery order up to its first Commons photo. A self-hosted
+// AI image must load from the exported media/ai/ folder; a Commons photo must use an
+// allow-listed thumbnail width.
+async function verifyCapernaumLeadImageLoads(page, baseUrl) {
+  const capernaumImages = await readCapernaumImages();
+  const firstCommonsIndex = capernaumImages.findIndex((image) => !isAiPayloadImage(image));
+  if (firstCommonsIndex < 0) {
+    throw new Error("Capernaum should have at least one Commons photo.");
   }
 
-  return imageState;
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
+    timeout: 30_000
+  });
+
+  const loadedImages = [];
+  let previousSrc = null;
+  for (let index = 0; index <= firstCommonsIndex; index += 1) {
+    if (index > 0) {
+      await page.locator("button[aria-label='Next image']").first().click();
+    }
+
+    const imageState = await readLoadedPanelImageState(page, previousSrc);
+    const image = capernaumImages[index];
+    const pathname = new URL(imageState.currentSrc).pathname;
+    if (isAiPayloadImage(image)) {
+      if (!pathname.endsWith(`/${image.url}`)) {
+        throw new Error(
+          `AI image '${image.id}' did not load from '${image.url}': '${imageState.currentSrc}'.`
+        );
+      }
+    } else if (!/(?:^|\/)(?:330|500|960|1280)px-[^/]+$/u.test(pathname)) {
+      throw new Error(
+        `Photo '${image.id}' did not use an allow-listed Commons thumbnail width: '${imageState.currentSrc}'.`
+      );
+    }
+
+    loadedImages.push({ id: image.id, kind: image.kind, ...imageState });
+    previousSrc = imageState.currentSrc;
+  }
+
+  return loadedImages;
 }
 
 async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
@@ -2404,14 +2464,16 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
     viewport: { width: 1440, height: 960 }
   });
   const page = await context.newPage();
+  const capernaumImages = await readCapernaumImages();
   let blockedImageCount = 0;
 
   await page.route("**/*", (route) => {
     const requestUrl = route.request().url();
-    if (
+    const isCommonsImage =
       requestUrl.includes("upload.wikimedia.org/wikipedia/commons") &&
-      /\.(?:jpg|jpeg|png|webp)(?:\?|$)/iu.test(requestUrl)
-    ) {
+      /\.(?:jpg|jpeg|png|webp)(?:\?|$)/iu.test(requestUrl);
+    const isHostedAiImage = /\/media\/ai\/[^/?#]+\.webp(?:\?|$)/iu.test(requestUrl);
+    if (isCommonsImage || isHostedAiImage) {
       blockedImageCount += 1;
       route.abort("failed");
       return;
@@ -2438,13 +2500,13 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
       (await page
         .locator("section[aria-label='Place details'] [data-photo-credit='true']")
         .textContent()) ?? "";
-    if (!creditText.includes("Photo:") || !creditText.includes("Wikimedia Commons")) {
+    if (!creditMatchesImage(creditText, capernaumImages[0])) {
       throw new Error(
         `Photo credit must remain visible when images fail to load, got '${creditText.trim()}'.`
       );
     }
     if (blockedImageCount === 0) {
-      throw new Error("Image-failure placeholder check was vacuous: no Commons images were blocked.");
+      throw new Error("Image-failure placeholder check was vacuous: no images were blocked.");
     }
 
     return {

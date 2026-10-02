@@ -2,7 +2,31 @@
   "locationId": "caesarea-maritima",
   "images": [
     {
-      "id": "caesarea-maritima-01",
+      "id": "caesarea-maritima-ai-01",
+      "url": "media/ai/caesarea-maritima-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Caesarea Maritima in about AD 57–59: looking down over the harbour's stone moles and moored ships to the quay's warehouses and the white temple raised above the waterfront.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt caesarea-maritima-ai-01",
+      "basedOn": [
+        "bib:josephus-antiquities",
+        "bib:isbe-caesarea",
+        "pleiades:678401",
+        "wikidata:Q319242"
+      ]
+    },
+    {
+      "id": "caesarea-maritima-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/CAESAREA%27_KING_HEROD%27S_SEA_PALACE_AERIAL.jpg",
       "width": 3055,
       "height": 1932,
@@ -15,7 +39,7 @@
       "aiGenerated": false
     },
     {
-      "id": "caesarea-maritima-02",
+      "id": "caesarea-maritima-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Ancient_Roman_aqueduct_in_Caesarea_Maritima_DSC05202.JPG",
       "width": 3264,
       "height": 2448,
@@ -28,7 +52,7 @@
       "aiGenerated": false
     },
     {
-      "id": "caesarea-maritima-03",
+      "id": "caesarea-maritima-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/92300_ancient_theater_in_caesarea_PikiWiki_Israel.jpg",
       "width": 3512,
       "height": 1706,
@@ -41,7 +65,7 @@
       "aiGenerated": false
     },
     {
-      "id": "caesarea-maritima-04",
+      "id": "caesarea-maritima-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/The_hippodrome%2C_built_by_Herod_the_Great_for_the_inauguration_of_the_city_in_9-10_BC%2C_it_was_the_venue_of_the_Actian_Games_instituted_by_King_Herod_in_honor_of_emperor_Augustus_and_held_every_4_years%2C_Caesarea_%2815572622871%29.jpg",
       "width": 4891,
       "height": 3239,
@@ -54,7 +78,7 @@
       "aiGenerated": false
     },
     {
-      "id": "caesarea-maritima-05",
+      "id": "caesarea-maritima-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/124996_caesarea_national_park_PikiWiki_Israel.jpg",
       "width": 1499,
       "height": 1000,
@@ -67,7 +91,7 @@
       "aiGenerated": false
     },
     {
-      "id": "caesarea-maritima-06",
+      "id": "caesarea-maritima-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Panoramic_view_from_south_Caesarea.jpg",
       "width": 8282,
       "height": 1713,

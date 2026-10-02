@@ -146,5 +146,9 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     name: "English Bible versions compared for place-name spellings: NIV (Biblica), ESV (Crossway), NLT (Tyndale House Foundation), KJV, NKJV (Thomas Nelson) and CSB (Holman Bible Publishers), read on Bible Gateway",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
+  },
+  {
+    name: "Google Gemini API image generation (Nano Banana Pro, `gemini-3-pro-image`)",
+    url: "https://ai.google.dev/gemini-api/terms"
   }
 ];

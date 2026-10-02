@@ -2,7 +2,36 @@
   "locationId": "nazareth",
   "images": [
     {
-      "id": "nazareth-01",
+      "id": "nazareth-ai-01",
+      "url": "media/ai/nazareth-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Nazareth in about AD 20: a small village of flat-roofed stone houses built against cave-cut hillsides, set among terraced olive groves and vineyards in a hill country bowl, with the walled town of Sepphoris visible on a distant hilltop.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt nazareth-ai-01",
+      "basedOn": [
+        "bib:josephus-antiquities",
+        "bib:custodia-nazareth",
+        "bib:dark-nazareth-archaeology",
+        "bib:isbe-house",
+        "bib:isbe-agriculture",
+        "bib:rainey-notley-sacred-bridge",
+        "pleiades:678299",
+        "wikidata:Q430776",
+        "wikidata:Q1132798"
+      ]
+    },
+    {
+      "id": "nazareth-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Habsora_from_selezian.jpg",
       "width": 2016,
       "height": 1512,
@@ -15,7 +44,7 @@
       "aiGenerated": false
     },
     {
-      "id": "nazareth-02",
+      "id": "nazareth-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/AnnunciationChurchNazarethOutside1.jpg",
       "width": 4320,
       "height": 2880,
@@ -28,7 +57,7 @@
       "aiGenerated": false
     },
     {
-      "id": "nazareth-03",
+      "id": "nazareth-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Buildings_in_Nazareth_P1020552.JPG",
       "width": 4000,
       "height": 2860,
@@ -41,7 +70,7 @@
       "aiGenerated": false
     },
     {
-      "id": "nazareth-04",
+      "id": "nazareth-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/127767_nazareth-synagogue_church_PikiWiki_Israel.jpg",
       "width": 4032,
       "height": 3024,
@@ -54,7 +83,7 @@
       "aiGenerated": false
     },
     {
-      "id": "nazareth-05",
+      "id": "nazareth-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/PikiWiki_Israel_28738_Mount_of_Precipice.JPG",
       "width": 4608,
       "height": 3456,
@@ -67,7 +96,7 @@
       "aiGenerated": false
     },
     {
-      "id": "nazareth-06",
+      "id": "nazareth-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Sisters_of_Nazareth_Convent_%28Nazareth%29_archaeological_site%2C_2019_%2806%29.jpg",
       "width": 6016,
       "height": 4016,

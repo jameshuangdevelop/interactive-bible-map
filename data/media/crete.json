@@ -2,7 +2,29 @@
   "locationId": "crete",
   "images": [
     {
-      "id": "crete-01",
+      "id": "crete-ai-01",
+      "url": "media/ai/crete-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Crete in about AD 59–65: a single Roman merchant ship anchored in a sheltered bay off the island's rugged southern coast, its sail partly furled, with mountains rising beyond cultivated valleys near the shore.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt crete-ai-01",
+      "basedOn": [
+        "bib:isbe-crete",
+        "wikidata:Q34374"
+      ]
+    },
+    {
+      "id": "crete-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Mount_Ida_chain_Messara_plain_from_Phaistos_Crete_Greece.jpg",
       "width": 4479,
       "height": 2730,
@@ -15,7 +37,7 @@
       "aiGenerated": false
     },
     {
-      "id": "crete-02",
+      "id": "crete-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Kali_Limenes_04.jpg",
       "width": 4608,
       "height": 3452,
@@ -28,7 +50,7 @@
       "aiGenerated": false
     },
     {
-      "id": "crete-03",
+      "id": "crete-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Antikes_Gortyn_01.jpg",
       "width": 4608,
       "height": 3452,
@@ -41,7 +63,7 @@
       "aiGenerated": false
     },
     {
-      "id": "crete-04",
+      "id": "crete-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Colline_Gortyne.jpg",
       "width": 4592,
       "height": 3056,
@@ -54,7 +76,7 @@
       "aiGenerated": false
     },
     {
-      "id": "crete-05",
+      "id": "crete-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Crete_satellite.jpg",
       "width": 1441,
       "height": 1081,
@@ -67,7 +89,7 @@
       "aiGenerated": false
     },
     {
-      "id": "crete-06",
+      "id": "crete-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Agios_Nikolaos%2C_Crete_%E2%80%93_Harbour_2019a.jpg",
       "width": 6192,
       "height": 3501,

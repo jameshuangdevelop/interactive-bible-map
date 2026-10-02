@@ -2,7 +2,32 @@
   "locationId": "athens",
   "images": [
     {
-      "id": "athens-01",
+      "id": "athens-ai-01",
+      "url": "media/ai/athens-ai-01.webp",
+      "width": 1600,
+      "height": 867,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Athens in about AD 50: the Acropolis crowned by the roofed, complete Parthenon and Propylaea gateway, seen rising above the colonnaded stoas and open square of the Agora, with narrow streets of flat-roofed houses spreading below.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt athens-ai-01",
+      "basedOn": [
+        "bib:isbe-athens",
+        "bib:suetonius-twelve-caesars",
+        "bib:cassius-dio-roman-history",
+        "pleiades:579885",
+        "wikidata:Q1524"
+      ]
+    },
+    {
+      "id": "athens-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Akropolis_2015.jpg",
       "width": 9648,
       "height": 5587,
@@ -15,7 +40,7 @@
       "aiGenerated": false
     },
     {
-      "id": "athens-02",
+      "id": "athens-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/View_of_the_Areopagus_from_the_Acropolis_in_Athens%2C_20240531_1329_9684.jpg",
       "width": 4540,
       "height": 3031,
@@ -28,7 +53,7 @@
       "aiGenerated": false
     },
     {
-      "id": "athens-03",
+      "id": "athens-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Ancient_Agora_Panorama_%28208938095%29.jpeg",
       "width": 2048,
       "height": 646,
@@ -41,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "athens-04",
+      "id": "athens-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Temple_of_Zeus_Olympian%2C_Athens%2C_Greece.jpg",
       "width": 4547,
       "height": 3026,
@@ -54,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "athens-05",
+      "id": "athens-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Panoramic_view_of_Athens_from_Mount_Lycabettus.jpg",
       "width": 2048,
       "height": 1536,

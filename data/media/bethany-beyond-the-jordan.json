@@ -2,7 +2,34 @@
   "locationId": "bethany-beyond-the-jordan",
   "images": [
     {
-      "id": "bethany-beyond-the-jordan-01",
+      "id": "bethany-beyond-the-jordan-ai-01",
+      "url": "media/ai/bethany-beyond-the-jordan-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Bethany beyond the Jordan in about AD 28: a bend in the Jordan River lined with tamarisk and reed beds between dry desert hills, with date palms by a spring and a line of people wading into the shallows near the bank.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-01"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt bethany-beyond-the-jordan-ai-01",
+      "basedOn": [
+        "bib:hutton-bethany-beyond-jordan",
+        "bib:unesco-baptism-site-al-maghtas",
+        "bib:origen-commentary-john",
+        "bib:isbe-agriculture",
+        "bib:rainey-notley-sacred-bridge",
+        "bib:josephus-jewish-war",
+        "wikidata:Q1574073"
+      ]
+    },
+    {
+      "id": "bethany-beyond-the-jordan-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/127027_qasr_al-yahud_-_baptismal_site_in_jordan_PikiWiki_Israel.jpg",
       "width": 5712,
       "height": 4284,
@@ -15,7 +42,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-beyond-the-jordan-02",
+      "id": "bethany-beyond-the-jordan-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Al-Maghtas%2C_2019_%2801%29.jpg",
       "width": 6008,
       "height": 4002,
@@ -28,7 +55,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-beyond-the-jordan-03",
+      "id": "bethany-beyond-the-jordan-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/76/Jordan_Baptism_site_BW_1.JPG",
       "width": 3872,
       "height": 2592,
@@ -41,7 +68,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-beyond-the-jordan-04",
+      "id": "bethany-beyond-the-jordan-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Atar_Hatvila_-_Qaser_Al_Yahud_P1020017.JPG",
       "width": 4000,
       "height": 3000,
@@ -54,7 +81,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-beyond-the-jordan-05",
+      "id": "bethany-beyond-the-jordan-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Baptism_Site-Jordan_River.jpg",
       "width": 5195,
       "height": 2923,
@@ -67,7 +94,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethany-beyond-the-jordan-06",
+      "id": "bethany-beyond-the-jordan-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/PikiWiki_Israel_30075_-_Qasr_el_Yahud_baptism_site%2C_2013-01.jpg",
       "width": 4288,
       "height": 3216,

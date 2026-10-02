@@ -2,7 +2,35 @@
   "locationId": "bethlehem",
   "images": [
     {
-      "id": "bethlehem-01",
+      "id": "bethlehem-ai-01",
+      "url": "media/ai/bethlehem-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Bethlehem in about 5 BC: flat-roofed stone houses built over caves on a terraced hillside at sunset, with a shepherd and flock nearby and Herod's fortress of Herodium rising on the distant skyline.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-01"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt bethlehem-ai-01",
+      "basedOn": [
+        "bib:rainey-notley-sacred-bridge",
+        "bib:murphy-oconnor-holy-land-guide",
+        "bib:unesco-church-of-nativity",
+        "bib:isbe-house",
+        "bib:isbe-agriculture",
+        "bib:freedman-anchor-bible-dictionary",
+        "wikidata:Q5776",
+        "wikidata:Q913099"
+      ]
+    },
+    {
+      "id": "bethlehem-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Palestine-06314_-_West_Bank_%2834121979493%29.jpg",
       "width": 6000,
       "height": 4000,
@@ -15,7 +43,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethlehem-02",
+      "id": "bethlehem-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Church_of_the_Nativity_%287703592746%29.jpg",
       "width": 4288,
       "height": 2848,
@@ -28,7 +56,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethlehem-03",
+      "id": "bethlehem-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Bethlehem_-_Mittelschiff_der_Geburtskirche_%C3%BCber_der_Geburtsgrotte.jpg",
       "width": 2832,
       "height": 4256,
@@ -41,7 +69,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethlehem-04",
+      "id": "bethlehem-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Bethlehem_by_Mujaddara_-_panoramio_%283437%29.jpg",
       "width": 3648,
       "height": 2736,
@@ -54,7 +82,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethlehem-05",
+      "id": "bethlehem-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Bethlehem_by_Mujaddara_-_panoramio_%282813%29.jpg",
       "width": 4912,
       "height": 1080,
@@ -67,7 +95,7 @@
       "aiGenerated": false
     },
     {
-      "id": "bethlehem-06",
+      "id": "bethlehem-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Church_of_the_Nativity_mosaic_floor_2010.jpg",
       "width": 4272,
       "height": 2848,

@@ -2,7 +2,35 @@
   "locationId": "colossae",
   "images": [
     {
-      "id": "colossae-01",
+      "id": "colossae-ai-01",
+      "url": "media/ai/colossae-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Colossae in about AD 60: the Lycus valley's farmland and grazing sheep flocks below high mountains, with a modest Phrygian town and a wool-dyer's smoke rising at its edge beside the river.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-01"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt colossae-ai-01",
+      "basedOn": [
+        "bib:bas-colossae-yener",
+        "bib:strabo-geography",
+        "bib:isbe-colossae",
+        "bib:tacitus-annals",
+        "bib:unesco-hierapolis-pamukkale",
+        "pleiades:638811",
+        "pleiades:638884",
+        "wikidata:Q1001370"
+      ]
+    },
+    {
+      "id": "colossae-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Colossae_Antik_Kenti.jpg",
       "width": 4080,
       "height": 3060,
@@ -15,7 +43,7 @@
       "aiGenerated": false
     },
     {
-      "id": "colossae-02",
+      "id": "colossae-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Colossae_Antik_Tiyatrosu.jpg",
       "width": 4080,
       "height": 3060,
@@ -28,7 +56,7 @@
       "aiGenerated": false
     },
     {
-      "id": "colossae-03",
+      "id": "colossae-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/1_longuner_-_panoramio.jpg",
       "width": 3664,
       "height": 2748,
@@ -41,7 +69,7 @@
       "aiGenerated": false
     },
     {
-      "id": "colossae-04",
+      "id": "colossae-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Colossae%27den_Honaz_g%C3%B6r%C3%BCn%C3%BCm.jpg",
       "width": 4672,
       "height": 3164,
@@ -54,7 +82,7 @@
       "aiGenerated": false
     },
     {
-      "id": "colossae-05",
+      "id": "colossae-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Ancient_City_of_Laodicea%2C_2019_10.jpg",
       "width": 3648,
       "height": 2736,
@@ -67,7 +95,7 @@
       "aiGenerated": false
     },
     {
-      "id": "colossae-06",
+      "id": "colossae-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Pamukkale_Hierapolis_Travertine_pools.JPG",
       "width": 2848,
       "height": 2136,

@@ -2,7 +2,34 @@
   "locationId": "sea-of-galilee",
   "images": [
     {
-      "id": "sea-of-galilee-01",
+      "id": "sea-of-galilee-ai-01",
+      "url": "media/ai/sea-of-galilee-ai-01.webp",
+      "width": 1600,
+      "height": 893,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of the Sea of Galilee in about AD 30: the lake at dawn, its far shore rising as dark basalt hills, with wooden fishing boats being rowed or drawn up on the beach and nets spread to dry along the fertile Gennesaret shoreline.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt sea-of-galilee-ai-01",
+      "basedOn": [
+        "bib:josephus-jewish-war",
+        "bib:rainey-notley-sacred-bridge",
+        "bib:josephus-antiquities",
+        "pleiades:678272",
+        "wikidata:Q126982",
+        "wikidata:Q59174",
+        "wikidata:Q7440096"
+      ]
+    },
+    {
+      "id": "sea-of-galilee-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/View_of_the_Sea_of_Galilee_%2814633578504%29.jpg",
       "width": 5184,
       "height": 3456,
@@ -15,7 +42,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sea-of-galilee-02",
+      "id": "sea-of-galilee-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Mount_of_Beatitude_Capernaum_200704.JPG",
       "width": 2592,
       "height": 1944,
@@ -28,7 +55,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sea-of-galilee-03",
+      "id": "sea-of-galilee-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Israel_Egypt_2009_4092581463_2de87bc5dd_P1250241_O_%289198117883%29.jpg",
       "width": 3648,
       "height": 2736,
@@ -41,7 +68,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sea-of-galilee-04",
+      "id": "sea-of-galilee-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Sea_of_Galilee_and_Tiberias.jpg",
       "width": 1600,
       "height": 1200,
@@ -54,7 +81,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sea-of-galilee-05",
+      "id": "sea-of-galilee-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Izrael%2C_imgp9389_%282017-10%29.jpg",
       "width": 2907,
       "height": 1938,
@@ -67,7 +94,7 @@
       "aiGenerated": false
     },
     {
-      "id": "sea-of-galilee-06",
+      "id": "sea-of-galilee-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Ancient_Boat_of_Sea_of_Galilee.jpg",
       "width": 2941,
       "height": 3642,

@@ -2,7 +2,38 @@
   "locationId": "galatia",
   "images": [
     {
-      "id": "galatia-01",
+      "id": "galatia-ai-01",
+      "url": "media/ai/galatia-ai-01.webp",
+      "width": 1600,
+      "height": 880,
+      "author": "Interactive Bible Map (AI-generated with Google Gemini API)",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "caption": "AI-generated reconstruction of Galatia in about AD 48: a walled provincial town on the Anatolian plateau, surrounded by rolling grassland where sheep graze and a shepherd leads a line of pack animals along a dirt track.",
+      "kind": "ai-reconstruction",
+      "aiGenerated": true,
+      "generator": {
+        "tool": "Google Gemini API (Nano Banana Pro)",
+        "model": "gemini-3-pro-image",
+        "date": "2026-10-02"
+      },
+      "promptRef": "### AI-generated reconstruction — prompt galatia-ai-01",
+      "basedOn": [
+        "bib:zondervan-who-were-galatians",
+        "bib:isbe-galatia",
+        "bib:isbe-antioch-pisidia",
+        "bib:isbe-pisidia",
+        "bib:isbe-phrygia",
+        "bib:isbe-lycaonia",
+        "bib:wagner-wilson-why-derbe",
+        "pleiades:619161",
+        "pleiades:648647",
+        "wikidata:Q26847",
+        "wikidata:Q1249412"
+      ]
+    },
+    {
+      "id": "galatia-02",
       "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Antioch_in_Pisidia_Augustus_Temple_2948.jpg",
       "width": 4928,
       "height": 3280,
@@ -15,7 +46,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-02",
+      "id": "galatia-03",
       "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Antioch_in_Pisida_Decumanus_Maximus_047.jpg",
       "width": 1600,
       "height": 959,
@@ -28,7 +59,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-03",
+      "id": "galatia-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Antioch_in_Pisidia_Theatre_2963.jpg",
       "width": 1600,
       "height": 2404,
@@ -41,7 +72,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-04",
+      "id": "galatia-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/ANTIOCHE_DE_PISIDIE_Augusteum_ok.jpg",
       "width": 6000,
       "height": 2510,
@@ -54,7 +85,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-05",
+      "id": "galatia-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Ankara_Hac%C4%B1_Bayram_Mosque_Exterior_and_Augustus_Temple_in_2014_06.jpg",
       "width": 4928,
       "height": 3280,
@@ -67,7 +98,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-06",
+      "id": "galatia-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Konya_view_from_Seljuk_Tower_3998.jpg",
       "width": 2196,
       "height": 1464,
@@ -80,7 +111,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-07",
+      "id": "galatia-08",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Hasanoba_03_04_1988_Karada%C4%9F.jpg",
       "width": 2643,
       "height": 1717,
