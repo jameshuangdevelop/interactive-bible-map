@@ -18,6 +18,7 @@ import {
   extractPromptTextFromMarkdown,
   findExistingCandidateFiles,
   parseAiCandidateFileName,
+  parsePublishAiArguments,
   publishAiCandidate,
   sha256Hex,
   summarizeAiIncomingCosts,
@@ -60,6 +61,65 @@ function jsonResponse(payload, status = 200, headers = {}) {
       ...headers
     }
   });
+}
+
+function createRawRgbData(width, height, colorFromPixel) {
+  const data = Buffer.alloc(width * height * 3);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const [r, g, b] = colorFromPixel(x, y);
+      const offset = ((y * width) + x) * 3;
+      data[offset] = r;
+      data[offset + 1] = g;
+      data[offset + 2] = b;
+    }
+  }
+  return data;
+}
+
+async function createPngBuffer(width, height, colorFromPixel) {
+  const rawData = createRawRgbData(width, height, colorFromPixel);
+  return sharp(rawData, {
+    raw: {
+      width,
+      height,
+      channels: 3
+    }
+  })
+    .png()
+    .toBuffer();
+}
+
+async function writeCandidateWithSidecar({
+  temporaryDirectory,
+  promptId,
+  fileName,
+  imageBuffer
+}) {
+  const incomingDirectory = path.join(temporaryDirectory, "media", "ai-incoming");
+  await fs.mkdir(incomingDirectory, { recursive: true });
+  const candidatePath = path.join(incomingDirectory, fileName);
+  const sidecarPath = `${candidatePath}.json`;
+  await fs.writeFile(candidatePath, imageBuffer);
+  await fs.writeFile(
+    sidecarPath,
+    `${JSON.stringify(
+      {
+        provider: "gemini",
+        model: "gemini-3-pro-image",
+        date: "2026-10-01T18:00:00.000Z",
+        seed: 808,
+        round: 1,
+        promptId,
+        prompt: "Prompt fixture text.",
+        promptSha256: sha256Hex("Prompt fixture text.")
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+  return { candidatePath, sidecarPath };
 }
 
 test("prompt extraction stops before Keep out section", () => {
@@ -367,6 +427,171 @@ test("writeAiCandidateAndSidecar writes side-car first and leaves no orphan imag
     assert.deepEqual(writeTargets, ["capernaum-ai-01-r2-v1.png.json"]);
     assert.equal(await pathExists(imagePath), false);
     assert.equal(await pathExists(sidecarPath), false);
+  });
+});
+
+test("parsePublishAiArguments supports --no-trim", () => {
+  const parsed = parsePublishAiArguments([
+    "--no-trim",
+    "--id",
+    "athens-ai-01",
+    "media/ai-incoming/athens-ai-01-r1-v1.jpg"
+  ]);
+  assert.equal(parsed.trimBars, false);
+  assert.equal(parsed.promptId, "athens-ai-01");
+});
+
+test("publishAiCandidate removes top and bottom letterbox bars", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await createPngBuffer(120, 80, (x, y) => {
+      if (x >= 0 && (y < 10 || y >= 68)) {
+        return [0, 0, 0];
+      }
+      return [120, 150, 190];
+    });
+    const { candidatePath } = await writeCandidateWithSidecar({
+      temporaryDirectory,
+      promptId: "athens-ai-01",
+      fileName: "athens-ai-01-r1-v1.png",
+      imageBuffer
+    });
+
+    const outputDirectory = path.join(temporaryDirectory, "media", "ai");
+    const result = await publishAiCandidate({ candidatePath, outputDirectory });
+    assert.deepEqual(result.trim, {
+      top: 10,
+      bottom: 12,
+      left: 0,
+      right: 0,
+      enabled: true,
+      applied: true
+    });
+    assert.equal(result.output.width, 120);
+    assert.equal(result.output.height, 58);
+  });
+});
+
+test("publishAiCandidate keeps dark non-black sky at the top", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await createPngBuffer(100, 60, (x, y) => {
+      if (x >= 0 && y < 8) {
+        return [24, 12, 8];
+      }
+      return [140, 110, 90];
+    });
+    const { candidatePath } = await writeCandidateWithSidecar({
+      temporaryDirectory,
+      promptId: "bethlehem-ai-01",
+      fileName: "bethlehem-ai-01-r1-v1.png",
+      imageBuffer
+    });
+
+    const outputDirectory = path.join(temporaryDirectory, "media", "ai");
+    const result = await publishAiCandidate({ candidatePath, outputDirectory });
+    assert.deepEqual(result.trim, {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      enabled: true,
+      applied: false
+    });
+    assert.equal(result.output.width, 100);
+    assert.equal(result.output.height, 60);
+  });
+});
+
+test("publishAiCandidate removes left and right pillarbox bars", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await createPngBuffer(130, 70, (x, y) => {
+      if ((x < 9 || x >= 123) && y >= 0) {
+        return [0, 0, 0];
+      }
+      return [150, 165, 180];
+    });
+    const { candidatePath } = await writeCandidateWithSidecar({
+      temporaryDirectory,
+      promptId: "capernaum-ai-01",
+      fileName: "capernaum-ai-01-r1-v1.png",
+      imageBuffer
+    });
+
+    const outputDirectory = path.join(temporaryDirectory, "media", "ai");
+    const result = await publishAiCandidate({ candidatePath, outputDirectory });
+    assert.deepEqual(result.trim, {
+      top: 0,
+      bottom: 0,
+      left: 9,
+      right: 7,
+      enabled: true,
+      applied: true
+    });
+    assert.equal(result.output.width, 114);
+    assert.equal(result.output.height, 70);
+  });
+});
+
+test("publishAiCandidate keeps black objects that are not touching edges", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await createPngBuffer(120, 80, (x, y) => {
+      if (x >= 45 && x < 75 && y >= 25 && y < 55) {
+        return [0, 0, 0];
+      }
+      return [160, 180, 200];
+    });
+    const { candidatePath } = await writeCandidateWithSidecar({
+      temporaryDirectory,
+      promptId: "jerusalem-ai-01",
+      fileName: "jerusalem-ai-01-r1-v1.png",
+      imageBuffer
+    });
+
+    const outputDirectory = path.join(temporaryDirectory, "media", "ai");
+    const result = await publishAiCandidate({ candidatePath, outputDirectory });
+    assert.deepEqual(result.trim, {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      enabled: true,
+      applied: false
+    });
+    assert.equal(result.output.width, 120);
+    assert.equal(result.output.height, 80);
+  });
+});
+
+test("publishAiCandidate --no-trim keeps bars", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const imageBuffer = await createPngBuffer(120, 80, (x, y) => {
+      if (x >= 0 && (y < 10 || y >= 68)) {
+        return [0, 0, 0];
+      }
+      return [120, 150, 190];
+    });
+    const { candidatePath } = await writeCandidateWithSidecar({
+      temporaryDirectory,
+      promptId: "athens-ai-01",
+      fileName: "athens-ai-01-r1-v1.png",
+      imageBuffer
+    });
+
+    const outputDirectory = path.join(temporaryDirectory, "media", "ai");
+    const result = await publishAiCandidate({
+      candidatePath,
+      outputDirectory,
+      trimBars: false
+    });
+    assert.deepEqual(result.trim, {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      enabled: false,
+      applied: false
+    });
+    assert.equal(result.output.width, 120);
+    assert.equal(result.output.height, 80);
   });
 });
 
@@ -1039,6 +1264,8 @@ test("publishAiCandidate writes valid WebP under 400 KB and validateData accepts
         <rect x="220" y="660" width="360" height="240" fill="#5a5a5a"/>
         <rect x="660" y="620" width="340" height="280" fill="#4d4d4d"/>
         <rect x="1060" y="640" width="410" height="260" fill="#676767"/>
+        <rect x="0" y="0" width="2200" height="100" fill="#000000"/>
+        <rect x="0" y="1200" width="2200" height="100" fill="#000000"/>
       </svg>
     `;
     const candidateBuffer = await sharp(Buffer.from(svg), {
@@ -1060,6 +1287,10 @@ test("publishAiCandidate writes valid WebP under 400 KB and validateData accepts
     assert.equal(publishResult.output.bytes <= MAX_AI_IMAGE_BYTES, true);
     assert.equal(publishResult.output.width <= 1600, true);
     assert.equal(publishResult.mediaUrl, "media/ai/capernaum-ai-01.webp");
+    assert.equal(publishResult.trim.top > 0, true);
+    assert.equal(publishResult.trim.bottom > 0, true);
+    assert.equal(publishResult.trim.left, 0);
+    assert.equal(publishResult.trim.right, 0);
     assert.deepEqual(publishResult.mediaEntryGenerator, {
       tool: "openai",
       model: "gpt-image-2.5-flare",

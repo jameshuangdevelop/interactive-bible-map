@@ -180,12 +180,14 @@ npm run generate:ai -- <prompt-id> [--provider cloudflare-flux|cloudflare-lucid|
 Publish one candidate to a hosted AI image:
 
 ```bash
-npm run publish:ai -- <candidate-file> [--id <prompt-id>]
+npm run publish:ai -- <candidate-file> [--id <prompt-id>] [--no-trim]
 ```
 
 - Converts the candidate to `media/ai/<prompt-id>.webp` using WebP quality steps until it is at most 1,600 px wide and 400 KB.
+- Before resizing, detects and removes edge-only near-black letterbox/pillarbox bars (full-row/full-column runs from the edges) so accidental cinematic bars do not require regeneration.
+- Use `--no-trim` to skip bar trimming for one publish.
 - Fails if the file cannot fit under 400 KB at quality 60 or above.
-- Prints final width/height/bytes and generator metadata derived from the candidate side-car for use in the media entry.
+- Prints final width/height/bytes, trim pixels per side, and generator metadata derived from the candidate side-car for use in the media entry.
 
 Summarize estimated Gemini spend from incoming side-cars:
 

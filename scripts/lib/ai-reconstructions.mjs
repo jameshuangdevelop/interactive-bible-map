@@ -20,6 +20,10 @@ const AI_CANDIDATE_FILE_PATTERN =
   /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r([1-9][0-9]*)-v([1-9][0-9]*)\.([a-z0-9]+)$/u;
 const AI_CANDIDATE_SIDECAR_FILE_PATTERN =
   /^([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})-r([1-9][0-9]*)-v([1-9][0-9]*)\.[a-z0-9]+\.json$/u;
+const NEAR_BLACK_CHANNEL_MAX = 16;
+const EDGE_NEAR_BLACK_RATIO = 0.98;
+const EDGE_TRIM_MIN_PX = 4;
+const EDGE_TRIM_MAX_SIDE_RATIO = 0.2;
 
 export const DEFAULT_IMAGE_PROMPTS_DIRECTORY = path.join(
   repositoryRoot,
@@ -576,7 +580,7 @@ export function parseGenerateAiArguments(argv) {
 }
 
 export function parsePublishAiArguments(argv) {
-  const options = {};
+  const options = { trimBars: true };
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -587,6 +591,10 @@ export function parsePublishAiArguments(argv) {
       if (idOption.consumedNext) {
         index += 1;
       }
+      continue;
+    }
+    if (argument === "--no-trim") {
+      options.trimBars = false;
       continue;
     }
 
@@ -601,7 +609,9 @@ export function parsePublishAiArguments(argv) {
   }
 
   if (!options.candidatePath) {
-    throw new Error("Usage: npm run publish:ai -- <candidate-file> [--id <prompt-id>]");
+    throw new Error(
+      "Usage: npm run publish:ai -- <candidate-file> [--id <prompt-id>] [--no-trim]"
+    );
   }
 
   if (options.promptId) {
@@ -767,11 +777,141 @@ export async function summarizeAiIncomingCosts({
   };
 }
 
+function maxRgbChannelForPixel(rawBuffer, pixelOffset, channels) {
+  const red = rawBuffer[pixelOffset];
+  const green = channels > 1 ? rawBuffer[pixelOffset + 1] : red;
+  const blue = channels > 2 ? rawBuffer[pixelOffset + 2] : red;
+  return Math.max(red, green, blue);
+}
+
+function isNearBlackRow(rawBuffer, width, channels, rowIndex) {
+  let nearBlackPixels = 0;
+  const rowOffset = rowIndex * width * channels;
+  for (let x = 0; x < width; x += 1) {
+    const pixelOffset = rowOffset + (x * channels);
+    if (maxRgbChannelForPixel(rawBuffer, pixelOffset, channels) <= NEAR_BLACK_CHANNEL_MAX) {
+      nearBlackPixels += 1;
+    }
+  }
+  return nearBlackPixels / width >= EDGE_NEAR_BLACK_RATIO;
+}
+
+function isNearBlackColumn(rawBuffer, width, height, channels, columnIndex) {
+  let nearBlackPixels = 0;
+  for (let y = 0; y < height; y += 1) {
+    const pixelOffset = ((y * width) + columnIndex) * channels;
+    if (maxRgbChannelForPixel(rawBuffer, pixelOffset, channels) <= NEAR_BLACK_CHANNEL_MAX) {
+      nearBlackPixels += 1;
+    }
+  }
+  return nearBlackPixels / height >= EDGE_NEAR_BLACK_RATIO;
+}
+
+function normalizeTrimRun(runPixels, maxAllowedPixels) {
+  const cappedRun = Math.min(runPixels, maxAllowedPixels);
+  return cappedRun >= EDGE_TRIM_MIN_PX ? cappedRun : 0;
+}
+
+function detectEdgeNearBlackTrim(rawBuffer, width, height, channels) {
+  const maxTopOrBottom = Math.floor(height * EDGE_TRIM_MAX_SIDE_RATIO);
+  const maxLeftOrRight = Math.floor(width * EDGE_TRIM_MAX_SIDE_RATIO);
+
+  let topRun = 0;
+  while (topRun < maxTopOrBottom && topRun < height) {
+    if (!isNearBlackRow(rawBuffer, width, channels, topRun)) {
+      break;
+    }
+    topRun += 1;
+  }
+
+  let bottomRun = 0;
+  while (bottomRun < maxTopOrBottom && bottomRun < height - topRun) {
+    const rowIndex = height - 1 - bottomRun;
+    if (!isNearBlackRow(rawBuffer, width, channels, rowIndex)) {
+      break;
+    }
+    bottomRun += 1;
+  }
+
+  let leftRun = 0;
+  while (leftRun < maxLeftOrRight && leftRun < width) {
+    if (!isNearBlackColumn(rawBuffer, width, height, channels, leftRun)) {
+      break;
+    }
+    leftRun += 1;
+  }
+
+  let rightRun = 0;
+  while (rightRun < maxLeftOrRight && rightRun < width - leftRun) {
+    const columnIndex = width - 1 - rightRun;
+    if (!isNearBlackColumn(rawBuffer, width, height, channels, columnIndex)) {
+      break;
+    }
+    rightRun += 1;
+  }
+
+  return {
+    top: normalizeTrimRun(topRun, maxTopOrBottom),
+    bottom: normalizeTrimRun(bottomRun, maxTopOrBottom),
+    left: normalizeTrimRun(leftRun, maxLeftOrRight),
+    right: normalizeTrimRun(rightRun, maxLeftOrRight)
+  };
+}
+
+function hasAnyTrim(trim) {
+  return trim.top > 0 || trim.bottom > 0 || trim.left > 0 || trim.right > 0;
+}
+
+function buildTrimExtractRegion(width, height, trim) {
+  const extractWidth = width - trim.left - trim.right;
+  const extractHeight = height - trim.top - trim.bottom;
+  if (extractWidth < 1 || extractHeight < 1) {
+    return {
+      left: 0,
+      top: 0,
+      width,
+      height
+    };
+  }
+  return {
+    left: trim.left,
+    top: trim.top,
+    width: extractWidth,
+    height: extractHeight
+  };
+}
+
+async function preparePublishSourceImage(inputBuffer, trimBars) {
+  const { data: rawBuffer, info: rawInfo } = await sharp(inputBuffer)
+    .rotate()
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const detectedTrim = trimBars
+    ? detectEdgeNearBlackTrim(rawBuffer, rawInfo.width, rawInfo.height, rawInfo.channels)
+    : { top: 0, bottom: 0, left: 0, right: 0 };
+
+  const extractRegion = buildTrimExtractRegion(rawInfo.width, rawInfo.height, detectedTrim);
+
+  return {
+    rawBuffer,
+    rawInfo,
+    trim: {
+      ...detectedTrim,
+      enabled: trimBars,
+      applied: hasAnyTrim(detectedTrim)
+    },
+    extractRegion
+  };
+}
+
 export async function publishAiCandidate({
   candidatePath,
   promptId,
   outputDirectory = DEFAULT_AI_MEDIA_DIRECTORY,
   sidecarPath,
+  trimBars = true,
   maxWidthPx = MAX_AI_IMAGE_WIDTH_PX,
   maxBytes = MAX_AI_IMAGE_BYTES,
   minQuality = 60,
@@ -786,6 +926,9 @@ export async function publishAiCandidate({
   }
   if (!Number.isInteger(maxBytes) || maxBytes < 1) {
     throw new Error("maxBytes must be a positive integer.");
+  }
+  if (typeof trimBars !== "boolean") {
+    throw new Error("trimBars must be a boolean.");
   }
   if (
     !Number.isInteger(minQuality) ||
@@ -821,11 +964,18 @@ export async function publishAiCandidate({
   }
 
   const inputBuffer = await fs.readFile(resolvedCandidatePath);
+  const preparedImage = await preparePublishSourceImage(inputBuffer, trimBars);
   let bestOutput = null;
 
   for (let quality = maxQuality; quality >= minQuality; quality -= qualityStep) {
-    const webpBuffer = await sharp(inputBuffer)
-      .rotate()
+    const sourcePipeline = sharp(preparedImage.rawBuffer, {
+      raw: preparedImage.rawInfo
+    });
+    const pipeline = preparedImage.trim.applied
+      ? sourcePipeline.extract(preparedImage.extractRegion)
+      : sourcePipeline;
+
+    const webpBuffer = await pipeline
       .resize({
         width: maxWidthPx,
         withoutEnlargement: true
@@ -867,8 +1017,15 @@ export async function publishAiCandidate({
       width: outputMetadata.width,
       height: outputMetadata.height,
       bytes: bestOutput.buffer.length,
-      quality: bestOutput.quality
+      quality: bestOutput.quality,
+      trim: {
+        top: preparedImage.trim.top,
+        bottom: preparedImage.trim.bottom,
+        left: preparedImage.trim.left,
+        right: preparedImage.trim.right
+      }
     },
+    trim: preparedImage.trim,
     sidecarPath: resolvedSidecarPath,
     sidecarData,
     mediaEntryGenerator: mediaEntryGeneratorFromSidecar(sidecarData),
