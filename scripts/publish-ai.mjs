@@ -18,12 +18,16 @@ export async function runPublishAi(argv = process.argv.slice(2)) {
   const result = await publishAiCandidate({
     candidatePath: options.candidatePath,
     promptId: options.promptId,
-    outputDirectory: DEFAULT_AI_MEDIA_DIRECTORY
+    outputDirectory: DEFAULT_AI_MEDIA_DIRECTORY,
+    trimBars: options.trimBars
   });
 
   console.log(`Published ${relativeToRepository(result.outputPath)}`);
   console.log(
     `Final image: ${result.output.width}x${result.output.height}, ${result.output.bytes} bytes (quality ${result.output.quality})`
+  );
+  console.log(
+    `Trimmed edges: top=${result.trim.top}px, bottom=${result.trim.bottom}px, left=${result.trim.left}px, right=${result.trim.right}px`
   );
   console.log(
     `Generator (for media entry): tool='${result.mediaEntryGenerator.tool}', model='${result.mediaEntryGenerator.model}', date='${result.mediaEntryGenerator.date}'`
