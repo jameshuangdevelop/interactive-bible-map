@@ -55,6 +55,7 @@ export function readCliArgument(argv, name) {
 
 function normalizeBaseUrl(baseUrl) {
   const parsed = new URL(baseUrl);
+  parsed.search = "";
   parsed.hash = "";
   const normalized = parsed.toString();
   return normalized.endsWith("/") ? normalized.slice(0, -1) : normalized;

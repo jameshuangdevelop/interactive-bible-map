@@ -65,6 +65,10 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: pages-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     permissions:
       contents: read
       issues: write
@@ -91,7 +95,7 @@ jobs:
 
       - name: Download web export artifact
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: web-export
           path: app/dist
@@ -116,43 +120,7 @@ jobs:
         env:
           PROJECTS_JSON: ${{ steps.list-projects.outputs.command-output }}
           PAGES_PROJECT_NAME: ${{ env.CLOUDFLARE_PAGES_PROJECT }}
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-
-          const raw = process.env.PROJECTS_JSON ?? "";
-          const projectName = process.env.PAGES_PROJECT_NAME ?? "";
-          const firstBracketIndex = raw.indexOf("[");
-          const lastBracketIndex = raw.lastIndexOf("]");
-
-          if (firstBracketIndex === -1 || lastBracketIndex < firstBracketIndex) {
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, "exists=false\n");
-            process.exit(0);
-          }
-
-          let rows;
-          try {
-            rows = JSON.parse(raw.slice(firstBracketIndex, lastBracketIndex + 1));
-          } catch (error) {
-            console.error("Failed to parse Cloudflare Pages project list output.");
-            console.error(error instanceof Error ? error.message : String(error));
-            process.exit(1);
-          }
-
-          if (!Array.isArray(rows)) {
-            console.error("Cloudflare Pages project list output did not parse to a JSON array.");
-            process.exit(1);
-          }
-
-          const exists = rows.some(
-            (entry) =>
-              entry &&
-              typeof entry === "object" &&
-              entry["Project Name"] === projectName
-          );
-
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `exists=${exists}\n`);
-          NODE
+        run: node scripts/detect-pages-project.mjs
 
       - name: Create Pages project
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' && steps.detect-project.outputs.exists != 'true' }}
@@ -192,7 +160,7 @@ jobs:
 
       - name: Post preview URL comment
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           PREVIEW_URL: ${{ steps.preview-url.outputs.preview_url }}
           ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
@@ -250,6 +218,10 @@ jobs:
       - build
       - deploy_preview
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: pages-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     env:
       CI: true
     steps:
@@ -297,6 +269,10 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: pages-production
+      cancel-in-progress: false
     permissions:
       contents: read
     steps:
@@ -319,7 +295,7 @@ jobs:
 
       - name: Download web export artifact
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: web-export
           path: app/dist
@@ -344,43 +320,7 @@ jobs:
         env:
           PROJECTS_JSON: ${{ steps.list-projects.outputs.command-output }}
           PAGES_PROJECT_NAME: ${{ env.CLOUDFLARE_PAGES_PROJECT }}
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-
-          const raw = process.env.PROJECTS_JSON ?? "";
-          const projectName = process.env.PAGES_PROJECT_NAME ?? "";
-          const firstBracketIndex = raw.indexOf("[");
-          const lastBracketIndex = raw.lastIndexOf("]");
-
-          if (firstBracketIndex === -1 || lastBracketIndex < firstBracketIndex) {
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, "exists=false\n");
-            process.exit(0);
-          }
-
-          let rows;
-          try {
-            rows = JSON.parse(raw.slice(firstBracketIndex, lastBracketIndex + 1));
-          } catch (error) {
-            console.error("Failed to parse Cloudflare Pages project list output.");
-            console.error(error instanceof Error ? error.message : String(error));
-            process.exit(1);
-          }
-
-          if (!Array.isArray(rows)) {
-            console.error("Cloudflare Pages project list output did not parse to a JSON array.");
-            process.exit(1);
-          }
-
-          const exists = rows.some(
-            (entry) =>
-              entry &&
-              typeof entry === "object" &&
-              entry["Project Name"] === projectName
-          );
-
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `exists=${exists}\n`);
-          NODE
+        run: node scripts/detect-pages-project.mjs
 
       - name: Create Pages project
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' && steps.detect-project.outputs.exists != 'true' }}
