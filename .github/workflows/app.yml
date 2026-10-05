@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  CLOUDFLARE_PAGES_PROJECT: interactive-bible-map
+
 permissions:
   contents: read
 
@@ -112,12 +115,44 @@ jobs:
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
         env:
           PROJECTS_JSON: ${{ steps.list-projects.outputs.command-output }}
+          PAGES_PROJECT_NAME: ${{ env.CLOUDFLARE_PAGES_PROJECT }}
         run: |
-          if printf '%s' "$PROJECTS_JSON" | grep -Eq '"name"[[:space:]]*:[[:space:]]*"interactive-bible-map"'; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const raw = process.env.PROJECTS_JSON ?? "";
+          const projectName = process.env.PAGES_PROJECT_NAME ?? "";
+          const firstBracketIndex = raw.indexOf("[");
+          const lastBracketIndex = raw.lastIndexOf("]");
+
+          if (firstBracketIndex === -1 || lastBracketIndex < firstBracketIndex) {
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, "exists=false\n");
+            process.exit(0);
+          }
+
+          let rows;
+          try {
+            rows = JSON.parse(raw.slice(firstBracketIndex, lastBracketIndex + 1));
+          } catch (error) {
+            console.error("Failed to parse Cloudflare Pages project list output.");
+            console.error(error instanceof Error ? error.message : String(error));
+            process.exit(1);
+          }
+
+          if (!Array.isArray(rows)) {
+            console.error("Cloudflare Pages project list output did not parse to a JSON array.");
+            process.exit(1);
+          }
+
+          const exists = rows.some(
+            (entry) =>
+              entry &&
+              typeof entry === "object" &&
+              entry["Project Name"] === projectName
+          );
+
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `exists=${exists}\n`);
+          NODE
 
       - name: Create Pages project
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' && steps.detect-project.outputs.exists != 'true' }}
@@ -126,7 +161,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4"
-          command: pages project create interactive-bible-map --production-branch main
+          command: pages project create ${{ env.CLOUDFLARE_PAGES_PROJECT }} --production-branch main
 
       - name: Deploy preview to Cloudflare Pages
         id: deploy
@@ -136,7 +171,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4"
-          command: pages deploy app/dist --project-name interactive-bible-map --branch pr-${{ github.event.pull_request.number }}
+          command: pages deploy app/dist --project-name ${{ env.CLOUDFLARE_PAGES_PROJECT }} --branch pr-${{ github.event.pull_request.number }}
 
       - name: Resolve preview URL
         id: preview-url
@@ -308,12 +343,44 @@ jobs:
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
         env:
           PROJECTS_JSON: ${{ steps.list-projects.outputs.command-output }}
+          PAGES_PROJECT_NAME: ${{ env.CLOUDFLARE_PAGES_PROJECT }}
         run: |
-          if printf '%s' "$PROJECTS_JSON" | grep -Eq '"name"[[:space:]]*:[[:space:]]*"interactive-bible-map"'; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const raw = process.env.PROJECTS_JSON ?? "";
+          const projectName = process.env.PAGES_PROJECT_NAME ?? "";
+          const firstBracketIndex = raw.indexOf("[");
+          const lastBracketIndex = raw.lastIndexOf("]");
+
+          if (firstBracketIndex === -1 || lastBracketIndex < firstBracketIndex) {
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, "exists=false\n");
+            process.exit(0);
+          }
+
+          let rows;
+          try {
+            rows = JSON.parse(raw.slice(firstBracketIndex, lastBracketIndex + 1));
+          } catch (error) {
+            console.error("Failed to parse Cloudflare Pages project list output.");
+            console.error(error instanceof Error ? error.message : String(error));
+            process.exit(1);
+          }
+
+          if (!Array.isArray(rows)) {
+            console.error("Cloudflare Pages project list output did not parse to a JSON array.");
+            process.exit(1);
+          }
+
+          const exists = rows.some(
+            (entry) =>
+              entry &&
+              typeof entry === "object" &&
+              entry["Project Name"] === projectName
+          );
+
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `exists=${exists}\n`);
+          NODE
 
       - name: Create Pages project
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' && steps.detect-project.outputs.exists != 'true' }}
@@ -322,7 +389,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4"
-          command: pages project create interactive-bible-map --production-branch main
+          command: pages project create ${{ env.CLOUDFLARE_PAGES_PROJECT }} --production-branch main
 
       - name: Deploy production to Cloudflare Pages
         if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
@@ -331,4 +398,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4"
-          command: pages deploy app/dist --project-name interactive-bible-map --branch main
+          command: pages deploy app/dist --project-name ${{ env.CLOUDFLARE_PAGES_PROJECT }} --branch main

@@ -2,6 +2,12 @@
 
 The app deploys from `.github/workflows/app.yml` to Cloudflare Pages (`interactive-bible-map`).
 
+## Site URLs
+
+- **Production:** `https://interactive-bible-map.pages.dev`
+- **PR preview branch alias:** `https://pr-<number>.interactive-bible-map.pages.dev`
+- **PR comment:** each preview deploy also updates one bot comment (`<!-- ibm-preview-url -->`) with the resolved preview URL.
+
 ## What runs in CI
 
 - **Build job (all PRs and pushes to `main`)**: lint, type-check, tests, data validation, data build, web export, and Playwright export verification.
@@ -57,4 +63,6 @@ The current token expires around **2027-09-25**. Renew it before expiry with:
 .\scripts\setup-cloudflare-token.ps1
 ```
 
-After renewal, update the GitHub repository secret `CLOUDFLARE_API_TOKEN`.
+This script creates a new Pages-scoped Cloudflare token and stores both
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in this repository's GitHub
+Actions secrets (without printing token values).
