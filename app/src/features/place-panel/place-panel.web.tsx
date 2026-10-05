@@ -720,25 +720,65 @@ function CollapsibleSectionHeading({
   contentId,
   label,
   expanded,
+  prefersReducedMotion,
   onToggle
 }: {
   sectionId: CollapsibleSectionId;
   contentId: string;
   label: string;
   expanded: boolean;
+  prefersReducedMotion: boolean;
   onToggle: () => void;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const chevronState = expanded ? "expanded" : "collapsed";
+
   return (
     <h2 style={sectionHeadingStyle}>
       <button
         aria-controls={contentId}
         aria-expanded={expanded}
         data-panel-section-toggle={sectionId}
+        onMouseEnter={() => {
+          setIsHovered(true);
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+        }}
         onClick={onToggle}
-        style={sectionHeadingToggleButtonStyle}
+        style={{
+          ...sectionHeadingToggleButtonStyle,
+          backgroundColor: isHovered ? tokens.color.subtleSurface : "transparent"
+        }}
         type="button"
       >
         <span>{label}</span>
+        <span
+          aria-hidden="true"
+          data-panel-section-chevron={sectionId}
+          data-panel-section-chevron-state={chevronState}
+          style={sectionHeadingChevronContainerStyle}
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            style={{
+              ...sectionHeadingChevronStyle,
+              transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+              transition: prefersReducedMotion ? "none" : "transform 180ms ease"
+            }}
+            viewBox="0 0 12 12"
+          >
+            <path
+              d="M4 2.5L8 6L4 9.5"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.75"
+            />
+          </svg>
+        </span>
       </button>
     </h2>
   );
@@ -922,6 +962,7 @@ export function PlacePanel({
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
   const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<CollapsibleSectionId, boolean>>(
     () => ({ ...rememberedCollapsibleSectionExpandedState })
   );
@@ -1014,6 +1055,30 @@ export function PlacePanel({
 
     return mentionsByParagraph;
   }, [aboutParagraphs, location, placeForDisplay.id, places]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => {
+      setPrefersReducedMotion(mediaQuery.matches);
+    };
+    updatePreference();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updatePreference);
+      return () => {
+        mediaQuery.removeEventListener("change", updatePreference);
+      };
+    }
+
+    mediaQuery.addListener(updatePreference);
+    return () => {
+      mediaQuery.removeListener(updatePreference);
+    };
+  }, []);
 
   useEffect(() => {
     if (!showAllScripture || visibleScriptureCount >= sortedScripture.length) {
@@ -1824,6 +1889,7 @@ export function PlacePanel({
                 onToggle={() => {
                   toggleSectionExpanded("about");
                 }}
+                prefersReducedMotion={prefersReducedMotion}
                 sectionId="about"
               />
               <div
@@ -1862,6 +1928,7 @@ export function PlacePanel({
                   onToggle={() => {
                     toggleSectionExpanded("places-in");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
                   sectionId="places-in"
                 />
                 <div
@@ -1923,6 +1990,7 @@ export function PlacePanel({
                   onToggle={() => {
                     toggleSectionExpanded("in-bible");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
                   sectionId="in-bible"
                 />
                 <div
@@ -2015,6 +2083,7 @@ export function PlacePanel({
                   onToggle={() => {
                     toggleSectionExpanded("ot-connections");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
                   sectionId="ot-connections"
                 />
                 <div
@@ -2046,6 +2115,7 @@ export function PlacePanel({
                   onToggle={() => {
                     toggleSectionExpanded("sources");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
                   sectionId="sources"
                 />
                 <div
@@ -2099,6 +2169,7 @@ export function PlacePanel({
                   onToggle={() => {
                     toggleSectionExpanded("photo-credits");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
                   sectionId="photo-credits"
                 />
                 <div
@@ -2398,18 +2469,36 @@ const sectionHeadingToggleButtonStyle: CSSProperties = {
   width: "100%",
   border: "none",
   background: "transparent",
-  padding: 0,
+  padding: "2px 4px",
+  borderRadius: "4px",
   color: tokens.color.textPrimary,
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-start",
+  justifyContent: "space-between",
   gap: `${tokens.spacing.sm}px`,
   textAlign: "left",
   fontFamily: tokens.typography.uiFont,
   fontSize: `${tokens.typography.sectionHeadingSize}px`,
   lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
   fontWeight: 500
+};
+
+const sectionHeadingChevronContainerStyle: CSSProperties = {
+  width: "16px",
+  height: "16px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: tokens.color.textSecondary,
+  flexShrink: 0
+};
+
+const sectionHeadingChevronStyle: CSSProperties = {
+  width: "12px",
+  height: "12px",
+  display: "block",
+  transformOrigin: "50% 50%"
 };
 
 const secondaryTextStyle: CSSProperties = {

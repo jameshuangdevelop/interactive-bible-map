@@ -98,14 +98,14 @@
   <line x1="0" y1="430" x2="408" y2="430" stroke="#DADCE0"/>
 
   <!-- About -->
-  <text class="h2" x="24" y="540">About</text>
+  <text class="h2" x="24" y="540">▾ About</text>
   <text class="body" x="24" y="564">Capernaum was a fishing village on the northwest</text>
   <text class="body" x="24" y="584">shore of the Sea of Galilee that served as a base for</text>
   <text class="body" x="24" y="604">Jesus' Galilean ministry … <tspan class="link" font-size="11" dy="-4">[1] [2]</tspan></text>
   <line x1="0" y1="622" x2="408" y2="622" stroke="#DADCE0"/>
 
   <!-- In the Bible -->
-  <text class="h2" x="24" y="650">In the Bible · 18 passages (toggle)</text>
+  <text class="h2" x="24" y="650">▾ In the Bible · 18 passages (toggle)</text>
   <text class="small" x="24" y="672" letter-spacing="1">MATTHEW</text>
   <text class="ref" x="24" y="694">Matthew 4:13</text>
   <text class="verse" x="24" y="716">Leaving Nazareth, he came and lived in</text>
@@ -116,7 +116,7 @@
   <line x1="0" y1="830" x2="408" y2="830" stroke="#DADCE0"/>
 
   <!-- OT connections -->
-  <text class="h2" x="24" y="858">Old Testament connections · 1</text>
+  <text class="h2" x="24" y="858">▾ Old Testament connections · 1</text>
   <text class="muted" x="24" y="882"><tspan font-weight="600" fill="#202124">Isaiah 9:1</tspan> — quoted in Matthew 4:13–16 … <tspan class="link" font-size="11" dy="-4">[3]</tspan></text>
 
   <!-- Annotations -->
@@ -125,7 +125,7 @@
   <path class="leader" d="M220,430 L440,430"/><text class="note" x="446" y="434">No action bar; the panel goes straight from names to About</text>
   <path class="leader" d="M226,598 L420,598 L440,586"/><text class="note" x="446" y="590">Every statement carries source markers that link to the Sources list</text>
   <path class="leader" d="M360,738 L440,700"/><text class="note" x="446" y="704">Scripture: WEB text in serif, grouped by book; first 5, then "Show all"</text>
-  <text class="note" x="446" y="806">Panel continues after About: Places in (child records) · In the Bible · Sources · Photo credits (all collapsible; Sources and Photo credits start collapsed) · "Checked by the Fact-Checker · last reviewed" · Report an issue</text>
+  <text class="note" x="446" y="806">Panel continues after About: Places in (child records) · In the Bible · ▸ Sources · n · ▸ Photo credits · n (all collapsible with chevrons; Sources and Photo credits start collapsed) · "Checked by the Fact-Checker · last reviewed" · Report an issue</text>
   <path class="leader" d="M1046,262 L1110,200"/><text class="note" x="1114" y="196">Disputed candidates: lettered pins, dashed outline</text>
   <path class="leader" d="M952,300 L1060,360"/><text class="note" x="1064" y="364">Selected place: larger pin</text>
   <text x="1430" y="892" font-size="12" fill="#80868B" text-anchor="end">02 · Place panel · desktop · low fidelity</text>

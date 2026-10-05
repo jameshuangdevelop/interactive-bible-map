@@ -235,10 +235,31 @@ function panelSectionContentSelector(sectionId) {
   return `${panelSectionSelector(sectionId)} [data-panel-section-content='${sectionId}']`;
 }
 
+function panelSectionChevronSelector(sectionId) {
+  return `${panelSectionToggleSelector(sectionId)} [data-panel-section-chevron='${sectionId}']`;
+}
+
 async function waitForPanelSectionToggle(page, sectionId) {
   const toggle = page.locator(panelSectionToggleSelector(sectionId)).first();
   await toggle.waitFor({ state: "visible", timeout: 30_000 });
   return toggle;
+}
+
+async function readPanelSectionChevronState(page, sectionId) {
+  const chevron = page.locator(panelSectionChevronSelector(sectionId)).first();
+  await chevron.waitFor({ state: "visible", timeout: 30_000 });
+  const ariaHidden = await chevron.getAttribute("aria-hidden");
+  if (ariaHidden !== "true") {
+    throw new Error(`${sectionId} chevron should be decorative with aria-hidden='true'.`);
+  }
+
+  const state = await chevron.getAttribute("data-panel-section-chevron-state");
+  if (state !== "expanded" && state !== "collapsed") {
+    throw new Error(
+      `${sectionId} chevron should expose expanded/collapsed state, got '${state ?? "null"}'.`
+    );
+  }
+  return state;
 }
 
 async function getPanelSectionExpanded(page, sectionId) {
@@ -1759,6 +1780,14 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
   for (const sectionId of sectionToggleIds) {
     const toggle = await waitForPanelSectionToggle(page, sectionId);
     const initialExpanded = await toggle.getAttribute("aria-expanded");
+    const initialChevronState = await readPanelSectionChevronState(page, sectionId);
+    const expectedInitialChevronState = initialExpanded === "true" ? "expanded" : "collapsed";
+    if (initialChevronState !== expectedInitialChevronState) {
+      throw new Error(
+        `${sectionId} chevron state mismatch before toggle: aria-expanded='${initialExpanded}', chevron='${initialChevronState}'.`
+      );
+    }
+
     await toggle.focus();
     await page.keyboard.press("Enter");
     await page.waitForFunction(
@@ -1776,6 +1805,16 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
       { timeout: 30_000, polling: 100 }
     );
     const expandedAfterEnter = await toggle.getAttribute("aria-expanded");
+    const chevronAfterEnter = await readPanelSectionChevronState(page, sectionId);
+    const expectedChevronAfterEnter = expandedAfterEnter === "true" ? "expanded" : "collapsed";
+    if (chevronAfterEnter !== expectedChevronAfterEnter) {
+      throw new Error(
+        `${sectionId} chevron mismatch after Enter: aria-expanded='${expandedAfterEnter}', chevron='${chevronAfterEnter}'.`
+      );
+    }
+    if (chevronAfterEnter === initialChevronState) {
+      throw new Error(`${sectionId} chevron did not change after keyboard toggle.`);
+    }
 
     await page.keyboard.press("Space");
     await page.waitForFunction(
@@ -1793,10 +1832,25 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
       { timeout: 30_000, polling: 100 }
     );
     const expandedAfterSpace = await toggle.getAttribute("aria-expanded");
+    const chevronAfterSpace = await readPanelSectionChevronState(page, sectionId);
+    const expectedChevronAfterSpace = expandedAfterSpace === "true" ? "expanded" : "collapsed";
+    if (chevronAfterSpace !== expectedChevronAfterSpace) {
+      throw new Error(
+        `${sectionId} chevron mismatch after Space: aria-expanded='${expandedAfterSpace}', chevron='${chevronAfterSpace}'.`
+      );
+    }
+    if (chevronAfterSpace !== initialChevronState) {
+      throw new Error(
+        `${sectionId} chevron should return to initial state after Enter+Space toggles, got '${chevronAfterSpace}' (initial '${initialChevronState}').`
+      );
+    }
     sectionKeyboardToggleStates[sectionId] = {
       initialExpanded,
       expandedAfterEnter,
-      expandedAfterSpace
+      expandedAfterSpace,
+      initialChevronState,
+      chevronAfterEnter,
+      chevronAfterSpace
     };
   }
 
