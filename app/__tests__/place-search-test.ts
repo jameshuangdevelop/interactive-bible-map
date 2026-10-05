@@ -117,4 +117,68 @@ describe("place-name search", () => {
     const results = searchPlacesByName([syntheticPlace], "capernaum");
     expect(results[0]?.place.id).toBe("accent-fixture");
   });
+
+  test("adds countries to the search subtitle when a place has one modern site", () => {
+    const syntheticPlace: PlaceIndexRecord = {
+      id: "ephesus-fixture",
+      names: {
+        ancient: ["Ephesus"],
+        modern: "Selçuk",
+        modernCountries: ["Türkiye"],
+        alternate: []
+      },
+      type: "city",
+      zoomTier: "city",
+      prominence: "major",
+      parentId: null,
+      candidates: [{ label: "Selçuk", coordinates: [27.35, 37.95], confidence: "high" }]
+    };
+
+    const results = searchPlacesByName([syntheticPlace], "eph");
+    expect(results[0]?.subtitle).toBe("Selçuk, Türkiye · City");
+  });
+
+  test("uses countries-only subtitle for several-candidate records without one modern name", () => {
+    const syntheticPlace: PlaceIndexRecord = {
+      id: "multi-site-fixture",
+      names: {
+        ancient: ["Multi-site fixture"],
+        modernCountries: ["Jordan", "West Bank"],
+        alternate: []
+      },
+      type: "site",
+      zoomTier: "site",
+      prominence: "standard",
+      parentId: null,
+      candidates: [
+        { label: "Candidate A", coordinates: [35.5, 31.7], confidence: "high" },
+        { label: "Candidate B", coordinates: [35.6, 31.71], confidence: "low" }
+      ]
+    };
+
+    const results = searchPlacesByName([syntheticPlace], "multi-site");
+    expect(results[0]?.subtitle).toBe("Jordan and the West Bank · Site");
+  });
+
+  test("keeps disputed subtitle format for disputed places", () => {
+    const disputedPlace: PlaceIndexRecord = {
+      id: "disputed-fixture",
+      names: {
+        ancient: ["Emmaus fixture"],
+        modernCountries: ["Israel", "West Bank"],
+        alternate: []
+      },
+      type: "village",
+      zoomTier: "city",
+      prominence: "standard",
+      parentId: null,
+      candidates: [
+        { label: "Candidate A", coordinates: [34.9, 31.8], confidence: "disputed" },
+        { label: "Candidate B", coordinates: [35.0, 31.85], confidence: "low" }
+      ]
+    };
+
+    const results = searchPlacesByName([disputedPlace], "emmaus");
+    expect(results[0]?.subtitle).toBe("Disputed · 2 proposed sites · Village");
+  });
 });

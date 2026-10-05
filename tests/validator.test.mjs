@@ -6,7 +6,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parseReference } from "../scripts/lib/books.mjs";
-import { validateData, REQUIRE_EMPIRE_ROOT } from "../scripts/lib/validator.mjs";
+import {
+  validateData,
+  REQUIRE_EMPIRE_ROOT,
+  REQUIRE_MODERN_COUNTRIES
+} from "../scripts/lib/validator.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const fixturesDirectory = path.join(testDirectory, "fixtures");
@@ -1220,6 +1224,273 @@ test("disputed multi-candidate record may omit names.modern", async () => {
 test("multi-candidate non-disputed record may keep names.modern", async () => {
   const result = await runCase("valid-modern-name-multiple-candidates");
   assert.equal(result.errors.length, 0);
+});
+
+test("modern-countries requirement is warning-only by default", async () => {
+  assert.equal(REQUIRE_MODERN_COUNTRIES, false);
+
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: []
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: false }
+  );
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
+  );
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("athens.json") &&
+        warning.path === "$.names.modernCountries" &&
+        warning.message.includes("required for all non-exempt records")
+    )
+  );
+});
+
+test("modern-countries requirement can be enabled as an error", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: []
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    )
+  );
+});
+
+test("non-exempt records with empty names.modernCountries still fail the policy check", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: []
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    )
+  );
+});
+
+test("exempt records must omit names.modernCountries (jerusalem and descendants)", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.id = "temple-mount";
+      cityData.names = {
+        ancient: ["Temple Mount"],
+        modern: "Temple Mount",
+        alternate: [],
+        modernCountries: ["Israel"]
+      };
+      cityData.parentId = "jerusalem";
+
+      provinceData.id = "jerusalem";
+      provinceData.type = "city";
+      provinceData.zoomTier = "city";
+      provinceData.names = {
+        ancient: ["Jerusalem"],
+        modern: "Jerusalem",
+        alternate: [],
+        modernCountries: ["Israel"]
+      };
+      provinceData.parentId = "roman-empire";
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("jerusalem.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("must be omitted for exempt records")
+    )
+  );
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("temple-mount.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("must be omitted for exempt records")
+    )
+  );
+});
+
+test("area records without names.modern emit a warning when modern-countries requirement is off", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: false }
+  );
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("achaia.json") &&
+        error.path === "$.names.modern" &&
+        error.message.includes("must define names.modern")
+    ),
+    false
+  );
+  assert.ok(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("achaia.json") &&
+        warning.path === "$.names.modern" &&
+        warning.message.includes("must define names.modern")
+    )
+  );
+});
+
+test("area records without names.modern fail when modern-countries requirement is enabled", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("achaia.json") &&
+        error.path === "$.names.modern" &&
+        error.message.includes("must define names.modern")
+    )
+  );
+});
+
+test("disputed area records may omit names.modern without triggering area-name requirement", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+
+      provinceData.names = {
+        ancient: ["Achaia"],
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+      provinceData.candidates = [
+        {
+          ...provinceData.candidates[0],
+          confidence: "disputed"
+        },
+        {
+          ...provinceData.candidates[0],
+          label: "Achaia alternate area (illustrative)",
+          confidence: "medium",
+          coordinates: [35.45, 32.9]
+        }
+      ];
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("achaia.json") &&
+        error.path === "$.names.modern" &&
+        error.message.includes("must define names.modern")
+    ),
+    false
+  );
+  assert.equal(
+    hasWarning(
+      result,
+      (warning) =>
+        warning.file.endsWith("achaia.json") &&
+        warning.path === "$.names.modern" &&
+        warning.message.includes("must define names.modern")
+    ),
+    false
+  );
 });
 
 test("scripture.book must match scripture.ref", async () => {
