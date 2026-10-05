@@ -104,6 +104,26 @@ const IMAGE_PROMPTS_BASE_URL =
 // Keep raw source IDs in data only; readers get a single brief link label.
 export const AI_BASED_ON_LABEL = "research brief";
 const WORD_CHARACTER_PATTERN = /[\p{Letter}\p{Number}]/u;
+// Keep in sync with schema/location.schema.json ($defs.modernCountry).
+const MODERN_COUNTRY_NAMES = [
+  "Türkiye",
+  "Greece",
+  "Italy",
+  "Israel",
+  "Jordan",
+  "Lebanon",
+  "Syria",
+  "Egypt",
+  "Cyprus",
+  "Malta",
+  "Iraq",
+  "Iran",
+  "Albania",
+  "North Macedonia",
+  "Libya",
+  "West Bank",
+  "Golan Heights"
+] as const;
 
 export interface GroupedScriptureBook {
   book: string;
@@ -222,6 +242,10 @@ function normalizeComparableText(value: string | undefined) {
   return value.trim().replace(/\s+/gu, " ").toLocaleLowerCase();
 }
 
+const MODERN_COUNTRY_COMPARABLE_NAMES = new Set(
+  MODERN_COUNTRY_NAMES.map((countryName) => normalizeComparableText(countryName))
+);
+
 function normalizeDisplayNameForMatch(value: string) {
   return value.trim().replace(/\s+/gu, " ");
 }
@@ -251,7 +275,11 @@ function collectNameOwners(places: PlaceIndexRecord[]) {
     const namesSeenForPlace = new Set<string>();
     for (const placeName of namesForAboutMatching(place)) {
       const normalized = normalizeComparableText(placeName);
-      if (normalized.length === 0 || namesSeenForPlace.has(normalized)) {
+      if (
+        normalized.length === 0 ||
+        namesSeenForPlace.has(normalized) ||
+        MODERN_COUNTRY_COMPARABLE_NAMES.has(normalized)
+      ) {
         continue;
       }
 
@@ -270,24 +298,21 @@ function collectNameOwners(places: PlaceIndexRecord[]) {
   return ownersByName;
 }
 
-interface AboutMatchCandidate {
+export interface AboutMatchCandidate {
   placeId: string;
   matcher: RegExp;
   priorityLength: number;
 }
 
-function collectAboutMatchCandidates(
-  places: PlaceIndexRecord[],
-  currentPlaceId: string
-): AboutMatchCandidate[] {
+export interface AboutPlaceMatchIndex {
+  candidates: AboutMatchCandidate[];
+}
+
+function collectAboutMatchCandidates(places: PlaceIndexRecord[]): AboutMatchCandidate[] {
   const ownersByName = collectNameOwners(places);
   const candidates: AboutMatchCandidate[] = [];
 
   for (const place of places) {
-    if (place.id === currentPlaceId) {
-      continue;
-    }
-
     const namesSeenForPlace = new Set<string>();
     for (const placeName of namesForAboutMatching(place)) {
       const comparableName = normalizeComparableText(placeName);
@@ -314,6 +339,12 @@ function collectAboutMatchCandidates(
   return candidates;
 }
 
+export function buildAboutPlaceMatchIndex(places: PlaceIndexRecord[]): AboutPlaceMatchIndex {
+  return {
+    candidates: collectAboutMatchCandidates(places)
+  };
+}
+
 interface AboutMentionCandidate extends Omit<AboutPlaceMention, "text"> {
   priorityLength: number;
 }
@@ -326,20 +357,15 @@ function rangesOverlap(
 }
 
 export function matchAboutPlaceMentions({
-  places,
+  matchIndex,
   currentPlaceId,
   paragraphs
 }: {
-  places: PlaceIndexRecord[];
+  matchIndex: AboutPlaceMatchIndex;
   currentPlaceId: string;
   paragraphs: string[];
 }) {
-  if (paragraphs.length === 0 || places.length === 0) {
-    return [] as AboutPlaceMention[];
-  }
-
-  const candidates = collectAboutMatchCandidates(places, currentPlaceId);
-  if (candidates.length === 0) {
+  if (paragraphs.length === 0 || matchIndex.candidates.length === 0) {
     return [] as AboutPlaceMention[];
   }
 
@@ -349,7 +375,11 @@ export function matchAboutPlaceMentions({
       return;
     }
 
-    for (const candidate of candidates) {
+    for (const candidate of matchIndex.candidates) {
+      if (candidate.placeId === currentPlaceId) {
+        continue;
+      }
+
       candidate.matcher.lastIndex = 0;
       let match: RegExpExecArray | null = candidate.matcher.exec(paragraphText);
       while (match) {
