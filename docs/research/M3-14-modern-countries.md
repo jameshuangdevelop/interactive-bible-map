@@ -47,6 +47,9 @@ Two territory/country names were needed beyond the 17 already in `schema/locatio
 - **"Northern Cyprus"** — for Salamis (`salamis-cyprus`), see "Extending the territory-naming
   principle" below.
 
+**PO ruling (2026-10-05):** Salamis uses "Cyprus", and "Northern Cyprus" is removed from the
+allow-list; see "Extending the territory-naming principle" below.
+
 ## Full per-record table
 
 `—` marks the 9 exempt records (the two empires, `jerusalem`, and the 6 records whose parent chain
@@ -129,7 +132,7 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | puteoli | city | Pozzuoli | Italy |
 | roman-empire | empire | — | — (exempt) |
 | rome | city | Rome | Italy |
-| salamis-cyprus | city | Near Famagusta | Northern Cyprus |
+| salamis-cyprus | city | Near Famagusta | Cyprus (PO ruling; proposed: Northern Cyprus) |
 | samaria | region | Hill country in the northern West Bank | West Bank |
 | sardis | city | Sart | Türkiye |
 | sea-of-galilee | natural-feature | Sea of Galilee / Lake Kinneret | Israel |
@@ -143,6 +146,9 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | thyatira | city | Akhisar | Türkiye |
 | troas | city | Near Ezine | Türkiye |
 | tyre | city | Sour / Tyre | Lebanon |
+
+After verification, the Fact-Checker changed Achaia's and Galatia's phrases and added Malta to Sicily,
+and sent Arabia and Illyricum back for rework; see `docs/verification/M3-modern-countries.md`.
 
 ### Sources behind each country (where not obvious from the record's own candidate `coordinateSource`)
 
@@ -194,6 +200,13 @@ where the place is, not who should rule it") applies the same way here: English 
 Salamis's ruins routinely place them in "Northern Cyprus." I added **"Northern Cyprus"** to the
 schema allow-list and used it for this one record. **This is a new application of the policy beyond
 CP3.5's named examples, not a case the human has separately confirmed — flagged for the PO below.**
+
+**PO ruling (2026-10-05):** "Cyprus", not "Northern Cyprus". West Bank and Golan Heights are the
+standard neutral names for territory whose sovereignty is disputed between states. For Cyprus, the
+island's name is also the internationally recognized state's name, while "Northern Cyprus" chiefly
+names an entity that only Türkiye recognizes, so using it would read as taking a side. `salamis-cyprus`
+now lists "Cyprus" (supported by the same `wikidata:Q767089` P17 claims), and "Northern Cyprus" is
+no longer on the allow-list. The human is asked to confirm at the next mini checkpoint.
 
 ### Multi-candidate places
 
@@ -264,6 +277,8 @@ non-political geographic name, which the rule explicitly allows in place of a lo
    Salamis, is a reasoned extension of ADR-0028's stated principle, but it is a case the human has not
    separately confirmed the way West Bank and Golan Heights were confirmed at CP3.5. Please confirm
    or override.
+   **PO ruling (2026-10-05):** "Cyprus"; see the ruling under "Extending the territory-naming
+   principle" above.
 2. **Emmaus Nicopolis (Imwas)**, one of `emmaus`'s four candidates, sits in the former Latrun
    no-man's land (1949–1967), exactly the case the task names as an example of genuine unclear
    status. Its own cited Wikidata entity (`wikidata:Q847246`) currently carries three P17 claims:
@@ -276,6 +291,8 @@ non-political geographic name, which the rule explicitly allows in place of a lo
    final value: `emmaus`'s other two candidates, Abu Ghosh (Israel) and El-Qubeibeh (West Bank),
    already establish both entries in `modernCountries: ["Israel", "West Bank"]` regardless of which
    way Imwas falls.
+   **PO ruling (2026-10-05):** resolved. The Fact-Checker confirmed that the list is the same
+   whichever way Imwas falls (`docs/verification/M3-modern-countries.md`).
 3. **Qaloniya/Motza**, a second `emmaus` candidate, has no current-country Wikidata claim at all
    (only "Mandatory Palestine", a pre-1948 historical entity, since the item describes a depopulated
    1948 village rather than today's adjacent Israeli locality). Its coordinates place it unambiguously

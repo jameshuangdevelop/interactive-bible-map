@@ -4,7 +4,7 @@
     "ancient": [
       "Achaia"
     ],
-    "modern": "Southern Greece",
+    "modern": "Central and southern Greece",
     "modernCountries": [
       "Greece"
     ],
@@ -129,5 +129,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-05"
 }

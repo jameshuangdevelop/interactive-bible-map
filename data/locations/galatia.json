@@ -4,7 +4,7 @@
     "ancient": [
       "Galatia"
     ],
-    "modern": "North-central Türkiye",
+    "modern": "Central Türkiye",
     "modernCountries": [
       "Türkiye"
     ],
@@ -104,5 +104,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-05"
 }
