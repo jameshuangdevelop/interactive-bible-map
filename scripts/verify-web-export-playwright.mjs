@@ -22,6 +22,7 @@ const licensesDocumentPath = path.join(repositoryRoot, "docs", "LICENSES.md");
 const smoothnessLongTaskLimitMs = 50;
 const syntheticPlaceIdPrefix = "synthetic-city-";
 const galleryScreenshotDirectoryName = "ibm-m35-gallery";
+const panelHeaderScreenshotDirectoryName = "ibm-m3-15";
 const fallbackStatusMessage = "The main map service isn't responding. Showing the backup map.";
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
 const mainAttributionNeedle = "OpenFreeMap";
@@ -158,6 +159,14 @@ function temporaryGalleryScreenshotPath(fileName) {
   return path.join(process.env.TEMP ?? os.tmpdir(), galleryScreenshotDirectoryName, fileName);
 }
 
+function temporaryPanelHeaderScreenshotPath(fileName) {
+  return path.join(
+    process.env.TEMP ?? os.tmpdir(),
+    panelHeaderScreenshotDirectoryName,
+    fileName
+  );
+}
+
 function parseCommonsThumbnailRequest(requestUrl) {
   try {
     const { pathname } = new URL(requestUrl);
@@ -197,16 +206,79 @@ function isAiPayloadImage(image) {
   return image?.kind === "ai-reconstruction" || image?.aiGenerated === true;
 }
 
-// Each image kind has its own credit line under the photo (visual spec §3), so the
-// checks below read the place's images to know which line to expect.
+const placePanelSelector = "section[aria-label='Place details']";
+const photoCreditsEntriesSelector = `${placePanelSelector} [data-panel-section='photo-credits'] [data-photo-credits-entry='true']`;
+
 function expectedCreditMarkers(image) {
   return isAiPayloadImage(image)
-    ? ["AI-generated reconstruction", "Based on:"]
+    ? ["AI-generated reconstruction", "Based on: research brief"]
     : ["Photo:", "Wikimedia Commons"];
 }
 
 function creditMatchesImage(creditText, image) {
   return expectedCreditMarkers(image).every((marker) => creditText.includes(marker));
+}
+
+function photoCreditEntrySelectorForImage(imageIndexOneBased) {
+  return `${photoCreditsEntriesSelector}[data-photo-credit-entry-index='${imageIndexOneBased}']`;
+}
+
+async function readPhotoCreditEntryForImage(page, imageIndexOneBased) {
+  const selector = photoCreditEntrySelectorForImage(imageIndexOneBased);
+  await page.waitForSelector(selector, { timeout: 30_000 });
+  const text = await page.$eval(
+    selector,
+    (element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim()
+  );
+  return text;
+}
+
+async function readCurrentGalleryImageNumber(page) {
+  const counterLocator = page.locator(
+    `${placePanelSelector} [data-panel-section='photos'] [data-photo-counter='true']`
+  );
+  if ((await counterLocator.count()) === 0) {
+    return 1;
+  }
+
+  const counterText = ((await counterLocator.first().textContent()) ?? "").trim();
+  const [leading] = counterText.split("/");
+  const parsed = Number.parseInt(leading?.trim() ?? "", 10);
+  return Number.isFinite(parsed) ? parsed : 1;
+}
+
+async function jumpToCurrentImageCredit(page) {
+  const currentImageNumber = await readCurrentGalleryImageNumber(page);
+  await page
+    .locator(`${placePanelSelector} [data-panel-section='photos'] [data-photo-credit-link='true']`)
+    .first()
+    .click();
+  await page.waitForFunction(() => {
+    const activeElement = document.activeElement;
+    return (
+      activeElement instanceof HTMLElement &&
+      activeElement.getAttribute("data-photo-credits-entry") === "true"
+    );
+  });
+
+  const focusedEntry = await page.evaluate(() => {
+    const activeElement = document.activeElement;
+    if (!(activeElement instanceof HTMLElement)) {
+      return null;
+    }
+
+    const indexText = activeElement.getAttribute("data-photo-credit-entry-index");
+    const parsedIndex = Number.parseInt(indexText ?? "", 10);
+    return {
+      imageIndex: Number.isFinite(parsedIndex) ? parsedIndex : null,
+      text: (activeElement.textContent ?? "").replace(/\s+/gu, " ").trim()
+    };
+  });
+
+  return {
+    currentImageNumber,
+    focusedEntry
+  };
 }
 
 async function readCapernaumImages() {
@@ -529,7 +601,11 @@ async function captureGalleryPanelLayoutSnapshot(page) {
     const nextButton = photosSection?.querySelector("button[aria-label='Next image']");
     const counter = photosSection?.querySelector("[data-photo-counter='true']");
     const kindLabel = photosSection?.querySelector("[data-photo-kind-label='true']");
-    const credit = photosSection?.querySelector("[data-photo-credit='true']");
+    const caption = photosSection?.querySelector("[data-photo-caption='true']");
+    const creditLink = photosSection?.querySelector("[data-photo-credit-link='true']");
+    const inlineCreditCount = photosSection
+      ? photosSection.querySelectorAll("[data-photo-credit='true']").length
+      : 0;
     const thumbnailRow = photosSection?.querySelector("[data-thumbnail-row='true']");
     const selectedThumbnail = photosSection?.querySelector(
       "[data-thumbnail-row='true'] button[data-gallery-thumbnail='selected']"
@@ -574,7 +650,9 @@ async function captureGalleryPanelLayoutSnapshot(page) {
       nextButtonBounds: toBounds(nextButton),
       counterBounds: toBounds(counter),
       kindLabelBounds: toBounds(kindLabel),
-      creditBounds: toBounds(credit),
+      captionBounds: toBounds(caption),
+      creditLinkBounds: toBounds(creditLink),
+      inlineCreditCount,
       thumbnailRowBounds: toBounds(thumbnailRow),
       selectedThumbnailBounds: toBounds(selectedThumbnail),
       rowScrollLeft,
@@ -613,7 +691,13 @@ function assertGalleryPanelBoundsAndOverflow(snapshot, scenarioLabel) {
   assertMinimumHitArea(snapshot.nextButtonBounds, "next image button", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.counterBounds, "counter", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.kindLabelBounds, "kind label", scenarioLabel);
-  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditBounds, "credit line", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.captionBounds, "caption line", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditLinkBounds, "credit link", scenarioLabel);
+  if (snapshot.inlineCreditCount !== 0) {
+    throw new Error(
+      `${scenarioLabel}: inline photo-credit lines should be removed, found ${snapshot.inlineCreditCount}.`
+    );
+  }
   assertBoundsWithinPanel(
     snapshot.panelBounds,
     snapshot.thumbnailRowBounds,
@@ -1680,130 +1764,6 @@ async function verifyCandidateSelectionUpdatesUrl(page, baseUrl) {
   };
 }
 
-async function verifyCopyLinkAction(browser, baseUrl) {
-  const clipboardContext = await browser.newContext({
-    viewport: { width: 1440, height: 960 }
-  });
-  const clipboardPage = await clipboardContext.newPage();
-
-  try {
-    await clipboardPage.goto(`${baseUrl}/?place=capernaum`, {
-      waitUntil: "networkidle",
-      timeout: 60_000
-    });
-    await waitForMapToSettle(clipboardPage);
-    await clipboardPage.evaluate(() => {
-      window.__copiedViaClipboard = [];
-      const captureWriteText = async (value) => {
-        window.__copiedViaClipboard.push(String(value));
-      };
-
-      if (navigator.clipboard && typeof navigator.clipboard === "object") {
-        try {
-          navigator.clipboard.writeText = captureWriteText;
-          return;
-        } catch {
-          // fall through to defineProperty path
-        }
-      }
-
-      Object.defineProperty(navigator, "clipboard", {
-        configurable: true,
-        value: {
-          writeText: captureWriteText
-        }
-      });
-    });
-
-    await clipboardPage.getByRole("button", { name: "Copy link" }).click();
-    await clipboardPage.getByText("Link copied", { exact: true }).waitFor({ timeout: 10_000 });
-
-    const clipboardResult = await clipboardPage.evaluate(() => ({
-      copiedText: window.__copiedViaClipboard[0] ?? null,
-      href: window.location.href
-    }));
-
-    if (clipboardResult.copiedText !== clipboardResult.href) {
-      throw new Error(
-        `Copy-link clipboard path mismatch: copied='${clipboardResult.copiedText}', href='${clipboardResult.href}'.`
-      );
-    }
-
-    const fallbackContext = await browser.newContext({
-      viewport: { width: 1440, height: 960 }
-    });
-    const fallbackPage = await fallbackContext.newPage();
-
-    try {
-      await fallbackPage.goto(`${baseUrl}/?place=capernaum`, {
-        waitUntil: "networkidle",
-        timeout: 60_000
-      });
-      await waitForMapToSettle(fallbackPage);
-      await fallbackPage.evaluate(() => {
-        window.__copiedViaFallback = [];
-
-        if (navigator.clipboard && typeof navigator.clipboard === "object") {
-          try {
-            navigator.clipboard.writeText = undefined;
-          } catch {
-            // Continue and try defineProperty fallback below.
-          }
-        }
-
-        try {
-          Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
-        } catch {
-          // writeText override above is enough to force fallback when clipboard exists.
-        }
-
-        const originalExecCommand = document.execCommand.bind(document);
-        document.execCommand = (commandId) => {
-          if (commandId === "copy") {
-            const textarea = document.querySelector("textarea");
-            window.__copiedViaFallback.push(
-              textarea instanceof HTMLTextAreaElement ? textarea.value : null
-            );
-            return true;
-          }
-          return originalExecCommand(commandId);
-        };
-      });
-
-      await fallbackPage.getByRole("button", { name: "Copy link" }).click();
-      await fallbackPage.getByText("Link copied", { exact: true }).waitFor({ timeout: 10_000 });
-
-      const fallbackResult = await fallbackPage.evaluate(() => ({
-        copiedText: window.__copiedViaFallback[0] ?? null,
-        fallbackCallCount: window.__copiedViaFallback.length,
-        href: window.location.href
-      }));
-      if (fallbackResult.fallbackCallCount === 0) {
-        throw new Error("Copy-link fallback path was vacuous: document.execCommand('copy') was not called.");
-      }
-
-      if (fallbackResult.copiedText !== fallbackResult.href) {
-        throw new Error(
-          `Copy-link fallback path mismatch: copied='${fallbackResult.copiedText}', href='${fallbackResult.href}'.`
-        );
-      }
-
-      return {
-        clipboardResult,
-        fallbackResult
-      };
-    } finally {
-      await fallbackPage.close();
-      await fallbackContext.close();
-    }
-  } finally {
-    if (!clipboardPage.isClosed()) {
-      await clipboardPage.close();
-    }
-    await clipboardContext.close();
-  }
-}
-
 async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 960 }
@@ -1886,12 +1846,12 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     "photos",
     "names",
     "candidates",
-    "actions",
     "about",
+    "places-in",
     "in-bible",
     "ot-connections",
-    "places-in",
     "sources",
+    "photo-credits",
     "footer"
   ];
   const canonicalIndex = new Map(canonicalOrder.map((entry, index) => [entry, index]));
@@ -1907,27 +1867,75 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     last = currentIndex;
   }
 
+  const inlinePhotoCreditCount = await page
+    .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
+    .count();
+  if (inlinePhotoCreditCount !== 0) {
+    throw new Error(
+      `Inline panel photo-credit lines should be removed, found ${inlinePhotoCreditCount}.`
+    );
+  }
+
+  const photoCreditsNoteText = (
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photo-credits'] [data-photo-credits-note='true']")
+      .textContent()
+  )
+    ?.replace(/\s+/gu, " ")
+    .trim();
+  const expectedPhotoCreditsNote =
+    "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
+  if (photoCreditsNoteText !== expectedPhotoCreditsNote) {
+    throw new Error(
+      `Photo-credits note mismatch. expected='${expectedPhotoCreditsNote}', got='${photoCreditsNoteText ?? ""}'.`
+    );
+  }
+
   const capernaumImages = await readCapernaumImages();
-  const firstCreditText =
-    (await page.locator("section[aria-label='Place details'] [data-photo-credit='true']").textContent()) ??
-    "";
-  if (!creditMatchesImage(firstCreditText, capernaumImages[0])) {
-    throw new Error(`Missing required photo credit text on lead image: '${firstCreditText.trim()}'`);
+  const photoCreditEntries = await page.$$eval(photoCreditsEntriesSelector, (elements) =>
+    elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  if (photoCreditEntries.length !== capernaumImages.length) {
+    throw new Error(
+      `Photo-credits entry count mismatch for Capernaum: expected ${capernaumImages.length}, got ${photoCreditEntries.length}.`
+    );
+  }
+  for (const [index, image] of capernaumImages.entries()) {
+    const entryText = photoCreditEntries[index] ?? "";
+    if (!creditMatchesImage(entryText, image)) {
+      throw new Error(
+        `Photo-credit entry ${index + 1} does not match image '${image.id}': '${entryText}'.`
+      );
+    }
+  }
+
+  const firstCreditFocus = await jumpToCurrentImageCredit(page);
+  if (firstCreditFocus.focusedEntry?.imageIndex !== 1) {
+    throw new Error(
+      `Lead image credit link focused wrong entry: ${JSON.stringify(firstCreditFocus.focusedEntry)}.`
+    );
+  }
+  if (!creditMatchesImage(firstCreditFocus.focusedEntry?.text ?? "", capernaumImages[0])) {
+    throw new Error(
+      `Lead image credit link focused wrong text: '${firstCreditFocus.focusedEntry?.text ?? ""}'.`
+    );
   }
 
   const nextImage = page.locator("button[aria-label='Next image']");
   const hasCarousel = (await nextImage.count()) > 0;
-  let secondCreditText = null;
+  let secondCreditFocus = null;
   if (hasCarousel) {
     await nextImage.first().click();
     await page.waitForTimeout(200);
-    secondCreditText =
-      (await page
-        .locator("section[aria-label='Place details'] [data-photo-credit='true']")
-        .textContent()) ?? "";
-    if (!creditMatchesImage(secondCreditText, capernaumImages[1])) {
+    secondCreditFocus = await jumpToCurrentImageCredit(page);
+    if (secondCreditFocus.focusedEntry?.imageIndex !== 2) {
       throw new Error(
-        `Photo credit did not render after switching images: '${secondCreditText.trim()}'`
+        `Second image credit link focused wrong entry: ${JSON.stringify(secondCreditFocus.focusedEntry)}.`
+      );
+    }
+    if (!creditMatchesImage(secondCreditFocus.focusedEntry?.text ?? "", capernaumImages[1])) {
+      throw new Error(
+        `Second image credit link focused wrong text: '${secondCreditFocus.focusedEntry?.text ?? ""}'.`
       );
     }
   }
@@ -1935,8 +1943,285 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
   return {
     sectionIds,
     hasCarousel,
-    firstCreditText: firstCreditText.trim(),
-    secondCreditText: secondCreditText?.trim() ?? null
+    photoCreditEntryCount: photoCreditEntries.length,
+    firstCreditFocus,
+    secondCreditFocus
+  };
+}
+
+async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
+  const panelSelector = "section[aria-label='Place details']";
+  const sectionSelector = `${panelSelector} [data-panel-section]`;
+
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
+
+  const jerusalemSectionIds = await page.$$eval(sectionSelector, (elements) =>
+    elements.map((element) => element.getAttribute("data-panel-section") ?? "")
+  );
+  const aboutIndex = jerusalemSectionIds.indexOf("about");
+  const placesInIndex = jerusalemSectionIds.indexOf("places-in");
+  if (aboutIndex < 0 || placesInIndex < 0) {
+    throw new Error(
+      `Jerusalem panel must include About and Places in sections, got order: ${jerusalemSectionIds.join(" -> ")}`
+    );
+  }
+  if (placesInIndex !== aboutIndex + 1) {
+    throw new Error(
+      `Jerusalem panel should place 'Places in' directly after About, got: ${jerusalemSectionIds.join(" -> ")}`
+    );
+  }
+
+  const places = JSON.parse(await fs.readFile(generatedPlacesPath, "utf8"));
+  const placeById = new Map(places.map((place) => [place.id, place]));
+  const majorPlaceIds = places
+    .filter((place) => place.prominence === "major")
+    .map((place) => place.id);
+  const placeSearchOrder = ["jerusalem", ...majorPlaceIds.filter((placeId) => placeId !== "jerusalem")];
+
+  let sourcePlaceId = null;
+  let sourcePlaceName = null;
+  let linkedPlaceId = null;
+  let linkedText = null;
+
+  for (const placeId of placeSearchOrder) {
+    if (placeId !== "jerusalem") {
+      await page.goto(`${baseUrl}/?place=${encodeURIComponent(placeId)}`, {
+        waitUntil: "networkidle",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(page);
+      await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
+    }
+
+    const links = page.locator(
+      `${panelSelector} [data-panel-section='about'] [data-about-place-link='true']`
+    );
+    const linkCount = await links.count();
+    if (linkCount === 0) {
+      continue;
+    }
+
+    const firstLink = links.first();
+    const candidateLinkedPlaceId = await firstLink.getAttribute("data-about-place-id");
+    if (!candidateLinkedPlaceId || !placeById.has(candidateLinkedPlaceId)) {
+      continue;
+    }
+
+    const headingText = normalizeTextContent(
+      (await page.locator(`${panelSelector} h1`).textContent()) ?? ""
+    );
+    if (!headingText) {
+      continue;
+    }
+
+    sourcePlaceId = placeId;
+    sourcePlaceName = headingText;
+    linkedPlaceId = candidateLinkedPlaceId;
+    linkedText = normalizeTextContent((await firstLink.textContent()) ?? "");
+    break;
+  }
+
+  if (!sourcePlaceId || !sourcePlaceName || !linkedPlaceId) {
+    throw new Error(
+      "No About-place links were found on Jerusalem or any major place, so link navigation could not be verified."
+    );
+  }
+
+  const activeAboutLink = page
+    .locator(`${panelSelector} [data-panel-section='about'] [data-about-place-link='true']`)
+    .first();
+  await activeAboutLink.click();
+
+  await page.waitForFunction(
+    (expectedPlaceId) => {
+      const parameters = new URLSearchParams(window.location.search.slice(1));
+      return parameters.get("place") === expectedPlaceId;
+    },
+    linkedPlaceId,
+    { timeout: 30_000, polling: 100 }
+  );
+
+  const linkedPlace = placeById.get(linkedPlaceId);
+  const expectedLinkedPlaceName =
+    linkedPlace?.names?.ancient?.[0] ?? linkedPlace?.names?.modern ?? linkedPlaceId;
+  await page.waitForFunction(
+    (expectedName) => {
+      const heading = document.querySelector("section[aria-label='Place details'] h1");
+      return (heading?.textContent ?? "").trim() === expectedName;
+    },
+    expectedLinkedPlaceName,
+    { timeout: 30_000, polling: 100 }
+  );
+
+  await page.goBack({ waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  await page.waitForFunction(
+    (expectedPlaceId) => {
+      const parameters = new URLSearchParams(window.location.search.slice(1));
+      return parameters.get("place") === expectedPlaceId;
+    },
+    sourcePlaceId,
+    { timeout: 30_000, polling: 100 }
+  );
+  await page.waitForFunction(
+    (expectedName) => {
+      const heading = document.querySelector("section[aria-label='Place details'] h1");
+      return (heading?.textContent ?? "").trim() === expectedName;
+    },
+    sourcePlaceName,
+    { timeout: 30_000, polling: 100 }
+  );
+
+  return {
+    jerusalemSectionIds,
+    sourcePlaceId,
+    sourcePlaceName,
+    linkedPlaceId,
+    linkedPlaceName: expectedLinkedPlaceName,
+    linkedText,
+    usedJerusalemAsLinkSource: sourcePlaceId === "jerusalem"
+  };
+}
+
+async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    map.jumpTo({
+      center: [35.5754, 32.8809],
+      zoom: 11
+    });
+  }, mapTestHookKey);
+  await waitForMapToSettle(page);
+
+  const probe = await page.evaluate(
+    ({ testHookKey, cityPinsLayerId, sitePinsLayerId, candidatePinsLayerId, interactiveLayers }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return null;
+      }
+
+      const canvas = map.getCanvas();
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const margin = 16;
+
+      const resolveCapernaumPoint = () => {
+        for (const layerId of [candidatePinsLayerId, sitePinsLayerId, cityPinsLayerId]) {
+          const features = map.queryRenderedFeatures(undefined, { layers: [layerId] });
+          for (const feature of features) {
+            if (feature.geometry?.type !== "Point" || feature.properties?.placeId !== "capernaum") {
+              continue;
+            }
+
+            const [lng, lat] = feature.geometry.coordinates;
+            const point = map.project([lng, lat]);
+            if (
+              point.x < margin ||
+              point.y < margin ||
+              point.x > width - margin ||
+              point.y > height - margin
+            ) {
+              continue;
+            }
+
+            return {
+              x: point.x,
+              y: point.y
+            };
+          }
+        }
+
+        return null;
+      };
+
+      const capernaumPoint = resolveCapernaumPoint();
+      if (!capernaumPoint) {
+        return null;
+      }
+
+      const findEmptyPoint = () => {
+        const step = 20;
+        for (let y = margin; y <= height - margin; y += step) {
+          for (let x = margin; x <= width - margin; x += step) {
+            const hitCount = map.queryRenderedFeatures(
+              [
+                [x - 2, y - 2],
+                [x + 2, y + 2]
+              ],
+              {
+                layers: interactiveLayers
+              }
+            ).length;
+            if (hitCount === 0) {
+              return { x, y };
+            }
+          }
+        }
+
+        return null;
+      };
+
+      return {
+        capernaumPoint,
+        emptyPoint: findEmptyPoint()
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      cityPinsLayerId: mapLayerIds.cityPins,
+      sitePinsLayerId: mapLayerIds.sitePins,
+      candidatePinsLayerId: mapLayerIds.candidatePins,
+      interactiveLayers: [
+        mapLayerIds.clusterPins,
+        mapLayerIds.clusterCounts,
+        mapLayerIds.candidatePins,
+        mapLayerIds.sitePins,
+        mapLayerIds.cityPins,
+        ...mapLayerIds.areaLabels
+      ]
+    }
+  );
+  if (!probe?.capernaumPoint || !probe.emptyPoint) {
+    throw new Error(`Could not resolve map probe points for cursor/click checks: ${JSON.stringify(probe)}`);
+  }
+
+  await page.mouse.move(probe.capernaumPoint.x, probe.capernaumPoint.y);
+  const cursorOverPin = await page.$eval("canvas.maplibregl-canvas", (element) =>
+    window.getComputedStyle(element).cursor
+  );
+  if (!cursorOverPin.includes("pointer")) {
+    throw new Error(`Cursor over Capernaum pin should be pointer, got '${cursorOverPin}'.`);
+  }
+
+  await page.mouse.move(probe.emptyPoint.x, probe.emptyPoint.y);
+  const cursorOverEmptyMap = await page.$eval("canvas.maplibregl-canvas", (element) =>
+    window.getComputedStyle(element).cursor
+  );
+  if (cursorOverEmptyMap.includes("pointer")) {
+    throw new Error(`Cursor over empty map should not be pointer, got '${cursorOverEmptyMap}'.`);
+  }
+
+  await page.mouse.click(probe.capernaumPoint.x + 6, probe.capernaumPoint.y + 6);
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "capernaum";
+  }, undefined, { timeout: 30_000, polling: 100 });
+  await page.getByRole("heading", { level: 1, name: "Capernaum" }).waitFor({ timeout: 30_000 });
+
+  return {
+    capernaumPoint: probe.capernaumPoint,
+    emptyPoint: probe.emptyPoint,
+    cursorOverPin,
+    cursorOverEmptyMap
   };
 }
 
@@ -2091,11 +2376,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
       .getByText("AI-generated reconstruction", { exact: true })
       .waitFor({ timeout: 30_000 });
-    const aiCreditText = normalizeTextContent(
-      (await page
-        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
-        .textContent()) ?? ""
-    );
+    const aiCreditText = await readPhotoCreditEntryForImage(page, 5);
     if (
       !aiCreditText.includes("AI-generated reconstruction") ||
       !aiCreditText.includes("DALL·E") ||
@@ -2106,7 +2387,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     }
     const aiBriefHref = await page
       .locator(
-        "section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true'] a"
+        `${photoCreditEntrySelectorForImage(5)} a`
       )
       .last()
       .getAttribute("href");
@@ -2489,17 +2770,14 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
       state: "visible",
       timeout: 30_000
     });
-    await page.waitForSelector("section[aria-label='Place details'] [data-photo-credit='true']", {
+    await page.waitForSelector(photoCreditsEntriesSelector, {
       timeout: 30_000
     });
     await page.waitForSelector("section[aria-label='Place details'] >> text=Image unavailable", {
       timeout: 30_000
     });
 
-    const creditText =
-      (await page
-        .locator("section[aria-label='Place details'] [data-photo-credit='true']")
-        .textContent()) ?? "";
+    const creditText = await readPhotoCreditEntryForImage(page, 1);
     if (!creditMatchesImage(creditText, capernaumImages[0])) {
       throw new Error(
         `Photo credit must remain visible when images fail to load, got '${creditText.trim()}'.`
@@ -2523,23 +2801,32 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
 async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
   await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
-  await page.waitForSelector("section[aria-label='Place details'] [data-disputed-banner='true']", {
+  await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
     timeout: 30_000
   });
 
-  const disputedBanner =
+  const emmausTodayLine =
     (await page
-      .locator("section[aria-label='Place details'] [data-disputed-banner='true']")
+      .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
       .textContent()) ?? "";
-  if (!disputedBanner.includes("Location disputed") || !disputedBanner.includes("4 proposed sites")) {
-    throw new Error(`Disputed-place banner mismatch: '${disputedBanner.trim()}'`);
+  const emmausTodayLineNormalized = emmausTodayLine.replace(/\s+/gu, " ").trim();
+  if (!emmausTodayLine.includes("Today: Israel and the West Bank")) {
+    throw new Error(`Emmaus today line is missing countries: '${emmausTodayLine.trim()}'.`);
+  }
+  if (
+    !emmausTodayLineNormalized.includes("Location disputed") ||
+    !emmausTodayLineNormalized.includes("4 proposed sites")
+  ) {
+    throw new Error(`Emmaus today line is missing disputed-chip text: '${emmausTodayLineNormalized}'.`);
   }
 
-  const modernNameLineCount = await page
-    .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
+  const emmausDisputedChipCount = await page
+    .locator(
+      "section[aria-label='Place details'] [data-modern-name-line='true'] [data-location-chip='disputed']"
+    )
     .count();
-  if (modernNameLineCount !== 0) {
-    throw new Error("Disputed places must not render a modern-name line.");
+  if (emmausDisputedChipCount !== 1) {
+    throw new Error(`Expected one disputed chip on Emmaus today line, got ${emmausDisputedChipCount}.`);
   }
 
   const candidateCount = await page
@@ -2558,11 +2845,11 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
   if (!jerichoNamesText.includes("2 sites")) {
     throw new Error(`Jericho should render the neutral multi-site line, got '${jerichoNamesText.trim()}'.`);
   }
-  const jerichoDisputedBannerCount = await page
-    .locator("section[aria-label='Place details'] [data-disputed-banner='true']")
+  const jerichoDisputedChipCount = await page
+    .locator("section[aria-label='Place details'] [data-location-chip='disputed']")
     .count();
-  if (jerichoDisputedBannerCount > 0) {
-    throw new Error("Jericho should not render a disputed banner.");
+  if (jerichoDisputedChipCount > 0) {
+    throw new Error("Jericho should not render a disputed-location chip.");
   }
 
   await page.goto(`${baseUrl}/?place=italy`, { waitUntil: "networkidle", timeout: 60_000 });
@@ -2598,12 +2885,181 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
   }
 
   return {
-    disputedBanner: disputedBanner.trim(),
+    emmausTodayLine: emmausTodayLine.trim(),
     candidateCount,
     jerichoNamesText: jerichoNamesText.trim(),
     italyNamesText: italyNamesText.trim(),
     empireNamesText: empireNamesText.trim(),
     achaiaNamesText: achaiaNamesText.trim()
+  };
+}
+
+async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPaths) {
+  await fs.mkdir(path.dirname(screenshotPaths.ephesusPanel), { recursive: true });
+  const desktopViewportSize = page.viewportSize() ?? { width: 1440, height: 960 };
+  const narrowViewportSize = { width: 360, height: desktopViewportSize.height };
+
+  const panelSelector = "section[aria-label='Place details']";
+  const panelLocator = page.locator(panelSelector);
+  const todayLineSelector = `${panelSelector} [data-modern-name-line='true']`;
+
+  const readTodayLine = async () =>
+    normalizeTextContent((await page.locator(todayLineSelector).textContent()) ?? "");
+
+  await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
+
+  const ephesusTodayLine = await readTodayLine();
+  if (!ephesusTodayLine.includes("Today: Selçuk, Türkiye")) {
+    throw new Error(`Ephesus today line mismatch: '${ephesusTodayLine}'.`);
+  }
+  const ephesusConfidenceChipCount = await page
+    .locator(`${todayLineSelector} [data-location-chip='confidence']`)
+    .count();
+  if (ephesusConfidenceChipCount !== 1) {
+    throw new Error(
+      `Expected one confidence chip on Ephesus today line, got ${ephesusConfidenceChipCount}.`
+    );
+  }
+
+  const actionSectionCount = await page
+    .locator(`${panelSelector} [data-panel-section='actions']`)
+    .count();
+  if (actionSectionCount !== 0) {
+    throw new Error(`Action bar section should be removed, found ${actionSectionCount}.`);
+  }
+
+  const removedActionButtons = {
+    zoomTo: await page.getByRole("button", { name: "Zoom to", exact: true }).count(),
+    fitAllSites: await page.getByRole("button", { name: "Fit all sites", exact: true }).count(),
+    copyLink: await page.getByRole("button", { name: "Copy link", exact: true }).count(),
+    sources: await page.getByRole("button", { name: "Sources", exact: true }).count()
+  };
+  if (
+    removedActionButtons.zoomTo > 0 ||
+    removedActionButtons.fitAllSites > 0 ||
+    removedActionButtons.copyLink > 0 ||
+    removedActionButtons.sources > 0
+  ) {
+    throw new Error(`Action bar buttons should be absent: ${JSON.stringify(removedActionButtons)}.`);
+  }
+
+  await panelLocator.screenshot({ path: screenshotPaths.ephesusPanel });
+
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
+
+  const emmausTodayLine = await readTodayLine();
+  if (!emmausTodayLine.includes("Today: Israel and the West Bank")) {
+    throw new Error(`Emmaus today line mismatch: '${emmausTodayLine}'.`);
+  }
+  if (
+    !emmausTodayLine.includes("Location disputed") ||
+    !emmausTodayLine.includes("4 proposed sites")
+  ) {
+    throw new Error(`Emmaus disputed chip mismatch: '${emmausTodayLine}'.`);
+  }
+
+  await panelLocator.screenshot({ path: screenshotPaths.emmausPanel });
+
+  await page.setViewportSize(narrowViewportSize);
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
+
+  const emmausNarrowWrapLayout = await page.evaluate((todayLineSelectorParam) => {
+    const todayLine = document.querySelector(todayLineSelectorParam);
+    if (!(todayLine instanceof HTMLElement)) {
+      throw new Error(`Could not find today line '${todayLineSelectorParam}' at narrow width.`);
+    }
+
+    const todayText = Array.from(todayLine.children).find(
+      (child) => child instanceof HTMLElement && !child.hasAttribute("data-location-chip")
+    );
+    if (!(todayText instanceof HTMLElement)) {
+      throw new Error("Could not find today-line text element at narrow width.");
+    }
+
+    const disputedChip = todayLine.querySelector("[data-location-chip='disputed']");
+    if (!(disputedChip instanceof HTMLElement)) {
+      throw new Error("Could not find disputed chip element at narrow width.");
+    }
+
+    const todayTextBounds = todayText.getBoundingClientRect();
+    const disputedChipBounds = disputedChip.getBoundingClientRect();
+    return {
+      textTop: todayTextBounds.top,
+      textBottom: todayTextBounds.bottom,
+      chipTop: disputedChipBounds.top,
+      chipBottom: disputedChipBounds.bottom
+    };
+  }, todayLineSelector);
+
+  if (emmausNarrowWrapLayout.chipTop <= emmausNarrowWrapLayout.textBottom + 1) {
+    throw new Error(
+      `Emmaus today-line chip did not wrap below the text on narrow width: ${JSON.stringify(emmausNarrowWrapLayout)}.`
+    );
+  }
+
+  await page.setViewportSize(desktopViewportSize);
+
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
+
+  const jerusalemTodayLine = await readTodayLine();
+  if (!jerusalemTodayLine.includes("Today: Jerusalem")) {
+    throw new Error(`Jerusalem today line mismatch: '${jerusalemTodayLine}'.`);
+  }
+  if (/Today:\s*Jerusalem,/u.test(jerusalemTodayLine)) {
+    throw new Error(`Jerusalem should not render countries: '${jerusalemTodayLine}'.`);
+  }
+
+  await panelLocator.screenshot({ path: screenshotPaths.jerusalemPanel });
+
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.keyboard.press("/");
+  await page.waitForFunction(() => {
+    const active = document.activeElement;
+    return Boolean(active && active.matches("input[aria-label='Search biblical places']"));
+  });
+  await page.keyboard.type("Ephesus");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+
+  const ephesusSearchEntries = await page.$$eval(
+    "[data-testid='search-results-list'] [role='option']",
+    (elements) =>
+      elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  const ephesusResultText =
+    ephesusSearchEntries.find((entry) => entry.includes("Ephesus")) ?? null;
+  if (!ephesusResultText) {
+    throw new Error(
+      `Search results for Ephesus are missing the Ephesus entry: ${JSON.stringify(ephesusSearchEntries)}.`
+    );
+  }
+  if (!ephesusResultText.includes("Selçuk, Türkiye · City")) {
+    throw new Error(
+      `Ephesus search result is missing modern country text: '${ephesusResultText}'.`
+    );
+  }
+
+  await page
+    .locator("[data-testid='search-results-list'] [role='option']")
+    .filter({ hasText: "Ephesus" })
+    .first()
+    .screenshot({ path: screenshotPaths.ephesusSearchResult });
+
+  return {
+    ephesusTodayLine,
+    emmausTodayLine,
+    emmausNarrowWrapLayout,
+    jerusalemTodayLine,
+    ephesusResultText,
+    removedActionButtons
   };
 }
 
@@ -4700,7 +5156,11 @@ async function run() {
     fallbackCapernaum: temporaryScreenshotPath("ibm-m3-04-fallback-capernaum.png"),
     fallbackGalilee: temporaryScreenshotPath("ibm-m3-04-fallback-galilee.png"),
     fallbackPbfOutage: temporaryScreenshotPath("ibm-m3-04-fallback-pbf-outage.png"),
-    fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-04-fallback-all-requests-outage.png")
+    fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-04-fallback-all-requests-outage.png"),
+    ephesusPanelHeader: temporaryPanelHeaderScreenshotPath("ephesus-panel.png"),
+    emmausPanelHeader: temporaryPanelHeaderScreenshotPath("emmaus-panel.png"),
+    jerusalemPanelHeader: temporaryPanelHeaderScreenshotPath("jerusalem-panel.png"),
+    ephesusSearchResult: temporaryPanelHeaderScreenshotPath("ephesus-search-result.png")
   };
 
   try {
@@ -4757,6 +5217,14 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const aboutPlaceLinkChecks = await verifyAboutPlaceLinksOpenPlacesAndSupportBack(
+      page,
+      staticServer.baseUrl
+    );
+    const pointerCursorAndNearPinClickCheck = await verifyPointerCursorAndNearPinClick(
+      page,
+      staticServer.baseUrl
+    );
     const galleryFixtureChecks = await verifyGalleryFixtureWithViewer(
       browser,
       staticServer.baseUrl
@@ -4773,6 +5241,12 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const simpleHeaderChecks = await verifySimplePanelHeaderWithCountries(page, staticServer.baseUrl, {
+      ephesusPanel: screenshotPaths.ephesusPanelHeader,
+      emmausPanel: screenshotPaths.emmausPanelHeader,
+      jerusalemPanel: screenshotPaths.jerusalemPanelHeader,
+      ephesusSearchResult: screenshotPaths.ephesusSearchResult
+    });
     const showAllPassagesCheck = await verifyShowAllPassages(page, staticServer.baseUrl);
     const panelAccessibilityCheck = await verifyPanelAccessibility(browser, staticServer.baseUrl);
     const panelMapDomStability = await verifyPanelDoesNotMutateMapDom(page, staticServer.baseUrl);
@@ -4818,7 +5292,6 @@ async function run() {
       page,
       staticServer.baseUrl
     );
-    const copyLinkCheck = await verifyCopyLinkAction(browser, staticServer.baseUrl);
     const placeDetailsRaceCheck = await verifyPlaceDetailsFetchRaceRecovery(
       browser,
       staticServer.baseUrl
@@ -4923,10 +5396,13 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       panelSectionAndCreditChecks,
+      aboutPlaceLinkChecks,
+      pointerCursorAndNearPinClickCheck,
       galleryFixtureChecks,
       capernaumLeadImageLoadCheck,
       imageFailurePlaceholderCheck,
       disputedAndHierarchyChecks,
+      simpleHeaderChecks,
       showAllPassagesCheck,
       panelAccessibilityCheck,
       panelMapDomStability,
@@ -4940,7 +5416,6 @@ async function run() {
       keyboardAndEscapeChecks,
       searchAndMenuChecks,
       keyboardDisclosureChecks,
-      copyLinkCheck,
       placeDetailsRaceCheck,
       galileePinOverlap,
       fallbackOutageChecks: {

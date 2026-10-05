@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { candidateIndexToLetter, getPrimaryPlaceName } from "../map/place-visibility";
+import { buildModernLocationLabel } from "../map/modern-location-label";
 import type {
   Confidence,
   MediaImageRecord,
@@ -20,18 +21,17 @@ import type {
   SourceId
 } from "../map/types";
 import {
-  AI_BASED_ON_LABEL,
+  type AboutPlaceMention,
   buildAlsoKnownAs,
-  buildImageCreditFields,
   buildImageKindLabel,
-  buildImagePromptBriefUrl,
   buildHierarchyItems,
+  buildPhotoCreditEntry,
   collectSourceIdsInPanelOrder,
   confidenceLabel,
   groupScriptureByBook,
   imageIndexesToLoad,
-  isAiReconstructionImage,
   isDisputedRecord,
+  matchAboutPlaceMentions,
   nextImageIndex,
   shouldRenderThumbnailRow,
   sortScriptureByCanonicalOrder
@@ -46,7 +46,6 @@ import { tokens } from "../../theme/tokens";
 const PANEL_SECTION_GAP = tokens.spacing.lg;
 const SCRIPTURE_INITIAL_COUNT = 5;
 const SCRIPTURE_CHUNK_SIZE = 24;
-const SOURCE_SECTION_ANCHOR_ID = "place-panel-sources";
 const PANEL_IMAGE_ASPECT_RATIO = 17 / 10;
 const PANEL_IMAGE_DESKTOP_WIDTH = 408;
 const THUMBNAIL_IMAGE_WIDTH = 72;
@@ -56,12 +55,19 @@ const VIEWER_DIALOG_VIEWPORT_MARGIN = 32;
 const VIEWER_DIALOG_PADDING = tokens.spacing.md * 2;
 const DIALOG_FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const PHOTO_CREDITS_NOTE =
+  "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
+const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 1_500;
 const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
   year: "numeric",
   timeZone: "UTC"
 });
+
+function photoCreditTargetId(placeId: string, imageIndex: number) {
+  return `photo-credit-${placeId}-${imageIndex + 1}`;
+}
 
 interface PlacePanelProps {
   selectedPlace: PlaceIndexRecord;
@@ -76,9 +82,9 @@ interface PlacePanelProps {
   onToggleSmallScreenExpanded: () => void;
   onClose: () => void;
   onSelectPlace: (selection: PlaceSelection) => void;
+  onSelectPlaceFromAbout: (selection: PlaceSelection) => void;
+  onHighlightPlace: (placeId: string | null) => void;
   onSelectCandidate: (candidateIndex: number) => void;
-  onZoomTo: () => void;
-  onCopyLink: () => void | Promise<void>;
 }
 
 function toSafeHttpUrl(url: string | null | undefined) {
@@ -202,16 +208,26 @@ function cycleDialogFocus(event: ReactKeyboardEvent<HTMLElement>) {
 
 interface CreditSegment {
   key: string;
-  content: ReactNode;
+  text: string;
+  href: string | null;
 }
 
 function renderCreditSegments(segments: CreditSegment[]) {
-  return segments.map((segment, index) => (
-    <span key={segment.key}>
-      {index > 0 ? " · " : null}
-      {segment.content}
-    </span>
-  ));
+  return segments.map((segment, index) => {
+    const safeHref = toSafeHttpUrl(segment.href);
+    return (
+      <span key={segment.key}>
+        {index > 0 ? " · " : null}
+        {safeHref ? (
+          <a href={safeHref} rel="noopener noreferrer" target="_blank">
+            {segment.text}
+          </a>
+        ) : (
+          segment.text
+        )}
+      </span>
+    );
+  });
 }
 
 function formatReviewedDate(lastReviewed: string | undefined) {
@@ -265,7 +281,11 @@ function WikimediaImage({
   onOpenViewer,
   openViewerTargetRef,
   onPreviousImage,
-  onNextImage
+  onNextImage,
+  showInlineCreditLine = true,
+  activeImageOrdinal = 1,
+  photoCreditLinkTargetId,
+  onPhotoCreditLinkSelect
 }: {
   image: MediaImageRecord;
   locationId: string;
@@ -280,6 +300,10 @@ function WikimediaImage({
   openViewerTargetRef?: RefObject<HTMLButtonElement | null>;
   onPreviousImage?: () => void;
   onNextImage?: () => void;
+  showInlineCreditLine?: boolean;
+  activeImageOrdinal?: number;
+  photoCreditLinkTargetId?: string;
+  onPhotoCreditLinkSelect?: () => void;
 }) {
   const { requestUrl: imageUrl } = resolveDisplayImageRequest({
     image,
@@ -288,72 +312,14 @@ function WikimediaImage({
     devicePixelRatio,
     fitMode: imageObjectFit
   });
-  const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
-  const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
   const showFallback = !imageUrl || Boolean(failedImageRequests[imageUrl]);
   const kindLabel = buildImageKindLabel(image.kind);
-  const isAiImage = isAiReconstructionImage(image);
-  const { authorLabel, licenseLabel, toolLabel } = buildImageCreditFields(image);
-  const aiBriefUrl = buildImagePromptBriefUrl(locationId, image.promptRef);
-  const aiSourcesText = AI_BASED_ON_LABEL;
-  const aiCreditSegments: CreditSegment[] = [{ key: "ai-label", content: "AI-generated reconstruction" }];
-  if (toolLabel) {
-    aiCreditSegments.push({
-      key: "tool",
-      content: toolLabel
-    });
-  }
-  if (licenseLabel) {
-    aiCreditSegments.push({
-      key: "license",
-      content: safeLicenseUrl ? (
-        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-          {licenseLabel}
-        </a>
-      ) : (
-        licenseLabel
-      )
-    });
-  }
-  aiCreditSegments.push({
-    key: "based-on",
-    content: (
-      <>
-        Based on:{" "}
-        <a href={aiBriefUrl} rel="noopener noreferrer" target="_blank">
-          {aiSourcesText}
-        </a>
-      </>
-    )
-  });
-  const commonsCreditSegments: CreditSegment[] = [
-    {
-      key: "photo",
-      content: authorLabel ? `Photo: ${authorLabel}` : "Photo"
-    }
-  ];
-  if (licenseLabel) {
-    commonsCreditSegments.push({
-      key: "license",
-      content: safeLicenseUrl ? (
-        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-          {licenseLabel}
-        </a>
-      ) : (
-        licenseLabel
-      )
-    });
-  }
-  commonsCreditSegments.push({
-    key: "source",
-    content: safeSourcePageUrl ? (
-      <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
-        Wikimedia Commons
-      </a>
-    ) : (
-      "Wikimedia Commons"
-    )
-  });
+  const photoCredit = buildPhotoCreditEntry(image, locationId);
+  const showCreditJumpLink =
+    !showInlineCreditLine &&
+    typeof onPhotoCreditLinkSelect === "function" &&
+    typeof photoCreditLinkTargetId === "string" &&
+    photoCreditLinkTargetId.length > 0;
 
   return (
     <div
@@ -481,27 +447,25 @@ function WikimediaImage({
           </>
         ) : null}
       </div>
-      <p
-        data-photo-credit="true"
-        style={{
-          marginTop: `${tokens.spacing.sm}px`,
-          marginBottom: 0,
-          color: tokens.color.textSecondary,
-          fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`,
-          overflowWrap: "anywhere"
-        }}
-      >
-        {isAiImage ? (
-          renderCreditSegments(aiCreditSegments)
-        ) : (
-          renderCreditSegments(commonsCreditSegments)
-        )}
-      </p>
+      {showInlineCreditLine ? (
+        <p
+          data-photo-credit="true"
+          style={{
+            marginTop: `${tokens.spacing.sm}px`,
+            marginBottom: 0,
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`,
+            overflowWrap: "anywhere"
+          }}
+        >
+          {renderCreditSegments(photoCredit.segments)}
+        </p>
+      ) : null}
       <p
         data-photo-caption="true"
         style={{
-          marginTop: `${tokens.spacing.xs}px`,
+          marginTop: showInlineCreditLine ? `${tokens.spacing.xs}px` : `${tokens.spacing.sm}px`,
           marginBottom: 0,
           color: tokens.color.textSecondary,
           fontSize: `${tokens.typography.captionSize}px`,
@@ -511,6 +475,34 @@ function WikimediaImage({
       >
         {image.caption}
       </p>
+      {showCreditJumpLink ? (
+        <p
+          style={{
+            marginTop: `${tokens.spacing.xs}px`,
+            marginBottom: 0,
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`
+          }}
+        >
+          <a
+            aria-label={`Credit for image ${activeImageOrdinal}`}
+            data-photo-credit-link="true"
+            href={`#${photoCreditLinkTargetId}`}
+            onClick={(event) => {
+              event.preventDefault();
+              onPhotoCreditLinkSelect();
+            }}
+            style={{
+              color: tokens.color.textSecondary,
+              textDecoration: "underline",
+              textUnderlineOffset: "2px"
+            }}
+          >
+            Credit
+          </a>
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -717,6 +709,76 @@ function LinkLikeButton({
   );
 }
 
+function renderAboutParagraphWithLinks({
+  paragraphText,
+  mentions,
+  onSelectPlace,
+  onHighlightPlace
+}: {
+  paragraphText: string;
+  mentions: AboutPlaceMention[];
+  onSelectPlace: (selection: PlaceSelection) => void;
+  onHighlightPlace: (placeId: string | null) => void;
+}) {
+  if (mentions.length === 0) {
+    return paragraphText;
+  }
+
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+
+  for (const mention of mentions) {
+    if (mention.start > cursor) {
+      parts.push(
+        <span key={`text-${mention.paragraphIndex}-${mention.start}`}>
+          {paragraphText.slice(cursor, mention.start)}
+        </span>
+      );
+    }
+
+    parts.push(
+      <button
+        data-about-place-id={mention.placeId}
+        data-about-place-link="true"
+        key={`link-${mention.paragraphIndex}-${mention.start}-${mention.placeId}`}
+        onBlur={() => {
+          onHighlightPlace(null);
+        }}
+        onClick={() => {
+          onSelectPlace({
+            placeId: mention.placeId,
+            candidateIndex: null
+          });
+        }}
+        onFocus={() => {
+          onHighlightPlace(mention.placeId);
+        }}
+        onMouseEnter={() => {
+          onHighlightPlace(mention.placeId);
+        }}
+        onMouseLeave={() => {
+          onHighlightPlace(null);
+        }}
+        style={aboutPlaceLinkStyle}
+        type="button"
+      >
+        {paragraphText.slice(mention.start, mention.end)}
+      </button>
+    );
+    cursor = mention.end;
+  }
+
+  if (cursor < paragraphText.length) {
+    parts.push(
+      <span key={`text-tail-${mentions[mentions.length - 1]?.paragraphIndex ?? 0}-${cursor}`}>
+        {paragraphText.slice(cursor)}
+      </span>
+    );
+  }
+
+  return parts;
+}
+
 function SkeletonPanelBody() {
   const block = (width: string, key: string) => (
     <div
@@ -745,39 +807,6 @@ function SkeletonPanelBody() {
       {block("46%", "a")}
       {block("78%", "b")}
       {block("64%", "c")}
-      <div
-        style={{
-          marginTop: `${tokens.spacing.md}px`,
-          marginBottom: `${tokens.spacing.md}px`,
-          display: "flex",
-          gap: `${tokens.spacing.sm}px`
-        }}
-      >
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            backgroundColor: "#E8EAED"
-          }}
-        />
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            backgroundColor: "#E8EAED"
-          }}
-        />
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            backgroundColor: "#E8EAED"
-          }}
-        />
-      </div>
       <hr
         style={{
           border: "none",
@@ -815,17 +844,19 @@ export function PlacePanel({
   onToggleSmallScreenExpanded,
   onClose,
   onSelectPlace,
-  onSelectCandidate,
-  onZoomTo,
-  onCopyLink
+  onSelectPlaceFromAbout,
+  onHighlightPlace,
+  onSelectCandidate
 }: PlacePanelProps) {
-  const sourceSectionRef = useRef<HTMLElement | null>(null);
   const imageViewerRef = useRef<HTMLDivElement | null>(null);
   const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
   const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
+  const photoCreditHighlightTimeoutRef = useRef<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
+  const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
@@ -876,6 +907,45 @@ export function PlacePanel({
     () => (location ? sortScriptureByCanonicalOrder(location.scripture) : []),
     [location]
   );
+  const aboutParagraphs = useMemo(() => {
+    if (!location) {
+      return [] as {
+        text: string;
+        sources: SourceId[];
+      }[];
+    }
+
+    return [
+      {
+        text: location.summary.text,
+        sources: location.summary.sources
+      },
+      ...location.history.map((entry) => ({
+        text: entry.text,
+        sources: entry.sources
+      }))
+    ];
+  }, [location]);
+  const aboutMentionsByParagraph = useMemo(() => {
+    const mentionsByParagraph = new Map<number, AboutPlaceMention[]>();
+    if (!location) {
+      return mentionsByParagraph;
+    }
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: placeForDisplay.id,
+      paragraphs: aboutParagraphs.map((entry) => entry.text)
+    });
+
+    for (const match of matches) {
+      const existing = mentionsByParagraph.get(match.paragraphIndex) ?? [];
+      existing.push(match);
+      mentionsByParagraph.set(match.paragraphIndex, existing);
+    }
+
+    return mentionsByParagraph;
+  }, [aboutParagraphs, location, placeForDisplay.id, places]);
 
   useEffect(() => {
     if (!showAllScripture || visibleScriptureCount >= sortedScripture.length) {
@@ -933,8 +1003,41 @@ export function PlacePanel({
   const viewerFrameWidth = viewerFrameHeight * selectedImageAspectRatio;
   const showThumbnailStrip = shouldRenderThumbnailRow(images.length);
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
-  const modernName = placeForDisplay.names.modern;
+  const modernLocationLabel = buildModernLocationLabel(placeForDisplay.names);
   const titleName = getPrimaryPlaceName(placeForDisplay);
+  const photoCreditEntries = useMemo(
+    () =>
+      images.map((image, imageIndex) => ({
+        imageId: image.id,
+        imageIndex,
+        entryId: photoCreditTargetId(placeForDisplay.id, imageIndex),
+        segments: buildPhotoCreditEntry(image, placeForDisplay.id).segments
+      })),
+    [images, placeForDisplay.id]
+  );
+
+  useEffect(
+    () => () => {
+      if (photoCreditHighlightTimeoutRef.current !== null) {
+        window.clearTimeout(photoCreditHighlightTimeoutRef.current);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (photoCreditHighlightTimeoutRef.current !== null) {
+      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
+      photoCreditHighlightTimeoutRef.current = null;
+    }
+  }, [selectedPlace.id]);
+
+  useEffect(
+    () => () => {
+      onHighlightPlace(null);
+    },
+    [onHighlightPlace]
+  );
 
   useEffect(() => {
     if (!selectedImage || images.length <= 1) {
@@ -1087,6 +1190,29 @@ export function PlacePanel({
     });
   };
 
+  const jumpToPhotoCredit = (imageIndex: number) => {
+    const targetId = photoCreditTargetId(placeForDisplay.id, imageIndex);
+    const targetElement = document.getElementById(targetId);
+    if (!(targetElement instanceof HTMLElement)) {
+      return;
+    }
+
+    targetElement.focus();
+    targetElement.scrollIntoView({
+      block: "nearest"
+    });
+    setHighlightedPhotoCreditId(targetId);
+
+    if (photoCreditHighlightTimeoutRef.current !== null) {
+      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
+    }
+
+    photoCreditHighlightTimeoutRef.current = window.setTimeout(() => {
+      setHighlightedPhotoCreditId((current) => (current === targetId ? null : current));
+      photoCreditHighlightTimeoutRef.current = null;
+    }, PHOTO_CREDIT_HIGHLIGHT_DURATION_MS);
+  };
+
   const openImageViewer = () => {
     if (!selectedImage) {
       return;
@@ -1102,37 +1228,41 @@ export function PlacePanel({
     });
   };
 
-  const confidenceRow = (() => {
+  const locationStatusIndicator = (() => {
     if (hasMultipleCandidates && isDisputed) {
       return (
-        <div
-          data-disputed-banner="true"
+        <span
+          data-location-chip="disputed"
           style={{
-            borderRadius: `${tokens.radius.panel}px`,
+            display: "inline-flex",
+            alignItems: "center",
+            borderRadius: "999px",
             backgroundColor: tokens.color.confidenceDisputedBackground,
             color: tokens.color.confidenceDisputedText,
-            padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
+            padding: "2px 10px",
             fontWeight: 500,
-            fontSize: `${tokens.typography.bodySize}px`
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`
           }}
         >
           Location disputed · {placeForDisplay.candidates.length} proposed{" "}
           {placeForDisplay.candidates.length === 1 ? "site" : "sites"}
-        </div>
+        </span>
       );
     }
 
     if (hasMultipleCandidates) {
       return (
-        <p
+        <span
+          data-location-chip="multi-site"
           style={{
-            marginTop: `${tokens.spacing.sm}px`,
-            marginBottom: 0,
-            color: tokens.color.textSecondary
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.bodySize}px`,
+            lineHeight: `${tokens.typography.bodyLineHeight}px`
           }}
         >
           {placeForDisplay.candidates.length} sites
-        </p>
+        </span>
       );
     }
 
@@ -1144,12 +1274,12 @@ export function PlacePanel({
     const chip = typeChipStyle(candidate.confidence);
     return (
       <span
+        data-location-chip="confidence"
         style={{
           display: "inline-flex",
           alignItems: "center",
-          marginTop: `${tokens.spacing.sm}px`,
           borderRadius: "999px",
-          padding: "4px 10px",
+          padding: "2px 10px",
           fontSize: `${tokens.typography.captionSize}px`,
           lineHeight: `${tokens.typography.captionLineHeight}px`,
           fontWeight: 600,
@@ -1161,16 +1291,6 @@ export function PlacePanel({
       </span>
     );
   })();
-
-  const onScrollToSources = () => {
-    sourceSectionRef.current?.scrollIntoView({
-      behavior:
-        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
-      block: "start"
-    });
-  };
 
   if (isLoading && !location) {
     return (
@@ -1300,6 +1420,7 @@ export function PlacePanel({
               image={selectedImage}
               imageObjectFit="cover"
               locationId={placeForDisplay.id}
+              activeImageOrdinal={normalizedActiveImageIndex + 1}
               onNextImage={
                 images.length > 1
                   ? () => {
@@ -1317,6 +1438,13 @@ export function PlacePanel({
               }
               onRequestFailure={markImageRequestFailed}
               openViewerTargetRef={imageViewerOpenTargetRef}
+              photoCreditLinkTargetId={
+                photoCreditEntries[normalizedActiveImageIndex]?.entryId
+              }
+              onPhotoCreditLinkSelect={() => {
+                jumpToPhotoCredit(normalizedActiveImageIndex);
+              }}
+              showInlineCreditLine={false}
             />
             {showThumbnailStrip ? (
               <GalleryThumbnails
@@ -1343,9 +1471,10 @@ export function PlacePanel({
           >
             {titleName}
           </h1>
-          {!isDisputed && modernName ? (
-            <p data-modern-name-line="true" style={secondaryTextStyle}>
-              Today: {modernName}
+          {modernLocationLabel || locationStatusIndicator ? (
+            <p data-modern-name-line="true" style={todayLineStyle}>
+              {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
+              {locationStatusIndicator}
             </p>
           ) : null}
           {alsoKnownAs.length > 0 ? (
@@ -1367,7 +1496,6 @@ export function PlacePanel({
               </span>
             ))}
           </p>
-          {confidenceRow}
         </section>
 
         {location && hasMultipleCandidates ? (
@@ -1501,52 +1629,76 @@ export function PlacePanel({
           </section>
         ) : null}
 
-        <section data-panel-section="actions">
-          <hr style={sectionDividerStyle} />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: `${tokens.spacing.md}px`
-            }}
-          >
-            <ActionIconButton
-              icon="◉"
-              label={hasMultipleCandidates ? "Fit all sites" : "Zoom to"}
-              onPress={onZoomTo}
-            />
-            <ActionIconButton icon="🔗" label="Copy link" onPress={onCopyLink} />
-            <ActionIconButton
-              disabled={sourceCitations.length === 0}
-              icon="≡"
-              label="Sources"
-              onPress={onScrollToSources}
-            />
-          </div>
-        </section>
-
         {location ? (
           <>
             <section data-panel-section="about">
               <hr style={sectionDividerStyle} />
               <h2 style={sectionHeadingStyle}>About</h2>
-              <p style={bodyTextStyle}>
-                {location.summary.text}
-                <SourceMarkers
-                  sourceOrdinalById={sourceOrdinalById}
-                  sources={location.summary.sources}
-                />
-              </p>
-              {location.history.map((entry, index) => (
-                <p key={`${entry.text}:${index}`} style={bodyTextStyle}>
-                  {entry.text}
-                  <SourceMarkers
-                    sourceOrdinalById={sourceOrdinalById}
-                    sources={entry.sources}
-                  />
-                </p>
-              ))}
+              {aboutParagraphs.map((entry, index) => {
+                const mentions = aboutMentionsByParagraph.get(index) ?? [];
+                return (
+                  <p key={`${entry.text}:${index}`} style={bodyTextStyle}>
+                    {renderAboutParagraphWithLinks({
+                      paragraphText: entry.text,
+                      mentions,
+                      onSelectPlace: onSelectPlaceFromAbout,
+                      onHighlightPlace
+                    })}
+                    <SourceMarkers
+                      sourceOrdinalById={sourceOrdinalById}
+                      sources={entry.sources}
+                    />
+                  </p>
+                );
+              })}
             </section>
+
+            {childPlaces.length > 0 ? (
+              <section data-panel-section="places-in">
+                <hr style={sectionDividerStyle} />
+                <h2 style={sectionHeadingStyle}>Places in {titleName}</h2>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: `${tokens.spacing.sm}px` }}>
+                  {childPlaces.map((childPlace) => (
+                    <button
+                      data-places-in-place-id={childPlace.id}
+                      key={childPlace.id}
+                      onBlur={() => {
+                        onHighlightPlace(null);
+                      }}
+                      onClick={() =>
+                        onSelectPlace({
+                          placeId: childPlace.id,
+                          candidateIndex: null
+                        })
+                      }
+                      onFocus={() => {
+                        onHighlightPlace(childPlace.id);
+                      }}
+                      onMouseEnter={() => {
+                        onHighlightPlace(childPlace.id);
+                      }}
+                      onMouseLeave={() => {
+                        onHighlightPlace(null);
+                      }}
+                      style={{
+                        border: `1px solid ${tokens.color.divider}`,
+                        borderRadius: "999px",
+                        backgroundColor: tokens.color.surface,
+                        padding: "6px 12px",
+                        color: tokens.color.textPrimary,
+                        cursor: "pointer",
+                        fontFamily: tokens.typography.uiFont,
+                        fontSize: `${tokens.typography.bodySize}px`,
+                        lineHeight: `${tokens.typography.bodyLineHeight}px`
+                      }}
+                      type="button"
+                    >
+                      {getPrimaryPlaceName(childPlace)}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {sortedScripture.length > 0 ? (
               <section data-panel-section="in-bible">
@@ -1647,42 +1799,8 @@ export function PlacePanel({
               </section>
             ) : null}
 
-            {childPlaces.length > 0 ? (
-              <section data-panel-section="places-in">
-                <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>Places in {titleName}</h2>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: `${tokens.spacing.sm}px` }}>
-                  {childPlaces.map((childPlace) => (
-                    <button
-                      key={childPlace.id}
-                      onClick={() =>
-                        onSelectPlace({
-                          placeId: childPlace.id,
-                          candidateIndex: null
-                        })
-                      }
-                      style={{
-                        border: `1px solid ${tokens.color.divider}`,
-                        borderRadius: "999px",
-                        backgroundColor: tokens.color.surface,
-                        padding: "6px 12px",
-                        color: tokens.color.textPrimary,
-                        cursor: "pointer",
-                        fontFamily: tokens.typography.uiFont,
-                        fontSize: `${tokens.typography.bodySize}px`,
-                        lineHeight: `${tokens.typography.bodyLineHeight}px`
-                      }}
-                      type="button"
-                    >
-                      {getPrimaryPlaceName(childPlace)}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
             {sourceCitations.length > 0 ? (
-              <section data-panel-section="sources" id={SOURCE_SECTION_ANCHOR_ID} ref={sourceSectionRef}>
+              <section data-panel-section="sources">
                 <hr style={sectionDividerStyle} />
                 <h2 style={sectionHeadingStyle}>Sources</h2>
                 <ol
@@ -1711,6 +1829,75 @@ export function PlacePanel({
                         ) : (
                           citation.label
                         )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </section>
+            ) : null}
+
+            {photoCreditEntries.length > 0 ? (
+              <section data-panel-section="photo-credits">
+                <hr style={sectionDividerStyle} />
+                <h2 style={sectionHeadingStyle}>Photo credits</h2>
+                <p
+                  data-photo-credits-note="true"
+                  style={{
+                    marginTop: 0,
+                    marginBottom: `${tokens.spacing.sm}px`,
+                    color: tokens.color.textSecondary,
+                    fontSize: `${tokens.typography.bodySize}px`,
+                    lineHeight: `${tokens.typography.bodyLineHeight}px`
+                  }}
+                >
+                  {PHOTO_CREDITS_NOTE}
+                </p>
+                <ol
+                  data-photo-credits-list="true"
+                  style={{
+                    margin: 0,
+                    paddingLeft: "22px",
+                    color: tokens.color.textSecondary
+                  }}
+                >
+                  {photoCreditEntries.map((entry) => {
+                    const isHighlighted = highlightedPhotoCreditId === entry.entryId;
+                    const isFocused = focusedPhotoCreditId === entry.entryId;
+                    return (
+                      <li
+                        id={entry.entryId}
+                        key={entry.imageId}
+                        data-photo-credits-entry="true"
+                        data-photo-credit-entry-index={entry.imageIndex + 1}
+                        onBlur={(event) => {
+                          const nextFocused = event.relatedTarget;
+                          if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) {
+                            return;
+                          }
+                          setFocusedPhotoCreditId((current) =>
+                            current === entry.entryId ? null : current
+                          );
+                        }}
+                        onFocus={() => {
+                          setFocusedPhotoCreditId(entry.entryId);
+                        }}
+                        style={{
+                          marginBottom: `${tokens.spacing.sm}px`,
+                          fontSize: `${tokens.typography.bodySize}px`,
+                          lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                          borderRadius: "4px",
+                          outline:
+                            isHighlighted || isFocused
+                              ? `2px solid ${tokens.color.accent}`
+                              : "none",
+                          outlineOffset: "2px",
+                          backgroundColor: isHighlighted ? "rgba(26,115,232,0.12)" : "transparent",
+                          transition:
+                            "background-color 180ms ease-out, outline-color 180ms ease-out"
+                        }}
+                        tabIndex={-1}
+                      >
+                        {renderCreditSegments(entry.segments)}
                       </li>
                     );
                   })}
@@ -1841,63 +2028,6 @@ export function PlacePanel({
   );
 }
 
-function ActionIconButton({
-  icon,
-  label,
-  disabled = false,
-  onPress
-}: {
-  icon: string;
-  label: string;
-  disabled?: boolean;
-  onPress: () => void | Promise<void>;
-}) {
-  return (
-    <button
-      disabled={disabled}
-      onClick={() => {
-        void onPress();
-      }}
-      style={{
-        border: "none",
-        background: "transparent",
-        display: "grid",
-        justifyItems: "center",
-        gap: "6px",
-        color: disabled ? tokens.color.textSecondary : tokens.color.accent,
-        cursor: disabled ? "default" : "pointer",
-        padding: 0
-      }}
-      type="button"
-    >
-      <span
-        aria-hidden="true"
-        style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "999px",
-          border: `1px solid ${tokens.color.divider}`,
-          backgroundColor: tokens.color.surface,
-          display: "grid",
-          placeItems: "center",
-          fontSize: "16px",
-          lineHeight: 1
-        }}
-      >
-        {icon}
-      </span>
-      <span
-        style={{
-          fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`
-        }}
-      >
-        {label}
-      </span>
-    </button>
-  );
-}
-
 const closeButtonStyle: CSSProperties = {
   width: "32px",
   height: "32px",
@@ -2000,6 +2130,14 @@ const secondaryTextStyle: CSSProperties = {
   lineHeight: `${tokens.typography.bodyLineHeight}px`
 };
 
+const todayLineStyle: CSSProperties = {
+  ...secondaryTextStyle,
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: `${tokens.spacing.xs}px`
+};
+
 const bodyTextStyle: CSSProperties = {
   marginTop: 0,
   marginBottom: `${tokens.spacing.sm}px`,
@@ -2019,4 +2157,12 @@ const textActionStyle: CSSProperties = {
   fontFamily: tokens.typography.uiFont,
   fontSize: `${tokens.typography.bodySize}px`,
   lineHeight: `${tokens.typography.bodyLineHeight}px`
+};
+
+const aboutPlaceLinkStyle: CSSProperties = {
+  ...textActionStyle,
+  display: "inline",
+  fontFamily: "inherit",
+  fontSize: "inherit",
+  lineHeight: "inherit"
 };

@@ -49,6 +49,15 @@
           "description": "Modern or present-day name label for orientation.",
           "minLength": 1
         },
+        "modernCountries": {
+          "type": "array",
+          "description": "Present-day country or territory names, ordered by reader orientation priority.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/modernCountry"
+          }
+        },
         "alternate": {
           "type": "array",
           "description": "Additional name spellings or transliterations.",
@@ -427,6 +436,29 @@
     }
   },
   "$defs": {
+    "modernCountry": {
+      "type": "string",
+      "description": "Allowed modern country or territory name in English short form.",
+      "enum": [
+        "Türkiye",
+        "Greece",
+        "Italy",
+        "Israel",
+        "Jordan",
+        "Lebanon",
+        "Syria",
+        "Egypt",
+        "Cyprus",
+        "Malta",
+        "Iraq",
+        "Iran",
+        "Albania",
+        "North Macedonia",
+        "Libya",
+        "West Bank",
+        "Golan Heights"
+      ]
+    },
     "yearNoZero": {
       "type": "integer",
       "description": "Year integer using astronomical omission of year 0 (BC years are negative).",

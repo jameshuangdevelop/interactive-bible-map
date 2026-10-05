@@ -181,7 +181,7 @@ test("buildAppData fails when validation fails", async () => {
   });
 });
 
-test("buildAppData omits names.otherLanguages from index and place payload outputs", async () => {
+test("buildAppData omits names.otherLanguages but keeps names.modernCountries in index and place payload outputs", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const locationsDirectory = path.join(temporaryDirectory, "locations");
     const mediaDirectory = path.join(temporaryDirectory, "media");
@@ -199,6 +199,7 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
       ancient: ["Capernaum"],
       modern: "Tell Hum",
       alternate: [],
+      modernCountries: ["Israel"],
       otherLanguages: ["Kfar Nahum"]
     };
 
@@ -239,10 +240,12 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
 
     assert.equal(Object.hasOwn(capernaumIndex.names, "otherLanguages"), false);
     assert.equal(Object.hasOwn(galileeIndex.names, "otherLanguages"), false);
+    assert.deepEqual(capernaumIndex.names.modernCountries, ["Israel"]);
     assert.equal(
       Object.hasOwn(capernaumPlacePayload.location.names, "otherLanguages"),
       false
     );
+    assert.deepEqual(capernaumPlacePayload.location.names.modernCountries, ["Israel"]);
   });
 });
 

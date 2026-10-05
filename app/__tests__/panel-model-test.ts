@@ -3,11 +3,13 @@ import {
   buildImageKindLabel,
   buildImagePromptBriefUrl,
   buildImageCreditFields,
+  buildPhotoCreditEntry,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
   groupScriptureByBook,
   imageIndexesToLoad,
   isAiReconstructionImage,
+  matchAboutPlaceMentions,
   nextImageIndex,
   shouldRenderThumbnailRow
 } from "../src/features/place-panel/panel-model";
@@ -33,6 +35,24 @@ describe("place panel model helpers", () => {
     parentId: "roman-empire",
     candidates: [{ label: "Achaia", coordinates: [22.45, 37.89], confidence: "high" }]
   };
+
+  const createPlace = ({
+    id,
+    ancient,
+    alternate = []
+  }: {
+    id: string;
+    ancient: string[];
+    alternate?: string[];
+  }): PlaceIndexRecord => ({
+    id,
+    names: { ancient, alternate },
+    type: "city",
+    zoomTier: "city",
+    prominence: "standard",
+    parentId: null,
+    candidates: [{ label: ancient[0] ?? id, coordinates: [1, 1], confidence: "high" }]
+  });
 
   test("renders the Italy hierarchy exception text", () => {
     const italy: PlaceIndexRecord = {
@@ -228,6 +248,70 @@ describe("place panel model helpers", () => {
     });
   });
 
+  test("builds AI photo-credit entries with fixed 'Based on: research brief' wording", () => {
+    const aiImage: MediaImageRecord = {
+      id: "capernaum-ai-01",
+      url: "media/ai/capernaum-ai-01.webp",
+      caption: "AI overview reconstruction",
+      kind: "ai-reconstruction",
+      aiGenerated: true,
+      license: "CC0 1.0",
+      licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
+      generator: {
+        tool: "Google Gemini API (Nano Banana Pro)",
+        model: "gemini-3-pro-image",
+        date: "2026-10-01"
+      },
+      promptRef: "Prompt 1: Shoreline overview",
+      basedOn: ["wikidata:Q59174"]
+    };
+
+    expect(buildPhotoCreditEntry(aiImage, "capernaum").segments).toEqual([
+      { key: "ai-label", text: "AI-generated reconstruction", href: null },
+      { key: "tool", text: "Google Gemini API (Nano Banana Pro)", href: null },
+      {
+        key: "license",
+        text: "CC0 1.0",
+        href: "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      {
+        key: "based-on",
+        text: "Based on: research brief",
+        href: "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-shoreline-overview"
+      }
+    ]);
+  });
+
+  test("builds commons photo-credit entries with author, license, and source links", () => {
+    const commonsImage: MediaImageRecord = {
+      id: "capernaum-02",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/1/1a/example.jpg",
+      width: 1600,
+      height: 1067,
+      author: "Example Author",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Example.jpg",
+      caption: "Example caption",
+      aiGenerated: false
+    };
+
+    expect(buildPhotoCreditEntry(commonsImage, "capernaum").segments).toEqual([
+      { key: "photo", text: "Photo: Example Author", href: null },
+      {
+        key: "license",
+        text: "CC BY-SA 4.0",
+        href: "https://creativecommons.org/licenses/by-sa/4.0/"
+      },
+      {
+        key: "source",
+        text: "Wikimedia Commons",
+        href: "https://commons.wikimedia.org/wiki/File:Example.jpg"
+      }
+    ]);
+  });
+
   test("computes cyclical image indices and thumbnail-row visibility", () => {
     expect(nextImageIndex(0, 10, 1)).toBe(1);
     expect(nextImageIndex(0, 10, -1)).toBe(9);
@@ -258,5 +342,129 @@ describe("place panel model helpers", () => {
         aiGenerated: false
       })
     ).toBe(false);
+  });
+
+  test("matches longer unique names before shorter overlapping names", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({
+        id: "bethany-beyond-the-jordan",
+        ancient: ["Bethany beyond the Jordan"],
+        alternate: ["Bethany"]
+      }),
+      createPlace({ id: "bethany", ancient: ["Bethany"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["Pilgrims crossed Bethany beyond the Jordan before returning by Bethany."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "bethany-beyond-the-jordan",
+        paragraphIndex: 0,
+        start: 17,
+        end: 42,
+        text: "Bethany beyond the Jordan"
+      }
+    ]);
+  });
+
+  test("matches only whole words", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({ id: "galilee", ancient: ["Galilee"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["A Galileean village was nearby; Galilee remained a region in the north."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "galilee",
+        paragraphIndex: 0,
+        start: 32,
+        end: 39,
+        text: "Galilee"
+      }
+    ]);
+  });
+
+  test("skips names shared by multiple places", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({
+        id: "antioch-on-the-orontes",
+        ancient: ["Antioch on the Orontes"],
+        alternate: ["Antioch"]
+      }),
+      createPlace({
+        id: "antioch-in-pisidia",
+        ancient: ["Antioch in Pisidia"],
+        alternate: ["Antioch"]
+      })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["Travelers gathered at Antioch before sailing west."]
+    });
+
+    expect(matches).toEqual([]);
+  });
+
+  test("skips the place itself", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "galilee", ancient: ["Galilee"] }),
+      createPlace({ id: "capernaum", ancient: ["Capernaum"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "galilee",
+      paragraphs: ["Galilee included Capernaum on its shore."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "capernaum",
+        paragraphIndex: 0,
+        start: 17,
+        end: 26,
+        text: "Capernaum"
+      }
+    ]);
+  });
+
+  test("links only the first mention of each place across the full About", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({ id: "capernaum", ancient: ["Capernaum"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: [
+        "Capernaum was active during the ministry years.",
+        "Later, Capernaum remained important in memory."
+      ]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "capernaum",
+        paragraphIndex: 0,
+        start: 0,
+        end: 9,
+        text: "Capernaum"
+      }
+    ]);
   });
 });
