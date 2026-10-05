@@ -4,6 +4,10 @@
     "ancient": [
       "Pontus"
     ],
+    "modern": "Northeastern Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "region",
@@ -66,5 +70,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

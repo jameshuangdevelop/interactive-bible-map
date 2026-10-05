@@ -8,6 +8,9 @@
       "Lake of Gennesaret"
     ],
     "modern": "Sea of Galilee / Lake Kinneret",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Yam Kinneret"
@@ -148,5 +151,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

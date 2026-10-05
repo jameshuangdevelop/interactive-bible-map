@@ -5,6 +5,10 @@
       "Bethany beyond the Jordan",
       "Bethabara"
     ],
+    "modernCountries": [
+      "Jordan",
+      "West Bank"
+    ],
     "alternate": []
   },
   "type": "site",
@@ -120,5 +124,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

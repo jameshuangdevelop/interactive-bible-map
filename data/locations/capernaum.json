@@ -5,6 +5,9 @@
       "Capernaum"
     ],
     "modern": "Kfar Nahum / Tell Hum",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Kfar Nahum",
@@ -195,5 +198,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

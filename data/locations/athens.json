@@ -5,6 +5,9 @@
       "Athens"
     ],
     "modern": "Athens",
+    "modernCountries": [
+      "Greece"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Athenae"
@@ -83,5 +86,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

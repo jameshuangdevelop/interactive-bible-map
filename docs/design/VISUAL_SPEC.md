@@ -91,7 +91,7 @@ A place is **disputed** when at least one of its candidates has confidence `disp
 ## 3. Place panel
 The section order follows brief §1.4. Sections without data are left out.
 
-1. **Images** (ADR-0029, built in M3.5-06). Major places have 5–10 images and standard places 1–3, about 408 × 240 px in the panel.
+1. **Images** (ADR-0029, built in M3.5-06). Major places have 4–7 images, counting the AI reconstruction, and standard places 1–3, about 408 × 240 px in the panel.
    - With several images, there are arrows and a "1 / 7" counter, plus a row of small thumbnails under the image when there are more than 3.
    - **A label on each image for its kind:** "Today", "Excavated site", "Reconstruction", "Historical view", or **"AI-generated reconstruction"**, which is always visible.
    - **Directly under each image, always visible:** "Photo: *author* · *license* · Wikimedia Commons". The license links to its legal text, and "Wikimedia Commons" links to the file page. AI images read "AI-generated reconstruction · *tool* · *license* · Based on: research brief", where "research brief" links to the place's cited brief.
@@ -173,7 +173,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 8. Neutrality in the interface
 - **Modern names include countries (ADR-0028):** the app shows "Today: *name*, *country/countries*" when a modern name exists, or countries only when there is no single modern name. Countries already present in the modern name are not repeated (for example "Central Türkiye" does not add "Türkiye" again). Jerusalem and records inside Jerusalem, and empire records, show no countries. "West Bank" and "Golan Heights" omit "the" when they directly follow the modern name, but use it in stand-alone and "and" list positions ("Israel and the West Bank", "the Golan Heights"). Disputed places omit `names.modern`; their "Today" line shows countries only (for example "Israel and the West Bank"), with the disputed chip beside it.
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
-- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
+- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6). Introduce every person, writer or work the first time the text names them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"). Don't name databases such as Pleiades or Wikidata in the text; the Sources list names them (ADR-0033).
 
 ## 9. Attribution and credits
 - **Map:** a compact attribution control. The exact text for OpenFreeMap, OpenMapTiles and OpenStreetMap is set by the Fact-Checker in `ATTRIBUTION.md` (task M3-07).

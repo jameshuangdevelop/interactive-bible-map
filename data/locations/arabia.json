@@ -4,6 +4,12 @@
     "ancient": [
       "Arabia"
     ],
+    "modern": "Jordan, with parts of Saudi Arabia and Syria",
+    "modernCountries": [
+      "Jordan",
+      "Saudi Arabia",
+      "Syria"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -34,7 +40,8 @@
       "bib:livius-nabataeans",
       "bib:isbe-arabia",
       "scripture:Galatians 1:17",
-      "scripture:2 Corinthians 11:32"
+      "scripture:2 Corinthians 11:32",
+      "wikidata:Q810"
     ]
   },
   "history": [
@@ -73,5 +80,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

@@ -71,6 +71,11 @@ async function runCase(caseName, options = {}) {
     // now defaulting to true. Tests that exercise the empire-root rule pass
     // requireEmpireRoot explicitly (see runWithTemporaryHierarchyCase below).
     requireEmpireRoot: false,
+    // Same reasoning as requireEmpireRoot above: these fixtures predate
+    // names.modernCountries, so default it off here and let the tests that
+    // exercise the modern-countries rule pass requireModernCountries
+    // explicitly (see runWithTemporaryHierarchyCase below).
+    requireModernCountries: false,
     ...validationOptions
   });
 }
@@ -121,6 +126,9 @@ async function runWithTemporaryCase(mutateLocations, options = {}) {
       // See the comment in runCase above: this fixture pair predates the
       // empire/province hierarchy and has no empire-rooted parentId chain.
       requireEmpireRoot: false,
+      // See the comment in runCase above: this fixture pair predates
+      // names.modernCountries.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
@@ -203,6 +211,10 @@ async function runWithTemporaryHierarchyCase(mutateLocations, options = {}) {
       webVplPath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This helper's cityData/provinceData/empireData literals above don't
+      // set names.modernCountries; default it off here and let the tests
+      // that exercise the modern-countries rule pass it explicitly.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
@@ -1183,8 +1195,10 @@ test("names.modern word check respects word boundaries", async () => {
       webVplPath: webFixturePath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This ad hoc fixture predates the empire/province hierarchy (M3-11).
-      requireEmpireRoot: false
+      // This ad hoc fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
+      requireEmpireRoot: false,
+      requireModernCountries: false
     });
 
     assert.equal(result.errors.length, 0);
@@ -1226,9 +1240,34 @@ test("multi-candidate non-disputed record may keep names.modern", async () => {
   assert.equal(result.errors.length, 0);
 });
 
-test("modern-countries requirement is warning-only by default", async () => {
-  assert.equal(REQUIRE_MODERN_COUNTRIES, false);
+test("modern-countries requirement is an error by default", async () => {
+  assert.equal(REQUIRE_MODERN_COUNTRIES, true);
 
+  // Bypass runWithTemporaryHierarchyCase's fixture-compatibility default
+  // (which pins requireModernCountries to false for its inline fixtures,
+  // which predate this field) so this test exercises the real module
+  // default with no requireModernCountries option supplied at all, the same
+  // way npm run validate:data calls validateData in production.
+  const result = await validateData({
+    locationsDirectory: path.join(validCaseDirectory, "locations"),
+    mediaDirectory: path.join(validCaseDirectory, "media"),
+    webVplPath: webFixturePath,
+    bibliographyPath: bibliographyFixturePath,
+    skipSnapshotChecksumCheck: true,
+    requireEmpireRoot: false
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    )
+  );
+});
+
+test("modern-countries requirement can be explicitly disabled to a warning", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {
       cityData.names = {
@@ -1326,6 +1365,66 @@ test("non-exempt records with empty names.modernCountries still fail the policy 
   );
 });
 
+test("names.modernCountries rejects values outside the allow-list", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Narnia"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries[0]" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("names.modernCountries rejects duplicate values", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Greece", "Greece"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("exempt records must omit names.modernCountries (jerusalem and descendants)", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {
@@ -1369,6 +1468,81 @@ test("exempt records must omit names.modernCountries (jerusalem and descendants)
         error.path === "$.names.modernCountries" &&
         error.message.includes("must be omitted for exempt records")
     )
+  );
+});
+
+test("jerusalem exemption applies at grandchild depth", async () => {
+  const runDepthCase = (grandchildModernCountries) =>
+    runWithTemporaryHierarchyCase(
+      ({ cityData, provinceData, empireData }) => {
+        cityData.id = "bethesda-grandchild";
+        cityData.names = {
+          ancient: ["Bethesda Grandchild"],
+          modern: "Bethesda Grandchild",
+          alternate: [],
+          ...(grandchildModernCountries
+            ? { modernCountries: grandchildModernCountries }
+            : {})
+        };
+        cityData.parentId = "temple-mount";
+
+        provinceData.id = "temple-mount";
+        provinceData.type = "city";
+        provinceData.zoomTier = "city";
+        provinceData.names = {
+          ancient: ["Temple Mount"],
+          modern: "Temple Mount",
+          alternate: []
+        };
+        provinceData.parentId = "jerusalem";
+
+        empireData.id = "jerusalem";
+        empireData.type = "city";
+        empireData.zoomTier = "city";
+        empireData.names = {
+          ancient: ["Jerusalem"],
+          modern: "Jerusalem",
+          alternate: []
+        };
+      },
+      {
+        requireModernCountries: true,
+        requireEmpireRoot: false
+      }
+    );
+
+  const omittedResult = await runDepthCase(undefined);
+  assert.equal(
+    hasError(
+      omittedResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
+  );
+  assert.equal(omittedResult.errors.length, 0);
+
+  const presentResult = await runDepthCase(["Greece"]);
+  assert.ok(
+    hasError(
+      presentResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("must be omitted for exempt records")
+    )
+  );
+  assert.equal(
+    hasError(
+      presentResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
   );
 });
 
