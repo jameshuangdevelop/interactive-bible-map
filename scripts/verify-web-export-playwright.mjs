@@ -1847,9 +1847,9 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     "names",
     "candidates",
     "about",
+    "places-in",
     "in-bible",
     "ot-connections",
-    "places-in",
     "sources",
     "photo-credits",
     "footer"
@@ -1946,6 +1946,143 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     photoCreditEntryCount: photoCreditEntries.length,
     firstCreditFocus,
     secondCreditFocus
+  };
+}
+
+async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
+  const panelSelector = "section[aria-label='Place details']";
+  const sectionSelector = `${panelSelector} [data-panel-section]`;
+
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
+
+  const jerusalemSectionIds = await page.$$eval(sectionSelector, (elements) =>
+    elements.map((element) => element.getAttribute("data-panel-section") ?? "")
+  );
+  const aboutIndex = jerusalemSectionIds.indexOf("about");
+  const placesInIndex = jerusalemSectionIds.indexOf("places-in");
+  if (aboutIndex < 0 || placesInIndex < 0) {
+    throw new Error(
+      `Jerusalem panel must include About and Places in sections, got order: ${jerusalemSectionIds.join(" -> ")}`
+    );
+  }
+  if (placesInIndex !== aboutIndex + 1) {
+    throw new Error(
+      `Jerusalem panel should place 'Places in' directly after About, got: ${jerusalemSectionIds.join(" -> ")}`
+    );
+  }
+
+  const places = JSON.parse(await fs.readFile(generatedPlacesPath, "utf8"));
+  const placeById = new Map(places.map((place) => [place.id, place]));
+  const majorPlaceIds = places
+    .filter((place) => place.prominence === "major")
+    .map((place) => place.id);
+  const placeSearchOrder = ["jerusalem", ...majorPlaceIds.filter((placeId) => placeId !== "jerusalem")];
+
+  let sourcePlaceId = null;
+  let sourcePlaceName = null;
+  let linkedPlaceId = null;
+  let linkedText = null;
+
+  for (const placeId of placeSearchOrder) {
+    if (placeId !== "jerusalem") {
+      await page.goto(`${baseUrl}/?place=${encodeURIComponent(placeId)}`, {
+        waitUntil: "networkidle",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(page);
+      await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
+    }
+
+    const links = page.locator(
+      `${panelSelector} [data-panel-section='about'] [data-about-place-link='true']`
+    );
+    const linkCount = await links.count();
+    if (linkCount === 0) {
+      continue;
+    }
+
+    const firstLink = links.first();
+    const candidateLinkedPlaceId = await firstLink.getAttribute("data-about-place-id");
+    if (!candidateLinkedPlaceId || !placeById.has(candidateLinkedPlaceId)) {
+      continue;
+    }
+
+    const headingText = normalizeTextContent(
+      (await page.locator(`${panelSelector} h1`).textContent()) ?? ""
+    );
+    if (!headingText) {
+      continue;
+    }
+
+    sourcePlaceId = placeId;
+    sourcePlaceName = headingText;
+    linkedPlaceId = candidateLinkedPlaceId;
+    linkedText = normalizeTextContent((await firstLink.textContent()) ?? "");
+    break;
+  }
+
+  if (!sourcePlaceId || !sourcePlaceName || !linkedPlaceId) {
+    throw new Error(
+      "No About-place links were found on Jerusalem or any major place, so link navigation could not be verified."
+    );
+  }
+
+  const activeAboutLink = page
+    .locator(`${panelSelector} [data-panel-section='about'] [data-about-place-link='true']`)
+    .first();
+  await activeAboutLink.click();
+
+  await page.waitForFunction(
+    (expectedPlaceId) => {
+      const parameters = new URLSearchParams(window.location.search.slice(1));
+      return parameters.get("place") === expectedPlaceId;
+    },
+    linkedPlaceId,
+    { timeout: 30_000, polling: 100 }
+  );
+
+  const linkedPlace = placeById.get(linkedPlaceId);
+  const expectedLinkedPlaceName =
+    linkedPlace?.names?.ancient?.[0] ?? linkedPlace?.names?.modern ?? linkedPlaceId;
+  await page.waitForFunction(
+    (expectedName) => {
+      const heading = document.querySelector("section[aria-label='Place details'] h1");
+      return (heading?.textContent ?? "").trim() === expectedName;
+    },
+    expectedLinkedPlaceName,
+    { timeout: 30_000, polling: 100 }
+  );
+
+  await page.goBack({ waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  await page.waitForFunction(
+    (expectedPlaceId) => {
+      const parameters = new URLSearchParams(window.location.search.slice(1));
+      return parameters.get("place") === expectedPlaceId;
+    },
+    sourcePlaceId,
+    { timeout: 30_000, polling: 100 }
+  );
+  await page.waitForFunction(
+    (expectedName) => {
+      const heading = document.querySelector("section[aria-label='Place details'] h1");
+      return (heading?.textContent ?? "").trim() === expectedName;
+    },
+    sourcePlaceName,
+    { timeout: 30_000, polling: 100 }
+  );
+
+  return {
+    jerusalemSectionIds,
+    sourcePlaceId,
+    sourcePlaceName,
+    linkedPlaceId,
+    linkedPlaceName: expectedLinkedPlaceName,
+    linkedText,
+    usedJerusalemAsLinkSource: sourcePlaceId === "jerusalem"
   };
 }
 
@@ -5036,6 +5173,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const aboutPlaceLinkChecks = await verifyAboutPlaceLinksOpenPlacesAndSupportBack(
+      page,
+      staticServer.baseUrl
+    );
     const pointerCursorAndNearPinClickCheck = await verifyPointerCursorAndNearPinClick(
       page,
       staticServer.baseUrl
@@ -5211,6 +5352,7 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       panelSectionAndCreditChecks,
+      aboutPlaceLinkChecks,
       pointerCursorAndNearPinClickCheck,
       galleryFixtureChecks,
       capernaumLeadImageLoadCheck,

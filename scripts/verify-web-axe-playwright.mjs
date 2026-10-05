@@ -16,7 +16,7 @@ function summarizeViolation(violation) {
 }
 
 async function runAxeScenario(page, baseUrl, scenario) {
-  await page.goto(`${baseUrl}${scenario.path}`, { waitUntil: "networkidle", timeout: 90_000 });
+  await page.goto(`${baseUrl}${scenario.path}`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   await scenario.prepare(page);
 

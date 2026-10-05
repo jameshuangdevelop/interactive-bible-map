@@ -676,7 +676,7 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
     const image = createCandidateIconImage({
       pinColor: feature.properties.pinColor,
       candidateLetter: feature.properties.candidateLetter,
-      selected: feature.properties.isSelectedCandidate
+      selected: feature.properties.isSelectedCandidate || feature.properties.isHighlightedPlace
     });
 
     if (!image) {
@@ -729,7 +729,11 @@ function ensureMapLayers(map: MapLibreMap) {
         "all",
         ["!", ["has", "point_count"]],
         basePinVisibilityFilter,
-        ["==", ["get", "isSelectedPlace"], true]
+        [
+          "any",
+          ["==", ["get", "isSelectedPlace"], true],
+          ["==", ["get", "isHighlightedPlace"], true]
+        ]
       ]),
       paint: {
         "circle-radius": 12,
@@ -748,7 +752,14 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "circle",
       filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
       paint: {
-        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 10.5, 8],
+        "circle-radius": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          10.5,
+          ["==", ["get", "isHighlightedPlace"], true],
+          9.5,
+          8
+        ],
         "circle-color": ["get", "pinColor"],
         "circle-stroke-color": "#FFFFFF",
         "circle-stroke-width": 2
@@ -764,7 +775,11 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         basePinVisibilityFilter,
-        ["==", ["get", "isSelectedPlace"], true]
+        [
+          "any",
+          ["==", ["get", "isSelectedPlace"], true],
+          ["==", ["get", "isHighlightedPlace"], true]
+        ]
       ]),
       paint: {
         "circle-radius": 12,
@@ -783,7 +798,14 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "circle",
       filter: toLayerFilter(basePinVisibilityFilter),
       paint: {
-        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 10.5, 8],
+        "circle-radius": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          10.5,
+          ["==", ["get", "isHighlightedPlace"], true],
+          9.5,
+          8
+        ],
         "circle-color": ["get", "pinColor"],
         "circle-stroke-color": "#FFFFFF",
         "circle-stroke-width": 2
@@ -1234,6 +1256,7 @@ function isMainSourceLoaded(map: MapLibreMap) {
 export function MapView({
   places,
   selection,
+  highlightedPlaceId,
   leftPanelWidth,
   focusRequestToken,
   onSelectPlace
@@ -1282,7 +1305,10 @@ export function MapView({
   );
   const panelInset = Math.max(0, leftPanelWidth);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
-  const renderData = useMemo(() => buildPlaceRenderData(places, selection), [places, selection]);
+  const renderData = useMemo(
+    () => buildPlaceRenderData(places, selection, highlightedPlaceId),
+    [highlightedPlaceId, places, selection]
+  );
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);

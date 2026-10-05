@@ -106,12 +106,12 @@ The section order follows brief §1.4. Sections without data are left out.
 3. **Location confidence:** the confidence chip (or note) sits on the same "Today" line, never by colour alone. Single-candidate places show "High/Medium/Low confidence". Disputed places show **"Location disputed · *n* proposed sites"** on that line. Other places with several candidates show **"*n* sites"** on that line. If both the modern name and countries are absent, the chip or note sits alone where the "Today" line would be.
 4. **Candidates** (places with several candidates): a list A, B, C … Each entry has its label, a confidence chip and its support text (two lines, expandable), plus its sources. Selecting an entry centres the map on it.
 5. **Actions:** there is **no action bar**. Opening a place still frames all its candidate sites on the map, the URL still carries `?place=...` (and `&candidate=...` when relevant), and the Sources section stays in the panel.
-6. **About:** the summary, then the history notes. Each factual statement ends with source markers such as [1] [2] that link to the Sources section.
-7. **In the Bible · *n* passages:** grouped by book in canonical order.
+6. **About:** the summary, then the history notes. Each factual statement ends with source markers such as [1] [2] that link to the Sources section. The first mention of each other place on the map is a text link (matching its English names), and each place is linked once at most. Pointing at or focusing a link highlights that place's pin, and selecting it opens that place.
+7. **Places in *name*:** chips for child records (for example Jerusalem → Temple Mount, Pool of Bethesda …; Galilee → Capernaum …), directly below About.
+8. **In the Bible · *n* passages:** grouped by book in canonical order.
    - Each entry shows its reference in bold (for example "Matthew 4:13") and the WEB verse text in a **serif** typeface, so scripture reads distinctly.
    - The first 5 are shown, then **"Show all *n* passages"** (CP3a decision 4). Jerusalem has 174.
-8. **Old Testament connections · *n*:** the reference and a short note, with source markers.
-9. **Places in *name*:** chips for child records (for example Jerusalem → Temple Mount, Pool of Bethesda …; Galilee → Capernaum …).
+9. **Old Testament connections · *n*:** the reference and a short note, with source markers.
 10. **Sources:** a numbered list, where each entry is a readable citation with a link:
     - "Pleiades place 678231" links to Pleiades;
     - `bib:` entries show as author, title and year;

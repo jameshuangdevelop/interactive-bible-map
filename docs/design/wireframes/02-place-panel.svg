@@ -125,7 +125,7 @@
   <path class="leader" d="M220,430 L440,430"/><text class="note" x="446" y="434">No action bar; the panel goes straight from names to About</text>
   <path class="leader" d="M226,598 L420,598 L440,586"/><text class="note" x="446" y="590">Every statement carries source markers that link to the Sources list</text>
   <path class="leader" d="M360,738 L440,700"/><text class="note" x="446" y="704">Scripture: WEB text in serif, grouped by book; first 5, then "Show all"</text>
-  <text class="note" x="446" y="806">Panel continues: Places in (child records) · Sources · Photo credits · "Checked by the Fact-Checker · last reviewed" · Report an issue</text>
+  <text class="note" x="446" y="806">Panel continues after About: Places in (child records) · In the Bible · Sources · Photo credits · "Checked by the Fact-Checker · last reviewed" · Report an issue</text>
   <path class="leader" d="M1046,262 L1110,200"/><text class="note" x="1114" y="196">Disputed candidates: lettered pins, dashed outline</text>
   <path class="leader" d="M952,300 L1060,360"/><text class="note" x="1064" y="364">Selected place: larger pin</text>
   <text x="1430" y="892" font-size="12" fill="#80868B" text-anchor="end">02 · Place panel · desktop · low fidelity</text>

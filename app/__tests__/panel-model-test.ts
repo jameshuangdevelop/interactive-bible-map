@@ -9,6 +9,7 @@ import {
   groupScriptureByBook,
   imageIndexesToLoad,
   isAiReconstructionImage,
+  matchAboutPlaceMentions,
   nextImageIndex,
   shouldRenderThumbnailRow
 } from "../src/features/place-panel/panel-model";
@@ -34,6 +35,24 @@ describe("place panel model helpers", () => {
     parentId: "roman-empire",
     candidates: [{ label: "Achaia", coordinates: [22.45, 37.89], confidence: "high" }]
   };
+
+  const createPlace = ({
+    id,
+    ancient,
+    alternate = []
+  }: {
+    id: string;
+    ancient: string[];
+    alternate?: string[];
+  }): PlaceIndexRecord => ({
+    id,
+    names: { ancient, alternate },
+    type: "city",
+    zoomTier: "city",
+    prominence: "standard",
+    parentId: null,
+    candidates: [{ label: ancient[0] ?? id, coordinates: [1, 1], confidence: "high" }]
+  });
 
   test("renders the Italy hierarchy exception text", () => {
     const italy: PlaceIndexRecord = {
@@ -323,5 +342,129 @@ describe("place panel model helpers", () => {
         aiGenerated: false
       })
     ).toBe(false);
+  });
+
+  test("matches longer unique names before shorter overlapping names", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({
+        id: "bethany-beyond-the-jordan",
+        ancient: ["Bethany beyond the Jordan"],
+        alternate: ["Bethany"]
+      }),
+      createPlace({ id: "bethany", ancient: ["Bethany"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["Pilgrims crossed Bethany beyond the Jordan before returning by Bethany."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "bethany-beyond-the-jordan",
+        paragraphIndex: 0,
+        start: 17,
+        end: 42,
+        text: "Bethany beyond the Jordan"
+      }
+    ]);
+  });
+
+  test("matches only whole words", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({ id: "galilee", ancient: ["Galilee"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["A Galileean village was nearby; Galilee remained a region in the north."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "galilee",
+        paragraphIndex: 0,
+        start: 32,
+        end: 39,
+        text: "Galilee"
+      }
+    ]);
+  });
+
+  test("skips names shared by multiple places", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({
+        id: "antioch-on-the-orontes",
+        ancient: ["Antioch on the Orontes"],
+        alternate: ["Antioch"]
+      }),
+      createPlace({
+        id: "antioch-in-pisidia",
+        ancient: ["Antioch in Pisidia"],
+        alternate: ["Antioch"]
+      })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["Travelers gathered at Antioch before sailing west."]
+    });
+
+    expect(matches).toEqual([]);
+  });
+
+  test("skips the place itself", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "galilee", ancient: ["Galilee"] }),
+      createPlace({ id: "capernaum", ancient: ["Capernaum"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "galilee",
+      paragraphs: ["Galilee included Capernaum on its shore."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "capernaum",
+        paragraphIndex: 0,
+        start: 17,
+        end: 26,
+        text: "Capernaum"
+      }
+    ]);
+  });
+
+  test("links only the first mention of each place across the full About", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({ id: "capernaum", ancient: ["Capernaum"] })
+    ];
+
+    const matches = matchAboutPlaceMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: [
+        "Capernaum was active during the ministry years.",
+        "Later, Capernaum remained important in memory."
+      ]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "capernaum",
+        paragraphIndex: 0,
+        start: 0,
+        end: 9,
+        text: "Capernaum"
+      }
+    ]);
   });
 });

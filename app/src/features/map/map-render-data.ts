@@ -55,6 +55,7 @@ export interface PinFeatureProperties extends BaseMapFeatureProperties {
   hasMultipleCandidates: boolean;
   isDisputed: boolean;
   isSelectedPlace: boolean;
+  isHighlightedPlace: boolean;
   labelText: string | null;
 }
 
@@ -64,6 +65,7 @@ export interface CandidateFeatureProperties extends BaseMapFeatureProperties {
   candidateLetter: string;
   candidateLabel: string;
   isSelectedPlace: boolean;
+  isHighlightedPlace: boolean;
   isSelectedCandidate: boolean;
   iconId: string;
 }
@@ -141,9 +143,9 @@ function placeTypeLabel(placeType: PlaceType) {
   return placeType.replace("-", " ");
 }
 
-function toLabelPriority(place: PlaceIndexRecord, selected: boolean, dataOrder: number) {
+function toLabelPriority(place: PlaceIndexRecord, emphasized: boolean, dataOrder: number) {
   const basePriority = labelPriorityByType[place.type] * 10_000 + dataOrder;
-  if (selected) {
+  if (emphasized) {
     return -1_000_000 + basePriority;
   }
 
@@ -171,12 +173,14 @@ function toPinFeature({
   placeName,
   dataOrder,
   selected,
+  highlighted,
   coordinates
 }: {
   place: PlaceIndexRecord;
   placeName: string;
   dataOrder: number;
   selected: boolean;
+  highlighted: boolean;
   coordinates: Coordinates;
 }): PinFeature {
   const zoomRange = getPinTierZoomRange(place);
@@ -193,13 +197,14 @@ function toPinFeature({
       placeType: place.type,
       typeLabel: placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${placeTypeLabel(place.type)}`,
-      labelPriority: toLabelPriority(place, selected, dataOrder),
+      labelPriority: toLabelPriority(place, selected || highlighted, dataOrder),
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       pinColor: placePinColor(place),
       hasMultipleCandidates,
       isDisputed: hasMultipleCandidates ? isDisputedPlace(place) : false,
       isSelectedPlace: selected,
+      isHighlightedPlace: highlighted,
       labelText: CITY_PIN_LABEL_TYPES.has(place.type) ? placeName : null
     }
   };
@@ -210,12 +215,14 @@ function toCandidateFeature({
   placeName,
   dataOrder,
   selection,
+  highlighted,
   candidateIndex
 }: {
   place: PlaceIndexRecord;
   placeName: string;
   dataOrder: number;
   selection: PlaceSelection | null;
+  highlighted: boolean;
   candidateIndex: number;
 }): CandidateFeature {
   const candidate = place.candidates[candidateIndex];
@@ -228,6 +235,7 @@ function toCandidateFeature({
   const zoomRange = getPinTierZoomRange(place);
   const candidateMinZoom = Math.max(CANDIDATE_PINS_MIN_ZOOM, zoomRange.minZoom);
   const pinColor = placePinColor(place);
+  const highlightedCandidate = highlighted && !selectedCandidate;
 
   return {
     type: "Feature",
@@ -240,7 +248,7 @@ function toCandidateFeature({
       placeType: place.type,
       typeLabel: placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${placeTypeLabel(place.type)}, candidate ${candidateLetter}`,
-      labelPriority: toLabelPriority(place, selectedCandidate, dataOrder),
+      labelPriority: toLabelPriority(place, selectedCandidate || highlighted, dataOrder),
       minZoom: candidateMinZoom,
       maxZoom: zoomRange.maxZoom,
       pinColor,
@@ -248,8 +256,9 @@ function toCandidateFeature({
       candidateLetter,
       candidateLabel: candidate.label,
       isSelectedPlace: placeSelected,
+      isHighlightedPlace: highlighted,
       isSelectedCandidate: selectedCandidate,
-      iconId: candidateIconId(pinColor, candidateLetter, selectedCandidate)
+      iconId: candidateIconId(pinColor, candidateLetter, selectedCandidate || highlightedCandidate)
     }
   };
 }
@@ -309,7 +318,8 @@ export function candidateIconId(pinColor: string, candidateLetter: string, selec
 
 export function buildPlaceRenderData(
   places: PlaceIndexRecord[],
-  selection: PlaceSelection | null
+  selection: PlaceSelection | null,
+  highlightedPlaceId: string | null = null
 ): PlaceRenderData {
   const clusteredCityPins = emptyFeatureCollection<PinFeatureProperties>();
   const sitePins = emptyFeatureCollection<PinFeatureProperties>();
@@ -323,6 +333,7 @@ export function buildPlaceRenderData(
 
     const placeName = getPrimaryPlaceName(place);
     const selectedPlace = selection?.placeId === place.id;
+    const highlightedPlace = highlightedPlaceId === place.id;
 
     if (isAreaLabelPlace(place)) {
       areaLabels.features.push(
@@ -330,7 +341,7 @@ export function buildPlaceRenderData(
           place,
           placeName,
           dataOrder,
-          selected: selectedPlace,
+          selected: selectedPlace || highlightedPlace,
           coordinates: toCoordinates(place, 0)
         })
       );
@@ -349,6 +360,7 @@ export function buildPlaceRenderData(
             placeName,
             dataOrder,
             selection,
+            highlighted: highlightedPlace,
             candidateIndex
           })
         );
@@ -364,6 +376,7 @@ export function buildPlaceRenderData(
       placeName,
       dataOrder,
       selected: selectedPlace,
+      highlighted: highlightedPlace,
       coordinates: toCoordinates(place, 0)
     });
 
