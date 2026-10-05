@@ -18,8 +18,9 @@ The app deploys from `.github/workflows/app.yml` to Cloudflare Pages (`interacti
   - deploys a preview with Wrangler;
   - updates one PR comment with the preview URL.
 - **Preview verification (PRs with secrets available)**: smoke test, axe serious/critical gate, and Lighthouse desktop cold-cache gate (LCP <= 2.5 s, TBT <= 200 ms) against the preview URL.
-  - Lighthouse runs three cold-cache passes and gates on the median LCP and median TBT.
-  - On Linux CI, Chrome is launched with ANGLE SwiftShader in the GPU process for WebGL rendering.
+  - Lighthouse runs three cold-cache passes and uses the median values.
+  - CI enforces **LCP** but only reports **TBT** (`--tbt-mode=report`) because software WebGL on free Linux runners does not measure TBT reliably for this app.
+  - Before asking for merge, the PO runs `npm run verify:web:lighthouse -- --base-url <preview URL>` from a desktop machine (default `--tbt-mode=enforce`) so both LCP and TBT are enforced there.
 - **Production deploy (pushes to `main`)**: same artifact + limits check, then deploys to the production branch in Pages.
 
 Deploy jobs skip automatically when `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` is missing (for example, fork PRs).

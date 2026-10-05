@@ -4,7 +4,13 @@ import path from "node:path";
 
 import { chromium } from "playwright";
 
-import { readCliArgument, repositoryRoot, withResolvedBaseUrl } from "./lib/web-checks.mjs";
+import {
+  evaluateLighthouseGate,
+  parseLighthouseTbtMode,
+  readCliArgument,
+  repositoryRoot,
+  withResolvedBaseUrl
+} from "./lib/web-checks.mjs";
 
 const lcpThresholdMs = 2_500;
 const tbtThresholdMs = 200;
@@ -24,26 +30,7 @@ function quoteForCmd(argument) {
 }
 
 function buildChromeFlagsForLighthouse() {
-  const flags = ["--headless=new", "--no-sandbox", "--disable-dev-shm-usage"];
-  if (process.platform === "linux") {
-    flags.push("--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader");
-  }
-
-  return flags;
-}
-
-function median(values) {
-  if (values.length === 0) {
-    throw new Error("Cannot compute median of an empty list.");
-  }
-
-  const sorted = [...values].sort((left, right) => left - right);
-  const middleIndex = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 1) {
-    return sorted[middleIndex];
-  }
-
-  return (sorted[middleIndex - 1] + sorted[middleIndex]) / 2;
+  return ["--headless=new", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"];
 }
 
 function roundToHundredths(value) {
@@ -279,7 +266,9 @@ async function writeReportFile(report, reportPath) {
 }
 
 async function run() {
-  const reportPathArgument = readCliArgument(process.argv.slice(2), "report-path");
+  const argv = process.argv.slice(2);
+  const tbtMode = parseLighthouseTbtMode(argv, process.env);
+  const reportPathArgument = readCliArgument(argv, "report-path");
 
   await withResolvedBaseUrl(async ({ baseUrl, usingProvidedBaseUrl }) => {
     const chromePath = chromium.executablePath();
@@ -315,14 +304,20 @@ async function run() {
       });
     }
 
-    const medianLcpMs = median(runResults.map((result) => result.lcpMs));
-    const medianTbtMs = median(runResults.map((result) => result.tbtMs));
-    const passed = medianLcpMs <= lcpThresholdMs && medianTbtMs <= tbtThresholdMs;
+    const gate = evaluateLighthouseGate({
+      lcpValuesMs: runResults.map((result) => result.lcpMs),
+      tbtValuesMs: runResults.map((result) => result.tbtMs),
+      lcpThresholdMs,
+      tbtThresholdMs,
+      tbtMode
+    });
 
     const summary = {
       baseUrl,
       usingProvidedBaseUrl,
       runCount: lighthouseRunCount,
+      tbtMode: gate.tbtMode,
+      tbtEnforced: gate.tbtEnforced,
       chromeFlags,
       webGlRenderer,
       runs: runResults.map((result) => {
@@ -340,14 +335,14 @@ async function run() {
         return runSummary;
       }),
       medians: {
-        lcpMs: roundToHundredths(medianLcpMs),
-        tbtMs: roundToHundredths(medianTbtMs)
+        lcpMs: roundToHundredths(gate.lcpMedianMs),
+        tbtMs: roundToHundredths(gate.tbtMedianMs)
       },
       thresholds: {
         lcpMs: lcpThresholdMs,
         tbtMs: tbtThresholdMs
       },
-      passed
+      passed: gate.passed
     };
 
     if (reportPathArgument) {
@@ -357,6 +352,8 @@ async function run() {
           chromeFlags,
           webGlRenderer,
           runCount: lighthouseRunCount,
+          tbtMode: gate.tbtMode,
+          tbtEnforced: gate.tbtEnforced,
           thresholds: {
             lcpMs: lcpThresholdMs,
             tbtMs: tbtThresholdMs
@@ -378,10 +375,27 @@ async function run() {
     }
 
     console.log(JSON.stringify(summary, null, 2));
+    if (!gate.tbtEnforced) {
+      console.log(
+        "TBT not enforced on this run (--tbt-mode=report): software WebGL on CI runners can't measure it; enforce it against the preview from a desktop machine (ADR-0034)"
+      );
+    }
 
-    if (!passed) {
+    if (!gate.passed) {
+      const failureParts = [];
+      if (!gate.lcpPassed) {
+        failureParts.push(
+          `LCP ${roundToHundredths(gate.lcpMedianMs)} ms (limit ${lcpThresholdMs})`
+        );
+      }
+      if (gate.tbtEnforced && !gate.tbtPassed) {
+        failureParts.push(
+          `TBT ${roundToHundredths(gate.tbtMedianMs)} ms (limit ${tbtThresholdMs})`
+        );
+      }
+
       throw new Error(
-        `Lighthouse gate failed (median of ${lighthouseRunCount} runs): LCP ${roundToHundredths(medianLcpMs)} ms (limit ${lcpThresholdMs}), TBT ${roundToHundredths(medianTbtMs)} ms (limit ${tbtThresholdMs}).`
+        `Lighthouse gate failed (median of ${lighthouseRunCount} runs): ${failureParts.join(", ")}.`
       );
     }
   });

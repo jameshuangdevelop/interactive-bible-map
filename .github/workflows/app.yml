@@ -255,7 +255,7 @@ jobs:
         env:
           BASE_URL: ${{ needs.deploy_preview.outputs.preview_url }}
           LIGHTHOUSE_REPORT_PATH: ${{ runner.temp }}/lighthouse-preview.json
-        run: npm run verify:web:lighthouse -- --base-url "$BASE_URL" --report-path "$LIGHTHOUSE_REPORT_PATH"
+        run: npm run verify:web:lighthouse -- --base-url "$BASE_URL" --report-path "$LIGHTHOUSE_REPORT_PATH" --tbt-mode=report
 
       - name: Upload Lighthouse report
         if: always()
