@@ -223,6 +223,64 @@ function photoCreditEntrySelectorForImage(imageIndexOneBased) {
   return `${photoCreditsEntriesSelector}[data-photo-credit-entry-index='${imageIndexOneBased}']`;
 }
 
+function panelSectionSelector(sectionId) {
+  return `${placePanelSelector} [data-panel-section='${sectionId}']`;
+}
+
+function panelSectionToggleSelector(sectionId) {
+  return `${panelSectionSelector(sectionId)} [data-panel-section-toggle='${sectionId}']`;
+}
+
+function panelSectionContentSelector(sectionId) {
+  return `${panelSectionSelector(sectionId)} [data-panel-section-content='${sectionId}']`;
+}
+
+async function waitForPanelSectionToggle(page, sectionId) {
+  const toggle = page.locator(panelSectionToggleSelector(sectionId)).first();
+  await toggle.waitFor({ state: "visible", timeout: 30_000 });
+  return toggle;
+}
+
+async function getPanelSectionExpanded(page, sectionId) {
+  const toggle = await waitForPanelSectionToggle(page, sectionId);
+  return (await toggle.getAttribute("aria-expanded")) === "true";
+}
+
+async function setPanelSectionExpanded(page, sectionId, expanded) {
+  const toggle = await waitForPanelSectionToggle(page, sectionId);
+  const currentExpanded = (await toggle.getAttribute("aria-expanded")) === "true";
+  if (currentExpanded === expanded) {
+    return;
+  }
+
+  await toggle.click();
+  await page.waitForFunction(
+    ({ selector, expectedExpanded }) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof HTMLButtonElement)) {
+        return false;
+      }
+      return element.getAttribute("aria-expanded") === (expectedExpanded ? "true" : "false");
+    },
+    { selector: panelSectionToggleSelector(sectionId), expectedExpanded: expanded },
+    { timeout: 30_000, polling: 100 }
+  );
+}
+
+async function assertPanelSectionStartsCollapsedWithCount(page, sectionId, label) {
+  const toggle = await waitForPanelSectionToggle(page, sectionId);
+  const expanded = await toggle.getAttribute("aria-expanded");
+  if (expanded !== "false") {
+    throw new Error(`${label} should start collapsed, got aria-expanded='${expanded}'.`);
+  }
+
+  const labelText = normalizeTextContent((await toggle.textContent()) ?? "");
+  const pattern = new RegExp(`^${label} · [0-9]+$`, "u");
+  if (!pattern.test(labelText)) {
+    throw new Error(`${label} heading must include '· N', got '${labelText}'.`);
+  }
+}
+
 async function readPhotoCreditEntryForImage(page, imageIndexOneBased) {
   const selector = photoCreditEntrySelectorForImage(imageIndexOneBased);
   await page.waitForSelector(selector, { timeout: 30_000 });
@@ -253,6 +311,16 @@ async function jumpToCurrentImageCredit(page) {
     .locator(`${placePanelSelector} [data-panel-section='photos'] [data-photo-credit-link='true']`)
     .first()
     .click();
+  await page.waitForFunction(
+    (selector) => {
+      const element = document.querySelector(selector);
+      return (
+        element instanceof HTMLButtonElement && element.getAttribute("aria-expanded") === "true"
+      );
+    },
+    panelSectionToggleSelector("photo-credits"),
+    { timeout: 30_000, polling: 100 }
+  );
   await page.waitForFunction(() => {
     const activeElement = document.activeElement;
     return (
@@ -277,7 +345,8 @@ async function jumpToCurrentImageCredit(page) {
 
   return {
     currentImageNumber,
-    focusedEntry
+    focusedEntry,
+    photoCreditsExpanded: await getPanelSectionExpanded(page, "photo-credits")
   };
 }
 
@@ -1672,8 +1741,121 @@ async function verifySearchMenuAndAccessibility(
 }
 
 async function verifyKeyboardDisclosureControls(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
+
+  const sectionToggleIds = await page.$$eval(
+    `${placePanelSelector} [data-panel-section-toggle]`,
+    (elements) =>
+      elements
+        .map((element) => element.getAttribute("data-panel-section-toggle"))
+        .filter((value) => typeof value === "string")
+  );
+  if (sectionToggleIds.length === 0) {
+    throw new Error("No collapsible section toggles were rendered in the place panel.");
+  }
+
+  const sectionKeyboardToggleStates = {};
+  for (const sectionId of sectionToggleIds) {
+    const toggle = await waitForPanelSectionToggle(page, sectionId);
+    const initialExpanded = await toggle.getAttribute("aria-expanded");
+    await toggle.focus();
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(
+      ({ selector, previousState }) => {
+        const element = document.querySelector(selector);
+        return (
+          element instanceof HTMLButtonElement &&
+          element.getAttribute("aria-expanded") !== previousState
+        );
+      },
+      {
+        selector: panelSectionToggleSelector(sectionId),
+        previousState: initialExpanded
+      },
+      { timeout: 30_000, polling: 100 }
+    );
+    const expandedAfterEnter = await toggle.getAttribute("aria-expanded");
+
+    await page.keyboard.press("Space");
+    await page.waitForFunction(
+      ({ selector, expectedState }) => {
+        const element = document.querySelector(selector);
+        return (
+          element instanceof HTMLButtonElement &&
+          element.getAttribute("aria-expanded") === expectedState
+        );
+      },
+      {
+        selector: panelSectionToggleSelector(sectionId),
+        expectedState: initialExpanded
+      },
+      { timeout: 30_000, polling: 100 }
+    );
+    const expandedAfterSpace = await toggle.getAttribute("aria-expanded");
+    sectionKeyboardToggleStates[sectionId] = {
+      initialExpanded,
+      expandedAfterEnter,
+      expandedAfterSpace
+    };
+  }
+
+  const aboutToggle = await waitForPanelSectionToggle(page, "about");
+  if ((await aboutToggle.getAttribute("aria-expanded")) !== "false") {
+    await aboutToggle.focus();
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(
+      (selector) => {
+        const element = document.querySelector(selector);
+        return (
+          element instanceof HTMLButtonElement && element.getAttribute("aria-expanded") === "false"
+        );
+      },
+      panelSectionToggleSelector("about"),
+      { timeout: 30_000, polling: 100 }
+    );
+  }
+
+  const sourcesToggle = await waitForPanelSectionToggle(page, "sources");
+  if ((await sourcesToggle.getAttribute("aria-expanded")) !== "true") {
+    await sourcesToggle.focus();
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(
+      (selector) => {
+        const element = document.querySelector(selector);
+        return (
+          element instanceof HTMLButtonElement && element.getAttribute("aria-expanded") === "true"
+        );
+      },
+      panelSectionToggleSelector("sources"),
+      { timeout: 30_000, polling: 100 }
+    );
+  }
+
+  const searchInput = page.locator("input[aria-label='Search biblical places']");
+  await searchInput.fill("Emmaus");
+  await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+  await page
+    .locator("[data-testid='search-results-list'] [role='option']")
+    .filter({ hasText: "Emmaus" })
+    .first()
+    .click();
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "emmaus";
+  }, undefined, { timeout: 30_000, polling: 100 });
+  await page.getByRole("heading", { level: 1, name: "Emmaus" }).waitFor({ timeout: 30_000 });
+
+  const persistedStates = {
+    aboutExpandedOnEmmaus: await getPanelSectionExpanded(page, "about"),
+    sourcesExpandedOnEmmaus: await getPanelSectionExpanded(page, "sources")
+  };
+  if (persistedStates.aboutExpandedOnEmmaus !== false) {
+    throw new Error("About section collapse state did not persist to the next place.");
+  }
+  if (persistedStates.sourcesExpandedOnEmmaus !== true) {
+    throw new Error("Sources section expansion state did not persist to the next place.");
+  }
 
   const candidateToggle = page
     .locator("section[aria-label='Place details'] button[data-candidate-support-toggle='true']")
@@ -1701,6 +1883,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
 
   await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
+  await setPanelSectionExpanded(page, "in-bible", true);
 
   const showAllButton = page.locator(
     "section[aria-label='Place details'] [data-show-all-passages='true']"
@@ -1725,8 +1908,49 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
   }, undefined, { timeout: 120_000, polling: 250 });
   const jerusalemExpanded = await showAllButton.first().getAttribute("aria-expanded");
   const jerusalemControlId = await showAllButton.first().getAttribute("aria-controls");
+  const expandedButtonText = normalizeTextContent((await showAllButton.first().textContent()) ?? "");
+  if (expandedButtonText !== "Show fewer") {
+    throw new Error(`Expanded scripture toggle should read 'Show fewer', got '${expandedButtonText}'.`);
+  }
+
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => {
+    const button = document.querySelector(
+      "section[aria-label='Place details'] [data-show-all-passages='true']"
+    );
+    if (!(button instanceof HTMLButtonElement)) {
+      return false;
+    }
+    if (button.getAttribute("aria-expanded") !== "false") {
+      return false;
+    }
+    const section = document.querySelector(
+      "section[aria-label='Place details'] [data-panel-section='in-bible']"
+    );
+    return Boolean(section && section.querySelectorAll("article").length === 5);
+  }, undefined, { timeout: 120_000, polling: 250 });
+  const jerusalemCollapsed = await showAllButton.first().getAttribute("aria-expanded");
+  const collapsedButtonText = normalizeTextContent((await showAllButton.first().textContent()) ?? "");
+  if (!/^Show all [0-9]+ passages$/u.test(collapsedButtonText)) {
+    throw new Error(
+      `Collapsed scripture toggle should read 'Show all n passages', got '${collapsedButtonText}'.`
+    );
+  }
+  const focusedAfterCollapse = normalizeTextContent(
+    await page.evaluate(() => {
+      const activeElement = document.activeElement;
+      return activeElement instanceof HTMLElement ? activeElement.textContent ?? "" : "";
+    })
+  );
+  if (!/^Show all [0-9]+ passages$/u.test(focusedAfterCollapse)) {
+    throw new Error(
+      `Focus should remain on the scripture toggle after collapsing, got '${focusedAfterCollapse}'.`
+    );
+  }
 
   return {
+    sectionKeyboardToggleStates,
+    persistedStates,
     emmaus: {
       controlId: candidateSupportControlId,
       expandedAfterEnter: emmausExpanded,
@@ -1734,7 +1958,10 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
     },
     jerusalem: {
       controlId: jerusalemControlId,
-      expandedAfterEnter: jerusalemExpanded
+      expandedAfterEnter: jerusalemExpanded,
+      collapsedAfterSpace: jerusalemCollapsed,
+      expandedButtonText,
+      collapsedButtonText
     }
   };
 }
@@ -1876,6 +2103,47 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     );
   }
 
+  await assertPanelSectionStartsCollapsedWithCount(page, "sources", "Sources");
+  await assertPanelSectionStartsCollapsedWithCount(page, "photo-credits", "Photo credits");
+
+  const capernaumImages = await readCapernaumImages();
+  const hiddenSectionSnapshot = await page.evaluate(
+    ({ sourcesContentSelector, photoCreditsContentSelector, photoEntrySelector }) => {
+      const sourcesContent = document.querySelector(sourcesContentSelector);
+      const photoCreditsContent = document.querySelector(photoCreditsContentSelector);
+      const photoEntries = document.querySelectorAll(photoEntrySelector);
+      return {
+        sourcesHidden:
+          sourcesContent instanceof HTMLElement &&
+          sourcesContent.hidden &&
+          getComputedStyle(sourcesContent).display === "none",
+        photoCreditsHidden:
+          photoCreditsContent instanceof HTMLElement &&
+          photoCreditsContent.hidden &&
+          getComputedStyle(photoCreditsContent).display === "none",
+        photoCreditsAttachedCount: photoEntries.length
+      };
+    },
+    {
+      sourcesContentSelector: panelSectionContentSelector("sources"),
+      photoCreditsContentSelector: panelSectionContentSelector("photo-credits"),
+      photoEntrySelector: photoCreditsEntriesSelector
+    }
+  );
+  if (!hiddenSectionSnapshot.sourcesHidden) {
+    throw new Error("Sources content should stay in the DOM but be hidden when collapsed.");
+  }
+  if (!hiddenSectionSnapshot.photoCreditsHidden) {
+    throw new Error("Photo credits content should stay in the DOM but be hidden when collapsed.");
+  }
+  if (hiddenSectionSnapshot.photoCreditsAttachedCount !== capernaumImages.length) {
+    throw new Error(
+      `Collapsed photo credits should stay attached in the DOM. expected=${capernaumImages.length}, got=${hiddenSectionSnapshot.photoCreditsAttachedCount}.`
+    );
+  }
+
+  await setPanelSectionExpanded(page, "photo-credits", true);
+
   const photoCreditsNoteText = (
     await page
       .locator("section[aria-label='Place details'] [data-panel-section='photo-credits'] [data-photo-credits-note='true']")
@@ -1891,7 +2159,6 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     );
   }
 
-  const capernaumImages = await readCapernaumImages();
   const photoCreditEntries = await page.$$eval(photoCreditsEntriesSelector, (elements) =>
     elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
   );
@@ -1909,11 +2176,25 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     }
   }
 
+  const creditLinkAriaLabel = await page
+    .locator(`${placePanelSelector} [data-panel-section='photos'] [data-photo-credit-link='true']`)
+    .first()
+    .getAttribute("aria-label");
+  if (creditLinkAriaLabel !== "Credit for image 1") {
+    throw new Error(
+      `Panel credit link accessible name mismatch. expected='Credit for image 1', got='${creditLinkAriaLabel ?? "null"}'.`
+    );
+  }
+
+  await setPanelSectionExpanded(page, "photo-credits", false);
   const firstCreditFocus = await jumpToCurrentImageCredit(page);
   if (firstCreditFocus.focusedEntry?.imageIndex !== 1) {
     throw new Error(
       `Lead image credit link focused wrong entry: ${JSON.stringify(firstCreditFocus.focusedEntry)}.`
     );
+  }
+  if (!firstCreditFocus.photoCreditsExpanded) {
+    throw new Error("Credit link should open photo credits when they are collapsed.");
   }
   if (!creditMatchesImage(firstCreditFocus.focusedEntry?.text ?? "", capernaumImages[0])) {
     throw new Error(
@@ -1927,6 +2208,7 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
   if (hasCarousel) {
     await nextImage.first().click();
     await page.waitForTimeout(200);
+    await setPanelSectionExpanded(page, "photo-credits", false);
     secondCreditFocus = await jumpToCurrentImageCredit(page);
     if (secondCreditFocus.focusedEntry?.imageIndex !== 2) {
       throw new Error(
@@ -1943,9 +2225,15 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
   return {
     sectionIds,
     hasCarousel,
+    collapsedDefaults: {
+      sources: true,
+      photoCredits: true
+    },
+    hiddenSectionSnapshot,
     photoCreditEntryCount: photoCreditEntries.length,
     firstCreditFocus,
-    secondCreditFocus
+    secondCreditFocus,
+    creditLinkAriaLabel
   };
 }
 
@@ -2376,6 +2664,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
       .getByText("AI-generated reconstruction", { exact: true })
       .waitFor({ timeout: 30_000 });
+    await setPanelSectionExpanded(page, "photo-credits", true);
     const aiCreditText = await readPhotoCreditEntryForImage(page, 5);
     if (
       !aiCreditText.includes("AI-generated reconstruction") ||
@@ -2770,6 +3059,7 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
       state: "visible",
       timeout: 30_000
     });
+    await setPanelSectionExpanded(page, "photo-credits", true);
     await page.waitForSelector(photoCreditsEntriesSelector, {
       timeout: 30_000
     });
@@ -3069,6 +3359,7 @@ async function verifyShowAllPassages(page, baseUrl) {
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='in-bible']", {
     timeout: 30_000
   });
+  await setPanelSectionExpanded(page, "in-bible", true);
 
   const headingText =
     (await page
@@ -3088,9 +3379,10 @@ async function verifyShowAllPassages(page, baseUrl) {
     throw new Error(`Expected 5 passages before expansion, got ${initialCount}.`);
   }
 
-  await page
-    .locator("section[aria-label='Place details'] [data-show-all-passages='true']")
-    .click();
+  const showAllButton = page.locator(
+    "section[aria-label='Place details'] [data-show-all-passages='true']"
+  );
+  await showAllButton.first().click();
 
   await page.waitForFunction(
     ({ expectedCount }) => {
@@ -3118,11 +3410,49 @@ async function verifyShowAllPassages(page, baseUrl) {
       `Expected all passages after expansion (${totalPassages}), got ${finalCount}.`
     );
   }
+  const expandedButtonText = normalizeTextContent((await showAllButton.first().textContent()) ?? "");
+  if (expandedButtonText !== "Show fewer") {
+    throw new Error(`Expanded scripture toggle should read 'Show fewer', got '${expandedButtonText}'.`);
+  }
+
+  await showAllButton.first().click();
+  await page.waitForFunction(
+    () => {
+      const section = document.querySelector(
+        "section[aria-label='Place details'] [data-panel-section='in-bible']"
+      );
+      const showAllToggle = section?.querySelector("[data-show-all-passages='true']");
+      if (!(showAllToggle instanceof HTMLButtonElement)) {
+        return false;
+      }
+
+      return (
+        showAllToggle.getAttribute("aria-expanded") === "false" &&
+        section.querySelectorAll("article").length === 5 &&
+        document.activeElement === showAllToggle
+      );
+    },
+    undefined,
+    { timeout: 30_000, polling: 100 }
+  );
+  const collapsedCount = await scriptureArticleLocator.count();
+  if (collapsedCount !== 5) {
+    throw new Error(`Expected 5 passages after collapsing, got ${collapsedCount}.`);
+  }
+  const collapsedButtonText = normalizeTextContent((await showAllButton.first().textContent()) ?? "");
+  if (!/^Show all [0-9]+ passages$/u.test(collapsedButtonText)) {
+    throw new Error(
+      `Collapsed scripture toggle should read 'Show all n passages', got '${collapsedButtonText}'.`
+    );
+  }
 
   return {
     totalPassages,
     initialCount,
-    finalCount
+    finalCount,
+    collapsedCount,
+    expandedButtonText,
+    collapsedButtonText
   };
 }
 
