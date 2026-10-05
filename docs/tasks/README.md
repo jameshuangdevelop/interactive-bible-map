@@ -32,8 +32,9 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3.5-06](M3.5-06-gallery.md) | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Merged (#31) |
 | [M3.5-07](M3.5-07-ai-reconstructions.md) | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker → the human → media-curator → fact-checker | `data/m3.5-ai-images` | Merged (#36) |
 | [M3-14](M3-14-modern-countries.md) | Countries in modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | In progress |
-| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | Waits for M3-14's schema commit |
+| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | In progress |
 | [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | In progress |
+| [M3-18](M3-18-gallery-size.md) | Galleries of 4 to 7 images for major places | media-curator → gis-engineer | `data/m3-gallery-size` | In progress |
 
 ## Template
 ```markdown
