@@ -262,6 +262,22 @@ async function readPanelSectionChevronState(page, sectionId) {
   return state;
 }
 
+async function readPanelSectionChevronVisualStyle(page, sectionId) {
+  const chevron = page.locator(panelSectionChevronSelector(sectionId)).first();
+  await chevron.waitFor({ state: "visible", timeout: 30_000 });
+  return chevron.evaluate((element) => {
+    const chevronStyle = window.getComputedStyle(element);
+    const icon = element.querySelector("svg");
+    const iconStyle = icon instanceof SVGElement ? window.getComputedStyle(icon) : null;
+    return {
+      color: chevronStyle.color,
+      backgroundColor: chevronStyle.backgroundColor,
+      transition: iconStyle?.transition ?? null,
+      transitionProperty: iconStyle?.transitionProperty ?? null
+    };
+  });
+}
+
 async function getPanelSectionExpanded(page, sectionId) {
   const toggle = await waitForPanelSectionToggle(page, sectionId);
   return (await toggle.getAttribute("aria-expanded")) === "true";
@@ -1776,6 +1792,49 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
     throw new Error("No collapsible section toggles were rendered in the place panel.");
   }
 
+  const chevronContrastBySection = {};
+  for (const sectionId of sectionToggleIds) {
+    const chevronVisualStyle = await readPanelSectionChevronVisualStyle(page, sectionId);
+    chevronContrastBySection[sectionId] = assertGalleryLabelContrast(
+      {
+        color: chevronVisualStyle.color,
+        backgroundColor: chevronVisualStyle.backgroundColor
+      },
+      `Section chevron contrast (${sectionId})`
+    );
+  }
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const reducedMotionSectionId = sectionToggleIds[0];
+  const reducedMotionChevronSelector = `${panelSectionChevronSelector(reducedMotionSectionId)} svg`;
+  await page.waitForFunction(
+    (selector) => {
+      const icon = document.querySelector(selector);
+      return (
+        icon instanceof SVGElement &&
+        window.getComputedStyle(icon).transitionProperty === "none"
+      );
+    },
+    reducedMotionChevronSelector,
+    { timeout: 30_000, polling: 100 }
+  );
+  const reducedMotionChevronTransition = await page.$eval(
+    reducedMotionChevronSelector,
+    (icon) => {
+      const style = window.getComputedStyle(icon);
+      return {
+        transition: style.transition,
+        transitionProperty: style.transitionProperty
+      };
+    }
+  );
+  if (reducedMotionChevronTransition.transitionProperty !== "none") {
+    throw new Error(
+      `Reduced-motion chevron transition should be none, got '${reducedMotionChevronTransition.transitionProperty}'.`
+    );
+  }
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+
   const sectionKeyboardToggleStates = {};
   for (const sectionId of sectionToggleIds) {
     const toggle = await waitForPanelSectionToggle(page, sectionId);
@@ -2003,6 +2062,8 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
   }
 
   return {
+    chevronContrastBySection,
+    reducedMotionChevronTransition,
     sectionKeyboardToggleStates,
     persistedStates,
     emmaus: {
@@ -2196,6 +2257,128 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     );
   }
 
+  const sourceMarkerTarget = await page.evaluate(() => {
+    const marker = document.querySelector(
+      "section[aria-label='Place details'] [data-panel-section='about'] a[href^='#source-']"
+    );
+    if (!(marker instanceof HTMLAnchorElement)) {
+      return null;
+    }
+    const href = marker.getAttribute("href");
+    if (!href || !/^#source-[0-9]+$/u.test(href)) {
+      return null;
+    }
+    return {
+      href,
+      targetId: href.slice(1)
+    };
+  });
+  if (!sourceMarkerTarget) {
+    throw new Error("Could not find an inline [n] source marker link in About.");
+  }
+
+  await page
+    .locator(
+      `section[aria-label='Place details'] [data-panel-section='about'] a[href='${sourceMarkerTarget.href}']`
+    )
+    .first()
+    .click();
+
+  await page.waitForFunction(
+    ({ sourceToggleSelector, targetId, panelSelector }) => {
+      const toggle = document.querySelector(sourceToggleSelector);
+      const target = document.getElementById(targetId);
+      const panel = document.querySelector(panelSelector);
+      if (
+        !(toggle instanceof HTMLButtonElement) ||
+        !(target instanceof HTMLElement) ||
+        !(panel instanceof HTMLElement)
+      ) {
+        return false;
+      }
+
+      if (toggle.getAttribute("aria-expanded") !== "true") {
+        return false;
+      }
+      if (document.activeElement !== target) {
+        return false;
+      }
+
+      const panelBounds = panel.getBoundingClientRect();
+      const targetBounds = target.getBoundingClientRect();
+      const visibleTop = Math.max(panelBounds.top, targetBounds.top);
+      const visibleBottom = Math.min(panelBounds.bottom, targetBounds.bottom);
+      return visibleBottom - visibleTop > 0;
+    },
+    {
+      sourceToggleSelector: panelSectionToggleSelector("sources"),
+      targetId: sourceMarkerTarget.targetId,
+      panelSelector: placePanelSelector
+    },
+    { timeout: 30_000, polling: 100 }
+  );
+
+  const sourceMarkerJump = await page.evaluate(
+    ({ sourceToggleSelector, targetId, panelSelector }) => {
+      const toggle = document.querySelector(sourceToggleSelector);
+      const target = document.getElementById(targetId);
+      const panel = document.querySelector(panelSelector);
+      if (
+        !(toggle instanceof HTMLButtonElement) ||
+        !(target instanceof HTMLElement) ||
+        !(panel instanceof HTMLElement)
+      ) {
+        return null;
+      }
+
+      const panelBounds = panel.getBoundingClientRect();
+      const targetBounds = target.getBoundingClientRect();
+      const visibleTop = Math.max(panelBounds.top, targetBounds.top);
+      const visibleBottom = Math.min(panelBounds.bottom, targetBounds.bottom);
+      const style = window.getComputedStyle(target);
+      const activeElement = document.activeElement;
+
+      return {
+        targetId,
+        expanded: toggle.getAttribute("aria-expanded"),
+        focusedId: activeElement instanceof HTMLElement ? activeElement.id : null,
+        visibleInPanel: visibleBottom - visibleTop > 0,
+        outline: style.outline,
+        backgroundColor: style.backgroundColor
+      };
+    },
+    {
+      sourceToggleSelector: panelSectionToggleSelector("sources"),
+      targetId: sourceMarkerTarget.targetId,
+      panelSelector: placePanelSelector
+    }
+  );
+  if (!sourceMarkerJump) {
+    throw new Error("Could not read source-marker jump details after clicking [n].");
+  }
+  if (sourceMarkerJump.expanded !== "true") {
+    throw new Error(
+      `Clicking an inline [n] marker should open Sources, got aria-expanded='${sourceMarkerJump.expanded}'.`
+    );
+  }
+  if (sourceMarkerJump.focusedId !== sourceMarkerTarget.targetId) {
+    throw new Error(
+      `Inline [n] marker should focus ${sourceMarkerTarget.targetId}, got '${sourceMarkerJump.focusedId ?? "null"}'.`
+    );
+  }
+  if (!sourceMarkerJump.visibleInPanel) {
+    throw new Error(`Inline [n] marker jump target '${sourceMarkerTarget.targetId}' is not visible.`);
+  }
+  const sourceEntryHighlightColor = parseCssRgbColor(sourceMarkerJump.backgroundColor);
+  if (!sourceEntryHighlightColor || sourceEntryHighlightColor.a <= 0) {
+    throw new Error(
+      `Inline [n] marker jump target should flash a highlight, got '${sourceMarkerJump.backgroundColor}'.`
+    );
+  }
+  if (!sourceMarkerJump.outline || sourceMarkerJump.outline === "none") {
+    throw new Error("Inline [n] marker jump target should show a visible focus ring.");
+  }
+
   await setPanelSectionExpanded(page, "photo-credits", true);
 
   const photoCreditsNoteText = (
@@ -2284,6 +2467,7 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
       photoCredits: true
     },
     hiddenSectionSnapshot,
+    sourceMarkerJump,
     photoCreditEntryCount: photoCreditEntries.length,
     firstCreditFocus,
     secondCreditFocus,
@@ -3469,6 +3653,30 @@ async function verifyShowAllPassages(page, baseUrl) {
     throw new Error(`Expanded scripture toggle should read 'Show fewer', got '${expandedButtonText}'.`);
   }
 
+  await page.evaluate(() => {
+    const panel = document.querySelector("section[aria-label='Place details']");
+    const toggle = document.querySelector(
+      "section[aria-label='Place details'] [data-show-all-passages='true']"
+    );
+    if (!(panel instanceof HTMLElement) || !(toggle instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const midpoint = window.innerHeight / 2;
+    const toggleTop = toggle.getBoundingClientRect().top;
+    panel.scrollTop += toggleTop - midpoint;
+  });
+  await page.waitForTimeout(100);
+  const topBeforeCollapse = await page.$eval(
+    "section[aria-label='Place details'] [data-show-all-passages='true']",
+    (element) => {
+      if (!(element instanceof HTMLButtonElement)) {
+        throw new Error("Show-fewer toggle was not found before collapse.");
+      }
+      return element.getBoundingClientRect().top;
+    }
+  );
+
   await showAllButton.first().click();
   await page.waitForFunction(
     () => {
@@ -3499,6 +3707,21 @@ async function verifyShowAllPassages(page, baseUrl) {
       `Collapsed scripture toggle should read 'Show all n passages', got '${collapsedButtonText}'.`
     );
   }
+  const topAfterCollapse = await page.$eval(
+    "section[aria-label='Place details'] [data-show-all-passages='true']",
+    (element) => {
+      if (!(element instanceof HTMLButtonElement)) {
+        throw new Error("Show-all toggle was not found after collapse.");
+      }
+      return element.getBoundingClientRect().top;
+    }
+  );
+  const collapseTogglePositionDelta = Math.abs(topAfterCollapse - topBeforeCollapse);
+  if (collapseTogglePositionDelta > 1.1) {
+    throw new Error(
+      `Collapsing to 'Show all' should keep the toggle in place; expected <=1.1 px movement, got ${collapseTogglePositionDelta.toFixed(2)} px.`
+    );
+  }
 
   return {
     totalPassages,
@@ -3506,7 +3729,10 @@ async function verifyShowAllPassages(page, baseUrl) {
     finalCount,
     collapsedCount,
     expandedButtonText,
-    collapsedButtonText
+    collapsedButtonText,
+    topBeforeCollapse,
+    topAfterCollapse,
+    collapseTogglePositionDelta
   };
 }
 

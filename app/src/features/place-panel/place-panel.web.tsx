@@ -4,7 +4,9 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type Dispatch,
   type KeyboardEvent as ReactKeyboardEvent,
+  type SetStateAction,
   type ReactNode,
   type RefObject
 } from "react";
@@ -74,6 +76,7 @@ const DEFAULT_COLLAPSIBLE_SECTION_EXPANDED_STATE: Record<CollapsibleSectionId, b
   sources: false,
   "photo-credits": false
 };
+// Module-level by design while a single panel instance renders; move this into context if that changes.
 let rememberedCollapsibleSectionExpandedState = {
   ...DEFAULT_COLLAPSIBLE_SECTION_EXPANDED_STATE
 };
@@ -94,6 +97,62 @@ function panelSectionContentId(placeId: string, sectionId: CollapsibleSectionId)
 
 function headingWithCount(label: string, count: number) {
   return `${label} · ${count}`;
+}
+
+function clearEntryHighlightTimeout(highlightTimeoutRef: {
+  current: number | null;
+}) {
+  if (highlightTimeoutRef.current === null) {
+    return;
+  }
+  window.clearTimeout(highlightTimeoutRef.current);
+  highlightTimeoutRef.current = null;
+}
+
+function focusAndHighlightEntry({
+  targetId,
+  setHighlightedEntryId,
+  highlightTimeoutRef
+}: {
+  targetId: string;
+  setHighlightedEntryId: Dispatch<SetStateAction<string | null>>;
+  highlightTimeoutRef: { current: number | null };
+}) {
+  const targetElement = document.getElementById(targetId);
+  if (!(targetElement instanceof HTMLElement)) {
+    return;
+  }
+
+  targetElement.focus();
+  targetElement.scrollIntoView({
+    block: "nearest"
+  });
+  setHighlightedEntryId(targetId);
+  clearEntryHighlightTimeout(highlightTimeoutRef);
+  highlightTimeoutRef.current = window.setTimeout(() => {
+    setHighlightedEntryId((current) => (current === targetId ? null : current));
+    highlightTimeoutRef.current = null;
+  }, PHOTO_CREDIT_HIGHLIGHT_DURATION_MS);
+}
+
+function panelJumpTargetStyle({
+  isFocused,
+  isHighlighted,
+  prefersReducedMotion
+}: {
+  isFocused: boolean;
+  isHighlighted: boolean;
+  prefersReducedMotion: boolean;
+}): CSSProperties {
+  return {
+    borderRadius: "4px",
+    outline: isFocused || isHighlighted ? `2px solid ${tokens.color.accent}` : "none",
+    outlineOffset: "2px",
+    backgroundColor: isHighlighted ? "rgba(26,115,232,0.12)" : "transparent",
+    transition: prefersReducedMotion
+      ? "none"
+      : "background-color 180ms ease-out, outline-color 180ms ease-out"
+  };
 }
 
 interface PlacePanelProps {
@@ -957,10 +1016,13 @@ export function PlacePanel({
   const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
   const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
   const photoCreditHighlightTimeoutRef = useRef<number | null>(null);
+  const sourceEntryHighlightTimeoutRef = useRef<number | null>(null);
   const showAllScriptureToggleRef = useRef<HTMLButtonElement | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [highlightedSourceEntryId, setHighlightedSourceEntryId] = useState<string | null>(null);
+  const [focusedSourceEntryId, setFocusedSourceEntryId] = useState<string | null>(null);
   const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
   const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -1181,18 +1243,15 @@ export function PlacePanel({
 
   useEffect(
     () => () => {
-      if (photoCreditHighlightTimeoutRef.current !== null) {
-        window.clearTimeout(photoCreditHighlightTimeoutRef.current);
-      }
+      clearEntryHighlightTimeout(photoCreditHighlightTimeoutRef);
+      clearEntryHighlightTimeout(sourceEntryHighlightTimeoutRef);
     },
     []
   );
 
   useEffect(() => {
-    if (photoCreditHighlightTimeoutRef.current !== null) {
-      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
-      photoCreditHighlightTimeoutRef.current = null;
-    }
+    clearEntryHighlightTimeout(photoCreditHighlightTimeoutRef);
+    clearEntryHighlightTimeout(sourceEntryHighlightTimeoutRef);
   }, [selectedPlace.id]);
 
   useEffect(
@@ -1380,40 +1439,26 @@ export function PlacePanel({
   };
 
   const focusPhotoCreditEntry = (targetId: string) => {
-    const targetElement = document.getElementById(targetId);
-    if (!(targetElement instanceof HTMLElement)) {
-      return;
-    }
-
-    targetElement.focus();
-    targetElement.scrollIntoView({
-      block: "nearest"
+    focusAndHighlightEntry({
+      targetId,
+      setHighlightedEntryId: setHighlightedPhotoCreditId,
+      highlightTimeoutRef: photoCreditHighlightTimeoutRef
     });
-    setHighlightedPhotoCreditId(targetId);
+  };
 
-    if (photoCreditHighlightTimeoutRef.current !== null) {
-      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
-    }
-
-    photoCreditHighlightTimeoutRef.current = window.setTimeout(() => {
-      setHighlightedPhotoCreditId((current) => (current === targetId ? null : current));
-      photoCreditHighlightTimeoutRef.current = null;
-    }, PHOTO_CREDIT_HIGHLIGHT_DURATION_MS);
+  const focusSourceEntry = (targetId: string) => {
+    focusAndHighlightEntry({
+      targetId,
+      setHighlightedEntryId: setHighlightedSourceEntryId,
+      highlightTimeoutRef: sourceEntryHighlightTimeoutRef
+    });
   };
 
   const jumpToSource = (sourceOrdinal: number) => {
     const targetId = `source-${sourceOrdinal}`;
     setSectionExpanded("sources", true);
     window.requestAnimationFrame(() => {
-      const targetElement = document.getElementById(targetId);
-      if (!(targetElement instanceof HTMLElement)) {
-        return;
-      }
-
-      targetElement.focus();
-      targetElement.scrollIntoView({
-        block: "nearest"
-      });
+      focusSourceEntry(targetId);
     });
   };
 
@@ -2133,16 +2178,39 @@ export function PlacePanel({
                     }}
                   >
                     {sourceCitations.map((citation, index) => {
+                      const sourceEntryId = `source-${index + 1}`;
+                      const isHighlighted = highlightedSourceEntryId === sourceEntryId;
+                      const isFocused = focusedSourceEntryId === sourceEntryId;
                       const safeCitationUrl = toSafeHttpUrl(citation.url);
                       return (
                         <li
                           data-source-entry="true"
-                          id={`source-${index + 1}`}
+                          id={sourceEntryId}
                           key={citation.id}
+                          onBlur={(event) => {
+                            const nextFocused = event.relatedTarget;
+                            if (
+                              nextFocused instanceof Node &&
+                              event.currentTarget.contains(nextFocused)
+                            ) {
+                              return;
+                            }
+                            setFocusedSourceEntryId((current) =>
+                              current === sourceEntryId ? null : current
+                            );
+                          }}
+                          onFocus={() => {
+                            setFocusedSourceEntryId(sourceEntryId);
+                          }}
                           style={{
                             marginBottom: `${tokens.spacing.sm}px`,
                             fontSize: `${tokens.typography.bodySize}px`,
-                            lineHeight: `${tokens.typography.bodyLineHeight}px`
+                            lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                            ...panelJumpTargetStyle({
+                              isFocused,
+                              isHighlighted,
+                              prefersReducedMotion
+                            })
                           }}
                           tabIndex={-1}
                         >
@@ -2227,17 +2295,11 @@ export function PlacePanel({
                             marginBottom: `${tokens.spacing.sm}px`,
                             fontSize: `${tokens.typography.bodySize}px`,
                             lineHeight: `${tokens.typography.bodyLineHeight}px`,
-                            borderRadius: "4px",
-                            outline:
-                              isHighlighted || isFocused
-                                ? `2px solid ${tokens.color.accent}`
-                                : "none",
-                            outlineOffset: "2px",
-                            backgroundColor: isHighlighted
-                              ? "rgba(26,115,232,0.12)"
-                              : "transparent",
-                            transition:
-                              "background-color 180ms ease-out, outline-color 180ms ease-out"
+                            ...panelJumpTargetStyle({
+                              isFocused,
+                              isHighlighted,
+                              prefersReducedMotion
+                            })
                           }}
                           tabIndex={-1}
                         >
@@ -2469,6 +2531,7 @@ const sectionHeadingStyle: CSSProperties = {
 
 const sectionHeadingToggleButtonStyle: CSSProperties = {
   width: "100%",
+  minHeight: "44px",
   border: "none",
   background: "transparent",
   padding: "2px 4px",
