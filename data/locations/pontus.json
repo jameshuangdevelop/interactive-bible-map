@@ -4,6 +4,10 @@
     "ancient": [
       "Pontus"
     ],
+    "modern": "Northeastern Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "region",

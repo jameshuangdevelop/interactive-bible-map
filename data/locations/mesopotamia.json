@@ -4,6 +4,12 @@
     "ancient": [
       "Mesopotamia"
     ],
+    "modern": "Mostly Iraq, with parts of Syria and Türkiye",
+    "modernCountries": [
+      "Iraq",
+      "Syria",
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "region",

@@ -4,6 +4,11 @@
     "ancient": [
       "Illyricum"
     ],
+    "modern": "Bosnia and Herzegovina, with the Croatian coast",
+    "modernCountries": [
+      "Bosnia and Herzegovina",
+      "Croatia"
+    ],
     "alternate": [
       "Dalmatia"
     ]
@@ -35,7 +40,9 @@
       "pleiades:981522",
       "bib:isbe-illyricum",
       "scripture:Romans 15:19",
-      "scripture:2 Timothy 4:10"
+      "scripture:2 Timothy 4:10",
+      "wikidata:Q224",
+      "wikidata:Q225"
     ]
   },
   "history": [

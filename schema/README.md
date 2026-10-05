@@ -36,11 +36,11 @@ All example values below are **illustrative only** (not verified historical clai
 - `site`: local site/feature context.
 
 ### Prominence
-- `prominence: "major"` marks one of the ADR-0029 major places, which target 5 to 10 images.
+- `prominence: "major"` marks one of the ADR-0029 major places, which target 4 to 7 images, counting the AI reconstruction (updated 2026-10-05).
 - `prominence: "standard"` marks every other place, which target 1 to 3 images.
 - The validator enforces the machine-checkable limits:
   - standard places must have at most 3 images;
-  - major places must have at least 5 images; this has been an error since every major place reached 5 (M3.5), and setting `REQUIRE_MAJOR_IMAGES=false` turns it back into a warning.
+  - major places must have at least 4 images while `REQUIRE_MAJOR_IMAGES` is on (the default); setting it to `false` reduces this to a warning. More than 7 is always an error.
 
 ### Ancient area hierarchy (AD 50 convention until M4 timeline)
 - `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
@@ -77,16 +77,20 @@ If any candidate has confidence `disputed`, the record must include at least **t
 - Scripture-linkage name matching still uses all configured names (`ancient`, `alternate`, `modern`, and `otherLanguages`).
 
 ### Modern names
-- `names.modern` is optional and, when present, must be the modern place name only.
-- Do not include country, state, province, political descriptors, or editorial notes in `names.modern`.
-- A disputed place is a record with at least one candidate whose confidence is `disputed`.
-- For disputed places, leave out `names.modern`; candidate labels already carry the modern site names.
-- For other places with several candidates, give `names.modern` only when one neutral name covers every candidate; otherwise leave it out.
-- Region and island records should use a neutral geographic name when one exists; otherwise leave `names.modern` out. This takes precedence over the several-candidates rule above (for example, Malta keeps `Malta` although a low-confidence candidate is Mljet). Leave it out where every modern name in use carries a political meaning (Judea, Samaria) or no modern region matches (Galatia).
+- `names.modernCountries` lists the present-day countries or territories a place or area lies in (ADR-0028), in the order a reader should see them: the country holding most of the place first.
+- `names.modernCountries` values come from one allow-list in `schema/location.schema.json` (`$defs.modernCountry`). If a record needs a value that isn't on the list, the Research Lead adds it in the same commit as that record, and the Fact-Checker reviews the addition.
+- Exempt records must omit `names.modernCountries`: records of type `empire`, the record `jerusalem`, and any record whose `parentId` chain includes `jerusalem`.
+- Every other record must have at least one `names.modernCountries` value.
+- Places outside any one country's undisputed territory use the territory name most English news and reference works use, such as `West Bank` or `Golan Heights`. The name describes where the place is, not who should rule it.
+- Places with several candidates list the countries of all their candidates (for example Cana: `Israel`, `Lebanon`).
+- Area records (`type: "province"` or `type: "region"`) must have `names.modern`: a short orienting phrase such as `Central Türkiye` or `Parts of Greece, North Macedonia and Albania`, or a plain geographic name that already orients the reader (`Crete`, `Galilee`). An area spanning many countries lists the main ones (at most 6) in `names.modernCountries`. Natural features are not areas.
+- For every other record, `names.modern` is the modern place name only, with no country, state, political descriptor or editorial note; the app adds the countries itself. A name that is also a country's name (`Malta`, `Cyprus`) is fine.
 - When an ancient site has no modern settlement of its own, `Near <town>` is allowed (for example `Near Denizli`).
-- Candidate `label` fields follow the same neutrality rule: no country, state or political descriptor.
-- The validator enforces the machine-checkable parts: `names.modern` must not contain the word `disputed`, and disputed places must omit `names.modern`.
-- Country/descriptor neutrality is reviewed by the Research Lead and Fact-Checker.
+- A disputed place is a record with at least one candidate whose confidence is `disputed`. Disputed places omit `names.modern` (candidate labels already carry the modern site names), and this takes precedence over the area rule above.
+- For other places with several candidates, give `names.modern` only when one neutral name covers every candidate; otherwise leave it out.
+- Candidate `label` fields stay the modern site name only, with no country, state or political descriptor.
+- The validator checks the machine-checkable parts: `names.modern` never contains the word `disputed`; disputed places omit `names.modern`; non-exempt records have `names.modernCountries` and exempt records don't; area records have `names.modern`. Now that all 89 records carry these fields, the last three are errors by default (`REQUIRE_MODERN_COUNTRIES` in `scripts/lib/validator.mjs`); pass `validateData({ requireModernCountries: false })` to relax them back to warnings.
+- The Research Lead and Fact-Checker review what the validator can't, such as a country inside an ordinary place's `names.modern`.
 
 ### Status workflow
 - `status: "draft"`: in-progress research; `verifiedBy` and `lastReviewed` are optional.

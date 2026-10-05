@@ -4,6 +4,12 @@
     "ancient": [
       "Syria"
     ],
+    "modern": "Syria, Lebanon and southeastern Türkiye",
+    "modernCountries": [
+      "Syria",
+      "Lebanon",
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -40,7 +46,10 @@
       "bib:nlt-2015-biblegateway",
       "bib:kjv-1987-biblegateway",
       "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:csb-2017-biblegateway",
+      "wikidata:Q858",
+      "wikidata:Q822",
+      "wikidata:Q43"
     ]
   },
   "history": [

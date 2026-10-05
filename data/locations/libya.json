@@ -4,6 +4,10 @@
     "ancient": [
       "Libya"
     ],
+    "modern": "Eastern Libya",
+    "modernCountries": [
+      "Libya"
+    ],
     "alternate": []
   },
   "type": "region",

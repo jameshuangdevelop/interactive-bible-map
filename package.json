@@ -28,7 +28,11 @@
     "test:app": "npm run test --workspace interactive-bible-map-app",
     "test:all": "npm test && npm run test:app",
     "export:web": "node scripts/export-web.mjs",
-    "verify:web:playwright": "node scripts/verify-web-export-playwright.mjs"
+    "verify:web:playwright": "node scripts/verify-web-export-playwright.mjs",
+    "verify:web:smoke": "node scripts/verify-web-smoke-playwright.mjs",
+    "verify:web:axe": "node scripts/verify-web-axe-playwright.mjs",
+    "verify:web:lighthouse": "node scripts/verify-web-lighthouse.mjs",
+    "check:pages:limits": "node scripts/check-pages-limits.mjs app/dist"
   },
   "dependencies": {
     "ajv": "8.20.0",
@@ -36,6 +40,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.0",
+    "lighthouse": "^12.8.2",
     "playwright": "1.63.0",
     "sharp": "^0.35.5-rc.0",
     "undici": "^7.24.4"

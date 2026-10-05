@@ -61,20 +61,11 @@
   <text class="small" x="24" y="222">Photo: <tspan fill="#202124">author</tspan> · <tspan class="link">license</tspan> · <tspan class="link">Wikimedia Commons</tspan></text>
 
   <text x="24" y="262" font-size="22" font-weight="600" fill="#202124">Emmaus</text>
-  <text class="muted" x="24" y="286">Village · <tspan class="link">Judea</tspan></text>
-  <rect x="24" y="300" width="360" height="40" rx="8" fill="#FCE8E6"/>
-  <text x="40" y="325" font-size="14" font-weight="500" fill="#A50E0E">Location disputed · 4 proposed sites</text>
-
-  <g fill="#ffffff" stroke="#DADCE0" stroke-width="1.5">
-    <circle cx="60" cy="380" r="20"/><circle cx="140" cy="380" r="20"/><circle cx="220" cy="380" r="20"/>
-  </g>
-  <circle cx="60" cy="380" r="7" fill="none" stroke="#1A73E8" stroke-width="2"/><circle cx="60" cy="380" r="2" fill="#1A73E8"/>
-  <text x="140" y="385" font-size="15" fill="#1A73E8" text-anchor="middle">🔗</text>
-  <g stroke="#1A73E8" stroke-width="2"><line x1="211" y1="374" x2="229" y2="374"/><line x1="211" y1="380" x2="229" y2="380"/><line x1="211" y1="386" x2="223" y2="386"/></g>
-  <text x="60" y="418" font-size="12" fill="#1A73E8" text-anchor="middle">Fit all sites</text>
-  <text x="140" y="418" font-size="12" fill="#1A73E8" text-anchor="middle">Copy link</text>
-  <text x="220" y="418" font-size="12" fill="#1A73E8" text-anchor="middle">Sources</text>
-  <line x1="0" y1="434" x2="408" y2="434" stroke="#DADCE0"/>
+  <text class="muted" x="24" y="286">Today: Israel and the West Bank</text>
+  <rect x="198" y="272" width="186" height="26" rx="13" fill="#FCE8E6"/>
+  <text x="291" y="289" font-size="12" font-weight="500" fill="#A50E0E" text-anchor="middle">Location disputed · 4 proposed sites</text>
+  <text class="muted" x="24" y="334">Village · <tspan class="link">Judea</tspan></text>
+  <line x1="0" y1="356" x2="408" y2="356" stroke="#DADCE0"/>
 
   <text class="h2" x="24" y="462">Proposed sites</text>
   <!-- Candidate A (selected) -->
@@ -109,7 +100,7 @@
   <text x="24" y="880" font-size="15" fill="#202124" font-family="Georgia, 'Noto Serif', serif">Behold, two of them were going that very day …</text>
 
   <!-- Annotations -->
-  <path class="leader" d="M384,320 L440,300"/><text class="note" x="446" y="304">Disputed places: a banner instead of a modern-name line</text>
+  <path class="leader" d="M384,286 L440,300"/><text class="note" x="446" y="304">Disputed places: countries + disputed chip on one "Today" line</text>
   <path class="leader" d="M396,511 L440,520"/><text class="note" x="446" y="524">Candidates in the data's order, all styled alike; the selected one is highlighted</text>
   <text class="note" x="446" y="544">Selecting a candidate centres the map on it; opening the place fits all four</text>
   <path class="leader" d="M378,690 L440,690"/><text class="note" x="446" y="694">Confidence chip per candidate, in words</text>

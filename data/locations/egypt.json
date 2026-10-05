@@ -4,6 +4,10 @@
     "ancient": [
       "Egypt"
     ],
+    "modern": "Egypt",
+    "modernCountries": [
+      "Egypt"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -36,7 +40,8 @@
       "scripture:Acts 2:9",
       "scripture:Acts 2:10",
       "bib:strabo-geography",
-      "bib:worldhistory-cassius-dio"
+      "bib:worldhistory-cassius-dio",
+      "wikidata:Q79"
     ]
   },
   "history": [

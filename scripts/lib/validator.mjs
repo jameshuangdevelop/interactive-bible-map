@@ -64,8 +64,10 @@ export const PROJECT_BOUNDS = Object.freeze({
   maxLat: 50
 });
 export const REQUIRE_EMPIRE_ROOT = true;
+export const REQUIRE_MODERN_COUNTRIES = true;
 export const REQUIRE_MAJOR_IMAGES = true;
-export const MAJOR_PLACE_MIN_IMAGE_COUNT = 5;
+export const MAJOR_PLACE_MIN_IMAGE_COUNT = 4;
+export const MAJOR_PLACE_MAX_IMAGE_COUNT = 7;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
 export const MAX_AI_IMAGE_WIDTH_PX = 1600;
 export const MAX_AI_IMAGE_BYTES = 400 * 1024;
@@ -965,6 +967,48 @@ function getParentId(locationData) {
   return typeof locationData?.parentId === "string" ? locationData.parentId : undefined;
 }
 
+function locationHasAncestorId(locationRecordsById, locationId, ancestorId) {
+  let currentRecord = locationRecordsById.get(locationId);
+  const visitedIds = new Set();
+
+  while (currentRecord) {
+    const currentId = currentRecord.data?.id;
+    if (typeof currentId === "string") {
+      if (visitedIds.has(currentId)) {
+        return false;
+      }
+      visitedIds.add(currentId);
+    }
+
+    const parentId = getParentId(currentRecord.data);
+    if (!parentId) {
+      return false;
+    }
+    if (parentId === ancestorId) {
+      return true;
+    }
+
+    currentRecord = locationRecordsById.get(parentId);
+  }
+
+  return false;
+}
+
+function recordModernNamesPolicyIssue({
+  requireModernCountries,
+  errors,
+  warnings,
+  file,
+  pathValue,
+  message
+}) {
+  if (requireModernCountries) {
+    recordError(errors, file, pathValue, message);
+  } else {
+    recordWarning(warnings, file, pathValue, message);
+  }
+}
+
 function validateLocationHierarchy({
   locationRecordsById,
   requireEmpireRoot,
@@ -1185,6 +1229,10 @@ export async function validateData(options = {}) {
     typeof options.requireEmpireRoot === "boolean"
       ? options.requireEmpireRoot
       : REQUIRE_EMPIRE_ROOT;
+  const requireModernCountries =
+    typeof options.requireModernCountries === "boolean"
+      ? options.requireModernCountries
+      : REQUIRE_MODERN_COUNTRIES;
   const requireMajorImagesFromEnvironment = parseBooleanEnvironmentFlag(
     process.env.REQUIRE_MAJOR_IMAGES
   );
@@ -1524,6 +1572,56 @@ export async function validateData(options = {}) {
       });
     }
 
+    const locationId = typeof data.id === "string" ? data.id : undefined;
+    const isAreaRecord = data.type === "province" || data.type === "region";
+    const modernCountriesExempt =
+      data.type === "empire" ||
+      locationId === "jerusalem" ||
+      (typeof locationId === "string" &&
+        locationHasAncestorId(locationRecordsById, locationId, "jerusalem"));
+    const hasModernCountriesField =
+      typeof data.names === "object" &&
+      data.names !== null &&
+      Object.hasOwn(data.names, "modernCountries");
+    const hasModernCountries =
+      Array.isArray(data.names?.modernCountries) && data.names.modernCountries.length > 0;
+
+    if (!modernCountriesExempt && !hasModernCountries) {
+      recordModernNamesPolicyIssue({
+        requireModernCountries,
+        errors,
+        warnings,
+        file: locationRecord.relativePath,
+        pathValue: "$.names.modernCountries",
+        message:
+          "names.modernCountries is required for all non-exempt records (all records except empires, jerusalem, and records whose parent chain includes jerusalem)"
+      });
+    }
+
+    if (modernCountriesExempt && hasModernCountriesField) {
+      recordModernNamesPolicyIssue({
+        requireModernCountries,
+        errors,
+        warnings,
+        file: locationRecord.relativePath,
+        pathValue: "$.names.modernCountries",
+        message:
+          "names.modernCountries must be omitted for exempt records (empires, jerusalem, and records whose parent chain includes jerusalem)"
+      });
+    }
+
+    if (isAreaRecord && !hasDisputedCandidate && typeof data.names?.modern !== "string") {
+      recordModernNamesPolicyIssue({
+        requireModernCountries,
+        errors,
+        warnings,
+        file: locationRecord.relativePath,
+        pathValue: "$.names.modern",
+        message:
+          "Records of type 'province' or 'region' must define names.modern unless any candidate confidence is 'disputed'"
+      });
+    }
+
     if (typeof data.names?.modern === "string") {
       if (/\bdisputed\b/iu.test(data.names.modern)) {
         recordError(
@@ -1760,6 +1858,15 @@ export async function validateData(options = {}) {
           mediaRecord.relativePath,
           "$.images",
           `Standard places must have at most ${STANDARD_PLACE_MAX_IMAGE_COUNT} images`
+        );
+      }
+
+      if (prominence === "major" && data.images.length > MAJOR_PLACE_MAX_IMAGE_COUNT) {
+        recordError(
+          errors,
+          mediaRecord.relativePath,
+          "$.images",
+          `Major places must have at most ${MAJOR_PLACE_MAX_IMAGE_COUNT} images`
         );
       }
 

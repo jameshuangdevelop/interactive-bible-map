@@ -5,6 +5,9 @@
       "Italy"
     ],
     "modern": "Italy",
+    "modernCountries": [
+      "Italy"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -40,7 +43,8 @@
       "scripture:Acts 28:13",
       "scripture:Acts 28:16",
       "scripture:Hebrews 13:24",
-      "bib:worldhistory-cassius-dio"
+      "bib:worldhistory-cassius-dio",
+      "wikidata:Q38"
     ]
   },
   "history": [
