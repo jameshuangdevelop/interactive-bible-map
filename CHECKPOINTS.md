@@ -9,11 +9,21 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
 | CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
-| CP3b | M3 MVP App | Working MVP deployed to a preview | **In progress** (M3-06 and M3-14 to M3-16) | |
+| CP3b | M3 MVP App | Working MVP deployed to a preview | **In progress** (M3-06, M3-14 to M3-16, M3-18 and M3-19) | |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
 | CP7 | M7 Mobile-web polish | Responsive layout, touch gestures, performance | Not started | |
+
+### Mini checkpoints (ADR-0031)
+Lighter stops between checkpoints: the PO opens the app with the work so far on a local server, and you try it and give feedback. There's no PR and no approval; only the step listed under "Waits for your feedback" is held.
+
+| MC | On the way to | What you can try | Waits for your feedback | Status |
+|---|---|---|---|---|
+| MC0 | CP3b | Today's app (main), as a baseline for the changes below | Nothing | Done 2026-10-05: photo credits at the end and a pointer over pins (ADR-0032, M3-19); a hosted site to share (M3-06) |
+| MC1 | CP3b | Countries on the "Today" line and in search results, the chip moved onto that line, no action bar (M3-14's data with M3-15), and galleries of 4 to 7 images (M3-18) | The reviews of M3-14, M3-15 and M3-18 | Not yet |
+| MC2 | CP3b | The longer "About" for the first 13 places (M3-16 half 1), and photo credits at the end of the panel with a pointer over pins (M3-19) | The second half's writing, and M3-19's review | Not yet |
+| MC3 | CP3b | Everything merged and built as it will deploy, with the accessibility and speed results (M3-06, M3-14 to M3-16, M3-18 and M3-19) | The push | Not yet |
 
 ---
 
