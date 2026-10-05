@@ -860,7 +860,7 @@ async function verifyGalleryFixtureBoundsAtViewport(
 
 async function waitForMapToSettle(page) {
   await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
-  await page.waitForSelector("button[data-place-entry-id]", { timeout: 60_000 });
+  await page.waitForSelector("button[data-place-entry-id]", { timeout: 30_000 });
   // A fixed delay isn't enough on a slow or busy machine (software WebGL on CI runners), so also
   // wait until the camera has stopped and every tile has loaded, then allow for label placement.
   await page.waitForFunction(
@@ -2759,6 +2759,8 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
 
 async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPaths) {
   await fs.mkdir(path.dirname(screenshotPaths.ephesusPanel), { recursive: true });
+  const desktopViewportSize = page.viewportSize() ?? { width: 1440, height: 960 };
+  const narrowViewportSize = { width: 360, height: desktopViewportSize.height };
 
   const panelSelector = "section[aria-label='Place details']";
   const panelLocator = page.locator(panelSelector);
@@ -2825,6 +2827,47 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await panelLocator.screenshot({ path: screenshotPaths.emmausPanel });
 
+  await page.setViewportSize(narrowViewportSize);
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
+
+  const emmausNarrowWrapLayout = await page.evaluate((todayLineSelectorParam) => {
+    const todayLine = document.querySelector(todayLineSelectorParam);
+    if (!(todayLine instanceof HTMLElement)) {
+      throw new Error(`Could not find today line '${todayLineSelectorParam}' at narrow width.`);
+    }
+
+    const todayText = Array.from(todayLine.children).find(
+      (child) => child instanceof HTMLElement && !child.hasAttribute("data-location-chip")
+    );
+    if (!(todayText instanceof HTMLElement)) {
+      throw new Error("Could not find today-line text element at narrow width.");
+    }
+
+    const disputedChip = todayLine.querySelector("[data-location-chip='disputed']");
+    if (!(disputedChip instanceof HTMLElement)) {
+      throw new Error("Could not find disputed chip element at narrow width.");
+    }
+
+    const todayTextBounds = todayText.getBoundingClientRect();
+    const disputedChipBounds = disputedChip.getBoundingClientRect();
+    return {
+      textTop: todayTextBounds.top,
+      textBottom: todayTextBounds.bottom,
+      chipTop: disputedChipBounds.top,
+      chipBottom: disputedChipBounds.bottom
+    };
+  }, todayLineSelector);
+
+  if (emmausNarrowWrapLayout.chipTop <= emmausNarrowWrapLayout.textBottom + 1) {
+    throw new Error(
+      `Emmaus today-line chip did not wrap below the text on narrow width: ${JSON.stringify(emmausNarrowWrapLayout)}.`
+    );
+  }
+
+  await page.setViewportSize(desktopViewportSize);
+
   await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
@@ -2876,6 +2919,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   return {
     ephesusTodayLine,
     emmausTodayLine,
+    emmausNarrowWrapLayout,
     jerusalemTodayLine,
     ephesusResultText,
     removedActionButtons

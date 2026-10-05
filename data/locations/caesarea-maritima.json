@@ -6,6 +6,9 @@
       "Strato's Tower"
     ],
     "modern": "Caesarea",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [
       "Straton's Tower",
       "Caesarea"
@@ -32,21 +35,42 @@
     }
   ],
   "summary": {
-    "text": "Caesarea Maritima was a Mediterranean port city built by Herod the Great on the site of the older settlement of Strato's Tower and named for Augustus. It served as the administrative center of Roman Judea and appears repeatedly in Acts as the base of Roman governors and the site of Paul's imprisonment before his voyage to Rome.",
+    "text": "Caesarea Maritima was a Mediterranean port that Herod the Great built from the ground up over about twelve years, on a stretch of coast between Joppa and Dora that had no good natural harbors. Herod named the city for the Roman emperor Augustus, building it in white stone with palaces, public buildings, a theatre, and an amphitheatre. Its showpiece was an artificial harbor that the Jewish historian Josephus compares in size to the Piraeus at Athens, built by sinking huge stone blocks into twenty fathoms of water to form a mole 200 feet wide; a temple holding statues of Rome and of Caesar stood on a rise overlooking the harbor, visible to approaching ships from far out at sea.",
     "sources": [
       "pleiades:678401",
       "wikidata:Q319242",
-      "openbible:caesarea",
-      "scripture:Acts 23:33",
-      "scripture:Acts 25:1"
+      "bib:josephus-antiquities",
+      "bib:isbe-caesarea",
+      "bib:worldhistory-josephus",
+      "bib:worldhistory-augustus"
     ]
   },
   "history": [
     {
-      "text": "Herod the Great constructed the city, including an artificial harbor, naming it Caesarea in honor of Augustus.",
+      "text": "By Paul's day, Caesarea was the residence of the Roman governor of Judea. Acts describes it as the home of Cornelius, a centurion of the \"Italian Regiment,\" whose Gentile household was baptized at Peter's command, and as the place where Paul was held \"in Herod's palace\" and kept in custody for two years under the governors Felix and Festus, until his final voyage to Rome.",
       "sources": [
-        "pleiades:678401",
-        "wikidata:Q319242"
+        "scripture:Acts 10:1",
+        "scripture:Acts 23:33",
+        "scripture:Acts 23:35",
+        "scripture:Acts 24:1",
+        "scripture:Acts 25:1",
+        "scripture:Acts 10:45",
+        "scripture:Acts 10:48",
+        "scripture:Acts 24:27",
+        "bib:isbe-caesarea"
+      ]
+    },
+    {
+      "text": "Riots between the city's Gentile and Jewish populations helped touch off the Jewish revolt against Rome. During that war, Roman soldiers at Caesarea hailed the general Vespasian as emperor, and his son Titus later celebrated his brother Domitian's birthday there by having 2,500 Jewish captives fight wild animals in the city's amphitheatre.",
+      "sources": [
+        "bib:isbe-caesarea",
+        "bib:worldhistory-vespasian"
+      ]
+    },
+    {
+      "text": "Caesarea was finally destroyed in 1265, during the Crusades. Today visitors to the site can see the ruins of a cathedral built where Herod's temple had stood, and of two aqueducts that brought water to the city.",
+      "sources": [
+        "bib:isbe-caesarea"
       ]
     }
   ],
@@ -112,6 +136,11 @@
       "textWEB": "When they came to Caesarea and delivered the letter to the governor, they also presented Paul to him."
     },
     {
+      "ref": "Acts 23:35",
+      "book": "Acts",
+      "textWEB": "“I will hear you fully when your accusers also arrive.” He commanded that he be kept in Herod’s palace."
+    },
+    {
       "ref": "Acts 24:1",
       "book": "Acts",
       "textWEB": "After five days, the high priest, Ananias, came down with certain elders and an orator, one Tertullus. They informed the governor against Paul."
@@ -140,11 +169,26 @@
       "ref": "Acts 25:24",
       "book": "Acts",
       "textWEB": "Festus said, “King Agrippa, and all men who are here present with us, you see this man about whom all the multitude of the Jews petitioned me, both at Jerusalem and here, crying that he ought not to live any longer."
+    },
+    {
+      "ref": "Acts 10:45",
+      "book": "Acts",
+      "textWEB": "They of the circumcision who believed were amazed, as many as came with Peter, because the gift of the Holy Spirit was also poured out on the Gentiles."
+    },
+    {
+      "ref": "Acts 10:48",
+      "book": "Acts",
+      "textWEB": "He commanded them to be baptized in the name of Jesus Christ. Then they asked him to stay some days."
+    },
+    {
+      "ref": "Acts 24:27",
+      "book": "Acts",
+      "textWEB": "But when two years were fulfilled, Felix was succeeded by Porcius Festus, and desiring to gain favor with the Jews, Felix left Paul in bonds."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

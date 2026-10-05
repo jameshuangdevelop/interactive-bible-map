@@ -5,6 +5,9 @@
       "Caesarea Philippi"
     ],
     "modern": "Banias",
+    "modernCountries": [
+      "Golan Heights"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Paneas",
@@ -73,5 +76,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

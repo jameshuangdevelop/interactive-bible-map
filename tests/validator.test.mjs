@@ -71,8 +71,66 @@ async function runCase(caseName, options = {}) {
     // now defaulting to true. Tests that exercise the empire-root rule pass
     // requireEmpireRoot explicitly (see runWithTemporaryHierarchyCase below).
     requireEmpireRoot: false,
+    // Same reasoning as requireEmpireRoot above: these fixtures predate
+    // names.modernCountries, so default it off here and let the tests that
+    // exercise the modern-countries rule pass requireModernCountries
+    // explicitly (see runWithTemporaryHierarchyCase below).
+    requireModernCountries: false,
     ...validationOptions
   });
+}
+
+// Reuses the valid-major-few-images fixture as a template for 3/4/7/8-image major-place cases.
+async function runWithTemporaryMajorImageCountCase(imageCount, options = {}) {
+  const temporaryDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "ibm-validator-major-images-")
+  );
+
+  try {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+
+    const majorFewImagesCaseDirectory = path.join(casesDirectory, "valid-major-few-images");
+    for (const locationFileName of ["capernaum.json", "galilee.json"]) {
+      fs.copyFileSync(
+        path.join(majorFewImagesCaseDirectory, "locations", locationFileName),
+        path.join(locationsDirectory, locationFileName)
+      );
+    }
+
+    const mediaPath = path.join(majorFewImagesCaseDirectory, "media", "capernaum.json");
+    const mediaData = JSON.parse(fs.readFileSync(mediaPath, "utf8"));
+    const templateImage = mediaData.images[0];
+    mediaData.images = Array.from({ length: imageCount }, (_, index) => ({
+      ...templateImage,
+      id: `capernaum-${String(index + 1).padStart(2, "0")}`
+    }));
+
+    fs.writeFileSync(
+      path.join(mediaDirectory, "capernaum.json"),
+      `${JSON.stringify(mediaData, null, 2)}\n`
+    );
+
+    const { webVplPath = webFixturePath, ...validationOptions } = options;
+    return await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
+      aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
+      webVplPath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      // This fixture predates names.modernCountries; keep this helper focused
+      // on image-count behavior unless a caller explicitly overrides it.
+      requireModernCountries: false,
+      ...validationOptions
+    });
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
 }
 
 function toDraftRecord(record) {
@@ -121,6 +179,9 @@ async function runWithTemporaryCase(mutateLocations, options = {}) {
       // See the comment in runCase above: this fixture pair predates the
       // empire/province hierarchy and has no empire-rooted parentId chain.
       requireEmpireRoot: false,
+      // See the comment in runCase above: this fixture pair predates
+      // names.modernCountries.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
@@ -203,6 +264,10 @@ async function runWithTemporaryHierarchyCase(mutateLocations, options = {}) {
       webVplPath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This helper's cityData/provinceData/empireData literals above don't
+      // set names.modernCountries; default it off here and let the tests
+      // that exercise the modern-countries rule pass it explicitly.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
@@ -577,8 +642,33 @@ test("standard places cannot have more than three images", async () => {
   );
 });
 
-test("major places with fewer than five images emit only a warning when REQUIRE_MAJOR_IMAGES is off", async () => {
-  const result = await runCase("valid-major-few-images", { requireMajorImages: false });
+test("major places with four images pass", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(4);
+  assert.equal(result.errors.length, 0);
+});
+
+test("major places with seven images pass", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(7);
+  assert.equal(result.errors.length, 0);
+});
+
+test("major places with more than seven images fail", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(8);
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images" &&
+        error.message.includes("at most 7 images")
+    )
+  );
+});
+
+test("major places with three images emit only a warning when REQUIRE_MAJOR_IMAGES is off", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(3, {
+    requireMajorImages: false
+  });
   assert.equal(result.errors.length, 0);
   assert.ok(
     hasWarning(
@@ -586,33 +676,35 @@ test("major places with fewer than five images emit only a warning when REQUIRE_
       (warning) =>
         warning.file.endsWith("media/capernaum.json") &&
         warning.path === "$.images" &&
-        warning.message.includes("at least 5 images")
+        warning.message.includes("at least 4 images")
     )
   );
 });
 
-test("major places with fewer than five images fail by default", async () => {
-  const defaultResult = await runCase("valid-major-few-images");
+test("major places with three images fail by default", async () => {
+  const defaultResult = await runWithTemporaryMajorImageCountCase(3);
   assert.ok(
     hasError(
       defaultResult,
       (error) =>
         error.file.endsWith("media/capernaum.json") &&
         error.path === "$.images" &&
-        error.message.includes("at least 5 images")
+        error.message.includes("at least 4 images")
     )
   );
 });
 
-test("major places with fewer than five images fail when REQUIRE_MAJOR_IMAGES is enabled", async () => {
-  const result = await runCase("valid-major-few-images", { requireMajorImages: true });
+test("major places with three images fail when REQUIRE_MAJOR_IMAGES is enabled", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(3, {
+    requireMajorImages: true
+  });
   assert.ok(
     hasError(
       result,
       (error) =>
         error.file.endsWith("media/capernaum.json") &&
         error.path === "$.images" &&
-        error.message.includes("at least 5 images")
+        error.message.includes("at least 4 images")
     )
   );
 });
@@ -1183,8 +1275,10 @@ test("names.modern word check respects word boundaries", async () => {
       webVplPath: webFixturePath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This ad hoc fixture predates the empire/province hierarchy (M3-11).
-      requireEmpireRoot: false
+      // This ad hoc fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
+      requireEmpireRoot: false,
+      requireModernCountries: false
     });
 
     assert.equal(result.errors.length, 0);
@@ -1226,9 +1320,34 @@ test("multi-candidate non-disputed record may keep names.modern", async () => {
   assert.equal(result.errors.length, 0);
 });
 
-test("modern-countries requirement is warning-only by default", async () => {
-  assert.equal(REQUIRE_MODERN_COUNTRIES, false);
+test("modern-countries requirement is an error by default", async () => {
+  assert.equal(REQUIRE_MODERN_COUNTRIES, true);
 
+  // Bypass runWithTemporaryHierarchyCase's fixture-compatibility default
+  // (which pins requireModernCountries to false for its inline fixtures,
+  // which predate this field) so this test exercises the real module
+  // default with no requireModernCountries option supplied at all, the same
+  // way npm run validate:data calls validateData in production.
+  const result = await validateData({
+    locationsDirectory: path.join(validCaseDirectory, "locations"),
+    mediaDirectory: path.join(validCaseDirectory, "media"),
+    webVplPath: webFixturePath,
+    bibliographyPath: bibliographyFixturePath,
+    skipSnapshotChecksumCheck: true,
+    requireEmpireRoot: false
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    )
+  );
+});
+
+test("modern-countries requirement can be explicitly disabled to a warning", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {
       cityData.names = {
@@ -1326,6 +1445,66 @@ test("non-exempt records with empty names.modernCountries still fail the policy 
   );
 });
 
+test("names.modernCountries rejects values outside the allow-list", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Narnia"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries[0]" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("names.modernCountries rejects duplicate values", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Greece", "Greece"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("exempt records must omit names.modernCountries (jerusalem and descendants)", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {
@@ -1369,6 +1548,81 @@ test("exempt records must omit names.modernCountries (jerusalem and descendants)
         error.path === "$.names.modernCountries" &&
         error.message.includes("must be omitted for exempt records")
     )
+  );
+});
+
+test("jerusalem exemption applies at grandchild depth", async () => {
+  const runDepthCase = (grandchildModernCountries) =>
+    runWithTemporaryHierarchyCase(
+      ({ cityData, provinceData, empireData }) => {
+        cityData.id = "bethesda-grandchild";
+        cityData.names = {
+          ancient: ["Bethesda Grandchild"],
+          modern: "Bethesda Grandchild",
+          alternate: [],
+          ...(grandchildModernCountries
+            ? { modernCountries: grandchildModernCountries }
+            : {})
+        };
+        cityData.parentId = "temple-mount";
+
+        provinceData.id = "temple-mount";
+        provinceData.type = "city";
+        provinceData.zoomTier = "city";
+        provinceData.names = {
+          ancient: ["Temple Mount"],
+          modern: "Temple Mount",
+          alternate: []
+        };
+        provinceData.parentId = "jerusalem";
+
+        empireData.id = "jerusalem";
+        empireData.type = "city";
+        empireData.zoomTier = "city";
+        empireData.names = {
+          ancient: ["Jerusalem"],
+          modern: "Jerusalem",
+          alternate: []
+        };
+      },
+      {
+        requireModernCountries: true,
+        requireEmpireRoot: false
+      }
+    );
+
+  const omittedResult = await runDepthCase(undefined);
+  assert.equal(
+    hasError(
+      omittedResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
+  );
+  assert.equal(omittedResult.errors.length, 0);
+
+  const presentResult = await runDepthCase(["Greece"]);
+  assert.ok(
+    hasError(
+      presentResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("must be omitted for exempt records")
+    )
+  );
+  assert.equal(
+    hasError(
+      presentResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
   );
 });
 

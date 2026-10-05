@@ -5,6 +5,9 @@
       "Nazareth"
     ],
     "modern": "Nazareth",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [
       "Nazarene"
     ],
@@ -35,26 +38,51 @@
     }
   ],
   "summary": {
-    "text": "Nazareth was a small Galilean village in the first century AD, identified in the Gospels of Matthew and Luke as the town where Jesus grew up and from which he is repeatedly called 'Jesus of Nazareth' throughout the New Testament.",
+    "text": "Nazareth was a small farming village in Lower Galilee, on the southern edge of the Galilean hills above the Jezreel Valley, in Herod Antipas's tetrarchy. About 6 km to the north stood Sepphoris, a much larger city that Antipas rebuilt early in the first century; the Jewish historian Josephus calls it \"the security of all Galilee\" and says Antipas \"made it the metropolis of the country.\" Matthew and Luke identify Nazareth as the town where Jesus grew up, and he is called \"Jesus of Nazareth\" throughout the New Testament.",
     "sources": [
       "wikidata:Q430776",
-      "openbible:nazareth",
+      "dare:22899",
+      "pleiades:678299",
+      "bib:custodia-nazareth",
+      "bib:josephus-jewish-war",
+      "bib:josephus-antiquities",
+      "wikidata:Q1132798",
+      "scripture:Luke 3:1",
       "scripture:Matthew 2:23",
-      "scripture:Mark 1:24",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "scripture:Luke 2:51",
+      "scripture:Acts 2:22",
+      "bib:worldhistory-josephus"
     ]
   },
   "history": [
     {
-      "text": "Excavations beneath and around the Basilica of the Annunciation and nearby sites, notably at the Sisters of Nazareth Convent, have uncovered rock-cut tombs, cisterns, and a domestic structure consistent with a small first-century Jewish village, matching the modest size implied by the Gospels' description of Nazareth.",
+      "text": "The Gospels describe Jesus growing up in Nazareth and returning to his home town, where people called him \"the carpenter\" and \"the carpenter's son,\" and going into its synagogue on the Sabbath \"as was his custom.\" Luke says that when he spoke there as an adult, the congregation was \"filled with wrath,\" threw him out of the town and led him to the brow of its hill \"that they might throw him off the cliff.\" In John, Nathanael asks, \"Can any good thing come out of Nazareth?\" Jesus is called \"Jesus of Nazareth\" or \"the Nazarene\" about twenty times in the Gospels and Acts, including on the title Pilate placed on the cross.",
+      "sources": [
+        "scripture:Mark 6:1",
+        "scripture:Mark 6:3",
+        "scripture:Matthew 13:55",
+        "scripture:Luke 4:16",
+        "scripture:Luke 4:28",
+        "scripture:Luke 4:29",
+        "scripture:John 1:46",
+        "scripture:Mark 1:24",
+        "scripture:Mark 16:6",
+        "scripture:John 19:19"
+      ]
+    },
+    {
+      "text": "Excavations beneath and around the Basilica of the Annunciation and the nearby Sisters of Nazareth Convent have uncovered rock-cut tombs, cisterns, grain-storage pits and dwellings built around natural caves, consistent with a small first-century Jewish village; the Franciscan excavators describe \"an agricultural village... gradually structured with simple dwellings constructed around caves used for their domestic work and for the recovery of animals.\"",
       "sources": [
         "bib:dark-nazareth-archaeology",
+        "bib:custodia-nazareth",
         "openbible:nazareth"
+      ]
+    },
+    {
+      "text": "Today Nazareth is a large city and a center of Christian pilgrimage. Its Basilica of the Annunciation, a modern building inaugurated in 1969, draws millions of pilgrims each year, and the excavated remains of the ancient village can be visited beside it. Other churches in the town, such as the Church of Saint Joseph, mark further Gospel traditions.",
+      "sources": [
+        "wikidata:Q430776",
+        "bib:custodia-nazareth"
       ]
     }
   ],
@@ -145,6 +173,16 @@
       "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
     },
     {
+      "ref": "Luke 4:28",
+      "book": "Luke",
+      "textWEB": "They were all filled with wrath in the synagogue as they heard these things."
+    },
+    {
+      "ref": "Luke 4:29",
+      "book": "Luke",
+      "textWEB": "They rose up, threw him out of the city, and led him to the brow of the hill that their city was built on, that they might throw him off the cliff."
+    },
+    {
       "ref": "Luke 4:34",
       "book": "Luke",
       "textWEB": "saying, “Ah! what have we to do with you, Jesus of Nazareth? Have you come to destroy us? I know who you are: the Holy One of God!”"
@@ -218,6 +256,21 @@
       "ref": "Acts 26:9",
       "book": "Acts",
       "textWEB": "“I myself most certainly thought that I ought to do many things contrary to the name of Jesus of Nazareth."
+    },
+    {
+      "ref": "Luke 3:1",
+      "book": "Luke",
+      "textWEB": "Now in the fifteenth year of the reign of Tiberius Caesar, Pontius Pilate being governor of Judea, and Herod being tetrarch of Galilee, and his brother Philip tetrarch of the region of Ituraea and Trachonitis, and Lysanias tetrarch of Abilene,"
+    },
+    {
+      "ref": "Mark 6:3",
+      "book": "Mark",
+      "textWEB": "Isn’t this the carpenter, the son of Mary and brother of James, Joses, Judah, and Simon? Aren’t his sisters here with us?” So they were offended at him."
+    },
+    {
+      "ref": "Matthew 13:55",
+      "book": "Matthew",
+      "textWEB": "Isn’t this the carpenter’s son? Isn’t his mother called Mary, and his brothers James, Joses, Simon, and Judas?"
     }
   ],
   "otConnections": [
@@ -267,5 +320,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

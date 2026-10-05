@@ -5,6 +5,9 @@
       "Jericho"
     ],
     "modern": "Jericho",
+    "modernCountries": [
+      "West Bank"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Hierichous",
@@ -50,26 +53,48 @@
     }
   ],
   "summary": {
-    "text": "Jericho, near the Jordan River in the eastern Judean lowlands, is one of the most anciently inhabited sites in the region; the Gospels set the healing of a blind man (or men) and Jesus' encounter with the tax collector Zacchaeus on the road through or near the city.",
+    "text": "Jericho lies in the Jordan Valley north of the Dead Sea, in a desert oasis watered by the perennial spring of 'Ain es-Sultan, and is one of the most anciently inhabited sites in the region. By the first century AD the inhabited city had shifted about two kilometers south of the Old Testament-era mound, Tell es-Sultan, to a new site that the Hasmoneans, a line of Jewish kings, and later the family of Herod the Great built up as a winter palace complex. The Jewish historian Josephus praises the oasis's many kinds of palm trees, its balsam and its cypress trees, writing that whoever called the place divine \"would not be mistaken.\"",
     "sources": [
       "wikidata:Q2402267",
-      "openbible:jericho-1",
-      "scripture:Mark 10:46",
-      "scripture:Luke 19:1",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "dare:23403",
+      "pleiades:687917",
+      "bib:unesco-ancient-jericho",
+      "bib:custodia-jericho",
+      "wikidata:Q2460244",
+      "bib:murphy-oconnor-holy-land-guide",
+      "bib:josephus-jewish-war",
+      "bib:worldhistory-josephus"
     ]
   },
   "history": [
     {
-      "text": "The Old Testament city associated with Joshua's conquest narrative is generally identified with the tell of Tell es-Sultan; by the first century AD the inhabited settlement had shifted about two kilometers south to a site built up by the Hasmonean and Herodian dynasties as a winter palace complex, which is the Jericho of the Gospel narratives.",
+      "text": "The Gospels set several episodes on the road through or near the city: Jesus healing a blind man, or two men, and his encounter with Zacchaeus, \"a chief tax collector\" who \"was rich.\" Luke's parable of the Good Samaritan begins with a man \"going down from Jerusalem to Jericho.\" Hebrews recalls that the walls of Jericho \"fell down after they had been encircled for seven days,\" and credits this to faith.",
       "sources": [
+        "scripture:Mark 10:46",
+        "scripture:Luke 18:35",
+        "scripture:Matthew 20:30",
+        "bib:custodia-jericho",
+        "scripture:Luke 19:1",
+        "scripture:Luke 19:2",
+        "scripture:Luke 10:30",
+        "scripture:Hebrews 11:30"
+      ]
+    },
+    {
+      "text": "Much later, a palace complex now known as Hisham's Palace was built at Khirbat al-Mafjar, just north of the city, with baths and a water system of aqueducts, bridges and a mill that its surveyors date to the Umayyad, or early Islamic, period.",
+      "sources": [
+        "bib:pef-khirbat-al-mafjar",
+        "wikidata:Q2456319"
+      ]
+    },
+    {
+      "text": "Today Jericho is a town around the ancient oasis, and the spring of 'Ain es-Sultan still serves as a water source. Visitors can see the excavated Hasmonean and Herodian winter palaces, the mound of Tell es-Sultan, now a UNESCO World Heritage Site and national archaeological park just northwest of the modern town, and Hisham's Palace to the north.",
+      "sources": [
+        "bib:unesco-ancient-jericho",
+        "wikidata:Q2402267",
         "wikidata:Q2460244",
-        "bib:murphy-oconnor-holy-land-guide"
+        "wikidata:Q2456319",
+        "bib:pef-khirbat-al-mafjar"
       ]
     }
   ],
@@ -100,9 +125,19 @@
       "textWEB": "He entered and was passing through Jericho."
     },
     {
+      "ref": "Luke 19:2",
+      "book": "Luke",
+      "textWEB": "There was a man named Zacchaeus. He was a chief tax collector, and he was rich."
+    },
+    {
       "ref": "Hebrews 11:30",
       "book": "Hebrews",
       "textWEB": "By faith the walls of Jericho fell down after they had been encircled for seven days."
+    },
+    {
+      "ref": "Matthew 20:30",
+      "book": "Matthew",
+      "textWEB": "Behold, two blind men sitting by the road, when they heard that Jesus was passing by, cried out, “Lord, have mercy on us, you son of David!”"
     }
   ],
   "otConnections": [
@@ -160,5 +195,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

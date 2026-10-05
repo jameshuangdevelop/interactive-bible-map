@@ -5,6 +5,9 @@
       "Damascus"
     ],
     "modern": "Damascus",
+    "modernCountries": [
+      "Syria"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Darmeseq"
@@ -31,31 +34,52 @@
     }
   ],
   "summary": {
-    "text": "Damascus is among the oldest continuously inhabited cities in the world and, in Acts, the city near which Paul experienced his conversion and where he first preached. Isaiah's oracle against Aram calls it 'the head of Syria.'",
+    "text": "Damascus lies in the northwest corner of the Ghuta, a fertile plain about 2,300 feet above sea level watered by the river Barada, the Abana of the Old Testament, and surrounded on three sides by bare hills, with open desert along its eastern edge. Among the most ancient cities of the Middle East, it had been part of the Roman province of Syria since the Roman general Pompey's conquest in 64 BC. In 2 Corinthians, Paul writes that around the time of his escape from the city, \"the governor under King Aretas guarded the Damascenes' city, desiring to arrest me.\" How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that the Roman emperor Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, so this map places Damascus within the Roman province of Syria as of about AD 50.",
     "sources": [
       "pleiades:678106",
       "wikidata:Q3678596",
-      "openbible:damascus",
-      "scripture:Acts 9:3",
-      "scripture:Acts 9:27",
-      "scripture:Isaiah 7:8",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:isbe-damascus",
+      "scripture:2 Corinthians 11:32",
+      "bib:isbe-aretas",
+      "wikipedia:Aretas_IV_Philopatris",
+      "bib:livius-nabataeans",
+      "bib:livius-damascus",
+      "bib:unesco-damascus",
+      "bib:worldhistory-pompey"
     ]
   },
   "history": [
     {
-      "text": "In 2 Corinthians 11:32 Paul writes: 'In Damascus the governor under King Aretas guarded the Damascenes’ city, desiring to arrest me.' How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, and Damascus had been part of the Roman province of Syria since Pompey's conquest in 64 BC, so this project places it in Syria for about AD 50.",
+      "text": "Acts describes a light from the sky blinding Saul of Tarsus as he approached Damascus, and a voice identifying itself as Jesus; led by companions into the city, he was blind for three days until a disciple named Ananias, obeying a vision, restored his sight at a house on \"the street which is called Straight.\" Saul, who became known as Paul, then preached in the city's synagogues that Jesus was the Christ, and his growing boldness provoked a plot to kill him: the Jews of the city \"watched the gates both day and night,\" and Paul escaped by night, let down over the city wall in a basket.",
       "sources": [
-        "scripture:2 Corinthians 11:32",
-        "bib:isbe-aretas",
-        "wikipedia:Aretas_IV_Philopatris",
-        "bib:livius-nabataeans",
-        "bib:livius-damascus"
+        "scripture:Acts 9:3",
+        "scripture:Acts 9:8",
+        "scripture:Acts 9:10",
+        "scripture:Acts 9:11",
+        "scripture:Acts 9:19",
+        "scripture:Acts 9:22",
+        "scripture:Acts 9:24",
+        "scripture:Acts 9:25",
+        "scripture:Acts 9:5",
+        "scripture:Acts 9:9",
+        "scripture:Acts 9:17",
+        "scripture:Acts 9:18",
+        "scripture:Acts 9:20",
+        "scripture:Acts 9:23",
+        "scripture:Acts 13:9"
+      ]
+    },
+    {
+      "text": "Centuries later, the Umayyad caliphate made Damascus the capital of its empire, and the eighth-century Great Mosque of the Umayyads was built within the old city on the site of a Roman temple, over an earlier Christian basilica.",
+      "sources": [
+        "bib:unesco-damascus"
+      ]
+    },
+    {
+      "text": "Today Damascus is a living city whose old quarter still follows the Roman street grid. Part of the ancient colonnaded street is still known as Derb el-Mustakim, \"Straight Street,\" though it is uncertain whether it has carried that name continuously since antiquity. Visitors can also see the remains of the Roman Temple of Jupiter, stretches of the Roman city wall, and the Great Mosque of the Umayyads.",
+      "sources": [
+        "bib:isbe-damascus",
+        "bib:unesco-damascus"
       ]
     }
   ],
@@ -81,6 +105,11 @@
       "textWEB": "Now there was a certain disciple at Damascus named Ananias. The Lord said to him in a vision, “Ananias!” He said, “Behold, it’s me, Lord.”"
     },
     {
+      "ref": "Acts 9:11",
+      "book": "Acts",
+      "textWEB": "The Lord said to him, “Arise and go to the street which is called Straight, and inquire in the house of Judah for one named Saul, a man of Tarsus. For behold, he is praying,"
+    },
+    {
       "ref": "Acts 9:19",
       "book": "Acts",
       "textWEB": "He took food and was strengthened. Saul stayed several days with the disciples who were at Damascus."
@@ -89,6 +118,16 @@
       "ref": "Acts 9:22",
       "book": "Acts",
       "textWEB": "But Saul increased more in strength, and confounded the Jews who lived at Damascus, proving that this is the Christ."
+    },
+    {
+      "ref": "Acts 9:24",
+      "book": "Acts",
+      "textWEB": "but their plot became known to Saul. They watched the gates both day and night that they might kill him,"
+    },
+    {
+      "ref": "Acts 9:25",
+      "book": "Acts",
+      "textWEB": "but his disciples took him by night and let him down through the wall, lowering him in a basket."
     },
     {
       "ref": "Acts 9:27",
@@ -139,6 +178,41 @@
       "ref": "Galatians 1:17",
       "book": "Galatians",
       "textWEB": "nor did I go up to Jerusalem to those who were apostles before me, but I went away into Arabia. Then I returned to Damascus."
+    },
+    {
+      "ref": "Acts 9:5",
+      "book": "Acts",
+      "textWEB": "He said, “Who are you, Lord?” The Lord said, “I am Jesus, whom you are persecuting."
+    },
+    {
+      "ref": "Acts 9:9",
+      "book": "Acts",
+      "textWEB": "He was without sight for three days, and neither ate nor drank."
+    },
+    {
+      "ref": "Acts 9:17",
+      "book": "Acts",
+      "textWEB": "Ananias departed and entered into the house. Laying his hands on him, he said, “Brother Saul, the Lord, who appeared to you on the road by which you came, has sent me that you may receive your sight and be filled with the Holy Spirit.”"
+    },
+    {
+      "ref": "Acts 9:18",
+      "book": "Acts",
+      "textWEB": "Immediately something like scales fell from his eyes, and he received his sight. He arose and was baptized."
+    },
+    {
+      "ref": "Acts 9:20",
+      "book": "Acts",
+      "textWEB": "Immediately in the synagogues he proclaimed the Christ, that he is the Son of God."
+    },
+    {
+      "ref": "Acts 9:23",
+      "book": "Acts",
+      "textWEB": "When many days were fulfilled, the Jews conspired together to kill him,"
+    },
+    {
+      "ref": "Acts 13:9",
+      "book": "Acts",
+      "textWEB": "But Saul, who is also called Paul, filled with the Holy Spirit, fastened his eyes on him"
     }
   ],
   "otConnections": [
@@ -178,5 +252,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

@@ -5,6 +5,9 @@
       "Philadelphia"
     ],
     "modern": "Alaşehir",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Philadelpheia"
@@ -31,20 +34,43 @@
     }
   ],
   "summary": {
-    "text": "Philadelphia was an ancient city of Asia Minor, at the site of modern Alaşehir. It is one of the seven churches addressed in Revelation 2-3, told there, 'I have set before you an open door,' and given no rebuke.",
+    "text": "Philadelphia stood in the valley of the Cogamis river, a tributary of the Hermus, at the site of modern Alaşehir. It was founded by the Pergamene king Attalus II, whose loyalty to his brother Eumenes earned him the title \"Philadelphus\" (brother-loving), from which the city took its name. The Greek geographer Strabo describes Philadelphia as a city \"ever subject to earthquakes,\" whose house walls cracked constantly in different parts of the city at different times; because of this, few people lived within the city itself, and most of its residents farmed the fertile countryside around it instead. Philadelphia guarded the gateway to the high central plateau of Asia Minor and stood at the edge of the Katakekaumene (burnt land), a district whose ash-covered plains and black hills Strabo also describes.",
     "sources": [
       "pleiades:550822",
       "wikidata:Q138280",
-      "scripture:Revelation 3:7-13",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:ramsay-seven-churches",
+      "bib:strabo-geography",
+      "bib:worldhistory-strabo"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Philadelphia is one of the seven churches addressed in Revelation 3, and unlike most of the others it receives no rebuke. The risen Christ tells the congregation, \"I have set before you an open door, which no one can shut,\" and promises that whoever overcomes will become \"a pillar in the temple of my God\" who \"will go out from there no more.\" Some interpreters connect this promise of permanence to the city's long experience of earthquakes, which had repeatedly driven its residents out of their homes and into the open countryside.",
+      "sources": [
+        "scripture:Revelation 3:7",
+        "scripture:Revelation 3:8",
+        "scripture:Revelation 3:12",
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "text": "Philadelphia was one of twelve cities struck by a severe earthquake in AD 17; the Roman historian Tacitus records that the emperor Tiberius granted its people tax relief afterward. Writing a few years after that earthquake, Strabo describes continuing fear in the region, with many residents still living in huts outside the city rather than risk its walls; by the time Revelation was written, decades later, the city had been rebuilt, though its reputation as a city prone to earthquakes persisted.",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:strabo-geography",
+        "bib:ramsay-seven-churches",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-tiberius"
+      ]
+    },
+    {
+      "text": "Today the site is occupied by the modern city of Alaşehir in Türkiye.",
+      "sources": [
+        "wikidata:Q138280",
+        "bib:ramsay-seven-churches"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Revelation 1:11",
@@ -55,11 +81,21 @@
       "ref": "Revelation 3:7",
       "book": "Revelation",
       "textWEB": "“To the angel of the assembly in Philadelphia write: “He who is holy, he who is true, he who has the key of David, he who opens and no one can shut, and who shuts and no one opens, says these things:"
+    },
+    {
+      "ref": "Revelation 3:8",
+      "book": "Revelation",
+      "textWEB": "“I know your works (behold, I have set before you an open door, which no one can shut), that you have a little power, and kept my word, and didn’t deny my name."
+    },
+    {
+      "ref": "Revelation 3:12",
+      "book": "Revelation",
+      "textWEB": "He who overcomes, I will make him a pillar in the temple of my God, and he will go out from there no more. I will write on him the name of my God and the name of the city of my God, the new Jerusalem, which comes down out of heaven from my God, and my own new name."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }
