@@ -44,7 +44,8 @@
       "bib:rainey-notley-sacred-bridge",
       "bib:josephus-jewish-war",
       "bib:livius-judaea",
-      "wikidata:Q1003997"
+      "wikidata:Q1003997",
+      "bib:worldhistory-josephus"
     ]
   },
   "history": [
@@ -75,7 +76,8 @@
         "wikidata:Q1003997",
         "bib:rainey-notley-sacred-bridge",
         "bib:josephus-jewish-war",
-        "scripture:Luke 21:20"
+        "scripture:Luke 21:20",
+        "bib:worldhistory-titus"
       ]
     },
     {

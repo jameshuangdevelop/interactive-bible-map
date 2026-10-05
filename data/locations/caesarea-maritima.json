@@ -37,7 +37,9 @@
       "pleiades:678401",
       "wikidata:Q319242",
       "bib:josephus-antiquities",
-      "bib:isbe-caesarea"
+      "bib:isbe-caesarea",
+      "bib:worldhistory-josephus",
+      "bib:worldhistory-augustus"
     ]
   },
   "history": [
@@ -58,7 +60,8 @@
     {
       "text": "Riots between the city's Gentile and Jewish populations helped touch off the Jewish revolt against Rome. During that war, Roman soldiers at Caesarea hailed the general Vespasian as emperor, and his son Titus later celebrated his brother Domitian's birthday there by having 2,500 Jewish captives fight wild animals in the city's amphitheatre.",
       "sources": [
-        "bib:isbe-caesarea"
+        "bib:isbe-caesarea",
+        "bib:worldhistory-vespasian"
       ]
     },
     {

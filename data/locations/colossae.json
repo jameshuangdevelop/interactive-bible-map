@@ -35,7 +35,10 @@
       "wikidata:Q1001370",
       "bib:strabo-geography",
       "bib:bas-colossae-yener",
-      "bib:isbe-colossae"
+      "bib:isbe-colossae",
+      "bib:worldhistory-strabo",
+      "bib:worldhistory-herodotus",
+      "bib:worldhistory-xenophon"
     ]
   },
   "history": [
@@ -54,7 +57,8 @@
       "sources": [
         "bib:tacitus-annals",
         "bib:bas-colossae-yener",
-        "bib:strabo-geography"
+        "bib:strabo-geography",
+        "bib:worldhistory-tacitus"
       ]
     },
     {

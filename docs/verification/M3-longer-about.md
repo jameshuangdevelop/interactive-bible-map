@@ -6,6 +6,7 @@ All 31 major places pass and are `verified` (`verifiedBy: "fact-checker"`, `last
 
 - **Half 1** (13 places, below): every place needed fixes. 14 bibliography entries were added.
 - **Half 2** (18 places, at the end): every place needed fixes. 2 bibliography entries were added. The same section covers the human's new rule on introducing names (ADR-0033). That rule touched 9 half-1 places plus 2 more fixes found by the scan (Mount of Olives and Jericho).
+- **Name-introduction sources** (second half-2 commit, PO ruling of 2026-10-05): every introduced person whose role no other cited source states now cites a biography page. That is 19 World History Encyclopedia pages and 1 Britannica page, cited in 27 places. One name with no such page (Metellus, at Crete) was trimmed.
 - **Checks on the final data:** all 520 `scripture[]` entries in the 31 places match the WEB, and all 263 `scripture:` citations exist. Every quoted phrase matches the WEB or its cited source. All 638 `bib:` citations in the location data resolve. `npm run validate:data` reports 0 errors and 186 warnings, `npm test` passes 137/137 and `npm run test:app` passes 93/93.
 
 ## Half 1 — Jerusalem and the Gospels
@@ -233,7 +234,7 @@ Each finding below is fixed in this commit, and the new text is in the records. 
 
 The scan applies rulings 2 and 3. Names a general reader knows need no introduction, such as Julius Caesar, Alexander the Great and Mark Antony. Biblical figures need none either, and neither do Herod Agrippa I and Archelaus, who appear as rulers with their role given. Candidate notes that name datasets are out of scope. Findings and fixes:
 
-- **Half 2:** I removed the "International Standard Bible Encyclopedia" name-drop (Corinth), Phidias (Athens), Polybius (Sardis) and John Chrysostom (Antioch). John Chrysostom's introduction, "fourth-century preacher", wasn't in ISBE. Octavian is now introduced as the later emperor Augustus. All other people, writers and works are introduced: Strabo, Tacitus, Josephus, Herodotus, Xenophon, Homer, Pompey, Mummius, Metellus, Cassander, Seleucus I, Antiochus II and III, Attalus II, Alyattes, Croesus, Cyrus, Polycarp, Tyrimnos, Celsus Polemaeanus, the emperors, Nicephorus Phokas and Barış Yener.
+- **Half 2:** I removed the "International Standard Bible Encyclopedia" name-drop (Corinth), Phidias (Athens), Polybius (Sardis) and John Chrysostom (Antioch). John Chrysostom's introduction, "fourth-century preacher", wasn't in ISBE. Octavian is now introduced as the later emperor Augustus. All other people, writers and works are introduced: Strabo, Tacitus, Josephus, Herodotus, Xenophon, Homer, Pompey, Mummius, Cassander, Seleucus I, Antiochus II and III, Attalus II, Alyattes, Croesus, Cyrus, Polycarp, Tyrimnos, Celsus Polemaeanus, the emperors, Nicephorus Phokas and Barış Yener.
 - **Half 1:** the scan found two more terms that a general reader wouldn't know. "All three Synoptic Gospels" (Mount of Olives) became "Matthew, Mark and Luke", the three cited Gospels. "The Hasmonean and Herodian dynasties" (Jericho) became "the Hasmoneans, a line of Jewish kings, and later the family of Herod the Great". That wording is from `wikidata:Q2460244` ("Hasmonean royal winter palaces") and *Jewish War* 1, both cited. The scan found no other unintroduced name.
 - **Databases and websites:** none is named in any About text. I read "a UNESCO World Heritage Site" as a designation, not as naming a source ("per UNESCO"). It appears in 8 places (Rome, Ephesus, Philippi, Pergamum, Jerusalem, Bethlehem, Jericho and Bethany beyond the Jordan); see "For the PO".
 
@@ -256,3 +257,43 @@ The scan applies rulings 2 and 3. Names a general reader knows need no introduct
 5. **Thin or dated "today" paragraphs.** Antioch, Galatia, Philadelphia and Thyatira have one-sentence "today" paragraphs. Caesarea's and Crete's rest on ISBE (1915) and Wikidata, because no modern authority page is in the bibliography. A later data pass could add one (for example, the Israel Nature and Parks Authority for Caesarea's harbour, which I cut as unsourced).
 6. **Corinth's refoundation:** ISBE says 46 BC and World History Encyclopedia says 44 BC. The text keeps 44 BC and cites World History Encyclopedia.
 7. **Supporting citations outside `scripture[]`:** Galatia cites Acts 13:14 and 14:6 and Damascus cites Acts 13:9 as supporting context, without listing them in the place's "In the Bible" passages, as half 1 did for its context verses. The 13 verses added in this review are in `scripture[]`, which accounts for the validator's 13 new warnings (173 to 186). Like the earlier ones, they are "WEB verse text contains none of this location's configured names".
+
+### Second commit: sources for the name introductions
+
+A cross-vendor review of M3-22 found that introductions such as "the Roman historian Tacitus" were cited only to the author's own work, which does not state the author's role. ADR-0017 needs a source that does. The PO ruled on 2026-10-05, for M3-16 too: keep the introductions and source them. This second commit ("data(locations): cite sources for the name introductions") applies the ruling to all 31 major places. It covers the 9 half-1 introductions, including Golgotha's `candidates[0].support`, and the half-2 text. It changes only `sources` (and one trimmed name, below) and `data/bibliography.json`. It replaces the "Source that states it" column in the table of the 9 half-1 introductions above for Josephus, Titus, Constantine and Justinian.
+
+I opened each page and confirmed that it states the role used in the text. Each entry below shows the page's own words:
+
+| `bib:` ID | Role stated on the page | Cited in |
+|---|---|---|
+| `worldhistory-josephus` | "a 1st-century CE Jewish historian" | jerusalem, temple-mount, mount-of-olives, nazareth, capernaum, sea-of-galilee, jericho, antioch-syria, caesarea-maritima (P1) |
+| `worldhistory-strabo` | author of the *Geography*, of "aristocratic Greek heritage" | colossae, thessalonica, smyrna, thyatira, philadelphia-lydia, laodicea (P1) |
+| `worldhistory-tacitus` | "a Roman historian" | rome P3, colossae P3, pergamum P1, sardis P1, philadelphia-lydia P3, laodicea P1 |
+| `worldhistory-herodotus`, `worldhistory-xenophon` | "a Greek historian"; Xenophon of Athens, author of the *Anabasis* | colossae P1 |
+| `britannica-origen` | "the most important theologian and biblical scholar of the early Greek church", c. 185–254 (Britannica blocks scripts, so it was opened through the Wayback Machine) | bethany-beyond-the-jordan P3 |
+| `worldhistory-augustus` | "the first … Roman emperor" | caesarea-maritima P1, pergamum P1 |
+| `worldhistory-tiberius` | "the second Roman emperor" | sea-of-galilee P1, smyrna P1, sardis P1, philadelphia-lydia P3 |
+| `worldhistory-claudius`, `worldhistory-nero` | "the fourth Roman emperor"; "the fifth Roman emperor" | rome P2; rome P3, corinth P3 |
+| `worldhistory-vespasian` | Roman emperor and military commander sent to the Judean revolt, succeeded by his sons Titus and Domitian | galatia P3, caesarea-maritima P3 |
+| `worldhistory-titus` | the "Roman commander" in the war in Judea, later emperor | jerusalem P3, temple-mount P3 |
+| `worldhistory-hadrian` | "emperor of Rome" | athens P3 |
+| `worldhistory-constantine` | "Roman emperor from 306 to 337" | golgotha P3 and `candidates[0]`, bethlehem P3, crete P3 |
+| `worldhistory-justinian` | "emperor of the Byzantine Empire" | bethlehem P3 (replaces the Wikidata person IDs added in the first commit) |
+| `worldhistory-pompey` | "a military leader" of the late Roman Republic | rome P1, damascus P1 |
+| `worldhistory-julius-caesar` | led his legions in the conquest of Gaul; dictator | corinth P1, philippi P1 |
+| `worldhistory-antigonus`, `worldhistory-lysimachus` | "one of the successor kings to Alexander the Great"; "assumed the title of king" | smyrna P1 |
+| `worldhistory-nikephoros-phokas` | a "commander who conquered Crete", later Byzantine emperor | crete P3 |
+
+The existing `worldhistory-sardis` was also cited in Sardis P2. It states that the Persian king Cyrus took Sardis in 547/546 BC and that Antiochus III besieged it. Several roles were already stated by a source cited in the same paragraph, so they needed nothing new:
+
+- Mummius, Cassander, Caligula, Alyattes, Seleucus I, Antiochus II, Attalus II and Eumenes, Albinus, Polycarp, Tyrimnos and Celsus Polemaeanus.
+- Octavian and Augustus at Philippi.
+- Trajan and Hadrian at Pergamum, and the emperors at Laodicea.
+- Homer, whom Strabo calls "the poet".
+- Biblical figures.
+
+**Trimmed:** Crete's "the Roman general Metellus". World History Encyclopedia has no page for him, Livius timed out, and Britannica's page could not be opened. The clause now reads "Rome annexed the island in 67 BC", which ISBE states.
+
+**Shared with M3-22:** six of these IDs are copied exactly from the entries the M3-22 branch adds (title, authors, year, URL and access date), so the two bibliographies are identical when they merge: `worldhistory-josephus`, `worldhistory-strabo`, `worldhistory-tacitus`, `worldhistory-nero`, `worldhistory-pompey` and `worldhistory-xenophon`. The other 14 are new to this branch.
+
+After this commit, `npm run validate:data` still reports 0 errors and 186 warnings, `npm test` passes 137/137 and `npm run test:app` passes 93/93. Every `bib:` ID resolves, and all 31 places are still 261–407 words.

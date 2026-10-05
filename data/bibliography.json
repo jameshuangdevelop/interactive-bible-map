@@ -1571,6 +1571,246 @@
       "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
       "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2387",
       "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-josephus",
+      "type": "web",
+      "title": "Flavius Josephus",
+      "authors": [
+        "Rebecca Denova"
+      ],
+      "year": 2021,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Flavius_Josephus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-strabo",
+      "type": "web",
+      "title": "Strabo of Amasia",
+      "authors": [
+        "Rosie Sykes"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Strabo_of_Amasia/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-tacitus",
+      "type": "web",
+      "title": "Tacitus",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/tacitus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-herodotus",
+      "type": "web",
+      "title": "Herodotus",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/herodotus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-xenophon",
+      "type": "web",
+      "title": "Xenophon",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/xenophon/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-augustus",
+      "type": "web",
+      "title": "Augustus",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/augustus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-tiberius",
+      "type": "web",
+      "title": "Tiberius: The Reclusive Roman Emperor",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Tiberius/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-claudius",
+      "type": "web",
+      "title": "Claudius: The Unlikely Roman Emperor",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/claudius/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-nero",
+      "type": "web",
+      "title": "Nero",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Nero/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-vespasian",
+      "type": "web",
+      "title": "Vespasian: The Commoner Who Became Roman Emperor",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Vespasian/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-titus",
+      "type": "web",
+      "title": "Titus (Roman Emperor)",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Titus_(Roman_Emperor)/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-hadrian",
+      "type": "web",
+      "title": "Hadrian",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2021,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/hadrian/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-constantine",
+      "type": "web",
+      "title": "Constantine I",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Constantine_I/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-justinian",
+      "type": "web",
+      "title": "Justinian I",
+      "authors": [
+        "Will Wyeth"
+      ],
+      "year": 2012,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Justinian_I/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-pompey",
+      "type": "web",
+      "title": "Pompey",
+      "authors": [
+        "James Lloyd"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pompey/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-julius-caesar",
+      "type": "web",
+      "title": "Julius Caesar",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2011,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Julius_Caesar/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-antigonus",
+      "type": "web",
+      "title": "Antigonus I",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2012,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Antigonus_I/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-lysimachus",
+      "type": "web",
+      "title": "Lysimachus",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2016,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Lysimachus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-nikephoros-phokas",
+      "type": "web",
+      "title": "Nikephoros II Phokas",
+      "authors": [
+        "Michael Goodyear"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Nikephoros_II_Phokas/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "britannica-origen",
+      "type": "web",
+      "title": "Origen",
+      "authors": [
+        "Henry Chadwick"
+      ],
+      "year": 1998,
+      "publisher": "Encyclopaedia Britannica",
+      "url": "https://www.britannica.com/biography/Origen",
+      "accessed": "2026-10-05"
     }
   ]
 }

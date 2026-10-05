@@ -38,7 +38,8 @@
       "bib:ritmeyer-temple-mount-quest",
       "bib:josephus-jewish-war",
       "bib:josephus-antiquities",
-      "scripture:John 2:20"
+      "scripture:John 2:20",
+      "bib:worldhistory-josephus"
     ]
   },
   "history": [
@@ -60,7 +61,8 @@
       "sources": [
         "wikidata:Q193163",
         "bib:josephus-jewish-war",
-        "bib:ritmeyer-temple-mount-quest"
+        "bib:ritmeyer-temple-mount-quest",
+        "bib:worldhistory-titus"
       ]
     },
     {

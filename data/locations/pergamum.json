@@ -39,7 +39,9 @@
       "bib:worldhistory-pergamon",
       "bib:strabo-geography",
       "bib:ramsay-seven-churches",
-      "bib:tacitus-annals"
+      "bib:tacitus-annals",
+      "bib:worldhistory-tacitus",
+      "bib:worldhistory-augustus"
     ]
   },
   "history": [

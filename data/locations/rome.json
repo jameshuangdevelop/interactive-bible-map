@@ -37,7 +37,8 @@
       "wikidata:Q220",
       "openbible:rome",
       "bib:isbe-rome",
-      "bib:platner-ashby-topographical-dictionary"
+      "bib:platner-ashby-topographical-dictionary",
+      "bib:worldhistory-pompey"
     ]
   },
   "history": [
@@ -53,13 +54,16 @@
         "scripture:Romans 1:7",
         "scripture:Romans 1:15",
         "scripture:Romans 15:24",
-        "bib:isbe-appii-forum"
+        "bib:isbe-appii-forum",
+        "bib:worldhistory-claudius"
       ]
     },
     {
       "text": "In July AD 64, a great fire burned through Rome for six days, destroying or badly damaging most of the city's fourteen districts. The Roman historian Tacitus records that the emperor Nero, to quiet rumors that he himself had ordered the fire, blamed it on a group \"whom the crowd styled Christians\" and had many of them put to death; Tacitus adds that their founder, \"Christus,\" had been executed in Judea \"by sentence of the procurator Pontius Pilatus.\" After the fire, Rome's streets were rebuilt wider, with lower buildings and fire-resistant stone, in place of the old city's narrow, twisting lanes.",
       "sources": [
-        "bib:tacitus-annals"
+        "bib:tacitus-annals",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-nero"
       ]
     },
     {

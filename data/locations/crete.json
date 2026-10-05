@@ -32,7 +32,7 @@
     }
   ],
   "summary": {
-    "text": "Crete is a long, mountainous island south of the Aegean Sea, about 156 miles long, with its central mountain range rising to more than 8,000 feet at Mount Ida. Excavations at Knossos and Phaistos show that Crete was a center of Mediterranean civilization in an early age, long before Rome's time; its most important ancient cities were Knossos, Gortyna, and Cydonia. Crete's support for pirate raiders gave Rome a pretext for war, and the Roman general Metellus annexed the island in 67 BC, joining it with Cyrene in North Africa as a single Roman province.",
+    "text": "Crete is a long, mountainous island south of the Aegean Sea, about 156 miles long, with its central mountain range rising to more than 8,000 feet at Mount Ida. Excavations at Knossos and Phaistos show that Crete was a center of Mediterranean civilization in an early age, long before Rome's time; its most important ancient cities were Knossos, Gortyna, and Cydonia. Crete's support for pirate raiders gave Rome a pretext for war, and Rome annexed the island in 67 BC, joining it with Cyrene in North Africa as a single Roman province.",
     "sources": [
       "wikidata:Q34374",
       "bib:isbe-crete"
@@ -57,7 +57,9 @@
     {
       "text": "Crete and Cyrene remained a single Roman province until the time of the Roman emperor Constantine, who made Crete a separate province. Arab forces conquered the island in AD 823, and it was recaptured for the Byzantine Empire by the general Nicephorus Phokas in the following century. Venice then ruled Crete from the thirteenth century until the Ottoman Turks took the island after a long siege that ended in 1669.",
       "sources": [
-        "bib:isbe-crete"
+        "bib:isbe-crete",
+        "bib:worldhistory-constantine",
+        "bib:worldhistory-nikephoros-phokas"
       ]
     },
     {

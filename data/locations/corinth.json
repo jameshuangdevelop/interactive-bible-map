@@ -36,7 +36,8 @@
       "pleiades:570182",
       "wikidata:Q1363688",
       "bib:isbe-corinth",
-      "bib:worldhistory-corinth"
+      "bib:worldhistory-corinth",
+      "bib:worldhistory-julius-caesar"
     ]
   },
   "history": [
@@ -57,7 +58,8 @@
     {
       "text": "Some years after Paul's visit, in AD 66-67, the emperor Nero tried to cut a ship canal through the isthmus so that vessels could avoid the overland crossing entirely; the project was never finished, and traces of Nero's unfinished canal were still visible before work began on the modern Corinth Canal.",
       "sources": [
-        "bib:isbe-corinth"
+        "bib:isbe-corinth",
+        "bib:worldhistory-nero"
       ]
     },
     {

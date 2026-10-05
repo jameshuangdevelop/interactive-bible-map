@@ -28,7 +28,8 @@
       "sources": [
         "wikidata:Q187702",
         "openbible:golgotha",
-        "bib:taylor-golgotha-reconsideration"
+        "bib:taylor-golgotha-reconsideration",
+        "bib:worldhistory-constantine"
       ]
     },
     {
@@ -78,7 +79,8 @@
         "bib:taylor-golgotha-reconsideration",
         "wikidata:Q1494672",
         "bib:garden-tomb-about",
-        "scripture:John 19:41"
+        "scripture:John 19:41",
+        "bib:worldhistory-constantine"
       ]
     },
     {

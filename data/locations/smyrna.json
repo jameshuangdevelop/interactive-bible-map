@@ -34,7 +34,11 @@
       "wikidata:Q1379299",
       "bib:strabo-geography",
       "bib:ramsay-seven-churches",
-      "bib:tacitus-annals"
+      "bib:tacitus-annals",
+      "bib:worldhistory-strabo",
+      "bib:worldhistory-tiberius",
+      "bib:worldhistory-antigonus",
+      "bib:worldhistory-lysimachus"
     ]
   },
   "history": [

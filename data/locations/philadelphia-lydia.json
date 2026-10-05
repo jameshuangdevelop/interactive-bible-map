@@ -36,7 +36,8 @@
       "pleiades:550822",
       "wikidata:Q138280",
       "bib:ramsay-seven-churches",
-      "bib:strabo-geography"
+      "bib:strabo-geography",
+      "bib:worldhistory-strabo"
     ]
   },
   "history": [
@@ -54,7 +55,9 @@
       "sources": [
         "bib:tacitus-annals",
         "bib:strabo-geography",
-        "bib:ramsay-seven-churches"
+        "bib:ramsay-seven-churches",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-tiberius"
       ]
     },
     {
