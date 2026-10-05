@@ -5,6 +5,5 @@ export interface MapViewProps {
   selection: PlaceSelection | null;
   highlightedPlaceId: string | null;
   leftPanelWidth: number;
-  focusRequestToken: number;
   onSelectPlace: (selection: PlaceSelection) => void;
 }
