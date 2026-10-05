@@ -32,38 +32,42 @@
     }
   ],
   "summary": {
-    "text": "The Mount of Olives is the ridge east of Jerusalem's Old City, separated from the Temple Mount by the Kidron Valley, with its summit directly overlooking the Temple precinct. Its name comes from the olive groves that, then as now, covered its terraced slopes; its eastern side descends through the villages of Bethphage and Bethany toward the Judean wilderness and, further on, Jericho and the Jordan Valley. No temple, synagogue or other major building stood on the ridge itself in this period; the Kidron Valley at its foot already held rock-cut tombs, part of a long-used burial ground.",
+    "text": "The Mount of Olives is the ridge east of Jerusalem's Old City, separated from the city and the Temple Mount by the Kidron Valley; Josephus places it about six furlongs (just over 1 km) from the city. Its name comes from the olive trees that have grown on its slopes for thousands of years. Its eastern side descends past the villages of Bethphage and Bethany toward the Judean Desert and the Dead Sea. Its slopes had long been used for burials: after David took the city, a number of Israelites chose to be buried there.",
     "sources": [
       "wikidata:Q205976",
       "openbible:mount-of-olives",
-      "bib:rainey-notley-sacred-bridge",
-      "bib:josephus-jewish-war"
+      "bib:josephus-jewish-war",
+      "bib:custodia-gethsemane"
     ]
   },
   "history": [
     {
-      "text": "The Gospels describe Jesus and his disciples regularly on the Mount of Olives: travelers coming up from Jericho passed its villages on the way into Jerusalem, Jesus sent two disciples from Bethphage to fetch a colt for his entry into the city, and he taught there, including the discourse later called the Olivet Discourse. Luke says that during his final days in Jerusalem he spent his nights on the mount, and all three Synoptic Gospels record him going out to the mount, to Gethsemane, for his last prayer on the night of his arrest; Acts records the disciples returning to Jerusalem from the mount after his ascension.",
+      "text": "The Gospels describe Jesus coming up from Jericho to Bethphage and Bethany at the Mount of Olives and sending two disciples ahead from there before his entry into Jerusalem; Luke says the crowd of disciples began to praise God \"at the descent of the Mount of Olives.\" Matthew says he was sitting on the mount when his disciples asked him privately about \"the end of the age.\" Luke says that in his last days he taught in the Temple by day and spent each night on the mount, and all three Synoptic Gospels say he went out to the mount on the night of his arrest. Acts records the disciples returning to Jerusalem from \"the mountain called Olivet,\" a Sabbath day's journey away.",
       "sources": [
         "scripture:Mark 10:46",
+        "scripture:Mark 11:1",
         "scripture:Matthew 21:1",
+        "scripture:Luke 19:37",
         "scripture:Matthew 24:3",
+        "scripture:Luke 21:37",
         "scripture:Matthew 26:30",
         "scripture:Mark 14:26",
-        "scripture:Luke 21:37",
         "scripture:Luke 22:39",
         "scripture:Acts 1:12"
       ]
     },
     {
-      "text": "The Old Testament already names the ridge: 2 Samuel describes King David fleeing over it during Absalom's revolt, and Zechariah's prophecy pictures a coming day when \"his feet will stand... on the Mount of Olives,\" imagery later linked to the mount's Jewish and Christian associations with a final judgment.",
+      "text": "The Old Testament already names the ridge: 2 Samuel describes King David going up it weeping as he fled from his son Absalom, and Zechariah pictures a day when \"his feet will stand... on the Mount of Olives.\" Such prophecies linked the mount with a day of judgment and the resurrection of the righteous, which helps explain why it became a favored burial place. During the siege of AD 70, Josephus says, a Roman legion camped on the mount.",
       "sources": [
         "scripture:2 Samuel 15:30",
         "scripture:Zechariah 14:4",
-        "openbible:mount-of-olives"
+        "openbible:mount-of-olives",
+        "bib:custodia-gethsemane",
+        "bib:josephus-jewish-war"
       ]
     },
     {
-      "text": "Today the ridge carries several churches marking Gospel scenes, among them the Franciscan sanctuaries of Bethphage and Dominus Flevit (\"the Lord wept\"), the Church of the Pater Noster, and the Chapel of the Ascension near the summit, alongside the large Mount of Olives Jewish Cemetery that covers much of the slope. The summit gives one of the best-known views over Jerusalem's Old City, with the Temple Mount directly below; to the north, the separate rise of Mount Scopus now carries a campus of the Hebrew University of Jerusalem.",
+      "text": "Today the ridge carries several churches marking events in the Gospels and Acts, among them the Franciscan sanctuaries of Bethphage and Dominus Flevit (\"the Lord wept\"), the Church of the Pater Noster and the Chapel of the Ascension, alongside the large Jewish cemetery that covers much of its slopes. The summit gives one of the best-known views of Jerusalem, and to the north, Mount Scopus is the site of the Hebrew University.",
       "sources": [
         "wikidata:Q2193088",
         "bib:custodia-bethphage",
@@ -72,6 +76,7 @@
         "wikidata:Q588849",
         "wikidata:Q773726",
         "wikidata:Q12404547",
+        "bib:custodia-gethsemane",
         "wikidata:Q312818",
         "wikidata:Q174158"
       ]
@@ -161,7 +166,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

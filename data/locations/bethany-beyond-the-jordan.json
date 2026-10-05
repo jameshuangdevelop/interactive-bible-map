@@ -20,12 +20,13 @@
       ],
       "coordinateSource": "wikidata:Q12193567",
       "confidence": "medium",
-      "support": "Byzantine-period churches, hermit caves and baptismal structures excavated on the Jordanian east bank match the site's depiction on the sixth-century Madaba mosaic map, making it the most archaeologically supported candidate; this is the basis of its UNESCO World Heritage listing as the traditional site of John's baptisms.",
+      "support": "Byzantine-period churches, hermit caves and baptismal structures excavated on the Jordanian east bank lie at Wadi al-Kharrar, which the sixth-century Madaba mosaic map labels 'Ainon, where now is Sapsaphas' (the map's 'Bethabara', the sanctuary of the baptism, is on the west bank), making it the most archaeologically supported candidate; this is the basis of its UNESCO World Heritage listing as the traditional site of John's baptisms.",
       "sources": [
         "wikidata:Q12193567",
         "openbible:bethany-2",
         "bib:unesco-baptism-site-al-maghtas",
-        "scripture:John 1:28"
+        "scripture:John 1:28",
+        "bib:piccirillo-ainon-sapsaphas"
       ]
     },
     {
@@ -44,22 +45,24 @@
     }
   ],
   "summary": {
-    "text": "Bethany beyond the Jordan lay in the Jordan Valley east of the river, in territory ruled by Herod Antipas and then Herod Agrippa I before coming under direct Roman governors in AD 44, who administered both Judea and the lands east of the Jordan together. John's Gospel names it as the place where John the Baptist was baptizing, including Jesus; its precise site is debated, and the wording itself was altered to \"Bethabara\" in some later manuscripts and older English translations. No fixed settlement is attested there in this period; the likeliest picture is a riverbank location near a ford, lined with tamarisk, willow and reed beds against the surrounding dry hills of the Jordan Valley.",
+    "text": "Bethany beyond the Jordan was a place in the Jordan Valley that John's Gospel names as where John the Baptist was baptizing; its precise site is debated, and the name itself was altered to \"Bethabara\" in some later manuscripts and older English translations. In this stretch the river divided Perea, on the east bank, ruled by Herod Antipas and then by Herod Agrippa I, from Judea on the west; from AD 44, Roman procurators governed both.",
     "sources": [
       "openbible:bethany-2",
       "bib:hutton-bethany-beyond-jordan",
-      "bib:rainey-notley-sacred-bridge",
-      "wikidata:Q1003997",
-      "scripture:John 1:28"
+      "scripture:John 1:28",
+      "bib:josephus-jewish-war",
+      "bib:livius-judaea",
+      "wikidata:Q1003997"
     ]
   },
   "history": [
     {
-      "text": "Matthew describes John the Baptist in this area wearing \"clothing made of camel's hair with a leather belt,\" eating \"locusts and wild honey,\" and crowds coming out from Jerusalem, all Judea and the region around the Jordan to be baptized by him, including Jesus.",
+      "text": "Matthew describes John the Baptist wearing \"clothing made of camel's hair with a leather belt\" and eating \"locusts and wild honey,\" and people from Jerusalem, all of Judea and all the region around the Jordan going out to him to be baptized in the river. Matthew also says that Jesus came from Galilee to the Jordan to be baptized by John, though he does not name the place.",
       "sources": [
         "scripture:Matthew 3:4",
         "scripture:Matthew 3:5",
-        "scripture:John 1:28"
+        "scripture:Matthew 3:6",
+        "scripture:Matthew 3:13"
       ]
     },
     {
@@ -71,19 +74,22 @@
       ]
     },
     {
-      "text": "This record's two candidate sites lie on opposite banks of the Jordan and favor neither. Byzantine-period churches, hermit caves and baptismal pools excavated at Al-Maghtas, on the river's east bank, date from about the fourth to the fifteenth century and underlie its 2015 UNESCO World Heritage listing as a site of outstanding significance to the Christian tradition of baptism and pilgrimage. Qasr al-Yahud, the parallel site on the west bank, has also drawn church-building and Christian pilgrimage for centuries, though it has seen less archaeological excavation.",
+      "text": "This record gives two candidate sites, on opposite banks of the Jordan, and favors neither. At Al-Maghtas, on the east bank, excavations have found Roman and Byzantine churches and chapels, a monastery, hermit caves and baptismal pools, left by monks, hermits and pilgrims between the fourth and fifteenth centuries; UNESCO listed it as a World Heritage Site in 2015. At Qasr al-Yahud, on the west bank, the Franciscans have made a yearly pilgrimage since at least 1641, and eight churches own land near the river. The sixth-century Madaba mosaic map marks \"Bethabara,\" the sanctuary of the baptism, on the west bank, and \"Ainon, where now is Sapsaphas\" at Wadi al-Kharrar on the east.",
       "sources": [
         "wikidata:Q12193567",
         "bib:unesco-baptism-site-al-maghtas",
-        "wikidata:Q1574073"
+        "wikidata:Q1574073",
+        "bib:custodia-jordan-baptism-site",
+        "bib:piccirillo-ainon-sapsaphas"
       ]
     },
     {
-      "text": "Today both banks remain active pilgrimage and baptism sites, each with churches and monasteries built by various Christian traditions near the riverbank, where visitors can walk down to the Jordan's water itself.",
+      "text": "Today both banks are visited by pilgrims, with churches of several Christian traditions nearby. At Al-Maghtas pilgrims are still baptized in the river, and part of the west-bank site was reopened to pilgrims in 2011 after decades as a closed, mined military zone.",
       "sources": [
         "wikidata:Q12193567",
+        "bib:unesco-baptism-site-al-maghtas",
         "wikidata:Q1574073",
-        "bib:unesco-baptism-site-al-maghtas"
+        "bib:custodia-jordan-baptism-site"
       ]
     }
   ],
@@ -130,7 +136,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

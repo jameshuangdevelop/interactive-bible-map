@@ -48,7 +48,7 @@
     }
   ],
   "summary": {
-    "text": "Golgotha, \"place of a skull,\" is the site of Jesus' crucifixion. All four Gospels name it, and John adds that it \"was near the city,\" on ground that for most of this period lay outside Jerusalem's walls; Hebrews says Jesus \"suffered outside of the gate.\" Its precise location is not settled. The two most discussed candidates are the Church of the Holy Sepulchre, inside today's Old City, and the Garden Tomb, about 600 meters north; some scholars propose the crucifixion and burial were at separate spots within the same disused quarry area.",
+    "text": "Golgotha, \"the place of a skull,\" is the site of Jesus' crucifixion. Matthew, Mark and John give the name Golgotha, and Luke calls it \"The Skull\"; John adds that the place \"was near the city,\" and Hebrews says Jesus \"suffered outside of the gate.\" Its precise location is not settled. The two most discussed candidates are the Church of the Holy Sepulchre, inside today's Old City, and the Garden Tomb, about 600 meters to the north. Some scholars propose that the crucifixion and the burial were at separate spots within the same disused quarry, west of the first-century city.",
     "sources": [
       "openbible:golgotha",
       "bib:taylor-golgotha-reconsideration",
@@ -62,7 +62,7 @@
   },
   "history": [
     {
-      "text": "John's Gospel says that \"in the place where he was crucified there was a garden,\" with \"a new tomb\" in it, and the Synoptic Gospels record women watching from a distance, a Roman centurion overseeing the execution, and two others condemned to death crucified alongside Jesus.",
+      "text": "John's Gospel says that \"in the place where he was crucified there was a garden,\" with \"a new tomb\" in it. Mark describes women \"watching from afar\" and a centurion \"who stood by opposite him,\" and Luke says two criminals were crucified with Jesus, \"one on the right and the other on the left.\"",
       "sources": [
         "scripture:John 19:41",
         "scripture:Mark 15:39",
@@ -71,18 +71,23 @@
       ]
     },
     {
-      "text": "Byzantine tradition, following fourth-century construction under Constantine, identifies the site beneath the Church of the Holy Sepulchre; archaeological work has confirmed the area functioned as a stone quarry with rock-cut tombs before Jerusalem's walls were later extended to enclose it. The Garden Tomb, promoted as an alternative site from the nineteenth century onward, contains a rock-cut tomb chamber that most archaeologists date many centuries before the first century AD, a difficulty for identifying it with the Gospels' \"new\" tomb; the skull-shaped rock formation associated with the site is a nineteenth-century observation, not an ancient description.",
+      "text": "Byzantine tradition, following fourth-century construction under Constantine, identifies the site beneath the Church of the Holy Sepulchre; excavations have shown that the area was a stone quarry with rock-cut family tombs before Jerusalem's walls were later extended to enclose it, though the course of the city wall in Jesus' time is still debated. The Garden Tomb was proposed in the mid-nineteenth century, when visiting Christian scholars suggested that a nearby rocky escarpment, whose face resembles a skull, marked the place of the crucifixion. Most archaeologists date its rock-cut tomb chamber many centuries before the first century AD, a difficulty for identifying it with the Gospels' \"new\" tomb.",
       "sources": [
         "wikidata:Q187702",
+        "bib:custodia-holy-sepulchre",
+        "bib:taylor-golgotha-reconsideration",
         "wikidata:Q1494672",
-        "bib:taylor-golgotha-reconsideration"
+        "bib:garden-tomb-about",
+        "scripture:John 19:41"
       ]
     },
     {
-      "text": "Today both candidates are visited by pilgrims and tourists. The Church of the Holy Sepulchre, built over the site venerated since the fourth century, encloses what church tradition identifies as both the crucifixion rock and a nearby tomb, under one roof. The Garden Tomb, in a garden setting outside today's Old City walls, preserves its rock-cut tomb chamber and is run as a separate, independently visited site.",
+      "text": "Today both candidates are visited by pilgrims and tourists. The Church of the Holy Sepulchre encloses under one roof both Calvary, which church tradition identifies as the place of the crucifixion, and the tomb it identifies as Jesus' tomb. The Garden Tomb, outside the Old City walls, keeps its rock-cut tomb chamber in a garden that a British Christian charity has owned and run since 1894.",
       "sources": [
         "wikidata:Q187702",
-        "wikidata:Q1494672"
+        "bib:custodia-holy-sepulchre",
+        "wikidata:Q1494672",
+        "bib:garden-tomb-about"
       ]
     }
   ],
@@ -144,7 +149,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

@@ -60,39 +60,46 @@
     }
   ],
   "summary": {
-    "text": "Cana of Galilee was a Jewish village in the cultivated hill country of Lower Galilee in the first century AD, part of Herod Antipas's tetrarchy. It is named in the Gospel of John as the site of Jesus' first recorded miracle, turning water into wine at a wedding, and of a second miracle recorded there; its identification is disputed among several candidate villages, and this record favors none of them.",
+    "text": "Cana of Galilee was a village in Galilee, which in the first century AD was part of Herod Antipas's tetrarchy. The Gospel of John names it as the place of Jesus' first recorded sign, turning water into wine at a wedding, and of a second episode set there; its identification is disputed among several candidate villages, and this record favors none of them.",
     "sources": [
       "openbible:cana",
-      "bib:rainey-notley-sacred-bridge",
       "scripture:John 2:1",
-      "scripture:John 4:46"
+      "scripture:John 2:11",
+      "scripture:John 4:46",
+      "scripture:Luke 3:1",
+      "bib:josephus-jewish-war"
     ]
   },
   "history": [
     {
-      "text": "John's Gospel sets a wedding feast at Cana where Jesus turned water into wine, \"the beginning of his signs,\" using six stone water jars kept for Jewish purification rites; John later records a second sign there, healing a royal official's son in Capernaum from a distance. A disciple, Nathanael, is identified as being from Cana.",
+      "text": "John's Gospel sets a wedding feast at Cana, attended by Jesus' mother, where Jesus turned water into wine in six stone water jars kept \"after the Jews' way of purifying\"; John calls this the beginning of Jesus' signs. John later brings Jesus back to Cana, where a nobleman whose son was sick at Capernaum came to him and begged him to heal his son. One of the disciples, Nathanael, was from Cana.",
       "sources": [
         "scripture:John 2:1",
         "scripture:John 2:6",
         "scripture:John 2:11",
         "scripture:John 4:46",
+        "scripture:John 4:47",
         "scripture:John 21:2"
       ]
     },
     {
-      "text": "Excavations at Khirbet Qana, one candidate site, uncovered a Jewish village occupied from the Hellenistic through Roman periods, including caves later adapted for Christian pilgrimage veneration with inscriptions invoking Jesus; many recent archaeologists favor this site over the rival candidate, Kafr Kanna, which has been venerated by pilgrims since at least the medieval period despite thinner first-century archaeological evidence. Neither candidate preserves a building identifiable as the Gospel's wedding house. A third, longstanding minority tradition, especially among Lebanese Christian communities, instead identifies a village in southern Lebanon as the biblical Cana, though John sets the episode within Galilee, well north of that village.",
+      "text": "Excavations at Khirbet Qana, the first candidate, uncovered a Jewish village with caves later adapted for Christian pilgrimage. Kafr Kanna, the second, has been venerated by pilgrims since at least the medieval period and has been the site most visited by pilgrims since the seventeenth century; excavations beneath its Franciscan church found remains of a Jewish building from the third and fourth centuries, perhaps a synagogue, though its first-century archaeological evidence is thinner. A third, minority identification places Cana at Qana in southern Lebanon; John calls the village \"Cana of Galilee.\"",
       "sources": [
         "bib:mccollough-khirbet-qana",
         "wikidata:Q17199012",
         "wikidata:Q2633158",
+        "bib:custodia-cana",
+        "openbible:cana",
         "wikidata:Q753812",
+        "pleiades:678219",
         "scripture:John 2:1"
       ]
     },
     {
-      "text": "Today Kafr Kanna is a thriving Arab town in Lower Galilee, where several churches mark the traditional wedding site and welcome pilgrims; Khirbet Qana is a hillside archaeological site, excavated but not built up, overlooking the Beit Netofa valley a few kilometers to the northwest.",
+      "text": "Today at Kafr Kanna a Franciscan church, blessed in 1881, marks the traditional site of the wedding, and a chapel built in 1885 nearby honors Nathanael. Khirbet Qana is an archaeological site with no modern village, about 9 km north-northwest of Kafr Kanna.",
       "sources": [
         "wikidata:Q2633158",
+        "bib:custodia-cana",
         "wikidata:Q17199012"
       ]
     }
@@ -160,7 +167,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

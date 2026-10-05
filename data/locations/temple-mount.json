@@ -32,7 +32,7 @@
     }
   ],
   "summary": {
-    "text": "The Temple Mount is the raised platform on Jerusalem's eastern ridge that Herod the Great built up to carry his expanded Second Temple, the center of Jewish worship in the first century AD. Herod began the rebuilding around 20-19 BC; Josephus says the priests finished the temple building itself in about a year and a half and the surrounding cloisters and courts in about eight years, but work on the wider precinct continued for decades, employing over eighteen thousand workers, and was only finished in the early 60s AD. Cloisters ringed the finished precinct for about six furlongs (roughly 1.2 km), and the Antonia fortress, a Roman garrison post, stood at its northwest corner. In John's Gospel, Jesus' own hearers say the Temple \"took forty-six years to build,\" reflecting this long, still-ongoing project.",
+    "text": "The Temple Mount is the raised platform in Jerusalem's Old City that Herod the Great enlarged to carry his rebuilt Second Temple, the center of Jewish worship in the first century AD. Herod began the work around 20-19 BC. Josephus says the priests built the temple building itself in a year and six months, and that Herod built the cloisters and outer courts in eight years; but work went on for decades, and when the temple was finally finished, in the time of the governor Albinus, more than eighteen thousand workers were left without work. The cloisters of the outer court ran about six furlongs (roughly 1.1 km), including the Antonia fortress, which stood at the northwest corner and always held a Roman garrison. In John's Gospel, Jesus' hearers say the Temple \"took forty-six years to build.\"",
     "sources": [
       "wikidata:Q193163",
       "bib:ritmeyer-temple-mount-quest",
@@ -43,32 +43,35 @@
   },
   "history": [
     {
-      "text": "The Gospels describe Jesus visiting the Temple as a boy, found sitting among its teachers, and later teaching in its courts and driving out the merchants and money changers who sold sacrificial animals and exchanged coins there. Acts describes the early church continuing to meet at the Temple, including Peter and John healing a man at a gate called Beautiful, and Paul later arrested there by a crowd. These episodes are a sample of the Gospels' and Acts' many references to \"the temple,\" a phrase recurring well over a hundred times in the New Testament.",
+      "text": "The Gospels describe Jesus visiting the Temple as a boy, found \"sitting in the middle of the teachers,\" and later driving out those who sold oxen, sheep and doves there and overturning the money changers' tables. Acts describes Peter and John at the Temple, where a man lame from birth, laid daily at the gate called Beautiful, stood up and walked into the Temple with them, and later Paul being seized there by a crowd. These are only a sample: the word \"temple\" appears more than a hundred times in the New Testament.",
       "sources": [
         "scripture:Luke 2:46",
         "scripture:Matthew 21:12",
         "scripture:John 2:14",
         "scripture:Acts 3:2",
+        "scripture:Acts 3:3",
+        "scripture:Acts 3:8",
         "scripture:Acts 21:27",
         "bib:ritmeyer-temple-mount-quest"
       ]
     },
     {
-      "text": "The Temple was destroyed by Roman forces under Titus in AD 70, ending the sacrificial worship it had hosted; its retaining walls, including the section known today as the Western Wall, survived as its most substantial remains.",
+      "text": "Roman forces under Titus destroyed the Temple in AD 70. Its retaining walls, including the section known today as the Western Wall, survived as its most substantial remains.",
       "sources": [
         "wikidata:Q193163",
-        "wikidata:Q1003997",
+        "bib:josephus-jewish-war",
         "bib:ritmeyer-temple-mount-quest"
       ]
     },
     {
-      "text": "Today the platform, also known as Haram al-Sharif, carries the Dome of the Rock and the Al-Aqsa Mosque, both built centuries after the Herodian Temple and outside this project's scope; below it, the Western Wall remains one of Judaism's holiest sites of prayer.",
+      "text": "Today the platform, also known as Haram al-Sharif, carries the Dome of the Rock, built in the seventh century, and the Al-Aqsa Mosque; these later buildings are outside this project's scope. Below the platform's western side, the Western Wall is a place of Jewish prayer.",
       "sources": [
         "wikidata:Q193163",
         "wikidata:Q172077",
         "wikidata:Q12192963",
+        "bib:unesco-old-city-jerusalem",
         "wikidata:Q134821",
-        "bib:ritmeyer-temple-mount-quest"
+        "bib:western-wall-heritage-foundation"
       ]
     }
   ],
@@ -104,6 +107,16 @@
       "textWEB": "A certain man who was lame from his mother’s womb was being carried, whom they laid daily at the door of the temple which is called Beautiful, to ask gifts for the needy of those who entered into the temple."
     },
     {
+      "ref": "Acts 3:3",
+      "book": "Acts",
+      "textWEB": "Seeing Peter and John about to go into the temple, he asked to receive gifts for the needy."
+    },
+    {
+      "ref": "Acts 3:8",
+      "book": "Acts",
+      "textWEB": "Leaping up, he stood and began to walk. He entered with them into the temple, walking, leaping, and praising God."
+    },
+    {
       "ref": "Acts 21:27",
       "book": "Acts",
       "textWEB": "When the seven days were almost completed, the Jews from Asia, when they saw him in the temple, stirred up all the multitude and laid hands on him,"
@@ -133,7 +146,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

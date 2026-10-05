@@ -50,11 +50,13 @@
     }
   ],
   "summary": {
-    "text": "Jericho lies in the Jordan Valley near the Dead Sea, in a hot, low desert oasis more than 200 meters below sea level, and is one of the most anciently inhabited sites in the region. By the first century AD the inhabited city had shifted about two kilometers south of the old Old Testament-era mound, Tell es-Sultan, to a new site built up by the Hasmonean and Herodian dynasties as a winter palace complex. Josephus praises the oasis's rare mix of date palms, balsam, cypress and other trees, writing that whoever called the place divine \"would not be mistaken.\"",
+    "text": "Jericho lies in the Jordan Valley north of the Dead Sea, in a desert oasis watered by the perennial spring of 'Ain es-Sultan, and is one of the most anciently inhabited sites in the region. By the first century AD the inhabited city had shifted about two kilometers south of the Old Testament-era mound, Tell es-Sultan, to a new site built up by the Hasmonean and Herodian dynasties as a winter palace complex. Josephus praises the oasis's many kinds of palm trees, its balsam and its cypress trees, writing that whoever called the place divine \"would not be mistaken.\"",
     "sources": [
       "wikidata:Q2402267",
       "dare:23403",
       "pleiades:687917",
+      "bib:unesco-ancient-jericho",
+      "bib:custodia-jericho",
       "wikidata:Q2460244",
       "bib:murphy-oconnor-holy-land-guide",
       "bib:josephus-jewish-war"
@@ -62,10 +64,12 @@
   },
   "history": [
     {
-      "text": "The Gospels set several episodes on the road through or near the city: Jesus healing a blind man, or two men, Luke's parable of the Good Samaritan traveling \"from Jerusalem to Jericho,\" and Jesus' encounter with Zacchaeus, \"a chief tax collector\" who \"was rich\" and climbed a tree to see him. Hebrews recalls the Old Testament story that the walls of Jericho \"fell down after they had been encircled for seven days,\" crediting Joshua's victory there to faith.",
+      "text": "The Gospels set several episodes on the road through or near the city: Jesus healing a blind man, or two men, and his encounter with Zacchaeus, \"a chief tax collector\" who \"was rich.\" Luke's parable of the Good Samaritan begins with a man \"going down from Jerusalem to Jericho.\" Hebrews recalls that the walls of Jericho \"fell down after they had been encircled for seven days,\" and credits this to faith.",
       "sources": [
         "scripture:Mark 10:46",
         "scripture:Luke 18:35",
+        "scripture:Matthew 20:30",
+        "bib:custodia-jericho",
         "scripture:Luke 19:1",
         "scripture:Luke 19:2",
         "scripture:Luke 10:30",
@@ -73,18 +77,20 @@
       ]
     },
     {
-      "text": "A few centuries later, the Umayyad dynasty built a lavish winter palace a little north of the city, known today as Hisham's Palace, famous for one of the largest ancient mosaic floors ever found.",
+      "text": "Much later, a palace complex now known as Hisham's Palace was built at Khirbat al-Mafjar, just north of the city, with baths and a water system of aqueducts, bridges and a mill that its surveyors date to the Umayyad, or early Islamic, period.",
       "sources": [
-        "bib:murphy-oconnor-holy-land-guide",
+        "bib:pef-khirbat-al-mafjar",
         "wikidata:Q2456319"
       ]
     },
     {
-      "text": "Today Jericho is a market town known for its palm and citrus groves, watered by the same springs that fed the ancient oasis. Visitors can see the excavated remains of Herod's winter palace, the nearby tell of Tell es-Sultan, and Hisham's Palace a little north of the modern town.",
+      "text": "Today Jericho is a town around the ancient oasis, and the spring of 'Ain es-Sultan still serves as a water source. Visitors can see the excavated Hasmonean and Herodian winter palaces, the mound of Tell es-Sultan, now a UNESCO World Heritage Site and national archaeological park just northwest of the modern town, and Hisham's Palace to the north.",
       "sources": [
+        "bib:unesco-ancient-jericho",
         "wikidata:Q2402267",
         "wikidata:Q2460244",
-        "wikidata:Q2456319"
+        "wikidata:Q2456319",
+        "bib:pef-khirbat-al-mafjar"
       ]
     }
   ],
@@ -178,7 +184,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

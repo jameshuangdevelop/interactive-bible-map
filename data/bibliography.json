@@ -1041,6 +1041,151 @@
       "accessed": "2026-10-05"
     },
     {
+      "id": "custodia-holy-sepulchre",
+      "type": "web",
+      "title": "Basilica of the Holy Sepulchre",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/basilica-of-the-holy-sepulchre/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-cana",
+      "type": "web",
+      "title": "Cana",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/cana/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-jericho",
+      "type": "web",
+      "title": "Jericho – Church of the Good Shepherd",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/jericho-church-good-shepherd/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-jordan-baptism-site",
+      "type": "web",
+      "title": "River Jordan – Site of the Baptism of Jesus",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/river-jordan-site-baptism-jesus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "garden-tomb-about",
+      "type": "web",
+      "title": "About Us",
+      "authors": [
+        "The Garden Tomb (Jerusalem) Association"
+      ],
+      "year": 2026,
+      "publisher": "The Garden Tomb (Jerusalem) Association",
+      "url": "https://gardentomb.com/about-us/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "abc-gethsemane-olive-trees-2012",
+      "type": "web",
+      "title": "Jerusalem olive trees among oldest in world",
+      "authors": [
+        "Reuters"
+      ],
+      "year": 2012,
+      "publisher": "ABC News (Australian Broadcasting Corporation), archived by the Internet Archive",
+      "url": "https://web.archive.org/web/20161031024714/http://www.abc.net.au/news/2012-10-20/jerusalem-olive-trees-among-oldest-in-world/4324342",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "piccirillo-ainon-sapsaphas",
+      "type": "chapter",
+      "title": "Ainon Sapsaphas and Bethabara",
+      "authors": [
+        "Michele Piccirillo"
+      ],
+      "year": 1999,
+      "publisher": "Studium Biblicum Franciscanum",
+      "containerTitle": "The Madaba Map Centenary 1897-1997 (web edition on the Studium Biblicum Franciscanum's Madaba Mosaic Map site, archived by the Internet Archive)",
+      "url": "https://web.archive.org/web/20121011045828/http://www.christusrex.org/www1/ofm/mad/articles/PiccirilloSapsaphas.html",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "unesco-old-city-jerusalem",
+      "type": "web",
+      "title": "Old City of Jerusalem and its Walls",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/148",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "unesco-ancient-jericho",
+      "type": "web",
+      "title": "Ancient Jericho/Tell es-Sultan",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1687",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "western-wall-heritage-foundation",
+      "type": "web",
+      "title": "The Western Wall",
+      "authors": [
+        "The Western Wall Heritage Foundation"
+      ],
+      "year": 2026,
+      "publisher": "The Western Wall Heritage Foundation",
+      "url": "https://thekotel.org/en/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "bas-siloam-pool",
+      "type": "web",
+      "title": "The Siloam Pool: Where Jesus Healed the Blind Man",
+      "authors": [
+        "Biblical Archaeology Society Staff"
+      ],
+      "year": 2009,
+      "publisher": "Biblical Archaeology Society (Bible History Daily)",
+      "url": "https://www.biblicalarchaeology.org/daily/biblical-sites-places/biblical-archaeology-sites/the-siloam-pool-where-jesus-healed-the-blind-man/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "pef-khirbat-al-mafjar",
+      "type": "web",
+      "title": "Khirbat al-Mafjar Archaeological Project, Jericho, Palestine",
+      "authors": [
+        "Mahmoud Hawari"
+      ],
+      "year": 2022,
+      "publisher": "Palestine Exploration Fund",
+      "url": "https://www.pef.org.uk/khirbat-al-mafjar-archaeological-project-jericho-palestine/",
+      "accessed": "2026-10-05"
+    },
+    {
       "id": "isbe-agriculture",
       "type": "chapter",
       "title": "Agriculture",

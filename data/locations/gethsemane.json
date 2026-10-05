@@ -29,17 +29,18 @@
     }
   ],
   "summary": {
-    "text": "Gethsemane is a garden at the foot of the Mount of Olives, across the Kidron Valley from Jerusalem's Temple Mount and within an easy walk of the city. Its name comes from an Aramaic or Hebrew phrase, gat shemanim, for an olive-oil press, which fits its traditional identification as a working olive grove rather than an ornamental garden; terracing hillsides for cultivation was standard practice in this hill country, so the plot was likely terraced like its neighbors on the Mount of Olives.",
+    "text": "Gethsemane is a garden at the foot of the Mount of Olives, across the Kidron Valley from Jerusalem's Temple Mount and a short walk from the city. Its name comes from an Aramaic or Hebrew phrase, gat shemanim, for an olive-oil press, which fits its traditional identification as an olive grove. Olive trees have grown on the mount's slopes for thousands of years, and in Jewish tradition it was also called the \"Mount of Unction,\" because oil from its olives was used to anoint the king and the high priest.",
     "sources": [
       "wikidata:Q205333",
       "openbible:gethsemane",
       "bib:bdag-greek-lexicon",
-      "bib:isbe-agriculture"
+      "bib:custodia-gethsemane",
+      "bib:abc-gethsemane-olive-trees-2012"
     ]
   },
   "history": [
     {
-      "text": "According to Matthew and Mark, Jesus came to Gethsemane with his disciples on the night of his arrest and told them to sit while he went a little farther to pray; he returned twice, then a third time, to find them asleep. John, without naming the garden, places the same night's prayer in \"a garden\" beyond the brook Kidron, and says the party that arrested Jesus there was a detachment of soldiers with officers from the chief priests and the Pharisees, carrying lanterns, torches and weapons.",
+      "text": "According to Matthew and Mark, Jesus came to Gethsemane with his disciples on the night of his arrest and told them to sit while he prayed. Mark says he came back and found them sleeping, went away to pray again, returned to find them asleep a second time, and came back a third time. John, without naming the place, says Jesus and his disciples crossed the brook Kidron into \"a garden,\" and that Judas came there with a detachment of soldiers and officers from the chief priests and the Pharisees, carrying lanterns, torches and weapons.",
       "sources": [
         "scripture:Matthew 26:36",
         "scripture:Mark 14:32",
@@ -49,11 +50,10 @@
       ]
     },
     {
-      "text": "The exact plot the Gospels describe is not fixed: two Christian traditions a short walk apart both claim the site, including a Franciscan-custodied garden by the Church of All Nations and a Russian Orthodox garden near the Church of Mary Magdalene, and no first-century boundary of \"the garden\" is archaeologically established. The Franciscan garden, in Franciscan hands since 1681, holds eight of the oldest olive trees in the region, but a radiocarbon study found that the three datable trees all began growing in the twelfth century and share identical DNA, meaning today's trees descend from one parent planted long after the Gospel events rather than standing witnesses to them.",
+      "text": "Today several churches mark places at the foot of the Mount of Olives linked to that night. The best-known garden, beside the Basilica of the Agony (the Church of All Nations), has been owned by the Franciscans since 1681 and holds eight of the oldest olive trees in the world. A study released in 2012 dated wood from three of them to 1092, 1166 and 1198, and DNA tests found that the trees were planted from the same parent plant. Because olive trees can grow back from their roots, the researchers said this does not settle whether they go back to Jesus' time.",
       "sources": [
-        "bib:murphy-oconnor-holy-land-guide",
         "bib:custodia-gethsemane",
-        "bib:bernabei-gethsemane-olive-trees"
+        "bib:abc-gethsemane-olive-trees-2012"
       ]
     }
   ],
@@ -86,7 +86,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "lastReviewed": "2026-10-05"
 }

@@ -36,43 +36,57 @@
     }
   ],
   "summary": {
-    "text": "Jerusalem was the capital of Judea and, through the first century AD, the religious center of Judaism, built on a cluster of ridges divided by the Kidron, Tyropoeon and Hinnom valleys. The city was ruled in turn by Herod the Great, his son Herod Archelaus, Roman prefects and procurators, and briefly the client king Herod Agrippa I. Herod's building program, above all his vastly enlarged Temple platform, made Jerusalem one of the major cities of the eastern Roman world; by the Roman siege of AD 70 its walls, an outer third wall still being completed for most of this period, ran about thirty-three furlongs (roughly 6 km) and carried towers at intervals along their length.",
+    "text": "Jerusalem was the capital of Judea and, through the first century AD, the religious center of Judaism. Josephus describes it as built on two hills divided by a valley, with the Kidron Valley to the east. The city was ruled in turn by Herod the Great, his son Herod Archelaus, Roman prefects and procurators, and, from AD 41 to 44, King Herod Agrippa I. Herod's building program, above all his vastly enlarged Temple platform, made Jerusalem one of the major cities of the eastern Roman world. By the Roman siege of AD 70, Josephus says, its walls ran about thirty-three furlongs (roughly 6 km), with towers along their length; the outer, third wall had been begun by Agrippa I and was completed later.",
     "sources": [
       "wikidata:Q1218",
       "pleiades:687928",
       "dare:15896",
       "bib:rainey-notley-sacred-bridge",
       "bib:josephus-jewish-war",
+      "bib:livius-judaea",
       "wikidata:Q1003997"
     ]
   },
   "history": [
     {
-      "text": "The Gospels set Jesus' final days, trial, death and resurrection appearances in Jerusalem, and describe him teaching in the Temple courts there. Acts describes the earliest church meeting in the city and growing from the crowds of Jewish pilgrims gathered there \"from every nation under the sky,\" and records Paul repeatedly traveling to Jerusalem, including the visit that ended in his arrest. Paul's letters recall a collection he gathered from Gentile churches for \"the poor among the saints\" in Jerusalem, and Revelation looks ahead to a \"new Jerusalem\" coming down from heaven.",
+      "text": "The Gospels set Jesus' final days, trial, death and resurrection appearances in Jerusalem, and describe him at the Temple there. Acts describes Jews \"from every nation under the sky\" living in the city, the first church there and its rapid growth, and Paul's repeated visits, including the one that ended in his arrest; Paul later says he \"was delivered prisoner from Jerusalem into the hands of the Romans.\" Paul's letters describe a collection from the churches of Macedonia and Achaia for \"the poor among the saints\" in Jerusalem, and Revelation describes a vision of the \"New Jerusalem\" coming down out of heaven.",
       "sources": [
         "scripture:Matthew 21:1",
+        "scripture:Luke 23:7",
         "scripture:John 19:20",
+        "scripture:Acts 1:4",
+        "scripture:Mark 11:11",
         "scripture:Acts 2:5",
+        "scripture:Acts 6:7",
+        "scripture:Acts 8:1",
+        "scripture:Acts 9:26",
+        "scripture:Acts 15:4",
         "scripture:Acts 21:17",
         "scripture:Acts 21:31",
+        "scripture:Acts 28:17",
         "scripture:Romans 15:25",
         "scripture:Romans 15:26",
         "scripture:Revelation 21:2"
       ]
     },
     {
-      "text": "Roman forces under Titus destroyed the city and the Second Temple in AD 70, during the First Jewish-Roman War, an event the Gospels describe Jesus foretelling: that one day the city would be \"surrounded by armies,\" with \"its desolation... at hand.\"",
+      "text": "Roman forces under Titus destroyed the city and the Second Temple in AD 70, during the First Jewish-Roman War. Luke's Gospel records Jesus warning of a time when Jerusalem would be \"surrounded by armies\" and \"its desolation is at hand.\"",
       "sources": [
         "wikidata:Q1003997",
         "bib:rainey-notley-sacred-bridge",
+        "bib:josephus-jewish-war",
         "scripture:Luke 21:20"
       ]
     },
     {
-      "text": "Today Jerusalem's Old City still sits over much of this ancient city, within later walls; archaeology continues to add to the record, including the Second Temple-period Pool of Siloam, uncovered just south of the Temple Mount. Several sites from this period are described in their own records in this project, including the Temple Mount, Golgotha and Gethsemane, all within or beside the Old City.",
+      "text": "Today Jerusalem's walled Old City, a UNESCO World Heritage Site, contains the Temple Mount and many other historic monuments. Archaeology continues to add to the record: in 2004, south of the Temple Mount at the southern end of the City of David, archaeologists uncovered a monumental stepped pool from the Second Temple period, identified as the Pool of Siloam. Several sites from this period have their own records in this project, including the Temple Mount, Golgotha and Gethsemane, all within or beside the Old City.",
       "sources": [
         "wikidata:Q1218",
-        "bib:reich-shukron-siloam-pool"
+        "bib:unesco-old-city-jerusalem",
+        "wikidata:Q193163",
+        "bib:bas-siloam-pool",
+        "bib:reich-shukron-siloam-pool",
+        "wikidata:Q1483483"
       ]
     }
   ],
@@ -1008,7 +1022,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

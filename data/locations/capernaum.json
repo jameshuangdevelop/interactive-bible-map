@@ -34,40 +34,43 @@
     }
   ],
   "summary": {
-    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee, part of Herod Antipas's tetrarchy of Galilee. Its ordinary houses were built of local black basalt fieldstone; the village had its own synagogue and, according to the Gospels, a Roman tax office. Josephus describes the adjoining Gennesaret plain as exceptionally fertile, watered by a spring the local people called \"Capharnaum,\" with orchards of walnut, palm, fig and olive producing fruit almost year-round.",
+    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee, in Herod Antipas's tetrarchy of Galilee. Its houses were built of the local black basalt, and its people lived from fishing and farming and from trade along the route between Galilee and Damascus. Josephus describes the neighboring plain of Gennesaret as exceptionally fertile, watered by a spring the local people called \"Capharnaum,\" with walnut trees, palms, fig trees and olives, and with grapes and figs ripening through ten months of the year.",
     "sources": [
       "wikidata:Q59174",
       "dare:33337",
       "pleiades:678231",
       "bib:custodia-capernaum",
       "bib:josephus-jewish-war",
-      "bib:rainey-notley-sacred-bridge"
+      "scripture:Luke 3:1",
+      "scripture:Luke 4:31"
     ]
   },
   "history": [
     {
-      "text": "The Gospels describe Capernaum as a base for Jesus' Galilean ministry and the hometown of the fishermen Simon Peter and Andrew, and James and John; Jesus taught in its synagogue and, according to Mark, entered \"the house of Simon and Andrew\" there. Matthew (Levi) was called from the village's tax office, and Jesus healed a Roman centurion's servant and a royal official's son from a distance. Despite these many \"mighty works,\" Matthew and Luke record Jesus pronouncing a judgment on Capernaum's unbelief, that it would be \"brought down to Hades.\"",
+      "text": "The Gospels describe Capernaum as Jesus' base in Galilee. Mark says he taught in its synagogue on the Sabbath and then went to \"the house of Simon and Andrew,\" and that when he came back to Capernaum \"he was at home.\" He called Levi from a tax office, and both a centurion and a nobleman whose son lay sick at Capernaum asked him for help. Despite the \"mighty works\" done there, Matthew and Luke record Jesus saying that Capernaum would be \"brought down to Hades.\"",
       "sources": [
+        "scripture:Matthew 4:13",
         "scripture:Mark 1:21",
         "scripture:Mark 1:29",
         "scripture:Mark 2:1",
         "scripture:Mark 2:14",
         "scripture:Matthew 8:5",
         "scripture:John 4:46",
+        "scripture:John 4:47",
         "scripture:Matthew 11:23",
         "scripture:Luke 10:15"
       ]
     },
     {
-      "text": "Archaeological excavation has uncovered a limestone synagogue, built centuries after Jesus' lifetime over the foundations of an earlier, more modest basalt structure that may be the synagogue of the Gospels' own time, and a Byzantine octagonal church built over a first-century house that an early Christian tradition identifies as Peter's.",
+      "text": "Excavations have uncovered a white limestone synagogue from the fifth century, built on the foundations of an earlier black basalt synagogue whose date is disputed (one of its excavators placed it in the first century), and a Byzantine octagonal church built over a first-century house that an early Christian tradition identifies as Peter's.",
       "sources": [
-        "bib:murphy-oconnor-holy-land-guide",
         "bib:custodia-capernaum",
+        "bib:murphy-oconnor-holy-land-guide",
         "dare:33337"
       ]
     },
     {
-      "text": "Today the site, known as Tell Hum or by its Hebrew name Kfar Nahum, is an archaeological park where visitors can see the excavated limestone synagogue and a modern Franciscan memorial church built over the remains of the house venerated as Peter's.",
+      "text": "Today the site, known as Tell Hum or by its Hebrew name Kfar Nahum, is a Franciscan-run archaeological site where visitors can see the partly reconstructed limestone synagogue and a modern memorial church, inaugurated in 1990, built over the remains of the house venerated as Peter's.",
       "sources": [
         "wikidata:Q59174",
         "bib:custodia-capernaum"
@@ -220,7 +223,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }
