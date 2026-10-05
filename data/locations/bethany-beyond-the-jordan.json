@@ -44,34 +44,46 @@
     }
   ],
   "summary": {
-    "text": "Bethany beyond the Jordan, named in John 1:28 as the place where John the Baptist was baptizing, including Jesus, is located east of the Jordan River; its precise site is debated, and the wording itself was altered to 'Bethabara' in some later manuscripts and older English translations.",
+    "text": "Bethany beyond the Jordan lay in the Jordan Valley east of the river, in territory ruled by Herod Antipas and then Herod Agrippa I before coming under direct Roman governors in AD 44, who administered both Judea and the lands east of the Jordan together. John's Gospel names it as the place where John the Baptist was baptizing, including Jesus; its precise site is debated, and the wording itself was altered to \"Bethabara\" in some later manuscripts and older English translations. No fixed settlement is attested there in this period; the likeliest picture is a riverbank location near a ford, lined with tamarisk, willow and reed beds against the surrounding dry hills of the Jordan Valley.",
     "sources": [
       "openbible:bethany-2",
       "bib:hutton-bethany-beyond-jordan",
+      "bib:rainey-notley-sacred-bridge",
+      "wikidata:Q1003997",
       "scripture:John 1:28"
     ]
   },
   "history": [
     {
-      "text": "The third-century scholar Origen could not find a village called Bethany east of the Jordan in his own day and proposed emending the text to 'Bethabara' ('house of the ford'), a reading that entered later manuscripts and older English translations, though the earliest and best-attested Greek manuscripts read 'Bethany.'",
+      "text": "Matthew describes John the Baptist in this area wearing \"clothing made of camel's hair with a leather belt,\" eating \"locusts and wild honey,\" and crowds coming out from Jerusalem, all Judea and the region around the Jordan to be baptized by him, including Jesus.",
       "sources": [
+        "scripture:Matthew 3:4",
+        "scripture:Matthew 3:5",
+        "scripture:John 1:28"
+      ]
+    },
+    {
+      "text": "The third-century scholar Origen could not find a village called Bethany east of the Jordan in his own day and proposed emending the text to \"Bethabara\" (\"house of the ford\"), a reading that entered later manuscripts and older English translations, though the earliest and best-attested Greek manuscripts read \"Bethany.\" Some scholars have instead proposed a location farther north and east, in the region historically called Batanea, as a better fit for the Gospel's geography and for John the Baptist's later arrest by Herod Antipas; this remains a minority academic view without a single agreed coordinate.",
+      "sources": [
+        "bib:origen-commentary-john",
         "bib:hutton-bethany-beyond-jordan",
         "scripture:John 1:28"
       ]
     },
     {
-      "text": "Some scholars have proposed a location farther north and east, in the region historically called Batanea, as a better fit for the Gospel's geography and for John the Baptist's later arrest by Herod Antipas; this remains a minority academic view without a single agreed coordinate.",
+      "text": "This record's two candidate sites lie on opposite banks of the Jordan and favor neither. Byzantine-period churches, hermit caves and baptismal pools excavated at Al-Maghtas, on the river's east bank, date from about the fourth to the fifteenth century and underlie its 2015 UNESCO World Heritage listing as a site of outstanding significance to the Christian tradition of baptism and pilgrimage. Qasr al-Yahud, the parallel site on the west bank, has also drawn church-building and Christian pilgrimage for centuries, though it has seen less archaeological excavation.",
       "sources": [
-        "bib:hutton-bethany-beyond-jordan"
+        "wikidata:Q12193567",
+        "bib:unesco-baptism-site-al-maghtas",
+        "wikidata:Q1574073"
       ]
     },
     {
-      "text": "This record's candidate sites lie on opposite banks of the Jordan: the east-bank candidate is in Perea, and the west-bank candidate is in this project's 'Judea' district. Rather than choose between them, this record's parent is the Roman province of Judea, which from AD 44 governed both Judea and the lands east of the Jordan; Josephus records the first procurator, Cuspius Fadus, dealing with a border quarrel between the Jews of Perea and the people of Philadelphia. The minority proposal in Batanea also lay in territory under the same procurators until AD 53.",
+      "text": "Today both banks remain active pilgrimage and baptism sites, each with churches and monasteries built by various Christian traditions near the riverbank, where visitors can walk down to the Jordan's water itself.",
       "sources": [
-        "bib:livius-judaea",
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge",
-        "wikidata:Q1003997"
+        "wikidata:Q12193567",
+        "wikidata:Q1574073",
+        "bib:unesco-baptism-site-al-maghtas"
       ]
     }
   ],
@@ -118,7 +130,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

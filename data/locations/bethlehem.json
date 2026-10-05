@@ -35,30 +35,51 @@
     }
   ],
   "summary": {
-    "text": "Bethlehem is a town in the Judean hill country south of Jerusalem, identified in Matthew and Luke as the birthplace of Jesus and already known in the Old Testament as the home town of David.",
+    "text": "Bethlehem is a small town in the Judean hill country, about 8 km (5 miles) south of Jerusalem, on a ridge among terraced hills. In the first century it had no grand public buildings, just the houses of rural Judean villagers and shepherds; a few kilometers to the southeast stood Herod the Great's hilltop palace-fortress of Herodium, a visible reminder of Herodian building even from this modest town. Bethlehem was already known in the Old Testament as the home town of David, centuries before Matthew and Luke identify it as the birthplace of Jesus.",
     "sources": [
       "wikidata:Q5776",
-      "openbible:bethlehem-1",
+      "dare:28331",
+      "wikidata:Q913099",
+      "bib:rainey-notley-sacred-bridge",
+      "bib:murphy-oconnor-holy-land-guide",
       "scripture:Matthew 2:1",
-      "scripture:Luke 2:4",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "scripture:Luke 2:4"
     ]
   },
   "history": [
     {
-      "text": "The Church of the Nativity, first built under Constantine around 339 AD and rebuilt in the mid-sixth century under Justinian, marks the traditional site of Jesus' birth and stands over one of the longest continuously venerated locations in Christian tradition.",
+      "text": "Luke's Gospel says Joseph and Mary travelled to Bethlehem, \"David's city,\" for a census decreed by Caesar Augustus, and that Mary laid her newborn son \"in a feeding trough, because there was no room for them in the inn.\" Luke also describes shepherds \"in the same country... keeping watch by night over their flock\" who were told of the birth. Matthew describes wise men arriving later, led by a star that \"stood over where the young child was,\" and Herod the Great's massacre of Bethlehem's young boys in response.",
+      "sources": [
+        "scripture:Luke 2:1",
+        "scripture:Luke 2:4",
+        "scripture:Luke 2:7",
+        "scripture:Luke 2:8",
+        "scripture:Matthew 2:1",
+        "scripture:Matthew 2:9",
+        "scripture:Matthew 2:16"
+      ]
+    },
+    {
+      "text": "Christian tradition identified the cave of Jesus' birth very early: a church first built under Constantine around AD 339 and rebuilt under Justinian in the mid-sixth century has marked the site ever since, making it one of the longest continuously venerated locations in Christian tradition.",
       "sources": [
         "bib:unesco-church-of-nativity",
         "bib:murphy-oconnor-holy-land-guide"
       ]
+    },
+    {
+      "text": "Today Bethlehem is a Palestinian town whose economy centers on Christian pilgrimage. The Church of the Nativity, a UNESCO World Heritage Site and among the oldest churches still in daily use, stands over the traditional birth cave, with a pilgrim route leading to it from the old town gate through to Manger Square.",
+      "sources": [
+        "bib:unesco-church-of-nativity",
+        "wikidata:Q5776"
+      ]
     }
   ],
   "scripture": [
+    {
+      "ref": "Luke 2:1",
+      "book": "Luke",
+      "textWEB": "Now in those days, a decree went out from Caesar Augustus that all the world should be enrolled."
+    },
     {
       "ref": "Matthew 2:1",
       "book": "Matthew",
@@ -93,6 +114,16 @@
       "ref": "Luke 2:4",
       "book": "Luke",
       "textWEB": "Joseph also went up from Galilee, out of the city of Nazareth, into Judea, to David’s city, which is called Bethlehem, because he was of the house and family of David,"
+    },
+    {
+      "ref": "Luke 2:7",
+      "book": "Luke",
+      "textWEB": "She gave birth to her firstborn son. She wrapped him in bands of cloth and laid him in a feeding trough, because there was no room for them in the inn."
+    },
+    {
+      "ref": "Luke 2:8",
+      "book": "Luke",
+      "textWEB": "There were shepherds in the same country staying in the field, and keeping watch by night over their flock."
     },
     {
       "ref": "Luke 2:11",
@@ -170,7 +201,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

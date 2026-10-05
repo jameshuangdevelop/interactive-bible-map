@@ -32,32 +32,42 @@
     }
   ],
   "summary": {
-    "text": "The Temple Mount is the elevated platform in Jerusalem's Old City that carried Herod the Great's expanded Second Temple, the building the Gospels describe Jesus visiting, teaching in, and, in one episode, driving merchants and money changers from.",
+    "text": "The Temple Mount is the raised platform on Jerusalem's eastern ridge that Herod the Great built up to carry his expanded Second Temple, the center of Jewish worship in the first century AD. Herod began the rebuilding around 20-19 BC; Josephus says the priests finished the temple building itself in about a year and a half and the surrounding cloisters and courts in about eight years, but work on the wider precinct continued for decades, employing over eighteen thousand workers, and was only finished in the early 60s AD. Cloisters ringed the finished precinct for about six furlongs (roughly 1.2 km), and the Antonia fortress, a Roman garrison post, stood at its northwest corner. In John's Gospel, Jesus' own hearers say the Temple \"took forty-six years to build,\" reflecting this long, still-ongoing project.",
     "sources": [
       "wikidata:Q193163",
       "bib:ritmeyer-temple-mount-quest",
-      "scripture:Matthew 21:12",
-      "scripture:Luke 2:46"
+      "bib:josephus-jewish-war",
+      "bib:josephus-antiquities",
+      "scripture:John 2:20"
     ]
   },
   "history": [
     {
-      "text": "Herod the Great began a major expansion and rebuilding of the Second Temple and its surrounding platform around 20-19 BC, a project that, per the Gospel of John, was still being completed decades into the first century AD.",
+      "text": "The Gospels describe Jesus visiting the Temple as a boy, found sitting among its teachers, and later teaching in its courts and driving out the merchants and money changers who sold sacrificial animals and exchanged coins there. Acts describes the early church continuing to meet at the Temple, including Peter and John healing a man at a gate called Beautiful, and Paul later arrested there by a crowd. These episodes are a sample of the Gospels' and Acts' many references to \"the temple,\" a phrase recurring well over a hundred times in the New Testament.",
       "sources": [
-        "bib:ritmeyer-temple-mount-quest",
-        "scripture:John 2:20"
-      ]
-    },
-    {
-      "text": "The Temple was destroyed by Roman forces in AD 70, leaving the retaining walls of Herod's platform, including the section known today as the Western Wall, as its most substantial surviving remains.",
-      "sources": [
-        "wikidata:Q193163",
+        "scripture:Luke 2:46",
+        "scripture:Matthew 21:12",
+        "scripture:John 2:14",
+        "scripture:Acts 3:2",
+        "scripture:Acts 21:27",
         "bib:ritmeyer-temple-mount-quest"
       ]
     },
     {
-      "text": "The seven scripture references below are a representative sample of Gospel and Acts episodes set at the Temple precinct, not an exhaustive list of every New Testament mention of 'the temple,' a phrase that recurs well over one hundred times across the Gospels and Acts.",
+      "text": "The Temple was destroyed by Roman forces under Titus in AD 70, ending the sacrificial worship it had hosted; its retaining walls, including the section known today as the Western Wall, survived as its most substantial remains.",
       "sources": [
+        "wikidata:Q193163",
+        "wikidata:Q1003997",
+        "bib:ritmeyer-temple-mount-quest"
+      ]
+    },
+    {
+      "text": "Today the platform, also known as Haram al-Sharif, carries the Dome of the Rock and the Al-Aqsa Mosque, both built centuries after the Herodian Temple and outside this project's scope; below it, the Western Wall remains one of Judaism's holiest sites of prayer.",
+      "sources": [
+        "wikidata:Q193163",
+        "wikidata:Q172077",
+        "wikidata:Q12192963",
+        "wikidata:Q134821",
         "bib:ritmeyer-temple-mount-quest"
       ]
     }
@@ -97,6 +107,11 @@
       "ref": "Acts 21:27",
       "book": "Acts",
       "textWEB": "When the seven days were almost completed, the Jews from Asia, when they saw him in the temple, stirred up all the multitude and laid hands on him,"
+    },
+    {
+      "ref": "John 2:20",
+      "book": "John",
+      "textWEB": "The Jews therefore said, “It took forty-six years to build this temple! Will you raise it up in three days?”"
     }
   ],
   "otConnections": [],
@@ -118,7 +133,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

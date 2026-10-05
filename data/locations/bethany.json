@@ -29,20 +29,38 @@
     }
   ],
   "summary": {
-    "text": "Bethany was a village on the eastern slope of the Mount of Olives, close to Jerusalem, identified in the Gospel of John as the home of Lazarus, Martha and Mary and the site of Lazarus being raised from death.",
+    "text": "Bethany was a small village on the eastern slope of the Mount of Olives, about fifteen stadia (roughly 2.7 km) from Jerusalem on the road from Jericho, in the Judean hill country where the terrain begins turning toward the drier wilderness further east. It lay within Herod the Great's kingdom and, after his death, under his successors and then Roman governors of Judea. The Gospel of John identifies it as the home of Lazarus, Martha and Mary and the site of Lazarus being raised from death.",
     "sources": [
       "wikidata:Q7818622",
       "openbible:bethany-1",
+      "bib:rainey-notley-sacred-bridge",
       "scripture:John 11:1",
-      "scripture:John 11:43"
+      "scripture:John 11:18"
     ]
   },
   "history": [
     {
-      "text": "The modern Palestinian town of al-Eizariya, whose Arabic name preserves the memory of Lazarus ('al-Azir'), occupies the traditional site and includes a tomb venerated since at least the fourth century AD as the tomb of Lazarus.",
+      "text": "John describes Jesus raising Lazarus after he had been \"in the tomb four days already,\" a tomb John describes as \"a cave, and a stone lay against it,\" the standard rock-cut family tomb form of the period. Mark and Matthew record a banquet at Bethany in the house of \"Simon the leper,\" where a woman anointed Jesus from an alabaster jar of costly perfume, and the Gospels place Jesus lodging in the village during his final days, with Luke recording his ascension from near there.",
+      "sources": [
+        "scripture:John 11:17",
+        "scripture:John 11:38",
+        "scripture:Mark 14:3",
+        "scripture:Matthew 21:17",
+        "scripture:Luke 24:50"
+      ]
+    },
+    {
+      "text": "By the Byzantine period the village's original name had been replaced with one recalling Lazarus, and a memorial church complex, the Lazarium, was built near his tomb in the fourth century; it was destroyed and rebuilt more than once over the following centuries, so the tomb as it appears today, with its sixteenth-century entrance, does not preserve its first-century form.",
+      "sources": [
+        "bib:custodia-bethany",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    },
+    {
+      "text": "Today the site is the Palestinian town of al-Eizariya, whose Arabic name preserves the memory of Lazarus (\"al-Azir\"). A Franciscan church, consecrated in 1954 over the remains of three earlier churches, stands near the traditional Tomb of Lazarus, which pilgrims reach by a stairway next to a mosque built beside it.",
       "sources": [
         "wikidata:Q2181579",
-        "bib:murphy-oconnor-holy-land-guide"
+        "bib:custodia-bethany"
       ]
     }
   ],
@@ -96,6 +114,11 @@
       "ref": "John 11:17",
       "book": "John",
       "textWEB": "So when Jesus came, he found that he had been in the tomb four days already."
+    },
+    {
+      "ref": "John 11:38",
+      "book": "John",
+      "textWEB": "Jesus therefore, again groaning in himself, came to the tomb. Now it was a cave, and a stone lay against it."
     },
     {
       "ref": "John 11:18",

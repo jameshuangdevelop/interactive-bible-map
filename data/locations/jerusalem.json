@@ -36,36 +36,43 @@
     }
   ],
   "summary": {
-    "text": "Jerusalem was the capital of Judea under its Herodian client kings and, throughout the first century AD, the religious center of Judaism as the site of the Second Temple; the Gospels set Jesus' final days, death, and resurrection appearances there.",
+    "text": "Jerusalem was the capital of Judea and, through the first century AD, the religious center of Judaism, built on a cluster of ridges divided by the Kidron, Tyropoeon and Hinnom valleys. The city was ruled in turn by Herod the Great, his son Herod Archelaus, Roman prefects and procurators, and briefly the client king Herod Agrippa I. Herod's building program, above all his vastly enlarged Temple platform, made Jerusalem one of the major cities of the eastern Roman world; by the Roman siege of AD 70 its walls, an outer third wall still being completed for most of this period, ran about thirty-three furlongs (roughly 6 km) and carried towers at intervals along their length.",
     "sources": [
       "wikidata:Q1218",
       "pleiades:687928",
       "dare:15896",
       "bib:rainey-notley-sacred-bridge",
-      "scripture:Matthew 21:1",
-      "scripture:John 19:20",
-      "scripture:Luke 24:36",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:josephus-jewish-war",
+      "wikidata:Q1003997"
     ]
   },
   "history": [
     {
-      "text": "By the time of Herod the Great, Jerusalem had grown well beyond its earlier Old Testament boundaries, and Herod's building program, including the enlarged Temple platform, made it one of the major cities of the eastern Roman world.",
+      "text": "The Gospels set Jesus' final days, trial, death and resurrection appearances in Jerusalem, and describe him teaching in the Temple courts there. Acts describes the earliest church meeting in the city and growing from the crowds of Jewish pilgrims gathered there \"from every nation under the sky,\" and records Paul repeatedly traveling to Jerusalem, including the visit that ended in his arrest. Paul's letters recall a collection he gathered from Gentile churches for \"the poor among the saints\" in Jerusalem, and Revelation looks ahead to a \"new Jerusalem\" coming down from heaven.",
       "sources": [
-        "bib:rainey-notley-sacred-bridge",
-        "dare:15896"
+        "scripture:Matthew 21:1",
+        "scripture:John 19:20",
+        "scripture:Acts 2:5",
+        "scripture:Acts 21:17",
+        "scripture:Acts 21:31",
+        "scripture:Romans 15:25",
+        "scripture:Romans 15:26",
+        "scripture:Revelation 21:2"
       ]
     },
     {
-      "text": "Roman forces under Titus destroyed the city and the Second Temple in AD 70 during the First Jewish-Roman War, an event referenced elsewhere in the New Testament as a coming judgment.",
+      "text": "Roman forces under Titus destroyed the city and the Second Temple in AD 70, during the First Jewish-Roman War, an event the Gospels describe Jesus foretelling: that one day the city would be \"surrounded by armies,\" with \"its desolation... at hand.\"",
       "sources": [
         "wikidata:Q1003997",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:rainey-notley-sacred-bridge",
+        "scripture:Luke 21:20"
+      ]
+    },
+    {
+      "text": "Today Jerusalem's Old City still sits over much of this ancient city, within later walls; archaeology continues to add to the record, including the Second Temple-period Pool of Siloam, uncovered just south of the Temple Mount. Several sites from this period are described in their own records in this project, including the Temple Mount, Golgotha and Gethsemane, all within or beside the Old City.",
+      "sources": [
+        "wikidata:Q1218",
+        "bib:reich-shukron-siloam-pool"
       ]
     }
   ],
@@ -1001,7 +1008,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

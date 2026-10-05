@@ -1017,6 +1017,30 @@
       "accessed": "2026-10-01"
     },
     {
+      "id": "custodia-dominus-flevit",
+      "type": "web",
+      "title": "Dominus Flevit",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/dominus-flevit",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-bethphage",
+      "type": "web",
+      "title": "Bethphage",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/bethphage",
+      "accessed": "2026-10-05"
+    },
+    {
       "id": "isbe-agriculture",
       "type": "chapter",
       "title": "Agriculture",

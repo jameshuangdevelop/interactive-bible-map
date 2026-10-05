@@ -32,21 +32,57 @@
     }
   ],
   "summary": {
-    "text": "The Mount of Olives is the ridge overlooking Jerusalem's Old City from the east across the Kidron Valley, described in the Gospels as a place Jesus and his disciples regularly visited, including on the night before his arrest.",
+    "text": "The Mount of Olives is the ridge east of Jerusalem's Old City, separated from the Temple Mount by the Kidron Valley, with its summit directly overlooking the Temple precinct. Its name comes from the olive groves that, then as now, covered its terraced slopes; its eastern side descends through the villages of Bethphage and Bethany toward the Judean wilderness and, further on, Jericho and the Jordan Valley. No temple, synagogue or other major building stood on the ridge itself in this period; the Kidron Valley at its foot already held rock-cut tombs, part of a long-used burial ground.",
     "sources": [
       "wikidata:Q205976",
       "openbible:mount-of-olives",
-      "scripture:Luke 22:39",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:rainey-notley-sacred-bridge",
+      "bib:josephus-jewish-war"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "The Gospels describe Jesus and his disciples regularly on the Mount of Olives: travelers coming up from Jericho passed its villages on the way into Jerusalem, Jesus sent two disciples from Bethphage to fetch a colt for his entry into the city, and he taught there, including the discourse later called the Olivet Discourse. Luke says that during his final days in Jerusalem he spent his nights on the mount, and all three Synoptic Gospels record him going out to the mount, to Gethsemane, for his last prayer on the night of his arrest; Acts records the disciples returning to Jerusalem from the mount after his ascension.",
+      "sources": [
+        "scripture:Mark 10:46",
+        "scripture:Matthew 21:1",
+        "scripture:Matthew 24:3",
+        "scripture:Matthew 26:30",
+        "scripture:Mark 14:26",
+        "scripture:Luke 21:37",
+        "scripture:Luke 22:39",
+        "scripture:Acts 1:12"
+      ]
+    },
+    {
+      "text": "The Old Testament already names the ridge: 2 Samuel describes King David fleeing over it during Absalom's revolt, and Zechariah's prophecy pictures a coming day when \"his feet will stand... on the Mount of Olives,\" imagery later linked to the mount's Jewish and Christian associations with a final judgment.",
+      "sources": [
+        "scripture:2 Samuel 15:30",
+        "scripture:Zechariah 14:4",
+        "openbible:mount-of-olives"
+      ]
+    },
+    {
+      "text": "Today the ridge carries several churches marking Gospel scenes, among them the Franciscan sanctuaries of Bethphage and Dominus Flevit (\"the Lord wept\"), the Church of the Pater Noster, and the Chapel of the Ascension near the summit, alongside the large Mount of Olives Jewish Cemetery that covers much of the slope. The summit gives one of the best-known views over Jerusalem's Old City, with the Temple Mount directly below; to the north, the separate rise of Mount Scopus now carries a campus of the Hebrew University of Jerusalem.",
+      "sources": [
+        "wikidata:Q2193088",
+        "bib:custodia-bethphage",
+        "wikidata:Q1238436",
+        "bib:custodia-dominus-flevit",
+        "wikidata:Q588849",
+        "wikidata:Q773726",
+        "wikidata:Q12404547",
+        "wikidata:Q312818",
+        "wikidata:Q174158"
+      ]
+    }
+  ],
   "scripture": [
+    {
+      "ref": "Mark 10:46",
+      "book": "Mark",
+      "textWEB": "They came to Jericho. As he went out from Jericho with his disciples and a great multitude, the son of Timaeus, Bartimaeus, a blind beggar, was sitting by the road."
+    },
     {
       "ref": "Matthew 21:1",
       "book": "Matthew",
@@ -125,7 +161,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

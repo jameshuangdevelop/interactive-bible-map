@@ -48,7 +48,7 @@
     }
   ],
   "summary": {
-    "text": "Golgotha, 'place of a skull,' is the site of Jesus' crucifixion described in all four Gospels as located outside Jerusalem's walls; its precise location is not settled, with the Church of the Holy Sepulchre and the Garden Tomb the two most discussed candidate sites, and some scholars proposing the crucifixion and burial were at somewhat separate spots within the same general quarry area.",
+    "text": "Golgotha, \"place of a skull,\" is the site of Jesus' crucifixion. All four Gospels name it, and John adds that it \"was near the city,\" on ground that for most of this period lay outside Jerusalem's walls; Hebrews says Jesus \"suffered outside of the gate.\" Its precise location is not settled. The two most discussed candidates are the Church of the Holy Sepulchre, inside today's Old City, and the Garden Tomb, about 600 meters north; some scholars propose the crucifixion and burial were at separate spots within the same disused quarry area.",
     "sources": [
       "openbible:golgotha",
       "bib:taylor-golgotha-reconsideration",
@@ -56,28 +56,33 @@
       "scripture:Mark 15:22",
       "scripture:Luke 23:33",
       "scripture:John 19:17",
-      "scripture:Hebrews 13:12",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "scripture:John 19:20",
+      "scripture:Hebrews 13:12"
     ]
   },
   "history": [
     {
-      "text": "Byzantine tradition, following fourth-century construction under Constantine, identifies the site beneath the Church of the Holy Sepulchre; archaeological work has confirmed the area functioned as a stone quarry with rock-cut tombs before Jerusalem's walls were later extended to enclose it.",
+      "text": "John's Gospel says that \"in the place where he was crucified there was a garden,\" with \"a new tomb\" in it, and the Synoptic Gospels record women watching from a distance, a Roman centurion overseeing the execution, and two others condemned to death crucified alongside Jesus.",
+      "sources": [
+        "scripture:John 19:41",
+        "scripture:Mark 15:39",
+        "scripture:Mark 15:40-41",
+        "scripture:Luke 23:33"
+      ]
+    },
+    {
+      "text": "Byzantine tradition, following fourth-century construction under Constantine, identifies the site beneath the Church of the Holy Sepulchre; archaeological work has confirmed the area functioned as a stone quarry with rock-cut tombs before Jerusalem's walls were later extended to enclose it. The Garden Tomb, promoted as an alternative site from the nineteenth century onward, contains a rock-cut tomb chamber that most archaeologists date many centuries before the first century AD, a difficulty for identifying it with the Gospels' \"new\" tomb; the skull-shaped rock formation associated with the site is a nineteenth-century observation, not an ancient description.",
       "sources": [
         "wikidata:Q187702",
+        "wikidata:Q1494672",
         "bib:taylor-golgotha-reconsideration"
       ]
     },
     {
-      "text": "The Garden Tomb, promoted as an alternative site from the nineteenth century onward, contains a rock-cut tomb chamber that most archaeologists date many centuries before the first century AD.",
+      "text": "Today both candidates are visited by pilgrims and tourists. The Church of the Holy Sepulchre, built over the site venerated since the fourth century, encloses what church tradition identifies as both the crucifixion rock and a nearby tomb, under one roof. The Garden Tomb, in a garden setting outside today's Old City walls, preserves its rock-cut tomb chamber and is run as a separate, independently visited site.",
       "sources": [
-        "wikidata:Q1494672",
-        "bib:taylor-golgotha-reconsideration"
+        "wikidata:Q187702",
+        "wikidata:Q1494672"
       ]
     }
   ],
@@ -101,6 +106,31 @@
       "ref": "John 19:17",
       "book": "John",
       "textWEB": "He went out, bearing his cross, to the place called “The Place of a Skull”, which is called in Hebrew, “Golgotha”,"
+    },
+    {
+      "ref": "John 19:20",
+      "book": "John",
+      "textWEB": "Therefore many of the Jews read this title, for the place where Jesus was crucified was near the city; and it was written in Hebrew, in Latin, and in Greek."
+    },
+    {
+      "ref": "John 19:41",
+      "book": "John",
+      "textWEB": "Now in the place where he was crucified there was a garden. In the garden was a new tomb in which no man had ever yet been laid."
+    },
+    {
+      "ref": "Mark 15:39",
+      "book": "Mark",
+      "textWEB": "When the centurion, who stood by opposite him, saw that he cried out like this and breathed his last, he said, “Truly this man was the Son of God!”"
+    },
+    {
+      "ref": "Mark 15:40-41",
+      "book": "Mark",
+      "textWEB": "There were also women watching from afar, among whom were both Mary Magdalene and Mary the mother of James the less and of Joses, and Salome; who, when he was in Galilee, followed him and served him; and many other women who came up with him to Jerusalem."
+    },
+    {
+      "ref": "Hebrews 13:12",
+      "book": "Hebrews",
+      "textWEB": "Therefore Jesus also, that he might sanctify the people through his own blood, suffered outside of the gate."
     }
   ],
   "otConnections": [],
@@ -114,7 +144,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

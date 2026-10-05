@@ -60,24 +60,40 @@
     }
   ],
   "summary": {
-    "text": "Cana of Galilee is named in the Gospel of John as the site of Jesus' first miracle, turning water into wine at a wedding, and of a second miracle recorded there; its identification is disputed among several candidate villages.",
+    "text": "Cana of Galilee was a Jewish village in the cultivated hill country of Lower Galilee in the first century AD, part of Herod Antipas's tetrarchy. It is named in the Gospel of John as the site of Jesus' first recorded miracle, turning water into wine at a wedding, and of a second miracle recorded there; its identification is disputed among several candidate villages, and this record favors none of them.",
     "sources": [
       "openbible:cana",
+      "bib:rainey-notley-sacred-bridge",
       "scripture:John 2:1",
-      "scripture:John 4:46",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "scripture:John 4:46"
     ]
   },
   "history": [
     {
-      "text": "Excavations at Khirbet Qana uncovered a Jewish village with caves later adapted for Christian pilgrimage veneration, while the rival site of Kafr Kanna has been venerated by pilgrims since at least the medieval period despite thinner first-century archaeological evidence.",
+      "text": "John's Gospel sets a wedding feast at Cana where Jesus turned water into wine, \"the beginning of his signs,\" using six stone water jars kept for Jewish purification rites; John later records a second sign there, healing a royal official's son in Capernaum from a distance. A disciple, Nathanael, is identified as being from Cana.",
       "sources": [
-        "bib:mccollough-khirbet-qana"
+        "scripture:John 2:1",
+        "scripture:John 2:6",
+        "scripture:John 2:11",
+        "scripture:John 4:46",
+        "scripture:John 21:2"
+      ]
+    },
+    {
+      "text": "Excavations at Khirbet Qana, one candidate site, uncovered a Jewish village occupied from the Hellenistic through Roman periods, including caves later adapted for Christian pilgrimage veneration with inscriptions invoking Jesus; many recent archaeologists favor this site over the rival candidate, Kafr Kanna, which has been venerated by pilgrims since at least the medieval period despite thinner first-century archaeological evidence. Neither candidate preserves a building identifiable as the Gospel's wedding house. A third, longstanding minority tradition, especially among Lebanese Christian communities, instead identifies a village in southern Lebanon as the biblical Cana, though John sets the episode within Galilee, well north of that village.",
+      "sources": [
+        "bib:mccollough-khirbet-qana",
+        "wikidata:Q17199012",
+        "wikidata:Q2633158",
+        "wikidata:Q753812",
+        "scripture:John 2:1"
+      ]
+    },
+    {
+      "text": "Today Kafr Kanna is a thriving Arab town in Lower Galilee, where several churches mark the traditional wedding site and welcome pilgrims; Khirbet Qana is a hillside archaeological site, excavated but not built up, overlooking the Beit Netofa valley a few kilometers to the northwest.",
+      "sources": [
+        "wikidata:Q2633158",
+        "wikidata:Q17199012"
       ]
     }
   ],
@@ -86,6 +102,11 @@
       "ref": "John 2:1",
       "book": "John",
       "textWEB": "The third day, there was a wedding in Cana of Galilee. Jesus’ mother was there."
+    },
+    {
+      "ref": "John 2:6",
+      "book": "John",
+      "textWEB": "Now there were six water pots of stone set there after the Jews’ way of purifying, containing two or three metretes apiece."
     },
     {
       "ref": "John 2:11",
@@ -139,7 +160,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

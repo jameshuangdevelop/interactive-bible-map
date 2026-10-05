@@ -35,26 +35,43 @@
     }
   ],
   "summary": {
-    "text": "Nazareth was a small Galilean village in the first century AD, identified in the Gospels of Matthew and Luke as the town where Jesus grew up and from which he is repeatedly called 'Jesus of Nazareth' throughout the New Testament.",
+    "text": "Nazareth was a small farming village in the hills of Lower Galilee, set in a natural bowl among the surrounding ridges, with perhaps only a few hundred people and, as far as excavation has found, no public building or synagogue of its own. A few kilometers away stood Sepphoris, a much larger city that Herod Antipas rebuilt early in the first century; Josephus calls it \"the security of all Galilee\" and says Antipas \"made it the metropolis of the country.\" Nazareth is identified in Matthew and Luke as the town where Jesus grew up, and he is called \"Jesus of Nazareth\" throughout the New Testament.",
     "sources": [
       "wikidata:Q430776",
-      "openbible:nazareth",
+      "dare:22899",
+      "pleiades:678299",
+      "bib:josephus-antiquities",
+      "wikidata:Q1132798",
       "scripture:Matthew 2:23",
-      "scripture:Mark 1:24",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "scripture:Luke 2:51"
     ]
   },
   "history": [
     {
-      "text": "Excavations beneath and around the Basilica of the Annunciation and nearby sites, notably at the Sisters of Nazareth Convent, have uncovered rock-cut tombs, cisterns, and a domestic structure consistent with a small first-century Jewish village, matching the modest size implied by the Gospels' description of Nazareth.",
+      "text": "The Gospels describe Jesus growing up in Nazareth, known there as \"the carpenter\" and \"the carpenter's son,\" and worshiping \"as was his custom\" in its synagogue. Luke records that when he preached there as an adult, the congregation grew furious and drove him to a cliff edge at the town's hillside \"to throw him off,\" though he walked away unharmed; elsewhere, a future disciple, Nathanael, doubts that \"any good thing\" could come out of so small a place. He is called \"Jesus of Nazareth\" or \"the Nazarene\" dozens of times across the Gospels and Acts, including on the inscription Pilate placed over the cross.",
+      "sources": [
+        "scripture:Matthew 13:55",
+        "scripture:Mark 6:3",
+        "scripture:Luke 4:16",
+        "scripture:Luke 4:28",
+        "scripture:Luke 4:29",
+        "scripture:John 1:46",
+        "scripture:John 19:19"
+      ]
+    },
+    {
+      "text": "Excavations beneath and around the Basilica of the Annunciation and the nearby Sisters of Nazareth Convent have uncovered rock-cut tombs, cisterns, grain-storage pits and dwellings built around natural caves, consistent with a small first-century Jewish village; the Franciscan excavators describe it as \"an agricultural village... gradually structured with simple dwellings constructed around caves used for their domestic work and for the recovery of animals.\"",
       "sources": [
         "bib:dark-nazareth-archaeology",
+        "bib:custodia-nazareth",
         "openbible:nazareth"
+      ]
+    },
+    {
+      "text": "Today Nazareth is a largely Arab city and a center of Christian pilgrimage. Its Basilica of the Annunciation, a modern building inaugurated in 1969 over the remains the earlier excavations uncovered, draws millions of visitors each year, alongside other churches marking Gospel scenes in the town.",
+      "sources": [
+        "wikidata:Q430776",
+        "bib:custodia-nazareth"
       ]
     }
   ],
@@ -143,6 +160,16 @@
       "ref": "Luke 4:16",
       "book": "Luke",
       "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
+    },
+    {
+      "ref": "Luke 4:28",
+      "book": "Luke",
+      "textWEB": "They were all filled with wrath in the synagogue as they heard these things."
+    },
+    {
+      "ref": "Luke 4:29",
+      "book": "Luke",
+      "textWEB": "They rose up, threw him out of the city, and led him to the brow of the hill that their city was built on, that they might throw him off the cliff."
     },
     {
       "ref": "Luke 4:34",
@@ -265,7 +292,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

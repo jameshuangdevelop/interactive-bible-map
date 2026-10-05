@@ -34,26 +34,43 @@
     }
   ],
   "summary": {
-    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee that served as a base for Jesus' Galilean ministry, described in the Gospels as the home of Peter and the location of numerous healings and teachings, including in its synagogue.",
+    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee, part of Herod Antipas's tetrarchy of Galilee. Its ordinary houses were built of local black basalt fieldstone; the village had its own synagogue and, according to the Gospels, a Roman tax office. Josephus describes the adjoining Gennesaret plain as exceptionally fertile, watered by a spring the local people called \"Capharnaum,\" with orchards of walnut, palm, fig and olive producing fruit almost year-round.",
     "sources": [
       "wikidata:Q59174",
-      "openbible:capernaum",
-      "scripture:Mark 1:21",
-      "scripture:Mark 2:1",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "dare:33337",
+      "pleiades:678231",
+      "bib:custodia-capernaum",
+      "bib:josephus-jewish-war",
+      "bib:rainey-notley-sacred-bridge"
     ]
   },
   "history": [
     {
-      "text": "Archaeological excavation has uncovered a limestone synagogue, generally dated several centuries after Jesus' lifetime, built over the foundations of an earlier, more modest structure, along with a Byzantine octagonal church built over a first-century house that an early Christian graffiti tradition identifies as Peter's house.",
+      "text": "The Gospels describe Capernaum as a base for Jesus' Galilean ministry and the hometown of the fishermen Simon Peter and Andrew, and James and John; Jesus taught in its synagogue and, according to Mark, entered \"the house of Simon and Andrew\" there. Matthew (Levi) was called from the village's tax office, and Jesus healed a Roman centurion's servant and a royal official's son from a distance. Despite these many \"mighty works,\" Matthew and Luke record Jesus pronouncing a judgment on Capernaum's unbelief, that it would be \"brought down to Hades.\"",
+      "sources": [
+        "scripture:Mark 1:21",
+        "scripture:Mark 1:29",
+        "scripture:Mark 2:1",
+        "scripture:Mark 2:14",
+        "scripture:Matthew 8:5",
+        "scripture:John 4:46",
+        "scripture:Matthew 11:23",
+        "scripture:Luke 10:15"
+      ]
+    },
+    {
+      "text": "Archaeological excavation has uncovered a limestone synagogue, built centuries after Jesus' lifetime over the foundations of an earlier, more modest basalt structure that may be the synagogue of the Gospels' own time, and a Byzantine octagonal church built over a first-century house that an early Christian tradition identifies as Peter's.",
       "sources": [
         "bib:murphy-oconnor-holy-land-guide",
+        "bib:custodia-capernaum",
         "dare:33337"
+      ]
+    },
+    {
+      "text": "Today the site, known as Tell Hum or by its Hebrew name Kfar Nahum, is an archaeological park where visitors can see the excavated limestone synagogue and a modern Franciscan memorial church built over the remains of the house venerated as Peter's.",
+      "sources": [
+        "wikidata:Q59174",
+        "bib:custodia-capernaum"
       ]
     }
   ],
@@ -84,9 +101,19 @@
       "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught."
     },
     {
+      "ref": "Mark 1:29",
+      "book": "Mark",
+      "textWEB": "Immediately, when they had come out of the synagogue, they came into the house of Simon and Andrew, with James and John."
+    },
+    {
       "ref": "Mark 2:1",
       "book": "Mark",
       "textWEB": "When he entered again into Capernaum after some days, it was heard that he was at home."
+    },
+    {
+      "ref": "Mark 2:14",
+      "book": "Mark",
+      "textWEB": "As he passed by, he saw Levi the son of Alphaeus sitting at the tax office. He said to him, “Follow me.” And he arose and followed him."
     },
     {
       "ref": "Mark 9:33",
@@ -193,7 +220,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }
