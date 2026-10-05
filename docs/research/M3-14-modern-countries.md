@@ -297,6 +297,11 @@ the Fact-Checker re-verifies them next.
     Testament, not a claim about what this specific kingdom controlled. Egypt and Israel are left out
     of `modernCountries` on that basis, keeping the list to the three countries the source most
     clearly supports as the kingdom's own extent.
+    **Fact-Checker note (re-verification, 2026-10-05):** Livius lists Rhinocolura (Al-Arish) and
+    Gaza among the kingdom's own towns ("there were many other towns: in the west, Rhinocolura
+    (Al-Arish) and Gaza"), not as a border zone. Leaving out Egypt and Israel still stands, but as a
+    "main ones" judgement: these are single towns and farmland on the western edge, against the
+    kingdom's large northern, southern and eastern extent.
 - **Illyricum** (`illyricum`): the original `["Croatia"]` / "Coastal Croatia" didn't match the record's
   own label point. The Fact-Checker found that `wikidata:Q753824`'s coordinate (17.3294 E, 43.8044 N)
   sits 36.6 km inside Bosnia and Herzegovina (Natural Earth), not Croatia. Reading `bib:isbe-illyricum`

@@ -5,10 +5,10 @@ This is an independent check of the Research Lead's commit `330e684` ("data(loca
 **Result:**
 - 74 non-exempt records pass as written.
 - 4 are fixed here: Salamis (PO ruling), and Achaia, Galatia and Sicily.
-- 2 fail and stay `draft`: Arabia and Illyricum. They go back to the Research Lead.
+- 2 failed and stayed `draft`: Arabia and Illyricum. They went back to the Research Lead.
 - The 9 exempt records correctly have no countries.
 
-So 87 of the 89 records are now `verified`.
+The first pass left 87 of the 89 records `verified`. After the Research Lead's rework (`f210fa8`), both failed records pass (see "Re-verification"), and **all 89 are now `verified`**.
 
 ## Scope
 
@@ -54,7 +54,7 @@ The Source column names the cited source behind each country. "NE" means Natural
 | achaia | province | Greece | Central and southern Greece | **Fixed** (phrase) | `wikidata:Q41`; label point in Greece (NE). The phrase follows the record's own summary, "the Peloponnese and central Greece". |
 | antioch-pisidia | city | Türkiye | | Pass | `wikidata:Q579468`; NE |
 | antioch-syria | city | Türkiye | | Pass | `wikidata:Q200441`; NE |
-| arabia | province | Jordan | Southern Jordan | **Fail** | Contradicted by its own `bib:livius-nabataeans`; see "Failures" |
+| arabia | province | Jordan, Saudi Arabia, Syria | Jordan, with parts of Saudi Arabia and Syria | **Fail**, then Pass on re-verification | `wikidata:Q810`; `bib:livius-nabataeans`; see "Re-verification" |
 | asia | province | Türkiye, Greece | Western Türkiye | Pass | `wikidata:Q43`, `wikidata:Q41`; Greece through Patmos (record history) |
 | athens | city | Greece | | Pass | `wikidata:Q1524`; NE |
 | berea | city | Greece | | Pass | `wikidata:Q201722`; NE |
@@ -87,7 +87,7 @@ The Source column names the cited source behind each country. "NE" means Natural
 | golgotha | site | — (exempt) | | Pass (exempt) | Parent chain includes `jerusalem` |
 | hierapolis | city | Türkiye | | Pass | `wikidata:Q7428276`; NE |
 | iconium | city | Türkiye | | Pass | `wikidata:Q79857`; NE |
-| illyricum | province | Croatia | Coastal Croatia | **Fail** | Its own label point is in Bosnia and Herzegovina; see "Failures" |
+| illyricum | province | Bosnia and Herzegovina, Croatia | Bosnia and Herzegovina, with the Croatian coast | **Fail**, then Pass on re-verification | `wikidata:Q225`, `wikidata:Q224`; label point in Bosnia and Herzegovina (NE); see "Re-verification" |
 | italy | province | Italy | Italy | Pass | `wikidata:Q38`; NE |
 | jericho | city | West Bank | | Pass | `wikidata:Q2402267` ("archaeological site in the West Bank"); NE for both candidates; CP3.5 d1 |
 | jerusalem | city | — (exempt) | | Pass (exempt) | ADR-0028 |
@@ -230,7 +230,7 @@ All four are within the card's scope: `names.modernCountries`, `names.modern` on
    - This is the Research Lead's own child-record method, as used for Patmos in Asia and Tarsus in Syria. Malta was already on the allow-list.
    - Italy comes first, since Sicily is by far the larger part.
 
-## Failures (left at `draft`, back to the Research Lead)
+## Failures in the first pass (reworked in `f210fa8`; see "Re-verification")
 
 Both need a new allow-list value. Under `schema/README.md`, the Research Lead adds allow-list values and the Fact-Checker reviews them, so I haven't added them myself. Both also need a decision on order that the cited sources don't settle.
 
@@ -265,6 +265,51 @@ Both need a new allow-list value. Under `schema/README.md`, the Research Lead ad
 
    Whether Imwas is counted as Israel, West Bank or no-man's land, the list doesn't change.
 
+## Re-verification (2026-10-05, Research Lead commit `f210fa8`)
+
+**Semantic diff against `19d7fc3`:**
+- Only `arabia` and `illyricum` changed, and only in `names.modern`, `names.modernCountries` and `summary.sources`.
+- Illyricum adds `wikidata:Q225` (Bosnia and Herzegovina).
+- Arabia's sources didn't change: `wikidata:Q810` and `bib:livius-nabataeans` were already cited.
+- The allow-list gains "Saudi Arabia" and "Bosnia and Herzegovina", both needed and both used.
+
+1. **`arabia`: Pass.** `["Jordan", "Saudi Arabia", "Syria"]`, phrase "Jordan, with parts of Saudi Arabia and Syria".
+   - **Extent and sources.** The cited `bib:livius-nabataeans` places the kingdom in all three countries. It says:
+     - "an Arab nation in modern Jordan";
+     - "In the north, it controlled Bosra in Syria, and even, though briefly, Damascus";
+     - "Hegra (Mada'in Salih) was within the Nabataean frontiers, just like the nearby oasis of Al-Ula, and the port of Leuke Kome";
+     - "In the east, the Nabataean king controlled several oases (Têma, Hayil, and Dawmat al-Jandal)";
+     - and it locates Hegra "in the northwest of Saudi Arabia".
+   - **Order.** Jordan comes first because Livius locates the Nabataeans "in modern Jordan". The capital, Petra, is there, as are the heartland towns Livius names (Madaba among them) and the record's label point. Saudi Arabia, where Livius names more places (Hegra, Al-Ula, Leuke Kome and three eastern oases, against Bosra and, briefly, Damascus), comes before Syria.
+     - The Saudi oases cover a wide area, but Livius describes them as controlled oases, not a block of held land. So Jordan first matches the source's own framing.
+   - **What's left out.**
+     - Livius also lists "in the west, Rhinocolura (Al-Arish) and Gaza" among the kingdom's towns, and mentions Nabataean farming in the Negev.
+     - The rework's research note calls this a "border zone". That misreads the page, so I added a one-line correction to the note.
+     - Leaving Egypt and Israel out still stands, as a "main ones" judgement: single towns on the western edge.
+     - Gaza would also need a territory name that CP3.5 decision 1 doesn't cover, which is a question for the PO, not for this record.
+   - **Phrase.** Neutral and orienting.
+2. **`illyricum`: Pass.** `["Bosnia and Herzegovina", "Croatia"]`, phrase "Bosnia and Herzegovina, with the Croatian coast".
+   - **Extent and sources.**
+     - Bosnia and Herzegovina: the record's own label point (Natural Earth, 36.6 km inside) and `wikidata:Q225`.
+     - Croatia: Pleiades' point for the province (`pleiades:981522`, at Salona) and ISBE's capital "Salonae (modern Spalato)", with `wikidata:Q224`.
+     - The rework's statement that ISBE's legionary base Delminium lies in Bosnia and Herzegovina is confirmed by `wikidata:Q1255537` (Delminium, `pleiades:197244`): P17 Bosnia and Herzegovina, at 17.31 E 43.64 N.
+   - **Order.** To test "the country holding most of it first", I sampled a 0.05° grid over the Roman province of Dalmatia's outline in the DARE-derived AD 117 provinces layer (`klokantech/roman-empire`, `data/provinces.geojson`, 4,094 points). Each point was classed by Natural Earth country, weighted by latitude.
+     - The result: Bosnia and Herzegovina 44.1%, Croatia 20.5%, Montenegro 14.8%, Serbia 13.6%, Albania 4.8%, Kosovo 0.4%.
+     - So Bosnia and Herzegovina first and Croatia second is correct.
+     - The AD 117 outline is used as a close proxy for AD 50, since the province broadly kept its outline after AD 9.
+   - **What's left out.**
+     - Montenegro and Serbia are real shares, but none of the record's cited sources names a place in either, so leaving them out matches the sourcing rule. The same applies to "Syria" on `judea-province`.
+     - Adding them would need a cited source, such as a dataset entry for the province's extent, and two allow-list values. This is optional.
+   - **Phrase.** Neutral and orienting. "The Croatian coast" simplifies Croatia's share, which also includes the inland Dalmatian hinterland, but that is acceptable for an orienting phrase.
+
+Both records are now `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-10-05"`.
+
+**Checks after the re-verification:**
+- `npm run validate:data`: 0 errors, 107 warnings (106 scripture linkage, 1 image width; none about countries).
+- `npm test`: 145/145.
+- `npm run test:app`: 93/93.
+- `npm run build:data`: 89 places.
+
 ## Validation
 
 - `npm run validate:data`: **0 errors, 107 warnings**, the same count as the Research Lead's run. 106 are the existing scripture-linkage warnings (a verse that doesn't contain the place's name) and 1 is the existing 800 px image on `philadelphia-lydia`. None concerns modern names, countries or areas.
@@ -275,7 +320,7 @@ Both need a new allow-list value. Under `schema/README.md`, the Research Lead ad
 ## For the PO
 
 1. **The Cyprus ruling**, for the human to confirm at the next mini checkpoint.
-2. **Arabia and Illyricum** need a short Research Lead round, with a Fact-Checker check after it. Until then, the card's last acceptance criterion ("All 89 records are `verified` again") is not met, and CI still passes because `draft` is allowed. Both need new allow-list values ("Saudi Arabia", "Bosnia and Herzegovina", and possibly "Montenegro").
+2. **Arabia and Illyricum**: resolved by the Research Lead's rework and this re-verification (see "Re-verification"). Two optional follow-ups remain there: Montenegro and Serbia for Illyricum, and Gaza for Arabia.
 3. **CP3.5's description** of Emmaus Nicopolis as "in the former Latrun no-man's land" is slightly off. Natural Earth puts Imwas just inside the 1949 West Bank line, on the no-man's land's edge. Either way, no data change follows.
 4. **Optional:**
    - `judea-province` could add "Syria" for Batanea and Trachonitis, if a source ties them to the province at AD 50.
