@@ -25,7 +25,6 @@ const SEARCH_HEIGHT = 48;
 const PANEL_CONTENT_TOP_PADDING = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + tokens.spacing.md;
 const MAP_PLACEHOLDER_COLOR = "#F1EEE4";
 const SMALL_SCREEN_BREAKPOINT = 768;
-const COPY_LINK_STATUS_TIMEOUT_MS = 2_000;
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -118,28 +117,13 @@ function MapLoadingPlaceholder() {
   );
 }
 
-function fallbackCopyToClipboard(value: string) {
-  const textarea = document.createElement("textarea");
-  textarea.value = value;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "absolute";
-  textarea.style.left = "-9999px";
-  document.body.append(textarea);
-  textarea.select();
-  const copied = document.execCommand("copy");
-  textarea.remove();
-  return copied;
-}
-
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
-  const [focusRequestToken, setFocusRequestToken] = useState(0);
   const [loading, setLoading] = useState(true);
   const [urlStateReady, setUrlStateReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [copyStatusMessage, setCopyStatusMessage] = useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== "undefined" ? window.innerWidth < SMALL_SCREEN_BREAKPOINT : false
   );
@@ -368,19 +352,6 @@ export function AppShell() {
     };
   }, [closePanel, selectedPlace]);
 
-  useEffect(() => {
-    if (!copyStatusMessage) {
-      return undefined;
-    }
-
-    const timer = window.setTimeout(() => {
-      setCopyStatusMessage(null);
-    }, COPY_LINK_STATUS_TIMEOUT_MS);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [copyStatusMessage]);
-
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setIsSmallScreenPanelExpanded(false);
@@ -413,36 +384,6 @@ export function AppShell() {
     },
     [selection]
   );
-
-  const handleCopyLink = useCallback(async () => {
-    const url = window.location.href;
-
-    try {
-      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-        await navigator.clipboard.writeText(url);
-      } else if (!fallbackCopyToClipboard(url)) {
-        throw new Error("Could not copy link to clipboard.");
-      }
-      setCopyStatusMessage("Link copied");
-    } catch {
-      setCopyStatusMessage("Copy failed");
-    }
-  }, []);
-
-  const handleZoomToSelection = useCallback(() => {
-    if (!selectedPlace || !selection) {
-      return;
-    }
-
-    if (selectedPlace.candidates.length > 1 && selection.candidateIndex !== null) {
-      setSelection({
-        placeId: selection.placeId,
-        candidateIndex: null
-      });
-    }
-
-    setFocusRequestToken((value) => value + 1);
-  }, [selectedPlace, selection]);
 
   const selectedPlaceDetails = selectedPlace ? placeDetailsById[selectedPlace.id] ?? null : null;
   const selectedPlaceLoading = selectedPlace
@@ -517,7 +458,6 @@ export function AppShell() {
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
-            focusRequestToken={focusRequestToken}
             leftPanelWidth={panelWidthForMap}
             onSelectPlace={handleSelectFromMap}
             places={places}
@@ -535,13 +475,11 @@ export function AppShell() {
             isSmallScreenExpanded={isSmallScreenPanelExpanded}
             loadErrorMessage={selectedPlaceLoadError}
             onClose={() => closePanel(false)}
-            onCopyLink={handleCopyLink}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
             onToggleSmallScreenExpanded={() =>
               setIsSmallScreenPanelExpanded((current) => !current)
             }
-            onZoomTo={handleZoomToSelection}
             placeDetails={selectedPlaceDetails}
             places={places}
             placesById={placesById}
@@ -569,27 +507,6 @@ export function AppShell() {
           }}
         >
           {statusMessage}
-        </div>
-      ) : null}
-
-      {copyStatusMessage ? (
-        <div
-          role="status"
-          style={{
-            position: "absolute",
-            right: "16px",
-            bottom: "112px",
-            backgroundColor: tokens.color.surface,
-            border: `1px solid ${tokens.color.divider}`,
-            borderRadius: "8px",
-            padding: "8px 12px",
-            color: tokens.color.textPrimary,
-            fontSize: `${tokens.typography.captionSize}px`,
-            boxShadow: "0 1px 2px rgba(60,64,67,.3), 0 2px 6px rgba(60,64,67,.15)",
-            zIndex: 25
-          }}
-        >
-          {copyStatusMessage}
         </div>
       ) : null}
 
