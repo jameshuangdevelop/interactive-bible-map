@@ -1300,7 +1300,7 @@ export function PlacePanel({
             {titleName}
           </h1>
           {modernLocationLabel || locationStatusIndicator ? (
-            <p data-today-line="true" style={todayLineStyle}>
+            <p data-modern-name-line="true" style={todayLineStyle}>
               {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
               {locationStatusIndicator}
             </p>

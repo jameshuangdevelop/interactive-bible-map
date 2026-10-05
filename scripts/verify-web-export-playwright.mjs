@@ -2407,13 +2407,13 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
 async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
   await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
-  await page.waitForSelector("section[aria-label='Place details'] [data-today-line='true']", {
+  await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
     timeout: 30_000
   });
 
   const emmausTodayLine =
     (await page
-      .locator("section[aria-label='Place details'] [data-today-line='true']")
+      .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
       .textContent()) ?? "";
   if (!emmausTodayLine.includes("Today: Israel and the West Bank")) {
     throw new Error(`Emmaus today line is missing countries: '${emmausTodayLine.trim()}'.`);
@@ -2426,7 +2426,9 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
   }
 
   const emmausDisputedChipCount = await page
-    .locator("section[aria-label='Place details'] [data-today-line='true'] [data-location-chip='disputed']")
+    .locator(
+      "section[aria-label='Place details'] [data-modern-name-line='true'] [data-location-chip='disputed']"
+    )
     .count();
   if (emmausDisputedChipCount !== 1) {
     throw new Error(`Expected one disputed chip on Emmaus today line, got ${emmausDisputedChipCount}.`);
@@ -2502,7 +2504,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   const panelSelector = "section[aria-label='Place details']";
   const panelLocator = page.locator(panelSelector);
-  const todayLineSelector = `${panelSelector} [data-today-line='true']`;
+  const todayLineSelector = `${panelSelector} [data-modern-name-line='true']`;
 
   const readTodayLine = async () =>
     normalizeTextContent((await page.locator(todayLineSelector).textContent()) ?? "");
