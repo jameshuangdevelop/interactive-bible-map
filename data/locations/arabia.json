@@ -4,9 +4,11 @@
     "ancient": [
       "Arabia"
     ],
-    "modern": "Southern Jordan",
+    "modern": "Jordan, with parts of Saudi Arabia and Syria",
     "modernCountries": [
-      "Jordan"
+      "Jordan",
+      "Saudi Arabia",
+      "Syria"
     ],
     "alternate": []
   },

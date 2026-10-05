@@ -47,6 +47,17 @@ Two territory/country names were needed beyond the 17 already in `schema/locatio
 - **"Northern Cyprus"** — for Salamis (`salamis-cyprus`), see "Extending the territory-naming
   principle" below.
 
+**Update (2026-10-05, rework after the Fact-Checker's report):** two more additions, for the two
+records the Fact-Checker sent back (see "Arabia and Illyricum rework" below):
+
+- **"Saudi Arabia"** — for Arabia (`arabia`): its own cited `bib:livius-nabataeans`, read directly at
+  livius.org, places Hegra ("Mada'in Salih") "in the northwest of Saudi Arabia," within "the
+  Nabataean frontiers."
+- **"Bosnia and Herzegovina"** — for Illyricum (`illyricum`): its own label point
+  (`wikidata:Q753824`'s coordinate) sits in central Bosnia and Herzegovina, not coastal Croatia (the
+  Fact-Checker's finding, confirmed against Natural Earth); the record's own cited `bib:isbe-illyricum`
+  separately places one of the province's two legions at Delminium, in the same area.
+
 **PO ruling (2026-10-05):** Salamis uses "Cyprus", and "Northern Cyprus" is removed from the
 allow-list; see "Extending the territory-naming principle" below.
 
@@ -60,7 +71,7 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | achaia | province | Southern Greece | Greece |
 | antioch-pisidia | city | Yalvaç | Türkiye |
 | antioch-syria | city | Antakya | Türkiye |
-| arabia | province | Southern Jordan | Jordan |
+| arabia | province | Jordan, with parts of Saudi Arabia and Syria | Jordan, Saudi Arabia, Syria |
 | asia | province | Western Türkiye | Türkiye, Greece |
 | athens | city | Athens | Greece |
 | berea | city | Veria | Greece |
@@ -93,7 +104,7 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | golgotha | site | — | — (exempt) |
 | hierapolis | city | Pamukkale | Türkiye |
 | iconium | city | Konya | Türkiye |
-| illyricum | province | Coastal Croatia | Croatia |
+| illyricum | province | Bosnia and Herzegovina, with the Croatian coast | Bosnia and Herzegovina, Croatia |
 | italy | province | Italy | Italy |
 | jericho | city | Jericho | West Bank |
 | jerusalem | city | Jerusalem | — (exempt) |
@@ -148,7 +159,9 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | tyre | city | Sour / Tyre | Lebanon |
 
 After verification, the Fact-Checker changed Achaia's and Galatia's phrases and added Malta to Sicily,
-and sent Arabia and Illyricum back for rework; see `docs/verification/M3-modern-countries.md`.
+and sent Arabia and Illyricum back for rework; see `docs/verification/M3-modern-countries.md`. The
+rows above for `arabia` and `illyricum` already show the reworked values; see "Arabia and Illyricum
+rework" below for the reasoning.
 
 ### Sources behind each country (where not obvious from the record's own candidate `coordinateSource`)
 
@@ -159,12 +172,13 @@ Lebanon; `rome` → `wikidata:Q220` → Italy). New `summary.sources` additions 
 | id | new source(s) added | why |
 |---|---|---|
 | achaia, asia, crete-cyrene, macedonia | `wikidata:Q41` (Greece) | cited entities (`Q204772`, `Q210718`, `Q692775`, `Q207497`) carry only historical-empire P17 claims |
-| arabia, judea-province | `wikidata:Q810` (Jordan) | `wikidata:Q11029653` (Nabataean kingdom) and `wikidata:Q1003997` (Roman Judaea) carry no modern P17 |
+| arabia | `wikidata:Q810` (Jordan) | `wikidata:Q11029653` (Nabataean kingdom) carries no modern P17; Saudi Arabia and Syria need no new source, since the already-cited `bib:livius-nabataeans`, read directly, names Bosra and Damascus (Syria) and Hegra/Al-Ula (Saudi Arabia) as within the kingdom's frontiers |
+| judea-province | `wikidata:Q810` (Jordan) | `wikidata:Q1003997` (Roman Judaea) carries no modern P17 |
 | asia, cappadocia, cilicia, lystra, pamphylia, phrygia, syria | `wikidata:Q43` (Türkiye) | cited entities carry only historical-empire P17, or (lystra, pamphylia) cite no Wikidata ID at all |
 | crete-cyrene | `wikidata:Q1016` (Libya) | as above |
 | cyprus (province) | `wikidata:Q229` (Cyprus) | `wikidata:Q2967757` carries only historical P17 |
 | egypt | `wikidata:Q79` (Egypt) | `wikidata:Q202311` carries only "Ancient Egypt" |
-| illyricum | `wikidata:Q224` (Croatia) | `wikidata:Q753824` carries only historical P17; grounded in the record's own cited "Dalmatian coast" / Salona text (`bib:isbe-illyricum`) |
+| illyricum | `wikidata:Q224` (Croatia), `wikidata:Q225` (Bosnia and Herzegovina, added in the 2026-10-05 rework) | `wikidata:Q753824` carries only historical P17; Croatia is grounded in the record's own cited Salona/"Dalmatian coast" text, Bosnia and Herzegovina in the record's own label point and `bib:isbe-illyricum`'s Delminium legion base |
 | italy (province) | `wikidata:Q38` (Italy) | `wikidata:Q913582` ("Roman Italy") carries only historical P17 |
 | judea-province | `wikidata:Q801` (Israel), `wikidata:Q36678` (West Bank), `wikidata:Q83210` (Golan Heights) | see "Areas spanning several countries" below |
 | judea (region) | `wikidata:Q36678` (West Bank) | the cited `wikidata:Q104028` gives only Israel; the record's own candidate coordinate sits in the hill country south of Hebron, in the West Bank |
@@ -254,6 +268,53 @@ no longer on the allow-list. The human is asked to confirm at the next mini chec
   "Albania"]`; the record's own four child cities (Berea, Philippi, Thessalonica, Neapolis) are all in
   modern Greece, but the Roman province's full historical extent, which this record represents, reached
   into both of the other two modern countries.
+
+### Arabia and Illyricum rework (2026-10-05, after the Fact-Checker's report)
+
+The Fact-Checker's `docs/verification/M3-modern-countries.md` found both of these records' original
+countries too narrow, each contradicted by a source the record already cites. Both are reworked here;
+the Fact-Checker re-verifies them next.
+
+- **Arabia** (`arabia`): the original `["Jordan"]` / "Southern Jordan" matched only the label point
+  (Petra). Reading `bib:livius-nabataeans` directly (not just the record's own paraphrase of it) shows
+  the Nabataean kingdom's own stated frontiers reached well beyond Jordan: "In the north, it
+  controlled Bosra in Syria, and even, though briefly, Damascus. To the south, Hegra (Mada'in Salih)
+  was within the Nabataean frontiers, just like the nearby oasis of Al-Ula... in the east, the
+  Nabataean king controlled several oases (Têma, Hayil, and Dawmat al-Jandal)" — Hegra, Al-Ula, Têma,
+  Hayil and Dawmat al-Jandal are all in modern Saudi Arabia. `modernCountries` is now `["Jordan",
+  "Saudi Arabia", "Syria"]` (Jordan first, since Livius itself calls the Nabataeans "an Arab nation in
+  modern Jordan" and Petra, the kingdom's capital and this record's label point, is there); phrase
+  "Jordan, with parts of Saudi Arabia and Syria." No new source was needed: `bib:livius-nabataeans` was
+  already cited in `summary.sources` before this rework.
+  - **Scope note:** the same Livius page also names two towns "in the west," Rhinocolura (modern
+    Al-Arish, Egypt) and Gaza, and separately mentions Nabataean farming "in the Negev desert"
+    (modern Israel). Unlike Bosra/Damascus and Hegra/Al-Ula, which Livius calls the kingdom's north
+    and south *frontiers*, these are listed as outlying towns and agricultural activity on the
+    kingdom's western edge, next to "the Jewish kingdom of Herod the Great and his sons" — the source
+    describes a border zone, not territory the kingdom is said to hold outright. The International
+    Standard Bible Encyclopedia's separate note that the New Testament's word "Arabia" can mean "the
+    Syrian desert or the peninsula of Sinai" is about the word's range of senses elsewhere in the New
+    Testament, not a claim about what this specific kingdom controlled. Egypt and Israel are left out
+    of `modernCountries` on that basis, keeping the list to the three countries the source most
+    clearly supports as the kingdom's own extent.
+- **Illyricum** (`illyricum`): the original `["Croatia"]` / "Coastal Croatia" didn't match the record's
+  own label point. The Fact-Checker found that `wikidata:Q753824`'s coordinate (17.3294 E, 43.8044 N)
+  sits 36.6 km inside Bosnia and Herzegovina (Natural Earth), not Croatia. Reading `bib:isbe-illyricum`
+  directly confirms the province was never just a coastal strip: it names the provincial capital,
+  "Salonae (modern Spalato)" — Split, on the Croatian coast — but also says "two legions were
+  stationed there, at Delminium and at Burnum," and Delminium is the Roman-era name for the area
+  around modern Tomislavgrad, in Bosnia and Herzegovina, close to the record's own label point.
+  `modernCountries` is now `["Bosnia and Herzegovina", "Croatia"]` (Bosnia and Herzegovina first,
+  since that is where the record's own label point and one of its two legionary bases sit; Croatia
+  second, for the provincial capital at Salona); phrase "Bosnia and Herzegovina, with the Croatian
+  coast." New source: `wikidata:Q225` (Bosnia and Herzegovina), added to `summary.sources` alongside
+  the already-cited `wikidata:Q224` (Croatia).
+  - **Scope note:** the Fact-Checker also asked whether Montenegro, which the later, enlarged
+    province of Dalmatia also reached, needs a place in the list. `bib:isbe-illyricum` describes the
+    province's three judicial circuits by the towns at their head (Scardona, Salonae, Narona), none of
+    which is in modern Montenegro, and names no place there directly; "Montenegro" is left off the
+    list and off the allow-list for the same reason Egypt and Israel are left off Arabia's: nothing
+    in the record's own cited sources names a location there.
 
 ### Area orienting phrases
 
