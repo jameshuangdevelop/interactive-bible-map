@@ -16,6 +16,7 @@ function summarizeViolation(violation) {
 }
 
 async function runAxeScenario(page, baseUrl, scenario) {
+  // waitForMapToSettle waits for the real map-ready state.
   await page.goto(`${baseUrl}${scenario.path}`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   await scenario.prepare(page);

@@ -1,5 +1,6 @@
 import {
   AI_BASED_ON_LABEL,
+  buildAboutPlaceMatchIndex,
   buildImageKindLabel,
   buildImagePromptBriefUrl,
   buildImageCreditFields,
@@ -53,6 +54,21 @@ describe("place panel model helpers", () => {
     parentId: null,
     candidates: [{ label: ancient[0] ?? id, coordinates: [1, 1], confidence: "high" }]
   });
+
+  const matchMentions = ({
+    places,
+    currentPlaceId,
+    paragraphs
+  }: {
+    places: PlaceIndexRecord[];
+    currentPlaceId: string;
+    paragraphs: string[];
+  }) =>
+    matchAboutPlaceMentions({
+      matchIndex: buildAboutPlaceMatchIndex(places),
+      currentPlaceId,
+      paragraphs
+    });
 
   test("renders the Italy hierarchy exception text", () => {
     const italy: PlaceIndexRecord = {
@@ -355,7 +371,7 @@ describe("place panel model helpers", () => {
       createPlace({ id: "bethany", ancient: ["Bethany"] })
     ];
 
-    const matches = matchAboutPlaceMentions({
+    const matches = matchMentions({
       places,
       currentPlaceId: "jerusalem",
       paragraphs: ["Pilgrims crossed Bethany beyond the Jordan before returning by Bethany."]
@@ -378,7 +394,7 @@ describe("place panel model helpers", () => {
       createPlace({ id: "galilee", ancient: ["Galilee"] })
     ];
 
-    const matches = matchAboutPlaceMentions({
+    const matches = matchMentions({
       places,
       currentPlaceId: "jerusalem",
       paragraphs: ["A Galileean village was nearby; Galilee remained a region in the north."]
@@ -410,7 +426,7 @@ describe("place panel model helpers", () => {
       })
     ];
 
-    const matches = matchAboutPlaceMentions({
+    const matches = matchMentions({
       places,
       currentPlaceId: "jerusalem",
       paragraphs: ["Travelers gathered at Antioch before sailing west."]
@@ -425,7 +441,7 @@ describe("place panel model helpers", () => {
       createPlace({ id: "capernaum", ancient: ["Capernaum"] })
     ];
 
-    const matches = matchAboutPlaceMentions({
+    const matches = matchMentions({
       places,
       currentPlaceId: "galilee",
       paragraphs: ["Galilee included Capernaum on its shore."]
@@ -448,7 +464,7 @@ describe("place panel model helpers", () => {
       createPlace({ id: "capernaum", ancient: ["Capernaum"] })
     ];
 
-    const matches = matchAboutPlaceMentions({
+    const matches = matchMentions({
       places,
       currentPlaceId: "jerusalem",
       paragraphs: [
@@ -466,5 +482,90 @@ describe("place panel model helpers", () => {
         text: "Capernaum"
       }
     ]);
+  });
+
+  test("matches possessive mentions", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({ id: "rome", ancient: ["Rome"] })
+    ];
+
+    const matches = matchMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["Rome's roads shaped travel."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "rome",
+        paragraphIndex: 0,
+        start: 0,
+        end: 4,
+        text: "Rome"
+      }
+    ]);
+  });
+
+  test("matches hyphen-adjacent mentions", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "jerusalem", ancient: ["Jerusalem"] }),
+      createPlace({ id: "antioch", ancient: ["Antioch"] })
+    ];
+
+    const matches = matchMentions({
+      places,
+      currentPlaceId: "jerusalem",
+      paragraphs: ["Antioch-based trade shaped travel."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "antioch",
+        paragraphIndex: 0,
+        start: 0,
+        end: 7,
+        text: "Antioch"
+      }
+    ]);
+  });
+
+  test("matches names with diacritics", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "ephesus", ancient: ["Ephesus"] }),
+      createPlace({ id: "selcuk", ancient: ["Selçuk"] })
+    ];
+
+    const matches = matchMentions({
+      places,
+      currentPlaceId: "ephesus",
+      paragraphs: ["Trade routes connected directly to SELÇUK in the valley."]
+    });
+
+    expect(matches).toEqual([
+      {
+        placeId: "selcuk",
+        paragraphIndex: 0,
+        start: 35,
+        end: 41,
+        text: "SELÇUK"
+      }
+    ]);
+  });
+
+  test("does not link modern country names", () => {
+    const places: PlaceIndexRecord[] = [
+      createPlace({ id: "corinth", ancient: ["Corinth"] }),
+      createPlace({ id: "achaia", ancient: ["Achaia"], alternate: ["Greece"] }),
+      createPlace({ id: "italia", ancient: ["Italia"], alternate: ["Italy"] })
+    ];
+
+    const matches = matchMentions({
+      places,
+      currentPlaceId: "corinth",
+      paragraphs: ["Travelers sailed across Greece and then crossed into Italy."]
+    });
+
+    expect(matches).toEqual([]);
   });
 });

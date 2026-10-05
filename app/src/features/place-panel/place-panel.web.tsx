@@ -22,6 +22,7 @@ import type {
 } from "../map/types";
 import {
   type AboutPlaceMention,
+  buildAboutPlaceMatchIndex,
   buildAlsoKnownAs,
   buildImageKindLabel,
   buildHierarchyItems,
@@ -1035,6 +1036,7 @@ export function PlacePanel({
       }))
     ];
   }, [location]);
+  const aboutPlaceMatchIndex = useMemo(() => buildAboutPlaceMatchIndex(places), [places]);
   const aboutMentionsByParagraph = useMemo(() => {
     const mentionsByParagraph = new Map<number, AboutPlaceMention[]>();
     if (!location) {
@@ -1042,7 +1044,7 @@ export function PlacePanel({
     }
 
     const matches = matchAboutPlaceMentions({
-      places,
+      matchIndex: aboutPlaceMatchIndex,
       currentPlaceId: placeForDisplay.id,
       paragraphs: aboutParagraphs.map((entry) => entry.text)
     });
@@ -1054,7 +1056,7 @@ export function PlacePanel({
     }
 
     return mentionsByParagraph;
-  }, [aboutParagraphs, location, placeForDisplay.id, places]);
+  }, [aboutParagraphs, aboutPlaceMatchIndex, location, placeForDisplay.id]);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") {

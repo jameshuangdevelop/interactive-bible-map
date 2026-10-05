@@ -98,6 +98,7 @@ async function setPanelSectionExpanded(page, sectionId, expanded) {
 }
 
 async function verifyMapLoads(page, baseUrl) {
+  // waitForMapToSettle waits for the real map-ready state.
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
 
@@ -112,6 +113,7 @@ async function verifyMapLoads(page, baseUrl) {
 }
 
 async function verifyCapernaumPanelAndImages(page, baseUrl) {
+  // waitForMapToSettle waits for the real map-ready state.
   await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   assert(
@@ -276,6 +278,7 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
 }
 
 async function verifyAntiochSearch(page, baseUrl) {
+  // waitForMapToSettle waits for the real map-ready state.
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
 
@@ -309,6 +312,7 @@ async function verifyAntiochSearch(page, baseUrl) {
 }
 
 async function verifyEmmausDisputedLayout(page, baseUrl) {
+  // waitForMapToSettle waits for the real map-ready state.
   await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   assert(
