@@ -2673,11 +2673,8 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
       .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
       .textContent()) ?? "";
   const emmausTodayLineNormalized = emmausTodayLine.replace(/\s+/gu, " ").trim();
-  if (
-    !emmausTodayLineNormalized.includes("Today: Israel and the West Bank") &&
-    !emmausTodayLineNormalized.startsWith("Location disputed")
-  ) {
-    throw new Error(`Emmaus today line has an unexpected format: '${emmausTodayLineNormalized}'.`);
+  if (!emmausTodayLine.includes("Today: Israel and the West Bank")) {
+    throw new Error(`Emmaus today line is missing countries: '${emmausTodayLine.trim()}'.`);
   }
   if (
     !emmausTodayLineNormalized.includes("Location disputed") ||
@@ -2775,10 +2772,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
   const ephesusTodayLine = await readTodayLine();
-  if (
-    !ephesusTodayLine.includes("Today: Selçuk, Türkiye") &&
-    !ephesusTodayLine.includes("Today: Selçuk")
-  ) {
+  if (!ephesusTodayLine.includes("Today: Selçuk, Türkiye")) {
     throw new Error(`Ephesus today line mismatch: '${ephesusTodayLine}'.`);
   }
   const ephesusConfidenceChipCount = await page
@@ -2819,10 +2813,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
   const emmausTodayLine = await readTodayLine();
-  if (
-    !emmausTodayLine.includes("Today: Israel and the West Bank") &&
-    !emmausTodayLine.startsWith("Location disputed")
-  ) {
+  if (!emmausTodayLine.includes("Today: Israel and the West Bank")) {
     throw new Error(`Emmaus today line mismatch: '${emmausTodayLine}'.`);
   }
   if (
@@ -2870,10 +2861,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
       `Search results for Ephesus are missing the Ephesus entry: ${JSON.stringify(ephesusSearchEntries)}.`
     );
   }
-  if (
-    !ephesusResultText.includes("Selçuk, Türkiye · City") &&
-    !ephesusResultText.includes("Selçuk · City")
-  ) {
+  if (!ephesusResultText.includes("Selçuk, Türkiye · City")) {
     throw new Error(
       `Ephesus search result is missing modern country text: '${ephesusResultText}'.`
     );
