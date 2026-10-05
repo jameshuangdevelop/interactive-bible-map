@@ -174,7 +174,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 8. Neutrality in the interface
 - **Modern names (until CP3.5; ADR-0028 adds the country after it)** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
-- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
+- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6). Introduce every person, writer or work the first time the text names them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"). Don't name databases such as Pleiades or Wikidata in the text; the Sources list names them (ADR-0033).
 
 ## 9. Attribution and credits
 - **Map:** a compact attribution control. The exact text for OpenFreeMap, OpenMapTiles and OpenStreetMap is set by the Fact-Checker in `ATTRIBUTION.md` (task M3-07).
