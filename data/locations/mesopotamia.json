@@ -39,7 +39,7 @@
   },
   "history": [
     {
-      "text": "The Greek name means the country between the rivers, and the Greek historian Arrian, writing about Alexander's campaigns, applied it to the northern part, the Jezira of today's eastern Syria and northern Iraq. The province Rome later formed east of the Euphrates also took the name, even though that province did not reach the south.",
+      "text": "The Greek name means the country between the rivers, and the Greek historian Arrian, writing about the campaigns of Alexander the Great, applied it to the northern part, the Jezira of today's eastern Syria and northern Iraq. The province Rome later formed east of the Euphrates also took the name, even though that province did not reach the south.",
       "sources": [
         "bib:livius-mesopotamia",
         "bib:worldhistory-arrian"
@@ -48,7 +48,8 @@
     {
       "text": "Rome did not hold Mesopotamia at this project's about AD 50 date. The International Standard Bible Encyclopedia records that the Roman emperor Trajan, decades later, invaded Parthia and 'took Upper Mesopotamia,' and that the Roman emperor Hadrian gave the conquered provinces back. It also describes large Jewish settlements in Mesopotamia under Parthian rule, and a massacre of Jewish settlers there under the Parthian king Artabanus III (AD 16-42).",
       "sources": [
-        "bib:isbe-parthians"
+        "bib:isbe-parthians",
+        "bib:cassius-dio-roman-history"
       ]
     }
   ],
@@ -75,7 +76,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

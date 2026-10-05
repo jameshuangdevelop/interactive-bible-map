@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Puteoli was, per BiblePlaces.com, the main harbor serving Rome until Claudius began building an artificial harbor at Ostia, which was completed in the reign of the Roman emperor Trajan; much of Rome's commerce from Egypt and Palestine passed through Puteoli. Acts records that Paul, sailing to Rome as a prisoner aboard an Alexandrian ship, landed at Puteoli and found believers there who urged him to stay with them seven days before the final overland journey to Rome.",
+    "text": "Puteoli was the main harbor serving Rome until Claudius began building an artificial harbor at Ostia, which was completed in the reign of the Roman emperor Trajan; much of Rome's commerce from Egypt and Palestine passed through Puteoli. Acts records that Paul, sailing to Rome as a prisoner aboard an Alexandrian ship, landed at Puteoli and found believers there who urged him to stay with them seven days before the final overland journey to Rome.",
     "sources": [
       "pleiades:432815",
       "wikidata:Q72425",
@@ -64,7 +64,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

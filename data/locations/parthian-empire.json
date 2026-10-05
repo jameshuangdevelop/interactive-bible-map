@@ -48,7 +48,8 @@
     {
       "text": "The International Standard Bible Encyclopedia records that the Roman general Crassus's invasion of Parthia ended with his defeat and death in 53 BC, and that Augustus later recovered Crassus's lost standards and made peace. Despite rivalry over Armenia, which the same article says was settled under the Roman emperor Nero, it describes no serious break in the peace until the Roman emperor Trajan's reign, so this project's about AD 50 date falls within it.",
       "sources": [
-        "bib:isbe-parthians"
+        "bib:isbe-parthians",
+        "bib:suetonius-twelve-caesars"
       ]
     }
   ],
@@ -61,7 +62,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

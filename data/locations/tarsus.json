@@ -44,7 +44,8 @@
         "pleiades:648789",
         "bib:livius-cilicia",
         "wikipedia:Cilicia",
-        "scripture:Galatians 1:21"
+        "scripture:Galatians 1:21",
+        "bib:livius-actium"
       ]
     }
   ],
@@ -77,7 +78,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

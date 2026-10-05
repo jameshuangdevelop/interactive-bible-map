@@ -34,7 +34,8 @@
       "bib:cassius-dio-roman-history",
       "scripture:Matthew 2:13",
       "scripture:Acts 2:9",
-      "scripture:Acts 2:10"
+      "scripture:Acts 2:10",
+      "bib:strabo-geography"
     ]
   },
   "history": [
@@ -76,7 +77,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

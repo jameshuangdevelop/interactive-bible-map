@@ -59,7 +59,7 @@
       ]
     },
     {
-      "text": "Ancient writers also describe Judea as attached to Syria. Josephus says that in AD 6 Judea 'was now added to the province of Syria,' and the Roman historian Tacitus reports that after the deaths of their kings Sohaemus and Agrippa, Ituraea and Judea were attached to the province of Syria. Judea is also described as both an autonomous part of Syria under its own governor and a small province, and elsewhere classified as a Roman province; this project follows that last classification, with the Roman Empire as its parent.",
+      "text": "Ancient writers also describe Judea as attached to Syria. Josephus says that in AD 6 Judea 'was now added to the province of Syria,' and the Roman historian Tacitus reports that after the deaths of their kings Sohaemus and Agrippa, Ituraea and Judea were attached to the province of Syria. Judea has also been described both as an autonomous part of Syria under its own governor and as a small province. Other sources classify it as a Roman province in its own right, and this project follows them, with the Roman Empire as its parent.",
       "sources": [
         "bib:josephus-antiquities",
         "bib:tacitus-annals",
@@ -118,7 +118,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

@@ -83,7 +83,7 @@
   },
   "history": [
     {
-      "text": "Luke's Gospel states the distance from Jerusalem to Emmaus as 'sixty stadia' in the majority of surviving Greek manuscripts, about 11 kilometers, while the fourth-century Codex Sinaiticus reads 'one hundred and sixty stadia,' about 30 kilometers; the two readings underlie much of the modern disagreement over which site is meant.",
+      "text": "Luke's Gospel states the distance from Jerusalem to Emmaus as 'sixty stadia' in the majority of surviving Greek manuscripts, about 11 kilometers, while the fourth-century manuscript Codex Sinaiticus reads 'one hundred and sixty stadia,' about 30 kilometers; the two readings underlie much of the modern disagreement over which site is meant.",
       "sources": [
         "bib:metzger-textual-commentary",
         "openbible:emmaus",
@@ -155,5 +155,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

@@ -32,7 +32,7 @@
     }
   ],
   "summary": {
-    "text": "Caesarea Philippi was a city at the southwest foot of Mount Hermon, near the principal spring source of the Jordan River. Its two recorded ancient names, Paneas and Caesarea Philippi, are recorded together as the site's name. It is the setting for Peter's confession of Jesus as the Christ.",
+    "text": "Caesarea Philippi was a city at the southwest foot of Mount Hermon, near the principal spring source of the Jordan River. In antiquity it was known both as Paneas and as Caesarea Philippi. It is the setting for Peter's confession of Jesus as the Christ.",
     "sources": [
       "pleiades:678324",
       "wikidata:Q2484244",
@@ -71,7 +71,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

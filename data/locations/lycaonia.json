@@ -40,7 +40,9 @@
     {
       "text": "The International Standard Bible Encyclopedia explains that in Paul's time Lycaonia had two parts. The western part was one of the 'regions' into which the Roman province of Galatia was divided. The eastern part, known as Lycaonia Antiochiana, had been placed under the client king Antiochus of Commagene in AD 37. Acts 14:6, which names only Lystra and Derbe, describes the western, Roman part, and this record follows that sense; the eastern part lay outside the province at this project's about AD 50 date.",
       "sources": [
-        "bib:isbe-lycaonia"
+        "bib:isbe-lycaonia",
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-annals"
       ]
     }
   ],
@@ -58,7 +60,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }
