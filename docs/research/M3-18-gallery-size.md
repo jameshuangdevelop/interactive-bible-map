@@ -84,6 +84,32 @@ A repository-wide search (excluding `node_modules`, `app/dist`, `app/public/gene
 provider, not by image id, and no test, script or app fixture hardcodes one of these ids. No other
 file needed a change.
 
+## Credit fixes (scope item 3, added 2026-10-05)
+
+M3-19's Fact-Checker found 12 `author` values that don't use the attribution form their Commons
+file page requests. Ids may have moved after the trims above, so each is identified by its file.
+Each page's raw wikitext (`action=raw`) was read one at a time (~1 s apart, descriptive User-Agent)
+and the exact requested credit copied into `author`; nothing else changed.
+
+| id (current) | file | old `author` | new `author` | What the page asks |
+|---|---|---|---|---|
+| `rome-07` | *Colosseum_in_Rome,_Italy_-_April_2007.jpg* | `Diliff` | `David Iliff` | `User:Diliff/Licensing` (linked from the file's `permission` field): "Attribution of this image to the author (DAVID ILIFF) is also required... Suggested attribution: 'Photo by DAVID ILIFF. License: ...'". |
+| `mount-of-olives-02` | *2013-Aerial-Mount_of_Olives.jpg* | `Godot13` | `Andrew Shiva / Wikipedia` | `{{Credit line\|Author=Andrew Shiva\|Other=Wikipedia\|License=CC-BY-SA-4.0}}` and `{{Attribution\|...\|text=Use or reproduction of this image outside of Wikipedia must give the original photographer (Andrew Shiva) credit.}}` |
+| `temple-mount-02` | *Jerusalem-2013(2)-Aerial-Temple_Mount-(south_exposure).jpg* | `Godot13` | `Andrew Shiva / Wikipedia` | Same `Credit line`/`Attribution` templates as `mount-of-olives-02`. |
+| `joppa-01` | *ISR-2013-Aerial-Jaffa-Port_of_Jaffa.jpg* | `Godot13` | `Andrew Shiva / Wikipedia` | Same `Credit line`/`Attribution` templates as above. |
+| `ephesus-06` | *Model_of_the_Artemisium_-_Ephesus_Museum.JPG* | `José Luiz` | `José Luiz Bernardes Ribeiro` | `{{Credit line\|Author=© José Luiz Bernardes Ribeiro\|License=CC-BY-SA-3.0}}` |
+| `tyre-02` | *Roman_Hippodrome,_Tyre,_Lebanon.jpg* | `Vyacheslav Argenberg` | `Vyacheslav Argenberg / www.vascoplanet.com` | `{{self\|cc-by-4.0\|author=Vyacheslav Argenberg\|attribution=© Vyacheslav Argenberg / http://www.vascoplanet.com/}}` |
+| `bethany-beyond-the-jordan-02` | *127027_qasr_al-yahud_-_baptismal_site_in_jordan_PikiWiki_Israel.jpg* | `שלמה רודד` | `שלמה רודד (PikiWiki Israel)` | `{{cc-by-2.5\|Roded Shlomo Pikiwiki Israel}}`; matches the house style already used in `data/media/chorazin.json` ("Zeev Stein (PikiWiki Israel)"). |
+| `bethany-beyond-the-jordan-07` | *PikiWiki_Israel_30075_-_Qasr_el_Yahud_baptism_site,_2013-01.jpg* | `אילת לב ארי שלי` | `אילת לב ארי שלי (PikiWiki Israel)` | `{{cc-by-2.5\|אילת לב ארי שלי Pikiwiki Israel}}` |
+| `caesarea-maritima-04` | *92300_ancient_theater_in_caesarea_PikiWiki_Israel.jpg* | `מיכל פריימן` | `מיכל פריימן (PikiWiki Israel)` | `{{cc-by-2.5\|michal freiman Pikiwiki Israel}}` |
+| `caesarea-maritima-06` | *124996_caesarea_national_park_PikiWiki_Israel.jpg* | `מיכל פריימן` | `מיכל פריימן (PikiWiki Israel)` | `{{cc-by-2.5\|michal freiman Pikiwiki Israel}}` |
+| `nazareth-05` | *127767_nazareth-synagogue_church_PikiWiki_Israel.jpg* | `Shlomo Roded` | `Shlomo Roded (PikiWiki Israel)` | `{{cc-by-2.5\|Roded Shlomo Pikiwiki Israel}}` |
+| `nazareth-06` | *PikiWiki_Israel_28738_Mount_of_Precipice.JPG* | `Dr. Avishai Teicher` | `Dr. Avishai Teicher (PikiWiki Israel)` | `{{cc-by-2.5\|Dr. Avishai Teicher Pikiwiki Israel}}` |
+
+No other field changed on any of these 12 images (license, `licenseUrl`, `sourcePage`, caption and
+`kind` all stay as they were). `npm run validate:data` (0 errors, 107 warnings, unchanged),
+`npm test` (140/140) and `npm run test:app` (93/93) all pass after this change.
+
 ## 31-place check (informational)
 
 A check of all 31 major places' media files, after this change, confirms every one has 4–7
