@@ -15,6 +15,16 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
 | CP7 | M7 Mobile-web polish | Responsive layout, touch gestures, performance | Not started | |
 
+### Mini checkpoints (ADR-0031)
+Lighter stops between checkpoints: the PO opens the app with the work so far on a local server, and you try it and give feedback. There's no PR and no approval; only the step listed under "Waits for your feedback" is held.
+
+| MC | On the way to | What you can try | Waits for your feedback | Status |
+|---|---|---|---|---|
+| MC0 | CP3b | Today's app (main), as a baseline for the changes below | Nothing | Open 2026-10-05 |
+| MC1 | CP3b | Countries on the "Today" line and in search results, the chip moved onto that line, and no action bar (M3-14's data with M3-15) | The reviews of M3-14 and M3-15 | Not yet |
+| MC2 | CP3b | The longer "About" for the first 13 places (M3-16 half 1) | The second half's writing | Not yet |
+| MC3 | CP3b | Everything merged and built as it will deploy, with the accessibility and speed results (M3-06, M3-14 to M3-16) | The push | Not yet |
+
 ---
 
 ## CP0 — Setup & Plan

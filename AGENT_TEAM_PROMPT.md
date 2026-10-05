@@ -119,6 +119,8 @@ If a model named here is not available in the Copilot surface being used (or is 
 ## 5. Milestones and human checkpoints
 Each checkpoint = a PR labeled `checkpoint`, with a summary, decisions needed, and budget used. **All agents pause at a checkpoint until the human approves (merges or comments "approved").**
 
+**Mini checkpoints (ADR-0031):** between checkpoints, the PO marks mini checkpoints in its task list wherever the human can see a change, and always one before asking for a push. At each one, the PO builds the app with the work so far, serves it locally, opens it in the human's browser, and lists what to try. Only the next step that the feedback could change waits; other work goes on.
+
 | Milestone | Scope | Checkpoint deliverable |
 |---|---|---|
 | **M0 – Setup & Plan** | Repo scaffolding, `CHECKPOINTS.md`, `BACKLOG.md`, `docs/` structure (incl. `docs/tasks/`), `.github/agents/` custom agent definitions for the 7 roles, PR template (with budget + attribution checklist), `docs/BUDGET.md`. | **CP0:** plan, org chart, budget forecast |
