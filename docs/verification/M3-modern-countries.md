@@ -1,49 +1,62 @@
 # M3-14 verification: Countries in modern names
 
-This is an independent check of the Research Lead's commit `330e684` ("data(locations): add modern countries"). That commit sits on the GIS Engineer's schema commit `25b3b8d` and the PO's README commit `6ac2980`, and it applies ADR-0028 and CP3.5 decision 1 to all 89 `data/locations/*.json` records. Reviewed on 2026-10-05.
+This is an independent check of the M3-14 data, which applies ADR-0028 and CP3.5 decision 1 to all 89 `data/locations/*.json` records.
+- **Research Lead commits checked:** `330e684` ("data(locations): add modern countries") and the rework `f210fa8`.
+- **Base:** the GIS Engineer's schema commit `25b3b8d` and the PO's README commit `6ac2980`.
+- **This report's commits:** `19d7fc3` (first pass) and `decd089` (re-verification).
+- **Reviewed:** 2026-10-05.
 
-**Result:**
-- 74 non-exempt records pass as written.
-- 4 are fixed here: Salamis (PO ruling), and Achaia, Galatia and Sicily.
-- 2 failed and stayed `draft`: Arabia and Illyricum. They went back to the Research Lead.
-- The 9 exempt records correctly have no countries.
+**Final state of the branch:**
+- **All 89 records are `verified`** (`verifiedBy: "fact-checker"`).
+  - **80 non-exempt records** have `names.modernCountries`: 74 passed as first written, 4 were fixed in the first pass (Salamis under the PO's ruling, and Achaia, Galatia and Sicily), and 2 were reworked by the Research Lead and then passed re-verification (Arabia and Illyricum).
+  - **The 9 exempt records** correctly have none: the 2 empires, `jerusalem`, and the 6 records whose parent chain includes `jerusalem`.
+- **Allow-list (`$defs.modernCountry`):** grows from 17 values to 20. The additions are "Croatia", "Saudi Arabia" and "Bosnia and Herzegovina".
+  - "Northern Cyprus" is not on the list. It was added in `330e684`, then removed in `19d7fc3` under the PO's ruling, which the human approved on 2026-10-05.
 
-The first pass left 87 of the 89 records `verified`. After the Research Lead's rework (`f210fa8`), both failed records pass (see "Re-verification"), and **all 89 are now `verified`**.
+The sections below, from "Every record" to "PO rulings applied", record the first pass (`19d7fc3`), and the record table reflects the final values. "Re-verification" covers the rework.
 
 ## Scope
 
 The rule is in `docs/tasks/M3-14-modern-countries.md`, ADR-0028 (with its CP3.5 update), CP3.5 decision 1, and `schema/README.md` → "Modern names". This report covers:
 - `names.modernCountries` on the 80 non-exempt records;
 - the orienting `names.modern` phrase on the 29 area records (24 new, 5 kept);
-- the 19 `summary.sources` additions;
-- the two allow-list additions ("Croatia", "Northern Cyprus");
-- the exempt records (the 2 empires, `jerusalem`, and the 6 records whose parent chain includes `jerusalem`).
+- the `summary.sources` additions (19 records, 30 entries in the final state);
+- the allow-list changes listed above;
+- the exempt records.
 
 It does not cover the panel display (M3-15) or candidate labels.
 
 ## Method
 
-**Semantic diff.** A node script parsed every record at `6ac2980` and in the working tree. It walked both field by field and listed every path that differed. It was run twice:
+**Semantic diff.** A node script parsed every record at `6ac2980` and in the working tree, walked both field by field, and listed every path that differed.
 
-- **Before this check** (`6ac2980` → `330e684`):
+- **Final branch** (`6ac2980` → HEAD):
   - 80 of 89 files changed. The 9 unchanged files are exactly the exempt records.
-  - The only paths that changed were `names.modernCountries` (80), `names.modern` (24, all area records that had none before), `summary.sources` (19), `status`, `verifiedBy` and `lastReviewed` (80 each).
-  - Every `summary.sources` change only appends entries, with no removals or reordering.
-  - No existing `names.modern` value changed.
-- **After this check** (`6ac2980` → this commit):
-  - The same 80 files changed, with the same paths.
-  - `status` and `verifiedBy` now differ only on `arabia` and `illyricum`, the two records left at `draft`. The other 78 are back at `verified` / `fact-checker`, so only `lastReviewed` moved.
-  - Against `330e684`, the only other changes are the four fixes listed below.
+  - The only changed paths are:
+    - `names.modernCountries` (80);
+    - `names.modern` (24, all area records that had none before; no existing value changed);
+    - `summary.sources` (19 records, append-only);
+    - `lastReviewed` (80).
+  - `status` and `verifiedBy` end where they started on every record.
+- **History, first pass** (`6ac2980` → `330e684`):
+  - The same 80 files and paths changed.
+  - All 80 records were set to `draft`.
+  - Every `summary.sources` change only appended entries.
+  - After `19d7fc3`, the only changes beyond `330e684` were the four first-pass fixes, and `arabia` and `illyricum` stayed `draft`.
+- **History, re-verification** (`19d7fc3` → `f210fa8`): only `arabia` and `illyricum` changed, in the allowed paths (see "Re-verification").
 
 **Sources fetched (2026-10-05):**
-- **Wikidata** `Special:EntityData/<QID>.json` for all 116 QIDs now cited on the records: the 99 cited before this task and the 17 country or region items the Research Lead added. For each, I read the P17 claims with their ranks and end-time (P582) qualifiers, the English description, and P625. Historical claims with an end time (Roman Empire, Ottoman Empire, Mandatory Palestine and so on) were set aside.
+- **Wikidata** `Special:EntityData/<QID>.json` for the 116 QIDs cited after `330e684`: the 99 cited before this task and the 17 country or region items the Research Lead added. The rework adds `wikidata:Q225`, which I fetched for the re-verification. `wikidata:Q233`, added to Sicily, was already cited on `malta`.
+  - For each, I read the P17 claims with their ranks and end-time (P582) qualifiers, the English description, and P625.
+  - Historical claims with an end time (Roman Empire, Ottoman Empire, Mandatory Palestine and so on) were set aside.
 - **Natural Earth 10m** "Admin 0 – Countries" and "Admin 0 – Breakaway, Disputed Areas" (public domain), from the `nvkelso/natural-earth-vector` GeoJSON. I ran a point-in-polygon test on all 100 candidate coordinates and measured each point's distance to the polygon edge. This gives every country an independent second source besides the record's own citation.
   - Natural Earth's disputed layer has separate polygons for the West Bank, the Golan Heights, East Jerusalem, N. Cyprus and the Latrun no-man's land.
   - At this scale, points within about 1 km of an edge, and coastal points that fall just offshore, are confirmed by the Wikidata claim or description rather than by Natural Earth alone.
-- **Pleiades** JSON for `pleiades:874602` (Mesopotamia) and `pleiades:981531` (Macedonia).
+- **Pleiades** JSON for `pleiades:874602` (Mesopotamia), `pleiades:981531` (Macedonia) and `pleiades:981522` (Dalmatia).
 - **The International Standard Bible Encyclopedia (ISBE)** "Illyricum", "Dalmatia" and "Macedonia" (`bib:isbe-illyricum`, `bib:isbe-dalmatia`, `bib:isbe-macedonia`).
 - **Livius.org** "Macedonia (8)" (`bib:livius-macedonia`) and "Nabataeans" (`bib:livius-nabataeans`).
 - **Each area record's own** `summary`, `history` and candidate `support` text, together with the countries of its child records.
+- **For the re-verification:** Wikidata `Q1255537` (Delminium), and the DARE-derived AD 117 provinces layer (`klokantech/roman-empire`).
 
 ## Every record
 
@@ -165,15 +178,16 @@ Applied exactly as approved.
 
 ### Cyprus
 
-Salamis now reads "Cyprus" (PO ruling 1, below). Natural Earth puts the site at the edge of its N. Cyprus polygon. Its cited `wikidata:Q767089` carries both "Northern Cyprus" and "Cyprus" as P17, so the existing citation supports "Cyprus" and no new source is needed. "Northern Cyprus" has been removed from `$defs.modernCountry`. No test, README or validator text used it. The research note now has "PO ruling" lines; its per-record table shows "Cyprus", and the Research Lead's reasoning is kept as written.
+Salamis now reads "Cyprus" (PO ruling 1, below). Natural Earth puts the site at the edge of its N. Cyprus polygon. Its cited `wikidata:Q767089` carries both "Northern Cyprus" and "Cyprus" as P17, so the existing citation supports "Cyprus" and no new source is needed. "Northern Cyprus" has been removed from `$defs.modernCountry`, and no test, README or validator text used it. The research note records the ruling. The human approved it on 2026-10-05.
 
-### Croatia
+### Allow-list additions
 
-"Croatia" is a correct addition to the allow-list:
-- **Malta's** low-confidence Mljet candidate: `wikidata:Q211306`, "island of Croatia", and Natural Earth agrees.
-- **Illyricum** needs Croatia too, but not Croatia alone (see "Failures").
-
-`malta`'s order (Malta first) follows the confidence of its candidates.
+The final branch adds three values. All three are correct, and each is used:
+- **"Croatia":**
+  - Malta's low-confidence Mljet candidate: `wikidata:Q211306`, "island of Croatia", and Natural Earth agrees. `malta`'s order (Malta first) follows the confidence of its candidates.
+  - Illyricum, where Croatia comes second after the rework (see "Re-verification"). The first pass found Croatia alone was wrong (see "Failures in the first pass").
+- **"Saudi Arabia"** for Arabia, and **"Bosnia and Herzegovina"** for Illyricum: added in the rework `f210fa8` (see "Re-verification").
+- **"Northern Cyprus"** was proposed in `330e684` and removed in `19d7fc3` (see "Cyprus" above).
 
 ### Multi-candidate places
 
@@ -215,7 +229,7 @@ Every record's first value is the country holding the record's label point, or m
 - **Mesopotamia:** passes. Pleiades `874602` says "roughly corresponding to most of modern Iraq and Kuwait, eastern Syria, and Southeastern Turkey". The record's support text leaves out Kuwait, which is a minor share, so the "main ones" rule allows it.
 - **Macedonia:** passes. Livius says the region lies in "the Former Yugoslav Republic of Macedonia and northern Greece", and that Rome "added southern Illyria (capital: Apollonia)". ISBE describes the province "enlarged by the addition of parts of Illyria" and the Via Egnatia "from Dyrrhachium". Apollonia and Dyrrhachium are in modern Albania.
 
-## Fixes made
+## Fixes made (first pass, `19d7fc3`)
 
 All four are within the card's scope: `names.modernCountries`, `names.modern` on an area record, and a `summary.sources` addition. Each is sourced by text the record already cites.
 
@@ -254,7 +268,7 @@ Both need a new allow-list value. Under `schema/README.md`, the Research Lead ad
 
 1. **Salamis is "Cyprus", not "Northern Cyprus"** (the PO, 2026-10-05).
    - **The reasoning.** West Bank and Golan Heights are used because sovereignty there is disputed between states, and those names are the standard neutral names for the territory. For Cyprus, the island's name is also the name of the internationally recognized state. "Northern Cyprus" chiefly names an entity that only Türkiye recognizes, so using it would read as taking a side.
-   - **Applied.** Applied to `salamis-cyprus`, the only record that used it. The value is removed from `$defs.modernCountry`, and "PO ruling" lines are added to the research note. The human will be asked to confirm this at the next mini checkpoint.
+   - **Applied.** Applied to `salamis-cyprus`, the only record that used it. The value is removed from `$defs.modernCountry`, and the research note records the ruling. The human approved the ruling on 2026-10-05.
 2. **Emmaus Nicopolis is resolved.** I confirmed that `emmaus`'s list, `["Israel", "West Bank"]`, is the same whichever way Imwas falls:
    - Abu Ghosh is in Israel (`wikidata:Q759606`, and NE 1.9 km inside), and Qaloniya/Motza is too (NE 1.7 km inside; Wikidata `Q2898847` has only "Mandatory Palestine").
    - El-Qubeibeh is in the West Bank (`wikidata:Q6041947`, P17 Palestine; NE 2.2 km inside).
@@ -312,14 +326,17 @@ Both records are now `status: "verified"`, `verifiedBy: "fact-checker"`, `lastRe
 
 ## Validation
 
-- `npm run validate:data`: **0 errors, 107 warnings**, the same count as the Research Lead's run. 106 are the existing scripture-linkage warnings (a verse that doesn't contain the place's name) and 1 is the existing 800 px image on `philadelphia-lydia`. None concerns modern names, countries or areas.
-- `npm test`: **145/145** pass.
+On the final branch (HEAD `51ce5a0`):
+- `npm run validate:data`: **0 errors, 107 warnings**. 106 are the existing scripture-linkage warnings (a verse that doesn't contain the place's name) and 1 is the existing 800 px image on `philadelphia-lydia`. None concerns modern names, countries or areas.
+- `npm test`: **148/148** pass, including the 3 validator tests added in `6620e40`.
 - `npm run test:app`: **93/93** pass (14 suites).
 - `npm run build:data`: built 89 places.
 
+The first pass (`19d7fc3`) and the re-verification (`decd089`) each ran before `6620e40`, with the same warnings, `npm test` at 145/145, `test:app` at 93/93 and `build:data` at 89.
+
 ## For the PO
 
-1. **The Cyprus ruling**, for the human to confirm at the next mini checkpoint.
+1. **The Cyprus ruling:** approved by the human on 2026-10-05. No action is left.
 2. **Arabia and Illyricum**: resolved by the Research Lead's rework and this re-verification (see "Re-verification"). Two optional follow-ups remain there: Montenegro and Serbia for Illyricum, and Gaza for Arabia.
 3. **CP3.5's description** of Emmaus Nicopolis as "in the former Latrun no-man's land" is slightly off. Natural Earth puts Imwas just inside the 1949 West Bank line, on the no-man's land's edge. Either way, no data change follows.
 4. **Optional:**
