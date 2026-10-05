@@ -68,19 +68,6 @@
     },
     {
       "id": "pergamum-05",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Temple_of_Trajan%2C_Pergamon_01.jpg",
-      "width": 3982,
-      "height": 2882,
-      "author": "Bernard Gagnon",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Temple_of_Trajan,_Pergamon_01.jpg",
-      "caption": "Standing columns of the Temple of Trajan, a 2nd-century addition to Pergamon's acropolis",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "pergamum-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/The_Temple_of_Athena%2C_Pergamon.jpg",
       "width": 4592,
       "height": 3056,
@@ -93,7 +80,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-07",
+      "id": "pergamum-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Entrance_Courtyard%2C_Pergamon_Asklepieion%2C_Aeolis%2C_Turkey.jpg",
       "width": 6016,
       "height": 4016,
@@ -106,7 +93,7 @@
       "aiGenerated": false
     },
     {
-      "id": "pergamum-08",
+      "id": "pergamum-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Bergama_town_from_the_Acropolis_Hill_1424.jpg",
       "width": 2560,
       "height": 1920,

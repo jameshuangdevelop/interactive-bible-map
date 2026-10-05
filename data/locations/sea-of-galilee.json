@@ -8,6 +8,9 @@
       "Lake of Gennesaret"
     ],
     "modern": "Sea of Galilee / Lake Kinneret",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Yam Kinneret"
@@ -34,34 +37,42 @@
     }
   ],
   "summary": {
-    "text": "The Sea of Galilee is the freshwater lake in northern Israel around which much of Jesus' Galilean ministry took place, including the calling of his first disciples, several miracles at sea, and post-resurrection appearances recorded in the Gospels.",
+    "text": "The Sea of Galilee is a freshwater lake in the Jordan Rift Valley, more than 200 meters below sea level, fed principally by the Jordan River, which enters from the north and exits to the south. The Jewish historian Josephus gives its size as forty furlongs wide and one hundred forty furlongs long (roughly 7 by 26 km) and describes its water as sweet, pure and good to drink. Several towns stood on its shores in the first century, among them Capernaum on the northwest shore and Tiberias, a city that Herod Antipas built on the lake and named after the emperor Tiberius.",
     "sources": [
       "wikidata:Q126982",
-      "openbible:sea-of-galilee",
-      "scripture:Mark 1:16",
-      "scripture:Matthew 14:25",
-      "scripture:John 21:1",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:josephus-jewish-war",
+      "wikidata:Q59174",
+      "bib:josephus-antiquities",
+      "bib:worldhistory-josephus",
+      "bib:worldhistory-tiberius"
     ]
   },
   "history": [
     {
-      "text": "The lake sits in the Jordan Rift Valley more than 200 meters below sea level and is fed principally by the Jordan River, which enters from the north and exits to the south.",
-      "sources": [
-        "wikidata:Q126982"
-      ]
-    },
-    {
-      "text": "The lake's western shore lay in Galilee, but Josephus gives Galilee's eastern border as the territories of Hippos and Gadara and Gaulanitis, and he places both Bethsaida, near where the Jordan enters the lake, and Gamala, on the eastern side, in Gaulanitis. This project places the lake in Galilee, after which the New Testament names it the 'sea of Galilee.'",
+      "text": "The lake's western shore lay in Galilee, but Josephus gives Galilee's eastern border as the territories of Hippos and Gadara and Gaulanitis, and he places both Bethsaida, near where the Jordan enters the lake, and Gamala, on the eastern side, in Gaulanitis. This project places the lake in Galilee, after which the New Testament names it the \"sea of Galilee.\"",
       "sources": [
         "bib:josephus-jewish-war",
         "bib:isbe-bethsaida",
         "scripture:Matthew 4:18"
+      ]
+    },
+    {
+      "text": "The Gospels set much of Jesus' Galilean ministry around the lake. He called his first disciples, the fishermen Simon and Andrew, as they cast a net into it; on its water he \"rebuked the wind and the sea,\" and on another night he came to his disciples \"walking on the sea.\" John, who also calls the lake \"the Sea of Tiberias,\" describes Jesus appearing to his disciples there after his resurrection.",
+      "sources": [
+        "scripture:Mark 1:16",
+        "scripture:Matthew 4:18",
+        "scripture:Matthew 8:26",
+        "scripture:Matthew 14:25",
+        "scripture:John 6:1",
+        "scripture:John 21:1"
+      ]
+    },
+    {
+      "text": "Today the lake, known in Hebrew as Lake Kinneret, lies in northern Israel. Capernaum's excavated site and other places around the shore draw Christian pilgrims and tourists.",
+      "sources": [
+        "wikidata:Q126982",
+        "wikidata:Q59174",
+        "bib:custodia-capernaum"
       ]
     }
   ],
@@ -72,9 +83,19 @@
       "textWEB": "Walking by the sea of Galilee, he saw two brothers: Simon, who is called Peter, and Andrew, his brother, casting a net into the sea; for they were fishermen."
     },
     {
+      "ref": "Matthew 8:26",
+      "book": "Matthew",
+      "textWEB": "He said to them, “Why are you fearful, O you of little faith?” Then he got up, rebuked the wind and the sea, and there was a great calm."
+    },
+    {
       "ref": "Matthew 9:1",
       "book": "Matthew",
       "textWEB": "He entered into a boat and crossed over, and came into his own city."
+    },
+    {
+      "ref": "Matthew 14:25",
+      "book": "Matthew",
+      "textWEB": "In the fourth watch of the night, Jesus came to them, walking on the sea."
     },
     {
       "ref": "Matthew 15:29",
@@ -148,5 +169,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

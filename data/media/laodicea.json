@@ -54,19 +54,6 @@
     },
     {
       "id": "laodicea-04",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Laodicea_Ancient_City_2026%2C_15.jpg",
-      "width": 5760,
-      "height": 3840,
-      "author": "Biologg",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Laodicea_Ancient_City_2026,_15.jpg",
-      "caption": "One of Laodicea's excavated colonnaded streets, with its stone paving and standing columns",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "laodicea-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Stadium_Street%2C_The_North-South_Street_extending_south_from_the_western_end_of_the_Syria_Street%2C_Laodicea_on_the_Lycus%2C_Phrygia%2C_Turkey_%2831957861892%29.jpg",
       "width": 4891,
       "height": 3252,
@@ -79,7 +66,7 @@
       "aiGenerated": false
     },
     {
-      "id": "laodicea-06",
+      "id": "laodicea-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Laodikeia_ad_Lycum_West_Theatre_4779.jpg",
       "width": 4256,
       "height": 2832,
@@ -92,7 +79,7 @@
       "aiGenerated": false
     },
     {
-      "id": "laodicea-07",
+      "id": "laodicea-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Laodicea_Stadium.jpg",
       "width": 5184,
       "height": 3456,
@@ -105,7 +92,7 @@
       "aiGenerated": false
     },
     {
-      "id": "laodicea-08",
+      "id": "laodicea-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Denizli_view_from_a_surrounding_hill_-_panoramio.jpg",
       "width": 3072,
       "height": 2304,

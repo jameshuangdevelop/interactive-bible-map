@@ -44,8 +44,10 @@ test("buildAppData writes compact index fields and candidate fields", async () =
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This fixture predates the empire/province hierarchy (M3-11).
+      // This fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
       requireEmpireRoot: false,
+      requireModernCountries: false,
       outputDirectory
     });
 
@@ -78,8 +80,10 @@ test("buildAppData writes one place file per location and resolves bibliography"
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This fixture predates the empire/province hierarchy (M3-11).
+      // This fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
       requireEmpireRoot: false,
+      requireModernCountries: false,
       outputDirectory
     });
 
@@ -139,8 +143,10 @@ test("buildAppData with fixture directories is isolated from repository prompt b
         bibliographyPath: bibliographyFixturePath,
         webVplPath: webFixturePath,
         skipSnapshotChecksumCheck: true,
-        // This fixture predates the empire/province hierarchy (M3-11).
+        // This fixture predates the empire/province hierarchy (M3-11)
+        // and names.modernCountries.
         requireEmpireRoot: false,
+        requireModernCountries: false,
         outputDirectory
       });
 
@@ -224,8 +230,10 @@ test("buildAppData omits names.otherLanguages but keeps names.modernCountries in
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This fixture predates the empire/province hierarchy (M3-11).
+      // This fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
       requireEmpireRoot: false,
+      requireModernCountries: false,
       outputDirectory
     });
 
@@ -318,6 +326,8 @@ test("buildAppData keeps empire/province types and parent chain in places.index"
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This fixture predates names.modernCountries.
+      requireModernCountries: false,
       outputDirectory
     });
 

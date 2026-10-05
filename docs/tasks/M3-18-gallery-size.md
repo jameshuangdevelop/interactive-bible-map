@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Agent(s) | `media-curator` (choose and remove) → `gis-engineer` (the rule), each adding its own commit |
+| Agent(s) | `media-curator` (choose and remove) → `gis-engineer` (the rule) → `media-curator` (credit names), each adding its own commit |
 | Model | Claude Sonnet 5 for the Media Curator, which must view every image; GPT-5.3-Codex for the GIS Engineer (fallback GPT-5.5) |
 | Branch | `data/m3-gallery-size` |
 | Depends on | ADR-0029's update of 2026-10-05 |
@@ -32,9 +32,10 @@ The human, on 2026-10-05: "for the more important places, we should have 4-7 ima
    - Test both limits, with the switch on and off for the minimum.
    - Update `schema/README.md` and the `prominence` description in `schema/location.schema.json` to say 4–7, counting the AI reconstruction.
    - Commit: `feat(validator): major places have 4 to 7 images`.
+3. **Media Curator: credit names as their Commons pages ask** (added 2026-10-05 from M3-19's licensing check, `docs/LICENSES.md`). Twelve credits don't use the attribution form their Commons file page requests: Rome's David Iliff photo, `mount-of-olives-02`, `temple-mount-02` and `joppa-01` ("Andrew Shiva / Wikipedia"), `ephesus-06` ("José Luiz Bernardes Ribeiro"), `tyre-02` (add "www.vascoplanet.com"), and six Pikiwiki Israel files (`bethany-beyond-the-jordan-02` and `-07`, `caesarea-maritima-04` and `-06`, `nazareth-05` and `-06`). Open each file page, copy its requested attribution exactly into the image's `author`, and change nothing else. Ids may have moved in step 1, so find each image by its file. Commit: `data(media): credit photos as their Commons pages ask`.
 
 ## Out of scope
-Adding or replacing images, captions and credits, standard places, and the gallery's design.
+Adding or replacing images, captions, credits other than the twelve in scope item 3, standard places other than `joppa` and `tyre`, and the gallery's design.
 
 ## Expected outputs
 Seven changed files in `data/media/`, any references to renumbered ids, the research note, and the validator, test and schema changes.

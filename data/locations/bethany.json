@@ -5,6 +5,9 @@
       "Bethany"
     ],
     "modern": "Al-Eizariya",
+    "modernCountries": [
+      "West Bank"
+    ],
     "alternate": []
   },
   "type": "village",
@@ -29,20 +32,43 @@
     }
   ],
   "summary": {
-    "text": "Bethany was a village on the eastern slope of the Mount of Olives, close to Jerusalem, identified in the Gospel of John as the home of Lazarus, Martha and Mary and the site of Lazarus being raised from death.",
+    "text": "Bethany was a village on the eastern slope of the Mount of Olives, about fifteen stadia (roughly 2.8 km) from Jerusalem, where the mount begins its descent toward the Judean Desert. It lay in Judea, which after Herod the Great's death was ruled by his son Archelaus and then by Roman governors. The Gospel of John identifies it as the home of Lazarus, Martha and Mary and the place where Jesus raised Lazarus from the dead.",
     "sources": [
       "wikidata:Q7818622",
       "openbible:bethany-1",
+      "bib:custodia-gethsemane",
+      "bib:josephus-jewish-war",
       "scripture:John 11:1",
-      "scripture:John 11:43"
+      "scripture:John 11:7",
+      "scripture:John 11:18",
+      "scripture:John 12:1"
     ]
   },
   "history": [
     {
-      "text": "The modern Palestinian town of al-Eizariya, whose Arabic name preserves the memory of Lazarus ('al-Azir'), occupies the traditional site and includes a tomb venerated since at least the fourth century AD as the tomb of Lazarus.",
+      "text": "John says Lazarus had been \"in the tomb four days already\" when Jesus arrived, and describes the tomb as \"a cave, and a stone lay against it.\" Mark and Matthew describe a meal at Bethany in the house of \"Simon the leper,\" where a woman broke an alabaster jar of costly ointment and poured it over Jesus' head. The Gospels say Jesus stayed at Bethany during his last days in Jerusalem, and Luke ends his Gospel with Jesus leading his disciples \"out as far as Bethany\" and blessing them.",
+      "sources": [
+        "scripture:John 11:17",
+        "scripture:John 11:38",
+        "scripture:Mark 14:3",
+        "scripture:Matthew 26:6",
+        "scripture:Matthew 21:17",
+        "scripture:Mark 11:11",
+        "scripture:Luke 24:50"
+      ]
+    },
+    {
+      "text": "By the Byzantine period the village's original name had been replaced with one recalling Lazarus, and a memorial church complex, the Lazarium, was built near his tomb in the fourth century. It was destroyed and rebuilt more than once over the following centuries, and the tomb as it appears today dates from the medieval period, with an entrance from the sixteenth century.",
+      "sources": [
+        "bib:custodia-bethany",
+        "bib:murphy-oconnor-holy-land-guide"
+      ]
+    },
+    {
+      "text": "Today the site is the Palestinian town of al-Eizariya, whose Arabic name preserves the memory of Lazarus (\"al-Azir\"). A Franciscan church, consecrated in 1954 over the remains of three earlier churches, stands about 50 meters from the traditional Tomb of Lazarus, which visitors enter by a stairway from an entrance beside a mosque.",
       "sources": [
         "wikidata:Q2181579",
-        "bib:murphy-oconnor-holy-land-guide"
+        "bib:custodia-bethany"
       ]
     }
   ],
@@ -98,6 +124,11 @@
       "textWEB": "So when Jesus came, he found that he had been in the tomb four days already."
     },
     {
+      "ref": "John 11:38",
+      "book": "John",
+      "textWEB": "Jesus therefore, again groaning in himself, came to the tomb. Now it was a cave, and a stone lay against it."
+    },
+    {
       "ref": "John 11:18",
       "book": "John",
       "textWEB": "Now Bethany was near Jerusalem, about fifteen stadia away."
@@ -106,6 +137,11 @@
       "ref": "John 12:1",
       "book": "John",
       "textWEB": "Then, six days before the Passover, Jesus came to Bethany, where Lazarus was, who had been dead, whom he raised from the dead."
+    },
+    {
+      "ref": "John 11:7",
+      "book": "John",
+      "textWEB": "Then after this he said to the disciples, “Let’s go into Judea again.”"
     }
   ],
   "otConnections": [],
@@ -155,5 +191,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-23"
+  "lastReviewed": "2026-10-05"
 }

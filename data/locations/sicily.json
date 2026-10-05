@@ -5,6 +5,10 @@
       "Sicily"
     ],
     "modern": "Sicily",
+    "modernCountries": [
+      "Italy",
+      "Malta"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -36,7 +40,9 @@
       "bib:cassius-dio-roman-history",
       "bib:strabo-geography",
       "bib:isbe-melita",
-      "scripture:Acts 28:12"
+      "scripture:Acts 28:12",
+      "wikidata:Q1460",
+      "wikidata:Q233"
     ]
   },
   "history": [
@@ -68,5 +74,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

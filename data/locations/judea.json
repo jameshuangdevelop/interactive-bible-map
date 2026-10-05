@@ -5,6 +5,11 @@
       "Judea",
       "Judaea"
     ],
+    "modern": "Hill country in the West Bank and Israel",
+    "modernCountries": [
+      "West Bank",
+      "Israel"
+    ],
     "alternate": [
       "Jewry",
       "Judah",
@@ -41,7 +46,8 @@
       "bib:nlt-2015-biblegateway",
       "bib:kjv-1987-biblegateway",
       "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:csb-2017-biblegateway",
+      "wikidata:Q36678"
     ]
   },
   "history": [
@@ -383,5 +389,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

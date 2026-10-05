@@ -5,6 +5,9 @@
       "Patmos"
     ],
     "modern": "Patmos",
+    "modernCountries": [
+      "Greece"
+    ],
     "alternate": []
   },
   "type": "natural-feature",
@@ -49,5 +52,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }
