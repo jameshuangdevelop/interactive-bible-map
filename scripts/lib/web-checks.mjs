@@ -53,6 +53,70 @@ export function readCliArgument(argv, name) {
   return null;
 }
 
+export function calculateMedian(values) {
+  if (!Array.isArray(values) || values.length === 0) {
+    throw new Error("Cannot compute median of an empty list.");
+  }
+
+  const sorted = [...values].sort((left, right) => left - right);
+  const middleIndex = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) {
+    return sorted[middleIndex];
+  }
+
+  return (sorted[middleIndex - 1] + sorted[middleIndex]) / 2;
+}
+
+export function parseLighthouseTbtMode(argv = process.argv.slice(2), env = process.env) {
+  const argumentValue = readCliArgument(argv, "tbt-mode");
+  const environmentValue = env.LIGHTHOUSE_TBT_MODE?.trim();
+  const selectedMode = (argumentValue ?? environmentValue ?? "enforce").trim().toLowerCase();
+  if (selectedMode === "enforce" || selectedMode === "report") {
+    return selectedMode;
+  }
+
+  throw new Error(
+    `Invalid Lighthouse TBT mode '${selectedMode}'. Use 'enforce' or 'report'.`
+  );
+}
+
+export function evaluateLighthouseGate({
+  lcpValuesMs,
+  tbtValuesMs,
+  lcpThresholdMs,
+  tbtThresholdMs,
+  tbtMode
+}) {
+  if (!Array.isArray(lcpValuesMs) || lcpValuesMs.length === 0) {
+    throw new Error("LCP values are required to evaluate Lighthouse gates.");
+  }
+
+  if (!Array.isArray(tbtValuesMs) || tbtValuesMs.length !== lcpValuesMs.length) {
+    throw new Error("TBT values must be provided and match LCP run count.");
+  }
+
+  if (tbtMode !== "enforce" && tbtMode !== "report") {
+    throw new Error(`Unsupported TBT mode '${tbtMode}'.`);
+  }
+
+  const lcpMedianMs = calculateMedian(lcpValuesMs);
+  const tbtMedianMs = calculateMedian(tbtValuesMs);
+  const lcpPassed = lcpMedianMs <= lcpThresholdMs;
+  const tbtPassed = tbtMedianMs <= tbtThresholdMs;
+  const tbtEnforced = tbtMode === "enforce";
+  const passed = lcpPassed && (!tbtEnforced || tbtPassed);
+
+  return {
+    lcpMedianMs,
+    tbtMedianMs,
+    lcpPassed,
+    tbtPassed,
+    tbtMode,
+    tbtEnforced,
+    passed
+  };
+}
+
 function normalizeBaseUrl(baseUrl) {
   const parsed = new URL(baseUrl);
   parsed.search = "";
