@@ -37,29 +37,25 @@ Golan Heights) using each candidate's own already-cited `coordinateSource`.
 
 ## Allow-list additions
 
-Two territory/country names were needed beyond the 17 already in `schema/location.schema.json`'s
-`$defs.modernCountry`, added in this commit:
+Three territory/country names were adopted beyond the 17 already in `schema/location.schema.json`'s
+`$defs.modernCountry`:
 
-- **"Croatia"** — for Illyricum (the Roman province's core, governed from Salona on the Dalmatian
-  coast, per the record's own cited `bib:isbe-illyricum`) and for Malta's low-confidence Mljet
-  candidate (`wikidata:Q211306`, P17 Croatia), which was already in the record's own sources before
-  this task.
-- **"Northern Cyprus"** — for Salamis (`salamis-cyprus`), see "Extending the territory-naming
-  principle" below.
-
-**Update (2026-10-05, rework after the Fact-Checker's report):** two more additions, for the two
-records the Fact-Checker sent back (see "Arabia and Illyricum rework" below):
-
+- **"Croatia"** — for Illyricum (the record's cited `bib:isbe-illyricum` names Salona, the province's
+  capital, on the Croatian coast) and for Malta's low-confidence Mljet candidate
+  (`wikidata:Q211306`, P17 Croatia), which was already in the record's own sources before this task.
 - **"Saudi Arabia"** — for Arabia (`arabia`): its own cited `bib:livius-nabataeans`, read directly at
   livius.org, places Hegra ("Mada'in Salih") "in the northwest of Saudi Arabia," within "the
-  Nabataean frontiers."
+  Nabataean frontiers." Added in the rework after the Fact-Checker's first verification pass (see
+  "Arabia and Illyricum rework" below).
 - **"Bosnia and Herzegovina"** — for Illyricum (`illyricum`): its own label point
-  (`wikidata:Q753824`'s coordinate) sits in central Bosnia and Herzegovina, not coastal Croatia (the
-  Fact-Checker's finding, confirmed against Natural Earth); the record's own cited `bib:isbe-illyricum`
-  separately places one of the province's two legions at Delminium, in the same area.
+  (`wikidata:Q753824`'s coordinate) sits in central Bosnia and Herzegovina, not coastal Croatia; the
+  record's own cited `bib:isbe-illyricum` separately places one of the province's two legions at
+  Delminium, in the same area. Added in the same rework.
 
-**PO ruling (2026-10-05):** Salamis uses "Cyprus", and "Northern Cyprus" is removed from the
-allow-list; see "Extending the territory-naming principle" below.
+A fourth name, **"Northern Cyprus,"** was proposed for Salamis (`salamis-cyprus`) but not adopted: the
+PO ruled, and the human approved on 2026-10-05, that Salamis should read **"Cyprus"** instead, so
+"Northern Cyprus" is not on the final allow-list. See "Extending the territory-naming principle"
+below for the reasoning on both sides.
 
 ## Full per-record table
 
@@ -68,7 +64,7 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 
 | id | type | names.modern | modernCountries |
 |---|---|---|---|
-| achaia | province | Southern Greece | Greece |
+| achaia | province | Central and southern Greece | Greece |
 | antioch-pisidia | city | Yalvaç | Türkiye |
 | antioch-syria | city | Antakya | Türkiye |
 | arabia | province | Jordan, with parts of Saudi Arabia and Syria | Jordan, Saudi Arabia, Syria |
@@ -98,7 +94,7 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | egypt | province | Egypt | Egypt |
 | emmaus | village | — | Israel, West Bank |
 | ephesus | city | Selçuk | Türkiye |
-| galatia | province | North-central Türkiye | Türkiye |
+| galatia | province | Central Türkiye | Türkiye |
 | galilee | region | Galilee | Israel |
 | gethsemane | site | Gethsemane | — (exempt) |
 | golgotha | site | — | — (exempt) |
@@ -143,11 +139,11 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | puteoli | city | Pozzuoli | Italy |
 | roman-empire | empire | — | — (exempt) |
 | rome | city | Rome | Italy |
-| salamis-cyprus | city | Near Famagusta | Cyprus (PO ruling; proposed: Northern Cyprus) |
+| salamis-cyprus | city | Near Famagusta | Cyprus |
 | samaria | region | Hill country in the northern West Bank | West Bank |
 | sardis | city | Sart | Türkiye |
 | sea-of-galilee | natural-feature | Sea of Galilee / Lake Kinneret | Israel |
-| sicily | province | Sicily | Italy |
+| sicily | province | Sicily | Italy, Malta |
 | smyrna | city | İzmir | Türkiye |
 | sychar | village | Tell Balata | West Bank |
 | syria | province | Syria, Lebanon and southeastern Türkiye | Syria, Lebanon, Türkiye |
@@ -158,10 +154,11 @@ includes `jerusalem`), which correctly carry no `names.modernCountries`.
 | troas | city | Near Ezine | Türkiye |
 | tyre | city | Sour / Tyre | Lebanon |
 
-After verification, the Fact-Checker changed Achaia's and Galatia's phrases and added Malta to Sicily,
-and sent Arabia and Illyricum back for rework; see `docs/verification/M3-modern-countries.md`. The
-rows above for `arabia` and `illyricum` already show the reworked values; see "Arabia and Illyricum
-rework" below for the reasoning.
+After verification, the Fact-Checker changed Achaia's and Galatia's phrases and added Malta to
+Sicily's countries, and sent Arabia and Illyricum back for rework; see
+`docs/verification/M3-modern-countries.md`. The table above shows the final values for all of these,
+including `arabia` and `illyricum`'s reworked values; see "Arabia and Illyricum rework" below for
+that reasoning.
 
 ### Sources behind each country (where not obvious from the record's own candidate `coordinateSource`)
 
@@ -211,16 +208,16 @@ own cited Wikidata entity (`wikidata:Q767089`) carries two current-rank P17 clai
 addresses for the West Bank and Golan Heights. CP3.5 decision 1 did not name Cyprus among its
 examples, but its stated principle ("the name most English news and reference works use... describes
 where the place is, not who should rule it") applies the same way here: English sources describing
-Salamis's ruins routinely place them in "Northern Cyprus." I added **"Northern Cyprus"** to the
-schema allow-list and used it for this one record. **This is a new application of the policy beyond
-CP3.5's named examples, not a case the human has separately confirmed — flagged for the PO below.**
+Salamis's ruins routinely place them in "Northern Cyprus." I proposed adding **"Northern Cyprus"** to
+the schema allow-list and using it for this one record, as a new application of the policy beyond
+CP3.5's named examples.
 
-**PO ruling (2026-10-05):** "Cyprus", not "Northern Cyprus". West Bank and Golan Heights are the
-standard neutral names for territory whose sovereignty is disputed between states. For Cyprus, the
-island's name is also the internationally recognized state's name, while "Northern Cyprus" chiefly
-names an entity that only Türkiye recognizes, so using it would read as taking a side. `salamis-cyprus`
-now lists "Cyprus" (supported by the same `wikidata:Q767089` P17 claims), and "Northern Cyprus" is
-no longer on the allow-list. The human is asked to confirm at the next mini checkpoint.
+**PO ruling (2026-10-05), approved by the human the same day:** "Cyprus", not "Northern Cyprus". West
+Bank and Golan Heights are the standard neutral names for territory whose sovereignty is disputed
+between states. For Cyprus, the island's name is also the internationally recognized state's name,
+while "Northern Cyprus" chiefly names an entity that only Türkiye recognizes, so using it would read
+as taking a side. `salamis-cyprus` lists "Cyprus" (supported by the same `wikidata:Q767089` P17
+claims); "Northern Cyprus" was not adopted and is not on the final allow-list.
 
 ### Multi-candidate places
 
