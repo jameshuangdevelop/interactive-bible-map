@@ -120,7 +120,6 @@ function MapLoadingPlaceholder() {
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
-  const focusRequestToken = 0;
   const [loading, setLoading] = useState(true);
   const [urlStateReady, setUrlStateReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -459,7 +458,6 @@ export function AppShell() {
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
-            focusRequestToken={focusRequestToken}
             leftPanelWidth={panelWidthForMap}
             onSelectPlace={handleSelectFromMap}
             places={places}
