@@ -50,7 +50,7 @@
     }
   ],
   "summary": {
-    "text": "Jericho lies in the Jordan Valley north of the Dead Sea, in a desert oasis watered by the perennial spring of 'Ain es-Sultan, and is one of the most anciently inhabited sites in the region. By the first century AD the inhabited city had shifted about two kilometers south of the Old Testament-era mound, Tell es-Sultan, to a new site built up by the Hasmonean and Herodian dynasties as a winter palace complex. Josephus praises the oasis's many kinds of palm trees, its balsam and its cypress trees, writing that whoever called the place divine \"would not be mistaken.\"",
+    "text": "Jericho lies in the Jordan Valley north of the Dead Sea, in a desert oasis watered by the perennial spring of 'Ain es-Sultan, and is one of the most anciently inhabited sites in the region. By the first century AD the inhabited city had shifted about two kilometers south of the Old Testament-era mound, Tell es-Sultan, to a new site built up by the Hasmonean and Herodian dynasties as a winter palace complex. The Jewish historian Josephus praises the oasis's many kinds of palm trees, its balsam and its cypress trees, writing that whoever called the place divine \"would not be mistaken.\"",
     "sources": [
       "wikidata:Q2402267",
       "dare:23403",
@@ -184,7 +184,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

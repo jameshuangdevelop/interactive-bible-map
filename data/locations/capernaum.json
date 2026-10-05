@@ -34,7 +34,7 @@
     }
   ],
   "summary": {
-    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee, in Herod Antipas's tetrarchy of Galilee. Its houses were built of the local black basalt, and its people lived from fishing and farming and from trade along the route between Galilee and Damascus. Josephus describes the neighboring plain of Gennesaret as exceptionally fertile, watered by a spring the local people called \"Capharnaum,\" with walnut trees, palms, fig trees and olives, and with grapes and figs ripening through ten months of the year.",
+    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee, in Herod Antipas's tetrarchy of Galilee. Its houses were built of the local black basalt, and its people lived from fishing and farming and from trade along the route between Galilee and Damascus. The Jewish historian Josephus describes the neighboring plain of Gennesaret as exceptionally fertile, watered by a spring the local people called \"Capharnaum,\" with walnut trees, palms, fig trees and olives, and with grapes and figs ripening through ten months of the year.",
     "sources": [
       "wikidata:Q59174",
       "dare:33337",
@@ -223,7 +223,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

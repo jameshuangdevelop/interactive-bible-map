@@ -29,25 +29,65 @@
     }
   ],
   "summary": {
-    "text": "Colossae was, per Wikidata, 'an ancient city of Phrygia,' addressed by Paul's letter to the Colossians even though Acts does not record him visiting personally.",
+    "text": "Colossae was a city of the Lycus River valley in the Roman province of Asia, grouped by the Greek geographer Strabo among the towns near the larger cities of Laodicea and Hierapolis. The Greek historian Herodotus called Colossae a great city of Phrygia, and the Greek writer Xenophon described it as large and prosperous, but by Paul's day it had been overshadowed by its growing neighbors. The Lycus valley was known for its wool: Laodicea's sheep were famous for soft, raven-black fleece, and the neighboring Colossians earned a similar income from a dye colour that bore their own city's name.",
     "sources": [
       "pleiades:638811",
       "wikidata:Q1001370",
-      "openbible:colossae",
-      "scripture:Colossians 1:2"
+      "bib:strabo-geography",
+      "bib:bas-colossae-yener",
+      "bib:isbe-colossae"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Paul's letter to the Colossians is addressed to believers in the city, though Acts never records him visiting Colossae in person; the letter says the gospel reached them through Epaphras, \"who is one of you.\" Paul asks that his letter also be read at the neighboring church in Laodicea, and that the Colossians in turn read the letter he had sent there.",
+      "sources": [
+        "scripture:Colossians 1:2",
+        "scripture:Colossians 1:7",
+        "scripture:Colossians 4:12-13",
+        "scripture:Colossians 4:16"
+      ]
+    },
+    {
+      "text": "The Lycus valley was prone to earthquakes. The Roman historian Tacitus records that an earthquake destroyed the city of Laodicea in AD 60 and that it recovered \"by its own resources, without assistance\" from Rome; whether this earthquake, or one like it, also struck Colossae is not established. In the centuries that followed, Colossae continued to decline, and its population eventually moved to the nearby hilltop town of Chonai.",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:bas-colossae-yener"
+      ]
+    },
+    {
+      "text": "Colossae remained one of the most under-excavated major sites of the New Testament world for over a century, visited only by a handful of short archaeological inspections. A survey beginning in 2021 mapped the unexcavated mound near modern Honaz in detail, and full-scale excavation began in 2025 under the archaeologist Barış Yener of Pamukkale University. The first excavation season focused on the site's northern necropolis, a Roman-period cemetery with rock-cut tombs, and the dig remains in its early stages.",
+      "sources": [
+        "bib:bas-colossae-yener",
+        "pleiades:638811"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Colossians 1:2",
       "book": "Colossians",
       "textWEB": "to the saints and faithful brothers in Christ at Colossae: Grace to you and peace from God our Father and the Lord Jesus Christ."
+    },
+    {
+      "ref": "Colossians 1:7",
+      "book": "Colossians",
+      "textWEB": "even as you learned from Epaphras our beloved fellow servant, who is a faithful servant of Christ on your behalf,"
+    },
+    {
+      "ref": "Colossians 4:12-13",
+      "book": "Colossians",
+      "textWEB": "Epaphras, who is one of you, a servant of Christ, salutes you, always striving for you in his prayers, that you may stand perfect and complete in all the will of God. For I testify about him that he has great zeal for you, and for those in Laodicea, and for those in Hierapolis."
+    },
+    {
+      "ref": "Colossians 4:16",
+      "book": "Colossians",
+      "textWEB": "When this letter has been read among you, cause it to be read also in the assembly of the Laodiceans, and that you also read the letter from Laodicea."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

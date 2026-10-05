@@ -28,14 +28,38 @@
     }
   ],
   "summary": {
-    "text": "Smyrna was a Greek city on the Aegean coast of Asia Minor, at the site of modern İzmir. It is one of the seven churches addressed in Revelation 2-3, where the risen Christ commends the congregation's endurance under persecution and poverty without any rebuke.",
+    "text": "Smyrna was an old Greek city on the Aegean coast, destroyed by the Lydian king Alyattes around 600 BC; its people then lived scattered in villages until the Hellenistic kings Antigonus and Lysimachus gathered them into a new city around 290 BC, on the slopes of Mount Pagos above a closable harbor. By the time Revelation was written, this refounded city was about three centuries old and, according to the Greek geographer Strabo, was laid out with an unusually good plan of straight, stone-paved streets; its lower town held large public porticoes, a library, and a shrine to the Greek poet Homer, whom the Smyrnaeans claimed as their own. In AD 26, Smyrna won a contest before the Roman Senate against the rival city of Sardis for the right to build a temple to the emperor Tiberius, on the strength of its long loyalty to Rome.",
     "sources": [
       "dare:21157",
       "wikidata:Q1379299",
-      "scripture:Revelation 2:8-11"
+      "bib:strabo-geography",
+      "bib:ramsay-seven-churches",
+      "bib:tacitus-annals"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Smyrna is one of the seven churches addressed in Revelation 2-3. Unlike most of the other churches, it receives no rebuke: the risen Christ tells the congregation, \"I know your works, oppression, and your poverty (but you are rich),\" and names opposition from a group the text calls \"those who say they are Jews, and they are not.\" The letter promises that those faithful even to death will receive \"the crown of life,\" a phrase some interpreters connect to \"the crown of Smyrna,\" a local expression for the ring of splendid public buildings crowning the hill above the city.",
+      "sources": [
+        "scripture:Revelation 2:8",
+        "scripture:Revelation 2:9",
+        "scripture:Revelation 2:10",
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "text": "In the second century, Smyrna's bishop Polycarp was burned to death in the city's stadium for refusing to renounce his faith, an episode later Christian writers linked to Revelation's promise of a \"crown of life\" for those faithful to the point of death. Smyrna was repeatedly struck by earthquakes over the centuries that followed, but each time it was rebuilt.",
+      "sources": [
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "text": "Today Smyrna survives as İzmir, a major city on Turkey's Aegean coast, built over the ancient site.",
+      "sources": [
+        "wikidata:Q1379299"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Revelation 1:11",
@@ -46,11 +70,21 @@
       "ref": "Revelation 2:8",
       "book": "Revelation",
       "textWEB": "“To the angel of the assembly in Smyrna write: “The first and the last, who was dead, and has come to life says these things:"
+    },
+    {
+      "ref": "Revelation 2:9",
+      "book": "Revelation",
+      "textWEB": "“I know your works, oppression, and your poverty (but you are rich), and the blasphemy of those who say they are Jews, and they are not, but are a synagogue of Satan."
+    },
+    {
+      "ref": "Revelation 2:10",
+      "book": "Revelation",
+      "textWEB": "Don’t be afraid of the things which you are about to suffer. Behold, the devil is about to throw some of you into prison, that you may be tested; and you will have oppression for ten days. Be faithful to death, and I will give you the crown of life."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

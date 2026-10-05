@@ -36,7 +36,7 @@
     }
   ],
   "summary": {
-    "text": "Jerusalem was the capital of Judea and, through the first century AD, the religious center of Judaism. Josephus describes it as built on two hills divided by a valley, with the Kidron Valley to the east. The city was ruled in turn by Herod the Great, his son Herod Archelaus, Roman prefects and procurators, and, from AD 41 to 44, King Herod Agrippa I. Herod's building program, above all his vastly enlarged Temple platform, made Jerusalem one of the major cities of the eastern Roman world. By the Roman siege of AD 70, Josephus says, its walls ran about thirty-three furlongs (roughly 6 km), with towers along their length; the outer, third wall had been begun by Agrippa I and was completed later.",
+    "text": "Jerusalem was the capital of Judea and, through the first century AD, the religious center of Judaism. The Jewish historian Josephus describes it as built on two hills divided by a valley, with the Kidron Valley to the east. The city was ruled in turn by Herod the Great, his son Herod Archelaus, Roman prefects and procurators, and, from AD 41 to 44, King Herod Agrippa I. Herod's building program, above all his vastly enlarged Temple platform, made Jerusalem one of the major cities of the eastern Roman world. By the Roman siege of AD 70, Josephus says, its walls ran about thirty-three furlongs (roughly 6 km), with towers along their length; the outer, third wall had been begun by Agrippa I and was completed later.",
     "sources": [
       "wikidata:Q1218",
       "pleiades:687928",
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "text": "Roman forces under Titus destroyed the city and the Second Temple in AD 70, during the First Jewish-Roman War. Luke's Gospel records Jesus warning of a time when Jerusalem would be \"surrounded by armies\" and \"its desolation is at hand.\"",
+      "text": "Roman forces under the general Titus destroyed the city and the Second Temple in AD 70, during the First Jewish-Roman War. Luke's Gospel records Jesus warning of a time when Jerusalem would be \"surrounded by armies\" and \"its desolation is at hand.\"",
       "sources": [
         "wikidata:Q1003997",
         "bib:rainey-notley-sacred-bridge",
@@ -1022,7 +1022,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

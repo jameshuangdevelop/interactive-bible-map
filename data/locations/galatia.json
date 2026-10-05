@@ -28,23 +28,41 @@
     }
   ],
   "summary": {
-    "text": "Galatia was both an ethnic region of Celtic settlers in the highlands of central Asia Minor and, from 25 BC, a much larger Roman province of the same name that also reached south to cities such as Antioch in Pisidia, Iconium, Lystra, and Derbe. Scholars are divided, without a clear consensus, on which of these Paul meant by 'the assemblies of Galatia' in his letter: the 'North Galatian' view holds he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled area, while the 'South Galatian' view holds he wrote to the congregations he founded on his first journey in the province's southern cities; this project takes neither side.",
+    "text": "Galatia was both an ethnic homeland of Celtic settlers in the highlands of central Asia Minor and, from 25 BC, a much larger Roman province of the same name. Celtic migrants, whom the Greeks and Romans called Galatians, had crossed into Asia Minor by 278 BC and settled around the headwaters of the Sangarios river and the middle course of the Halys. The Roman province, formed when Rome annexed the client kingdom in 25 BC, reached far south of this Celtic homeland to take in parts of Phrygia, Pisidia, and Lycaonia, including the cities of Antioch in Pisidia, Iconium, Lystra, and Derbe.",
     "sources": [
       "pleiades:619161",
       "wikidata:Q26847",
       "wikidata:Q1249412",
       "bib:zondervan-who-were-galatians",
-      "scripture:Galatians 1:2",
-      "scripture:Acts 13:14",
-      "scripture:Acts 14:6"
+      "bib:isbe-galatia"
     ]
   },
   "history": [
     {
-      "text": "The Roman province of Galatia was formed in 25 BC and administered from the provincial capital Ancyra (modern Ankara); in its larger first-century extent it also included southern regions such as Pisidia and Lycaonia, before Vespasian detached most of Pisidia in AD 74.",
+      "text": "Paul's letter to the Galatians is addressed to \"the assemblies of Galatia,\" but which congregations he meant is debated, without a clear scholarly consensus. The \"North Galatian\" view holds that he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled region; the \"South Galatian\" view holds that he wrote to the congregations he and Barnabas founded on their first missionary journey, in the province's southern cities. This record favors neither view. Acts twice describes Paul traveling through the region of Galatia and nearby Phrygia, and in 1 Corinthians he mentions a collection organized among \"the assemblies of Galatia.\"",
+      "sources": [
+        "scripture:Galatians 1:2",
+        "scripture:Acts 16:6",
+        "scripture:Acts 18:23",
+        "scripture:1 Corinthians 16:1",
+        "scripture:Acts 13:14",
+        "scripture:Acts 14:6",
+        "bib:zondervan-who-were-galatians"
+      ]
+    },
+    {
+      "text": "The Roman province of Galatia was formed in 25 BC and governed from the city of Ancyra; in its larger first-century extent it also included Pisidia and Lycaonia, until the emperor Vespasian detached most of Pisidia in AD 74. By the late first century, the letter of 1 Peter could be addressed to believers scattered across Galatia and four neighboring provinces, a sign of how far the church had spread through the region.",
       "sources": [
         "bib:zondervan-who-were-galatians",
-        "wikidata:Q1249412"
+        "wikidata:Q1249412",
+        "scripture:1 Peter 1:1"
+      ]
+    },
+    {
+      "text": "Galatia's former territory lies today within Turkey, across the high country of the Anatolian plateau.",
+      "sources": [
+        "wikidata:Q26847",
+        "bib:isbe-galatia"
       ]
     }
   ],
@@ -100,7 +118,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

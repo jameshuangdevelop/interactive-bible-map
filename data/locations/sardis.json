@@ -28,19 +28,38 @@
     }
   ],
   "summary": {
-    "text": "Sardis was the capital of the ancient Kingdom of Lydia and, per World History Encyclopedia, was known in antiquity for its wealth and culture and for its favorable position on a major trade route between the Aegean coast and the interior of Asia Minor, later becoming an important city of the Roman province of Asia. It is one of the seven churches addressed in Revelation 2-3, warned there, 'I know your works, that you have a reputation of being alive, but you are dead.'",
+    "text": "Sardis stood at the foot of Mount Tmolus, on the edge of the fertile Hermus river plain, combining a steep, naturally fortified acropolis that the Greek historian Polybius called \"the strongest place in the world\" with a much larger lower city on the plain below. It had been the capital of the ancient kingdom of Lydia, whose king Croesus became proverbial for his wealth, drawn partly from gold dust carried down from Mount Tmolus by the small Pactolus river, until the Persian conquest of 547/546 BC. By Paul's day it was a major city of the Roman province of Asia, still recovering from a catastrophic earthquake that struck twelve cities of Asia in a single night in AD 17; the Roman historian Tacitus records that Sardis suffered the worst damage of them all and received the largest relief from the emperor Tiberius, a ten-million-sesterce grant and a five-year tax remission.",
     "sources": [
       "pleiades:550867",
       "wikidata:Q232615",
       "bib:worldhistory-sardis",
-      "scripture:Revelation 3:1"
+      "bib:strabo-geography",
+      "bib:sardis-expedition-about",
+      "bib:tacitus-annals"
     ]
   },
   "history": [
     {
-      "text": "Sardis was capital of the Lydian kingdom under kings such as Croesus, famed for his wealth, until the Persian conquest of 547/546 BC; it later passed through Seleucid and Roman rule, remained an important city of Roman Asia, and by the 7th century had long been associated with Christianity as one of the seven churches of Revelation.",
+      "text": "Sardis is one of the seven churches addressed in Revelation, rebuked there for having \"a reputation of being alive,\" though \"you are dead,\" and warned, \"I will come as a thief, and you won't know what hour I will come upon you.\" Some interpreters connect this warning to local history: the city's acropolis, trusted as impregnable, had twice been captured by surprise, first by the Persian king Cyrus in the sixth century BC and later by the Greek king Antiochus III, in both cases by soldiers who climbed an unguarded, weathered section of the cliff. Despite being one of the seven churches, excavators have found no church building at Sardis from this period.",
       "sources": [
-        "bib:worldhistory-sardis"
+        "scripture:Revelation 3:1",
+        "scripture:Revelation 3:3",
+        "bib:ramsay-seven-churches",
+        "bib:sardis-expedition-about"
+      ]
+    },
+    {
+      "text": "In the centuries after Revelation was written, Sardis's Temple of Artemis, whose core had stood since the third century BC, gained a partial outer colonnade, though it was never fully finished. The city's grand Bath-Gymnasium complex, and a large synagogue later built within one of its halls, said to be the largest synagogue known from the ancient world, both date from the late second or third century AD.",
+      "sources": [
+        "bib:sardis-expedition-artemis-temple",
+        "bib:sardis-expedition-bath-gymnasium"
+      ]
+    },
+    {
+      "text": "Today Sardis is an archaeological site near the Turkish village of Sart, where excavations continue to uncover the ancient city's acropolis, the Temple of Artemis, and the Roman-era bath and gymnasium complex.",
+      "sources": [
+        "wikidata:Q232615",
+        "bib:sardis-expedition-about"
       ]
     }
   ],
@@ -56,6 +75,11 @@
       "textWEB": "“And to the angel of the assembly in Sardis write: “He who has the seven Spirits of God and the seven stars says these things: “I know your works, that you have a reputation of being alive, but you are dead."
     },
     {
+      "ref": "Revelation 3:3",
+      "book": "Revelation",
+      "textWEB": "Remember therefore how you have received and heard. Keep it and repent. If therefore you won’t watch, I will come as a thief, and you won’t know what hour I will come upon you."
+    },
+    {
       "ref": "Revelation 3:4",
       "book": "Revelation",
       "textWEB": "Nevertheless you have a few names in Sardis that didn’t defile their garments. They will walk with me in white, for they are worthy."
@@ -63,7 +87,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

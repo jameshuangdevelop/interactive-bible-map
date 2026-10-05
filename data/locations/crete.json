@@ -32,26 +32,56 @@
     }
   ],
   "summary": {
-    "text": "Crete is the large Mediterranean island south of the Aegean Sea. Acts records that Paul's ship sailed under the lee of Crete and, further on, close along its shore, on the journey to Rome; the Letter to Titus states that Paul left Titus in Crete to set in order what was lacking and appoint elders in every city.",
+    "text": "Crete is a long, mountainous island south of the Aegean Sea, about 156 miles long, with its central mountain range rising to more than 8,000 feet at Mount Ida. Excavations at Knossos and Phaistos show that Crete was a center of Mediterranean civilization in an early age, long before Rome's time; its most important cities in the Roman period were Knossos, Gortyna, and Cydonia. Crete's support for pirate raiders gave Rome a pretext for war, and the Roman general Metellus annexed the island in 67 BC, joining it with Cyrene in North Africa as a single Roman province.",
     "sources": [
       "wikidata:Q34374",
-      "scripture:Acts 27:7",
-      "scripture:Acts 27:13",
-      "scripture:Titus 1:5",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:isbe-crete"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Acts reports that Jews from Crete were among the crowd present at Pentecost in Jerusalem. On Paul's voyage to Rome, his ship sailed under the lee of Crete and anchored at Fair Havens, near the city of Lasea; when the harbor proved unsuitable for winter, the ship set out for the port of Phoenix farther west and was instead driven out to sea by a stormy wind called Euroclydon, passing the small island of Clauda. Paul's letter to Titus says that he had left Titus in Crete to \"set in order the things that were lacking and appoint elders in every city,\" and quotes a Cretan prophet's description of the islanders as \"always liars, evil beasts, and idle gluttons.\"",
+      "sources": [
+        "scripture:Acts 2:11",
+        "scripture:Acts 27:7",
+        "scripture:Acts 27:8",
+        "scripture:Acts 27:12",
+        "scripture:Acts 27:13",
+        "scripture:Acts 27:14",
+        "scripture:Acts 27:16",
+        "scripture:Titus 1:5",
+        "scripture:Titus 1:12"
+      ]
+    },
+    {
+      "text": "Crete and Cyrene remained a single Roman province until the time of the Roman emperor Constantine, who made Crete a separate province. Arab forces conquered the island in AD 823, and it was recaptured for the Byzantine Empire by the general Nicephorus Phokas in the following century. Venice then ruled Crete from the thirteenth century until the Ottoman Turks took the island after a long siege that ended in 1669.",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    },
+    {
+      "text": "Today Crete is a Greek island. Visitors can see the Minoan palace at Knossos, excavated in the early twentieth century, and the Roman-period remains at Gortyna, where church tradition holds that Titus served as the island's first bishop.",
+      "sources": [
+        "wikidata:Q34374",
+        "bib:isbe-crete"
+      ]
+    }
+  ],
   "scripture": [
+    {
+      "ref": "Acts 2:11",
+      "book": "Acts",
+      "textWEB": "Cretans and Arabians—we hear them speaking in our languages the mighty works of God!”"
+    },
     {
       "ref": "Acts 27:7",
       "book": "Acts",
       "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+    },
+    {
+      "ref": "Acts 27:8",
+      "book": "Acts",
+      "textWEB": "With difficulty sailing along it we came to a certain place called Fair Havens, near the city of Lasea."
     },
     {
       "ref": "Acts 27:12",
@@ -62,6 +92,16 @@
       "ref": "Acts 27:13",
       "book": "Acts",
       "textWEB": "When the south wind blew softly, supposing that they had obtained their purpose, they weighed anchor and sailed along Crete, close to shore."
+    },
+    {
+      "ref": "Acts 27:14",
+      "book": "Acts",
+      "textWEB": "But before long, a stormy wind beat down from shore, which is called Euroclydon."
+    },
+    {
+      "ref": "Acts 27:16",
+      "book": "Acts",
+      "textWEB": "Running under the lee of a small island called Clauda, we were able, with difficulty, to secure the boat."
     },
     {
       "ref": "Acts 27:21",
@@ -81,7 +121,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

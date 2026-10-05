@@ -24,7 +24,7 @@
       ],
       "coordinateSource": "wikidata:Q187702",
       "confidence": "medium",
-      "support": "Identified as Golgotha since the fourth century AD under Constantine; archaeological work beneath the church has found a first-century quarry with rock-cut tombs consistent with a site once outside the city wall, which is the majority scholarly view, though the precise course of the wall in Jesus' time remains debated.",
+      "support": "Identified as Golgotha since the fourth century AD under the Roman emperor Constantine; archaeological work beneath the church has found a first-century quarry with rock-cut tombs consistent with a site once outside the city wall, which is the majority scholarly view, though the precise course of the wall in Jesus' time remains debated.",
       "sources": [
         "wikidata:Q187702",
         "openbible:golgotha",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "text": "Byzantine tradition, following fourth-century construction under Constantine, identifies the site beneath the Church of the Holy Sepulchre; excavations have shown that the area was a stone quarry with rock-cut family tombs before Jerusalem's walls were later extended to enclose it, though the course of the city wall in Jesus' time is still debated. The Garden Tomb was proposed in the mid-nineteenth century, when visiting Christian scholars suggested that a nearby rocky escarpment, whose face resembles a skull, marked the place of the crucifixion. Most archaeologists date its rock-cut tomb chamber many centuries before the first century AD, a difficulty for identifying it with the Gospels' \"new\" tomb.",
+      "text": "Byzantine tradition, following fourth-century construction under the Roman emperor Constantine, identifies the site beneath the Church of the Holy Sepulchre; excavations have shown that the area was a stone quarry with rock-cut family tombs before Jerusalem's walls were later extended to enclose it, though the course of the city wall in Jesus' time is still debated. The Garden Tomb was proposed in the mid-nineteenth century, when visiting Christian scholars suggested that a nearby rocky escarpment, whose face resembles a skull, marked the place of the crucifixion. Most archaeologists date its rock-cut tomb chamber many centuries before the first century AD, a difficulty for identifying it with the Gospels' \"new\" tomb.",
       "sources": [
         "wikidata:Q187702",
         "bib:custodia-holy-sepulchre",
@@ -149,7 +149,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

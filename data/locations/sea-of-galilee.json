@@ -34,7 +34,7 @@
     }
   ],
   "summary": {
-    "text": "The Sea of Galilee is a freshwater lake in the Jordan Rift Valley, more than 200 meters below sea level, fed principally by the Jordan River, which enters from the north and exits to the south. Josephus gives its size as forty furlongs wide and one hundred forty furlongs long (roughly 7 by 26 km) and describes its water as sweet, pure and good to drink. Several towns stood on its shores in the first century, among them Capernaum on the northwest shore and Tiberias, a city that Herod Antipas built on the lake and named after the emperor Tiberius.",
+    "text": "The Sea of Galilee is a freshwater lake in the Jordan Rift Valley, more than 200 meters below sea level, fed principally by the Jordan River, which enters from the north and exits to the south. The Jewish historian Josephus gives its size as forty furlongs wide and one hundred forty furlongs long (roughly 7 by 26 km) and describes its water as sweet, pure and good to drink. Several towns stood on its shores in the first century, among them Capernaum on the northwest shore and Tiberias, a city that Herod Antipas built on the lake and named after the emperor Tiberius.",
     "sources": [
       "wikidata:Q126982",
       "bib:josephus-jewish-war",
@@ -162,7 +162,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

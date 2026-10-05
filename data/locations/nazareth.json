@@ -35,7 +35,7 @@
     }
   ],
   "summary": {
-    "text": "Nazareth was a small farming village in Lower Galilee, on the southern edge of the Galilean hills above the Jezreel Valley, in Herod Antipas's tetrarchy. About 6 km to the north stood Sepphoris, a much larger city that Antipas rebuilt early in the first century; Josephus calls it \"the security of all Galilee\" and says Antipas \"made it the metropolis of the country.\" Matthew and Luke identify Nazareth as the town where Jesus grew up, and he is called \"Jesus of Nazareth\" throughout the New Testament.",
+    "text": "Nazareth was a small farming village in Lower Galilee, on the southern edge of the Galilean hills above the Jezreel Valley, in Herod Antipas's tetrarchy. About 6 km to the north stood Sepphoris, a much larger city that Antipas rebuilt early in the first century; the Jewish historian Josephus calls it \"the security of all Galilee\" and says Antipas \"made it the metropolis of the country.\" Matthew and Luke identify Nazareth as the town where Jesus grew up, and he is called \"Jesus of Nazareth\" throughout the New Testament.",
     "sources": [
       "wikidata:Q430776",
       "dare:22899",
@@ -299,7 +299,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

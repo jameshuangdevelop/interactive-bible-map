@@ -32,7 +32,7 @@
     }
   ],
   "summary": {
-    "text": "The Mount of Olives is the ridge east of Jerusalem's Old City, separated from the city and the Temple Mount by the Kidron Valley; Josephus places it about six furlongs (just over 1 km) from the city. Its name comes from the olive trees that have grown on its slopes for thousands of years. Its eastern side descends past the villages of Bethphage and Bethany toward the Judean Desert and the Dead Sea. Its slopes had long been used for burials: after David took the city, a number of Israelites chose to be buried there.",
+    "text": "The Mount of Olives is the ridge east of Jerusalem's Old City, separated from the city and the Temple Mount by the Kidron Valley; the Jewish historian Josephus places it about six furlongs (just over 1 km) from the city. Its name comes from the olive trees that have grown on its slopes for thousands of years. Its eastern side descends past the villages of Bethphage and Bethany toward the Judean Desert and the Dead Sea. Its slopes had long been used for burials: after David took the city, a number of Israelites chose to be buried there.",
     "sources": [
       "wikidata:Q205976",
       "openbible:mount-of-olives",
@@ -166,7 +166,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

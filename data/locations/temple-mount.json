@@ -32,7 +32,7 @@
     }
   ],
   "summary": {
-    "text": "The Temple Mount is the raised platform in Jerusalem's Old City that Herod the Great enlarged to carry his rebuilt Second Temple, the center of Jewish worship in the first century AD. Herod began the work around 20-19 BC. Josephus says the priests built the temple building itself in a year and six months, and that Herod built the cloisters and outer courts in eight years; but work went on for decades, and when the temple was finally finished, in the time of the governor Albinus, more than eighteen thousand workers were left without work. The cloisters of the outer court ran about six furlongs (roughly 1.1 km), including the Antonia fortress, which stood at the northwest corner and always held a Roman garrison. In John's Gospel, Jesus' hearers say the Temple \"took forty-six years to build.\"",
+    "text": "The Temple Mount is the raised platform in Jerusalem's Old City that Herod the Great enlarged to carry his rebuilt Second Temple, the center of Jewish worship in the first century AD. Herod began the work around 20-19 BC. The Jewish historian Josephus says the priests built the temple building itself in a year and six months, and that Herod built the cloisters and outer courts in eight years; but work went on for decades, and when the temple was finally finished, in the time of the governor Albinus, more than eighteen thousand workers were left without work. The cloisters of the outer court ran about six furlongs (roughly 1.1 km), including the Antonia fortress, which stood at the northwest corner and always held a Roman garrison. In John's Gospel, Jesus' hearers say the Temple \"took forty-six years to build.\"",
     "sources": [
       "wikidata:Q193163",
       "bib:ritmeyer-temple-mount-quest",
@@ -56,7 +56,7 @@
       ]
     },
     {
-      "text": "Roman forces under Titus destroyed the Temple in AD 70. Its retaining walls, including the section known today as the Western Wall, survived as its most substantial remains.",
+      "text": "Roman forces under the general Titus destroyed the Temple in AD 70. Its retaining walls, including the section known today as the Western Wall, survived as its most substantial remains.",
       "sources": [
         "wikidata:Q193163",
         "bib:josephus-jewish-war",
@@ -146,7 +146,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }
