@@ -489,7 +489,7 @@ function WikimediaImage({
               onPhotoCreditLinkSelect();
             }}
             style={{
-              color: tokens.color.accent,
+              color: tokens.color.textSecondary,
               textDecoration: "underline",
               textUnderlineOffset: "2px"
             }}
@@ -779,6 +779,7 @@ export function PlacePanel({
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
+  const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
@@ -1722,34 +1723,47 @@ export function PlacePanel({
                     color: tokens.color.textSecondary
                   }}
                 >
-                  {photoCreditEntries.map((entry) => (
-                    <li
-                      id={entry.entryId}
-                      key={entry.imageId}
-                      data-photo-credits-entry="true"
-                      data-photo-credit-entry-index={entry.imageIndex + 1}
-                      style={{
-                        marginBottom: `${tokens.spacing.sm}px`,
-                        fontSize: `${tokens.typography.bodySize}px`,
-                        lineHeight: `${tokens.typography.bodyLineHeight}px`,
-                        borderRadius: "4px",
-                        outline:
-                          highlightedPhotoCreditId === entry.entryId
-                            ? `2px solid ${tokens.color.accent}`
-                            : "none",
-                        outlineOffset: "2px",
-                        backgroundColor:
-                          highlightedPhotoCreditId === entry.entryId
-                            ? "rgba(26,115,232,0.12)"
-                            : "transparent",
-                        transition:
-                          "background-color 180ms ease-out, outline-color 180ms ease-out"
-                      }}
-                      tabIndex={-1}
-                    >
-                      {renderCreditSegments(entry.segments)}
-                    </li>
-                  ))}
+                  {photoCreditEntries.map((entry) => {
+                    const isHighlighted = highlightedPhotoCreditId === entry.entryId;
+                    const isFocused = focusedPhotoCreditId === entry.entryId;
+                    return (
+                      <li
+                        id={entry.entryId}
+                        key={entry.imageId}
+                        data-photo-credits-entry="true"
+                        data-photo-credit-entry-index={entry.imageIndex + 1}
+                        onBlur={(event) => {
+                          const nextFocused = event.relatedTarget;
+                          if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) {
+                            return;
+                          }
+                          setFocusedPhotoCreditId((current) =>
+                            current === entry.entryId ? null : current
+                          );
+                        }}
+                        onFocus={() => {
+                          setFocusedPhotoCreditId(entry.entryId);
+                        }}
+                        style={{
+                          marginBottom: `${tokens.spacing.sm}px`,
+                          fontSize: `${tokens.typography.bodySize}px`,
+                          lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                          borderRadius: "4px",
+                          outline:
+                            isHighlighted || isFocused
+                              ? `2px solid ${tokens.color.accent}`
+                              : "none",
+                          outlineOffset: "2px",
+                          backgroundColor: isHighlighted ? "rgba(26,115,232,0.12)" : "transparent",
+                          transition:
+                            "background-color 180ms ease-out, outline-color 180ms ease-out"
+                        }}
+                        tabIndex={-1}
+                      >
+                        {renderCreditSegments(entry.segments)}
+                      </li>
+                    );
+                  })}
                 </ol>
               </section>
             ) : null}

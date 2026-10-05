@@ -1258,6 +1258,8 @@ export function MapView({
   const mainSourceLoadControllerRef = useRef(new MainSourceLoadTimeoutController());
   const mapKeyboardActiveRef = useRef(false);
   const tooltipTrackingEnabledRef = useRef(false);
+  const tooltipMouseMoveFrameRef = useRef<number | null>(null);
+  const pendingTooltipPointRef = useRef<PointLike | null>(null);
   const activateVisibleEntryRef = useRef<(entry: VisibleListEntry) => void>(() => undefined);
   const handleTooltipAtPointRef = useRef<(point: PointLike) => void>(() => undefined);
   const refreshVisibleEntryStateRef = useRef<() => void>(() => undefined);
@@ -1671,11 +1673,43 @@ export function MapView({
     };
     syncAttributionControl(map, initialMode);
 
+    const cancelScheduledTooltipUpdate = () => {
+      pendingTooltipPointRef.current = null;
+      if (tooltipMouseMoveFrameRef.current !== null) {
+        window.cancelAnimationFrame(tooltipMouseMoveFrameRef.current);
+        tooltipMouseMoveFrameRef.current = null;
+      }
+    };
+
+    const scheduleTooltipUpdate = (point: PointLike) => {
+      const pointer = asScreenPoint(point);
+      if (!pointer) {
+        return;
+      }
+
+      pendingTooltipPointRef.current = [pointer.x, pointer.y];
+      if (tooltipMouseMoveFrameRef.current !== null) {
+        return;
+      }
+
+      tooltipMouseMoveFrameRef.current = window.requestAnimationFrame(() => {
+        tooltipMouseMoveFrameRef.current = null;
+        const pendingPoint = pendingTooltipPointRef.current;
+        pendingTooltipPointRef.current = null;
+        if (!pendingPoint || gestureInProgressRef.current || !tooltipTrackingEnabledRef.current) {
+          return;
+        }
+
+        handleTooltipAtPointRef.current(pendingPoint);
+      });
+    };
+
     const markGestureStarted = () => {
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
         gestureReleaseTimeoutRef.current = null;
       }
+      cancelScheduledTooltipUpdate();
       if (tooltipTrackingEnabledRef.current) {
         map.off("mousemove", handleMouseMove);
         tooltipTrackingEnabledRef.current = false;
@@ -1865,9 +1899,10 @@ export function MapView({
       activateVisibleEntryRef.current(entry);
     };
     const handleMouseMove = (event: { point: PointLike }) => {
-      handleTooltipAtPointRef.current(event.point);
+      scheduleTooltipUpdate(event.point);
     };
     const handleMouseOut = () => {
+      cancelScheduledTooltipUpdate();
       setInteractiveCursor(false);
       hideTooltip();
     };
@@ -1910,6 +1945,7 @@ export function MapView({
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
       }
+      cancelScheduledTooltipUpdate();
 
       document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
       document.removeEventListener("keydown", handleMapKeyboardShortcuts, true);
