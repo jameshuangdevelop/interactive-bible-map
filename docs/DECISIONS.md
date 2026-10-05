@@ -257,3 +257,17 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   2. **Places in the About.** "Places in *name*" moves directly below About. In the About text, the first mention of another place on the map becomes a link: pointing at it highlights that place's pin, and selecting it opens the place.
   3. **Collapsible sections.** Each panel section below the header can collapse. Sources and Photo credits start collapsed, and "Show all *n* passages" can go back to the preview. The Fact-Checker rules first on whether credits may start collapsed (M3-19's ruling said they must not).
 - **Consequences:** The rule in item 1 goes into visual spec §8, the Research Lead's instructions and card M3-16. M3-16's second half follows it and fixes the 8 places of the first half that need it, and card M3-22 fixes the other 30 places. Card M3-20 covers item 2, and card M3-21 covers item 3 (the human: "this can be its own task").
+
+## ADR-0034 — CI reports the speed gate's Total Blocking Time; the PO enforces it from a desktop
+- **Date:** 2026-10-05 · **Status:** Accepted · **By:** the human ("ok in that case proceed with your in progress change please"), on the PO's recommendation
+- **Context:** Visual spec §11 sets two Lighthouse gates for the desktop preset with a cold cache: Largest Contentful Paint (LCP) of 2.5 s or less and Total Blocking Time (TBT) of 200 ms or less. M3-06 runs them in CI against each PR's preview.
+  - GitHub's free Linux runners have no graphics card, so the map is drawn in software on shared CPU cores.
+  - Against #39's preview, CI measured TBT of 331 ms in one run. After WebGL was moved into Chrome's GPU process, it measured a median of 584 ms over three runs.
+  - From a Windows desktop against the same preview, the median over three runs was 9 ms (0–15 ms), with LCP about 0.4 s. That desktop has no graphics card either.
+  - All the long tasks are the map's own drawing.
+  - LCP passes in CI, at about 1.2 s.
+- **Decision:**
+  1. In CI, the preview check enforces LCP, using the median of three runs, and only reports TBT, with the reason in the log (`--tbt-mode=report`). The smoke and accessibility checks stay blocking.
+  2. `scripts/verify-web-lighthouse.mjs` enforces both gates by default. Before asking the human to merge a PR that changes the app, the PO runs it against that PR's preview from a desktop and puts the numbers in the PR.
+  3. Revisit this if GitHub's free runners gain graphics cards, or if TBT in CI rises well above the levels above.
+- **Consequences:** M3-06's acceptance criterion now reads "LCP passes in CI and TBT is reported there; both gates pass from a desktop against the preview". The PO's agent file includes the desktop check.
