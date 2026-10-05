@@ -93,7 +93,7 @@ The section order follows brief §1.4. Sections without data are left out.
 
 **Coming after CP3.5:** the modern name gains its country (ADR-0028), the action bar goes, and the confidence chip moves onto the "Today" line (ADR-0030). Items 2, 3 and 5 below describe the panel until then.
 
-1. **Images** (ADR-0029, built in M3.5-06). Major places have 5–10 images and standard places 1–3, about 408 × 240 px in the panel.
+1. **Images** (ADR-0029, built in M3.5-06). Major places have 4–7 images, counting the AI reconstruction, and standard places 1–3, about 408 × 240 px in the panel.
    - With several images, there are arrows and a "1 / 7" counter, plus a row of small thumbnails under the image when there are more than 3.
    - **A label on each image for its kind:** "Today", "Excavated site", "Reconstruction", "Historical view", or **"AI-generated reconstruction"**, which is always visible.
    - **Directly under each image, always visible:** "Photo: *author* · *license* · Wikimedia Commons". The license links to its legal text, and "Wikimedia Commons" links to the file page. AI images read "AI-generated reconstruction · *tool* · *license* · Based on: research brief", where "research brief" links to the place's cited brief.
@@ -174,7 +174,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 8. Neutrality in the interface
 - **Modern names (until CP3.5; ADR-0028 adds the country after it)** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
-- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
+- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6). Introduce every person, writer or work the first time the text names them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"). Don't name databases such as Pleiades or Wikidata in the text; the Sources list names them (ADR-0033).
 
 ## 9. Attribution and credits
 - **Map:** a compact attribution control. The exact text for OpenFreeMap, OpenMapTiles and OpenStreetMap is set by the Fact-Checker in `ATTRIBUTION.md` (task M3-07).
