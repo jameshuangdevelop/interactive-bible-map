@@ -53,7 +53,8 @@
       "text": "Archaeologists Ronny Reich and Eli Shukron identified a monumental stepped pool from the Second Temple period at the base of the City of David in 2004, which they identify with the Pool of Siloam known to first-century Jerusalem.",
       "sources": [
         "bib:reich-shukron-siloam-pool",
-        "openbible:siloam"
+        "openbible:siloam",
+        "bib:bas-siloam-pool"
       ]
     }
   ],
@@ -86,5 +87,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

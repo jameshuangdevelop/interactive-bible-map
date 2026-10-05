@@ -46,7 +46,10 @@
         "bib:tacitus-histories",
         "bib:livius-pamphylia",
         "pleiades:981530",
-        "wikipedia:Lycia_et_Pamphylia"
+        "wikipedia:Lycia_et_Pamphylia",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-galba"
       ]
     }
   ],

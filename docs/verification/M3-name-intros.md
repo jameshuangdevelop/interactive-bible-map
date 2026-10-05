@@ -111,3 +111,47 @@ There is no new upstream publisher. The new entry, `livius-ptolemy-i-soter`, is 
 1. **UNESCO.** I applied your ruling to "per UNESCO" in `hierapolis` and `tyre`, since the UNESCO World Heritage Centre page is the website cited, and the pattern is the same as "per Pleiades". If you read UNESCO as an organization rather than a website, put those two words back. Sentences in which UNESCO is the subject (for example "UNESCO listed it as a World Heritage Site", in major places) are not affected.
 2. **The ISBE by name.** The text names "The International Standard Bible Encyclopedia" in 17 records. It is a work with a self-explaining title, and the text needs it where sources differ, so I kept it. If you want readers told that it dates from the early 20th century, that is a text change for another card.
 3. **Candidate `support` text.** These short notes still name datasets ("Pleiades' representative point", "Wikidata's point"). ADR-0033 covers only the About text, and in these notes the dataset is the subject of the sentence (where a coordinate comes from), so I left them.
+
+## Review follow-up
+
+The PR Reviewer (GPT-5.4) found that some role words, such as "the Roman historian Cassius Dio", were supported only by the author's own work (LacusCurtius, CCEL), which doesn't state the author's role. The PO ruled that the introductions stay and must be sourced. I listed every role introduction in the 58 non-major records (55 paragraphs). Wherever no cited source in the paragraph states the role, I cited a biography page that I opened and that states it. The rows above that relied on the author's own work for a role, or on a role the source only implied, are replaced by this section.
+
+| New entry | URL | What it states | Cited in |
+|---|---|---|---|
+| `worldhistory-cassius-dio` | https://www.worldhistory.org/Cassius_Dio/ | "a Roman politician and historian" | achaia H0, cilicia H0, crete-cyrene H0, egypt S, illyricum H0, italy S, libya S, nicopolis H1, pamphylia H0, perga H0, sicily H1 |
+| `worldhistory-strabo` | https://www.worldhistory.org/Strabo_of_Amasia/ | "the author of Geography", of "aristocratic Greek heritage" | achaia H0, crete-cyrene H0, iconium H0, media H0, sicily H1 |
+| `worldhistory-tacitus` | https://www.worldhistory.org/tacitus/ | "a Roman historian" | cappadocia H0, cilicia H0, egypt H1, illyricum H0, judea-province H1, media H0, nicopolis H1, pamphylia H0, perga H0 |
+| `worldhistory-josephus` | https://www.worldhistory.org/Flavius_Josephus/ | "a 1st-century CE Jewish historian" | bethsaida H0, illyricum H0, judea-province H0, magdala H0, syria H2 |
+| `worldhistory-suetonius` | https://www.worldhistory.org/Suetonius/ | "a Roman writer" (so the text now reads "the Roman writer Suetonius", not "historian") | italy H1, pontus H0 |
+| `worldhistory-caligula` | https://www.worldhistory.org/Caligula/ | "the third Roman emperor" | caesarea-philippi H0, cilicia H0, judea-province H2, syria H1 |
+| `worldhistory-nero` | https://www.worldhistory.org/Nero/ | "the fifth Roman emperor" | judea-province H4, parthian-empire H1 (replaces my earlier Suetonius citation there), pontus H0 |
+| `worldhistory-trajan` | https://www.worldhistory.org/trajan/ | "Roman emperor from 98 to 117 CE" | mesopotamia H1, parthian-empire H1, puteoli S |
+| `worldhistory-galba` | https://www.worldhistory.org/Galba/ | "Roman emperor from June 68 to January 69 CE" | pamphylia H0, perga H0 |
+| `worldhistory-pompey` | https://www.worldhistory.org/pompey/ | "a military leader and politician during the fall of the Roman Republic" | pontus H0, syria H0 |
+| `worldhistory-germanicus` | https://www.worldhistory.org/Germanicus/ | "a commander in the Roman Empire" | egypt H1, nicopolis H1 |
+| `worldhistory-crassus` | https://www.worldhistory.org/Marcus_Licinius_Crassus/ | one of Sulla's "most able commanders", who led the invasion of Parthia | parthian-empire H1 |
+| `bas-siloam-pool` | https://www.biblicalarchaeology.org/daily/biblical-sites-places/biblical-archaeology-sites/the-siloam-pool-where-jesus-healed-the-blind-man/ | "archaeologists Ronny Reich and Eli Shukron" | pool-of-siloam H0 |
+| `codexsinaiticus-about` | https://codexsinaiticus.org/en/codex/ | "a manuscript of the Christian Bible written in the middle of the fourth century" | emmaus H0 |
+
+Existing entries are now also cited where they state the role:
+- `livius-actium` ("Octavian could start his one-man rule, calling himself Augustus") for "(the future Augustus)" in cilicia H0 and syria H1.
+- `worldhistory-cicero` for "the Roman orator Cicero" in cilicia H0.
+
+No new source was needed where a cited source already states the role:
+- Livius for Trajan and Pompey in arabia, Vespasian, Antony, Cleopatra, Octavian, Mithradates I and Ptolemy I.
+- ISBE for Polemon, Mithridates VI ("king at Amasia"), Amyntas, Artabanus III and Perseus.
+- Dio 69 for Hadrian.
+- Tacitus for Archelaus, Quintus Veranius, Gotarzes and Vonones.
+
+**Notes:**
+- `worldhistory-josephus` and `worldhistory-strabo` use the ids the PO set, although the pages are titled "Flavius Josephus" and "Strabo of Amasia". `worldhistory-crassus` likewise uses the name in the text.
+- `bas-siloam-pool` is copied unchanged from M3-16's branch, so that branch and this one share one entry.
+- The Codex Sinaiticus Project is a new cite-only publisher. It is covered by the cite-only row in `ATTRIBUTION.md`.
+- `pool-of-siloam` is the 39th changed record and is set to `verified` (2026-10-05).
+
+**Checks after the follow-up:**
+- A script checked 93 role introductions in the 58 records against the sources confirmed above. Each one is stated by a cited source.
+- The scope script still finds only About text, added sources and `lastReviewed` changed, all in non-major records.
+- `validate:data`: 0 errors and the same 107 warnings.
+- All 673 `bib:` references resolve, with no duplicate ids.
+- `npm test`: 137/137. `npm run test:app`: 93/93.

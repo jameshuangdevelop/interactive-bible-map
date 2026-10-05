@@ -46,7 +46,10 @@
         "bib:isbe-dalmatia",
         "bib:tacitus-annals",
         "bib:josephus-jewish-war",
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-josephus"
       ]
     },
     {

@@ -35,7 +35,8 @@
       "scripture:Matthew 2:13",
       "scripture:Acts 2:9",
       "scripture:Acts 2:10",
-      "bib:strabo-geography"
+      "bib:strabo-geography",
+      "bib:worldhistory-cassius-dio"
     ]
   },
   "history": [
@@ -50,7 +51,9 @@
       "text": "The Roman historian Tacitus records that when the Roman general Germanicus visited Egypt in AD 19, Tiberius rebuked him sharply for entering Alexandria without imperial consent. Augustus had made it a rule of his power that no senator or leading knight could enter the country without permission, so that no one who seized the province and its approaches by land and sea could starve Italy. Writing of AD 69, Tacitus adds that Roman knights had governed Egypt in place of its former kings ever since Augustus, so the arrangement still held at this project's about AD 50 date.",
       "sources": [
         "bib:tacitus-annals",
-        "bib:tacitus-histories"
+        "bib:tacitus-histories",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-germanicus"
       ]
     }
   ],

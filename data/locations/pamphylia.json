@@ -42,7 +42,10 @@
         "bib:cassius-dio-roman-history",
         "bib:tacitus-histories",
         "bib:livius-pamphylia",
-        "pleiades:981530"
+        "pleiades:981530",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-galba"
       ]
     },
     {

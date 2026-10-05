@@ -50,7 +50,10 @@
       "sources": [
         "bib:cassius-dio-roman-history",
         "bib:tacitus-annals",
-        "pleiades:531013"
+        "pleiades:531013",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-germanicus"
       ]
     }
   ],

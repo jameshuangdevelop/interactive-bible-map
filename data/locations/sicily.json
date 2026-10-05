@@ -53,7 +53,9 @@
       "text": "The Roman historian Cassius Dio's list of the provinces assigned to the Senate in Augustus's settlement of 27 BC includes Sicily, and the Greek geographer Strabo's Geography also lists it among the provinces of the Roman people.",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:strabo-geography"
+        "bib:strabo-geography",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-strabo"
       ]
     }
   ],

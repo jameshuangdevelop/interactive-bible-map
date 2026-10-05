@@ -48,7 +48,9 @@
         "bib:isbe-crete",
         "bib:cassius-dio-roman-history",
         "bib:strabo-geography",
-        "wikipedia:Creta_et_Cyrenaica"
+        "wikipedia:Creta_et_Cyrenaica",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-strabo"
       ]
     }
   ],

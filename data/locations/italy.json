@@ -39,7 +39,8 @@
       "scripture:Acts 27:1",
       "scripture:Acts 28:13",
       "scripture:Acts 28:16",
-      "scripture:Hebrews 13:24"
+      "scripture:Hebrews 13:24",
+      "bib:worldhistory-cassius-dio"
     ]
   },
   "history": [
@@ -51,10 +52,11 @@
       ]
     },
     {
-      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; the Roman historian Suetonius likewise reports that Claudius expelled the Jews from Rome because they 'constantly made disturbances at the instigation of Chrestus.'",
+      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; the Roman writer Suetonius likewise reports that Claudius expelled the Jews from Rome because they 'constantly made disturbances at the instigation of Chrestus.'",
       "sources": [
         "scripture:Acts 18:2",
-        "bib:suetonius-twelve-caesars"
+        "bib:suetonius-twelve-caesars",
+        "bib:worldhistory-suetonius"
       ]
     }
   ],

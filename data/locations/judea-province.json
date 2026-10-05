@@ -55,7 +55,8 @@
         "bib:livius-judaea",
         "bib:josephus-jewish-war",
         "bib:josephus-antiquities",
-        "wikidata:Q1003997"
+        "wikidata:Q1003997",
+        "bib:worldhistory-josephus"
       ]
     },
     {
@@ -65,14 +66,16 @@
         "bib:tacitus-annals",
         "bib:livius-judaea",
         "pleiades:981527",
-        "wikidata:Q1003997"
+        "wikidata:Q1003997",
+        "bib:worldhistory-tacitus"
       ]
     },
     {
       "text": "The Roman emperor Caligula made Herod Agrippa I king of the former tetrarchy of Philip, and in AD 41 Claudius confirmed his kingdom and added Judea and Samaria to it. Agrippa I ruled until his death in AD 44.",
       "sources": [
         "bib:josephus-antiquities",
-        "bib:livius-judaea"
+        "bib:livius-judaea",
+        "bib:worldhistory-caligula"
       ]
     },
     {
@@ -85,7 +88,8 @@
     {
       "text": "Claudius first gave Agrippa II the small kingdom of Chalcis, after the death of its king Herod, Agrippa I's brother. Only when Claudius had completed the twelfth year of his reign, in AD 53, did he give Agrippa II 'the tetrarchy of Philip and Batanea,' with Trachonitis and Abila, and in the first year of his reign (AD 54/55) the Roman emperor Nero added Tiberias and Tarichaea in Galilee and Julias in Perea.",
       "sources": [
-        "bib:josephus-antiquities"
+        "bib:josephus-antiquities",
+        "bib:worldhistory-nero"
       ]
     }
   ],

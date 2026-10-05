@@ -1438,6 +1438,174 @@
       "publisher": "Livius.org",
       "url": "https://www.livius.org/articles/person/ptolemy-i-soter/",
       "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-josephus",
+      "type": "web",
+      "title": "Flavius Josephus",
+      "authors": [
+        "Rebecca Denova"
+      ],
+      "year": 2021,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Flavius_Josephus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-cassius-dio",
+      "type": "web",
+      "title": "Cassius Dio",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Cassius_Dio/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-strabo",
+      "type": "web",
+      "title": "Strabo of Amasia",
+      "authors": [
+        "Rosie Sykes"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Strabo_of_Amasia/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-tacitus",
+      "type": "web",
+      "title": "Tacitus",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/tacitus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-suetonius",
+      "type": "web",
+      "title": "Suetonius",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2016,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Suetonius/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-caligula",
+      "type": "web",
+      "title": "Caligula",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Caligula/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-nero",
+      "type": "web",
+      "title": "Nero",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Nero/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-trajan",
+      "type": "web",
+      "title": "Trajan",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/trajan/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-galba",
+      "type": "web",
+      "title": "Galba",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2012,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Galba/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-pompey",
+      "type": "web",
+      "title": "Pompey",
+      "authors": [
+        "James Lloyd"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pompey/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-germanicus",
+      "type": "web",
+      "title": "Germanicus",
+      "authors": [
+        "Marianne R. H. Fisher"
+      ],
+      "year": 2016,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Germanicus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-crassus",
+      "type": "web",
+      "title": "Marcus Licinius Crassus",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Marcus_Licinius_Crassus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "bas-siloam-pool",
+      "type": "web",
+      "title": "The Siloam Pool: Where Jesus Healed the Blind Man",
+      "authors": [
+        "Biblical Archaeology Society Staff"
+      ],
+      "year": 2009,
+      "publisher": "Biblical Archaeology Society (Bible History Daily)",
+      "url": "https://www.biblicalarchaeology.org/daily/biblical-sites-places/biblical-archaeology-sites/the-siloam-pool-where-jesus-healed-the-blind-man/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "codexsinaiticus-about",
+      "type": "web",
+      "title": "About Codex Sinaiticus",
+      "authors": [
+        "Codex Sinaiticus Project"
+      ],
+      "year": 2026,
+      "publisher": "Codex Sinaiticus Project",
+      "url": "https://codexsinaiticus.org/en/codex/",
+      "accessed": "2026-10-05"
     }
   ]
 }

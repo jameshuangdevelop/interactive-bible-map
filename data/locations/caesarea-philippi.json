@@ -53,7 +53,8 @@
       "sources": [
         "bib:josephus-antiquities",
         "bib:livius-judaea",
-        "wikipedia:Judaea_(Roman_province)"
+        "wikipedia:Judaea_(Roman_province)",
+        "bib:worldhistory-caligula"
       ]
     }
   ],

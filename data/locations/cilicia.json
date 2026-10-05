@@ -45,7 +45,12 @@
         "bib:isbe-cilicia",
         "bib:livius-cilicia",
         "bib:cassius-dio-roman-history",
-        "bib:tacitus-annals"
+        "bib:tacitus-annals",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-caligula",
+        "bib:livius-actium",
+        "bib:worldhistory-cicero"
       ]
     }
   ],

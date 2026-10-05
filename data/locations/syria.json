@@ -50,7 +50,8 @@
         "bib:livius-damascus",
         "wikidata:Q207118",
         "wikipedia:Syria_(Roman_province)",
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:worldhistory-pompey"
       ]
     },
     {
@@ -58,14 +59,17 @@
       "sources": [
         "bib:livius-cilicia",
         "bib:cassius-dio-roman-history",
-        "wikipedia:Cilicia"
+        "wikipedia:Cilicia",
+        "bib:worldhistory-caligula",
+        "bib:livius-actium"
       ]
     },
     {
       "text": "The governors of Syria also acted in Judea: the first-century Jewish historian Josephus records that Quirinius, sent by Augustus to Syria, came into Judea to take an account of property after Archelaus was deposed, and that Vitellius, then governing Syria, went up to Jerusalem while marching against the Nabataean king Aretas.",
       "sources": [
         "bib:josephus-antiquities",
-        "bib:isbe-aretas"
+        "bib:isbe-aretas",
+        "bib:worldhistory-josephus"
       ]
     }
   ],

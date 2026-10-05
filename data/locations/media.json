@@ -44,7 +44,9 @@
       "sources": [
         "bib:livius-parthia",
         "bib:strabo-geography",
-        "bib:tacitus-annals"
+        "bib:tacitus-annals",
+        "bib:worldhistory-strabo",
+        "bib:worldhistory-tacitus"
       ]
     }
   ],
