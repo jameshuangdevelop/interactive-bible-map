@@ -4,6 +4,10 @@
     "ancient": [
       "Cappadocia"
     ],
+    "modern": "Central Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -34,7 +38,8 @@
       "bib:isbe-cappadocia",
       "bib:tacitus-annals",
       "scripture:Acts 2:9",
-      "scripture:1 Peter 1:1"
+      "scripture:1 Peter 1:1",
+      "wikidata:Q43"
     ]
   },
   "history": [
@@ -60,7 +65,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "status": "draft"
 }

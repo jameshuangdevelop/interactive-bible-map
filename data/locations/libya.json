@@ -4,6 +4,10 @@
     "ancient": [
       "Libya"
     ],
+    "modern": "Eastern Libya",
+    "modernCountries": [
+      "Libya"
+    ],
     "alternate": []
   },
   "type": "region",
@@ -62,7 +66,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "status": "draft"
 }

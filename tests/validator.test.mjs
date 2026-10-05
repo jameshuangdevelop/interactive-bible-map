@@ -71,6 +71,11 @@ async function runCase(caseName, options = {}) {
     // now defaulting to true. Tests that exercise the empire-root rule pass
     // requireEmpireRoot explicitly (see runWithTemporaryHierarchyCase below).
     requireEmpireRoot: false,
+    // Same reasoning as requireEmpireRoot above: these fixtures predate
+    // names.modernCountries, so default it off here and let the tests that
+    // exercise the modern-countries rule pass requireModernCountries
+    // explicitly (see runWithTemporaryHierarchyCase below).
+    requireModernCountries: false,
     ...validationOptions
   });
 }
@@ -121,6 +126,9 @@ async function runWithTemporaryCase(mutateLocations, options = {}) {
       // See the comment in runCase above: this fixture pair predates the
       // empire/province hierarchy and has no empire-rooted parentId chain.
       requireEmpireRoot: false,
+      // See the comment in runCase above: this fixture pair predates
+      // names.modernCountries.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
@@ -203,6 +211,10 @@ async function runWithTemporaryHierarchyCase(mutateLocations, options = {}) {
       webVplPath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This helper's cityData/provinceData/empireData literals above don't
+      // set names.modernCountries; default it off here and let the tests
+      // that exercise the modern-countries rule pass it explicitly.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
@@ -1183,8 +1195,10 @@ test("names.modern word check respects word boundaries", async () => {
       webVplPath: webFixturePath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This ad hoc fixture predates the empire/province hierarchy (M3-11).
-      requireEmpireRoot: false
+      // This ad hoc fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
+      requireEmpireRoot: false,
+      requireModernCountries: false
     });
 
     assert.equal(result.errors.length, 0);
@@ -1226,9 +1240,34 @@ test("multi-candidate non-disputed record may keep names.modern", async () => {
   assert.equal(result.errors.length, 0);
 });
 
-test("modern-countries requirement is warning-only by default", async () => {
-  assert.equal(REQUIRE_MODERN_COUNTRIES, false);
+test("modern-countries requirement is an error by default", async () => {
+  assert.equal(REQUIRE_MODERN_COUNTRIES, true);
 
+  // Bypass runWithTemporaryHierarchyCase's fixture-compatibility default
+  // (which pins requireModernCountries to false for its inline fixtures,
+  // which predate this field) so this test exercises the real module
+  // default with no requireModernCountries option supplied at all, the same
+  // way npm run validate:data calls validateData in production.
+  const result = await validateData({
+    locationsDirectory: path.join(validCaseDirectory, "locations"),
+    mediaDirectory: path.join(validCaseDirectory, "media"),
+    webVplPath: webFixturePath,
+    bibliographyPath: bibliographyFixturePath,
+    skipSnapshotChecksumCheck: true,
+    requireEmpireRoot: false
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    )
+  );
+});
+
+test("modern-countries requirement can be explicitly disabled to a warning", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {
       cityData.names = {

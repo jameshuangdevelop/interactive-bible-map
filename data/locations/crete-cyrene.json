@@ -4,6 +4,11 @@
     "ancient": [
       "Crete and Cyrene"
     ],
+    "modern": "Crete and eastern Libya",
+    "modernCountries": [
+      "Greece",
+      "Libya"
+    ],
     "alternate": [
       "Crete and Cyrenaica"
     ]
@@ -38,7 +43,9 @@
       "bib:cassius-dio-roman-history",
       "scripture:Acts 27:7",
       "scripture:Matthew 27:32",
-      "scripture:Acts 2:10"
+      "scripture:Acts 2:10",
+      "wikidata:Q41",
+      "wikidata:Q1016"
     ]
   },
   "history": [
@@ -71,7 +78,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

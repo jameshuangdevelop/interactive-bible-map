@@ -4,6 +4,13 @@
     "ancient": [
       "Province of Judea"
     ],
+    "modern": "Israel, the West Bank, Jordan and the Golan Heights",
+    "modernCountries": [
+      "Israel",
+      "West Bank",
+      "Jordan",
+      "Golan Heights"
+    ],
     "alternate": [
       "Judea",
       "Judaea"
@@ -45,7 +52,11 @@
       "bib:nlt-2015-biblegateway",
       "bib:kjv-1987-biblegateway",
       "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:csb-2017-biblegateway",
+      "wikidata:Q801",
+      "wikidata:Q36678",
+      "wikidata:Q810",
+      "wikidata:Q83210"
     ]
   },
   "history": [
@@ -118,7 +129,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

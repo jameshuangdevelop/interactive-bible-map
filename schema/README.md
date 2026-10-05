@@ -89,7 +89,7 @@ If any candidate has confidence `disputed`, the record must include at least **t
 - A disputed place is a record with at least one candidate whose confidence is `disputed`. Disputed places omit `names.modern` (candidate labels already carry the modern site names), and this takes precedence over the area rule above.
 - For other places with several candidates, give `names.modern` only when one neutral name covers every candidate; otherwise leave it out.
 - Candidate `label` fields stay the modern site name only, with no country, state or political descriptor.
-- The validator checks the machine-checkable parts: `names.modern` never contains the word `disputed`; disputed places omit `names.modern`; non-exempt records have `names.modernCountries` and exempt records don't; area records have `names.modern`. While the data is being filled, the last three are warnings; `REQUIRE_MODERN_COUNTRIES` in `scripts/lib/validator.mjs` (or `validateData({ requireModernCountries: true })`) makes them errors.
+- The validator checks the machine-checkable parts: `names.modern` never contains the word `disputed`; disputed places omit `names.modern`; non-exempt records have `names.modernCountries` and exempt records don't; area records have `names.modern`. Now that all 89 records carry these fields, the last three are errors by default (`REQUIRE_MODERN_COUNTRIES` in `scripts/lib/validator.mjs`); pass `validateData({ requireModernCountries: false })` to relax them back to warnings.
 - The Research Lead and Fact-Checker review what the validator can't, such as a country inside an ordinary place's `names.modern`.
 
 ### Status workflow

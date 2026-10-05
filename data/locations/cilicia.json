@@ -4,6 +4,10 @@
     "ancient": [
       "Cilicia"
     ],
+    "modern": "Southeastern Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "region",
@@ -35,7 +39,8 @@
       "bib:tacitus-annals",
       "scripture:Acts 21:39",
       "scripture:Galatians 1:21",
-      "scripture:Acts 15:41"
+      "scripture:Acts 15:41",
+      "wikidata:Q43"
     ]
   },
   "history": [
@@ -63,7 +68,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "status": "draft"
 }

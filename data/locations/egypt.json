@@ -4,6 +4,10 @@
     "ancient": [
       "Egypt"
     ],
+    "modern": "Egypt",
+    "modernCountries": [
+      "Egypt"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -34,7 +38,8 @@
       "bib:cassius-dio-roman-history",
       "scripture:Matthew 2:13",
       "scripture:Acts 2:9",
-      "scripture:Acts 2:10"
+      "scripture:Acts 2:10",
+      "wikidata:Q79"
     ]
   },
   "history": [
@@ -75,7 +80,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "status": "draft"
 }

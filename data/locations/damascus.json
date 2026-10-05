@@ -5,6 +5,9 @@
       "Damascus"
     ],
     "modern": "Damascus",
+    "modernCountries": [
+      "Syria"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Darmeseq"
@@ -176,7 +179,5 @@
     }
   ],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

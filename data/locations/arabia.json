@@ -4,6 +4,10 @@
     "ancient": [
       "Arabia"
     ],
+    "modern": "Southern Jordan",
+    "modernCountries": [
+      "Jordan"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -34,7 +38,8 @@
       "bib:livius-nabataeans",
       "bib:isbe-arabia",
       "scripture:Galatians 1:17",
-      "scripture:2 Corinthians 11:32"
+      "scripture:2 Corinthians 11:32",
+      "wikidata:Q810"
     ]
   },
   "history": [
@@ -71,7 +76,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "status": "draft"
 }

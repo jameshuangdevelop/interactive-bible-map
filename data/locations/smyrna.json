@@ -5,6 +5,9 @@
       "Smyrna"
     ],
     "modern": "İzmir",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "city",
@@ -50,7 +53,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

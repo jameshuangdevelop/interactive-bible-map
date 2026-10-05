@@ -4,6 +4,10 @@
     "ancient": [
       "Phrygia"
     ],
+    "modern": "West-central Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "region",
@@ -33,7 +37,8 @@
       "bib:isbe-phrygia",
       "scripture:Acts 2:10",
       "scripture:Acts 16:6",
-      "scripture:Acts 18:23"
+      "scripture:Acts 18:23",
+      "wikidata:Q43"
     ]
   },
   "history": [
@@ -64,7 +69,5 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "status": "draft"
 }

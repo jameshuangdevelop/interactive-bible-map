@@ -7,6 +7,9 @@
       "Dalmanutha"
     ],
     "modern": "Migdal",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Taricheae"
@@ -106,7 +109,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

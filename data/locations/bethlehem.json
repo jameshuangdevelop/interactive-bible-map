@@ -6,6 +6,9 @@
       "Bethlehem Ephrathah"
     ],
     "modern": "Bethlehem",
+    "modernCountries": [
+      "West Bank"
+    ],
     "alternate": [
       "Bethlehem Ephratah"
     ],
@@ -170,7 +173,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

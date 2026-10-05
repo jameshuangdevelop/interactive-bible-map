@@ -4,6 +4,9 @@
     "ancient": [
       "Bethsaida"
     ],
+    "modernCountries": [
+      "Golan Heights"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Julias"
@@ -177,7 +180,5 @@
       ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "status": "draft"
 }

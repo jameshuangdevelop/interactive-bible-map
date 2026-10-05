@@ -1608,7 +1608,8 @@ test("publishAiCandidate writes valid WebP under 400 KB and validateData accepts
       webVplPath: webFixturePath,
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
-      requireEmpireRoot: false
+      requireEmpireRoot: false,
+      requireModernCountries: false
     });
 
     assert.equal(
