@@ -35,6 +35,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | In progress |
 | [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | In progress |
 | [M3-18](M3-18-gallery-size.md) | Galleries of 4 to 7 images for major places | media-curator → gis-engineer | `data/m3-gallery-size` | In progress |
+| [M3-19](M3-19-credits-and-pointer.md) | Photo credits at the end of the panel, and a pointer over pins | fact-checker → frontend-engineer | `feat/m3-credits-and-pointer` | In progress (Fact-Checker) |
 
 ## Template
 ```markdown
