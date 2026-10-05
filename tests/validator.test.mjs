@@ -123,6 +123,9 @@ async function runWithTemporaryMajorImageCountCase(imageCount, options = {}) {
       bibliographyPath: bibliographyFixturePath,
       skipSnapshotChecksumCheck: true,
       requireEmpireRoot: false,
+      // This fixture predates names.modernCountries; keep this helper focused
+      // on image-count behavior unless a caller explicitly overrides it.
+      requireModernCountries: false,
       ...validationOptions
     });
   } finally {
