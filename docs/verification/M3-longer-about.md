@@ -7,7 +7,7 @@ All 31 major places pass and are `verified` (`verifiedBy: "fact-checker"`, `last
 - **Half 1** (13 places, below): every place needed fixes. 14 bibliography entries were added.
 - **Half 2** (18 places, at the end): every place needed fixes. 2 bibliography entries were added. The same section covers the human's new rule on introducing names (ADR-0033). That rule touched 9 half-1 places plus 2 more fixes found by the scan (Mount of Olives and Jericho).
 - **Name-introduction sources** (second half-2 commit, PO ruling of 2026-10-05): every introduced person whose role no other cited source states now cites a biography page. That is 19 World History Encyclopedia pages and 1 Britannica page, cited in 27 places. One name with no such page (Metellus, at Crete) was trimmed.
-- **Checks on the final data:** all 520 `scripture[]` entries in the 31 places match the WEB, and all 263 `scripture:` citations exist. Every quoted phrase matches the WEB or its cited source. All 638 `bib:` citations in the location data resolve. `npm run validate:data` reports 0 errors and 186 warnings, `npm test` passes 137/137 and `npm run test:app` passes 93/93.
+- **Checks on the final data** (after all four half-2 commits): all 536 `scripture[]` entries in the 31 places match the WEB, and all 263 `scripture:` citations exist. Every New Testament citation is now also in its place's `scripture[]`. Every quoted phrase matches the WEB or its cited source. All 689 `bib:` citations in the location data resolve. `npm run validate:data` reports 0 errors and 202 warnings: 201 are the "WEB verse text contains none of this location's configured names" pattern on supporting verses, and 1 is an existing image-width note. `npm test` passes 137/137 and `npm run test:app` passes 93/93.
 
 ## Half 1 — Jerusalem and the Gospels
 
@@ -317,11 +317,6 @@ The PO ruled on the "For the PO" items above on 2026-10-05. This commit ("data(l
 - `phrygia` P2: "… under their province rather than under this record."
 - `mesopotamia` `candidates[0].support`: "… parts of Syria and Turkey" (this also names Pleiades).
 
-**Half-1 citations outside `scripture[]`, for information:**
-
-- 13 New Testament context verses: Bethany beyond the Jordan (Matthew 3:4, 3:5, 3:6, 3:13), Bethany (John 11:7), Bethlehem (Luke 2:5), Cana (Luke 3:1, John 4:47), Capernaum (Luke 3:1), Jericho (Matthew 20:30) and Nazareth (Luke 3:1, Mark 6:3, Matthew 13:55).
-- 2 Old Testament verses in the Mount of Olives' text (2 Samuel 15:30, Zechariah 14:4), which are listed in its `otConnections`.
-
-They follow half 1's practice and are outside ruling (7).
+**Half-1 context verses** (fourth commit, "data(locations): list the cited context verses"): to match ruling (7), the 13 New Testament context verses that the half-1 text cited are now in their places' `scripture[]` lists, with WEB text. They are Bethany beyond the Jordan (Matthew 3:4, 3:5, 3:6, 3:13), Bethany (John 11:7), Bethlehem (Luke 2:5), Cana (Luke 3:1, John 4:47), Capernaum (Luke 3:1), Jericho (Matthew 20:30) and Nazareth (Luke 3:1, Mark 6:3, Matthew 13:55). The Mount of Olives' two Old Testament verses (2 Samuel 15:30, Zechariah 14:4) stay in its `otConnections`. Each of the 13 adds one "no configured names" warning (189 to 202). All 536 `scripture[]` entries match the WEB, and no text or other field changed.
 
 After this commit, `npm run validate:data` reports 0 errors and 189 warnings, `npm test` passes 137/137 and `npm run test:app` passes 93/93. All 523 `scripture[]` entries in the 31 places match the WEB, and all 31 places are still 261–407 words.
