@@ -53,7 +53,7 @@ New features, custom domains, and analytics.
 - [ ] Before the push: the smoke, accessibility and Lighthouse scripts pass against a local server of the export. After the push (PO): this PR's own preview deploys, and the URL is posted on the PR.
 - [ ] The smoke test passes against that preview.
 - [ ] Automated accessibility checks report no serious or critical issues.
-- [ ] The Lighthouse desktop gates from spec §11 pass in CI, and the numbers are in the PR.
+- [ ] LCP passes in CI and TBT is reported there; both spec §11 gates pass from a desktop against the preview (ADR-0034), and the numbers are in the PR.
 - [ ] No secret values appear in logs, code or docs.
 - [ ] Committed as `feat(deploy): add Cloudflare Pages preview and production deploys`.
 
