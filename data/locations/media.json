@@ -4,6 +4,10 @@
     "ancient": [
       "Media"
     ],
+    "modern": "Northwestern Iran",
+    "modernCountries": [
+      "Iran"
+    ],
     "alternate": [
       "Medes"
     ]
@@ -35,7 +39,8 @@
       "bib:isbe-media",
       "bib:livius-parthia",
       "bib:tacitus-annals",
-      "scripture:Acts 2:9"
+      "scripture:Acts 2:9",
+      "wikidata:Q3853673"
     ]
   },
   "history": [
@@ -59,5 +64,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

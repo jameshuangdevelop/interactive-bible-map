@@ -5,6 +5,9 @@
       "Thessalonica"
     ],
     "modern": "Thessaloniki",
+    "modernCountries": [
+      "Greece"
+    ],
     "alternate": []
   },
   "type": "city",
@@ -28,22 +31,63 @@
     }
   ],
   "summary": {
-    "text": "Thessalonica was the capital of the Roman province of Macedonia (per Wikidata) and, per Pleiades, 'an important center of the Roman and Late Antique worlds.' Paul founded a church there on his second missionary journey, later writing 1 and 2 Thessalonians to its believers.",
+    "text": "Thessalonica stood at the northern end of the Thermaic Gulf, a short distance from the mouth of the Vardar river. The Macedonian king Cassander enlarged and fortified the town around 315 BC, gathering in people from several smaller towns nearby and renaming it. By Paul's day it was the capital of the Roman province of Macedonia and, according to the Greek geographer Strabo, its most populous town; because it had backed the winning side in the last civil war of the Roman Republic, Rome gave it the privileged status of a \"free city,\" with its own Greek-style magistrates called politarchs rather than Roman officials. It also stood on the Via Egnatia, the great road from the Adriatic to the Hellespont, as that road's principal station.",
     "sources": [
       "pleiades:491741",
       "wikidata:Q17151",
-      "openbible:thessalonica",
-      "scripture:Acts 17:1",
-      "scripture:1 Thessalonians 1:1",
-      "scripture:2 Thessalonians 1:1"
+      "bib:isbe-thessalonica",
+      "bib:worldhistory-strabo"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Acts reports that Paul reasoned in the city's synagogue over three Sabbaths, explaining that the Christ had to suffer and rise from the dead, and that some Jews, \"a great multitude\" of devout Greeks, and \"not a few of the chief women\" believed. Paul later recalled working \"night and day\" so as not to burden the new believers. An inscription from one of the city's gates names six politarchs, including a Sosipater, a Gaius, and a Secundus, names also borne by three of Paul's Macedonian converts. Paul wrote both 1 Thessalonians and 2 Thessalonians to the church he founded in the city.",
+      "sources": [
+        "scripture:Acts 17:1",
+        "scripture:Acts 17:2",
+        "scripture:Acts 17:3",
+        "scripture:Acts 17:4",
+        "scripture:1 Thessalonians 2:9",
+        "scripture:Acts 20:4",
+        "scripture:1 Thessalonians 1:1",
+        "scripture:2 Thessalonians 1:1",
+        "bib:isbe-thessalonica"
+      ]
+    },
+    {
+      "text": "The forum at the heart of Roman Thessalonica, whose remains stand today, was not built until the end of the second century AD, replacing an earlier forum from the early imperial period that Paul's contemporaries would have known.",
+      "sources": [
+        "bib:odysseus-thessaloniki-forum"
+      ]
+    },
+    {
+      "text": "Thessalonica survives today as the modern Greek city of Thessaloniki, built on the same site. Visitors can see the remains of the later Roman forum, with its colonnaded stoas and underground vaulted galleries.",
+      "sources": [
+        "wikidata:Q17151",
+        "bib:odysseus-thessaloniki-forum"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 17:1",
       "book": "Acts",
       "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+    },
+    {
+      "ref": "Acts 17:2",
+      "book": "Acts",
+      "textWEB": "Paul, as was his custom, went in to them; and for three Sabbath days reasoned with them from the Scriptures,"
+    },
+    {
+      "ref": "Acts 17:3",
+      "book": "Acts",
+      "textWEB": "explaining and demonstrating that the Christ had to suffer and rise again from the dead, and saying, “This Jesus, whom I proclaim to you, is the Christ.”"
+    },
+    {
+      "ref": "Acts 17:4",
+      "book": "Acts",
+      "textWEB": "Some of them were persuaded and joined Paul and Silas: of the devout Greeks a great multitude, and not a few of the chief women."
     },
     {
       "ref": "Acts 17:11",
@@ -76,6 +120,11 @@
       "textWEB": "Paul, Silvanus, and Timothy, to the assembly of the Thessalonians in God the Father and the Lord Jesus Christ: Grace to you and peace from God our Father and the Lord Jesus Christ."
     },
     {
+      "ref": "1 Thessalonians 2:9",
+      "book": "1 Thessalonians",
+      "textWEB": "For you remember, brothers, our labor and travail; for working night and day, that we might not burden any of you, we preached to you the Good News of God."
+    },
+    {
       "ref": "2 Thessalonians 1:1",
       "book": "2 Thessalonians",
       "textWEB": "Paul, Silvanus, and Timothy, to the assembly of the Thessalonians in God our Father and the Lord Jesus Christ:"
@@ -90,5 +139,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

@@ -64,9 +64,10 @@ export const PROJECT_BOUNDS = Object.freeze({
   maxLat: 50
 });
 export const REQUIRE_EMPIRE_ROOT = true;
-export const REQUIRE_MODERN_COUNTRIES = false;
+export const REQUIRE_MODERN_COUNTRIES = true;
 export const REQUIRE_MAJOR_IMAGES = true;
-export const MAJOR_PLACE_MIN_IMAGE_COUNT = 5;
+export const MAJOR_PLACE_MIN_IMAGE_COUNT = 4;
+export const MAJOR_PLACE_MAX_IMAGE_COUNT = 7;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
 export const MAX_AI_IMAGE_WIDTH_PX = 1600;
 export const MAX_AI_IMAGE_BYTES = 400 * 1024;
@@ -1857,6 +1858,15 @@ export async function validateData(options = {}) {
           mediaRecord.relativePath,
           "$.images",
           `Standard places must have at most ${STANDARD_PLACE_MAX_IMAGE_COUNT} images`
+        );
+      }
+
+      if (prominence === "major" && data.images.length > MAJOR_PLACE_MAX_IMAGE_COUNT) {
+        recordError(
+          errors,
+          mediaRecord.relativePath,
+          "$.images",
+          `Major places must have at most ${MAJOR_PLACE_MAX_IMAGE_COUNT} images`
         );
       }
 

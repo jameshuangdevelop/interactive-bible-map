@@ -5,6 +5,9 @@
       "Italy"
     ],
     "modern": "Italy",
+    "modernCountries": [
+      "Italy"
+    ],
     "alternate": []
   },
   "type": "province",
@@ -39,7 +42,8 @@
       "scripture:Acts 27:1",
       "scripture:Acts 28:13",
       "scripture:Acts 28:16",
-      "scripture:Hebrews 13:24"
+      "scripture:Hebrews 13:24",
+      "wikidata:Q38"
     ]
   },
   "history": [
@@ -79,5 +83,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

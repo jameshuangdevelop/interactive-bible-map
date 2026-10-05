@@ -106,7 +106,7 @@
     },
     "prominence": {
       "type": "string",
-      "description": "Image-coverage priority from ADR-0029: major places get 5-10 images, standard places get 1-3.",
+      "description": "Image-coverage priority from ADR-0029 (updated 2026-10-05): major places get 4-7 images (counting the AI reconstruction), standard places get 1-3.",
       "enum": [
         "major",
         "standard"
@@ -456,7 +456,10 @@
         "North Macedonia",
         "Libya",
         "West Bank",
-        "Golan Heights"
+        "Golan Heights",
+        "Croatia",
+        "Saudi Arabia",
+        "Bosnia and Herzegovina"
       ]
     },
     "yearNoZero": {
