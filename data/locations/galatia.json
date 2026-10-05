@@ -39,7 +39,7 @@
   },
   "history": [
     {
-      "text": "Paul's letter to the Galatians is addressed to \"the assemblies of Galatia,\" but which congregations he meant has long been debated. The \"North Galatian\" view holds that he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled region; the \"South Galatian\" view holds that he wrote to the congregations in the province's southern cities, which he reached on his first missionary journey. This record favors neither view. Acts twice describes Paul traveling through the region of Galatia and nearby Phrygia, and in 1 Corinthians he mentions a collection organized among \"the assemblies of Galatia.\"",
+      "text": "Paul's letter to the Galatians is addressed to \"the assemblies of Galatia,\" but which congregations he meant has long been debated. The \"North Galatian\" view holds that he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled region; the \"South Galatian\" view holds that he wrote to the congregations in the province's southern cities, which he reached on his first missionary journey. This map favors neither view. Acts twice describes Paul traveling through the region of Galatia and nearby Phrygia, and in 1 Corinthians he mentions a collection organized among \"the assemblies of Galatia.\"",
       "sources": [
         "scripture:Galatians 1:2",
         "scripture:Acts 16:6",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "text": "Galatia's former territory lies today within Turkey, across the high country of the Anatolian plateau.",
+      "text": "Galatia's former territory lies today within Türkiye, across the high country of the Anatolian plateau.",
       "sources": [
         "wikidata:Q26847",
         "bib:isbe-galatia"
@@ -97,6 +97,16 @@
       "ref": "1 Peter 1:1",
       "book": "1 Peter",
       "textWEB": "Peter, an apostle of Jesus Christ, to the chosen ones who are living as foreigners in the Dispersion in Pontus, Galatia, Cappadocia, Asia, and Bithynia,"
+    },
+    {
+      "ref": "Acts 13:14",
+      "book": "Acts",
+      "textWEB": "But they, passing on from Perga, came to Antioch of Pisidia. They went into the synagogue on the Sabbath day and sat down."
+    },
+    {
+      "ref": "Acts 14:6",
+      "book": "Acts",
+      "textWEB": "they became aware of it and fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region."
     }
   ],
   "otConnections": [],

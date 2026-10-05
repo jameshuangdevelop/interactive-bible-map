@@ -297,3 +297,31 @@ The existing `worldhistory-sardis` was also cited in Sardis P2. It states that t
 **Shared with M3-22:** six of these IDs are copied exactly from the entries the M3-22 branch adds (title, authors, year, URL and access date), so the two bibliographies are identical when they merge: `worldhistory-josephus`, `worldhistory-strabo`, `worldhistory-tacitus`, `worldhistory-nero`, `worldhistory-pompey` and `worldhistory-xenophon`. The other 14 are new to this branch.
 
 After this commit, `npm run validate:data` still reports 0 errors and 186 warnings, `npm test` passes 137/137 and `npm run test:app` passes 93/93. Every `bib:` ID resolves, and all 31 places are still 261–407 words.
+
+### Third commit: wording fixes from the PO's rulings
+
+The PO ruled on the "For the PO" items above on 2026-10-05. This commit ("data(locations): wording fixes from the half-2 verification") applies them:
+
+- **(2) Türkiye.** The About text now says "Türkiye", as ADR-0028's country field does, in all 10 places where it said "Turkey" or "Turkish". These are in 9 records: antioch-syria, ephesus, galatia, laodicea, pergamum, philadelphia-lydia, sardis, smyrna and thyatira (twice). "The Turkish town of Selçuk" became "the town of Selçuk in Türkiye", and the others changed the same way. No source names or quoted titles changed. Philadelphia's `candidates[0].support` ("Alaşehir, Turkey") is candidate text, not About text, so it was left.
+- **(4) "This record".** Five texts now say "this map" instead: Bethany beyond the Jordan ("This map shows two candidate sites … and favors neither"), Cana, Damascus ("this map places Damascus within the Roman province of Syria as of about AD 50"), Galatia and Pergamum. Jerusalem's "add to the record" means the archaeological record and was left.
+- **(7) Context verses.** Galatia's `scripture[]` gains Acts 13:14 and Acts 14:6, and Damascus's gains Acts 13:9, all with WEB text. They account for the validator's 3 new warnings (186 to 189), which follow the usual "no configured names" pattern.
+- **(3) and (6), no change:** "a UNESCO World Heritage Site" stays as a status, and Corinth keeps 44 BC.
+- **(1) and (5):** left for the human and the backlog.
+
+**The same scan over the 58 other records** (reported only; another branch owns those texts):
+
+- `arabia` P1: "This record shows the Nabataean kingdom, which Livius.org calls Arabia" (this also names a website).
+- `bethsaida` P4: "Both of this record's candidate sites …"
+- `judea-province` P1: "… the 'judea' record is the district around Jerusalem, and this record is the larger Roman province …"
+- `lycaonia` P2: "… and this record follows that sense".
+- `phrygia` P2: "… under their province rather than under this record."
+- `mesopotamia` `candidates[0].support`: "… parts of Syria and Turkey" (this also names Pleiades).
+
+**Half-1 citations outside `scripture[]`, for information:**
+
+- 13 New Testament context verses: Bethany beyond the Jordan (Matthew 3:4, 3:5, 3:6, 3:13), Bethany (John 11:7), Bethlehem (Luke 2:5), Cana (Luke 3:1, John 4:47), Capernaum (Luke 3:1), Jericho (Matthew 20:30) and Nazareth (Luke 3:1, Mark 6:3, Matthew 13:55).
+- 2 Old Testament verses in the Mount of Olives' text (2 Samuel 15:30, Zechariah 14:4), which are listed in its `otConnections`.
+
+They follow half 1's practice and are outside ruling (7).
+
+After this commit, `npm run validate:data` reports 0 errors and 189 warnings, `npm test` passes 137/137 and `npm run test:app` passes 93/93. All 523 `scripture[]` entries in the 31 places match the WEB, and all 31 places are still 261–407 words.

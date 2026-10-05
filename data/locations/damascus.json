@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Damascus lies in the northwest corner of the Ghuta, a fertile plain about 2,300 feet above sea level watered by the river Barada, the Abana of the Old Testament, and surrounded on three sides by bare hills, with open desert along its eastern edge. Among the most ancient cities of the Middle East, it had been part of the Roman province of Syria since the Roman general Pompey's conquest in 64 BC. In 2 Corinthians, Paul writes that around the time of his escape from the city, \"the governor under King Aretas guarded the Damascenes' city, desiring to arrest me.\" How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that the Roman emperor Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, so this record places Damascus within the Roman province of Syria for about AD 50.",
+    "text": "Damascus lies in the northwest corner of the Ghuta, a fertile plain about 2,300 feet above sea level watered by the river Barada, the Abana of the Old Testament, and surrounded on three sides by bare hills, with open desert along its eastern edge. Among the most ancient cities of the Middle East, it had been part of the Roman province of Syria since the Roman general Pompey's conquest in 64 BC. In 2 Corinthians, Paul writes that around the time of his escape from the city, \"the governor under King Aretas guarded the Damascenes' city, desiring to arrest me.\" How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that the Roman emperor Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, so this map places Damascus within the Roman province of Syria as of about AD 50.",
     "sources": [
       "pleiades:678106",
       "wikidata:Q3678596",
@@ -205,6 +205,11 @@
       "ref": "Acts 9:23",
       "book": "Acts",
       "textWEB": "When many days were fulfilled, the Jews conspired together to kill him,"
+    },
+    {
+      "ref": "Acts 13:9",
+      "book": "Acts",
+      "textWEB": "But Saul, who is also called Paul, filled with the Holy Spirit, fastened his eyes on him"
     }
   ],
   "otConnections": [
