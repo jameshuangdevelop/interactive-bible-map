@@ -9,6 +9,7 @@ import { readCliArgument, repositoryRoot, withResolvedBaseUrl } from "./lib/web-
 const lcpThresholdMs = 2_500;
 const tbtThresholdMs = 200;
 const lighthouseTimeoutMs = 5 * 60 * 1000;
+const lighthouseRunCount = 3;
 
 function quoteForCmd(argument) {
   if (argument.length === 0) {
@@ -20,6 +21,33 @@ function quoteForCmd(argument) {
   }
 
   return `"${argument.replace(/%/gu, "%%").replace(/"/gu, '""')}"`;
+}
+
+function buildChromeFlagsForLighthouse() {
+  const flags = ["--headless=new", "--no-sandbox", "--disable-dev-shm-usage"];
+  if (process.platform === "linux") {
+    flags.push("--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader");
+  }
+
+  return flags;
+}
+
+function median(values) {
+  if (values.length === 0) {
+    throw new Error("Cannot compute median of an empty list.");
+  }
+
+  const sorted = [...values].sort((left, right) => left - right);
+  const middleIndex = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) {
+    return sorted[middleIndex];
+  }
+
+  return (sorted[middleIndex - 1] + sorted[middleIndex]) / 2;
+}
+
+function roundToHundredths(value) {
+  return Number(value.toFixed(2));
 }
 
 function terminateProcessTree(child) {
@@ -51,7 +79,65 @@ function terminateProcessTree(child) {
   return Promise.resolve();
 }
 
-function runLighthouse(baseUrl, chromePath) {
+async function readWebGlRenderer(baseUrl, chromePath, chromeFlags) {
+  const launchArguments = chromeFlags.filter((flag) => flag !== "--headless=new");
+  const browser = await chromium.launch({
+    executablePath: chromePath,
+    headless: true,
+    args: launchArguments
+  });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  try {
+    await page.goto(baseUrl, {
+      waitUntil: "domcontentloaded",
+      timeout: 60_000
+    });
+
+    return await page.evaluate(() => {
+      const canvas = document.createElement("canvas");
+      const webglContext =
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      if (!webglContext) {
+        return {
+          renderer: null,
+          vendor: null,
+          usesDebugRendererInfo: false,
+          error: "WebGL context unavailable."
+        };
+      }
+
+      const debugRendererInfo = webglContext.getExtension("WEBGL_debug_renderer_info");
+      const renderer = debugRendererInfo
+        ? webglContext.getParameter(debugRendererInfo.UNMASKED_RENDERER_WEBGL)
+        : webglContext.getParameter(webglContext.RENDERER);
+      const vendor = debugRendererInfo
+        ? webglContext.getParameter(debugRendererInfo.UNMASKED_VENDOR_WEBGL)
+        : webglContext.getParameter(webglContext.VENDOR);
+
+      return {
+        renderer: typeof renderer === "string" ? renderer : String(renderer ?? ""),
+        vendor: typeof vendor === "string" ? vendor : String(vendor ?? ""),
+        usesDebugRendererInfo: Boolean(debugRendererInfo),
+        error: null
+      };
+    });
+  } catch (error) {
+    return {
+      renderer: null,
+      vendor: null,
+      usesDebugRendererInfo: false,
+      error: error instanceof Error ? error.message : String(error)
+    };
+  } finally {
+    await page.close();
+    await context.close();
+    await browser.close();
+  }
+}
+
+function runLighthouse(baseUrl, chromePath, chromeFlags) {
   const npmArgs = [
     "exec",
     "--",
@@ -61,7 +147,7 @@ function runLighthouse(baseUrl, chromePath) {
     "--output=json",
     "--output-path=stdout",
     "--quiet",
-    "--chrome-flags=--headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage"
+    `--chrome-flags=${chromeFlags.join(" ")}`
   ];
 
   return new Promise((resolve, reject) => {
@@ -197,46 +283,105 @@ async function run() {
 
   await withResolvedBaseUrl(async ({ baseUrl, usingProvidedBaseUrl }) => {
     const chromePath = chromium.executablePath();
-    const { stdout, stderr, cleanupErrorRecovered } = await runLighthouse(baseUrl, chromePath);
-    const report = parseLighthouseJson(stdout);
+    const chromeFlags = buildChromeFlagsForLighthouse();
+    const webGlRenderer = await readWebGlRenderer(baseUrl, chromePath, chromeFlags);
 
-    const lcpMs = readNumericAuditValue(report, "largest-contentful-paint");
-    const tbtMs = readNumericAuditValue(report, "total-blocking-time");
-    const performanceScore = report?.categories?.performance?.score;
+    const runResults = [];
+    for (let runIndex = 1; runIndex <= lighthouseRunCount; runIndex += 1) {
+      const { stdout, stderr, cleanupErrorRecovered } = await runLighthouse(
+        baseUrl,
+        chromePath,
+        chromeFlags
+      );
+      const report = parseLighthouseJson(stdout);
+      const lcpMs = readNumericAuditValue(report, "largest-contentful-paint");
+      const tbtMs = readNumericAuditValue(report, "total-blocking-time");
+      const performanceScore = report?.categories?.performance?.score;
+
+      runResults.push({
+        runIndex,
+        lcpMs,
+        tbtMs,
+        performanceScore:
+          typeof performanceScore === "number" ? Number((performanceScore * 100).toFixed(0)) : null,
+        cleanupErrorRecovered,
+        cleanupErrorDetail: cleanupErrorRecovered
+          ? stderr
+              .split(/\r?\n/gu)
+              .filter((line) => line.trim().length > 0)
+              .slice(0, 8)
+          : null,
+        report
+      });
+    }
+
+    const medianLcpMs = median(runResults.map((result) => result.lcpMs));
+    const medianTbtMs = median(runResults.map((result) => result.tbtMs));
+    const passed = medianLcpMs <= lcpThresholdMs && medianTbtMs <= tbtThresholdMs;
 
     const summary = {
       baseUrl,
       usingProvidedBaseUrl,
-      performanceScore:
-        typeof performanceScore === "number" ? Number((performanceScore * 100).toFixed(0)) : null,
-      lcpMs: Number(lcpMs.toFixed(2)),
-      tbtMs: Number(tbtMs.toFixed(2)),
+      runCount: lighthouseRunCount,
+      chromeFlags,
+      webGlRenderer,
+      runs: runResults.map((result) => {
+        const runSummary = {
+          runIndex: result.runIndex,
+          performanceScore: result.performanceScore,
+          lcpMs: roundToHundredths(result.lcpMs),
+          tbtMs: roundToHundredths(result.tbtMs)
+        };
+        if (result.cleanupErrorRecovered) {
+          runSummary.recoveredChromeCleanupError = true;
+          runSummary.recoveredChromeCleanupErrorDetail = result.cleanupErrorDetail;
+        }
+
+        return runSummary;
+      }),
+      medians: {
+        lcpMs: roundToHundredths(medianLcpMs),
+        tbtMs: roundToHundredths(medianTbtMs)
+      },
       thresholds: {
         lcpMs: lcpThresholdMs,
         tbtMs: tbtThresholdMs
       },
-      passed: lcpMs <= lcpThresholdMs && tbtMs <= tbtThresholdMs
+      passed
     };
 
-    if (cleanupErrorRecovered) {
-      summary.recoveredChromeCleanupError = true;
-      summary.recoveredChromeCleanupErrorDetail = stderr
-        .split(/\r?\n/gu)
-        .filter((line) => line.trim().length > 0)
-        .slice(0, 8);
-    }
-
-    let reportPath = null;
     if (reportPathArgument) {
-      reportPath = await writeReportFile(report, reportPathArgument);
+      const reportPath = await writeReportFile(
+        {
+          baseUrl,
+          chromeFlags,
+          webGlRenderer,
+          runCount: lighthouseRunCount,
+          thresholds: {
+            lcpMs: lcpThresholdMs,
+            tbtMs: tbtThresholdMs
+          },
+          medians: summary.medians,
+          runs: runResults.map((result) => ({
+            runIndex: result.runIndex,
+            performanceScore: result.performanceScore,
+            lcpMs: roundToHundredths(result.lcpMs),
+            tbtMs: roundToHundredths(result.tbtMs),
+            cleanupErrorRecovered: result.cleanupErrorRecovered,
+            cleanupErrorDetail: result.cleanupErrorDetail,
+            report: result.report
+          }))
+        },
+        reportPathArgument
+      );
       summary.reportPath = reportPath;
     }
 
     console.log(JSON.stringify(summary, null, 2));
 
-    if (!summary.passed) {
+    if (!passed) {
       throw new Error(
-        `Lighthouse gate failed: LCP ${summary.lcpMs} ms (limit ${lcpThresholdMs}), TBT ${summary.tbtMs} ms (limit ${tbtThresholdMs}).`
+        `Lighthouse gate failed (median of ${lighthouseRunCount} runs): LCP ${roundToHundredths(medianLcpMs)} ms (limit ${lcpThresholdMs}), TBT ${roundToHundredths(medianTbtMs)} ms (limit ${tbtThresholdMs}).`
       );
     }
   });

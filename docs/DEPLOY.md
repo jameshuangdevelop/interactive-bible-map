@@ -18,6 +18,8 @@ The app deploys from `.github/workflows/app.yml` to Cloudflare Pages (`interacti
   - deploys a preview with Wrangler;
   - updates one PR comment with the preview URL.
 - **Preview verification (PRs with secrets available)**: smoke test, axe serious/critical gate, and Lighthouse desktop cold-cache gate (LCP <= 2.5 s, TBT <= 200 ms) against the preview URL.
+  - Lighthouse runs three cold-cache passes and gates on the median LCP and median TBT.
+  - On Linux CI, Chrome is launched with ANGLE SwiftShader in the GPU process for WebGL rendering.
 - **Production deploy (pushes to `main`)**: same artifact + limits check, then deploys to the production branch in Pages.
 
 Deploy jobs skip automatically when `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID` is missing (for example, fork PRs).
