@@ -795,10 +795,26 @@ describe("place panel model helpers", () => {
         blockedText: "Caesarea"
       },
       {
+        label: "caesarea-philippi-self-short-name-in-history",
+        currentPlaceId: "caesarea-philippi",
+        paragraph:
+          "Herod Philip built Caesarea at Paneas, in his tetrarchy.",
+        blockedPlaceId: "caesarea-maritima",
+        blockedText: "Caesarea"
+      },
+      {
         label: "bethany-beyond-the-jordan-self-name",
         currentPlaceId: "bethany-beyond-the-jordan",
         paragraph:
           "Bethany beyond the Jordan was a place in the Jordan Valley that John's Gospel names as where John the Baptist was baptizing.",
+        blockedPlaceId: "bethany",
+        blockedText: "Bethany"
+      },
+      {
+        label: "bethany-beyond-the-jordan-self-short-name-in-history",
+        currentPlaceId: "bethany-beyond-the-jordan",
+        paragraph:
+          "The third-century scholar Origen could not find a village called Bethany east of the Jordan in his own day.",
         blockedPlaceId: "bethany",
         blockedText: "Bethany"
       },

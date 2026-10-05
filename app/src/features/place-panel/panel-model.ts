@@ -509,6 +509,8 @@ function collectNameOwners(places: PlaceIndexRecord[]) {
 
 export interface AboutMatchCandidate {
   placeId: string;
+  matchName: string;
+  comparableName: string;
   matcher: RegExp;
   priorityLength: number;
 }
@@ -521,6 +523,7 @@ interface SelfNameMaskCandidate {
 export interface AboutPlaceMatchIndex {
   candidates: AboutMatchCandidate[];
   selfNameMaskCandidatesByPlaceId: Map<string, SelfNameMaskCandidate[]>;
+  ownNamesByPlaceId: Map<string, string[]>;
 }
 
 function collectAboutMatchCandidates(places: PlaceIndexRecord[]): AboutMatchCandidate[] {
@@ -554,6 +557,8 @@ function collectAboutMatchCandidates(places: PlaceIndexRecord[]): AboutMatchCand
         const pattern = escapeRegExp(displayName).replace(/\s+/gu, "\\s+");
         candidates.push({
           placeId: place.id,
+          matchName: displayName,
+          comparableName,
           matcher: new RegExp(pattern, "gu"),
           priorityLength: displayName.length
         });
@@ -593,10 +598,36 @@ function collectSelfNameMaskCandidatesByPlaceId(places: PlaceIndexRecord[]) {
   return byPlaceId;
 }
 
+function collectOwnNamesByPlaceId(places: PlaceIndexRecord[]) {
+  const byPlaceId = new Map<string, string[]>();
+
+  for (const place of places) {
+    const ownNames: string[] = [];
+    const seenNames = new Set<string>();
+
+    for (const placeName of namesForAboutMatching(place)) {
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const displayName = normalizeDisplayNameForMatch(nameVariant);
+        if (displayName.length === 0 || seenNames.has(displayName)) {
+          continue;
+        }
+
+        seenNames.add(displayName);
+        ownNames.push(displayName);
+      }
+    }
+
+    byPlaceId.set(place.id, ownNames);
+  }
+
+  return byPlaceId;
+}
+
 export function buildAboutPlaceMatchIndex(places: PlaceIndexRecord[]): AboutPlaceMatchIndex {
   return {
     candidates: collectAboutMatchCandidates(places),
-    selfNameMaskCandidatesByPlaceId: collectSelfNameMaskCandidatesByPlaceId(places)
+    selfNameMaskCandidatesByPlaceId: collectSelfNameMaskCandidatesByPlaceId(places),
+    ownNamesByPlaceId: collectOwnNamesByPlaceId(places)
   };
 }
 
@@ -717,6 +748,53 @@ function maskCurrentPlaceNamesInParagraph({
   return maskRangesInText(paragraphText, selectNonOverlappingRanges(maskRanges));
 }
 
+function containsWholeWordSequence(text: string, sequence: string) {
+  if (text.length === 0 || sequence.length === 0) {
+    return false;
+  }
+
+  const pattern = escapeRegExp(sequence).replace(/\s+/gu, "\\s+");
+  const matcher = new RegExp(pattern, "gu");
+  let match: RegExpExecArray | null = matcher.exec(text);
+  while (match) {
+    const start = match.index;
+    const end = start + match[0].length;
+    if (isWholeWordMatch(text, start, end)) {
+      return true;
+    }
+
+    match = matcher.exec(text);
+  }
+
+  return false;
+}
+
+function collectBlockedComparableNamesForCurrentPlace({
+  matchIndex,
+  currentPlaceId
+}: {
+  matchIndex: AboutPlaceMatchIndex;
+  currentPlaceId: string;
+}) {
+  const ownNames = matchIndex.ownNamesByPlaceId.get(currentPlaceId);
+  if (!ownNames || ownNames.length === 0) {
+    return new Set<string>();
+  }
+
+  const blockedComparableNames = new Set<string>();
+  for (const candidate of matchIndex.candidates) {
+    if (candidate.placeId === currentPlaceId || blockedComparableNames.has(candidate.comparableName)) {
+      continue;
+    }
+
+    if (ownNames.some((ownName) => containsWholeWordSequence(ownName, candidate.matchName))) {
+      blockedComparableNames.add(candidate.comparableName);
+    }
+  }
+
+  return blockedComparableNames;
+}
+
 export function matchAboutPlaceMentions({
   matchIndex,
   currentPlaceId,
@@ -730,6 +808,10 @@ export function matchAboutPlaceMentions({
     return [] as AboutPlaceMention[];
   }
 
+  const blockedComparableNames = collectBlockedComparableNamesForCurrentPlace({
+    matchIndex,
+    currentPlaceId
+  });
   const allMatches: AboutMentionCandidate[] = [];
   paragraphs.forEach((paragraphText, paragraphIndex) => {
     if (!paragraphText) {
@@ -743,7 +825,10 @@ export function matchAboutPlaceMentions({
     });
 
     for (const candidate of matchIndex.candidates) {
-      if (candidate.placeId === currentPlaceId) {
+      if (
+        candidate.placeId === currentPlaceId ||
+        blockedComparableNames.has(candidate.comparableName)
+      ) {
         continue;
       }
 
