@@ -155,3 +155,4 @@ No new source was needed where a cited source already states the role:
 - `validate:data`: 0 errors and the same 107 warnings.
 - All 673 `bib:` references resolve, with no duplicate ids.
 - `npm test`: 137/137. `npm run test:app`: 93/93.
+- **Plain wording for readers (PO ruling, 2026-10-05):** the About text no longer refers to the data as "this record" or "the X record". Each such clause now says "this map" or names the place, with no change to the facts or sources: arabia S, bethsaida H2, bithynia H0, illyricum H0, judea-province S, libya S, lycaonia S and H0, pamphylia S and H1, phrygia S and H0, and sicily H0. `phrygia` is now the 40th changed record and is `verified` (2026-10-05). None of the 58 About texts says "Turkey" or "Turkish", so no "Türkiye" change was needed.
