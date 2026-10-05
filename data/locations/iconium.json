@@ -48,10 +48,14 @@
   },
   "history": [
     {
-      "text": "Ancient writers disagreed on whether Iconium belonged to Phrygia or Lycaonia. The International Standard Bible Encyclopedia notes that most ancient authorities, among them Cicero, Strabo and Pliny, wrote from the standpoint of Roman provincial administration and put Iconium in Lycaonia. Xenophon, however, calls it 'the last city of Phrygia', and Acts 14:6 implies the same when Paul and Barnabas flee from Iconium to 'the cities of Lycaonia,' Lystra and Derbe. The same source concludes that in the apostolic period Iconium was a leading city in the south of Galatia, the Roman province, and probably belonged to the region of Phrygia that Acts 16:6 names. Either way it lay in the province of Galatia, which this project gives as its parent.",
+      "text": "Ancient writers disagreed on whether Iconium belonged to Phrygia or Lycaonia. The International Standard Bible Encyclopedia notes that most ancient authorities, among them the Roman orator Cicero, the Greek geographer Strabo and the Roman writer Pliny, wrote from the standpoint of Roman provincial administration and put Iconium in Lycaonia. The Greek historian Xenophon, however, calls it 'the last city of Phrygia', and Acts 14:6 implies the same when Paul and Barnabas flee from Iconium to 'the cities of Lycaonia,' Lystra and Derbe. The same source concludes that in the apostolic period Iconium was a leading city in the south of Galatia, the Roman province, and probably belonged to the region of Phrygia that Acts 16:6 names. Either way it lay in the province of Galatia, which this project gives as its parent.",
       "sources": [
         "bib:isbe-iconium",
-        "scripture:Acts 14:6"
+        "scripture:Acts 14:6",
+        "bib:worldhistory-cicero",
+        "bib:strabo-geography",
+        "bib:worldhistory-pliny-the-elder",
+        "bib:worldhistory-xenophon"
       ]
     }
   ],
@@ -89,7 +93,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-30"
 }

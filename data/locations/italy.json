@@ -28,7 +28,7 @@
     }
   ],
   "summary": {
-    "text": "Italy was the peninsula, extending north to the Alps, that contained Rome itself. It was not formally a province and received no provincial governor: the Roman state had two distinct parts, Italy and the provinces, and Italy is absent from Cassius Dio's list of the provinces that Augustus divided between the Senate and himself in 27 BC. Acts names Italy as the destination of Paul's voyage as a prisoner and records his landing at Puteoli and his arrival in Rome, and Hebrews closes with the words 'The Italians greet you.'",
+    "text": "Italy was the peninsula, extending north to the Alps, that contained Rome itself. It was not formally a province and received no provincial governor: the Roman state had two distinct parts, Italy and the provinces, and Italy is absent from the Roman historian Cassius Dio's list of the provinces that Augustus divided between the Senate and himself in 27 BC. Acts names Italy as the destination of Paul's voyage as a prisoner and records his landing at Puteoli and his arrival in Rome, and Hebrews closes with the words 'The Italians greet you.'",
     "sources": [
       "pleiades:1052",
       "wikidata:Q913582",
@@ -51,7 +51,7 @@
       ]
     },
     {
-      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; Suetonius likewise reports that Claudius expelled the Jews from Rome because they 'constantly made disturbances at the instigation of Chrestus.'",
+      "text": "Acts records that Priscilla and Aquila had 'recently come from Italy' because 'Claudius had commanded all the Jews to depart from Rome'; the Roman historian Suetonius likewise reports that Claudius expelled the Jews from Rome because they 'constantly made disturbances at the instigation of Chrestus.'",
       "sources": [
         "scripture:Acts 18:2",
         "bib:suetonius-twelve-caesars"
@@ -77,7 +77,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

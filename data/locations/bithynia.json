@@ -37,7 +37,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia says the last king of Bithynia, tired of the constant conflicts among the peoples of Asia Minor, left his kingdom to Rome, ending a line of kings that ruled until 74 BC; Pleiades also dates the annexation to 74 BC. Under Rome, the same source adds, the Black Sea coast as far east as Amisus was governed more or less together with Bithynia: this was the western part of Pontus described in this project's Pontus record.",
+      "text": "The International Standard Bible Encyclopedia says the last king of Bithynia, tired of the constant conflicts among the peoples of Asia Minor, left his kingdom to Rome, ending a line of kings that ruled until 74 BC; this date for the annexation is also independently attested. Under Rome, the same source adds, the Black Sea coast as far east as Amisus was governed more or less together with Bithynia: this was the western part of Pontus described in this project's Pontus record.",
       "sources": [
         "bib:isbe-bithynia",
         "pleiades:981512"
@@ -58,7 +58,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-30"
 }

@@ -45,7 +45,7 @@
   },
   "history": [
     {
-      "text": "Pompey made Syria a Roman province in 64 BC. In Augustus's settlement of 27 BC it was one of the provinces he kept for himself, together with Phoenicia and Cilicia.",
+      "text": "The Roman general Pompey made Syria a Roman province in 64 BC. In Augustus's settlement of 27 BC it was one of the provinces he kept for himself, together with Phoenicia and Cilicia.",
       "sources": [
         "bib:livius-damascus",
         "wikidata:Q207118",
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "text": "After Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria; Caligula gave the coastal region of Cilicia to Antiochus IV of Commagene. Vespasian reunited Cilicia as a separate province in AD 72, so at AD 50 Tarsus and the Cilician plain were governed from Syria.",
+      "text": "After Octavian (the future Augustus) became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria; the Roman emperor Caligula gave the coastal region of Cilicia to the client king Antiochus IV of Commagene. The Roman emperor Vespasian reunited Cilicia as a separate province in AD 72, so at AD 50 Tarsus and the Cilician plain were governed from Syria.",
       "sources": [
         "bib:livius-cilicia",
         "bib:cassius-dio-roman-history",
@@ -62,7 +62,7 @@
       ]
     },
     {
-      "text": "The governors of Syria also acted in Judea: Josephus records that Quirinius, sent by Augustus to Syria, came into Judea to take an account of property after Archelaus was deposed, and that Vitellius, then governing Syria, went up to Jerusalem while marching against the Nabataean king Aretas.",
+      "text": "The governors of Syria also acted in Judea: the first-century Jewish historian Josephus records that Quirinius, sent by Augustus to Syria, came into Judea to take an account of property after Archelaus was deposed, and that Vitellius, then governing Syria, went up to Jerusalem while marching against the Nabataean king Aretas.",
       "sources": [
         "bib:josephus-antiquities",
         "bib:isbe-aretas"
@@ -118,7 +118,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

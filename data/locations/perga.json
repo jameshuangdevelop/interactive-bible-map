@@ -40,7 +40,7 @@
   },
   "history": [
     {
-      "text": "Sources differ on Perga's province in about AD 50. Cassius Dio reports that in AD 43 Claudius incorporated the Lycians into the district of Pamphylia. Tacitus, however, records that under Galba (AD 68-69) the provinces of Galatia and Pamphylia had a single governor, and Livius and Pleiades describe Pamphylia as part of Galatia until Vespasian created the province of Lycia and Pamphylia after AD 70. This project follows the second view and places Perga in Galatia.",
+      "text": "Sources differ on Perga's province in about AD 50. The Roman historian Cassius Dio reports that in AD 43 Claudius incorporated the Lycians into the district of Pamphylia. The Roman historian Tacitus, however, records that under the Roman emperor Galba (AD 68-69) the provinces of Galatia and Pamphylia had a single governor, and Pamphylia is also described as part of Galatia until the Roman emperor Vespasian created the province of Lycia and Pamphylia after AD 70. This project follows the second view and places Perga in Galatia.",
       "sources": [
         "bib:cassius-dio-roman-history",
         "bib:tacitus-histories",
@@ -69,7 +69,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-30"
 }

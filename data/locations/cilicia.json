@@ -40,7 +40,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia records that Cilicia came under Roman administration step by step, with Cicero serving as its governor in 51-50 BC, and that its land fell naturally into two parts: the mountains of Tracheia in the west and a broad plain in the east. Livius.org adds that after Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, until Vespasian reunited Cilicia in AD 72. Cassius Dio records that Caligula gave Antiochus of Commagene the coastal part of Cilicia, and that Claudius restored Commagene to him; Tacitus, describing a revolt of Cilician hill tribes in AD 52, says their part of the coast lay in Antiochus's kingdom. Because Cilicia was split between Syria and a client kingdom in about AD 50, this project places it directly under the Roman Empire, and Tarsus, in the plain, under Syria.",
+      "text": "The International Standard Bible Encyclopedia records that Cilicia came under Roman administration step by step, with the Roman orator Cicero serving as its governor in 51-50 BC, and that its land fell naturally into two parts: the mountains of Tracheia in the west and a broad plain in the east. After Octavian (the future Augustus) became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, until the Roman emperor Vespasian reunited Cilicia in AD 72. The Roman historian Cassius Dio records that the Roman emperor Caligula gave the client king Antiochus of Commagene the coastal part of Cilicia, and that Claudius restored Commagene to him; the Roman historian Tacitus, describing a revolt of Cilician hill tribes in AD 52, says their part of the coast lay in Antiochus's kingdom. Because Cilicia was split between Syria and a client kingdom in about AD 50, this project places it directly under the Roman Empire, and Tarsus, in the plain, under Syria.",
       "sources": [
         "bib:isbe-cilicia",
         "bib:livius-cilicia",
@@ -63,7 +63,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-30"
 }

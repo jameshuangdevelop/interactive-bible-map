@@ -1378,6 +1378,54 @@
       "publisher": "Biblical Archaeology Society, Bible History Daily",
       "url": "https://www.biblicalarchaeology.org/daily/archaeology-today/colossae-a-biblical-city-of-classical-world/",
       "accessed": "2026-10-01"
+    },
+    {
+      "id": "worldhistory-cicero",
+      "type": "web",
+      "title": "Cicero",
+      "authors": [
+        "James Lloyd"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/cicero/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-pliny-the-elder",
+      "type": "web",
+      "title": "Pliny the Elder",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2014,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pliny-the-elder/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-xenophon",
+      "type": "web",
+      "title": "Xenophon",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/xenophon/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-arrian",
+      "type": "web",
+      "title": "Arrian",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/arrian/",
+      "accessed": "2026-10-05"
     }
   ]
 }

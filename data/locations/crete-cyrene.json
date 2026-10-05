@@ -43,7 +43,7 @@
   },
   "history": [
     {
-      "text": "Rome annexed Crete in 67 BC and joined it with Cyrene as one province. In Augustus's settlement of 27 BC, Cassius Dio lists 'Crete and the Cyrenaic portion of Libya' among the provinces assigned to the Senate, and Strabo likewise lists Crete with Cyrenaea among the provinces of the Roman people.",
+      "text": "Rome annexed Crete in 67 BC and joined it with Cyrene as one province. In Augustus's settlement of 27 BC, the Roman historian Cassius Dio lists 'Crete and the Cyrenaic portion of Libya' among the provinces assigned to the Senate, and the Greek geographer Strabo likewise lists Crete with Cyrenaea among the provinces of the Roman people.",
       "sources": [
         "bib:isbe-crete",
         "bib:cassius-dio-roman-history",
@@ -71,7 +71,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

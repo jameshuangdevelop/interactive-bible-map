@@ -62,10 +62,11 @@
   },
   "history": [
     {
-      "text": "Ancient sources, including Josephus, describe Bethsaida being refounded and elevated to a Greek-style city named Julias by the tetrarch Philip early in the first century AD, a status that both excavation teams look for evidence of at their respective candidate sites.",
+      "text": "Ancient sources, including the first-century Jewish historian Josephus, describe Bethsaida being refounded and elevated to a Greek-style city named Julias by the tetrarch Philip early in the first century AD, a status that both excavation teams look for evidence of at their respective candidate sites.",
       "sources": [
         "bib:arav-bethsaida-et-tell",
-        "bib:notley-aviam-bethsaida-el-araj"
+        "bib:notley-aviam-bethsaida-el-araj",
+        "bib:josephus-jewish-war"
       ]
     },
     {
@@ -177,7 +178,7 @@
       ]
     }
   ],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-28"
 }

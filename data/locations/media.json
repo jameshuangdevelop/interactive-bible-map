@@ -40,7 +40,7 @@
   },
   "history": [
     {
-      "text": "Livius.org records that the Parthian king Mithradates I (r. 165-132 BC) took Media, together with Babylonia and Elam. Strabo, writing of his own day, says the Parthians ruled the Medes and the Babylonians, and in his account of AD 49 Tacitus records that on the death of the Parthian king Gotarzes the throne passed to Vonones, at that time 'viceroy of Media'.",
+      "text": "The Parthian king Mithradates I (r. 165-132 BC) took Media, together with Babylonia and Elam. The Greek geographer Strabo, writing of his own day, says the Parthians ruled the Medes and the Babylonians, and in his account of AD 49 the Roman historian Tacitus records that on the death of the Parthian king Gotarzes the throne passed to Vonones, at that time 'viceroy of Media'.",
       "sources": [
         "bib:livius-parthia",
         "bib:strabo-geography",
@@ -57,7 +57,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "verified",
+  "status": "draft",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-09-30"
 }
