@@ -88,8 +88,19 @@ file needed a change.
 
 M3-19's Fact-Checker found 12 `author` values that don't use the attribution form their Commons
 file page requests. Ids may have moved after the trims above, so each is identified by its file.
-Each page's raw wikitext (`action=raw`) was read one at a time (~1 s apart, descriptive User-Agent)
-and the exact requested credit copied into `author`; nothing else changed.
+Each page's raw wikitext (`action=raw`) was read one at a time (~1 s apart, descriptive User-Agent),
+and each `author` now gives the visible credit the file page asks for, normalized to our existing
+credit format (title case, no copyright mark, and a `/` to join a name with a second credited party
+or site, as already used elsewhere in `data/media/`). Nine of the twelve match the page's own
+wording; three are normalized rather than literal copies, and the review (`REVIEW-M3-18-media.md`)
+asked that these be spelled out:
+
+- `rome-07`'s `author` is "David Iliff"; the page's literal wording (`User:Diliff/Licensing`'s
+  suggested attribution) is all caps, "DAVID ILIFF".
+- `ephesus-06`'s `author` is "José Luiz Bernardes Ribeiro"; the page's literal wording carries a
+  copyright mark, "© José Luiz Bernardes Ribeiro".
+- `tyre-02`'s `author` is "Vyacheslav Argenberg / www.vascoplanet.com"; the page's literal wording
+  is "© Vyacheslav Argenberg / http://www.vascoplanet.com/".
 
 | id (current) | file | old `author` | new `author` | What the page asks |
 |---|---|---|---|---|
