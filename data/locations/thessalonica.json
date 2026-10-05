@@ -28,7 +28,7 @@
     }
   ],
   "summary": {
-    "text": "Thessalonica stood at the northern end of the Thermaic Gulf, a short distance from the mouth of the Vardar river. The Macedonian king Cassander enlarged and fortified the town around 315 BC, gathering in people from several smaller towns nearby and renaming it. By Paul's day it was the capital of the Roman province of Macedonia and, according to the Greek geographer Strabo, its most populous town; because it had sided with the eventual victors in the civil war that followed the battle of Philippi, Rome let it keep the privileged status of a \"free city,\" with its own Greek-style magistrates called politarchs rather than Roman officials. It also stood on the Via Egnatia, the great road from the Adriatic to the Hellespont, as that road's principal station.",
+    "text": "Thessalonica stood at the northern end of the Thermaic Gulf, a short distance from the mouth of the Vardar river. The Macedonian king Cassander enlarged and fortified the town around 315 BC, gathering in people from several smaller towns nearby and renaming it. By Paul's day it was the capital of the Roman province of Macedonia and, according to the Greek geographer Strabo, its most populous town; because it had backed the winning side in the last civil war of the Roman Republic, Rome gave it the privileged status of a \"free city,\" with its own Greek-style magistrates called politarchs rather than Roman officials. It also stood on the Via Egnatia, the great road from the Adriatic to the Hellespont, as that road's principal station.",
     "sources": [
       "pleiades:491741",
       "wikidata:Q17151",
@@ -37,7 +37,7 @@
   },
   "history": [
     {
-      "text": "Acts reports that Paul reasoned in the city's synagogue over three Sabbaths, explaining that the Christ had to suffer and rise from the dead, and that some Jews, \"a great multitude\" of devout Greeks, and \"not a few of the chief women\" believed. Paul later recalled working \"night and day\" so as not to burden the new believers. An inscription from one of the city's gates names six politarchs, including a Sosipater, a Gaius, and a Secundus, names that also belong to Paul's travelling companions from Macedonia. Paul wrote both 1 Thessalonians and 2 Thessalonians to the church he founded in the city.",
+      "text": "Acts reports that Paul reasoned in the city's synagogue over three Sabbaths, explaining that the Christ had to suffer and rise from the dead, and that some Jews, \"a great multitude\" of devout Greeks, and \"not a few of the chief women\" believed. Paul later recalled working \"night and day\" so as not to burden the new believers. An inscription from one of the city's gates names six politarchs, including a Sosipater, a Gaius, and a Secundus, names also borne by three of Paul's Macedonian converts. Paul wrote both 1 Thessalonians and 2 Thessalonians to the church he founded in the city.",
       "sources": [
         "scripture:Acts 17:1",
         "scripture:Acts 17:2",
@@ -133,7 +133,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

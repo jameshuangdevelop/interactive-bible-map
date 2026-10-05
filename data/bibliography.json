@@ -1547,6 +1547,30 @@
       "publisher": "Biblical Archaeology Society, Bible History Daily",
       "url": "https://www.biblicalarchaeology.org/daily/archaeology-today/colossae-a-biblical-city-of-classical-world/",
       "accessed": "2026-10-01"
+    },
+    {
+      "id": "unesco-historic-centre-rome",
+      "type": "web",
+      "title": "Historic Centre of Rome, the Properties of the Holy See in that City Enjoying Extraterritorial Rights and San Paolo Fuori le Mura",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/91/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "odysseus-philippi-history",
+      "type": "web",
+      "title": "Philippoi: History",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2387",
+      "accessed": "2026-10-05"
     }
   ]
 }

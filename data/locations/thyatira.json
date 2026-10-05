@@ -28,7 +28,7 @@
     }
   ],
   "summary": {
-    "text": "Thyatira stood in an open valley between the Hermus and Caicus river valleys, on a minor tributary of the Hermus, at the site of modern Akhisar in western Turkey. The Greek geographer Strabo calls it \"a settlement of the Macedonians\"; the Hellenistic king Seleucus I planted a colony of Macedonian soldiers there around 300 BC to guard the road between Pergamon and Sardis. Unlike hill cities such as Sardis or Pergamon, Thyatira sat on open, only gently rising ground, and inscriptions show it had more trade guilds than any other city in the province of Asia, including wool-workers, linen-workers, dyers, leather-workers, potters, and bronze-smiths.",
+    "text": "Thyatira stood in an open valley between the Hermus and Caicus river valleys, on a minor tributary of the Hermus, at the site of modern Akhisar in western Turkey. The Greek geographer Strabo calls it \"a settlement of the Macedonians\"; Seleucus I, the Hellenistic king who founded the Seleucid dynasty, made it a city and a military colony, a garrison to hold the road between Pergamum and Sardis. Unlike hill cities such as Sardis or Pergamum, Thyatira sat on open, only gently rising ground, and inscriptions show it had more trade guilds than any other city in the province of Asia, including wool-workers, linen-workers, dyers, leather-workers, potters, and bronze-smiths.",
     "sources": [
       "dare:21159",
       "wikidata:Q1135603",
@@ -38,7 +38,7 @@
   },
   "history": [
     {
-      "text": "Acts identifies Lydia, who was converted and baptized at Philippi, as \"a seller of purple, of the city of Thyatira\"; given the city's known trade in dyes, some scholars think her \"purple\" goods were colored with a locally made red dye rather than the costlier purple derived from shellfish. Thyatira is also one of the seven churches addressed in Revelation 2, commended for its \"love, faith, service, patient endurance,\" but rebuked for tolerating a woman the text calls \"Jezebel,\" who called herself a prophetess and taught believers to commit sexual immorality and eat food sacrificed to idols.",
+      "text": "Acts identifies Lydia, who was converted and baptized at Philippi, as \"a seller of purple, of the city of Thyatira\"; given the city's known trade in dyes, some scholars think her \"purple\" goods were colored with a locally made red dye rather than the usual purple dye made from shellfish. Thyatira is also one of the seven churches addressed in Revelation 2, commended for its \"love, faith, service, patient endurance,\" but rebuked for tolerating a woman the text calls \"Jezebel,\" who called herself a prophetess and taught believers to commit sexual immorality and eat food sacrificed to idols.",
       "sources": [
         "scripture:Acts 16:14",
         "scripture:Revelation 2:19",
@@ -47,13 +47,13 @@
       ]
     },
     {
-      "text": "Thyatira's coinage was struck on a particularly large scale in the third century AD, a sign of continuing prosperity built on the city's trade and craft guilds.",
+      "text": "Thyatira's coinage was struck on a large scale in the late second and third centuries AD, a sign of prosperity and wealth. Its coins show a local hero, Tyrimnos, riding out on horseback with a battle-axe over his shoulder, a fitting emblem for a city founded as a military colony.",
       "sources": [
         "bib:ramsay-seven-churches"
       ]
     },
     {
-      "text": "Today the site of Thyatira lies beneath the modern Turkish town of Akhisar, so little of the ancient city has been excavated.",
+      "text": "Today the site of Thyatira lies beneath the modern Turkish town of Akhisar.",
       "sources": [
         "dare:21159",
         "wikidata:Q1135603",
@@ -95,7 +95,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

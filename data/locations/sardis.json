@@ -28,7 +28,7 @@
     }
   ],
   "summary": {
-    "text": "Sardis stood at the foot of Mount Tmolus, on the edge of the fertile Hermus river plain, combining a steep, naturally fortified acropolis that the Greek historian Polybius called \"the strongest place in the world\" with a much larger lower city on the plain below. It had been the capital of the ancient kingdom of Lydia, whose king Croesus became proverbial for his wealth, drawn partly from gold dust carried down from Mount Tmolus by the small Pactolus river, until the Persian conquest of 547/546 BC. By Paul's day it was a major city of the Roman province of Asia, still recovering from a catastrophic earthquake that struck twelve cities of Asia in a single night in AD 17; the Roman historian Tacitus records that Sardis suffered the worst damage of them all and received the largest relief from the emperor Tiberius, a ten-million-sesterce grant and a five-year tax remission.",
+    "text": "Sardis stood at the foot of Mount Tmolus, on the edge of the fertile Hermus river plain, combining a steep, naturally fortified acropolis with a much larger lower city on the plain below. It had been the capital of the ancient kingdom of Lydia, whose king Croesus became proverbial for his wealth, drawn partly from gold dust carried down from Mount Tmolus by the small Pactolus river, until the Persian conquest of 547/546 BC. By Paul's day it was a major city of the Roman province of Asia. In AD 17 a catastrophic earthquake struck twelve cities of Asia in a single night; the Roman historian Tacitus records that Sardis suffered the worst damage of them all and received the largest relief from the emperor Tiberius, a ten-million-sesterce grant and a five-year tax remission.",
     "sources": [
       "pleiades:550867",
       "wikidata:Q232615",
@@ -40,7 +40,7 @@
   },
   "history": [
     {
-      "text": "Sardis is one of the seven churches addressed in Revelation, rebuked there for having \"a reputation of being alive,\" though \"you are dead,\" and warned, \"I will come as a thief, and you won't know what hour I will come upon you.\" Some interpreters connect this warning to local history: the city's acropolis, trusted as impregnable, had twice been captured by surprise, first by the Persian king Cyrus in the sixth century BC and later by the Greek king Antiochus III, in both cases by soldiers who climbed an unguarded, weathered section of the cliff. Despite being one of the seven churches, excavators have found no church building at Sardis from this period.",
+      "text": "Sardis is one of the seven churches addressed in Revelation, rebuked there for having \"a reputation of being alive,\" though \"you are dead,\" and warned, \"I will come as a thief, and you won't know what hour I will come upon you.\" Some interpreters connect this warning to local history: the city's acropolis, trusted as impregnable, had twice been captured by surprise, first by the Persian king Cyrus in the sixth century BC and later by the Greek king Antiochus III, in both cases by soldiers who climbed an unguarded, weathered section of the cliff. Although Sardis was one of the seven churches, excavators have found no church building there from this period.",
       "sources": [
         "scripture:Revelation 3:1",
         "scripture:Revelation 3:3",
@@ -49,10 +49,11 @@
       ]
     },
     {
-      "text": "In the centuries after Revelation was written, Sardis's Temple of Artemis, whose core had stood since the third century BC, gained a partial outer colonnade, though it was never fully finished. The city's grand Bath-Gymnasium complex, and a large synagogue later built within one of its halls, said to be the largest synagogue known from the ancient world, both date from the late second or third century AD.",
+      "text": "In the centuries after Revelation was written, Sardis's Temple of Artemis, whose core had stood since the third century BC, gained a partial outer colonnade, though it was never fully finished. The city's grand Bath-Gymnasium complex dates from the late second or early third century AD; one of its halls was later turned into a synagogue, the biggest ancient synagogue yet found.",
       "sources": [
         "bib:sardis-expedition-artemis-temple",
-        "bib:sardis-expedition-bath-gymnasium"
+        "bib:sardis-expedition-bath-gymnasium",
+        "bib:sardis-expedition-about"
       ]
     },
     {
@@ -87,7 +88,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

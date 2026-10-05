@@ -32,7 +32,7 @@
     }
   ],
   "summary": {
-    "text": "Crete is a long, mountainous island south of the Aegean Sea, about 156 miles long, with its central mountain range rising to more than 8,000 feet at Mount Ida. Excavations at Knossos and Phaistos show that Crete was a center of Mediterranean civilization in an early age, long before Rome's time; its most important cities in the Roman period were Knossos, Gortyna, and Cydonia. Crete's support for pirate raiders gave Rome a pretext for war, and the Roman general Metellus annexed the island in 67 BC, joining it with Cyrene in North Africa as a single Roman province.",
+    "text": "Crete is a long, mountainous island south of the Aegean Sea, about 156 miles long, with its central mountain range rising to more than 8,000 feet at Mount Ida. Excavations at Knossos and Phaistos show that Crete was a center of Mediterranean civilization in an early age, long before Rome's time; its most important ancient cities were Knossos, Gortyna, and Cydonia. Crete's support for pirate raiders gave Rome a pretext for war, and the Roman general Metellus annexed the island in 67 BC, joining it with Cyrene in North Africa as a single Roman province.",
     "sources": [
       "wikidata:Q34374",
       "bib:isbe-crete"
@@ -40,7 +40,7 @@
   },
   "history": [
     {
-      "text": "Acts reports that Jews from Crete were among the crowd present at Pentecost in Jerusalem. On Paul's voyage to Rome, his ship sailed under the lee of Crete and anchored at Fair Havens, near the city of Lasea; when the harbor proved unsuitable for winter, the ship set out for the port of Phoenix farther west and was instead driven out to sea by a stormy wind called Euroclydon, passing the small island of Clauda. Paul's letter to Titus says that he had left Titus in Crete to \"set in order the things that were lacking and appoint elders in every city,\" and quotes a Cretan prophet's description of the islanders as \"always liars, evil beasts, and idle gluttons.\"",
+      "text": "Acts reports that Jews from Crete were among the crowd present at Pentecost in Jerusalem. On Paul's voyage to Rome, his ship sailed under the lee of Crete and anchored at Fair Havens, near the city of Lasea; when the harbor proved unsuitable for winter, the ship set out for the harbor of Phoenix and was instead driven out to sea by a stormy wind called Euroclydon, passing the small island of Clauda. Paul's letter to Titus says that he had left Titus in Crete to \"set in order the things that were lacking and appoint elders in every city,\" and quotes a Cretan prophet's description of the islanders as \"always liars, evil beasts, and idle gluttons.\"",
       "sources": [
         "scripture:Acts 2:11",
         "scripture:Acts 27:7",
@@ -50,7 +50,8 @@
         "scripture:Acts 27:14",
         "scripture:Acts 27:16",
         "scripture:Titus 1:5",
-        "scripture:Titus 1:12"
+        "scripture:Titus 1:12",
+        "scripture:Acts 27:15"
       ]
     },
     {
@@ -60,7 +61,7 @@
       ]
     },
     {
-      "text": "Today Crete is a Greek island. Visitors can see the Minoan palace at Knossos, excavated in the early twentieth century, and the Roman-period remains at Gortyna, where church tradition holds that Titus served as the island's first bishop.",
+      "text": "Today Crete is a Greek island. Visitors can see the excavated palace at Knossos, one of its chief ancient cities. Church tradition made Titus, whom Paul had left on the island, its first bishop and patron saint.",
       "sources": [
         "wikidata:Q34374",
         "bib:isbe-crete"
@@ -117,11 +118,16 @@
       "ref": "Titus 1:12",
       "book": "Titus",
       "textWEB": "One of them, a prophet of their own, said, “Cretans are always liars, evil beasts, and idle gluttons.”"
+    },
+    {
+      "ref": "Acts 27:15",
+      "book": "Acts",
+      "textWEB": "When the ship was caught and couldn’t face the wind, we gave way to it and were driven along."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

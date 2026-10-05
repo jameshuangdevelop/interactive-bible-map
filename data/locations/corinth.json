@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Corinth stood on the narrow isthmus joining central Greece to the Peloponnese, below the steep rock of Acrocorinthus, a citadel hill rising more than 1,800 feet directly south of the city. The Roman general Mummius destroyed the Greek city in 146 BC, and the Roman leader Julius Caesar refounded it as a Roman colony in 44 BC; it grew quickly into what the International Standard Bible Encyclopedia calls \"the metropolis of the Peloponnesus.\" Corinth's twin harbors, Lechaeum on the Corinthian Gulf and Cenchreae on the Saronic Gulf, let traders avoid the long voyage around the Peloponnese by hauling smaller ships overland on a paved track, the diolkos.",
+    "text": "Corinth stood on the narrow isthmus joining central Greece to the Peloponnese, below the steep rock of Acrocorinthus, a citadel hill rising more than 1,800 feet directly south of the city. The Roman general Mummius destroyed the Greek city in 146 BC, and the Roman leader Julius Caesar refounded it as a Roman colony in 44 BC; it grew quickly, and by Paul's time it was the leading city of the Peloponnese. Corinth's twin harbors, Lechaeum on the Corinthian Gulf and Cenchreae on the Saronic Gulf, let traders avoid the long voyage around the Peloponnese by hauling smaller ships overland on a paved track, the diolkos.",
     "sources": [
       "pleiades:570182",
       "wikidata:Q1363688",
@@ -41,7 +41,7 @@
   },
   "history": [
     {
-      "text": "Acts reports that Paul spent eighteen months in Corinth on his second missionary journey, lodging and working as a tentmaker alongside the Jewish couple Priscilla and Aquila and teaching the word of God there. When the city's Jewish community brought him before the Roman proconsul Gallio, Gallio refused to judge what he called a dispute about Jewish law rather than a crime, and had the accusers driven from his court. The congregation Paul founded there included members with Latin names such as Crispus, Gaius, and Erastus, reflecting the strongly Roman character of Caesar's colony, and Paul later wrote both 1 Corinthians and 2 Corinthians to address the young church's troubles.",
+      "text": "Acts reports that Paul spent eighteen months in Corinth, lodging and working as a tentmaker alongside the Jewish couple Priscilla and Aquila and teaching the word of God there. When the city's Jewish community brought him before the Roman proconsul Gallio, Gallio refused to judge what he called a dispute about Jewish law rather than a crime, and had the accusers driven from his court. The congregation Paul founded there included members with Latin names such as Crispus, Gaius, and Erastus, reflecting the strongly Roman character of Caesar's colony, and Paul later wrote both 1 Corinthians and 2 Corinthians to the church there.",
       "sources": [
         "scripture:Acts 18:2",
         "scripture:Acts 18:3",
@@ -50,11 +50,12 @@
         "scripture:Acts 18:14-15",
         "scripture:1 Corinthians 1:2",
         "scripture:2 Corinthians 1:1",
-        "bib:isbe-corinth"
+        "bib:isbe-corinth",
+        "scripture:Acts 18:16"
       ]
     },
     {
-      "text": "A few years after Paul left, in AD 66-67, the emperor Nero tried to cut a ship canal through the isthmus so that vessels could avoid the overland crossing entirely; the project was never finished, and traces of Nero's unfinished canal were still visible before the modern Corinth Canal was dug along the same route.",
+      "text": "Some years after Paul's visit, in AD 66-67, the emperor Nero tried to cut a ship canal through the isthmus so that vessels could avoid the overland crossing entirely; the project was never finished, and traces of Nero's unfinished canal were still visible before work began on the modern Corinth Canal.",
       "sources": [
         "bib:isbe-corinth"
       ]
@@ -137,11 +138,16 @@
       "ref": "2 Timothy 4:20",
       "book": "2 Timothy",
       "textWEB": "Erastus remained at Corinth, but I left Trophimus at Miletus sick."
+    },
+    {
+      "ref": "Acts 18:16",
+      "book": "Acts",
+      "textWEB": "So he drove them from the judgment seat."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

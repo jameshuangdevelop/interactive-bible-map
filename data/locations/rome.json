@@ -57,16 +57,17 @@
       ]
     },
     {
-      "text": "A few years after Paul's custody ended, in July AD 64, a great fire burned through Rome for six days, destroying or badly damaging most of the city's fourteen districts. The Roman historian Tacitus records that the emperor Nero, to quiet rumors that he himself had ordered the fire, blamed it on a group \"whom the crowd styled Christians\" and had many of them put to death; Tacitus adds that their founder, \"Christus,\" had been executed in Judea \"by sentence of the procurator Pontius Pilatus.\" After the fire, Rome's streets were rebuilt wider, with lower buildings and fire-resistant stone, in place of the old city's narrow, twisting lanes.",
+      "text": "In July AD 64, a great fire burned through Rome for six days, destroying or badly damaging most of the city's fourteen districts. The Roman historian Tacitus records that the emperor Nero, to quiet rumors that he himself had ordered the fire, blamed it on a group \"whom the crowd styled Christians\" and had many of them put to death; Tacitus adds that their founder, \"Christus,\" had been executed in Judea \"by sentence of the procurator Pontius Pilatus.\" After the fire, Rome's streets were rebuilt wider, with lower buildings and fire-resistant stone, in place of the old city's narrow, twisting lanes.",
       "sources": [
         "bib:tacitus-annals"
       ]
     },
     {
-      "text": "Today Rome is the capital of Italy. Visitors can walk through the Forum Romanum, where the temples, speakers' platforms, and senate house of Paul's day still stand in ruins, and past the long outline of the Circus Maximus. Stretches of the Via Appia, the road Paul traveled on his way into the city, remain paved and lined with ancient tombs south of Rome.",
+      "text": "Today Rome is the capital of Italy. Its historic center is a UNESCO World Heritage Site that includes the Roman and Imperial Forums and other monuments of antiquity, such as the Colosseum and the Pantheon. Excavations at the Circus Maximus have uncovered comparatively few remains of the great stadium.",
       "sources": [
         "wikidata:Q220",
-        "bib:platner-ashby-topographical-dictionary"
+        "bib:platner-ashby-topographical-dictionary",
+        "bib:unesco-historic-centre-rome"
       ]
     }
   ],
@@ -144,7 +145,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

@@ -36,28 +36,33 @@
     "sources": [
       "pleiades:678401",
       "wikidata:Q319242",
-      "bib:josephus-antiquities"
+      "bib:josephus-antiquities",
+      "bib:isbe-caesarea"
     ]
   },
   "history": [
     {
-      "text": "By Paul's day, Caesarea was the residence of the Roman governor of Judea. Acts describes it as the home of Cornelius, a centurion of the \"Italian Regiment\" whose household became among the first Gentile believers baptized, and as the base where Paul was imprisoned for about two years under the governors Felix and Festus, held \"in Herod's palace\" before his final voyage to Rome.",
+      "text": "By Paul's day, Caesarea was the residence of the Roman governor of Judea. Acts describes it as the home of Cornelius, a centurion of the \"Italian Regiment,\" whose Gentile household was baptized at Peter's command, and as the place where Paul was held \"in Herod's palace\" and kept in custody for two years under the governors Felix and Festus, until his final voyage to Rome.",
       "sources": [
         "scripture:Acts 10:1",
         "scripture:Acts 23:33",
         "scripture:Acts 23:35",
         "scripture:Acts 24:1",
-        "scripture:Acts 25:1"
+        "scripture:Acts 25:1",
+        "scripture:Acts 10:45",
+        "scripture:Acts 10:48",
+        "scripture:Acts 24:27",
+        "bib:isbe-caesarea"
       ]
     },
     {
-      "text": "Riots between the city's Gentile and Jewish populations helped touch off the Jewish revolt against Rome in AD 66. During that war, Roman soldiers at Caesarea hailed the general Vespasian as emperor, and his son Titus later celebrated his brother Domitian's birthday there by having thousands of Jewish captives fight wild animals in the city's amphitheatre.",
+      "text": "Riots between the city's Gentile and Jewish populations helped touch off the Jewish revolt against Rome. During that war, Roman soldiers at Caesarea hailed the general Vespasian as emperor, and his son Titus later celebrated his brother Domitian's birthday there by having 2,500 Jewish captives fight wild animals in the city's amphitheatre.",
       "sources": [
         "bib:isbe-caesarea"
       ]
     },
     {
-      "text": "Caesarea was finally destroyed in 1265, during the Crusades. Today visitors to the site can see the ruins of Herod's harbor and temple platform, two Roman aqueducts, and the remains of a Crusader-era fortress and cathedral built within the ancient walls.",
+      "text": "Caesarea was finally destroyed in 1265, during the Crusades. Today visitors to the site can see the ruins of a cathedral built where Herod's temple had stood, and of two aqueducts that brought water to the city.",
       "sources": [
         "bib:isbe-caesarea"
       ]
@@ -158,11 +163,26 @@
       "ref": "Acts 25:24",
       "book": "Acts",
       "textWEB": "Festus said, “King Agrippa, and all men who are here present with us, you see this man about whom all the multitude of the Jews petitioned me, both at Jerusalem and here, crying that he ought not to live any longer."
+    },
+    {
+      "ref": "Acts 10:45",
+      "book": "Acts",
+      "textWEB": "They of the circumcision who believed were amazed, as many as came with Peter, because the gift of the Holy Spirit was also poured out on the Gentiles."
+    },
+    {
+      "ref": "Acts 10:48",
+      "book": "Acts",
+      "textWEB": "He commanded them to be baptized in the name of Jesus Christ. Then they asked him to stay some days."
+    },
+    {
+      "ref": "Acts 24:27",
+      "book": "Acts",
+      "textWEB": "But when two years were fulfilled, Felix was succeeded by Porcius Festus, and desiring to gain favor with the Jews, Felix left Paul in bonds."
     }
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

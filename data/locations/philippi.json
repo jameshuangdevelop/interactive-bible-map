@@ -32,17 +32,18 @@
     }
   ],
   "summary": {
-    "text": "Philippi was a Roman colony on a fertile, partly marshy plain of eastern Macedonia, linked to its port of Neapolis nine miles to the south by a road over the Symbolum ridge, and standing on the Via Egnatia, the great Roman road linking the empire's eastern provinces. Philip II of Macedon, a fourth-century BC king, had founded the city to work the district's gold mines, but by the time of the Roman general Julius Caesar it had sunk to a small settlement. In 42 BC, forces loyal to Caesar's heirs defeated his assassins in a decisive battle fought outside the city's walls, and the victor Octavian turned Philippi into a Roman colony, later reinforced with veteran soldiers and granted the tax privileges of Italian soil.",
+    "text": "Philippi was a Roman colony on a partly marshy plain of eastern Macedonia, linked to its port of Neapolis nine miles to the south by a road over the Symbolum ridge, and standing on the Via Egnatia, a Roman road built through the city in the second century BC. Philip II of Macedon, a fourth-century BC king, had refounded the city and named it after himself, drawn by the district's gold mines, but by the time of the Roman general Julius Caesar it had sunk to a small settlement. In 42 BC, Octavian, who later became the emperor Augustus, and Mark Antony defeated Caesar's assassins in a decisive battle outside the city's walls. Philippi then became a Roman colony; it was later reinforced with settlers from Italy and granted a much-coveted privilege that freed its land from taxation.",
     "sources": [
       "pleiades:501482",
       "wikidata:Q379652",
       "bib:isbe-philippi",
-      "bib:odysseus-philippi"
+      "bib:odysseus-philippi",
+      "bib:odysseus-philippi-history"
     ]
   },
   "history": [
     {
-      "text": "Acts describes Philippi as \"the foremost\" city of that district of Macedonia and \"a Roman colony,\" the first place Paul preached in Europe. Finding no synagogue, Paul went on the Sabbath to a place of prayer by the river, where Lydia, a dealer in purple cloth from Thyatira, believed and was baptized with her household. After Paul drove a \"spirit of divination\" out of a slave girl whose fortune-telling had profited her owners, they had Paul and his companion Silas beaten and imprisoned; a great earthquake that night threw open the prison doors, and the jailer and his household were baptized. Paul's letter to the Philippians is addressed to the church he founded there, and in 1 Thessalonians he recalled that he and his companions had \"suffered before and been shamefully treated... at Philippi.\"",
+      "text": "Acts describes Philippi as \"the foremost\" city of that district of Macedonia and \"a Roman colony,\" and it was the first place in Europe where Paul founded a church. On the Sabbath, Paul and his companions went to a place of prayer by the river, where Lydia, a dealer in purple cloth from Thyatira, believed and was baptized with her household. After Paul drove a \"spirit of divination\" out of a slave girl whose fortune-telling had profited her owners, they had Paul and his companion Silas beaten and imprisoned; a great earthquake that night threw open the prison doors, and the jailer and his household were baptized. Paul's letter to the Philippians is addressed to the church he founded there, and in 1 Thessalonians he recalled that he and his companions had \"suffered before and been shamefully treated... at Philippi.\"",
       "sources": [
         "scripture:Acts 16:12",
         "scripture:Acts 16:13",
@@ -52,20 +53,23 @@
         "scripture:Acts 16:19-24",
         "scripture:Acts 16:25-34",
         "scripture:Philippians 1:1",
-        "scripture:1 Thessalonians 2:2"
+        "scripture:1 Thessalonians 2:2",
+        "bib:odysseus-philippi-history"
       ]
     },
     {
-      "text": "Philippi became home to one of the earliest Christian communities in Europe, and from the fourth to sixth centuries AD a large church complex known as the Octagon, dedicated to the apostle Paul, was built on the site of earlier Roman buildings, along with three grand basilicas. The city was largely abandoned in the early seventh century after severe earthquakes and Slavic raids, though it survived through the Byzantine period as a fortress before being deserted following the Ottoman conquest at the end of the fourteenth century.",
+      "text": "Philippi became home to one of the earliest Christian communities in Europe, and from the fourth to sixth centuries AD a large cathedral complex known as the Octagon, dedicated to the apostle Paul, was built there, along with three grand basilicas. Earthquakes and Slavic raids led people to leave the lower city early in the seventh century, though a fortress there held out through Byzantine times until the Ottoman conquest at the end of the fourteenth century.",
       "sources": [
-        "bib:odysseus-philippi"
+        "bib:odysseus-philippi",
+        "bib:odysseus-philippi-history"
       ]
     },
     {
       "text": "Today Philippi is an archaeological site near the village of Krinides, excavated since 1914 and recognized by UNESCO as a World Heritage Site. Visitors can see the city's Hellenistic walls and theatre, the Roman forum, and the remains of the Octagon church complex, with the ancient acropolis rising on the hill above.",
       "sources": [
         "wikidata:Q379652",
-        "bib:odysseus-philippi"
+        "bib:odysseus-philippi",
+        "bib:odysseus-philippi-history"
       ]
     }
   ],
@@ -123,7 +127,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

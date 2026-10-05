@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Athens lay inland from its port of Piraeus, to which it had once been joined by long defensive walls, and was dominated by the Acropolis, a steep rock about 200 feet high at the city's center. By Paul's day Athens had lost its old political power but remained a celebrated center of art, philosophy, and learning under Roman rule. The Acropolis still carried its great fifth-century BC buildings nearly intact: the Propylaea gateway, the Parthenon with its gold-and-ivory statue of the goddess Athena by the sculptor Phidias, the Erechtheum, and the small temple of Athena Nike.",
+    "text": "Athens lay inland from its port of Piraeus, to which it had once been joined by long defensive walls, and was dominated by the Acropolis, a steep rock about 200 feet high at the city's center. By Paul's day Athens had lost its old political power but remained a celebrated center of art, philosophy, and learning under Roman rule. The Acropolis still carried its great fifth-century BC buildings nearly intact: the Propylaea gateway, the Parthenon with its famous gold-and-ivory statue of the goddess Athena, the Erechtheum, and the small temple of Athena Nike.",
     "sources": [
       "pleiades:579885",
       "wikidata:Q1524",
@@ -53,17 +53,19 @@
       ]
     },
     {
-      "text": "The great Temple of Olympian Zeus, whose foundations had been laid centuries earlier, stood unfinished in Paul's day; it was not completed until decades later, under the Roman emperor Hadrian, who placed his own statue inside it. Paul left Athens for Corinth after this single recorded visit, and no New Testament letter is addressed to the city.",
+      "text": "The great Temple of Olympian Zeus still stood unfinished in Paul's day; it was completed only decades later, under the Roman emperor Hadrian, whose own statue stood inside it. Paul left Athens for Corinth after this single recorded visit, and no New Testament letter is addressed to the city.",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "scripture:Acts 18:1"
+        "scripture:Acts 18:1",
+        "bib:isbe-athens"
       ]
     },
     {
-      "text": "Today Athens is the capital and largest city of Greece, built around the same Acropolis that stood in Paul's day. The Parthenon and the other Acropolis buildings survive, though in ruins, and the Agora below has been excavated to reveal the stoas and other public buildings Paul would have walked past.",
+      "text": "Today Athens is the capital and largest city of Greece, built around the same Acropolis that stood in Paul's day. The Parthenon, partly destroyed in 1687, still stands in ruins, as do the Erechtheum and the temple of Athena Nike, and the site of the Agora, the marketplace where Paul reasoned, lies just north of the Acropolis.",
       "sources": [
         "wikidata:Q1524",
-        "bib:isbe-athens"
+        "bib:isbe-athens",
+        "scripture:Acts 17:17"
       ]
     }
   ],
@@ -131,7 +133,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

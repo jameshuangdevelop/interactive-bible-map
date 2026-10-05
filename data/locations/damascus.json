@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Damascus lies in the northwest corner of the Ghuta, a fertile plain about 2,300 feet above sea level watered by the river Barada, the Abana of the Old Testament, and surrounded on three sides by bare hills, with open desert along its eastern edge. Among the oldest continuously inhabited cities in the world, it had been part of the Roman province of Syria since the Roman general Pompey's conquest in 64 BC. In 2 Corinthians, Paul writes that around the time of his escape from the city, \"the governor under King Aretas guarded the Damascenes' city, desiring to arrest me.\" How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that the Roman emperor Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, so this record places Damascus within the Roman province of Syria for about AD 50.",
+    "text": "Damascus lies in the northwest corner of the Ghuta, a fertile plain about 2,300 feet above sea level watered by the river Barada, the Abana of the Old Testament, and surrounded on three sides by bare hills, with open desert along its eastern edge. Among the most ancient cities of the Middle East, it had been part of the Roman province of Syria since the Roman general Pompey's conquest in 64 BC. In 2 Corinthians, Paul writes that around the time of his escape from the city, \"the governor under King Aretas guarded the Damascenes' city, desiring to arrest me.\" How far the Nabataean king Aretas IV controlled Damascus at that time is debated; one proposal is that the Roman emperor Caligula gave him the city about AD 37. Aretas IV's reign ended in AD 40, so this record places Damascus within the Roman province of Syria for about AD 50.",
     "sources": [
       "pleiades:678106",
       "wikidata:Q3678596",
@@ -40,7 +40,8 @@
       "bib:isbe-aretas",
       "wikipedia:Aretas_IV_Philopatris",
       "bib:livius-nabataeans",
-      "bib:livius-damascus"
+      "bib:livius-damascus",
+      "bib:unesco-damascus"
     ]
   },
   "history": [
@@ -54,7 +55,14 @@
         "scripture:Acts 9:19",
         "scripture:Acts 9:22",
         "scripture:Acts 9:24",
-        "scripture:Acts 9:25"
+        "scripture:Acts 9:25",
+        "scripture:Acts 9:5",
+        "scripture:Acts 9:9",
+        "scripture:Acts 9:17",
+        "scripture:Acts 9:18",
+        "scripture:Acts 9:20",
+        "scripture:Acts 9:23",
+        "scripture:Acts 13:9"
       ]
     },
     {
@@ -64,7 +72,7 @@
       ]
     },
     {
-      "text": "Today Damascus is a living city whose old quarter still follows the Roman street grid. Part of the ancient colonnaded street is still known as Derb el-Mustakim, \"Straight Street,\" though it is uncertain whether it has carried that name continuously since antiquity. Visitors can also see the remains of the Roman Temple of Jupiter, stretches of the Roman city wall, and the Great Mosque of the Umayyads, built on the site of that temple.",
+      "text": "Today Damascus is a living city whose old quarter still follows the Roman street grid. Part of the ancient colonnaded street is still known as Derb el-Mustakim, \"Straight Street,\" though it is uncertain whether it has carried that name continuously since antiquity. Visitors can also see the remains of the Roman Temple of Jupiter, stretches of the Roman city wall, and the Great Mosque of the Umayyads.",
       "sources": [
         "bib:isbe-damascus",
         "bib:unesco-damascus"
@@ -166,6 +174,36 @@
       "ref": "Galatians 1:17",
       "book": "Galatians",
       "textWEB": "nor did I go up to Jerusalem to those who were apostles before me, but I went away into Arabia. Then I returned to Damascus."
+    },
+    {
+      "ref": "Acts 9:5",
+      "book": "Acts",
+      "textWEB": "He said, “Who are you, Lord?” The Lord said, “I am Jesus, whom you are persecuting."
+    },
+    {
+      "ref": "Acts 9:9",
+      "book": "Acts",
+      "textWEB": "He was without sight for three days, and neither ate nor drank."
+    },
+    {
+      "ref": "Acts 9:17",
+      "book": "Acts",
+      "textWEB": "Ananias departed and entered into the house. Laying his hands on him, he said, “Brother Saul, the Lord, who appeared to you on the road by which you came, has sent me that you may receive your sight and be filled with the Holy Spirit.”"
+    },
+    {
+      "ref": "Acts 9:18",
+      "book": "Acts",
+      "textWEB": "Immediately something like scales fell from his eyes, and he received his sight. He arose and was baptized."
+    },
+    {
+      "ref": "Acts 9:20",
+      "book": "Acts",
+      "textWEB": "Immediately in the synagogues he proclaimed the Christ, that he is the Son of God."
+    },
+    {
+      "ref": "Acts 9:23",
+      "book": "Acts",
+      "textWEB": "When many days were fulfilled, the Jews conspired together to kill him,"
     }
   ],
   "otConnections": [
@@ -203,7 +241,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

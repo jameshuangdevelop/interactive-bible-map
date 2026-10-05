@@ -39,7 +39,7 @@
   },
   "history": [
     {
-      "text": "Paul's letter to the Galatians is addressed to \"the assemblies of Galatia,\" but which congregations he meant is debated, without a clear scholarly consensus. The \"North Galatian\" view holds that he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled region; the \"South Galatian\" view holds that he wrote to the congregations he and Barnabas founded on their first missionary journey, in the province's southern cities. This record favors neither view. Acts twice describes Paul traveling through the region of Galatia and nearby Phrygia, and in 1 Corinthians he mentions a collection organized among \"the assemblies of Galatia.\"",
+      "text": "Paul's letter to the Galatians is addressed to \"the assemblies of Galatia,\" but which congregations he meant has long been debated. The \"North Galatian\" view holds that he wrote to ethnic-Galatian congregations in the province's northern, Celtic-settled region; the \"South Galatian\" view holds that he wrote to the congregations in the province's southern cities, which he reached on his first missionary journey. This record favors neither view. Acts twice describes Paul traveling through the region of Galatia and nearby Phrygia, and in 1 Corinthians he mentions a collection organized among \"the assemblies of Galatia.\"",
       "sources": [
         "scripture:Galatians 1:2",
         "scripture:Acts 16:6",
@@ -51,7 +51,7 @@
       ]
     },
     {
-      "text": "The Roman province of Galatia was formed in 25 BC and governed from the city of Ancyra; in its larger first-century extent it also included Pisidia and Lycaonia, until the emperor Vespasian detached most of Pisidia in AD 74. By the late first century, the letter of 1 Peter could be addressed to believers scattered across Galatia and four neighboring provinces, a sign of how far the church had spread through the region.",
+      "text": "The Roman province of Galatia was formed in 25 BC and governed from the city of Ancyra; in its larger first-century extent it also included Pisidia and Lycaonia, until the emperor Vespasian detached most of Pisidia in AD 74. The letter of 1 Peter is addressed to believers scattered across Galatia and four neighboring regions: Pontus, Cappadocia, Asia, and Bithynia.",
       "sources": [
         "bib:zondervan-who-were-galatians",
         "wikidata:Q1249412",
@@ -118,7 +118,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

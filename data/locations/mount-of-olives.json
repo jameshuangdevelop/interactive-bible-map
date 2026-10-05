@@ -42,7 +42,7 @@
   },
   "history": [
     {
-      "text": "The Gospels describe Jesus coming up from Jericho to Bethphage and Bethany at the Mount of Olives and sending two disciples ahead from there before his entry into Jerusalem; Luke says the crowd of disciples began to praise God \"at the descent of the Mount of Olives.\" Matthew says he was sitting on the mount when his disciples asked him privately about \"the end of the age.\" Luke says that in his last days he taught in the Temple by day and spent each night on the mount, and all three Synoptic Gospels say he went out to the mount on the night of his arrest. Acts records the disciples returning to Jerusalem from \"the mountain called Olivet,\" a Sabbath day's journey away.",
+      "text": "The Gospels describe Jesus coming up from Jericho to Bethphage and Bethany at the Mount of Olives and sending two disciples ahead from there before his entry into Jerusalem; Luke says the crowd of disciples began to praise God \"at the descent of the Mount of Olives.\" Matthew says he was sitting on the mount when his disciples asked him privately about \"the end of the age.\" Luke says that in his last days he taught in the Temple by day and spent each night on the mount, and Matthew, Mark and Luke all say he went out to the mount on the night of his arrest. Acts records the disciples returning to Jerusalem from \"the mountain called Olivet,\" a Sabbath day's journey away.",
       "sources": [
         "scripture:Mark 10:46",
         "scripture:Mark 11:1",
@@ -166,7 +166,7 @@
     }
   ],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

@@ -66,7 +66,9 @@
       "text": "By at least the second century, Christians believed that a cave at Bethlehem was the birthplace of Jesus. A church built over the cave was completed in AD 339 under the Roman emperor Constantine and replaced in the mid-sixth century under the Byzantine emperor Justinian; that building, with later changes, still stands, making the site one of the longest continuously venerated places in Christian tradition.",
       "sources": [
         "bib:unesco-church-of-nativity",
-        "bib:murphy-oconnor-holy-land-guide"
+        "bib:murphy-oconnor-holy-land-guide",
+        "wikidata:Q8413",
+        "wikidata:Q41866"
       ]
     },
     {
@@ -204,7 +206,7 @@
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
   "lastReviewed": "2026-10-05"
 }

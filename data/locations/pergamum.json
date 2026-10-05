@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Pergamon stood on a steep, cone-shaped hill above the fertile plain of the Caicus river, in the region of Mysia. It had been the capital of the Attalid dynasty of kings, who built up its acropolis with temples, a theatre seating about 10,000, and a library said to rival the one at Alexandria; the last Attalid king bequeathed his kingdom to Rome in 133 BC, after which Pergamon became the first capital of the Roman province of Asia. About 29 BC, the city built the first provincial temple to the Roman emperor Augustus and the goddess Roma anywhere in the province; the Roman historian Tacitus notes that this sanctuary still stood in AD 26, when other Asian cities competed for the right to build a second one, a contest the city of Smyrna eventually won.",
+    "text": "Pergamum stood on a huge, rocky hill above the broad plain of the Caicus river, in the region of Mysia. It had been the capital of the Attalid dynasty of kings, who built up its acropolis with temples, a theatre seating about 10,000, and a library said to rival the one at Alexandria; the last Attalid king bequeathed his kingdom to Rome in 133 BC, after which Pergamum became the first capital of the Roman province of Asia. About 29 BC, the city built the first provincial temple to the Roman emperor Augustus and the goddess Roma anywhere in the province; the Roman historian Tacitus notes that this sanctuary still stood in AD 26, when other Asian cities competed for the right to build a second one, a contest the city of Smyrna eventually won.",
     "sources": [
       "dare:21158",
       "wikidata:Q18986",
@@ -53,14 +53,15 @@
       ]
     },
     {
-      "text": "In the decades after Revelation was written, Pergamon continued to grow under Roman rule: a temple to the emperor Trajan, and the Red Basilica in the lower city, were both built after the first century had ended. In the Byzantine period the city shrank to a middle-sized town, but it remained a religious center as the home of one of the seven churches.",
+      "text": "In the decades after Revelation was written, Pergamum flourished under the emperors Trajan and Hadrian: a second imperial temple was built there in Trajan's honor, and the Red Basilica, thought to have been commissioned by one of them as a temple to Egyptian gods, dates from the same period. The city also became known for its healing center, the Asclepieion.",
       "sources": [
         "bib:worldhistory-pergamon",
-        "bib:ramsay-seven-churches"
+        "bib:ramsay-seven-churches",
+        "bib:unesco-pergamon"
       ]
     },
     {
-      "text": "Today Pergamon's acropolis and its monuments stand near the Turkish town of Bergama, recognized by UNESCO as a World Heritage Site for its unusually well-preserved, multi-layered ancient landscape.",
+      "text": "Today Pergamum's acropolis rises above the Turkish town of Bergama, on the lower slopes. The site, a UNESCO World Heritage Site, includes the acropolis's temples, theatres and altar, burial mounds, and remains from the Roman, Byzantine and Ottoman periods.",
       "sources": [
         "wikidata:Q18986",
         "bib:unesco-pergamon"
@@ -86,7 +87,7 @@
   ],
   "otConnections": [],
   "politicalHistory": [],
-  "status": "draft",
+  "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }
