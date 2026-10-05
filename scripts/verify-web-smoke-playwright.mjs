@@ -95,7 +95,28 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
     `Expected Capernaum panel to include a Today line, got '${todayLineText}'.`
   );
 
-  const creditLocator = page.locator("section[aria-label='Place details'] [data-photo-credit='true']");
+  const photoCreditsEntrySelector =
+    "section[aria-label='Place details'] [data-panel-section='photo-credits'] [data-photo-credits-entry='true']";
+  await page.waitForSelector(photoCreditsEntrySelector, { timeout: 45_000 });
+  const inlinePhotoCreditCount = await page
+    .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
+    .count();
+  assert(
+    inlinePhotoCreditCount === 0,
+    `Inline panel photo-credit lines should be removed, found ${inlinePhotoCreditCount}.`
+  );
+
+  const photoCreditEntries = await page.$$eval(photoCreditsEntrySelector, (elements) =>
+    elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  assert(photoCreditEntries.length > 0, "Capernaum should render at least one photo-credits entry.");
+  const aiCreditText = photoCreditEntries[0] ?? "";
+  assertCreditIncludes(
+    aiCreditText,
+    ["AI-generated reconstruction", "Based on: research brief"],
+    "Lead AI photo-credits entry"
+  );
+
   const aiImage = await readLoadedPanelImageState(page);
   const aiImagePath = new URL(aiImage.currentSrc).pathname;
   assert(
@@ -103,14 +124,12 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
     `Capernaum lead image must be served from media/ai, got '${aiImage.currentSrc}'.`
   );
 
-  const aiCreditText = ((await creditLocator.textContent()) ?? "").trim();
-  assertCreditIncludes(aiCreditText, ["AI-generated reconstruction", "Based on:"], "Lead AI image");
-
   const nextImageButton = page.getByRole("button", { name: "Next image" });
   assert((await nextImageButton.count()) > 0, "Capernaum gallery is missing a Next image control.");
 
   let commonsImage = null;
   let commonsCreditText = "";
+  let focusedCreditEntry = null;
   let previousSrc = aiImage.currentSrc;
   const seenImageSources = new Set([aiImage.currentSrc]);
 
@@ -134,8 +153,47 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
       );
     }
 
-    commonsCreditText = ((await creditLocator.textContent()) ?? "").trim();
-    assertCreditIncludes(commonsCreditText, ["Photo:", "Wikimedia Commons"], "Commons image");
+    const currentImageNumber = await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-counter='true']")
+      .evaluate((element) => {
+        const text = element.textContent ?? "";
+        const [leading] = text.split("/");
+        const parsed = Number.parseInt(leading?.trim() ?? "", 10);
+        return Number.isFinite(parsed) ? parsed : 1;
+      })
+      .catch(() => 1);
+
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit-link='true']")
+      .first()
+      .click();
+
+    await page.waitForFunction(() => {
+      const activeElement = document.activeElement;
+      return (
+        activeElement instanceof HTMLElement &&
+        activeElement.getAttribute("data-photo-credits-entry") === "true"
+      );
+    });
+    focusedCreditEntry = await page.evaluate(() => {
+      const activeElement = document.activeElement;
+      if (!(activeElement instanceof HTMLElement)) {
+        return null;
+      }
+
+      const indexValue = activeElement.getAttribute("data-photo-credit-entry-index");
+      const imageIndex = Number.parseInt(indexValue ?? "", 10);
+      return {
+        text: (activeElement.textContent ?? "").replace(/\s+/gu, " ").trim(),
+        imageIndex: Number.isFinite(imageIndex) ? imageIndex : null
+      };
+    });
+    assert(
+      focusedCreditEntry?.imageIndex === currentImageNumber,
+      `Credit link should focus image ${currentImageNumber}, got ${JSON.stringify(focusedCreditEntry)}.`
+    );
+    commonsCreditText = focusedCreditEntry?.text ?? "";
+    assertCreditIncludes(commonsCreditText, ["Photo:", "Wikimedia Commons"], "Commons photo-credits entry");
     commonsImage = {
       ...candidateImage,
       pathname: parsed.pathname
@@ -157,7 +215,8 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
     },
     commonsImage: {
       ...commonsImage,
-      credit: commonsCreditText
+      credit: commonsCreditText,
+      focusedCreditEntry
     }
   };
 }
@@ -202,14 +261,14 @@ async function verifyEmmausDisputedLayout(page, baseUrl) {
     page.url().includes("?place=emmaus"),
     `Emmaus deep link did not resolve as expected, got '${page.url()}'.`
   );
-  await page.waitForSelector("section[aria-label='Place details'] [data-disputed-banner='true']", {
+  await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
     timeout: 45_000
   });
 
   const disputedBanner =
     (
       await page
-        .locator("section[aria-label='Place details'] [data-disputed-banner='true']")
+        .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
         .textContent()
     )?.trim() ?? "";
   assert(

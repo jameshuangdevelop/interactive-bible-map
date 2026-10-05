@@ -54,6 +54,10 @@ import {
   PRIMARY_VECTOR_SOURCE_ID,
   shouldCountTileErrorForFallback
 } from "./tile-error-filter";
+import {
+  pickNearestCandidate,
+  type ScreenPoint as HitScreenPoint
+} from "./interactive-hit";
 import type { MapViewProps } from "./map-view.types";
 import type { Coordinates, PlaceIndexRecord, PlaceSelection } from "./types";
 
@@ -93,6 +97,7 @@ const gestureReleaseDelayMs = 1_000;
 const mapLabelPaddingTop = 80;
 const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
+const interactiveHitPaddingPx = 8;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
 const fallbackStyleLandcoverLayerIds = [
@@ -108,6 +113,8 @@ const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa of
 
 const interactiveLayerIds = [
   layerClusterCircleId,
+  layerClusterCountId,
+  layerQuestionBadgeId,
   layerCandidatePinId,
   layerSitePinId,
   layerCityPinId,
@@ -1018,6 +1025,39 @@ function asNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function asScreenPoint(point: PointLike): HitScreenPoint | null {
+  if (Array.isArray(point)) {
+    const [x, y] = point;
+    if (typeof x === "number" && Number.isFinite(x) && typeof y === "number" && Number.isFinite(y)) {
+      return { x, y };
+    }
+    return null;
+  }
+
+  if (!point || typeof point !== "object") {
+    return null;
+  }
+
+  if (!("x" in point) || !("y" in point)) {
+    return null;
+  }
+
+  const x = point.x;
+  const y = point.y;
+  if (typeof x !== "number" || !Number.isFinite(x) || typeof y !== "number" || !Number.isFinite(y)) {
+    return null;
+  }
+
+  return { x, y };
+}
+
+function queryBoxAroundPoint(point: HitScreenPoint, paddingPx: number): [PointLike, PointLike] {
+  return [
+    [point.x - paddingPx, point.y - paddingPx],
+    [point.x + paddingPx, point.y + paddingPx]
+  ];
+}
+
 function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
   const coordinates = asCoordinates(feature);
   if (!coordinates) {
@@ -1211,6 +1251,7 @@ export function MapView({
   const gestureReleaseTimeoutRef = useRef<number | null>(null);
   const visibleListRefreshFrameRef = useRef<number | null>(null);
   const activeTooltipEntryIdRef = useRef<string | null>(null);
+  const mapCanvasHasPointerCursorRef = useRef(false);
   const attributionControlRef = useRef<AttributionControl | null>(null);
   const attributionModeRef = useRef<BasemapMode | null>(null);
   const mainSourceLoadTimeoutRef = useRef<number | null>(null);
@@ -1256,6 +1297,50 @@ export function MapView({
 
     tooltip.style.display = "none";
     activeTooltipEntryIdRef.current = null;
+  }, []);
+
+  const setInteractiveCursor = useCallback((isInteractiveTarget: boolean) => {
+    const map = mapRef.current;
+    if (!map || mapCanvasHasPointerCursorRef.current === isInteractiveTarget) {
+      return;
+    }
+
+    map.getCanvas().style.cursor = isInteractiveTarget ? "pointer" : "";
+    mapCanvasHasPointerCursorRef.current = isInteractiveTarget;
+  }, []);
+
+  const resolveInteractiveEntryAtPoint = useCallback((point: PointLike) => {
+    const map = mapRef.current;
+    if (!map) {
+      return null;
+    }
+
+    const pointer = asScreenPoint(point);
+    if (!pointer) {
+      return null;
+    }
+
+    const features = map.queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
+      layers: [...interactiveLayerIds]
+    });
+    const entries = deduplicateVisibleEntries(
+      features.map(toVisibleEntry).filter((entry): entry is VisibleListEntry => entry !== null)
+    );
+
+    return pickNearestCandidate(
+      pointer,
+      entries.map((entry) => {
+        const projected = map.project(entry.coordinates as LngLatLike);
+        return {
+          value: entry,
+          point: {
+            x: projected.x,
+            y: projected.y
+          }
+        };
+      }),
+      (left, right) => left.id.localeCompare(right.id)
+    );
   }, []);
 
   const updateScaleBar = useCallback(() => {
@@ -1347,15 +1432,14 @@ export function MapView({
         return;
       }
 
-      const features = map.queryRenderedFeatures(point, {
-        layers: [...interactiveLayerIds]
-      });
-      const entry = features.map(toVisibleEntry).find((candidate) => candidate !== null);
+      const entry = resolveInteractiveEntryAtPoint(point);
       if (!entry) {
+        setInteractiveCursor(false);
         hideTooltip();
         return;
       }
 
+      setInteractiveCursor(true);
       const projected = map.project(entry.coordinates as LngLatLike);
       if (activeTooltipEntryIdRef.current === entry.id) {
         tooltip.style.left = `${projected.x}px`;
@@ -1369,7 +1453,7 @@ export function MapView({
       tooltip.style.top = `${projected.y - 22}px`;
       activeTooltipEntryIdRef.current = entry.id;
     },
-    [hideTooltip]
+    [hideTooltip, resolveInteractiveEntryAtPoint, setInteractiveCursor]
   );
 
   const zoomToCluster = useCallback(
@@ -1597,6 +1681,7 @@ export function MapView({
         tooltipTrackingEnabledRef.current = false;
       }
       gestureInProgressRef.current = true;
+      setInteractiveCursor(false);
       hideTooltip();
     };
 
@@ -1772,10 +1857,7 @@ export function MapView({
     };
 
     const handleMapClick = (event: { point: PointLike }) => {
-      const features = map.queryRenderedFeatures(event.point, {
-        layers: [...interactiveLayerIds]
-      });
-      const entry = features.map(toVisibleEntry).find((candidate) => candidate !== null);
+      const entry = resolveInteractiveEntryAtPoint(event.point);
       if (!entry) {
         return;
       }
@@ -1784,6 +1866,10 @@ export function MapView({
     };
     const handleMouseMove = (event: { point: PointLike }) => {
       handleTooltipAtPointRef.current(event.point);
+    };
+    const handleMouseOut = () => {
+      setInteractiveCursor(false);
+      hideTooltip();
     };
     const handleMoveEnd = () => {
       scheduleVisibleEntryRefreshRef.current();
@@ -1808,7 +1894,7 @@ export function MapView({
     map.on("dblclick", handleDoubleClickZoom);
     map.on("mousemove", handleMouseMove);
     tooltipTrackingEnabledRef.current = true;
-    map.on("mouseout", hideTooltip);
+    map.on("mouseout", handleMouseOut);
     map.on("click", handleMapClick);
     map.on("sourcedata", handleSourceData);
     map.on("error", handleError);
@@ -1843,12 +1929,13 @@ export function MapView({
         map.off("mousemove", handleMouseMove);
         tooltipTrackingEnabledRef.current = false;
       }
-      map.off("mouseout", hideTooltip);
+      map.off("mouseout", handleMouseOut);
       map.off("click", handleMapClick);
       map.off("sourcedata", handleSourceData);
       map.off("error", handleError);
 
       clearMainSourceLoadTimeout();
+      setInteractiveCursor(false);
       if (attributionControlRef.current) {
         map.removeControl(attributionControlRef.current);
         attributionControlRef.current = null;
@@ -1876,7 +1963,9 @@ export function MapView({
     basemapController,
     clearMainSourceLoadTimeout,
     hideTooltip,
+    resolveInteractiveEntryAtPoint,
     scheduleMainSourceLoadTimeout,
+    setInteractiveCursor,
     switchToFallback,
     syncAttributionControl,
     runtimeTuning
