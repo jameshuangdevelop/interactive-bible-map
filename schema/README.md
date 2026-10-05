@@ -36,11 +36,12 @@ All example values below are **illustrative only** (not verified historical clai
 - `site`: local site/feature context.
 
 ### Prominence
-- `prominence: "major"` marks one of the ADR-0029 major places, which target 5 to 10 images.
+- `prominence: "major"` marks one of the ADR-0029 major places, which target 4 to 7 images, counting the AI reconstruction (updated 2026-10-05).
 - `prominence: "standard"` marks every other place, which target 1 to 3 images.
 - The validator enforces the machine-checkable limits:
   - standard places must have at most 3 images;
-  - major places must have at least 5 images; this has been an error since every major place reached 5 (M3.5), and setting `REQUIRE_MAJOR_IMAGES=false` turns it back into a warning.
+  - major places must have at most 7 images;
+  - major places should have at least 4 images; this has been an error since every major place reached 4 (M3-18), and setting `REQUIRE_MAJOR_IMAGES=false` turns it back into a warning.
 
 ### Ancient area hierarchy (AD 50 convention until M4 timeline)
 - `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
