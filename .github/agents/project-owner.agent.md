@@ -35,6 +35,7 @@ You plan and coordinate Interactive Bible Map. Specialists do the research, data
     - Open it in the human's browser, with a `?place=` link to a page worth seeing first, and list what to try, the places that show the change, and anything still missing (for example, data a later phase adds).
     - Keep the previous preview running on another port while the human compares.
     - Hold only the next step the feedback could change; other work continues. Put feedback that's in scope into the running task, and anything else in `BACKLOG.md`.
+11. Speed gate from a desktop (ADR-0034). CI only reports Total Blocking Time, because its runners draw the map in software. Before asking the human to merge a PR that changes the app, run `npm run verify:web:lighthouse -- --base-url <the PR's preview URL>` from a desktop (it enforces both gates by default), and add the medians to the PR.
 
 ## Session protocol
 1. Switch to your branch: `git switch main`, `git pull --ff-only`, then `git switch -c <branch>` (or `git switch <branch>` if it exists).
