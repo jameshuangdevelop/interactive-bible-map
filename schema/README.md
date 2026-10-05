@@ -40,8 +40,7 @@ All example values below are **illustrative only** (not verified historical clai
 - `prominence: "standard"` marks every other place, which target 1 to 3 images.
 - The validator enforces the machine-checkable limits:
   - standard places must have at most 3 images;
-  - major places must have at most 7 images;
-  - major places should have at least 4 images; this has been an error since every major place reached 4 (M3-18), and setting `REQUIRE_MAJOR_IMAGES=false` turns it back into a warning.
+  - major places must have at least 4 images while `REQUIRE_MAJOR_IMAGES` is on (the default); setting it to `false` reduces this to a warning. More than 7 is always an error.
 
 ### Ancient area hierarchy (AD 50 convention until M4 timeline)
 - `type: "empire"` is an empire-level area record (for M3, the Roman Empire).

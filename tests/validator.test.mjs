@@ -71,6 +71,7 @@ async function runCase(caseName, options = {}) {
   });
 }
 
+// Reuses the valid-major-few-images fixture as a template for 3/4/7/8-image major-place cases.
 async function runWithTemporaryMajorImageCountCase(imageCount, options = {}) {
   const temporaryDirectory = fs.mkdtempSync(
     path.join(os.tmpdir(), "ibm-validator-major-images-")
