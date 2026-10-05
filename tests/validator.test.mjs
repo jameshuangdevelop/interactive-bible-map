@@ -1365,6 +1365,66 @@ test("non-exempt records with empty names.modernCountries still fail the policy 
   );
 });
 
+test("names.modernCountries rejects values outside the allow-list", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Narnia"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries[0]" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
+test("names.modernCountries rejects duplicate values", async () => {
+  const result = await runWithTemporaryHierarchyCase(
+    ({ cityData, provinceData }) => {
+      cityData.names = {
+        ancient: ["Athens"],
+        modern: "Athens",
+        alternate: [],
+        modernCountries: ["Greece", "Greece"]
+      };
+      provinceData.names = {
+        ancient: ["Achaia"],
+        modern: "Achaia",
+        alternate: [],
+        modernCountries: ["Greece"]
+      };
+    },
+    { requireModernCountries: true }
+  );
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("athens.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("Schema validation failed")
+    )
+  );
+});
+
 test("exempt records must omit names.modernCountries (jerusalem and descendants)", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {
@@ -1408,6 +1468,81 @@ test("exempt records must omit names.modernCountries (jerusalem and descendants)
         error.path === "$.names.modernCountries" &&
         error.message.includes("must be omitted for exempt records")
     )
+  );
+});
+
+test("jerusalem exemption applies at grandchild depth", async () => {
+  const runDepthCase = (grandchildModernCountries) =>
+    runWithTemporaryHierarchyCase(
+      ({ cityData, provinceData, empireData }) => {
+        cityData.id = "bethesda-grandchild";
+        cityData.names = {
+          ancient: ["Bethesda Grandchild"],
+          modern: "Bethesda Grandchild",
+          alternate: [],
+          ...(grandchildModernCountries
+            ? { modernCountries: grandchildModernCountries }
+            : {})
+        };
+        cityData.parentId = "temple-mount";
+
+        provinceData.id = "temple-mount";
+        provinceData.type = "city";
+        provinceData.zoomTier = "city";
+        provinceData.names = {
+          ancient: ["Temple Mount"],
+          modern: "Temple Mount",
+          alternate: []
+        };
+        provinceData.parentId = "jerusalem";
+
+        empireData.id = "jerusalem";
+        empireData.type = "city";
+        empireData.zoomTier = "city";
+        empireData.names = {
+          ancient: ["Jerusalem"],
+          modern: "Jerusalem",
+          alternate: []
+        };
+      },
+      {
+        requireModernCountries: true,
+        requireEmpireRoot: false
+      }
+    );
+
+  const omittedResult = await runDepthCase(undefined);
+  assert.equal(
+    hasError(
+      omittedResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
+  );
+  assert.equal(omittedResult.errors.length, 0);
+
+  const presentResult = await runDepthCase(["Greece"]);
+  assert.ok(
+    hasError(
+      presentResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("must be omitted for exempt records")
+    )
+  );
+  assert.equal(
+    hasError(
+      presentResult,
+      (error) =>
+        error.file.endsWith("bethesda-grandchild.json") &&
+        error.path === "$.names.modernCountries" &&
+        error.message.includes("required for all non-exempt records")
+    ),
+    false
   );
 });
 
