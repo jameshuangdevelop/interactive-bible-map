@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  CLOUDFLARE_PAGES_PROJECT: interactive-bible-map
+
 permissions:
   contents: read
 
@@ -36,6 +39,9 @@ jobs:
       - name: Run tests
         run: npm run test:all
 
+      - name: Validate data
+        run: npm run validate:data
+
       - name: Build app data
         run: npm run build:data
 
@@ -53,3 +59,284 @@ jobs:
         with:
           name: web-export
           path: app/dist
+
+  deploy_preview:
+    name: Deploy preview
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: pages-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    outputs:
+      secrets_available: ${{ steps.cloudflare-secrets.outputs.available }}
+      preview_url: ${{ steps.preview-url.outputs.preview_url }}
+    steps:
+      - name: Check Cloudflare secrets
+        id: cloudflare-secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare secrets are missing; skipping preview deploy." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: actions/checkout@v7
+
+      - name: Download web export artifact
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: web-export
+          path: app/dist
+
+      - name: Check Cloudflare Pages free-plan limits
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        run: node scripts/check-pages-limits.mjs app/dist
+
+      - name: List Pages projects
+        id: list-projects
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages project list --json
+
+      - name: Detect Pages project
+        id: detect-project
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        env:
+          PROJECTS_JSON: ${{ steps.list-projects.outputs.command-output }}
+          PAGES_PROJECT_NAME: ${{ env.CLOUDFLARE_PAGES_PROJECT }}
+        run: node scripts/detect-pages-project.mjs
+
+      - name: Create Pages project
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' && steps.detect-project.outputs.exists != 'true' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages project create ${{ env.CLOUDFLARE_PAGES_PROJECT }} --production-branch main
+
+      - name: Deploy preview to Cloudflare Pages
+        id: deploy
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages deploy app/dist --project-name ${{ env.CLOUDFLARE_PAGES_PROJECT }} --branch pr-${{ github.event.pull_request.number }}
+
+      - name: Resolve preview URL
+        id: preview-url
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        env:
+          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: |
+          preview_url="$ALIAS_URL"
+          if [ -z "$preview_url" ]; then
+            preview_url="$DEPLOYMENT_URL"
+          fi
+          if [ -z "$preview_url" ]; then
+            echo "Could not resolve preview URL from Wrangler outputs." >&2
+            exit 1
+          fi
+          echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
+
+      - name: Post preview URL comment
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: actions/github-script@v9
+        env:
+          PREVIEW_URL: ${{ steps.preview-url.outputs.preview_url }}
+          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+        with:
+          script: |
+            const marker = "<!-- ibm-preview-url -->";
+            const bodyLines = [
+              marker,
+              "### Cloudflare Pages preview",
+              "",
+              `- Preview URL: ${process.env.PREVIEW_URL}`,
+              process.env.ALIAS_URL ? `- Alias URL: ${process.env.ALIAS_URL}` : null,
+              process.env.DEPLOYMENT_URL ? `- Deployment URL: ${process.env.DEPLOYMENT_URL}` : null,
+              "",
+              `_Updated: ${new Date().toISOString()}_`
+            ].filter(Boolean);
+            const body = bodyLines.join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100
+            });
+            const existing = comments.find((comment) =>
+              comment.user?.login === "github-actions[bot]" &&
+              typeof comment.body === "string" &&
+              comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body
+              });
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body
+            });
+
+  verify_preview:
+    name: Verify preview checks
+    if: ${{ github.event_name == 'pull_request' && needs.deploy_preview.outputs.secrets_available == 'true' && needs.deploy_preview.outputs.preview_url != '' }}
+    needs:
+      - build
+      - deploy_preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: pages-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke test against preview
+        env:
+          BASE_URL: ${{ needs.deploy_preview.outputs.preview_url }}
+        run: npm run verify:web:smoke -- --base-url "$BASE_URL"
+
+      - name: Run accessibility check against preview
+        env:
+          BASE_URL: ${{ needs.deploy_preview.outputs.preview_url }}
+        run: npm run verify:web:axe -- --base-url "$BASE_URL"
+
+      - name: Run Lighthouse desktop gate against preview
+        env:
+          BASE_URL: ${{ needs.deploy_preview.outputs.preview_url }}
+          LIGHTHOUSE_REPORT_PATH: ${{ runner.temp }}/lighthouse-preview.json
+        run: npm run verify:web:lighthouse -- --base-url "$BASE_URL" --report-path "$LIGHTHOUSE_REPORT_PATH"
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-preview
+          path: ${{ runner.temp }}/lighthouse-preview.json
+          if-no-files-found: ignore
+
+  deploy_production:
+    name: Deploy production
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: pages-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    steps:
+      - name: Check Cloudflare secrets
+        id: cloudflare-secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare secrets are missing; skipping production deploy." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: actions/checkout@v7
+
+      - name: Download web export artifact
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: web-export
+          path: app/dist
+
+      - name: Check Cloudflare Pages free-plan limits
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        run: node scripts/check-pages-limits.mjs app/dist
+
+      - name: List Pages projects
+        id: list-projects
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages project list --json
+
+      - name: Detect Pages project
+        id: detect-project
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        env:
+          PROJECTS_JSON: ${{ steps.list-projects.outputs.command-output }}
+          PAGES_PROJECT_NAME: ${{ env.CLOUDFLARE_PAGES_PROJECT }}
+        run: node scripts/detect-pages-project.mjs
+
+      - name: Create Pages project
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' && steps.detect-project.outputs.exists != 'true' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages project create ${{ env.CLOUDFLARE_PAGES_PROJECT }} --production-branch main
+
+      - name: Deploy production to Cloudflare Pages
+        if: ${{ steps.cloudflare-secrets.outputs.available == 'true' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          command: pages deploy app/dist --project-name ${{ env.CLOUDFLARE_PAGES_PROJECT }} --branch main

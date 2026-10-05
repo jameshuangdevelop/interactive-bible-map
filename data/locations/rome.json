@@ -5,6 +5,9 @@
       "Rome"
     ],
     "modern": "Rome",
+    "modernCountries": [
+      "Italy"
+    ],
     "alternate": [],
     "otherLanguages": [
       "Roma"
@@ -31,24 +34,50 @@
     }
   ],
   "summary": {
-    "text": "Rome was the capital of the Roman Empire. Acts ends with Paul under house arrest there awaiting trial, and Paul's letter to the Romans is addressed to the believers already established in the city before his arrival.",
+    "text": "Rome was the capital of the Roman Empire, built mainly on the left bank of the Tiber river, about 15 miles from the Mediterranean Sea. Its public life centered on the Forum Romanum, an open civic square ringed by the Senate house, speakers' platforms, and temples such as those of Saturn and Concord, and on the nearby Circus Maximus, a chariot-racing stadium that could seat about 150,000 people. Men of the senatorial class wore a tunic with a broad purple border, and Jews had lived in the city in large numbers since the first century BC, after the Roman general Pompey brought captives there from Judea.",
     "sources": [
       "pleiades:423025",
       "wikidata:Q220",
       "openbible:rome",
-      "scripture:Acts 28:16",
-      "scripture:Acts 28:30",
-      "scripture:Romans 1:7",
-      "scripture:Romans 15:24",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:isbe-rome",
+      "bib:platner-ashby-topographical-dictionary",
+      "bib:worldhistory-pompey"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Paul's letter to the Romans, written before he ever reached the city, is addressed to believers already established there, and tells them of his hope to visit Spain after seeing them. Acts records that the Roman emperor Claudius had ordered all Jews to leave Rome, which is how Paul came to meet the Jewish couple Priscilla and Aquila, who had recently left Italy for that reason. After appealing to the emperor, Paul was brought toward Rome along the Appian Way; believers from the city walked out to meet him as far as the Market of Appius and the Three Taverns. In Rome a centurion handed him over to the captain of the guard, and for two years Paul lived under guard in a house he rented himself and \"received all who were coming to him.\"",
+      "sources": [
+        "scripture:Acts 18:2",
+        "scripture:Acts 25:25",
+        "scripture:Acts 28:14",
+        "scripture:Acts 28:15",
+        "scripture:Acts 28:16",
+        "scripture:Acts 28:30",
+        "scripture:Romans 1:7",
+        "scripture:Romans 1:15",
+        "scripture:Romans 15:24",
+        "bib:isbe-appii-forum",
+        "bib:worldhistory-claudius"
+      ]
+    },
+    {
+      "text": "In July AD 64, a great fire burned through Rome for six days, destroying or badly damaging most of the city's fourteen districts. The Roman historian Tacitus records that the emperor Nero, to quiet rumors that he himself had ordered the fire, blamed it on a group \"whom the crowd styled Christians\" and had many of them put to death; Tacitus adds that their founder, \"Christus,\" had been executed in Judea \"by sentence of the procurator Pontius Pilatus.\" After the fire, Rome's streets were rebuilt wider, with lower buildings and fire-resistant stone, in place of the old city's narrow, twisting lanes.",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-nero"
+      ]
+    },
+    {
+      "text": "Today Rome is the capital of Italy. Its historic center is a UNESCO World Heritage Site that includes the Roman and Imperial Forums and other monuments of antiquity, such as the Colosseum and the Pantheon. Excavations at the Circus Maximus have uncovered comparatively few remains of the great stadium.",
+      "sources": [
+        "wikidata:Q220",
+        "bib:platner-ashby-topographical-dictionary",
+        "bib:unesco-historic-centre-rome"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 2:10",
@@ -125,5 +154,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

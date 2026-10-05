@@ -4,6 +4,10 @@
     "ancient": [
       "Pamphylia"
     ],
+    "modern": "Southern Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
     "alternate": []
   },
   "type": "region",
@@ -32,7 +36,8 @@
       "pleiades:639034",
       "bib:isbe-pamphylia",
       "scripture:Acts 13:13",
-      "scripture:Acts 27:5"
+      "scripture:Acts 27:5",
+      "wikidata:Q43"
     ]
   },
   "history": [
@@ -69,5 +74,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }

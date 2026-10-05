@@ -91,8 +91,6 @@ A place is **disputed** when at least one of its candidates has confidence `disp
 ## 3. Place panel
 The section order follows brief §1.4. Sections without data are left out.
 
-**Coming after CP3.5:** the modern name gains its country (ADR-0028), the action bar goes, and the confidence chip moves onto the "Today" line (ADR-0030). Items 2, 3 and 5 below describe the panel until then.
-
 1. **Images** (ADR-0029, built in M3.5-06). Major places have 4–7 images, counting the AI reconstruction, and standard places 1–3, about 408 × 240 px in the panel.
    - With several images, there are arrows and a "1 / 7" counter, plus a row of small thumbnails under the image when there are more than 3.
    - **A label on each image for its kind:** "Today", "Excavated site", "Reconstruction", "Historical view", or **"AI-generated reconstruction"**, which is always visible.
@@ -101,12 +99,12 @@ The section order follows brief §1.4. Sections without data are left out.
    - Selecting the image opens a large viewer (a dialog) with the same arrows, label, credit and caption. ← and → move between images, and Esc closes it.
 2. **Names:**
    - the title is the first ancient name, the spelling most popular English Bibles agree on, for example **Capernaum** (CP3a decision 2; ADR-0026);
-   - under it, the modern name, labelled **"Today: *name*"** (see §8 for the neutrality rule);
+   - under it, one **"Today"** line: **"Today: *modern name*, *country/countries*"** when both exist; the modern name alone when no country is shown; or the countries alone when there is no single modern name. "West Bank" and "Golan Heights" omit "the" when they directly follow the modern name (for example "Bethlehem, West Bank"), but keep it in stand-alone or "and" positions;
    - then "Also known as …" with the other ancient and alternate names, which are English only. Names in `names.otherLanguages` are never shown;
    - then a line with the type, the region and the empire as of about AD 50 (ADR-0027), for example "City · Achaia · Roman Empire" or "Village · Galilee · Roman Empire". The region is the place's parent, and the empire is the end of its parent chain; each links to its own record. An empire record shows only its type.
-3. **Location confidence:** a chip in words, never colour alone. "High confidence" appears for single-candidate places. **Disputed places** get a banner instead: **"Location disputed · 4 proposed sites"**. Other places with several candidates get a neutral line, **"*n* sites"**, and each candidate carries its own confidence chip.
+3. **Location confidence:** the confidence chip (or note) sits on the same "Today" line, never by colour alone. Single-candidate places show "High/Medium/Low confidence". Disputed places show **"Location disputed · *n* proposed sites"** on that line. Other places with several candidates show **"*n* sites"** on that line. If both the modern name and countries are absent, the chip or note sits alone where the "Today" line would be.
 4. **Candidates** (places with several candidates): a list A, B, C … Each entry has its label, a confidence chip and its support text (two lines, expandable), plus its sources. Selecting an entry centres the map on it.
-5. **Actions:** round buttons with labels: **Zoom to**, **Copy link** and **Sources**, which scrolls to the sources.
+5. **Actions:** there is **no action bar**. Opening a place still frames all its candidate sites on the map, the URL still carries `?place=...` (and `&candidate=...` when relevant), and the Sources section stays in the panel.
 6. **About:** the summary, then the history notes. Each factual statement ends with source markers such as [1] [2] that link to the Sources section.
 7. **In the Bible · *n* passages:** grouped by book in canonical order.
    - Each entry shows its reference in bold (for example "Matthew 4:13") and the WEB verse text in a **serif** typeface, so scripture reads distinctly.
@@ -125,8 +123,9 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Placeholder:** "Search biblical places". The box searches **English place names only** (brief §1.7; ADR-0026): each record's `ancient` and `alternate` names, which include the spellings of the NIV, ESV, NLT, KJV, NKJV, CSB and WEB. So a reader can look up any place by the name their Bible uses; for example "Melita" (KJV) finds Malta. Modern names, candidate labels and names in other languages are not searched.
 - **Matching:** prefix and word-start matches, ignoring case and diacritics, so "capernaum" finds Capernaum. It tolerates one typo in names of 5 letters or more.
 - **Results:** up to 8 appear as the user types. Each shows the title name with the match in bold, and a second line with the modern name and type.
-  - Disputed places have no modern name, so their second line reads "Disputed · *n* proposed sites · *type*".
-  - Records without a modern name show just the type.
+  - For non-disputed places, the second line follows the same rule as the panel's "Today" line: modern name, then countries (without repeating countries already in the name), then the type. Example: "Selçuk, Türkiye · City".
+  - Disputed places keep "Disputed · *n* proposed sites · *type*".
+  - Records without a modern name or countries show just the type.
   - A match found through a name other than the title adds "also: *name*", for example "Malta — also: Melita". Searching "Antioch" lists **Antioch on the Orontes** (Antakya) and **Antioch in Pisidia** (Yalvaç) as separate places.
 - **Keyboard:** ↓ and ↑ move through the results, Enter opens one, and Esc clears the box. Pressing "/" anywhere focuses the search.
 - **No results:** "No places match *'xyz'*. Search covers place names only."
@@ -172,9 +171,9 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Touch targets** are at least 44 × 44 px. **Reduced motion** replaces every animation with a jump.
 
 ## 8. Neutrality in the interface
-- **Modern names (until CP3.5; ADR-0028 adds the country after it)** show the place name only: **no country, state or political descriptor** (for example "Yalvaç", "Tell Balata", "Antakya"). The map itself gives the location, and the basemap hides disputed borders (CP3a decision 3). Disputed places show no modern name line; their candidates carry their own labels, which follow the same rule. A site with no modern settlement of its own may read "Near *town*".
+- **Modern names include countries (ADR-0028):** the app shows "Today: *name*, *country/countries*" when a modern name exists, or countries only when there is no single modern name. Countries already present in the modern name are not repeated (for example "Central Türkiye" does not add "Türkiye" again). Jerusalem and records inside Jerusalem, and empire records, show no countries. "West Bank" and "Golan Heights" omit "the" when they directly follow the modern name, but use it in stand-alone and "and" list positions ("Israel and the West Bank", "the Golan Heights"). Disputed places omit `names.modern`; their "Today" line shows countries only (for example "Israel and the West Bank"), with the disputed chip beside it.
 - **Candidate order:** candidates keep the data's order, and no candidate is styled as the answer. Where church tradition and archaeology differ, both appear as candidates, with their support text.
-- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6).
+- **Wording:** plain and descriptive, with no devotional or polemical framing, in keeping with the data (brief §2.6). Introduce every person, writer or work the first time the text names them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"). Don't name databases such as Pleiades or Wikidata in the text; the Sources list names them (ADR-0033).
 
 ## 9. Attribution and credits
 - **Map:** a compact attribution control. The exact text for OpenFreeMap, OpenMapTiles and OpenStreetMap is set by the Fact-Checker in `ATTRIBUTION.md` (task M3-07).
@@ -186,7 +185,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 
 ## 10. Links
 - A selected place is kept in the URL, as `?place=capernaum`, plus `&candidate=b` for a candidate, so any view can be shared.
-- Copy link copies that URL. Opening it selects the place.
+- Opening that URL selects the same place (and candidate, when present).
 
 ## 11. Performance targets
 - **Load speed:** measured with Lighthouse's **desktop preset on a cold cache** against the preview deploy, the Largest Contentful Paint must be **2.5 s or less**, and the Total Blocking Time **200 ms or less**. These are Lighthouse's "good" thresholds.
@@ -201,7 +200,7 @@ The Ancient layer's borders and timeline (M4), the Modern/Ancient toggle and mod
 | File | Shows |
 |---|---|
 | [01-map-overview.svg](wireframes/01-map-overview.svg) | Opening view: the Mediterranean overview, search, pins, a cluster, region labels, a sample disputed "?" pin, controls and the reserved areas |
-| [02-place-panel.svg](wireframes/02-place-panel.svg) | Capernaum selected: photos with credits, names, actions, About, In the Bible, OT connections |
-| [03-disputed-place.svg](wireframes/03-disputed-place.svg) | Emmaus selected: the disputed banner and four lettered candidates on the panel and the map |
+| [02-place-panel.svg](wireframes/02-place-panel.svg) | Capernaum selected: photos with credits, names with a single "Today" line and chip, About, In the Bible, OT connections |
+| [03-disputed-place.svg](wireframes/03-disputed-place.svg) | Emmaus selected: countries + disputed chip on one "Today" line, and four lettered candidates on the panel and the map |
 | [04-search.svg](wireframes/04-search.svg) | Search results for "Antioch" |
 | [05-small-screen.svg](wireframes/05-small-screen.svg) | Small screen: search and the bottom sheet |

@@ -30,6 +30,7 @@ export interface PlaceLocationCandidate extends PlaceCandidate {
 export interface PlaceNames {
   ancient: string[];
   modern?: string;
+  modernCountries?: string[];
   alternate: string[];
 }
 
