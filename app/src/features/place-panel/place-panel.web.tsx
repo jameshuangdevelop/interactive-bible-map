@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { candidateIndexToLetter, getPrimaryPlaceName } from "../map/place-visibility";
+import { buildModernLocationLabel } from "../map/modern-location-label";
 import type {
   Confidence,
   MediaImageRecord,
@@ -46,7 +47,6 @@ import { tokens } from "../../theme/tokens";
 const PANEL_SECTION_GAP = tokens.spacing.lg;
 const SCRIPTURE_INITIAL_COUNT = 5;
 const SCRIPTURE_CHUNK_SIZE = 24;
-const SOURCE_SECTION_ANCHOR_ID = "place-panel-sources";
 const PANEL_IMAGE_ASPECT_RATIO = 17 / 10;
 const PANEL_IMAGE_DESKTOP_WIDTH = 408;
 const THUMBNAIL_IMAGE_WIDTH = 72;
@@ -77,8 +77,6 @@ interface PlacePanelProps {
   onClose: () => void;
   onSelectPlace: (selection: PlaceSelection) => void;
   onSelectCandidate: (candidateIndex: number) => void;
-  onZoomTo: () => void;
-  onCopyLink: () => void | Promise<void>;
 }
 
 function toSafeHttpUrl(url: string | null | undefined) {
@@ -745,39 +743,6 @@ function SkeletonPanelBody() {
       {block("46%", "a")}
       {block("78%", "b")}
       {block("64%", "c")}
-      <div
-        style={{
-          marginTop: `${tokens.spacing.md}px`,
-          marginBottom: `${tokens.spacing.md}px`,
-          display: "flex",
-          gap: `${tokens.spacing.sm}px`
-        }}
-      >
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            backgroundColor: "#E8EAED"
-          }}
-        />
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            backgroundColor: "#E8EAED"
-          }}
-        />
-        <div
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            backgroundColor: "#E8EAED"
-          }}
-        />
-      </div>
       <hr
         style={{
           border: "none",
@@ -815,11 +780,8 @@ export function PlacePanel({
   onToggleSmallScreenExpanded,
   onClose,
   onSelectPlace,
-  onSelectCandidate,
-  onZoomTo,
-  onCopyLink
+  onSelectCandidate
 }: PlacePanelProps) {
-  const sourceSectionRef = useRef<HTMLElement | null>(null);
   const imageViewerRef = useRef<HTMLDivElement | null>(null);
   const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
   const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
@@ -933,7 +895,7 @@ export function PlacePanel({
   const viewerFrameWidth = viewerFrameHeight * selectedImageAspectRatio;
   const showThumbnailStrip = shouldRenderThumbnailRow(images.length);
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
-  const modernName = placeForDisplay.names.modern;
+  const modernLocationLabel = buildModernLocationLabel(placeForDisplay.names);
   const titleName = getPrimaryPlaceName(placeForDisplay);
 
   useEffect(() => {
@@ -1102,37 +1064,41 @@ export function PlacePanel({
     });
   };
 
-  const confidenceRow = (() => {
+  const locationStatusIndicator = (() => {
     if (hasMultipleCandidates && isDisputed) {
       return (
-        <div
-          data-disputed-banner="true"
+        <span
+          data-location-chip="disputed"
           style={{
-            borderRadius: `${tokens.radius.panel}px`,
+            display: "inline-flex",
+            alignItems: "center",
+            borderRadius: "999px",
             backgroundColor: tokens.color.confidenceDisputedBackground,
             color: tokens.color.confidenceDisputedText,
-            padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
+            padding: "2px 10px",
             fontWeight: 500,
-            fontSize: `${tokens.typography.bodySize}px`
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`
           }}
         >
           Location disputed · {placeForDisplay.candidates.length} proposed{" "}
           {placeForDisplay.candidates.length === 1 ? "site" : "sites"}
-        </div>
+        </span>
       );
     }
 
     if (hasMultipleCandidates) {
       return (
-        <p
+        <span
+          data-location-chip="multi-site"
           style={{
-            marginTop: `${tokens.spacing.sm}px`,
-            marginBottom: 0,
-            color: tokens.color.textSecondary
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.bodySize}px`,
+            lineHeight: `${tokens.typography.bodyLineHeight}px`
           }}
         >
           {placeForDisplay.candidates.length} sites
-        </p>
+        </span>
       );
     }
 
@@ -1144,12 +1110,12 @@ export function PlacePanel({
     const chip = typeChipStyle(candidate.confidence);
     return (
       <span
+        data-location-chip="confidence"
         style={{
           display: "inline-flex",
           alignItems: "center",
-          marginTop: `${tokens.spacing.sm}px`,
           borderRadius: "999px",
-          padding: "4px 10px",
+          padding: "2px 10px",
           fontSize: `${tokens.typography.captionSize}px`,
           lineHeight: `${tokens.typography.captionLineHeight}px`,
           fontWeight: 600,
@@ -1161,16 +1127,6 @@ export function PlacePanel({
       </span>
     );
   })();
-
-  const onScrollToSources = () => {
-    sourceSectionRef.current?.scrollIntoView({
-      behavior:
-        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
-      block: "start"
-    });
-  };
 
   if (isLoading && !location) {
     return (
@@ -1343,9 +1299,10 @@ export function PlacePanel({
           >
             {titleName}
           </h1>
-          {!isDisputed && modernName ? (
-            <p data-modern-name-line="true" style={secondaryTextStyle}>
-              Today: {modernName}
+          {modernLocationLabel || locationStatusIndicator ? (
+            <p data-today-line="true" style={todayLineStyle}>
+              {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
+              {locationStatusIndicator}
             </p>
           ) : null}
           {alsoKnownAs.length > 0 ? (
@@ -1367,7 +1324,6 @@ export function PlacePanel({
               </span>
             ))}
           </p>
-          {confidenceRow}
         </section>
 
         {location && hasMultipleCandidates ? (
@@ -1500,30 +1456,6 @@ export function PlacePanel({
             </div>
           </section>
         ) : null}
-
-        <section data-panel-section="actions">
-          <hr style={sectionDividerStyle} />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: `${tokens.spacing.md}px`
-            }}
-          >
-            <ActionIconButton
-              icon="◉"
-              label={hasMultipleCandidates ? "Fit all sites" : "Zoom to"}
-              onPress={onZoomTo}
-            />
-            <ActionIconButton icon="🔗" label="Copy link" onPress={onCopyLink} />
-            <ActionIconButton
-              disabled={sourceCitations.length === 0}
-              icon="≡"
-              label="Sources"
-              onPress={onScrollToSources}
-            />
-          </div>
-        </section>
 
         {location ? (
           <>
@@ -1682,7 +1614,7 @@ export function PlacePanel({
             ) : null}
 
             {sourceCitations.length > 0 ? (
-              <section data-panel-section="sources" id={SOURCE_SECTION_ANCHOR_ID} ref={sourceSectionRef}>
+              <section data-panel-section="sources">
                 <hr style={sectionDividerStyle} />
                 <h2 style={sectionHeadingStyle}>Sources</h2>
                 <ol
@@ -1841,63 +1773,6 @@ export function PlacePanel({
   );
 }
 
-function ActionIconButton({
-  icon,
-  label,
-  disabled = false,
-  onPress
-}: {
-  icon: string;
-  label: string;
-  disabled?: boolean;
-  onPress: () => void | Promise<void>;
-}) {
-  return (
-    <button
-      disabled={disabled}
-      onClick={() => {
-        void onPress();
-      }}
-      style={{
-        border: "none",
-        background: "transparent",
-        display: "grid",
-        justifyItems: "center",
-        gap: "6px",
-        color: disabled ? tokens.color.textSecondary : tokens.color.accent,
-        cursor: disabled ? "default" : "pointer",
-        padding: 0
-      }}
-      type="button"
-    >
-      <span
-        aria-hidden="true"
-        style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "999px",
-          border: `1px solid ${tokens.color.divider}`,
-          backgroundColor: tokens.color.surface,
-          display: "grid",
-          placeItems: "center",
-          fontSize: "16px",
-          lineHeight: 1
-        }}
-      >
-        {icon}
-      </span>
-      <span
-        style={{
-          fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`
-        }}
-      >
-        {label}
-      </span>
-    </button>
-  );
-}
-
 const closeButtonStyle: CSSProperties = {
   width: "32px",
   height: "32px",
@@ -1998,6 +1873,14 @@ const secondaryTextStyle: CSSProperties = {
   color: tokens.color.textSecondary,
   fontSize: `${tokens.typography.bodySize}px`,
   lineHeight: `${tokens.typography.bodyLineHeight}px`
+};
+
+const todayLineStyle: CSSProperties = {
+  ...secondaryTextStyle,
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: `${tokens.spacing.xs}px`
 };
 
 const bodyTextStyle: CSSProperties = {

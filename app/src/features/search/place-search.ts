@@ -1,4 +1,5 @@
 import { getPrimaryPlaceName, isDisputedPlace } from "../map/place-visibility";
+import { buildModernLocationLabel } from "../map/modern-location-label";
 import type { PlaceIndexRecord, PlaceType } from "../map/types";
 
 type MatchRank = 0 | 1 | 2;
@@ -289,8 +290,9 @@ function buildSubtitle(place: PlaceIndexRecord) {
     return `Disputed · ${place.candidates.length} proposed sites · ${typeLabel}`;
   }
 
-  if (typeof place.names.modern === "string" && place.names.modern.trim().length > 0) {
-    return `${place.names.modern} · ${typeLabel}`;
+  const modernLocationLabel = buildModernLocationLabel(place.names);
+  if (modernLocationLabel) {
+    return `${modernLocationLabel} · ${typeLabel}`;
   }
 
   return typeLabel;
