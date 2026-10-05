@@ -104,6 +104,13 @@ const IMAGE_PROMPTS_BASE_URL =
 // Keep raw source IDs in data only; readers get a single brief link label.
 export const AI_BASED_ON_LABEL = "research brief";
 const WORD_CHARACTER_PATTERN = /[\p{Letter}\p{Number}]/u;
+const WORD_BODY_CHARACTER_PATTERN = /[\p{Letter}\p{Number}'’]/u;
+const CAPITALIZED_WORD_START_PATTERN = /^\p{Lu}/u;
+const SENTENCE_BOUNDARY_PATTERN = /[.!?]/u;
+const LOWERCASE_LINK_NAME_CONNECTORS = new Set(["the", "of", "on", "in", "and", "beyond"]);
+const OPENING_WORD_PUNCTUATION = new Set(['"', "“", "‘", "(", "[", "{"]);
+const CLOSING_WORD_PUNCTUATION = new Set(['"', "”", "’", "'", ")", "]", "}"]);
+const TRAILING_NEIGHBOR_PUNCTUATION = new Set([".", ...CLOSING_WORD_PUNCTUATION]);
 // Keep in sync with schema/location.schema.json ($defs.modernCountry).
 const MODERN_COUNTRY_NAMES = [
   "Türkiye",
@@ -250,6 +257,65 @@ function normalizeDisplayNameForMatch(value: string) {
   return value.trim().replace(/\s+/gu, " ");
 }
 
+function normalizeNameWordForComparison(value: string) {
+  return value.toLocaleLowerCase();
+}
+
+function buildNameMatchVariants(value: string) {
+  const normalizedName = normalizeDisplayNameForMatch(value);
+  if (normalizedName.length === 0) {
+    return [] as string[];
+  }
+
+  const variants = [normalizedName];
+  const firstWordMatch = /^(?<word>\p{Letter}+(?:['’]\p{Letter}+)*)/u.exec(normalizedName);
+  const firstWord = firstWordMatch?.groups?.word;
+  if (!firstWord) {
+    return variants;
+  }
+
+  const firstWordLower = firstWord.toLocaleLowerCase();
+  if (!LOWERCASE_LINK_NAME_CONNECTORS.has(firstWordLower)) {
+    return variants;
+  }
+
+  const lowercaseVariant = `${firstWordLower}${normalizedName.slice(firstWord.length)}`;
+  if (!variants.includes(lowercaseVariant)) {
+    variants.push(lowercaseVariant);
+  }
+
+  const firstCharacter = firstWord.charAt(0);
+  const titleCasedFirstWord = `${firstCharacter.toLocaleUpperCase()}${firstWord.slice(
+    firstCharacter.length
+  )}`;
+  const titleCaseVariant = `${titleCasedFirstWord}${normalizedName.slice(firstWord.length)}`;
+  if (!variants.includes(titleCaseVariant)) {
+    variants.push(titleCaseVariant);
+  }
+
+  return variants;
+}
+
+function hasDisallowedLowercaseWords(value: string) {
+  const words = value.match(/\p{Letter}+(?:['’]\p{Letter}+)?/gu) ?? [];
+  for (const word of words) {
+    const normalizedWord = normalizeNameWordForComparison(word);
+    if (word !== normalizedWord) {
+      continue;
+    }
+
+    if (!LOWERCASE_LINK_NAME_CONNECTORS.has(normalizedWord)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isAllowedAboutLinkName(value: string) {
+  return !hasDisallowedLowercaseWords(value);
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }
@@ -258,10 +324,147 @@ function isWordCharacter(value: string | undefined) {
   return Boolean(value && WORD_CHARACTER_PATTERN.test(value));
 }
 
+function isWordBodyCharacter(value: string | undefined) {
+  return Boolean(value && WORD_BODY_CHARACTER_PATTERN.test(value));
+}
+
 function isWholeWordMatch(text: string, start: number, end: number) {
   const before = start > 0 ? text[start - 1] : undefined;
   const after = end < text.length ? text[end] : undefined;
   return !isWordCharacter(before) && !isWordCharacter(after);
+}
+
+function isCapitalizedWord(word: string) {
+  const trimmedWord = word.replace(/^['’"“‘]+/u, "");
+  return CAPITALIZED_WORD_START_PATTERN.test(trimmedWord);
+}
+
+function isWhitespaceCharacter(value: string | undefined) {
+  return Boolean(value && /\s/u.test(value));
+}
+
+function wordNearStartOfSentence(text: string, wordStart: number) {
+  let cursor = wordStart - 1;
+  while (cursor >= 0 && isWhitespaceCharacter(text[cursor])) {
+    cursor -= 1;
+  }
+
+  while (cursor >= 0 && CLOSING_WORD_PUNCTUATION.has(text[cursor])) {
+    cursor -= 1;
+  }
+
+  if (cursor < 0) {
+    return true;
+  }
+
+  return SENTENCE_BOUNDARY_PATTERN.test(text[cursor]);
+}
+
+interface WordRange {
+  start: number;
+  end: number;
+  text: string;
+}
+
+function readWordBackward(text: string, endInclusive: number) {
+  if (endInclusive < 0 || endInclusive >= text.length) {
+    return null as WordRange | null;
+  }
+
+  if (!isWordBodyCharacter(text[endInclusive])) {
+    return null as WordRange | null;
+  }
+
+  let start = endInclusive;
+  while (start > 0 && isWordBodyCharacter(text[start - 1])) {
+    start -= 1;
+  }
+
+  return {
+    start,
+    end: endInclusive + 1,
+    text: text.slice(start, endInclusive + 1)
+  };
+}
+
+function readWordForward(text: string, start: number) {
+  if (start < 0 || start >= text.length) {
+    return null as WordRange | null;
+  }
+
+  if (!isWordBodyCharacter(text[start])) {
+    return null as WordRange | null;
+  }
+
+  let end = start + 1;
+  while (end < text.length && isWordBodyCharacter(text[end])) {
+    end += 1;
+  }
+
+  return {
+    start,
+    end,
+    text: text.slice(start, end)
+  };
+}
+
+function readAdjacentWordBefore(text: string, matchStart: number) {
+  const separator = matchStart > 0 ? text[matchStart - 1] : undefined;
+  if (separator !== " " && separator !== "-") {
+    return null as WordRange | null;
+  }
+
+  let cursor = matchStart - 2;
+  while (cursor >= 0 && TRAILING_NEIGHBOR_PUNCTUATION.has(text[cursor])) {
+    cursor -= 1;
+  }
+
+  return readWordBackward(text, cursor);
+}
+
+function readAdjacentWordAfter(text: string, matchEnd: number) {
+  const separator = matchEnd < text.length ? text[matchEnd] : undefined;
+  if (separator !== " " && separator !== "-") {
+    return null as WordRange | null;
+  }
+
+  let cursor = matchEnd + 1;
+  while (cursor < text.length && OPENING_WORD_PUNCTUATION.has(text[cursor])) {
+    cursor += 1;
+  }
+
+  return readWordForward(text, cursor);
+}
+
+function isPartOfLongerCapitalizedName(text: string, start: number, end: number) {
+  const beforeWord = readAdjacentWordBefore(text, start);
+  if (
+    beforeWord &&
+    isCapitalizedWord(beforeWord.text) &&
+    !wordNearStartOfSentence(text, beforeWord.start)
+  ) {
+    return true;
+  }
+
+  const afterWord = readAdjacentWordAfter(text, end);
+  if (afterWord && isCapitalizedWord(afterWord.text) && !wordNearStartOfSentence(text, afterWord.start)) {
+    return true;
+  }
+
+  return false;
+}
+
+function hasFollowingOfCapitalizedWord(text: string, end: number) {
+  if (text.slice(end, end + 4) !== " of ") {
+    return false;
+  }
+
+  const wordAfterOf = readWordForward(text, end + 4);
+  return Boolean(wordAfterOf && isCapitalizedWord(wordAfterOf.text));
+}
+
+function shouldSkipAboutMatchForContext(text: string, start: number, end: number) {
+  return isPartOfLongerCapitalizedName(text, start, end) || hasFollowingOfCapitalizedWord(text, end);
 }
 
 function namesForAboutMatching(place: PlaceIndexRecord) {
@@ -274,24 +477,30 @@ function collectNameOwners(places: PlaceIndexRecord[]) {
   for (const place of places) {
     const namesSeenForPlace = new Set<string>();
     for (const placeName of namesForAboutMatching(place)) {
-      const normalized = normalizeComparableText(placeName);
-      if (
-        normalized.length === 0 ||
-        namesSeenForPlace.has(normalized) ||
-        MODERN_COUNTRY_COMPARABLE_NAMES.has(normalized)
-      ) {
+      if (!isAllowedAboutLinkName(placeName)) {
         continue;
       }
 
-      namesSeenForPlace.add(normalized);
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const normalized = normalizeComparableText(nameVariant);
+        if (
+          normalized.length === 0 ||
+          namesSeenForPlace.has(normalized) ||
+          MODERN_COUNTRY_COMPARABLE_NAMES.has(normalized)
+        ) {
+          continue;
+        }
 
-      const existing = ownersByName.get(normalized);
-      if (existing) {
-        existing.add(place.id);
-        continue;
+        namesSeenForPlace.add(normalized);
+
+        const existing = ownersByName.get(normalized);
+        if (existing) {
+          existing.add(place.id);
+          continue;
+        }
+
+        ownersByName.set(normalized, new Set([place.id]));
       }
-
-      ownersByName.set(normalized, new Set([place.id]));
     }
   }
 
@@ -304,8 +513,14 @@ export interface AboutMatchCandidate {
   priorityLength: number;
 }
 
+interface SelfNameMaskCandidate {
+  matcher: RegExp;
+  priorityLength: number;
+}
+
 export interface AboutPlaceMatchIndex {
   candidates: AboutMatchCandidate[];
+  selfNameMaskCandidatesByPlaceId: Map<string, SelfNameMaskCandidate[]>;
 }
 
 function collectAboutMatchCandidates(places: PlaceIndexRecord[]): AboutMatchCandidate[] {
@@ -315,33 +530,73 @@ function collectAboutMatchCandidates(places: PlaceIndexRecord[]): AboutMatchCand
   for (const place of places) {
     const namesSeenForPlace = new Set<string>();
     for (const placeName of namesForAboutMatching(place)) {
-      const comparableName = normalizeComparableText(placeName);
-      if (comparableName.length === 0 || namesSeenForPlace.has(comparableName)) {
+      if (!isAllowedAboutLinkName(placeName)) {
         continue;
       }
 
-      namesSeenForPlace.add(comparableName);
-      const owners = ownersByName.get(comparableName);
-      if (!owners || owners.size !== 1) {
-        continue;
-      }
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const comparableName = normalizeComparableText(nameVariant);
+        if (
+          comparableName.length === 0 ||
+          namesSeenForPlace.has(nameVariant) ||
+          MODERN_COUNTRY_COMPARABLE_NAMES.has(comparableName)
+        ) {
+          continue;
+        }
 
-      const displayName = normalizeDisplayNameForMatch(placeName);
-      const pattern = escapeRegExp(displayName).replace(/\s+/gu, "\\s+");
-      candidates.push({
-        placeId: place.id,
-        matcher: new RegExp(pattern, "giu"),
-        priorityLength: displayName.length
-      });
+        namesSeenForPlace.add(nameVariant);
+        const owners = ownersByName.get(comparableName);
+        if (!owners || owners.size !== 1) {
+          continue;
+        }
+
+        const displayName = normalizeDisplayNameForMatch(nameVariant);
+        const pattern = escapeRegExp(displayName).replace(/\s+/gu, "\\s+");
+        candidates.push({
+          placeId: place.id,
+          matcher: new RegExp(pattern, "gu"),
+          priorityLength: displayName.length
+        });
+      }
     }
   }
 
   return candidates;
 }
 
+function collectSelfNameMaskCandidatesByPlaceId(places: PlaceIndexRecord[]) {
+  const byPlaceId = new Map<string, SelfNameMaskCandidate[]>();
+
+  for (const place of places) {
+    const matchers: SelfNameMaskCandidate[] = [];
+    const seenNames = new Set<string>();
+
+    for (const placeName of namesForAboutMatching(place)) {
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const displayName = normalizeDisplayNameForMatch(nameVariant);
+        if (displayName.length === 0 || seenNames.has(displayName)) {
+          continue;
+        }
+
+        seenNames.add(displayName);
+        const pattern = escapeRegExp(displayName).replace(/\s+/gu, "\\s+");
+        matchers.push({
+          matcher: new RegExp(pattern, "gu"),
+          priorityLength: displayName.length
+        });
+      }
+    }
+
+    byPlaceId.set(place.id, matchers);
+  }
+
+  return byPlaceId;
+}
+
 export function buildAboutPlaceMatchIndex(places: PlaceIndexRecord[]): AboutPlaceMatchIndex {
   return {
-    candidates: collectAboutMatchCandidates(places)
+    candidates: collectAboutMatchCandidates(places),
+    selfNameMaskCandidatesByPlaceId: collectSelfNameMaskCandidatesByPlaceId(places)
   };
 }
 
@@ -354,6 +609,112 @@ function rangesOverlap(
   right: Pick<AboutMentionCandidate, "start" | "end">
 ) {
   return left.start < right.end && right.start < left.end;
+}
+
+interface ParagraphMatchRange {
+  start: number;
+  end: number;
+  priorityLength: number;
+}
+
+function sortRangesByPositionAndLength(
+  left: Pick<ParagraphMatchRange, "start" | "end" | "priorityLength">,
+  right: Pick<ParagraphMatchRange, "start" | "end" | "priorityLength">
+) {
+  if (left.start !== right.start) {
+    return left.start - right.start;
+  }
+
+  if (left.priorityLength !== right.priorityLength) {
+    return right.priorityLength - left.priorityLength;
+  }
+
+  return left.end - right.end;
+}
+
+function collectMatchRangesFromCandidates(
+  paragraphText: string,
+  candidates: readonly Pick<SelfNameMaskCandidate, "matcher" | "priorityLength">[]
+) {
+  const ranges: ParagraphMatchRange[] = [];
+
+  for (const candidate of candidates) {
+    candidate.matcher.lastIndex = 0;
+    let match: RegExpExecArray | null = candidate.matcher.exec(paragraphText);
+    while (match) {
+      const start = match.index;
+      const end = start + match[0].length;
+      if (isWholeWordMatch(paragraphText, start, end)) {
+        ranges.push({
+          start,
+          end,
+          priorityLength: candidate.priorityLength
+        });
+      }
+
+      match = candidate.matcher.exec(paragraphText);
+    }
+  }
+
+  return ranges;
+}
+
+function selectNonOverlappingRanges(ranges: ParagraphMatchRange[]) {
+  if (ranges.length === 0) {
+    return [] as ParagraphMatchRange[];
+  }
+
+  const sortedRanges = [...ranges].sort(sortRangesByPositionAndLength);
+  const selectedRanges: ParagraphMatchRange[] = [];
+
+  for (const range of sortedRanges) {
+    if (selectedRanges.some((selectedRange) => rangesOverlap(selectedRange, range))) {
+      continue;
+    }
+
+    selectedRanges.push(range);
+  }
+
+  return selectedRanges;
+}
+
+function maskRangesInText(paragraphText: string, rangesToMask: ParagraphMatchRange[]) {
+  if (rangesToMask.length === 0) {
+    return paragraphText;
+  }
+
+  let maskedText = paragraphText;
+  const rangesInReverseOrder = [...rangesToMask].sort((left, right) => right.start - left.start);
+  for (const range of rangesInReverseOrder) {
+    maskedText =
+      maskedText.slice(0, range.start) +
+      " ".repeat(range.end - range.start) +
+      maskedText.slice(range.end);
+  }
+
+  return maskedText;
+}
+
+function maskCurrentPlaceNamesInParagraph({
+  matchIndex,
+  currentPlaceId,
+  paragraphText
+}: {
+  matchIndex: AboutPlaceMatchIndex;
+  currentPlaceId: string;
+  paragraphText: string;
+}) {
+  const selfNameMaskCandidates = matchIndex.selfNameMaskCandidatesByPlaceId.get(currentPlaceId);
+  if (!selfNameMaskCandidates || selfNameMaskCandidates.length === 0) {
+    return paragraphText;
+  }
+
+  const maskRanges = collectMatchRangesFromCandidates(paragraphText, selfNameMaskCandidates);
+  if (maskRanges.length === 0) {
+    return paragraphText;
+  }
+
+  return maskRangesInText(paragraphText, selectNonOverlappingRanges(maskRanges));
 }
 
 export function matchAboutPlaceMentions({
@@ -375,17 +736,26 @@ export function matchAboutPlaceMentions({
       return;
     }
 
+    const maskedParagraphText = maskCurrentPlaceNamesInParagraph({
+      matchIndex,
+      currentPlaceId,
+      paragraphText
+    });
+
     for (const candidate of matchIndex.candidates) {
       if (candidate.placeId === currentPlaceId) {
         continue;
       }
 
       candidate.matcher.lastIndex = 0;
-      let match: RegExpExecArray | null = candidate.matcher.exec(paragraphText);
+      let match: RegExpExecArray | null = candidate.matcher.exec(maskedParagraphText);
       while (match) {
         const matchStart = match.index;
         const matchEnd = matchStart + match[0].length;
-        if (isWholeWordMatch(paragraphText, matchStart, matchEnd)) {
+        if (
+          isWholeWordMatch(maskedParagraphText, matchStart, matchEnd) &&
+          !shouldSkipAboutMatchForContext(paragraphText, matchStart, matchEnd)
+        ) {
           allMatches.push({
             placeId: candidate.placeId,
             paragraphIndex,
@@ -395,7 +765,7 @@ export function matchAboutPlaceMentions({
           });
         }
 
-        match = candidate.matcher.exec(paragraphText);
+        match = candidate.matcher.exec(maskedParagraphText);
       }
     }
   });
