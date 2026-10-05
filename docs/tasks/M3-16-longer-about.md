@@ -33,7 +33,7 @@ Order: Research Lead half 1, then Fact-Checker half 1; then Research Lead half 2
   2. what the Bible reports there, with the passages (cited as `scripture:`), and, for the cities Paul wrote to, the letter and the church;
   3. what happened to it afterwards, briefly;
   4. what a visitor sees today: the modern town and the excavated remains.
-- **For Bible readers:** plain English, short sentences, no jargon. Explain any term a general reader wouldn't know in a few words.
+- **For Bible readers:** plain English, short sentences, no jargon. Explain any term a general reader wouldn't know in a few words. Introduce every person, writer or work the first time you name them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"), and don't name databases such as Pleiades or Wikidata in the text (ADR-0033). The second half's Research Lead also applies this to the first half's places.
 - **Neutral:** descriptive and non-devotional (spec §8). Report what a passage says ("According to Acts, Paul stayed …"), not whether it happened. On disputed locations (Golgotha, Cana, Bethany beyond the Jordan), describe every candidate fairly, in the data's order, and favour none. On disputed modern status, describe, don't judge.
 - **Sources:** each paragraph's `sources` must state every factual clause in it (ADR-0017): datasets for places and dates, `bib:` entries for history and archaeology, and `scripture:` for what a passage reports. Open every source you cite; add new `bib:` entries to `data/bibliography.json` as needed. Paraphrase; quote only short phrases.
 

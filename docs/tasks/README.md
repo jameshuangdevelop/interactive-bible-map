@@ -17,7 +17,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-03](M3-03-map-view.md) | Map view | frontend-engineer | `feat/m3-map` | Merged (#21) |
 | [M3-04](M3-04-place-panel.md) | Place panel | frontend-engineer | `feat/m3-place-panel` | Merged (#27) |
 | [M3-05](M3-05-search.md) | Search by place name, and the menu | frontend-engineer | `feat/m3-search` | Merged (#28) |
-| [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | Waits for CP3.5 |
+| [M3-06](M3-06-preview-deploy.md) | Preview deploy and CP3b readiness | frontend-engineer | `feat/m3-preview-deploy` | In progress |
 | [M3-07](M3-07-basemap-attribution.md) | Basemap attribution and style license | fact-checker | `docs/m3-basemap-attribution` | Merged (#19) |
 | [M3-08](M3-08-modern-names.md) | Neutral modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-names` | Merged (#20); its no-country rule is replaced by ADR-0028 and M3-14 |
 | [M3-10](M3-10-english-names.md) | English-only names | gis-engineer → research-lead → fact-checker | `data/m3-english-names` | Merged (#22) |
@@ -31,9 +31,14 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3.5-05](M3.5-05-standard-places.md) | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Merged (#34) |
 | [M3.5-06](M3.5-06-gallery.md) | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Merged (#31) |
 | [M3.5-07](M3.5-07-ai-reconstructions.md) | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker → the human → media-curator → fact-checker | `data/m3.5-ai-images` | Merged (#36) |
-| [M3-14](M3-14-modern-countries.md) | Countries in modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | Waits for CP3.5 |
-| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | Waits for CP3.5 and M3-14's schema commit |
-| [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | Waits for CP3.5 |
+| [M3-14](M3-14-modern-countries.md) | Countries in modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | In progress |
+| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | In progress |
+| [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | In progress |
+| [M3-18](M3-18-gallery-size.md) | Galleries of 4 to 7 images for major places | media-curator → gis-engineer | `data/m3-gallery-size` | In progress |
+| [M3-19](M3-19-credits-and-pointer.md) | Photo credits at the end of the panel, and a pointer over pins | fact-checker → frontend-engineer | `feat/m3-credits-and-pointer` | In progress (Fact-Checker) |
+| [M3-20](M3-20-about-places.md) | Places in the About | frontend-engineer | `feat/m3-about-places` | In progress |
+| [M3-21](M3-21-collapsible-sections.md) | Collapsible panel sections | fact-checker → frontend-engineer | `feat/m3-collapsible-sections` | In progress (Fact-Checker) |
+| [M3-22](M3-22-name-intros.md) | Introduce names in the other About texts | research-lead → fact-checker | `data/m3-name-intros` | In progress |
 
 ## Template
 ```markdown

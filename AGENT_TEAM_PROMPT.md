@@ -30,7 +30,7 @@ A Google-Maps-style, 2D interactive web map of New Testament locations, with the
 2. **Every fact has a source.** Every location record stores source citations and a `confidence` field (`high` / `medium` / `low` / `disputed`).
 3. **Bible text = World English Bible (WEB) only** (public domain). No ESV/NIV/etc.
 4. **Licensing:** code is MIT. The agents must decide on and document content licenses, e.g. a separate data license (CC BY-SA 4.0 if required by upstream sources such as Pleiades/OSM/Wikimedia). They keep `docs/LICENSES.md` and `ATTRIBUTION.md` listing every upstream source, its license and required attribution. Do not use any source whose license is incompatible.
-5. **Images:** only freely licensed images (Wikimedia Commons, public domain art), **hotlinked**, with author/license/source stored in data and shown in the UI. **Major places get 5–10 images and standard places 1–3 (ADR-0029)**, showing the overall feel of the place rather than fragments. AI reconstructions: agents write cited research briefs and labeled prompts (in `content/image-prompts/`), generate the images through an image API with keys the human keeps outside the repository, and the Fact-Checker checks each one against its brief (ADR-0029 §7). The human approves the final set, the project hosts the images itself, and they must be shown with an "AI-generated reconstruction" label.
+5. **Images:** only freely licensed images (Wikimedia Commons, public domain art), **hotlinked**, with author/license/source stored in data and shown in the UI. **Major places get 4–7 images, counting the AI reconstruction, and standard places 1–3 (ADR-0029)**, showing the overall feel of the place rather than fragments. AI reconstructions: agents write cited research briefs and labeled prompts (in `content/image-prompts/`), generate the images through an image API with keys the human keeps outside the repository, and the Fact-Checker checks each one against its brief (ADR-0029 §7). The human approves the final set, the project hosts the images itself, and they must be shown with an "AI-generated reconstruction" label.
 6. **Neutrality:** present scholarly consensus. Where traditions differ (e.g. Catholic/Orthodox pilgrimage sites vs. archaeological proposals), describe each side neutrally and do not take one.
 7. **Workflow:** feature branches → PRs → the human merges. **Never push to `main`.** One focused PR per task. Conventional commit messages.
 8. **Cost efficiency (budget: 1,000,000 GitHub Copilot AI credits/month across all Copilot agents; 1 credit = US$0.01, charged per token at each model's rate):**
@@ -118,6 +118,8 @@ If a model named here is not available in the Copilot surface being used (or is 
 
 ## 5. Milestones and human checkpoints
 Each checkpoint = a PR labeled `checkpoint`, with a summary, decisions needed, and budget used. **All agents pause at a checkpoint until the human approves (merges or comments "approved").**
+
+**Mini checkpoints (ADR-0031):** between checkpoints, the PO marks mini checkpoints in its task list wherever the human can see a change, and always one before asking for a push. At each one, the PO builds the app with the work so far, serves it locally, opens it in the human's browser, and lists what to try. Only the next step that the feedback could change waits; other work goes on.
 
 | Milestone | Scope | Checkpoint deliverable |
 |---|---|---|

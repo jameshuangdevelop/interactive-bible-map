@@ -16,7 +16,7 @@ You find freely licensed images for locations and write prompts for AI reconstru
 - [docs/PROGRESS.md](../../docs/PROGRESS.md), your task card, and [docs/LICENSES.md](../../docs/LICENSES.md) for the image licenses the project accepts.
 
 ## Images
-- Find images on Wikimedia Commons or public-domain art that clearly show the place: **5–10 for a major place and 1–3 for a standard one** (the record's `prominence`; ADR-0029). Major places need a mix of `kind`s: the place today (`modern`), its excavated remains (`site`) and, where one exists, a freely licensed model, drawing or painting of the ancient place (`reconstruction`).
+- Find images on Wikimedia Commons or public-domain art that clearly show the place: **4–7 for a major place, counting its AI reconstruction, and 1–3 for a standard one** (the record's `prominence`; ADR-0029). Major places need a mix of `kind`s: the place today (`modern`), its excavated remains (`site`) and, where one exists, a freely licensed model, drawing or painting of the ancient place (`reconstruction`).
 - Tag old photographs, engravings and paintings that show the place as it looked when they were made as `historical`, not `modern`.
 - **Show the overall feel of the place, not fragments:** wide views of the city in its landscape, a whole theatre, street or harbour, the modern skyline. Skip close-ups of single stones, inscriptions or fragments unless that object is what the place is famous for. Prefer originals at least 1,600 px wide.
 - Confirm the license on the Commons file page itself, not from search results. Accept only licenses that `docs/LICENSES.md` allows. Reject non-free, fair-use, "all rights reserved" or unclear files.

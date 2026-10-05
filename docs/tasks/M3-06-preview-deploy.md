@@ -35,11 +35,22 @@ Deploy the MVP to Cloudflare Pages: a preview for every pull request and product
 4. **Performance check:** run Lighthouse with the **desktop preset on a cold cache** against the preview (in CI, for example with Lighthouse CI), and assert the spec §11 gates: Largest Contentful Paint of 2.5 s or less and Total Blocking Time of 200 ms or less. Report the numbers in the PR.
 5. **Docs:** add `docs/DEPLOY.md`, explaining how deploys work, where to find the preview URL, how to roll back, what to do if tiles fail (the ADR-0009 fallback), and how to renew the Cloudflare token with `scripts/setup-cloudflare-token.ps1`. The token expires on about 2027-09-25.
 
+## Notes for the run
+- **The secrets exist only on GitHub.** Neither the agent nor the local machine has the Cloudflare token, so the deploy jobs run for the first time when the PO pushes the branch, with the human's approval. Before that, check everything else locally:
+  - run the smoke, accessibility and Lighthouse scripts against a local static server of `app/dist` (they take the base URL as an argument);
+  - lint the workflow with `actionlint` if it is available.
+  
+  The PO checks the first real deploy after the push, and sends any fixes back.
+- **CI runners have no GPU,** so WebGL runs in software (SwiftShader), as on the human's remote desktop (ADR-0024 update, M3-12). If a Lighthouse gate fails only because of this:
+  - report the CI and local numbers side by side, and ask the PO;
+  - never loosen a gate on your own.
+- **Free-plan limits:** a Pages site may hold at most 20,000 files, and no file may exceed 25 MiB ([Pages limits](https://developers.cloudflare.com/pages/platform/limits/), read 2026-10-02). The deploy job checks that the export stays within both.
+
 ## Out of scope
 New features, custom domains, and analytics.
 
 ## Acceptance criteria
-- [ ] This PR's own preview deploys, and the URL is posted on the PR.
+- [ ] Before the push: the smoke, accessibility and Lighthouse scripts pass against a local server of the export. After the push (PO): this PR's own preview deploys, and the URL is posted on the PR.
 - [ ] The smoke test passes against that preview.
 - [ ] Automated accessibility checks report no serious or critical issues.
 - [ ] The Lighthouse desktop gates from spec §11 pass in CI, and the numbers are in the PR.
