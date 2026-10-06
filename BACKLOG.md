@@ -23,6 +23,7 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Places within Jerusalem that aren't on the map yet,** such as the Kidron Valley, which Jerusalem's About mentions. The human asked for places in the About to be links (ADR-0033); only places on the map can be. Add them, with sources, in an M6 batch.
 - **Unsupported clauses in candidate support text.** M3-16's Fact-Checker found clauses in the untouched `candidates[].support` text of Bethany beyond the Jordan and Cana that no cited source states (`docs/verification/M3-longer-about.md`). A small sourced data task should fix them.
 - **Older verified text cites books no one on the team could open,** such as Murphy-O'Connor's guide and Rainey and Notley's atlas (found by M3-16's Fact-Checker). Decide whether to re-source those clauses from openable sources (a question for CP3b).
+- **Thin "today" paragraphs.** In some major places, the About paragraph on what a visitor sees today is short, or rests on a 1915 encyclopedia (M3-16's Fact-Checker). Refresh them from current site and museum pages in a later data pass.
 
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).

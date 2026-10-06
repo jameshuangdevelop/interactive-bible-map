@@ -271,3 +271,18 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   2. `scripts/verify-web-lighthouse.mjs` enforces both gates by default. Before asking the human to merge a PR that changes the app, the PO runs it against that PR's preview from a desktop and puts the numbers in the PR.
   3. Revisit this if GitHub's free runners gain graphics cards, or if TBT in CI rises well above the levels above.
 - **Consequences:** M3-06's acceptance criterion now reads "LCP passes in CI and TBT is reported there; both gates pass from a desktop against the preview". The PO's agent file includes the desktop check.
+
+## ADR-0035 — Important places first on the opening map
+- **Date:** 2026-10-06 · **Status:** Accepted · **By:** the human, at mini checkpoint MC3 ("When the map first loads, the places that show up are 'Nicopolis', 'Troas', 'Perga' etc. Most Bible readers probably have never heard of these places before ... What'd actually be really helpful is if we can find a good way to show the more important places (like the ones addressed to from Paul's letters) when the map first loads ... Perhaps let's try to put as many important places in the smaller dots as we can and collapse the less important places into the bigger dots?"), and the PO (the importance order and how close places group)
+- **Context:**
+  - The map opens at zoom 4.7 and clusters every city, town and village by distance alone.
+  - Isolated places, often little-known ones such as Nicopolis, Troas and Perga, stay as labelled pins.
+  - The areas where most major places lie are folded into count bubbles. These are Judea, Galilee, and the churches of Asia.
+  - Labels are ranked by place type and then by the data's order, not by importance.
+  - At the opening zoom, Jerusalem, Bethlehem, Bethany, Jericho and Bethany beyond the Jordan lie within about 6 pixels of each other, so they can't all be drawn as separate dots.
+- **Decision:**
+  1. **Importance order:** the 31 major places (ADR-0029) come first. Within major places, and within other places, the place with more Bible passages comes first (its `scripture` entries; Jerusalem has 174, Nazareth 37, Damascus and Ephesus 26). Ties follow the data's order. The order comes from the data, takes no side, and still works as M6 adds places.
+  2. **Major places get their own dots:** below zoom 7, each major place is a labelled pin of its own and is never folded into a count bubble with other places. Major places too close to draw apart at the current zoom show as one pin. Its label names the most important member and adds the number of the others, as in "Jerusalem +4". Selecting that pin opens the named place, and its framing then shows the others.
+  3. **Other places step back:** below zoom 6, places that aren't major are drawn as small, muted dots without labels, and nearby ones fold into muted count bubbles. They keep their tooltips, stay clickable, and stay in the keyboard list. From zoom 6, they look as they do now.
+  4. **Label priority:** first the selected place, then major places in importance order (including the major areas Galatia and Crete), then empires, provinces and regions, then other places.
+- **Consequences:** Card M3-23 builds this (Frontend Engineer). Visual spec §2 and wireframe 01 change to match. The smoothness rules of ADR-0024 still apply.
