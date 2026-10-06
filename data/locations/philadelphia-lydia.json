@@ -45,10 +45,11 @@
   },
   "history": [
     {
-      "text": "Philadelphia is one of the seven churches addressed in Revelation 3, and unlike most of the others it receives no rebuke. The risen Christ tells the congregation, \"I have set before you an open door, which no one can shut,\" and promises that whoever overcomes will become \"a pillar in the temple of my God\" who \"will go out from there no more.\" Some interpreters connect this promise of permanence to the city's long experience of earthquakes, which had repeatedly driven its residents out of their homes and into the open countryside.",
+      "text": "Philadelphia is one of the seven churches addressed in Revelation 3, and unlike most of the others it receives no rebuke. The risen Christ tells the congregation, \"I have set before you an open door, which no one can shut,\" and promises that whoever overcomes will become \"a pillar in the temple of my God\" who \"will go out from there no more.\" Some interpreters connect this promise of permanence to the city's long experience of earthquakes, which had repeatedly driven its residents out of their homes and into the open countryside. The letter also describes local opponents in harsh terms, as \"some of the synagogue of Satan, of those who say they are Jews, and they are not, but lie.\"",
       "sources": [
         "scripture:Revelation 3:7",
         "scripture:Revelation 3:8",
+        "scripture:Revelation 3:9",
         "scripture:Revelation 3:12",
         "bib:ramsay-seven-churches"
       ]
@@ -88,6 +89,11 @@
       "textWEB": "“I know your works (behold, I have set before you an open door, which no one can shut), that you have a little power, and kept my word, and didn’t deny my name."
     },
     {
+      "ref": "Revelation 3:9",
+      "book": "Revelation",
+      "textWEB": "Behold, I make some of the synagogue of Satan, of those who say they are Jews, and they are not, but lie—behold, I will make them to come and worship before your feet, and to know that I have loved you."
+    },
+    {
       "ref": "Revelation 3:12",
       "book": "Revelation",
       "textWEB": "He who overcomes, I will make him a pillar in the temple of my God, and he will go out from there no more. I will write on him the name of my God and the name of the city of my God, the new Jerusalem, which comes down out of heaven from my God, and my own new name."
@@ -97,5 +103,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-06"
 }
