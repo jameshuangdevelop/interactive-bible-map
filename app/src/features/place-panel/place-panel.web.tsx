@@ -1483,27 +1483,51 @@ export function PlacePanel({
     setShowAllScripture(false);
     setVisibleScriptureCount(SCRIPTURE_INITIAL_COUNT);
 
-    window.requestAnimationFrame(() => {
+    const preserveTogglePosition = (
+      targetTop: number,
+      remainingAttempts: number,
+      onComplete: () => void
+    ) => {
       const refreshedButton = showAllScriptureToggleRef.current;
-      refreshedButton?.focus();
-
-      if (topBeforeCollapse === null || !refreshedButton) {
+      if (!refreshedButton) {
         return;
       }
 
       const topAfterCollapse = refreshedButton.getBoundingClientRect().top;
-      const scrollOffsetDelta = topAfterCollapse - topBeforeCollapse;
-      if (Math.abs(scrollOffsetDelta) < 1) {
+      const scrollOffsetDelta = topAfterCollapse - targetTop;
+      if (Math.abs(scrollOffsetDelta) < 1 || remainingAttempts <= 0) {
+        onComplete();
         return;
       }
 
       if (panelContainer) {
         panelContainer.scrollTop += scrollOffsetDelta;
+      } else {
+        window.scrollBy({
+          top: scrollOffsetDelta
+        });
+      }
+
+      if (remainingAttempts > 1) {
+        window.requestAnimationFrame(() => {
+          preserveTogglePosition(targetTop, remainingAttempts - 1, onComplete);
+        });
         return;
       }
 
-      window.scrollBy({
-        top: scrollOffsetDelta
+      onComplete();
+    };
+
+    window.requestAnimationFrame(() => {
+      const refreshedButton = showAllScriptureToggleRef.current;
+
+      if (topBeforeCollapse === null || !refreshedButton) {
+        refreshedButton?.focus({ preventScroll: true });
+        return;
+      }
+
+      preserveTogglePosition(topBeforeCollapse, 3, () => {
+        showAllScriptureToggleRef.current?.focus({ preventScroll: true });
       });
     });
   };

@@ -23,6 +23,7 @@ describe("place panel model helpers", () => {
     type: "empire",
     zoomTier: "region",
     prominence: "standard",
+    passageCount: 2,
     parentId: null,
     candidates: [{ label: "Rome", coordinates: [12.5, 41.9], confidence: "high" }]
   };
@@ -33,6 +34,7 @@ describe("place panel model helpers", () => {
     type: "province",
     zoomTier: "region",
     prominence: "standard",
+    passageCount: 1,
     parentId: "roman-empire",
     candidates: [{ label: "Achaia", coordinates: [22.45, 37.89], confidence: "high" }]
   };
@@ -57,6 +59,7 @@ describe("place panel model helpers", () => {
     type: "city",
     zoomTier: "city",
     prominence: "standard",
+    passageCount: 0,
     parentId: null,
     candidates: [{ label: ancient[0] ?? id, coordinates: [1, 1], confidence: "high" }]
   });
@@ -83,6 +86,7 @@ describe("place panel model helpers", () => {
       type: "province",
       zoomTier: "region",
       prominence: "standard",
+      passageCount: 0,
       parentId: "roman-empire",
       candidates: [{ label: "Italy", coordinates: [11.09, 43.69], confidence: "high" }]
     };
@@ -114,6 +118,7 @@ describe("place panel model helpers", () => {
       type: "province",
       zoomTier: "region",
       prominence: "standard",
+      passageCount: 0,
       parentId: "roman-empire",
       candidates: [{ label: "Arabia", coordinates: [35.0, 30.0], confidence: "high" }]
     };
@@ -141,6 +146,7 @@ describe("place panel model helpers", () => {
       type: "city",
       zoomTier: "city",
       prominence: "standard",
+      passageCount: 4,
       parentId: "achaia",
       candidates: [{ label: "Corinth", coordinates: [22.88, 37.9], confidence: "high" }]
     };
@@ -184,6 +190,7 @@ describe("place panel model helpers", () => {
       type: "city",
       zoomTier: "city",
       prominence: "standard",
+      passageCount: 0,
       parentId: null,
       candidates: [
         {

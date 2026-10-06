@@ -65,10 +65,10 @@ These are real renders, not wireframes. They are what the app's map will look li
 | Province (`type: "province"`, from M3-11; for example Achaia or Macedonia) | **No pin:** a clickable label in spaced capitals, 13 px, `#5F6368` | — |
 | Region or island record (for example Galilee or Crete) | **No pin:** a clickable label in spaced capitals, 12 px, `#5F6368` | — |
 
-- **Drawn by the map (ADR-0024):** pins, labels, clusters, badges and candidate letters are MapLibre layers, drawn on the graphics card in the same frame as the map, so they never lag behind a drag or zoom. Labels that would overlap are hidden automatically; a hidden label still appears in the hover tooltip. The label priority is the selected place, then empires, provinces, regions, cities, towns, villages, sites and natural features, then the data's order. Map labels use the basemap's Noto Sans font.
+- **Drawn by the map (ADR-0024):** pins, labels, clusters, badges and candidate letters are MapLibre layers, drawn on the graphics card in the same frame as the map, so they never lag behind a drag or zoom. Labels that would overlap are hidden automatically; a hidden label still appears in the hover tooltip. Label priority is: the selected place; then major places in importance order (including the major areas Galatia and Crete); then empires, provinces and regions; then other places. Map labels use the basemap's Noto Sans font.
 - **Contrast on Liberty:** every pin colour has at least 3:1 contrast against every Liberty background, park, wood, grass, building and water colour; the lowest is red on water, at 3.1:1. The natural-feature green was darkened from `#188038` because that colour reached only 2.7:1 on water, where pins such as the Sea of Galilee sit. The white outline separates each pin from the map.
 - **Selected place:** its pin grows by about 30% and gets a drop shadow; the other pins stay as they are.
-- **Hover** (on desktop): a tooltip with the name and type, and a pointer cursor over any clickable pin, cluster, disputed "?" badge, candidate letter or area label. Elsewhere, MapLibre keeps its own grab/grabbing cursors.
+- **Hover** (on desktop): a tooltip with the name and type, and a pointer cursor over any clickable pin, cluster, disputed "?" badge, candidate letter or area label. A grouped major pin shows all of its members in the tooltip (for example "Jerusalem, Bethlehem, Bethany, Jericho, Bethany beyond the Jordan"). Elsewhere, MapLibre keeps its own grab/grabbing cursors.
 - **Hit area:** hover and click check a small box around the pointer (about 8 px each way) and choose the nearest feature in that box, so crowded pins are easier to hit.
 - **Keyboard:** every place on the map can be reached by keyboard through the list of visible places (see §7).
 
@@ -78,7 +78,7 @@ The data's `zoomTier` decides when a place appears. The initial view shows the w
 | `zoomTier` | Visible from zoom | Notes |
 |---|---|---|
 | `region` | 6 to 9 | Labels only; they fade out as you zoom in. Within this tier, empire labels show from zoom 3 to 5, and province labels from 4 to 8. |
-| `city` | 4 | Nearby pins **cluster** into a count bubble below zoom 7. Clicking a bubble zooms in. |
+| `city` | 4 | **Major pins** (cities, towns, villages, plus city-tier sites and natural features) stay as their own dots below zoom 7. Where major pins overlap, they group as one labelled pin such as "Jerusalem +4"; selecting it opens the top member. **Other pins** step back below zoom 6 as smaller muted dots with no labels, and nearby ones fold into muted count bubbles. From zoom 6 they look and cluster as before. |
 | `site` | 12 | Sites inside a city (Jerusalem's Temple Mount, pools and so on) appear only when zoomed in. |
 
 **Selecting a place zooms the map to it:** a city to about zoom 11, a site to zoom 14 (the closest zoom), a region or province to about zoom 7, and an empire to about zoom 4. A place with several candidates zooms to fit all of them. If the user prefers reduced motion, the map jumps instead of flying.
@@ -163,7 +163,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - **Contrast:** text at least 4.5:1; pins, outlines and controls at least 3:1 against the basemap.
 - **Keyboard:**
   - Everything is reachable, in this order: search, map controls, the places on the map, then the panel.
-  - The map draws its pins itself (ADR-0024), so keyboard and screen-reader users get a **list of the places currently on the map**, kept in step with it after each pan or zoom ends. Each entry is a button named like "Capernaum, city", or "Cluster of 7 places". Tab moves through the list in reading order (top to bottom, then left to right). A focus ring is drawn around the focused pin on the map, the map pans if the pin is hidden under the panel, and Enter selects the place or zooms into the cluster. The list is capped at 200 entries, with "Zoom in or search to reach more places" after them.
+  - The map draws its pins itself (ADR-0024), so keyboard and screen-reader users get a **list of the places currently on the map**, kept in step with it after each pan or zoom ends. Each entry is a button named like "Capernaum, city", "Jerusalem and 4 nearby places", or "Cluster of 7 places". Tab moves through the list in reading order (top to bottom, then left to right). A focus ring is drawn around the focused pin on the map, the map pans if the pin is hidden under the panel, and Enter selects the place or zooms into the cluster. The list is capped at 200 entries, with "Zoom in or search to reach more places" after them.
   - The focus ring is 2 px `#1A73E8` with a 2 px offset.
   - Esc closes search results and the panel.
 - **Screen readers:**

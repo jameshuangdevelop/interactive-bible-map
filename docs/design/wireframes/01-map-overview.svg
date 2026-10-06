@@ -52,13 +52,16 @@
     <circle class="pin" cx="1127" cy="536" r="8"/><text class="label" x="1141" y="540">Damascus</text>
   </g>
 
-  <!-- Clusters (count bubbles) -->
-  <g font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">
-    <circle cx="812" cy="330" r="17" fill="#C5221F" stroke="#ffffff" stroke-width="3"/><text x="812" y="334">9</text>
-    <circle cx="1085" cy="592" r="19" fill="#C5221F" stroke="#ffffff" stroke-width="3"/><text x="1085" y="596">24</text>
+  <!-- Major grouped pins on the opening view -->
+  <g>
+    <circle class="pin" cx="812" cy="330" r="8"/><text class="label" x="826" y="334">Nazareth +3</text>
+    <circle class="pin" cx="1085" cy="592" r="8"/><text class="label" x="1099" y="596">Jerusalem +4</text>
   </g>
 
-  <circle class="pin" cx="1022" cy="371" r="8"/><text class="label" x="990" y="395">Derbe</text>
+  <!-- Secondary (non-major) clusters stay visible but muted below zoom 6 -->
+  <g font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <circle cx="1022" cy="371" r="14" fill="#9AA0A6" stroke="#ffffff" stroke-width="3"/><text x="1022" y="375">9</text>
+  </g>
 
   <!-- Sample of a disputed-place pin: disputed places (for example Emmaus) sit inside a cluster at this zoom -->
   <rect x="160" y="640" width="462" height="46" rx="6" fill="#ffffff" stroke="#C2185B" stroke-width="1"/>
@@ -109,9 +112,11 @@
   <text class="note" x="24" y="104">The menu button opens About, Sources &amp; credits, Report an issue</text>
   <text class="note" x="720" y="86" text-anchor="middle">Dashed = reserved for a later milestone (not built in M3)</text>
   <text class="note" x="204" y="659">Sample: a disputed place (e.g. Emmaus) shows one pin with "?" until zoom 8</text>
-  <text class="note" x="204" y="676">At this zoom Emmaus is still inside the 24 cluster</text>
-  <path class="leader" d="M1104,597 L1180,640"/>
-  <text class="note" x="1184" y="644">Cluster bubble: click to zoom in</text>
+  <text class="note" x="204" y="676">At this zoom Emmaus is still inside a muted secondary cluster</text>
+  <path class="leader" d="M1095,588 L1220,624"/>
+  <text class="note" x="1224" y="628">Grouped major pin: top place + nearby count</text>
+  <path class="leader" d="M1022,385 L1108,438"/>
+  <text class="note" x="1112" y="442">Muted cluster: non-major places</text>
   <path class="leader" d="M696,500 L620,540"/>
   <text class="note" x="430" y="556">Region or island record: a label, no pin</text>
   <text class="note" x="1374" y="690" text-anchor="end">Zoom in / out, reset view, attribution (ⓘ)</text>

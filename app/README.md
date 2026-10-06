@@ -9,7 +9,7 @@ This Expo + React Native Web app now renders the M3 map view with MapLibre GL JS
   - `app/public/styles/liberty/style.json` (main)
   - `app/public/styles/versatiles-colorful/style.json` (outage-only fallback)
 - **Basemap treatment:** physical-only (relief, natural landcover, water, rivers/streams), max zoom 14.
-- **Places rendering:** MapLibre sources/layers (clustered city-tier source, circle/symbol layers, canvas images via `map.addImage` for dashed candidate pins and `?` badge).
+- **Places rendering:** MapLibre sources/layers (separate major and standard city-tier clustered sources, plus site/candidate/area sources; circle/symbol layers; canvas images via `map.addImage` for dashed candidate pins and `?` badge).
 - **Keyboard/screen reader path:** hidden DOM list of currently visible places (`button[data-place-entry-id]`), updated on `moveend`/`idle`.
 - **Selection state:** URL-backed (`?place=` + `&candidate=`), restored on load.
 - **Search:** ARIA 1.2 combobox over `generated/places.index.json` (`names.ancient` + `names.alternate` only), with case/diacritic-insensitive prefix and word-start matching plus one-typo tolerance for names of 5+ letters.

@@ -10,6 +10,7 @@ const multiCandidatePlace: PlaceIndexRecord = {
   type: "village",
   zoomTier: "city",
   prominence: "standard",
+  passageCount: 3,
   parentId: "judea",
   candidates: [
     {
@@ -34,6 +35,7 @@ const singleCandidatePlace: PlaceIndexRecord = {
   type: "city",
   zoomTier: "city",
   prominence: "standard",
+  passageCount: 21,
   parentId: "galilee",
   candidates: [
     {
@@ -53,6 +55,7 @@ const sitePlace: PlaceIndexRecord = {
   type: "site",
   zoomTier: "site",
   prominence: "standard",
+  passageCount: 9,
   parentId: "jerusalem",
   candidates: [
     {

@@ -41,17 +41,62 @@ const minimumControlHitAreaPx = 44;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
-  pinLabels: "ibm-pin-label"
+  pinLabels: "ibm-pin-label-standard"
 };
 const mapLayerIds = {
-  areaLabels: ["ibm-area-label-overview", "ibm-area-label"],
+  areaLabels: [
+    "ibm-major-area-label-overview",
+    "ibm-major-area-label",
+    "ibm-area-label-overview",
+    "ibm-area-label",
+    "ibm-selected-area-label"
+  ],
+  majorClusterPins: "ibm-major-cluster-circle",
+  majorClusterLabels: "ibm-major-cluster-label",
   clusterPins: "ibm-cluster-circle",
   clusterCounts: "ibm-cluster-count",
+  majorPins: "ibm-major-pin",
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
   candidatePins: "ibm-candidate-pin",
-  pinLabels: "ibm-pin-label"
+  pinLabels: [
+    "ibm-major-cluster-label",
+    "ibm-pin-label",
+    "ibm-pin-label-standard",
+    "ibm-selected-major-pin-label",
+    "ibm-selected-pin-label"
+  ]
 };
+const allClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.clusterPins];
+const allClusterLabelLayerIds = [mapLayerIds.majorClusterLabels, mapLayerIds.clusterCounts];
+const allCityPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.cityPins];
+const expectedMajorPinPlaceIds = [
+  "jerusalem",
+  "nazareth",
+  "damascus",
+  "ephesus",
+  "caesarea-maritima",
+  "capernaum",
+  "antioch-syria",
+  "corinth",
+  "bethany",
+  "bethlehem",
+  "rome",
+  "thessalonica",
+  "athens",
+  "philippi",
+  "sea-of-galilee",
+  "jericho",
+  "laodicea",
+  "cana",
+  "thyatira",
+  "bethany-beyond-the-jordan",
+  "colossae",
+  "philadelphia-lydia",
+  "sardis",
+  "smyrna",
+  "pergamum"
+];
 const fixtureImageSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -2629,7 +2674,13 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
   await waitForMapToSettle(page);
 
   const probe = await page.evaluate(
-    ({ testHookKey, cityPinsLayerId, sitePinsLayerId, candidatePinsLayerId, interactiveLayers }) => {
+    ({
+      testHookKey,
+      cityPinsLayerIds,
+      sitePinsLayerId,
+      candidatePinsLayerId,
+      interactiveLayers
+    }) => {
       const map = window[testHookKey];
       if (!map) {
         return null;
@@ -2641,7 +2692,7 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
       const margin = 16;
 
       const resolveCapernaumPoint = () => {
-        for (const layerId of [candidatePinsLayerId, sitePinsLayerId, cityPinsLayerId]) {
+        for (const layerId of [candidatePinsLayerId, sitePinsLayerId, ...cityPinsLayerIds]) {
           const features = map.queryRenderedFeatures(undefined, { layers: [layerId] });
           for (const feature of features) {
             if (feature.geometry?.type !== "Point" || feature.properties?.placeId !== "capernaum") {
@@ -2703,15 +2754,15 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
     },
     {
       testHookKey: mapTestHookKey,
-      cityPinsLayerId: mapLayerIds.cityPins,
+      cityPinsLayerIds: allCityPinLayerIds,
       sitePinsLayerId: mapLayerIds.sitePins,
       candidatePinsLayerId: mapLayerIds.candidatePins,
       interactiveLayers: [
-        mapLayerIds.clusterPins,
-        mapLayerIds.clusterCounts,
+        ...allClusterPinLayerIds,
+        ...allClusterLabelLayerIds,
         mapLayerIds.candidatePins,
         mapLayerIds.sitePins,
-        mapLayerIds.cityPins,
+        ...allCityPinLayerIds,
         ...mapLayerIds.areaLabels
       ]
     }
@@ -3598,6 +3649,8 @@ async function verifyShowAllPassages(page, baseUrl) {
     timeout: 30_000
   });
   await setPanelSectionExpanded(page, "in-bible", true);
+  await setPanelSectionExpanded(page, "sources", false);
+  await setPanelSectionExpanded(page, "photo-credits", false);
 
   const headingText =
     (await page
@@ -4257,8 +4310,8 @@ async function verifyAreaLabelsAvoidPins(page, url) {
       testHookKey: mapTestHookKey,
       areaLayerIds: mapLayerIds.areaLabels,
       pinLayerIds: [
-        mapLayerIds.clusterPins,
-        mapLayerIds.cityPins,
+        ...allClusterPinLayerIds,
+        ...allCityPinLayerIds,
         mapLayerIds.sitePins,
         mapLayerIds.candidatePins
       ]
@@ -4283,22 +4336,20 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
   });
 
   const overlap = await page.evaluate(
-    ({ testHookKey, areaLayerIds, clusterLayerId, clusterCountLayerId }) => {
+    ({ testHookKey, areaLayerIds, clusterLayerIds, clusterTextLayerIds, majorClusterLayerId }) => {
       const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
       }
 
-      const clusters = map.queryRenderedFeatures(undefined, {
-        layers: [clusterLayerId]
-      });
-      const clusterIdsWithCounts = new Set(
+      const clusters = map.queryRenderedFeatures(undefined, { layers: clusterLayerIds });
+      const clusterIdsWithLabels = new Set(
         map
-          .queryRenderedFeatures(undefined, { layers: [clusterCountLayerId] })
+          .queryRenderedFeatures(undefined, { layers: clusterTextLayerIds })
           .map((feature) => feature.properties?.cluster_id)
       );
-      const clustersWithoutCounts = clusters.filter(
-        (feature) => !clusterIdsWithCounts.has(feature.properties?.cluster_id)
+      const clustersWithoutLabels = clusters.filter(
+        (feature) => !clusterIdsWithLabels.has(feature.properties?.cluster_id)
       );
       const collisions = [];
 
@@ -4310,7 +4361,18 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
         const [longitude, latitude] = clusterFeature.geometry.coordinates;
         const point = map.project([longitude, latitude]);
         const pointCount = Number(clusterFeature.properties?.point_count ?? 0);
-        const circleRadius = pointCount >= 20 ? 18 : pointCount >= 8 ? 16 : 14;
+        const circleRadius =
+          clusterFeature.layer.id === majorClusterLayerId
+            ? pointCount >= 20
+              ? 11
+              : pointCount >= 8
+                ? 10
+                : 9
+            : pointCount >= 20
+              ? 18
+              : pointCount >= 8
+                ? 16
+                : 14;
         // The rendered bubble includes a 3px white stroke; probe just outside that edge.
         const probeRadius = circleRadius + 4;
         const diagonal = Math.round(probeRadius * 0.72);
@@ -4348,7 +4410,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
 
       return {
         clusterCount: clusters.length,
-        clustersWithoutCountCount: clustersWithoutCounts.length,
+        clustersWithoutLabelCount: clustersWithoutLabels.length,
         collisionCount: collisions.length,
         collisionSamples: collisions.slice(0, 8)
       };
@@ -4356,8 +4418,9 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
     {
       testHookKey: mapTestHookKey,
       areaLayerIds: mapLayerIds.areaLabels,
-      clusterLayerId: mapLayerIds.clusterPins,
-      clusterCountLayerId: mapLayerIds.clusterCounts
+      clusterLayerIds: allClusterPinLayerIds,
+      clusterTextLayerIds: allClusterLabelLayerIds,
+      majorClusterLayerId: mapLayerIds.majorClusterPins
     }
   );
 
@@ -4365,10 +4428,9 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
     throw new Error("Overview cluster-overlap check was vacuous: no clusters were rendered.");
   }
 
-  // Every count bubble must show its number (spec §2); a bubble without one is just a red dot.
-  if (overlap.clustersWithoutCountCount > 0) {
+  if (overlap.clustersWithoutLabelCount > 0) {
     throw new Error(
-      `${overlap.clustersWithoutCountCount} of ${overlap.clusterCount} count bubbles on the overview show no number.`
+      `${overlap.clustersWithoutLabelCount} of ${overlap.clusterCount} clusters on the overview are missing text labels.`
     );
   }
 
@@ -4389,7 +4451,7 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
     timeout: 30_000
   });
 
-  const overlap = await page.evaluate(({ testHookKey, areaLayerIds, pinLabelsLayerId }) => {
+  const overlap = await page.evaluate(({ testHookKey, areaLayerIds, pinLabelLayerIds }) => {
     const map = window[testHookKey];
     if (!map) {
       throw new Error("Map test hook is unavailable.");
@@ -4411,18 +4473,19 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
       throw new Error("Search box rect is outside the map viewport.");
     }
 
+    const labelLayerIds = [...areaLayerIds, ...pinLabelLayerIds];
     const labelsInsideSearchBox = map.queryRenderedFeatures(
       [
         [minX, minY],
         [maxX, maxY]
       ],
       {
-        layers: [...areaLayerIds, pinLabelsLayerId]
+        layers: labelLayerIds
       }
     );
 
     const allLabels = map.queryRenderedFeatures(undefined, {
-      layers: [...areaLayerIds, pinLabelsLayerId]
+      layers: labelLayerIds
     });
 
     const distinctLabelsInsideSearchBox = Array.from(
@@ -4459,7 +4522,7 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
   }, {
     testHookKey: mapTestHookKey,
     areaLayerIds: mapLayerIds.areaLabels,
-    pinLabelsLayerId: mapLayerIds.pinLabels
+    pinLabelLayerIds: mapLayerIds.pinLabels
   });
 
   if (overlap.labelCount > 0) {
@@ -4522,6 +4585,291 @@ async function collectRenderedTextValues(page, layerIds, propertyName) {
       targetPropertyName: propertyName
     }
   );
+}
+
+async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+
+  const overview = await page.evaluate(
+    async ({
+      testHookKey,
+      expectedMajorPinIds,
+      majorSourceId,
+      majorClusterLayerId,
+      majorClusterLabelLayerId,
+      majorPinLabelLayerId,
+      standardPinLabelLayerId
+    }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const majorSource = map.getSource(majorSourceId);
+      if (!majorSource || typeof majorSource.getClusterLeaves !== "function") {
+        throw new Error("Major clustered source is unavailable.");
+      }
+
+      const majorPinLabels = map.queryRenderedFeatures(undefined, {
+        layers: [majorPinLabelLayerId]
+      });
+      const standardPinLabels = map.queryRenderedFeatures(undefined, {
+        layers: [standardPinLabelLayerId]
+      });
+      const majorClusterFeatures = map.queryRenderedFeatures(undefined, {
+        layers: [majorClusterLayerId]
+      });
+      const majorClusterLabelFeatures = map.queryRenderedFeatures(undefined, {
+        layers: [majorClusterLabelLayerId]
+      });
+
+      const majorPinLabelPlaceIds = new Set(
+        majorPinLabels
+          .map((feature) => String(feature.properties?.placeId ?? "").trim())
+          .filter((value) => value.length > 0)
+      );
+      const standardPinLabelPlaceIds = new Set(
+        standardPinLabels
+          .map((feature) => String(feature.properties?.placeId ?? "").trim())
+          .filter((value) => value.length > 0)
+      );
+
+      const byClusterId = new Map();
+      for (const feature of majorClusterFeatures) {
+        const clusterId = Number(feature.properties?.cluster_id);
+        const pointCount = Number(feature.properties?.point_count);
+        if (!Number.isFinite(clusterId) || !Number.isFinite(pointCount)) {
+          continue;
+        }
+        if (!byClusterId.has(clusterId)) {
+          byClusterId.set(clusterId, {
+            clusterId,
+            pointCount,
+            coordinates:
+              feature.geometry?.type === "Point" ? feature.geometry.coordinates : null
+          });
+        }
+      }
+
+      const clusterLabelById = new Map();
+      for (const feature of majorClusterLabelFeatures) {
+        const clusterId = Number(feature.properties?.cluster_id);
+        if (!Number.isFinite(clusterId) || clusterLabelById.has(clusterId)) {
+          continue;
+        }
+        const labelText = String(feature.properties?.clusterLabelText ?? "").trim();
+        clusterLabelById.set(clusterId, labelText);
+      }
+
+      const majorIdsCovered = new Set(majorPinLabelPlaceIds);
+      const majorClusterSummaries = [];
+      for (const clusterSummary of byClusterId.values()) {
+        const leaves = await majorSource.getClusterLeaves(
+          clusterSummary.clusterId,
+          clusterSummary.pointCount,
+          0
+        );
+        const members = leaves
+          .map((feature) => {
+            const placeId = String(feature.properties?.placeId ?? "").trim();
+            const placeName = String(feature.properties?.placeName ?? "").trim();
+            const importanceRank = Number(feature.properties?.importanceRank);
+            if (!placeId || !placeName || !Number.isFinite(importanceRank)) {
+              return null;
+            }
+            return { placeId, placeName, importanceRank };
+          })
+          .filter((value) => value !== null)
+          .sort((left, right) => left.importanceRank - right.importanceRank);
+
+        for (const member of members) {
+          majorIdsCovered.add(member.placeId);
+        }
+
+        const topMember = members[0] ?? null;
+        majorClusterSummaries.push({
+          clusterId: clusterSummary.clusterId,
+          pointCount: clusterSummary.pointCount,
+          topPlaceId: topMember?.placeId ?? null,
+          topPlaceName: topMember?.placeName ?? null,
+          labelText:
+            clusterLabelById.get(clusterSummary.clusterId) ??
+            (topMember
+              ? `${topMember.placeName} +${Math.max(0, clusterSummary.pointCount - 1)}`
+              : ""),
+          memberIds: members.map((member) => member.placeId),
+          memberNames: members.map((member) => member.placeName),
+          coordinates: clusterSummary.coordinates
+        });
+      }
+
+      const missingMajorIds = expectedMajorPinIds.filter((id) => !majorIdsCovered.has(id));
+      const jerusalemCluster =
+        majorClusterSummaries.find((summary) => summary.memberIds.includes("jerusalem")) ?? null;
+
+      return {
+        majorPinLabelPlaceIds: Array.from(majorPinLabelPlaceIds).sort(),
+        standardPinLabelPlaceIds: Array.from(standardPinLabelPlaceIds).sort(),
+        majorIdsCovered: Array.from(majorIdsCovered).sort(),
+        missingMajorIds,
+        majorClusterCount: majorClusterSummaries.length,
+        majorClusterSummaries,
+        jerusalemCluster
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      expectedMajorPinIds: expectedMajorPinPlaceIds,
+      majorSourceId: "ibm-major-city-pins",
+      majorClusterLayerId: mapLayerIds.majorClusterPins,
+      majorClusterLabelLayerId: mapLayerIds.majorClusterLabels,
+      majorPinLabelLayerId: "ibm-pin-label",
+      standardPinLabelLayerId: "ibm-pin-label-standard"
+    }
+  );
+
+  if (overview.missingMajorIds.length > 0) {
+    throw new Error(
+      `Overview is missing major pin places from labels/groups: ${JSON.stringify(
+        overview.missingMajorIds
+      )}`
+    );
+  }
+
+  if (overview.standardPinLabelPlaceIds.length > 0) {
+    throw new Error(
+      `Overview shows non-major pin labels at default zoom: ${JSON.stringify(
+        overview.standardPinLabelPlaceIds
+      )}`
+    );
+  }
+
+  if (!overview.jerusalemCluster) {
+    throw new Error(
+      `Could not find a major cluster containing Jerusalem at default zoom: ${JSON.stringify(
+        overview.majorClusterSummaries
+      )}`
+    );
+  }
+
+  if (overview.jerusalemCluster.topPlaceId !== "jerusalem") {
+    throw new Error(
+      `Jerusalem cluster should prioritize Jerusalem, got ${JSON.stringify(
+        overview.jerusalemCluster
+      )}`
+    );
+  }
+
+  const jerusalemNearbyCount = Math.max(0, Number(overview.jerusalemCluster.pointCount) - 1);
+  if (jerusalemNearbyCount !== 4) {
+    throw new Error(
+      `Jerusalem cluster should include 4 nearby places, got ${jerusalemNearbyCount}.`
+    );
+  }
+
+  const jerusalemClusterCoordinates = overview.jerusalemCluster.coordinates;
+  if (
+    !Array.isArray(jerusalemClusterCoordinates) ||
+    jerusalemClusterCoordinates.length < 2 ||
+    typeof jerusalemClusterCoordinates[0] !== "number" ||
+    typeof jerusalemClusterCoordinates[1] !== "number"
+  ) {
+    throw new Error(
+      `Jerusalem cluster coordinates were unavailable: ${JSON.stringify(overview.jerusalemCluster)}`
+    );
+  }
+
+  const jerusalemPoint = await page.evaluate(
+    ({ testHookKey, coordinates }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return null;
+      }
+
+      const projected = map.project(coordinates);
+      return {
+        x: projected.x,
+        y: projected.y
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      coordinates: jerusalemClusterCoordinates
+    }
+  );
+  if (!jerusalemPoint) {
+    throw new Error("Failed to project Jerusalem cluster coordinates to screen space.");
+  }
+
+  await page.mouse.click(jerusalemPoint.x, jerusalemPoint.y);
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "jerusalem";
+  }, undefined, { timeout: 30_000, polling: 100 });
+  await page.getByRole("heading", { level: 1, name: "Jerusalem" }).waitFor({ timeout: 30_000 });
+
+  await page.evaluate(
+    ({ testHookKey, center, zoom }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      map.jumpTo({ center, zoom });
+    },
+    {
+      testHookKey: mapTestHookKey,
+      center: [22.5, 35],
+      zoom: 6
+    }
+  );
+  await waitForMapToSettle(page);
+
+  const zoom6StandardLabels = await page.evaluate(
+    ({ testHookKey, standardPinLabelLayerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const features = map.queryRenderedFeatures(undefined, {
+        layers: [standardPinLabelLayerId]
+      });
+      const labelsByPlaceId = new Map();
+      for (const feature of features) {
+        const placeId = String(feature.properties?.placeId ?? "").trim();
+        const labelText = String(feature.properties?.labelText ?? "").trim();
+        if (!placeId || !labelText || labelsByPlaceId.has(placeId)) {
+          continue;
+        }
+        labelsByPlaceId.set(placeId, labelText);
+      }
+
+      return {
+        labelCount: labelsByPlaceId.size,
+        labels: Array.from(labelsByPlaceId.values()).sort((left, right) =>
+          left.localeCompare(right, undefined, { sensitivity: "base" })
+        ),
+        placeIds: Array.from(labelsByPlaceId.keys()).sort()
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      standardPinLabelLayerId: "ibm-pin-label-standard"
+    }
+  );
+
+  if (zoom6StandardLabels.labelCount === 0) {
+    throw new Error("Expected non-major pin labels to appear at zoom 6, but none were rendered.");
+  }
+
+  return {
+    overview,
+    jerusalemNearbyCount,
+    zoom6StandardLabels
+  };
 }
 
 async function verifyPinLabelRegression(page, baseUrl) {
@@ -5873,6 +6221,10 @@ async function run() {
       `${staticServer.baseUrl}/?place=galilee`
     );
     const pinLabelRegression = await verifyPinLabelRegression(page, staticServer.baseUrl);
+    const importantPlacesFirstCheck = await verifyImportantPlacesFirstOnOverview(
+      page,
+      staticServer.baseUrl
+    );
     const candidatePinColorCheck = await verifyCandidatePinColorRendering(
       page,
       staticServer.baseUrl
@@ -6017,6 +6369,7 @@ async function run() {
       panelAccessibilityCheck,
       panelMapDomStability,
       pinLabelRegression,
+      importantPlacesFirstCheck,
       candidatePinColorCheck,
       candidateSelectionCheck,
       overviewAreaLabelFixtureCheck,
