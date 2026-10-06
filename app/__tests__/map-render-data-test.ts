@@ -161,6 +161,16 @@ describe("map render data", () => {
           passageCount: 0,
           parentId: "judea-province",
           candidates: [{ label: "Judea", coordinates: [35.306389, 31.698889], confidence: "high" }]
+        },
+        {
+          id: "italy",
+          names: { ancient: ["Italy"], alternate: [] },
+          type: "province",
+          zoomTier: "region",
+          prominence: "standard",
+          passageCount: 0,
+          parentId: "roman-empire",
+          candidates: [{ label: "Italy", coordinates: [12.4964, 41.9028], confidence: "high" }]
         }
       ],
       null
@@ -179,6 +189,13 @@ describe("map render data", () => {
 
     expect(judeaRegionLabel).toBeDefined();
     expect(judeaRegionLabel?.properties.minZoom).toBe(8);
+
+    const italyRegionLabel = renderData.areaLabels.features.find(
+      (feature) => feature.properties.placeId === "italy"
+    );
+
+    expect(italyRegionLabel).toBeDefined();
+    expect(italyRegionLabel?.properties.minZoom).toBe(5);
   });
 
   test("moves selected multi-candidate places out of clustered pins into candidate icons", () => {

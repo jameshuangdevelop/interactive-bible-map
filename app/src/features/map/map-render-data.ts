@@ -44,7 +44,8 @@ const AREA_LABEL_TYPE_PRIORITY: Record<"empire" | "province" | "region", number>
 
 const AREA_LABEL_OVERVIEW_MIN_ZOOM_OVERRIDES: Partial<Record<string, number>> = {
   "judea-province": 5,
-  judea: 8
+  judea: 8,
+  italy: 5
 };
 
 const CITY_PIN_LABEL_TYPES = new Set<PlaceType>(["city", "town", "village"]);

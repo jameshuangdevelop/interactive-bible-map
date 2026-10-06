@@ -39,7 +39,6 @@ import {
   type PlaceRenderData
 } from "./map-render-data";
 import {
-  AREA_LABEL_OFFSET_LAYOUT,
   CLUSTER_COLLISION_IMAGE_SIZE,
   CLUSTER_COUNT_LAYOUT,
   PIN_COLLISION_IMAGE_SIZE,
@@ -109,7 +108,7 @@ const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
 const gestureReleaseDelayMs = 1_000;
-const mapLabelPaddingTop = 80;
+const mapLabelPaddingTop = 96;
 const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
@@ -204,15 +203,10 @@ const areaLabelMajorVariableAnchorFilter = [
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const selectedAreaLabelFilter = ["all", areaLabelVisibilityFilter, ["==", ["get", "isSelectedPlace"], true]];
-const areaLabelOverviewOffsetLayout = {
-  "text-variable-anchor": ["top"] as ["top"],
-  "text-radial-offset": 3.5,
-  "text-justify": "auto" as const
-};
-const majorAreaLabelOverviewOffsetLayout = {
-  "text-variable-anchor": ["top", "bottom"] as ["top", "bottom"],
-  "text-radial-offset": 6,
-  "text-justify": "auto" as const
+const areaLabelPointLayout = {
+  "text-anchor": "center" as const,
+  "text-justify": "center" as const,
+  "text-offset": [0, 0] as [number, number]
 };
 
 type RuntimeTuning = ReturnType<typeof resolveMapRuntimeTuning>;
@@ -1106,7 +1100,7 @@ function ensureMapLayers(
       layout: {
         "icon-size": 1,
         "icon-anchor": "center",
-        "icon-allow-overlap": true,
+        "icon-allow-overlap": false,
         "icon-ignore-placement": false,
         "icon-image": clusterCollisionImageId
       },
@@ -1244,7 +1238,7 @@ function ensureMapLayers(
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-optional": true,
-        ...areaLabelOverviewOffsetLayout
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#5F6368",
@@ -1268,7 +1262,7 @@ function ensureMapLayers(
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-optional": true,
-        ...AREA_LABEL_OFFSET_LAYOUT
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#5F6368",
@@ -1292,7 +1286,7 @@ function ensureMapLayers(
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-optional": true,
-        ...majorAreaLabelOverviewOffsetLayout
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#5F6368",
@@ -1316,7 +1310,7 @@ function ensureMapLayers(
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-optional": true,
-        ...AREA_LABEL_OFFSET_LAYOUT
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#5F6368",
@@ -1337,10 +1331,29 @@ function ensureMapLayers(
         "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
         "text-font": ["Noto Sans Bold"],
         "text-size": 12,
-        "text-offset": [1.2, 0],
-        "text-anchor": "left",
+        "text-variable-anchor": [
+          "right",
+          "left",
+          "top",
+          "bottom",
+          "top-right",
+          "top-left",
+          "bottom-right",
+          "bottom-left"
+        ] as [
+          "right",
+          "left",
+          "top",
+          "bottom",
+          "top-right",
+          "top-left",
+          "bottom-right",
+          "bottom-left"
+        ],
+        "text-radial-offset": 1.2,
+        "text-justify": "auto" as const,
         "symbol-sort-key": ["get", "minImportanceRank"],
-        "text-allow-overlap": true,
+        "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": true
       },
@@ -1368,10 +1381,29 @@ function ensureMapLayers(
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 12,
-        "text-offset": [1.2, 0],
-        "text-anchor": "left",
+        "text-variable-anchor": [
+          "right",
+          "left",
+          "top",
+          "bottom",
+          "top-right",
+          "top-left",
+          "bottom-right",
+          "bottom-left"
+        ] as [
+          "right",
+          "left",
+          "top",
+          "bottom",
+          "top-right",
+          "top-left",
+          "bottom-right",
+          "bottom-left"
+        ],
+        "text-radial-offset": 1.2,
+        "text-justify": "auto" as const,
         "symbol-sort-key": ["get", "labelPriority"],
-        "text-allow-overlap": true,
+        "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": true
       },
@@ -1397,7 +1429,7 @@ function ensureMapLayers(
         "text-letter-spacing": 0.18,
         "text-allow-overlap": true,
         "text-ignore-placement": true,
-        ...AREA_LABEL_OFFSET_LAYOUT
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#202124",
@@ -1480,6 +1512,8 @@ function ensureMapLayers(
   }
 
   const areaLayersNeedingStandardClusterClearance = [
+    layerAreaLabelOverviewId,
+    layerAreaLabelId,
     layerMajorAreaLabelOverviewId,
     layerMajorAreaLabelId
   ] as const;
