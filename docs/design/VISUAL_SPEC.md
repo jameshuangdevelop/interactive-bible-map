@@ -110,14 +110,15 @@ The section order follows brief §1.4. Sections without data are left out.
 7. **Places in *name*:** chips for child records (for example Jerusalem → Temple Mount, Pool of Bethesda …; Galilee → Capernaum …), directly below About.
 8. **In the Bible · *n* passages:** grouped by book in canonical order.
    - Each entry shows its reference in bold (for example "Matthew 4:13") and the WEB verse text in a **serif** typeface, so scripture reads distinctly.
-   - The first 5 are shown, then **"Show all *n* passages"** (CP3a decision 4). Jerusalem has 174.
+   - The first 5 are shown, then a toggle: **"Show all *n* passages"** expands to all verses and changes to **"Show fewer"** to return to the 5-verse preview (CP3a decision 4). Jerusalem has 174.
 9. **Old Testament connections · *n*:** the reference and a short note, with source markers.
-10. **Sources:** a numbered list, where each entry is a readable citation with a link:
+10. **Sources · *n*:** a numbered list, where each entry is a readable citation with a link:
     - "Pleiades place 678231" links to Pleiades;
     - `bib:` entries show as author, title and year;
     - `scripture:` entries show as the passage.
-11. **Photo credits:** a numbered list in gallery order, directly after Sources and before the footer, with the same heading style and entry typography as Sources. It starts with the note: "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole." Each entry has the same full credit line the viewer shows.
-12. **Footer:** "Checked by the project's Fact-Checker · last reviewed 24 Sep 2026", and **Report an issue**, which opens a GitHub issue with the place id filled in.
+11. **Photo credits · *n*:** a numbered list in gallery order, directly after Sources and before the footer, with the same heading style and entry typography as Sources. It starts with the note: "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole." Each entry has the same full credit line the viewer shows.
+12. **Collapsible sections:** About, Places in *name*, In the Bible, Old Testament connections, Sources and Photo credits each keep a heading, with a full-row button inside that heading (`aria-expanded`, `aria-controls`). The heading button shows a decorative chevron (`aria-hidden`) that points right when collapsed and down when open, with a subtle hover state and pointer cursor. About, Places in *name*, In the Bible and OT connections start open. Sources and Photo credits start collapsed, with heading text in the form "*Section* · *N*" (for example "Sources · 13", "Photo credits · 13"). Collapsed content is hidden but remains in the DOM.
+13. **Footer:** "Checked by the project's Fact-Checker · last reviewed 24 Sep 2026", and **Report an issue**, which opens a GitHub issue with the place id filled in.
 
 The panel closes with its × button or with Esc. While the panel is open, the map keeps its position.
 
@@ -179,7 +180,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 
 ## 9. Attribution and credits
 - **Map:** a compact attribution control. The exact text for OpenFreeMap, OpenMapTiles and OpenStreetMap is set by the Fact-Checker in `ATTRIBUTION.md` (task M3-07).
-- **Photos:** every image's full credit is in a numbered "Photo credits" list at the end of the place panel, after Sources, numbered as in the gallery's counter and styled like the Sources list. Under the panel's image there is only the caption and a small "Credit" link to the image's entry; the AI label stays on the image, and the large viewer shows the full credit (§3; `docs/LICENSES.md`, "Image credits").
+- **Photos:** every image's full credit is in a numbered "Photo credits · *n*" list at the end of the place panel, after "Sources · *n*". Both sections start collapsed, with the same heading style and toggle control. Under the panel's image there is only the caption and a small "Credit" link to the image's entry; selecting it opens Photo credits if needed and moves focus to the matching entry. The AI label stays on the image, and the large viewer shows the full credit (§3; `docs/LICENSES.md`, "Image credits").
 - **Menu → Sources & credits:**
   - the data licence (CC BY-SA 4.0; OSM- and AWMC-derived geometry under ODbL 1.0 from M4);
   - the WEB notice, word for word from `docs/LICENSES.md`;

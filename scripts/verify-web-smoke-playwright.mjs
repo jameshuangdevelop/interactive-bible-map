@@ -58,6 +58,45 @@ function assertCreditIncludes(creditText, requiredMarkers, label) {
   }
 }
 
+const placePanelSelector = "section[aria-label='Place details']";
+
+function sectionToggleSelector(sectionId) {
+  return `${placePanelSelector} [data-panel-section='${sectionId}'] [data-panel-section-toggle='${sectionId}']`;
+}
+
+async function assertCollapsedSectionWithCount(page, sectionId, sectionLabel) {
+  const toggle = page.locator(sectionToggleSelector(sectionId)).first();
+  await toggle.waitFor({ state: "visible", timeout: 45_000 });
+  const expanded = await toggle.getAttribute("aria-expanded");
+  assert(expanded === "false", `${sectionLabel} should start collapsed, got aria-expanded='${expanded}'.`);
+
+  const text = ((await toggle.textContent()) ?? "").replace(/\s+/gu, " ").trim();
+  const pattern = new RegExp(`^${sectionLabel} · [0-9]+$`, "u");
+  assert(pattern.test(text), `${sectionLabel} heading should show a count, got '${text}'.`);
+}
+
+async function setPanelSectionExpanded(page, sectionId, expanded) {
+  const toggle = page.locator(sectionToggleSelector(sectionId)).first();
+  await toggle.waitFor({ state: "visible", timeout: 45_000 });
+  const current = (await toggle.getAttribute("aria-expanded")) === "true";
+  if (current === expanded) {
+    return;
+  }
+
+  await toggle.click();
+  await page.waitForFunction(
+    ({ selector, expectedExpanded }) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof HTMLButtonElement)) {
+        return false;
+      }
+      return element.getAttribute("aria-expanded") === (expectedExpanded ? "true" : "false");
+    },
+    { selector: sectionToggleSelector(sectionId), expectedExpanded: expanded },
+    { timeout: 45_000, polling: 100 }
+  );
+}
+
 async function verifyMapLoads(page, baseUrl) {
   // waitForMapToSettle waits for the real map-ready state.
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 90_000 });
@@ -96,9 +135,12 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
     todayLineText.startsWith("Today: "),
     `Expected Capernaum panel to include a Today line, got '${todayLineText}'.`
   );
+  await assertCollapsedSectionWithCount(page, "sources", "Sources");
+  await assertCollapsedSectionWithCount(page, "photo-credits", "Photo credits");
 
   const photoCreditsEntrySelector =
     "section[aria-label='Place details'] [data-panel-section='photo-credits'] [data-photo-credits-entry='true']";
+  await setPanelSectionExpanded(page, "photo-credits", true);
   await page.waitForSelector(photoCreditsEntrySelector, { timeout: 45_000 });
   const inlinePhotoCreditCount = await page
     .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
@@ -125,6 +167,7 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
     aiImagePath.includes("/media/ai/"),
     `Capernaum lead image must be served from media/ai, got '${aiImage.currentSrc}'.`
   );
+  await setPanelSectionExpanded(page, "photo-credits", false);
 
   const nextImageButton = page.getByRole("button", { name: "Next image" });
   assert((await nextImageButton.count()) > 0, "Capernaum gallery is missing a Next image control.");
@@ -169,6 +212,17 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
       .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit-link='true']")
       .first()
       .click();
+    await page.waitForFunction(
+      (selector) => {
+        const element = document.querySelector(selector);
+        return (
+          element instanceof HTMLButtonElement &&
+          element.getAttribute("aria-expanded") === "true"
+        );
+      },
+      sectionToggleSelector("photo-credits"),
+      { timeout: 45_000, polling: 100 }
+    );
 
     await page.waitForFunction(() => {
       const activeElement = document.activeElement;

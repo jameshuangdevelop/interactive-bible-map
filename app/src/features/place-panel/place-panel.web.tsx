@@ -1,10 +1,13 @@
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type Dispatch,
   type KeyboardEvent as ReactKeyboardEvent,
+  type SetStateAction,
   type ReactNode,
   type RefObject
 } from "react";
@@ -59,6 +62,25 @@ const DIALOG_FOCUSABLE_SELECTOR =
 const PHOTO_CREDITS_NOTE =
   "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
 const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 1_500;
+type CollapsibleSectionId =
+  | "about"
+  | "places-in"
+  | "in-bible"
+  | "ot-connections"
+  | "sources"
+  | "photo-credits";
+const DEFAULT_COLLAPSIBLE_SECTION_EXPANDED_STATE: Record<CollapsibleSectionId, boolean> = {
+  about: true,
+  "places-in": true,
+  "in-bible": true,
+  "ot-connections": true,
+  sources: false,
+  "photo-credits": false
+};
+// Module-level by design while a single panel instance renders; move this into context if that changes.
+let rememberedCollapsibleSectionExpandedState = {
+  ...DEFAULT_COLLAPSIBLE_SECTION_EXPANDED_STATE
+};
 const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -68,6 +90,70 @@ const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
 
 function photoCreditTargetId(placeId: string, imageIndex: number) {
   return `photo-credit-${placeId}-${imageIndex + 1}`;
+}
+
+function panelSectionContentId(placeId: string, sectionId: CollapsibleSectionId) {
+  return `panel-section-content-${sectionId}-${placeId}`;
+}
+
+function headingWithCount(label: string, count: number) {
+  return `${label} · ${count}`;
+}
+
+function clearEntryHighlightTimeout(highlightTimeoutRef: {
+  current: number | null;
+}) {
+  if (highlightTimeoutRef.current === null) {
+    return;
+  }
+  window.clearTimeout(highlightTimeoutRef.current);
+  highlightTimeoutRef.current = null;
+}
+
+function focusAndHighlightEntry({
+  targetId,
+  setHighlightedEntryId,
+  highlightTimeoutRef
+}: {
+  targetId: string;
+  setHighlightedEntryId: Dispatch<SetStateAction<string | null>>;
+  highlightTimeoutRef: { current: number | null };
+}) {
+  const targetElement = document.getElementById(targetId);
+  if (!(targetElement instanceof HTMLElement)) {
+    return;
+  }
+
+  targetElement.focus();
+  targetElement.scrollIntoView({
+    block: "nearest"
+  });
+  setHighlightedEntryId(targetId);
+  clearEntryHighlightTimeout(highlightTimeoutRef);
+  highlightTimeoutRef.current = window.setTimeout(() => {
+    setHighlightedEntryId((current) => (current === targetId ? null : current));
+    highlightTimeoutRef.current = null;
+  }, PHOTO_CREDIT_HIGHLIGHT_DURATION_MS);
+}
+
+function panelJumpTargetStyle({
+  isFocused,
+  isHighlighted,
+  prefersReducedMotion
+}: {
+  isFocused: boolean;
+  isHighlighted: boolean;
+  prefersReducedMotion: boolean;
+}): CSSProperties {
+  return {
+    borderRadius: "4px",
+    outline: isFocused || isHighlighted ? `2px solid ${tokens.color.accent}` : "none",
+    outlineOffset: "2px",
+    backgroundColor: isHighlighted ? "rgba(26,115,232,0.12)" : "transparent",
+    transition: prefersReducedMotion
+      ? "none"
+      : "background-color 180ms ease-out, outline-color 180ms ease-out"
+  };
 }
 
 interface PlacePanelProps {
@@ -651,10 +737,12 @@ function sourceMarkersFor(
 
 function SourceMarkers({
   sources,
-  sourceOrdinalById
+  sourceOrdinalById,
+  onSelectSource
 }: {
   sources: SourceId[];
   sourceOrdinalById: Map<SourceId, number>;
+  onSelectSource?: (sourceOrdinal: number) => void;
 }) {
   const ordinals = sourceMarkersFor(sources, sourceOrdinalById);
   if (ordinals.length === 0) {
@@ -667,6 +755,13 @@ function SourceMarkers({
         <a
           href={`#source-${ordinal}`}
           key={ordinal}
+          onClick={(event) => {
+            if (!onSelectSource) {
+              return;
+            }
+            event.preventDefault();
+            onSelectSource(ordinal);
+          }}
           style={{
             color: tokens.color.accent,
             textDecoration: "none",
@@ -678,6 +773,75 @@ function SourceMarkers({
         </a>
       ))}
     </span>
+  );
+}
+
+function CollapsibleSectionHeading({
+  sectionId,
+  contentId,
+  label,
+  expanded,
+  prefersReducedMotion,
+  onToggle
+}: {
+  sectionId: CollapsibleSectionId;
+  contentId: string;
+  label: string;
+  expanded: boolean;
+  prefersReducedMotion: boolean;
+  onToggle: () => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const chevronState = expanded ? "expanded" : "collapsed";
+
+  return (
+    <h2 style={sectionHeadingStyle}>
+      <button
+        aria-controls={contentId}
+        aria-expanded={expanded}
+        data-panel-section-toggle={sectionId}
+        onMouseEnter={() => {
+          setIsHovered(true);
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+        }}
+        onClick={onToggle}
+        style={{
+          ...sectionHeadingToggleButtonStyle,
+          backgroundColor: isHovered ? tokens.color.subtleSurface : "transparent"
+        }}
+        type="button"
+      >
+        <span>{label}</span>
+        <span
+          aria-hidden="true"
+          data-panel-section-chevron={sectionId}
+          data-panel-section-chevron-state={chevronState}
+          style={sectionHeadingChevronContainerStyle}
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            style={{
+              ...sectionHeadingChevronStyle,
+              transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
+              transition: prefersReducedMotion ? "none" : "transform 180ms ease"
+            }}
+            viewBox="0 0 12 12"
+          >
+            <path
+              d="M4 2.5L8 6L4 9.5"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="1.75"
+            />
+          </svg>
+        </span>
+      </button>
+    </h2>
   );
 }
 
@@ -853,11 +1017,20 @@ export function PlacePanel({
   const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
   const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
   const photoCreditHighlightTimeoutRef = useRef<number | null>(null);
+  const sourceEntryHighlightTimeoutRef = useRef<number | null>(null);
+  const showAllScriptureToggleRef = useRef<HTMLButtonElement | null>(null);
+  const pendingScriptureCollapseTopRef = useRef<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [highlightedSourceEntryId, setHighlightedSourceEntryId] = useState<string | null>(null);
+  const [focusedSourceEntryId, setFocusedSourceEntryId] = useState<string | null>(null);
   const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
   const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<CollapsibleSectionId, boolean>>(
+    () => ({ ...rememberedCollapsibleSectionExpandedState })
+  );
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
@@ -950,6 +1123,30 @@ export function PlacePanel({
   }, [aboutParagraphs, aboutPlaceMatchIndex, location, placeForDisplay.id]);
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => {
+      setPrefersReducedMotion(mediaQuery.matches);
+    };
+    updatePreference();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updatePreference);
+      return () => {
+        mediaQuery.removeEventListener("change", updatePreference);
+      };
+    }
+
+    mediaQuery.addListener(updatePreference);
+    return () => {
+      mediaQuery.removeListener(updatePreference);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!showAllScripture || visibleScriptureCount >= sortedScripture.length) {
       return undefined;
     }
@@ -964,6 +1161,41 @@ export function PlacePanel({
       window.clearTimeout(timer);
     };
   }, [showAllScripture, sortedScripture.length, visibleScriptureCount]);
+
+  useLayoutEffect(() => {
+    if (showAllScripture) {
+      return;
+    }
+
+    const topBeforeCollapse = pendingScriptureCollapseTopRef.current;
+    if (topBeforeCollapse === null) {
+      return;
+    }
+    pendingScriptureCollapseTopRef.current = null;
+
+    const refreshedButton = showAllScriptureToggleRef.current;
+    refreshedButton?.focus({ preventScroll: true });
+
+    if (!refreshedButton) {
+      return;
+    }
+
+    const topAfterCollapse = refreshedButton.getBoundingClientRect().top;
+    const scrollOffsetDelta = topAfterCollapse - topBeforeCollapse;
+    if (Math.abs(scrollOffsetDelta) < 1) {
+      return;
+    }
+
+    const panelContainer = refreshedButton.closest<HTMLElement>("section[aria-label='Place details']");
+    if (panelContainer) {
+      panelContainer.scrollTop += scrollOffsetDelta;
+      return;
+    }
+
+    window.scrollBy({
+      top: scrollOffsetDelta
+    });
+  }, [showAllScripture]);
 
   const visibleScripture = sortedScripture.slice(0, visibleScriptureCount);
   const groupedScripture = groupScriptureByBook(visibleScripture);
@@ -1017,21 +1249,46 @@ export function PlacePanel({
       })),
     [images, placeForDisplay.id]
   );
+  const aboutSectionContentId = panelSectionContentId(selectedPlace.id, "about");
+  const placesInSectionContentId = panelSectionContentId(selectedPlace.id, "places-in");
+  const inBibleSectionContentId = panelSectionContentId(selectedPlace.id, "in-bible");
+  const otConnectionsSectionContentId = panelSectionContentId(
+    selectedPlace.id,
+    "ot-connections"
+  );
+  const sourcesSectionContentId = panelSectionContentId(selectedPlace.id, "sources");
+  const photoCreditsSectionContentId = panelSectionContentId(
+    selectedPlace.id,
+    "photo-credits"
+  );
+  const aboutSectionExpanded = expandedSections.about;
+  const placesInSectionExpanded = expandedSections["places-in"];
+  const inBibleSectionExpanded = expandedSections["in-bible"];
+  const otConnectionsSectionExpanded = expandedSections["ot-connections"];
+  const sourcesSectionExpanded = expandedSections.sources;
+  const photoCreditsSectionExpanded = expandedSections["photo-credits"];
+  const placesInSectionHeading = headingWithCount(`Places in ${titleName}`, childPlaces.length);
+  const inBibleSectionHeading = `In the Bible · ${sortedScripture.length} ${
+    sortedScripture.length === 1 ? "passage" : "passages"
+  }`;
+  const otConnectionsSectionHeading = headingWithCount(
+    "Old Testament connections",
+    location?.otConnections.length ?? 0
+  );
+  const sourcesSectionHeading = headingWithCount("Sources", sourceCitations.length);
+  const photoCreditsSectionHeading = headingWithCount("Photo credits", photoCreditEntries.length);
 
   useEffect(
     () => () => {
-      if (photoCreditHighlightTimeoutRef.current !== null) {
-        window.clearTimeout(photoCreditHighlightTimeoutRef.current);
-      }
+      clearEntryHighlightTimeout(photoCreditHighlightTimeoutRef);
+      clearEntryHighlightTimeout(sourceEntryHighlightTimeoutRef);
     },
     []
   );
 
   useEffect(() => {
-    if (photoCreditHighlightTimeoutRef.current !== null) {
-      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
-      photoCreditHighlightTimeoutRef.current = null;
-    }
+    clearEntryHighlightTimeout(photoCreditHighlightTimeoutRef);
+    clearEntryHighlightTimeout(sourceEntryHighlightTimeoutRef);
   }, [selectedPlace.id]);
 
   useEffect(
@@ -1192,27 +1449,76 @@ export function PlacePanel({
     });
   };
 
+  const setSectionExpanded = (sectionId: CollapsibleSectionId, expanded: boolean) => {
+    setExpandedSections((current) => {
+      if (current[sectionId] === expanded) {
+        return current;
+      }
+
+      const next = {
+        ...current,
+        [sectionId]: expanded
+      };
+      rememberedCollapsibleSectionExpandedState = next;
+      return next;
+    });
+  };
+
+  const toggleSectionExpanded = (sectionId: CollapsibleSectionId) => {
+    setExpandedSections((current) => {
+      const next = {
+        ...current,
+        [sectionId]: !current[sectionId]
+      };
+      rememberedCollapsibleSectionExpandedState = next;
+      return next;
+    });
+  };
+
+  const focusPhotoCreditEntry = (targetId: string) => {
+    focusAndHighlightEntry({
+      targetId,
+      setHighlightedEntryId: setHighlightedPhotoCreditId,
+      highlightTimeoutRef: photoCreditHighlightTimeoutRef
+    });
+  };
+
+  const focusSourceEntry = (targetId: string) => {
+    focusAndHighlightEntry({
+      targetId,
+      setHighlightedEntryId: setHighlightedSourceEntryId,
+      highlightTimeoutRef: sourceEntryHighlightTimeoutRef
+    });
+  };
+
+  const jumpToSource = (sourceOrdinal: number) => {
+    const targetId = `source-${sourceOrdinal}`;
+    setSectionExpanded("sources", true);
+    window.requestAnimationFrame(() => {
+      focusSourceEntry(targetId);
+    });
+  };
+
   const jumpToPhotoCredit = (imageIndex: number) => {
     const targetId = photoCreditTargetId(placeForDisplay.id, imageIndex);
-    const targetElement = document.getElementById(targetId);
-    if (!(targetElement instanceof HTMLElement)) {
+    setSectionExpanded("photo-credits", true);
+    window.requestAnimationFrame(() => {
+      focusPhotoCreditEntry(targetId);
+    });
+  };
+
+  const toggleShowAllScripture = () => {
+    if (!showAllScripture) {
+      pendingScriptureCollapseTopRef.current = null;
+      setShowAllScripture(true);
       return;
     }
 
-    targetElement.focus();
-    targetElement.scrollIntoView({
-      block: "nearest"
-    });
-    setHighlightedPhotoCreditId(targetId);
+    const toggleButton = showAllScriptureToggleRef.current;
+    pendingScriptureCollapseTopRef.current = toggleButton?.getBoundingClientRect().top ?? null;
 
-    if (photoCreditHighlightTimeoutRef.current !== null) {
-      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
-    }
-
-    photoCreditHighlightTimeoutRef.current = window.setTimeout(() => {
-      setHighlightedPhotoCreditId((current) => (current === targetId ? null : current));
-      photoCreditHighlightTimeoutRef.current = null;
-    }, PHOTO_CREDIT_HIGHLIGHT_DURATION_MS);
+    setShowAllScripture(false);
+    setVisibleScriptureCount(SCRIPTURE_INITIAL_COUNT);
   };
 
   const openImageViewer = () => {
@@ -1587,6 +1893,7 @@ export function PlacePanel({
                     >
                       {support}
                       <SourceMarkers
+                        onSelectSource={jumpToSource}
                         sourceOrdinalById={sourceOrdinalById}
                         sources={candidate.sources}
                       />
@@ -1635,69 +1942,100 @@ export function PlacePanel({
           <>
             <section data-panel-section="about">
               <hr style={sectionDividerStyle} />
-              <h2 style={sectionHeadingStyle}>About</h2>
-              {aboutParagraphs.map((entry, index) => {
-                const mentions = aboutMentionsByParagraph.get(index) ?? [];
-                return (
-                  <p key={`${entry.text}:${index}`} style={bodyTextStyle}>
-                    {renderAboutParagraphWithLinks({
-                      paragraphText: entry.text,
-                      mentions,
-                      onSelectPlace: onSelectPlaceFromAbout,
-                      onHighlightPlace
-                    })}
-                    <SourceMarkers
-                      sourceOrdinalById={sourceOrdinalById}
-                      sources={entry.sources}
-                    />
-                  </p>
-                );
-              })}
+              <CollapsibleSectionHeading
+                contentId={aboutSectionContentId}
+                expanded={aboutSectionExpanded}
+                label="About"
+                onToggle={() => {
+                  toggleSectionExpanded("about");
+                }}
+                prefersReducedMotion={prefersReducedMotion}
+                sectionId="about"
+              />
+              <div
+                data-panel-section-content="about"
+                hidden={!aboutSectionExpanded}
+                id={aboutSectionContentId}
+              >
+                {aboutParagraphs.map((entry, index) => {
+                  const mentions = aboutMentionsByParagraph.get(index) ?? [];
+                  return (
+                    <p key={`${entry.text}:${index}`} style={bodyTextStyle}>
+                      {renderAboutParagraphWithLinks({
+                        paragraphText: entry.text,
+                        mentions,
+                        onSelectPlace: onSelectPlaceFromAbout,
+                        onHighlightPlace
+                      })}
+                      <SourceMarkers
+                        onSelectSource={jumpToSource}
+                        sourceOrdinalById={sourceOrdinalById}
+                        sources={entry.sources}
+                      />
+                    </p>
+                  );
+                })}
+              </div>
             </section>
 
             {childPlaces.length > 0 ? (
               <section data-panel-section="places-in">
                 <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>Places in {titleName}</h2>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: `${tokens.spacing.sm}px` }}>
-                  {childPlaces.map((childPlace) => (
-                    <button
-                      data-places-in-place-id={childPlace.id}
-                      key={childPlace.id}
-                      onBlur={() => {
-                        onHighlightPlace(null);
-                      }}
-                      onClick={() =>
-                        onSelectPlace({
-                          placeId: childPlace.id,
-                          candidateIndex: null
-                        })
-                      }
-                      onFocus={() => {
-                        onHighlightPlace(childPlace.id);
-                      }}
-                      onMouseEnter={() => {
-                        onHighlightPlace(childPlace.id);
-                      }}
-                      onMouseLeave={() => {
-                        onHighlightPlace(null);
-                      }}
-                      style={{
-                        border: `1px solid ${tokens.color.divider}`,
-                        borderRadius: "999px",
-                        backgroundColor: tokens.color.surface,
-                        padding: "6px 12px",
-                        color: tokens.color.textPrimary,
-                        cursor: "pointer",
-                        fontFamily: tokens.typography.uiFont,
-                        fontSize: `${tokens.typography.bodySize}px`,
-                        lineHeight: `${tokens.typography.bodyLineHeight}px`
-                      }}
-                      type="button"
-                    >
-                      {getPrimaryPlaceName(childPlace)}
-                    </button>
-                  ))}
+                <CollapsibleSectionHeading
+                  contentId={placesInSectionContentId}
+                  expanded={placesInSectionExpanded}
+                  label={placesInSectionHeading}
+                  onToggle={() => {
+                    toggleSectionExpanded("places-in");
+                  }}
+                  prefersReducedMotion={prefersReducedMotion}
+                  sectionId="places-in"
+                />
+                <div
+                  data-panel-section-content="places-in"
+                  hidden={!placesInSectionExpanded}
+                  id={placesInSectionContentId}
+                >
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: `${tokens.spacing.sm}px` }}>
+                    {childPlaces.map((childPlace) => (
+                      <button
+                        data-places-in-place-id={childPlace.id}
+                        key={childPlace.id}
+                        onBlur={() => {
+                          onHighlightPlace(null);
+                        }}
+                        onClick={() =>
+                          onSelectPlace({
+                            placeId: childPlace.id,
+                            candidateIndex: null
+                          })
+                        }
+                        onFocus={() => {
+                          onHighlightPlace(childPlace.id);
+                        }}
+                        onMouseEnter={() => {
+                          onHighlightPlace(childPlace.id);
+                        }}
+                        onMouseLeave={() => {
+                          onHighlightPlace(null);
+                        }}
+                        style={{
+                          border: `1px solid ${tokens.color.divider}`,
+                          borderRadius: "999px",
+                          backgroundColor: tokens.color.surface,
+                          padding: "6px 12px",
+                          color: tokens.color.textPrimary,
+                          cursor: "pointer",
+                          fontFamily: tokens.typography.uiFont,
+                          fontSize: `${tokens.typography.bodySize}px`,
+                          lineHeight: `${tokens.typography.bodyLineHeight}px`
+                        }}
+                        type="button"
+                      >
+                        {getPrimaryPlaceName(childPlace)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </section>
             ) : null}
@@ -1705,205 +2043,285 @@ export function PlacePanel({
             {sortedScripture.length > 0 ? (
               <section data-panel-section="in-bible">
                 <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>
-                  In the Bible · {sortedScripture.length}{" "}
-                  {sortedScripture.length === 1 ? "passage" : "passages"}
-                </h2>
-                <div id={`scripture-passages-${selectedPlace.id}`}>
-                  {groupedScripture.map((group) => (
-                    <div key={group.book} style={{ marginBottom: `${tokens.spacing.md}px` }}>
-                      <h3
-                        style={{
-                          marginTop: 0,
-                          marginBottom: `${tokens.spacing.sm}px`,
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                          color: tokens.color.textSecondary,
-                          fontSize: `${tokens.typography.captionSize}px`,
-                          lineHeight: `${tokens.typography.captionLineHeight}px`,
-                          fontWeight: 600
-                        }}
-                      >
-                        {group.book}
-                      </h3>
-                      {group.passages.map((passage) => (
-                        <article
-                          key={passage.ref}
+                <CollapsibleSectionHeading
+                  contentId={inBibleSectionContentId}
+                  expanded={inBibleSectionExpanded}
+                  label={inBibleSectionHeading}
+                  onToggle={() => {
+                    toggleSectionExpanded("in-bible");
+                  }}
+                  prefersReducedMotion={prefersReducedMotion}
+                  sectionId="in-bible"
+                />
+                <div
+                  data-panel-section-content="in-bible"
+                  hidden={!inBibleSectionExpanded}
+                  id={inBibleSectionContentId}
+                >
+                  <div id={`scripture-passages-${selectedPlace.id}`}>
+                    {groupedScripture.map((group) => (
+                      <div key={group.book} style={{ marginBottom: `${tokens.spacing.md}px` }}>
+                        <h3
                           style={{
-                            marginBottom: `${tokens.spacing.sm}px`
+                            marginTop: 0,
+                            marginBottom: `${tokens.spacing.sm}px`,
+                            letterSpacing: "0.08em",
+                            textTransform: "uppercase",
+                            color: tokens.color.textSecondary,
+                            fontSize: `${tokens.typography.captionSize}px`,
+                            lineHeight: `${tokens.typography.captionLineHeight}px`,
+                            fontWeight: 600
                           }}
                         >
-                          <p
+                          {group.book}
+                        </h3>
+                        {group.passages.map((passage) => (
+                          <article
+                            key={passage.ref}
                             style={{
-                              marginTop: 0,
-                              marginBottom: "2px",
-                              color: tokens.color.textPrimary,
-                              fontSize: `${tokens.typography.bodySize}px`,
-                              lineHeight: `${tokens.typography.bodyLineHeight}px`,
-                              fontWeight: 700
+                              marginBottom: `${tokens.spacing.sm}px`
                             }}
                           >
-                            {passage.ref}
-                          </p>
-                          <p
-                            style={{
-                              marginTop: 0,
-                              marginBottom: 0,
-                              color: tokens.color.textPrimary,
-                              fontSize: `${tokens.typography.scriptureSize}px`,
-                              lineHeight: `${tokens.typography.scriptureLineHeight}px`,
-                              fontFamily: tokens.typography.scriptureFont
-                            }}
-                          >
-                            {passage.textWEB}
-                          </p>
-                        </article>
-                      ))}
-                    </div>
-                  ))}
+                            <p
+                              style={{
+                                marginTop: 0,
+                                marginBottom: "2px",
+                                color: tokens.color.textPrimary,
+                                fontSize: `${tokens.typography.bodySize}px`,
+                                lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                                fontWeight: 700
+                              }}
+                            >
+                              {passage.ref}
+                            </p>
+                            <p
+                              style={{
+                                marginTop: 0,
+                                marginBottom: 0,
+                                color: tokens.color.textPrimary,
+                                fontSize: `${tokens.typography.scriptureSize}px`,
+                                lineHeight: `${tokens.typography.scriptureLineHeight}px`,
+                                fontFamily: tokens.typography.scriptureFont
+                              }}
+                            >
+                              {passage.textWEB}
+                            </p>
+                          </article>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                  {sortedScripture.length > SCRIPTURE_INITIAL_COUNT ? (
+                    <button
+                      aria-controls={`scripture-passages-${selectedPlace.id}`}
+                      aria-expanded={showAllScripture}
+                      data-show-all-passages="true"
+                      onClick={toggleShowAllScripture}
+                      ref={showAllScriptureToggleRef}
+                      style={textActionStyle}
+                      type="button"
+                    >
+                      {showAllScripture
+                        ? "Show fewer"
+                        : `Show all ${sortedScripture.length} passages`}
+                    </button>
+                  ) : null}
+                  {showAllScripture && visibleScriptureCount < sortedScripture.length ? (
+                    <p style={secondaryTextStyle}>Loading more passages…</p>
+                  ) : null}
                 </div>
-                {sortedScripture.length > SCRIPTURE_INITIAL_COUNT ? (
-                  <button
-                    aria-controls={`scripture-passages-${selectedPlace.id}`}
-                    aria-expanded={showAllScripture}
-                    data-show-all-passages="true"
-                    disabled={showAllScripture}
-                    onClick={() => setShowAllScripture(true)}
-                    style={textActionStyle}
-                    type="button"
-                  >
-                    {showAllScripture
-                      ? `Showing all ${sortedScripture.length} passages`
-                      : `Show all ${sortedScripture.length} passages`}
-                  </button>
-                ) : null}
-                {showAllScripture && visibleScriptureCount < sortedScripture.length ? (
-                  <p style={secondaryTextStyle}>Loading more passages…</p>
-                ) : null}
               </section>
             ) : null}
 
             {location.otConnections.length > 0 ? (
               <section data-panel-section="ot-connections">
                 <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>
-                  Old Testament connections · {location.otConnections.length}
-                </h2>
-                {location.otConnections.map((connection) => (
-                  <p key={`${connection.ref}:${connection.note}`} style={bodyTextStyle}>
-                    <strong>{connection.ref}</strong> — {connection.note}
-                    <SourceMarkers
-                      sourceOrdinalById={sourceOrdinalById}
-                      sources={connection.sources}
-                    />
-                  </p>
-                ))}
+                <CollapsibleSectionHeading
+                  contentId={otConnectionsSectionContentId}
+                  expanded={otConnectionsSectionExpanded}
+                  label={otConnectionsSectionHeading}
+                  onToggle={() => {
+                    toggleSectionExpanded("ot-connections");
+                  }}
+                  prefersReducedMotion={prefersReducedMotion}
+                  sectionId="ot-connections"
+                />
+                <div
+                  data-panel-section-content="ot-connections"
+                  hidden={!otConnectionsSectionExpanded}
+                  id={otConnectionsSectionContentId}
+                >
+                  {location.otConnections.map((connection) => (
+                    <p key={`${connection.ref}:${connection.note}`} style={bodyTextStyle}>
+                      <strong>{connection.ref}</strong> — {connection.note}
+                      <SourceMarkers
+                        onSelectSource={jumpToSource}
+                        sourceOrdinalById={sourceOrdinalById}
+                        sources={connection.sources}
+                      />
+                    </p>
+                  ))}
+                </div>
               </section>
             ) : null}
 
             {sourceCitations.length > 0 ? (
               <section data-panel-section="sources">
                 <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>Sources</h2>
-                <ol
-                  style={{
-                    margin: 0,
-                    paddingLeft: "22px",
-                    color: tokens.color.textSecondary
+                <CollapsibleSectionHeading
+                  contentId={sourcesSectionContentId}
+                  expanded={sourcesSectionExpanded}
+                  label={sourcesSectionHeading}
+                  onToggle={() => {
+                    toggleSectionExpanded("sources");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
+                  sectionId="sources"
+                />
+                <div
+                  data-panel-section-content="sources"
+                  hidden={!sourcesSectionExpanded}
+                  id={sourcesSectionContentId}
                 >
-                  {sourceCitations.map((citation, index) => {
-                    const safeCitationUrl = toSafeHttpUrl(citation.url);
-                    return (
-                      <li
-                        id={`source-${index + 1}`}
-                        key={citation.id}
-                        style={{
-                          marginBottom: `${tokens.spacing.sm}px`,
-                          fontSize: `${tokens.typography.bodySize}px`,
-                          lineHeight: `${tokens.typography.bodyLineHeight}px`
-                        }}
-                      >
-                        {safeCitationUrl ? (
-                          <a href={safeCitationUrl} rel="noopener noreferrer" target="_blank">
-                            {citation.label}
-                          </a>
-                        ) : (
-                          citation.label
-                        )}
-                      </li>
-                    );
-                  })}
-                </ol>
+                  <ol
+                    style={{
+                      margin: 0,
+                      paddingLeft: "22px",
+                      color: tokens.color.textSecondary
+                    }}
+                  >
+                    {sourceCitations.map((citation, index) => {
+                      const sourceEntryId = `source-${index + 1}`;
+                      const isHighlighted = highlightedSourceEntryId === sourceEntryId;
+                      const isFocused = focusedSourceEntryId === sourceEntryId;
+                      const safeCitationUrl = toSafeHttpUrl(citation.url);
+                      return (
+                        <li
+                          data-source-entry="true"
+                          id={sourceEntryId}
+                          key={citation.id}
+                          onBlur={(event) => {
+                            const nextFocused = event.relatedTarget;
+                            if (
+                              nextFocused instanceof Node &&
+                              event.currentTarget.contains(nextFocused)
+                            ) {
+                              return;
+                            }
+                            setFocusedSourceEntryId((current) =>
+                              current === sourceEntryId ? null : current
+                            );
+                          }}
+                          onFocus={() => {
+                            setFocusedSourceEntryId(sourceEntryId);
+                          }}
+                          style={{
+                            marginBottom: `${tokens.spacing.sm}px`,
+                            fontSize: `${tokens.typography.bodySize}px`,
+                            lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                            ...panelJumpTargetStyle({
+                              isFocused,
+                              isHighlighted,
+                              prefersReducedMotion
+                            })
+                          }}
+                          tabIndex={-1}
+                        >
+                          {safeCitationUrl ? (
+                            <a href={safeCitationUrl} rel="noopener noreferrer" target="_blank">
+                              {citation.label}
+                            </a>
+                          ) : (
+                            citation.label
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
               </section>
             ) : null}
 
             {photoCreditEntries.length > 0 ? (
               <section data-panel-section="photo-credits">
                 <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>Photo credits</h2>
-                <p
-                  data-photo-credits-note="true"
-                  style={{
-                    marginTop: 0,
-                    marginBottom: `${tokens.spacing.sm}px`,
-                    color: tokens.color.textSecondary,
-                    fontSize: `${tokens.typography.bodySize}px`,
-                    lineHeight: `${tokens.typography.bodyLineHeight}px`
+                <CollapsibleSectionHeading
+                  contentId={photoCreditsSectionContentId}
+                  expanded={photoCreditsSectionExpanded}
+                  label={photoCreditsSectionHeading}
+                  onToggle={() => {
+                    toggleSectionExpanded("photo-credits");
                   }}
+                  prefersReducedMotion={prefersReducedMotion}
+                  sectionId="photo-credits"
+                />
+                <div
+                  data-panel-section-content="photo-credits"
+                  hidden={!photoCreditsSectionExpanded}
+                  id={photoCreditsSectionContentId}
                 >
-                  {PHOTO_CREDITS_NOTE}
-                </p>
-                <ol
-                  data-photo-credits-list="true"
-                  style={{
-                    margin: 0,
-                    paddingLeft: "22px",
-                    color: tokens.color.textSecondary
-                  }}
-                >
-                  {photoCreditEntries.map((entry) => {
-                    const isHighlighted = highlightedPhotoCreditId === entry.entryId;
-                    const isFocused = focusedPhotoCreditId === entry.entryId;
-                    return (
-                      <li
-                        id={entry.entryId}
-                        key={entry.imageId}
-                        data-photo-credits-entry="true"
-                        data-photo-credit-entry-index={entry.imageIndex + 1}
-                        onBlur={(event) => {
-                          const nextFocused = event.relatedTarget;
-                          if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) {
-                            return;
-                          }
-                          setFocusedPhotoCreditId((current) =>
-                            current === entry.entryId ? null : current
-                          );
-                        }}
-                        onFocus={() => {
-                          setFocusedPhotoCreditId(entry.entryId);
-                        }}
-                        style={{
-                          marginBottom: `${tokens.spacing.sm}px`,
-                          fontSize: `${tokens.typography.bodySize}px`,
-                          lineHeight: `${tokens.typography.bodyLineHeight}px`,
-                          borderRadius: "4px",
-                          outline:
-                            isHighlighted || isFocused
-                              ? `2px solid ${tokens.color.accent}`
-                              : "none",
-                          outlineOffset: "2px",
-                          backgroundColor: isHighlighted ? "rgba(26,115,232,0.12)" : "transparent",
-                          transition:
-                            "background-color 180ms ease-out, outline-color 180ms ease-out"
-                        }}
-                        tabIndex={-1}
-                      >
-                        {renderCreditSegments(entry.segments)}
-                      </li>
-                    );
-                  })}
-                </ol>
+                  <p
+                    data-photo-credits-note="true"
+                    style={{
+                      marginTop: 0,
+                      marginBottom: `${tokens.spacing.sm}px`,
+                      color: tokens.color.textSecondary,
+                      fontSize: `${tokens.typography.bodySize}px`,
+                      lineHeight: `${tokens.typography.bodyLineHeight}px`
+                    }}
+                  >
+                    {PHOTO_CREDITS_NOTE}
+                  </p>
+                  <ol
+                    data-photo-credits-list="true"
+                    style={{
+                      margin: 0,
+                      paddingLeft: "22px",
+                      color: tokens.color.textSecondary
+                    }}
+                  >
+                    {photoCreditEntries.map((entry) => {
+                      const isHighlighted = highlightedPhotoCreditId === entry.entryId;
+                      const isFocused = focusedPhotoCreditId === entry.entryId;
+                      return (
+                        <li
+                          id={entry.entryId}
+                          key={entry.imageId}
+                          data-photo-credits-entry="true"
+                          data-photo-credit-entry-index={entry.imageIndex + 1}
+                          onBlur={(event) => {
+                            const nextFocused = event.relatedTarget;
+                            if (
+                              nextFocused instanceof Node &&
+                              event.currentTarget.contains(nextFocused)
+                            ) {
+                              return;
+                            }
+                            setFocusedPhotoCreditId((current) =>
+                              current === entry.entryId ? null : current
+                            );
+                          }}
+                          onFocus={() => {
+                            setFocusedPhotoCreditId(entry.entryId);
+                          }}
+                          style={{
+                            marginBottom: `${tokens.spacing.sm}px`,
+                            fontSize: `${tokens.typography.bodySize}px`,
+                            lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                            ...panelJumpTargetStyle({
+                              isFocused,
+                              isHighlighted,
+                              prefersReducedMotion
+                            })
+                          }}
+                          tabIndex={-1}
+                        >
+                          {renderCreditSegments(entry.segments)}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
               </section>
             ) : null}
 
@@ -2122,6 +2540,43 @@ const sectionHeadingStyle: CSSProperties = {
   fontSize: `${tokens.typography.sectionHeadingSize}px`,
   lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
   fontWeight: 500
+};
+
+const sectionHeadingToggleButtonStyle: CSSProperties = {
+  width: "100%",
+  minHeight: "44px",
+  border: "none",
+  background: "transparent",
+  padding: "2px 4px",
+  borderRadius: "4px",
+  color: tokens.color.textPrimary,
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: `${tokens.spacing.sm}px`,
+  textAlign: "left",
+  fontFamily: tokens.typography.uiFont,
+  fontSize: `${tokens.typography.sectionHeadingSize}px`,
+  lineHeight: `${tokens.typography.sectionHeadingLineHeight}px`,
+  fontWeight: 500
+};
+
+const sectionHeadingChevronContainerStyle: CSSProperties = {
+  width: "16px",
+  height: "16px",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: tokens.color.textSecondary,
+  flexShrink: 0
+};
+
+const sectionHeadingChevronStyle: CSSProperties = {
+  width: "12px",
+  height: "12px",
+  display: "block",
+  transformOrigin: "50% 50%"
 };
 
 const secondaryTextStyle: CSSProperties = {
