@@ -24,6 +24,7 @@ Let readers switch between the ancient map and today's map, to see where the pla
 1. **Modern styles:** extend `scripts/build-basemap-styles.mjs` to build a modern Liberty: today's towns, roads, railways and country borders, labelled in English (`name:en`, falling back to the name in Latin script, never in another script), with every boundary where `disputed=1` hidden, no points of interest, and the same zoom range as the ancient map. Build the VersaTiles fallback the same way. Leave the physical styles as they are.
 2. **The toggle:** "Ancient | Modern" as spec §2 "Modern map" describes, at the top right (on phones just below the search box), as a keyboard radio group. The URL keeps the choice (`map=modern`; spec §10).
    - Switching keeps the camera, the selected place and the pins.
+   - The pins keep their Bible names on both maps, which is the PO's default until the human decides at MC6 (ADR-0037 item 4). Make the pins' label source one setting, so that modern names (where a record has one) could replace them without reworking the feature.
    - The modern map hides the area labels (empires, provinces and regions).
    - The switch to the fallback after tile errors works on both maps, and the attribution follows the map shown.
 3. **Room for M4-05:** the ancient layer and the timeline will appear on the ancient map only. Structure the code so they can plug in, without building them.
@@ -38,7 +39,7 @@ The ancient layer and the timeline (M4-05), and any change to the ancient map it
 
 ## Acceptance criteria
 - [ ] The toggle works by mouse, touch and keyboard, the URL keeps the choice, and switching keeps the camera and the selected place.
-- [ ] The modern map has English labels only, today's borders with disputed borders hidden, and no points of interest. The pins keep their Bible names, and the area labels are hidden.
+- [ ] The modern map has English labels only, today's borders with disputed borders hidden, and no points of interest. The pins keep their Bible names (provisional until MC6, through one setting), and the area labels are hidden.
 - [ ] The fallback switch still works on both maps.
 - [ ] The notices and attribution are right (Fact-Checker).
 - [ ] `npm run lint`, `typecheck`, `test:all`, `build:data`, `export:web` and `verify:web:playwright` pass.

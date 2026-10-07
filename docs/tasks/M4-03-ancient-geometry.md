@@ -34,7 +34,7 @@ Read by the PO on 2026-10-07; confirm each license at the source.
 1. **Shapes:** one shape for each area in M4-02's list. Start with the provinces and the lands of Herod's kingdom, while the list is being finished.
    - Build them from AWMC's lines and polygons, closed against the coastline.
    - Where the first-century border differs from AWMC's (which shows AD 117 or AD 200), move it only along a cited description: an ancient author or a modern scholarly description, such as a river or a mountain range. Record each change and its source in the feature's provenance.
-   - Where nothing supports a border between two areas, don't draw one: merge them, or flag it to the PO. Never invent a line.
+   - Where nothing supports a border between two areas, don't draw one, and never invent a line. Send the case to the PO: M4-02 then merges the area into a neighbour, or turns it into a place exception.
    - Pontus, Galatia, Cappadocia, Asia and Bithynia must have shapes (ADR-0018).
 2. **Roads:** AWMC's major roads of the Roman period within the map's focus. Leave out any road a source dates after AD 100, for example Trajan's Via Nova Traiana (AD 111–114). Keep AWMC's known or conjectured flag and its ids.
 3. **Coastline:** compare AWMC's ancient coastline with today's near our places. Include only differences that show at zoom 10 or below and that the data supports, for example the silted gulfs at Ephesus and Miletus, as shapes of land that was then sea. If none qualify, say why and add a line to `BACKLOG.md`.
@@ -53,7 +53,7 @@ Commit: `data(geo): first-century areas, roads and coastline`.
 Who held each area (M4-02), the app (M4-04 and M4-05), and modern borders.
 
 ## Acceptance criteria
-- [ ] Every area in M4-02's list has a shape with provenance, and every change to AWMC's lines cites a source.
+- [ ] Every area in M4-02's list has a shape with provenance, or was sent back and merged or made a place exception; every change to AWMC's lines cites a source.
 - [ ] Roads and coastline as above, with upstream ids.
 - [ ] Everything the ancient layer loads is under about 300 KB compressed.
 - [ ] Every place lies in its assigned area at every stop, or is an explained exception.
