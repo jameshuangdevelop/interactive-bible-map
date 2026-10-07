@@ -5,6 +5,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
   type RefObject
 } from "react";
 
@@ -20,6 +21,8 @@ import type {
   SourceId
 } from "../map/types";
 import {
+  type AboutPlaceMention,
+  buildAboutPlaceMatchIndex,
   buildAlsoKnownAs,
   buildImageKindLabel,
   buildHierarchyItems,
@@ -29,6 +32,7 @@ import {
   groupScriptureByBook,
   imageIndexesToLoad,
   isDisputedRecord,
+  matchAboutPlaceMentions,
   nextImageIndex,
   shouldRenderThumbnailRow,
   sortScriptureByCanonicalOrder
@@ -79,6 +83,8 @@ interface PlacePanelProps {
   onToggleSmallScreenExpanded: () => void;
   onClose: () => void;
   onSelectPlace: (selection: PlaceSelection) => void;
+  onSelectPlaceFromAbout: (selection: PlaceSelection) => void;
+  onHighlightPlace: (placeId: string | null) => void;
   onSelectCandidate: (candidateIndex: number) => void;
 }
 
@@ -704,6 +710,76 @@ function LinkLikeButton({
   );
 }
 
+function renderAboutParagraphWithLinks({
+  paragraphText,
+  mentions,
+  onSelectPlace,
+  onHighlightPlace
+}: {
+  paragraphText: string;
+  mentions: AboutPlaceMention[];
+  onSelectPlace: (selection: PlaceSelection) => void;
+  onHighlightPlace: (placeId: string | null) => void;
+}) {
+  if (mentions.length === 0) {
+    return paragraphText;
+  }
+
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+
+  for (const mention of mentions) {
+    if (mention.start > cursor) {
+      parts.push(
+        <span key={`text-${mention.paragraphIndex}-${mention.start}`}>
+          {paragraphText.slice(cursor, mention.start)}
+        </span>
+      );
+    }
+
+    parts.push(
+      <button
+        data-about-place-id={mention.placeId}
+        data-about-place-link="true"
+        key={`link-${mention.paragraphIndex}-${mention.start}-${mention.placeId}`}
+        onBlur={() => {
+          onHighlightPlace(null);
+        }}
+        onClick={() => {
+          onSelectPlace({
+            placeId: mention.placeId,
+            candidateIndex: null
+          });
+        }}
+        onFocus={() => {
+          onHighlightPlace(mention.placeId);
+        }}
+        onMouseEnter={() => {
+          onHighlightPlace(mention.placeId);
+        }}
+        onMouseLeave={() => {
+          onHighlightPlace(null);
+        }}
+        style={aboutPlaceLinkStyle}
+        type="button"
+      >
+        {paragraphText.slice(mention.start, mention.end)}
+      </button>
+    );
+    cursor = mention.end;
+  }
+
+  if (cursor < paragraphText.length) {
+    parts.push(
+      <span key={`text-tail-${mentions[mentions.length - 1]?.paragraphIndex ?? 0}-${cursor}`}>
+        {paragraphText.slice(cursor)}
+      </span>
+    );
+  }
+
+  return parts;
+}
+
 function SkeletonPanelBody() {
   const block = (width: string, key: string) => (
     <div
@@ -769,6 +845,8 @@ export function PlacePanel({
   onToggleSmallScreenExpanded,
   onClose,
   onSelectPlace,
+  onSelectPlaceFromAbout,
+  onHighlightPlace,
   onSelectCandidate
 }: PlacePanelProps) {
   const imageViewerRef = useRef<HTMLDivElement | null>(null);
@@ -830,6 +908,46 @@ export function PlacePanel({
     () => (location ? sortScriptureByCanonicalOrder(location.scripture) : []),
     [location]
   );
+  const aboutParagraphs = useMemo(() => {
+    if (!location) {
+      return [] as {
+        text: string;
+        sources: SourceId[];
+      }[];
+    }
+
+    return [
+      {
+        text: location.summary.text,
+        sources: location.summary.sources
+      },
+      ...location.history.map((entry) => ({
+        text: entry.text,
+        sources: entry.sources
+      }))
+    ];
+  }, [location]);
+  const aboutPlaceMatchIndex = useMemo(() => buildAboutPlaceMatchIndex(places), [places]);
+  const aboutMentionsByParagraph = useMemo(() => {
+    const mentionsByParagraph = new Map<number, AboutPlaceMention[]>();
+    if (!location) {
+      return mentionsByParagraph;
+    }
+
+    const matches = matchAboutPlaceMentions({
+      matchIndex: aboutPlaceMatchIndex,
+      currentPlaceId: placeForDisplay.id,
+      paragraphs: aboutParagraphs.map((entry) => entry.text)
+    });
+
+    for (const match of matches) {
+      const existing = mentionsByParagraph.get(match.paragraphIndex) ?? [];
+      existing.push(match);
+      mentionsByParagraph.set(match.paragraphIndex, existing);
+    }
+
+    return mentionsByParagraph;
+  }, [aboutParagraphs, aboutPlaceMatchIndex, location, placeForDisplay.id]);
 
   useEffect(() => {
     if (!showAllScripture || visibleScriptureCount >= sortedScripture.length) {
@@ -915,6 +1033,13 @@ export function PlacePanel({
       photoCreditHighlightTimeoutRef.current = null;
     }
   }, [selectedPlace.id]);
+
+  useEffect(
+    () => () => {
+      onHighlightPlace(null);
+    },
+    [onHighlightPlace]
+  );
 
   useEffect(() => {
     if (!selectedImage || images.length <= 1) {
@@ -1511,23 +1636,71 @@ export function PlacePanel({
             <section data-panel-section="about">
               <hr style={sectionDividerStyle} />
               <h2 style={sectionHeadingStyle}>About</h2>
-              <p style={bodyTextStyle}>
-                {location.summary.text}
-                <SourceMarkers
-                  sourceOrdinalById={sourceOrdinalById}
-                  sources={location.summary.sources}
-                />
-              </p>
-              {location.history.map((entry, index) => (
-                <p key={`${entry.text}:${index}`} style={bodyTextStyle}>
-                  {entry.text}
-                  <SourceMarkers
-                    sourceOrdinalById={sourceOrdinalById}
-                    sources={entry.sources}
-                  />
-                </p>
-              ))}
+              {aboutParagraphs.map((entry, index) => {
+                const mentions = aboutMentionsByParagraph.get(index) ?? [];
+                return (
+                  <p key={`${entry.text}:${index}`} style={bodyTextStyle}>
+                    {renderAboutParagraphWithLinks({
+                      paragraphText: entry.text,
+                      mentions,
+                      onSelectPlace: onSelectPlaceFromAbout,
+                      onHighlightPlace
+                    })}
+                    <SourceMarkers
+                      sourceOrdinalById={sourceOrdinalById}
+                      sources={entry.sources}
+                    />
+                  </p>
+                );
+              })}
             </section>
+
+            {childPlaces.length > 0 ? (
+              <section data-panel-section="places-in">
+                <hr style={sectionDividerStyle} />
+                <h2 style={sectionHeadingStyle}>Places in {titleName}</h2>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: `${tokens.spacing.sm}px` }}>
+                  {childPlaces.map((childPlace) => (
+                    <button
+                      data-places-in-place-id={childPlace.id}
+                      key={childPlace.id}
+                      onBlur={() => {
+                        onHighlightPlace(null);
+                      }}
+                      onClick={() =>
+                        onSelectPlace({
+                          placeId: childPlace.id,
+                          candidateIndex: null
+                        })
+                      }
+                      onFocus={() => {
+                        onHighlightPlace(childPlace.id);
+                      }}
+                      onMouseEnter={() => {
+                        onHighlightPlace(childPlace.id);
+                      }}
+                      onMouseLeave={() => {
+                        onHighlightPlace(null);
+                      }}
+                      style={{
+                        border: `1px solid ${tokens.color.divider}`,
+                        borderRadius: "999px",
+                        backgroundColor: tokens.color.surface,
+                        padding: "6px 12px",
+                        color: tokens.color.textPrimary,
+                        cursor: "pointer",
+                        fontFamily: tokens.typography.uiFont,
+                        fontSize: `${tokens.typography.bodySize}px`,
+                        lineHeight: `${tokens.typography.bodyLineHeight}px`
+                      }}
+                      type="button"
+                    >
+                      {getPrimaryPlaceName(childPlace)}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {sortedScripture.length > 0 ? (
               <section data-panel-section="in-bible">
@@ -1625,40 +1798,6 @@ export function PlacePanel({
                     />
                   </p>
                 ))}
-              </section>
-            ) : null}
-
-            {childPlaces.length > 0 ? (
-              <section data-panel-section="places-in">
-                <hr style={sectionDividerStyle} />
-                <h2 style={sectionHeadingStyle}>Places in {titleName}</h2>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: `${tokens.spacing.sm}px` }}>
-                  {childPlaces.map((childPlace) => (
-                    <button
-                      key={childPlace.id}
-                      onClick={() =>
-                        onSelectPlace({
-                          placeId: childPlace.id,
-                          candidateIndex: null
-                        })
-                      }
-                      style={{
-                        border: `1px solid ${tokens.color.divider}`,
-                        borderRadius: "999px",
-                        backgroundColor: tokens.color.surface,
-                        padding: "6px 12px",
-                        color: tokens.color.textPrimary,
-                        cursor: "pointer",
-                        fontFamily: tokens.typography.uiFont,
-                        fontSize: `${tokens.typography.bodySize}px`,
-                        lineHeight: `${tokens.typography.bodyLineHeight}px`
-                      }}
-                      type="button"
-                    >
-                      {getPrimaryPlaceName(childPlace)}
-                    </button>
-                  ))}
-                </div>
               </section>
             ) : null}
 
@@ -2020,4 +2159,12 @@ const textActionStyle: CSSProperties = {
   fontFamily: tokens.typography.uiFont,
   fontSize: `${tokens.typography.bodySize}px`,
   lineHeight: `${tokens.typography.bodyLineHeight}px`
+};
+
+const aboutPlaceLinkStyle: CSSProperties = {
+  ...textActionStyle,
+  display: "inline",
+  fontFamily: "inherit",
+  fontSize: "inherit",
+  lineHeight: "inherit"
 };

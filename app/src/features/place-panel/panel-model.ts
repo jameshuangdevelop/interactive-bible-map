@@ -103,6 +103,34 @@ const IMAGE_PROMPTS_BASE_URL =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts";
 // Keep raw source IDs in data only; readers get a single brief link label.
 export const AI_BASED_ON_LABEL = "research brief";
+const WORD_CHARACTER_PATTERN = /[\p{Letter}\p{Number}]/u;
+const WORD_BODY_CHARACTER_PATTERN = /[\p{Letter}\p{Number}'’]/u;
+const CAPITALIZED_WORD_START_PATTERN = /^\p{Lu}/u;
+const SENTENCE_BOUNDARY_PATTERN = /[.!?]/u;
+const LOWERCASE_LINK_NAME_CONNECTORS = new Set(["the", "of", "on", "in", "and", "beyond"]);
+const OPENING_WORD_PUNCTUATION = new Set(['"', "“", "‘", "(", "[", "{"]);
+const CLOSING_WORD_PUNCTUATION = new Set(['"', "”", "’", "'", ")", "]", "}"]);
+const TRAILING_NEIGHBOR_PUNCTUATION = new Set([".", ...CLOSING_WORD_PUNCTUATION]);
+// Keep in sync with schema/location.schema.json ($defs.modernCountry).
+const MODERN_COUNTRY_NAMES = [
+  "Türkiye",
+  "Greece",
+  "Italy",
+  "Israel",
+  "Jordan",
+  "Lebanon",
+  "Syria",
+  "Egypt",
+  "Cyprus",
+  "Malta",
+  "Iraq",
+  "Iran",
+  "Albania",
+  "North Macedonia",
+  "Libya",
+  "West Bank",
+  "Golan Heights"
+] as const;
 
 export interface GroupedScriptureBook {
   book: string;
@@ -129,6 +157,14 @@ export interface PhotoCreditSegment {
 export interface PhotoCreditEntry {
   imageId: string;
   segments: PhotoCreditSegment[];
+}
+
+export interface AboutPlaceMention {
+  placeId: string;
+  paragraphIndex: number;
+  start: number;
+  end: number;
+  text: string;
 }
 
 function githubHeadingAnchor(heading: string) {
@@ -203,6 +239,684 @@ function pushUniqueName(target: string[], seen: Set<string>, value: string | und
 
   seen.add(key);
   target.push(trimmed);
+}
+
+function normalizeComparableText(value: string | undefined) {
+  if (!value) {
+    return "";
+  }
+
+  return value.trim().replace(/\s+/gu, " ").toLocaleLowerCase();
+}
+
+const MODERN_COUNTRY_COMPARABLE_NAMES = new Set(
+  MODERN_COUNTRY_NAMES.map((countryName) => normalizeComparableText(countryName))
+);
+
+function normalizeDisplayNameForMatch(value: string) {
+  return value.trim().replace(/\s+/gu, " ");
+}
+
+function normalizeNameWordForComparison(value: string) {
+  return value.toLocaleLowerCase();
+}
+
+function buildNameMatchVariants(value: string) {
+  const normalizedName = normalizeDisplayNameForMatch(value);
+  if (normalizedName.length === 0) {
+    return [] as string[];
+  }
+
+  const variants = [normalizedName];
+  const firstWordMatch = /^(?<word>\p{Letter}+(?:['’]\p{Letter}+)*)/u.exec(normalizedName);
+  const firstWord = firstWordMatch?.groups?.word;
+  if (!firstWord) {
+    return variants;
+  }
+
+  const firstWordLower = firstWord.toLocaleLowerCase();
+  if (!LOWERCASE_LINK_NAME_CONNECTORS.has(firstWordLower)) {
+    return variants;
+  }
+
+  const lowercaseVariant = `${firstWordLower}${normalizedName.slice(firstWord.length)}`;
+  if (!variants.includes(lowercaseVariant)) {
+    variants.push(lowercaseVariant);
+  }
+
+  const firstCharacter = firstWord.charAt(0);
+  const titleCasedFirstWord = `${firstCharacter.toLocaleUpperCase()}${firstWord.slice(
+    firstCharacter.length
+  )}`;
+  const titleCaseVariant = `${titleCasedFirstWord}${normalizedName.slice(firstWord.length)}`;
+  if (!variants.includes(titleCaseVariant)) {
+    variants.push(titleCaseVariant);
+  }
+
+  return variants;
+}
+
+function hasDisallowedLowercaseWords(value: string) {
+  const words = value.match(/\p{Letter}+(?:['’]\p{Letter}+)?/gu) ?? [];
+  for (const word of words) {
+    const normalizedWord = normalizeNameWordForComparison(word);
+    if (word !== normalizedWord) {
+      continue;
+    }
+
+    if (!LOWERCASE_LINK_NAME_CONNECTORS.has(normalizedWord)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isAllowedAboutLinkName(value: string) {
+  return !hasDisallowedLowercaseWords(value);
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+}
+
+function isWordCharacter(value: string | undefined) {
+  return Boolean(value && WORD_CHARACTER_PATTERN.test(value));
+}
+
+function isWordBodyCharacter(value: string | undefined) {
+  return Boolean(value && WORD_BODY_CHARACTER_PATTERN.test(value));
+}
+
+function isWholeWordMatch(text: string, start: number, end: number) {
+  const before = start > 0 ? text[start - 1] : undefined;
+  const after = end < text.length ? text[end] : undefined;
+  return !isWordCharacter(before) && !isWordCharacter(after);
+}
+
+function isCapitalizedWord(word: string) {
+  const trimmedWord = word.replace(/^['’"“‘]+/u, "");
+  return CAPITALIZED_WORD_START_PATTERN.test(trimmedWord);
+}
+
+function isWhitespaceCharacter(value: string | undefined) {
+  return Boolean(value && /\s/u.test(value));
+}
+
+function wordNearStartOfSentence(text: string, wordStart: number) {
+  let cursor = wordStart - 1;
+  while (cursor >= 0 && isWhitespaceCharacter(text[cursor])) {
+    cursor -= 1;
+  }
+
+  while (cursor >= 0 && CLOSING_WORD_PUNCTUATION.has(text[cursor])) {
+    cursor -= 1;
+  }
+
+  if (cursor < 0) {
+    return true;
+  }
+
+  return SENTENCE_BOUNDARY_PATTERN.test(text[cursor]);
+}
+
+interface WordRange {
+  start: number;
+  end: number;
+  text: string;
+}
+
+function readWordBackward(text: string, endInclusive: number) {
+  if (endInclusive < 0 || endInclusive >= text.length) {
+    return null as WordRange | null;
+  }
+
+  if (!isWordBodyCharacter(text[endInclusive])) {
+    return null as WordRange | null;
+  }
+
+  let start = endInclusive;
+  while (start > 0 && isWordBodyCharacter(text[start - 1])) {
+    start -= 1;
+  }
+
+  return {
+    start,
+    end: endInclusive + 1,
+    text: text.slice(start, endInclusive + 1)
+  };
+}
+
+function readWordForward(text: string, start: number) {
+  if (start < 0 || start >= text.length) {
+    return null as WordRange | null;
+  }
+
+  if (!isWordBodyCharacter(text[start])) {
+    return null as WordRange | null;
+  }
+
+  let end = start + 1;
+  while (end < text.length && isWordBodyCharacter(text[end])) {
+    end += 1;
+  }
+
+  return {
+    start,
+    end,
+    text: text.slice(start, end)
+  };
+}
+
+function readAdjacentWordBefore(text: string, matchStart: number) {
+  const separator = matchStart > 0 ? text[matchStart - 1] : undefined;
+  if (separator !== " " && separator !== "-") {
+    return null as WordRange | null;
+  }
+
+  let cursor = matchStart - 2;
+  while (cursor >= 0 && TRAILING_NEIGHBOR_PUNCTUATION.has(text[cursor])) {
+    cursor -= 1;
+  }
+
+  return readWordBackward(text, cursor);
+}
+
+function readAdjacentWordAfter(text: string, matchEnd: number) {
+  const separator = matchEnd < text.length ? text[matchEnd] : undefined;
+  if (separator !== " " && separator !== "-") {
+    return null as WordRange | null;
+  }
+
+  let cursor = matchEnd + 1;
+  while (cursor < text.length && OPENING_WORD_PUNCTUATION.has(text[cursor])) {
+    cursor += 1;
+  }
+
+  return readWordForward(text, cursor);
+}
+
+function isPartOfLongerCapitalizedName(text: string, start: number, end: number) {
+  const beforeWord = readAdjacentWordBefore(text, start);
+  if (
+    beforeWord &&
+    isCapitalizedWord(beforeWord.text) &&
+    !wordNearStartOfSentence(text, beforeWord.start)
+  ) {
+    return true;
+  }
+
+  const afterWord = readAdjacentWordAfter(text, end);
+  if (afterWord && isCapitalizedWord(afterWord.text) && !wordNearStartOfSentence(text, afterWord.start)) {
+    return true;
+  }
+
+  return false;
+}
+
+function hasFollowingOfCapitalizedWord(text: string, end: number) {
+  if (text.slice(end, end + 4) !== " of ") {
+    return false;
+  }
+
+  const wordAfterOf = readWordForward(text, end + 4);
+  return Boolean(wordAfterOf && isCapitalizedWord(wordAfterOf.text));
+}
+
+function shouldSkipAboutMatchForContext(text: string, start: number, end: number) {
+  return isPartOfLongerCapitalizedName(text, start, end) || hasFollowingOfCapitalizedWord(text, end);
+}
+
+function namesForAboutMatching(place: PlaceIndexRecord) {
+  return [getPrimaryPlaceName(place), ...place.names.ancient, ...place.names.alternate];
+}
+
+function collectNameOwners(places: PlaceIndexRecord[]) {
+  const ownersByName = new Map<string, Set<string>>();
+
+  for (const place of places) {
+    const namesSeenForPlace = new Set<string>();
+    for (const placeName of namesForAboutMatching(place)) {
+      if (!isAllowedAboutLinkName(placeName)) {
+        continue;
+      }
+
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const normalized = normalizeComparableText(nameVariant);
+        if (
+          normalized.length === 0 ||
+          namesSeenForPlace.has(normalized) ||
+          MODERN_COUNTRY_COMPARABLE_NAMES.has(normalized)
+        ) {
+          continue;
+        }
+
+        namesSeenForPlace.add(normalized);
+
+        const existing = ownersByName.get(normalized);
+        if (existing) {
+          existing.add(place.id);
+          continue;
+        }
+
+        ownersByName.set(normalized, new Set([place.id]));
+      }
+    }
+  }
+
+  return ownersByName;
+}
+
+export interface AboutMatchCandidate {
+  placeId: string;
+  matchName: string;
+  comparableName: string;
+  matcher: RegExp;
+  priorityLength: number;
+}
+
+interface SelfNameMaskCandidate {
+  matcher: RegExp;
+  priorityLength: number;
+}
+
+export interface AboutPlaceMatchIndex {
+  candidates: AboutMatchCandidate[];
+  selfNameMaskCandidatesByPlaceId: Map<string, SelfNameMaskCandidate[]>;
+  ownNamesByPlaceId: Map<string, string[]>;
+}
+
+function collectAboutMatchCandidates(places: PlaceIndexRecord[]): AboutMatchCandidate[] {
+  const ownersByName = collectNameOwners(places);
+  const candidates: AboutMatchCandidate[] = [];
+
+  for (const place of places) {
+    const namesSeenForPlace = new Set<string>();
+    for (const placeName of namesForAboutMatching(place)) {
+      if (!isAllowedAboutLinkName(placeName)) {
+        continue;
+      }
+
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const comparableName = normalizeComparableText(nameVariant);
+        if (
+          comparableName.length === 0 ||
+          namesSeenForPlace.has(nameVariant) ||
+          MODERN_COUNTRY_COMPARABLE_NAMES.has(comparableName)
+        ) {
+          continue;
+        }
+
+        namesSeenForPlace.add(nameVariant);
+        const owners = ownersByName.get(comparableName);
+        if (!owners || owners.size !== 1) {
+          continue;
+        }
+
+        const displayName = normalizeDisplayNameForMatch(nameVariant);
+        const pattern = escapeRegExp(displayName).replace(/\s+/gu, "\\s+");
+        candidates.push({
+          placeId: place.id,
+          matchName: displayName,
+          comparableName,
+          matcher: new RegExp(pattern, "gu"),
+          priorityLength: displayName.length
+        });
+      }
+    }
+  }
+
+  return candidates;
+}
+
+function collectSelfNameMaskCandidatesByPlaceId(places: PlaceIndexRecord[]) {
+  const byPlaceId = new Map<string, SelfNameMaskCandidate[]>();
+
+  for (const place of places) {
+    const matchers: SelfNameMaskCandidate[] = [];
+    const seenNames = new Set<string>();
+
+    for (const placeName of namesForAboutMatching(place)) {
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const displayName = normalizeDisplayNameForMatch(nameVariant);
+        if (displayName.length === 0 || seenNames.has(displayName)) {
+          continue;
+        }
+
+        seenNames.add(displayName);
+        const pattern = escapeRegExp(displayName).replace(/\s+/gu, "\\s+");
+        matchers.push({
+          matcher: new RegExp(pattern, "gu"),
+          priorityLength: displayName.length
+        });
+      }
+    }
+
+    byPlaceId.set(place.id, matchers);
+  }
+
+  return byPlaceId;
+}
+
+function collectOwnNamesByPlaceId(places: PlaceIndexRecord[]) {
+  const byPlaceId = new Map<string, string[]>();
+
+  for (const place of places) {
+    const ownNames: string[] = [];
+    const seenNames = new Set<string>();
+
+    for (const placeName of namesForAboutMatching(place)) {
+      for (const nameVariant of buildNameMatchVariants(placeName)) {
+        const displayName = normalizeDisplayNameForMatch(nameVariant);
+        if (displayName.length === 0 || seenNames.has(displayName)) {
+          continue;
+        }
+
+        seenNames.add(displayName);
+        ownNames.push(displayName);
+      }
+    }
+
+    byPlaceId.set(place.id, ownNames);
+  }
+
+  return byPlaceId;
+}
+
+export function buildAboutPlaceMatchIndex(places: PlaceIndexRecord[]): AboutPlaceMatchIndex {
+  return {
+    candidates: collectAboutMatchCandidates(places),
+    selfNameMaskCandidatesByPlaceId: collectSelfNameMaskCandidatesByPlaceId(places),
+    ownNamesByPlaceId: collectOwnNamesByPlaceId(places)
+  };
+}
+
+interface AboutMentionCandidate extends Omit<AboutPlaceMention, "text"> {
+  priorityLength: number;
+}
+
+function rangesOverlap(
+  left: Pick<AboutMentionCandidate, "start" | "end">,
+  right: Pick<AboutMentionCandidate, "start" | "end">
+) {
+  return left.start < right.end && right.start < left.end;
+}
+
+interface ParagraphMatchRange {
+  start: number;
+  end: number;
+  priorityLength: number;
+}
+
+function sortRangesByPositionAndLength(
+  left: Pick<ParagraphMatchRange, "start" | "end" | "priorityLength">,
+  right: Pick<ParagraphMatchRange, "start" | "end" | "priorityLength">
+) {
+  if (left.start !== right.start) {
+    return left.start - right.start;
+  }
+
+  if (left.priorityLength !== right.priorityLength) {
+    return right.priorityLength - left.priorityLength;
+  }
+
+  return left.end - right.end;
+}
+
+function collectMatchRangesFromCandidates(
+  paragraphText: string,
+  candidates: readonly Pick<SelfNameMaskCandidate, "matcher" | "priorityLength">[]
+) {
+  const ranges: ParagraphMatchRange[] = [];
+
+  for (const candidate of candidates) {
+    candidate.matcher.lastIndex = 0;
+    let match: RegExpExecArray | null = candidate.matcher.exec(paragraphText);
+    while (match) {
+      const start = match.index;
+      const end = start + match[0].length;
+      if (isWholeWordMatch(paragraphText, start, end)) {
+        ranges.push({
+          start,
+          end,
+          priorityLength: candidate.priorityLength
+        });
+      }
+
+      match = candidate.matcher.exec(paragraphText);
+    }
+  }
+
+  return ranges;
+}
+
+function selectNonOverlappingRanges(ranges: ParagraphMatchRange[]) {
+  if (ranges.length === 0) {
+    return [] as ParagraphMatchRange[];
+  }
+
+  const sortedRanges = [...ranges].sort(sortRangesByPositionAndLength);
+  const selectedRanges: ParagraphMatchRange[] = [];
+
+  for (const range of sortedRanges) {
+    if (selectedRanges.some((selectedRange) => rangesOverlap(selectedRange, range))) {
+      continue;
+    }
+
+    selectedRanges.push(range);
+  }
+
+  return selectedRanges;
+}
+
+function maskRangesInText(paragraphText: string, rangesToMask: ParagraphMatchRange[]) {
+  if (rangesToMask.length === 0) {
+    return paragraphText;
+  }
+
+  let maskedText = paragraphText;
+  const rangesInReverseOrder = [...rangesToMask].sort((left, right) => right.start - left.start);
+  for (const range of rangesInReverseOrder) {
+    maskedText =
+      maskedText.slice(0, range.start) +
+      " ".repeat(range.end - range.start) +
+      maskedText.slice(range.end);
+  }
+
+  return maskedText;
+}
+
+function maskCurrentPlaceNamesInParagraph({
+  matchIndex,
+  currentPlaceId,
+  paragraphText
+}: {
+  matchIndex: AboutPlaceMatchIndex;
+  currentPlaceId: string;
+  paragraphText: string;
+}) {
+  const selfNameMaskCandidates = matchIndex.selfNameMaskCandidatesByPlaceId.get(currentPlaceId);
+  if (!selfNameMaskCandidates || selfNameMaskCandidates.length === 0) {
+    return paragraphText;
+  }
+
+  const maskRanges = collectMatchRangesFromCandidates(paragraphText, selfNameMaskCandidates);
+  if (maskRanges.length === 0) {
+    return paragraphText;
+  }
+
+  return maskRangesInText(paragraphText, selectNonOverlappingRanges(maskRanges));
+}
+
+function containsWholeWordSequence(text: string, sequence: string) {
+  if (text.length === 0 || sequence.length === 0) {
+    return false;
+  }
+
+  const pattern = escapeRegExp(sequence).replace(/\s+/gu, "\\s+");
+  const matcher = new RegExp(pattern, "gu");
+  let match: RegExpExecArray | null = matcher.exec(text);
+  while (match) {
+    const start = match.index;
+    const end = start + match[0].length;
+    if (isWholeWordMatch(text, start, end)) {
+      return true;
+    }
+
+    match = matcher.exec(text);
+  }
+
+  return false;
+}
+
+function collectBlockedComparableNamesForCurrentPlace({
+  matchIndex,
+  currentPlaceId
+}: {
+  matchIndex: AboutPlaceMatchIndex;
+  currentPlaceId: string;
+}) {
+  const ownNames = matchIndex.ownNamesByPlaceId.get(currentPlaceId);
+  if (!ownNames || ownNames.length === 0) {
+    return new Set<string>();
+  }
+
+  const blockedComparableNames = new Set<string>();
+  for (const candidate of matchIndex.candidates) {
+    if (candidate.placeId === currentPlaceId || blockedComparableNames.has(candidate.comparableName)) {
+      continue;
+    }
+
+    if (ownNames.some((ownName) => containsWholeWordSequence(ownName, candidate.matchName))) {
+      blockedComparableNames.add(candidate.comparableName);
+    }
+  }
+
+  return blockedComparableNames;
+}
+
+export function matchAboutPlaceMentions({
+  matchIndex,
+  currentPlaceId,
+  paragraphs
+}: {
+  matchIndex: AboutPlaceMatchIndex;
+  currentPlaceId: string;
+  paragraphs: string[];
+}) {
+  if (paragraphs.length === 0 || matchIndex.candidates.length === 0) {
+    return [] as AboutPlaceMention[];
+  }
+
+  const blockedComparableNames = collectBlockedComparableNamesForCurrentPlace({
+    matchIndex,
+    currentPlaceId
+  });
+  const allMatches: AboutMentionCandidate[] = [];
+  paragraphs.forEach((paragraphText, paragraphIndex) => {
+    if (!paragraphText) {
+      return;
+    }
+
+    const maskedParagraphText = maskCurrentPlaceNamesInParagraph({
+      matchIndex,
+      currentPlaceId,
+      paragraphText
+    });
+
+    for (const candidate of matchIndex.candidates) {
+      if (
+        candidate.placeId === currentPlaceId ||
+        blockedComparableNames.has(candidate.comparableName)
+      ) {
+        continue;
+      }
+
+      candidate.matcher.lastIndex = 0;
+      let match: RegExpExecArray | null = candidate.matcher.exec(maskedParagraphText);
+      while (match) {
+        const matchStart = match.index;
+        const matchEnd = matchStart + match[0].length;
+        if (
+          isWholeWordMatch(maskedParagraphText, matchStart, matchEnd) &&
+          !shouldSkipAboutMatchForContext(paragraphText, matchStart, matchEnd)
+        ) {
+          allMatches.push({
+            placeId: candidate.placeId,
+            paragraphIndex,
+            start: matchStart,
+            end: matchEnd,
+            priorityLength: candidate.priorityLength
+          });
+        }
+
+        match = candidate.matcher.exec(maskedParagraphText);
+      }
+    }
+  });
+
+  if (allMatches.length === 0) {
+    return [] as AboutPlaceMention[];
+  }
+
+  allMatches.sort((left, right) => {
+    if (left.paragraphIndex !== right.paragraphIndex) {
+      return left.paragraphIndex - right.paragraphIndex;
+    }
+
+    if (left.start !== right.start) {
+      return left.start - right.start;
+    }
+
+    if (left.priorityLength !== right.priorityLength) {
+      return right.priorityLength - left.priorityLength;
+    }
+
+    return left.placeId.localeCompare(right.placeId);
+  });
+
+  const selectedPlaceIds = new Set<string>();
+  const selectedByParagraph = new Map<number, AboutMentionCandidate[]>();
+
+  for (const match of allMatches) {
+    if (selectedPlaceIds.has(match.placeId)) {
+      continue;
+    }
+
+    const selectedForParagraph = selectedByParagraph.get(match.paragraphIndex) ?? [];
+    if (selectedForParagraph.some((existing) => rangesOverlap(existing, match))) {
+      continue;
+    }
+
+    selectedPlaceIds.add(match.placeId);
+    selectedForParagraph.push(match);
+    selectedByParagraph.set(match.paragraphIndex, selectedForParagraph);
+  }
+
+  const selectedMatches: AboutPlaceMention[] = [];
+  for (const [paragraphIndex, selectedForParagraph] of selectedByParagraph.entries()) {
+    selectedForParagraph
+      .sort((left, right) => left.start - right.start)
+      .forEach((match) => {
+        selectedMatches.push({
+          placeId: match.placeId,
+          paragraphIndex,
+          start: match.start,
+          end: match.end,
+          text: paragraphs[paragraphIndex].slice(match.start, match.end)
+        });
+      });
+  }
+
+  selectedMatches.sort((left, right) => {
+    if (left.paragraphIndex !== right.paragraphIndex) {
+      return left.paragraphIndex - right.paragraphIndex;
+    }
+
+    return left.start - right.start;
+  });
+
+  return selectedMatches;
 }
 
 export function isDisputedRecord(place: Pick<PlaceIndexRecord, "candidates">) {

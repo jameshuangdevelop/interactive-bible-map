@@ -140,6 +140,38 @@ describe("map render data", () => {
     });
   });
 
+  test("marks highlighted pins for single-candidate places", () => {
+    const renderData = buildPlaceRenderData(fixtures, null, "capernaum");
+    const capernaumPin = renderData.clusteredCityPins.features.find(
+      (feature) => feature.properties.placeId === "capernaum"
+    );
+
+    expect(capernaumPin).toBeDefined();
+    expect(capernaumPin?.properties).toMatchObject({
+      isSelectedPlace: false,
+      isHighlightedPlace: true
+    });
+  });
+
+  test("uses highlighted candidate icons for hovered multi-candidate places", () => {
+    const renderData = buildPlaceRenderData(fixtures, null, "emmaus");
+    const emmausCandidates = renderData.candidatePins.features.filter(
+      (feature) => feature.properties.placeId === "emmaus"
+    );
+
+    expect(emmausCandidates).toHaveLength(2);
+    expect(emmausCandidates[0].properties).toMatchObject({
+      isSelectedCandidate: false,
+      isHighlightedPlace: true,
+      iconId: "candidate-c5221f-selected-a"
+    });
+    expect(emmausCandidates[1].properties).toMatchObject({
+      isSelectedCandidate: false,
+      isHighlightedPlace: true,
+      iconId: "candidate-c5221f-selected-b"
+    });
+  });
+
   test("keeps an area label renderable when it shares coordinates with a city pin", () => {
     const overlapFixtures: PlaceIndexRecord[] = [
       {

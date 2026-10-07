@@ -57,12 +57,17 @@ function normalizeSelection(
   return selection;
 }
 
-function writeSelectionToUrl(selection: PlaceSelection | null) {
+function writeSelectionToUrl(selection: PlaceSelection | null, mode: "replace" | "push" = "replace") {
   const nextSearch = applySelectionToSearch(window.location.search, selection);
   const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
   const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
   if (nextUrl !== currentUrl) {
+    if (mode === "push") {
+      window.history.pushState({}, "", nextUrl);
+      return;
+    }
+
     window.history.replaceState({}, "", nextUrl);
   }
 }
@@ -124,6 +129,7 @@ export function AppShell() {
   const [urlStateReady, setUrlStateReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== "undefined" ? window.innerWidth < SMALL_SCREEN_BREAKPOINT : false
   );
@@ -177,10 +183,12 @@ export function AppShell() {
 
         if (parsedSelection && !normalized) {
           lastSelectionActivatorEntryIdRef.current = null;
+          setHighlightedPlaceId(null);
           setStatusMessage("Place not found");
           writeSelectionToUrl(null);
         } else if (normalized) {
           lastSelectionActivatorEntryIdRef.current = null;
+          setHighlightedPlaceId(null);
           setSelection(normalized);
         }
 
@@ -285,6 +293,7 @@ export function AppShell() {
 
       if (!parsedSelection) {
         lastSelectionActivatorEntryIdRef.current = null;
+        setHighlightedPlaceId(null);
         setSelection(null);
         setStatusMessage(null);
         return;
@@ -292,12 +301,14 @@ export function AppShell() {
 
       if (!normalized) {
         lastSelectionActivatorEntryIdRef.current = null;
+        setHighlightedPlaceId(null);
         setSelection(null);
         setStatusMessage("Place not found");
         return;
       }
 
       lastSelectionActivatorEntryIdRef.current = null;
+      setHighlightedPlaceId(null);
       setStatusMessage(null);
       setSelection(normalized);
     };
@@ -310,6 +321,7 @@ export function AppShell() {
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
+    setHighlightedPlaceId(null);
     setIsSmallScreenPanelExpanded(false);
 
     if (!restoreFocus) {
@@ -354,6 +366,7 @@ export function AppShell() {
 
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
+    setHighlightedPlaceId(null);
     setIsSmallScreenPanelExpanded(false);
 
     const activeElement = document.activeElement;
@@ -367,7 +380,17 @@ export function AppShell() {
 
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
+    setHighlightedPlaceId(null);
     setIsSmallScreenPanelExpanded(false);
+    setSelection(nextSelection);
+  }, []);
+
+  const handlePanelSelectPlaceFromAbout = useCallback((nextSelection: PlaceSelection) => {
+    setStatusMessage(null);
+    setHighlightedPlaceId(null);
+    setIsSmallScreenPanelExpanded(false);
+    lastSelectionActivatorEntryIdRef.current = null;
+    writeSelectionToUrl(nextSelection, "push");
     setSelection(nextSelection);
   }, []);
 
@@ -377,6 +400,7 @@ export function AppShell() {
         return;
       }
 
+      setHighlightedPlaceId(null);
       setSelection({
         placeId: selection.placeId,
         candidateIndex
@@ -394,10 +418,22 @@ export function AppShell() {
 
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
+    setHighlightedPlaceId(null);
     setIsSmallScreenPanelExpanded(false);
     lastSelectionActivatorEntryIdRef.current = null;
     setSelection(nextSelection);
   }, []);
+  const handlePanelHighlightPlace = useCallback(
+    (placeId: string | null) => {
+      if (!placeId || !placesById.has(placeId)) {
+        setHighlightedPlaceId(null);
+        return;
+      }
+
+      setHighlightedPlaceId(placeId);
+    },
+    [placesById]
+  );
 
   const panelStyle: CSSProperties | null = selectedPlace
     ? isSmallScreen
@@ -458,6 +494,7 @@ export function AppShell() {
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
+            highlightedPlaceId={highlightedPlaceId}
             leftPanelWidth={panelWidthForMap}
             onSelectPlace={handleSelectFromMap}
             places={places}
@@ -475,8 +512,10 @@ export function AppShell() {
             isSmallScreenExpanded={isSmallScreenPanelExpanded}
             loadErrorMessage={selectedPlaceLoadError}
             onClose={() => closePanel(false)}
+            onHighlightPlace={handlePanelHighlightPlace}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
+            onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
             onToggleSmallScreenExpanded={() =>
               setIsSmallScreenPanelExpanded((current) => !current)
             }

@@ -59,7 +59,8 @@ function assertCreditIncludes(creditText, requiredMarkers, label) {
 }
 
 async function verifyMapLoads(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+  // waitForMapToSettle waits for the real map-ready state.
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
 
   const snapshot = await page.evaluate(() => ({
@@ -73,7 +74,8 @@ async function verifyMapLoads(page, baseUrl) {
 }
 
 async function verifyCapernaumPanelAndImages(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 90_000 });
+  // waitForMapToSettle waits for the real map-ready state.
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   assert(
     page.url().includes("?place=capernaum"),
@@ -222,7 +224,8 @@ async function verifyCapernaumPanelAndImages(page, baseUrl) {
 }
 
 async function verifyAntiochSearch(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+  // waitForMapToSettle waits for the real map-ready state.
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
 
   const searchInput = page.locator("input[aria-label='Search biblical places']");
@@ -255,7 +258,8 @@ async function verifyAntiochSearch(page, baseUrl) {
 }
 
 async function verifyEmmausDisputedLayout(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 90_000 });
+  // waitForMapToSettle waits for the real map-ready state.
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   assert(
     page.url().includes("?place=emmaus"),
