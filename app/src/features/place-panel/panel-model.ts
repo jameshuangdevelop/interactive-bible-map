@@ -120,6 +120,17 @@ export interface ImageCreditFields {
   toolLabel: string | null;
 }
 
+export interface PhotoCreditSegment {
+  key: string;
+  text: string;
+  href: string | null;
+}
+
+export interface PhotoCreditEntry {
+  imageId: string;
+  segments: PhotoCreditSegment[];
+}
+
 function githubHeadingAnchor(heading: string) {
   return heading
     .trim()
@@ -408,6 +419,85 @@ export function buildImageCreditFields(
     authorLabel: normalizeOptionalText(image.author),
     licenseLabel: normalizeOptionalText(image.license),
     toolLabel: normalizeOptionalText(image.generator?.tool)
+  };
+}
+
+export function buildPhotoCreditEntry(
+  image: Pick<
+    MediaImageRecord,
+    | "id"
+    | "kind"
+    | "aiGenerated"
+    | "author"
+    | "license"
+    | "licenseUrl"
+    | "sourcePage"
+    | "generator"
+    | "promptRef"
+  >,
+  locationId: string
+): PhotoCreditEntry {
+  const { authorLabel, licenseLabel, toolLabel } = buildImageCreditFields(image);
+  const segments: PhotoCreditSegment[] = [];
+
+  if (isAiReconstructionImage(image)) {
+    segments.push({
+      key: "ai-label",
+      text: "AI-generated reconstruction",
+      href: null
+    });
+
+    if (toolLabel) {
+      segments.push({
+        key: "tool",
+        text: toolLabel,
+        href: null
+      });
+    }
+
+    if (licenseLabel) {
+      segments.push({
+        key: "license",
+        text: licenseLabel,
+        href: normalizeOptionalText(image.licenseUrl)
+      });
+    }
+
+    segments.push({
+      key: "based-on",
+      text: `Based on: ${AI_BASED_ON_LABEL}`,
+      href: buildImagePromptBriefUrl(locationId, image.promptRef)
+    });
+
+    return {
+      imageId: image.id,
+      segments
+    };
+  }
+
+  segments.push({
+    key: "photo",
+    text: authorLabel ? `Photo: ${authorLabel}` : "Photo",
+    href: null
+  });
+
+  if (licenseLabel) {
+    segments.push({
+      key: "license",
+      text: licenseLabel,
+      href: normalizeOptionalText(image.licenseUrl)
+    });
+  }
+
+  segments.push({
+    key: "source",
+    text: "Wikimedia Commons",
+    href: normalizeOptionalText(image.sourcePage)
+  });
+
+  return {
+    imageId: image.id,
+    segments
   };
 }
 

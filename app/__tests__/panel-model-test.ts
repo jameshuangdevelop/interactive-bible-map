@@ -3,6 +3,7 @@ import {
   buildImageKindLabel,
   buildImagePromptBriefUrl,
   buildImageCreditFields,
+  buildPhotoCreditEntry,
   buildHierarchyItems,
   collectSourceIdsInPanelOrder,
   groupScriptureByBook,
@@ -226,6 +227,70 @@ describe("place panel model helpers", () => {
       licenseLabel: null,
       toolLabel: "DALL·E"
     });
+  });
+
+  test("builds AI photo-credit entries with fixed 'Based on: research brief' wording", () => {
+    const aiImage: MediaImageRecord = {
+      id: "capernaum-ai-01",
+      url: "media/ai/capernaum-ai-01.webp",
+      caption: "AI overview reconstruction",
+      kind: "ai-reconstruction",
+      aiGenerated: true,
+      license: "CC0 1.0",
+      licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
+      generator: {
+        tool: "Google Gemini API (Nano Banana Pro)",
+        model: "gemini-3-pro-image",
+        date: "2026-10-01"
+      },
+      promptRef: "Prompt 1: Shoreline overview",
+      basedOn: ["wikidata:Q59174"]
+    };
+
+    expect(buildPhotoCreditEntry(aiImage, "capernaum").segments).toEqual([
+      { key: "ai-label", text: "AI-generated reconstruction", href: null },
+      { key: "tool", text: "Google Gemini API (Nano Banana Pro)", href: null },
+      {
+        key: "license",
+        text: "CC0 1.0",
+        href: "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      {
+        key: "based-on",
+        text: "Based on: research brief",
+        href: "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/content/image-prompts/capernaum.md#prompt-1-shoreline-overview"
+      }
+    ]);
+  });
+
+  test("builds commons photo-credit entries with author, license, and source links", () => {
+    const commonsImage: MediaImageRecord = {
+      id: "capernaum-02",
+      kind: "modern",
+      url: "https://upload.wikimedia.org/wikipedia/commons/1/1a/example.jpg",
+      width: 1600,
+      height: 1067,
+      author: "Example Author",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Example.jpg",
+      caption: "Example caption",
+      aiGenerated: false
+    };
+
+    expect(buildPhotoCreditEntry(commonsImage, "capernaum").segments).toEqual([
+      { key: "photo", text: "Photo: Example Author", href: null },
+      {
+        key: "license",
+        text: "CC BY-SA 4.0",
+        href: "https://creativecommons.org/licenses/by-sa/4.0/"
+      },
+      {
+        key: "source",
+        text: "Wikimedia Commons",
+        href: "https://commons.wikimedia.org/wiki/File:Example.jpg"
+      }
+    ]);
   });
 
   test("computes cyclical image indices and thumbnail-row visibility", () => {

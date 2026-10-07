@@ -206,16 +206,79 @@ function isAiPayloadImage(image) {
   return image?.kind === "ai-reconstruction" || image?.aiGenerated === true;
 }
 
-// Each image kind has its own credit line under the photo (visual spec §3), so the
-// checks below read the place's images to know which line to expect.
+const placePanelSelector = "section[aria-label='Place details']";
+const photoCreditsEntriesSelector = `${placePanelSelector} [data-panel-section='photo-credits'] [data-photo-credits-entry='true']`;
+
 function expectedCreditMarkers(image) {
   return isAiPayloadImage(image)
-    ? ["AI-generated reconstruction", "Based on:"]
+    ? ["AI-generated reconstruction", "Based on: research brief"]
     : ["Photo:", "Wikimedia Commons"];
 }
 
 function creditMatchesImage(creditText, image) {
   return expectedCreditMarkers(image).every((marker) => creditText.includes(marker));
+}
+
+function photoCreditEntrySelectorForImage(imageIndexOneBased) {
+  return `${photoCreditsEntriesSelector}[data-photo-credit-entry-index='${imageIndexOneBased}']`;
+}
+
+async function readPhotoCreditEntryForImage(page, imageIndexOneBased) {
+  const selector = photoCreditEntrySelectorForImage(imageIndexOneBased);
+  await page.waitForSelector(selector, { timeout: 30_000 });
+  const text = await page.$eval(
+    selector,
+    (element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim()
+  );
+  return text;
+}
+
+async function readCurrentGalleryImageNumber(page) {
+  const counterLocator = page.locator(
+    `${placePanelSelector} [data-panel-section='photos'] [data-photo-counter='true']`
+  );
+  if ((await counterLocator.count()) === 0) {
+    return 1;
+  }
+
+  const counterText = ((await counterLocator.first().textContent()) ?? "").trim();
+  const [leading] = counterText.split("/");
+  const parsed = Number.parseInt(leading?.trim() ?? "", 10);
+  return Number.isFinite(parsed) ? parsed : 1;
+}
+
+async function jumpToCurrentImageCredit(page) {
+  const currentImageNumber = await readCurrentGalleryImageNumber(page);
+  await page
+    .locator(`${placePanelSelector} [data-panel-section='photos'] [data-photo-credit-link='true']`)
+    .first()
+    .click();
+  await page.waitForFunction(() => {
+    const activeElement = document.activeElement;
+    return (
+      activeElement instanceof HTMLElement &&
+      activeElement.getAttribute("data-photo-credits-entry") === "true"
+    );
+  });
+
+  const focusedEntry = await page.evaluate(() => {
+    const activeElement = document.activeElement;
+    if (!(activeElement instanceof HTMLElement)) {
+      return null;
+    }
+
+    const indexText = activeElement.getAttribute("data-photo-credit-entry-index");
+    const parsedIndex = Number.parseInt(indexText ?? "", 10);
+    return {
+      imageIndex: Number.isFinite(parsedIndex) ? parsedIndex : null,
+      text: (activeElement.textContent ?? "").replace(/\s+/gu, " ").trim()
+    };
+  });
+
+  return {
+    currentImageNumber,
+    focusedEntry
+  };
 }
 
 async function readCapernaumImages() {
@@ -538,7 +601,11 @@ async function captureGalleryPanelLayoutSnapshot(page) {
     const nextButton = photosSection?.querySelector("button[aria-label='Next image']");
     const counter = photosSection?.querySelector("[data-photo-counter='true']");
     const kindLabel = photosSection?.querySelector("[data-photo-kind-label='true']");
-    const credit = photosSection?.querySelector("[data-photo-credit='true']");
+    const caption = photosSection?.querySelector("[data-photo-caption='true']");
+    const creditLink = photosSection?.querySelector("[data-photo-credit-link='true']");
+    const inlineCreditCount = photosSection
+      ? photosSection.querySelectorAll("[data-photo-credit='true']").length
+      : 0;
     const thumbnailRow = photosSection?.querySelector("[data-thumbnail-row='true']");
     const selectedThumbnail = photosSection?.querySelector(
       "[data-thumbnail-row='true'] button[data-gallery-thumbnail='selected']"
@@ -583,7 +650,9 @@ async function captureGalleryPanelLayoutSnapshot(page) {
       nextButtonBounds: toBounds(nextButton),
       counterBounds: toBounds(counter),
       kindLabelBounds: toBounds(kindLabel),
-      creditBounds: toBounds(credit),
+      captionBounds: toBounds(caption),
+      creditLinkBounds: toBounds(creditLink),
+      inlineCreditCount,
       thumbnailRowBounds: toBounds(thumbnailRow),
       selectedThumbnailBounds: toBounds(selectedThumbnail),
       rowScrollLeft,
@@ -622,7 +691,13 @@ function assertGalleryPanelBoundsAndOverflow(snapshot, scenarioLabel) {
   assertMinimumHitArea(snapshot.nextButtonBounds, "next image button", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.counterBounds, "counter", scenarioLabel);
   assertBoundsWithinPanel(snapshot.panelBounds, snapshot.kindLabelBounds, "kind label", scenarioLabel);
-  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditBounds, "credit line", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.captionBounds, "caption line", scenarioLabel);
+  assertBoundsWithinPanel(snapshot.panelBounds, snapshot.creditLinkBounds, "credit link", scenarioLabel);
+  if (snapshot.inlineCreditCount !== 0) {
+    throw new Error(
+      `${scenarioLabel}: inline photo-credit lines should be removed, found ${snapshot.inlineCreditCount}.`
+    );
+  }
   assertBoundsWithinPanel(
     snapshot.panelBounds,
     snapshot.thumbnailRowBounds,
@@ -1776,6 +1851,7 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     "ot-connections",
     "places-in",
     "sources",
+    "photo-credits",
     "footer"
   ];
   const canonicalIndex = new Map(canonicalOrder.map((entry, index) => [entry, index]));
@@ -1791,27 +1867,75 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     last = currentIndex;
   }
 
+  const inlinePhotoCreditCount = await page
+    .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
+    .count();
+  if (inlinePhotoCreditCount !== 0) {
+    throw new Error(
+      `Inline panel photo-credit lines should be removed, found ${inlinePhotoCreditCount}.`
+    );
+  }
+
+  const photoCreditsNoteText = (
+    await page
+      .locator("section[aria-label='Place details'] [data-panel-section='photo-credits'] [data-photo-credits-note='true']")
+      .textContent()
+  )
+    ?.replace(/\s+/gu, " ")
+    .trim();
+  const expectedPhotoCreditsNote =
+    "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
+  if (photoCreditsNoteText !== expectedPhotoCreditsNote) {
+    throw new Error(
+      `Photo-credits note mismatch. expected='${expectedPhotoCreditsNote}', got='${photoCreditsNoteText ?? ""}'.`
+    );
+  }
+
   const capernaumImages = await readCapernaumImages();
-  const firstCreditText =
-    (await page.locator("section[aria-label='Place details'] [data-photo-credit='true']").textContent()) ??
-    "";
-  if (!creditMatchesImage(firstCreditText, capernaumImages[0])) {
-    throw new Error(`Missing required photo credit text on lead image: '${firstCreditText.trim()}'`);
+  const photoCreditEntries = await page.$$eval(photoCreditsEntriesSelector, (elements) =>
+    elements.map((element) => (element.textContent ?? "").replace(/\s+/gu, " ").trim())
+  );
+  if (photoCreditEntries.length !== capernaumImages.length) {
+    throw new Error(
+      `Photo-credits entry count mismatch for Capernaum: expected ${capernaumImages.length}, got ${photoCreditEntries.length}.`
+    );
+  }
+  for (const [index, image] of capernaumImages.entries()) {
+    const entryText = photoCreditEntries[index] ?? "";
+    if (!creditMatchesImage(entryText, image)) {
+      throw new Error(
+        `Photo-credit entry ${index + 1} does not match image '${image.id}': '${entryText}'.`
+      );
+    }
+  }
+
+  const firstCreditFocus = await jumpToCurrentImageCredit(page);
+  if (firstCreditFocus.focusedEntry?.imageIndex !== 1) {
+    throw new Error(
+      `Lead image credit link focused wrong entry: ${JSON.stringify(firstCreditFocus.focusedEntry)}.`
+    );
+  }
+  if (!creditMatchesImage(firstCreditFocus.focusedEntry?.text ?? "", capernaumImages[0])) {
+    throw new Error(
+      `Lead image credit link focused wrong text: '${firstCreditFocus.focusedEntry?.text ?? ""}'.`
+    );
   }
 
   const nextImage = page.locator("button[aria-label='Next image']");
   const hasCarousel = (await nextImage.count()) > 0;
-  let secondCreditText = null;
+  let secondCreditFocus = null;
   if (hasCarousel) {
     await nextImage.first().click();
     await page.waitForTimeout(200);
-    secondCreditText =
-      (await page
-        .locator("section[aria-label='Place details'] [data-photo-credit='true']")
-        .textContent()) ?? "";
-    if (!creditMatchesImage(secondCreditText, capernaumImages[1])) {
+    secondCreditFocus = await jumpToCurrentImageCredit(page);
+    if (secondCreditFocus.focusedEntry?.imageIndex !== 2) {
       throw new Error(
-        `Photo credit did not render after switching images: '${secondCreditText.trim()}'`
+        `Second image credit link focused wrong entry: ${JSON.stringify(secondCreditFocus.focusedEntry)}.`
+      );
+    }
+    if (!creditMatchesImage(secondCreditFocus.focusedEntry?.text ?? "", capernaumImages[1])) {
+      throw new Error(
+        `Second image credit link focused wrong text: '${secondCreditFocus.focusedEntry?.text ?? ""}'.`
       );
     }
   }
@@ -1819,8 +1943,148 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
   return {
     sectionIds,
     hasCarousel,
-    firstCreditText: firstCreditText.trim(),
-    secondCreditText: secondCreditText?.trim() ?? null
+    photoCreditEntryCount: photoCreditEntries.length,
+    firstCreditFocus,
+    secondCreditFocus
+  };
+}
+
+async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    map.jumpTo({
+      center: [35.5754, 32.8809],
+      zoom: 11
+    });
+  }, mapTestHookKey);
+  await waitForMapToSettle(page);
+
+  const probe = await page.evaluate(
+    ({ testHookKey, cityPinsLayerId, sitePinsLayerId, candidatePinsLayerId, interactiveLayers }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return null;
+      }
+
+      const canvas = map.getCanvas();
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const margin = 16;
+
+      const resolveCapernaumPoint = () => {
+        for (const layerId of [candidatePinsLayerId, sitePinsLayerId, cityPinsLayerId]) {
+          const features = map.queryRenderedFeatures(undefined, { layers: [layerId] });
+          for (const feature of features) {
+            if (feature.geometry?.type !== "Point" || feature.properties?.placeId !== "capernaum") {
+              continue;
+            }
+
+            const [lng, lat] = feature.geometry.coordinates;
+            const point = map.project([lng, lat]);
+            if (
+              point.x < margin ||
+              point.y < margin ||
+              point.x > width - margin ||
+              point.y > height - margin
+            ) {
+              continue;
+            }
+
+            return {
+              x: point.x,
+              y: point.y
+            };
+          }
+        }
+
+        return null;
+      };
+
+      const capernaumPoint = resolveCapernaumPoint();
+      if (!capernaumPoint) {
+        return null;
+      }
+
+      const findEmptyPoint = () => {
+        const step = 20;
+        for (let y = margin; y <= height - margin; y += step) {
+          for (let x = margin; x <= width - margin; x += step) {
+            const hitCount = map.queryRenderedFeatures(
+              [
+                [x - 2, y - 2],
+                [x + 2, y + 2]
+              ],
+              {
+                layers: interactiveLayers
+              }
+            ).length;
+            if (hitCount === 0) {
+              return { x, y };
+            }
+          }
+        }
+
+        return null;
+      };
+
+      return {
+        capernaumPoint,
+        emptyPoint: findEmptyPoint()
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      cityPinsLayerId: mapLayerIds.cityPins,
+      sitePinsLayerId: mapLayerIds.sitePins,
+      candidatePinsLayerId: mapLayerIds.candidatePins,
+      interactiveLayers: [
+        mapLayerIds.clusterPins,
+        mapLayerIds.clusterCounts,
+        mapLayerIds.candidatePins,
+        mapLayerIds.sitePins,
+        mapLayerIds.cityPins,
+        ...mapLayerIds.areaLabels
+      ]
+    }
+  );
+  if (!probe?.capernaumPoint || !probe.emptyPoint) {
+    throw new Error(`Could not resolve map probe points for cursor/click checks: ${JSON.stringify(probe)}`);
+  }
+
+  await page.mouse.move(probe.capernaumPoint.x, probe.capernaumPoint.y);
+  const cursorOverPin = await page.$eval("canvas.maplibregl-canvas", (element) =>
+    window.getComputedStyle(element).cursor
+  );
+  if (!cursorOverPin.includes("pointer")) {
+    throw new Error(`Cursor over Capernaum pin should be pointer, got '${cursorOverPin}'.`);
+  }
+
+  await page.mouse.move(probe.emptyPoint.x, probe.emptyPoint.y);
+  const cursorOverEmptyMap = await page.$eval("canvas.maplibregl-canvas", (element) =>
+    window.getComputedStyle(element).cursor
+  );
+  if (cursorOverEmptyMap.includes("pointer")) {
+    throw new Error(`Cursor over empty map should not be pointer, got '${cursorOverEmptyMap}'.`);
+  }
+
+  await page.mouse.click(probe.capernaumPoint.x + 6, probe.capernaumPoint.y + 6);
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "capernaum";
+  }, undefined, { timeout: 30_000, polling: 100 });
+  await page.getByRole("heading", { level: 1, name: "Capernaum" }).waitFor({ timeout: 30_000 });
+
+  return {
+    capernaumPoint: probe.capernaumPoint,
+    emptyPoint: probe.emptyPoint,
+    cursorOverPin,
+    cursorOverEmptyMap
   };
 }
 
@@ -1975,11 +2239,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
       .getByText("AI-generated reconstruction", { exact: true })
       .waitFor({ timeout: 30_000 });
-    const aiCreditText = normalizeTextContent(
-      (await page
-        .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true']")
-        .textContent()) ?? ""
-    );
+    const aiCreditText = await readPhotoCreditEntryForImage(page, 5);
     if (
       !aiCreditText.includes("AI-generated reconstruction") ||
       !aiCreditText.includes("DALL·E") ||
@@ -1990,7 +2250,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     }
     const aiBriefHref = await page
       .locator(
-        "section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-credit='true'] a"
+        `${photoCreditEntrySelectorForImage(5)} a`
       )
       .last()
       .getAttribute("href");
@@ -2373,17 +2633,14 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
       state: "visible",
       timeout: 30_000
     });
-    await page.waitForSelector("section[aria-label='Place details'] [data-photo-credit='true']", {
+    await page.waitForSelector(photoCreditsEntriesSelector, {
       timeout: 30_000
     });
     await page.waitForSelector("section[aria-label='Place details'] >> text=Image unavailable", {
       timeout: 30_000
     });
 
-    const creditText =
-      (await page
-        .locator("section[aria-label='Place details'] [data-photo-credit='true']")
-        .textContent()) ?? "";
+    const creditText = await readPhotoCreditEntryForImage(page, 1);
     if (!creditMatchesImage(creditText, capernaumImages[0])) {
       throw new Error(
         `Photo credit must remain visible when images fail to load, got '${creditText.trim()}'.`
@@ -2415,14 +2672,15 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     (await page
       .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
       .textContent()) ?? "";
+  const emmausTodayLineNormalized = emmausTodayLine.replace(/\s+/gu, " ").trim();
   if (!emmausTodayLine.includes("Today: Israel and the West Bank")) {
     throw new Error(`Emmaus today line is missing countries: '${emmausTodayLine.trim()}'.`);
   }
   if (
-    !emmausTodayLine.includes("Location disputed") ||
-    !emmausTodayLine.includes("4 proposed sites")
+    !emmausTodayLineNormalized.includes("Location disputed") ||
+    !emmausTodayLineNormalized.includes("4 proposed sites")
   ) {
-    throw new Error(`Emmaus today line is missing disputed-chip text: '${emmausTodayLine.trim()}'.`);
+    throw new Error(`Emmaus today line is missing disputed-chip text: '${emmausTodayLineNormalized}'.`);
   }
 
   const emmausDisputedChipCount = await page
@@ -4822,6 +5080,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const pointerCursorAndNearPinClickCheck = await verifyPointerCursorAndNearPinClick(
+      page,
+      staticServer.baseUrl
+    );
     const galleryFixtureChecks = await verifyGalleryFixtureWithViewer(
       browser,
       staticServer.baseUrl
@@ -4993,6 +5255,7 @@ async function run() {
       consoleErrors,
       workerConsoleEvents,
       panelSectionAndCreditChecks,
+      pointerCursorAndNearPinClickCheck,
       galleryFixtureChecks,
       capernaumLeadImageLoadCheck,
       imageFailurePlaceholderCheck,

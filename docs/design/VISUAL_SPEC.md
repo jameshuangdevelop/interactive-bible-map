@@ -68,7 +68,8 @@ These are real renders, not wireframes. They are what the app's map will look li
 - **Drawn by the map (ADR-0024):** pins, labels, clusters, badges and candidate letters are MapLibre layers, drawn on the graphics card in the same frame as the map, so they never lag behind a drag or zoom. Labels that would overlap are hidden automatically; a hidden label still appears in the hover tooltip. The label priority is the selected place, then empires, provinces, regions, cities, towns, villages, sites and natural features, then the data's order. Map labels use the basemap's Noto Sans font.
 - **Contrast on Liberty:** every pin colour has at least 3:1 contrast against every Liberty background, park, wood, grass, building and water colour; the lowest is red on water, at 3.1:1. The natural-feature green was darkened from `#188038` because that colour reached only 2.7:1 on water, where pins such as the Sea of Galilee sit. The white outline separates each pin from the map.
 - **Selected place:** its pin grows by about 30% and gets a drop shadow; the other pins stay as they are.
-- **Hover** (on desktop): a tooltip with the name and type.
+- **Hover** (on desktop): a tooltip with the name and type, and a pointer cursor over any clickable pin, cluster, disputed "?" badge, candidate letter or area label. Elsewhere, MapLibre keeps its own grab/grabbing cursors.
+- **Hit area:** hover and click check a small box around the pointer (about 8 px each way) and choose the nearest feature in that box, so crowded pins are easier to hit.
 - **Keyboard:** every place on the map can be reached by keyboard through the list of visible places (see §7).
 
 ### Zoom tiers
@@ -94,8 +95,8 @@ The section order follows brief §1.4. Sections without data are left out.
 1. **Images** (ADR-0029, built in M3.5-06). Major places have 4–7 images, counting the AI reconstruction, and standard places 1–3, about 408 × 240 px in the panel.
    - With several images, there are arrows and a "1 / 7" counter, plus a row of small thumbnails under the image when there are more than 3.
    - **A label on each image for its kind:** "Today", "Excavated site", "Reconstruction", "Historical view", or **"AI-generated reconstruction"**, which is always visible.
-   - **Directly under each image, always visible:** "Photo: *author* · *license* · Wikimedia Commons". The license links to its legal text, and "Wikimedia Commons" links to the file page. AI images read "AI-generated reconstruction · *tool* · *license* · Based on: research brief", where "research brief" links to the place's cited brief.
-   - The alt text is the caption, and the caption appears in small type below the credit.
+   - **Directly under each panel image:** the caption and a small, visible **Credit** link to that image's entry in **Photo credits** (at the end of the panel). The link is keyboard-reachable, named like "Credit for image *n*", and moves focus to the matching entry.
+   - The alt text is the caption, and the caption appears in small type.
    - Selecting the image opens a large viewer (a dialog) with the same arrows, label, credit and caption. ← and → move between images, and Esc closes it.
 2. **Names:**
    - the title is the first ancient name, the spelling most popular English Bibles agree on, for example **Capernaum** (CP3a decision 2; ADR-0026);
@@ -115,7 +116,8 @@ The section order follows brief §1.4. Sections without data are left out.
     - "Pleiades place 678231" links to Pleiades;
     - `bib:` entries show as author, title and year;
     - `scripture:` entries show as the passage.
-11. **Footer:** "Checked by the project's Fact-Checker · last reviewed 24 Sep 2026", and **Report an issue**, which opens a GitHub issue with the place id filled in.
+11. **Photo credits:** a numbered list in gallery order, directly after Sources and before the footer, with the same heading style and entry typography as Sources. It starts with the note: "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole." Each entry has the same full credit line the viewer shows.
+12. **Footer:** "Checked by the project's Fact-Checker · last reviewed 24 Sep 2026", and **Report an issue**, which opens a GitHub issue with the place id filled in.
 
 The panel closes with its × button or with Esc. While the panel is open, the map keeps its position.
 
@@ -136,7 +138,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 |---|---|
 | Loading a place | Grey skeleton blocks in the panel. The map is usable at once, because the map and search data (about 18 KB) load with the app. |
 | Basemap tiles failing | After repeated tile errors, switch to the fallback style and show a message: "The main map service isn't responding. Showing the backup map." |
-| An image fails to load | A grey placeholder with an icon; the credit line stays. |
+| An image fails to load | A grey placeholder with an icon; that image's entry in **Photo credits** stays. |
 | A link to an unknown place | The default view, with the message "Place not found". |
 
 ## 6. Visual tokens
@@ -177,7 +179,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 
 ## 9. Attribution and credits
 - **Map:** a compact attribution control. The exact text for OpenFreeMap, OpenMapTiles and OpenStreetMap is set by the Fact-Checker in `ATTRIBUTION.md` (task M3-07).
-- **Photos:** a credit under every photo (§3).
+- **Photos:** every image's full credit is in a numbered "Photo credits" list at the end of the place panel, after Sources, numbered as in the gallery's counter and styled like the Sources list. Under the panel's image there is only the caption and a small "Credit" link to the image's entry; the AI label stays on the image, and the large viewer shows the full credit (§3; `docs/LICENSES.md`, "Image credits").
 - **Menu → Sources & credits:**
   - the data licence (CC BY-SA 4.0; OSM- and AWMC-derived geometry under ODbL 1.0 from M4);
   - the WEB notice, word for word from `docs/LICENSES.md`;
@@ -200,7 +202,7 @@ The Ancient layer's borders and timeline (M4), the Modern/Ancient toggle and mod
 | File | Shows |
 |---|---|
 | [01-map-overview.svg](wireframes/01-map-overview.svg) | Opening view: the Mediterranean overview, search, pins, a cluster, region labels, a sample disputed "?" pin, controls and the reserved areas |
-| [02-place-panel.svg](wireframes/02-place-panel.svg) | Capernaum selected: photos with credits, names with a single "Today" line and chip, About, In the Bible, OT connections |
+| [02-place-panel.svg](wireframes/02-place-panel.svg) | Capernaum selected: photos with caption + Credit link (full credits at panel end), names with a single "Today" line and chip, About, In the Bible, OT connections |
 | [03-disputed-place.svg](wireframes/03-disputed-place.svg) | Emmaus selected: countries + disputed chip on one "Today" line, and four lettered candidates on the panel and the map |
 | [04-search.svg](wireframes/04-search.svg) | Search results for "Antioch" |
 | [05-small-screen.svg](wireframes/05-small-screen.svg) | Small screen: search and the bottom sheet |

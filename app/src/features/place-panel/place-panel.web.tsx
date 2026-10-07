@@ -5,7 +5,6 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
-  type ReactNode,
   type RefObject
 } from "react";
 
@@ -21,17 +20,14 @@ import type {
   SourceId
 } from "../map/types";
 import {
-  AI_BASED_ON_LABEL,
   buildAlsoKnownAs,
-  buildImageCreditFields,
   buildImageKindLabel,
-  buildImagePromptBriefUrl,
   buildHierarchyItems,
+  buildPhotoCreditEntry,
   collectSourceIdsInPanelOrder,
   confidenceLabel,
   groupScriptureByBook,
   imageIndexesToLoad,
-  isAiReconstructionImage,
   isDisputedRecord,
   nextImageIndex,
   shouldRenderThumbnailRow,
@@ -56,12 +52,19 @@ const VIEWER_DIALOG_VIEWPORT_MARGIN = 32;
 const VIEWER_DIALOG_PADDING = tokens.spacing.md * 2;
 const DIALOG_FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const PHOTO_CREDITS_NOTE =
+  "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
+const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 1_500;
 const reviewedDateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
   year: "numeric",
   timeZone: "UTC"
 });
+
+function photoCreditTargetId(placeId: string, imageIndex: number) {
+  return `photo-credit-${placeId}-${imageIndex + 1}`;
+}
 
 interface PlacePanelProps {
   selectedPlace: PlaceIndexRecord;
@@ -200,16 +203,26 @@ function cycleDialogFocus(event: ReactKeyboardEvent<HTMLElement>) {
 
 interface CreditSegment {
   key: string;
-  content: ReactNode;
+  text: string;
+  href: string | null;
 }
 
 function renderCreditSegments(segments: CreditSegment[]) {
-  return segments.map((segment, index) => (
-    <span key={segment.key}>
-      {index > 0 ? " · " : null}
-      {segment.content}
-    </span>
-  ));
+  return segments.map((segment, index) => {
+    const safeHref = toSafeHttpUrl(segment.href);
+    return (
+      <span key={segment.key}>
+        {index > 0 ? " · " : null}
+        {safeHref ? (
+          <a href={safeHref} rel="noopener noreferrer" target="_blank">
+            {segment.text}
+          </a>
+        ) : (
+          segment.text
+        )}
+      </span>
+    );
+  });
 }
 
 function formatReviewedDate(lastReviewed: string | undefined) {
@@ -263,7 +276,11 @@ function WikimediaImage({
   onOpenViewer,
   openViewerTargetRef,
   onPreviousImage,
-  onNextImage
+  onNextImage,
+  showInlineCreditLine = true,
+  activeImageOrdinal = 1,
+  photoCreditLinkTargetId,
+  onPhotoCreditLinkSelect
 }: {
   image: MediaImageRecord;
   locationId: string;
@@ -278,6 +295,10 @@ function WikimediaImage({
   openViewerTargetRef?: RefObject<HTMLButtonElement | null>;
   onPreviousImage?: () => void;
   onNextImage?: () => void;
+  showInlineCreditLine?: boolean;
+  activeImageOrdinal?: number;
+  photoCreditLinkTargetId?: string;
+  onPhotoCreditLinkSelect?: () => void;
 }) {
   const { requestUrl: imageUrl } = resolveDisplayImageRequest({
     image,
@@ -286,72 +307,14 @@ function WikimediaImage({
     devicePixelRatio,
     fitMode: imageObjectFit
   });
-  const safeLicenseUrl = toSafeHttpUrl(image.licenseUrl);
-  const safeSourcePageUrl = toSafeHttpUrl(image.sourcePage);
   const showFallback = !imageUrl || Boolean(failedImageRequests[imageUrl]);
   const kindLabel = buildImageKindLabel(image.kind);
-  const isAiImage = isAiReconstructionImage(image);
-  const { authorLabel, licenseLabel, toolLabel } = buildImageCreditFields(image);
-  const aiBriefUrl = buildImagePromptBriefUrl(locationId, image.promptRef);
-  const aiSourcesText = AI_BASED_ON_LABEL;
-  const aiCreditSegments: CreditSegment[] = [{ key: "ai-label", content: "AI-generated reconstruction" }];
-  if (toolLabel) {
-    aiCreditSegments.push({
-      key: "tool",
-      content: toolLabel
-    });
-  }
-  if (licenseLabel) {
-    aiCreditSegments.push({
-      key: "license",
-      content: safeLicenseUrl ? (
-        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-          {licenseLabel}
-        </a>
-      ) : (
-        licenseLabel
-      )
-    });
-  }
-  aiCreditSegments.push({
-    key: "based-on",
-    content: (
-      <>
-        Based on:{" "}
-        <a href={aiBriefUrl} rel="noopener noreferrer" target="_blank">
-          {aiSourcesText}
-        </a>
-      </>
-    )
-  });
-  const commonsCreditSegments: CreditSegment[] = [
-    {
-      key: "photo",
-      content: authorLabel ? `Photo: ${authorLabel}` : "Photo"
-    }
-  ];
-  if (licenseLabel) {
-    commonsCreditSegments.push({
-      key: "license",
-      content: safeLicenseUrl ? (
-        <a href={safeLicenseUrl} rel="noopener noreferrer" target="_blank">
-          {licenseLabel}
-        </a>
-      ) : (
-        licenseLabel
-      )
-    });
-  }
-  commonsCreditSegments.push({
-    key: "source",
-    content: safeSourcePageUrl ? (
-      <a href={safeSourcePageUrl} rel="noopener noreferrer" target="_blank">
-        Wikimedia Commons
-      </a>
-    ) : (
-      "Wikimedia Commons"
-    )
-  });
+  const photoCredit = buildPhotoCreditEntry(image, locationId);
+  const showCreditJumpLink =
+    !showInlineCreditLine &&
+    typeof onPhotoCreditLinkSelect === "function" &&
+    typeof photoCreditLinkTargetId === "string" &&
+    photoCreditLinkTargetId.length > 0;
 
   return (
     <div
@@ -479,27 +442,25 @@ function WikimediaImage({
           </>
         ) : null}
       </div>
-      <p
-        data-photo-credit="true"
-        style={{
-          marginTop: `${tokens.spacing.sm}px`,
-          marginBottom: 0,
-          color: tokens.color.textSecondary,
-          fontSize: `${tokens.typography.captionSize}px`,
-          lineHeight: `${tokens.typography.captionLineHeight}px`,
-          overflowWrap: "anywhere"
-        }}
-      >
-        {isAiImage ? (
-          renderCreditSegments(aiCreditSegments)
-        ) : (
-          renderCreditSegments(commonsCreditSegments)
-        )}
-      </p>
+      {showInlineCreditLine ? (
+        <p
+          data-photo-credit="true"
+          style={{
+            marginTop: `${tokens.spacing.sm}px`,
+            marginBottom: 0,
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`,
+            overflowWrap: "anywhere"
+          }}
+        >
+          {renderCreditSegments(photoCredit.segments)}
+        </p>
+      ) : null}
       <p
         data-photo-caption="true"
         style={{
-          marginTop: `${tokens.spacing.xs}px`,
+          marginTop: showInlineCreditLine ? `${tokens.spacing.xs}px` : `${tokens.spacing.sm}px`,
           marginBottom: 0,
           color: tokens.color.textSecondary,
           fontSize: `${tokens.typography.captionSize}px`,
@@ -509,6 +470,34 @@ function WikimediaImage({
       >
         {image.caption}
       </p>
+      {showCreditJumpLink ? (
+        <p
+          style={{
+            marginTop: `${tokens.spacing.xs}px`,
+            marginBottom: 0,
+            color: tokens.color.textSecondary,
+            fontSize: `${tokens.typography.captionSize}px`,
+            lineHeight: `${tokens.typography.captionLineHeight}px`
+          }}
+        >
+          <a
+            aria-label={`Credit for image ${activeImageOrdinal}`}
+            data-photo-credit-link="true"
+            href={`#${photoCreditLinkTargetId}`}
+            onClick={(event) => {
+              event.preventDefault();
+              onPhotoCreditLinkSelect();
+            }}
+            style={{
+              color: tokens.color.textSecondary,
+              textDecoration: "underline",
+              textUnderlineOffset: "2px"
+            }}
+          >
+            Credit
+          </a>
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -785,9 +774,12 @@ export function PlacePanel({
   const imageViewerRef = useRef<HTMLDivElement | null>(null);
   const imageViewerOpenTargetRef = useRef<HTMLButtonElement | null>(null);
   const imageViewerInertTargetsRef = useRef<HTMLElement[]>([]);
+  const photoCreditHighlightTimeoutRef = useRef<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
+  const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
   const [expandedCandidateSupport, setExpandedCandidateSupport] = useState<Record<number, true>>({});
   const [showAllScripture, setShowAllScripture] = useState(false);
   const [visibleScriptureCount, setVisibleScriptureCount] = useState(SCRIPTURE_INITIAL_COUNT);
@@ -897,6 +889,32 @@ export function PlacePanel({
   const alsoKnownAs = buildAlsoKnownAs(placeForDisplay.names);
   const modernLocationLabel = buildModernLocationLabel(placeForDisplay.names);
   const titleName = getPrimaryPlaceName(placeForDisplay);
+  const photoCreditEntries = useMemo(
+    () =>
+      images.map((image, imageIndex) => ({
+        imageId: image.id,
+        imageIndex,
+        entryId: photoCreditTargetId(placeForDisplay.id, imageIndex),
+        segments: buildPhotoCreditEntry(image, placeForDisplay.id).segments
+      })),
+    [images, placeForDisplay.id]
+  );
+
+  useEffect(
+    () => () => {
+      if (photoCreditHighlightTimeoutRef.current !== null) {
+        window.clearTimeout(photoCreditHighlightTimeoutRef.current);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (photoCreditHighlightTimeoutRef.current !== null) {
+      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
+      photoCreditHighlightTimeoutRef.current = null;
+    }
+  }, [selectedPlace.id]);
 
   useEffect(() => {
     if (!selectedImage || images.length <= 1) {
@@ -1047,6 +1065,29 @@ export function PlacePanel({
         [requestUrl]: true
       };
     });
+  };
+
+  const jumpToPhotoCredit = (imageIndex: number) => {
+    const targetId = photoCreditTargetId(placeForDisplay.id, imageIndex);
+    const targetElement = document.getElementById(targetId);
+    if (!(targetElement instanceof HTMLElement)) {
+      return;
+    }
+
+    targetElement.focus();
+    targetElement.scrollIntoView({
+      block: "nearest"
+    });
+    setHighlightedPhotoCreditId(targetId);
+
+    if (photoCreditHighlightTimeoutRef.current !== null) {
+      window.clearTimeout(photoCreditHighlightTimeoutRef.current);
+    }
+
+    photoCreditHighlightTimeoutRef.current = window.setTimeout(() => {
+      setHighlightedPhotoCreditId((current) => (current === targetId ? null : current));
+      photoCreditHighlightTimeoutRef.current = null;
+    }, PHOTO_CREDIT_HIGHLIGHT_DURATION_MS);
   };
 
   const openImageViewer = () => {
@@ -1256,6 +1297,7 @@ export function PlacePanel({
               image={selectedImage}
               imageObjectFit="cover"
               locationId={placeForDisplay.id}
+              activeImageOrdinal={normalizedActiveImageIndex + 1}
               onNextImage={
                 images.length > 1
                   ? () => {
@@ -1273,6 +1315,13 @@ export function PlacePanel({
               }
               onRequestFailure={markImageRequestFailed}
               openViewerTargetRef={imageViewerOpenTargetRef}
+              photoCreditLinkTargetId={
+                photoCreditEntries[normalizedActiveImageIndex]?.entryId
+              }
+              onPhotoCreditLinkSelect={() => {
+                jumpToPhotoCredit(normalizedActiveImageIndex);
+              }}
+              showInlineCreditLine={false}
             />
             {showThumbnailStrip ? (
               <GalleryThumbnails
@@ -1643,6 +1692,75 @@ export function PlacePanel({
                         ) : (
                           citation.label
                         )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </section>
+            ) : null}
+
+            {photoCreditEntries.length > 0 ? (
+              <section data-panel-section="photo-credits">
+                <hr style={sectionDividerStyle} />
+                <h2 style={sectionHeadingStyle}>Photo credits</h2>
+                <p
+                  data-photo-credits-note="true"
+                  style={{
+                    marginTop: 0,
+                    marginBottom: `${tokens.spacing.sm}px`,
+                    color: tokens.color.textSecondary,
+                    fontSize: `${tokens.typography.bodySize}px`,
+                    lineHeight: `${tokens.typography.bodyLineHeight}px`
+                  }}
+                >
+                  {PHOTO_CREDITS_NOTE}
+                </p>
+                <ol
+                  data-photo-credits-list="true"
+                  style={{
+                    margin: 0,
+                    paddingLeft: "22px",
+                    color: tokens.color.textSecondary
+                  }}
+                >
+                  {photoCreditEntries.map((entry) => {
+                    const isHighlighted = highlightedPhotoCreditId === entry.entryId;
+                    const isFocused = focusedPhotoCreditId === entry.entryId;
+                    return (
+                      <li
+                        id={entry.entryId}
+                        key={entry.imageId}
+                        data-photo-credits-entry="true"
+                        data-photo-credit-entry-index={entry.imageIndex + 1}
+                        onBlur={(event) => {
+                          const nextFocused = event.relatedTarget;
+                          if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) {
+                            return;
+                          }
+                          setFocusedPhotoCreditId((current) =>
+                            current === entry.entryId ? null : current
+                          );
+                        }}
+                        onFocus={() => {
+                          setFocusedPhotoCreditId(entry.entryId);
+                        }}
+                        style={{
+                          marginBottom: `${tokens.spacing.sm}px`,
+                          fontSize: `${tokens.typography.bodySize}px`,
+                          lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                          borderRadius: "4px",
+                          outline:
+                            isHighlighted || isFocused
+                              ? `2px solid ${tokens.color.accent}`
+                              : "none",
+                          outlineOffset: "2px",
+                          backgroundColor: isHighlighted ? "rgba(26,115,232,0.12)" : "transparent",
+                          transition:
+                            "background-color 180ms ease-out, outline-color 180ms ease-out"
+                        }}
+                        tabIndex={-1}
+                      >
+                        {renderCreditSegments(entry.segments)}
                       </li>
                     );
                   })}
