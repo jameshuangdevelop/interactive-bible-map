@@ -38,26 +38,44 @@
     }
   ],
   "summary": {
-    "text": "Antioch on the Orontes was a major Hellenistic and Roman city in northern Syria, one of the four cities of the Seleucid Syrian Tetrapolis, and the base from which Paul and Barnabas were sent out on missionary journeys. Acts records that the disciples were first called Christians here.",
+    "text": "Antioch on the Orontes was a major Hellenistic and Roman city in northern Syria, standing on the river's left bank about 15 miles from the Mediterranean, with its port at Seleucia. Founded in 301 BC by Seleucus I Nicator, a king who had just become master of Syria, it grew by Paul's day into the third city of the Roman world after Rome and Alexandria, and the capital of the Roman province of Syria. Seleucus had settled Jews in the city with equal rights to its Greek citizens, and a few decades before Paul's time, Herod the Great paved the city's twenty-furlong main street with polished marble and lined it with covered colonnades on both sides, a street that the Jewish historian Josephus says had before been \"shunned by all men... because it was full of dirt and filthiness.\"",
     "sources": [
       "pleiades:658381",
       "wikidata:Q200441",
-      "openbible:antioch-1",
-      "scripture:Acts 14:26",
-      "scripture:Acts 11:26",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:isbe-antioch-syria",
+      "bib:josephus-jewish-war",
+      "bib:josephus-antiquities",
+      "bib:worldhistory-josephus"
     ]
   },
   "history": [
     {
-      "text": "The city was founded around 300 BC by Seleucus I Nicator, a successor of Alexander the Great, and grew into one of the great trading centers of the eastern Mediterranean.",
+      "text": "Acts reports that believers scattered by persecution first brought the gospel to Antioch, and that the Jerusalem church sent Barnabas there; he in turn brought Saul from Tarsus, and the two taught there for a year, during which \"the disciples were first called Christians.\" Acts also says that the Holy Spirit set apart Barnabas and Saul in Antioch for the missionary journey the church sent them on, and the city hosted a dispute over keeping the Jewish law that the apostles in Jerusalem settled by letter. Paul also recalled opposing the apostle Peter \"to his face\" in Antioch, because, in Paul's words, Peter \"stood condemned.\"",
       "sources": [
-        "pleiades:658381"
+        "scripture:Acts 11:19",
+        "scripture:Acts 11:20",
+        "scripture:Acts 11:22",
+        "scripture:Acts 11:26",
+        "scripture:Acts 13:1",
+        "scripture:Acts 13:2-3",
+        "scripture:Acts 14:26",
+        "scripture:Acts 15:1",
+        "scripture:Acts 15:22",
+        "scripture:Acts 15:30",
+        "scripture:Galatians 2:11",
+        "scripture:Acts 11:25"
+      ]
+    },
+    {
+      "text": "The church at Antioch became known as the mother church of Gentile Christianity, a reputation it long kept. The city suffered repeatedly from earthquakes, and it lost its place as the leading city of Syria only after the Arab conquest restored that status to Damascus.",
+      "sources": [
+        "bib:isbe-antioch-syria"
+      ]
+    },
+    {
+      "text": "Today the site survives as Antakya, a city in southern Türkiye on the Orontes river.",
+      "sources": [
+        "wikidata:Q200441"
       ]
     }
   ],
@@ -101,6 +119,11 @@
       "ref": "Acts 13:1",
       "book": "Acts",
       "textWEB": "Now in the assembly that was at Antioch there were some prophets and teachers: Barnabas, Simeon who was called Niger, Lucius of Cyrene, Manaen the foster brother of Herod the tetrarch, and Saul."
+    },
+    {
+      "ref": "Acts 13:2-3",
+      "book": "Acts",
+      "textWEB": "As they served the Lord and fasted, the Holy Spirit said, “Separate Barnabas and Saul for me, for the work to which I have called them.” Then, when they had fasted and prayed and laid their hands on them, they sent them away."
     },
     {
       "ref": "Acts 14:26",
@@ -151,6 +174,11 @@
       "ref": "Galatians 2:11",
       "book": "Galatians",
       "textWEB": "But when Peter came to Antioch, I resisted him to his face, because he stood condemned."
+    },
+    {
+      "ref": "Acts 11:25",
+      "book": "Acts",
+      "textWEB": "Barnabas went out to Tarsus to look for Saul."
     }
   ],
   "otConnections": [],

@@ -35,22 +35,45 @@
     }
   ],
   "summary": {
-    "text": "Laodicea on the Lycus was a city of the Lycus Valley in Roman Phrygia, grouped with nearby Colossae and Hierapolis in Colossians 4:13. Paul's letter to the Colossians directs that it be read also at Laodicea and that the letter from Laodicea also be read at Colossae, and Laodicea is separately addressed as one of the seven churches of Revelation 2-3, called 'lukewarm' there and rebuked for claiming to 'have need of nothing.'",
+    "text": "Laodicea on the Lycus stood in the Lycus river valley of Roman Phrygia, on the great road running east from Ephesus and at a junction of important trade routes, which made it a wealthy commercial city. Founded in the mid-third century BC by the Seleucid king Antiochus II, who named it after his wife Laodice, the city stood about six miles from Hierapolis to the north and eleven miles from Colossae to the east. The region was prone to earthquakes: the Greek geographer Strabo took the Lycus river's habit of running underground for much of its course as a sign that the country was \"full of holes and subject to earthquakes.\" The Roman historian Tacitus records that an earthquake destroyed Laodicea in AD 60 and that it recovered \"by its own resources, without assistance\" from Rome, while neighboring cities such as Hierapolis were rebuilt with imperial help.",
     "sources": [
       "dare:21162",
       "wikidata:Q849709",
-      "scripture:Colossians 4:13",
-      "scripture:Colossians 4:16",
-      "scripture:Revelation 3:15-17",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:ramsay-seven-churches",
+      "bib:strabo-geography",
+      "bib:tacitus-annals",
+      "bib:pau-laodikeia-kazisi",
+      "bib:worldhistory-strabo",
+      "bib:worldhistory-tacitus"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Paul's letter to the Colossians, written to the neighboring church at Colossae, directs that it also be read at Laodicea, and that the Colossians in turn read \"the letter from Laodicea\"; it also sends greetings to the Laodicean believer Nymphas and the church that met in his house. Laodicea is separately addressed as one of the seven churches of Revelation 2-3, where it is called \"lukewarm\" and rebuked for saying, \"I am rich, and have gotten riches, and have need of nothing\"; the letter counsels the church to buy \"eye salve\" so that it may see clearly. Some commentators connect these images to the city's self-funded recovery from the AD 60 earthquake and to a medical school and eye remedy associated with Laodicea, though Revelation itself does not state either connection.",
+      "sources": [
+        "scripture:Colossians 4:13",
+        "scripture:Colossians 4:15",
+        "scripture:Colossians 4:16",
+        "scripture:Revelation 3:15-17",
+        "scripture:Revelation 3:18",
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "text": "In the decades after Revelation was written, Laodicea was extensively rebuilt: a stadium was dedicated to the emperor Titus in AD 79, and new city gates and main streets with Doric façades were built under the emperor Domitian in AD 84-85. The emperor Hadrian visited the city in AD 135, and further grand construction, including new bathhouses and monumental fountains, continued into the second century.",
+      "sources": [
+        "bib:pau-laodikeia-kazisi"
+      ]
+    },
+    {
+      "text": "Today Laodicea is an archaeological site near the city of Denizli in Türkiye, where excavations by Pamukkale University have uncovered colonnaded streets, two theatres, the stadium, bathhouses, a council house, temples, and public squares.",
+      "sources": [
+        "dare:21162",
+        "wikidata:Q849709",
+        "bib:pau-laodikeia-kazisi"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Colossians 2:1",
@@ -86,6 +109,11 @@
       "ref": "Revelation 3:15-17",
       "book": "Revelation",
       "textWEB": "“I know your works, that you are neither cold nor hot. I wish you were cold or hot. So, because you are lukewarm, and neither hot nor cold, I will vomit you out of my mouth. Because you say, ‘I am rich, and have gotten riches, and have need of nothing,’ and don’t know that you are the wretched one, miserable, poor, blind, and naked;"
+    },
+    {
+      "ref": "Revelation 3:18",
+      "book": "Revelation",
+      "textWEB": "I counsel you to buy from me gold refined by fire, that you may become rich; and white garments, that you may clothe yourself, and that the shame of your nakedness may not be revealed; and eye salve to anoint your eyes, that you may see."
     }
   ],
   "otConnections": [],

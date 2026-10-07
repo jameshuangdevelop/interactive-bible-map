@@ -31,16 +31,40 @@
     }
   ],
   "summary": {
-    "text": "Thyatira was an ancient city of Asia Minor, at the site of modern Akhisar. Acts identifies Lydia, whose conversion and baptism at Philippi Acts records, as 'a seller of purple, of the city of Thyatira,' and Thyatira is also one of the seven churches addressed in Revelation 2, commended for love and service but rebuked for tolerating a false prophetess.",
+    "text": "Thyatira stood in an open valley between the Hermus and Caicus river valleys, on a minor tributary of the Hermus, at the site of modern Akhisar in western Türkiye. The Greek geographer Strabo calls it \"a settlement of the Macedonians\"; Seleucus I, the Hellenistic king who founded the Seleucid dynasty, made it a city and a military colony, a garrison to hold the road between Pergamum and Sardis. Unlike hill cities such as Sardis or Pergamum, Thyatira sat on open, only gently rising ground, and inscriptions show it had more trade guilds than any other city in the province of Asia, including wool-workers, linen-workers, dyers, leather-workers, potters, and bronze-smiths.",
     "sources": [
       "dare:21159",
       "wikidata:Q1135603",
-      "scripture:Acts 16:14",
-      "scripture:Acts 16:15",
-      "scripture:Revelation 2:19-20"
+      "bib:strabo-geography",
+      "bib:ramsay-seven-churches",
+      "bib:worldhistory-strabo"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Acts identifies Lydia, who was converted and baptized at Philippi, as \"a seller of purple, of the city of Thyatira\"; given the city's known trade in dyes, some scholars think her \"purple\" goods were colored with a locally made red dye rather than the usual purple dye made from shellfish. Thyatira is also one of the seven churches addressed in Revelation 2, commended for its \"love, faith, service, patient endurance,\" but rebuked for tolerating a woman the text calls \"Jezebel,\" who called herself a prophetess and taught believers to commit sexual immorality and eat food sacrificed to idols.",
+      "sources": [
+        "scripture:Acts 16:14",
+        "scripture:Revelation 2:19",
+        "scripture:Revelation 2:20",
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "text": "Thyatira's coinage was struck on a large scale in the late second and third centuries AD, a sign of prosperity and wealth. Its coins show a local hero, Tyrimnos, riding out on horseback with a battle-axe over his shoulder, a fitting emblem for a city founded as a military colony.",
+      "sources": [
+        "bib:ramsay-seven-churches"
+      ]
+    },
+    {
+      "text": "Today the site of Thyatira lies beneath the modern town of Akhisar in Türkiye.",
+      "sources": [
+        "dare:21159",
+        "wikidata:Q1135603",
+        "bib:ramsay-seven-churches"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 16:14",
@@ -56,6 +80,16 @@
       "ref": "Revelation 2:18",
       "book": "Revelation",
       "textWEB": "“To the angel of the assembly in Thyatira write: “The Son of God, who has his eyes like a flame of fire, and his feet are like burnished brass, says these things:"
+    },
+    {
+      "ref": "Revelation 2:19",
+      "book": "Revelation",
+      "textWEB": "“I know your works, your love, faith, service, patient endurance, and that your last works are more than the first."
+    },
+    {
+      "ref": "Revelation 2:20",
+      "book": "Revelation",
+      "textWEB": "But I have this against you, that you tolerate your woman Jezebel, who calls herself a prophetess. She teaches and seduces my servants to commit sexual immorality and to eat things sacrificed to idols."
     },
     {
       "ref": "Revelation 2:24",

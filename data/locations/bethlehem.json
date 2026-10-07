@@ -38,30 +38,56 @@
     }
   ],
   "summary": {
-    "text": "Bethlehem is a town in the Judean hill country south of Jerusalem, identified in Matthew and Luke as the birthplace of Jesus and already known in the Old Testament as the home town of David.",
+    "text": "Bethlehem is a town in the fertile limestone hill country of Judea, less than 10 km (6 miles) south of Jerusalem. A few kilometers to the southeast stood Herodium, the hilltop fortress and palace that Herod the Great built and named after himself, and where he was buried. Bethlehem was already known in the Old Testament as the home town of David, centuries before Matthew and Luke identify it as the birthplace of Jesus.",
     "sources": [
       "wikidata:Q5776",
-      "openbible:bethlehem-1",
+      "dare:28331",
+      "wikidata:Q1218",
+      "bib:unesco-church-of-nativity",
+      "wikidata:Q913099",
+      "bib:josephus-jewish-war",
       "scripture:Matthew 2:1",
-      "scripture:Luke 2:4",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "scripture:Luke 2:4"
     ]
   },
   "history": [
     {
-      "text": "The Church of the Nativity, first built under Constantine around 339 AD and rebuilt in the mid-sixth century under Justinian, marks the traditional site of Jesus' birth and stands over one of the longest continuously venerated locations in Christian tradition.",
+      "text": "Luke's Gospel says that Joseph went up to Bethlehem, \"David's city,\" with Mary to be enrolled under a decree of Caesar Augustus, and that Mary laid her newborn son \"in a feeding trough, because there was no room for them in the inn.\" Luke also describes shepherds \"in the same country... keeping watch by night over their flock,\" who were told that a Savior had been born \"in David's city.\" Matthew describes wise men from the east, led by a star that \"stood over where the young child was,\" and King Herod then killing the boys of Bethlehem and its surroundings who were two years old and under.",
+      "sources": [
+        "scripture:Luke 2:1",
+        "scripture:Luke 2:4",
+        "scripture:Luke 2:5",
+        "scripture:Luke 2:7",
+        "scripture:Luke 2:8",
+        "scripture:Luke 2:11",
+        "scripture:Matthew 2:1",
+        "scripture:Matthew 2:9",
+        "scripture:Matthew 2:16"
+      ]
+    },
+    {
+      "text": "By at least the second century, Christians believed that a cave at Bethlehem was the birthplace of Jesus. A church built over the cave was completed in AD 339 under the Roman emperor Constantine and replaced in the mid-sixth century under the Byzantine emperor Justinian; that building, with later changes, still stands, making the site one of the longest continuously venerated places in Christian tradition.",
       "sources": [
         "bib:unesco-church-of-nativity",
-        "bib:murphy-oconnor-holy-land-guide"
+        "bib:murphy-oconnor-holy-land-guide",
+        "bib:worldhistory-constantine",
+        "bib:worldhistory-justinian"
+      ]
+    },
+    {
+      "text": "Today Bethlehem is a Palestinian town and, as it has been for some 1,700 years, a pilgrim destination. The Church of the Nativity, a UNESCO World Heritage Site and the oldest Christian church in daily use, stands over the traditional birth cave. A pilgrimage route runs to it from the town's traditional entrance along Star Street to Manger Square.",
+      "sources": [
+        "bib:unesco-church-of-nativity",
+        "wikidata:Q5776"
       ]
     }
   ],
   "scripture": [
+    {
+      "ref": "Luke 2:1",
+      "book": "Luke",
+      "textWEB": "Now in those days, a decree went out from Caesar Augustus that all the world should be enrolled."
+    },
     {
       "ref": "Matthew 2:1",
       "book": "Matthew",
@@ -98,6 +124,16 @@
       "textWEB": "Joseph also went up from Galilee, out of the city of Nazareth, into Judea, to David’s city, which is called Bethlehem, because he was of the house and family of David,"
     },
     {
+      "ref": "Luke 2:7",
+      "book": "Luke",
+      "textWEB": "She gave birth to her firstborn son. She wrapped him in bands of cloth and laid him in a feeding trough, because there was no room for them in the inn."
+    },
+    {
+      "ref": "Luke 2:8",
+      "book": "Luke",
+      "textWEB": "There were shepherds in the same country staying in the field, and keeping watch by night over their flock."
+    },
+    {
       "ref": "Luke 2:11",
       "book": "Luke",
       "textWEB": "For there is born to you today, in David’s city, a Savior, who is Christ the Lord."
@@ -111,6 +147,11 @@
       "ref": "John 7:42",
       "book": "John",
       "textWEB": "Hasn’t the Scripture said that the Christ comes of the offspring of David, and from Bethlehem, the village where David was?”"
+    },
+    {
+      "ref": "Luke 2:5",
+      "book": "Luke",
+      "textWEB": "to enroll himself with Mary, who was pledged to be married to him as wife, being pregnant."
     }
   ],
   "otConnections": [

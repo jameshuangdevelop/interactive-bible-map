@@ -34,24 +34,41 @@
     }
   ],
   "summary": {
-    "text": "Pergamon was founded in the 3rd century BC as the capital of the Attalid dynasty and, per UNESCO, became a major cultural, scientific and political hub of the Hellenistic world, with one of antiquity's largest libraries; after passing to Rome in 133 BC it served as capital of the Roman province of Asia. It is addressed in Revelation 2 as one of the seven churches, described there as the place 'where Satan's throne is.'",
+    "text": "Pergamum stood on a huge, rocky hill above the broad plain of the Caicus river, in the region of Mysia. It had been the capital of the Attalid dynasty of kings, who built up its acropolis with temples, a theatre seating about 10,000, and a library said to rival the one at Alexandria; the last Attalid king bequeathed his kingdom to Rome in 133 BC, after which Pergamum became the first capital of the Roman province of Asia. About 29 BC, the city built the first provincial temple to the Roman emperor Augustus and the goddess Roma anywhere in the province; the Roman historian Tacitus notes that this sanctuary still stood in AD 26, when other Asian cities competed for the right to build a second one, a contest the city of Smyrna eventually won.",
     "sources": [
       "dare:21158",
       "wikidata:Q18986",
       "bib:unesco-pergamon",
-      "scripture:Revelation 2:13",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:worldhistory-pergamon",
+      "bib:strabo-geography",
+      "bib:ramsay-seven-churches",
+      "bib:tacitus-annals",
+      "bib:worldhistory-tacitus",
+      "bib:worldhistory-augustus"
     ]
   },
   "history": [
     {
-      "text": "After the last Attalid king bequeathed his kingdom to Rome in 133 BC, Pergamon became a metropolis of the Roman province of Asia; in the Byzantine period, though reduced to a middle-sized town, it remained a religious centre as the home of one of the seven churches of Revelation.",
+      "text": "Pergamum is addressed in Revelation 2 as one of the seven churches, told that it dwells \"where Satan's throne is\" and commended for holding fast even when a believer named Antipas was put to death in the city. Interpreters differ on what \"Satan's throne\" meant: proposals include the city's temple of Rome and Augustus, used for emperor worship; the Great Altar of Zeus, with its massive frieze of the gods battling giants; and the city's role as a whole as a seat of Roman power in the province. This map takes no side.",
       "sources": [
+        "scripture:Revelation 2:12",
+        "scripture:Revelation 2:13",
+        "bib:ramsay-seven-churches",
+        "bib:worldhistory-pergamon"
+      ]
+    },
+    {
+      "text": "In the decades after Revelation was written, Pergamum flourished under the emperors Trajan and Hadrian: a second imperial temple was built there in Trajan's honor, and the Red Basilica, thought to have been commissioned by one of them as a temple to Egyptian gods, dates from the same period. The city also became known for its healing center, the Asclepieion.",
+      "sources": [
+        "bib:worldhistory-pergamon",
+        "bib:ramsay-seven-churches",
+        "bib:unesco-pergamon"
+      ]
+    },
+    {
+      "text": "Today Pergamum's acropolis rises above Bergama, a town in Türkiye on its lower slopes. The site, a UNESCO World Heritage Site, includes the acropolis's temples, theatres and altar, burial mounds, and remains from the Roman, Byzantine and Ottoman periods.",
+      "sources": [
+        "wikidata:Q18986",
         "bib:unesco-pergamon"
       ]
     }
@@ -66,6 +83,11 @@
       "ref": "Revelation 2:12",
       "book": "Revelation",
       "textWEB": "“To the angel of the assembly in Pergamum write: “He who has the sharp two-edged sword says these things:"
+    },
+    {
+      "ref": "Revelation 2:13",
+      "book": "Revelation",
+      "textWEB": "“I know your works and where you dwell, where Satan’s throne is. You hold firmly to my name, and didn’t deny my faith in the days of Antipas my witness, my faithful one, who was killed among you, where Satan dwells."
     }
   ],
   "otConnections": [],

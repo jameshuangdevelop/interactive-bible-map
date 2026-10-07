@@ -37,26 +37,47 @@
     }
   ],
   "summary": {
-    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee that served as a base for Jesus' Galilean ministry, described in the Gospels as the home of Peter and the location of numerous healings and teachings, including in its synagogue.",
+    "text": "Capernaum was a fishing village on the northwest shore of the Sea of Galilee, in Herod Antipas's tetrarchy of Galilee. Its houses were built of the local black basalt, and its people lived from fishing and farming and from trade along the route between Galilee and Damascus. The Jewish historian Josephus describes the neighboring plain of Gennesaret as exceptionally fertile, watered by a spring the local people called \"Capharnaum,\" with walnut trees, palms, fig trees and olives, and with grapes and figs ripening through ten months of the year.",
     "sources": [
       "wikidata:Q59174",
-      "openbible:capernaum",
-      "scripture:Mark 1:21",
-      "scripture:Mark 2:1",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "dare:33337",
+      "pleiades:678231",
+      "bib:custodia-capernaum",
+      "bib:josephus-jewish-war",
+      "scripture:Luke 3:1",
+      "scripture:Luke 4:31",
+      "bib:worldhistory-josephus"
     ]
   },
   "history": [
     {
-      "text": "Archaeological excavation has uncovered a limestone synagogue, generally dated several centuries after Jesus' lifetime, built over the foundations of an earlier, more modest structure, along with a Byzantine octagonal church built over a first-century house that an early Christian graffiti tradition identifies as Peter's house.",
+      "text": "The Gospels describe Capernaum as Jesus' base in Galilee. Mark says he taught in its synagogue on the Sabbath and then went to \"the house of Simon and Andrew,\" and that when he came back to Capernaum \"he was at home.\" He called Levi from a tax office, and both a centurion and a nobleman whose son lay sick at Capernaum asked him for help. Despite the \"mighty works\" done there, Matthew and Luke record Jesus saying that Capernaum would be \"brought down to Hades.\"",
       "sources": [
+        "scripture:Matthew 4:13",
+        "scripture:Mark 1:21",
+        "scripture:Mark 1:29",
+        "scripture:Mark 2:1",
+        "scripture:Mark 2:14",
+        "scripture:Matthew 8:5",
+        "scripture:John 4:46",
+        "scripture:John 4:47",
+        "scripture:Matthew 11:23",
+        "scripture:Luke 10:15"
+      ]
+    },
+    {
+      "text": "Excavations have uncovered a white limestone synagogue from the fifth century, built on the foundations of an earlier black basalt synagogue whose date is disputed (one of its excavators placed it in the first century), and a Byzantine octagonal church built over a first-century house that an early Christian tradition identifies as Peter's.",
+      "sources": [
+        "bib:custodia-capernaum",
         "bib:murphy-oconnor-holy-land-guide",
         "dare:33337"
+      ]
+    },
+    {
+      "text": "Today the site, known as Tell Hum or by its Hebrew name Kfar Nahum, is a Franciscan-run archaeological site where visitors can see the partly reconstructed limestone synagogue and a modern memorial church, inaugurated in 1990, built over the remains of the house venerated as Peter's.",
+      "sources": [
+        "wikidata:Q59174",
+        "bib:custodia-capernaum"
       ]
     }
   ],
@@ -87,9 +108,19 @@
       "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught."
     },
     {
+      "ref": "Mark 1:29",
+      "book": "Mark",
+      "textWEB": "Immediately, when they had come out of the synagogue, they came into the house of Simon and Andrew, with James and John."
+    },
+    {
       "ref": "Mark 2:1",
       "book": "Mark",
       "textWEB": "When he entered again into Capernaum after some days, it was heard that he was at home."
+    },
+    {
+      "ref": "Mark 2:14",
+      "book": "Mark",
+      "textWEB": "As he passed by, he saw Levi the son of Alphaeus sitting at the tax office. He said to him, “Follow me.” And he arose and followed him."
     },
     {
       "ref": "Mark 9:33",
@@ -150,6 +181,11 @@
       "ref": "John 6:59",
       "book": "John",
       "textWEB": "He said these things in the synagogue, as he taught in Capernaum."
+    },
+    {
+      "ref": "Luke 3:1",
+      "book": "Luke",
+      "textWEB": "Now in the fifteenth year of the reign of Tiberius Caesar, Pontius Pilate being governor of Judea, and Herod being tetrarch of Galilee, and his brother Philip tetrarch of the region of Ituraea and Trachonitis, and Lysanias tetrarch of Abilene,"
     }
   ],
   "otConnections": [

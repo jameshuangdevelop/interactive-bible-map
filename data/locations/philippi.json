@@ -35,28 +35,83 @@
     }
   ],
   "summary": {
-    "text": "Philippi was a Roman colony in Macedonia, founded by Philip II of Macedon on an earlier Thasian settlement. Acts describes it as the first city in Macedonia where Paul preached, calling it 'a Roman colony,' resulting in the conversion of Lydia and Paul and Silas's imprisonment.",
+    "text": "Philippi was a Roman colony on a partly marshy plain of eastern Macedonia, linked to its port of Neapolis nine miles to the south by a road over the Symbolum ridge, and standing on the Via Egnatia, a Roman road built through the city in the second century BC. Philip II of Macedon, a fourth-century BC king, had refounded the city and named it after himself, drawn by the district's gold mines, but by the time of the Roman general Julius Caesar it had sunk to a small settlement. In 42 BC, Octavian, who later became the emperor Augustus, and Mark Antony defeated Caesar's assassins in a decisive battle outside the city's walls. Philippi then became a Roman colony; it was later reinforced with settlers from Italy and granted a much-coveted privilege that freed its land from taxation.",
     "sources": [
       "pleiades:501482",
       "wikidata:Q379652",
-      "openbible:philippi",
-      "scripture:Acts 16:12",
-      "scripture:Acts 16:14",
-      "scripture:Acts 16:23",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:isbe-philippi",
+      "bib:odysseus-philippi",
+      "bib:odysseus-philippi-history",
+      "bib:worldhistory-julius-caesar"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Acts describes Philippi as \"the foremost\" city of that district of Macedonia and \"a Roman colony,\" and it was the first place in Europe where Paul founded a church. On the Sabbath, Paul and his companions went to a place of prayer by the river, where Lydia, a dealer in purple cloth from Thyatira, believed and was baptized with her household. After Paul drove a \"spirit of divination\" out of a slave girl whose fortune-telling had profited her owners, they had Paul and his companion Silas beaten and imprisoned; a great earthquake that night threw open the prison doors, and the jailer and his household were baptized. Paul's letter to the Philippians is addressed to the church he founded there, and in 1 Thessalonians he recalled that he and his companions had \"suffered before and been shamefully treated... at Philippi.\"",
+      "sources": [
+        "scripture:Acts 16:12",
+        "scripture:Acts 16:13",
+        "scripture:Acts 16:14",
+        "scripture:Acts 16:15",
+        "scripture:Acts 16:16-18",
+        "scripture:Acts 16:19-24",
+        "scripture:Acts 16:25-34",
+        "scripture:Philippians 1:1",
+        "scripture:1 Thessalonians 2:2",
+        "bib:odysseus-philippi-history"
+      ]
+    },
+    {
+      "text": "Philippi became home to one of the earliest Christian communities in Europe, and from the fourth to sixth centuries AD a large cathedral complex known as the Octagon, dedicated to the apostle Paul, was built there, along with three grand basilicas. Earthquakes and Slavic raids led people to leave the lower city early in the seventh century, though a fortress there held out through Byzantine times until the Ottoman conquest at the end of the fourteenth century.",
+      "sources": [
+        "bib:odysseus-philippi",
+        "bib:odysseus-philippi-history"
+      ]
+    },
+    {
+      "text": "Today Philippi is an archaeological site near the village of Krinides, excavated since 1914 and recognized by UNESCO as a World Heritage Site. Visitors can see the city's Hellenistic walls and theatre, the Roman forum, and the remains of the Octagon church complex, with the ancient acropolis rising on the hill above.",
+      "sources": [
+        "wikidata:Q379652",
+        "bib:odysseus-philippi",
+        "bib:odysseus-philippi-history"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 16:12",
       "book": "Acts",
       "textWEB": "and from there to Philippi, which is a city of Macedonia, the foremost of the district, a Roman colony. We were staying some days in this city."
+    },
+    {
+      "ref": "Acts 16:13",
+      "book": "Acts",
+      "textWEB": "On the Sabbath day we went outside of the city by a riverside, where we supposed there was a place of prayer, and we sat down and spoke to the women who had come together."
+    },
+    {
+      "ref": "Acts 16:14",
+      "book": "Acts",
+      "textWEB": "A certain woman named Lydia, a seller of purple, of the city of Thyatira, one who worshiped God, heard us. The Lord opened her heart to listen to the things which were spoken by Paul."
+    },
+    {
+      "ref": "Acts 16:15",
+      "book": "Acts",
+      "textWEB": "When she and her household were baptized, she begged us, saying, “If you have judged me to be faithful to the Lord, come into my house and stay.” So she persuaded us."
+    },
+    {
+      "ref": "Acts 16:16-18",
+      "book": "Acts",
+      "textWEB": "As we were going to prayer, a certain girl having a spirit of divination met us, who brought her masters much gain by fortune telling. Following Paul and us, she cried out, “These men are servants of the Most High God, who proclaim to us a way of salvation!” She was doing this for many days. But Paul, becoming greatly annoyed, turned and said to the spirit, “I command you in the name of Jesus Christ to come out of her!” It came out that very hour."
+    },
+    {
+      "ref": "Acts 16:19-24",
+      "book": "Acts",
+      "textWEB": "But when her masters saw that the hope of their gain was gone, they seized Paul and Silas and dragged them into the marketplace before the rulers. When they had brought them to the magistrates, they said, “These men, being Jews, are agitating our city and advocate customs which it is not lawful for us to accept or to observe, being Romans.” The multitude rose up together against them and the magistrates tore their clothes from them, then commanded them to be beaten with rods. When they had laid many stripes on them, they threw them into prison, charging the jailer to keep them safely. Having received such a command, he threw them into the inner prison and secured their feet in the stocks."
+    },
+    {
+      "ref": "Acts 16:25-34",
+      "book": "Acts",
+      "textWEB": "But about midnight Paul and Silas were praying and singing hymns to God, and the prisoners were listening to them. Suddenly there was a great earthquake, so that the foundations of the prison were shaken; and immediately all the doors were opened, and everyone’s bonds were loosened. The jailer, being roused out of sleep and seeing the prison doors open, drew his sword and was about to kill himself, supposing that the prisoners had escaped. But Paul cried with a loud voice, saying, “Don’t harm yourself, for we are all here!” He called for lights, sprang in, fell down trembling before Paul and Silas, brought them out, and said, “Sirs, what must I do to be saved?” They said, “Believe in the Lord Jesus Christ, and you will be saved, you and your household.” They spoke the word of the Lord to him, and to all who were in his house. He took them the same hour of the night and washed their stripes, and was immediately baptized, he and all his household. He brought them up into his house and set food before them, and rejoiced greatly with all his household, having believed in God."
     },
     {
       "ref": "Acts 20:6",

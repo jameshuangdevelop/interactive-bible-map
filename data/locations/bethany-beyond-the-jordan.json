@@ -24,12 +24,13 @@
       ],
       "coordinateSource": "wikidata:Q12193567",
       "confidence": "medium",
-      "support": "Byzantine-period churches, hermit caves and baptismal structures excavated on the Jordanian east bank match the site's depiction on the sixth-century Madaba mosaic map, making it the most archaeologically supported candidate; this is the basis of its UNESCO World Heritage listing as the traditional site of John's baptisms.",
+      "support": "Byzantine-period churches, hermit caves and baptismal structures excavated on the Jordanian east bank lie at Wadi al-Kharrar, which the sixth-century Madaba mosaic map labels 'Ainon, where now is Sapsaphas' (the map's 'Bethabara', the sanctuary of the baptism, is on the west bank), making it the most archaeologically supported candidate; this is the basis of its UNESCO World Heritage listing as the traditional site of John's baptisms.",
       "sources": [
         "wikidata:Q12193567",
         "openbible:bethany-2",
         "bib:unesco-baptism-site-al-maghtas",
-        "scripture:John 1:28"
+        "scripture:John 1:28",
+        "bib:piccirillo-ainon-sapsaphas"
       ]
     },
     {
@@ -48,34 +49,52 @@
     }
   ],
   "summary": {
-    "text": "Bethany beyond the Jordan, named in John 1:28 as the place where John the Baptist was baptizing, including Jesus, is located east of the Jordan River; its precise site is debated, and the wording itself was altered to 'Bethabara' in some later manuscripts and older English translations.",
+    "text": "Bethany beyond the Jordan was a place in the Jordan Valley that John's Gospel names as where John the Baptist was baptizing; its precise site is debated, and the name itself was altered to \"Bethabara\" in some later manuscripts and older English translations. In this stretch the river divided Perea, on the east bank, ruled by Herod Antipas and then by Herod Agrippa I, from Judea on the west; from AD 44, Roman procurators governed both.",
     "sources": [
       "openbible:bethany-2",
       "bib:hutton-bethany-beyond-jordan",
-      "scripture:John 1:28"
+      "scripture:John 1:28",
+      "bib:josephus-jewish-war",
+      "bib:livius-judaea",
+      "wikidata:Q1003997"
     ]
   },
   "history": [
     {
-      "text": "The third-century scholar Origen could not find a village called Bethany east of the Jordan in his own day and proposed emending the text to 'Bethabara' ('house of the ford'), a reading that entered later manuscripts and older English translations, though the earliest and best-attested Greek manuscripts read 'Bethany.'",
+      "text": "Matthew describes John the Baptist wearing \"clothing made of camel's hair with a leather belt\" and eating \"locusts and wild honey,\" and people from Jerusalem, all of Judea and all the region around the Jordan going out to him to be baptized in the river. Matthew also says that Jesus came from Galilee to the Jordan to be baptized by John, though he does not name the place.",
       "sources": [
+        "scripture:Matthew 3:4",
+        "scripture:Matthew 3:5",
+        "scripture:Matthew 3:6",
+        "scripture:Matthew 3:13"
+      ]
+    },
+    {
+      "text": "The third-century scholar Origen could not find a village called Bethany east of the Jordan in his own day and proposed emending the text to \"Bethabara\" (\"house of the ford\"), a reading that entered later manuscripts and older English translations, though the earliest and best-attested Greek manuscripts read \"Bethany.\" Some scholars have instead proposed a location farther north and east, in the region historically called Batanea, as a better fit for the Gospel's geography and for John the Baptist's later arrest by Herod Antipas; this remains a minority academic view without a single agreed coordinate.",
+      "sources": [
+        "bib:origen-commentary-john",
         "bib:hutton-bethany-beyond-jordan",
-        "scripture:John 1:28"
+        "scripture:John 1:28",
+        "bib:britannica-origen"
       ]
     },
     {
-      "text": "Some scholars have proposed a location farther north and east, in the region historically called Batanea, as a better fit for the Gospel's geography and for John the Baptist's later arrest by Herod Antipas; this remains a minority academic view without a single agreed coordinate.",
+      "text": "This map shows two candidate sites, on opposite banks of the Jordan, and favors neither. At Al-Maghtas, on the east bank, excavations have found Roman and Byzantine churches and chapels, a monastery, hermit caves and baptismal pools, left by monks, hermits and pilgrims between the fourth and fifteenth centuries; UNESCO listed it as a World Heritage Site in 2015. At Qasr al-Yahud, on the west bank, the Franciscans have made a yearly pilgrimage since at least 1641, and eight churches own land near the river. The sixth-century Madaba mosaic map marks \"Bethabara,\" the sanctuary of the baptism, on the west bank, and \"Ainon, where now is Sapsaphas\" at Wadi al-Kharrar on the east.",
       "sources": [
-        "bib:hutton-bethany-beyond-jordan"
+        "wikidata:Q12193567",
+        "bib:unesco-baptism-site-al-maghtas",
+        "wikidata:Q1574073",
+        "bib:custodia-jordan-baptism-site",
+        "bib:piccirillo-ainon-sapsaphas"
       ]
     },
     {
-      "text": "This record's candidate sites lie on opposite banks of the Jordan: the east-bank candidate is in Perea, and the west-bank candidate is in this project's 'Judea' district. Rather than choose between them, this record's parent is the Roman province of Judea, which from AD 44 governed both Judea and the lands east of the Jordan; Josephus records the first procurator, Cuspius Fadus, dealing with a border quarrel between the Jews of Perea and the people of Philadelphia. The minority proposal in Batanea also lay in territory under the same procurators until AD 53.",
+      "text": "Today both banks are visited by pilgrims, with churches of several Christian traditions nearby. At Al-Maghtas pilgrims are still baptized in the river, and part of the west-bank site was reopened to pilgrims in 2011 after decades as a closed, mined military zone.",
       "sources": [
-        "bib:livius-judaea",
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge",
-        "wikidata:Q1003997"
+        "wikidata:Q12193567",
+        "bib:unesco-baptism-site-al-maghtas",
+        "wikidata:Q1574073",
+        "bib:custodia-jordan-baptism-site"
       ]
     }
   ],
@@ -84,6 +103,26 @@
       "ref": "John 1:28",
       "book": "John",
       "textWEB": "These things were done in Bethany beyond the Jordan, where John was baptizing."
+    },
+    {
+      "ref": "Matthew 3:4",
+      "book": "Matthew",
+      "textWEB": "Now John himself wore clothing made of camel’s hair with a leather belt around his waist. His food was locusts and wild honey."
+    },
+    {
+      "ref": "Matthew 3:5",
+      "book": "Matthew",
+      "textWEB": "Then people from Jerusalem, all of Judea, and all the region around the Jordan went out to him."
+    },
+    {
+      "ref": "Matthew 3:6",
+      "book": "Matthew",
+      "textWEB": "They were baptized by him in the Jordan, confessing their sins."
+    },
+    {
+      "ref": "Matthew 3:13",
+      "book": "Matthew",
+      "textWEB": "Then Jesus came from Galilee to the Jordan to John, to be baptized by him."
     }
   ],
   "otConnections": [],

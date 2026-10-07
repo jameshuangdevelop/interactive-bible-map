@@ -34,30 +34,60 @@
     }
   ],
   "summary": {
-    "text": "Corinth was a major commercial center on the isthmus linking central Greece to the Peloponnese; after Julius Caesar refounded it as a Roman colony in 44 BC it became, per World History Encyclopedia, an important center of Roman administration and trade. Paul spent eighteen months founding a church there on his second journey, an episode Acts ties to his appearance before the proconsul Gallio, and later wrote 1 and 2 Corinthians to the congregation.",
+    "text": "Corinth stood on the narrow isthmus joining central Greece to the Peloponnese, below the steep rock of Acrocorinthus, a citadel hill rising more than 1,800 feet directly south of the city. The Roman general Mummius destroyed the Greek city in 146 BC, and the Roman leader Julius Caesar refounded it as a Roman colony in 44 BC; it grew quickly, and by Paul's time it was the leading city of the Peloponnese. Corinth's twin harbors, Lechaeum on the Corinthian Gulf and Cenchreae on the Saronic Gulf, let traders avoid the long voyage around the Peloponnese by hauling smaller ships overland on a paved track, the diolkos.",
     "sources": [
       "pleiades:570182",
       "wikidata:Q1363688",
-      "openbible:corinth",
+      "bib:isbe-corinth",
       "bib:worldhistory-corinth",
-      "scripture:Acts 18:11",
-      "scripture:Acts 18:12",
-      "scripture:1 Corinthians 1:2",
-      "scripture:2 Corinthians 1:1",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:worldhistory-julius-caesar"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "Acts reports that Paul spent eighteen months in Corinth, lodging and working as a tentmaker alongside the Jewish couple Priscilla and Aquila and teaching the word of God there. When the city's Jewish community brought him before the Roman proconsul Gallio, Gallio refused to judge what he called a dispute about Jewish law rather than a crime, and had the accusers driven from his court. The congregation Paul founded there included members with Latin names such as Crispus, Gaius, and Erastus, reflecting the strongly Roman character of Caesar's colony, and Paul later wrote both 1 Corinthians and 2 Corinthians to the church there.",
+      "sources": [
+        "scripture:Acts 18:2",
+        "scripture:Acts 18:3",
+        "scripture:Acts 18:11",
+        "scripture:Acts 18:12",
+        "scripture:Acts 18:14-15",
+        "scripture:1 Corinthians 1:2",
+        "scripture:2 Corinthians 1:1",
+        "bib:isbe-corinth",
+        "scripture:Acts 18:16"
+      ]
+    },
+    {
+      "text": "Some years after Paul's visit, in AD 66-67, the emperor Nero tried to cut a ship canal through the isthmus so that vessels could avoid the overland crossing entirely; the project was never finished, and traces of Nero's unfinished canal were still visible before work began on the modern Corinth Canal.",
+      "sources": [
+        "bib:isbe-corinth",
+        "bib:worldhistory-nero"
+      ]
+    },
+    {
+      "text": "Today the ruins of ancient Corinth, a few kilometers from the modern city of the same name, form an archaeological site first excavated in 1892. Its best-known standing monument is the Temple of Apollo, built in the sixth century BC, of which seven of the original stone columns still stand.",
+      "sources": [
+        "bib:worldhistory-corinth",
+        "wikidata:Q1363688"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 18:1",
       "book": "Acts",
       "textWEB": "After these things Paul departed from Athens and came to Corinth."
+    },
+    {
+      "ref": "Acts 18:2",
+      "book": "Acts",
+      "textWEB": "He found a certain Jew named Aquila, a man of Pontus by race, who had recently come from Italy with his wife Priscilla, because Claudius had commanded all the Jews to depart from Rome. He came to them,"
+    },
+    {
+      "ref": "Acts 18:3",
+      "book": "Acts",
+      "textWEB": "and because he practiced the same trade, he lived with them and worked, for by trade they were tent makers."
     },
     {
       "ref": "Acts 18:8",
@@ -73,6 +103,11 @@
       "ref": "Acts 18:12",
       "book": "Acts",
       "textWEB": "But when Gallio was proconsul of Achaia, the Jews with one accord rose up against Paul and brought him before the judgment seat,"
+    },
+    {
+      "ref": "Acts 18:14-15",
+      "book": "Acts",
+      "textWEB": "But when Paul was about to open his mouth, Gallio said to the Jews, “If indeed it were a matter of wrong or of wicked crime, you Jews, it would be reasonable that I should bear with you; but if they are questions about words and names and your own law, look to it yourselves. For I don’t want to be a judge of these matters.”"
     },
     {
       "ref": "Acts 18:18",
@@ -108,6 +143,11 @@
       "ref": "2 Timothy 4:20",
       "book": "2 Timothy",
       "textWEB": "Erastus remained at Corinth, but I left Trophimus at Miletus sick."
+    },
+    {
+      "ref": "Acts 18:16",
+      "book": "Acts",
+      "textWEB": "So he drove them from the judgment seat."
     }
   ],
   "otConnections": [],

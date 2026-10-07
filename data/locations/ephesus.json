@@ -34,27 +34,47 @@
     }
   ],
   "summary": {
-    "text": "Ephesus was, per Pleiades, 'the most important ancient metropolis of Ionian Asia Minor,' and home to the great temple of Artemis, a scene Acts 19:35 confirms by calling Ephesus 'temple keeper of the great goddess Artemis.' Paul spent about three years there on his third journey, and the city is addressed directly in Ephesians, 1 and 2 Timothy, and Revelation.",
+    "text": "Ephesus stood near the mouth of the Cayster river, on the slopes of two hills, Prion and Coressus, about three miles from the Aegean coast opposite the island of Samos. An artificial harbor with a sea channel, and roads running inland, made Ephesus the most easily reached city in the province of Asia, by both land and sea. The city's greatest landmark was the Temple of Artemis, one of the Seven Wonders of the ancient world: a temple open to the sky, about 425 feet long, ringed by 127 columns 60 feet high. Acts records the Ephesians' own pride in guarding this temple, calling their city \"temple keeper of the great goddess Artemis.\"",
     "sources": [
       "pleiades:599612",
       "wikidata:Q47611",
-      "openbible:ephesus",
+      "bib:isbe-ephesus",
       "scripture:Acts 19:35",
-      "scripture:Acts 20:31",
-      "scripture:Ephesians 1:1",
-      "scripture:1 Timothy 1:3",
-      "scripture:2 Timothy 4:12",
-      "scripture:Revelation 1:11",
-      "scripture:Revelation 2:1",
-      "bib:niv-2011-biblegateway",
-      "bib:esv-2025-biblegateway",
-      "bib:nlt-2015-biblegateway",
-      "bib:kjv-1987-biblegateway",
-      "bib:nkjv-1982-biblegateway",
-      "bib:csb-2017-biblegateway"
+      "bib:unesco-ephesus"
     ]
   },
-  "history": [],
+  "history": [
+    {
+      "text": "According to Acts, Paul spent about three years in Ephesus, reasoning daily in a lecture hall called the school of Tyrannus. When his preaching hurt the business of craftsmen who made silver shrines of Artemis, the silversmith Demetrius stirred up a riot: a crowd dragged two of Paul's companions into the city's great theatre and shouted for two hours, \"Great is Artemis of the Ephesians!\" Paul's letter to the Ephesians is addressed to believers in the city; 1 and 2 Timothy also mention Ephesus, and it is the first of the seven churches addressed in Revelation.",
+      "sources": [
+        "scripture:Acts 19:9",
+        "scripture:Acts 19:24",
+        "scripture:Acts 19:28",
+        "scripture:Acts 19:29",
+        "scripture:Acts 19:34",
+        "scripture:Ephesians 1:1",
+        "scripture:1 Timothy 1:3",
+        "scripture:2 Timothy 4:12",
+        "scripture:Revelation 1:11",
+        "scripture:Revelation 2:1",
+        "scripture:Acts 20:31"
+      ]
+    },
+    {
+      "text": "In the second century AD, long after Paul's time, Ephesus gained some of the grand buildings seen there today, including the Library of Celsus, built as a tomb and library for the Roman senator Tiberius Julius Celsus Polemaeanus. Pilgrims from across the Mediterranean had once come to the Temple of Artemis; from the fifth century, Christian pilgrims came instead to the Church of Mary and the Basilica of St. John.",
+      "sources": [
+        "bib:oeaw-celsus-library",
+        "bib:unesco-ephesus"
+      ]
+    },
+    {
+      "text": "Today the ruins of Ephesus, near the town of Selçuk in Türkiye, are a UNESCO World Heritage Site. Visitors walk its old processional way past the Library of Celsus and the Great Theatre, though little remains of the Temple of Artemis itself.",
+      "sources": [
+        "wikidata:Q47611",
+        "bib:unesco-ephesus"
+      ]
+    }
+  ],
   "scripture": [
     {
       "ref": "Acts 18:19",
@@ -82,6 +102,11 @@
       "textWEB": "While Apollos was at Corinth, Paul, having passed through the upper country, came to Ephesus and found certain disciples."
     },
     {
+      "ref": "Acts 19:9",
+      "book": "Acts",
+      "textWEB": "But when some were hardened and disobedient, speaking evil of the Way before the multitude, he departed from them and separated the disciples, reasoning daily in the school of Tyrannus."
+    },
+    {
       "ref": "Acts 19:17",
       "book": "Acts",
       "textWEB": "This became known to all, both Jews and Greeks, who lived at Ephesus. Fear fell on them all, and the name of the Lord Jesus was magnified."
@@ -92,9 +117,29 @@
       "textWEB": "About that time there arose no small disturbance concerning the Way."
     },
     {
+      "ref": "Acts 19:24",
+      "book": "Acts",
+      "textWEB": "For a certain man named Demetrius, a silversmith who made silver shrines of Artemis, brought no little business to the craftsmen,"
+    },
+    {
       "ref": "Acts 19:26",
       "book": "Acts",
       "textWEB": "You see and hear that not at Ephesus alone, but almost throughout all Asia, this Paul has persuaded and turned away many people, saying that they are no gods that are made with hands."
+    },
+    {
+      "ref": "Acts 19:28",
+      "book": "Acts",
+      "textWEB": "When they heard this they were filled with anger, and cried out, saying, “Great is Artemis of the Ephesians!”"
+    },
+    {
+      "ref": "Acts 19:29",
+      "book": "Acts",
+      "textWEB": "The whole city was filled with confusion, and they rushed with one accord into the theater, having seized Gaius and Aristarchus, men of Macedonia, Paul’s companions in travel."
+    },
+    {
+      "ref": "Acts 19:34",
+      "book": "Acts",
+      "textWEB": "But when they perceived that he was a Jew, all with one voice for a time of about two hours cried out, “Great is Artemis of the Ephesians!”"
     },
     {
       "ref": "Acts 19:35",
@@ -155,6 +200,11 @@
       "ref": "Revelation 2:1",
       "book": "Revelation",
       "textWEB": "“To the angel of the assembly in Ephesus write: “He who holds the seven stars in his right hand, he who walks among the seven golden lamp stands says these things:"
+    },
+    {
+      "ref": "Acts 20:31",
+      "book": "Acts",
+      "textWEB": "Therefore watch, remembering that for a period of three years I didn’t cease to admonish everyone night and day with tears."
     }
   ],
   "otConnections": [],
