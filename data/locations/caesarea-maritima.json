@@ -6,6 +6,9 @@
       "Strato's Tower"
     ],
     "modern": "Caesarea",
+    "modernCountries": [
+      "Israel"
+    ],
     "alternate": [
       "Straton's Tower",
       "Caesarea"
@@ -146,5 +149,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

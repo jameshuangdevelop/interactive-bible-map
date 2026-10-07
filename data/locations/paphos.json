@@ -6,6 +6,9 @@
       "Nea Paphos"
     ],
     "modern": "Kato Paphos",
+    "modernCountries": [
+      "Cyprus"
+    ],
     "alternate": [
       "New Paphos"
     ]
@@ -58,5 +61,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

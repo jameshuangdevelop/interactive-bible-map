@@ -44,8 +44,10 @@ test("buildAppData writes compact index fields and candidate fields", async () =
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This fixture predates the empire/province hierarchy (M3-11).
+      // This fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
       requireEmpireRoot: false,
+      requireModernCountries: false,
       outputDirectory
     });
 
@@ -78,8 +80,10 @@ test("buildAppData writes one place file per location and resolves bibliography"
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This fixture predates the empire/province hierarchy (M3-11).
+      // This fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
       requireEmpireRoot: false,
+      requireModernCountries: false,
       outputDirectory
     });
 
@@ -139,8 +143,10 @@ test("buildAppData with fixture directories is isolated from repository prompt b
         bibliographyPath: bibliographyFixturePath,
         webVplPath: webFixturePath,
         skipSnapshotChecksumCheck: true,
-        // This fixture predates the empire/province hierarchy (M3-11).
+        // This fixture predates the empire/province hierarchy (M3-11)
+        // and names.modernCountries.
         requireEmpireRoot: false,
+        requireModernCountries: false,
         outputDirectory
       });
 
@@ -181,7 +187,7 @@ test("buildAppData fails when validation fails", async () => {
   });
 });
 
-test("buildAppData omits names.otherLanguages from index and place payload outputs", async () => {
+test("buildAppData omits names.otherLanguages but keeps names.modernCountries in index and place payload outputs", async () => {
   await withTempDirectory(async (temporaryDirectory) => {
     const locationsDirectory = path.join(temporaryDirectory, "locations");
     const mediaDirectory = path.join(temporaryDirectory, "media");
@@ -199,6 +205,7 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
       ancient: ["Capernaum"],
       modern: "Tell Hum",
       alternate: [],
+      modernCountries: ["Israel"],
       otherLanguages: ["Kfar Nahum"]
     };
 
@@ -223,8 +230,10 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
-      // This fixture predates the empire/province hierarchy (M3-11).
+      // This fixture predates the empire/province hierarchy (M3-11)
+      // and names.modernCountries.
       requireEmpireRoot: false,
+      requireModernCountries: false,
       outputDirectory
     });
 
@@ -239,10 +248,12 @@ test("buildAppData omits names.otherLanguages from index and place payload outpu
 
     assert.equal(Object.hasOwn(capernaumIndex.names, "otherLanguages"), false);
     assert.equal(Object.hasOwn(galileeIndex.names, "otherLanguages"), false);
+    assert.deepEqual(capernaumIndex.names.modernCountries, ["Israel"]);
     assert.equal(
       Object.hasOwn(capernaumPlacePayload.location.names, "otherLanguages"),
       false
     );
+    assert.deepEqual(capernaumPlacePayload.location.names.modernCountries, ["Israel"]);
   });
 });
 
@@ -315,6 +326,8 @@ test("buildAppData keeps empire/province types and parent chain in places.index"
       bibliographyPath: bibliographyFixturePath,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
+      // This fixture predates names.modernCountries.
+      requireModernCountries: false,
       outputDirectory
     });
 

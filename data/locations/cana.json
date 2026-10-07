@@ -6,6 +6,10 @@
       "Cana of Galilee",
       "Cana in Galilee"
     ],
+    "modernCountries": [
+      "Israel",
+      "Lebanon"
+    ],
     "alternate": []
   },
   "type": "village",
@@ -141,5 +145,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }
