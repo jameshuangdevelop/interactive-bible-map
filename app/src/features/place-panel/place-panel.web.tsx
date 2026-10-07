@@ -1526,8 +1526,12 @@ export function PlacePanel({
         return;
       }
 
-      preserveTogglePosition(topBeforeCollapse, 3, () => {
-        showAllScriptureToggleRef.current?.focus({ preventScroll: true });
+      preserveTogglePosition(topBeforeCollapse, 6, () => {
+        const focusedButton = showAllScriptureToggleRef.current;
+        focusedButton?.focus({ preventScroll: true });
+        window.requestAnimationFrame(() => {
+          preserveTogglePosition(topBeforeCollapse, 3, () => {});
+        });
       });
     });
   };

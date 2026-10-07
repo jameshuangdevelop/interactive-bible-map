@@ -72,12 +72,16 @@ const sourceAreaLabelsId = "ibm-area-labels";
 const sourceKeyboardFocusId = "ibm-keyboard-focus";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
+const layerMajorClusterLabelEphesusId = "ibm-major-cluster-label-ephesus";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
 const layerMajorPinShadowId = "ibm-major-pin-shadow";
 const layerMajorPinId = "ibm-major-pin";
 const layerMajorQuestionBadgeId = "ibm-major-question-badge";
 const layerMajorClusterCollisionMaskId = "ibm-major-cluster-collision-mask";
 const layerMajorPinCollisionMaskId = "ibm-major-pin-collision-mask";
+const layerMajorPinLabelEastEdgeId = "ibm-pin-label-east-edge";
+const layerMajorPinLabelLaodiceaId = "ibm-pin-label-laodicea";
+const layerMajorPinLabelThessalonicaId = "ibm-pin-label-thessalonica";
 const layerMajorPinLabelId = "ibm-pin-label";
 const layerMajorAreaLabelOverviewId = "ibm-major-area-label-overview";
 const layerMajorAreaLabelId = "ibm-major-area-label";
@@ -113,7 +117,8 @@ const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
 const majorInteractionPreferencePx = 3;
-const majorClusterRadiusPx = 10;
+const majorClusterMaxZoom = 5;
+const majorClusterRadiusPx = 20;
 const standardClusterRadiusPx = 52;
 const standardMutedThresholdZoom = 6;
 const mainStyleReliefLayerId = "natural_earth";
@@ -207,6 +212,11 @@ const areaLabelPointLayout = {
   "text-anchor": "center" as const,
   "text-justify": "center" as const,
   "text-offset": [0, 0] as [number, number]
+};
+const majorPinLabelLayout = {
+  "text-offset": [1.2, 0] as [number, number],
+  "text-anchor": "left" as const,
+  "text-justify": "left" as const
 };
 
 type RuntimeTuning = ReturnType<typeof resolveMapRuntimeTuning>;
@@ -934,7 +944,7 @@ function ensureMapLayers(
       source: sourceMajorCityPinsId,
       type: "circle",
       filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      maxzoom: majorClusterMaxZoom + 1,
       paint: {
         "circle-radius": ["step", ["get", "point_count"], 9, 8, 10, 20, 11],
         "circle-color": toExpression(createMajorClusterTopColorMatchExpression(majorPlaceByRank)),
@@ -1132,7 +1142,7 @@ function ensureMapLayers(
       source: sourceMajorCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      maxzoom: majorClusterMaxZoom + 1,
       layout: {
         "icon-size": 1,
         "icon-anchor": "center",
@@ -1320,39 +1330,166 @@ function ensureMapLayers(
     });
   }
 
+  if (!map.getLayer(layerMajorClusterLabelEphesusId)) {
+    map.addLayer({
+      id: layerMajorClusterLabelEphesusId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["has", "point_count"],
+        [
+          "any",
+          ["==", ["get", "minImportanceRank"], 3],
+          ["==", ["get", "minImportanceRank"], 7]
+        ]
+      ]),
+      maxzoom: majorClusterMaxZoom + 1,
+      layout: {
+        "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [-2.2, 0],
+        "text-anchor": "right",
+        "text-justify": "right",
+        "symbol-sort-key": ["get", "minImportanceRank"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
   if (!map.getLayer(layerMajorClusterLabelId)) {
     map.addLayer({
       id: layerMajorClusterLabelId,
       source: sourceMajorCityPinsId,
       type: "symbol",
-      filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      filter: toLayerFilter([
+        "all",
+        ["has", "point_count"],
+        ["!=", ["get", "minImportanceRank"], 3],
+        ["!=", ["get", "minImportanceRank"], 7]
+      ]),
+      maxzoom: majorClusterMaxZoom + 1,
       layout: {
         "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
         "text-font": ["Noto Sans Bold"],
         "text-size": 12,
-        "text-variable-anchor": [
-          "right",
-          "left",
-          "top",
-          "bottom",
-          "top-right",
-          "top-left",
-          "bottom-right",
-          "bottom-left"
-        ] as [
-          "right",
-          "left",
-          "top",
-          "bottom",
-          "top-right",
-          "top-left",
-          "bottom-right",
-          "bottom-left"
-        ],
-        "text-radial-offset": 1.2,
-        "text-justify": "auto" as const,
+        "text-offset": [1.2, 0],
+        "text-anchor": "left",
+        "text-justify": "left",
         "symbol-sort-key": ["get", "minImportanceRank"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  moveLayerBefore(map, layerMajorClusterLabelId, layerMajorClusterLabelEphesusId);
+
+  if (!map.getLayer(layerMajorPinLabelThessalonicaId)) {
+    map.addLayer({
+      id: layerMajorPinLabelThessalonicaId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "placeId"], "thessalonica"]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["bottom", "top"] as ["bottom", "top"],
+        "text-radial-offset": 0.9,
+        "text-justify": "auto" as const,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorPinLabelEastEdgeId)) {
+    map.addLayer({
+      id: layerMajorPinLabelEastEdgeId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true],
+        [
+          "any",
+          ["==", ["get", "placeId"], "antioch-syria"],
+          ["==", ["get", "placeId"], "damascus"]
+        ]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [-1.2, 0],
+        "text-anchor": "right",
+        "text-justify": "right",
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorPinLabelLaodiceaId)) {
+    map.addLayer({
+      id: layerMajorPinLabelLaodiceaId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "placeId"], "laodicea"]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [-1.2, 0],
+        "text-anchor": "right",
+        "text-justify": "right",
+        "symbol-sort-key": ["get", "labelPriority"],
         "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": true
@@ -1375,33 +1512,17 @@ function ensureMapLayers(
         ["!", ["has", "point_count"]],
         basePinVisibilityFilter,
         ["!=", ["get", "labelText"], null],
-        ["!=", ["get", "isSelectedPlace"], true]
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["!=", ["get", "placeId"], "thessalonica"],
+        ["!=", ["get", "placeId"], "antioch-syria"],
+        ["!=", ["get", "placeId"], "damascus"],
+        ["!=", ["get", "placeId"], "laodicea"]
       ]),
       layout: {
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 12,
-        "text-variable-anchor": [
-          "right",
-          "left",
-          "top",
-          "bottom",
-          "top-right",
-          "top-left",
-          "bottom-right",
-          "bottom-left"
-        ] as [
-          "right",
-          "left",
-          "top",
-          "bottom",
-          "top-right",
-          "top-left",
-          "bottom-right",
-          "bottom-left"
-        ],
-        "text-radial-offset": 1.2,
-        "text-justify": "auto" as const,
+        ...majorPinLabelLayout,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-allow-overlap": false,
         "text-ignore-placement": false,
@@ -1414,6 +1535,10 @@ function ensureMapLayers(
       }
     });
   }
+
+  moveLayerBefore(map, layerMajorPinLabelId, layerMajorPinLabelEastEdgeId);
+  moveLayerBefore(map, layerMajorPinLabelId, layerMajorPinLabelLaodiceaId);
+  moveLayerBefore(map, layerMajorPinLabelId, layerMajorPinLabelThessalonicaId);
 
   if (!map.getLayer(layerSelectedAreaLabelId)) {
     map.addLayer({
@@ -2026,7 +2151,7 @@ export function MapView({
 
     ensureGeoJsonSource(map, sourceMajorCityPinsId, renderData.majorCityPins, {
       cluster: true,
-      clusterMaxZoom: CLUSTER_MAX_ZOOM,
+      clusterMaxZoom: majorClusterMaxZoom,
       clusterRadius: majorClusterRadiusPx,
       clusterProperties: {
         minImportanceRank: ["min", ["get", "importanceRank"]]
