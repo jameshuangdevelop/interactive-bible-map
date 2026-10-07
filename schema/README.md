@@ -28,6 +28,83 @@ All example values below are **illustrative only** (not verified historical clai
 - Years are integers.
 - BC years are negative.
 - **Year 0 is not allowed.**
+- Timeline and political-history periods use **half-open intervals**: `[fromYear, toYear)`.
+  - `toYear` is the first year of the next period.
+  - `[-1, 1)` means **1 BC only** (it does not include AD 1).
+  - With `range: { fromYear: -4, toYear: 101 }`, AD 100 is the last shown year.
+
+### Timeline and ancient layer (M4)
+- Canonical political timeline data lives in `data/timeline.json` (CC BY-SA 4.0), validated by `schema/timeline.schema.json`.
+- Ancient geometry lives in `data/geo/` (ODbL 1.0), validated by:
+  - `schema/ancient-areas.schema.json`
+  - `schema/ancient-roads.schema.json`
+  - `schema/ancient-coastline.schema.json`
+- In production/CI, if `data/timeline.json` is absent, validation skips timeline rules and `build:data` skips ancient generated outputs.
+- For development before M4-02 lands factual timeline data, generate ancient app payloads from the fixture with `npm run build:data -- --ancient-source tests/fixtures/ancient`.
+- The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
+- Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
+- Periods may start before `range.fromYear` or end after `range.toYear` (for example a kingdom lasting to AD 106); validation allows this and build-time stop assignment clips naturally to the configured timeline range.
+- `entities[].kind` also supports `uncertain` for intervals where sources are unclear or in conflict; these still set `romanSide` so the empire edge remains accurate.
+- `romanSide` must match `kind`: `outside-empire` is `false`, Roman-side kinds (`roman-province`, `client-kingdom`, `client-tetrarchy`, `free-city-or-league`) are `true`, and `uncertain` can be either.
+- `areas[].periods[]` supports an optional `note` for short source-backed uncertainty/explanation text.
+
+Small timeline example:
+
+```json
+{
+  "range": { "fromYear": -4, "toYear": 101, "defaultYear": 50 },
+  "stops": [{ "id": "4bc", "year": -4 }, { "id": "ad44", "year": 44 }],
+  "entities": [{ "id": "province-judaea", "kind": "roman-province", "romanSide": true }],
+  "areas": [{
+    "id": "galilee",
+    "periods": [
+      { "fromYear": -4, "toYear": 44, "holderId": "client-antipas" },
+      { "fromYear": 44, "toYear": 101, "holderId": "province-judaea" }
+    ]
+  }]
+}
+```
+
+Small area-shape example with provenance:
+
+```json
+{
+  "type": "Feature",
+  "properties": {
+    "areaId": "galilee",
+    "provenance": {
+      "dataset": "AWMC geodata",
+      "version": "commit:<sha>",
+      "upstreamFeatureIds": ["awmc:feature-123"],
+      "changes": [{ "kind": "line-merge", "detail": "Merged boundary segments", "sources": ["bib:..."] }]
+    }
+  },
+  "geometry": { "type": "Polygon", "coordinates": [[[35.1, 32.9], [35.2, 32.9], [35.2, 33.0], [35.1, 33.0], [35.1, 32.9]]] }
+}
+```
+
+Generated app payloads:
+- `app/public/generated/ancient.timeline.json` (stops + entities)
+- `app/public/generated/ancient.shapes.json` (full + zoom<=10 simplified shapes)
+- `app/public/generated/ancient.roads.geojson`
+- `app/public/generated/ancient.coastline.geojson`
+- `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
+  - Stop-area assignments carry each period's optional `note`.
+  - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
+
+Places and political history:
+- `politicalAreaId` links a location to one timeline area.
+- `candidates[].politicalAreaId` links a specific candidate site to its own timeline area when candidates fall in different areas.
+- A record uses **either** place-level `politicalAreaId` **or** candidate-level `candidates[].politicalAreaId` links, never both.
+- `politicalHistoryOverrides[]` and `candidates[].politicalHistoryOverrides[]` store place- or candidate-level exceptions.
+- `npm run fill:political-history` rewrites `politicalHistory[]` from timeline periods + overrides and includes `holderId`.
+- For candidate-level derivation, each generated political-history entry also carries `candidate` as a zero-based candidate index.
+- The validator can enforce exact derived/stored equality with `REQUIRE_DERIVED_POLITICAL_HISTORY=true` (default is off until timeline research lands).
+
+GIS terms used here:
+- **Topology-aware simplification** means simplifying shared boundaries once so neighboring polygons still share exactly the same border, which avoids slivers and overlaps; see TopoJSON simplification docs: <https://github.com/topojson/topojson-simplify>.
+- A **mesh** is a derived line layer of shared polygon edges, which we use to draw one border per holder pair; see `topojson-client` mesh: <https://github.com/topojson/topojson-client#mesh>.
+- **Polylabel** finds a point deep inside a polygon for stable labels, even on irregular shapes: <https://github.com/mapbox/polylabel>.
 
 ### Zoom tiers
 - `mediterranean`: broad world context.

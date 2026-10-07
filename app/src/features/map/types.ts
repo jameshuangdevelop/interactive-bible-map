@@ -75,7 +75,16 @@ export interface OtConnectionEntry {
 export interface PoliticalHistoryEntry {
   fromYear: number;
   toYear: number;
+  holderId?: string;
   entity: string;
+  sources: SourceId[];
+}
+
+export interface PoliticalHistoryOverrideEntry {
+  fromYear: number;
+  toYear: number;
+  holderId: string;
+  ruler?: string;
   sources: SourceId[];
 }
 
@@ -85,6 +94,8 @@ export interface PlaceRecord extends PlaceIndexRecord {
   history: SourcedTextEntry[];
   scripture: ScriptureEntry[];
   otConnections: OtConnectionEntry[];
+  politicalAreaId?: string;
+  politicalHistoryOverrides?: PoliticalHistoryOverrideEntry[];
   politicalHistory: PoliticalHistoryEntry[];
   status: "draft" | "verified";
   verifiedBy?: string;

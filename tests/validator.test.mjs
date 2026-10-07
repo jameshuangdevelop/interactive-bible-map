@@ -28,6 +28,23 @@ const webSnapshotMetadataMismatchPath = path.join(
   "engwebp-mini.metadata.bad.json"
 );
 const bibliographyFixturePath = path.join(fixturesDirectory, "bibliography.json");
+const ancientFixtureDirectory = path.join(fixturesDirectory, "ancient");
+const ancientTimelineFixturePath = path.join(ancientFixtureDirectory, "timeline.json");
+const ancientAreasFixturePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "ancient-areas.geojson"
+);
+const ancientRoadsFixturePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "ancient-roads.geojson"
+);
+const ancientCoastlineFixturePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "ancient-coastline.geojson"
+);
 
 const locationSchemaPath = path.join(
   testDirectory,
@@ -267,6 +284,68 @@ async function runWithTemporaryHierarchyCase(mutateLocations, options = {}) {
       // This helper's cityData/provinceData/empireData literals above don't
       // set names.modernCountries; default it off here and let the tests
       // that exercise the modern-countries rule pass it explicitly.
+      requireModernCountries: false,
+      ...validationOptions
+    });
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
+async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
+  const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-ancient-"));
+
+  try {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    const geoDirectory = path.join(temporaryDirectory, "geo");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+    fs.mkdirSync(geoDirectory, { recursive: true });
+
+    for (const locationFile of ["capernaum.json", "galilee.json"]) {
+      fs.copyFileSync(
+        path.join(validCaseDirectory, "locations", locationFile),
+        path.join(locationsDirectory, locationFile)
+      );
+    }
+    fs.copyFileSync(
+      path.join(validCaseDirectory, "media", "capernaum.json"),
+      path.join(mediaDirectory, "capernaum.json")
+    );
+
+    const timeline = JSON.parse(fs.readFileSync(ancientTimelineFixturePath, "utf8"));
+    const areas = JSON.parse(fs.readFileSync(ancientAreasFixturePath, "utf8"));
+    const roads = JSON.parse(fs.readFileSync(ancientRoadsFixturePath, "utf8"));
+    const coastline = JSON.parse(fs.readFileSync(ancientCoastlineFixturePath, "utf8"));
+
+    if (typeof mutateAncient === "function") {
+      mutateAncient({ timeline, areas, roads, coastline });
+    }
+
+    const timelinePath = path.join(temporaryDirectory, "timeline.json");
+    const areasPath = path.join(geoDirectory, "ancient-areas.geojson");
+    const roadsPath = path.join(geoDirectory, "ancient-roads.geojson");
+    const coastlinePath = path.join(geoDirectory, "ancient-coastline.geojson");
+    fs.writeFileSync(timelinePath, `${JSON.stringify(timeline, null, 2)}\n`);
+    fs.writeFileSync(areasPath, `${JSON.stringify(areas, null, 2)}\n`);
+    fs.writeFileSync(roadsPath, `${JSON.stringify(roads, null, 2)}\n`);
+    fs.writeFileSync(coastlinePath, `${JSON.stringify(coastline, null, 2)}\n`);
+
+    const { webVplPath = webFixturePath, ...validationOptions } = options;
+    return await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      timelinePath,
+      ancientAreasPath: areasPath,
+      ancientRoadsPath: roadsPath,
+      ancientCoastlinePath: coastlinePath,
+      imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
+      aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
+      webVplPath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
       requireModernCountries: false,
       ...validationOptions
     });
@@ -1924,4 +2003,553 @@ test("names.modern matching an ancient name is not a duplicate error (Rome case)
     ),
     false
   );
+});
+
+test("ancient timeline fixture is valid with ancient-shape requirement enabled", async () => {
+  const result = await runWithTemporaryAncientCase(undefined, {
+    requireAncientShapes: true
+  });
+  assert.equal(result.errors.length, 0);
+});
+
+test("missing timeline file is allowed and skips timeline validation", async () => {
+  const result = await runCase("valid", {
+    timelinePath: path.join(os.tmpdir(), `ibm-missing-timeline-${Date.now()}.json`)
+  });
+  assert.equal(result.errors.length, 0);
+});
+
+test("ancient timeline catches unknown holder ids", async () => {
+  const result = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.areas[0].periods[0].holderId = "missing-holder";
+  });
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.areas[0].periods[0].holderId" &&
+        /Unknown holder id/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient timeline catches range coverage gaps and overlaps", async () => {
+  const gapResult = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.areas[1].periods = [
+      {
+        "fromYear": -4,
+        "toYear": 10,
+        "holderId": "client-antipas",
+        "sources": ["bib:existing-bib-source"]
+      },
+      {
+        "fromYear": 20,
+        "toYear": 101,
+        "holderId": "client-antipas",
+        "sources": ["bib:existing-bib-source"]
+      }
+    ];
+  });
+  assert.equal(
+    hasError(gapResult, (error) => /coverage gap inside \[-4, 101\)/u.test(error.message)),
+    true
+  );
+
+  const overlapResult = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.areas[1].periods = [
+      {
+        "fromYear": -4,
+        "toYear": 50,
+        "holderId": "client-antipas",
+        "sources": ["bib:existing-bib-source"]
+      },
+      {
+        "fromYear": 40,
+        "toYear": 101,
+        "holderId": "client-antipas",
+        "sources": ["bib:existing-bib-source"]
+      }
+    ];
+  });
+  assert.equal(
+    hasError(overlapResult, (error) => /overlapping periods inside \[-4, 101\)/u.test(error.message)),
+    true
+  );
+});
+
+test("ancient timeline catches stops with no boundary event and missing default-year stop", async () => {
+  const noBoundaryStop = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.stops[1].year = 45;
+  });
+  assert.equal(
+    hasError(
+      noBoundaryStop,
+      (error) =>
+        error.path === "$.stops[1].year" &&
+        /holder or ruler change/u.test(error.message)
+    ),
+    true
+  );
+
+  const noDefaultStop = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.range.defaultYear = -2;
+    timeline.stops = [
+      {
+        "id": "ad44",
+        "year": 44,
+        "title": "Fixture change",
+        "summary": "Fixture state change.",
+        "sources": ["bib:existing-bib-source"]
+      }
+    ];
+  });
+  assert.equal(
+    hasError(
+      noDefaultStop,
+      (error) =>
+        error.path === "$.range.defaultYear" &&
+        /covered by at least one timeline stop/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient timeline rejects adjacent duplicate holder+ruler periods", async () => {
+  const result = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.areas[0].periods = [
+      {
+        fromYear: -4,
+        toYear: 44,
+        holderId: "client-antipas",
+        ruler: "Herod Antipas",
+        sources: ["bib:existing-bib-source"]
+      },
+      {
+        fromYear: 44,
+        toYear: 101,
+        holderId: "client-antipas",
+        ruler: "Herod Antipas",
+        sources: ["bib:existing-bib-source"]
+      }
+    ];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.areas[0].periods" &&
+        /must be merged/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient timeline stop must represent holder or ruler change", async () => {
+  const result = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.stops[1].year = 50;
+    timeline.areas[0].periods = [
+      {
+        fromYear: -4,
+        toYear: 50,
+        holderId: "client-antipas",
+        sources: ["bib:existing-bib-source"]
+      },
+      {
+        fromYear: 50,
+        toYear: 101,
+        holderId: "client-antipas",
+        sources: ["bib:existing-bib-source"]
+      }
+    ];
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.stops[1].year" &&
+        /holder or ruler change/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient timeline enforces entity kind and romanSide consistency", async () => {
+  const outsideMismatch = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.entities.find((entity) => entity.id === "outside-parthia").romanSide = true;
+  });
+  assert.equal(
+    hasError(
+      outsideMismatch,
+      (error) =>
+        error.path.includes("$.entities[") &&
+        /outside-empire/u.test(error.message)
+    ),
+    true
+  );
+
+  const romanMismatch = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.entities.find((entity) => entity.id === "province-judaea").romanSide = false;
+  });
+  assert.equal(
+    hasError(
+      romanMismatch,
+      (error) =>
+        /must set romanSide to true/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient timeline allows periods beyond range and clips them for coverage checks", async () => {
+  const result = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.areas[1].periods[1].toYear = 150;
+  });
+  assert.equal(result.errors.length, 0);
+});
+
+test("ancient timeline rejects periods with toYear equal to fromYear", async () => {
+  const result = await runWithTemporaryAncientCase(({ timeline }) => {
+    timeline.areas[1].periods[1].toYear = timeline.areas[1].periods[1].fromYear;
+  });
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.areas[1].periods[1]" &&
+        /fromYear < toYear/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("timeline stop scripture references must resolve in WEB text", async () => {
+  const result = await runWithTemporaryAncientCase(
+    ({ timeline }) => {
+      timeline.stops[0].scripture = ["scripture:Mark 99:99"];
+    },
+    { webVplPath: webFixturePath }
+  );
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.stops[0].scripture[0]" &&
+        /not found in WEB snapshot/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient shapes catch unknown area ids and missing required shapes", async () => {
+  const unknownArea = await runWithTemporaryAncientCase(({ areas }) => {
+    areas.features[0].properties.areaId = "missing-area";
+  });
+  assert.equal(
+    hasError(
+      unknownArea,
+      (error) => /Shape references unknown area id 'missing-area'/u.test(error.message)
+    ),
+    true
+  );
+
+  const missingShape = await runWithTemporaryAncientCase(
+    ({ areas }) => {
+      areas.features = areas.features.filter(
+        (feature) => feature.properties.areaId !== "parthia-west"
+      );
+    },
+    { requireAncientShapes: true }
+  );
+  assert.equal(
+    hasError(
+      missingShape,
+      (error) => /Missing shape for focus area 'parthia-west'/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("ancient shapes catch open rings, out-of-range coordinates, and self-intersections", async () => {
+  const openRing = await runWithTemporaryAncientCase(({ areas }) => {
+    areas.features[0].geometry.coordinates[0].pop();
+  });
+  assert.equal(
+    hasError(openRing, (error) => /rings must be closed/u.test(error.message)),
+    true
+  );
+
+  const outOfRange = await runWithTemporaryAncientCase(({ areas }) => {
+    areas.features[0].geometry.coordinates[0][0] = [999, 999];
+  });
+  assert.equal(
+    hasError(
+      outOfRange,
+      (error) => /Geometry coordinates must stay within \[lon, lat\]/u.test(error.message)
+    ),
+    true
+  );
+
+  const selfIntersecting = await runWithTemporaryAncientCase(({ areas }) => {
+    areas.features[0].geometry.coordinates[0] = [
+      [0, 0],
+      [1, 1],
+      [1, 0],
+      [0, 1],
+      [0, 0]
+    ];
+  });
+  assert.equal(
+    hasError(selfIntersecting, (error) => /self-intersection/u.test(error.message)),
+    true
+  );
+});
+
+test("derived political-history consistency check is switchable", async () => {
+  const relaxed = await runWithTemporaryCase(
+    ({ galileeData }) => {
+      galileeData.politicalAreaId = "galilee";
+      galileeData.politicalHistory = [
+        {
+          fromYear: -4,
+          toYear: 101,
+          entity: "Incorrect test holder",
+          sources: ["bib:existing-bib-source"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath,
+      requireDerivedPoliticalHistory: false
+    }
+  );
+  assert.equal(relaxed.errors.length, 0);
+
+  const strict = await runWithTemporaryCase(
+    ({ galileeData }) => {
+      galileeData.politicalAreaId = "galilee";
+      galileeData.politicalHistory = [
+        {
+          fromYear: -4,
+          toYear: 101,
+          entity: "Incorrect test holder",
+          sources: ["bib:existing-bib-source"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath,
+      requireDerivedPoliticalHistory: true
+    }
+  );
+  assert.equal(
+    hasError(
+      strict,
+      (error) =>
+        error.path === "$.politicalHistory" ||
+        error.path.startsWith("$.politicalHistory[")
+    ),
+    true
+  );
+});
+
+test("place-level and candidate-level political area links cannot both be set", async () => {
+  const result = await runWithTemporaryCase(
+    ({ capernaumData }) => {
+      capernaumData.politicalAreaId = "galilee";
+      capernaumData.candidates[0].politicalAreaId = "perea";
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath
+    }
+  );
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.politicalAreaId" &&
+        /either place-level politicalAreaId or candidate-level politicalAreaId/u.test(
+          error.message
+        )
+    ),
+    true
+  );
+});
+
+test("politicalHistoryOverrides cannot overlap (place-level and candidate-level)", async () => {
+  const placeOverlap = await runWithTemporaryCase(
+    ({ capernaumData }) => {
+      capernaumData.politicalAreaId = "galilee";
+      capernaumData.politicalHistoryOverrides = [
+        {
+          fromYear: -4,
+          toYear: 44,
+          holderId: "client-antipas",
+          sources: ["bib:existing-bib-source"]
+        },
+        {
+          fromYear: 30,
+          toYear: 60,
+          holderId: "province-judaea",
+          sources: ["bib:existing-bib-source"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath
+    }
+  );
+  assert.equal(
+    hasError(
+      placeOverlap,
+      (error) =>
+        error.path === "$.politicalHistoryOverrides[1]" &&
+        /must not overlap/u.test(error.message)
+    ),
+    true
+  );
+
+  const candidateOverlap = await runWithTemporaryCase(
+    ({ capernaumData }) => {
+      delete capernaumData.politicalAreaId;
+      capernaumData.candidates[0].politicalAreaId = "galilee";
+      capernaumData.candidates[0].politicalHistoryOverrides = [
+        {
+          fromYear: -4,
+          toYear: 44,
+          holderId: "client-antipas",
+          sources: ["bib:existing-bib-source"]
+        },
+        {
+          fromYear: 40,
+          toYear: 70,
+          holderId: "province-judaea",
+          sources: ["bib:existing-bib-source"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath
+    }
+  );
+  assert.equal(
+    hasError(
+      candidateOverlap,
+      (error) =>
+        error.path === "$.candidates[0].politicalHistoryOverrides[1]" &&
+        /must not overlap/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("candidate-level political area derivation supports per-candidate sequences", async () => {
+  const result = await runWithTemporaryCase(
+    ({ capernaumData }) => {
+      delete capernaumData.politicalAreaId;
+      delete capernaumData.politicalHistoryOverrides;
+      capernaumData.candidates = capernaumData.candidates.slice(0, 2);
+      capernaumData.candidates[0].politicalAreaId = "galilee";
+      capernaumData.candidates[1].politicalAreaId = "perea";
+      capernaumData.politicalHistory = [
+        {
+          fromYear: -4,
+          toYear: 44,
+          holderId: "client-antipas",
+          candidate: 0,
+          entity: "Tetrarchy of Herod Antipas (ruler: Herod Antipas)",
+          sources: ["bib:pleiades-place-resource"]
+        },
+        {
+          fromYear: 44,
+          toYear: 101,
+          holderId: "province-judaea",
+          candidate: 0,
+          entity: "Roman province of Judaea",
+          sources: ["bib:pleiades-place-resource"]
+        },
+        {
+          fromYear: -4,
+          toYear: 44,
+          holderId: "client-antipas",
+          candidate: 1,
+          entity: "Tetrarchy of Herod Antipas",
+          sources: ["bib:pleiades-place-resource"]
+        },
+        {
+          fromYear: 44,
+          toYear: 101,
+          holderId: "uncertain-roman-side",
+          candidate: 1,
+          note: "Status in the sources is unclear for this interval (fixture).",
+          entity: "Roman-side control uncertain",
+          sources: ["bib:pleiades-place-resource"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath,
+      requireDerivedPoliticalHistory: true
+    }
+  );
+
+  assert.equal(result.errors.length, 0);
+});
+
+test("derived political-history source comparison is order-insensitive", async () => {
+  const result = await runWithTemporaryCase(
+    ({ galileeData, capernaumData }) => {
+      capernaumData.candidates.forEach((candidate) => {
+        delete candidate.politicalAreaId;
+        delete candidate.politicalHistoryOverrides;
+      });
+      galileeData.politicalAreaId = "perea";
+      galileeData.politicalHistoryOverrides = [
+        {
+          fromYear: -4,
+          toYear: 101,
+          holderId: "client-antipas",
+          sources: ["bib:existing-bib-source", "bib:pleiades-place-resource"]
+        }
+      ];
+      galileeData.politicalHistory = [
+        {
+          fromYear: -4,
+          toYear: 101,
+          holderId: "client-antipas",
+          entity: "Tetrarchy of Herod Antipas",
+          sources: ["bib:pleiades-place-resource", "bib:existing-bib-source"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath,
+      requireDerivedPoliticalHistory: true
+    }
+  );
+  assert.equal(result.errors.length, 0);
 });

@@ -3,10 +3,16 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import booleanValid from "@turf/boolean-valid";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 
 import { CANONICAL_BOOKS, OLD_TESTAMENT_BOOKS, parseReference } from "./books.mjs";
+import {
+  comparePoliticalHistoryEntries,
+  derivePoliticalHistoryFromTimeline,
+  getStopInForce
+} from "./timeline-model.mjs";
 import {
   DEFAULT_WEB_VPL_PATH,
   getWebTextForReference,
@@ -39,10 +45,54 @@ const DEFAULT_BIBLIOGRAPHY_SCHEMA_PATH = path.join(
   "schema",
   "bibliography.schema.json"
 );
+const DEFAULT_TIMELINE_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "timeline.schema.json"
+);
+const DEFAULT_ANCIENT_AREAS_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "ancient-areas.schema.json"
+);
+const DEFAULT_ANCIENT_ROADS_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "ancient-roads.schema.json"
+);
+const DEFAULT_ANCIENT_COASTLINE_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "ancient-coastline.schema.json"
+);
+const DEFAULT_GEO_PROVENANCE_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "geo-provenance.schema.json"
+);
 const DEFAULT_BIBLIOGRAPHY_PATH = path.join(
   repositoryRoot,
   "data",
   "bibliography.json"
+);
+const DEFAULT_TIMELINE_PATH = path.join(repositoryRoot, "data", "timeline.json");
+const DEFAULT_ANCIENT_AREAS_PATH = path.join(
+  repositoryRoot,
+  "data",
+  "geo",
+  "ancient-areas.geojson"
+);
+const DEFAULT_ANCIENT_ROADS_PATH = path.join(
+  repositoryRoot,
+  "data",
+  "geo",
+  "ancient-roads.geojson"
+);
+const DEFAULT_ANCIENT_COASTLINE_PATH = path.join(
+  repositoryRoot,
+  "data",
+  "geo",
+  "ancient-coastline.geojson"
 );
 const DEFAULT_IMAGE_PROMPTS_DIRECTORY = path.join(
   repositoryRoot,
@@ -66,6 +116,8 @@ export const PROJECT_BOUNDS = Object.freeze({
 export const REQUIRE_EMPIRE_ROOT = true;
 export const REQUIRE_MODERN_COUNTRIES = true;
 export const REQUIRE_MAJOR_IMAGES = true;
+export const REQUIRE_ANCIENT_SHAPES = false;
+export const REQUIRE_DERIVED_POLITICAL_HISTORY = false;
 export const MAJOR_PLACE_MIN_IMAGE_COUNT = 4;
 export const MAJOR_PLACE_MAX_IMAGE_COUNT = 7;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
@@ -192,6 +244,15 @@ function parseBooleanEnvironmentFlag(value) {
     return false;
   }
   return null;
+}
+
+async function pathExists(targetPath) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function listJsonFiles(directoryPath) {
@@ -332,16 +393,46 @@ async function loadSchemas(
   locationSchemaPath,
   mediaSchemaPath,
   sourceIdSchemaPath,
-  bibliographySchemaPath
+  bibliographySchemaPath,
+  timelineSchemaPath,
+  ancientAreasSchemaPath,
+  ancientRoadsSchemaPath,
+  ancientCoastlineSchemaPath,
+  geoProvenanceSchemaPath
 ) {
-  const [locationSchema, mediaSchema, sourceIdSchema, bibliographySchema] =
+  const [
+    locationSchema,
+    mediaSchema,
+    sourceIdSchema,
+    bibliographySchema,
+    timelineSchema,
+    ancientAreasSchema,
+    ancientRoadsSchema,
+    ancientCoastlineSchema,
+    geoProvenanceSchema
+  ] =
     await Promise.all([
       readJsonFile(locationSchemaPath),
       readJsonFile(mediaSchemaPath),
       readJsonFile(sourceIdSchemaPath),
-      readJsonFile(bibliographySchemaPath)
+      readJsonFile(bibliographySchemaPath),
+      readJsonFile(timelineSchemaPath),
+      readJsonFile(ancientAreasSchemaPath),
+      readJsonFile(ancientRoadsSchemaPath),
+      readJsonFile(ancientCoastlineSchemaPath),
+      readJsonFile(geoProvenanceSchemaPath)
     ]);
-  return { locationSchema, mediaSchema, sourceIdSchema, bibliographySchema };
+  return {
+    locationSchema,
+    mediaSchema,
+    sourceIdSchema,
+    bibliographySchema,
+    timelineSchema,
+    ancientAreasSchema,
+    ancientRoadsSchema,
+    ancientCoastlineSchema,
+    geoProvenanceSchema
+  };
 }
 
 function sourceArrayHasOnlyWikipedia(sourceIds) {
@@ -1009,6 +1100,433 @@ function recordModernNamesPolicyIssue({
   }
 }
 
+function readFeatureCollection(filePath, errors) {
+  const relativePath = relativeFromRepositoryRoot(filePath);
+  return readJsonFile(filePath).catch((error) => {
+    recordError(errors, relativePath, "$", `Invalid JSON: ${error.message}`);
+    return null;
+  });
+}
+
+function iteratePositions(geometry, callback) {
+  if (!geometry || typeof geometry !== "object") {
+    return;
+  }
+
+  const { type, coordinates } = geometry;
+  if (!Array.isArray(coordinates)) {
+    return;
+  }
+
+  if (type === "Point") {
+    callback(coordinates);
+    return;
+  }
+
+  if (type === "LineString" || type === "MultiPoint") {
+    coordinates.forEach((position) => callback(position));
+    return;
+  }
+
+  if (type === "Polygon" || type === "MultiLineString") {
+    coordinates.forEach((line) => line.forEach((position) => callback(position)));
+    return;
+  }
+
+  if (type === "MultiPolygon") {
+    coordinates.forEach((polygon) =>
+      polygon.forEach((line) => line.forEach((position) => callback(position)))
+    );
+  }
+}
+
+function validateCoordinateRanges({ featureCollection, file, errors }) {
+  if (!Array.isArray(featureCollection?.features)) {
+    return;
+  }
+
+  featureCollection.features.forEach((feature, featureIndex) => {
+    iteratePositions(feature?.geometry, (position) => {
+      if (!Array.isArray(position) || position.length < 2) {
+        return;
+      }
+
+      const [lon, lat] = position;
+      if (typeof lon !== "number" || typeof lat !== "number") {
+        return;
+      }
+
+      if (lon < -180 || lon > 180 || lat < -90 || lat > 90) {
+        recordError(
+          errors,
+          file,
+          `$.features[${featureIndex}].geometry`,
+          "Geometry coordinates must stay within [lon, lat] world bounds"
+        );
+      }
+    });
+  });
+}
+
+function isClosedRing(ring) {
+  if (!Array.isArray(ring) || ring.length < 4) {
+    return false;
+  }
+
+  const first = ring[0];
+  const last = ring[ring.length - 1];
+  return (
+    Array.isArray(first) &&
+    Array.isArray(last) &&
+    first.length >= 2 &&
+    last.length >= 2 &&
+    first[0] === last[0] &&
+    first[1] === last[1]
+  );
+}
+
+function validatePolygonRings({ featureCollection, file, errors }) {
+  if (!Array.isArray(featureCollection?.features)) {
+    return;
+  }
+
+  featureCollection.features.forEach((feature, featureIndex) => {
+    const geometry = feature?.geometry;
+    if (!geometry || typeof geometry !== "object") {
+      return;
+    }
+
+    if (geometry.type === "Polygon" && Array.isArray(geometry.coordinates)) {
+      geometry.coordinates.forEach((ring, ringIndex) => {
+        if (!isClosedRing(ring)) {
+          recordError(
+            errors,
+            file,
+            `$.features[${featureIndex}].geometry.coordinates[${ringIndex}]`,
+            "Polygon rings must be closed (first and last coordinate must match)"
+          );
+        }
+      });
+    }
+
+    if (geometry.type === "MultiPolygon" && Array.isArray(geometry.coordinates)) {
+      geometry.coordinates.forEach((polygon, polygonIndex) => {
+        polygon.forEach((ring, ringIndex) => {
+          if (!isClosedRing(ring)) {
+            recordError(
+              errors,
+              file,
+              `$.features[${featureIndex}].geometry.coordinates[${polygonIndex}][${ringIndex}]`,
+              "Polygon rings must be closed (first and last coordinate must match)"
+            );
+          }
+        });
+      });
+    }
+  });
+}
+
+function validatePoliticalHistoryOverrideEntry({
+  entry,
+  entryPath,
+  file,
+  timelineEntitiesById,
+  enforceTimelineEntityIds,
+  bibliographyIds,
+  webVerseIndex,
+  validateSourceIdSchema,
+  errors
+}) {
+  if (typeof entry?.fromYear === "number" && typeof entry?.toYear === "number") {
+    if (entry.fromYear >= entry.toYear) {
+      recordError(
+        errors,
+        file,
+        entryPath,
+        "politicalHistoryOverrides intervals must use [fromYear, toYear) with fromYear < toYear"
+      );
+    }
+  }
+
+  if (
+    enforceTimelineEntityIds &&
+    typeof entry?.holderId === "string" &&
+    !timelineEntitiesById.has(entry.holderId)
+  ) {
+    recordError(
+      errors,
+      file,
+      `${entryPath}.holderId`,
+      `Unknown holder id '${entry.holderId}'`
+    );
+  }
+
+  validateSourceArray({
+    sourceIds: entry?.sources,
+    file,
+    pathValue: `${entryPath}.sources`,
+    bibliographyIds,
+    webVerseIndex,
+    validateSourceIdSchema,
+    errors
+  });
+}
+
+function validateGeometryTopology({ featureCollection, file, errors }) {
+  if (!Array.isArray(featureCollection?.features)) {
+    return;
+  }
+
+  featureCollection.features.forEach((feature, featureIndex) => {
+    const geometryType = feature?.geometry?.type;
+    if (geometryType !== "Polygon" && geometryType !== "MultiPolygon") {
+      return;
+    }
+
+    const hasSelfIntersection = (ring) => {
+      const pointOnSegment = (point, left, right) => {
+        const [px, py] = point;
+        const [lx, ly] = left;
+        const [rx, ry] = right;
+        const cross = (py - ly) * (rx - lx) - (px - lx) * (ry - ly);
+        if (Math.abs(cross) > 1e-9) {
+          return false;
+        }
+        const dot = (px - lx) * (px - rx) + (py - ly) * (py - ry);
+        return dot <= 0;
+      };
+
+      const orientation = (left, middle, right) => {
+        return (
+          (middle[1] - left[1]) * (right[0] - middle[0]) -
+          (middle[0] - left[0]) * (right[1] - middle[1])
+        );
+      };
+
+      const segmentsIntersect = (segmentAStart, segmentAEnd, segmentBStart, segmentBEnd) => {
+        const o1 = orientation(segmentAStart, segmentAEnd, segmentBStart);
+        const o2 = orientation(segmentAStart, segmentAEnd, segmentBEnd);
+        const o3 = orientation(segmentBStart, segmentBEnd, segmentAStart);
+        const o4 = orientation(segmentBStart, segmentBEnd, segmentAEnd);
+
+        if (
+          ((o1 > 0 && o2 < 0) || (o1 < 0 && o2 > 0)) &&
+          ((o3 > 0 && o4 < 0) || (o3 < 0 && o4 > 0))
+        ) {
+          return true;
+        }
+
+        return (
+          (Math.abs(o1) <= 1e-9 && pointOnSegment(segmentBStart, segmentAStart, segmentAEnd)) ||
+          (Math.abs(o2) <= 1e-9 && pointOnSegment(segmentBEnd, segmentAStart, segmentAEnd)) ||
+          (Math.abs(o3) <= 1e-9 && pointOnSegment(segmentAStart, segmentBStart, segmentBEnd)) ||
+          (Math.abs(o4) <= 1e-9 && pointOnSegment(segmentAEnd, segmentBStart, segmentBEnd))
+        );
+      };
+
+      for (let leftIndex = 0; leftIndex < ring.length - 1; leftIndex += 1) {
+        const leftSegmentStart = ring[leftIndex];
+        const leftSegmentEnd = ring[leftIndex + 1];
+        for (let rightIndex = leftIndex + 1; rightIndex < ring.length - 1; rightIndex += 1) {
+          const areAdjacent =
+            Math.abs(leftIndex - rightIndex) <= 1 ||
+            (leftIndex === 0 && rightIndex === ring.length - 2);
+          if (areAdjacent) {
+            continue;
+          }
+
+          const rightSegmentStart = ring[rightIndex];
+          const rightSegmentEnd = ring[rightIndex + 1];
+          if (
+            segmentsIntersect(
+              leftSegmentStart,
+              leftSegmentEnd,
+              rightSegmentStart,
+              rightSegmentEnd
+            )
+          ) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    const geometry = feature.geometry;
+    const polygonRings =
+      geometry.type === "Polygon"
+        ? geometry.coordinates
+        : geometry.coordinates.flatMap((polygon) => polygon);
+    if (polygonRings.some((ring) => hasSelfIntersection(ring))) {
+      recordError(
+        errors,
+        file,
+        `$.features[${featureIndex}].geometry`,
+        "Polygon geometry is invalid (self-intersection or malformed topology)"
+      );
+      return;
+    }
+
+    try {
+      const valid = booleanValid(feature);
+      if (!valid) {
+        recordError(
+          errors,
+          file,
+          `$.features[${featureIndex}].geometry`,
+          "Polygon geometry is invalid (self-intersection or malformed topology)"
+        );
+      }
+    } catch (error) {
+      recordError(
+        errors,
+        file,
+        `$.features[${featureIndex}].geometry`,
+        `Unable to validate polygon topology: ${error.message}`
+      );
+    }
+  });
+}
+
+function evaluateCoverage(periods, rangeFromYear, rangeToYear) {
+  const sorted = [...periods].sort((left, right) =>
+    left.fromYear === right.fromYear
+      ? left.toYear - right.toYear
+      : left.fromYear - right.fromYear
+  );
+
+  const problems = [];
+  let cursor = rangeFromYear;
+
+  for (const period of sorted) {
+    if (period.toYear <= rangeFromYear || period.fromYear >= rangeToYear) {
+      continue;
+    }
+
+    const clippedFrom = Math.max(period.fromYear, rangeFromYear);
+    const clippedTo = Math.min(period.toYear, rangeToYear);
+    if (clippedFrom >= clippedTo) {
+      continue;
+    }
+
+    if (clippedFrom > cursor) {
+      problems.push({ kind: "gap", fromYear: cursor, toYear: clippedFrom });
+    } else if (clippedFrom < cursor) {
+      problems.push({ kind: "overlap", fromYear: clippedFrom, toYear: cursor });
+    }
+
+    cursor = Math.max(cursor, clippedTo);
+  }
+
+  if (cursor < rangeToYear) {
+    problems.push({ kind: "gap", fromYear: cursor, toYear: rangeToYear });
+  }
+
+  return problems;
+}
+
+function sortedPeriods(periods) {
+  return [...periods].sort((left, right) =>
+    left.fromYear === right.fromYear
+      ? left.toYear - right.toYear
+      : left.fromYear - right.fromYear
+  );
+}
+
+function periodStateMatches(leftPeriod, rightPeriod) {
+  return (
+    leftPeriod?.holderId === rightPeriod?.holderId &&
+    (leftPeriod?.ruler ?? null) === (rightPeriod?.ruler ?? null)
+  );
+}
+
+function periodPairsAtStop(periods, stopYear) {
+  const pairs = [];
+  const orderedPeriods = sortedPeriods(periods);
+  for (let index = 1; index < orderedPeriods.length; index += 1) {
+    const previous = orderedPeriods[index - 1];
+    const current = orderedPeriods[index];
+    if (previous.toYear === stopYear && current.fromYear === stopYear) {
+      pairs.push({ previous, current });
+    }
+  }
+  return pairs;
+}
+
+function stopHasStateChange(periodsByAreaId, stopYear) {
+  for (const periods of periodsByAreaId.values()) {
+    for (const pair of periodPairsAtStop(periods, stopYear)) {
+      if (!periodStateMatches(pair.previous, pair.current)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function findOverlappingIntervals(periods) {
+  const orderedPeriods = sortedPeriods(periods);
+  const overlaps = [];
+
+  for (let leftIndex = 0; leftIndex < orderedPeriods.length; leftIndex += 1) {
+    const leftPeriod = orderedPeriods[leftIndex];
+    for (let rightIndex = leftIndex + 1; rightIndex < orderedPeriods.length; rightIndex += 1) {
+      const rightPeriod = orderedPeriods[rightIndex];
+      if (rightPeriod.fromYear >= leftPeriod.toYear) {
+        break;
+      }
+
+      if (leftPeriod.fromYear < rightPeriod.toYear && rightPeriod.fromYear < leftPeriod.toYear) {
+        overlaps.push({ leftPeriod, rightPeriod });
+      }
+    }
+  }
+
+  return overlaps;
+}
+
+function validateOverrideOverlapErrors({
+  overrides,
+  file,
+  pathPrefix,
+  errors
+}) {
+  if (!Array.isArray(overrides) || overrides.length < 2) {
+    return;
+  }
+
+  const indexed = overrides
+    .map((entry, index) => ({ entry, index }))
+    .filter(
+      ({ entry }) =>
+        typeof entry?.fromYear === "number" && typeof entry?.toYear === "number"
+    )
+    .sort((left, right) =>
+      left.entry.fromYear === right.entry.fromYear
+        ? left.entry.toYear - right.entry.toYear
+        : left.entry.fromYear - right.entry.fromYear
+    );
+
+  for (let leftIndex = 0; leftIndex < indexed.length; leftIndex += 1) {
+    const left = indexed[leftIndex];
+    for (let rightIndex = leftIndex + 1; rightIndex < indexed.length; rightIndex += 1) {
+      const right = indexed[rightIndex];
+      if (right.entry.fromYear >= left.entry.toYear) {
+        break;
+      }
+      if (left.entry.fromYear < right.entry.toYear && right.entry.fromYear < left.entry.toYear) {
+        recordError(
+          errors,
+          file,
+          `${pathPrefix}[${right.index}]`,
+          "politicalHistoryOverrides intervals must not overlap"
+        );
+      }
+    }
+  }
+}
+
 function validateLocationHierarchy({
   locationRecordsById,
   requireEmpireRoot,
@@ -1218,6 +1736,43 @@ export async function validateData(options = {}) {
   const bibliographyPath = path.resolve(
     options.bibliographyPath ?? DEFAULT_BIBLIOGRAPHY_PATH
   );
+  const defaultDataRoot = path.join(repositoryRoot, "data");
+  const usingRepositoryDataRoot =
+    inferDataRootFromDirectory(locationsDirectory, "locations") === defaultDataRoot &&
+    inferDataRootFromDirectory(mediaDirectory, "media") === defaultDataRoot;
+  const inferredDataRoot = usingRepositoryDataRoot
+    ? defaultDataRoot
+    : inferValidationContentRoot(locationsDirectory, mediaDirectory);
+  const timelinePath = path.resolve(
+    options.timelinePath ?? path.join(inferredDataRoot, "timeline.json")
+  );
+  const ancientAreasPath = path.resolve(
+    options.ancientAreasPath ??
+      path.join(inferredDataRoot, "geo", "ancient-areas.geojson")
+  );
+  const ancientRoadsPath = path.resolve(
+    options.ancientRoadsPath ??
+      path.join(inferredDataRoot, "geo", "ancient-roads.geojson")
+  );
+  const ancientCoastlinePath = path.resolve(
+    options.ancientCoastlinePath ??
+      path.join(inferredDataRoot, "geo", "ancient-coastline.geojson")
+  );
+  const timelineSchemaPath = path.resolve(
+    options.timelineSchemaPath ?? DEFAULT_TIMELINE_SCHEMA_PATH
+  );
+  const ancientAreasSchemaPath = path.resolve(
+    options.ancientAreasSchemaPath ?? DEFAULT_ANCIENT_AREAS_SCHEMA_PATH
+  );
+  const ancientRoadsSchemaPath = path.resolve(
+    options.ancientRoadsSchemaPath ?? DEFAULT_ANCIENT_ROADS_SCHEMA_PATH
+  );
+  const ancientCoastlineSchemaPath = path.resolve(
+    options.ancientCoastlineSchemaPath ?? DEFAULT_ANCIENT_COASTLINE_SCHEMA_PATH
+  );
+  const geoProvenanceSchemaPath = path.resolve(
+    options.geoProvenanceSchemaPath ?? DEFAULT_GEO_PROVENANCE_SCHEMA_PATH
+  );
   const webSnapshotMetadataPath = path.resolve(
     options.webSnapshotMetadataPath ?? DEFAULT_WEB_SNAPSHOT_METADATA_PATH
   );
@@ -1236,28 +1791,62 @@ export async function validateData(options = {}) {
   const requireMajorImagesFromEnvironment = parseBooleanEnvironmentFlag(
     process.env.REQUIRE_MAJOR_IMAGES
   );
+  const requireAncientShapesFromEnvironment = parseBooleanEnvironmentFlag(
+    process.env.REQUIRE_ANCIENT_SHAPES
+  );
+  const requireDerivedPoliticalHistoryFromEnvironment = parseBooleanEnvironmentFlag(
+    process.env.REQUIRE_DERIVED_POLITICAL_HISTORY
+  );
   const requireMajorImages =
     typeof options.requireMajorImages === "boolean"
       ? options.requireMajorImages
       : requireMajorImagesFromEnvironment ?? REQUIRE_MAJOR_IMAGES;
+  const requireAncientShapes =
+    typeof options.requireAncientShapes === "boolean"
+      ? options.requireAncientShapes
+      : requireAncientShapesFromEnvironment ?? REQUIRE_ANCIENT_SHAPES;
+  const requireDerivedPoliticalHistory =
+    typeof options.requireDerivedPoliticalHistory === "boolean"
+      ? options.requireDerivedPoliticalHistory
+      : requireDerivedPoliticalHistoryFromEnvironment ??
+        REQUIRE_DERIVED_POLITICAL_HISTORY;
 
   const errors = [];
   const warnings = [];
 
-  const { locationSchema, mediaSchema, sourceIdSchema, bibliographySchema } =
-    await loadSchemas(
-      locationSchemaPath,
-      mediaSchemaPath,
-      sourceIdSchemaPath,
-      bibliographySchemaPath
-    );
+  const {
+    locationSchema,
+    mediaSchema,
+    sourceIdSchema,
+    bibliographySchema,
+    timelineSchema,
+    ancientAreasSchema,
+    ancientRoadsSchema,
+    ancientCoastlineSchema,
+    geoProvenanceSchema
+  } = await loadSchemas(
+    locationSchemaPath,
+    mediaSchemaPath,
+    sourceIdSchemaPath,
+    bibliographySchemaPath,
+    timelineSchemaPath,
+    ancientAreasSchemaPath,
+    ancientRoadsSchemaPath,
+    ancientCoastlineSchemaPath,
+    geoProvenanceSchemaPath
+  );
 
   const ajv = new Ajv2020({ allErrors: true, strict: false });
   addFormats(ajv);
   ajv.addSchema(sourceIdSchema);
+  ajv.addSchema(geoProvenanceSchema);
   const validateLocationSchema = ajv.compile(locationSchema);
   const validateMediaSchema = ajv.compile(mediaSchema);
   const validateBibliographySchema = ajv.compile(bibliographySchema);
+  const validateTimelineSchema = ajv.compile(timelineSchema);
+  const validateAncientAreasSchema = ajv.compile(ancientAreasSchema);
+  const validateAncientRoadsSchema = ajv.compile(ancientRoadsSchema);
+  const validateAncientCoastlineSchema = ajv.compile(ancientCoastlineSchema);
   const validateSourceIdSchema = ajv.compile({
     $ref: "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
   });
@@ -1307,6 +1896,109 @@ export async function validateData(options = {}) {
 
       bibliographyIds.add(entry.id);
     });
+  }
+
+  let timelineData = null;
+  const timelineRelativePath = relativeFromRepositoryRoot(timelinePath);
+  const timelineExists = await pathExists(timelinePath);
+  if (timelineExists) {
+    try {
+      timelineData = await readJsonFile(timelinePath);
+    } catch (error) {
+      recordError(
+        errors,
+        timelineRelativePath,
+        "$",
+        `Unable to read timeline file: ${error.message}`
+      );
+    }
+  }
+
+  if (timelineData && !validateTimelineSchema(timelineData)) {
+    for (const issue of validateTimelineSchema.errors ?? []) {
+      recordError(
+        errors,
+        timelineRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
+    }
+  }
+
+  const [ancientAreasExists, ancientRoadsExists, ancientCoastlineExists] =
+    await Promise.all([
+      pathExists(ancientAreasPath),
+      pathExists(ancientRoadsPath),
+      pathExists(ancientCoastlinePath)
+    ]);
+
+  const [ancientAreasData, ancientRoadsData, ancientCoastlineData] = await Promise.all([
+    ancientAreasExists ? readFeatureCollection(ancientAreasPath, errors) : null,
+    ancientRoadsExists ? readFeatureCollection(ancientRoadsPath, errors) : null,
+    ancientCoastlineExists ? readFeatureCollection(ancientCoastlinePath, errors) : null
+  ]);
+  const ancientAreasRelativePath = relativeFromRepositoryRoot(ancientAreasPath);
+  const ancientRoadsRelativePath = relativeFromRepositoryRoot(ancientRoadsPath);
+  const ancientCoastlineRelativePath = relativeFromRepositoryRoot(ancientCoastlinePath);
+
+  if (usingRepositoryDataRoot) {
+    if (!ancientAreasExists) {
+      recordError(
+        errors,
+        ancientAreasRelativePath,
+        "$",
+        "Unable to read ancient areas file: ENOENT"
+      );
+    }
+    if (!ancientRoadsExists) {
+      recordError(
+        errors,
+        ancientRoadsRelativePath,
+        "$",
+        "Unable to read ancient roads file: ENOENT"
+      );
+    }
+    if (!ancientCoastlineExists) {
+      recordError(
+        errors,
+        ancientCoastlineRelativePath,
+        "$",
+        "Unable to read ancient coastline file: ENOENT"
+      );
+    }
+  }
+
+  if (ancientAreasData && !validateAncientAreasSchema(ancientAreasData)) {
+    for (const issue of validateAncientAreasSchema.errors ?? []) {
+      recordError(
+        errors,
+        ancientAreasRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
+    }
+  }
+
+  if (ancientRoadsData && !validateAncientRoadsSchema(ancientRoadsData)) {
+    for (const issue of validateAncientRoadsSchema.errors ?? []) {
+      recordError(
+        errors,
+        ancientRoadsRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
+    }
+  }
+
+  if (ancientCoastlineData && !validateAncientCoastlineSchema(ancientCoastlineData)) {
+    for (const issue of validateAncientCoastlineSchema.errors ?? []) {
+      recordError(
+        errors,
+        ancientCoastlineRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
+    }
   }
 
   if (!skipSnapshotChecksumCheck) {
@@ -1444,6 +2136,291 @@ export async function validateData(options = {}) {
   }
   validateLocationHierarchy({ locationRecordsById, requireEmpireRoot, errors });
 
+  const timelineEntitiesById = new Map();
+  const timelineAreasById = new Map();
+  const timelineAreaPeriodsById = new Map();
+
+  if (timelineData && Array.isArray(timelineData.entities)) {
+    timelineData.entities.forEach((entity, entityIndex) => {
+      if (typeof entity?.id !== "string") {
+        return;
+      }
+
+      if (timelineEntitiesById.has(entity.id)) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.entities[${entityIndex}].id`,
+          `Duplicate timeline entity id '${entity.id}'`
+        );
+      }
+      timelineEntitiesById.set(entity.id, entity);
+
+      if (typeof entity.locationId === "string" && !locationIds.has(entity.locationId)) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.entities[${entityIndex}].locationId`,
+          `Unknown location id '${entity.locationId}'`
+        );
+      }
+
+      if (entity?.kind === "outside-empire" && entity?.romanSide !== false) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.entities[${entityIndex}].romanSide`,
+          "Entities of kind 'outside-empire' must set romanSide to false"
+        );
+      }
+      if (
+        (entity?.kind === "roman-province" ||
+          entity?.kind === "client-kingdom" ||
+          entity?.kind === "client-tetrarchy" ||
+          entity?.kind === "free-city-or-league") &&
+        entity?.romanSide !== true
+      ) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.entities[${entityIndex}].romanSide`,
+          `Entities of kind '${entity.kind}' must set romanSide to true`
+        );
+      }
+
+      validateSourceArray({
+        sourceIds: entity.sources,
+        file: timelineRelativePath,
+        pathValue: `$.entities[${entityIndex}].sources`,
+        bibliographyIds,
+        webVerseIndex: null,
+        validateSourceIdSchema,
+        errors
+      });
+    });
+  }
+
+  if (timelineData && Array.isArray(timelineData.stops)) {
+    timelineData.stops.forEach((stop, stopIndex) => {
+      validateSourceArray({
+        sourceIds: stop?.sources,
+        file: timelineRelativePath,
+        pathValue: `$.stops[${stopIndex}].sources`,
+        bibliographyIds,
+        webVerseIndex: null,
+        validateSourceIdSchema,
+        errors
+      });
+    });
+  }
+
+  if (timelineData && Array.isArray(timelineData.areas)) {
+    timelineData.areas.forEach((area, areaIndex) => {
+      if (typeof area?.id !== "string") {
+        return;
+      }
+
+      if (timelineAreasById.has(area.id)) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.areas[${areaIndex}].id`,
+          `Duplicate timeline area id '${area.id}'`
+        );
+      }
+      timelineAreasById.set(area.id, area);
+
+      if (typeof area.locationId === "string" && !locationIds.has(area.locationId)) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.areas[${areaIndex}].locationId`,
+          `Unknown location id '${area.locationId}'`
+        );
+      }
+
+      const periods = Array.isArray(area.periods) ? area.periods : [];
+      timelineAreaPeriodsById.set(area.id, periods);
+      periods.forEach((period, periodIndex) => {
+        if (typeof period?.holderId === "string" && !timelineEntitiesById.has(period.holderId)) {
+          recordError(
+            errors,
+            timelineRelativePath,
+            `$.areas[${areaIndex}].periods[${periodIndex}].holderId`,
+            `Unknown holder id '${period.holderId}'`
+          );
+        }
+
+        if (typeof period?.fromYear === "number" && typeof period?.toYear === "number") {
+          if (period.fromYear >= period.toYear) {
+            recordError(
+              errors,
+              timelineRelativePath,
+              `$.areas[${areaIndex}].periods[${periodIndex}]`,
+              "Periods must use half-open intervals [fromYear, toYear) with fromYear < toYear"
+            );
+          }
+        }
+
+        validateSourceArray({
+          sourceIds: period?.sources,
+          file: timelineRelativePath,
+          pathValue: `$.areas[${areaIndex}].periods[${periodIndex}].sources`,
+          bibliographyIds,
+          webVerseIndex: null,
+          validateSourceIdSchema,
+          errors
+        });
+      });
+
+      const orderedPeriods = sortedPeriods(periods);
+      for (let periodIndex = 1; periodIndex < orderedPeriods.length; periodIndex += 1) {
+        const previous = orderedPeriods[periodIndex - 1];
+        const current = orderedPeriods[periodIndex];
+        if (previous.toYear === current.fromYear && periodStateMatches(previous, current)) {
+          recordError(
+            errors,
+            timelineRelativePath,
+            `$.areas[${areaIndex}].periods`,
+            "Adjacent periods with the same holderId and ruler must be merged into one period"
+          );
+        }
+      }
+    });
+  }
+
+  if (timelineData?.range) {
+    const range = timelineData.range;
+    if (typeof range.fromYear === "number" && typeof range.toYear === "number") {
+      if (range.fromYear >= range.toYear) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          "$.range",
+          "range must satisfy fromYear < toYear"
+        );
+      }
+    }
+
+    const rangeFromYear = range.fromYear;
+    const rangeToYear = range.toYear;
+
+    if (
+      typeof range.defaultYear === "number" &&
+      typeof rangeFromYear === "number" &&
+      typeof rangeToYear === "number"
+    ) {
+      if (range.defaultYear < rangeFromYear || range.defaultYear >= rangeToYear) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          "$.range.defaultYear",
+          "defaultYear must be inside [range.fromYear, range.toYear)"
+        );
+      }
+
+      const stopInForce = getStopInForce(timelineData.stops, range.defaultYear);
+      if (!stopInForce) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          "$.range.defaultYear",
+          "defaultYear must be covered by at least one timeline stop"
+        );
+      }
+    }
+
+    if (typeof rangeFromYear === "number" && typeof rangeToYear === "number") {
+      for (const [areaId, periods] of timelineAreaPeriodsById.entries()) {
+        const coverageProblems = evaluateCoverage(periods, rangeFromYear, rangeToYear);
+        coverageProblems.forEach((problem) => {
+          recordError(
+            errors,
+            timelineRelativePath,
+            `$.areas[${Array.from(timelineAreasById.keys()).indexOf(areaId)}].periods`,
+            problem.kind === "gap"
+              ? `Area '${areaId}' leaves a coverage gap inside [${rangeFromYear}, ${rangeToYear}) at [${problem.fromYear}, ${problem.toYear})`
+              : `Area '${areaId}' has overlapping periods inside [${rangeFromYear}, ${rangeToYear}) at [${problem.fromYear}, ${problem.toYear})`
+          );
+        });
+      }
+    }
+  }
+
+  if (Array.isArray(timelineData?.stops) && timelineAreaPeriodsById.size > 0) {
+    timelineData.stops.forEach((stop, stopIndex) => {
+      if (typeof stop?.year !== "number") {
+        return;
+      }
+      if (!stopHasStateChange(timelineAreaPeriodsById, stop.year)) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          `$.stops[${stopIndex}].year`,
+          "Each stop year must represent at least one holder or ruler change across a period boundary"
+        );
+      }
+    });
+  }
+
+  const areaShapeIds = new Set();
+  if (Array.isArray(ancientAreasData?.features)) {
+    ancientAreasData.features.forEach((feature, featureIndex) => {
+      const areaId = feature?.properties?.areaId;
+      if (typeof areaId !== "string") {
+        return;
+      }
+      areaShapeIds.add(areaId);
+      if (!timelineAreasById.has(areaId)) {
+        recordError(
+          errors,
+          ancientAreasRelativePath,
+          `$.features[${featureIndex}].properties.areaId`,
+          `Shape references unknown area id '${areaId}'`
+        );
+      }
+    });
+  }
+
+  if (requireAncientShapes && timelineAreasById.size > 0) {
+    for (const [areaId, area] of timelineAreasById.entries()) {
+      if (area?.focus === true && !areaShapeIds.has(areaId)) {
+        recordError(
+          errors,
+          ancientAreasRelativePath,
+          "$.features",
+          `Missing shape for focus area '${areaId}' while REQUIRE_ANCIENT_SHAPES is enabled`
+        );
+      }
+    }
+  }
+
+  validateCoordinateRanges({
+    featureCollection: ancientAreasData,
+    file: ancientAreasRelativePath,
+    errors
+  });
+  validateCoordinateRanges({
+    featureCollection: ancientRoadsData,
+    file: ancientRoadsRelativePath,
+    errors
+  });
+  validateCoordinateRanges({
+    featureCollection: ancientCoastlineData,
+    file: ancientCoastlineRelativePath,
+    errors
+  });
+  validatePolygonRings({
+    featureCollection: ancientAreasData,
+    file: ancientAreasRelativePath,
+    errors
+  });
+  validateGeometryTopology({
+    featureCollection: ancientAreasData,
+    file: ancientAreasRelativePath,
+    errors
+  });
+
   let webVerseIndex;
   const hasScriptureSources = locationRecords.some((record) =>
     locationHasScriptureSources(record.data)
@@ -1451,7 +2428,11 @@ export async function validateData(options = {}) {
   const hasScripture = locationRecords.some(
     (record) => Array.isArray(record.data.scripture) && record.data.scripture.length > 0
   );
-  if (hasScripture || hasScriptureSources) {
+  const hasTimelineStopScripture = Array.isArray(timelineData?.stops) &&
+    timelineData.stops.some(
+      (stop) => Array.isArray(stop?.scripture) && stop.scripture.length > 0
+    );
+  if (hasScripture || hasScriptureSources || hasTimelineStopScripture) {
     try {
       webVerseIndex = await loadWebVerseIndex(webVplPath);
     } catch (error) {
@@ -1463,8 +2444,31 @@ export async function validateData(options = {}) {
           `Unable to read WEB source text required for scripture validation: ${error.message}`
         );
       }
+      if (hasTimelineStopScripture) {
+        recordError(
+          errors,
+          timelineRelativePath,
+          "$.stops",
+          `Unable to read WEB source text required for timeline stop scripture validation: ${error.message}`
+        );
+      }
       return { errors, warnings };
     }
+  }
+
+  if (Array.isArray(timelineData?.stops) && webVerseIndex) {
+    timelineData.stops.forEach((stop, stopIndex) => {
+      validateSourceArray({
+        sourceIds: stop?.scripture,
+        file: timelineRelativePath,
+        pathValue: `$.stops[${stopIndex}].scripture`,
+        bibliographyIds,
+        webVerseIndex,
+        enforceNonWikipedia: false,
+        validateSourceIdSchema,
+        errors
+      });
+    });
   }
 
   for (const locationRecord of locationRecords) {
@@ -1748,6 +2752,171 @@ export async function validateData(options = {}) {
           errors
         });
       });
+    }
+
+    if (
+      timelineData &&
+      typeof data.politicalAreaId === "string" &&
+      !timelineAreasById.has(data.politicalAreaId)
+    ) {
+      recordError(
+        errors,
+        locationRecord.relativePath,
+        "$.politicalAreaId",
+        `Unknown timeline area id '${data.politicalAreaId}'`
+      );
+    }
+
+    const candidateAreaIndexes = [];
+    if (Array.isArray(data.candidates)) {
+      data.candidates.forEach((candidate, candidateIndex) => {
+        if (typeof candidate?.politicalAreaId === "string") {
+          candidateAreaIndexes.push(candidateIndex);
+          if (timelineData && !timelineAreasById.has(candidate.politicalAreaId)) {
+            recordError(
+              errors,
+              locationRecord.relativePath,
+              `$.candidates[${candidateIndex}].politicalAreaId`,
+              `Unknown timeline area id '${candidate.politicalAreaId}'`
+            );
+          }
+        }
+
+        if (Array.isArray(candidate?.politicalHistoryOverrides)) {
+          validateOverrideOverlapErrors({
+            overrides: candidate.politicalHistoryOverrides,
+            file: locationRecord.relativePath,
+            pathPrefix: `$.candidates[${candidateIndex}].politicalHistoryOverrides`,
+            errors
+          });
+          candidate.politicalHistoryOverrides.forEach((entry, entryIndex) => {
+            validatePoliticalHistoryOverrideEntry({
+              entry,
+              entryPath: `$.candidates[${candidateIndex}].politicalHistoryOverrides[${entryIndex}]`,
+              file: locationRecord.relativePath,
+              timelineEntitiesById,
+              enforceTimelineEntityIds: Boolean(timelineData),
+              bibliographyIds,
+              webVerseIndex,
+              validateSourceIdSchema,
+              errors
+            });
+          });
+        }
+      });
+    }
+
+    if (typeof data.politicalAreaId === "string" && candidateAreaIndexes.length > 0) {
+      recordError(
+        errors,
+        locationRecord.relativePath,
+        "$.politicalAreaId",
+        "A record must use either place-level politicalAreaId or candidate-level politicalAreaId values, not both"
+      );
+    }
+
+    if (Array.isArray(data.politicalHistory)) {
+      data.politicalHistory.forEach((entry, entryIndex) => {
+        if (typeof entry?.candidate !== "number") {
+          return;
+        }
+        if (!Number.isInteger(entry.candidate) || entry.candidate < 0) {
+          recordError(
+            errors,
+            locationRecord.relativePath,
+            `$.politicalHistory[${entryIndex}].candidate`,
+            "candidate must be a non-negative integer index"
+          );
+          return;
+        }
+        if (!Array.isArray(data.candidates) || entry.candidate >= data.candidates.length) {
+          recordError(
+            errors,
+            locationRecord.relativePath,
+            `$.politicalHistory[${entryIndex}].candidate`,
+            "candidate index must reference an existing candidates[] entry"
+          );
+        }
+      });
+    }
+
+    if (Array.isArray(data.politicalHistoryOverrides)) {
+      validateOverrideOverlapErrors({
+        overrides: data.politicalHistoryOverrides,
+        file: locationRecord.relativePath,
+        pathPrefix: "$.politicalHistoryOverrides",
+        errors
+      });
+      data.politicalHistoryOverrides.forEach((entry, entryIndex) => {
+        validatePoliticalHistoryOverrideEntry({
+          entry,
+          entryPath: `$.politicalHistoryOverrides[${entryIndex}]`,
+          file: locationRecord.relativePath,
+          timelineEntitiesById,
+          enforceTimelineEntityIds: Boolean(timelineData),
+          bibliographyIds,
+          webVerseIndex,
+          validateSourceIdSchema,
+          errors
+        });
+      });
+    }
+
+    if (
+      requireDerivedPoliticalHistory &&
+      (typeof data.politicalAreaId === "string" || candidateAreaIndexes.length > 0)
+    ) {
+      const derivedPoliticalHistory = derivePoliticalHistoryFromTimeline({
+        locationRecord: data,
+        areasById: timelineAreasById,
+        entitiesById: timelineEntitiesById
+      });
+
+      if (!Array.isArray(derivedPoliticalHistory)) {
+        recordError(
+          errors,
+          locationRecord.relativePath,
+          "$.politicalHistory",
+          "Unable to derive politicalHistory from timeline data for this record"
+        );
+      } else {
+        const storedPoliticalHistory = Array.isArray(data.politicalHistory)
+          ? data.politicalHistory
+          : [];
+        if (storedPoliticalHistory.length !== derivedPoliticalHistory.length) {
+          recordError(
+            errors,
+            locationRecord.relativePath,
+            "$.politicalHistory",
+            "Stored politicalHistory does not match timeline-derived politicalHistory"
+          );
+        } else {
+          storedPoliticalHistory.forEach((entry, index) => {
+            const normalizedStoredEntry = {
+              fromYear: entry.fromYear,
+              toYear: entry.toYear,
+              holderId: entry.holderId,
+              note: entry.note,
+              candidate: entry.candidate,
+              entity: entry.entity,
+              sources: Array.isArray(entry.sources) ? entry.sources : []
+            };
+            if (
+              !comparePoliticalHistoryEntries(
+                normalizedStoredEntry,
+                derivedPoliticalHistory[index]
+              )
+            ) {
+              recordError(
+                errors,
+                locationRecord.relativePath,
+                `$.politicalHistory[${index}]`,
+                "Stored politicalHistory does not match timeline-derived politicalHistory"
+              );
+            }
+          });
+        }
+      }
     }
 
     if (Array.isArray(data.scripture) && webVerseIndex) {
@@ -2085,6 +3254,40 @@ export async function validateData(options = {}) {
       );
     }
   }
+
+  const validateGeoLayerProvenance = (featureCollection, file) => {
+    if (!Array.isArray(featureCollection?.features)) {
+      return;
+    }
+    featureCollection.features.forEach((feature, featureIndex) => {
+      validateSourceArray({
+        sourceIds: feature?.properties?.provenance?.upstreamFeatureIds,
+        file,
+        pathValue: `$.features[${featureIndex}].properties.provenance.upstreamFeatureIds`,
+        bibliographyIds,
+        webVerseIndex: null,
+        enforceNonWikipedia: false,
+        validateSourceIdSchema,
+        errors
+      });
+      feature?.properties?.provenance?.changes?.forEach((change, changeIndex) => {
+        validateSourceArray({
+          sourceIds: change?.sources,
+          file,
+          pathValue: `$.features[${featureIndex}].properties.provenance.changes[${changeIndex}].sources`,
+          bibliographyIds,
+          webVerseIndex: null,
+          enforceNonWikipedia: false,
+          validateSourceIdSchema,
+          errors
+        });
+      });
+    });
+  };
+
+  validateGeoLayerProvenance(ancientAreasData, ancientAreasRelativePath);
+  validateGeoLayerProvenance(ancientRoadsData, ancientRoadsRelativePath);
+  validateGeoLayerProvenance(ancientCoastlineData, ancientCoastlineRelativePath);
 
   return { errors, warnings };
 }
