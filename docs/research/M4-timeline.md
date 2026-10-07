@@ -5,11 +5,11 @@ Research for card `docs/tasks/M4-02-timeline.md`, phase 1. This note is the Rese
 ## 1. How to read this note
 
 - **Years** are integers; BC years are negative; there is no year 0 (so 1 BC is `-1` and AD 1 is `1`). For a period, `toYear` is the year the change happened, matching the convention already used in `politicalHistory` (for example `-4` to `6`, then `6` to `41`).
-- **Areas** (§2) are units that changed hands together, at the detail the sources support. Some match an existing `data/locations/*.json` area record; some do not yet have one (noted in each heading, and listed again in §6).
+- **Areas** (§2) are units that changed hands together, at the detail the sources support, and that the sources describe well enough to draw as land (ADR-0037 item 3). Some match an existing `data/locations/*.json` area record; some do not yet have one (noted in each heading, and listed again in §7). A unit without a drawable territory of its own — a free city, the cities of the Decapolis, or a town another ruler received without its surrounding land — is recorded as a holder of its place instead (§6), not as an area; §2.7 explains this for the Decapolis. Where this note is unsure an area's extent is well enough attested to draw on its own, it says so, so M4-03 can merge that area into a neighbour.
 - **Entities** (§3) are the political bodies that held one or more areas (a kingdom, a tetrarchy, a province under a given status, and so on), so the areas' period tables can point to one short entity id instead of repeating a long description.
-- **Stops** (§4) are the subset of period boundaries that change the map, under ADR-0037 item 1.
-- **Places** (§5) lists every current location record's area and whether it is consistent with this note or an explained exception.
-- Sources already cited in the project's existing, Fact-Checker-verified records (mainly the M2 batch-1 places, which cite `bib:rainey-notley-sacred-bridge`, the Rainey & Notley atlas no one on the team could open — CP3b decision 2) are carried forward as the prior baseline where this note does not change them. Every **new** claim in this note cites a source opened for this task; see §8 for the list of newly opened or newly added sources. CP3b decision 2 applies here too: this note replaces `bib:rainey-notley-sacred-bridge` wherever it touches a period this note documents, and flags the rest for the next time that text is edited.
+- **Stops** (§4) are the subset of period boundaries that change the map, under ADR-0037 item 1. A stop can be a border, a ruler or a status change (as the brief's four examples all are), or a change in the name the map shows for an area or entity; §5 lists every name change found, including the few that are stops.
+- **Places** (§6) lists every current location record's area and whether it is consistent with this note or an explained exception.
+- Sources already cited in the project's existing, Fact-Checker-verified records (mainly the M2 batch-1 places, which cite `bib:rainey-notley-sacred-bridge`, the Rainey & Notley atlas no one on the team could open — CP3b decision 2) are carried forward as the prior baseline where this note does not change them. Every **new** claim in this note cites a source opened for this task; see §9 for the list of newly opened or newly added sources. CP3b decision 2 applies here too: this note replaces `bib:rainey-notley-sacred-bridge` wherever it touches a period this note documents, and flags the rest for the next time that text is edited.
 - **Josephus citations** use the book and chapter numbers of Whiston's translation as published at `ccel.org` (the edition opened for this note), each with a short description, because that edition does not print the Niese section numbers (e.g. "18.106") that secondary works often cite. Readers using a Niese-numbered edition should search by the quoted detail, not the chapter number alone.
 
 ## 2. Areas and their periods
@@ -33,7 +33,7 @@ These moved together for the whole period: one ethnarchy (4 BC), then one provin
 
 ### 2.2 Galilee and Perea
 
-Moved together under Antipas, then Agrippa I, then the province — with one later exception (Nero's grant, §2.2 note and §5). `galilee` exists; **Perea has no record yet.**
+Moved together under Antipas, then Agrippa I, then the province — with one later exception (Nero's grant, §2.2 note and §6). `galilee` exists; **Perea has no record yet.**
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
@@ -41,7 +41,7 @@ Moved together under Antipas, then Agrippa I, then the province — with one lat
 | -4 | 39 | Tetrarchy | Herod Antipas | `bib:josephus-antiquities` (17.8, the will; 17.11.4, "to him it was that Perea and Galilee paid their tribute"); `scripture:Luke 3:1,23:6-7` | Antipas is "Herod the tetrarch" in the Gospels; the Gospels never use "Antipas." |
 | 39 | 44 | Client kingdom (added to Agrippa I's) | Herod Agrippa I | `bib:josephus-antiquities` (18.7.2, Caligula "took away from him his tetrarchy, and gave it... to Agrippa") | Antipas was banished after his wife Herodias pressed him to seek the royal title Caligula had just given her brother Agrippa I. Antiquities (18.7.2) places the banishment at Lugdunum (Lyon) in Gaul; the Jewish War (2.9, "he was punished for his ambition, by being banished into Spain") names Spain instead. Both are Josephus's own words; this note does not resolve the discrepancy. |
 | 44 | 54 (or 61) | Roman province (procurators) | | `bib:josephus-antiquities` (19.9.2) | |
-| 54 (or 61) | 100 | Mostly the province; **Tiberias and Tarichaeae (Galilee) and Julias-in-Perea with 14 villages** pass to Agrippa I's kingdom instead | Herod Agrippa II | `bib:josephus-antiquities` (20.8.4, "Caesar also bestowed on Agrippa a certain part of Galilee, Tiberias, and Tarichaeae... He gave him also Julias, a city of Perea, with fourteen villages"); on the year, `bib:jewish-encyclopedia-agrippa-ii` | Josephus dates this grant to "the first year of the reign of Nero" (AD 54). The Jewish Encyclopedia notes Agrippa II's coins carry two era-starting years, 53 and 61, and reads the second as this grant's real date, from numismatic evidence Josephus's narrative does not mention. This note presents both; see the stop at §4. No current place record is Tiberias, Tarichaeae, or the Perea Julias (not Bethsaida's Julias — see the entity `julias-perea`), so no place needs reassignment either way (§5). |
+| 54 (or 61) | 100 | Mostly the province; **Tiberias and Tarichaeae (Galilee) and Julias-in-Perea with 14 villages** pass to Agrippa I's kingdom instead | Herod Agrippa II | `bib:josephus-antiquities` (20.8.4, "Caesar also bestowed on Agrippa a certain part of Galilee, Tiberias, and Tarichaeae... He gave him also Julias, a city of Perea, with fourteen villages"); on the year, `bib:jewish-encyclopedia-agrippa-ii` | Josephus dates this grant to "the first year of the reign of Nero" (AD 54). The Jewish Encyclopedia notes Agrippa II's coins carry two era-starting years, 53 and 61, and reads the second as this grant's real date, from numismatic evidence Josephus's narrative does not mention. This note presents both; see the stop at §4. No current place record is Tiberias, Tarichaeae, or the Perea Julias (not Bethsaida's Julias — see the entity `julias-perea`), so no place needs reassignment either way (§6). |
 
 **Perea** (no record; e.g. `scripture:Matthew 19:1`, "the borders of Judea beyond the Jordan"; John 10:40): same table as Galilee, substituting "Julias in Perea with 14 villages" for "Tiberias and Tarichaeae" at the last row.
 
@@ -56,7 +56,7 @@ These four districts, which the sources never clearly separate from one another 
 | 34 | 37 | Attached to the province of Syria (Philip died without an heir) | Governor of Syria | `bib:josephus-antiquities` (18.4.6); `bib:isbe-trachonitis` | |
 | 37 | 44 | Client kingdom | Herod Agrippa I | `bib:josephus-antiquities` (18.6.10, Caligula "appointed him to be king of the tetrarchy of Philip") | |
 | 44 | 53 | Roman province (procurators) | | `bib:josephus-antiquities` (19.9.2); `bib:isbe-trachonitis` ("administered by Roman officers" during Agrippa II's minority) | |
-| 53 | ~92/93 or 100 | Client kingdom | Herod Agrippa II | `bib:josephus-antiquities` (20.7.1, "he bestowed upon Agrippa the tetrarchy of Philip and Batanea, and added thereto Trachonites, with Abila"); `bib:isbe-trachonitis` ("From 53 till 100 AD it was ruled by Agrippa II") | The existing `bethsaida.json` record's table ends this period at 70; no source found for a change in 70, and `bib:isbe-trachonitis` and `bib:jewish-encyclopedia-agrippa-ii` both describe Agrippa II's rule continuing after the war (he fought on the Roman side) to his death. Phase 2 should correct the end year here (see §4, stop at ~100, and §7). |
+| 53 | ~92/93 or 100 | Client kingdom | Herod Agrippa II | `bib:josephus-antiquities` (20.7.1, "he bestowed upon Agrippa the tetrarchy of Philip and Batanea, and added thereto Trachonites, with Abila"); `bib:isbe-trachonitis` ("From 53 till 100 AD it was ruled by Agrippa II") | The existing `bethsaida.json` record's table ends this period at 70; no source found for a change in 70, and `bib:isbe-trachonitis` and `bib:jewish-encyclopedia-agrippa-ii` both describe Agrippa II's rule continuing after the war (he fought on the Roman side) to his death. Phase 2 should correct the end year here (see §4, stop at ~100, and §8). |
 | ~92/93 or 100 | 106 | Added to the province of Syria | | `bib:isbe-abilene` ("his kingdom was incorporated in the province of Syria") | In 106 this area, with the Nabataean kingdom, became the new province of Arabia (`bib:isbe-trachonitis`; `bib:livius-nabataeans`) — after this note's AD 100 end point. |
 
 ### 2.4 Abilene
@@ -73,7 +73,7 @@ No current record (proposed id `abilene`). Its history runs with §2.3 from AD 3
 
 ### 2.5 Chalcis
 
-No current record (proposed id `chalcis`); no map place sits here. Chalcis (in the Beqaa valley, capital of the old Iturean kingdom under Lysanias — `bib:isbe-ituraea`) became a small Herodian client kingdom distinct from Judea.
+No current record (proposed id `chalcis`); no map place sits here. Chalcis (in the Beqaa valley, capital of the old Iturean kingdom under Lysanias — `bib:isbe-ituraea`) became a small Herodian client kingdom distinct from Judea. **Doubt flag:** the sources this note opened describe Chalcis politically (who ruled it, and when) but not geographically — `bib:isbe-ituraea`'s "he ruled over the land from Damascus to the sea" describes the older, larger Iturean realm under the first Lysanias, not necessarily the smaller territory later kings of Chalcis held. If AWMC or another cited description does not give this smaller Chalcis its own boundary, M4-03 should merge it into a neighbouring area (Abilene or Syria are the most likely candidates) rather than guess at a shape.
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
@@ -92,13 +92,9 @@ Matches the existing `arabia` record, which already carries this history in its 
 | 40 | 71 | Client kingdom | Malichus II | `bib:livius-nabataeans` ("Malichus II, 40-70/71") | |
 | 71 | 106 | Client kingdom (continues past this note's AD 100 end point) | Rabbel II | `bib:livius-nabataeans` ("Rabbel II the Savior, 71-106") | Annexed as the Roman province of Arabia in 106 — after this note's window. |
 
-### 2.7 The Decapolis
+### 2.7 The Decapolis — not an area
 
-No current record (proposed id `decapolis`); `damascus` (sometimes counted as one of the ten) already exists and is treated under Syria (§2.8), consistent with the point below. No other Decapolis city is yet a place record.
-
-| From | To | Holder | Ruler | Sources | Notes |
-|---|---|---|---|---|---|
-| -63 | 100 (no change found in this window) | A league of mostly Greek cities, each "independent of the local tetrarchy, and answerable directly to the governor of Syria" | (Self-governing; overseen by Syria's governor) | `bib:isbe-decapolis` (league from "about the time of Pompey's campaign in Syria, 65 BC"; cities "enjoyed the rights of association and asylum; they struck their own coinage, paid imperial taxes and were liable to military service"); `scripture:Matthew 4:25,Mark 5:20,Mark 7:31` | `bib:isbe-decapolis` gives Pliny's list of ten: Scythopolis (the only one west of the Jordan), Hippos, Gadara, Pella, Philadelphia, Gerasa, Dion, Canatha, Damascus and Raphana (unidentified). Because each city answered to Syria individually rather than to a single Decapolis government, this note does not propose a single "Decapolis" political entity distinct from Syria — see the Syria table's note on Gaza, Gadara and Hippos being cut from Archelaus's and Philip's territory in 4 BC and added to Syria (`bib:josephus-antiquities` 17.11.4). |
+The Decapolis is a league of cities, not a block of land one border could enclose: `bib:isbe-decapolis` describes each member as "independent of the local tetrarchy, and answerable directly to the governor of Syria," scattered from Scythopolis (the only one west of the Jordan) to Damascus. Under the new rule that an area must be land the sources describe well enough to draw (§1), this note does not propose a "Decapolis" area. Instead, each Decapolis city is a holder recorded on its own place record (§6): currently only `damascus` (sometimes counted among the ten) is a place record, and its Places-table row there notes its Decapolis membership alongside its ordinary parent, Syria. `bib:isbe-decapolis` gives Pliny's list of ten: Scythopolis, Hippos, Gadara, Pella, Philadelphia, Gerasa, Dion, Canatha, Damascus and Raphana (unidentified) — see also the Syria table's note (§2.8) on Gaza, Gadara and Hippos being cut from Archelaus's and Philip's territory in 4 BC and added to Syria (`bib:josephus-antiquities` 17.11.4), the same administrative pattern. The league itself needed no stop: `bib:isbe-decapolis` and this note's other sources find no change to its arrangement before AD 100.
 
 ### 2.8 Syria (and the coastal cities)
 
@@ -118,7 +114,7 @@ Matches the existing `syria` record (already has a two-row `politicalHistory`, `
 
 ### 2.9 Commagene, and the "rough" (western) part of Cilicia
 
-No current record for Commagene (proposed id `commagene`); the existing `cilicia` record already describes the plain/rough split and is extended here, not changed.
+No current record for Commagene (proposed id `commagene`); the existing `cilicia` record already describes the plain/rough split and is extended here, not changed. **On drawing this:** Commagene's own, separately describable territory (centered on Samosata) is the proposed `commagene` area below; the "coastal part of... Cilicia" Antiochus IV also held (next table, rows 3–4) is not a separately drawable shape in any source this note opened, so it is better understood as the existing `cilicia` area (§2.10) having Commagene's king as its holder for that span, not as added Commagene territory. §2.10's table already carries it that way.
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
@@ -312,18 +308,46 @@ Thirteen stops. The brief's four (ADR-0037) are marked **(required)**.
 | 54 (some sources: 61) | Nero enlarges Agrippa II's kingdom in Galilee and Perea | Josephus dates this to Nero's first year: Agrippa II receives Tiberias and Tarichaeae in Galilee and Julias in Perea (with fourteen villages), while the rest of both regions stays under the Roman procurators. The Jewish Encyclopedia reads Agrippa II's own coinage as pointing to 61 for this specific grant instead. | `bib:josephus-antiquities` (20.8.4); `bib:jewish-encyclopedia-agrippa-ii` |
 | **70 (required)** | Jerusalem falls | After four years of war, Titus's forces take Jerusalem and destroy the Second Temple, ending Jewish self-government in the province. Agrippa II, who had sided with Rome, keeps his own separate kingdom. | `bib:josephus-jewish-war` (7) |
 | 72 | Commagene is annexed; Cilicia is reunited | Vespasian's governor of Syria accuses Antiochus IV of Commagene of plotting with Parthia and annexes his kingdom, including the Cilician coast he held. The same year, Cilicia (plain and rough together) becomes a single province again for the first time since Augustus. | `bib:josephus-jewish-war` (7.7); `bib:livius-cilicia` |
-| about 92/93 or 100 | Agrippa II dies; his kingdom joins Syria | The last Herodian ruler dies — older reference works, following the Byzantine scholar Photius's citation of a lost history, give AD 100 (a date those same works call disputed); this note could not open a source for the earlier date some modern historians propose and flags this for the Fact-Checker (§7). His kingdom (Gaulanitis, Batanea, Trachonitis, Auranitis and Abilene) is added to the province of Syria. | `bib:jewish-encyclopedia-agrippa-ii`; `bib:isbe-abilene` |
+| 74 | Pamphylia leaves Galatia and is joined with Lycia | Vespasian detaches most of Pisidia from the province of Galatia and joins Pamphylia with the separately-administered region of Lycia to its south, forming one new province. Perga's own province changes name and neighbours, from "Galatia" to "Lycia and Pamphylia," even though Perga's own ground does not move. | (existing `galatia.json`, `pisidia.json`, `pamphylia.json`); `bib:cassius-dio-roman-history` (60.17.3–4, the Claudius-era background to the merger) |
+| about 92/93 or 100 | Agrippa II dies; his kingdom joins Syria | The last Herodian ruler dies — older reference works, following the Byzantine scholar Photius's citation of a lost history, give AD 100 (a date those same works call disputed); this note could not open a source for the earlier date some modern historians propose and flags this for the Fact-Checker (§8). His kingdom (Gaulanitis, Batanea, Trachonitis, Auranitis and Abilene) is added to the province of Syria. | `bib:jewish-encyclopedia-agrippa-ii`; `bib:isbe-abilene` |
 
 **Changes considered and left out, with reasons:**
 - **Achaia's and Macedonia's Senate↔emperor transfers (AD 15, 44) and Nero's grant of freedom to Greece (67, reversed by Vespasian):** explicitly not stops under ADR-0037 item 1's own example (no border moves); kept in those areas' own history text only.
-- **Paphlagonia and "Pontus Galaticus" added to Galatia (6 BC, 2 BC); "Pontus Polemoniacus" added (AD 64):** none borders a current place; kept in Galatia's and Pontus's own tables (§2.12, §2.13) only.
-- **Lycia's annexation (AD 43):** borders no current place, and Pamphylia's own province at this date is already unresolved in the existing records (§2.12); not added as a separate stop.
+- **Paphlagonia and "Pontus Galaticus" added to Galatia (6 BC, 2 BC); "Pontus Polemoniacus" added (AD 64):** none borders a current place; kept in Galatia's and Pontus's own tables (§2.12, §2.13), and in §5's name-change list, only.
+- **Lycia's own annexation as a province (AD 43):** borders no current place on its own, and Pamphylia's own province at this date is already unresolved in the existing records (§2.12); not added as a separate stop. The later 74 merger with Pamphylia is added above, because it does reach a current place (Perga) and gives the area a new name.
 - **Thrace's reduction to a province (AD 38, then 46/47 or 69-79, disputed):** no current place is there, and the ancient sources disagree on the year by three decades (§2.14); not added as a stop, though it is one of the "empire's extent" items a reader might expect — flagged here rather than guessed at.
 - **Herod of Chalcis's and Agrippa II's appointments to Chalcis (41, 50) and Agrippa II's exchange of it (53):** folded into the stops at 41 and 53 above rather than given their own entries, since Chalcis itself holds no current place and the 53 stop already covers Agrippa II's major territorial change that year.
 - **Individual Armenian and Parthian kings:** far too numerous and, for Armenia, too often contested mid-reign to list; only the lasting 63 settlement is in Armenia's own table (§2.22), and it is not proposed as a stop because it changes no border our map would show (a client king remains a client king; only his patron's identity is confirmed).
 - **Mauretania's and Britain's internal changes:** per the brief, tracked only as "what the far edge looks like" at each stop above, not as their own stops.
 
-## 5. Places
+## 5. Names that changed
+
+Under the new rule (brief §1.3; ADR-0037 item 1) that a name change can itself be a stop, this section lists every area, entity and town name this note found changing between 4 BC and AD 100.
+
+### 5.1 Area and entity names
+
+| Year | Change | Is it a stop? | Sources |
+|---|---|---|---|
+| 2 BC | "Pontus Galaticus" — the part of Pontus added to Galatia — comes into use for that part, distinct from the independent eastern kingdom | No: borders no current place (§4 exclusions) | `bib:isbe-galatia` |
+| 64 | "Pontus Polemoniacus" comes into use for the formerly independent eastern kingdom, now a province, distinct from Pontus Galaticus and from Bithynia-administered western Pontus | No: borders no current place (§4 exclusions) | `bib:isbe-galatia` |
+| 74 | "Lycia and Pamphylia" (or "Lycia et Pamphylia") becomes the name of the new joint province; Pamphylia stops being described as part of Galatia | **Yes — a stop at §4** | `bib:cassius-dio-roman-history` (60.17.3–4); existing `galatia.json`/`pisidia.json`/`pamphylia.json` |
+
+No other area or entity in this note's scope is found changing its name in this window. (Judea's two senses, the district and the province, and Achaia's alternate name "Greece," are parallel names used throughout, not changes over time, and are already explained in §2.1 and §2.15 respectively.)
+
+### 5.2 Renamed towns
+
+These keep their Bible names on the map (ADR-0026); none is proposed as a stop, per the card's instruction. Listed for the human and for the Fact-Checker.
+
+| Town (Bible / map name) | Renamed to | By whom, and when | Sources |
+|---|---|---|---|
+| Bethsaida | Julias | Philip raised the village to a city and renamed it, "the same name with Caesar's daughter," context-dated to shortly after the AD 6 census | `bib:josephus-antiquities` (18.2.1) |
+| Betharamphtha (Perea) | Julias | Antipas rebuilt it and renamed it "from the name of the emperor's wife," same context, shortly after AD 6 | `bib:josephus-antiquities` (18.2.1) |
+| Paneas | Caesarea (Philippi) | Philip rebuilt it and renamed it, same passage, shortly after AD 6 | `bib:josephus-antiquities` (18.2.1) |
+| Caesarea Philippi | Neronias | Agrippa II renamed his capital "in order to flatter" the emperor Nero, after AD 54 | `bib:jewish-encyclopedia-agrippa-ii` (citing Antiquities 20.9.4) |
+
+**Note on Julia/Julias.** Whiston's translation gives two different reasons for the same name in the same passage (Antiquities 18.2.1): Betharamphtha is renamed "from the name of the emperor's wife," but Bethsaida "the same name with Caesar's daughter." Both are usually read as honoring the same woman, Livia: Augustus's will "appointed as his chief heirs Tiberius... and Livia... these he also bade assume his name," so that she became Julia Augusta (`bib:suetonius-twelve-caesars`, *Augustus*, read for this update). This note does not resolve why Josephus's own (or Whiston's) wording differs between "wife" and "daughter" for the same woman. **Bethsaida's and the Perea Julias's names are identical but the towns are different** — see the entity `julias-perea` in §3 — a known source of confusion this note flags for anyone drawing or labeling either site.
+
+## 6. Places
 
 Every current place record's area, grouped (89 places; none needs reassignment — see notes).
 
@@ -333,8 +357,8 @@ Every current place record's area, grouped (89 places; none needs reassignment �
 | `judea-province` | bethany-beyond-the-jordan, bethsaida, caesarea-maritima, caesarea-philippi, joppa, galilee, judea, samaria | Consistent for "about AD 50" (the project's snapshot date), which falls in the 44–53 window when the procurators governed Philip's former tetrarchy too (§2.3). From 53, bethsaida and caesarea-philippi fall under Agrippa II's kingdom instead (§2.3); this does not change their *parent area* (still the smallest area containing them), only that area's own holder at a later date, already captured in §2.3's table. |
 | `galilee` | cana, capernaum, chorazin, magdala, nain, nazareth, sea-of-galilee | Consistent. `sea-of-galilee`'s parent is a deliberate, already-sourced exception (M3-11): the lake spans the Galilee/Gaulanitis boundary, and no smaller area contains all of it. |
 | `samaria` | sychar | Consistent. |
-| `syria` | antioch-syria, damascus, tarsus, tyre | Consistent (§2.8); tarsus is in the Cilician plain, administered from Syria throughout. |
-| `galatia` | antioch-pisidia, iconium, lycaonia (derbe, lystra), pamphylia (perga), pisidia | Consistent, including the already-sourced placement of Antioch and Iconium directly under Galatia rather than under Pisidia or Phrygia (existing records' own notes), and Perga under Pamphylia under Galatia despite the split evidence on Pamphylia's own status (§2.12). |
+| `syria` | antioch-syria, damascus, tarsus, tyre | Consistent (§2.8); tarsus is in the Cilician plain, administered from Syria throughout. `damascus` is also, by some ancient counts, a city of the Decapolis (§2.7) — a holder note on this place, not a different area; its ordinary parent stays `syria`. |
+| `galatia` | antioch-pisidia, iconium, lycaonia (derbe, lystra), pamphylia (perga), pisidia | Consistent, including the already-sourced placement of Antioch and Iconium directly under Galatia rather than under Pisidia or Phrygia (existing records' own notes), and Perga under Pamphylia under Galatia despite the split evidence on Pamphylia's own status (§2.12). From 74, Pamphylia's (and so Perga's) province is "Lycia and Pamphylia," not Galatia (§4, §5.1) — a later data task should update this once M4-01's schema is in place. |
 | `asia` | colossae, ephesus, hierapolis, laodicea, miletus, mysia, patmos, pergamum, philadelphia-lydia, sardis, smyrna, thyatira, troas | Consistent (§2.16). |
 | `achaia` | athens, corinth (cenchreae), nicopolis | Consistent; cenchreae's parent is the city of Corinth (it is Corinth's port), not Achaia directly — a city-level nesting, not an area exception. |
 | `macedonia` | berea, neapolis-macedonia, philippi, thessalonica | Consistent (§2.15). |
@@ -347,11 +371,11 @@ Every current place record's area, grouped (89 places; none needs reassignment �
 
 No current place record is one of the towns Nero gave Agrippa II (Tiberias, Tarichaeae, the Perea Julias) or a Decapolis city besides Damascus (§2.2, §2.7), so none needs reassignment on that account.
 
-## 6. Records worth adding later (M6)
+## 7. Records worth adding later (M6)
 
 Areas this note researched that have no location record yet: **Idumea, Perea, the combined Gaulanitis/Batanea/Trachonitis/Auranitis area, Abilene, Chalcis, the Decapolis (and its individual cities), Lycia, Thrace, Commagene, Armenia**, and (for the coastal cities, §2.8) **Gaza and Ashkelon**. Phoenicia (Tyre's and Sidon's own region, distinct from the city of Tyre) is also still missing, per the existing backlog. This note does not add any of these as data; M4-03 takes its area list from §2 above for shapes, and a future M6 batch would add place/area records.
 
-## 7. Open questions for the Fact-Checker
+## 8. Open questions for the Fact-Checker
 
 1. **Bethsaida's (and similarly Caesarea Philippi's and the Philip-tetrarchy area's) `politicalHistory` currently ends the Agrippa II period at AD 70.** This note's sources (`bib:isbe-trachonitis`, `bib:jewish-encyclopedia-agrippa-ii`) describe his rule continuing to his death (c. 92/93 or 100); the 70 cutoff appears to be a side effect of the war's end rather than a sourced change to this area. Recommend correcting in phase 2.
 2. **Chalcis's holder, 48–50 and 53–72** (§2.5): this note could not find a named holder in the sources it opened. Recommend a further search, or carrying the gap forward as "unclear" if none is found.
@@ -360,8 +384,10 @@ Areas this note researched that have no location record yet: **Idumea, Perea, th
 5. **"Prefect" vs. "procurator" for AD 6–41** (§2.1): this note's primary source (Whiston's Josephus) uses "procurator" throughout, while the Pilate inscription supports "prefect" for this earlier period specifically. Recommend the Fact-Checker confirm the project's preferred wording with an additional source, since this affects entity names across many periods.
 6. **The Luke 2:1–2 census and the Quirinius question** (§2.1): presented neutrally per the card's instruction; no resolution attempted.
 7. **Philip's tetrarchy's exact district list, and "Iturea"** (§2.3): Josephus himself is inconsistent across three passages; presented neutrally.
+8. **Perga's province from AD 74** (§5.1, §6): once phase 2 encodes the timeline, Perga's `politicalHistory` (and `pamphylia`'s and `pisidia`'s) should gain a row for "Lycia and Pamphylia" from 74, alongside the already-flagged, unresolved question of Pamphylia's status before that date.
+9. **Chalcis's drawability** (§2.5): flagged so M4-03 can merge it into a neighbour if no source gives it its own boundary; this note did not find one.
 
-## 8. Sources
+## 9. Sources
 
 ### New bibliography entries (added to `data/bibliography.json`)
 - `bib:isbe-decapolis`, `bib:isbe-ituraea`, `bib:isbe-peraea`, `bib:isbe-trachonitis`, `bib:isbe-abilene` — International Standard Bible Encyclopedia (1915), each opened at internationalstandardbible.com.
@@ -370,11 +396,11 @@ Areas this note researched that have no location record yet: **Idumea, Perea, th
 - `bib:smith-dictionary-thracia` — "Thracia," *A Dictionary of Greek and Roman Geography* (William Smith, ed., 1854), opened at perseus.tufts.edu. No individual contributor's signature was found on this entry; cited to the general editor, as the project's existing Smith's-dictionary entry does for its own (differently authored) work.
 
 ### Primary texts opened for this note (existing bibliography entries, new chapters read)
-- `bib:josephus-antiquities`, books 17–20 (Whiston's translation, ccel.org): Herod's death and will (17.8); Augustus's division of the kingdom (17.11.4); Quirinius's census and Coponius (18.1); the Pilate/Vitellius/Aretas narrative (18.4–18.5); Philip's death (18.4.6); Caligula frees and crowns Agrippa I (18.6); Antipas banished (18.7); Claudius's accession and settlement (19.4–19.5); Herod of Chalcis mentioned (20.1); Agrippa II's exchange of Chalcis and Nero's grants (20.7–20.8).
+- `bib:josephus-antiquities`, books 17–20 (Whiston's translation, ccel.org): Herod's death and will (17.8); Augustus's division of the kingdom (17.11.4); Quirinius's census and Coponius (18.1); the Pilate/Vitellius/Aretas narrative (18.4–18.5); Herod's and Philip's city-building, including the renamings in §5.2 (18.2.1); Philip's death (18.4.6); Caligula frees and crowns Agrippa I (18.6); Antipas banished (18.7); Claudius's accession and settlement (19.4–19.5); Herod of Chalcis mentioned (20.1); Agrippa II's exchange of Chalcis and Nero's grants (20.7–20.8).
 - `bib:josephus-jewish-war`, books 2 and 7 (same translation): the division and AD 6 narrative (2.6–2.8); Antipas's banishment, with a different place of exile than Antiquities (2.9); Commagene's annexation under Vespasian (7.7).
 - `bib:tacitus-annals`, book 2 (LacusCurtius, Loeb translation): Cappadocia's and Commagene's annexation, 2.42.
 - `bib:cassius-dio-roman-history`, books 59–60 (LacusCurtius, Loeb translation): Caligula's grants to Agrippa I and Antiochus IV, 59.8; Mauretania, 59.25; Claudius's British campaign, 60.19–21.
-- `bib:suetonius-twelve-caesars`, *Claudius* (LacusCurtius): the British triumph, checked for a Thrace reference (none found).
+- `bib:suetonius-twelve-caesars`, *Claudius* (LacusCurtius): the British triumph, checked for a Thrace reference (none found). *Augustus* (LacusCurtius, read for the PO's amendment): Augustus's will directing Livia to "assume his name" (§5.2's note on Julia/Julias).
 - `bib:livius-nabataeans`: re-opened for this note's precise reign years.
 - `bib:isbe-galatia`: re-opened for Paphlagonia, Pontus Galaticus and eastern Lycaonia's years.
 
