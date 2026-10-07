@@ -1,11 +1,21 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   fetchCommonsImageSizes,
   parseCommonsFileNameFromUploadUrl
 } from "./lib/commons-image-sizes.mjs";
+import { readChangedSinceRef } from "./lib/check-images-cli.mjs";
+import {
+  createChangedSinceSelectionKey,
+  isAiImage,
+  selectImagesChangedSinceRef
+} from "./lib/check-images-changed-since.mjs";
+import {
+  loadBaseMediaRecordsByFileName,
+  loadChangedAiFilesSinceRef
+} from "./lib/check-images-git.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
@@ -327,6 +337,43 @@ async function loadMediaRecords() {
   );
 }
 
+async function selectChangedImagesSinceRef(changedSinceRef, mediaRecords) {
+  const [baseMediaData, changedAiFiles] = await Promise.all([
+    loadBaseMediaRecordsByFileName({
+      changedSinceRef,
+      mediaRecords,
+      repositoryRoot
+    }),
+    loadChangedAiFilesSinceRef({
+      changedSinceRef,
+      repositoryRoot
+    })
+  ]);
+
+  const selection = selectImagesChangedSinceRef({
+    currentMediaRecords: mediaRecords,
+    baseMediaRecordsByFileName: baseMediaData.baseMediaRecordsByFileName,
+    changedAiFiles
+  });
+
+  return {
+    ...selection,
+    parseWarnings: baseMediaData.parseWarnings
+  };
+}
+
+function logChangedSinceSelection(changedSinceRef, summary) {
+  console.log(
+    `Selected ${summary.selectedImages} of ${summary.totalCurrentImages} image(s) with --changed-since ${changedSinceRef}.`
+  );
+  console.log(
+    `Reasons: ${summary.newMediaFileImages} from new media files, ${summary.addedImages} newly added image(s), ${summary.changedMetadataImages} with changed check fields, ${summary.aiFileChangedImages} with changed AI files.`
+  );
+  console.log(
+    `Skipped ${summary.unchangedImages} unchanged image(s); ${summary.removedImages} removed image(s) were not checked.`
+  );
+}
+
 async function validateAiImage(task) {
   const failures = [];
   const match = AI_MEDIA_URL_PATTERN.exec(task.image.url);
@@ -433,8 +480,21 @@ function summarizeFailureRows(failures) {
 }
 
 async function main() {
+  const changedSinceRef = readChangedSinceRef();
   const thumbnailWidths = await loadCommonsThumbnailWidths();
   const mediaRecords = await loadMediaRecords();
+  let selectedImageKeys = null;
+
+  if (changedSinceRef) {
+    const changedSinceSelection = await selectChangedImagesSinceRef(changedSinceRef, mediaRecords);
+    for (const warningMessage of changedSinceSelection.parseWarnings) {
+      console.warn(`WARNING ${warningMessage}`);
+    }
+    logChangedSinceSelection(changedSinceRef, changedSinceSelection.summary);
+    selectedImageKeys = new Set(
+      changedSinceSelection.selected.map((selection) => selection.selectionKey)
+    );
+  }
 
   const commonsTasks = [];
   const commonsSizeChecks = [];
@@ -444,12 +504,19 @@ async function main() {
     const locationId = mediaRecord.locationId;
     const images = Array.isArray(mediaRecord.images) ? mediaRecord.images : [];
 
-    for (const image of images) {
+    for (const [imageIndex, image] of images.entries()) {
       if (!image || typeof image !== "object" || typeof image.url !== "string") {
         continue;
       }
 
-      if (image.kind === "ai-reconstruction" || image.aiGenerated === true) {
+      if (
+        selectedImageKeys &&
+        !selectedImageKeys.has(createChangedSinceSelectionKey(mediaRecord.fileName, imageIndex))
+      ) {
+        continue;
+      }
+
+      if (isAiImage(image)) {
         aiTasks.push({ locationId, image });
         continue;
       }
@@ -579,4 +646,14 @@ async function main() {
   console.log("All image checks passed.");
 }
 
-await main();
+function isExecutedAsScript() {
+  if (!process.argv[1]) {
+    return false;
+  }
+
+  return pathToFileURL(process.argv[1]).href === import.meta.url;
+}
+
+if (isExecutedAsScript()) {
+  await main();
+}

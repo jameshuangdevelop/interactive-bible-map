@@ -231,10 +231,7 @@ npm test
 npm run check:images
 ```
 
-CI runs:
-1. `npm ci`
-2. `npm test`
-3. `npm run validate:data`
+For current workflow coverage, see `docs/DEPLOY.md` → **What runs in CI**.
 
 ## Dependencies (kept minimal)
 - `ajv`: JSON Schema draft 2020-12 validation.
