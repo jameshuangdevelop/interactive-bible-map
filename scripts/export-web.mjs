@@ -79,7 +79,24 @@ async function copyAiMediaIntoDist() {
 
 async function run() {
   const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-  await runCommand(npmCommand, ["run", "export:web", "--workspace", "interactive-bible-map-app"]);
+  try {
+    await runCommand(npmCommand, [
+      "run",
+      "export:web",
+      "--workspace",
+      "interactive-bible-map-app"
+    ]);
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !error.message.includes("Command failed") ||
+      !error.message.includes("workspace")
+    ) {
+      throw error;
+    }
+
+    await runCommand(npmCommand, ["--prefix", "app", "run", "export:web"]);
+  }
 
   const copyResult = await copyAiMediaIntoDist();
   if (!copyResult.sourceDirectoryExists) {

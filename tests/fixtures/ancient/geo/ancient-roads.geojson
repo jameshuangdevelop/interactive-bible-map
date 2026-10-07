@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "roadId": "fixture-road-1",
+        "major": true,
+        "known": false,
+        "timeperiod": "R",
+        "provenance": {
+          "dataset": "AWMC fixture",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "awmc:fixture-road-1"
+          ],
+          "changes": [
+            {
+              "kind": "none",
+              "detail": "Fixture linestring",
+              "sources": [
+                "bib:existing-bib-source"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            0.2,
+            0.2
+          ],
+          [
+            3.8,
+            0.2
+          ]
+        ]
+      }
+    }
+  ]
+}

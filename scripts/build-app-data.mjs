@@ -7,8 +7,19 @@ try {
     console.warn(`WARNING ${warning.file} ${warning.path}: ${warning.message}`);
   }
 
+  console.log(`Built app data for ${result.locationCount} place(s) into app/public/generated.`);
+  for (const outputFile of result.outputFiles) {
+    console.log(
+      `  ${outputFile.file}: ${outputFile.bytes} bytes (${outputFile.gzipBytes} bytes gzip)`
+    );
+  }
+  const totalBytes = result.outputFiles.reduce((sum, file) => sum + file.bytes, 0);
+  const totalGzipBytes = result.outputFiles.reduce(
+    (sum, file) => sum + file.gzipBytes,
+    0
+  );
   console.log(
-    `Built app data for ${result.locationCount} place(s) into app/public/generated (${result.indexBytes} bytes for places.index.json).`
+    `Total generated size: ${totalBytes} bytes (${totalGzipBytes} bytes gzip)`
   );
 } catch (error) {
   if (error.validationResult) {

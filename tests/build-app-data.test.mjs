@@ -14,6 +14,15 @@ const validCaseDirectory = path.join(fixturesDirectory, "cases", "valid");
 const invalidCaseDirectory = path.join(fixturesDirectory, "cases", "invalid-missing-bib");
 const bibliographyFixturePath = path.join(fixturesDirectory, "bibliography.json");
 const webFixturePath = path.join(fixturesDirectory, "web", "engwebp-mini.vpl.txt");
+const ancientFixtureDirectory = path.join(fixturesDirectory, "ancient");
+const ancientTimelinePath = path.join(ancientFixtureDirectory, "timeline.json");
+const ancientAreasPath = path.join(ancientFixtureDirectory, "geo", "ancient-areas.geojson");
+const ancientRoadsPath = path.join(ancientFixtureDirectory, "geo", "ancient-roads.geojson");
+const ancientCoastlinePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "ancient-coastline.geojson"
+);
 const repositoryImagePromptsDirectory = path.join(
   repositoryRoot,
   "content",
@@ -355,5 +364,57 @@ test("buildAppData keeps empire/province types and parent chain in places.index"
     assert.equal(indexById.get("achaia").parentId, "roman-empire");
     assert.equal(indexById.get("roman-empire").type, "empire");
     assert.equal(indexById.get("roman-empire").parentId, null);
+  });
+});
+
+test("buildAppData writes ancient generated files with holder borders, empire edge, and holder labels", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      timelinePath: ancientTimelinePath,
+      ancientAreasPath,
+      ancientRoadsPath,
+      ancientCoastlinePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    const timelinePayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.timeline.json"), "utf8")
+    );
+    assert.equal(timelinePayload.stops.length, 2);
+    assert.equal(timelinePayload.defaultStopId, "ad44");
+
+    const stopPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
+    );
+    assert.ok(
+      stopPayload.holderLabels.some((entry) => entry.holderId === "client-antipas"),
+      "expected holder label for client-antipas"
+    );
+    assert.ok(
+      stopPayload.holderBorders.features.some(
+        (feature) =>
+          feature.properties.holderAId === "client-antipas" &&
+          feature.properties.holderBId === "province-judaea"
+      ),
+      "expected province/client border"
+    );
+    assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
+
+    const shapesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.shapes.json"), "utf8")
+    );
+    assert.equal(shapesPayload.areas.features.length, 4);
+    assert.equal(shapesPayload.areasSimplifiedForZoom10.features.length, 4);
+
+    const outputFiles = await fs.readdir(outputDirectory);
+    assert.ok(outputFiles.includes("ancient.roads.geojson"));
+    assert.ok(outputFiles.includes("ancient.coastline.geojson"));
   });
 });

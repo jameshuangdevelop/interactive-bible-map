@@ -1,7 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import zlib from "node:zlib";
 
+import { buildAncientAppData } from "./ancient-app-data-builder.mjs";
 import { validateData } from "./validator.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -23,6 +25,24 @@ async function listJsonFiles(directoryPath) {
 async function readJsonFile(filePath) {
   const content = await fs.readFile(filePath, "utf8");
   return JSON.parse(content);
+}
+
+async function pathExists(targetPath) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function inferDataRootFromDirectory(directoryPath, expectedLeafDirectoryName) {
+  const directoryName = path.basename(directoryPath).toLowerCase();
+  if (directoryName === expectedLeafDirectoryName) {
+    return path.dirname(directoryPath);
+  }
+
+  return directoryPath;
 }
 
 function collectBibSourceIds(locationRecord) {
@@ -114,17 +134,37 @@ export async function buildAppData(options = {}) {
   );
   const mediaDirectory = path.resolve(options.mediaDirectory ?? DEFAULT_MEDIA_DIRECTORY);
   const bibliographyPath = path.resolve(options.bibliographyPath ?? DEFAULT_BIBLIOGRAPHY_PATH);
+  const dataRoot =
+    options.dataRoot != null
+      ? path.resolve(options.dataRoot)
+      : inferDataRootFromDirectory(locationsDirectory, "locations");
+  const timelinePath = path.resolve(options.timelinePath ?? path.join(dataRoot, "timeline.json"));
+  const ancientAreasPath = path.resolve(
+    options.ancientAreasPath ?? path.join(dataRoot, "geo", "ancient-areas.geojson")
+  );
+  const ancientRoadsPath = path.resolve(
+    options.ancientRoadsPath ?? path.join(dataRoot, "geo", "ancient-roads.geojson")
+  );
+  const ancientCoastlinePath = path.resolve(
+    options.ancientCoastlinePath ?? path.join(dataRoot, "geo", "ancient-coastline.geojson")
+  );
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
 
   const validationResult = await validateData({
     locationsDirectory,
     mediaDirectory,
     bibliographyPath,
+    timelinePath,
+    ancientAreasPath,
+    ancientRoadsPath,
+    ancientCoastlinePath,
     webVplPath: options.webVplPath,
     webSnapshotMetadataPath: options.webSnapshotMetadataPath,
     skipSnapshotChecksumCheck: options.skipSnapshotChecksumCheck,
     requireEmpireRoot: options.requireEmpireRoot,
-    requireModernCountries: options.requireModernCountries
+    requireModernCountries: options.requireModernCountries,
+    requireAncientShapes: options.requireAncientShapes,
+    requireDerivedPoliticalHistory: options.requireDerivedPoliticalHistory
   });
 
   if (validationResult.errors.length > 0) {
@@ -165,6 +205,13 @@ export async function buildAppData(options = {}) {
   await fs.mkdir(placesDirectory, { recursive: true });
 
   await fs.writeFile(path.join(outputDirectory, "places.index.json"), indexPayload, "utf8");
+  const outputFiles = [
+    {
+      file: "places.index.json",
+      bytes: Buffer.byteLength(indexPayload, "utf8"),
+      gzipBytes: zlib.gzipSync(indexPayload, { level: zlib.constants.Z_BEST_COMPRESSION }).length
+    }
+  ];
 
   for (const locationRecord of locationRecords) {
     const bibliographyIds = collectBibSourceIds(locationRecord);
@@ -185,13 +232,45 @@ export async function buildAppData(options = {}) {
     };
 
     const destinationPath = path.join(placesDirectory, `${locationRecord.id}.json`);
-    await fs.writeFile(destinationPath, JSON.stringify(placePayload), "utf8");
+    const placePayloadText = JSON.stringify(placePayload);
+    await fs.writeFile(destinationPath, placePayloadText, "utf8");
+    outputFiles.push({
+      file: `places/${locationRecord.id}.json`,
+      bytes: Buffer.byteLength(placePayloadText, "utf8"),
+      gzipBytes: zlib.gzipSync(placePayloadText, { level: zlib.constants.Z_BEST_COMPRESSION }).length
+    });
+  }
+
+  const [timelineExists, areasExists, roadsExists, coastlineExists] = await Promise.all([
+    pathExists(timelinePath),
+    pathExists(ancientAreasPath),
+    pathExists(ancientRoadsPath),
+    pathExists(ancientCoastlinePath)
+  ]);
+
+  if (timelineExists && areasExists && roadsExists && coastlineExists) {
+    const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData] =
+      await Promise.all([
+        readJsonFile(timelinePath),
+        readJsonFile(ancientAreasPath),
+        readJsonFile(ancientRoadsPath),
+        readJsonFile(ancientCoastlinePath)
+      ]);
+    const ancientBuildResult = await buildAncientAppData({
+      timelineData,
+      ancientAreasData,
+      ancientRoadsData,
+      ancientCoastlineData,
+      outputDirectory
+    });
+    outputFiles.push(...ancientBuildResult.writtenFiles);
   }
 
   return {
     validationResult,
     outputDirectory,
     locationCount: locationRecords.length,
-    indexBytes: Buffer.byteLength(indexPayload, "utf8")
+    indexBytes: Buffer.byteLength(indexPayload, "utf8"),
+    outputFiles
   };
 }
