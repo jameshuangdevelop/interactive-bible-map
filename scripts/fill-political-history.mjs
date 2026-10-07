@@ -21,6 +21,15 @@ async function readJson(filePath) {
   return JSON.parse(await fs.readFile(filePath, "utf8"));
 }
 
+async function pathExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function toMapById(records) {
   const map = new Map();
   for (const record of records) {
@@ -29,6 +38,13 @@ function toMapById(records) {
     }
   }
   return map;
+}
+
+if (!(await pathExists(timelinePath))) {
+  console.log(
+    "Skipped: data/timeline.json is missing. No politicalHistory was changed."
+  );
+  process.exit(0);
 }
 
 const timeline = await readJson(timelinePath);

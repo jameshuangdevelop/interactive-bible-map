@@ -1761,8 +1761,6 @@ export async function validateData(options = {}) {
         `Unable to read timeline file: ${error.message}`
       );
     }
-  } else if (usingRepositoryDataRoot) {
-    recordError(errors, timelineRelativePath, "$", "Unable to read timeline file: ENOENT");
   }
 
   if (timelineData && !validateTimelineSchema(timelineData)) {

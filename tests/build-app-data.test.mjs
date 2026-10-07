@@ -418,3 +418,53 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
   });
 });
+
+test("buildAppData skips ancient generated files when timeline is absent", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const result = await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    assert.equal(result.ancientBuild.generated, false);
+    assert.match(
+      result.ancientBuild.skippedReason,
+      /Skipped ancient generated files/u
+    );
+
+    const outputFiles = await fs.readdir(outputDirectory);
+    assert.equal(
+      outputFiles.some((fileName) => fileName.startsWith("ancient.")),
+      false
+    );
+  });
+});
+
+test("buildAppData supports ancient-source fixture directory", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const result = await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      ancientSourceDirectory: ancientFixtureDirectory,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    assert.equal(result.ancientBuild.generated, true);
+
+    const stopPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
+    );
+    assert.ok(Array.isArray(stopPayload.holderLabels));
+  });
+});

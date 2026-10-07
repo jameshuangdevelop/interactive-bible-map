@@ -39,6 +39,8 @@ All example values below are **illustrative only** (not verified historical clai
   - `schema/ancient-areas.schema.json`
   - `schema/ancient-roads.schema.json`
   - `schema/ancient-coastline.schema.json`
+- In production/CI, if `data/timeline.json` is absent, validation skips timeline rules and `build:data` skips ancient generated outputs.
+- For development before M4-02 lands factual timeline data, generate ancient app payloads from the fixture with `npm run build:data -- --ancient-source tests/fixtures/ancient`.
 - The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
 - Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
 

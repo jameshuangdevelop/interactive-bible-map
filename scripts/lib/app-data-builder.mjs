@@ -138,15 +138,22 @@ export async function buildAppData(options = {}) {
     options.dataRoot != null
       ? path.resolve(options.dataRoot)
       : inferDataRootFromDirectory(locationsDirectory, "locations");
-  const timelinePath = path.resolve(options.timelinePath ?? path.join(dataRoot, "timeline.json"));
+  const ancientSourceDirectory = options.ancientSourceDirectory
+    ? path.resolve(options.ancientSourceDirectory)
+    : null;
+  const ancientDataRoot = ancientSourceDirectory ?? dataRoot;
   const ancientAreasPath = path.resolve(
-    options.ancientAreasPath ?? path.join(dataRoot, "geo", "ancient-areas.geojson")
+    options.ancientAreasPath ?? path.join(ancientDataRoot, "geo", "ancient-areas.geojson")
   );
   const ancientRoadsPath = path.resolve(
-    options.ancientRoadsPath ?? path.join(dataRoot, "geo", "ancient-roads.geojson")
+    options.ancientRoadsPath ?? path.join(ancientDataRoot, "geo", "ancient-roads.geojson")
   );
   const ancientCoastlinePath = path.resolve(
-    options.ancientCoastlinePath ?? path.join(dataRoot, "geo", "ancient-coastline.geojson")
+    options.ancientCoastlinePath ??
+      path.join(ancientDataRoot, "geo", "ancient-coastline.geojson")
+  );
+  const resolvedTimelinePath = path.resolve(
+    options.timelinePath ?? path.join(ancientDataRoot, "timeline.json")
   );
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
 
@@ -154,7 +161,7 @@ export async function buildAppData(options = {}) {
     locationsDirectory,
     mediaDirectory,
     bibliographyPath,
-    timelinePath,
+    timelinePath: resolvedTimelinePath,
     ancientAreasPath,
     ancientRoadsPath,
     ancientCoastlinePath,
@@ -242,16 +249,22 @@ export async function buildAppData(options = {}) {
   }
 
   const [timelineExists, areasExists, roadsExists, coastlineExists] = await Promise.all([
-    pathExists(timelinePath),
+    pathExists(resolvedTimelinePath),
     pathExists(ancientAreasPath),
     pathExists(ancientRoadsPath),
     pathExists(ancientCoastlinePath)
   ]);
 
+  let ancientBuild = {
+    generated: false,
+    skippedReason:
+      "Skipped ancient generated files because timeline or ancient geo source files are missing."
+  };
+
   if (timelineExists && areasExists && roadsExists && coastlineExists) {
     const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData] =
       await Promise.all([
-        readJsonFile(timelinePath),
+        readJsonFile(resolvedTimelinePath),
         readJsonFile(ancientAreasPath),
         readJsonFile(ancientRoadsPath),
         readJsonFile(ancientCoastlinePath)
@@ -264,6 +277,10 @@ export async function buildAppData(options = {}) {
       outputDirectory
     });
     outputFiles.push(...ancientBuildResult.writtenFiles);
+    ancientBuild = {
+      generated: true,
+      skippedReason: null
+    };
   }
 
   return {
@@ -271,6 +288,7 @@ export async function buildAppData(options = {}) {
     outputDirectory,
     locationCount: locationRecords.length,
     indexBytes: Buffer.byteLength(indexPayload, "utf8"),
-    outputFiles
+    outputFiles,
+    ancientBuild
   };
 }

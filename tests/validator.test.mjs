@@ -2012,6 +2012,13 @@ test("ancient timeline fixture is valid with ancient-shape requirement enabled",
   assert.equal(result.errors.length, 0);
 });
 
+test("missing timeline file is allowed and skips timeline validation", async () => {
+  const result = await runCase("valid", {
+    timelinePath: path.join(os.tmpdir(), `ibm-missing-timeline-${Date.now()}.json`)
+  });
+  assert.equal(result.errors.length, 0);
+});
+
 test("ancient timeline catches unknown holder ids", async () => {
   const result = await runWithTemporaryAncientCase(({ timeline }) => {
     timeline.areas[0].periods[0].holderId = "missing-holder";

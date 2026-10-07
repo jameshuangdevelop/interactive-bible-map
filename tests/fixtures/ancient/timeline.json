@@ -12,7 +12,7 @@
       "title": "Fixture start",
       "summary": "Fixture start state.",
       "sources": [
-        "bib:existing-bib-source"
+        "bib:pleiades-place-resource"
       ]
     },
     {
@@ -21,7 +21,7 @@
       "title": "Fixture change",
       "summary": "Fixture state change.",
       "sources": [
-        "bib:existing-bib-source"
+        "bib:pleiades-place-resource"
       ]
     }
   ],
@@ -32,7 +32,7 @@
       "kind": "roman-province",
       "romanSide": true,
       "sources": [
-        "bib:existing-bib-source"
+        "bib:pleiades-place-resource"
       ]
     },
     {
@@ -41,7 +41,7 @@
       "kind": "client-tetrarchy",
       "romanSide": true,
       "sources": [
-        "bib:existing-bib-source"
+        "bib:pleiades-place-resource"
       ]
     },
     {
@@ -50,7 +50,7 @@
       "kind": "outside-empire",
       "romanSide": false,
       "sources": [
-        "bib:existing-bib-source"
+        "bib:pleiades-place-resource"
       ]
     }
   ],
@@ -66,7 +66,7 @@
           "holderId": "client-antipas",
           "ruler": "Herod Antipas",
           "sources": [
-            "bib:existing-bib-source"
+            "bib:pleiades-place-resource"
           ]
         },
         {
@@ -74,7 +74,7 @@
           "toYear": 101,
           "holderId": "province-judaea",
           "sources": [
-            "bib:existing-bib-source"
+            "bib:pleiades-place-resource"
           ]
         }
       ]
@@ -88,7 +88,7 @@
           "toYear": 101,
           "holderId": "client-antipas",
           "sources": [
-            "bib:existing-bib-source"
+            "bib:pleiades-place-resource"
           ]
         }
       ]
@@ -102,7 +102,7 @@
           "toYear": 101,
           "holderId": "province-judaea",
           "sources": [
-            "bib:existing-bib-source"
+            "bib:pleiades-place-resource"
           ]
         }
       ]
@@ -116,7 +116,7 @@
           "toYear": 101,
           "holderId": "outside-parthia",
           "sources": [
-            "bib:existing-bib-source"
+            "bib:pleiades-place-resource"
           ]
         }
       ]
