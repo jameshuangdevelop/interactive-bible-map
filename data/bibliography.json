@@ -2060,6 +2060,78 @@
       "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
       "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=thracia-geo",
       "accessed": "2026-10-07"
+    },
+    {
+      "id": "livius-herod-agrippa-ii",
+      "type": "web",
+      "title": "Herod Agrippa II",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/herod-agrippa-ii/",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "kokkinos-justus-josephus-agrippa-coins",
+      "type": "article",
+      "title": "Justus, Josephus, Agrippa II and his Coins",
+      "authors": [
+        "Nikos Kokkinos"
+      ],
+      "year": 2003,
+      "journal": "Scripta Classica Israelica",
+      "url": "https://scriptaclassica.org/index.php/sci/article/view/3711",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "livius-titus",
+      "type": "web",
+      "title": "Titus",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/titus/",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "livius-domitian",
+      "type": "web",
+      "title": "Domitian",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/domitian/",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "livius-nerva",
+      "type": "web",
+      "title": "Nerva",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/nerva/",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "livius-trajan",
+      "type": "web",
+      "title": "Trajan",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/trajan/",
+      "accessed": "2026-10-07"
     }
   ]
 }

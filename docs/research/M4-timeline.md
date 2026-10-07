@@ -22,10 +22,10 @@ These moved together for the whole period: one ethnarchy (4 BC), then one provin
 |---|---|---|---|---|---|
 | -37 | -4 | Client kingdom | Herod the Great | `bib:rainey-notley-sacred-bridge` (existing) | |
 | -4 | 6 | Ethnarchy of Judea, Samaria and Idumea | Herod Archelaus | `bib:josephus-antiquities` (17.8, Herod's will; 17.11.4, Augustus's division); `scripture:Matthew 2:22` | Augustus did not grant Archelaus the royal title his father's will asked for, only "ethnarch," with kingship promised later if he ruled well (`bib:josephus-antiquities` 17.11.4). |
-| 6 | 41 | Roman province (prefects) | Augustus's and Tiberius's prefects, e.g. Pontius Pilate (`scripture:Luke 3:1`) | `bib:josephus-antiquities` (17.13.1–2, Archelaus banished; 18.1, Quirinius's census and Coponius); `bib:josephus-jewish-war` (2.7.3–2.8.1); `scripture:Luke 2:1-2` | The governors of 6–41 are called "prefect" on the Pilate inscription found at Caesarea in 1961; Josephus (Whiston's translation) calls them "procurator" throughout, the same word he uses after 44. This note uses "prefect" for 6–41 and "procurator" for 44 on, following the inscription, and flags the difference for the Fact-Checker. **Luke's census (Luke 2:1–2) is dated to this same Quirinius, but to the time of Herod's birth narrative, years before Herod's death in 4 BC; Josephus dates Quirinius's census to AD 6, after Herod's death.** This note does not resolve the question; see §4 (stop at 6) and the entity `quirinius`. |
+| 6 | 41 | Roman province (prefects) | Augustus's and Tiberius's prefects, e.g. Pontius Pilate (`scripture:Luke 3:1`) | `bib:josephus-antiquities` (17.13.1–2, Archelaus banished; 18.1, Quirinius's census and Coponius); `bib:josephus-jewish-war` (2.7.3–2.8.1); `scripture:Luke 2:1-2` | The governors of 6–41 are called "prefect" on the Pilate inscription found at Caesarea in 1961; Josephus (Whiston's translation) calls them "procurator" throughout, the same word he uses after 44. This note uses "prefect" for 6–41 and "procurator" for 44 on, following the inscription, and flags the difference for the Fact-Checker. **Luke's census (Luke 2:1–2) is dated to this same Quirinius, but to the time of Herod's birth narrative, years before Herod's death in 4 BC; Josephus dates Quirinius's census to AD 6, after Herod's death.** This note does not resolve the question; see §4 (stop at 6). Quirinius himself is not modeled as a holder (§3): he governed Syria and conducted a census, but did not hold Judea as its ruler. |
 | 41 | 44 | Client kingdom, reunified | Herod Agrippa I | `bib:josephus-antiquities` (19.5.1, Claudius adds Judea and Samaria "as due to his family"); `scripture:Acts 12:1,12:19-23` | |
 | 44 | 70 | Roman province (procurators) | e.g. Antonius Felix, Porcius Festus (`scripture:Acts 23-26`) | `bib:josephus-antiquities` (19.9.2, Fadus sent "to be procurator of Judea, and of the entire kingdom"); `scripture:Acts 25:1,25:23` | |
-| 70 | 100 | Roman province, now with a legion based at Jerusalem; no further border change found to AD 100 | Legates in place of procurators | `bib:josephus-jewish-war` (7, the war's end); general historical consensus | This is an administrative upgrade (a praetorian legate instead of a procurator), not a border or name change, so it is not treated as a stop (ADR-0037 item 1's example). The existing `judea-province.json` record's table currently ends its last entry at 70 ("procuratorial rule"); no source found for a further change before 100, so phase 2 should continue this row to 100 rather than leave a gap. |
+| 70 | 100 | Roman province, now with a legion based at Jerusalem; no further border change found to AD 100 | Legates in place of procurators | `bib:josephus-jewish-war` (7, the war's end); `bib:livius-titus`, `bib:livius-domitian`, `bib:livius-nerva`, `bib:livius-trajan` (the emperors of this span; see §2.23) | This is an administrative upgrade (a praetorian legate instead of a procurator), not a border or name change, so it is not treated as a stop (ADR-0037 item 1's example). The existing `judea-province.json` record's table currently ends its last entry at 70 ("procuratorial rule"); no source found for a further change before 100, so phase 2 should continue this row to 100 rather than leave a gap. |
 
 **Idumea** (no record; `scripture:Mark 3:8` names it, WEB: "from Jerusalem, from Idumaea, beyond the Jordan..."): held exactly as Judea/Samaria above (part of Archelaus's ethnarchy, then the province) — `bib:josephus-antiquities` 17.11.4 ("Idumea, and Judea... paid tribute to Archelaus"). Aristobulus's earlier annexation of part of Idumea to the Hasmonean state (140 BC) is Old Testament-period background, not part of this window.
 
@@ -41,13 +41,13 @@ Moved together under Antipas, then Agrippa I, then the province — with one lat
 | -4 | 39 | Tetrarchy | Herod Antipas | `bib:josephus-antiquities` (17.8, the will; 17.11.4, "to him it was that Perea and Galilee paid their tribute"); `scripture:Luke 3:1,23:6-7` | Antipas is "Herod the tetrarch" in the Gospels; the Gospels never use "Antipas." |
 | 39 | 44 | Client kingdom (added to Agrippa I's) | Herod Agrippa I | `bib:josephus-antiquities` (18.7.2, Caligula "took away from him his tetrarchy, and gave it... to Agrippa") | Antipas was banished after his wife Herodias pressed him to seek the royal title Caligula had just given her brother Agrippa I. Antiquities (18.7.2) places the banishment at Lugdunum (Lyon) in Gaul; the Jewish War (2.9, "he was punished for his ambition, by being banished into Spain") names Spain instead. Both are Josephus's own words; this note does not resolve the discrepancy. |
 | 44 | 54 (or 61) | Roman province (procurators) | | `bib:josephus-antiquities` (19.9.2) | |
-| 54 (or 61) | 100 | Mostly the province; **Tiberias and Tarichaeae (Galilee) and Julias-in-Perea with 14 villages** pass to Agrippa I's kingdom instead | Herod Agrippa II | `bib:josephus-antiquities` (20.8.4, "Caesar also bestowed on Agrippa a certain part of Galilee, Tiberias, and Tarichaeae... He gave him also Julias, a city of Perea, with fourteen villages"); on the year, `bib:jewish-encyclopedia-agrippa-ii` | Josephus dates this grant to "the first year of the reign of Nero" (AD 54). The Jewish Encyclopedia notes Agrippa II's coins carry two era-starting years, 53 and 61, and reads the second as this grant's real date, from numismatic evidence Josephus's narrative does not mention. This note presents both; see the stop at §4. No current place record is Tiberias, Tarichaeae, or the Perea Julias (not Bethsaida's Julias — see the entity `julias-perea`), so no place needs reassignment either way (§6). |
+| 54 (or 61) | 100 | Mostly the province; **Tiberias and Tarichaeae (Galilee) and Julias-in-Perea with 14 villages** pass to Agrippa I's kingdom instead | Herod Agrippa II | `bib:josephus-antiquities` (20.8.4, "Caesar also bestowed on Agrippa a certain part of Galilee, Tiberias, and Tarichaeae... He gave him also Julias, a city of Perea, with fourteen villages"); on the year, `bib:jewish-encyclopedia-agrippa-ii` | Josephus dates this grant to "the first year of the reign of Nero" (AD 54). The Jewish Encyclopedia notes Agrippa II's coins carry two era-starting years, 53 and 61, and reads the second as this grant's real date, from numismatic evidence Josephus's narrative does not mention. This note presents both; see the stop at §4 (folded into the AD 53 stop, since these towns are not drawable land of their own, ADR-0037 item 3). No current place record is Tiberias, Tarichaeae, or the Perea Julias (not Bethsaida's Julias — see §5.2), so no place needs reassignment either way (§6). |
 
 **Perea** (no record; e.g. `scripture:Matthew 19:1`, "the borders of Judea beyond the Jordan"; John 10:40): same table as Galilee, substituting "Julias in Perea with 14 villages" for "Tiberias and Tarichaeae" at the last row.
 
 ### 2.3 Gaulanitis, Batanea, Trachonitis and Auranitis (Philip's former tetrarchy)
 
-These four districts, which the sources never clearly separate from one another by border, moved together for the whole period. **No area record yet covers them as a group**; `caesarea-philippi` and `bethsaida` (both existing place records) sit here. Proposed area id: `gaulanitis` (an anchor name only; M4-03 may prefer separate shapes per district if the geometry supports it).
+These four districts, which the sources never clearly separate from one another by border, moved together for the whole period. **No area record yet covers them as a group**; `caesarea-philippi` and `bethsaida` (both existing place records) sit here. Proposed area id: **`philip-tetrarchy-lands`** (confirmed by the PO; not `gaulanitis`, since a later record named "Gaulanitis" on its own would mean the Golan alone, one of the four districts here, not all of them). Map labels come from the holder in force each year, not from this area id (ADR-0037, visual spec update).
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
@@ -56,8 +56,8 @@ These four districts, which the sources never clearly separate from one another 
 | 34 | 37 | Attached to the province of Syria (Philip died without an heir) | Governor of Syria | `bib:josephus-antiquities` (18.4.6); `bib:isbe-trachonitis` | |
 | 37 | 44 | Client kingdom | Herod Agrippa I | `bib:josephus-antiquities` (18.6.10, Caligula "appointed him to be king of the tetrarchy of Philip") | |
 | 44 | 53 | Roman province (procurators) | | `bib:josephus-antiquities` (19.9.2); `bib:isbe-trachonitis` ("administered by Roman officers" during Agrippa II's minority) | |
-| 53 | ~92/93 or 100 | Client kingdom | Herod Agrippa II | `bib:josephus-antiquities` (20.7.1, "he bestowed upon Agrippa the tetrarchy of Philip and Batanea, and added thereto Trachonites, with Abila"); `bib:isbe-trachonitis` ("From 53 till 100 AD it was ruled by Agrippa II") | The existing `bethsaida.json` record's table ends this period at 70; no source found for a change in 70, and `bib:isbe-trachonitis` and `bib:jewish-encyclopedia-agrippa-ii` both describe Agrippa II's rule continuing after the war (he fought on the Roman side) to his death. Phase 2 should correct the end year here (see §4, stop at ~100, and §8). |
-| ~92/93 or 100 | 106 | Added to the province of Syria | | `bib:isbe-abilene` ("his kingdom was incorporated in the province of Syria") | In 106 this area, with the Nabataean kingdom, became the new province of Arabia (`bib:isbe-trachonitis`; `bib:livius-nabataeans`) — after this note's AD 100 end point. |
+| 53 | 100 | Client kingdom | Herod Agrippa II | `bib:josephus-antiquities` (20.7.1, "he bestowed upon Agrippa the tetrarchy of Philip and Batanea, and added thereto Trachonites, with Abila"); `bib:isbe-trachonitis` ("From 53 till 100 AD it was ruled by Agrippa II") | The existing `bethsaida.json` record's table ends this period at 70; no source found for a change in 70, and `bib:isbe-trachonitis`, `bib:jewish-encyclopedia-agrippa-ii` and `bib:livius-herod-agrippa-ii` all describe Agrippa II's rule continuing after the war (he fought on the Roman side) to his death in 100 (see §4). Phase 2 should correct the end year here. |
+| 100 | 106 | Added to the province of Syria | | `bib:isbe-abilene` ("his kingdom was incorporated in the province of Syria") | In 106 this area, with the Nabataean kingdom, became the new province of Arabia (`bib:isbe-trachonitis`; `bib:livius-nabataeans`) — after this note's AD 100 end point. |
 
 ### 2.4 Abilene
 
@@ -69,7 +69,7 @@ No current record (proposed id `abilene`). Its history runs with §2.3 from AD 3
 | -35? | 37 | A separate tetrarchy, history obscure | "Lysanias the tetrarch" (`scripture:Luke 3:1`) | `bib:isbe-abilene` ("nothing further is known of the tetrarch Lysanias") | ISBE directly addresses the old objection that Luke 3:1's Lysanias must be the one killed in 36 BC: "the circumstances in which Abilene became [a] distinct tetrarchy are altogether obscure," implying a second, later ruler of the same name, attested by Josephus (`bib:josephus-antiquities` 19.5.1; 20.7.1) and a dedication inscription near Abila itself that ISBE describes. |
 | 37 | 44 | Added to Agrippa I's kingdom | Herod Agrippa I | `bib:josephus-antiquities` (18.6.10, "the tetrarchy of Lysanias" given with Philip's); `bib:isbe-abilene` | Josephus's account of Claudius's settlement in 41 (`bib:josephus-antiquities` 19.5.1) also names "Abila of Lysanias" as something Claudius "bestowed... as out of his own territories" — unclear whether this records a fresh grant or a confirmation of Caligula's 37 grant. This note presents both. |
 | 44 | 53 | Roman province (procurators) | | `bib:isbe-abilene` | |
-| 53 | ~92/93 or 100 | Added to Agrippa II's kingdom | Herod Agrippa II | `bib:josephus-antiquities` (20.7.1, "Abila; which last had been the tetrarchy of Lysanias"); `bib:isbe-abilene` | |
+| 53 | 100 | Added to Agrippa II's kingdom | Herod Agrippa II | `bib:josephus-antiquities` (20.7.1, "Abila; which last had been the tetrarchy of Lysanias"); `bib:isbe-abilene` | |
 
 ### 2.5 Chalcis
 
@@ -78,9 +78,9 @@ No current record (proposed id `chalcis`); no map place sits here. Chalcis (in t
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
 | 41 | 48 | Client kingdom | Herod (of Chalcis), Agrippa I's brother | `bib:josephus-antiquities` (19.5.1, "begged for him of Claudius the kingdom of Chalcis"); `bib:jewish-encyclopedia-herod-ii` (gives his death as "48-49 C.E.") | |
-| 48 | 50 | Unclear; no king named in the sources checked | | — | A gap this note could not source: Josephus does not say who, if anyone, held Chalcis between Herod's death and Agrippa II's appointment. Flagged for the Fact-Checker. |
+| 48 | 50 | **Uncertain** (kind: `uncertain`) | None named | — | No source this note opened names a holder for this span: Josephus does not say who, if anyone, ruled Chalcis between Herod's death and Agrippa II's appointment. Per the PO's instruction, this is modeled as an unclear status, not a guess or a silent gap. |
 | 50 | 53 | Client kingdom | Herod Agrippa II | `bib:jewish-encyclopedia-agrippa-ii` ("In the year 50... he had himself appointed... to the principality of Chalcis"); `bib:josephus-antiquities` (20.7.1, "he took from him Chalcis, when he had been governor thereof four years") | |
-| 53 | 72+ | Client kingdom; holder after 53 unclear until 72 | By 72: Aristobulus (son of Herod of Chalcis) | `bib:josephus-jewish-war` (7.7.1, "Aristobulus, king of the country called Chalcidene," assists Rome against Commagene in AD 72) | Josephus does not say when Aristobulus became king of Chalcis, only that he held it by 72. The gap 53–72 is unsourced in what this note could open; flagged for the Fact-Checker. |
+| 53 | 72 | **Uncertain** (kind: `uncertain`) | Not named until 72: Aristobulus (son of Herod of Chalcis), by then "king of the country called Chalcidene" | `bib:josephus-jewish-war` (7.7.1, Aristobulus assists Rome against Commagene in AD 72) | Josephus does not say when Aristobulus became king, only that he held it by 72; this note does not assume he held it for the whole span back to 53. Modeled as unclear for 53–72, with Aristobulus's name attached only from the year he is first attested. |
 
 ### 2.6 The Nabataean kingdom ("Arabia")
 
@@ -103,7 +103,7 @@ Matches the existing `syria` record (already has a two-row `politicalHistory`, `
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
 | -64 | -27 | Roman province | | (existing) | |
-| -27 | 100 (no change found in this window) | Province kept by the emperor; governed from Antioch; administers the Cilician plain throughout; administered Philip's former tetrarchy 34–37 and 44–53 (§2.3) and briefly oversaw Commagene and "rough" Cilicia, AD 17–37 (§2.9) | Imperial legates | (existing); `bib:tacitus-annals` (2.42, naming Syria's and Judea's "burdens" in the same breath as Cappadocia's and Commagene's annexation) | |
+| -27 | 100 (no change found in this window) | Province kept by the emperor; governed from Antioch; administers the Cilician plain throughout; administered Philip's former tetrarchy 34–37 and 44–53 (§2.3) and briefly oversaw Commagene and Cilicia Tracheia, AD 17–38 (§2.9, §2.10) | Imperial legates | (existing); `bib:tacitus-annals` (2.42, naming Syria's and Judea's "burdens" in the same breath as Cappadocia's and Commagene's annexation) | |
 
 **Coastal cities.** This note does not propose a single "coastal cities" area, because their status was not uniform:
 - **Caesarea Maritima and Joppa** (both existing place records, parent `judea-province`): named among the cities "subject to" Archelaus's ethnarchy in 4 BC, alongside Jerusalem and Sebaste (`bib:josephus-antiquities` 17.11.4) — consistent with their current parent throughout.
@@ -112,26 +112,39 @@ Matches the existing `syria` record (already has a two-row `politicalHistory`, `
 - **Ashkelon (Ascalon)**: Josephus notes Salome received "the royal palace of Ascalon" from Augustus, but the city itself is conventionally described as a free city outside Herodian rule throughout; this note could not open a source stating its status plainly and flags it for the Fact-Checker rather than asserting it.
 - None of these is a current place record except Caesarea Maritima, Joppa and Tyre, all already correctly parented.
 
-### 2.9 Commagene, and the "rough" (western) part of Cilicia
+### 2.9 Commagene
 
-No current record for Commagene (proposed id `commagene`); the existing `cilicia` record already describes the plain/rough split and is extended here, not changed. **On drawing this:** Commagene's own, separately describable territory (centered on Samosata) is the proposed `commagene` area below; the "coastal part of... Cilicia" Antiochus IV also held (next table, rows 3–4) is not a separately drawable shape in any source this note opened, so it is better understood as the existing `cilicia` area (§2.10) having Commagene's king as its holder for that span, not as added Commagene territory. §2.10's table already carries it that way.
+No current record (proposed id `commagene`): its own territory, centered on Samosata on the Euphrates.
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
-| ? | 17 | Client kingdom (Commagene); a separate king also held at least part of "rough" Cilicia | Antiochus III (Commagene); Philopator (Cilicia) | `bib:tacitus-annals` (2.42, "the death of the two kings, Antiochus of Commagene and Philopator of Cilicia, disturbed the peace of their countries, where the majority of men desired a Roman governor, and the minority a monarch") | Tacitus does not say which side prevailed immediately; this note infers direct rule from Caligula's later "restoration" (next row), which implies the kingdom had lapsed. |
+| ? | 17 | Client kingdom | Antiochus III | `bib:tacitus-annals` (2.42, "the death of the two kings, Antiochus of Commagene and Philopator of Cilicia, disturbed the peace of their countries, where the majority of men desired a Roman governor, and the minority a monarch") | Tacitus does not say which side prevailed immediately; this note infers direct rule from Caligula's later "restoration" (next row), which implies the kingdom had lapsed. |
 | 17 | 38 | Administered directly (probably attached to Syria) | Governor of Syria | `bib:tacitus-annals` (2.42); inference, flagged above | |
-| 38 | 41 | Client kingdom restored; also given the coastal part of "rough" Cilicia | Antiochus IV | `bib:cassius-dio-roman-history` (59.8.2, Caligula "had given Antiochus, the son of Antiochus, the district of Commagene, which his father had held, and likewise the coast region of Cilicia") | |
-| 41 | 72 | Client kingdom, continued (Josephus's wording of Claudius's 41 settlement is unclear whether this is a reduction or a restoration) | Antiochus IV | `bib:josephus-antiquities` (19.5.1, "he also took away from Antiochus that kingdom which he was possessed of, but gave him a certain part of Cilicia and Commagena") | |
-| 72 | 100 (no change found in this window) | Annexed to the province of Syria | | `bib:josephus-jewish-war` (7.7.1–3, "in the fourth year of the reign of Vespasian," Caesennius Paetus, governor of Syria, deposes Antiochus IV on suspicion of conspiring with Parthia) | Cilicia (plain and rough together) was reunited as its own province the same year (existing `cilicia.json`, `bib:livius-cilicia`). |
+| 38 | 41 | Client kingdom restored | Antiochus IV | `bib:cassius-dio-roman-history` (59.8.2, Caligula "had given Antiochus, the son of Antiochus, the district of Commagene, which his father had held") | |
+| 41 | 72 | Client kingdom, continued (Josephus's wording of Claudius's 41 settlement is unclear whether this is a reduction or a restoration) | Antiochus IV | `bib:josephus-antiquities` (19.5.1, "he also took away from Antiochus that kingdom which he was possessed of, but gave him a certain part of Cilicia and Commagena") | The "part of Cilicia" in the same clause is not Commagene's own territory; it is the coastal part of Cilicia Tracheia, carried in that area's own table (§2.10) with Antiochus IV as its holder for the same span. |
+| 72 | 100 (no change found in this window) | Annexed to the province of Syria | | `bib:josephus-jewish-war` (7.7.1–3, "in the fourth year of the reign of Vespasian," Caesennius Paetus, governor of Syria, deposes Antiochus IV on suspicion of conspiring with Parthia) | |
 
-### 2.10 Cilicia (the plain)
+### 2.10 Cilicia: the plain (Pedias) and the rough west (Tracheia)
 
-Matches the existing `cilicia` region record (parent `roman-empire`, not `syria`, by design — see its existing history text). No change proposed; this note only adds the primary-source confirmation.
+**Split per the PO's review:** these are two separate areas. The existing `cilicia` record (parent `roman-empire`, not `syria`, by design) is narrowed to mean the plain only (Cilicia Pedias, where Tarsus sits); the rough west (Cilicia Tracheia) is a new, separate proposed area, `cilicia-tracheia`. The two shared one Roman province both before 27 BC and again from 72; between those dates they had different holders, so a single area would have put Tarsus under Commagene's king, which the sources do not support.
+
+**The dividing line (for M4-03 to draw):** Strabo gives a specific boundary: "the boundary of [Cilicia Tracheia], the river Lamus and the village of the same name, lies between Soli and Elaeussa" (`bib:strabo-geography`, 14.5.6). Everything from the Lamus west to Pamphylia is Tracheia; everything from Soli (just east of the Lamus) to Issus, "for the most part... plains and fertile land," is Pedias (14.5.1, 14.5.6).
+
+**Cilicia Pedias (the plain; existing id `cilicia`):**
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
-| -27 | 72 | The plain administered from Syria; the rough west under client kings (§2.9) | | (existing); `bib:cassius-dio-roman-history` (59.8.2) | |
-| 72 | 100 (no change found) | Reunited as its own province | | (existing); `bib:livius-cilicia` | |
+| -27 | 72 | Administered from Syria throughout | | (existing `cilicia.json`); `bib:cassius-dio-roman-history` (59.8.2); `bib:strabo-geography` (14.5.1, 14.5.6) | |
+| 72 | 100 (no change found) | Reunited with Cilicia Tracheia as one province | | (existing); `bib:livius-cilicia` | From 72 both pieces share one holder, "the Roman province of Cilicia," without becoming one area: each keeps its own already-described shape. |
+
+**Cilicia Tracheia (the rough west; new proposed area `cilicia-tracheia`; no current place sits here):**
+
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | 17 | Client king(s); Strabo and Tacitus name different rulers | Archelaus of Cappadocia (Strabo); Philopator (Tacitus) | `bib:strabo-geography` (14.5.6, "Archelaüs received, in addition to Cappadocia, Cilicia Tracheia... except Seleuceia"); `bib:tacitus-annals` (2.42, "Philopator of Cilicia" dies in AD 17) | Strabo (writing earlier, under Augustus) names Archelaus of Cappadocia as holding Tracheia; Tacitus separately names "Philopator of Cilicia" as dying in AD 17, the same year as Antiochus of Commagene. This note could not find a source resolving whether Philopator succeeded Archelaus here, held a sub-grant of it, or is another name for the same person, and does not guess; both names are given. |
+| 17 | 38 | Administered directly (probably attached to Syria, with Commagene — §2.9) | Governor of Syria | `bib:tacitus-annals` (2.42); inference | |
+| 38 | 72 | Client kingdom: given to Commagene's king | Antiochus IV (of Commagene) | `bib:cassius-dio-roman-history` (59.8.2, "the coast region of Cilicia"); `bib:josephus-antiquities` (19.5.1) | Held by Commagene's king, but not part of Commagene's own territory (§2.9) — a different area under the same ruler. |
+| 72 | 100 (no change found) | Reunited with Cilicia Pedias as one province | | `bib:josephus-jewish-war` (7.7.1–3); `bib:livius-cilicia` | |
 
 ### 2.11 Cappadocia
 
@@ -142,32 +155,72 @@ Matches the existing `cappadocia` record (empty `politicalHistory`). This note a
 | ? | 17 | Client kingdom | Archelaus | `bib:tacitus-annals` (2.42, "for fifty years King Archelaus had been in possession of Cappadocia"; Tiberius "lured Archelaus from Cappadocia," and "his kingdom was converted into a province") | |
 | 17 | 100 (no change found) | Roman province | Quintus Veranius, first governor | (existing, citing `bib:isbe-cappadocia`); `bib:tacitus-annals` (2.42, the annexation) | |
 
-### 2.12 Galatia, and the lands joined to it (Pisidia, Lycaonia, Pamphylia, Paphlagonia, parts of Pontus); Lycia
+### 2.12 Galatia, and the lands joined to it (each its own area)
 
-Matches the existing `galatia`, `pisidia`, `lycaonia`, `pamphylia` records (already have history text; `galatia` already has a two-row `politicalHistory`). This note adds the precise years for Paphlagonia and Pontus Galaticus, and treats Lycia separately since no current place sits there.
+**Per the PO's review, each piece below is its own area**, since each changed holder on its own. Most are already existing records (`galatia`, `pisidia`, `lycaonia`, `pamphylia`); **Paphlagonia** and **Pontus Galaticus** are new proposed areas (`paphlagonia`, `pontus-galaticus`), and **Lycia** is a new proposed area (`lycia`; no current place sits there). A single entity, **"Roman province of Galatia"** (proposed entity id `galatia-province`), holds several of these at once from various dates; a second, **"Roman province of Lycia and Pamphylia"** (`lycia-pamphylia-province`), holds the pieces that left Galatia in 74. Map labels follow the holder, not the area (ADR-0037, visual spec update), so one province can label several areas on the map in the same year.
+
+**Galatia (the core; existing id `galatia`):**
 
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
-| -25 | -6 | Roman province (Galatia, Pisidia, Lycaonia and Isauria only) | | (existing `galatia.json`) | |
-| -6 | -2 | Paphlagonia added | | `bib:isbe-galatia` ("to it were added Paphlagonia 6 BC") | Both changes in this row and the next predate this note's 4 BC start by 2 years or fall just after it; neither moves a border near a current place, so neither is proposed as a stop (§4). |
-| -2 | 74 | Part of Pontus ("Pontus Galaticus") added | | `bib:isbe-galatia` ("part of Pontus 2 BC") | |
-| 74 | 137 | Most of Pisidia detached | | (existing `galatia.json`) | |
+| ? | -25 | Client kingdom | Amyntas (last king; d. 25 BC) | (existing `galatia.json`) | |
+| -25 | 100 (no change found) | Roman province of Galatia | | (existing) | |
 
-**Eastern Lycaonia** ("Lycaonia Antiochiana"): held by the king of Commagene (§2.9), not by Galatia, for at least part of this window. The existing `lycaonia.json` record gives 37–72; `bib:isbe-galatia` gives 41–72 for the same arrangement ("Part of Lycaonia was non-Roman and was governed by King Antiochus; from 41 to 72 AD Laranda belonged to this district"). This note presents both start years rather than resolving them; both plausibly track the Commagene dating uncertainty in §2.9.
+**Pisidia (existing id `pisidia`):**
 
-**Pamphylia's province** at "about AD 50" is already presented as unresolved in the existing `pamphylia.json`/`perga.json` records (the Fact-Checker's M3-11 note calls the evidence "split"); this note does not revisit that finding.
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | -25 | Client kingdom (held by Galatia's king) | Amyntas | (existing `pisidia.json`, citing `bib:isbe-pisidia`) | |
+| -25 | 74 | Roman province of Galatia | | (existing) | |
+| 74 | 100 (no change found) | Roman province of Galatia (north); Roman province of Lycia and Pamphylia (south, per the existing record) | | (existing) | **Doubt flag:** the existing record says only that Pisidia's "southern part" transferred to the new province of Lycia and Pamphylia in 74, implying the north stayed with Galatia; this note could not find a source describing exactly where that internal line ran. M4-03 should either find a cited line or treat Pisidia as one area with an `uncertain` holder from 74, rather than guess at a split. |
 
-**Lycia** (no record; no current place sits here): a free federation (the Lycian League) allied with Rome until Claudius made it a province in AD 43; later joined with Pamphylia under Vespasian. Already summarized with sources in the existing `pamphylia.json` note (citing `bib:cassius-dio-roman-history` 60.17.3–4 and `bib:livius-pamphylia`); this note does not re-derive it, and does not propose Lycia as a separate stop (§4) since it borders no current place.
+**Lycaonia (the Roman, western part; existing id `lycaonia`):**
+
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | -25 | Client kingdom (held by Galatia's king) | Amyntas | (existing `lycaonia.json`) | |
+| -25 | 100 (no change found) | Roman province of Galatia | | (existing) | |
+
+*Eastern Lycaonia ("Lycaonia Antiochiana") is not its own area*: no source this note opened describes its extent, only that it was "non-Roman" and that the town of Laranda belonged to it. It is a note on Lycaonia's own record, not a second area. Held by the king of Commagene (§2.9) 37 or 41–72; the existing `lycaonia.json` gives 37, `bib:isbe-galatia` gives 41, and this note does not resolve the difference (both plausibly track the Commagene dating uncertainty at §2.9).
+
+**Pamphylia (existing id `pamphylia`):**
+
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | 74 | **Uncertain** (kind: `uncertain`) | | (existing `pamphylia.json`/`perga.json`, already calling the evidence "split" — see the M3-11 Fact-Check's note on Dio 60.17.3–4 read against Tacitus *Histories* 2.9, `bib:livius-pamphylia` and `pleiades:981530`) | The existing records already hold this open rather than choosing; this note carries that forward as the `uncertain` kind for the whole span, rather than defaulting to "Galatia" as this note's first draft did. |
+| 74 | 100 (no change found) | Roman province of Lycia and Pamphylia | | (existing); `bib:cassius-dio-roman-history` (60.17.3–4, the Claudius-era background) | |
+
+**Paphlagonia (new proposed area `paphlagonia`; no current place sits here):**
+
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | -6 | Client kingdom | Deiotarus Philadelphus (last king, by inference from the bequest) | `bib:isbe-galatia` ("to it were added Paphlagonia 6 BC") | This note could not open a source naming the king directly; flagged. -6 is before this note's 4 BC start, so it is background only, not a stop. |
+| -6 | 100 (no change found) | Roman province of Galatia | | `bib:isbe-galatia` | |
+
+**Pontus Galaticus (new proposed area `pontus-galaticus`; no current place sits here):**
+
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | -2 | Part of the independent Pontic kingdom (§2.13) | | `bib:isbe-galatia` ("part of Pontus 2 BC") | |
+| -2 | 100 (no change found) | Roman province of Galatia | | `bib:isbe-galatia` | Folded into the AD 6 stop (§4), the nearest one after -2, per the PO's instruction. |
+
+**Lycia (new proposed area `lycia`; no current place sits here):**
+
+| From | To | Holder | Ruler | Sources | Notes |
+|---|---|---|---|---|---|
+| ? | 43 | Free federation (the Lycian League), allied with Rome | | (existing `pamphylia.json` note, citing `bib:cassius-dio-roman-history` 60.17.3–4 and `bib:livius-pamphylia`) | |
+| 43 | 74 | Roman province of Lycia | | (existing) | |
+| 74 | 100 (no change found) | Roman province of Lycia and Pamphylia | | (existing) | Folded into the AD 74 stop (§4), alongside Pamphylia's own change the same year. |
 
 ### 2.13 Pontus (the eastern, Polemon kingdom) and Bithynia
 
-Matches the existing `pontus` and `bithynia` records (both empty `politicalHistory`; `pontus.json`'s history text already describes the three-way division and Polemon's kingdom).
+Bithynia (existing id `bithynia`) is not one of the Galatia-administered pieces above; it was always its own, separately stable province. Pontus (existing id `pontus`) is the independent eastern kingdom, which becomes one of the Galatia-administered pieces once Polemon gives it up.
 
-| From | To | Holder | Ruler | Sources | Notes |
+| Area | From | To | Holder | Sources | Notes |
 |---|---|---|---|---|---|
-| -74 | 100 (no change found) | Bithynia: Roman province throughout | | (existing `bithynia.json`, citing `bib:isbe-bithynia`) | |
-| -36 | 64 | Eastern Pontus: client kingdom | Polemon I, then his descendants, ending with Polemon II | (existing `pontus.json`, citing `bib:isbe-pontus`); `bib:isbe-galatia` ("in 64 also Pontus Polemoniacus [added to Galatia]") | This note supplies the precise year (64) for Polemon II giving up the kingdom; the existing record only says "when Polemon gave it up." Not proposed as a stop (§4): it borders no current place. |
-| 64 | 100 (no change found) | Added to the province of Galatia, as "Pontus Polemoniacus" | | `bib:isbe-galatia` | |
+| Bithynia | -74 | 100 (no change found) | Roman province | (existing `bithynia.json`, citing `bib:isbe-bithynia`) | |
+| Pontus | -36 | 64 | Client kingdom | (existing `pontus.json`, citing `bib:isbe-pontus`); `bib:isbe-galatia` ("in 64 also Pontus Polemoniacus [added to Galatia]") | Ruler: Polemon I, then his descendants, ending with Polemon II. This note supplies the precise year (64) for Polemon II giving up the kingdom; the existing record only says "when Polemon gave it up." |
+| Pontus | 64 | 100 (no change found) | Roman province of Galatia, as "Pontus Polemoniacus" | `bib:isbe-galatia` | Folded into the AD 70 stop (§4), the nearest one after 64. |
 
 ### 2.14 Thrace
 
@@ -176,8 +229,9 @@ No current record (proposed id `thrace`); no current place sits here, but the ca
 | From | To | Holder | Ruler | Sources | Notes |
 |---|---|---|---|---|---|
 | ? | 38 | Client kingdom | Rhoemetalces II ("the last native prince," installed by Caligula in 38) | `bib:smith-dictionary-thracia` | |
-| 38 | 46 or 69–79 | Disputed — see note | | `bib:smith-dictionary-thracia` | Smith's Dictionary reports a genuine ancient disagreement: the Eusebian Chronicle dates Thrace's reduction to a province to AD 47, under Claudius, but Suetonius (`Vespasian` 8), Eutropius and Tacitus (`Histories` 1.11) date it to Vespasian's reign (69–79). The 19th-century editor suggests Rhoemetalces II may have died around 46/47, ending native rule in practice, while formal provincial status waited for Vespasian. This note presents both without resolving them, and does not propose Thrace as a stop (§4), both for this uncertainty and because it borders no current place. |
-| by 79 | 100 (no change found) | Roman province | | `bib:smith-dictionary-thracia` | |
+| 38 | 46 | Client kingdom, continued | Rhoemetalces II | `bib:smith-dictionary-thracia` | |
+| 46 | 79 | **Uncertain** (kind: `uncertain`) | | `bib:smith-dictionary-thracia` | No openable modern source found settling this, so per the PO's instruction this span is modeled as unclear rather than choosing. Smith's Dictionary (1854) reports a genuine ancient disagreement: the Eusebian Chronicle dates Thrace's reduction to a province to AD 47, under Claudius, but Suetonius (`Vespasian` 8), Eutropius and Tacitus (`Histories` 1.11) date it to Vespasian's reign (69–79). Its 19th-century editor suggests Rhoemetalces II may have died around 46/47, ending native rule in practice, while formal provincial status waited for Vespasian; this note presents both readings without choosing. Not proposed as a stop (§4): it borders no current place, and the year itself is too uncertain to attach to one. |
+| 79 | 100 (no change found) | Roman province | | `bib:smith-dictionary-thracia` | |
 
 ### 2.15 Achaia and Macedonia
 
@@ -239,7 +293,7 @@ Matches the existing record (stable; organized AD 10). No change proposed.
 
 | Area | From | To | Holder | Sources | Notes |
 |---|---|---|---|---|---|
-| Armenia (no record; proposed id `armenia`) | ? | 63 | Contested client kingdom; Roman and Parthian nominees alternate repeatedly | `bib:tacitus-annals` (books 2, 6, 11-15 cover individual reigns) | This note does not enumerate every brief claimant; see "left out" in §4. |
+| Armenia (no record; proposed id `armenia`) | ? | 63 | **Uncertain** (kind: `uncertain`) | `bib:tacitus-annals` (books 2, 6, 11-15 cover individual reigns) | Roman and Parthian nominees alternate repeatedly and contestedly through this span; this note does not enumerate every brief claimant and models it as unclear rather than naming one ruler per stretch. See "left out" in §4. |
 | Armenia | 63 | 100 (no change found) | Client kingdom under a Parthian prince, crowned by and nominally subject to Rome (the Peace of Rhandeia) | (existing `parthian-empire.json` history text) | |
 | Parthian Empire | — | — | No internal Parthian succession tracked in this note | (existing text) | Out of scope in the same way as other areas outside the focus; its kings are not a "stop" unless they touch Rome's or Armenia's border. |
 
@@ -256,10 +310,10 @@ Matches the existing `roman-empire` record, whose `politicalHistory` already lis
 | 54 | 68 | Nero | `bib:suetonius-twelve-caesars` | |
 | 68 | 69 | Galba, Otho, Vitellius (the "Year of the Four Emperors") | `bib:cassius-dio-roman-history`; `bib:tacitus-histories` | No border change in our focus area is attributed to this instability; not proposed as a stop by itself. |
 | 69 | 79 | Vespasian | `bib:josephus-jewish-war` (7) | |
-| 79 | 81 | Titus | general historical consensus | |
-| 81 | 96 | Domitian | general historical consensus | |
-| 96 | 98 | Nerva | general historical consensus | |
-| 98 | 100 (continues past this note's end) | Trajan | general historical consensus | |
+| 79 | 81 | Titus | `bib:livius-titus` ("r. 79-81") | |
+| 81 | 96 | Domitian | `bib:livius-domitian` ("r.81-96") | |
+| 96 | 98 | Nerva | `bib:livius-nerva` ("96-98") | |
+| 98 | 100 (continues past this note's end) | Trajan | `bib:livius-trajan` ("r. 98-117") | |
 
 **The empire's outer edge, for context at each stop (not separate areas):**
 - **Mauretania:** a client kingdom (Juba II, then Ptolemy) until Caligula had King Ptolemy put to death, c. AD 40 (`bib:cassius-dio-roman-history` 59.25, "Gaius sent for Ptolemy, the son of Juba, and... put him to death," followed by the editorial note "How the Mauretanian began to be governed by Romans"). Claudius organized it into two provinces after suppressing the revolt that followed. By AD 44 and after, the map's western edge should show two Roman provinces, not a client kingdom.
@@ -267,28 +321,28 @@ Matches the existing `roman-empire` record, whose `politicalHistory` already lis
 
 ## 3. Entities
 
-Deduplicated political bodies referenced in §2, for M4-01 to use as a lookup if its schema separates "who" from "where."
+Deduplicated political bodies referenced in §2, for M4-01 to use as a lookup if its schema separates "who" from "where." **Entities are holders only** (per the PO's review): Quirinius and the Perea Julias are removed below, since neither held an area as its ruler (the census is in the AD 6 stop, §4; Julias is in §5). Judea's two Roman-governor entities are merged into one, since a change of title alone is not a map change. Ethnarchies and tetrarchies share one kind, `client-tetrarchy`, with the English name kept distinct.
 
 | id | English name | Kind | Rulers (years) | Passages | Sources | Matching location record |
 |---|---|---|---|---|---|---|
 | `herod-the-great` | Kingdom of Herod the Great | Client kingdom | Herod the Great (-37 to -4) | `scripture:Matthew 2:1,Luke 1:5` | `bib:josephus-antiquities` (17.8) | None (a ruler, not an area) |
-| `archelaus-ethnarchy` | Ethnarchy of Herod Archelaus | Ethnarchy | Herod Archelaus (-4 to 6) | `scripture:Matthew 2:22` | `bib:josephus-antiquities` (17.11.4) | None |
-| `antipas-tetrarchy` | Tetrarchy of Herod Antipas | Tetrarchy | Herod Antipas (-4 to 39) | `scripture:Luke 3:1,23:6-7,Mark 6:14-29` | `bib:josephus-antiquities` (17.8) | None |
-| `philip-tetrarchy` | Tetrarchy of Herod Philip | Tetrarchy | Herod Philip (-4 to 34) | `scripture:Luke 3:1` | `bib:josephus-antiquities` (17.8, 18.4.6) | None |
-| `lysanias-abilene` | Tetrarchy of Lysanias | Tetrarchy | "Lysanias the tetrarch" (? to 37) | `scripture:Luke 3:1` | `bib:isbe-abilene` | None |
-| `judea-prefects` | Roman province of Judea (prefects) | Province | Prefects, e.g. Pontius Pilate (6 to 41) | `scripture:Luke 3:1` | `bib:josephus-antiquities` (18.1) | `judea-province` (for this period) |
+| `archelaus-ethnarchy` | Ethnarchy of Herod Archelaus | Client tetrarchy | Herod Archelaus (-4 to 6) | `scripture:Matthew 2:22` | `bib:josephus-antiquities` (17.11.4) | None |
+| `antipas-tetrarchy` | Tetrarchy of Herod Antipas | Client tetrarchy | Herod Antipas (-4 to 39) | `scripture:Luke 3:1,23:6-7,Mark 6:14-29` | `bib:josephus-antiquities` (17.8) | None |
+| `philip-tetrarchy` | Tetrarchy of Herod Philip | Client tetrarchy | Herod Philip (-4 to 34) | `scripture:Luke 3:1` | `bib:josephus-antiquities` (17.8, 18.4.6) | None |
+| `lysanias-abilene` | Tetrarchy of Lysanias | Client tetrarchy | "Lysanias the tetrarch" (? to 37) | `scripture:Luke 3:1` | `bib:isbe-abilene` | None |
+| `roman-province-judea` | Roman province of Judea | Province | Prefects 6–41 (e.g. Pontius Pilate), procurators 44–100 (e.g. Antonius Felix, Porcius Festus) — the title changes in 44, but this is one entity, since a title change alone is not a map change | `scripture:Luke 3:1,Acts 23:24,25:1,25:23` | `bib:josephus-antiquities` (18.1, prefects; 19.9.2, procurators) | `judea-province` |
 | `agrippa-i-kingdom` | Kingdom of Herod Agrippa I | Client kingdom | Herod Agrippa I (37 to 44; Philip's tetrarchy and Abilene from 37, Galilee and Perea added 39, Judea and Samaria added 41) | `scripture:Acts 12:1-23` | `bib:josephus-antiquities` (18.6.10, 18.7.2, 19.5.1) | None |
 | `herod-of-chalcis` | Kingdom of Herod (of Chalcis) | Client kingdom | Herod, brother of Agrippa I (41 to 48) | — | `bib:josephus-antiquities` (19.5.1); `bib:jewish-encyclopedia-herod-ii` | None |
-| `judea-procurators` | Roman province of Judea (procurators) | Province | Procurators, e.g. Antonius Felix, Porcius Festus (44 to 100, continuing) | `scripture:Acts 23:24,25:1,25:23` | `bib:josephus-antiquities` (19.9.2) | `judea-province` (for this period) |
 | `agrippa-ii-chalcis` | Agrippa II as king of Chalcis | Client kingdom | Herod Agrippa II (50 to 53) | — | `bib:josephus-antiquities` (20.7.1); `bib:jewish-encyclopedia-agrippa-ii` | None |
-| `agrippa-ii-kingdom` | Kingdom of Herod Agrippa II | Client kingdom | Herod Agrippa II (53 to about 92/93 or 100; Galilee/Perea towns added 54 or 61) | `scripture:Acts 25:13,25:23,26:2,26:32` | `bib:josephus-antiquities` (20.7.1, 20.8.4); `bib:jewish-encyclopedia-agrippa-ii`; `bib:isbe-trachonitis` | None |
-| `commagene-kingdom` | Kingdom of Commagene | Client kingdom | Antiochus III (to 17), direct rule (17-38), Antiochus IV (38-72) | — | `bib:tacitus-annals` (2.42); `bib:cassius-dio-roman-history` (59.8.2); `bib:josephus-antiquities` (19.5.1); `bib:josephus-jewish-war` (7.7) | None |
+| `agrippa-ii-kingdom` | Kingdom of Herod Agrippa II | Client kingdom | Herod Agrippa II (53 to 100; Galilee/Perea towns added 54 or 61) | `scripture:Acts 25:13,25:23,26:2,26:32` | `bib:josephus-antiquities` (20.7.1, 20.8.4); `bib:jewish-encyclopedia-agrippa-ii`; `bib:isbe-trachonitis`; `bib:livius-herod-agrippa-ii` | None |
+| `commagene-kingdom` | Kingdom of Commagene | Client kingdom | Antiochus III (to 17), direct rule (17-38), Antiochus IV (38-72; also holds Cilicia Tracheia's coastal part, §2.10, over the same span) | — | `bib:tacitus-annals` (2.42); `bib:cassius-dio-roman-history` (59.8.2); `bib:josephus-antiquities` (19.5.1); `bib:josephus-jewish-war` (7.7) | None |
 | `aristobulus-chalcis` | Aristobulus, king of Chalcis | Client kingdom | Aristobulus (by 72; start year not found) | — | `bib:josephus-jewish-war` (7.7.1) | None |
 | `polemon-pontus` | Kingdom of Pontus (Polemon) | Client kingdom | Polemon I, then descendants ending with Polemon II (-36 to 64) | — | (existing `pontus.json`); `bib:isbe-galatia` | `pontus` |
-| `thrace-kingdom` | Kingdom of Thrace | Client kingdom | Rhoemetalces II (to 38 or 46/47; dispute, see §2.14) | — | `bib:smith-dictionary-thracia` | None |
+| `galatia-province` | Roman province of Galatia | Province | Roman governors (-25 to 100, continuing); holds `galatia` from -25, `pisidia` and `lycaonia` (west) from -25, `paphlagonia` from -6, `pontus-galaticus` from -2, `pontus` from 64 | — | `bib:isbe-galatia`; existing `galatia.json` | `galatia` (for the core area only; also the holder of several other areas, §2.12) |
+| `lycia-province` | Roman province of Lycia | Province | Roman governors (43 to 74) | — | (existing `pamphylia.json` note); `bib:cassius-dio-roman-history` (60.17.3–4) | None |
+| `lycia-pamphylia-province` | Roman province of Lycia and Pamphylia | Province | Roman governors (74 to 100, continuing); holds `lycia` and `pamphylia` | — | (existing `galatia.json`/`pisidia.json`/`pamphylia.json`) | None |
+| `thrace-kingdom` | Kingdom of Thrace | Client kingdom | Rhoemetalces II (to 46; status uncertain 46–79, §2.14) | — | `bib:smith-dictionary-thracia` | None |
 | `nabataean-kingdom` | Nabataean kingdom ("Arabia") | Client kingdom | Aretas IV (-9 to 40), Malichus II (40-71), Rabbel II (71-106) | `scripture:2 Corinthians 11:32,Galatians 1:17` | `bib:livius-nabataeans` | `arabia` |
-| `quirinius` | Quirinius (Cyrenius), governor of Syria | Roman official | Quirinius (census in AD 6; governed Syria at an uncertain, possibly earlier, additional time — see §2.1) | `scripture:Luke 2:1-2` | `bib:josephus-antiquities` (18.1) | None |
-| `julias-perea` | Julias (formerly Betharamphtha), Perea | Town, not an area | Renamed by Herod Antipas for the emperor's wife | — | `bib:isbe-peraea` | None (not Bethsaida's "Julias" in Gaulanitis — two different towns share the name) |
 
 ## 4. Stops
 
@@ -297,27 +351,25 @@ Thirteen stops. The brief's four (ADR-0037) are marked **(required)**.
 | Year | Title | Summary | Sources |
 |---|---|---|---|
 | **-4 (required)** | Herod's kingdom is divided | Herod the Great dies. Augustus confirms his sons' claims but not as Herod willed them: Archelaus becomes ethnarch (not king) of Judea, Samaria and Idumea; Antipas becomes tetrarch of Galilee and Perea; Philip becomes tetrarch of Gaulanitis, Batanea, Trachonitis and Auranitis. Three Greek cities — Gaza, Gadara and Hippos — are cut away and added to the province of Syria. | `bib:josephus-antiquities` (17.8, 17.11.4); `scripture:Matthew 2:22` |
-| **6 (required)** | Judea becomes a Roman province | Rome deposes Archelaus and turns his ethnarchy into a province under a prefect. Quirinius, governing Syria, conducts a census. Antipas's and Philip's territories are unaffected. | `bib:josephus-antiquities` (18.1); `scripture:Luke 2:1-2,3:1` |
-| 17 | Cappadocia and Commagene come under direct Roman rule | King Archelaus of Cappadocia dies (or is deposed) after a 50-year reign, and his kingdom becomes a province. The same year, the kings of Commagene and of part of Cilicia also die, and Tacitus records that Rome and local opinion were divided over whether to install a new king or govern directly; this note follows the administration-by-Syria reading (§2.9). | `bib:tacitus-annals` (2.42) |
+| **6 (required)** | Judea becomes a Roman province | Rome deposes Archelaus and turns his ethnarchy into a province under a prefect. Quirinius, governing Syria, conducts a census. Antipas's and Philip's territories are unaffected. Folded here: in 2 BC, the part of Pontus called "Pontus Galaticus" had already been added to the province of Galatia, the nearest stop to that change. | `bib:josephus-antiquities` (18.1); `scripture:Luke 2:1-2,3:1`; `bib:isbe-galatia` |
+| 17 | Cappadocia comes under direct Roman rule; Cilicia Tracheia's king also dies | King Archelaus of Cappadocia dies (or is deposed) after a 50-year reign, and his kingdom becomes a province. Strabo says Archelaus also held Cilicia Tracheia; Tacitus separately records that "Philopator of Cilicia" died the same year as Antiochus of Commagene, and that Rome and local opinion were divided over whether to install a new king there or govern directly. This note follows the administration-by-Syria reading for both Commagene and Cilicia Tracheia (§2.9, §2.10). | `bib:tacitus-annals` (2.42); `bib:strabo-geography` (14.5.6) |
 | 34 | Philip's tetrarchy is absorbed into Syria | Philip dies without an heir after 37 years. Rome does not appoint a successor tetrarch; his territory is attached to the province of Syria, though its own revenues stay earmarked for it. | `bib:josephus-antiquities` (18.4.6) |
-| 37 | Caligula makes Agrippa I a king | The new emperor frees his friend Agrippa (Agrippa I, grandson of Herod the Great) from a Roman prison and makes him king over Philip's former tetrarchy and the neighboring tetrarchy of Abilene — the first time since Herod the Great that any of this land is ruled by a king rather than a tetrarch, prefect or governor. Separately, Caligula restores the kingdom of Commagene, with part of the Cilician coast, to Antiochus IV. | `bib:josephus-antiquities` (18.6.10); `bib:cassius-dio-roman-history` (59.8.2) |
-| 39 | Antipas is banished; his tetrarchy joins Agrippa I's kingdom | Herodias presses her husband Antipas to seek the royal title Caligula gave her brother. Caligula instead banishes Antipas and gives Galilee and Perea to Agrippa I. | `bib:josephus-antiquities` (18.7.2) |
-| **41 (required)** | Agrippa I's kingdom is made whole; new neighbors appear | The new emperor Claudius adds Judea and Samaria to Agrippa I's kingdom, restoring his grandfather Herod's full extent under one ruler for the only time in this period. At the same time Claudius makes Agrippa I's brother Herod king of the new client kingdom of Chalcis, and resolves Antiochus IV's position in Commagene and coastal Cilicia. | `bib:josephus-antiquities` (19.5.1); `scripture:Acts 12:1` |
-| **44 (required)** | Agrippa I dies; direct Roman rule returns | Agrippa I dies at Caesarea (Acts 12 and Josephus both describe his sudden death). Rather than let his young son inherit, Claudius places the whole kingdom — Judea, Samaria, Galilee, Perea and Philip's former tetrarchy — under Roman procurators. | `bib:josephus-antiquities` (19.9.2); `scripture:Acts 12:20-23` |
-| 53 | Agrippa II trades Chalcis for the northern tetrarchy | Claudius, in the twelfth year of his reign, takes Chalcis back from the younger Agrippa (Agrippa I's son, ruling Chalcis since 50) and gives him Philip's former tetrarchy and Abilene instead, with the title of king. | `bib:josephus-antiquities` (20.7.1) |
-| 54 (some sources: 61) | Nero enlarges Agrippa II's kingdom in Galilee and Perea | Josephus dates this to Nero's first year: Agrippa II receives Tiberias and Tarichaeae in Galilee and Julias in Perea (with fourteen villages), while the rest of both regions stays under the Roman procurators. The Jewish Encyclopedia reads Agrippa II's own coinage as pointing to 61 for this specific grant instead. | `bib:josephus-antiquities` (20.8.4); `bib:jewish-encyclopedia-agrippa-ii` |
-| **70 (required)** | Jerusalem falls | After four years of war, Titus's forces take Jerusalem and destroy the Second Temple, ending Jewish self-government in the province. Agrippa II, who had sided with Rome, keeps his own separate kingdom. | `bib:josephus-jewish-war` (7) |
-| 72 | Commagene is annexed; Cilicia is reunited | Vespasian's governor of Syria accuses Antiochus IV of Commagene of plotting with Parthia and annexes his kingdom, including the Cilician coast he held. The same year, Cilicia (plain and rough together) becomes a single province again for the first time since Augustus. | `bib:josephus-jewish-war` (7.7); `bib:livius-cilicia` |
-| 74 | Pamphylia leaves Galatia and is joined with Lycia | Vespasian detaches most of Pisidia from the province of Galatia and joins Pamphylia with the separately-administered region of Lycia to its south, forming one new province. Perga's own province changes name and neighbours, from "Galatia" to "Lycia and Pamphylia," even though Perga's own ground does not move. | (existing `galatia.json`, `pisidia.json`, `pamphylia.json`); `bib:cassius-dio-roman-history` (60.17.3–4, the Claudius-era background to the merger) |
-| about 92/93 or 100 | Agrippa II dies; his kingdom joins Syria | The last Herodian ruler dies — older reference works, following the Byzantine scholar Photius's citation of a lost history, give AD 100 (a date those same works call disputed); this note could not open a source for the earlier date some modern historians propose and flags this for the Fact-Checker (§8). His kingdom (Gaulanitis, Batanea, Trachonitis, Auranitis and Abilene) is added to the province of Syria. | `bib:jewish-encyclopedia-agrippa-ii`; `bib:isbe-abilene` |
+| 37 | Caligula makes Agrippa I a king | The new emperor frees his friend Agrippa (Agrippa I, grandson of Herod the Great) from a Roman prison and makes him king over Philip's former tetrarchy and the neighboring tetrarchy of Abilene — the first time since Herod the Great that any of this land is ruled by a king rather than a tetrarch, prefect or governor. | `bib:josephus-antiquities` (18.6.10) |
+| 39 | Antipas is banished; his tetrarchy joins Agrippa I's kingdom | Herodias presses her husband Antipas to seek the royal title Caligula gave her brother. Caligula instead banishes Antipas and gives Galilee and Perea to Agrippa I. Folded here: the previous year, Caligula had restored the kingdom of Commagene, with the coastal part of Cilicia Tracheia, to Antiochus IV — a different area, placed at this later stop because it could not show on the AD 37 map above. | `bib:josephus-antiquities` (18.7.2); `bib:cassius-dio-roman-history` (59.8.2, Commagene's restoration, AD 38) |
+| **41 (required)** | Agrippa I's kingdom is made whole; new neighbors appear | The new emperor Claudius adds Judea and Samaria to Agrippa I's kingdom, restoring his grandfather Herod's full extent under one ruler for the only time in this period. At the same time Claudius makes Agrippa I's brother Herod king of the new client kingdom of Chalcis, and resolves Antiochus IV's position in Commagene and Cilicia Tracheia's coastal part. | `bib:josephus-antiquities` (19.5.1); `scripture:Acts 12:1` |
+| **44 (required)** | Agrippa I dies; direct Roman rule returns | Agrippa I dies at Caesarea (Acts 12 and Josephus both describe his sudden death). Rather than let his young son inherit, Claudius places the whole kingdom — Judea, Samaria, Galilee, Perea and Philip's former tetrarchy — under Roman procurators. Folded here: the previous year, Claudius had made Lycia, until then a free federation allied with Rome, a Roman province in its own right — a different area, placed at this stop as the nearest one after AD 43. | `bib:josephus-antiquities` (19.9.2); `scripture:Acts 12:20-23`; `bib:cassius-dio-roman-history` (60.17.3–4, Lycia, AD 43) |
+| 53 | Agrippa II trades Chalcis for the northern tetrarchy | Claudius, in the twelfth year of his reign, takes Chalcis back from the younger Agrippa (Agrippa I's son, ruling Chalcis since 50) and gives him Philip's former tetrarchy and Abilene instead, with the title of king. Within the next few years, Nero enlarges this grant with parts of Galilee (Tiberias and Tarichaeae) and Perea (Julias and fourteen villages), while the rest of both regions stays under the Roman procurators; Josephus dates this to Nero's first year (54), but the Jewish Encyclopedia reads Agrippa II's own coinage as pointing to 61 for this specific addition instead. Neither of these towns is drawable land of its own (ADR-0037 item 3), so this does not move the map's borders; it is recorded on the towns themselves, not as its own stop. | `bib:josephus-antiquities` (20.7.1, the Chalcis exchange; 20.8.4, "Caesar also bestowed on Agrippa a certain part of Galilee, Tiberias, and Tarichaeae... Julias, a city of Perea, with fourteen villages"); `bib:jewish-encyclopedia-agrippa-ii` (the 61 reading) |
+| **70 (required)** | Jerusalem falls | After four years of war, Titus's forces take Jerusalem and destroy the Second Temple, ending Jewish self-government in the province. Agrippa II, who had sided with Rome, keeps his own separate kingdom. Folded here: six years earlier, Polemon II had given up the independent kingdom of eastern Pontus, which the province of Galatia then absorbed as "Pontus Polemoniacus" — a different area, placed at this later stop as the nearest one after AD 64. | `bib:josephus-jewish-war` (7); `bib:isbe-galatia` (Pontus Polemoniacus, AD 64) |
+| 72 | Commagene is annexed; Cilicia is reunited | Vespasian's governor of Syria accuses Antiochus IV of Commagene of plotting with Parthia and annexes his kingdom, including the coastal part of Cilicia Tracheia he held. The same year, Cilicia Pedias and Cilicia Tracheia share one province again for the first time since Augustus. | `bib:josephus-jewish-war` (7.7); `bib:livius-cilicia` |
+| 74 | Pamphylia leaves Galatia and is joined with Lycia | Vespasian joins Pamphylia with Lycia to its south, forming one new province, and most of Pisidia leaves Galatia for it too. Perga's own province changes name and neighbours, from "Galatia" to "Lycia and Pamphylia," even though Perga's own ground does not move. | (existing `galatia.json`, `pisidia.json`, `pamphylia.json`); `bib:cassius-dio-roman-history` (60.17.3–4, the Claudius-era background to the merger) |
+| 100 | Agrippa II dies; his kingdom joins Syria | The last Herodian ruler dies. Justus of Tiberias, Agrippa II's own secretary, gave this year, read from the lost works of Justus by the ninth-century Byzantine scholar Photius; a lead weight found near Tiberias, dated to Agrippa II's own 43rd regnal year (AD 97/98), shows him still reigning shortly before. The historian Nikos Kokkinos defends this date with this and other documentary evidence. Kokkinos's own article records that other historians have instead read Josephus's wording in the *Antiquities* to place Agrippa II's death earlier, "pre-CE 93" — the view of, among others, the standard reference work *The History of the Jewish People in the Age of Jesus Christ* as revised by Vermes and Millar (1973) — a view Kokkinos's article argues against. This note follows the brief's instruction to describe both and choose neither on its own authority; the PO has set the stop at AD 100. His kingdom (Gaulanitis, Batanea, Trachonitis, Auranitis and Abilene) is added to the province of Syria; Livius.org notes signs that he had already lost some territory after 93. | `bib:livius-herod-agrippa-ii`; `bib:kokkinos-justus-josephus-agrippa-coins`; `bib:jewish-encyclopedia-agrippa-ii`; `bib:isbe-abilene` |
 
 **Changes considered and left out, with reasons:**
 - **Achaia's and Macedonia's Senate↔emperor transfers (AD 15, 44) and Nero's grant of freedom to Greece (67, reversed by Vespasian):** explicitly not stops under ADR-0037 item 1's own example (no border moves); kept in those areas' own history text only.
-- **Paphlagonia and "Pontus Galaticus" added to Galatia (6 BC, 2 BC); "Pontus Polemoniacus" added (AD 64):** none borders a current place; kept in Galatia's and Pontus's own tables (§2.12, §2.13), and in §5's name-change list, only.
-- **Lycia's own annexation as a province (AD 43):** borders no current place on its own, and Pamphylia's own province at this date is already unresolved in the existing records (§2.12); not added as a separate stop. The later 74 merger with Pamphylia is added above, because it does reach a current place (Perga) and gives the area a new name.
-- **Thrace's reduction to a province (AD 38, then 46/47 or 69-79, disputed):** no current place is there, and the ancient sources disagree on the year by three decades (§2.14); not added as a stop, though it is one of the "empire's extent" items a reader might expect — flagged here rather than guessed at.
+- **Paphlagonia added to Galatia (6 BC):** this predates the window (4 BC on) by two years, so it is background in Galatia's own table (§2.12) only, not folded into a stop.
+- **Thrace's reduction to a province (disputed between AD 46 and 79):** no current place is there, and the ancient sources disagree on the year by three decades (§2.14); modeled as `uncertain` rather than folded into one stop, since folding would wrongly imply a single known year.
 - **Herod of Chalcis's and Agrippa II's appointments to Chalcis (41, 50) and Agrippa II's exchange of it (53):** folded into the stops at 41 and 53 above rather than given their own entries, since Chalcis itself holds no current place and the 53 stop already covers Agrippa II's major territorial change that year.
-- **Individual Armenian and Parthian kings:** far too numerous and, for Armenia, too often contested mid-reign to list; only the lasting 63 settlement is in Armenia's own table (§2.22), and it is not proposed as a stop because it changes no border our map would show (a client king remains a client king; only his patron's identity is confirmed).
+- **Individual Armenian and Parthian kings:** far too numerous and, for Armenia, too often contested mid-reign to list; modeled as `uncertain` for that whole span (§2.22) rather than folded into a stop, and only the lasting 63 settlement is named, since it changes no border our map would show (a client king remains a client king; only his patron's identity is confirmed).
 - **Mauretania's and Britain's internal changes:** per the brief, tracked only as "what the far edge looks like" at each stop above, not as their own stops.
 
 ## 5. Names that changed
@@ -328,9 +380,9 @@ Under the new rule (brief §1.3; ADR-0037 item 1) that a name change can itself 
 
 | Year | Change | Is it a stop? | Sources |
 |---|---|---|---|
-| 2 BC | "Pontus Galaticus" — the part of Pontus added to Galatia — comes into use for that part, distinct from the independent eastern kingdom | No: borders no current place (§4 exclusions) | `bib:isbe-galatia` |
-| 64 | "Pontus Polemoniacus" comes into use for the formerly independent eastern kingdom, now a province, distinct from Pontus Galaticus and from Bithynia-administered western Pontus | No: borders no current place (§4 exclusions) | `bib:isbe-galatia` |
-| 74 | "Lycia and Pamphylia" (or "Lycia et Pamphylia") becomes the name of the new joint province; Pamphylia stops being described as part of Galatia | **Yes — a stop at §4** | `bib:cassius-dio-roman-history` (60.17.3–4); existing `galatia.json`/`pisidia.json`/`pamphylia.json` |
+| 2 BC | "Pontus Galaticus" — the part of Pontus added to Galatia — comes into use for that part, distinct from the independent eastern kingdom | Folded into the AD 6 stop (§4); borders no current place on its own | `bib:isbe-galatia` |
+| 64 | "Pontus Polemoniacus" comes into use for the formerly independent eastern kingdom, now a province, distinct from Pontus Galaticus and from Bithynia-administered western Pontus | Folded into the AD 70 stop (§4); borders no current place on its own | `bib:isbe-galatia` |
+| 74 | "Lycia and Pamphylia" (or "Lycia et Pamphylia") becomes the name of the new joint province; Pamphylia stops being described as part of Galatia | **Yes — its own stop at §4** | `bib:cassius-dio-roman-history` (60.17.3–4); existing `galatia.json`/`pisidia.json`/`pamphylia.json` |
 
 No other area or entity in this note's scope is found changing its name in this window. (Judea's two senses, the district and the province, and Achaia's alternate name "Greece," are parallel names used throughout, not changes over time, and are already explained in §2.1 and §2.15 respectively.)
 
@@ -345,7 +397,7 @@ These keep their Bible names on the map (ADR-0026); none is proposed as a stop, 
 | Paneas | Caesarea (Philippi) | Philip rebuilt it and renamed it, same passage, shortly after AD 6 | `bib:josephus-antiquities` (18.2.1) |
 | Caesarea Philippi | Neronias | Agrippa II renamed his capital "in order to flatter" the emperor Nero, after AD 54 | `bib:jewish-encyclopedia-agrippa-ii` (citing Antiquities 20.9.4) |
 
-**Note on Julia/Julias.** Whiston's translation gives two different reasons for the same name in the same passage (Antiquities 18.2.1): Betharamphtha is renamed "from the name of the emperor's wife," but Bethsaida "the same name with Caesar's daughter." Both are usually read as honoring the same woman, Livia: Augustus's will "appointed as his chief heirs Tiberius... and Livia... these he also bade assume his name," so that she became Julia Augusta (`bib:suetonius-twelve-caesars`, *Augustus*, read for this update). This note does not resolve why Josephus's own (or Whiston's) wording differs between "wife" and "daughter" for the same woman. **Bethsaida's and the Perea Julias's names are identical but the towns are different** — see the entity `julias-perea` in §3 — a known source of confusion this note flags for anyone drawing or labeling either site.
+**Note on Julia/Julias.** Whiston's translation gives two different reasons for the same name in the same passage (Antiquities 18.2.1): Betharamphtha is renamed "from the name of the emperor's wife," but Bethsaida "the same name with Caesar's daughter." Both are usually read as honoring the same woman, Livia: Augustus's will "appointed as his chief heirs Tiberius... and Livia... these he also bade assume his name," so that she became Julia Augusta (`bib:suetonius-twelve-caesars`, *Augustus*, read for this update). This note does not resolve why Josephus's own (or Whiston's) wording differs between "wife" and "daughter" for the same woman. **Bethsaida's and the Perea Julias's names are identical but the towns are different** — a known source of confusion this note flags for anyone drawing or labeling either site; both are described in this table, not as entities in §3, since a renamed town is not a holder.
 
 ## 6. Places
 
@@ -358,7 +410,7 @@ Every current place record's area, grouped (89 places; none needs reassignment �
 | `galilee` | cana, capernaum, chorazin, magdala, nain, nazareth, sea-of-galilee | Consistent. `sea-of-galilee`'s parent is a deliberate, already-sourced exception (M3-11): the lake spans the Galilee/Gaulanitis boundary, and no smaller area contains all of it. |
 | `samaria` | sychar | Consistent. |
 | `syria` | antioch-syria, damascus, tarsus, tyre | Consistent (§2.8); tarsus is in the Cilician plain, administered from Syria throughout. `damascus` is also, by some ancient counts, a city of the Decapolis (§2.7) — a holder note on this place, not a different area; its ordinary parent stays `syria`. |
-| `galatia` | antioch-pisidia, iconium, lycaonia (derbe, lystra), pamphylia (perga), pisidia | Consistent, including the already-sourced placement of Antioch and Iconium directly under Galatia rather than under Pisidia or Phrygia (existing records' own notes), and Perga under Pamphylia under Galatia despite the split evidence on Pamphylia's own status (§2.12). From 74, Pamphylia's (and so Perga's) province is "Lycia and Pamphylia," not Galatia (§4, §5.1) — a later data task should update this once M4-01's schema is in place. |
+| `galatia` | antioch-pisidia, iconium, lycaonia (derbe, lystra), pamphylia (perga), pisidia | Consistent, including the already-sourced placement of Antioch and Iconium directly under Galatia rather than under Pisidia or Phrygia (existing records' own notes), and Perga under Pamphylia despite Pamphylia's own status being modeled as `uncertain` before 74 (§2.12). From 74, Pamphylia's (and so Perga's) holder is "Lycia and Pamphylia," not Galatia (§4, §5.1) — a later data task should update this once M4-01's schema is in place. |
 | `asia` | colossae, ephesus, hierapolis, laodicea, miletus, mysia, patmos, pergamum, philadelphia-lydia, sardis, smyrna, thyatira, troas | Consistent (§2.16). |
 | `achaia` | athens, corinth (cenchreae), nicopolis | Consistent; cenchreae's parent is the city of Corinth (it is Corinth's port), not Achaia directly — a city-level nesting, not an area exception. |
 | `macedonia` | berea, neapolis-macedonia, philippi, thessalonica | Consistent (§2.15). |
@@ -371,21 +423,30 @@ Every current place record's area, grouped (89 places; none needs reassignment �
 
 No current place record is one of the towns Nero gave Agrippa II (Tiberias, Tarichaeae, the Perea Julias) or a Decapolis city besides Damascus (§2.2, §2.7), so none needs reassignment on that account.
 
+**Two disputed places have candidates in different areas, which today's single-area `politicalHistory` cannot show without favoring one:**
+- **`bethany-beyond-the-jordan`** (parent `judea-province`): its Al-Maghtas candidate is on the east bank, in Perea (§2.2); its Qasr al-Yahud candidate is on the west bank, in Judea (§2.1). The two have different early histories — Perea was Antipas's tetrarchy from 4 BC, while the Judea side was Archelaus's ethnarchy, then the province, until 41 — which the record's current single table (following the Perea side) does not show for the Judea candidate.
+- **`cana`** (parent `galilee`): its Khirbet Qana and Kafr Kanna candidates are in Galilee; its minority candidate, Qana in today's Lebanon, is in Syria (Phoenicia, which has no area record yet — §7), under a wholly different history than Galilee's.
+
+Both should move to per-candidate political history once M4-01 adds candidate-level links, rather than the single area this note found already in place. No other current place record has candidates in different areas.
+
 ## 7. Records worth adding later (M6)
 
-Areas this note researched that have no location record yet: **Idumea, Perea, the combined Gaulanitis/Batanea/Trachonitis/Auranitis area, Abilene, Chalcis, the Decapolis (and its individual cities), Lycia, Thrace, Commagene, Armenia**, and (for the coastal cities, §2.8) **Gaza and Ashkelon**. Phoenicia (Tyre's and Sidon's own region, distinct from the city of Tyre) is also still missing, per the existing backlog. This note does not add any of these as data; M4-03 takes its area list from §2 above for shapes, and a future M6 batch would add place/area records.
+Areas this note researched that have no location record yet: **Idumea, Perea, the combined Philip-tetrarchy area (`philip-tetrarchy-lands`), Abilene, Chalcis, Commagene, Cilicia Tracheia, Paphlagonia, Pontus Galaticus, Lycia, Thrace, Armenia**, and (for the coastal cities, §2.8) **Gaza and Ashkelon**; the Decapolis's individual cities besides Damascus (§2.7, not an area of its own) are also missing. Phoenicia (Tyre's and Sidon's own region, distinct from the city of Tyre) is also still missing, per the existing backlog. This note does not add any of these as data; M4-03 takes its area list from §2 above for shapes, and a future M6 batch would add place/area records.
 
 ## 8. Open questions for the Fact-Checker
 
-1. **Bethsaida's (and similarly Caesarea Philippi's and the Philip-tetrarchy area's) `politicalHistory` currently ends the Agrippa II period at AD 70.** This note's sources (`bib:isbe-trachonitis`, `bib:jewish-encyclopedia-agrippa-ii`) describe his rule continuing to his death (c. 92/93 or 100); the 70 cutoff appears to be a side effect of the war's end rather than a sourced change to this area. Recommend correcting in phase 2.
-2. **Chalcis's holder, 48–50 and 53–72** (§2.5): this note could not find a named holder in the sources it opened. Recommend a further search, or carrying the gap forward as "unclear" if none is found.
-3. **Agrippa II's death year:** this note can source "AD 100" (two older reference works, one of which calls it disputed) but not a specific source for the modern "92/93" alternative the task card itself names. Recommend the Fact-Checker search further, or the PO decide whether to keep both figures with the sourcing gap noted, or drop the earlier figure until sourced.
+1. **Bethsaida's (and similarly Caesarea Philippi's and the Philip-tetrarchy area's) `politicalHistory` currently ends the Agrippa II period at AD 70.** This note's sources (`bib:isbe-trachonitis`, `bib:jewish-encyclopedia-agrippa-ii`, `bib:livius-herod-agrippa-ii`) describe his rule continuing to his death in 100; the 70 cutoff appears to be a side effect of the war's end rather than a sourced change to this area. Recommend correcting in phase 2.
+2. **Chalcis's holder, 48–50 and 53–72** (§2.5): modeled as `uncertain`, since this note could not find a named holder in the sources it opened. Recommend a further search in phase 2 before accepting the gap as permanent.
+3. **Resolved: Agrippa II's death year is AD 100** (PO's decision), per `bib:livius-herod-agrippa-ii` (the lead weight and Photius) and `bib:kokkinos-justus-josephus-agrippa-coins` (Kokkinos's defense of the same date with further documentary evidence). That same article identifies "pre-CE 93" as "the conventional date," held by, among others, the Vermes & Millar revision of Schürer's standard reference work, and argued from Josephus's own wording rather than from Justus, Photius or the documentary evidence — this note's source for the card's "92/93" alternative, now cited in the AD 100 stop's summary (§4) per the PO's instruction.
 4. **Ashkelon's free-city status** (§2.8): asserted by general knowledge of the period, not by a source this note opened. Recommend sourcing before use, or omitting the claim.
 5. **"Prefect" vs. "procurator" for AD 6–41** (§2.1): this note's primary source (Whiston's Josephus) uses "procurator" throughout, while the Pilate inscription supports "prefect" for this earlier period specifically. Recommend the Fact-Checker confirm the project's preferred wording with an additional source, since this affects entity names across many periods.
 6. **The Luke 2:1–2 census and the Quirinius question** (§2.1): presented neutrally per the card's instruction; no resolution attempted.
 7. **Philip's tetrarchy's exact district list, and "Iturea"** (§2.3): Josephus himself is inconsistent across three passages; presented neutrally.
-8. **Perga's province from AD 74** (§5.1, §6): once phase 2 encodes the timeline, Perga's `politicalHistory` (and `pamphylia`'s and `pisidia`'s) should gain a row for "Lycia and Pamphylia" from 74, alongside the already-flagged, unresolved question of Pamphylia's status before that date.
+8. **Perga's province from AD 74** (§5.1, §6): once phase 2 encodes the timeline, Perga's `politicalHistory` (and `pamphylia`'s and `pisidia`'s) should gain a row for "Lycia and Pamphylia" from 74, alongside the already-flagged, unresolved (`uncertain`-kind) status of Pamphylia before that date.
 9. **Chalcis's drawability** (§2.5): flagged so M4-03 can merge it into a neighbour if no source gives it its own boundary; this note did not find one.
+10. **Cilicia Tracheia's pre-17 ruler** (§2.10): Strabo names Archelaus of Cappadocia; Tacitus separately names "Philopator of Cilicia" dying in AD 17. This note presents both without resolving whether Philopator succeeded Archelaus, held a sub-grant, or is another name for the same person; recommend a further search in phase 2.
+11. **Pisidia's internal 74 split** (§2.12): the existing record says only "its southern part" transferred to Lycia and Pamphylia; this note found no source describing where that line ran. Recommend finding one, or treating Pisidia as a single area with an `uncertain` holder from 74.
+12. **Two candidate-area mismatches** (`bethany-beyond-the-jordan`, `cana` — §6): both need per-candidate political history once M4-01 supports it, rather than today's single area.
 
 ## 9. Sources
 
@@ -394,6 +455,9 @@ Areas this note researched that have no location record yet: **Idumea, Perea, th
 - `bib:jewish-encyclopedia-agrippa-ii` — "Agrippa II," Jewish Encyclopedia (1906), by M. Brann. The live site renders articles by JavaScript; this note opened the article's text through a 2005 Wayback Machine snapshot of the same page (URL in the bibliography entry) after the live page returned only its navigation shell.
 - `bib:jewish-encyclopedia-herod-ii` — "Herod II." (Herod of Chalcis), Jewish Encyclopedia (1906), by Joseph Jacobs and Isaac Broydé. Opened directly at jewishencyclopedia.com.
 - `bib:smith-dictionary-thracia` — "Thracia," *A Dictionary of Greek and Roman Geography* (William Smith, ed., 1854), opened at perseus.tufts.edu. No individual contributor's signature was found on this entry; cited to the general editor, as the project's existing Smith's-dictionary entry does for its own (differently authored) work.
+- `bib:livius-herod-agrippa-ii` — "Herod Agrippa II," Livius.org, by Jona Lendering. Opened directly; the PO's own suggested source. States his reign 48–100, the lead weight (his 43rd regnal year, 97/98), Photius's report of his death in Trajan's third year (100), and "indications that he lost some territories after 93."
+- `bib:kokkinos-justus-josephus-agrippa-coins` — Nikos Kokkinos, "Justus, Josephus, Agrippa II and his Coins," *Scripta Classica Israelica* 22 (2003), open access at scriptaclassica.org (PDF downloaded and its text extracted for this note, since the article view page alone does not render the text). Kokkinos defends Justus's/Photius's AD 100 date with the lead weight, an inscription and coin evidence, against two critics; the same article calls "pre-CE 93" "the conventional date," based on "an interpretation of Josephus" and held by, among others, the Vermes & Millar revision of Schürer — this note's source for the card's "92/93" alternative.
+- `bib:livius-titus`, `bib:livius-domitian`, `bib:livius-nerva`, `bib:livius-trajan` — Livius.org person pages, by Jona Lendering, each opened directly for its stated reign years (§2.23).
 
 ### Primary texts opened for this note (existing bibliography entries, new chapters read)
 - `bib:josephus-antiquities`, books 17–20 (Whiston's translation, ccel.org): Herod's death and will (17.8); Augustus's division of the kingdom (17.11.4); Quirinius's census and Coponius (18.1); the Pilate/Vitellius/Aretas narrative (18.4–18.5); Herod's and Philip's city-building, including the renamings in §5.2 (18.2.1); Philip's death (18.4.6); Caligula frees and crowns Agrippa I (18.6); Antipas banished (18.7); Claudius's accession and settlement (19.4–19.5); Herod of Chalcis mentioned (20.1); Agrippa II's exchange of Chalcis and Nero's grants (20.7–20.8).
@@ -401,6 +465,7 @@ Areas this note researched that have no location record yet: **Idumea, Perea, th
 - `bib:tacitus-annals`, book 2 (LacusCurtius, Loeb translation): Cappadocia's and Commagene's annexation, 2.42.
 - `bib:cassius-dio-roman-history`, books 59–60 (LacusCurtius, Loeb translation): Caligula's grants to Agrippa I and Antiochus IV, 59.8; Mauretania, 59.25; Claudius's British campaign, 60.19–21.
 - `bib:suetonius-twelve-caesars`, *Claudius* (LacusCurtius): the British triumph, checked for a Thrace reference (none found). *Augustus* (LacusCurtius, read for the PO's amendment): Augustus's will directing Livia to "assume his name" (§5.2's note on Julia/Julias).
+- `bib:strabo-geography`, book 14 (LacusCurtius, Loeb translation), read for the PO's amendment: the Cilicia Tracheia/Pedias division and its boundary at the river Lamus, and Archelaus of Cappadocia's hold on Tracheia (14.5.1, 14.5.6).
 - `bib:livius-nabataeans`: re-opened for this note's precise reign years.
 - `bib:isbe-galatia`: re-opened for Paphlagonia, Pontus Galaticus and eastern Lycaonia's years.
 
