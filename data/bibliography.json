@@ -1955,6 +1955,111 @@
       "publisher": "Encyclopaedia Britannica",
       "url": "https://www.britannica.com/biography/Origen",
       "accessed": "2026-10-05"
+    },
+    {
+      "id": "isbe-decapolis",
+      "type": "chapter",
+      "title": "Decapolis",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/decapolis.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-ituraea",
+      "type": "chapter",
+      "title": "Ituraea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/I/ituraea.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-peraea",
+      "type": "chapter",
+      "title": "Peraea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/peraea.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-trachonitis",
+      "type": "chapter",
+      "title": "Trachonitis",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/trachonitis.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-abilene",
+      "type": "chapter",
+      "title": "Abilene",
+      "authors": [
+        "C. H. Thomson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/abilene.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "jewish-encyclopedia-agrippa-ii",
+      "type": "chapter",
+      "title": "Agrippa II.",
+      "authors": [
+        "M. Brann"
+      ],
+      "year": 1906,
+      "publisher": "Funk & Wagnalls",
+      "containerTitle": "The Jewish Encyclopedia, hosted at jewishencyclopedia.com",
+      "url": "https://web.archive.org/web/20051207192312/http://www.jewishencyclopedia.com:80/view.jsp?artid=913&letter=A",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "jewish-encyclopedia-herod-ii",
+      "type": "chapter",
+      "title": "Herod II.",
+      "authors": [
+        "Joseph Jacobs",
+        "Isaac Broydé"
+      ],
+      "year": 1906,
+      "publisher": "Funk & Wagnalls",
+      "containerTitle": "The Jewish Encyclopedia, hosted at jewishencyclopedia.com",
+      "url": "https://www.jewishencyclopedia.com/articles/7599-herod-ii",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "smith-dictionary-thracia",
+      "type": "chapter",
+      "title": "Thracia",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=thracia-geo",
+      "accessed": "2026-10-07"
     }
   ]
 }
