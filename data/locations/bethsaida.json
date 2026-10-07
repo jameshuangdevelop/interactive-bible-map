@@ -65,10 +65,12 @@
   },
   "history": [
     {
-      "text": "Ancient sources, including Josephus, describe Bethsaida being refounded and elevated to a Greek-style city named Julias by the tetrarch Philip early in the first century AD, a status that both excavation teams look for evidence of at their respective candidate sites.",
+      "text": "Ancient sources, including the first-century Jewish historian Josephus, describe Bethsaida being refounded and elevated to a Greek-style city named Julias by the tetrarch Philip early in the first century AD, a status that both excavation teams look for evidence of at their respective candidate sites.",
       "sources": [
         "bib:arav-bethsaida-et-tell",
-        "bib:notley-aviam-bethsaida-el-araj"
+        "bib:notley-aviam-bethsaida-el-araj",
+        "bib:josephus-jewish-war",
+        "bib:worldhistory-josephus"
       ]
     },
     {
@@ -78,7 +80,7 @@
       ]
     },
     {
-      "text": "John 12:21 calls Philip's home town 'Bethsaida of Galilee.' Josephus, however, places Bethsaida, which the tetrarch Philip raised to a city named Julias, in Lower Gaulanitis, and gives Galilee's eastern border as the territories of Hippos and Gadara and Gaulanitis. Scholars discuss whether John's wording reflects a wider use of 'Galilee' for the land around the lake or points to a town on the Galilean shore; some have proposed a second Bethsaida there. Both of this record's candidate sites are put forward as Bethsaida-Julias, so for about AD 50 this project places Bethsaida in the Roman province of Judea, which governed Philip's former tetrarchy from AD 44 until AD 53, rather than in the Galilee district.",
+      "text": "John 12:21 calls Philip's home town 'Bethsaida of Galilee.' Josephus, however, places Bethsaida, which the tetrarch Philip raised to a city named Julias, in Lower Gaulanitis, and gives Galilee's eastern border as the territories of Hippos and Gadara and Gaulanitis. Scholars discuss whether John's wording reflects a wider use of 'Galilee' for the land around the lake or points to a town on the Galilean shore; some have proposed a second Bethsaida there. Both candidate sites shown on this map are put forward as Bethsaida-Julias, so for about AD 50 this project places Bethsaida in the Roman province of Judea, which governed Philip's former tetrarchy from AD 44 until AD 53, rather than in the Galilee district.",
       "sources": [
         "scripture:John 12:21",
         "bib:josephus-jewish-war",

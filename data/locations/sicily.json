@@ -47,7 +47,7 @@
   },
   "history": [
     {
-      "text": "Sicily was organized as a Roman province in 241 BC. Rome took Malta from Carthage in 218 BC and attached it to the province of Sicily, which is why this project's 'malta' record has Sicily as its parent.",
+      "text": "Sicily was organized as a Roman province in 241 BC. Rome took Malta from Carthage in 218 BC and attached it to the province of Sicily, which is why this map places Malta under Sicily.",
       "sources": [
         "pleiades:981549",
         "wikidata:Q691321",
@@ -56,10 +56,12 @@
       ]
     },
     {
-      "text": "Cassius Dio's list of the provinces assigned to the Senate in Augustus's settlement of 27 BC includes Sicily, and Strabo's Geography also lists it among the provinces of the Roman people.",
+      "text": "The Roman historian Cassius Dio's list of the provinces assigned to the Senate in Augustus's settlement of 27 BC includes Sicily, and the Greek geographer Strabo's Geography also lists it among the provinces of the Roman people.",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:strabo-geography"
+        "bib:strabo-geography",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-strabo"
       ]
     }
   ],

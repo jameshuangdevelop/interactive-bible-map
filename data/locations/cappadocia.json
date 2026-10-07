@@ -44,10 +44,11 @@
   },
   "history": [
     {
-      "text": "Tacitus records that King Archelaus had ruled Cappadocia for fifty years when Tiberius, whom he had offended, lured him to Rome. The kingdom was then made a province under the governor Quintus Veranius, and some of the royal taxes were lowered so that Roman rule would seem mild. The International Standard Bible Encyclopedia dates the annexation to AD 17.",
+      "text": "The Roman historian Tacitus records that King Archelaus had ruled Cappadocia for fifty years when Tiberius, whom he had offended, lured him to Rome. The kingdom was then made a province under the governor Quintus Veranius, and some of the royal taxes were lowered so that Roman rule would seem mild. The International Standard Bible Encyclopedia dates the annexation to AD 17.",
       "sources": [
         "bib:tacitus-annals",
-        "bib:isbe-cappadocia"
+        "bib:isbe-cappadocia",
+        "bib:worldhistory-tacitus"
       ]
     }
   ],

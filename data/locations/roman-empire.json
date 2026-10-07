@@ -26,7 +26,7 @@
     }
   ],
   "summary": {
-    "text": "The Roman Empire was the state ruled from Rome by emperors, the first of whom was Augustus (formerly Octavian), after his victory over Mark Antony and Cleopatra at the Battle of Actium in 31 BC. In this project it is the top of the 'about AD 50' hierarchy, above the provinces and Italy. Luke records a decree 'from Caesar Augustus that all the world should be enrolled,' and Acts records Paul's words 'I appeal to Caesar!'",
+    "text": "The Roman Empire was the state ruled from Rome by emperors, the first of whom was Augustus (formerly Octavian), after his victory over the Roman general Mark Antony and Cleopatra, the queen of Egypt, at the Battle of Actium in 31 BC. In this project it is the top of the 'about AD 50' hierarchy, above the provinces and Italy. Luke records a decree 'from Caesar Augustus that all the world should be enrolled,' and Acts records Paul's words 'I appeal to Caesar!'",
     "sources": [
       "wikidata:Q2277",
       "pleiades:423025",
@@ -101,5 +101,5 @@
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-28"
+  "lastReviewed": "2026-10-05"
 }

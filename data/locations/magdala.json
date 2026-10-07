@@ -54,10 +54,12 @@
   },
   "history": [
     {
-      "text": "Excavations beginning in 2009 uncovered a first-century synagogue together with a paved street and a building resting against a stone quay on the ancient shoreline, consistent with Josephus' description of the town, which he calls Taricheae, as a fishing and fish-processing center on the lake.",
+      "text": "Excavations beginning in 2009 uncovered a first-century synagogue together with a paved street and a building resting against a stone quay on the ancient shoreline, consistent with the description given by the first-century Jewish historian Josephus of the town, which he calls Taricheae, as a fishing and fish-processing center on the lake.",
       "sources": [
         "bib:iaa-magdala-excavation",
-        "bib:murphy-oconnor-holy-land-guide"
+        "bib:murphy-oconnor-holy-land-guide",
+        "bib:josephus-jewish-war",
+        "bib:worldhistory-josephus"
       ]
     }
   ],

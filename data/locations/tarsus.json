@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Tarsus was, per Pleiades, 'an important city and river port on the Cydnus river located in Cilicia Pedias,' and, according to Acts, the birthplace of Paul, who identifies himself as 'a citizen of no insignificant city.'",
+    "text": "Tarsus was an important city and river port on the Cydnus river, located in Cilicia Pedias, and, according to Acts, the birthplace of Paul, who identifies himself as 'a citizen of no insignificant city.'",
     "sources": [
       "pleiades:648789",
       "wikidata:Q134287",
@@ -42,12 +42,13 @@
   },
   "history": [
     {
-      "text": "Tarsus lay in the plain of Cilicia. After Octavian became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, and Cilicia became a separate province again only when Vespasian reunited it in AD 72. This project therefore places Tarsus in Syria for about AD 50, matching the New Testament's pairing of 'the regions of Syria and Cilicia' (Galatians 1:21).",
+      "text": "Tarsus lay in the plain of Cilicia. After Octavian (the future Augustus) became sole ruler, parts of Cilicia were given to client kings and the rest was attached to the province of Syria, and Cilicia became a separate province again only when the Roman emperor Vespasian reunited it in AD 72. This project therefore places Tarsus in Syria for about AD 50, matching the New Testament's pairing of 'the regions of Syria and Cilicia' (Galatians 1:21).",
       "sources": [
         "pleiades:648789",
         "bib:livius-cilicia",
         "wikipedia:Cilicia",
-        "scripture:Galatians 1:21"
+        "scripture:Galatians 1:21",
+        "bib:livius-actium"
       ]
     }
   ],

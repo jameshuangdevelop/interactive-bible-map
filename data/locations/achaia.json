@@ -53,12 +53,14 @@
   },
   "history": [
     {
-      "text": "Rome made Greece a province in 146 BC under the control of the governor of Macedonia. In Augustus's settlement of 27 BC, Achaia and Macedonia became two separate provinces, both assigned to the Senate and governed by proconsuls. Cassius Dio lists 'Greece with Epirus' among the Senate's provinces, and Strabo describes Achaia as reaching to Thessaly, Aetolia, Acarnania and some Epirote peoples bordering Macedonia.",
+      "text": "Rome made Greece a province in 146 BC under the control of the governor of Macedonia. In Augustus's settlement of 27 BC, Achaia and Macedonia became two separate provinces, both assigned to the Senate and governed by proconsuls. The Roman historian Cassius Dio lists 'Greece with Epirus' among the Senate's provinces, and the Greek geographer Strabo describes Achaia as reaching to Thessaly, Aetolia, Acarnania and some Epirote peoples bordering Macedonia.",
       "sources": [
         "bib:isbe-macedonia",
         "bib:isbe-achaia",
         "bib:cassius-dio-roman-history",
-        "bib:strabo-geography"
+        "bib:strabo-geography",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-strabo"
       ]
     },
     {

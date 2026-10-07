@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Egypt was a Roman province governed from Alexandria under an unusual arrangement: Cassius Dio records that Augustus put it under Cornelius Gallus rather than a senator and, because of its grain and wealth, let no senator even live there without his personal permission. In Matthew's account an angel tells Joseph to flee into Egypt with the child and his mother, because Herod will seek to destroy the child, and at Pentecost the crowd in Jerusalem includes people 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene.'",
+    "text": "Egypt was a Roman province governed from Alexandria under an unusual arrangement: the Roman historian Cassius Dio records that Augustus put it under its first prefect, Cornelius Gallus, rather than a senator and, because of its grain and wealth, let no senator even live there without his personal permission. In Matthew's account an angel tells Joseph to flee into Egypt with the child and his mother, because Herod will seek to destroy the child, and at Pentecost the crowd in Jerusalem includes people 'from Mesopotamia, Judea, Cappadocia, Pontus, Asia, Phrygia, Pamphylia, Egypt, the parts of Libya around Cyrene.'",
     "sources": [
       "wikidata:Q202311",
       "pleiades:766",
@@ -39,21 +39,26 @@
       "scripture:Matthew 2:13",
       "scripture:Acts 2:9",
       "scripture:Acts 2:10",
+      "bib:strabo-geography",
+      "bib:worldhistory-cassius-dio",
       "wikidata:Q79"
     ]
   },
   "history": [
     {
-      "text": "After his victory over Antony and Cleopatra, Augustus made Egypt pay tribute and put it under Cornelius Gallus, not a senator. Cassius Dio explains that because the country was populous, volatile, and rich in grain and money, Augustus would not let any senator even live there without his personal permission.",
+      "text": "After his victory over the Roman general Antony and Cleopatra, the queen of Egypt, Augustus made Egypt pay tribute and put it under Cornelius Gallus, not a senator. Cassius Dio explains that because the country was populous, volatile, and rich in grain and money, Augustus would not let any senator even live there without his personal permission.",
       "sources": [
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:livius-actium"
       ]
     },
     {
-      "text": "Tacitus records that when Germanicus visited Egypt in AD 19, Tiberius rebuked him sharply for entering Alexandria without imperial consent. Augustus had made it a rule of his power that no senator or leading knight could enter the country without permission, so that no one who seized the province and its approaches by land and sea could starve Italy. Writing of AD 69, Tacitus adds that Roman knights had governed Egypt in place of its former kings ever since Augustus, so the arrangement still held at this project's about AD 50 date.",
+      "text": "The Roman historian Tacitus records that when the Roman general Germanicus visited Egypt in AD 19, Tiberius rebuked him sharply for entering Alexandria without imperial consent. Augustus had made it a rule of his power that no senator or leading knight could enter the country without permission, so that no one who seized the province and its approaches by land and sea could starve Italy. Writing of AD 69, Tacitus adds that Roman knights had governed Egypt in place of its former kings ever since Augustus, so the arrangement still held at this project's about AD 50 date.",
       "sources": [
         "bib:tacitus-annals",
-        "bib:tacitus-histories"
+        "bib:tacitus-histories",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-germanicus"
       ]
     }
   ],

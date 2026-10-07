@@ -56,12 +56,13 @@
   },
   "history": [
     {
-      "text": "Rome made Macedonia a province after putting down the revolt of Andriscus in 148 BC; some reference works date the province from 146 BC.",
+      "text": "Rome made Macedonia a province after putting down, in 148 BC, the revolt of Andriscus, who claimed to be a son of the Macedonian king Perseus; some reference works date the province from 146 BC.",
       "sources": [
         "bib:isbe-macedonia",
         "bib:livius-macedonia",
         "wikidata:Q207497",
-        "wikipedia:Macedonia_(Roman_province)"
+        "wikipedia:Macedonia_(Roman_province)",
+        "bib:cassius-dio-roman-history"
       ]
     },
     {

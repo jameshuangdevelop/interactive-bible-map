@@ -35,7 +35,7 @@
     }
   ],
   "summary": {
-    "text": "Caesarea Philippi was a city at the southwest foot of Mount Hermon (Pleiades), near the principal spring source of the Jordan River. Its two recorded ancient names, Paneas and Caesarea Philippi, are given together in Pleiades' title for the site. It is the setting for Peter's confession of Jesus as the Christ.",
+    "text": "Caesarea Philippi was a city at the southwest foot of Mount Hermon, near the principal spring source of the Jordan River. In antiquity it was known both as Paneas and as Caesarea Philippi. It is the setting for Peter's confession of Jesus as the Christ.",
     "sources": [
       "pleiades:678324",
       "wikidata:Q2484244",
@@ -52,11 +52,12 @@
   },
   "history": [
     {
-      "text": "Herod Philip built Caesarea at Paneas, in his tetrarchy. When Philip died in the twentieth year of Tiberius (about AD 34), Tiberius added his territory to the province of Syria, and Caligula then made Herod Agrippa I its king. After Agrippa I's death in AD 44, Claudius sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom,' and he gave 'the tetrarchy of Philip and Batanea' to Agrippa II only in AD 53. This project therefore places Caesarea Philippi in the Roman province of Judea for about AD 50.",
+      "text": "Herod Philip built Caesarea at Paneas, in his tetrarchy. When Philip died in the twentieth year of Tiberius (about AD 34), Tiberius added his territory to the province of Syria, and the Roman emperor Caligula then made Herod Agrippa I its king. After Agrippa I's death in AD 44, Claudius sent Cuspius Fadus 'to be procurator of Judea, and of the entire kingdom,' and he gave 'the tetrarchy of Philip and Batanea' to Agrippa II only in AD 53. This project therefore places Caesarea Philippi in the Roman province of Judea for about AD 50.",
       "sources": [
         "bib:josephus-antiquities",
         "bib:livius-judaea",
-        "wikipedia:Judaea_(Roman_province)"
+        "wikipedia:Judaea_(Roman_province)",
+        "bib:worldhistory-caligula"
       ]
     }
   ],

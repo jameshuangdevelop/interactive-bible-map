@@ -33,7 +33,7 @@
     }
   ],
   "summary": {
-    "text": "Nicopolis in Epirus was founded by Augustus (then Octavian) to commemorate his victory over Mark Antony and Cleopatra at the nearby Battle of Actium in 31 BC. Paul's letter to Titus asks Titus to join him at Nicopolis, where Paul had decided to spend the winter.",
+    "text": "Nicopolis in Epirus was founded by Augustus (then Octavian) to commemorate his victory over the Roman general Mark Antony and Cleopatra, the queen of Egypt, at the nearby Battle of Actium in 31 BC. Paul's letter to Titus asks Titus to join him at Nicopolis, where Paul had decided to spend the winter.",
     "sources": [
       "pleiades:531013",
       "wikidata:Q943637",
@@ -49,11 +49,14 @@
       ]
     },
     {
-      "text": "Nicopolis lay in Epirus. Cassius Dio lists 'Greece with Epirus' as one of the provinces assigned to the Senate in Augustus's settlement of 27 BC, and Tacitus calls Nicopolis an Achaian town when Germanicus arrived there in AD 18, so this project places Nicopolis in Achaia for about AD 50.",
+      "text": "Nicopolis lay in Epirus. The Roman historian Cassius Dio lists 'Greece with Epirus' as one of the provinces assigned to the Senate in Augustus's settlement of 27 BC, and the Roman historian Tacitus calls Nicopolis an Achaian town when the Roman general Germanicus arrived there in AD 18, so this project places Nicopolis in Achaia for about AD 50.",
       "sources": [
         "bib:cassius-dio-roman-history",
         "bib:tacitus-annals",
-        "pleiades:531013"
+        "pleiades:531013",
+        "bib:worldhistory-cassius-dio",
+        "bib:worldhistory-tacitus",
+        "bib:worldhistory-germanicus"
       ]
     }
   ],

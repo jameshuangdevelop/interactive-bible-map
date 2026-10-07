@@ -31,7 +31,7 @@
     }
   ],
   "summary": {
-    "text": "Phrygia was a large, mountainous region of central Asia Minor. Acts names Phrygia among the homelands of the Pentecost crowd, and records that Paul went through 'the region of Phrygia and Galatia' on one journey and 'the region of Galatia and Phrygia' on a later one. In Paul's time Phrygia was divided between two Roman provinces, so this project's Phrygia record sits directly under the Roman Empire rather than under either province.",
+    "text": "Phrygia was a large, mountainous region of central Asia Minor. Acts names Phrygia among the homelands of the Pentecost crowd, and records that Paul went through 'the region of Phrygia and Galatia' on one journey and 'the region of Galatia and Phrygia' on a later one. In Paul's time Phrygia was divided between two Roman provinces, so on this map Phrygia sits directly under the Roman Empire rather than under either province.",
     "sources": [
       "pleiades:609502",
       "bib:isbe-phrygia",
@@ -43,7 +43,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia says that in Paul's time Phrygia was divided in two. The larger part, 'Asian Phrygia', belonged to the Roman province of Asia; the smaller part, 'Galatian Phrygia', ran along the Pisidian mountains, counted as a region of the province of Galatia, and included Antioch (in Pisidia) and Iconium. The line between the two parts was never sharply drawn. Because of that division, this project places cities in Phrygia, such as Antioch and Iconium in its Galatian part, under their province rather than under this record.",
+      "text": "The International Standard Bible Encyclopedia says that in Paul's time Phrygia was divided in two. The larger part, 'Asian Phrygia', belonged to the Roman province of Asia; the smaller part, 'Galatian Phrygia', ran along the Pisidian mountains, counted as a region of the province of Galatia, and included Antioch (in Pisidia) and Iconium. The line between the two parts was never sharply drawn. Because of that division, this project places cities in Phrygia, such as Antioch and Iconium in its Galatian part, under their province rather than under Phrygia.",
       "sources": [
         "bib:isbe-phrygia",
         "bib:isbe-lycaonia"

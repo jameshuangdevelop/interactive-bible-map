@@ -39,16 +39,19 @@
   },
   "history": [
     {
-      "text": "Per Livius.org, the Parthians began as the Parni, nomads from the steppes of Central Asia who seized the Seleucid satrapy of Parthia in the third century BC and took its name. Under Mithradates I (r. 165-132 BC) they took Media, Babylonia and Elam, and the empire lasted until AD 224, when the Sasanian Empire succeeded it. The International Standard Bible Encyclopedia gives slightly different dates for Mithridates I (174-137 BC) and for the empire's fall (AD 226).",
+      "text": "The Parthians began as the Parni, nomads from the steppes of Central Asia who seized the Seleucid satrapy of Parthia in the third century BC and took its name. Under the Parthian king Mithradates I (r. 165-132 BC) they took Media, Babylonia and Elam, and the empire lasted until AD 224, when the Sasanian Empire succeeded it. The International Standard Bible Encyclopedia gives slightly different dates for Mithridates I (174-137 BC) and for the empire's fall (AD 226).",
       "sources": [
         "bib:livius-parthia",
         "bib:isbe-parthians"
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia records that Crassus's invasion of Parthia ended with his defeat and death in 53 BC, and that Augustus later recovered Crassus's lost standards and made peace. Despite rivalry over Armenia, which the same article says was settled under Nero, it describes no serious break in the peace until Trajan's reign, so this project's about AD 50 date falls within it.",
+      "text": "The International Standard Bible Encyclopedia records that the Roman general Crassus's invasion of Parthia ended with his defeat and death in 53 BC, and that Augustus later recovered Crassus's lost standards and made peace. Despite rivalry over Armenia, which the same article says was settled under the Roman emperor Nero, it describes no serious break in the peace until the Roman emperor Trajan's reign, so this project's about AD 50 date falls within it.",
       "sources": [
-        "bib:isbe-parthians"
+        "bib:isbe-parthians",
+        "bib:worldhistory-nero",
+        "bib:worldhistory-trajan",
+        "bib:worldhistory-crassus"
       ]
     }
   ],
@@ -63,5 +66,5 @@
   "politicalHistory": [],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-09-30"
+  "lastReviewed": "2026-10-05"
 }
