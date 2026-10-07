@@ -42,6 +42,75 @@ function roundGeometry(geometry, decimals = 5) {
   };
 }
 
+function perpendicularDistance(point, start, end) {
+  const [px, py] = point;
+  const [sx, sy] = start;
+  const [ex, ey] = end;
+  const dx = ex - sx;
+  const dy = ey - sy;
+  if (dx === 0 && dy === 0) {
+    return Math.hypot(px - sx, py - sy);
+  }
+  const t = ((px - sx) * dx + (py - sy) * dy) / (dx * dx + dy * dy);
+  const clampedT = Math.max(0, Math.min(1, t));
+  const nx = sx + clampedT * dx;
+  const ny = sy + clampedT * dy;
+  return Math.hypot(px - nx, py - ny);
+}
+
+function simplifyLineString(coordinates, tolerance) {
+  if (!Array.isArray(coordinates) || coordinates.length <= 2) {
+    return coordinates;
+  }
+
+  const keepIndexes = new Set([0, coordinates.length - 1]);
+  const stack = [[0, coordinates.length - 1]];
+
+  while (stack.length > 0) {
+    const [startIndex, endIndex] = stack.pop();
+    const start = coordinates[startIndex];
+    const end = coordinates[endIndex];
+    let maxDistance = 0;
+    let maxDistanceIndex = -1;
+
+    for (let index = startIndex + 1; index < endIndex; index += 1) {
+      const distance = perpendicularDistance(coordinates[index], start, end);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        maxDistanceIndex = index;
+      }
+    }
+
+    if (maxDistanceIndex > -1 && maxDistance > tolerance) {
+      keepIndexes.add(maxDistanceIndex);
+      stack.push([startIndex, maxDistanceIndex], [maxDistanceIndex, endIndex]);
+    }
+  }
+
+  return [...keepIndexes]
+    .sort((left, right) => left - right)
+    .map((index) => coordinates[index]);
+}
+
+function simplifyRoadGeometry(geometry, tolerance) {
+  if (!geometry || typeof geometry !== "object") {
+    return geometry;
+  }
+  if (geometry.type === "LineString") {
+    return {
+      ...geometry,
+      coordinates: simplifyLineString(geometry.coordinates, tolerance)
+    };
+  }
+  if (geometry.type === "MultiLineString") {
+    return {
+      ...geometry,
+      coordinates: geometry.coordinates.map((line) => simplifyLineString(line, tolerance))
+    };
+  }
+  return geometry;
+}
+
 function polygonArea(linearRing) {
   if (!Array.isArray(linearRing) || linearRing.length < 4) {
     return 0;
@@ -296,7 +365,8 @@ export async function buildAncientAppData({
   ancientRoadsData,
   ancientCoastlineData,
   outputDirectory,
-  simplifyThreshold = 0.00002
+  simplifyThreshold = 0.00002,
+  roadSimplifyTolerance = 0.0015
 }) {
   const entitiesById = toMapById(timelineData.entities ?? []);
   const areasById = toMapById(timelineData.areas ?? []);
@@ -356,7 +426,10 @@ export async function buildAncientAppData({
         ...ancientRoadsData,
         features: (ancientRoadsData.features ?? []).map((feature) => ({
           ...feature,
-          geometry: roundGeometry(feature.geometry)
+          geometry: roundGeometry(
+            simplifyRoadGeometry(feature.geometry, roadSimplifyTolerance),
+            4
+          )
         }))
       }
     )
@@ -430,4 +503,3 @@ export async function buildAncientAppData({
 
   return { writtenFiles, totalBytes, totalGzipBytes };
 }
-

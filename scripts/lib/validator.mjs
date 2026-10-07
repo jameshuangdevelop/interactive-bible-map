@@ -2183,7 +2183,7 @@ export async function validateData(options = {}) {
         return;
       }
       areaShapeIds.add(areaId);
-      if (!timelineAreasById.has(areaId)) {
+      if (timelineAreasById.size > 0 && !timelineAreasById.has(areaId)) {
         recordError(
           errors,
           ancientAreasRelativePath,

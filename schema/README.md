@@ -86,6 +86,7 @@ Generated app payloads:
 - `app/public/generated/ancient.roads.geojson`
 - `app/public/generated/ancient.coastline.geojson`
 - `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
+- `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size; `data/geo/ancient-roads.geojson` remains the full-detail source.
 
 Places and political history:
 - `politicalAreaId` links a location to one timeline area.
