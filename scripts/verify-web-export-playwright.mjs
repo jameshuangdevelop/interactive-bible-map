@@ -41,7 +41,8 @@ const minimumControlHitAreaPx = 44;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
-  pinLabels: "ibm-pin-label-standard"
+  pinLabels: "ibm-pin-label-standard",
+  clusterSource: "ibm-clustered-city-pins"
 };
 const mapLayerIds = {
   areaLabels: [
@@ -52,33 +53,25 @@ const mapLayerIds = {
     "ibm-selected-area-label"
   ],
   majorClusterPins: "ibm-major-cluster-circle",
-  majorClusterLabelLayers: ["ibm-major-cluster-label-ephesus", "ibm-major-cluster-label"],
+  majorClusterLabelLayers: ["ibm-major-cluster-label", "ibm-major-cluster-label-left"],
   clusterPins: "ibm-cluster-circle",
-  clusterCounts: "ibm-cluster-count",
   majorPins: "ibm-major-pin",
-  majorPinLabels: [
-    "ibm-pin-label-thessalonica",
-    "ibm-pin-label-east-edge",
-    "ibm-pin-label-laodicea",
-    "ibm-pin-label"
-  ],
+  majorPinLabels: ["ibm-pin-label", "ibm-pin-label-left"],
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
   candidatePins: "ibm-candidate-pin",
   pinLabels: [
-    "ibm-major-cluster-label-ephesus",
     "ibm-major-cluster-label",
-    "ibm-pin-label-thessalonica",
-    "ibm-pin-label-east-edge",
-    "ibm-pin-label-laodicea",
+    "ibm-major-cluster-label-left",
     "ibm-pin-label",
+    "ibm-pin-label-left",
     "ibm-pin-label-standard",
     "ibm-selected-major-pin-label",
     "ibm-selected-pin-label"
   ]
 };
 const allClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.clusterPins];
-const allClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers, mapLayerIds.clusterCounts];
+const allClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers, mapLayerIds.clusterPins];
 const allCityPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.cityPins];
 const expectedMajorPinPlaceIds = [
   "jerusalem",
@@ -4388,10 +4381,10 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
                 ? 10
                 : 9
             : pointCount >= 20
-              ? 18
+              ? 6
               : pointCount >= 8
-                ? 16
-                : 14;
+                ? 5
+                : 4;
         // The rendered bubble includes a 3px white stroke; probe just outside that edge.
         const probeRadius = circleRadius + 4;
         const diagonal = Math.round(probeRadius * 0.72);
@@ -4996,6 +4989,8 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
           pinLabelLayerIds,
           majorPinLayerId,
           majorClusterLayerId,
+          standardPinLayerId,
+          standardClusterLayerId,
           areaLabelDriftTolerancePx
         }) => {
           const map = window[testHookKey];
@@ -5288,6 +5283,89 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
             }
           }
 
+          const standardSymbolFeatures = map.queryRenderedFeatures(undefined, {
+            layers: [standardPinLayerId, standardClusterLayerId]
+          });
+          const standardSymbolsByKey = new Map();
+          for (const feature of standardSymbolFeatures) {
+            const key = featureKey(feature);
+            if (standardSymbolsByKey.has(key)) {
+              continue;
+            }
+
+            const projected = projectPointFeature(feature);
+            if (!projected) {
+              continue;
+            }
+
+            const pointCount = Number(feature.properties?.point_count ?? 0);
+            const isStandardCluster = String(feature.layer?.id ?? "") === standardClusterLayerId;
+            const isSelectedPlace =
+              feature.properties?.isSelectedPlace === true ||
+              feature.properties?.isSelectedPlace === "true";
+            const isHighlightedPlace =
+              feature.properties?.isHighlightedPlace === true ||
+              feature.properties?.isHighlightedPlace === "true";
+            const fillRadius = isStandardCluster
+              ? pointCount >= 20
+                ? 6
+                : pointCount >= 8
+                  ? 5
+                  : 4
+              : isSelectedPlace
+                ? 10.5
+                : isHighlightedPlace
+                  ? 9.5
+                  : map.getZoom() >= 6
+                    ? 8
+                    : 5.5;
+            const effectiveRadius = isStandardCluster ? fillRadius + 1.5 : fillRadius + 1;
+
+            standardSymbolsByKey.set(key, {
+              key,
+              layerId: String(feature.layer?.id ?? ""),
+              label: featureLabelText(feature),
+              projected: { x: projected.x, y: projected.y },
+              effectiveRadius
+            });
+          }
+
+          const standardSymbols = Array.from(standardSymbolsByKey.values());
+          const majorStandardOverlapSamples = [];
+          let majorStandardOverlapCount = 0;
+          for (const majorSymbol of majorSymbols) {
+            for (const standardSymbol of standardSymbols) {
+              const distance = Math.hypot(
+                majorSymbol.projected.x - standardSymbol.projected.x,
+                majorSymbol.projected.y - standardSymbol.projected.y
+              );
+              const minimumSeparation = majorSymbol.effectiveRadius + standardSymbol.effectiveRadius;
+              if (distance + 0.25 >= minimumSeparation) {
+                continue;
+              }
+
+              majorStandardOverlapCount += 1;
+              if (majorStandardOverlapSamples.length < 8) {
+                majorStandardOverlapSamples.push({
+                  major: {
+                    key: majorSymbol.key,
+                    layerId: majorSymbol.layerId,
+                    pointPx: [majorSymbol.projected.x, majorSymbol.projected.y],
+                    effectiveRadius: majorSymbol.effectiveRadius
+                  },
+                  standard: {
+                    key: standardSymbol.key,
+                    layerId: standardSymbol.layerId,
+                    pointPx: [standardSymbol.projected.x, standardSymbol.projected.y],
+                    effectiveRadius: standardSymbol.effectiveRadius
+                  },
+                  distancePx: distance,
+                  requiredPx: minimumSeparation
+                });
+              }
+            }
+          }
+
           return {
             viewport: {
               width: Math.round(mapRect.width),
@@ -5309,8 +5387,11 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
             maxAreaLabelDistancePx,
             areaLabelsTooFar,
             majorSymbolCount: majorSymbols.length,
+            standardSymbolCount: standardSymbols.length,
             majorPinOverlapCount,
-            majorPinOverlapSamples
+            majorPinOverlapSamples,
+            majorStandardOverlapCount,
+            majorStandardOverlapSamples
           };
         },
         {
@@ -5319,6 +5400,8 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
           pinLabelLayerIds: mapLayerIds.pinLabels,
           majorPinLayerId: mapLayerIds.majorPins,
           majorClusterLayerId: mapLayerIds.majorClusterPins,
+          standardPinLayerId: mapLayerIds.cityPins,
+          standardClusterLayerId: mapLayerIds.clusterPins,
           areaLabelDriftTolerancePx
         }
       );
@@ -5357,6 +5440,14 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
         throw new Error(
           `Overview major-pin overlap check failed at ${viewport.width}x${viewport.height}: ${JSON.stringify(
             readability.majorPinOverlapSamples
+          )}`
+        );
+      }
+
+      if (readability.majorStandardOverlapCount > 0) {
+        throw new Error(
+          `Overview major-vs-standard overlap check failed at ${viewport.width}x${viewport.height}: ${JSON.stringify(
+            readability.majorStandardOverlapSamples
           )}`
         );
       }
@@ -5549,6 +5640,266 @@ async function verifyAsiaMinorSevenChurchesAtZoom65(browser, baseUrl) {
         sevenChurchPinCount: asiaMinorSevenChurchPlaceIds.length,
         sevenChurchVisiblePinPlaceIds: asiaMinorSevenChurchPlaceIds,
         sevenChurchVisibleLabelPlaceIds,
+        majorLabelAttachment
+      });
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  }
+
+  return results;
+}
+
+async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
+  const targetViewports = [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 }
+  ];
+  const results = [];
+
+  for (const viewport of targetViewports) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+
+    try {
+      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await waitForMapToSettle(page);
+      await waitForMapStyleLoaded(page);
+      await setMapView(page, {
+        center: [35.24, 32.28],
+        zoom: 6
+      });
+      await waitForMapToSettle(page);
+
+      const overlap = await page.evaluate(
+        ({ testHookKey, majorPinLayerId, majorClusterLayerId, standardPinLayerId, standardClusterLayerId }) => {
+          const map = window[testHookKey];
+          if (!map) {
+            throw new Error("Map test hook is unavailable.");
+          }
+
+          const featureKey = (feature) => {
+            const properties = feature.properties ?? {};
+            const layerId = String(feature.layer?.id ?? "layer");
+            const entryId = typeof properties.entryId === "string" ? properties.entryId.trim() : "";
+            if (entryId.length > 0) {
+              return `${layerId}:${entryId}`;
+            }
+
+            const clusterId = Number(properties.cluster_id);
+            if (Number.isFinite(clusterId)) {
+              return `${layerId}:cluster:${clusterId}`;
+            }
+
+            const placeId = typeof properties.placeId === "string" ? properties.placeId.trim() : "";
+            if (placeId.length > 0) {
+              return `${layerId}:place:${placeId}`;
+            }
+
+            return `${layerId}:${String(feature.id ?? "feature")}:${feature.geometry?.type ?? "geom"}`;
+          };
+
+          const projectPointFeature = (feature) => {
+            if (feature.geometry?.type !== "Point") {
+              return null;
+            }
+
+            const [longitude, latitude] = feature.geometry.coordinates;
+            if (typeof longitude !== "number" || typeof latitude !== "number") {
+              return null;
+            }
+
+            return map.project([longitude, latitude]);
+          };
+
+          const toSymbolSnapshot = (feature, clusterLayerId) => {
+            const projected = projectPointFeature(feature);
+            if (!projected) {
+              return null;
+            }
+
+            const pointCount = Number(feature.properties?.point_count ?? 0);
+            const isCluster = String(feature.layer?.id ?? "") === clusterLayerId;
+            const isSelectedPlace =
+              feature.properties?.isSelectedPlace === true ||
+              feature.properties?.isSelectedPlace === "true";
+            const isHighlightedPlace =
+              feature.properties?.isHighlightedPlace === true ||
+              feature.properties?.isHighlightedPlace === "true";
+            const fillRadius = isCluster
+              ? pointCount >= 20
+                ? 6
+                : pointCount >= 8
+                  ? 5
+                  : 4
+              : isSelectedPlace
+                ? 10.5
+                : isHighlightedPlace
+                  ? 9.5
+                  : map.getZoom() >= 6
+                    ? 8
+                    : 5.5;
+            const effectiveRadius = isCluster ? fillRadius + 1.5 : fillRadius + 1;
+
+            return {
+              key: featureKey(feature),
+              layerId: String(feature.layer?.id ?? ""),
+              pointPx: { x: projected.x, y: projected.y },
+              effectiveRadius
+            };
+          };
+
+          const toMajorSnapshot = (feature) => {
+            const projected = projectPointFeature(feature);
+            if (!projected) {
+              return null;
+            }
+
+            const pointCount = Number(feature.properties?.point_count ?? 0);
+            const isCluster = String(feature.layer?.id ?? "") === majorClusterLayerId;
+            const isSelectedPlace =
+              feature.properties?.isSelectedPlace === true ||
+              feature.properties?.isSelectedPlace === "true";
+            const isHighlightedPlace =
+              feature.properties?.isHighlightedPlace === true ||
+              feature.properties?.isHighlightedPlace === "true";
+            const fillRadius = isCluster
+              ? pointCount >= 20
+                ? 11
+                : pointCount >= 8
+                  ? 10
+                  : 9
+              : isSelectedPlace
+                ? 10.5
+                : isHighlightedPlace
+                  ? 9.5
+                  : 8;
+
+            return {
+              key: featureKey(feature),
+              layerId: String(feature.layer?.id ?? ""),
+              pointPx: { x: projected.x, y: projected.y },
+              effectiveRadius: fillRadius + 1
+            };
+          };
+
+          const collectUniqueSymbols = (features, mapSymbol) => {
+            const byKey = new Map();
+            for (const feature of features) {
+              const snapshot = mapSymbol(feature);
+              if (!snapshot || byKey.has(snapshot.key)) {
+                continue;
+              }
+              byKey.set(snapshot.key, snapshot);
+            }
+            return Array.from(byKey.values());
+          };
+
+          const majorSymbols = collectUniqueSymbols(
+            map.queryRenderedFeatures(undefined, { layers: [majorPinLayerId, majorClusterLayerId] }),
+            toMajorSnapshot
+          );
+          const standardSymbols = collectUniqueSymbols(
+            map.queryRenderedFeatures(undefined, {
+              layers: [standardPinLayerId, standardClusterLayerId]
+            }),
+            (feature) => toSymbolSnapshot(feature, standardClusterLayerId)
+          );
+
+          const majorPinOverlapSamples = [];
+          let majorPinOverlapCount = 0;
+          for (let index = 0; index < majorSymbols.length; index += 1) {
+            const left = majorSymbols[index];
+            for (let otherIndex = index + 1; otherIndex < majorSymbols.length; otherIndex += 1) {
+              const right = majorSymbols[otherIndex];
+              const distance = Math.hypot(left.pointPx.x - right.pointPx.x, left.pointPx.y - right.pointPx.y);
+              const minimumSeparation = left.effectiveRadius + right.effectiveRadius;
+              if (distance + 0.25 >= minimumSeparation) {
+                continue;
+              }
+
+              majorPinOverlapCount += 1;
+              if (majorPinOverlapSamples.length < 8) {
+                majorPinOverlapSamples.push({
+                  left,
+                  right,
+                  distancePx: distance,
+                  requiredPx: minimumSeparation
+                });
+              }
+            }
+          }
+
+          const majorStandardOverlapSamples = [];
+          let majorStandardOverlapCount = 0;
+          for (const majorSymbol of majorSymbols) {
+            for (const standardSymbol of standardSymbols) {
+              const distance = Math.hypot(
+                majorSymbol.pointPx.x - standardSymbol.pointPx.x,
+                majorSymbol.pointPx.y - standardSymbol.pointPx.y
+              );
+              const minimumSeparation = majorSymbol.effectiveRadius + standardSymbol.effectiveRadius;
+              if (distance + 0.25 >= minimumSeparation) {
+                continue;
+              }
+
+              majorStandardOverlapCount += 1;
+              if (majorStandardOverlapSamples.length < 8) {
+                majorStandardOverlapSamples.push({
+                  major: majorSymbol,
+                  standard: standardSymbol,
+                  distancePx: distance,
+                  requiredPx: minimumSeparation
+                });
+              }
+            }
+          }
+
+          return {
+            majorSymbolCount: majorSymbols.length,
+            standardSymbolCount: standardSymbols.length,
+            majorPinOverlapCount,
+            majorPinOverlapSamples,
+            majorStandardOverlapCount,
+            majorStandardOverlapSamples
+          };
+        },
+        {
+          testHookKey: mapTestHookKey,
+          majorPinLayerId: mapLayerIds.majorPins,
+          majorClusterLayerId: mapLayerIds.majorClusterPins,
+          standardPinLayerId: mapLayerIds.cityPins,
+          standardClusterLayerId: mapLayerIds.clusterPins
+        }
+      );
+
+      const majorLabelAttachment = await collectMajorLabelAttachmentDiagnostics(page, {
+        majorPinLayerId: mapLayerIds.majorPins,
+        majorClusterLayerId: mapLayerIds.majorClusterPins,
+        majorPinLabelLayerIds: mapLayerIds.majorPinLabels,
+        majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers
+      });
+
+      if (overlap.majorStandardOverlapCount > 0) {
+        throw new Error(
+          `Jerusalem/Galilee zoom 6 has major-vs-standard overlaps at ${viewport.width}x${viewport.height}: ${JSON.stringify(
+            overlap.majorStandardOverlapSamples
+          )}`
+        );
+      }
+
+      if (majorLabelAttachment.majorLabelCount === 0) {
+        throw new Error(
+          `Jerusalem/Galilee zoom 6 rendered no major labels at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      results.push({
+        viewport,
+        center: [35.24, 32.28],
+        zoom: 6,
+        ...overlap,
         majorLabelAttachment
       });
     } finally {
@@ -6159,7 +6510,7 @@ async function verifyAreaLabelsOverviewWithProvinceFixture(browser, baseUrl, bas
     await setMapView(page, { center: [22.5, 35], zoom: 4.7 });
 
     const labels = await collectRenderedTextValues(page, mapLayerIds.areaLabels, "placeName");
-    for (const expectedLabel of ["Syria", "Judea"]) {
+    for (const expectedLabel of ["Syria", "Roman Empire"]) {
       if (!labels.includes(expectedLabel)) {
         throw new Error(
           `Overview area-label fixture missing '${expectedLabel}'. Rendered: ${JSON.stringify(labels)}`
@@ -6443,7 +6794,14 @@ async function setMapView(page, { center, zoom }) {
 
 async function collectRenderedCoverage(page) {
   return page.evaluate(
-    ({ clustersLayerId, cityPinsLayerId, pinLabelsLayerId, syntheticPrefix, testHookKey }) => {
+    ({
+      clustersLayerId,
+      cityPinsLayerId,
+      pinLabelsLayerId,
+      clusterSourceId,
+      syntheticPrefix,
+      testHookKey
+    }) => {
       const map = window[testHookKey];
       if (!map) {
         throw new Error("Map test hook is unavailable.");
@@ -6487,7 +6845,7 @@ async function collectRenderedCoverage(page) {
         (feature) => `label:${feature.properties?.entryId ?? feature.id ?? Math.random()}`
       );
 
-      const syntheticPinCount = cityPins.filter((feature) =>
+      const renderedSyntheticPinCount = cityPins.filter((feature) =>
         String(feature.properties?.placeId ?? "").startsWith(syntheticPrefix)
       ).length;
       const syntheticLabelCount = labels.filter((feature) =>
@@ -6501,7 +6859,31 @@ async function collectRenderedCoverage(page) {
         (maximum, feature) => Math.max(maximum, Number(feature.properties?.point_count ?? 0)),
         0
       );
-      const syntheticVisibleEstimate = clusterPointTotal + syntheticPinCount;
+      const sourceFeaturesRaw = map.querySourceFeatures(clusterSourceId);
+      const sourceFeatures = uniqueEntries(sourceFeaturesRaw, (feature) => {
+        if (feature.properties?.cluster) {
+          return `source-cluster:${feature.properties?.cluster_id ?? "unknown"}:${feature.geometry?.coordinates?.join(",") ?? ""}`;
+        }
+
+        return `source-pin:${feature.properties?.entryId ?? feature.id ?? Math.random()}`;
+      });
+      const syntheticSourcePinCount = sourceFeatures.filter((feature) =>
+        String(feature.properties?.placeId ?? "").startsWith(syntheticPrefix)
+      ).length;
+      const syntheticSourceClusterPointCount = sourceFeatures.reduce((sum, feature) => {
+        if (!feature.properties?.cluster) {
+          return sum;
+        }
+
+        return sum + Number(feature.properties?.point_count ?? 0);
+      }, 0);
+      const syntheticSourcePointCount = syntheticSourceClusterPointCount + syntheticSourcePinCount;
+      const syntheticPinCount = Math.max(renderedSyntheticPinCount, syntheticSourcePinCount);
+
+      const syntheticVisibleEstimate = Math.max(
+        clusterPointTotal + renderedSyntheticPinCount,
+        syntheticSourcePointCount
+      );
       const syntheticPlaceListEntries = document.querySelectorAll(
         `button[data-place-entry-id^='place:${syntheticPrefix}']`
       ).length;
@@ -6520,6 +6902,9 @@ async function collectRenderedCoverage(page) {
         maxClusterPointCount,
         syntheticPinCount,
         syntheticLabelCount,
+        renderedSyntheticPinCount,
+        syntheticSourcePinCount,
+        syntheticSourcePointCount,
         syntheticVisibleEstimate,
         syntheticPlaceListEntries,
         clusterPlaceListEntries,
@@ -6530,6 +6915,7 @@ async function collectRenderedCoverage(page) {
       clustersLayerId: smoothnessLayerIds.clusters,
       cityPinsLayerId: smoothnessLayerIds.cityPins,
       pinLabelsLayerId: smoothnessLayerIds.pinLabels,
+      clusterSourceId: smoothnessLayerIds.clusterSource,
       syntheticPrefix: syntheticPlaceIdPrefix,
       testHookKey: mapTestHookKey
     }
@@ -7269,6 +7655,10 @@ async function run() {
       browser,
       staticServer.baseUrl
     );
+    const jerusalemGalileeZoom6Check = await verifyJerusalemGalileeAtZoom6(
+      browser,
+      staticServer.baseUrl
+    );
     const asiaMinorSevenChurchesZoom65Check = await verifyAsiaMinorSevenChurchesAtZoom65(
       browser,
       staticServer.baseUrl
@@ -7419,6 +7809,7 @@ async function run() {
       pinLabelRegression,
       importantPlacesFirstCheck,
       overviewLabelReadabilityCheck,
+      jerusalemGalileeZoom6Check,
       asiaMinorSevenChurchesZoom65Check,
       candidatePinColorCheck,
       candidateSelectionCheck,

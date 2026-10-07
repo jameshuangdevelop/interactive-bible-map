@@ -40,7 +40,6 @@ import {
 } from "./map-render-data";
 import {
   CLUSTER_COLLISION_IMAGE_SIZE,
-  CLUSTER_COUNT_LAYOUT,
   PIN_COLLISION_IMAGE_SIZE,
   PIN_COLLISION_LAYOUT,
   QUESTION_BADGE_LAYOUT
@@ -72,29 +71,24 @@ const sourceAreaLabelsId = "ibm-area-labels";
 const sourceKeyboardFocusId = "ibm-keyboard-focus";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
-const layerMajorClusterLabelEphesusId = "ibm-major-cluster-label-ephesus";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
+const layerMajorClusterLabelLeftId = "ibm-major-cluster-label-left";
 const layerMajorPinShadowId = "ibm-major-pin-shadow";
 const layerMajorPinId = "ibm-major-pin";
 const layerMajorQuestionBadgeId = "ibm-major-question-badge";
 const layerMajorClusterCollisionMaskId = "ibm-major-cluster-collision-mask";
 const layerMajorPinCollisionMaskId = "ibm-major-pin-collision-mask";
-const layerMajorPinLabelEastEdgeId = "ibm-pin-label-east-edge";
-const layerMajorPinLabelLaodiceaId = "ibm-pin-label-laodicea";
-const layerMajorPinLabelThessalonicaId = "ibm-pin-label-thessalonica";
 const layerMajorPinLabelId = "ibm-pin-label";
+const layerMajorPinLabelLeftId = "ibm-pin-label-left";
 const layerMajorAreaLabelOverviewId = "ibm-major-area-label-overview";
 const layerMajorAreaLabelId = "ibm-major-area-label";
 const layerClusterCircleId = "ibm-cluster-circle";
-const layerClusterCountId = "ibm-cluster-count";
 const layerCityPinShadowId = "ibm-city-pin-shadow";
 const layerCityPinId = "ibm-city-pin";
 const layerSitePinShadowId = "ibm-site-pin-shadow";
 const layerSitePinId = "ibm-site-pin";
 const layerQuestionBadgeId = "ibm-question-badge";
 const layerCandidatePinId = "ibm-candidate-pin";
-const layerClusterCollisionMaskId = "ibm-cluster-collision-mask";
-const layerCityPinCollisionMaskId = "ibm-city-pin-collision-mask";
 const layerSitePinCollisionMaskId = "ibm-site-pin-collision-mask";
 const layerCandidatePinCollisionMaskId = "ibm-candidate-pin-collision-mask";
 const layerPinLabelId = "ibm-pin-label-standard";
@@ -108,6 +102,8 @@ const layerKeyboardFocusId = "ibm-keyboard-focus";
 const questionBadgeImageId = "ibm-question-badge-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
+const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
+const clusterSymbolImageId = "ibm-cluster-symbol-image";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
@@ -118,9 +114,19 @@ const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
 const majorInteractionPreferencePx = 3;
 const majorClusterMaxZoom = 5;
-const majorClusterRadiusPx = 20;
+const majorClusterRadiusPx = 25.6;
 const standardClusterRadiusPx = 52;
 const standardMutedThresholdZoom = 6;
+const standardPinBaseRadiusPx = 8;
+const standardPinOverviewDefaultRadiusPx = 5.5;
+const standardPinHighlightedRadiusPx = 9.5;
+const standardPinSelectedRadiusPx = 10.5;
+const standardClusterBaseRadiusPx = 14;
+const standardClusterRadiusByPointCount = {
+  default: 4,
+  medium: 5,
+  large: 6
+} as const;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
 const fallbackStyleLandcoverLayerIds = [
@@ -137,8 +143,8 @@ const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa of
 const interactiveLayerIds = [
   layerMajorClusterCircleId,
   layerMajorClusterLabelId,
+  layerMajorClusterLabelLeftId,
   layerClusterCircleId,
-  layerClusterCountId,
   layerMajorQuestionBadgeId,
   layerQuestionBadgeId,
   layerCandidatePinId,
@@ -218,6 +224,11 @@ const majorPinLabelLayout = {
   "text-anchor": "left" as const,
   "text-justify": "left" as const
 };
+const majorPinLabelLeftLayout = {
+  "text-offset": [-1.2, 0] as [number, number],
+  "text-anchor": "right" as const,
+  "text-justify": "right" as const
+};
 
 type RuntimeTuning = ReturnType<typeof resolveMapRuntimeTuning>;
 interface WebGlRendererInfo {
@@ -281,14 +292,19 @@ interface MajorPlaceReference {
   placeId: string;
   placeName: string;
   pinColor: string;
+  majorLabelSide: "left" | "right";
 }
 
 function isMajorClusterLayerId(layerId: string) {
-  return layerId === layerMajorClusterCircleId || layerId === layerMajorClusterLabelId;
+  return (
+    layerId === layerMajorClusterCircleId ||
+    layerId === layerMajorClusterLabelId ||
+    layerId === layerMajorClusterLabelLeftId
+  );
 }
 
 function isStandardClusterLayerId(layerId: string) {
-  return layerId === layerClusterCircleId || layerId === layerClusterCountId;
+  return layerId === layerClusterCircleId;
 }
 
 function buildMajorPlaceReferenceByRank(renderData: PlaceRenderData) {
@@ -302,7 +318,8 @@ function buildMajorPlaceReferenceByRank(renderData: PlaceRenderData) {
     byRank.set(rank, {
       placeId: feature.properties.placeId,
       placeName: feature.properties.placeName,
-      pinColor: feature.properties.pinColor
+      pinColor: feature.properties.pinColor,
+      majorLabelSide: feature.properties.majorLabelSide
     });
   }
 
@@ -341,6 +358,27 @@ function createMajorClusterLabelExpression(majorPlaceByRank: Map<number, MajorPl
     " +",
     ["to-string", ["max", 0, ["-", ["get", "point_count"], 1]]]
   ];
+}
+
+function createMajorClusterTopSideFilter(
+  majorPlaceByRank: Map<number, MajorPlaceReference>,
+  side: "left" | "right"
+) {
+  const ranks = Array.from(majorPlaceByRank.entries())
+    .filter(([, place]) => place.majorLabelSide === side)
+    .map(([rank]) => rank)
+    .sort((left, right) => left - right);
+
+  if (ranks.length === 0) {
+    return ["==", 1, 0];
+  }
+
+  const expression: unknown[] = ["any"];
+  for (const rank of ranks) {
+    expression.push(["==", ["get", "minImportanceRank"], rank]);
+  }
+
+  return expression;
 }
 
 function getStyleUrl(mode: BasemapMode) {
@@ -743,6 +781,23 @@ function createTransparentCollisionImage(sizePx: number) {
   });
 }
 
+function createCircularSdfImage({
+  canvasSizePx,
+  radiusPx
+}: {
+  canvasSizePx: number;
+  radiusPx: number;
+}) {
+  return createCanvasImage(canvasSizePx, (context, size) => {
+    const center = size / 2;
+    context.clearRect(0, 0, size, size);
+    context.fillStyle = "#FFFFFF";
+    context.beginPath();
+    context.arc(center, center, radiusPx, 0, Math.PI * 2);
+    context.fill();
+  });
+}
+
 function createCandidateIconImage({
   pinColor,
   candidateLetter,
@@ -813,6 +868,26 @@ function ensureCollisionImages(map: MapLibreMap) {
       map.addImage(clusterCollisionImageId, image.image, { pixelRatio: image.pixelRatio });
     }
   }
+
+  if (!map.hasImage(cityPinSymbolImageId)) {
+    const image = createCircularSdfImage({
+      canvasSizePx: 24,
+      radiusPx: standardPinBaseRadiusPx
+    });
+    if (image) {
+      map.addImage(cityPinSymbolImageId, image.image, { pixelRatio: image.pixelRatio, sdf: true });
+    }
+  }
+
+  if (!map.hasImage(clusterSymbolImageId)) {
+    const image = createCircularSdfImage({
+      canvasSizePx: 40,
+      radiusPx: standardClusterBaseRadiusPx
+    });
+    if (image) {
+      map.addImage(clusterSymbolImageId, image.image, { pixelRatio: image.pixelRatio, sdf: true });
+    }
+  }
 }
 
 function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
@@ -846,27 +921,34 @@ function ensureMapLayers(
     map.addLayer({
       id: layerClusterCircleId,
       source: sourceClusteredCityPinsId,
-      type: "circle",
-      filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
-      paint: {
-        "circle-radius": ["step", ["get", "point_count"], 14, 8, 16, 20, 18],
-        "circle-color": ["step", ["zoom"], "#9AA0A6", standardMutedThresholdZoom, "#C5221F"],
-        "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 3
-      }
-    });
-  }
-
-  if (!map.getLayer(layerClusterCountId)) {
-    map.addLayer({
-      id: layerClusterCountId,
-      source: sourceClusteredCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: CLUSTER_MAX_ZOOM + 1,
-      layout: CLUSTER_COUNT_LAYOUT,
+      layout: {
+        "icon-image": clusterSymbolImageId,
+        "icon-size": [
+          "step",
+          ["get", "point_count"],
+          standardClusterRadiusByPointCount.default / standardClusterBaseRadiusPx,
+          8,
+          standardClusterRadiusByPointCount.medium / standardClusterBaseRadiusPx,
+          20,
+          standardClusterRadiusByPointCount.large / standardClusterBaseRadiusPx
+        ],
+        "icon-anchor": "center",
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "text-optional": false
+      },
       paint: {
+        "icon-color": ["step", ["zoom"], "#9AA0A6", standardMutedThresholdZoom, "#C5221F"],
+        "icon-halo-color": "#FFFFFF",
+        "icon-halo-width": 3,
         "text-color": "#FFFFFF"
       }
     });
@@ -901,39 +983,46 @@ function ensureMapLayers(
     map.addLayer({
       id: layerCityPinId,
       source: sourceClusteredCityPinsId,
-      type: "circle",
+      type: "symbol",
       filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
-      paint: {
-        "circle-radius": [
+      layout: {
+        "icon-image": cityPinSymbolImageId,
+        "icon-size": [
           "step",
           ["zoom"],
           [
             "case",
             ["==", ["get", "isSelectedPlace"], true],
-            10.5,
+            standardPinSelectedRadiusPx / standardPinBaseRadiusPx,
             ["==", ["get", "isHighlightedPlace"], true],
-            9.5,
-            5.5
+            standardPinHighlightedRadiusPx / standardPinBaseRadiusPx,
+            standardPinOverviewDefaultRadiusPx / standardPinBaseRadiusPx
           ],
           standardMutedThresholdZoom,
           [
             "case",
             ["==", ["get", "isSelectedPlace"], true],
-            10.5,
+            standardPinSelectedRadiusPx / standardPinBaseRadiusPx,
             ["==", ["get", "isHighlightedPlace"], true],
-            9.5,
-            8
+            standardPinHighlightedRadiusPx / standardPinBaseRadiusPx,
+            1
           ]
         ],
-        "circle-color": [
+        "icon-anchor": "center",
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": ["get", "labelPriority"]
+      },
+      paint: {
+        "icon-color": [
           "step",
           ["zoom"],
           "#9AA0A6",
           standardMutedThresholdZoom,
           ["get", "pinColor"]
         ],
-        "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": ["step", ["zoom"], 1.5, standardMutedThresholdZoom, 2]
+        "icon-halo-color": "#FFFFFF",
+        "icon-halo-width": ["step", ["zoom"], 1.5, standardMutedThresholdZoom, 2]
       }
     });
   }
@@ -1100,42 +1189,6 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerClusterCollisionMaskId)) {
-    map.addLayer({
-      id: layerClusterCollisionMaskId,
-      source: sourceClusteredCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
-      layout: {
-        "icon-size": 1,
-        "icon-anchor": "center",
-        "icon-allow-overlap": false,
-        "icon-ignore-placement": false,
-        "icon-image": clusterCollisionImageId
-      },
-      paint: {
-        "icon-opacity": 0
-      }
-    });
-  }
-
-  if (!map.getLayer(layerCityPinCollisionMaskId)) {
-    map.addLayer({
-      id: layerCityPinCollisionMaskId,
-      source: sourceClusteredCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
-      layout: {
-        ...PIN_COLLISION_LAYOUT,
-        "icon-image": pinCollisionImageId
-      },
-      paint: {
-        "icon-opacity": 0
-      }
-    });
-  }
-
   if (!map.getLayer(layerMajorClusterCollisionMaskId)) {
     map.addLayer({
       id: layerMajorClusterCollisionMaskId,
@@ -1144,9 +1197,17 @@ function ensureMapLayers(
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: majorClusterMaxZoom + 1,
       layout: {
-        "icon-size": 1,
+        "icon-size": [
+          "step",
+          ["get", "point_count"],
+          0.32,
+          8,
+          0.34,
+          20,
+          0.36
+        ],
         "icon-anchor": "center",
-        "icon-allow-overlap": false,
+        "icon-allow-overlap": true,
         "icon-ignore-placement": false,
         "icon-image": clusterCollisionImageId
       },
@@ -1330,41 +1391,6 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerMajorClusterLabelEphesusId)) {
-    map.addLayer({
-      id: layerMajorClusterLabelEphesusId,
-      source: sourceMajorCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter([
-        "all",
-        ["has", "point_count"],
-        [
-          "any",
-          ["==", ["get", "minImportanceRank"], 3],
-          ["==", ["get", "minImportanceRank"], 7]
-        ]
-      ]),
-      maxzoom: majorClusterMaxZoom + 1,
-      layout: {
-        "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
-        "text-font": ["Noto Sans Bold"],
-        "text-size": 12,
-        "text-offset": [-2.2, 0],
-        "text-anchor": "right",
-        "text-justify": "right",
-        "symbol-sort-key": ["get", "minImportanceRank"],
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "text-optional": true
-      },
-      paint: {
-        "text-color": "#202124",
-        "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.3
-      }
-    });
-  }
-
   if (!map.getLayer(layerMajorClusterLabelId)) {
     map.addLayer({
       id: layerMajorClusterLabelId,
@@ -1373,17 +1399,20 @@ function ensureMapLayers(
       filter: toLayerFilter([
         "all",
         ["has", "point_count"],
-        ["!=", ["get", "minImportanceRank"], 3],
-        ["!=", ["get", "minImportanceRank"], 7]
+        createMajorClusterTopSideFilter(majorPlaceByRank, "right")
       ]),
       maxzoom: majorClusterMaxZoom + 1,
       layout: {
         "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
         "text-font": ["Noto Sans Bold"],
-        "text-size": 12,
-        "text-offset": [1.2, 0],
-        "text-anchor": "left",
-        "text-justify": "left",
+        "text-size": 11,
+        "text-variable-anchor": ["left", "top", "right"] as [
+          "left",
+          "top",
+          "right"
+        ],
+        "text-radial-offset": 0.6,
+        "text-justify": "auto" as const,
         "symbol-sort-key": ["get", "minImportanceRank"],
         "text-allow-overlap": false,
         "text-ignore-placement": false,
@@ -1397,99 +1426,25 @@ function ensureMapLayers(
     });
   }
 
-  moveLayerBefore(map, layerMajorClusterLabelId, layerMajorClusterLabelEphesusId);
-
-  if (!map.getLayer(layerMajorPinLabelThessalonicaId)) {
+  if (!map.getLayer(layerMajorClusterLabelLeftId)) {
     map.addLayer({
-      id: layerMajorPinLabelThessalonicaId,
+      id: layerMajorClusterLabelLeftId,
       source: sourceMajorCityPinsId,
       type: "symbol",
       filter: toLayerFilter([
         "all",
-        ["!", ["has", "point_count"]],
-        basePinVisibilityFilter,
-        ["!=", ["get", "labelText"], null],
-        ["!=", ["get", "isSelectedPlace"], true],
-        ["==", ["get", "placeId"], "thessalonica"]
+        ["has", "point_count"],
+        createMajorClusterTopSideFilter(majorPlaceByRank, "left")
       ]),
+      maxzoom: majorClusterMaxZoom + 1,
       layout: {
-        "text-field": ["get", "labelText"],
+        "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
         "text-font": ["Noto Sans Bold"],
-        "text-size": 12,
-        "text-variable-anchor": ["bottom", "top"] as ["bottom", "top"],
-        "text-radial-offset": 0.9,
+        "text-size": 11,
+        "text-variable-anchor": ["top"] as ["top"],
+        "text-radial-offset": 0.8,
         "text-justify": "auto" as const,
-        "symbol-sort-key": ["get", "labelPriority"],
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "text-optional": true
-      },
-      paint: {
-        "text-color": "#202124",
-        "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.3
-      }
-    });
-  }
-
-  if (!map.getLayer(layerMajorPinLabelEastEdgeId)) {
-    map.addLayer({
-      id: layerMajorPinLabelEastEdgeId,
-      source: sourceMajorCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter([
-        "all",
-        ["!", ["has", "point_count"]],
-        basePinVisibilityFilter,
-        ["!=", ["get", "labelText"], null],
-        ["!=", ["get", "isSelectedPlace"], true],
-        [
-          "any",
-          ["==", ["get", "placeId"], "antioch-syria"],
-          ["==", ["get", "placeId"], "damascus"]
-        ]
-      ]),
-      layout: {
-        "text-field": ["get", "labelText"],
-        "text-font": ["Noto Sans Bold"],
-        "text-size": 12,
-        "text-offset": [-1.2, 0],
-        "text-anchor": "right",
-        "text-justify": "right",
-        "symbol-sort-key": ["get", "labelPriority"],
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "text-optional": true
-      },
-      paint: {
-        "text-color": "#202124",
-        "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.3
-      }
-    });
-  }
-
-  if (!map.getLayer(layerMajorPinLabelLaodiceaId)) {
-    map.addLayer({
-      id: layerMajorPinLabelLaodiceaId,
-      source: sourceMajorCityPinsId,
-      type: "symbol",
-      filter: toLayerFilter([
-        "all",
-        ["!", ["has", "point_count"]],
-        basePinVisibilityFilter,
-        ["!=", ["get", "labelText"], null],
-        ["!=", ["get", "isSelectedPlace"], true],
-        ["==", ["get", "placeId"], "laodicea"]
-      ]),
-      layout: {
-        "text-field": ["get", "labelText"],
-        "text-font": ["Noto Sans Bold"],
-        "text-size": 12,
-        "text-offset": [-1.2, 0],
-        "text-anchor": "right",
-        "text-justify": "right",
-        "symbol-sort-key": ["get", "labelPriority"],
+        "symbol-sort-key": ["get", "minImportanceRank"],
         "text-allow-overlap": false,
         "text-ignore-placement": false,
         "text-optional": true
@@ -1513,10 +1468,7 @@ function ensureMapLayers(
         basePinVisibilityFilter,
         ["!=", ["get", "labelText"], null],
         ["!=", ["get", "isSelectedPlace"], true],
-        ["!=", ["get", "placeId"], "thessalonica"],
-        ["!=", ["get", "placeId"], "antioch-syria"],
-        ["!=", ["get", "placeId"], "damascus"],
-        ["!=", ["get", "placeId"], "laodicea"]
+        ["!=", ["get", "majorLabelSide"], "left"]
       ]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -1536,9 +1488,36 @@ function ensureMapLayers(
     });
   }
 
-  moveLayerBefore(map, layerMajorPinLabelId, layerMajorPinLabelEastEdgeId);
-  moveLayerBefore(map, layerMajorPinLabelId, layerMajorPinLabelLaodiceaId);
-  moveLayerBefore(map, layerMajorPinLabelId, layerMajorPinLabelThessalonicaId);
+  if (!map.getLayer(layerMajorPinLabelLeftId)) {
+    map.addLayer({
+      id: layerMajorPinLabelLeftId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "majorLabelSide"], "left"]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        ...majorPinLabelLeftLayout,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
 
   if (!map.getLayer(layerSelectedAreaLabelId)) {
     map.addLayer({
@@ -1644,7 +1623,7 @@ function ensureMapLayers(
   ] as const;
 
   for (const areaLayerId of areaLayersNeedingStandardClusterClearance) {
-    moveLayerBefore(map, areaLayerId, layerClusterCollisionMaskId);
+    moveLayerBefore(map, areaLayerId, layerMajorClusterCollisionMaskId);
   }
 }
 
