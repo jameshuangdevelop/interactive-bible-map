@@ -100,13 +100,14 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
   | Roman province | Warm tint, `#B3261E` at 6% | Solid, `#7D5A50`, 1 px (1.5 px from zoom 7) |
   | Allied ("client") kingdom, tetrarchy, or free city or league under Rome | Ochre tint, `#E8A33D` at 12% | Dashed, `#7D5A50`, 1 px |
   | Outside the empire (for example the Parthian Empire) | Grey tint, `#5F6368` at 6% | Solid, `#80868B`, 1 px |
+  | Status unclear in the sources (for example Chalcis in AD 48–50) | No tint; thin diagonal hatching in `#80868B` | Dotted, `#80868B`, 1 px |
   | The Roman Empire's outer edge | — | Solid, `#7D5A50`, 2 px |
 
   Above zoom 10 the fills fade out; the borders stay.
-- **Area labels:** spaced capitals, like province labels (§2 "Places on the map"), from the timeline data's English names. An area that is one of our records (for example Syria, Galatia, or Judea the province) uses that record's label, which opens the record as now. An area without a record (for example the tetrarchy of Philip) has a plain label, without the pointer cursor: hovering or focusing it shows a tooltip with its name, kind, ruler and years. A province record whose area doesn't exist in the selected year is hidden then; for example, the province of Judea in AD 41–44, when Agrippa I ruled it as king. Region labels (Galilee, Samaria and the others) stay as they are.
+- **Area labels:** one label for each holder of that year (a province, kingdom, tetrarchy, free league, or a state outside the empire), placed on its largest piece, in spaced capitals like province labels (§2 "Places on the map"), from the timeline data's English names. A holder that is one of our records (for example Syria, Galatia, or Judea the province) uses that record's label, which opens the record as now. A holder without a record (for example the tetrarchy of Philip) has a plain label, without the pointer cursor: hovering or focusing it shows a tooltip with its name, kind, ruler and years. An area whose status is unclear has no label; hovering it shows "Status unclear in the sources" with the reason. A province record that holds no land in the selected year is hidden then; for example, the province of Judea in AD 41–44, when Agrippa I ruled it as king. Region labels (Galilee, Samaria and the others) stay as they are.
 - **Roads:** major Roman roads (ADR-0037) as thin lines in `#8D6E63`, from 1 px at zoom 5 to 2 px at zoom 9; roads the data marks as known are solid, and conjectured ones dashed. They appear from zoom 5, under every label. No road names in M4.
 - **Ancient coastline,** only where it differs from today's (ADR-0037): land that was sea is drawn in the basemap's water colour with a dotted edge.
-- **Map key:** a small "Map key" button below the toggle opens a compact card: the three kinds of area, the empire's edge, known and conjectured roads, the ancient coastline, and "Borders are approximate. Sources are under Sources & credits."
+- **Map key:** a small "Map key" button below the toggle opens a compact card: the four kinds of area, the empire's edge, known and conjectured roads, the ancient coastline, and "Borders are approximate. Sources are under Sources & credits."
 - **Smoothness:** the layer is drawn by MapLibre, like the pins (ADR-0024), so it moves with every drag and zoom.
 
 ### Timeline (M4)
