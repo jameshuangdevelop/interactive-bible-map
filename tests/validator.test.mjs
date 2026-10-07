@@ -80,6 +80,59 @@ async function runCase(caseName, options = {}) {
   });
 }
 
+// Reuses the valid-major-few-images fixture as a template for 3/4/7/8-image major-place cases.
+async function runWithTemporaryMajorImageCountCase(imageCount, options = {}) {
+  const temporaryDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "ibm-validator-major-images-")
+  );
+
+  try {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+
+    const majorFewImagesCaseDirectory = path.join(casesDirectory, "valid-major-few-images");
+    for (const locationFileName of ["capernaum.json", "galilee.json"]) {
+      fs.copyFileSync(
+        path.join(majorFewImagesCaseDirectory, "locations", locationFileName),
+        path.join(locationsDirectory, locationFileName)
+      );
+    }
+
+    const mediaPath = path.join(majorFewImagesCaseDirectory, "media", "capernaum.json");
+    const mediaData = JSON.parse(fs.readFileSync(mediaPath, "utf8"));
+    const templateImage = mediaData.images[0];
+    mediaData.images = Array.from({ length: imageCount }, (_, index) => ({
+      ...templateImage,
+      id: `capernaum-${String(index + 1).padStart(2, "0")}`
+    }));
+
+    fs.writeFileSync(
+      path.join(mediaDirectory, "capernaum.json"),
+      `${JSON.stringify(mediaData, null, 2)}\n`
+    );
+
+    const { webVplPath = webFixturePath, ...validationOptions } = options;
+    return await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
+      aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
+      webVplPath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      // This fixture predates names.modernCountries; keep this helper focused
+      // on image-count behavior unless a caller explicitly overrides it.
+      requireModernCountries: false,
+      ...validationOptions
+    });
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
 function toDraftRecord(record) {
   const draftRecord = { ...record, status: "draft" };
   delete draftRecord.verifiedBy;
@@ -589,8 +642,33 @@ test("standard places cannot have more than three images", async () => {
   );
 });
 
-test("major places with fewer than five images emit only a warning when REQUIRE_MAJOR_IMAGES is off", async () => {
-  const result = await runCase("valid-major-few-images", { requireMajorImages: false });
+test("major places with four images pass", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(4);
+  assert.equal(result.errors.length, 0);
+});
+
+test("major places with seven images pass", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(7);
+  assert.equal(result.errors.length, 0);
+});
+
+test("major places with more than seven images fail", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(8);
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("media/capernaum.json") &&
+        error.path === "$.images" &&
+        error.message.includes("at most 7 images")
+    )
+  );
+});
+
+test("major places with three images emit only a warning when REQUIRE_MAJOR_IMAGES is off", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(3, {
+    requireMajorImages: false
+  });
   assert.equal(result.errors.length, 0);
   assert.ok(
     hasWarning(
@@ -598,33 +676,35 @@ test("major places with fewer than five images emit only a warning when REQUIRE_
       (warning) =>
         warning.file.endsWith("media/capernaum.json") &&
         warning.path === "$.images" &&
-        warning.message.includes("at least 5 images")
+        warning.message.includes("at least 4 images")
     )
   );
 });
 
-test("major places with fewer than five images fail by default", async () => {
-  const defaultResult = await runCase("valid-major-few-images");
+test("major places with three images fail by default", async () => {
+  const defaultResult = await runWithTemporaryMajorImageCountCase(3);
   assert.ok(
     hasError(
       defaultResult,
       (error) =>
         error.file.endsWith("media/capernaum.json") &&
         error.path === "$.images" &&
-        error.message.includes("at least 5 images")
+        error.message.includes("at least 4 images")
     )
   );
 });
 
-test("major places with fewer than five images fail when REQUIRE_MAJOR_IMAGES is enabled", async () => {
-  const result = await runCase("valid-major-few-images", { requireMajorImages: true });
+test("major places with three images fail when REQUIRE_MAJOR_IMAGES is enabled", async () => {
+  const result = await runWithTemporaryMajorImageCountCase(3, {
+    requireMajorImages: true
+  });
   assert.ok(
     hasError(
       result,
       (error) =>
         error.file.endsWith("media/capernaum.json") &&
         error.path === "$.images" &&
-        error.message.includes("at least 5 images")
+        error.message.includes("at least 4 images")
     )
   );
 });

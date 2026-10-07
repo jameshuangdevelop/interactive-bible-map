@@ -47,19 +47,6 @@
     },
     {
       "id": "galatia-03",
-      "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Antioch_in_Pisida_Decumanus_Maximus_047.jpg",
-      "width": 1600,
-      "height": 959,
-      "author": "Dosseman",
-      "license": "CC BY-SA 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "sourcePage": "https://commons.wikimedia.org/wiki/File:Antioch_in_Pisida_Decumanus_Maximus_047.jpg",
-      "caption": "The Decumanus Maximus, the main street of Antioch in Pisidia, with the surrounding highland behind.",
-      "kind": "site",
-      "aiGenerated": false
-    },
-    {
-      "id": "galatia-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/Antioch_in_Pisidia_Theatre_2963.jpg",
       "width": 1600,
       "height": 2404,
@@ -72,7 +59,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-05",
+      "id": "galatia-04",
       "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/ANTIOCHE_DE_PISIDIE_Augusteum_ok.jpg",
       "width": 6000,
       "height": 2510,
@@ -85,7 +72,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-06",
+      "id": "galatia-05",
       "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Ankara_Hac%C4%B1_Bayram_Mosque_Exterior_and_Augustus_Temple_in_2014_06.jpg",
       "width": 4928,
       "height": 3280,
@@ -98,7 +85,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-07",
+      "id": "galatia-06",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Konya_view_from_Seljuk_Tower_3998.jpg",
       "width": 2196,
       "height": 1464,
@@ -111,7 +98,7 @@
       "aiGenerated": false
     },
     {
-      "id": "galatia-08",
+      "id": "galatia-07",
       "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Hasanoba_03_04_1988_Karada%C4%9F.jpg",
       "width": 2643,
       "height": 1717,
