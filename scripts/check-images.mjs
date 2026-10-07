@@ -1,11 +1,18 @@
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 import {
   fetchCommonsImageSizes,
   parseCommonsFileNameFromUploadUrl
 } from "./lib/commons-image-sizes.mjs";
+import {
+  createChangedSinceSelectionKey,
+  isAiImage,
+  selectImagesChangedSinceRef
+} from "./lib/check-images-changed-since.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
@@ -32,6 +39,53 @@ const MAX_AI_IMAGE_WIDTH_PX = 1600;
 const MAX_AI_IMAGE_BYTES = 400 * 1024;
 const AI_MEDIA_URL_PATTERN =
   /^media\/ai\/([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})\.webp$/u;
+const execFileAsync = promisify(execFile);
+
+function readCliArgument(argv, argumentName) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const entry = argv[index];
+    if (entry === `--${argumentName}`) {
+      return argv[index + 1] ?? null;
+    }
+
+    const prefix = `--${argumentName}=`;
+    if (entry.startsWith(prefix)) {
+      return entry.slice(prefix.length);
+    }
+  }
+
+  return null;
+}
+
+function readChangedSinceRef(argv = process.argv.slice(2)) {
+  const rawRef = readCliArgument(argv, "changed-since");
+  if (rawRef === null) {
+    return null;
+  }
+
+  const changedSinceRef = rawRef.trim();
+  if (!changedSinceRef) {
+    throw new Error("Expected a git ref after --changed-since.");
+  }
+
+  return changedSinceRef;
+}
+
+function normalizeRelativePath(pathValue) {
+  return String(pathValue).replace(/\\/gu, "/");
+}
+
+function collectCommandOutput(error) {
+  const stdout = typeof error?.stdout === "string" ? error.stdout : "";
+  const stderr = typeof error?.stderr === "string" ? error.stderr : "";
+  const message = error instanceof Error ? error.message : String(error);
+  return `${stdout}\n${stderr}\n${message}`.trim();
+}
+
+function isMissingPathAtRefError(error) {
+  const output = collectCommandOutput(error).toLowerCase();
+  return output.includes("exists on disk, but not in") || output.includes("does not exist in");
+}
 
 function toCommonsOriginalPathname(pathname) {
   if (pathname.startsWith(COMMONS_THUMB_PREFIX)) {
@@ -327,6 +381,101 @@ async function loadMediaRecords() {
   );
 }
 
+async function readMediaRecordAtRef(changedSinceRef, fileName) {
+  const relativePath = `data/media/${fileName}`;
+  try {
+    const { stdout } = await execFileAsync("git", ["show", `${changedSinceRef}:${relativePath}`], {
+      cwd: repositoryRoot,
+      maxBuffer: 10 * 1024 * 1024
+    });
+    return JSON.parse(stdout);
+  } catch (error) {
+    if (isMissingPathAtRefError(error)) {
+      return null;
+    }
+
+    throw new Error(
+      `Could not read ${relativePath} at ${changedSinceRef}: ${collectCommandOutput(error)}`
+    );
+  }
+}
+
+async function loadBaseMediaRecordsByFileName(changedSinceRef, mediaRecords) {
+  const mediaRecordsWithFileName = mediaRecords.filter(
+    (mediaRecord) => typeof mediaRecord?.fileName === "string" && mediaRecord.fileName.length > 0
+  );
+
+  const entries = (
+    await runWithConcurrency(mediaRecordsWithFileName, 4, async (mediaRecord) => {
+      const baseRecord = await readMediaRecordAtRef(changedSinceRef, mediaRecord.fileName);
+      return [mediaRecord.fileName, baseRecord];
+    })
+  ).filter((entry) => entry[1] !== null);
+
+  return new Map(entries);
+}
+
+async function loadChangedAiFilesSinceRef(changedSinceRef) {
+  const { stdout } = await execFileAsync(
+    "git",
+    ["diff", "--name-only", changedSinceRef, "--", "media/ai"],
+    {
+      cwd: repositoryRoot,
+      maxBuffer: 10 * 1024 * 1024
+    }
+  );
+
+  const changedPaths = stdout
+    .split(/\r?\n/u)
+    .map((line) => normalizeRelativePath(line.trim()))
+    .filter((line) => line.length > 0 && line.toLowerCase().endsWith(".webp"));
+
+  const existingChangedPaths = (
+    await Promise.all(
+      changedPaths.map(async (relativePath) => {
+        const absolutePath = path.resolve(repositoryRoot, relativePath);
+        try {
+          const stats = await fs.stat(absolutePath);
+          if (!stats.isFile()) {
+            return null;
+          }
+        } catch {
+          return null;
+        }
+
+        return relativePath;
+      })
+    )
+  ).filter((relativePath) => relativePath !== null);
+
+  return new Set(existingChangedPaths);
+}
+
+async function selectChangedImagesSinceRef(changedSinceRef, mediaRecords) {
+  const [baseMediaRecordsByFileName, changedAiFiles] = await Promise.all([
+    loadBaseMediaRecordsByFileName(changedSinceRef, mediaRecords),
+    loadChangedAiFilesSinceRef(changedSinceRef)
+  ]);
+
+  return selectImagesChangedSinceRef({
+    currentMediaRecords: mediaRecords,
+    baseMediaRecordsByFileName,
+    changedAiFiles
+  });
+}
+
+function logChangedSinceSelection(changedSinceRef, summary) {
+  console.log(
+    `Selected ${summary.selectedImages} of ${summary.totalCurrentImages} image(s) with --changed-since ${changedSinceRef}.`
+  );
+  console.log(
+    `Reasons: ${summary.newMediaFileImages} from new media files, ${summary.addedImages} newly added image(s), ${summary.changedMetadataImages} with changed check fields, ${summary.aiFileChangedImages} with changed AI files.`
+  );
+  console.log(
+    `Skipped ${summary.unchangedImages} unchanged image(s); ${summary.removedImages} removed image(s) were not checked.`
+  );
+}
+
 async function validateAiImage(task) {
   const failures = [];
   const match = AI_MEDIA_URL_PATTERN.exec(task.image.url);
@@ -433,8 +582,18 @@ function summarizeFailureRows(failures) {
 }
 
 async function main() {
+  const changedSinceRef = readChangedSinceRef();
   const thumbnailWidths = await loadCommonsThumbnailWidths();
   const mediaRecords = await loadMediaRecords();
+  let selectedImageKeys = null;
+
+  if (changedSinceRef) {
+    const changedSinceSelection = await selectChangedImagesSinceRef(changedSinceRef, mediaRecords);
+    logChangedSinceSelection(changedSinceRef, changedSinceSelection.summary);
+    selectedImageKeys = new Set(
+      changedSinceSelection.selected.map((selection) => selection.selectionKey)
+    );
+  }
 
   const commonsTasks = [];
   const commonsSizeChecks = [];
@@ -444,12 +603,19 @@ async function main() {
     const locationId = mediaRecord.locationId;
     const images = Array.isArray(mediaRecord.images) ? mediaRecord.images : [];
 
-    for (const image of images) {
+    for (const [imageIndex, image] of images.entries()) {
       if (!image || typeof image !== "object" || typeof image.url !== "string") {
         continue;
       }
 
-      if (image.kind === "ai-reconstruction" || image.aiGenerated === true) {
+      if (
+        selectedImageKeys &&
+        !selectedImageKeys.has(createChangedSinceSelectionKey(mediaRecord.fileName, imageIndex))
+      ) {
+        continue;
+      }
+
+      if (isAiImage(image)) {
         aiTasks.push({ locationId, image });
         continue;
       }
