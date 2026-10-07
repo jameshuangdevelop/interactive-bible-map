@@ -289,7 +289,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Consequences:** Card M3-23 builds this (Frontend Engineer). Visual spec §2 and wireframe 01 change to match. The smoothness rules of ADR-0024 still apply.
 
 ## ADR-0036 — Lean CI: fast checks and deploys in CI, the full browser suite run locally
-- **Date:** 2026-10-07 · **Status:** Accepted (PO decision; the human was away when asked, and confirms or changes it at CP3b) · **By:** the human ("let's reexamine what we actually need for CI if local tests are consistently passing") and the PO
+- **Date:** 2026-10-07 · **Status:** Accepted · **By:** the human ("let's reexamine what we actually need for CI if local tests are consistently passing"; on the PO's recommendation: "that sounds good to me")
 - **Context:**
   - A PR's CI took about 17 minutes:
     - the full Playwright suite (`verify:web:playwright`) took 10¼ minutes;
