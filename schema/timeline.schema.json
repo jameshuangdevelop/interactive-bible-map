@@ -104,7 +104,8 @@
               "client-kingdom",
               "client-tetrarchy",
               "free-city-or-league",
-              "outside-empire"
+              "outside-empire",
+              "uncertain"
             ]
           },
           "romanSide": {
@@ -161,6 +162,10 @@
                   "$ref": "#/$defs/id"
                 },
                 "ruler": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "note": {
                   "type": "string",
                   "minLength": 1
                 },

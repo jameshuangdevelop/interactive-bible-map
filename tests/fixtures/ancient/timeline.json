@@ -52,6 +52,15 @@
       "sources": [
         "bib:pleiades-place-resource"
       ]
+    },
+    {
+      "id": "uncertain-roman-side",
+      "name": "Roman-side control uncertain",
+      "kind": "uncertain",
+      "romanSide": true,
+      "sources": [
+        "bib:pleiades-place-resource"
+      ]
     }
   ],
   "areas": [
@@ -85,8 +94,17 @@
       "periods": [
         {
           "fromYear": -4,
-          "toYear": 101,
+          "toYear": 44,
           "holderId": "client-antipas",
+          "sources": [
+            "bib:pleiades-place-resource"
+          ]
+        },
+        {
+          "fromYear": 44,
+          "toYear": 101,
+          "holderId": "uncertain-roman-side",
+          "note": "Status in the sources is unclear for this interval (fixture).",
           "sources": [
             "bib:pleiades-place-resource"
           ]

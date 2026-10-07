@@ -183,6 +183,59 @@
             "description": "Neutral summary of why this candidate is proposed.",
             "minLength": 1
           },
+          "politicalAreaId": {
+            "type": "string",
+            "description": "Optional timeline area ID for candidate-specific political history derivation.",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "politicalHistoryOverrides": {
+            "type": "array",
+            "description": "Optional candidate-specific overrides applied over this candidate's timeline-derived political history.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fromYear",
+                "toYear",
+                "holderId",
+                "sources"
+              ],
+              "properties": {
+                "fromYear": {
+                  "$ref": "#/$defs/yearNoZero",
+                  "description": "Start year as an integer, with BC negative and no year 0."
+                },
+                "toYear": {
+                  "$ref": "#/$defs/yearNoZero",
+                  "description": "First year after this override interval."
+                },
+                "holderId": {
+                  "type": "string",
+                  "description": "Timeline entity ID from data/timeline.json.",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "ruler": {
+                  "type": "string",
+                  "description": "Optional ruler label for this override interval.",
+                  "minLength": 1
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Optional short note for this override interval.",
+                  "minLength": 1
+                },
+                "sources": {
+                  "type": "array",
+                  "description": "Sources for this override interval.",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+                  }
+                }
+              }
+            }
+          },
           "sources": {
             "type": "array",
             "description": "Sources supporting this candidate.",
@@ -409,6 +462,16 @@
             "description": "Optional holder entity ID from data/timeline.json.",
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
+          "candidate": {
+            "type": "integer",
+            "description": "Optional candidate index when politicalHistory is derived per candidate.",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional short note for uncertainty or brief explanation on this interval.",
+            "minLength": 1
+          },
           "entity": {
             "type": "string",
             "description": "Political entity label used for this interval.",
@@ -455,6 +518,11 @@
           "ruler": {
             "type": "string",
             "description": "Optional ruler label for this override interval.",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional short note for this override interval.",
             "minLength": 1
           },
           "sources": {

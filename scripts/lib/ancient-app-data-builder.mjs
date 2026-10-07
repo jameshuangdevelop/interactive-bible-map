@@ -159,6 +159,9 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) 
     if (!holder || !piece?.polygon) {
       continue;
     }
+    if (holder.kind === "uncertain") {
+      continue;
+    }
     const labelPoint = polylabel(piece.polygon, 1);
     labels.push({
       holderId,
@@ -396,6 +399,7 @@ export async function buildAncientAppData({
         holderRomanSide: holder.romanSide,
         holderLocationId: holder.locationId ?? null,
         ruler: period.ruler ?? null,
+        note: period.note ?? null,
         hasShape: areaFeatureById.has(area.id)
       };
       assignments.push(assignment);
@@ -430,4 +434,3 @@ export async function buildAncientAppData({
 
   return { writtenFiles, totalBytes, totalGzipBytes };
 }
-

@@ -2232,3 +2232,86 @@ test("derived political-history consistency check is switchable", async () => {
     true
   );
 });
+
+test("place-level and candidate-level political area links cannot both be set", async () => {
+  const result = await runWithTemporaryCase(
+    ({ capernaumData }) => {
+      capernaumData.politicalAreaId = "galilee";
+      capernaumData.candidates[0].politicalAreaId = "perea";
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath
+    }
+  );
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        error.path === "$.politicalAreaId" &&
+        /either place-level politicalAreaId or candidate-level politicalAreaId/u.test(
+          error.message
+        )
+    ),
+    true
+  );
+});
+
+test("candidate-level political area derivation supports per-candidate sequences", async () => {
+  const result = await runWithTemporaryCase(
+    ({ capernaumData }) => {
+      delete capernaumData.politicalAreaId;
+      delete capernaumData.politicalHistoryOverrides;
+      capernaumData.candidates = capernaumData.candidates.slice(0, 2);
+      capernaumData.candidates[0].politicalAreaId = "galilee";
+      capernaumData.candidates[1].politicalAreaId = "perea";
+      capernaumData.politicalHistory = [
+        {
+          fromYear: -4,
+          toYear: 44,
+          holderId: "client-antipas",
+          candidate: 0,
+          entity: "Tetrarchy of Herod Antipas (ruler: Herod Antipas)",
+          sources: ["bib:pleiades-place-resource"]
+        },
+        {
+          fromYear: 44,
+          toYear: 101,
+          holderId: "province-judaea",
+          candidate: 0,
+          entity: "Roman province of Judaea",
+          sources: ["bib:pleiades-place-resource"]
+        },
+        {
+          fromYear: -4,
+          toYear: 44,
+          holderId: "client-antipas",
+          candidate: 1,
+          entity: "Tetrarchy of Herod Antipas",
+          sources: ["bib:pleiades-place-resource"]
+        },
+        {
+          fromYear: 44,
+          toYear: 101,
+          holderId: "uncertain-roman-side",
+          candidate: 1,
+          note: "Status in the sources is unclear for this interval (fixture).",
+          entity: "Roman-side control uncertain",
+          sources: ["bib:pleiades-place-resource"]
+        }
+      ];
+    },
+    {
+      timelinePath: ancientTimelineFixturePath,
+      ancientAreasPath: ancientAreasFixturePath,
+      ancientRoadsPath: ancientRoadsFixturePath,
+      ancientCoastlinePath: ancientCoastlineFixturePath,
+      requireDerivedPoliticalHistory: true
+    }
+  );
+
+  assert.equal(result.errors.length, 0);
+});

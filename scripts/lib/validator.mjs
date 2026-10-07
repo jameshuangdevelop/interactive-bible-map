@@ -1222,6 +1222,52 @@ function validateGeometryTopology({ featureCollection, file, errors }) {
     return;
   }
 
+  function validatePoliticalHistoryOverrideEntry({
+    entry,
+    entryPath,
+    file,
+    timelineEntitiesById,
+    enforceTimelineEntityIds,
+    bibliographyIds,
+    webVerseIndex,
+    validateSourceIdSchema,
+    errors
+  }) {
+    if (typeof entry?.fromYear === "number" && typeof entry?.toYear === "number") {
+      if (entry.fromYear >= entry.toYear) {
+        recordError(
+          errors,
+          file,
+          entryPath,
+          "politicalHistoryOverrides intervals must use [fromYear, toYear) with fromYear < toYear"
+        );
+      }
+    }
+
+    if (
+      enforceTimelineEntityIds &&
+      typeof entry?.holderId === "string" &&
+      !timelineEntitiesById.has(entry.holderId)
+    ) {
+      recordError(
+        errors,
+        file,
+        `${entryPath}.holderId`,
+        `Unknown holder id '${entry.holderId}'`
+      );
+    }
+
+    validateSourceArray({
+      sourceIds: entry?.sources,
+      file,
+      pathValue: `${entryPath}.sources`,
+      bibliographyIds,
+      webVerseIndex,
+      validateSourceIdSchema,
+      errors
+    });
+  }
+
   featureCollection.features.forEach((feature, featureIndex) => {
     const geometryType = feature?.geometry?.type;
     if (geometryType !== "Polygon" && geometryType !== "MultiPolygon") {
@@ -2539,7 +2585,11 @@ export async function validateData(options = {}) {
       });
     }
 
-    if (typeof data.politicalAreaId === "string" && !timelineAreasById.has(data.politicalAreaId)) {
+    if (
+      timelineData &&
+      typeof data.politicalAreaId === "string" &&
+      !timelineAreasById.has(data.politicalAreaId)
+    ) {
       recordError(
         errors,
         locationRecord.relativePath,
@@ -2548,40 +2598,93 @@ export async function validateData(options = {}) {
       );
     }
 
-    if (Array.isArray(data.politicalHistoryOverrides)) {
-      data.politicalHistoryOverrides.forEach((entry, entryIndex) => {
-        if (typeof entry?.fromYear === "number" && typeof entry?.toYear === "number") {
-          if (entry.fromYear >= entry.toYear) {
+    const candidateAreaIndexes = [];
+    if (Array.isArray(data.candidates)) {
+      data.candidates.forEach((candidate, candidateIndex) => {
+        if (typeof candidate?.politicalAreaId === "string") {
+          candidateAreaIndexes.push(candidateIndex);
+          if (timelineData && !timelineAreasById.has(candidate.politicalAreaId)) {
             recordError(
               errors,
               locationRecord.relativePath,
-              `$.politicalHistoryOverrides[${entryIndex}]`,
-              "politicalHistoryOverrides intervals must use [fromYear, toYear) with fromYear < toYear"
+              `$.candidates[${candidateIndex}].politicalAreaId`,
+              `Unknown timeline area id '${candidate.politicalAreaId}'`
             );
           }
         }
 
-        if (typeof entry?.holderId === "string" && !timelineEntitiesById.has(entry.holderId)) {
+        if (Array.isArray(candidate?.politicalHistoryOverrides)) {
+          candidate.politicalHistoryOverrides.forEach((entry, entryIndex) => {
+            validatePoliticalHistoryOverrideEntry({
+              entry,
+              entryPath: `$.candidates[${candidateIndex}].politicalHistoryOverrides[${entryIndex}]`,
+              file: locationRecord.relativePath,
+              timelineEntitiesById,
+              enforceTimelineEntityIds: Boolean(timelineData),
+              bibliographyIds,
+              webVerseIndex,
+              validateSourceIdSchema,
+              errors
+            });
+          });
+        }
+      });
+    }
+
+    if (typeof data.politicalAreaId === "string" && candidateAreaIndexes.length > 0) {
+      recordError(
+        errors,
+        locationRecord.relativePath,
+        "$.politicalAreaId",
+        "A record must use either place-level politicalAreaId or candidate-level politicalAreaId values, not both"
+      );
+    }
+
+    if (Array.isArray(data.politicalHistory)) {
+      data.politicalHistory.forEach((entry, entryIndex) => {
+        if (typeof entry?.candidate !== "number") {
+          return;
+        }
+        if (!Number.isInteger(entry.candidate) || entry.candidate < 0) {
           recordError(
             errors,
             locationRecord.relativePath,
-            `$.politicalHistoryOverrides[${entryIndex}].holderId`,
-            `Unknown holder id '${entry.holderId}'`
+            `$.politicalHistory[${entryIndex}].candidate`,
+            "candidate must be a non-negative integer index"
+          );
+          return;
+        }
+        if (!Array.isArray(data.candidates) || entry.candidate >= data.candidates.length) {
+          recordError(
+            errors,
+            locationRecord.relativePath,
+            `$.politicalHistory[${entryIndex}].candidate`,
+            "candidate index must reference an existing candidates[] entry"
           );
         }
+      });
+    }
 
-        validateSourceArray({
-          sourceIds: entry?.sources,
+    if (Array.isArray(data.politicalHistoryOverrides)) {
+      data.politicalHistoryOverrides.forEach((entry, entryIndex) => {
+        validatePoliticalHistoryOverrideEntry({
+          entry,
+          entryPath: `$.politicalHistoryOverrides[${entryIndex}]`,
           file: locationRecord.relativePath,
-          pathValue: `$.politicalHistoryOverrides[${entryIndex}].sources`,
+          timelineEntitiesById,
+          enforceTimelineEntityIds: Boolean(timelineData),
           bibliographyIds,
           webVerseIndex,
+          validateSourceIdSchema,
           errors
         });
       });
     }
 
-    if (requireDerivedPoliticalHistory && typeof data.politicalAreaId === "string") {
+    if (
+      requireDerivedPoliticalHistory &&
+      (typeof data.politicalAreaId === "string" || candidateAreaIndexes.length > 0)
+    ) {
       const derivedPoliticalHistory = derivePoliticalHistoryFromTimeline({
         locationRecord: data,
         areasById: timelineAreasById,
@@ -2612,6 +2715,8 @@ export async function validateData(options = {}) {
               fromYear: entry.fromYear,
               toYear: entry.toYear,
               holderId: entry.holderId,
+              note: entry.note,
+              candidate: entry.candidate,
               entity: entry.entity,
               sources: Array.isArray(entry.sources) ? entry.sources : []
             };

@@ -51,7 +51,8 @@ export interface AncientEntityRecord {
     | "client-kingdom"
     | "client-tetrarchy"
     | "free-city-or-league"
-    | "outside-empire";
+    | "outside-empire"
+    | "uncertain";
   romanSide: boolean;
   locationId: string | null;
 }
@@ -75,6 +76,7 @@ export interface AncientAreaAssignment {
   holderRomanSide: boolean;
   holderLocationId: string | null;
   ruler: string | null;
+  note: string | null;
   hasShape: boolean;
 }
 

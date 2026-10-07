@@ -43,6 +43,8 @@ All example values below are **illustrative only** (not verified historical clai
 - For development before M4-02 lands factual timeline data, generate ancient app payloads from the fixture with `npm run build:data -- --ancient-source tests/fixtures/ancient`.
 - The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
 - Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
+- `entities[].kind` also supports `uncertain` for intervals where sources are unclear or in conflict; these still set `romanSide` so the empire edge remains accurate.
+- `areas[].periods[]` supports an optional `note` for short source-backed uncertainty/explanation text.
 
 Small timeline example:
 
@@ -85,11 +87,16 @@ Generated app payloads:
 - `app/public/generated/ancient.roads.geojson`
 - `app/public/generated/ancient.coastline.geojson`
 - `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
+  - Stop-area assignments carry each period's optional `note`.
+  - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
 
 Places and political history:
 - `politicalAreaId` links a location to one timeline area.
-- `politicalHistoryOverrides[]` stores place-only exceptions.
+- `candidates[].politicalAreaId` links a specific candidate site to its own timeline area when candidates fall in different areas.
+- A record uses **either** place-level `politicalAreaId` **or** candidate-level `candidates[].politicalAreaId` links, never both.
+- `politicalHistoryOverrides[]` and `candidates[].politicalHistoryOverrides[]` store place- or candidate-level exceptions.
 - `npm run fill:political-history` rewrites `politicalHistory[]` from timeline periods + overrides and includes `holderId`.
+- For candidate-level derivation, each generated political-history entry also carries `candidate` as a zero-based candidate index.
 - The validator can enforce exact derived/stored equality with `REQUIRE_DERIVED_POLITICAL_HISTORY=true` (default is off until timeline research lands).
 
 GIS terms used here:

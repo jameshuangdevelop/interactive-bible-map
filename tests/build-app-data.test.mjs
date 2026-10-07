@@ -397,6 +397,10 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       stopPayload.holderLabels.some((entry) => entry.holderId === "client-antipas"),
       "expected holder label for client-antipas"
     );
+    assert.equal(
+      stopPayload.holderLabels.some((entry) => entry.holderId === "uncertain-roman-side"),
+      false
+    );
     assert.ok(
       stopPayload.holderBorders.features.some(
         (feature) =>
@@ -406,6 +410,10 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       "expected province/client border"
     );
     assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
+    const ad44Payload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
+    );
+    assert.equal(ad44Payload.areas.find((area) => area.areaId === "perea")?.note, "Status in the sources is unclear for this interval (fixture).");
 
     const shapesPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.shapes.json"), "utf8")
