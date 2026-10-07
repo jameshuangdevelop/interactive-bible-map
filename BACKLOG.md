@@ -14,8 +14,7 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 
 ## Data
 - **Elam ("Elamites", Acts 2:9).** M3-13 removed the Elam record because no source gave its status in about AD 50. Strabo 16.1.18 even says the Elymaean king refused to be subject to the Parthian king. Add it back when a first-century source gives the status of Susiana and Elymais, and decide whether its parent is the Parthian Empire or whether it was a semi-independent kingdom (`docs/verification/M3-well-known-areas.md`).
-- **Client-kingdom status in M4's timeline.** `arabia` (the Nabataean kingdom) is `type: "province"` under the Roman Empire, as ADR-0027 allows, and the panel calls it "Client kingdom allied with Rome". M4 should model client kingdoms properly, with dates of alliance and annexation: the Nabataean kingdom, Polemon's Pontus, and Antiochus's Commagene and coastal Cilicia.
-- **Province histories for M4's timeline.** M3-11's Fact-Checker removed the `politicalHistory` entries of four provinces because their end years rested on Wikipedia alone. M4 rebuilds them from non-Wikipedia sources, since the timeline needs them.
+- **Records for the areas the timeline draws that the New Testament names,** such as the Decapolis, Idumea, Iturea, Trachonitis, Abilene, Phoenicia and Lycia. In M4 they are areas on the map without a record; M4-02's research note lists them for an M6 batch (ADR-0037).
 
 - **Images for area records** (provinces and regions such as Egypt or Cappadocia). M3.5 covers places, and Galatia and Crete as major areas; other areas have no images yet.
 - **Countries in candidate labels.** ADR-0028 keeps M3-08's country-free candidate labels for now; the record's "Today" line says where the proposed sites are.
@@ -27,8 +26,10 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
+- **A time limit for CI's build job.** `.github/workflows/app.yml`'s `build` job has no `timeout-minutes`, so a stuck run waits for GitHub's 6-hour default. On 2026-10-07, three runs on `main` hung at the Playwright install, a step lean CI (ADR-0036) has since removed from the build. Add a 20-minute limit the next time the workflow changes.
 
 ## Map
+- **A place line that follows the timeline.** In M4 the panel's line, such as "City · Galilee · Roman Empire", keeps the "about AD 50" convention (ADR-0037 item 2). It could follow the timeline's year instead, for example naming Herod Antipas's tetrarchy in AD 30.
 - **Egypt's label point** sits in the Eastern Desert rather than the Nile valley most readers associate with Roman Egypt (M3-13 review nit). Revisit in a sourced label-point pass.
 - **Self-hosted Protomaps fallback** (M3-07's recommended option). M3 uses the VersaTiles public server as the outage-only fallback instead, because a regional Protomaps extract won't fit Cloudflare Pages' 25 MiB file limit. Hosting it on Cloudflare R2 (free up to 10 GB-month) needs an R2 bucket and a token with R2 permissions. Revisit if VersaTiles' terms change or if outages become frequent.
 - **Colossae is no longer unexcavated.** Its location record still says it has never been excavated, but excavation has begun (Biblical Archaeology Society interview, July 2026; found by the M3.5-03 Fact-Checker). After CP3.5, a small sourced data task updates the record.

@@ -2,13 +2,15 @@
 
 Shared memory for all agents. Every session reads this first and updates its own task row before committing.
 
-**Current milestone:** M3 – MVP App, at CP3b · **Status:** M3-06 and M3-14 to M3-23 merged (#38 to #48), and the site is live at https://interactive-bible-map.pages.dev; M3-24 (lean CI) and the CP3b summary wait for your approval · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 10.0% of October's cap; September closed at about 7.6%)
+**Current milestone:** M4 – Ancient Layer & Timeline (CP3b approved 2026-10-07, #50) · **Status:** M4-00 (kickoff, ADR-0037, cards M4-01 to M4-05 and M7-01) done and waiting for the push; M7-01, M4-01 and M4-02's research are running · **Budget used this month:** see [BUDGET.md](BUDGET.md) (about 10.0% of October's cap; September closed at about 7.6%)
 
 ## Resume point
-1. **Merged:** M3-02 to M3-13 (#18 to #28) and M3.5-00 to M3.5-07 (#29 to #36); #25 to #36 merged on 2026-10-02. The map is ancient-only and physical, with English names, the Roman provinces of about AD 50, a place panel, search, and 275 images: 6 to 8 for each of the 31 major places, each gallery led by an approved AI reconstruction.
-2. **CP3.5 approved (2026-10-02, #37)** with both decisions as recommended: the disputed-territory defaults for countries (ADR-0028), and the preview deploy now, alongside the other tasks.
-3. **Now:** CP3b. #38 to #48 merged on 2026-10-06 and 2026-10-07, and production at https://interactive-bible-map.pages.dev updates on every merge. M3-24 (lean CI, ADR-0036) is #49, and the CP3b summary is #50. Next: M4, with a small phone task beside it (CP3b decision 1).
-4. **Cloudflare secrets:** added on 2026-09-25 with `scripts/setup-cloudflare-token.ps1`. M3-06's first deploy confirms that they work, and the token expires on about 2027-09-25.
+1. **Merged:** everything through #50. CP3b was approved as recommended on 2026-10-07: M4 starts with a phone task beside it (M7-01), and older text whose sources no one could open is re-sourced when it is next edited. The site is live at https://interactive-bible-map.pages.dev and updates on every merge.
+2. **Now:** M4 (ADR-0037). Two lanes run in parallel.
+   - **Data:** M4-01 (schema and build), then M4-02 (the timeline; its research starts at once) and M4-03 (shapes, roads and coastline).
+   - **App:** M7-01 (phone basics), then M4-04 (the modern map and the toggle), then M4-05 (the ancient layer and the timeline).
+   - Mini checkpoints MC5 to MC8 are in `CHECKPOINTS.md`.
+3. **Cloudflare secrets:** renewed on 2026-10-05; the token expires in about a year (`docs/DEPLOY.md`).
 ## Tasks
 | ID | Task | Agent | Branch | Status | PR |
 |---|---|---|---|---|---|
@@ -47,8 +49,15 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-21 | Collapsible panel sections (ADR-0033) | fact-checker → frontend-engineer | `feat/m3-collapsible-sections` | Merged | #46 |
 | M3-22 | Introduce names in the other About texts (ADR-0033) | research-lead → fact-checker | `data/m3-name-intros` | Merged | #47 |
 | M3-23 | Important places first on the opening map (ADR-0035) | frontend-engineer | `feat/m3-important-places-first` | Merged | #48 |
-| M3-24 | Lean CI (ADR-0036) | frontend-engineer | `chore/m3-lean-ci` | Done, PR pending review | #49 |
-| M3-25 | CP3b summary | project-owner | `docs/cp3b-summary` | Done, PR pending review (CP3b) | #50 |
+| M3-24 | Lean CI (ADR-0036) | frontend-engineer | `chore/m3-lean-ci` | Merged | #49 |
+| M3-25 | CP3b summary | project-owner | `docs/cp3b-summary` | Merged (CP3b approved 2026-10-07) | #50 |
+| M4-00 | Record CP3b; plan M4 (ADR-0037); visual spec; cards M4-01 to M4-05 and M7-01 | project-owner | `docs/m4-kickoff` | Done, waiting for the push | |
+| M7-01 | Phone basics | frontend-engineer | `feat/m7-phone-basics` | Running | |
+| M4-01 | Timeline and ancient layer: schema and build | gis-engineer | `feat/m4-ancient-schema` | Running | |
+| M4-02 | The timeline: who held each area, and when | research-lead → fact-checker | `data/m4-timeline` | Running (research note) | |
+| M4-03 | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Waiting for M4-01 | |
+| M4-04 | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | `feat/m4-modern-map` | Waiting for M7-01 | |
+| M4-05 | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | Waiting for M4-01 and M4-04 | |
 
 ## Open questions
 - **Answered by the human (2026-10-01, M3.5-07):** Google's Gemini API (Nano Banana Pro), scripted with an API key, one image per major place, released under CC0 1.0 (ADR-0029 §7, `docs/LICENSES.md`). The label is shown on each image in the app; the files carry Google's invisible SynthID mark and nothing is burned in. The original question follows. The Fact-Checker compared the current terms in [`docs/research/M3.5-ai-generators.md`](research/M3.5-ai-generators.md) and recommends, in order:
@@ -172,3 +181,4 @@ Shared memory for all agents. Every session reads this first and updates its own
 | 2026-10-07 | project-owner | M3-24 (card; CI review) | Pushed #40 to #48 and their CI fixes, and posted the desktop speed checks (all pass: median LCP 400–431 ms, TBT 0 ms). The human asked to re-examine what CI needs while local tests pass consistently. A PR's CI took about 17 minutes, 10¼ of them the full Playwright suite that already runs locally, and most failures came from outside our code. ADR-0036, recommended by the PO and approved by the human: PRs run the fast checks, the deploys, and the smoke and accessibility checks on the preview; the full suite and Lighthouse run locally and the full suite weekly on main; data.yml goes; and PRs check only their own images. Updated the Frontend Engineer's and the PO's instructions, and wrote card M3-24. |
 | 2026-10-07 | frontend-engineer | M3-24 | Implemented ADR-0036 lean CI end to end: removed Playwright export verification from `app.yml` build, removed Lighthouse preview checks/upload, deleted `data.yml`, added weekly/on-demand `full-suite.yml` on `main` (build:data, export:web, Playwright install, verify:web:playwright), and updated `image-links.yml` so PRs use `check:images -- --changed-since ${{ github.event.pull_request.base.sha }}` with `fetch-depth: 0` while schedule/dispatch still run full. Added `--changed-since` support to `scripts/check-images.mjs` with a pure selection helper and unit tests covering added/changed/unchanged/removed/new-file/AI-file cases. Updated `docs/DEPLOY.md` for PR vs weekly vs local checks and ADR-0036 rationale. Ran: `actionlint`, `lint`, `typecheck`, `test`, `test:app`, `validate:data`, `build:data`, `export:web`, `verify:web:playwright`; `check:images -- --changed-since 062a880e...` selected 20/268 images (stopped early after selection output) and `--changed-since HEAD` selected 0/268 and passed. |
 | 2026-10-07 | project-owner | M3-25 (CP3b) | The human merged #40 to #48. Removed the merged worktrees and local branches, and checked the live site on a desktop and a phone (on a phone, the opening map shows only Greece). Wrote the CP3b summary with two decisions: start M4 with a small phone task beside it, and re-source older unopened-book citations when their text is next edited. Copied the 15 reviews' budget rows into the ledger, estimated five sessions that recorded none, and reconciled October (about 99,500, 10.0%). |
+| 2026-10-07 | project-owner | M4-00 | Recorded CP3b's approval (#50) and planned M4. Read AWMC's data first: it has Herod's kingdom, the empire's extent in 60 BC, AD 117 and AD 200, the AD 200 provinces as boundary lines only, Roman-period roads with major and known flags, and an ancient coastline, but no first-century provinces, so the shapes must be built from its layers with cited changes. Wrote ADR-0037 (stops only where a border, ruler or status changes for our areas, including the brief's four; the AD 50 stop by default; holders kept apart from shapes; the modern map keeps the Bible names on the pins, pending the human at MC6; roads and coastline; two lanes), the visual spec's toggle, ancient layer, timeline and modern map, cards M4-01 to M4-05 and M7-01, and mini checkpoints MC5 to MC8. Moved the two M4 backlog items into M4-02, and added three deferred items. Deleted the merged remote branches of #49 and #50 (ADR-0023). |
