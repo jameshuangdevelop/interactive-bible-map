@@ -31,17 +31,16 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3.5-05](M3.5-05-standard-places.md) | Images for standard places | media-curator → fact-checker | `data/m3.5-images-standard` | Merged (#34) |
 | [M3.5-06](M3.5-06-gallery.md) | A larger gallery in the place panel | frontend-engineer | `feat/m3.5-gallery` | Merged (#31) |
 | [M3.5-07](M3.5-07-ai-reconstructions.md) | AI reconstructions: generate, check and publish | fact-checker → gis-engineer → media-curator and fact-checker → the human → media-curator → fact-checker | `data/m3.5-ai-images` | Merged (#36) |
-| [M3-14](M3-14-modern-countries.md) | Countries in modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | Done, PR pending review |
-| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | Done, PR pending review |
-| [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | Done, PR pending review |
-| [M3-18](M3-18-gallery-size.md) | Galleries of 4 to 7 images for major places | media-curator → gis-engineer | `data/m3-gallery-size` | Done, PR pending review |
-| [M3-19](M3-19-credits-and-pointer.md) | Photo credits at the end of the panel, and a pointer over pins | fact-checker → frontend-engineer | `feat/m3-credits-and-pointer` | Done, PR pending review |
-| [M3-20](M3-20-about-places.md) | Places in the About | frontend-engineer | `feat/m3-about-places` | Done, PR pending review |
-| [M3-21](M3-21-collapsible-sections.md) | Collapsible panel sections | fact-checker → frontend-engineer | `feat/m3-collapsible-sections` | Done, PR pending review |
-| [M3-22](M3-22-name-intros.md) | Introduce names in the other About texts | research-lead → fact-checker | `data/m3-name-intros` | Done, PR pending review |
-| [M3-23](M3-23-important-places-first.md) | Important places first on the opening map | frontend-engineer | `feat/m3-important-places-first` | Done, PR #48 |
-| [M3-24](M3-24-lean-ci.md) | Lean CI | frontend-engineer | `chore/m3-lean-ci` | In progress |
-
+| [M3-14](M3-14-modern-countries.md) | Countries in modern names | gis-engineer → research-lead → fact-checker | `data/m3-modern-countries` | Merged (#40) |
+| [M3-15](M3-15-panel-header.md) | A simpler panel header, with countries | frontend-engineer | `feat/m3-panel-header` | Merged (#41) |
+| [M3-16](M3-16-longer-about.md) | A longer "About" for the 31 major places | research-lead → fact-checker | `data/m3-longer-about` | Merged (#42) |
+| [M3-18](M3-18-gallery-size.md) | Galleries of 4 to 7 images for major places | media-curator → gis-engineer | `data/m3-gallery-size` | Merged (#43) |
+| [M3-19](M3-19-credits-and-pointer.md) | Photo credits at the end of the panel, and a pointer over pins | fact-checker → frontend-engineer | `feat/m3-credits-and-pointer` | Merged (#44) |
+| [M3-20](M3-20-about-places.md) | Places in the About | frontend-engineer | `feat/m3-about-places` | Merged (#45) |
+| [M3-21](M3-21-collapsible-sections.md) | Collapsible panel sections | fact-checker → frontend-engineer | `feat/m3-collapsible-sections` | Merged (#46) |
+| [M3-22](M3-22-name-intros.md) | Introduce names in the other About texts | research-lead → fact-checker | `data/m3-name-intros` | Merged (#47) |
+| [M3-23](M3-23-important-places-first.md) | Important places first on the opening map | frontend-engineer | `feat/m3-important-places-first` | Merged (#48) |
+| [M3-24](M3-24-lean-ci.md) | Lean CI | frontend-engineer | `chore/m3-lean-ci` | Done, PR #49 |
 ## Template
 ```markdown
 # <ID> — <title>

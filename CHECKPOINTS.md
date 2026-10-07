@@ -9,7 +9,7 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
 | CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
-| CP3b | M3 MVP App | Working MVP deployed to a preview | **In progress** (M3-06 merged as #39; M3-14 to M3-16 and M3-18 to M3-24) | |
+| CP3b | M3 MVP App | Working MVP deployed to a preview | **Waiting for your approval** (live at https://interactive-bible-map.pages.dev) | #38–#50 |
 | CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
@@ -322,3 +322,72 @@ The rest of M3, then CP3b.
 | [M3-15](docs/tasks/M3-15-panel-header.md) | A simpler panel header, with countries (ADR-0028, ADR-0030) | frontend-engineer | M3-14's schema commit |
 | [M3-16](docs/tasks/M3-16-longer-about.md) | A longer "About" for the 31 major places: 250–450 cited words each, up from a median of 75 | research-lead → fact-checker | CP3.5 |
 | CP3b | Working MVP deployed to a preview | project-owner | M3-06 and M3-14 to M3-16 merged |
+
+---
+
+## CP3b — Working MVP
+
+**Outcome:** waiting for your approval.
+
+### What was delivered
+The MVP is live at **https://interactive-bible-map.pages.dev**. It updates whenever a PR merges, and every PR gets its own preview link. This is more than CP3b asked for, which was a preview.
+
+| Task | Output | PR |
+|---|---|---|
+| M3-17 | CP3.5 recorded; mini checkpoints with a local preview (ADR-0031); cards M3-18 to M3-22 | #38 |
+| M3-06 | Cloudflare Pages: a preview for each PR (its link posted on the PR) and production on every merge to `main`; smoke, accessibility and speed checks; `docs/DEPLOY.md`; the speed gate's TBT measured from a desktop (ADR-0034) | #39 |
+| M3-14 | Countries in modern names for 80 places, and short orienting phrases such as "Central Türkiye" for the 24 regions; "West Bank", "Golan Heights" and "Cyprus" per your decisions ([verification](docs/verification/M3-modern-countries.md)) | #40 |
+| M3-15 | A simpler panel header: "Today: Selçuk, Türkiye" with the confidence chip on the same line, and no action bar (ADR-0030) | #41 |
+| M3-16 | A longer About for the 31 major places: 261–407 words in 3–5 sourced paragraphs (median 308, up from 75); names introduced; Smyrna and Philadelphia quote Revelation alike ([verification](docs/verification/M3-longer-about.md)) | #42 |
+| M3-18 | Galleries of 4 to 7 images for major places, and 12 credits corrected to the form their Commons pages ask for | #43 |
+| M3-19 | Photo credits in a numbered list at the end of the panel, a "Credit" link under each photo, and a pointing-hand cursor with easier clicks on pins (ADR-0032) | #44 |
+| M3-20 | "Places in *name*" right below About, and the places the About names linked to the map | #45 |
+| M3-21 | Collapsible sections, with Sources and Photo credits starting collapsed, and "Show fewer" for the passages | #46 |
+| M3-22 | Names introduced, with sources, in the other 58 places' About texts (ADR-0033) | #47 |
+| M3-23 | Important places first on the opening map: major places as labelled pins, grouped as "Jerusalem +4" where they overlap, and other places muted until you zoom in (ADR-0035) | #48 |
+| M3-24 | Lean CI: about 5 minutes per PR; the full browser suite runs locally and weekly; PRs check only their own images (ADR-0036) | #49 |
+
+**The data now:** 89 places, all `verified`; 80 with countries; 268 images; 161 bibliography entries. Every About clause is stated by a cited source.
+
+### How quality was checked
+- **Mini checkpoints (ADR-0031):** you tried each visible change in a browser before its review and push (MC0 to MC4). Your feedback became ADR-0032, ADR-0033 and ADR-0035.
+- **Every branch had a cross-vendor review:** Claude Sonnet 5 reviewed the GPT work, and GPT-5.4 the Claude work. Every finding was fixed or answered, and each PR carries its reviews.
+- **The Fact-Checker opened every source** cited by the new About text, the countries and the name introductions. It cut or re-sourced what they didn't state.
+- **Desktop speed check on every PR's preview:** median LCP 400–431 ms against the 2.5 s limit, and TBT 0 ms against 200 ms.
+
+### Decisions needed from you
+**Merging this PR approves CP3b with the recommendations below.** To choose differently, comment on the PR.
+
+| # | Decision | Recommendation | Alternative |
+|---|---|---|---|
+| 1 | What comes next | **Start M4 (the ancient layer and timeline) as planned, with one small "phone basics" task beside it.** Now that you're sharing the site, people will open it on phones. On a phone the opening map shows only Greece, so Rome and Jerusalem are off screen. That task would fit the whole map on a phone and check that the panel works as a bottom sheet. | M4 only; phones wait for M7 |
+| 2 | Older text whose sources no one could open (M3-16's Fact-Checker; on the backlog) | **Keep it, and re-source it whenever that text is next edited** (for example in M6's data batches). | A re-sourcing task now (about 5,000 credits) |
+
+**For your information:**
+- **CI is leaner (ADR-0036):** you approved this on 2026-10-07. The full browser suite now runs locally before every push and weekly on `main`.
+- **The Cloudflare token** was renewed on 2026-10-05 and expires in about a year. `docs/DEPLOY.md` says how to renew it.
+- **Clean-up:** the merged branches on GitHub can be deleted. I'll ask when I push this PR.
+
+### Concepts for you
+- **Preview deployments.** Each PR gets its own temporary copy of the site at its own address, so a change can be tried before it merges. [Cloudflare: Preview deployments](https://developers.cloudflare.com/pages/configuration/preview-deployments/)
+- **Label collision.** The map hides any label that would overlap a more important one, and tries other positions first. That's how the opening map shows the major places cleanly. [MapLibre: text-variable-anchor](https://maplibre.org/maplibre-style-spec/layers/#text-variable-anchor)
+- **Scheduled workflows.** A workflow can run on a timetable instead of on every change, as the full browser suite now does weekly. [GitHub: schedule events](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflows-run/events-that-trigger-workflows#schedule)
+
+### Risks
+- **Free services:** the map tiles come from OpenFreeMap, which offers no service guarantee, and the photos from Wikimedia Commons. The app switches to a backup map, and the weekly link check finds broken photos.
+- **Fewer checks on each PR:** CI no longer runs the full browser suite on every PR. Mitigation: the PO runs it on every assembled stack before a push, and it runs weekly on `main`.
+- **Phones:** see decision 1.
+
+### Budget
+The rest of M3, after CP3.5 (M3-06, M3-14 to M3-24, their reviews and the PO's work), used about **41,800 AI credits**. The largest items were the Research Lead's work (about 13,250, mostly the longer About texts), the Frontend Engineer's app and CI work (about 10,000) and the Fact-Checker's verifications (about 7,250). October stands at about **99,500 of 1,000,000 (10.0%)**, and September closed at about 75,500 (7.6%). See [BUDGET.md](docs/BUDGET.md).
+- At this checkpoint the PO copied the 15 reviews' budget rows into the ledger. Five sessions recorded no row: two cut short when the PO session crashed on 2026-10-02, two CI fixes and one small fact-check. The PO added estimates for those, each marked as such.
+- These figures are the ledger's estimates. GitHub's billing report is the authority (ADR-0005), and your Copilot usage page would confirm them.
+
+### Next (after you approve)
+M4: the ancient layer and timeline. Its cards are written when it starts, so they reflect what M3 taught us (PO responsibility 4).
+
+| ID | Task | Agent | Starts after |
+|---|---|---|---|
+| M4-00 | Record CP3b, plan M4 (the Modern↔Ancient toggle, ancient provinces and roads, and a timeline that snaps to the years when borders changed), and write its cards | project-owner | CP3b |
+| M7-01 | Phone basics, if you approve decision 1: the opening map fits a phone, and the panel works as a bottom sheet | frontend-engineer | CP3b |
+| CP4 | The ancient layer and timeline | project-owner | M4's tasks merged |
