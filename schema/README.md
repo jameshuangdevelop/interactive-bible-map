@@ -43,7 +43,9 @@ All example values below are **illustrative only** (not verified historical clai
 - For development before M4-02 lands factual timeline data, generate ancient app payloads from the fixture with `npm run build:data -- --ancient-source tests/fixtures/ancient`.
 - The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
 - Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
+- Periods may start before `range.fromYear` or end after `range.toYear` (for example a kingdom lasting to AD 106); validation allows this and build-time stop assignment clips naturally to the configured timeline range.
 - `entities[].kind` also supports `uncertain` for intervals where sources are unclear or in conflict; these still set `romanSide` so the empire edge remains accurate.
+- `romanSide` must match `kind`: `outside-empire` is `false`, Roman-side kinds (`roman-province`, `client-kingdom`, `client-tetrarchy`, `free-city-or-league`) are `true`, and `uncertain` can be either.
 - `areas[].periods[]` supports an optional `note` for short source-backed uncertainty/explanation text.
 
 Small timeline example:

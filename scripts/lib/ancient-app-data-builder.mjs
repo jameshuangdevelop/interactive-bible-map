@@ -56,6 +56,131 @@ function polygonArea(linearRing) {
   return Math.abs(sum / 2);
 }
 
+function pointOnSegment(point, segmentStart, segmentEnd, epsilon = 1e-9) {
+  const [px, py] = point;
+  const [x1, y1] = segmentStart;
+  const [x2, y2] = segmentEnd;
+  const cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1);
+  if (Math.abs(cross) > epsilon) {
+    return false;
+  }
+  const dot = (px - x1) * (x2 - x1) + (py - y1) * (y2 - y1);
+  if (dot < -epsilon) {
+    return false;
+  }
+  const squaredLength = (x2 - x1) ** 2 + (y2 - y1) ** 2;
+  return dot - squaredLength <= epsilon;
+}
+
+function pointInRing(point, ring) {
+  let inside = false;
+  for (let index = 0, previousIndex = ring.length - 1; index < ring.length; previousIndex = index, index += 1) {
+    const current = ring[index];
+    const previous = ring[previousIndex];
+    if (!Array.isArray(current) || !Array.isArray(previous)) {
+      continue;
+    }
+
+    if (pointOnSegment(point, current, previous)) {
+      return true;
+    }
+
+    const intersects =
+      (current[1] > point[1]) !== (previous[1] > point[1]) &&
+      point[0] <
+        ((previous[0] - current[0]) * (point[1] - current[1])) /
+          (previous[1] - current[1]) +
+          current[0];
+    if (intersects) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+function pointInPolygon(point, polygonCoordinates) {
+  if (!Array.isArray(polygonCoordinates) || polygonCoordinates.length === 0) {
+    return false;
+  }
+  if (!pointInRing(point, polygonCoordinates[0])) {
+    return false;
+  }
+  for (let index = 1; index < polygonCoordinates.length; index += 1) {
+    if (pointInRing(point, polygonCoordinates[index])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function polygonBoundingBox(polygonCoordinates) {
+  const outerRing = polygonCoordinates[0] ?? [];
+  let minX = Number.POSITIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+
+  for (const position of outerRing) {
+    if (!Array.isArray(position) || position.length < 2) {
+      continue;
+    }
+    minX = Math.min(minX, position[0]);
+    minY = Math.min(minY, position[1]);
+    maxX = Math.max(maxX, position[0]);
+    maxY = Math.max(maxY, position[1]);
+  }
+
+  if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+    return null;
+  }
+
+  return { minX, minY, maxX, maxY };
+}
+
+function findGuaranteedInteriorPoint(polygonCoordinates) {
+  const bounds = polygonBoundingBox(polygonCoordinates);
+  if (!bounds) {
+    return null;
+  }
+
+  const { minY, maxY } = bounds;
+  const outerRing = polygonCoordinates[0] ?? [];
+  const yRange = maxY - minY;
+  if (yRange <= 0 || outerRing.length < 4) {
+    return null;
+  }
+
+  for (let step = 0; step < 128; step += 1) {
+    const y = minY + ((step + 0.5) / 128) * yRange;
+    const intersections = [];
+    for (let index = 0; index < outerRing.length - 1; index += 1) {
+      const [x1, y1] = outerRing[index];
+      const [x2, y2] = outerRing[index + 1];
+      const intersects = (y1 > y) !== (y2 > y);
+      if (!intersects) {
+        continue;
+      }
+      const x = x1 + ((x2 - x1) * (y - y1)) / (y2 - y1);
+      intersections.push(x);
+    }
+
+    intersections.sort((left, right) => left - right);
+    for (let index = 0; index + 1 < intersections.length; index += 2) {
+      const x1 = intersections[index];
+      const x2 = intersections[index + 1];
+      if (x2 <= x1) {
+        continue;
+      }
+      const midpoint = [(x1 + x2) / 2, y];
+      if (pointInPolygon(midpoint, polygonCoordinates)) {
+        return midpoint;
+      }
+    }
+  }
+
+  return null;
+}
+
 function polygonsFromGeometry(geometry) {
   if (!geometry) {
     return [];
@@ -108,13 +233,17 @@ async function writeJsonWithSize(outputDirectory, relativePath, payload) {
 
 function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold) {
   const baseTopology = topology({ areas: areaFeatureCollection });
-  const simplifiedTopology = simplify(presimplify(topology({ areas: areaFeatureCollection })), simplifyThreshold);
+  const simplifiedTopology = simplify(
+    presimplify(JSON.parse(JSON.stringify(baseTopology))),
+    simplifyThreshold
+  );
 
   const fullFeatures = feature(baseTopology, baseTopology.objects.areas);
   const simplifiedFeatures = feature(simplifiedTopology, simplifiedTopology.objects.areas);
 
   return {
     baseTopology,
+    simplifiedTopology,
     fullFeatures: {
       ...fullFeatures,
       features: fullFeatures.features.map((item) => ({
@@ -162,7 +291,15 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) 
     if (holder.kind === "uncertain") {
       continue;
     }
-    const labelPoint = polylabel(piece.polygon, 1);
+    const bounds = polygonBoundingBox(piece.polygon);
+    const smallerSide = bounds
+      ? Math.max(1e-6, Math.min(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY))
+      : 1;
+    const precision = Math.max(1e-6, smallerSide / 100);
+    let labelPoint = polylabel(piece.polygon, precision);
+    if (!pointInPolygon(labelPoint, piece.polygon)) {
+      labelPoint = findGuaranteedInteriorPoint(piece.polygon) ?? labelPoint;
+    }
     labels.push({
       holderId,
       name: holder.name,
@@ -177,11 +314,11 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) 
 }
 
 function buildStopBorderCollections({
-  baseTopology,
+  stopTopology,
   assignmentsByAreaId,
   entitiesById
 }) {
-  const areaObject = baseTopology.objects.areas;
+  const areaObject = stopTopology.objects.areas;
   const geometries = areaObject.geometries ?? [];
   const adjacentIndexes = neighbors(geometries);
   const borderPairs = new Set();
@@ -216,7 +353,7 @@ function buildStopBorderCollections({
 
   for (const borderPair of borderPairs) {
     const { leftId, rightId } = parsePairKey(borderPair);
-    const geometry = mesh(baseTopology, areaObject, (leftArea, rightArea) => {
+    const geometry = mesh(stopTopology, areaObject, (leftArea, rightArea) => {
       if (!leftArea || !rightArea) {
         return false;
       }
@@ -255,7 +392,7 @@ function buildStopBorderCollections({
     });
   }
 
-  const romanEmpireEdge = mesh(baseTopology, areaObject, (leftArea, rightArea) => {
+  const romanEmpireEdge = mesh(stopTopology, areaObject, (leftArea, rightArea) => {
     if (!leftArea || !rightArea) {
       return false;
     }
@@ -407,7 +544,7 @@ export async function buildAncientAppData({
     }
 
     const borderCollections = buildStopBorderCollections({
-      baseTopology: topologyData.baseTopology,
+      stopTopology: topologyData.simplifiedTopology,
       assignmentsByAreaId,
       entitiesById
     });

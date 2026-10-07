@@ -208,6 +208,12 @@ export function getStopInForce(stops, year) {
 }
 
 export function comparePoliticalHistoryEntries(left, right) {
+  const leftSources = Array.isArray(left.sources)
+    ? [...left.sources].sort((a, b) => a.localeCompare(b))
+    : [];
+  const rightSources = Array.isArray(right.sources)
+    ? [...right.sources].sort((a, b) => a.localeCompare(b))
+    : [];
   return (
     left.fromYear === right.fromYear &&
     left.toYear === right.toYear &&
@@ -215,6 +221,6 @@ export function comparePoliticalHistoryEntries(left, right) {
     (left.note ?? null) === (right.note ?? null) &&
     (left.candidate ?? null) === (right.candidate ?? null) &&
     left.entity === right.entity &&
-    JSON.stringify(left.sources) === JSON.stringify(right.sources)
+    JSON.stringify(leftSources) === JSON.stringify(rightSources)
   );
 }

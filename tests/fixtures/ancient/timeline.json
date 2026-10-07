@@ -61,6 +61,15 @@
       "sources": [
         "bib:pleiades-place-resource"
       ]
+    },
+    {
+      "id": "uncertain-outside",
+      "name": "Outside control uncertain",
+      "kind": "uncertain",
+      "romanSide": false,
+      "sources": [
+        "bib:pleiades-place-resource"
+      ]
     }
   ],
   "areas": [
@@ -129,6 +138,15 @@
       "id": "parthia-west",
       "focus": true,
       "periods": [
+        {
+          "fromYear": -20,
+          "toYear": -4,
+          "holderId": "uncertain-outside",
+          "note": "Status before fixture range is uncertain.",
+          "sources": [
+            "bib:pleiades-place-resource"
+          ]
+        },
         {
           "fromYear": -4,
           "toYear": 101,
