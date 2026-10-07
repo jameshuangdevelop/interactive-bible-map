@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -1018,6 +1019,7 @@ export function PlacePanel({
   const photoCreditHighlightTimeoutRef = useRef<number | null>(null);
   const sourceEntryHighlightTimeoutRef = useRef<number | null>(null);
   const showAllScriptureToggleRef = useRef<HTMLButtonElement | null>(null);
+  const pendingScriptureCollapseTopRef = useRef<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [failedImageRequests, setFailedImageRequests] = useState<Record<string, true>>({});
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
@@ -1159,6 +1161,41 @@ export function PlacePanel({
       window.clearTimeout(timer);
     };
   }, [showAllScripture, sortedScripture.length, visibleScriptureCount]);
+
+  useLayoutEffect(() => {
+    if (showAllScripture) {
+      return;
+    }
+
+    const topBeforeCollapse = pendingScriptureCollapseTopRef.current;
+    if (topBeforeCollapse === null) {
+      return;
+    }
+    pendingScriptureCollapseTopRef.current = null;
+
+    const refreshedButton = showAllScriptureToggleRef.current;
+    refreshedButton?.focus({ preventScroll: true });
+
+    if (!refreshedButton) {
+      return;
+    }
+
+    const topAfterCollapse = refreshedButton.getBoundingClientRect().top;
+    const scrollOffsetDelta = topAfterCollapse - topBeforeCollapse;
+    if (Math.abs(scrollOffsetDelta) < 1) {
+      return;
+    }
+
+    const panelContainer = refreshedButton.closest<HTMLElement>("section[aria-label='Place details']");
+    if (panelContainer) {
+      panelContainer.scrollTop += scrollOffsetDelta;
+      return;
+    }
+
+    window.scrollBy({
+      top: scrollOffsetDelta
+    });
+  }, [showAllScripture]);
 
   const visibleScripture = sortedScripture.slice(0, visibleScriptureCount);
   const groupedScripture = groupScriptureByBook(visibleScripture);
@@ -1472,40 +1509,16 @@ export function PlacePanel({
 
   const toggleShowAllScripture = () => {
     if (!showAllScripture) {
+      pendingScriptureCollapseTopRef.current = null;
       setShowAllScripture(true);
       return;
     }
 
     const toggleButton = showAllScriptureToggleRef.current;
-    const panelContainer = toggleButton?.closest<HTMLElement>("section[aria-label='Place details']");
-    const topBeforeCollapse = toggleButton?.getBoundingClientRect().top ?? null;
+    pendingScriptureCollapseTopRef.current = toggleButton?.getBoundingClientRect().top ?? null;
 
     setShowAllScripture(false);
     setVisibleScriptureCount(SCRIPTURE_INITIAL_COUNT);
-
-    window.requestAnimationFrame(() => {
-      const refreshedButton = showAllScriptureToggleRef.current;
-      refreshedButton?.focus();
-
-      if (topBeforeCollapse === null || !refreshedButton) {
-        return;
-      }
-
-      const topAfterCollapse = refreshedButton.getBoundingClientRect().top;
-      const scrollOffsetDelta = topAfterCollapse - topBeforeCollapse;
-      if (Math.abs(scrollOffsetDelta) < 1) {
-        return;
-      }
-
-      if (panelContainer) {
-        panelContainer.scrollTop += scrollOffsetDelta;
-        return;
-      }
-
-      window.scrollBy({
-        top: scrollOffsetDelta
-      });
-    });
   };
 
   const openImageViewer = () => {
