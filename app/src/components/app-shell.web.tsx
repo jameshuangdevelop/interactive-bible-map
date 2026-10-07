@@ -11,6 +11,7 @@ import {
 
 import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
+import { sortPlacesByImportance } from "../features/map/place-importance";
 import { applySelectionToSearch, parseSelectionFromSearch } from "../features/map/selection-url";
 import type {
   PlaceDetailsPayload,
@@ -82,7 +83,7 @@ async function fetchPlaces() {
   }
 
   const payload = (await response.json()) as PlaceIndexRecord[];
-  return payload;
+  return sortPlacesByImportance(payload);
 }
 
 async function fetchPlaceDetails(placeId: string) {

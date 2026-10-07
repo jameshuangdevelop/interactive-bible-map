@@ -7,22 +7,21 @@ import {
   isAreaLabelType,
   isDisputedPlace
 } from "./place-visibility";
-import type { Coordinates, PlaceIndexRecord, PlaceSelection, PlaceType } from "./types";
+import type {
+  Coordinates,
+  PlaceIndexRecord,
+  PlaceProminence,
+  PlaceSelection,
+  PlaceType
+} from "./types";
 
 export const MAX_VISIBLE_PLACE_LIST_ENTRIES = 200;
 
 const mapMaxZoomExclusive = MAX_MAP_ZOOM + 0.01;
-
-const labelPriorityByType: Record<PlaceType, number> = {
-  empire: 0,
-  province: 1,
-  region: 2,
-  city: 3,
-  town: 4,
-  village: 5,
-  site: 6,
-  "natural-feature": 7
-};
+const majorAndSelectedLabelGroupBase = 0;
+const areaLabelGroupBase = 1_000_000;
+const otherLabelGroupBase = 2_000_000;
+const selectedLabelBoost = -1_000_000;
 
 const AREA_FONT_SIZE_BY_TYPE = {
   empire: 15,
@@ -36,18 +35,34 @@ const AREA_ZOOM_RANGE_BY_TYPE = {
   region: { minZoom: 6, maxZoom: 9.01 }
 } as const;
 
+const AREA_LABEL_TYPE_PRIORITY: Record<"empire" | "province" | "region", number> = {
+  empire: 0,
+  province: 1,
+  region: 2
+};
+
+const AREA_LABEL_OVERVIEW_MIN_ZOOM_OVERRIDES: Partial<Record<string, number>> = {
+  "judea-province": 5,
+  judea: 8,
+  italy: 5
+};
+
 const CITY_PIN_LABEL_TYPES = new Set<PlaceType>(["city", "town", "village"]);
+const MAJOR_CITY_TIER_LABEL_TYPES = new Set<PlaceType>(["site", "natural-feature"]);
 
 export interface BaseMapFeatureProperties {
   entryId: string;
   placeId: string;
   placeName: string;
   placeType: PlaceType;
+  prominence: PlaceProminence;
   typeLabel: string;
   accessibleName: string;
   labelPriority: number;
   minZoom: number;
   maxZoom: number;
+  importanceRank: number;
+  interactionRank: number;
 }
 
 export interface PinFeatureProperties extends BaseMapFeatureProperties {
@@ -57,6 +72,7 @@ export interface PinFeatureProperties extends BaseMapFeatureProperties {
   isSelectedPlace: boolean;
   isHighlightedPlace: boolean;
   labelText: string | null;
+  majorLabelSide: "left" | "right";
 }
 
 export interface CandidateFeatureProperties extends BaseMapFeatureProperties {
@@ -80,6 +96,7 @@ export type CandidateFeature = Feature<Point, CandidateFeatureProperties>;
 export type AreaFeature = Feature<Point, AreaFeatureProperties>;
 
 export interface PlaceRenderData {
+  majorCityPins: FeatureCollection<Point, PinFeatureProperties>;
   clusteredCityPins: FeatureCollection<Point, PinFeatureProperties>;
   sitePins: FeatureCollection<Point, PinFeatureProperties>;
   candidatePins: FeatureCollection<Point, CandidateFeatureProperties>;
@@ -104,6 +121,40 @@ function isSiteTier(place: PlaceIndexRecord) {
   return place.zoomTier === "site";
 }
 
+function isMajorCityTierPinPlace(place: PlaceIndexRecord) {
+  if (place.prominence !== "major" || place.zoomTier !== "city") {
+    return false;
+  }
+
+  return (
+    place.type === "city" ||
+    place.type === "town" ||
+    place.type === "village" ||
+    place.type === "site" ||
+    place.type === "natural-feature"
+  );
+}
+
+function interactionRankForPlace(place: PlaceIndexRecord) {
+  if (place.prominence === "major") {
+    return 0;
+  }
+
+  if (isAreaLabelPlace(place)) {
+    return 2;
+  }
+
+  return 1;
+}
+
+function shouldShowPinLabel(place: PlaceIndexRecord) {
+  if (CITY_PIN_LABEL_TYPES.has(place.type)) {
+    return true;
+  }
+
+  return place.prominence === "major" && MAJOR_CITY_TIER_LABEL_TYPES.has(place.type);
+}
+
 function getPinTierZoomRange(place: PlaceIndexRecord) {
   if (isSiteTier(place)) {
     return {
@@ -119,37 +170,72 @@ function getPinTierZoomRange(place: PlaceIndexRecord) {
 }
 
 function getAreaLabelSpec(place: PlaceIndexRecord): AreaLabelSpec {
-  if (place.type === "empire") {
+  const applyOverviewMinZoomOverride = (spec: AreaLabelSpec): AreaLabelSpec => {
+    const overrideMinZoom = AREA_LABEL_OVERVIEW_MIN_ZOOM_OVERRIDES[place.id];
+    if (overrideMinZoom === undefined || overrideMinZoom <= spec.minZoom) {
+      return spec;
+    }
+
     return {
+      ...spec,
+      minZoom: overrideMinZoom
+    };
+  };
+
+  if (place.type === "empire") {
+    return applyOverviewMinZoomOverride({
       ...AREA_ZOOM_RANGE_BY_TYPE.empire,
       fontSize: AREA_FONT_SIZE_BY_TYPE.empire
-    };
+    });
   }
 
   if (place.type === "province") {
-    return {
+    return applyOverviewMinZoomOverride({
       ...AREA_ZOOM_RANGE_BY_TYPE.province,
       fontSize: AREA_FONT_SIZE_BY_TYPE.province
-    };
+    });
   }
 
-  return {
+  return applyOverviewMinZoomOverride({
     ...AREA_ZOOM_RANGE_BY_TYPE.region,
     fontSize: AREA_FONT_SIZE_BY_TYPE.region
-  };
+  });
 }
 
 function placeTypeLabel(placeType: PlaceType) {
   return placeType.replace("-", " ");
 }
 
-function toLabelPriority(place: PlaceIndexRecord, emphasized: boolean, dataOrder: number) {
-  const basePriority = labelPriorityByType[place.type] * 10_000 + dataOrder;
-  if (emphasized) {
-    return -1_000_000 + basePriority;
+function areaTypePriority(placeType: PlaceType) {
+  if (placeType === "empire") {
+    return AREA_LABEL_TYPE_PRIORITY.empire;
   }
 
-  return basePriority;
+  if (placeType === "province") {
+    return AREA_LABEL_TYPE_PRIORITY.province;
+  }
+
+  return AREA_LABEL_TYPE_PRIORITY.region;
+}
+
+function toLabelPriority(
+  place: PlaceIndexRecord,
+  emphasized: boolean,
+  importanceRank: number
+) {
+  if (emphasized) {
+    return selectedLabelBoost + importanceRank;
+  }
+
+  if (place.prominence === "major") {
+    return majorAndSelectedLabelGroupBase + importanceRank;
+  }
+
+  if (isAreaLabelPlace(place)) {
+    return areaLabelGroupBase + areaTypePriority(place.type) * 100_000 + importanceRank;
+  }
+
+  return otherLabelGroupBase + importanceRank;
 }
 
 function placePinColor(place: PlaceIndexRecord) {
@@ -171,14 +257,14 @@ function toPointFeatureCoordinates(coordinates: Coordinates): Point {
 function toPinFeature({
   place,
   placeName,
-  dataOrder,
+  importanceRank,
   selected,
   highlighted,
   coordinates
 }: {
   place: PlaceIndexRecord;
   placeName: string;
-  dataOrder: number;
+  importanceRank: number;
   selected: boolean;
   highlighted: boolean;
   coordinates: Coordinates;
@@ -195,17 +281,21 @@ function toPinFeature({
       placeId: place.id,
       placeName,
       placeType: place.type,
+      prominence: place.prominence,
       typeLabel: placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${placeTypeLabel(place.type)}`,
-      labelPriority: toLabelPriority(place, selected || highlighted, dataOrder),
+      labelPriority: toLabelPriority(place, selected || highlighted, importanceRank),
       minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
+      importanceRank,
+      interactionRank: interactionRankForPlace(place),
       pinColor: placePinColor(place),
       hasMultipleCandidates,
       isDisputed: hasMultipleCandidates ? isDisputedPlace(place) : false,
       isSelectedPlace: selected,
       isHighlightedPlace: highlighted,
-      labelText: CITY_PIN_LABEL_TYPES.has(place.type) ? placeName : null
+      labelText: shouldShowPinLabel(place) ? placeName : null,
+      majorLabelSide: "right"
     }
   };
 }
@@ -213,14 +303,14 @@ function toPinFeature({
 function toCandidateFeature({
   place,
   placeName,
-  dataOrder,
+  importanceRank,
   selection,
   highlighted,
   candidateIndex
 }: {
   place: PlaceIndexRecord;
   placeName: string;
-  dataOrder: number;
+  importanceRank: number;
   selection: PlaceSelection | null;
   highlighted: boolean;
   candidateIndex: number;
@@ -246,11 +336,14 @@ function toCandidateFeature({
       placeId: place.id,
       placeName,
       placeType: place.type,
+      prominence: place.prominence,
       typeLabel: placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${placeTypeLabel(place.type)}, candidate ${candidateLetter}`,
-      labelPriority: toLabelPriority(place, selectedCandidate || highlighted, dataOrder),
+      labelPriority: toLabelPriority(place, selectedCandidate || highlighted, importanceRank),
       minZoom: candidateMinZoom,
       maxZoom: zoomRange.maxZoom,
+      importanceRank,
+      interactionRank: interactionRankForPlace(place),
       pinColor,
       candidateIndex,
       candidateLetter,
@@ -266,13 +359,13 @@ function toCandidateFeature({
 function toAreaFeature({
   place,
   placeName,
-  dataOrder,
+  importanceRank,
   selected,
   coordinates
 }: {
   place: PlaceIndexRecord;
   placeName: string;
-  dataOrder: number;
+  importanceRank: number;
   selected: boolean;
   coordinates: Coordinates;
 }): AreaFeature {
@@ -289,11 +382,14 @@ function toAreaFeature({
       placeId: place.id,
       placeName,
       placeType: place.type,
+      prominence: place.prominence,
       typeLabel: place.type === "natural-feature" ? "region" : placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${place.type === "natural-feature" ? "region" : placeTypeLabel(place.type)}`,
-      labelPriority: toLabelPriority(place, selected, dataOrder),
+      labelPriority: toLabelPriority(place, selected, importanceRank),
       minZoom: labelSpec.minZoom,
       maxZoom: labelSpec.maxZoom,
+      importanceRank,
+      interactionRank: interactionRankForPlace(place),
       areaKind,
       areaFontSize: labelSpec.fontSize
     }
@@ -305,6 +401,63 @@ function emptyFeatureCollection<TProperties>(): FeatureCollection<Point, TProper
     type: "FeatureCollection",
     features: []
   };
+}
+
+function assignMajorPinLabelSides(features: PinFeature[]) {
+  if (features.length === 0) {
+    return;
+  }
+
+  const points = features.map((feature) => {
+    const [longitude, latitude] = feature.geometry.coordinates;
+    return {
+      feature,
+      longitude,
+      latitude
+    };
+  });
+  const longitudes = points.map((point) => point.longitude);
+  const minimumLongitude = Math.min(...longitudes);
+  const maximumLongitude = Math.max(...longitudes);
+  const longitudeSpan = Math.max(0.0001, maximumLongitude - minimumLongitude);
+  const westEdgeThreshold = minimumLongitude + longitudeSpan * 0.12;
+  const eastEdgeThreshold = maximumLongitude - longitudeSpan * 0.12;
+
+  for (const point of points) {
+    if (point.longitude >= eastEdgeThreshold) {
+      point.feature.properties.majorLabelSide = "left";
+      continue;
+    }
+
+    if (point.longitude <= westEdgeThreshold) {
+      point.feature.properties.majorLabelSide = "right";
+      continue;
+    }
+
+    let nearestNeighbor: (typeof point) | null = null;
+    let nearestDistanceSquared = Number.POSITIVE_INFINITY;
+    for (const candidate of points) {
+      if (candidate === point) {
+        continue;
+      }
+
+      const longitudeDelta = candidate.longitude - point.longitude;
+      const latitudeDelta = candidate.latitude - point.latitude;
+      const distanceSquared = longitudeDelta * longitudeDelta + latitudeDelta * latitudeDelta;
+      if (distanceSquared < nearestDistanceSquared) {
+        nearestDistanceSquared = distanceSquared;
+        nearestNeighbor = candidate;
+      }
+    }
+
+    if (!nearestNeighbor) {
+      point.feature.properties.majorLabelSide = "right";
+      continue;
+    }
+
+    point.feature.properties.majorLabelSide =
+      nearestNeighbor.longitude <= point.longitude ? "right" : "left";
+  }
 }
 
 export function candidateIconId(pinColor: string, candidateLetter: string, selected: boolean) {
@@ -321,12 +474,16 @@ export function buildPlaceRenderData(
   selection: PlaceSelection | null,
   highlightedPlaceId: string | null = null
 ): PlaceRenderData {
+  // AppShell keeps places sorted by importance for search/list UX; render data reuses that order.
+  const sortedPlaces = places;
+
+  const majorCityPins = emptyFeatureCollection<PinFeatureProperties>();
   const clusteredCityPins = emptyFeatureCollection<PinFeatureProperties>();
   const sitePins = emptyFeatureCollection<PinFeatureProperties>();
   const candidatePins = emptyFeatureCollection<CandidateFeatureProperties>();
   const areaLabels = emptyFeatureCollection<AreaFeatureProperties>();
 
-  places.forEach((place, dataOrder) => {
+  sortedPlaces.forEach((place, importanceRank) => {
     if (place.candidates.length === 0) {
       return;
     }
@@ -340,7 +497,7 @@ export function buildPlaceRenderData(
         toAreaFeature({
           place,
           placeName,
-          dataOrder,
+          importanceRank,
           selected: selectedPlace || highlightedPlace,
           coordinates: toCoordinates(place, 0)
         })
@@ -358,7 +515,7 @@ export function buildPlaceRenderData(
           toCandidateFeature({
             place,
             placeName,
-            dataOrder,
+            importanceRank,
             selection,
             highlighted: highlightedPlace,
             candidateIndex
@@ -374,7 +531,7 @@ export function buildPlaceRenderData(
     const pinFeature = toPinFeature({
       place,
       placeName,
-      dataOrder,
+      importanceRank,
       selected: selectedPlace,
       highlighted: highlightedPlace,
       coordinates: toCoordinates(place, 0)
@@ -385,10 +542,18 @@ export function buildPlaceRenderData(
       return;
     }
 
+    if (isMajorCityTierPinPlace(place)) {
+      majorCityPins.features.push(pinFeature);
+      return;
+    }
+
     clusteredCityPins.features.push(pinFeature);
   });
 
+  assignMajorPinLabelSides(majorCityPins.features);
+
   return {
+    majorCityPins,
     clusteredCityPins,
     sitePins,
     candidatePins,

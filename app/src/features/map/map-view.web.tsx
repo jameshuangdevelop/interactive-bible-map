@@ -5,6 +5,7 @@ import {
   Map as MapLibreMapClass,
   setWorkerUrl,
   type ErrorEvent,
+  type ExpressionSpecification,
   type FilterSpecification,
   type GeoJSONSource,
   type LngLatLike,
@@ -38,9 +39,7 @@ import {
   type PlaceRenderData
 } from "./map-render-data";
 import {
-  AREA_LABEL_OFFSET_LAYOUT,
   CLUSTER_COLLISION_IMAGE_SIZE,
-  CLUSTER_COUNT_LAYOUT,
   PIN_COLLISION_IMAGE_SIZE,
   PIN_COLLISION_LAYOUT,
   QUESTION_BADGE_LAYOUT
@@ -55,7 +54,7 @@ import {
   shouldCountTileErrorForFallback
 } from "./tile-error-filter";
 import {
-  pickNearestCandidate,
+  pickNearestCandidateWithPreferredRank,
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
 import type { MapViewProps } from "./map-view.types";
@@ -64,40 +63,70 @@ import type { Coordinates, PlaceIndexRecord, PlaceSelection } from "./types";
 setWorkerUrl(MAP_WORKER_URL);
 const configuredBasemapMode = resolveInitialBasemapMode(process.env.EXPO_PUBLIC_BASEMAP);
 
+const sourceMajorCityPinsId = "ibm-major-city-pins";
 const sourceClusteredCityPinsId = "ibm-clustered-city-pins";
 const sourceSitePinsId = "ibm-site-pins";
 const sourceCandidatePinsId = "ibm-candidate-pins";
 const sourceAreaLabelsId = "ibm-area-labels";
 const sourceKeyboardFocusId = "ibm-keyboard-focus";
 
+const layerMajorClusterCircleId = "ibm-major-cluster-circle";
+const layerMajorClusterLabelId = "ibm-major-cluster-label";
+const layerMajorClusterLabelLeftId = "ibm-major-cluster-label-left";
+const layerMajorPinShadowId = "ibm-major-pin-shadow";
+const layerMajorPinId = "ibm-major-pin";
+const layerMajorQuestionBadgeId = "ibm-major-question-badge";
+const layerMajorClusterCollisionMaskId = "ibm-major-cluster-collision-mask";
+const layerMajorPinCollisionMaskId = "ibm-major-pin-collision-mask";
+const layerMajorPinLabelId = "ibm-pin-label";
+const layerMajorPinLabelLeftId = "ibm-pin-label-left";
+const layerMajorAreaLabelOverviewId = "ibm-major-area-label-overview";
+const layerMajorAreaLabelId = "ibm-major-area-label";
 const layerClusterCircleId = "ibm-cluster-circle";
-const layerClusterCountId = "ibm-cluster-count";
 const layerCityPinShadowId = "ibm-city-pin-shadow";
 const layerCityPinId = "ibm-city-pin";
 const layerSitePinShadowId = "ibm-site-pin-shadow";
 const layerSitePinId = "ibm-site-pin";
 const layerQuestionBadgeId = "ibm-question-badge";
 const layerCandidatePinId = "ibm-candidate-pin";
-const layerClusterCollisionMaskId = "ibm-cluster-collision-mask";
-const layerCityPinCollisionMaskId = "ibm-city-pin-collision-mask";
 const layerSitePinCollisionMaskId = "ibm-site-pin-collision-mask";
 const layerCandidatePinCollisionMaskId = "ibm-candidate-pin-collision-mask";
-const layerPinLabelId = "ibm-pin-label";
+const layerPinLabelId = "ibm-pin-label-standard";
+const layerSelectedMajorPinLabelId = "ibm-selected-major-pin-label";
+const layerSelectedPinLabelId = "ibm-selected-pin-label";
 const layerAreaLabelOverviewId = "ibm-area-label-overview";
 const layerAreaLabelId = "ibm-area-label";
+const layerSelectedAreaLabelId = "ibm-selected-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
 
 const questionBadgeImageId = "ibm-question-badge-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
+const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
+const clusterSymbolImageId = "ibm-cluster-symbol-image";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
 const gestureReleaseDelayMs = 1_000;
-const mapLabelPaddingTop = 80;
+const mapLabelPaddingTop = 96;
 const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
+const majorInteractionPreferencePx = 3;
+const majorClusterMaxZoom = 5;
+const majorClusterRadiusPx = 25.6;
+const standardClusterRadiusPx = 52;
+const standardMutedThresholdZoom = 6;
+const standardPinBaseRadiusPx = 8;
+const standardPinOverviewDefaultRadiusPx = 5.5;
+const standardPinHighlightedRadiusPx = 9.5;
+const standardPinSelectedRadiusPx = 10.5;
+const standardClusterBaseRadiusPx = 14;
+const standardClusterRadiusByPointCount = {
+  default: 4,
+  medium: 5,
+  large: 6
+} as const;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
 const fallbackStyleLandcoverLayerIds = [
@@ -112,14 +141,21 @@ const fallbackStyleLandcoverLayerIds = [
 const softwareRendererPattern = /(swiftshader|software|llvmpipe|softpipe|mesa offscreen)/i;
 
 const interactiveLayerIds = [
+  layerMajorClusterCircleId,
+  layerMajorClusterLabelId,
+  layerMajorClusterLabelLeftId,
   layerClusterCircleId,
-  layerClusterCountId,
+  layerMajorQuestionBadgeId,
   layerQuestionBadgeId,
   layerCandidatePinId,
   layerSitePinId,
+  layerMajorPinId,
   layerCityPinId,
+  layerMajorAreaLabelOverviewId,
+  layerMajorAreaLabelId,
   layerAreaLabelOverviewId,
-  layerAreaLabelId
+  layerAreaLabelId,
+  layerSelectedAreaLabelId
 ] as const;
 
 const candidateVisibilityFilter = [
@@ -139,31 +175,59 @@ const basePinVisibilityFilter = [
   ]
 ];
 
+const standardPinUnmutedZoomFilter: ExpressionSpecification = [
+  ">=",
+  ["zoom"],
+  standardMutedThresholdZoom
+];
+
 const areaLabelVisibilityFilter = [
   "all",
   [">=", ["zoom"], ["get", "minZoom"]],
   ["<", ["zoom"], ["get", "maxZoom"]]
 ];
 const areaLabelVariableAnchorMinZoom = 6;
+const areaLabelMajorFilter = ["==", ["get", "prominence"], "major"];
+const areaLabelNonMajorFilter = ["!=", ["get", "prominence"], "major"];
 const areaLabelOverviewFilter = [
   "all",
+  areaLabelNonMajorFilter,
   areaLabelVisibilityFilter,
   ["<", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const areaLabelVariableAnchorFilter = [
   "all",
+  areaLabelNonMajorFilter,
   areaLabelVisibilityFilter,
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
-const areaLabelOverviewOffsetLayout = {
-  "text-variable-anchor": ["top", "bottom", "left", "right"] as [
-    "top",
-    "bottom",
-    "left",
-    "right"
-  ],
-  "text-radial-offset": 3.5,
-  "text-justify": "auto" as const
+const areaLabelMajorOverviewFilter = [
+  "all",
+  areaLabelMajorFilter,
+  areaLabelVisibilityFilter,
+  ["<", ["zoom"], areaLabelVariableAnchorMinZoom]
+];
+const areaLabelMajorVariableAnchorFilter = [
+  "all",
+  areaLabelMajorFilter,
+  areaLabelVisibilityFilter,
+  [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
+];
+const selectedAreaLabelFilter = ["all", areaLabelVisibilityFilter, ["==", ["get", "isSelectedPlace"], true]];
+const areaLabelPointLayout = {
+  "text-anchor": "center" as const,
+  "text-justify": "center" as const,
+  "text-offset": [0, 0] as [number, number]
+};
+const majorPinLabelLayout = {
+  "text-offset": [1.2, 0] as [number, number],
+  "text-anchor": "left" as const,
+  "text-justify": "left" as const
+};
+const majorPinLabelLeftLayout = {
+  "text-offset": [-1.2, 0] as [number, number],
+  "text-anchor": "right" as const,
+  "text-justify": "right" as const
 };
 
 type RuntimeTuning = ReturnType<typeof resolveMapRuntimeTuning>;
@@ -182,14 +246,34 @@ function toLayerFilter(filter: unknown): LayerFilter {
   return filter as LayerFilter;
 }
 
+function toExpression(expression: unknown): ExpressionSpecification {
+  return expression as ExpressionSpecification;
+}
+
 interface VisibleClusterEntry {
   id: string;
   kind: "cluster";
+  sourceId: typeof sourceClusteredCityPinsId;
   coordinates: Coordinates;
   accessibleName: string;
   tooltipText: string;
   clusterId: number;
   pointCount: number;
+  interactionRank: number;
+}
+
+interface VisibleMajorClusterEntry {
+  id: string;
+  kind: "major-cluster";
+  sourceId: typeof sourceMajorCityPinsId;
+  coordinates: Coordinates;
+  accessibleName: string;
+  tooltipText: string;
+  clusterId: number;
+  pointCount: number;
+  topPlaceName: string;
+  selection: PlaceSelection;
+  interactionRank: number;
 }
 
 interface VisiblePlaceEntry {
@@ -199,9 +283,103 @@ interface VisiblePlaceEntry {
   accessibleName: string;
   tooltipText: string;
   selection: PlaceSelection;
+  interactionRank: number;
 }
 
-type VisibleListEntry = VisibleClusterEntry | VisiblePlaceEntry;
+type VisibleListEntry = VisibleClusterEntry | VisibleMajorClusterEntry | VisiblePlaceEntry;
+
+interface MajorPlaceReference {
+  placeId: string;
+  placeName: string;
+  pinColor: string;
+  majorLabelSide: "left" | "right";
+}
+
+function isMajorClusterLayerId(layerId: string) {
+  return (
+    layerId === layerMajorClusterCircleId ||
+    layerId === layerMajorClusterLabelId ||
+    layerId === layerMajorClusterLabelLeftId
+  );
+}
+
+function isStandardClusterLayerId(layerId: string) {
+  return layerId === layerClusterCircleId;
+}
+
+function buildMajorPlaceReferenceByRank(renderData: PlaceRenderData) {
+  const byRank = new Map<number, MajorPlaceReference>();
+  for (const feature of renderData.majorCityPins.features) {
+    const rank = Number(feature.properties.importanceRank);
+    if (!Number.isFinite(rank) || byRank.has(rank)) {
+      continue;
+    }
+
+    byRank.set(rank, {
+      placeId: feature.properties.placeId,
+      placeName: feature.properties.placeName,
+      pinColor: feature.properties.pinColor,
+      majorLabelSide: feature.properties.majorLabelSide
+    });
+  }
+
+  return byRank;
+}
+
+function createMajorClusterTopNameMatchExpression(majorPlaceByRank: Map<number, MajorPlaceReference>) {
+  const expression: unknown[] = ["match", ["to-string", ["get", "minImportanceRank"]]];
+
+  const sortedEntries = Array.from(majorPlaceByRank.entries()).sort((left, right) => left[0] - right[0]);
+  for (const [rank, place] of sortedEntries) {
+    expression.push(String(rank), place.placeName);
+  }
+
+  expression.push("Place");
+  return expression;
+}
+
+function createMajorClusterTopColorMatchExpression(majorPlaceByRank: Map<number, MajorPlaceReference>) {
+  const expression: unknown[] = ["match", ["to-string", ["get", "minImportanceRank"]]];
+
+  const sortedEntries = Array.from(majorPlaceByRank.entries()).sort((left, right) => left[0] - right[0]);
+  for (const [rank, place] of sortedEntries) {
+    expression.push(String(rank), place.pinColor);
+  }
+
+  expression.push("#C5221F");
+  return expression;
+}
+
+function createMajorClusterLabelExpression(majorPlaceByRank: Map<number, MajorPlaceReference>) {
+  const topNameExpression = createMajorClusterTopNameMatchExpression(majorPlaceByRank);
+  return [
+    "concat",
+    topNameExpression,
+    " +",
+    ["to-string", ["max", 0, ["-", ["get", "point_count"], 1]]]
+  ];
+}
+
+function createMajorClusterTopSideFilter(
+  majorPlaceByRank: Map<number, MajorPlaceReference>,
+  side: "left" | "right"
+) {
+  const ranks = Array.from(majorPlaceByRank.entries())
+    .filter(([, place]) => place.majorLabelSide === side)
+    .map(([rank]) => rank)
+    .sort((left, right) => left - right);
+
+  if (ranks.length === 0) {
+    return ["==", 1, 0];
+  }
+
+  const expression: unknown[] = ["any"];
+  for (const rank of ranks) {
+    expression.push(["==", ["get", "minImportanceRank"], rank]);
+  }
+
+  return expression;
+}
 
 function getStyleUrl(mode: BasemapMode) {
   if (mode === "fallback") {
@@ -465,6 +643,14 @@ function setLayerVisibility(map: MapLibreMap, layerId: string, visible: boolean)
   map.setLayoutProperty(layerId, "visibility", visible ? "visible" : "none");
 }
 
+function moveLayerBefore(map: MapLibreMap, layerId: string, beforeId: string) {
+  if (!map.getLayer(layerId) || !map.getLayer(beforeId)) {
+    return;
+  }
+
+  map.moveLayer(layerId, beforeId);
+}
+
 function applyBasemapLayerVariants(map: MapLibreMap, mode: BasemapMode, tuning: RuntimeTuning) {
   if (mode === "main") {
     setLayerVisibility(map, mainStyleReliefLayerId, !tuning.variants.disableRelief);
@@ -522,6 +708,7 @@ function ensureGeoJsonSource(
     cluster: boolean;
     clusterMaxZoom: number;
     clusterRadius: number;
+    clusterProperties: Record<string, unknown>;
   }> = {}
 ) {
   const existingSource = map.getSource(sourceId);
@@ -591,6 +778,23 @@ function createTransparentCollisionImage(sizePx: number) {
   return createCanvasImage(sizePx, (context, size) => {
     context.fillStyle = "#000000";
     context.fillRect(0, 0, size, size);
+  });
+}
+
+function createCircularSdfImage({
+  canvasSizePx,
+  radiusPx
+}: {
+  canvasSizePx: number;
+  radiusPx: number;
+}) {
+  return createCanvasImage(canvasSizePx, (context, size) => {
+    const center = size / 2;
+    context.clearRect(0, 0, size, size);
+    context.fillStyle = "#FFFFFF";
+    context.beginPath();
+    context.arc(center, center, radiusPx, 0, Math.PI * 2);
+    context.fill();
   });
 }
 
@@ -664,6 +868,26 @@ function ensureCollisionImages(map: MapLibreMap) {
       map.addImage(clusterCollisionImageId, image.image, { pixelRatio: image.pixelRatio });
     }
   }
+
+  if (!map.hasImage(cityPinSymbolImageId)) {
+    const image = createCircularSdfImage({
+      canvasSizePx: 24,
+      radiusPx: standardPinBaseRadiusPx
+    });
+    if (image) {
+      map.addImage(cityPinSymbolImageId, image.image, { pixelRatio: image.pixelRatio, sdf: true });
+    }
+  }
+
+  if (!map.hasImage(clusterSymbolImageId)) {
+    const image = createCircularSdfImage({
+      canvasSizePx: 40,
+      radiusPx: standardClusterBaseRadiusPx
+    });
+    if (image) {
+      map.addImage(clusterSymbolImageId, image.image, { pixelRatio: image.pixelRatio, sdf: true });
+    }
+  }
 }
 
 function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
@@ -687,34 +911,44 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
   }
 }
 
-function ensureMapLayers(map: MapLibreMap) {
+function ensureMapLayers(
+  map: MapLibreMap,
+  majorPlaceByRank: Map<number, MajorPlaceReference>
+) {
   ensureCollisionImages(map);
 
   if (!map.getLayer(layerClusterCircleId)) {
     map.addLayer({
       id: layerClusterCircleId,
       source: sourceClusteredCityPinsId,
-      type: "circle",
-      filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
-      paint: {
-        "circle-radius": ["step", ["get", "point_count"], 14, 8, 16, 20, 18],
-        "circle-color": "#C5221F",
-        "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 3
-      }
-    });
-  }
-
-  if (!map.getLayer(layerClusterCountId)) {
-    map.addLayer({
-      id: layerClusterCountId,
-      source: sourceClusteredCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
       maxzoom: CLUSTER_MAX_ZOOM + 1,
-      layout: CLUSTER_COUNT_LAYOUT,
+      layout: {
+        "icon-image": clusterSymbolImageId,
+        "icon-size": [
+          "step",
+          ["get", "point_count"],
+          standardClusterRadiusByPointCount.default / standardClusterBaseRadiusPx,
+          8,
+          standardClusterRadiusByPointCount.medium / standardClusterBaseRadiusPx,
+          20,
+          standardClusterRadiusByPointCount.large / standardClusterBaseRadiusPx
+        ],
+        "icon-anchor": "center",
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "text-optional": false
+      },
       paint: {
+        "icon-color": ["step", ["zoom"], "#9AA0A6", standardMutedThresholdZoom, "#C5221F"],
+        "icon-halo-color": "#FFFFFF",
+        "icon-halo-width": 3,
         "text-color": "#FFFFFF"
       }
     });
@@ -749,6 +983,95 @@ function ensureMapLayers(map: MapLibreMap) {
     map.addLayer({
       id: layerCityPinId,
       source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
+      layout: {
+        "icon-image": cityPinSymbolImageId,
+        "icon-size": [
+          "step",
+          ["zoom"],
+          [
+            "case",
+            ["==", ["get", "isSelectedPlace"], true],
+            standardPinSelectedRadiusPx / standardPinBaseRadiusPx,
+            ["==", ["get", "isHighlightedPlace"], true],
+            standardPinHighlightedRadiusPx / standardPinBaseRadiusPx,
+            standardPinOverviewDefaultRadiusPx / standardPinBaseRadiusPx
+          ],
+          standardMutedThresholdZoom,
+          [
+            "case",
+            ["==", ["get", "isSelectedPlace"], true],
+            standardPinSelectedRadiusPx / standardPinBaseRadiusPx,
+            ["==", ["get", "isHighlightedPlace"], true],
+            standardPinHighlightedRadiusPx / standardPinBaseRadiusPx,
+            1
+          ]
+        ],
+        "icon-anchor": "center",
+        "icon-allow-overlap": false,
+        "icon-ignore-placement": false,
+        "symbol-sort-key": ["get", "labelPriority"]
+      },
+      paint: {
+        "icon-color": [
+          "step",
+          ["zoom"],
+          "#9AA0A6",
+          standardMutedThresholdZoom,
+          ["get", "pinColor"]
+        ],
+        "icon-halo-color": "#FFFFFF",
+        "icon-halo-width": ["step", ["zoom"], 1.5, standardMutedThresholdZoom, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorClusterCircleId)) {
+    map.addLayer({
+      id: layerMajorClusterCircleId,
+      source: sourceMajorCityPinsId,
+      type: "circle",
+      filter: toLayerFilter(["has", "point_count"]),
+      maxzoom: majorClusterMaxZoom + 1,
+      paint: {
+        "circle-radius": ["step", ["get", "point_count"], 9, 8, 10, 20, 11],
+        "circle-color": toExpression(createMajorClusterTopColorMatchExpression(majorPlaceByRank)),
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": 2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorPinShadowId)) {
+    map.addLayer({
+      id: layerMajorPinShadowId,
+      source: sourceMajorCityPinsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        [
+          "any",
+          ["==", ["get", "isSelectedPlace"], true],
+          ["==", ["get", "isHighlightedPlace"], true]
+        ]
+      ]),
+      paint: {
+        "circle-radius": 12,
+        "circle-color": "rgba(60,64,67,0.42)",
+        "circle-translate": [0, 2],
+        "circle-translate-anchor": "viewport",
+        "circle-blur": 0.2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorPinId)) {
+    map.addLayer({
+      id: layerMajorPinId,
+      source: sourceMajorCityPinsId,
       type: "circle",
       filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
       paint: {
@@ -832,6 +1155,25 @@ function ensureMapLayers(map: MapLibreMap) {
     });
   }
 
+  if (!map.getLayer(layerMajorQuestionBadgeId)) {
+    map.addLayer({
+      id: layerMajorQuestionBadgeId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["==", ["get", "hasMultipleCandidates"], true],
+        ["==", ["get", "isDisputed"], true]
+      ]),
+      layout: {
+        ...QUESTION_BADGE_LAYOUT,
+        "icon-image": questionBadgeImageId
+      }
+    });
+  }
+
   if (!map.getLayer(layerCandidatePinId)) {
     map.addLayer({
       id: layerCandidatePinId,
@@ -847,17 +1189,25 @@ function ensureMapLayers(map: MapLibreMap) {
     });
   }
 
-  if (!map.getLayer(layerClusterCollisionMaskId)) {
+  if (!map.getLayer(layerMajorClusterCollisionMaskId)) {
     map.addLayer({
-      id: layerClusterCollisionMaskId,
-      source: sourceClusteredCityPinsId,
+      id: layerMajorClusterCollisionMaskId,
+      source: sourceMajorCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["has", "point_count"]),
-      maxzoom: CLUSTER_MAX_ZOOM + 1,
+      maxzoom: majorClusterMaxZoom + 1,
       layout: {
-        "icon-size": 1,
+        "icon-size": [
+          "step",
+          ["get", "point_count"],
+          0.32,
+          8,
+          0.34,
+          20,
+          0.36
+        ],
         "icon-anchor": "center",
-        "icon-allow-overlap": false,
+        "icon-allow-overlap": true,
         "icon-ignore-placement": false,
         "icon-image": clusterCollisionImageId
       },
@@ -867,10 +1217,10 @@ function ensureMapLayers(map: MapLibreMap) {
     });
   }
 
-  if (!map.getLayer(layerCityPinCollisionMaskId)) {
+  if (!map.getLayer(layerMajorPinCollisionMaskId)) {
     map.addLayer({
-      id: layerCityPinCollisionMaskId,
-      source: sourceClusteredCityPinsId,
+      id: layerMajorPinCollisionMaskId,
+      source: sourceMajorCityPinsId,
       type: "symbol",
       filter: toLayerFilter(["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]),
       layout: {
@@ -924,7 +1274,9 @@ function ensureMapLayers(map: MapLibreMap) {
         "all",
         ["!", ["has", "point_count"]],
         basePinVisibilityFilter,
-        ["!=", ["get", "labelText"], null]
+        standardPinUnmutedZoomFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true]
       ]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -957,7 +1309,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-optional": true,
-        ...areaLabelOverviewOffsetLayout
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#5F6368",
@@ -981,10 +1333,268 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-optional": true,
-        ...AREA_LABEL_OFFSET_LAYOUT
+        ...areaLabelPointLayout
       },
       paint: {
         "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorAreaLabelOverviewId)) {
+    map.addLayer({
+      id: layerMajorAreaLabelOverviewId,
+      source: sourceAreaLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(areaLabelMajorOverviewFilter),
+      layout: {
+        "text-field": ["get", "placeName"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["get", "areaFontSize"],
+        "text-letter-spacing": 0.18,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true,
+        ...areaLabelPointLayout
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorAreaLabelId)) {
+    map.addLayer({
+      id: layerMajorAreaLabelId,
+      source: sourceAreaLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(areaLabelMajorVariableAnchorFilter),
+      layout: {
+        "text-field": ["get", "placeName"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["get", "areaFontSize"],
+        "text-letter-spacing": 0.18,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-optional": true,
+        ...areaLabelPointLayout
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorClusterLabelId)) {
+    map.addLayer({
+      id: layerMajorClusterLabelId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["has", "point_count"],
+        createMajorClusterTopSideFilter(majorPlaceByRank, "right")
+      ]),
+      maxzoom: majorClusterMaxZoom + 1,
+      layout: {
+        "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 11,
+        "text-variable-anchor": ["left", "top", "right"] as [
+          "left",
+          "top",
+          "right"
+        ],
+        "text-radial-offset": 0.6,
+        "text-justify": "auto" as const,
+        "symbol-sort-key": ["get", "minImportanceRank"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorClusterLabelLeftId)) {
+    map.addLayer({
+      id: layerMajorClusterLabelLeftId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["has", "point_count"],
+        createMajorClusterTopSideFilter(majorPlaceByRank, "left")
+      ]),
+      maxzoom: majorClusterMaxZoom + 1,
+      layout: {
+        "text-field": toExpression(createMajorClusterLabelExpression(majorPlaceByRank)),
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 11,
+        "text-variable-anchor": ["top"] as ["top"],
+        "text-radial-offset": 0.8,
+        "text-justify": "auto" as const,
+        "symbol-sort-key": ["get", "minImportanceRank"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorPinLabelId)) {
+    map.addLayer({
+      id: layerMajorPinLabelId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["!=", ["get", "majorLabelSide"], "left"]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        ...majorPinLabelLayout,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerMajorPinLabelLeftId)) {
+    map.addLayer({
+      id: layerMajorPinLabelLeftId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "majorLabelSide"], "left"]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        ...majorPinLabelLeftLayout,
+        "symbol-sort-key": ["get", "labelPriority"],
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.3
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSelectedAreaLabelId)) {
+    map.addLayer({
+      id: layerSelectedAreaLabelId,
+      source: sourceAreaLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(selectedAreaLabelFilter),
+      layout: {
+        "text-field": ["get", "placeName"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": ["get", "areaFontSize"],
+        "text-letter-spacing": 0.18,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        ...areaLabelPointLayout
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSelectedMajorPinLabelId)) {
+    map.addLayer({
+      id: layerSelectedMajorPinLabelId,
+      source: sourceMajorCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["==", ["get", "isSelectedPlace"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [1.2, 0],
+        "text-anchor": "left",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerSelectedPinLabelId)) {
+    map.addLayer({
+      id: layerSelectedPinLabelId,
+      source: sourceClusteredCityPinsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["!", ["has", "point_count"]],
+        basePinVisibilityFilter,
+        ["!=", ["get", "labelText"], null],
+        ["==", ["get", "isSelectedPlace"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [1.2, 0],
+        "text-anchor": "left",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      paint: {
+        "text-color": "#202124",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
       }
@@ -1003,6 +1613,17 @@ function ensureMapLayers(map: MapLibreMap) {
         "circle-stroke-width": 2
       }
     });
+  }
+
+  const areaLayersNeedingStandardClusterClearance = [
+    layerAreaLabelOverviewId,
+    layerAreaLabelId,
+    layerMajorAreaLabelOverviewId,
+    layerMajorAreaLabelId
+  ] as const;
+
+  for (const areaLayerId of areaLayersNeedingStandardClusterClearance) {
+    moveLayerBefore(map, areaLayerId, layerMajorClusterCollisionMaskId);
   }
 }
 
@@ -1080,12 +1701,16 @@ function queryBoxAroundPoint(point: HitScreenPoint, paddingPx: number): [PointLi
   ];
 }
 
-function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
+function toVisibleEntry(
+  feature: MapGeoJSONFeature,
+  majorPlaceByRank: Map<number, MajorPlaceReference>
+): VisibleListEntry | null {
   const coordinates = asCoordinates(feature);
   if (!coordinates) {
     return null;
   }
 
+  const layerId = typeof feature.layer?.id === "string" ? feature.layer.id : "";
   const properties = asObject(feature.properties);
   if (!properties) {
     return null;
@@ -1094,14 +1719,51 @@ function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
   const clusterId = asNumber(properties.cluster_id);
   const pointCount = asNumber(properties.point_count);
   if (clusterId !== null && pointCount !== null) {
+    if (isMajorClusterLayerId(layerId)) {
+      const minImportanceRank = asNumber(properties.minImportanceRank);
+      if (minImportanceRank === null) {
+        return null;
+      }
+
+      const topPlace = majorPlaceByRank.get(minImportanceRank);
+      if (!topPlace) {
+        return null;
+      }
+
+      const nearbyCount = Math.max(0, pointCount - 1);
+      const nearbyWord = nearbyCount === 1 ? "place" : "places";
+      return {
+        id: `major-cluster:${clusterId}`,
+        kind: "major-cluster",
+        sourceId: sourceMajorCityPinsId,
+        coordinates,
+        accessibleName: `${topPlace.placeName} and ${nearbyCount} nearby ${nearbyWord}`,
+        tooltipText: `${topPlace.placeName} +${nearbyCount}`,
+        clusterId,
+        pointCount,
+        topPlaceName: topPlace.placeName,
+        selection: {
+          placeId: topPlace.placeId,
+          candidateIndex: null
+        },
+        interactionRank: 0
+      };
+    }
+
+    if (!isStandardClusterLayerId(layerId)) {
+      return null;
+    }
+
     return {
       id: `cluster:${clusterId}`,
       kind: "cluster",
+      sourceId: sourceClusteredCityPinsId,
       coordinates,
       accessibleName: `Cluster of ${pointCount} places`,
       tooltipText: `${pointCount} places`,
       clusterId,
-      pointCount
+      pointCount,
+      interactionRank: 1
     };
   }
 
@@ -1117,6 +1779,7 @@ function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
 
   const candidateIndex = asNumber(properties.candidateIndex);
   const candidateLetter = asString(properties.candidateLetter);
+  const interactionRank = asNumber(properties.interactionRank) ?? 1;
 
   return {
     id: entryId,
@@ -1130,7 +1793,8 @@ function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
     selection: {
       placeId,
       candidateIndex
-    }
+    },
+    interactionRank
   };
 }
 
@@ -1282,6 +1946,8 @@ export function MapView({
   const tooltipTrackingEnabledRef = useRef(false);
   const tooltipMouseMoveFrameRef = useRef<number | null>(null);
   const pendingTooltipPointRef = useRef<PointLike | null>(null);
+  const majorPlaceByRankRef = useRef<Map<number, MajorPlaceReference>>(new Map());
+  const majorClusterTooltipByEntryIdRef = useRef(new Map<string, string>());
   const activateVisibleEntryRef = useRef<(entry: VisibleListEntry) => void>(() => undefined);
   const handleTooltipAtPointRef = useRef<(point: PointLike) => void>(() => undefined);
   const refreshVisibleEntryStateRef = useRef<() => void>(() => undefined);
@@ -1310,11 +1976,23 @@ export function MapView({
     () => buildPlaceRenderData(places, selection, highlightedPlaceId),
     [highlightedPlaceId, places, selection]
   );
+  const majorPlaceByRank = useMemo(
+    () => buildMajorPlaceReferenceByRank(renderData),
+    [renderData]
+  );
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
   const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
+
+  useEffect(() => {
+    majorPlaceByRankRef.current = majorPlaceByRank;
+  }, [majorPlaceByRank]);
+
+  useEffect(() => {
+    majorClusterTooltipByEntryIdRef.current.clear();
+  }, [renderData]);
 
   const hideTooltip = useCallback(() => {
     const tooltip = tooltipRef.current;
@@ -1342,6 +2020,8 @@ export function MapView({
       return null;
     }
 
+    const majorPlaceByRankForView = majorPlaceByRankRef.current;
+
     const pointer = asScreenPoint(point);
     if (!pointer) {
       return null;
@@ -1351,22 +2031,32 @@ export function MapView({
       layers: [...interactiveLayerIds]
     });
     const entries = deduplicateVisibleEntries(
-      features.map(toVisibleEntry).filter((entry): entry is VisibleListEntry => entry !== null)
+      features
+        .map((feature) => toVisibleEntry(feature, majorPlaceByRankForView))
+        .filter((entry): entry is VisibleListEntry => entry !== null)
     );
 
-    return pickNearestCandidate(
+    const candidates = entries.map((entry) => {
+      const projected = map.project(entry.coordinates as LngLatLike);
+      return {
+        value: entry,
+        point: {
+          x: projected.x,
+          y: projected.y
+        },
+        interactionRank: entry.interactionRank
+      };
+    });
+
+    return pickNearestCandidateWithPreferredRank(
       pointer,
-      entries.map((entry) => {
-        const projected = map.project(entry.coordinates as LngLatLike);
-        return {
-          value: entry,
-          point: {
-            x: projected.x,
-            y: projected.y
-          }
-        };
-      }),
-      (left, right) => left.id.localeCompare(right.id)
+      candidates,
+      {
+        preferredRank: 0,
+        competingRank: 1,
+        maxPreferredDistanceDeltaPx: majorInteractionPreferencePx,
+        tieBreaker: (left, right) => left.id.localeCompare(right.id)
+      }
     );
   }, []);
 
@@ -1402,7 +2092,9 @@ export function MapView({
       layers: [...interactiveLayerIds]
     });
     const deduplicated = deduplicateVisibleEntries(
-      rendered.map(toVisibleEntry).filter((entry): entry is VisibleListEntry => entry !== null)
+      rendered
+        .map((feature) => toVisibleEntry(feature, majorPlaceByRankRef.current))
+        .filter((entry): entry is VisibleListEntry => entry !== null)
     );
     deduplicated.sort((left, right) => compareByReadingOrder(map, left, right));
 
@@ -1436,10 +2128,18 @@ export function MapView({
       return;
     }
 
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, renderData.majorCityPins, {
+      cluster: true,
+      clusterMaxZoom: majorClusterMaxZoom,
+      clusterRadius: majorClusterRadiusPx,
+      clusterProperties: {
+        minImportanceRank: ["min", ["get", "importanceRank"]]
+      }
+    });
     ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
-      clusterRadius: 52
+      clusterRadius: standardClusterRadiusPx
     });
     ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
     ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
@@ -1448,8 +2148,65 @@ export function MapView({
 
     ensureQuestionBadgeImage(map);
     ensureCandidateImages(map, renderData);
-    ensureMapLayers(map);
-  }, [renderData]);
+    ensureMapLayers(map, majorPlaceByRank);
+  }, [majorPlaceByRank, renderData]);
+
+  const resolveMajorClusterTooltipText = useCallback(
+    async (entry: VisibleMajorClusterEntry) => {
+      const cached = majorClusterTooltipByEntryIdRef.current.get(entry.id);
+      if (cached) {
+        return cached;
+      }
+
+      const map = mapRef.current;
+      if (!map) {
+        return entry.tooltipText;
+      }
+
+      const source = map.getSource(entry.sourceId);
+      if (!isGeoJsonSource(source)) {
+        return entry.tooltipText;
+      }
+
+      try {
+        const leaves = await source.getClusterLeaves(entry.clusterId, entry.pointCount, 0);
+        const names = leaves
+          .map((feature) => {
+            const properties = asObject(feature.properties);
+            if (!properties) {
+              return null;
+            }
+
+            const placeName = asString(properties.placeName);
+            const importanceRank = asNumber(properties.importanceRank);
+            if (!placeName || importanceRank === null) {
+              return null;
+            }
+
+            return {
+              placeName,
+              importanceRank
+            };
+          })
+          .filter(
+            (value): value is { placeName: string; importanceRank: number } => value !== null
+          )
+          .sort((left, right) => left.importanceRank - right.importanceRank)
+          .map((value) => value.placeName);
+
+        const tooltipText = names.length > 0 ? names.join(", ") : entry.tooltipText;
+        majorClusterTooltipByEntryIdRef.current.set(entry.id, tooltipText);
+        return tooltipText;
+      } catch (error) {
+        console.error(
+          `Failed to resolve members for major cluster ${entry.clusterId}:`,
+          error
+        );
+        return entry.tooltipText;
+      }
+    },
+    []
+  );
 
   const handleTooltipAtPoint = useCallback(
     (point: PointLike) => {
@@ -1479,8 +2236,18 @@ export function MapView({
       tooltip.style.left = `${projected.x}px`;
       tooltip.style.top = `${projected.y - 22}px`;
       activeTooltipEntryIdRef.current = entry.id;
+
+      if (entry.kind === "major-cluster") {
+        void resolveMajorClusterTooltipText(entry).then((tooltipText) => {
+          if (activeTooltipEntryIdRef.current !== entry.id || !tooltipRef.current) {
+            return;
+          }
+
+          tooltipRef.current.textContent = tooltipText;
+        });
+      }
     },
-    [hideTooltip, resolveInteractiveEntryAtPoint, setInteractiveCursor]
+    [hideTooltip, resolveInteractiveEntryAtPoint, resolveMajorClusterTooltipText, setInteractiveCursor]
   );
 
   const zoomToCluster = useCallback(
@@ -1490,7 +2257,7 @@ export function MapView({
         return;
       }
 
-      const source = map.getSource(sourceClusteredCityPinsId);
+      const source = map.getSource(entry.sourceId);
       if (!isGeoJsonSource(source)) {
         return;
       }
@@ -1513,6 +2280,11 @@ export function MapView({
 
   const activateVisibleEntry = useCallback(
     (entry: VisibleListEntry) => {
+      if (entry.kind === "major-cluster") {
+        onSelectPlace(entry.selection);
+        return;
+      }
+
       if (entry.kind === "cluster") {
         void zoomToCluster(entry);
         return;
@@ -1530,7 +2302,7 @@ export function MapView({
         return;
       }
 
-      const focusRadius = entry.kind === "cluster" ? 16 : 13;
+      const focusRadius = entry.kind === "cluster" || entry.kind === "major-cluster" ? 16 : 13;
       updateKeyboardFocusRing(map, entry.coordinates, focusRadius);
       panPointOutFromPanel(
         map,

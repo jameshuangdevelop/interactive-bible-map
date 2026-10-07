@@ -1,5 +1,7 @@
 import {
+  pickNearestCandidateWithPreferredRank,
   pickNearestCandidate,
+  type RankedHitCandidate,
   squaredDistance,
   type HitCandidate,
   type ScreenPoint
@@ -38,5 +40,53 @@ describe("interactive hit helpers", () => {
 
   test("computes squared distance without floating precision noise from sqrt", () => {
     expect(squaredDistance({ x: 2, y: 3 }, { x: -1, y: -1 })).toBe(25);
+  });
+
+  test("prefers major-ranked candidates unless the standard candidate is clearly nearer", () => {
+    const pointer: ScreenPoint = { x: 100, y: 100 };
+    const candidates: RankedHitCandidate<string>[] = [
+      {
+        value: "standard",
+        point: { x: 100, y: 100 },
+        interactionRank: 1
+      },
+      {
+        value: "major",
+        point: { x: 102.5, y: 100 },
+        interactionRank: 0
+      }
+    ];
+
+    const nearest = pickNearestCandidateWithPreferredRank(pointer, candidates, {
+      preferredRank: 0,
+      competingRank: 1,
+      maxPreferredDistanceDeltaPx: 3
+    });
+
+    expect(nearest).toBe("major");
+  });
+
+  test("keeps the standard candidate when it is clearly nearer", () => {
+    const pointer: ScreenPoint = { x: 100, y: 100 };
+    const candidates: RankedHitCandidate<string>[] = [
+      {
+        value: "standard",
+        point: { x: 100, y: 100 },
+        interactionRank: 1
+      },
+      {
+        value: "major",
+        point: { x: 106, y: 100 },
+        interactionRank: 0
+      }
+    ];
+
+    const nearest = pickNearestCandidateWithPreferredRank(pointer, candidates, {
+      preferredRank: 0,
+      competingRank: 1,
+      maxPreferredDistanceDeltaPx: 3
+    });
+
+    expect(nearest).toBe("standard");
   });
 });

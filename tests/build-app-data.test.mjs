@@ -59,7 +59,16 @@ test("buildAppData writes compact index fields and candidate fields", async () =
     for (const place of indexData) {
       assert.deepEqual(
         Object.keys(place).sort(),
-        ["candidates", "id", "names", "parentId", "prominence", "type", "zoomTier"]
+        [
+          "candidates",
+          "id",
+          "names",
+          "parentId",
+          "passageCount",
+          "prominence",
+          "type",
+          "zoomTier"
+        ]
       );
       for (const candidate of place.candidates) {
         assert.deepEqual(Object.keys(candidate).sort(), [
@@ -69,6 +78,10 @@ test("buildAppData writes compact index fields and candidate fields", async () =
         ]);
       }
     }
+
+    const indexById = new Map(indexData.map((place) => [place.id, place]));
+    assert.equal(indexById.get("capernaum")?.passageCount, 1);
+    assert.equal(indexById.get("galilee")?.passageCount, 1);
   });
 });
 

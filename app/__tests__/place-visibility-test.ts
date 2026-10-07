@@ -28,6 +28,7 @@ describe("place visibility helpers", () => {
       type: "village",
       zoomTier: "city",
       prominence: "standard",
+      passageCount: 2,
       parentId: "judea",
       candidates: [
         {
@@ -53,6 +54,7 @@ describe("place visibility helpers", () => {
       type: "empire",
       zoomTier: "region",
       prominence: "standard",
+      passageCount: 2,
       parentId: null,
       candidates: [{ label: "Roman Empire", coordinates: [20, 38], confidence: "high" }]
     };

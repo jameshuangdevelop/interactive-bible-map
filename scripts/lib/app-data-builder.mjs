@@ -82,7 +82,10 @@ function toAppNames(names) {
 function toAppLocationRecord(locationRecord) {
   return {
     ...locationRecord,
-    names: toAppNames(locationRecord.names)
+    names: toAppNames(locationRecord.names),
+    passageCount: Array.isArray(locationRecord.scripture)
+      ? locationRecord.scripture.length
+      : 0
   };
 }
 
@@ -93,6 +96,9 @@ function toIndexRecord(locationRecord) {
     type: locationRecord.type,
     zoomTier: locationRecord.zoomTier,
     prominence: locationRecord.prominence,
+    passageCount: Array.isArray(locationRecord.scripture)
+      ? locationRecord.scripture.length
+      : 0,
     parentId: locationRecord.parentId ?? null,
     candidates: (locationRecord.candidates ?? []).map((candidate) => ({
       label: candidate.label,

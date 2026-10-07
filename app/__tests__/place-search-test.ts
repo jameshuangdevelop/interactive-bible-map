@@ -22,6 +22,7 @@ function loadPlacesFromDataRecords(): PlaceIndexRecord[] {
       type: PlaceIndexRecord["type"];
       zoomTier: PlaceIndexRecord["zoomTier"];
       prominence: PlaceIndexRecord["prominence"];
+      scripture?: unknown[];
       parentId?: string;
       candidates?: PlaceIndexRecord["candidates"];
     };
@@ -36,6 +37,7 @@ function loadPlacesFromDataRecords(): PlaceIndexRecord[] {
       type: payload.type,
       zoomTier: payload.zoomTier,
       prominence: payload.prominence,
+      passageCount: Array.isArray(payload.scripture) ? payload.scripture.length : 0,
       parentId: payload.parentId ?? null,
       candidates: payload.candidates ?? []
     };
@@ -110,6 +112,7 @@ describe("place-name search", () => {
       type: "city",
       zoomTier: "city",
       prominence: "standard",
+      passageCount: 1,
       parentId: null,
       candidates: [{ label: "Capernaüm", coordinates: [35.5, 32.9], confidence: "high" }]
     };
@@ -130,6 +133,7 @@ describe("place-name search", () => {
       type: "city",
       zoomTier: "city",
       prominence: "major",
+      passageCount: 26,
       parentId: null,
       candidates: [{ label: "Selçuk", coordinates: [27.35, 37.95], confidence: "high" }]
     };
@@ -149,6 +153,7 @@ describe("place-name search", () => {
       type: "site",
       zoomTier: "site",
       prominence: "standard",
+      passageCount: 0,
       parentId: null,
       candidates: [
         { label: "Candidate A", coordinates: [35.5, 31.7], confidence: "high" },
@@ -171,6 +176,7 @@ describe("place-name search", () => {
       type: "village",
       zoomTier: "city",
       prominence: "standard",
+      passageCount: 2,
       parentId: null,
       candidates: [
         { label: "Candidate A", coordinates: [34.9, 31.8], confidence: "disputed" },

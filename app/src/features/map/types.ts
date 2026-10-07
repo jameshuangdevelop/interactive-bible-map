@@ -41,6 +41,7 @@ export interface PlaceIndexRecord {
   zoomTier: ZoomTier;
   parentId: string | null;
   prominence: PlaceProminence;
+  passageCount: number;
   candidates: PlaceCandidate[];
 }
 
