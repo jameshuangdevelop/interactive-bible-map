@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { buildAppData } from "../scripts/lib/app-data-builder.mjs";
+import { buildAncientAppData } from "../scripts/lib/ancient-app-data-builder.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
@@ -43,6 +44,32 @@ function toDraftRecord(record) {
   delete draftRecord.verifiedBy;
   delete draftRecord.lastReviewed;
   return draftRecord;
+}
+
+function pointInRing(point, ring) {
+  let inside = false;
+  for (let index = 0, previousIndex = ring.length - 1; index < ring.length; previousIndex = index, index += 1) {
+    const [x1, y1] = ring[index];
+    const [x2, y2] = ring[previousIndex];
+    const intersects = (y1 > point[1]) !== (y2 > point[1]) &&
+      point[0] < ((x2 - x1) * (point[1] - y1)) / (y2 - y1) + x1;
+    if (intersects) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+function pointInPolygon(point, polygon) {
+  if (!pointInRing(point, polygon[0])) {
+    return false;
+  }
+  for (let index = 1; index < polygon.length; index += 1) {
+    if (pointInRing(point, polygon[index])) {
+      return false;
+    }
+  }
+  return true;
 }
 
 test("buildAppData writes compact index fields and candidate fields", async () => {
@@ -397,6 +424,10 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       stopPayload.holderLabels.some((entry) => entry.holderId === "client-antipas"),
       "expected holder label for client-antipas"
     );
+    assert.equal(
+      stopPayload.holderLabels.some((entry) => entry.holderId === "uncertain-roman-side"),
+      false
+    );
     assert.ok(
       stopPayload.holderBorders.features.some(
         (feature) =>
@@ -406,6 +437,20 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       "expected province/client border"
     );
     assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
+    const ad44Payload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
+    );
+    assert.equal(ad44Payload.areas.find((area) => area.areaId === "perea")?.note, "Status in the sources is unclear for this interval (fixture).");
+    assert.equal(
+      ad44Payload.holderBorders.features.some(
+        (feature) =>
+          (feature.properties.holderAId === "client-antipas" &&
+            feature.properties.holderBId === "province-judaea") ||
+          (feature.properties.holderAId === "province-judaea" &&
+            feature.properties.holderBId === "client-antipas")
+      ),
+      false
+    );
 
     const shapesPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.shapes.json"), "utf8")
@@ -466,5 +511,191 @@ test("buildAppData supports ancient-source fixture directory", async () => {
       await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
     );
     assert.ok(Array.isArray(stopPayload.holderLabels));
+  });
+});
+
+test("buildAncientAppData keeps label points inside concave polygons", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const timelineData = {
+      version: 1,
+      range: { fromYear: -4, toYear: 101, defaultYear: 44 },
+      stops: [
+        {
+          id: "ad44",
+          year: 44,
+          title: "Fixture stop",
+          summary: "Fixture stop summary",
+          sources: ["bib:pleiades-place-resource"]
+        }
+      ],
+      entities: [
+        {
+          id: "holder-concave",
+          name: "Concave holder",
+          kind: "roman-province",
+          romanSide: true,
+          sources: ["bib:pleiades-place-resource"]
+        }
+      ],
+      areas: [
+        {
+          id: "concave-area",
+          periods: [
+            {
+              fromYear: -4,
+              toYear: 101,
+              holderId: "holder-concave",
+              sources: ["bib:pleiades-place-resource"]
+            }
+          ]
+        }
+      ]
+    };
+
+    const concavePolygon = [
+      [0, 0],
+      [0.6, 0],
+      [0.6, 0.2],
+      [0.2, 0.2],
+      [0.2, 0.4],
+      [0.6, 0.4],
+      [0.6, 0.6],
+      [0, 0.6],
+      [0, 0]
+    ];
+
+    const ancientAreasData = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {
+            areaId: "concave-area",
+            provenance: {
+              dataset: "fixture",
+              version: "fixture-1",
+              upstreamFeatureIds: ["awmc:fixture-concave"],
+              changes: [
+                {
+                  kind: "none",
+                  detail: "fixture",
+                  sources: ["bib:pleiades-place-resource"]
+                }
+              ]
+            }
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [concavePolygon]
+          }
+        }
+      ]
+    };
+
+    await buildAncientAppData({
+      timelineData,
+      ancientAreasData,
+      ancientRoadsData: { type: "FeatureCollection", features: [] },
+      ancientCoastlineData: { type: "FeatureCollection", features: [] },
+      outputDirectory
+    });
+
+    const stopPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
+    );
+    const label = stopPayload.holderLabels.find((entry) => entry.holderId === "holder-concave");
+    assert.ok(label, "expected concave holder label");
+    assert.equal(pointInPolygon(label.labelPoint, [concavePolygon]), true);
+  });
+});
+
+test("buildAncientAppData stress fixture stays under 300KB gzip", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const entities = [
+      {
+        id: "roman-holder",
+        name: "Roman holder",
+        kind: "roman-province",
+        romanSide: true,
+        sources: ["bib:pleiades-place-resource"]
+      },
+      {
+        id: "outside-holder",
+        name: "Outside holder",
+        kind: "outside-empire",
+        romanSide: false,
+        sources: ["bib:pleiades-place-resource"]
+      }
+    ];
+
+    const stops = Array.from({ length: 15 }, (_, index) => ({
+      id: `stop-${index + 1}`,
+      year: -4 + index * 7,
+      title: `Stop ${index + 1}`,
+      summary: "Synthetic stop",
+      sources: ["bib:pleiades-place-resource"]
+    }));
+
+    const areas = [];
+    const features = [];
+    let areaCounter = 0;
+    for (let row = 0; row < 5; row += 1) {
+      for (let column = 0; column < 8; column += 1) {
+        areaCounter += 1;
+        const areaId = `synthetic-area-${areaCounter}`;
+        const periods = [];
+        for (let stopIndex = 0; stopIndex < stops.length - 1; stopIndex += 1) {
+          periods.push({
+            fromYear: stops[stopIndex].year,
+            toYear: stops[stopIndex + 1].year,
+            holderId: (stopIndex + row + column) % 2 === 0 ? "roman-holder" : "outside-holder",
+            sources: ["bib:pleiades-place-resource"]
+          });
+        }
+        periods.push({
+          fromYear: stops[stops.length - 1].year,
+          toYear: 101,
+          holderId: (row + column) % 2 === 0 ? "outside-holder" : "roman-holder",
+          sources: ["bib:pleiades-place-resource"]
+        });
+
+        areas.push({ id: areaId, periods });
+
+        const minX = column * 1.1;
+        const minY = row * 1.1;
+        features.push({
+          type: "Feature",
+          properties: {
+            areaId,
+            provenance: {
+              dataset: "fixture",
+              version: "fixture-1",
+              upstreamFeatureIds: [`awmc:${areaId}`],
+              changes: [{ kind: "none", detail: "fixture", sources: ["bib:pleiades-place-resource"] }]
+            }
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [[[minX, minY], [minX + 1, minY], [minX + 1, minY + 1], [minX, minY + 1], [minX, minY]]]
+          }
+        });
+      }
+    }
+
+    const buildResult = await buildAncientAppData({
+      timelineData: {
+        version: 1,
+        range: { fromYear: -4, toYear: 101, defaultYear: 44 },
+        stops,
+        entities,
+        areas
+      },
+      ancientAreasData: { type: "FeatureCollection", features },
+      ancientRoadsData: { type: "FeatureCollection", features: [] },
+      ancientCoastlineData: { type: "FeatureCollection", features: [] },
+      outputDirectory
+    });
+
+    assert.ok(buildResult.totalGzipBytes <= 300 * 1024);
   });
 });
