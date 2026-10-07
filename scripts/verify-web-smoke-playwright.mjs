@@ -202,14 +202,14 @@ async function verifyEmmausDisputedLayout(page, baseUrl) {
     page.url().includes("?place=emmaus"),
     `Emmaus deep link did not resolve as expected, got '${page.url()}'.`
   );
-  await page.waitForSelector("section[aria-label='Place details'] [data-disputed-banner='true']", {
+  await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
     timeout: 45_000
   });
 
   const disputedBanner =
     (
       await page
-        .locator("section[aria-label='Place details'] [data-disputed-banner='true']")
+        .locator("section[aria-label='Place details'] [data-modern-name-line='true']")
         .textContent()
     )?.trim() ?? "";
   assert(

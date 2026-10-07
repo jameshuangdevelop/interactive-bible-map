@@ -124,4 +124,35 @@ describe("planSelectionFocus", () => {
       zoom: 14
     });
   });
+
+  test("reselecting the same disputed place still reuses fit-all-sites framing", () => {
+    const initialPlaceFocus = planSelectionFocus(multiCandidatePlace, {
+      placeId: multiCandidatePlace.id,
+      candidateIndex: null
+    });
+    expect(initialPlaceFocus).toEqual({
+      kind: "fit-bounds",
+      coordinates: [
+        [35.1, 31.8],
+        [35.2, 31.7]
+      ],
+      zoom: 11
+    });
+
+    const candidateFocus = planSelectionFocus(multiCandidatePlace, {
+      placeId: multiCandidatePlace.id,
+      candidateIndex: 1
+    });
+    expect(candidateFocus).toEqual({
+      kind: "center",
+      coordinates: [35.2, 31.7],
+      zoom: 11
+    });
+
+    const repeatedPlaceFocus = planSelectionFocus(multiCandidatePlace, {
+      placeId: multiCandidatePlace.id,
+      candidateIndex: null
+    });
+    expect(repeatedPlaceFocus).toEqual(initialPlaceFocus);
+  });
 });

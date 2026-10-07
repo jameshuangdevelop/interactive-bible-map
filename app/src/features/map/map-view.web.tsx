@@ -1195,7 +1195,6 @@ export function MapView({
   places,
   selection,
   leftPanelWidth,
-  focusRequestToken,
   onSelectPlace
 }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1912,7 +1911,7 @@ export function MapView({
       return;
     }
 
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${focusRequestToken}`;
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}`;
     if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
@@ -1925,7 +1924,6 @@ export function MapView({
     previousFocusRequestRef.current = selectionKey;
     focusSelection(map, place, selection, panelInset, runtimeTuning.flyToDurationMs);
   }, [
-    focusRequestToken,
     mapReadyVersion,
     panelInset,
     placeById,
