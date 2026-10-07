@@ -39,7 +39,8 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-20](M3-20-about-places.md) | Places in the About | frontend-engineer | `feat/m3-about-places` | Done, PR pending review |
 | [M3-21](M3-21-collapsible-sections.md) | Collapsible panel sections | fact-checker → frontend-engineer | `feat/m3-collapsible-sections` | Done, PR pending review |
 | [M3-22](M3-22-name-intros.md) | Introduce names in the other About texts | research-lead → fact-checker | `data/m3-name-intros` | Done, PR pending review |
-| [M3-23](M3-23-important-places-first.md) | Important places first on the opening map | frontend-engineer | `feat/m3-important-places-first` | In progress |
+| [M3-23](M3-23-important-places-first.md) | Important places first on the opening map | frontend-engineer | `feat/m3-important-places-first` | Done, PR #48 |
+| [M3-24](M3-24-lean-ci.md) | Lean CI | frontend-engineer | `chore/m3-lean-ci` | In progress |
 
 ## Template
 ```markdown

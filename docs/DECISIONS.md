@@ -271,6 +271,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   2. `scripts/verify-web-lighthouse.mjs` enforces both gates by default. Before asking the human to merge a PR that changes the app, the PO runs it against that PR's preview from a desktop and puts the numbers in the PR.
   3. Revisit this if GitHub's free runners gain graphics cards, or if TBT in CI rises well above the levels above.
 - **Consequences:** M3-06's acceptance criterion now reads "LCP passes in CI and TBT is reported there; both gates pass from a desktop against the preview". The PO's agent file includes the desktop check.
+- **Update (2026-10-07, ADR-0036):** CI no longer runs Lighthouse on PRs. Both gates are enforced only from a desktop, against each PR's preview, before a merge.
 
 ## ADR-0035 — Important places first on the opening map
 - **Date:** 2026-10-06 · **Status:** Accepted · **By:** the human, at mini checkpoint MC3 ("When the map first loads, the places that show up are 'Nicopolis', 'Troas', 'Perga' etc. Most Bible readers probably have never heard of these places before ... What'd actually be really helpful is if we can find a good way to show the more important places (like the ones addressed to from Paul's letters) when the map first loads ... Perhaps let's try to put as many important places in the smaller dots as we can and collapse the less important places into the bigger dots?"), and the PO (the importance order and how close places group)
@@ -286,3 +287,22 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   3. **Other places step back:** below zoom 6, places that aren't major are drawn as small, muted dots without labels, and nearby ones fold into muted count bubbles. They keep their tooltips, stay clickable, and stay in the keyboard list. From zoom 6, they look as they do now.
   4. **Label priority:** first the selected place, then major places in importance order (including the major areas Galatia and Crete), then empires, provinces and regions, then other places.
 - **Consequences:** Card M3-23 builds this (Frontend Engineer). Visual spec §2 and wireframe 01 change to match. The smoothness rules of ADR-0024 still apply.
+
+## ADR-0036 — Lean CI: fast checks and deploys in CI, the full browser suite run locally
+- **Date:** 2026-10-07 · **Status:** Accepted (PO decision; the human was away when asked, and confirms or changes it at CP3b) · **By:** the human ("let's reexamine what we actually need for CI if local tests are consistently passing") and the PO
+- **Context:**
+  - A PR's CI took about 17 minutes:
+    - the full Playwright suite (`verify:web:playwright`) took 10¼ minutes;
+    - everything else in the build took about 1½ minutes;
+    - deploying and checking the preview took about 4 minutes.
+  - The same suite runs locally before every push: each engineer runs it, and the PO runs it on the assembled stack.
+  - Of 24 app-workflow runs, 9 failed. Most failures came from outside our code: GitHub outages, the public VersaTiles server, Wikimedia rate limits (HTTP 429) and slow-runner timing. CI did find real problems too: an expired Cloudflare token, a missing permission, and a "Show fewer" jump that only appears on slow machines.
+  - `data.yml` repeated the app workflow's tests and validation.
+  - The image link check loaded all 275 images on every PR that touched media, which took about 35 minutes and ran into Wikimedia's rate limits when several PRs ran at once.
+- **Decision:**
+  1. **Every PR runs:** lint, type-check, unit tests, data validation, the data build and the web export; the preview deploy with its link comment; and the smoke and accessibility checks against the live preview. Pushes to `main` deploy production.
+  2. **Run locally, not in CI on every PR:** the full Playwright suite and Lighthouse. Engineers run them before every commit that changes the app. The PO runs them on the assembled stack, and runs the speed gate against each preview from a desktop (ADR-0034), before asking for a merge.
+  3. **Weekly on `main`** (and on demand): the full Playwright suite, so slow-machine timing bugs and outside changes still surface. GitHub emails the owner when a scheduled run fails.
+  4. **`data.yml` is removed**, since the app workflow covers it.
+  5. **Image links:** on a PR, only the images the PR adds or changes are checked; the full check stays weekly.
+- **Consequences:** Card M3-24 makes the change. ADR-0034's CI part (LCP enforced, TBT reported) is replaced by item 2. A PR's CI should take about 5 minutes.
