@@ -17,8 +17,6 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
   CLUSTER_MAX_ZOOM,
-  DEFAULT_MAP_CENTER,
-  DEFAULT_MAP_ZOOM,
   FALLBACK_BASEMAP_ATTRIBUTION,
   FALLBACK_BASEMAP_STYLE_URL,
   MAP_WORKER_URL,
@@ -26,6 +24,7 @@ import {
   MAX_MAP_ZOOM,
   MAIN_BASEMAP_STYLE_URL
 } from "./constants";
+import { openingAreaBounds, openingAreaFitOptions, resolveMapFitPadding } from "./map-camera";
 import {
   BasemapFallbackController,
   MainSourceLoadTimeoutController,
@@ -426,6 +425,7 @@ function fitBoundsForPlace(
   coordinates: Coordinates[],
   maxZoom: number,
   leftInset: number,
+  bottomInset: number,
   durationMs: number,
   reducedMotion = prefersReducedMotion()
 ) {
@@ -440,12 +440,13 @@ function fitBoundsForPlace(
   }
 
   map.fitBounds(bounds, {
-    padding: {
+    padding: resolveMapFitPadding({
+      leftInset,
+      bottomInset,
       top: focusPaddingTop,
-      right: 64,
-      bottom: 64,
-      left: leftInset + 64
-    },
+      side: 64,
+      bottom: 64
+    }),
     maxZoom,
     duration: reducedMotion ? 0 : durationMs
   });
@@ -456,6 +457,7 @@ function focusSelection(
   place: PlaceIndexRecord,
   selection: PlaceSelection,
   leftInset: number,
+  bottomInset: number,
   durationMs: number
 ) {
   const focusPlan = planSelectionFocus(place, selection);
@@ -464,7 +466,7 @@ function focusSelection(
   }
 
   if (focusPlan.kind === "fit-bounds") {
-    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, durationMs);
+    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, bottomInset, durationMs);
     return;
   }
 
@@ -473,23 +475,24 @@ function focusSelection(
     {
       center: focusPlan.coordinates,
       zoom: focusPlan.zoom,
-      padding: {
+      padding: resolveMapFitPadding({
+        leftInset,
+        bottomInset,
         top: focusPaddingTop,
-        right: 64,
-        bottom: 64,
-        left: leftInset + 64
-      }
+        side: 64,
+        bottom: 64
+      })
     },
     durationMs,
     prefersReducedMotion()
   );
 }
 
-function getMapLabelPadding(leftInset: number) {
+function getMapLabelPadding(leftInset: number, bottomInset: number) {
   return {
     top: mapLabelPaddingTop,
     right: mapLabelPaddingEdge,
-    bottom: mapLabelPaddingEdge,
+    bottom: bottomInset + mapLabelPaddingEdge,
     left: leftInset + mapLabelPaddingEdge
   };
 }
@@ -1922,6 +1925,8 @@ export function MapView({
   selection,
   highlightedPlaceId,
   leftPanelWidth,
+  bottomPanelInset,
+  isSmallScreen,
   onSelectPlace
 }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1946,6 +1951,10 @@ export function MapView({
   const tooltipTrackingEnabledRef = useRef(false);
   const tooltipMouseMoveFrameRef = useRef<number | null>(null);
   const pendingTooltipPointRef = useRef<PointLike | null>(null);
+  const openingOverviewAppliedRef = useRef(false);
+  const panelInsetRef = useRef(0);
+  const bottomInsetRef = useRef(0);
+  const selectionRef = useRef<PlaceSelection | null>(null);
   const majorPlaceByRankRef = useRef<Map<number, MajorPlaceReference>>(new Map());
   const majorClusterTooltipByEntryIdRef = useRef(new Map<string, string>());
   const activateVisibleEntryRef = useRef<(entry: VisibleListEntry) => void>(() => undefined);
@@ -1971,6 +1980,7 @@ export function MapView({
     []
   );
   const panelInset = Math.max(0, leftPanelWidth);
+  const bottomInset = Math.max(0, bottomPanelInset);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(
     () => buildPlaceRenderData(places, selection, highlightedPlaceId),
@@ -1989,6 +1999,18 @@ export function MapView({
   useEffect(() => {
     majorPlaceByRankRef.current = majorPlaceByRank;
   }, [majorPlaceByRank]);
+
+  useEffect(() => {
+    panelInsetRef.current = panelInset;
+  }, [panelInset]);
+
+  useEffect(() => {
+    bottomInsetRef.current = bottomInset;
+  }, [bottomInset]);
+
+  useEffect(() => {
+    selectionRef.current = selection;
+  }, [selection]);
 
   useEffect(() => {
     majorClusterTooltipByEntryIdRef.current.clear();
@@ -2435,8 +2457,8 @@ export function MapView({
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode),
-      center: DEFAULT_MAP_CENTER,
-      zoom: DEFAULT_MAP_ZOOM,
+      center: [22.5, 35],
+      zoom: 3.5,
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
@@ -2679,6 +2701,17 @@ export function MapView({
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
 
+      if (!openingOverviewAppliedRef.current && !selectionRef.current) {
+        map.fitBounds(
+          openingAreaBounds(),
+          openingAreaFitOptions({
+            insets: { left: panelInsetRef.current, bottom: bottomInsetRef.current },
+            durationMs: 0
+          })
+        );
+        openingOverviewAppliedRef.current = true;
+      }
+
       if (!cleanupAttributionRef.current) {
         cleanupAttributionRef.current = expandCompactAttributionOnFirstPaint(
           map,
@@ -2823,9 +2856,9 @@ export function MapView({
       return;
     }
 
-    map.setPadding(getMapLabelPadding(panelInset));
+    map.setPadding(getMapLabelPadding(panelInset, bottomInset));
     refreshVisibleEntryState();
-  }, [panelInset, refreshVisibleEntryState]);
+  }, [bottomInset, panelInset, refreshVisibleEntryState]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2834,7 +2867,7 @@ export function MapView({
       return;
     }
 
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}`;
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}`;
     if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
@@ -2845,8 +2878,16 @@ export function MapView({
     }
 
     previousFocusRequestRef.current = selectionKey;
-    focusSelection(map, place, selection, panelInset, runtimeTuning.flyToDurationMs);
+    focusSelection(
+      map,
+      place,
+      selection,
+      panelInset,
+      bottomInset,
+      runtimeTuning.flyToDurationMs
+    );
   }, [
+    bottomInset,
     mapReadyVersion,
     panelInset,
     placeById,
@@ -2860,17 +2901,14 @@ export function MapView({
       return;
     }
 
-    flyOrJump(map, {
-      center: DEFAULT_MAP_CENTER,
-      zoom: DEFAULT_MAP_ZOOM,
-      padding: {
-        top: focusPaddingTop,
-        right: 64,
-        bottom: 64,
-        left: panelInset + 64
-      }
-    }, runtimeTuning.flyToDurationMs);
-  }, [panelInset, runtimeTuning.flyToDurationMs]);
+    map.fitBounds(
+      openingAreaBounds(),
+      openingAreaFitOptions({
+        insets: { left: panelInset, bottom: bottomInset },
+        durationMs: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
+      })
+    );
+  }, [bottomInset, panelInset, runtimeTuning.flyToDurationMs]);
 
   const zoomIn = useCallback(() => {
     const map = mapRef.current;
@@ -2947,7 +2985,7 @@ export function MapView({
         style={{
           position: "absolute",
           left: `${getScaleControlLeftOffset(panelInset)}px`,
-          bottom: "16px",
+          bottom: `${bottomInset + 16}px`,
           backgroundColor: "#FFFFFF",
           border: "1px solid rgba(95,99,104,0.35)",
           borderRadius: "4px",
@@ -2977,58 +3015,62 @@ export function MapView({
           0 m
         </span>
       </div>
-      <button
-        aria-label="Zoom in"
-        data-map-control="zoom-in"
-        onClick={zoomIn}
-        style={{
-          position: "absolute",
-          right: "16px",
-          bottom: "248px",
-          width: "44px",
-          height: "44px",
-          borderRadius: "999px",
-          border: "1px solid #DADCE0",
-          backgroundColor: "#FFFFFF",
-          color: "#202124",
-          fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontSize: "22px",
-          lineHeight: 1,
-          boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
-          cursor: "pointer",
-          zIndex: 12
-        }}
-        title="Zoom in"
-        type="button"
-      >
-        +
-      </button>
-      <button
-        aria-label="Zoom out"
-        data-map-control="zoom-out"
-        onClick={zoomOut}
-        style={{
-          position: "absolute",
-          right: "16px",
-          bottom: "200px",
-          width: "44px",
-          height: "44px",
-          borderRadius: "999px",
-          border: "1px solid #DADCE0",
-          backgroundColor: "#FFFFFF",
-          color: "#202124",
-          fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontSize: "22px",
-          lineHeight: 1,
-          boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
-          cursor: "pointer",
-          zIndex: 12
-        }}
-        title="Zoom out"
-        type="button"
-      >
-        −
-      </button>
+      {!isSmallScreen ? (
+        <>
+          <button
+            aria-label="Zoom in"
+            data-map-control="zoom-in"
+            onClick={zoomIn}
+            style={{
+              position: "absolute",
+              right: "16px",
+              bottom: "248px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "999px",
+              border: "1px solid #DADCE0",
+              backgroundColor: "#FFFFFF",
+              color: "#202124",
+              fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              fontSize: "22px",
+              lineHeight: 1,
+              boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
+              cursor: "pointer",
+              zIndex: 12
+            }}
+            title="Zoom in"
+            type="button"
+          >
+            +
+          </button>
+          <button
+            aria-label="Zoom out"
+            data-map-control="zoom-out"
+            onClick={zoomOut}
+            style={{
+              position: "absolute",
+              right: "16px",
+              bottom: "200px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "999px",
+              border: "1px solid #DADCE0",
+              backgroundColor: "#FFFFFF",
+              color: "#202124",
+              fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              fontSize: "22px",
+              lineHeight: 1,
+              boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
+              cursor: "pointer",
+              zIndex: 12
+            }}
+            title="Zoom out"
+            type="button"
+          >
+            −
+          </button>
+        </>
+      ) : null}
       <button
         aria-label="Reset view"
         data-map-control="reset-view"
@@ -3036,7 +3078,7 @@ export function MapView({
         style={{
           position: "absolute",
           right: "16px",
-          bottom: "150px",
+          bottom: `${bottomInset + 16}px`,
           width: "44px",
           height: "44px",
           borderRadius: "999px",

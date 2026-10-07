@@ -7482,6 +7482,346 @@ async function runPanelOpenSmoothnessCheck({
   }
 }
 
+async function verifyPhoneBasics(browser, baseUrl) {
+  const requiredOpeningLabels = ["Rome", "Athens", "Ephesus", "Antioch", "Damascus", "Jerusalem"];
+  const viewports = [
+    { width: 390, height: 844 },
+    { width: 360, height: 800 }
+  ];
+  const results = [];
+
+  for (const viewport of viewports) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+
+    try {
+      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+      await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+        timeout: 30_000
+      });
+
+      const openingOverviewSnapshot = await page.evaluate(
+        ({ testHookKey, pinLabelLayerIds }) => {
+          const map = window[testHookKey];
+          if (!map) {
+            throw new Error("Map test hook is unavailable.");
+          }
+
+          const labels = Array.from(
+            new Set(
+              map
+                .queryRenderedFeatures(undefined, { layers: pinLabelLayerIds })
+                .map((feature) =>
+                  String(
+                    feature.properties?.clusterLabelText ??
+                      feature.properties?.labelText ??
+                      feature.properties?.placeName ??
+                      ""
+                  ).trim()
+                )
+                .filter((value) => value.length > 0)
+            )
+          );
+
+          const mapCenter = map.getCenter();
+          return {
+            labels,
+            zoom: Number(map.getZoom().toFixed(4)),
+            center: [Number(mapCenter.lng.toFixed(6)), Number(mapCenter.lat.toFixed(6))]
+          };
+        },
+        {
+          testHookKey: mapTestHookKey,
+          pinLabelLayerIds: mapLayerIds.pinLabels
+        }
+      );
+
+      for (const expectedLabel of requiredOpeningLabels) {
+        const found = openingOverviewSnapshot.labels.some((label) => label.includes(expectedLabel));
+        if (!found) {
+          throw new Error(
+            `Phone opening view ${viewport.width}x${viewport.height} is missing '${expectedLabel}' in labels ${JSON.stringify(openingOverviewSnapshot.labels)}.`
+          );
+        }
+      }
+
+      const searchLayoutSnapshot = await page.evaluate(() => {
+        const searchShell = document.querySelector("[data-map-search-shell='true']");
+        const menuButton = document.querySelector("button[aria-label='Open app menu']");
+        const toBounds = (element) => {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+          const { left, top, right, bottom, width, height } = element.getBoundingClientRect();
+          return { left, top, right, bottom, width, height };
+        };
+
+        return {
+          viewportWidth: window.innerWidth,
+          searchShellBounds: toBounds(searchShell),
+          menuButtonBounds: toBounds(menuButton)
+        };
+      });
+
+      if (!searchLayoutSnapshot.searchShellBounds) {
+        throw new Error(`Phone search shell missing at ${viewport.width}x${viewport.height}.`);
+      }
+      if (Math.abs(searchLayoutSnapshot.searchShellBounds.left - 16) > 1.5) {
+        throw new Error(
+          `Phone search shell should keep 16px left margin at ${viewport.width}x${viewport.height}, got ${searchLayoutSnapshot.searchShellBounds.left.toFixed(2)}.`
+        );
+      }
+      if (
+        Math.abs(searchLayoutSnapshot.viewportWidth - searchLayoutSnapshot.searchShellBounds.right - 16) >
+        1.5
+      ) {
+        throw new Error(
+          `Phone search shell should keep 16px right margin at ${viewport.width}x${viewport.height}, got right edge ${searchLayoutSnapshot.searchShellBounds.right.toFixed(2)} for viewport ${searchLayoutSnapshot.viewportWidth}.`
+        );
+      }
+
+      await page.getByLabel("Search biblical places").fill("Antioch");
+      const searchResults = page.locator("[data-testid='search-results-list']");
+      await searchResults.waitFor({ state: "visible", timeout: 30_000 });
+
+      const searchResultsBounds = await searchResults.boundingBox();
+      if (!searchResultsBounds) {
+        throw new Error(`Phone search results bounds missing at ${viewport.width}x${viewport.height}.`);
+      }
+      if (searchResultsBounds.left < 15 || searchResultsBounds.right > viewport.width - 15) {
+        throw new Error(
+          `Phone search results overflow viewport at ${viewport.width}x${viewport.height}: ${JSON.stringify(searchResultsBounds)}.`
+        );
+      }
+
+      await page.getByRole("button", { name: "Open app menu" }).click();
+      const menuDrawer = page.locator("[data-testid='app-menu-drawer']");
+      await menuDrawer.waitFor({ state: "visible", timeout: 30_000 });
+      const menuDrawerBounds = await menuDrawer.boundingBox();
+      if (!menuDrawerBounds) {
+        throw new Error(`Phone menu drawer bounds missing at ${viewport.width}x${viewport.height}.`);
+      }
+      if (menuDrawerBounds.left < 15 || menuDrawerBounds.right > viewport.width - 15) {
+        throw new Error(
+          `Phone menu drawer overflow at ${viewport.width}x${viewport.height}: ${JSON.stringify(menuDrawerBounds)}.`
+        );
+      }
+
+      await page.getByRole("button", { name: "Close app menu" }).click();
+      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+      await page.waitForSelector("section[aria-label='Place details']", {
+        state: "visible",
+        timeout: 45_000
+      });
+
+      const readSheetSnapshot = async () =>
+        page.evaluate(
+          ({ testHookKey, selectedLayerIds }) => {
+            const panel = document.querySelector("section[aria-label='Place details']");
+            const handle = panel?.querySelector("button[aria-label$='place details panel']");
+            const closeButton = panel?.querySelector("button[aria-label='Close place panel']");
+            const resetView = document.querySelector("button[data-map-control='reset-view']");
+            if (!(panel instanceof HTMLElement)) {
+              throw new Error("Phone panel is not visible.");
+            }
+
+            const toBounds = (element) => {
+              if (!(element instanceof HTMLElement)) {
+                return null;
+              }
+              const { left, top, right, bottom, width, height } = element.getBoundingClientRect();
+              return { left, top, right, bottom, width, height };
+            };
+
+            const panelBounds = toBounds(panel);
+            const handleBounds = toBounds(handle);
+            const closeBounds = toBounds(closeButton);
+            const resetBounds = toBounds(resetView);
+
+            const map = window[testHookKey];
+            if (!map) {
+              throw new Error("Map test hook is unavailable.");
+            }
+
+            const selectedFeatures = map
+              .queryRenderedFeatures(undefined, { layers: selectedLayerIds })
+              .filter(
+                (feature) =>
+                  feature.properties?.isSelectedPlace === true ||
+                  feature.properties?.isSelectedPlace === "true"
+              );
+            const selectedPoint = selectedFeatures.find((feature) => feature.geometry?.type === "Point");
+            if (!selectedPoint) {
+              throw new Error("Selected place feature is not visible on map.");
+            }
+
+            const [longitude, latitude] = selectedPoint.geometry.coordinates;
+            const projected = map.project([longitude, latitude]);
+            const centerBefore = map.getCenter();
+
+            return {
+              panelBounds,
+              handleBounds,
+              closeBounds,
+              resetBounds,
+              selectedPointPx: { x: projected.x, y: projected.y },
+              mapCenter: [centerBefore.lng, centerBefore.lat]
+            };
+          },
+          {
+            testHookKey: mapTestHookKey,
+            selectedLayerIds: [
+              mapLayerIds.majorPins,
+              mapLayerIds.cityPins,
+              mapLayerIds.sitePins,
+              mapLayerIds.candidatePins
+            ]
+          }
+        );
+
+      const collapsedSheet = await readSheetSnapshot();
+      if (!collapsedSheet.panelBounds || !collapsedSheet.handleBounds || !collapsedSheet.closeBounds) {
+        throw new Error(`Phone panel controls missing at ${viewport.width}x${viewport.height}.`);
+      }
+
+      const collapsedRatio = collapsedSheet.panelBounds.height / viewport.height;
+      if (collapsedRatio < 0.33 || collapsedRatio > 0.5) {
+        throw new Error(
+          `Phone sheet should open near 40% height at ${viewport.width}x${viewport.height}, got ${(collapsedRatio * 100).toFixed(1)}%.`
+        );
+      }
+      assertMinimumHitArea(
+        collapsedSheet.handleBounds,
+        "bottom-sheet handle",
+        `phone ${viewport.width}x${viewport.height}`
+      );
+      assertMinimumHitArea(
+        collapsedSheet.closeBounds,
+        "bottom-sheet close button",
+        `phone ${viewport.width}x${viewport.height}`
+      );
+      assertMinimumHitArea(
+        collapsedSheet.resetBounds,
+        "reset view button",
+        `phone ${viewport.width}x${viewport.height}`
+      );
+
+      if (collapsedSheet.selectedPointPx.y >= collapsedSheet.panelBounds.top - 8) {
+        throw new Error(
+          `Selected place should stay above collapsed sheet at ${viewport.width}x${viewport.height}. panelTop=${collapsedSheet.panelBounds.top.toFixed(2)} pointY=${collapsedSheet.selectedPointPx.y.toFixed(2)}`
+        );
+      }
+
+      const handleButton = page.locator("section[aria-label='Place details'] button[aria-label$='place details panel']");
+      await handleButton.click();
+      await page.waitForTimeout(350);
+      const expandedSheetAfterTap = await readSheetSnapshot();
+      if (
+        !expandedSheetAfterTap.panelBounds ||
+        expandedSheetAfterTap.panelBounds.height <= collapsedSheet.panelBounds.height + 40
+      ) {
+        throw new Error(
+          `Phone sheet tap should expand panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await handleButton.click();
+      await page.waitForTimeout(350);
+      const collapsedAfterTap = await readSheetSnapshot();
+      if (
+        !collapsedAfterTap.panelBounds ||
+        collapsedAfterTap.panelBounds.height >= expandedSheetAfterTap.panelBounds.height - 40
+      ) {
+        throw new Error(
+          `Phone sheet tap should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      const handleDragBox = await handleButton.boundingBox();
+      if (!handleDragBox) {
+        throw new Error(`Phone handle bounds missing for drag at ${viewport.width}x${viewport.height}.`);
+      }
+
+      const dragStartX = handleDragBox.x + handleDragBox.width / 2;
+      const dragStartY = handleDragBox.y + handleDragBox.height / 2;
+      await page.mouse.move(dragStartX, dragStartY);
+      await page.mouse.down();
+      await page.mouse.move(dragStartX, Math.max(20, dragStartY - 180), { steps: 10 });
+      await page.mouse.up();
+      await page.waitForTimeout(350);
+      const expandedAfterDrag = await readSheetSnapshot();
+      if (
+        !expandedAfterDrag.panelBounds ||
+        expandedAfterDrag.panelBounds.height <= collapsedAfterTap.panelBounds.height + 40
+      ) {
+        throw new Error(
+          `Phone sheet drag-up should expand panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      const mapCenterBeforeDrag = expandedAfterDrag.mapCenter;
+      const mapDragStartY = Math.max(80, expandedAfterDrag.panelBounds.top - 70);
+      await page.mouse.move(Math.round(viewport.width / 2), mapDragStartY);
+      await page.mouse.down();
+      await page.mouse.move(Math.round(viewport.width / 2) + 90, mapDragStartY + 20, { steps: 10 });
+      await page.mouse.up();
+      await page.waitForTimeout(250);
+      const mapCenterAfterDrag = await page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        const center = map.getCenter();
+        return [center.lng, center.lat];
+      }, mapTestHookKey);
+      const centerDelta =
+        Math.abs(mapCenterAfterDrag[0] - mapCenterBeforeDrag[0]) +
+        Math.abs(mapCenterAfterDrag[1] - mapCenterBeforeDrag[1]);
+      if (centerDelta < 0.01) {
+        throw new Error(
+          `Map should still drag above sheet at ${viewport.width}x${viewport.height}; observed center delta ${centerDelta.toFixed(5)}.`
+        );
+      }
+
+      await page.mouse.move(dragStartX, Math.max(20, dragStartY - 180));
+      await page.mouse.down();
+      await page.mouse.move(dragStartX, dragStartY + 200, { steps: 10 });
+      await page.mouse.up();
+      await page.waitForTimeout(350);
+      const collapsedAfterDrag = await readSheetSnapshot();
+      if (
+        !collapsedAfterDrag.panelBounds ||
+        collapsedAfterDrag.panelBounds.height >= expandedAfterDrag.panelBounds.height - 40
+      ) {
+        throw new Error(
+          `Phone sheet drag-down should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      if (collapsedAfterDrag.selectedPointPx.y >= collapsedAfterDrag.panelBounds.top - 8) {
+        throw new Error(
+          `Selected place should stay above sheet after drag interactions at ${viewport.width}x${viewport.height}. panelTop=${collapsedAfterDrag.panelBounds.top.toFixed(2)} pointY=${collapsedAfterDrag.selectedPointPx.y.toFixed(2)}`
+        );
+      }
+
+      results.push({
+        viewport,
+        openingOverviewSnapshot,
+        collapsedHeightRatio: collapsedRatio,
+        searchResultsBounds,
+        menuDrawerBounds
+      });
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  }
+
+  return results;
+}
+
 async function run() {
   const staticServer = await startStaticServer(distDirectory);
   const browser = await chromium.launch({ headless: true });
@@ -7688,6 +8028,7 @@ async function run() {
       screenshotPaths.creditsDrawer,
       expectedDrawerText
     );
+    const phoneBasicsChecks = await verifyPhoneBasics(browser, staticServer.baseUrl);
     const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
       page,
       staticServer.baseUrl
@@ -7819,6 +8160,7 @@ async function run() {
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
       searchAndMenuChecks,
+      phoneBasicsChecks,
       keyboardDisclosureChecks,
       placeDetailsRaceCheck,
       galileePinOverlap,

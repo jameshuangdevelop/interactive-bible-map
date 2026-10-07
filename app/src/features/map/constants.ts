@@ -10,8 +10,10 @@ export const MAIN_BASEMAP_ATTRIBUTION =
 export const FALLBACK_BASEMAP_ATTRIBUTION =
   '<a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)';
 
-export const DEFAULT_MAP_CENTER: Coordinates = [22.5, 35];
-export const DEFAULT_MAP_ZOOM = 4.7;
+export const OPENING_AREA_BOUNDS: readonly [Coordinates, Coordinates] = [
+  [3.0229106482542534, 24.45351319358689],
+  [41.97708935174575, 44.345035689593246]
+];
 export const MAX_MAP_ZOOM = 14;
 
 export const CLUSTER_MAX_ZOOM = 6;

@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type Dispatch,
   type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
   type SetStateAction,
   type ReactNode,
   type RefObject
@@ -167,6 +168,7 @@ interface PlacePanelProps {
   isSmallScreen: boolean;
   isSmallScreenExpanded: boolean;
   onToggleSmallScreenExpanded: () => void;
+  onSmallScreenHandlePointerDown: (event: ReactPointerEvent<HTMLButtonElement>) => void;
   onClose: () => void;
   onSelectPlace: (selection: PlaceSelection) => void;
   onSelectPlaceFromAbout: (selection: PlaceSelection) => void;
@@ -1007,6 +1009,7 @@ export function PlacePanel({
   isSmallScreen,
   isSmallScreenExpanded,
   onToggleSmallScreenExpanded,
+  onSmallScreenHandlePointerDown,
   onClose,
   onSelectPlace,
   onSelectPlaceFromAbout,
@@ -1616,18 +1619,31 @@ export function PlacePanel({
               aria-label={
                 isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
               }
+              onPointerDown={onSmallScreenHandlePointerDown}
               onClick={onToggleSmallScreenExpanded}
               style={{
                 width: "44px",
-                height: "6px",
-                borderRadius: "999px",
+                height: "44px",
                 border: "none",
-                backgroundColor: tokens.color.divider,
+                borderRadius: "999px",
+                backgroundColor: "transparent",
                 cursor: "pointer",
                 alignSelf: "center"
               }}
               type="button"
-            />
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "block",
+                  width: "36px",
+                  height: "6px",
+                  margin: "0 auto",
+                  borderRadius: "999px",
+                  backgroundColor: tokens.color.divider
+                }}
+              />
+            </button>
           ) : (
             <span />
           )}
@@ -1680,17 +1696,30 @@ export function PlacePanel({
             aria-label={
               isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
             }
+            onPointerDown={onSmallScreenHandlePointerDown}
             onClick={onToggleSmallScreenExpanded}
             style={{
               width: "44px",
-              height: "6px",
-              borderRadius: "999px",
+              height: "44px",
               border: "none",
-              backgroundColor: tokens.color.divider,
+              borderRadius: "999px",
+              backgroundColor: "transparent",
               cursor: "pointer"
             }}
             type="button"
-          />
+          >
+            <span
+              aria-hidden="true"
+              style={{
+                display: "block",
+                width: "36px",
+                height: "6px",
+                margin: "0 auto",
+                borderRadius: "999px",
+                backgroundColor: tokens.color.divider
+              }}
+            />
+          </button>
         ) : (
           <span />
         )}
@@ -1906,7 +1935,8 @@ export function PlacePanel({
                         style={{
                           border: "none",
                           background: "transparent",
-                          padding: 0,
+                          padding: "0 4px",
+                          minHeight: "44px",
                           cursor: "pointer",
                           color: tokens.color.accent,
                           fontSize: `${tokens.typography.captionSize}px`,
@@ -2118,7 +2148,7 @@ export function PlacePanel({
                       data-show-all-passages="true"
                       onClick={toggleShowAllScripture}
                       ref={showAllScriptureToggleRef}
-                      style={textActionStyle}
+                      style={showAllControlStyle}
                       type="button"
                     >
                       {showAllScripture
@@ -2449,9 +2479,9 @@ export function PlacePanel({
 }
 
 const closeButtonStyle: CSSProperties = {
-  width: "32px",
-  height: "32px",
-  borderRadius: "16px",
+  width: "44px",
+  height: "44px",
+  borderRadius: "999px",
   border: `1px solid ${tokens.color.divider}`,
   backgroundColor: tokens.color.surface,
   cursor: "pointer",
@@ -2622,4 +2652,10 @@ const aboutPlaceLinkStyle: CSSProperties = {
   fontFamily: "inherit",
   fontSize: "inherit",
   lineHeight: "inherit"
+};
+
+const showAllControlStyle: CSSProperties = {
+  ...textActionStyle,
+  minHeight: "44px",
+  padding: "0 4px"
 };
