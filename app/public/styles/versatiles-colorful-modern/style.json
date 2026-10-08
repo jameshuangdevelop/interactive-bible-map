@@ -3,7 +3,7 @@
   "name": "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)",
   "metadata": {
     "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels and state names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
+    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
   },
   "glyphs": "https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf",
   "sprite": [
@@ -15964,12 +15964,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "neighbourhood"
         ],
-        "neighbourhood"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16038,12 +16057,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "quarter"
         ],
-        "quarter"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16112,12 +16150,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "suburb"
         ],
-        "suburb"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16198,12 +16255,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "hamlet"
         ],
-        "hamlet"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16284,12 +16360,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "village"
         ],
-        "village"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16369,12 +16464,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "town"
         ],
-        "town"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16454,12 +16568,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "city"
         ],
-        "city"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16539,12 +16672,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "state_capital"
         ],
-        "state_capital"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16624,12 +16776,31 @@
       "type": "symbol",
       "source-layer": "place_labels",
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "kind"
+          "==",
+          [
+            "get",
+            "kind"
+          ],
+          "capital"
         ],
-        "capital"
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "kind"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -16965,7 +17136,7 @@
       "source": "versatiles-shortbread"
     },
     {
-      "id": "ibm-modern-neutral-boundary",
+      "id": "ibm-modern-neutral-boundary-fallback",
       "type": "line",
       "source": "ibm-modern-neutral-boundaries",
       "layout": {},

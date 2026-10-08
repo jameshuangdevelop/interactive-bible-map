@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
@@ -428,8 +428,17 @@ function assertLibertyModernLabels(style) {
   }
 }
 
-function assertNoStateOrProvincePlaceClassLayers(style, styleName) {
-  for (const layer of style.layers) {
+async function assertNoStateOrProvinceLabelsAcrossZooms(style, styleName) {
+  const maplibreStyleSpecPath = path.join(
+    repositoryRoot,
+    "node_modules",
+    "@maplibre",
+    "maplibre-gl-style-spec",
+    "dist",
+    "index.mjs"
+  );
+  const { featureFilter } = await import(pathToFileURL(maplibreStyleSpecPath).href);
+  for (const [layerIndex, layer] of style.layers.entries()) {
     if (layer.type !== "symbol") {
       continue;
     }
@@ -437,17 +446,27 @@ function assertNoStateOrProvincePlaceClassLayers(style, styleName) {
     if (sourceLayer !== "place" && sourceLayer !== "place_labels") {
       continue;
     }
-    const filterText = JSON.stringify(layer.filter ?? []);
-    assert.equal(
-      filterText.includes('"state"'),
-      false,
-      `${styleName} layer '${layer.id}' must not target place class/kind 'state'`
-    );
-    assert.equal(
-      filterText.includes('"province"'),
-      false,
-      `${styleName} layer '${layer.id}' must not target place class/kind 'province'`
-    );
+    assert.ok(layer.filter, `${styleName} layer '${layer.id}' must define a filter`);
+    const compiledFilter = featureFilter(layer.filter, `layers[${layerIndex}].filter`, {});
+    for (let zoom = 0; zoom <= 14; zoom += 1) {
+      for (const contestedClass of ["state", "province"]) {
+        const passesFilter = compiledFilter.filter(
+          { zoom },
+          {
+            type: 1,
+            properties: { class: contestedClass, kind: contestedClass },
+            geometry: [[{ x: 0, y: 0 }]],
+            id: 1
+          },
+          { z: zoom, x: 0, y: 0 }
+        );
+        assert.equal(
+          passesFilter,
+          false,
+          `${styleName} layer '${layer.id}' must reject ${contestedClass} labels at zoom ${zoom}`
+        );
+      }
+    }
   }
 }
 
@@ -845,7 +864,7 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   );
   assert.equal(
     style.metadata["interactive-bible-map:notice"],
-    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels and state names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
@@ -863,7 +882,7 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   assertVersaTilesModernNameFields(style);
   assertOnlyCountryBoundaryLayers(style, "VersaTiles modern");
   const neutralBoundaryLayer = style.layers.find(
-    (layer) => layer.id === "ibm-modern-neutral-boundary"
+    (layer) => layer.id === "ibm-modern-neutral-boundary-fallback"
   );
   assert.ok(neutralBoundaryLayer, "VersaTiles modern must include Natural Earth boundary layer");
   assert.equal(
@@ -881,6 +900,15 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
     undefined,
     "VersaTiles modern boundary layer must render at all zoom levels"
   );
+  for (const zoom of [4, 6, 10]) {
+    const minZoom = neutralBoundaryLayer.minzoom ?? 0;
+    const maxZoom = neutralBoundaryLayer.maxzoom ?? Number.POSITIVE_INFINITY;
+    assert.equal(
+      zoom >= minZoom && zoom < maxZoom,
+      true,
+      `VersaTiles modern fallback boundary layer must render at zoom ${zoom}`
+    );
+  }
   assertMaxZoom14(style, "VersaTiles modern");
 });
 
@@ -898,8 +926,8 @@ test("Modern styles do not allow non-English or local-script name fallbacks in s
     "VersaTiles modern",
     new Set(["name_en"])
   );
-  assertNoStateOrProvincePlaceClassLayers(libertyStyle, "Liberty modern");
-  assertNoStateOrProvincePlaceClassLayers(versaTilesStyle, "VersaTiles modern");
+  await assertNoStateOrProvinceLabelsAcrossZooms(libertyStyle, "Liberty modern");
+  await assertNoStateOrProvinceLabelsAcrossZooms(versaTilesStyle, "VersaTiles modern");
 });
 
 test("Modern shared Natural Earth boundaries keep mask areas line-free", async () => {

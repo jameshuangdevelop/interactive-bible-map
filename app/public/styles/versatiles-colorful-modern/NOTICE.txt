@@ -7,7 +7,7 @@ Fallback policy: use this style only when the primary OpenFreeMap Liberty modern
 
 Modifications in this copy:
 - Modern-map treatment: labels in English only (name_en)
-- Remove points of interest, airport labels and state names
+- Remove points of interest, airport labels, and state and province names
 - Remove the tiles' boundary lines, including maritime boundaries
 - Draw the country borders at every zoom from Natural Earth's boundary lines (public domain), simplified
 - No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places.

@@ -4085,36 +4085,6 @@
                 "coordinates": [
                   [
                     [
-                      32.43,
-                      44.33
-                    ],
-                    [
-                      36.69,
-                      44.33
-                    ],
-                    [
-                      36.69,
-                      46.27
-                    ],
-                    [
-                      32.43,
-                      46.27
-                    ],
-                    [
-                      32.43,
-                      44.33
-                    ]
-                  ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
                       19.97,
                       41.79
                     ],
@@ -4175,24 +4145,24 @@
                 "coordinates": [
                   [
                     [
-                      39.93,
-                      42.35
+                      44.98,
+                      40.99
                     ],
                     [
-                      42.21,
-                      42.35
+                      45.04,
+                      40.99
                     ],
                     [
-                      42.21,
-                      43.63
+                      45.04,
+                      41.1
                     ],
                     [
-                      39.93,
-                      43.63
+                      44.98,
+                      41.1
                     ],
                     [
-                      39.93,
-                      42.35
+                      44.98,
+                      40.99
                     ]
                   ]
                 ]
@@ -4205,24 +4175,24 @@
                 "coordinates": [
                   [
                     [
-                      43.5,
-                      41.93
+                      44.93,
+                      39.75
                     ],
                     [
-                      44.71,
-                      41.93
+                      44.99,
+                      39.75
                     ],
                     [
-                      44.71,
-                      42.81
+                      44.99,
+                      39.83
                     ],
                     [
-                      43.5,
-                      42.81
+                      44.93,
+                      39.83
                     ],
                     [
-                      43.5,
-                      41.93
+                      44.93,
+                      39.75
                     ]
                   ]
                 ]
@@ -4235,54 +4205,24 @@
                 "coordinates": [
                   [
                     [
-                      28.45,
-                      46.5
+                      45.17,
+                      40.95
                     ],
                     [
-                      30.01,
-                      46.5
+                      45.23,
+                      40.95
                     ],
                     [
-                      30.01,
-                      48.21
+                      45.23,
+                      41.03
                     ],
                     [
-                      28.45,
-                      48.21
+                      45.17,
+                      41.03
                     ],
                     [
-                      28.45,
-                      46.5
-                    ]
-                  ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      46.24,
-                      39.48
-                    ],
-                    [
-                      47.26,
-                      39.48
-                    ],
-                    [
-                      47.26,
-                      40.47
-                    ],
-                    [
-                      46.24,
-                      40.47
-                    ],
-                    [
-                      46.24,
-                      39.48
+                      45.17,
+                      40.95
                     ]
                   ]
                 ]
@@ -5254,20 +5194,40 @@
       "source-layer": "place",
       "minzoom": 8,
       "filter": [
-        "match",
+        "all",
         [
-          "get",
-          "class"
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "city",
+            "continent",
+            "country",
+            "state",
+            "town",
+            "village"
+          ],
+          false,
+          true
         ],
         [
-          "city",
-          "continent",
-          "country",
-          "town",
-          "village"
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
         ],
-        false,
-        true
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -5330,12 +5290,31 @@
       "source-layer": "place",
       "minzoom": 9,
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "class"
+          "==",
+          [
+            "get",
+            "class"
+          ],
+          "village"
         ],
-        "village"
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "icon-allow-overlap": true,
@@ -5410,12 +5389,31 @@
       "source-layer": "place",
       "minzoom": 6,
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "class"
+          "==",
+          [
+            "get",
+            "class"
+          ],
+          "town"
         ],
-        "town"
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "icon-allow-overlap": true,
@@ -5506,6 +5504,22 @@
             "capital"
           ],
           2
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5603,6 +5617,22 @@
             "capital"
           ],
           2
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5701,6 +5731,22 @@
             "rank"
           ],
           3
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5778,6 +5824,22 @@
             "rank"
           ],
           2
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5855,6 +5917,22 @@
             "rank"
           ],
           1
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {

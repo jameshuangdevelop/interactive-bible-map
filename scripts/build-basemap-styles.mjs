@@ -57,7 +57,7 @@ const libertyModernMetadataLicense = `Modified by Interactive Bible Map from Ope
 
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
-const versaTilesModernMetadataNotice = `Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels and state names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. ${modernNoBorderLineStatement} Max zoom set to 14.`;
+const versaTilesModernMetadataNotice = `Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. ${modernNoBorderLineStatement} Max zoom set to 14.`;
 
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
@@ -84,7 +84,7 @@ Fallback policy: use this style only when the primary OpenFreeMap Liberty modern
 
 Modifications in this copy:
 - Modern-map treatment: labels in English only (name_en)
-- Remove points of interest, airport labels and state names
+- Remove points of interest, airport labels, and state and province names
 - Remove the tiles' boundary lines, including maritime boundaries
 - Draw the country borders at every zoom from Natural Earth's boundary lines (public domain), simplified
 - ${modernNoBorderLineStatement}
@@ -148,20 +148,18 @@ const versaTilesDisputedBoundaryLayerId = "boundary-country-disputed";
 const libertyPoiLayerIdPattern = /^poi_/u;
 const modernNeutralBoundarySourceId = "ibm-modern-neutral-boundaries";
 const libertyModernNeutralBoundaryLayerId = "ibm-modern-neutral-boundary";
-const versaTilesModernNeutralBoundaryLayerId = "ibm-modern-neutral-boundary";
+const versaTilesModernNeutralBoundaryLayerId = "ibm-modern-neutral-boundary-fallback";
 const modernNeutralBoundaryGeoJsonRelativeUrl = "/styles/shared/modern-neutral-boundaries.geojson";
 const simplifiedBoundaryToleranceDegrees = 0.25;
 const lineClipBufferDegrees = 0.05;
 const libertyContestedMaskRectangles = [
   [34.05, 29.35, 36.30, 33.65], // Israel, West Bank, Gaza, Golan
   [32.53, 34.93, 34.65, 35.75], // Northern Cyprus and UN buffer area
-  [32.43, 44.33, 36.69, 46.27], // Crimea
   [19.97, 41.79, 21.83, 43.32], // Kosovo
   [-17.16, 20.71, -8.63, 27.72], // Western Sahara
-  [39.93, 42.35, 42.21, 43.63], // Abkhazia
-  [43.50, 41.93, 44.71, 42.81], // South Ossetia
-  [28.45, 46.50, 30.01, 48.21], // Transnistria
-  [46.24, 39.48, 47.26, 40.47] // Nagorno-Karabakh
+  [44.98, 40.99, 45.04, 41.10], // Armenian-exclave cluster (north)
+  [44.93, 39.75, 44.99, 39.83], // Armenian-exclave cluster (southwest)
+  [45.17, 40.95, 45.23, 41.03] // Armenian-exclave cluster (east)
 ].map(([minLng, minLat, maxLng, maxLat]) => ({
   type: "Polygon",
   coordinates: [[
@@ -182,13 +180,8 @@ const neutralMaskRegionDefinitions = [
     id: "northern-cyprus",
     disputedAreas: ["Turkish Republic of Northern Cyprus", "United Nations Buffer Zone in Cyprus"]
   },
-  { id: "crimea", disputedAreas: ["Crimean Peninsula"] },
   { id: "kosovo", disputedAreas: ["Kosovo"] },
-  { id: "western-sahara", disputedAreas: ["Western Sahara"] },
-  { id: "abkhazia", disputedAreas: ["Abkhazia"] },
-  { id: "south-ossetia", disputedAreas: ["South Ossetia"] },
-  { id: "transnistria", disputedAreas: ["Transnistria"] },
-  { id: "nagorno-karabakh", disputedAreas: ["Nagorno-Karabakh"] }
+  { id: "western-sahara", disputedAreas: ["Western Sahara"] }
 ];
 const hiddenBoundaryAdm0Pairs = [
   ["ISR", "PSE"], // Israel and the Palestinian territories
@@ -202,6 +195,17 @@ const hiddenBoundaryNeIdsByPair = new Map([
   ["ARM|AZE", new Set([1746705689, 1746705697])],
   ["GEO|RUS", new Set([1746705547])]
 ]);
+const neOnlyExclaveMaskRectangles = [
+  [44.98, 40.99, 45.04, 41.10],
+  [44.93, 39.75, 44.99, 39.83],
+  [45.17, 40.95, 45.23, 41.03]
+].map(([minLng, minLat, maxLng, maxLat]) => [[
+  [minLng, minLat],
+  [maxLng, minLat],
+  [maxLng, maxLat],
+  [minLng, maxLat],
+  [minLng, minLat]
+]]);
 
 function modernEnglishLabelExpression(preferredFields) {
   const expression = ["coalesce"];
@@ -732,29 +736,17 @@ function removeLibertyModernExcludedLayers(style) {
   });
 }
 
-function removeStateOrProvincePlaceClassesFromLayerFilter(filterExpression) {
-  if (
-    !Array.isArray(filterExpression) ||
-    filterExpression.length < 3 ||
-    filterExpression[0] !== "match" ||
-    !Array.isArray(filterExpression[1]) ||
-    filterExpression[1][0] !== "get" ||
-    filterExpression[1][1] !== "class" ||
-    !Array.isArray(filterExpression[2])
-  ) {
-    return filterExpression;
+function appendClassExclusions(existingFilter, fieldName, disallowedValues) {
+  const exclusions = disallowedValues.map((value) => ["!=", ["get", fieldName], value]);
+  if (!existingFilter) {
+    return ["all", ...exclusions];
   }
 
-  const remainingClasses = filterExpression[2].filter(
-    (value) => value !== "state" && value !== "province"
-  );
-  return [
-    filterExpression[0],
-    filterExpression[1],
-    remainingClasses,
-    filterExpression[3],
-    filterExpression[4]
-  ];
+  if (Array.isArray(existingFilter) && existingFilter[0] === "all") {
+    return [...existingFilter, ...exclusions];
+  }
+
+  return ["all", existingFilter, ...exclusions];
 }
 
 function updateLibertyModernLabelFields(style) {
@@ -775,8 +767,8 @@ function updateLibertyModernLabelFields(style) {
       continue;
     }
 
-    if (layer.id === "label_other") {
-      layer.filter = removeStateOrProvincePlaceClassesFromLayerFilter(layer.filter);
+    if (layer["source-layer"] === "place") {
+      layer.filter = appendClassExclusions(layer.filter, "class", ["state", "province"]);
     }
 
     if (expressionContainsGetField(layer.layout["text-field"], replaceFieldNames)) {
@@ -842,6 +834,10 @@ function updateVersaTilesModernLabelFields(style) {
   for (const layer of style.layers) {
     if (!layer.layout || !("text-field" in layer.layout)) {
       continue;
+    }
+
+    if (layer["source-layer"] === "place_labels") {
+      layer.filter = appendClassExclusions(layer.filter, "kind", ["state", "province"]);
     }
 
     layer.layout["text-field"] = replaceLabelFieldExpression(
@@ -1166,12 +1162,16 @@ async function buildStyles() {
     neutralMaskPolygonCoordinates,
     lineClipBufferDegrees
   );
+  const allNeutralMaskPolygonCoordinates = [
+    ...bufferedMaskPolygonCoordinates,
+    ...neOnlyExclaveMaskRectangles
+  ];
   const neutralBoundaryGeoJson = createNeutralBoundaryGeoJson(
     naturalEarthBoundaryGeoJson,
-    bufferedMaskPolygonCoordinates,
+    allNeutralMaskPolygonCoordinates,
     simplifiedBoundaryToleranceDegrees
   );
-  if (!ensureNoNeutralBoundaryVerticesInsideMasks(neutralBoundaryGeoJson, bufferedMaskPolygonCoordinates)) {
+  if (!ensureNoNeutralBoundaryVerticesInsideMasks(neutralBoundaryGeoJson, allNeutralMaskPolygonCoordinates)) {
     throw new Error("Neutral boundary output still contains vertices inside a contested-area mask.");
   }
 
@@ -1219,7 +1219,7 @@ async function buildStyles() {
   );
 
   await fs.mkdir(sharedStylesOutputDirectory, { recursive: true });
-  const neutralMaskGeoJson = createMaskFeatureCollection(bufferedMaskPolygonCoordinates);
+  const neutralMaskGeoJson = createMaskFeatureCollection(allNeutralMaskPolygonCoordinates);
   await fs.writeFile(
     path.join(sharedStylesOutputDirectory, "modern-neutral-boundary-masks.geojson"),
     `${JSON.stringify(neutralMaskGeoJson)}\n`,
