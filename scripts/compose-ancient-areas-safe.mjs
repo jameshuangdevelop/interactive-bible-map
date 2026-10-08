@@ -19,6 +19,9 @@ const outputAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.
 const AWMC_COMMIT = "7ecf8bccea2efe1e1e9df2daf6001942de73fb87";
 
 const AREA_ORDER = [
+  "judea-samaria-idumea",
+  "galilee-perea",
+  "philip-tetrarchy-lands",
   "arabia",
   "syria",
   "cilicia",
@@ -68,10 +71,11 @@ const SOURCE_BY_AREA = {
   illyricum: ["awmc:roman-empire-ad-69-provinces"]
   ,thrace: ["awmc:roman-empire-ad-69-provinces"],
   "arabia-difference": ["awmc:roman-empire-ad-200-extent"],
+  "arabia-union": ["bib:livius-nabataeans"],
   "cilicia-whole": ["awmc:roman-empire-ad-69-provinces"],
   "judea-samaria-idumea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378"],
   "galilee-perea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326"],
-  "philip-tetrarchy-lands": ["bib:josephus-jewish-war", "bib:isbe-golan-gaulonitis"]
+  "philip-tetrarchy-lands": ["bib:josephus-jewish-war"]
 };
 
 const POINTS = {
@@ -356,10 +360,20 @@ async function fetchLamusOsmLine() {
       // Fetch below.
     }
     const query = `[out:json][timeout:25];way["waterway"](32.3,35.4,33.0,36.2);out tags geom;`;
-    const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
-      headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
-    });
-    if (!response.ok) throw new Error(`Overpass Yarmuk query failed: ${response.status}`);
+    const endpoints = [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.kumi.systems/api/interpreter"
+    ];
+    let response;
+    const errors = [];
+    for (const endpoint of endpoints) {
+      response = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, {
+        headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
+      });
+      if (response.ok) break;
+      errors.push(`${endpoint}: ${response.status}`);
+    }
+    if (!response?.ok) throw new Error(`Overpass Yarmuk query failed (${errors.join("; ")})`);
     const data = await response.json();
     const ways = (data.elements ?? []).filter((element) => {
       if (element.type !== "way" || !Array.isArray(element.geometry)) return false;
@@ -381,6 +395,56 @@ async function fetchLamusOsmLine() {
       const name = String(feature.properties?.name_en ?? feature.properties?.name ?? "").toLowerCase();
       return names.some((candidate) => name.includes(candidate));
     });
+  }
+
+  function lineFeature(cutId, coordinates, sources) {
+    return {
+      type: "Feature",
+      properties: { cutId, sources: sources.join(";") },
+      geometry: { type: "LineString", coordinates }
+    };
+  }
+
+  function lineCoordinateArrays(geometry) {
+    if (!geometry) return [];
+    if (geometry.type === "LineString") return [geometry.coordinates];
+    if (geometry.type === "MultiLineString") return geometry.coordinates;
+    return [];
+  }
+
+  function collectRiverCoordinates(features, northToSouth = true) {
+    const coordinates = [];
+    for (const feature of features) {
+      for (const line of lineCoordinateArrays(feature.geometry)) {
+        coordinates.push(...line);
+      }
+    }
+    coordinates.sort((left, right) => northToSouth ? right[1] - left[1] : left[1] - right[1]);
+    const deduped = [];
+    for (const point of coordinates) {
+      const previous = deduped.at(-1);
+      if (!previous || Math.hypot(previous[0] - point[0], previous[1] - point[1]) > 0.002) {
+        deduped.push(point);
+      }
+    }
+    return deduped;
+  }
+
+  function buildRiftLine(jordanFeatures, notes) {
+    const jordan = collectRiverCoordinates(jordanFeatures).filter(([lon, lat]) => lon > 34.9 && lon < 36.0 && lat > 30.5 && lat < 33.5);
+    const seaOfGalileeMedian = [[35.57, 32.88], [35.58, 32.82], [35.58, 32.72]];
+    const deadSeaMedian = [[35.50, 31.72], [35.50, 31.2], [35.48, 30.75]];
+    const joined = [[35.65, 33.35], ...jordan, ...seaOfGalileeMedian, ...deadSeaMedian, [35.18, 30.15]];
+    notes.push("Rift line joins Natural Earth Jordan segments through median lines across the Sea of Galilee and Dead Sea; these joins are recorded as geometric repairs for closed polygonization.");
+    return lineFeature("rift-jordan-lakes-arabah", joined, ["awmc:natural-earth-10m-rivers", "awmc:rift-line-lake-median-repair"]);
+  }
+
+  async function clippedHerodOutline(herodRecord12, landMaskPath) {
+    const herodPath = path.join(workDirectory, "herod-record-12-source.geojson");
+    const outputPath = path.join(workDirectory, "herod-record-12-land.geojson");
+    await writeJson(herodPath, featureCollection([herodRecord12]));
+    await mapshaper.runCommands(`-i ${quote(herodPath)} name=herod -clip ${quote(landMaskPath)} -clean -o format=geojson ${quote(outputPath)}`);
+    return ensureFeatureCollection(await readJson(outputPath)).features[0];
   }
   const query = `[out:json][timeout:25];way["waterway"](36.35,34.05,36.75,34.55);out geom;`;
   const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
@@ -418,10 +482,17 @@ async function fetchYarmukOsmLine() {
     // Fetch below.
   }
   const query = `[out:json][timeout:25];way["waterway"](32.3,35.4,33.0,36.2);out tags geom;`;
-  const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
-    headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
-  });
-  if (!response.ok) throw new Error(`Overpass Yarmuk query failed: ${response.status}`);
+  const endpoints = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"];
+  let response;
+  const errors = [];
+  for (const endpoint of endpoints) {
+    response = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, {
+      headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
+    });
+    if (response.ok) break;
+    errors.push(`${endpoint}: ${response.status}`);
+  }
+  if (!response?.ok) throw new Error(`Overpass Yarmuk query failed (${errors.join("; ")})`);
   const data = await response.json();
   const ways = (data.elements ?? []).filter((element) => {
     if (element.type !== "way" || !Array.isArray(element.geometry)) return false;
@@ -443,6 +514,52 @@ function selectRiverFeaturesByName(rivers, names) {
     const name = String(feature.properties?.name_en ?? feature.properties?.name ?? "").toLowerCase();
     return names.some((candidate) => name.includes(candidate));
   });
+}
+
+function lineFeature(cutId, coordinates, sources) {
+  return {
+    type: "Feature",
+    properties: { cutId, sources: sources.join(";") },
+    geometry: { type: "LineString", coordinates }
+  };
+}
+
+function lineCoordinateArrays(geometry) {
+  if (!geometry) return [];
+  if (geometry.type === "LineString") return [geometry.coordinates];
+  if (geometry.type === "MultiLineString") return geometry.coordinates;
+  return [];
+}
+
+function collectRiverCoordinates(features, northToSouth = true) {
+  const coordinates = [];
+  for (const feature of features) {
+    for (const line of lineCoordinateArrays(feature.geometry)) coordinates.push(...line);
+  }
+  coordinates.sort((left, right) => northToSouth ? right[1] - left[1] : left[1] - right[1]);
+  const deduped = [];
+  for (const point of coordinates) {
+    const previous = deduped.at(-1);
+    if (!previous || Math.hypot(previous[0] - point[0], previous[1] - point[1]) > 0.002) deduped.push(point);
+  }
+  return deduped;
+}
+
+function buildRiftLine(jordanFeatures, notes) {
+  const jordan = collectRiverCoordinates(jordanFeatures).filter(([lon, lat]) => lon > 34.9 && lon < 36.0 && lat > 30.5 && lat < 33.5);
+  const seaOfGalileeMedian = [[35.57, 32.88], [35.58, 32.82], [35.58, 32.72]];
+  const deadSeaMedian = [[35.50, 31.72], [35.50, 31.2], [35.48, 30.75]];
+  const joined = [[35.65, 33.35], ...jordan, ...seaOfGalileeMedian, ...deadSeaMedian, [35.18, 30.15]];
+  notes.push("Rift line joins Natural Earth Jordan segments through median lines across the Sea of Galilee and Dead Sea; these joins are recorded as geometric repairs for closed polygonization.");
+  return lineFeature("rift-jordan-lakes-arabah", joined, ["awmc:natural-earth-10m-rivers", "awmc:rift-line-lake-median-repair"]);
+}
+
+async function clippedHerodOutline(herodRecord12, landMaskPath) {
+  const herodPath = path.join(workDirectory, "herod-record-12-source.geojson");
+  const outputPath = path.join(workDirectory, "herod-record-12-land.geojson");
+  await writeJson(herodPath, featureCollection([herodRecord12]));
+  await mapshaper.runCommands(`-i ${quote(herodPath)} name=herod -clip ${quote(landMaskPath)} -clean -o format=geojson ${quote(outputPath)}`);
+  return ensureFeatureCollection(await readJson(outputPath)).features[0];
 }
 
 function selectItalyRawFaces(ad69Raw) {
@@ -579,9 +696,12 @@ async function main() {
   const culturalRoot = path.join(partitionWorkDirectory, "awmc-cultural");
   const ad200Extent = (await readJson(path.join(os.tmpdir(), "ibm-m4-03-build", "empire200.geojson"))).features[0];
   const ad200ProvinceLinesPath = path.join(os.tmpdir(), "ibm-m4-03-build", "provinces200-lines.geojson");
+  const ad200Cells = ensureFeatureCollection(await readJson(path.join(os.tmpdir(), "ibm-m4-03-build", "province-cells.geojson")));
+  const landMaskPath = path.join(partitionWorkDirectory, "ad69", "ne-land-mask.geojson");
   const riversAll = await readJson(path.join(os.tmpdir(), "ibm-m4-03-build", "rivers-all.geojson"));
   const ad69Extent = await extractAd69Extent(culturalRoot);
   const herodRecord12 = await extractHerodRecord12(culturalRoot);
+  const herodLand = await clippedHerodOutline(herodRecord12, landMaskPath);
   const notes = [];
 
   const built = [];
@@ -656,7 +776,9 @@ async function main() {
   try {
     const yarmuk = await fetchYarmukOsmLine();
     const jordanFeatures = selectRiverFeaturesByName(riversAll, ["jordan"]);
+    const riftLine = buildRiftLine(jordanFeatures, notes);
     const herodCuts = featureCollection([
+      riftLine,
       {
         type: "Feature",
         properties: {
@@ -690,12 +812,11 @@ async function main() {
           ]
         }
       },
-      ...jordanFeatures,
       ...(yarmuk.features ?? [])
     ]);
     const herodCutsPath = path.join(workDirectory, "herod-cuts.geojson");
     await writeJson(herodCutsPath, herodCuts);
-    const herodCells = await polygonizeInsideBase(herodRecord12, herodCutsPath, "herod-lands");
+    const herodCells = await polygonizeInsideBase(herodLand, herodCutsPath, "herod-lands");
     const judeaCells = [featureAtPoint(herodCells, HEROD_ANCHORS.jerusalem, "Jerusalem")];
     const galileePereaCells = [
       featureAtPoint(herodCells, HEROD_ANCHORS.nazareth, "Nazareth/Galilee"),
@@ -714,21 +835,21 @@ async function main() {
       "judea-samaria-idumea",
       judeaCells,
       "Herod record 12 clipped by straight Galilee/Samaria anchor line (Mount Carmel, Ginea/Jenin, Scythopolis), Jordan linework and Pella/Philadelphia/Yarmuk working cuts; kept the Jerusalem side. Approximate: straight segments between named anchors.",
-      ["awmc:herod-record-12", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", ...yarmukIds]
+      ["awmc:herod-record-12-land-clipped", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", ...yarmukIds]
     ));
     built.push(await dissolveArea(
       "galilee-perea",
       galileePereaCells,
       "Herod record 12 clipped by the Galilee/Samaria anchor line, Jordan linework and Pella/Philadelphia/Yarmuk working cuts; kept Nazareth and Perea near Machaerus cells. Approximate: straight segments between named anchors.",
-      ["awmc:herod-record-12", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728", ...yarmukIds]
+      ["awmc:herod-record-12-land-clipped", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728", ...yarmukIds]
     ));
     built.push(await dissolveArea(
       "philip-tetrarchy-lands",
       philipCells,
       "Herod record 12 clipped by Jordan/Yarmuk linework and Pella/Philadelphia working cut; kept Caesarea Philippi, Bethsaida and Hippos north of the Yarmuk. Approximate where straight anchor lines are used.",
-      ["awmc:herod-record-12", "pleiades:678326", "pleiades:697728", ...yarmukIds]
+      ["awmc:herod-record-12-land-clipped", "pleiades:678326", "pleiades:697728", ...yarmukIds]
     ));
-    notes.push(`Herodian lands built with ${jordanFeatures.length} Natural Earth Jordan features and Yarmuk OSM ids ${yarmukIds.join(", ")}; the Gadara/Decapolis zone between Yarmuk and the Pella line remains a working split and is not assigned to Syria until Syria topology is buildable.`);
+    notes.push(`Herodian lands built from land-clipped Herod record 12 with ${jordanFeatures.length} Natural Earth Jordan features, repaired lake-median rift joins and Yarmuk OSM ids ${yarmukIds.join(", ")}; the Gadara/Decapolis zone between Yarmuk and the Pella line remains a working split and is not assigned to Syria until Syria topology is buildable.`);
   } catch (error) {
     notes.push(`Herodian lands not built: ${error.message}`);
     OMITTED_BASE.push(["judea-samaria-idumea", `Herodian cut failed: ${error.message}`]);
@@ -745,25 +866,24 @@ async function main() {
 
   let arabia = null;
   try {
-    const arabiaDifference = await eraseArea(
-      "arabia-difference",
-      { geometry: ad200Extent.geometry },
-      [ad69Extent, herodRecord12],
-      "temporary Arabia difference",
-      ["awmc:roman-empire-ad-200-extent", "awmc:roman-empire-ad-69-extent", "awmc:herod-record-12"]
-    );
-    arabia = await selectContainingPart(
+    const arabiaCells = [
+      featureAtPoint(ad200Cells, POINTS.petra, "Petra in AD200 province cells"),
+      featureAtPointOrNearest(ad200Cells, POINTS.bostra, "Bostra/Hauran in AD200 province cells", 20),
+      featureAtPoint(ad69Raw, [34.45, 30.75], "Sinai AD69 face east of Aegyptus")
+    ];
+    const arabiaUnion = await dissolveArea("arabia-union", arabiaCells, "temporary Arabia union", ["awmc:ad200-petra-bostra-cells", "awmc:ad69-sinai-face"]);
+    arabia = await eraseArea(
       "arabia",
-      arabiaDifference,
-      POINTS.petra,
-      "AD200 extent minus AD69 extent minus Herod record 12, keeping the polygon part that contains Petra.",
-      ["awmc:roman-empire-ad-200-extent", "awmc:roman-empire-ad-69-extent", "awmc:herod-record-12"]
+      arabiaUnion,
+      [herodLand],
+      "AD200 provincial cells containing Petra and Bostra, plus the AD69 Sinai face east of Aegyptus, with the land-clipped Herod outline erased.",
+      ["awmc:ad200-petra-bostra-cells", "awmc:ad69-sinai-face", "awmc:herod-record-12-land-clipped"]
     );
     notes.push(`Arabia extent: ${Math.round(geometryAreaKm2(arabia.geometry)).toLocaleString("en-US")} km²; Bostra/Hauran ${pointInGeometry(POINTS.bostra, arabia.geometry) ? "is included" : "is not included"}.`);
     built.push(arabia);
   } catch (error) {
-    notes.push(`Arabia not built: AD200 extent minus AD69 extent minus Herod record 12 produced no part containing Petra (${error.message}).`);
-    OMITTED_BASE.push(["arabia", `Requested AD200-minus-AD69-minus-Herod polygon algebra produced no part containing Petra: ${error.message}`]);
+    notes.push(`Arabia not built: AD200 Petra/Bostra cells plus AD69 Sinai face could not be composed (${error.message}).`);
+    OMITTED_BASE.push(["arabia", `AD200 Petra/Bostra cells plus AD69 Sinai face could not be composed: ${error.message}`]);
   }
 
   const syriaMerged = namedFace(ad69Named, "Agrippa II kingdom / Cilicia / Emesa / Syria");
@@ -809,7 +929,7 @@ async function main() {
     }
 
     const commageneArea = built.find((feature) => feature.properties.areaId === "commagene");
-    const eraseFromSyria = [commageneArea, herodRecord12, arabia].filter(Boolean);
+    const eraseFromSyria = [commageneArea, herodLand, arabia].filter(Boolean);
     if (cilicia) eraseFromSyria.push(cilicia);
     if (ciliciaTracheia) eraseFromSyria.push(ciliciaTracheia);
     await eraseArea("syria", syriaMerged, eraseFromSyria, "AD69 merged Syria face with Commagene, Herod record 12, Arabia, and Cilicia/Cilicia Tracheia erased; small units remain in Syria.", [`awmc:ad69-face-${syriaMerged.properties.faceId}`]);
