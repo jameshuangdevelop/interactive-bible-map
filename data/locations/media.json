@@ -67,15 +67,12 @@
     {
       "fromYear": -4,
       "toYear": 101,
-      "holderId": "parthian-empire-entity",
-      "entity": "Parthian Empire",
+      "entity": "Part of the Parthian Empire; no internal succession tracked",
       "sources": [
         "bib:isbe-parthians",
         "bib:livius-parthia"
-      ],
-      "note": "No internal Parthian succession tracked in this note; Media and Mesopotamia sit within this same area throughout."
+      ]
     }
   ],
-  "status": "draft",
-  "politicalAreaId": "parthian-empire"
+  "status": "draft"
 }

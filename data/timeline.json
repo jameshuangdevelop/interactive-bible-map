@@ -444,35 +444,6 @@
         "bib:tacitus-histories",
         "bib:cassius-dio-roman-history"
       ]
-    },
-    {
-      "id": "armenia-contested",
-      "name": "Status contested between Rome and Parthia",
-      "kind": "uncertain",
-      "romanSide": false,
-      "sources": [
-        "bib:tacitus-annals"
-      ]
-    },
-    {
-      "id": "armenia-client-kingdom",
-      "name": "Client kingdom under a Parthian prince, crowned by Rome",
-      "kind": "client-kingdom",
-      "romanSide": true,
-      "sources": [
-        "bib:isbe-parthians"
-      ]
-    },
-    {
-      "id": "parthian-empire-entity",
-      "name": "Parthian Empire",
-      "kind": "outside-empire",
-      "romanSide": false,
-      "locationId": "parthian-empire",
-      "sources": [
-        "bib:isbe-parthians",
-        "bib:livius-parthia"
-      ]
     }
   ],
   "areas": [
@@ -1212,47 +1183,6 @@
           "note": "Augustus organized it as one province in AD 10, under an imperial legate residing at Salona on the Dalmatian coast; already under Roman control in the years before that.",
           "sources": [
             "bib:isbe-illyricum"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "parthian-empire",
-      "locationId": "parthian-empire",
-      "focus": false,
-      "periods": [
-        {
-          "fromYear": -4,
-          "toYear": 101,
-          "holderId": "parthian-empire-entity",
-          "note": "No internal Parthian succession tracked in this note; Media and Mesopotamia sit within this same area throughout.",
-          "sources": [
-            "bib:isbe-parthians",
-            "bib:livius-parthia"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "armenia",
-      "focus": false,
-      "periods": [
-        {
-          "fromYear": -4,
-          "toYear": 63,
-          "holderId": "armenia-contested",
-          "note": "Roman and Parthian nominees alternate repeatedly and contestedly through this span; individual brief claimants are not enumerated.",
-          "sources": [
-            "bib:tacitus-annals"
-          ]
-        },
-        {
-          "fromYear": 63,
-          "toYear": 101,
-          "holderId": "armenia-client-kingdom",
-          "ruler": "A Parthian prince, crowned by and nominally subject to Rome (the Peace of Rhandeia)",
-          "sources": [
-            "bib:isbe-parthians"
           ]
         }
       ]

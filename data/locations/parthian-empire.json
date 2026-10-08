@@ -67,15 +67,12 @@
     {
       "fromYear": -4,
       "toYear": 101,
-      "holderId": "parthian-empire-entity",
-      "entity": "Parthian Empire",
+      "entity": "The Parthian Empire itself; no internal succession tracked. Not drawn as a timeline area in M4: AWMC gives no sourced extent for Parthian territory (ADR-0037 item 5), so only the Roman empire's own edge shows on the map, not the Parthian side of it.",
       "sources": [
         "bib:isbe-parthians",
         "bib:livius-parthia"
-      ],
-      "note": "No internal Parthian succession tracked in this note; Media and Mesopotamia sit within this same area throughout."
+      ]
     }
   ],
-  "status": "draft",
-  "politicalAreaId": "parthian-empire"
+  "status": "draft"
 }
