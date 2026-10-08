@@ -8,7 +8,7 @@ export const ABOUT_THIS_MAP_TEXT =
   "Interactive Bible Map shows the places of the New Testament on a map of the ancient world, with their English Bible names, candidate sites where the location is uncertain, and the passages that mention them (World English Bible).";
 
 export const DATA_LICENSE_TEXT =
-  "Data license: all non-reference data and content are CC BY-SA 4.0. OSM- and AWMC-derived geometry in the map layer is ODbL 1.0.";
+  "Data license: all non-reference data and content are CC BY-SA 4.0, except the ancient layer's borders, roads and coastline, which are derived from AWMC Geodata and OpenStreetMap and are ODbL 1.0.";
 
 export const LICENSE_DETAILS_URL =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
@@ -133,12 +133,12 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     url: "https://esa-worldcover.org/en/data-access"
   },
   {
-    name: "Cite-only references in `data/bibliography.json` (e.g. UNESCO World Heritage Centre listings, World History Encyclopedia, Livius.org, Zondervan Academic, BiblePlaces.com, HMML, the Hellenic Ministry of Culture and Sports' Odysseus portal, the Austrian Academy of Sciences, the Biblical Archaeology Society)",
+    name: "Cite-only references in `data/bibliography.json` (e.g. UNESCO World Heritage Centre listings, World History Encyclopedia, Livius.org, Zondervan Academic, BiblePlaces.com, HMML, the Hellenic Ministry of Culture and Sports' Odysseus portal, the Austrian Academy of Sciences, the Biblical Archaeology Society, and Nikos Kokkinos's article in *Scripta Classica Israelica*)",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
   },
   {
-    name: "Public-domain texts cited in `data/bibliography.json`: Loeb translations of Cassius Dio, Suetonius, Tacitus and Strabo (hosted on LacusCurtius), Josephus in Whiston's translation (hosted by CCEL), the *International Standard Bible Encyclopedia* (1915), and Smith's *Dictionary of Greek and Roman Antiquities* (1875, hosted on LacusCurtius)",
+    name: "Public-domain texts cited in `data/bibliography.json`: Loeb translations of Cassius Dio, Suetonius, Tacitus and Strabo (hosted on LacusCurtius), Josephus in Whiston's translation (hosted by CCEL), the *International Standard Bible Encyclopedia* (1915), Smith's *Dictionary of Greek and Roman Antiquities* (1875, hosted on LacusCurtius), the *Jewish Encyclopedia* (1906), and Smith's *Dictionary of Greek and Roman Geography* (1854, hosted on the Perseus Digital Library)",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
   },

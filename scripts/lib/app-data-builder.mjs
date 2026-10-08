@@ -153,6 +153,11 @@ export async function buildAppData(options = {}) {
     options.ancientCoastlinePath ??
       path.join(ancientDataRoot, "geo", "ancient-coastline.geojson")
   );
+  // Optional: when this file is missing the other ancient files are still built.
+  const ancientEmpireEdgePath = path.resolve(
+    options.ancientEmpireEdgePath ??
+      path.join(ancientDataRoot, "geo", "ancient-empire-edge.geojson")
+  );
   const resolvedTimelinePath = path.resolve(
     options.timelinePath ?? path.join(ancientDataRoot, "timeline.json")
   );
@@ -166,6 +171,7 @@ export async function buildAppData(options = {}) {
     ancientAreasPath,
     ancientRoadsPath,
     ancientCoastlinePath,
+    ancientEmpireEdgePath,
     webVplPath: options.webVplPath,
     webSnapshotMetadataPath: options.webSnapshotMetadataPath,
     skipSnapshotChecksumCheck: options.skipSnapshotChecksumCheck,
@@ -270,12 +276,16 @@ export async function buildAppData(options = {}) {
         readJsonFile(ancientRoadsPath),
         readJsonFile(ancientCoastlinePath)
       ]);
+    const ancientEmpireEdgeData = (await pathExists(ancientEmpireEdgePath))
+      ? await readJsonFile(ancientEmpireEdgePath)
+      : null;
     const ancientBuildResult = await buildAncientAppData({
       timelineData,
       ancientAreasData,
       ancientRoadsData,
       ancientCoastlineData,
       bibliographyById,
+      ancientEmpireEdgeData,
       outputDirectory
     });
     outputFiles.push(...ancientBuildResult.writtenFiles);

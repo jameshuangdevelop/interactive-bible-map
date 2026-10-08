@@ -68,8 +68,19 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 101,
+      "entity": "Divided between the Roman province of Asia (the larger, western part) and the Roman province of Galatia (the smaller, southern part along the Pisidian mountains, including Antioch and Iconium); the line between the two was never sharply drawn, so this region has no single political area of its own on this map",
+      "sources": [
+        "bib:isbe-phrygia",
+        "bib:isbe-galatia",
+        "bib:isbe-asia"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08"
 }
