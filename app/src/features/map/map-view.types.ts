@@ -5,5 +5,7 @@ export interface MapViewProps {
   selection: PlaceSelection | null;
   highlightedPlaceId: string | null;
   leftPanelWidth: number;
+  bottomPanelInset: number;
+  isSmallScreen: boolean;
   onSelectPlace: (selection: PlaceSelection) => void;
 }

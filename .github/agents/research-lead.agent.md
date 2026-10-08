@@ -23,7 +23,7 @@ You find and evaluate existing open sources, then compile draft records from the
 - Do not copy text from copyrighted works. Summarize in your own words and cite.
 - Bible text: World English Bible (WEB) only.
 - Use a neutral, scholarly tone. For a disputed site, list each serious candidate with its support and sources, and do not pick one. Where church tradition and archaeology differ, describe both.
-- Write for Bible readers. Introduce every person, writer or work the first time the text names them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"). Don't name databases such as Pleiades or Wikidata in the text; the sources list names them (ADR-0033).
+- Write for Bible readers. Introduce every person, writer or work the first time the text names them, unless the Bible makes them familiar ("the first-century Jewish historian Josephus"). Don't name databases such as Pleiades or Wikidata in the text; the sources list names them (ADR-0033). This applies to every text a reader can see, including the timeline's stop titles and summaries, entity names, rulers and period notes, not only the About text.
 - Jesus' movements: only well-attested segments, each with its passages. No harmonized itinerary.
 
 ## Outputs

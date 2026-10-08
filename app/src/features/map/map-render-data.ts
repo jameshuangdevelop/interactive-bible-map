@@ -163,6 +163,13 @@ function getPinTierZoomRange(place: PlaceIndexRecord) {
     };
   }
 
+  if (place.prominence === "major") {
+    return {
+      minZoom: 3,
+      maxZoom: mapMaxZoomExclusive
+    };
+  }
+
   return {
     minZoom: 4,
     maxZoom: mapMaxZoomExclusive
