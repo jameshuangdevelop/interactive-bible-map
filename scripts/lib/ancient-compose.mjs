@@ -18,6 +18,7 @@ import {
 import { cleanPolygonGeometry, geometryAreaKm2, polygonFromLineAndFrame, polygonsOf } from "./geometry-cleanup.mjs";
 import {
   acceptanceFailures,
+  borderStretchesNear,
   coverageRows,
   distancePointToSegmentKm,
   distanceToGeometryKm,
@@ -48,6 +49,11 @@ let pinnedWaterwaysAsOf;
 
 // Parts smaller than this are slivers left where two datasets' lines nearly coincide.
 const MIN_PART_KM2 = 1;
+// A processing aid is a line that only helps an intermediate step and must never shape a border: borders
+// may cross it, but no stretch of border longer than PROCESSING_AID_MAX_STRETCH_KM may lie within
+// PROCESSING_AID_CLEARANCE_KM of it. (A straight crossing at 24° or more spends less than that within the band.)
+const PROCESSING_AID_CLEARANCE_KM = 1;
+const PROCESSING_AID_MAX_STRETCH_KM = 5;
 // Coverage gaps up to this size are reported only as a count.
 const COVERAGE_TOLERANCE_KM2 = 5;
 // G10: land inside AWMC's AD 69 extent that no AWMC face covers is land to cover only where AWMC's
@@ -1369,10 +1375,10 @@ function placeExplanation(row) {
   return "";
 }
 
-async function writeReport({ collection, omitted, notes, validity, overlaps, compositionCoverage, coverage, oldSea, places, jordanSites, anchorChecks, acceptance, empireEdge, outsideLandNote, roadSummary, roadClip, previewPaths, osmSummary, simplifyNote }) {
+async function writeReport({ collection, omitted, notes, validity, overlaps, compositionCoverage, coverage, oldSea, places, jordanSites, anchorChecks, acceptance, processingAids, empireEdge, outsideLandNote, roadSummary, roadClip, previewPaths, osmSummary, simplifyNote }) {
   const lines = ["# M4-03 area composition", ""];
   lines.push(`Built ${collection.features.length} of ${AREA_ORDER.length} areas. ${simplifyNote}`, "");
-  lines.push("## Acceptance checks", "", acceptance.length === 0 ? "All pass: every area is built, valid and free of repeated vertices; no overlap is larger than 1 km²; every coverage gap is explained; every place lies in its area, within 3 km of it or with an explanation; every anchor lies in its area; the old-sea points lie in no area; and no stretch of the empire's edge longer than 10 km runs along today's coast." : `**${acceptance.length} failed:**`, "");
+  lines.push("## Acceptance checks", "", acceptance.length === 0 ? `All pass: every area is built, valid and free of repeated vertices; no overlap is larger than 1 km²; every coverage gap is explained; every place lies in its area, within 3 km of it or with an explanation; every anchor lies in its area; the old-sea points lie in no area; no stretch of the empire's edge longer than 10 km runs along today's coast; and no stretch of area border longer than ${PROCESSING_AID_MAX_STRETCH_KM} km runs within ${PROCESSING_AID_CLEARANCE_KM} km of a processing aid.` : `**${acceptance.length} failed:**`, "");
   for (const failure of acceptance) lines.push(`- ${failure}`);
   if (acceptance.length > 0) lines.push("");
   lines.push("## Areas", "", "| Area | km² | Parts | Valid | Repeated vertices | Composition |", "|---|---:|---:|---|---:|---|");
@@ -1405,6 +1411,11 @@ async function writeReport({ collection, omitted, notes, validity, overlaps, com
   }
   lines.push("", "Points that must stay in no area:", "");
   for (const check of oldSea.checks) lines.push(`- ${check.name} (${check.point.join(", ")}): ${check.areaIds.length === 0 ? "in no area" : `in ${check.areaIds.map((areaId) => `\`${areaId}\``).join(", ")}`}.`);
+  lines.push("", "## Processing aids", "", `Lines that only help an intermediate step. Borders may cross them, but none may follow one: no stretch of an area's border longer than ${PROCESSING_AID_MAX_STRETCH_KM} km may lie within ${PROCESSING_AID_CLEARANCE_KM} km of it. Each shared border is measured once for each of its two areas.`);
+  for (const aid of processingAids) {
+    lines.push("", `- ${aid.name}: ${aid.description} Stretches of border within ${PROCESSING_AID_CLEARANCE_KM} km: ${aid.stretches.length}; longest ${aid.stretches[0] ? `${rounded(aid.stretches[0].lengthKm, 1)} km` : "none"}.`);
+    for (const stretch of aid.stretches) lines.push(`  - \`${stretch.areaId}\`: ${rounded(stretch.lengthKm, 2)} km from ${stretch.start.map((value) => value.toFixed(3)).join(", ")}, at closest ${rounded(stretch.closestKm, 2)} km.`);
+  }
   lines.push("", "## Empire edge", "", `\`data/geo/ancient-empire-edge.geojson\`: ${empireEdge.pieceCount} piece(s), ${rounded(empireEdge.lengthKm)} km in all, where the union of the ${collection.features.length} areas meets Natural Earth land beyond the empire (land that runs on past the map's frame), less stretches within ${EDGE_COAST_TOLERANCE_KM} km of today's coastline. ${outsideLandNote}`);
   const longCoastStretches = empireEdge.coastStretches.filter((stretch) => stretch.lengthKm > 10);
   lines.push("", `Stretches of the edge within ${EDGE_COAST_TEST_KM} km of today's coast (G2's test: none longer than 10 km): ${empireEdge.coastStretches.length}; longest ${empireEdge.coastStretches[0] ? `${rounded(empireEdge.coastStretches[0].lengthKm, 1)} km from ${empireEdge.coastStretches[0].start.map((value) => value.toFixed(2)).join(", ")}` : "none"}; longer than 10 km: ${longCoastStretches.length === 0 ? "none" : longCoastStretches.map((stretch) => `${rounded(stretch.lengthKm, 1)} km from ${stretch.start.map((value) => value.toFixed(2)).join(", ")}`).join("; ")}.`);
@@ -1437,8 +1448,9 @@ async function writeReport({ collection, omitted, notes, validity, overlaps, com
 // `reportDirectory` and its previews to `previewDirectory`. `inputs` maps the keys of
 // ANCIENT_GEO_INPUTS to checked files; `partitionDirectory` holds the AD 69 and AD 14 partitions and
 // their named faces; `culturalRoot` is AWMC's unpacked cultural shapefiles; `ad200CellsPath` holds the
-// AD 200 cells; `coastlinePath` is this run's ancient coastline. Throws when an acceptance check fails,
-// after writing the report.
+// AD 200 cells; `coastlinePath` is this run's ancient coastline; `processingAids` ([{ name, description,
+// coordinates }]) are lines that helped an intermediate step and must not shape any border. Throws when
+// an acceptance check fails, after writing the report.
 export async function composeAncientAreas(options) {
   ({ reportDirectory, previewDirectory } = options);
   workDirectory = options.workDirectory;
@@ -1883,6 +1895,10 @@ export async function composeAncientAreas(options) {
     `Lamus (Limonlu Çayı), relation ${OSM_RIVERS.lamus.relationId} main stream: ${osmWayVersions(lamus)}.`,
     `Read from \`${PINNED_WATERWAYS_PATH}\`, Overpass's attic data as of ${waterways.asOf}; © OpenStreetMap contributors, ODbL 1.0.`
   ];
+  const processingAids = (options.processingAids ?? []).map((aid) => ({
+    ...aid,
+    stretches: borderStretchesNear(collection.features, aid.coordinates, PROCESSING_AID_CLEARANCE_KM).map((stretch) => ({ ...stretch, aid: aid.name }))
+  }));
   const acceptance = acceptanceFailures({
     builtAreaIds: collection.features.map((feature) => feature.properties.areaId),
     expectedAreaIds: AREA_ORDER,
@@ -1892,8 +1908,9 @@ export async function composeAncientAreas(options) {
     places: places.map((row) => ({ ...row, explanation: placeExplanation(row) })),
     anchors: [...anchorChecks, ...jordanSites],
     emptyPoints: oldSeaChecks,
-    coastStretches: empireEdge.coastStretches
-  });
+    coastStretches: empireEdge.coastStretches,
+    aidStretches: processingAids.flatMap((aid) => aid.stretches)
+  }, { maxAidStretchKm: PROCESSING_AID_MAX_STRETCH_KM });
   await writeReport({
     collection,
     omitted,
@@ -1907,6 +1924,7 @@ export async function composeAncientAreas(options) {
     jordanSites,
     anchorChecks,
     acceptance,
+    processingAids,
     empireEdge,
     outsideLandNote: `Land outside every area before simplification: ${outsideBefore.beyond.length} piece(s) beyond the empire; ${outsideBefore.enclosed.length} enclosed by Roman land and the sea (${rounded(outsideBefore.enclosed.reduce((sum, piece) => sum + geometryAreaKm2(piece.geometry), 0))} km², drawn without an edge; the largest ${[...outsideBefore.enclosed].sort((left, right) => geometryAreaKm2(right.geometry) - geometryAreaKm2(left.geometry)).slice(0, 3).map((piece) => `${rounded(geometryAreaKm2(piece.geometry))} km² at ${labelPoint(piece.geometry).map((value) => value.toFixed(2)).join(", ")}`).join("; ")}); ${outsideBefore.islands.length} island(s) that no area touches.`,
     roadSummary,

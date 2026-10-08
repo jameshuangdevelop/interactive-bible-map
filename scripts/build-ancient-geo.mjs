@@ -43,21 +43,18 @@ const COASTLINE_TARGETS = [
   }
 ];
 
-// AWMC's AD 200 linework leaves Arabia Petraea open to the south-west, so the cell that holds Petra and
-// Bostra would run on through Sinai into the Libyan desert. This line from the first approach separates
-// them. No source draws it, and no written border follows it (none runs within 200 m of it), but the
-// composition takes the cell north-east of it whole and the cell south-west of it only outside AWMC's
-// AD 69 extent, so it shapes `arabia`. Replacing it with a sourced line is an open question for the PO
-// (docs/PROGRESS.md).
-const AD200_SINAI_SEPARATOR = {
-  type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      properties: { splitId: "ad200-petra-sinai-separator" },
-      geometry: { type: "LineString", coordinates: [[33.4, 31.45], [34.4, 30.8], [35.2, 30.1], [35.95, 29.15]] }
-    }
-  ]
+// A processing aid: an internal line that separates Petra's AD 200 cell from Sinai and the Libyan desert
+// in an intermediate step. AWMC's AD 200 linework leaves Arabia Petraea open to the south-west, so
+// without it the cell that holds Petra and Bostra would run on through Sinai into the Libyan desert. No
+// source draws the line, so it may only pick Petra's cell: `arabia` also takes the land beyond it (the
+// cell south-west of it, but only outside AWMC's AD 69 extent, and AWMC's AD 69 Sinai faces), and no
+// drawn border follows the line. The build checks this: it fails if any stretch of area border longer
+// than 5 km lies within 1 km of the line (borders that cross it spend about 2 to 4 km there).
+const PETRA_CELL_AID = {
+  id: "petra-ad200-cell-aid",
+  name: "the processing aid that separates Petra's AD 200 cell",
+  description: "An internal line that separates Petra's AD 200 cell from Sinai and the Libyan desert in an intermediate step; no drawn border follows it.",
+  coordinates: [[33.4, 31.45], [34.4, 30.8], [35.2, 30.1], [35.95, 29.15]]
 };
 
 function quote(filePath) {
@@ -153,19 +150,22 @@ function minDistanceToModernCoast(point, modernLines, modernBboxes) {
 }
 
 // The AD 200 cells that Cilicia and Arabia are cut from: AWMC's AD 200 province lines, shoreline and
-// extents of AD 117, AD 200 and 60 BC, Herod's kingdom and the senatorial provinces, and the separator
-// above, polygonised together.
+// extents of AD 117, AD 200 and 60 BC, Herod's kingdom and the senatorial provinces, and the processing
+// aid above, polygonised together.
 async function buildAd200Cells(inputs, workDirectory) {
-  const separatorPath = path.join(workDirectory, "ad200-petra-sinai-separator.geojson");
+  const aidPath = path.join(workDirectory, `${PETRA_CELL_AID.id}.geojson`);
   const cellPath = path.join(workDirectory, "ad200-cells.geojson");
-  await writeJson(separatorPath, AD200_SINAI_SEPARATOR);
+  await writeJson(aidPath, {
+    type: "FeatureCollection",
+    features: [{ type: "Feature", properties: { aidId: PETRA_CELL_AID.id }, geometry: { type: "LineString", coordinates: PETRA_CELL_AID.coordinates } }]
+  });
   await mapshaper.runCommands([
     `-i ${quote(inputs.awmcAd200Provinces)} name=prov`,
     `-i ${quote(inputs.awmcAd200Extent)} name=emp200`,
     `-i ${quote(inputs.awmc60BceExtent)} name=emp60`,
     `-i ${quote(inputs.awmcHerodsKingdom)} name=herod`,
     `-i ${quote(inputs.awmcSenatorialProvinces)} name=sen`,
-    `-i ${quote(separatorPath)} name=separator`,
+    `-i ${quote(aidPath)} name=aid`,
     "-target emp200 -dissolve -lines name=emp200_line",
     "-target emp60 -dissolve -lines name=emp60_line",
     "-target herod -dissolve -lines name=herod_line",
@@ -173,7 +173,7 @@ async function buildAd200Cells(inputs, workDirectory) {
     `-i ${quote(inputs.awmcShoreline)} name=coast`,
     `-i ${quote(inputs.awmcAd117Extent)} name=emp`,
     "-target emp -dissolve -lines name=emp_line",
-    "-target prov,coast,emp_line,emp200_line,emp60_line,herod_line,sen_line,separator",
+    "-target prov,coast,emp_line,emp200_line,emp60_line,herod_line,sen_line,aid",
     "-merge-layers force name=linework",
     "-target linework -snap interval=0.001 -clean -polygons gap-tolerance=0.02 -rename-layers cells",
     `-o format=geojson ${quote(cellPath)}`
@@ -325,7 +325,8 @@ async function main() {
     workDirectory: path.join(cache.work, "compose"),
     outputDirectory: stagingDirectory,
     reportDirectory: cache.report,
-    previewDirectory: cache.previews
+    previewDirectory: cache.previews,
+    processingAids: [PETRA_CELL_AID]
   });
 
   // Every acceptance check passed, so the layers can replace the committed ones.
