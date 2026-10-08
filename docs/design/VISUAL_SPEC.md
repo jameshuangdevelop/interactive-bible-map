@@ -118,7 +118,7 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
 - **Opening year:** the stop in force in AD 50 (ADR-0037). The URL keeps the stop (§10).
 
 ### Modern map (M4)
-- **Basemap:** our copy of Liberty with today's towns, roads, railways and country borders, labelled in English (`name:en`, falling back to the name in Latin script), with **disputed borders hidden** (ADR-0009) and **no points of interest**. Its zoom range is the same as the ancient map's. The fallback is VersaTiles Colorful, given the same treatment.
+- **Basemap:** our copy of Liberty with today's towns, roads, railways and country borders, labelled in English (`name:en`, falling back to the name in Latin script), with **disputed borders hidden** (ADR-0009) and **no points of interest**. Only country borders are drawn, never state or district lines, and no border lines at all inside a mask over Israel, the West Bank, Gaza and the Golan Heights, or over any other contested place where the data draws an unflagged line (ADR-0037). Its zoom range is the same as the ancient map's. The fallback is VersaTiles Colorful, given the same treatment.
 - **Our places:** the pins, clusters, badges, candidate letters and their Bible names stay as on the ancient map, the way Google Maps marks historic sites (ADR-0037; the PO's default until the human confirms it at MC6). The area labels (empires, provinces and regions), the ancient layer and the timeline are hidden.
 - **The panel** is the same on both maps.
 - **The toggle:** a two-part control, "Ancient | Modern", 40 px tall, on the panel's white surface and shadow; the selected part is filled with the accent colour, with white text. Switching keeps the camera and the selected place. The URL keeps the choice (§10).
