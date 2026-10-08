@@ -569,19 +569,25 @@ export async function buildAncientAppData({
     })
   );
 
+  // Like the shapes, the app's roads leave out each road's provenance, which stays in data/geo/
+  // (ADR-0037's update of 2026-10-08, item 2).
   writtenFiles.push(
     await writeJsonWithSize(
       outputDirectory,
       "ancient.roads.geojson",
       {
         ...ancientRoadsData,
-        features: (ancientRoadsData.features ?? []).map((feature) => ({
-          ...feature,
-          geometry: roundGeometry(
-            simplifyRoadGeometry(feature.geometry, roadSimplifyTolerance),
-            4
-          )
-        }))
+        features: (ancientRoadsData.features ?? []).map((feature) => {
+          const { provenance: _provenance, ...properties } = feature.properties ?? {};
+          return {
+            ...feature,
+            properties,
+            geometry: roundGeometry(
+              simplifyRoadGeometry(feature.geometry, roadSimplifyTolerance),
+              4
+            )
+          };
+        })
       }
     )
   );

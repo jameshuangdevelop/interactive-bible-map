@@ -1,11 +1,9 @@
-// AWMC roads for the ancient layer: the major roads of the Roman period (ADR-0037 item 5) and the minor
-// roads of that period that pass near one of our places (ADR-0037's update of 2026-10-08, item 1).
-// AWMC's roads carry Barrington Atlas periods, not dates: "R" is the Roman period, 30 BC – AD 300.
-import { distancePointToSegmentKm } from "./ancient-area-checks.mjs";
+// AWMC roads for the ancient layer: the major roads of the Roman period (ADR-0037 item 5). AWMC's roads
+// carry Barrington Atlas periods, not dates: "R" is the Roman period, 30 BC – AD 300. Minor roads are
+// left out (ADR-0037's update of 2026-10-08, item 1): AWMC dates none in the Holy Land, Egypt or Cyprus.
 
-// Major roads are kept across the map's extent; minor roads only near our places.
+// Major roads are kept across the map's extent.
 export const MAJOR_ROAD_BOUNDS = Object.freeze({ minLon: 10, maxLon: 40, minLat: 28, maxLat: 45 });
-export const MINOR_ROAD_NEAR_PLACE_KM = 50;
 
 const DACIA_SOURCES = ["bib:livius-trajan", "bib:cassius-dio-roman-history"];
 const DACIA_EVIDENCE = "north of the Danube in Dacia, which Rome conquered in 101–106 (Livius \"Trajan\"; Cassius Dio 68.14.3)";
@@ -70,17 +68,6 @@ function boundsIntersect(left, right) {
   return !(right.maxLon < left.minLon || right.minLon > left.maxLon || right.maxLat < left.minLat || right.minLat > left.maxLat);
 }
 
-// True when some stretch of the road passes within `km` of one of the points.
-export function roadNearPoints(geometry, points, km) {
-  const lines = roadLines(geometry);
-  if (lines.length === 0 || points.length === 0) return false;
-  const bounds = lineBounds(lines);
-  const latMargin = km / 110.574;
-  const lonMargin = km / (111.32 * Math.cos((Math.max(Math.abs(bounds.minLat), Math.abs(bounds.maxLat)) * Math.PI) / 180));
-  const nearby = points.filter(([lon, lat]) => lon >= bounds.minLon - lonMargin && lon <= bounds.maxLon + lonMargin && lat >= bounds.minLat - latMargin && lat <= bounds.maxLat + latMargin);
-  return nearby.some((point) => lines.some((line) => line.some((position, index) => index > 0 && distancePointToSegmentKm(point, line[index - 1], position) <= km)));
-}
-
 // One change text for every kept road: the OBJECTIDs left out, grouped by their short reason.
 function listWithAnd(items) {
   return items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
@@ -92,11 +79,11 @@ const DATE_EXCLUSION_CHANGE = Object.freeze({
   sources: [...new Set(EXCLUDED_POST_AD100_ROADS.flatMap((entry) => entry.sources))]
 });
 
-// Picks AWMC's roads of the Roman period: every major road that touches MAJOR_ROAD_BOUNDS, and every
-// minor road within MINOR_ROAD_NEAR_PLACE_KM of one of `placePoints`, less EXCLUDED_POST_AD100_ROADS.
-// Each road keeps AWMC's `major` and `known` flags (known roads are drawn solid, conjectured ones dashed).
-// Returns the roads and the ids of the roads the date list left out.
-export function selectAncientRoads(roadsSource, { placePoints, awmcCommit, awmcRoadsPath }) {
+// Picks AWMC's major roads of the Roman period that touch MAJOR_ROAD_BOUNDS, less
+// EXCLUDED_POST_AD100_ROADS. Each road keeps AWMC's `known` flag (known roads are drawn solid,
+// conjectured ones dashed) and its `major` flag. Returns the roads and the ids of the roads the date
+// list left out.
+export function selectAncientRoads(roadsSource, { awmcCommit, awmcRoadsPath }) {
   const features = [];
   const excludedRoadIds = [];
   const round = (value) => Math.round(value * 1e5) / 1e5;
@@ -105,10 +92,7 @@ export function selectAncientRoads(roadsSource, { placePoints, awmcCommit, awmcR
     const lines = roadLines(sourceFeature.geometry);
     if (lines.length === 0 || !isRomanPeriod(properties.timeperiod)) continue;
     const major = String(properties.Major_or_M ?? "").trim() === "1";
-    const selected = major
-      ? boundsIntersect(lineBounds(lines), MAJOR_ROAD_BOUNDS)
-      : roadNearPoints(sourceFeature.geometry, placePoints, MINOR_ROAD_NEAR_PLACE_KM);
-    if (!selected) continue;
+    if (!major || !boundsIntersect(lineBounds(lines), MAJOR_ROAD_BOUNDS)) continue;
     const rawObjectId = Number(properties.OBJECTID);
     const objectId = Number.isFinite(rawObjectId) && rawObjectId >= 0 ? rawObjectId : index + 1;
     const roadId = `awmc-road-${objectId}-${index + 1}`;
@@ -128,17 +112,11 @@ export function selectAncientRoads(roadsSource, { placePoints, awmcCommit, awmcR
           version: `commit:${awmcCommit};path:${awmcRoadsPath}`,
           upstreamFeatureIds: [`awmc:roads-objectid-${objectId}`, `awmc:roads-feature-${index + 1}`],
           changes: [
-            major
-              ? {
-                kind: "filter",
-                detail: `An AWMC major road of the Roman period (Barrington "R", 30 BC – AD 300) in ${MAJOR_ROAD_BOUNDS.minLon}–${MAJOR_ROAD_BOUNDS.maxLon}°E, ${MAJOR_ROAD_BOUNDS.minLat}–${MAJOR_ROAD_BOUNDS.maxLat}°N (ADR-0037 item 5).`,
-                sources: ["awmc:roads-major-filter", "awmc:roads-roman-period-filter"]
-              }
-              : {
-                kind: "filter",
-                detail: `An AWMC minor road of the Roman period (Barrington "R", 30 BC – AD 300) that passes within ${MINOR_ROAD_NEAR_PLACE_KM} km of one of our places (ADR-0037's update of 2026-10-08, item 1).`,
-                sources: ["awmc:roads-minor-near-places-filter", "awmc:roads-roman-period-filter"]
-              },
+            {
+              kind: "filter",
+              detail: `An AWMC major road of the Roman period (Barrington "R", 30 BC – AD 300) in ${MAJOR_ROAD_BOUNDS.minLon}–${MAJOR_ROAD_BOUNDS.maxLon}°E, ${MAJOR_ROAD_BOUNDS.minLat}–${MAJOR_ROAD_BOUNDS.maxLat}°N (ADR-0037 item 5).`,
+              sources: ["awmc:roads-major-filter", "awmc:roads-roman-period-filter"]
+            },
             { ...DATE_EXCLUSION_CHANGE }
           ]
         }

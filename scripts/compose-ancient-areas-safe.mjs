@@ -31,7 +31,7 @@ import {
   writePreviewPng
 } from "./lib/ancient-area-checks.mjs";
 import { validateGeometryTopology } from "./lib/validator.mjs";
-import { EXCLUDED_POST_AD100_ROADS, MINOR_ROAD_NEAR_PLACE_KM, roadLines, selectAncientRoads } from "./lib/ancient-roads.mjs";
+import { EXCLUDED_POST_AD100_ROADS, roadLines, selectAncientRoads } from "./lib/ancient-roads.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -1241,19 +1241,15 @@ async function clipRoadsToRomanWorld(roads, outsideLand, notes) {
 function summarizeRoads(selectedRoads, roadClip, excludedRoadIds) {
   const lengthKm = (geometry) => roadLines(geometry).reduce((sum, line) => sum + line.slice(1).reduce((total, point, index) => total + distanceKm(line[index], point), 0), 0);
   const kept = roadClip.roads.features;
-  const major = kept.filter((feature) => feature.properties.major);
-  const minor = kept.filter((feature) => !feature.properties.major);
   const known = kept.filter((feature) => feature.properties.known);
   const totals = {
-    majorCount: major.length,
-    minorCount: minor.length,
-    majorKm: major.reduce((sum, feature) => sum + lengthKm(feature.geometry), 0),
-    minorKm: minor.reduce((sum, feature) => sum + lengthKm(feature.geometry), 0),
+    count: kept.length,
+    km: kept.reduce((sum, feature) => sum + lengthKm(feature.geometry), 0),
     knownCount: known.length,
     selectedCount: selectedRoads.features.length,
     excludedRoadIds
   };
-  totals.text = `${kept.length} roads kept: ${totals.majorCount} major (${rounded(totals.majorKm)} km) and ${totals.minorCount} minor within ${MINOR_ROAD_NEAR_PLACE_KM} km of our places (${rounded(totals.minorKm)} km); ${totals.knownCount} known, ${kept.length - totals.knownCount} conjectured. Left out as later than AD 100: ${excludedRoadIds.join(", ")}. Clipping shortened ${roadClip.shortened.length} and dropped ${roadClip.dropped.length}.`;
+  totals.text = `${kept.length} AWMC major roads of the Roman period kept (${rounded(totals.km)} km); ${totals.knownCount} known, ${kept.length - totals.knownCount} conjectured. Minor roads are left out (ADR-0037's update of 2026-10-08). Left out as later than AD 100: ${excludedRoadIds.join(", ")}. Clipping shortened ${roadClip.shortened.length} and dropped ${roadClip.dropped.length}.`;
   return totals;
 }
 
@@ -1652,7 +1648,7 @@ async function main() {
   // Roads: AWMC's roads of the Roman period, picked (G5; ADR-0037's update of 2026-10-08, item 1) and
   // clipped to the drawn Roman world.
   const roadsSource = await readJson(path.join(buildWorkDirectory, "roads.geojson"));
-  const { roads: selectedRoads, excludedRoadIds } = selectAncientRoads(roadsSource, { placePoints, awmcCommit: AWMC_COMMIT, awmcRoadsPath: AWMC_ROADS_PATH });
+  const { roads: selectedRoads, excludedRoadIds } = selectAncientRoads(roadsSource, { awmcCommit: AWMC_COMMIT, awmcRoadsPath: AWMC_ROADS_PATH });
   const outsideAfter = await classifyOutsideLand("roads", collection.features, landParts);
   const roadClip = await clipRoadsToRomanWorld(selectedRoads, outsideAfter, notes);
   await fs.writeFile(outputRoadsPath, `${JSON.stringify(roadClip.roads)}\n`, "utf8");
@@ -1715,19 +1711,16 @@ async function main() {
   const anchorPoints = Object.entries(HEROD_ANCHORS).map(([name, coordinates]) => ({ name, coordinates }));
   const machaerusLine = [[35.3, herod.machaerusCutLatitude], [36.2, herod.machaerusCutLatitude]];
   const edgeLines = empireEdge.edge.features[0].geometry.coordinates.map((coordinates) => ({ coordinates, color: "#b00000", width: 2.6 }));
-  // Roads as the visual spec draws them: major roads from 1 px at zoom 5 to 2 px at zoom 9, minor roads
-  // from zoom 7 at 0.75 px, conjectured roads dashed; previews are drawn at twice the pixel density.
+  // Roads as the visual spec draws them: from 1 px at zoom 5 to 2 px at zoom 9, conjectured roads dashed;
+  // previews are drawn at twice the pixel density.
   const pixelRatio = 2;
   const zoomWidth = (bounds, zoom) => Math.round(((bounds[2] - bounds[0]) * 256 * 2 ** zoom * pixelRatio) / 360);
   const roadPreviewLines = (zoom) => roadClip.roads.features.flatMap((feature) => {
-    const { major, known } = feature.properties;
-    if (!major && zoom < 7) return [];
-    const width = (major ? Math.min(2, 1 + (zoom - 5) * 0.25) : 0.75) * pixelRatio;
-    return roadLines(feature.geometry).map((coordinates) => ({ coordinates, color: "#8D6E63", width, dash: known ? undefined : `${3 * pixelRatio},${2 * pixelRatio}` }));
+    const width = Math.min(2, 1 + (zoom - 5) * 0.25) * pixelRatio;
+    return roadLines(feature.geometry).map((coordinates) => ({ coordinates, color: "#8D6E63", width, dash: feature.properties.known ? undefined : `${3 * pixelRatio},${2 * pixelRatio}` }));
   });
   const placesIn = (bounds) => records.flatMap((record) => (record.candidates ?? []).slice(0, 1).filter((candidate) => Array.isArray(candidate.coordinates) && !["region", "province", "empire", "natural-feature"].includes(record.type)).map((candidate) => ({ name: record.id, coordinates: candidate.coordinates })))
     .filter(({ coordinates: [lon, lat] }) => lon >= bounds[0] && lon <= bounds[2] && lat >= bounds[1] && lat <= bounds[3]);
-  const holyLandBounds = [34.15, 30.45, 36.95, 33.55];
   const westAsiaBounds = [26.0, 36.9, 30.4, 40.3];
   const roadsIn = (bounds) => roadClip.roads.features.filter((feature) => roadLines(feature.geometry).some((line) => line.some(([lon, lat]) => lon >= bounds[0] && lon <= bounds[2] && lat >= bounds[1] && lat <= bounds[3]))).length;
   const previewPaths = [
@@ -1738,16 +1731,8 @@ async function main() {
       lines: edgeLines,
       width: 2200
     }),
-    await writePreviewPng(path.join(previewDirectory, "roads-holy-land-z8.png"), {
-      title: `Holy Land roads at zoom 8 (${pixelRatio}x): ${roadsIn(holyLandBounds)} road(s) of the Roman period`,
-      bounds: holyLandBounds,
-      areas: collection,
-      lines: roadPreviewLines(8),
-      points: placesIn(holyLandBounds),
-      width: zoomWidth(holyLandBounds, 8)
-    }),
     await writePreviewPng(path.join(previewDirectory, "roads-west-asia-z8.png"), {
-      title: `Western Asia Minor roads at zoom 8 (${pixelRatio}x): ${roadsIn(westAsiaBounds)} roads; major thicker, minor thin, conjectured dashed`,
+      title: `Western Asia Minor roads at zoom 8 (${pixelRatio}x): ${roadsIn(westAsiaBounds)} major roads; conjectured roads dashed`,
       bounds: westAsiaBounds,
       areas: collection,
       lines: roadPreviewLines(8),
@@ -1824,7 +1809,7 @@ async function main() {
   });
   console.log(`Wrote ${outputAreasPath} (${collection.features.length} areas)`);
   console.log(`Wrote ${outputEmpireEdgePath} (${empireEdge.pieceCount} pieces, ${rounded(empireEdge.lengthKm)} km)`);
-  console.log(`Wrote ${outputRoadsPath} (${roadClip.roads.features.length} roads: ${roadSummary.majorCount} major, ${roadSummary.minorCount} minor)`);
+  console.log(`Wrote ${outputRoadsPath} (${roadClip.roads.features.length} major roads)`);
   console.log(`Wrote ${path.join(reportDirectory, "composition-report.md")}`);
   for (const previewPath of previewPaths) console.log(`Wrote ${previewPath}`);
 }
