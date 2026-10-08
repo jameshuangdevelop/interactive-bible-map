@@ -31,6 +31,15 @@ const libertyLicensePartUrls = [
   "https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/LICENSE.md"
 ];
 
+const libertyModernName = "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)";
+const libertyModernMetadataLicense =
+  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
+
+const versaTilesModernName =
+  "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
+const versaTilesModernMetadataNotice =
+  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels with name_en fallback to Latin-script fields where present; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14.";
+
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
 Source style: VersaTiles Colorful
@@ -41,6 +50,23 @@ Fallback policy: use this style only when the primary OpenFreeMap Liberty basema
 Modifications in this copy:
 - Physical-map treatment only: keep natural landcover, water and waterways
 - Remove all symbols, roads, railways, aeroways, boundaries, landuse, parks and buildings
+- Max zoom set to 14
+
+Attribution string used in the vector source:
+${versaTilesAttribution}
+`;
+
+const versaTilesModernNotice = `This file is part of Interactive Bible Map's outage-only fallback modern basemap.
+
+Source style: VersaTiles Colorful
+Source URL: ${versaTilesColorfulStyleUrl}
+Source style license: CC0 1.0 (metadata.license in upstream style)
+Fallback policy: use this style only when the primary OpenFreeMap Liberty modern basemap is unavailable.
+
+Modifications in this copy:
+- Modern-map treatment: use English-only labels (name_en, then Latin-script fields where present)
+- Hide disputed borders
+- Remove points of interest and airport labels
 - Max zoom set to 14
 
 Attribution string used in the vector source:
@@ -90,6 +116,194 @@ const versaTilesAllowedLayerIds = new Set([
   "land-wetland",
   "land-glacier"
 ]);
+
+const labelSourceLayerIdsToExclude = new Set(["pois"]);
+const libertyDisputedBoundaryLayerId = "boundary_disputed";
+const versaTilesDisputedBoundaryLayerId = "boundary-country-disputed";
+const libertyPoiLayerIdPattern = /^poi_/u;
+
+function modernEnglishLabelExpression(preferredFields) {
+  const expression = ["coalesce"];
+  for (const field of preferredFields) {
+    expression.push(["get", field]);
+  }
+  return expression;
+}
+
+function replaceLabelFieldExpression(value, predicate, replacement) {
+  if (Array.isArray(value)) {
+    if (
+      value.length === 2 &&
+      value[0] === "get" &&
+      typeof value[1] === "string" &&
+      predicate(value[1])
+    ) {
+      return structuredClone(replacement);
+    }
+
+    return value.map((entry) => replaceLabelFieldExpression(entry, predicate, replacement));
+  }
+
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value);
+    return Object.fromEntries(
+      entries.map(([key, entry]) => [
+        key,
+        replaceLabelFieldExpression(entry, predicate, replacement)
+      ])
+    );
+  }
+
+  return value;
+}
+
+function expressionContainsGetField(expression, fieldNames) {
+  if (!Array.isArray(expression)) {
+    return false;
+  }
+
+  if (
+    expression.length === 2 &&
+    expression[0] === "get" &&
+    typeof expression[1] === "string" &&
+    fieldNames.has(expression[1])
+  ) {
+    return true;
+  }
+
+  return expression.some((entry) => expressionContainsGetField(entry, fieldNames));
+}
+
+function appendDisputedFilterExclusion(existingFilter) {
+  const disputedFilter = ["!=", ["get", "disputed"], true];
+  if (!existingFilter) {
+    return disputedFilter;
+  }
+
+  return ["all", existingFilter, disputedFilter];
+}
+
+function removeLibertyModernExcludedLayers(style) {
+  style.layers = style.layers.filter((layer) => {
+    if (layer.id === libertyDisputedBoundaryLayerId) {
+      return false;
+    }
+
+    if (layer.id === "airport") {
+      return false;
+    }
+
+    if (libertyPoiLayerIdPattern.test(layer.id)) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function updateLibertyModernLabelFields(style) {
+  const englishOnlyExpression = modernEnglishLabelExpression(["name:en", "name_en", "name:latin"]);
+  const replaceFieldNames = new Set(["name:nonlatin", "name:latin", "name_en", "name"]);
+
+  for (const layer of style.layers) {
+    if (layer.type !== "symbol" || labelSourceLayerIdsToExclude.has(layer["source-layer"])) {
+      continue;
+    }
+
+    if (!layer.layout || !("text-field" in layer.layout)) {
+      continue;
+    }
+
+    if (expressionContainsGetField(layer.layout["text-field"], replaceFieldNames)) {
+      layer.layout["text-field"] = structuredClone(englishOnlyExpression);
+    }
+  }
+}
+
+function removeVersaTilesModernExcludedLayers(style) {
+  style.layers = style.layers.filter((layer) => {
+    if (layer.id === versaTilesDisputedBoundaryLayerId) {
+      return false;
+    }
+
+    if (layer.id.startsWith("poi-")) {
+      return false;
+    }
+
+    if (layer.id === "symbol-transit-airfield" || layer.id === "symbol-transit-airport") {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function updateVersaTilesModernBoundaryFilters(style) {
+  for (const layer of style.layers) {
+    if (layer["source-layer"] === "boundaries") {
+      if (layer.id === "boundary-country:outline") {
+        layer.filter = [
+          "all",
+          ["==", ["get", "admin_level"], 2],
+          ["!=", ["get", "disputed"], true],
+          ["!=", ["get", "maritime"], true]
+        ];
+        continue;
+      }
+
+      if (layer.id === "boundary-state:outline" || layer.id === "boundary-state") {
+        layer.filter = [
+          "all",
+          ["==", ["get", "admin_level"], 4],
+          ["!=", ["get", "disputed"], true],
+          ["!=", ["get", "maritime"], true]
+        ];
+        continue;
+      }
+
+      if (layer.id === "boundary-country") {
+        layer.filter = [
+          "all",
+          ["==", ["get", "admin_level"], 2],
+          ["!=", ["get", "disputed"], true],
+          ["!=", ["get", "maritime"], true]
+        ];
+        continue;
+      }
+
+      if (layer.id === "boundary-country-maritime") {
+        layer.filter = [
+          "all",
+          ["==", ["get", "admin_level"], 2],
+          ["==", ["get", "maritime"], true],
+          ["!=", ["get", "disputed"], true]
+        ];
+        continue;
+      }
+    }
+
+    if (layer["source-layer"] !== "boundary_labels") {
+      continue;
+    }
+
+    layer.filter = appendDisputedFilterExclusion(layer.filter);
+  }
+}
+
+function updateVersaTilesModernLabelFields(style) {
+  const englishOnlyExpression = modernEnglishLabelExpression(["name_en", "name:latin", "name_int"]);
+  for (const layer of style.layers) {
+    if (!layer.layout || !("text-field" in layer.layout)) {
+      continue;
+    }
+
+    layer.layout["text-field"] = replaceLabelFieldExpression(
+      layer.layout["text-field"],
+      (fieldName) => fieldName === "name",
+      englishOnlyExpression
+    );
+  }
+}
 
 function removeDisallowedLayerTypes(style) {
   style.layers = style.layers.filter((layer) => layer.type !== "symbol");
@@ -255,6 +469,52 @@ function buildVersaTilesStyle(upstreamStyle) {
   return style;
 }
 
+function buildModernLibertyStyle(upstreamStyle) {
+  const style = structuredClone(upstreamStyle);
+  style.name = libertyModernName;
+  style.metadata = {
+    ...(style.metadata ?? {}),
+    "interactive-bible-map:license": libertyModernMetadataLicense
+  };
+
+  if (style.sources.openmaptiles) {
+    style.sources.openmaptiles = {
+      ...style.sources.openmaptiles,
+      attribution: libertyAttribution
+    };
+  }
+
+  removeLibertyModernExcludedLayers(style);
+  updateLibertyModernLabelFields(style);
+  clampVectorSourceMaxZoomTo14(style);
+  normalizeMaxZoom(style);
+  return style;
+}
+
+function buildModernVersaTilesStyle(upstreamStyle) {
+  const style = structuredClone(upstreamStyle);
+  style.name = versaTilesModernName;
+  style.metadata = {
+    ...(style.metadata ?? {}),
+    "interactive-bible-map:notice": versaTilesModernMetadataNotice
+  };
+
+  for (const [sourceId, source] of Object.entries(style.sources)) {
+    if (source.type !== "vector") {
+      continue;
+    }
+
+    style.sources[sourceId] = { ...source, attribution: versaTilesAttribution };
+  }
+
+  removeVersaTilesModernExcludedLayers(style);
+  updateVersaTilesModernBoundaryFilters(style);
+  updateVersaTilesModernLabelFields(style);
+  clampVectorSourceMaxZoomTo14(style);
+  normalizeMaxZoom(style);
+  return style;
+}
+
 async function fetchJson(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -293,10 +553,16 @@ async function buildStyles() {
 
   const libertyStyle = buildLibertyStyle(libertyUpstream);
   const versaTilesStyle = buildVersaTilesStyle(versaTilesUpstream);
+  const libertyModernStyle = buildModernLibertyStyle(libertyUpstream);
+  const versaTilesModernStyle = buildModernVersaTilesStyle(versaTilesUpstream);
 
   const licenseParts = await Promise.all(libertyLicensePartUrls.map((url) => fetchText(url)));
   const libertyLicenseNotice = [
     libertyMetadataLicense,
+    ...licenseParts.map((part) => part.trimEnd())
+  ].join("\n\n-----\n\n");
+  const libertyModernLicenseNotice = [
+    libertyModernMetadataLicense,
     ...licenseParts.map((part) => part.trimEnd())
   ].join("\n\n-----\n\n");
 
@@ -314,11 +580,29 @@ async function buildStyles() {
     versaTilesNotice
   );
 
+  await writeStyleDirectory(
+    path.join(stylesOutputDirectory, "liberty-modern"),
+    libertyModernStyle,
+    "LICENSE.txt",
+    `${libertyModernLicenseNotice}\n`
+  );
+
+  await writeStyleDirectory(
+    path.join(stylesOutputDirectory, "versatiles-colorful-modern"),
+    versaTilesModernStyle,
+    "NOTICE.txt",
+    versaTilesModernNotice
+  );
+
   console.log("Wrote hosted basemap styles:");
   console.log(" - app/public/styles/liberty/style.json");
   console.log(" - app/public/styles/liberty/LICENSE.txt");
   console.log(" - app/public/styles/versatiles-colorful/style.json");
   console.log(" - app/public/styles/versatiles-colorful/NOTICE.txt");
+  console.log(" - app/public/styles/liberty-modern/style.json");
+  console.log(" - app/public/styles/liberty-modern/LICENSE.txt");
+  console.log(" - app/public/styles/versatiles-colorful-modern/style.json");
+  console.log(" - app/public/styles/versatiles-colorful-modern/NOTICE.txt");
 }
 
 buildStyles().catch((error) => {

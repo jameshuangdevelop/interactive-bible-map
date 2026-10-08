@@ -12,6 +12,8 @@ export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";
 export type SourceId = string;
 export type PlaceProminence = "major" | "standard";
+export type MapDisplayMode = "ancient" | "modern";
+export type PinLabelSource = "biblical" | "modern";
 
 export type Coordinates = [number, number];
 

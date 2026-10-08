@@ -48,8 +48,23 @@ async function run() {
           prepare: async () => {}
         },
         {
+          name: "modern-overview",
+          path: "/?map=modern",
+          prepare: async () => {}
+        },
+        {
           name: "open-place-panel",
           path: "/?place=capernaum",
+          prepare: async (currentPage) => {
+            await currentPage.waitForSelector("section[aria-label='Place details']", {
+              state: "visible",
+              timeout: 45_000
+            });
+          }
+        },
+        {
+          name: "modern-open-place-panel",
+          path: "/?map=modern&place=capernaum",
           prepare: async (currentPage) => {
             await currentPage.waitForSelector("section[aria-label='Place details']", {
               state: "visible",

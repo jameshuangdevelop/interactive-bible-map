@@ -28,6 +28,22 @@ const versaTilesStylePath = path.join(
   "versatiles-colorful",
   "style.json"
 );
+const libertyModernStylePath = path.join(
+  repositoryRoot,
+  "app",
+  "public",
+  "styles",
+  "liberty-modern",
+  "style.json"
+);
+const versaTilesModernStylePath = path.join(
+  repositoryRoot,
+  "app",
+  "public",
+  "styles",
+  "versatiles-colorful-modern",
+  "style.json"
+);
 
 const libertyAllowedLayerIds = new Set([
   "background",
@@ -332,6 +348,97 @@ function assertMaxZoom14(style, styleName) {
   }
 }
 
+function assertLayerMissing(style, layerId, styleName) {
+  assert.equal(
+    style.layers.some((layer) => layer.id === layerId),
+    false,
+    `${styleName} must not include layer '${layerId}'`
+  );
+}
+
+function assertNoLayerIdsMatching(style, pattern, styleName, description) {
+  const matchingLayerIds = style.layers.filter((layer) => pattern.test(layer.id)).map((layer) => layer.id);
+  assert.deepEqual(
+    matchingLayerIds,
+    [],
+    `${styleName} must not include ${description}: ${matchingLayerIds.join(", ")}`
+  );
+}
+
+function assertLibertyModernLabels(style) {
+  const expected = ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name:latin"]];
+  const layers = style.layers.filter((layer) =>
+    [
+      "waterway_line_label",
+      "water_name_point_label",
+      "water_name_line_label",
+      "highway-name-path",
+      "highway-name-minor",
+      "highway-name-major",
+      "label_other",
+      "label_village",
+      "label_town",
+      "label_state",
+      "label_city",
+      "label_city_capital",
+      "label_country_3",
+      "label_country_2",
+      "label_country_1"
+    ].includes(layer.id)
+  );
+  assert.equal(layers.length > 0, true, "Liberty modern style must keep core label layers");
+  for (const layer of layers) {
+    assert.deepEqual(
+      layer.layout?.["text-field"],
+      expected,
+      `Liberty modern layer '${layer.id}' must use English-only text field`
+    );
+  }
+}
+
+function assertVersaTilesModernNameFields(style) {
+  const expected = ["coalesce", ["get", "name_en"], ["get", "name:latin"], ["get", "name_int"]];
+  const layers = style.layers.filter((layer) =>
+    [
+      "label-place-city",
+      "label-place-town",
+      "label-place-village",
+      "label-boundary-country-large",
+      "label-water-area-major",
+      "label-water-river",
+      "label-street-primary"
+    ].includes(layer.id)
+  );
+  assert.equal(layers.length > 0, true, "VersaTiles modern style must keep label layers");
+  for (const layer of layers) {
+    assert.deepEqual(
+      layer.layout?.["text-field"],
+      expected,
+      `VersaTiles modern layer '${layer.id}' must use English-only text field`
+    );
+  }
+}
+
+function assertNoDisputedBoundaryFilters(style, styleName) {
+  for (const layer of style.layers) {
+    if (layer["source-layer"] !== "boundaries" && layer["source-layer"] !== "boundary_labels") {
+      continue;
+    }
+
+    const filterText = JSON.stringify(layer.filter ?? []);
+    assert.equal(
+      filterText.includes("\"disputed\""),
+      true,
+      `${styleName} boundary layer '${layer.id}' must include a disputed filter guard`
+    );
+    assert.equal(
+      filterText.includes('"==",["get","disputed"],true'),
+      false,
+      `${styleName} boundary layer '${layer.id}' must not include disputed=true branch`
+    );
+  }
+}
+
 test("Liberty hosted style is physical-only and keeps required attribution", async () => {
   const style = await readStyle(libertyStylePath);
 
@@ -377,4 +484,43 @@ test("VersaTiles fallback hosted style is physical-only and keeps required attri
   assertVersaTilesLandFilters(style);
   assertRemovedSourceLayers(style, "VersaTiles");
   assertMaxZoom14(style, "VersaTiles");
+});
+
+test("Liberty modern hosted style removes disputed boundary and POI/airport labels", async () => {
+  const style = await readStyle(libertyModernStylePath);
+
+  assert.equal(
+    style.name,
+    "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)"
+  );
+  assert.equal(
+    style.metadata["interactive-bible-map:license"],
+    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+  );
+  assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
+  assertLayerMissing(style, "boundary_disputed", "Liberty modern");
+  assertLayerMissing(style, "airport", "Liberty modern");
+  assertNoLayerIdsMatching(style, /^poi_/u, "Liberty modern", "POI layers");
+  assertLibertyModernLabels(style);
+  assertMaxZoom14(style, "Liberty modern");
+});
+
+test("VersaTiles modern hosted style removes disputed boundary and POI/airport labels", async () => {
+  const style = await readStyle(versaTilesModernStylePath);
+
+  assert.equal(
+    style.name,
+    "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)"
+  );
+  assert.equal(
+    style.metadata["interactive-bible-map:notice"],
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels with name_en fallback to Latin-script fields where present; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
+  );
+  assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
+  assertNoLayerIdsMatching(style, /^poi-/u, "VersaTiles modern", "POI layers");
+  assertLayerMissing(style, "symbol-transit-airfield", "VersaTiles modern");
+  assertLayerMissing(style, "symbol-transit-airport", "VersaTiles modern");
+  assertNoDisputedBoundaryFilters(style, "VersaTiles modern");
+  assertVersaTilesModernNameFields(style);
+  assertMaxZoom14(style, "VersaTiles modern");
 });

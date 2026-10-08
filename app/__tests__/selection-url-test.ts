@@ -1,6 +1,8 @@
 import {
+  applyMapModeToSearch,
   applySelectionToSearch,
   candidateLetterToIndex,
+  parseMapModeFromSearch,
   parseSelectionFromSearch
 } from "../src/features/map/selection-url";
 
@@ -41,5 +43,17 @@ describe("selection URL helpers", () => {
     expect(candidateLetterToIndex("aa")).toBeNull();
     expect(candidateLetterToIndex("7")).toBeNull();
     expect(candidateLetterToIndex(null)).toBeNull();
+  });
+
+  test("parses map mode from URL search params", () => {
+    expect(parseMapModeFromSearch("?map=modern")).toBe("modern");
+    expect(parseMapModeFromSearch("?map=ancient")).toBe("ancient");
+    expect(parseMapModeFromSearch("?map=foo")).toBe("ancient");
+    expect(parseMapModeFromSearch("")).toBe("ancient");
+  });
+
+  test("writes and removes map mode params without dropping unrelated params", () => {
+    expect(applyMapModeToSearch("?place=jerusalem", "modern")).toBe("?place=jerusalem&map=modern");
+    expect(applyMapModeToSearch("?place=jerusalem&map=modern", "ancient")).toBe("?place=jerusalem");
   });
 });

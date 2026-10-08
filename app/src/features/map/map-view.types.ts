@@ -1,4 +1,4 @@
-import type { PlaceIndexRecord, PlaceSelection } from "./types";
+import type { MapDisplayMode, PinLabelSource, PlaceIndexRecord, PlaceSelection } from "./types";
 
 export interface MapViewProps {
   places: PlaceIndexRecord[];
@@ -7,5 +7,7 @@ export interface MapViewProps {
   leftPanelWidth: number;
   bottomPanelInset: number;
   isSmallScreen: boolean;
+  mapMode: MapDisplayMode;
+  pinLabelSource: PinLabelSource;
   onSelectPlace: (selection: PlaceSelection) => void;
 }

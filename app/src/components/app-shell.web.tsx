@@ -6,14 +6,22 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent
 } from "react";
 
 import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { sortPlacesByImportance } from "../features/map/place-importance";
-import { applySelectionToSearch, parseSelectionFromSearch } from "../features/map/selection-url";
+import {
+  applyMapModeToSearch,
+  applySelectionToSearch,
+  parseMapModeFromSearch,
+  parseSelectionFromSearch
+} from "../features/map/selection-url";
 import type {
+  MapDisplayMode,
+  PinLabelSource,
   PlaceDetailsPayload,
   PlaceIndexRecord,
   PlaceSelection
@@ -30,6 +38,8 @@ const SMALL_SCREEN_SHEET_EDGE_GAP_PX = 16;
 const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.4;
 const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
+const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
+const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -130,6 +140,9 @@ function MapLoadingPlaceholder() {
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
+  const [mapMode, setMapMode] = useState<MapDisplayMode>(() =>
+    typeof window === "undefined" ? "ancient" : parseMapModeFromSearch(window.location.search)
+  );
   const [loading, setLoading] = useState(true);
   const [urlStateReady, setUrlStateReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -276,6 +289,8 @@ export function AppShell() {
           loadedPlaces.map((place) => [place.id, place] as const)
         );
         const parsedSelection = parseSelectionFromSearch(window.location.search);
+        const parsedMapMode = parseMapModeFromSearch(window.location.search);
+        setMapMode(parsedMapMode);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
         if (parsedSelection && !normalized) {
@@ -380,13 +395,28 @@ export function AppShell() {
   }, [selection, urlStateReady]);
 
   useEffect(() => {
+    if (!urlStateReady) {
+      return;
+    }
+
+    const nextSearch = applyMapModeToSearch(window.location.search, mapMode);
+    const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState({}, "", nextUrl);
+    }
+  }, [mapMode, urlStateReady]);
+
+  useEffect(() => {
     if (loading || !urlStateReady) {
       return undefined;
     }
 
     const onPopState = () => {
       const parsedSelection = parseSelectionFromSearch(window.location.search);
+      const parsedMapMode = parseMapModeFromSearch(window.location.search);
       const normalized = normalizeSelection(parsedSelection, placesById);
+      setMapMode(parsedMapMode);
 
       if (!parsedSelection) {
         lastSelectionActivatorEntryIdRef.current = null;
@@ -536,6 +566,25 @@ export function AppShell() {
     },
     [placesById]
   );
+  const handleMapModeRadioKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight" && event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+        return;
+      }
+
+      event.preventDefault();
+      const nextMode =
+        event.key === "ArrowLeft" || event.key === "ArrowUp"
+          ? mapMode === "modern"
+            ? "ancient"
+            : "modern"
+          : mapMode === "ancient"
+            ? "modern"
+            : "ancient";
+      setMapMode(nextMode);
+    },
+    [mapMode]
+  );
 
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
@@ -598,6 +647,70 @@ export function AppShell() {
         places={places}
       />
 
+      <div
+        aria-label="Map type"
+        role="radiogroup"
+        style={{
+          position: "absolute",
+          right: `${tokens.spacing.md}px`,
+          top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
+          display: "inline-flex",
+          borderRadius: "999px",
+          border: `1px solid ${tokens.color.divider}`,
+          backgroundColor: tokens.color.surface,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          padding: "2px",
+          zIndex: 45
+        }}
+      >
+        {([
+          ["ancient", "Ancient"],
+          ["modern", "Modern"]
+        ] as const).map(([value, label]) => {
+          const selected = mapMode === value;
+          return (
+            <button
+              aria-checked={selected}
+              data-map-mode={value}
+              key={value}
+              onClick={() => setMapMode(value)}
+              onKeyDown={handleMapModeRadioKeyDown}
+              role="radio"
+              style={{
+                minWidth: "86px",
+                height: "36px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: selected ? "#1A73E8" : "transparent",
+                color: selected ? "#FFFFFF" : tokens.color.textPrimary,
+                fontFamily: tokens.typography.uiFont,
+                fontSize: `${tokens.typography.captionSize}px`,
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {mapMode === "ancient" ? (
+        <div
+          aria-hidden="true"
+          data-ancient-map-only-controls-slot="true"
+          style={{
+            position: "absolute",
+            right: `${tokens.spacing.md}px`,
+            top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX + 48}px` : `${tokens.spacing.md + 48}px`,
+            width: "176px",
+            height: "1px",
+            zIndex: 44
+          }}
+        />
+      ) : null}
+
       {loading ? (
         <MapLoadingPlaceholder />
       ) : (
@@ -607,7 +720,9 @@ export function AppShell() {
             highlightedPlaceId={highlightedPlaceId}
             isSmallScreen={isSmallScreen}
             leftPanelWidth={panelWidthForMap}
+            mapMode={mapMode}
             onSelectPlace={handleSelectFromMap}
+            pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
             selection={selection}
           />
