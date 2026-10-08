@@ -2899,8 +2899,8 @@ export function MapView({
     }
 
     map.setPadding(getMapLabelPadding(panelInset, bottomInset));
-    refreshVisibleEntryState();
-  }, [bottomInset, panelInset, refreshVisibleEntryState]);
+    scheduleVisibleEntryRefresh();
+  }, [bottomInset, panelInset, scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2971,6 +2971,9 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
   }, [runtimeTuning.controlZoomDurationMs]);
+  const resetButtonBottomOffset = isSmallScreen
+    ? Math.max(bottomInset + 16, 88)
+    : bottomInset + 16;
 
   return (
     <div
@@ -3118,7 +3121,7 @@ export function MapView({
         style={{
           position: "absolute",
           right: "16px",
-          bottom: `${bottomInset + 16}px`,
+          bottom: `${resetButtonBottomOffset}px`,
           width: "44px",
           height: "44px",
           borderRadius: "999px",

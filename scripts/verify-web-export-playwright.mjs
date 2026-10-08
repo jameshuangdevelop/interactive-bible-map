@@ -7480,6 +7480,60 @@ async function runPanelOpenSmoothnessCheck({
   }
 }
 
+async function verifyOpeningCameraBaseline(browser, baseUrl) {
+  const targetViewports = [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 }
+  ];
+  const results = [];
+
+  for (const viewport of targetViewports) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    try {
+      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+
+      const openingCamera = await page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        const center = map.getCenter();
+        return {
+          zoom: map.getZoom(),
+          center: [center.lng, center.lat]
+        };
+      }, mapTestHookKey);
+
+      const zoomDelta = Math.abs(openingCamera.zoom - 4.7);
+      const centerLngDelta = Math.abs(openingCamera.center[0] - 22.5);
+      const centerLatDelta = Math.abs(openingCamera.center[1] - 35);
+      if (zoomDelta > 0.1 || centerLngDelta > 0.1 || centerLatDelta > 0.1) {
+        throw new Error(
+          `Opening camera drifted at ${viewport.width}x${viewport.height}: ${JSON.stringify(openingCamera)}`
+        );
+      }
+
+      results.push({
+        viewport,
+        openingCamera: {
+          zoom: Number(openingCamera.zoom.toFixed(4)),
+          center: [
+            Number(openingCamera.center[0].toFixed(6)),
+            Number(openingCamera.center[1].toFixed(6))
+          ]
+        }
+      });
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  }
+
+  return results;
+}
+
 async function verifyPhoneBasics(browser, baseUrl) {
   const requiredOpeningPlaces = [
     { id: "rome", label: "Rome" },
@@ -7496,7 +7550,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
   const results = [];
 
   for (const viewport of viewports) {
-    const context = await browser.newContext({ viewport });
+    const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true });
     const page = await context.newPage();
 
     try {
@@ -7869,27 +7923,148 @@ async function verifyPhoneBasics(browser, baseUrl) {
       }
 
       const handleButton = page.locator("section[aria-label='Place details'] button[aria-label$='place details panel']");
-      await handleButton.click();
+      const cdpSession = await context.newCDPSession(page);
+      const readHandleCenter = async () => {
+        const handleBox = await handleButton.boundingBox();
+        if (!handleBox) {
+          throw new Error(`Phone handle bounds missing at ${viewport.width}x${viewport.height}.`);
+        }
+        return {
+          x: handleBox.x + handleBox.width / 2,
+          y: handleBox.y + handleBox.height / 2
+        };
+      };
+      const dragHandleWithMouse = async (deltaY) => {
+        const center = await readHandleCenter();
+        await page.mouse.move(center.x, center.y);
+        await page.mouse.down();
+        await page.mouse.move(center.x, Math.max(20, center.y + deltaY), { steps: 10 });
+        await page.mouse.up();
+      };
+      const dragHandleWithTouch = async (deltaY) => {
+        const center = await readHandleCenter();
+        const targetY = Math.max(20, center.y + deltaY);
+        await cdpSession.send("Input.dispatchTouchEvent", {
+          type: "touchStart",
+          touchPoints: [{ x: Math.round(center.x), y: Math.round(center.y), radiusX: 1, radiusY: 1, force: 1, id: 1 }]
+        });
+        for (let step = 1; step <= 10; step += 1) {
+          const progress = step / 10;
+          await cdpSession.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [
+              {
+                x: Math.round(center.x),
+                y: Math.round(center.y + (targetY - center.y) * progress),
+                radiusX: 1,
+                radiusY: 1,
+                force: 1,
+                id: 1
+              }
+            ]
+          });
+        }
+        await cdpSession.send("Input.dispatchTouchEvent", {
+          type: "touchEnd",
+          touchPoints: []
+        });
+      };
+
+      const pointerTapCenter = await readHandleCenter();
+      await page.mouse.click(pointerTapCenter.x, pointerTapCenter.y);
       await page.waitForTimeout(350);
-      const expandedSheetAfterTap = await readSheetSnapshot();
+      const expandedAfterPointerTap = await readSheetSnapshot();
       if (
-        !expandedSheetAfterTap.panelBounds ||
-        expandedSheetAfterTap.panelBounds.height <= collapsedSheet.panelBounds.height + 40
+        !expandedAfterPointerTap.panelBounds ||
+        expandedAfterPointerTap.panelBounds.height <= collapsedSheet.panelBounds.height + 40
       ) {
         throw new Error(
-          `Phone sheet tap should expand panel at ${viewport.width}x${viewport.height}.`
+          `Phone sheet pointer tap should expand panel at ${viewport.width}x${viewport.height}.`
         );
       }
 
-      await handleButton.click();
+      const pointerCollapseCenter = await readHandleCenter();
+      await page.mouse.click(pointerCollapseCenter.x, pointerCollapseCenter.y);
       await page.waitForTimeout(350);
-      const collapsedAfterTap = await readSheetSnapshot();
+      const collapsedAfterPointerTap = await readSheetSnapshot();
       if (
-        !collapsedAfterTap.panelBounds ||
-        collapsedAfterTap.panelBounds.height >= expandedSheetAfterTap.panelBounds.height - 40
+        !collapsedAfterPointerTap.panelBounds ||
+        collapsedAfterPointerTap.panelBounds.height >= expandedAfterPointerTap.panelBounds.height - 40
       ) {
         throw new Error(
-          `Phone sheet tap should collapse panel at ${viewport.width}x${viewport.height}.`
+          `Phone sheet pointer tap should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await handleButton.tap();
+      await page.waitForTimeout(350);
+      const expandedAfterTouchTap = await readSheetSnapshot();
+      if (
+        !expandedAfterTouchTap.panelBounds ||
+        expandedAfterTouchTap.panelBounds.height <= collapsedAfterPointerTap.panelBounds.height + 40
+      ) {
+        throw new Error(
+          `Phone sheet touch tap should expand panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await handleButton.tap();
+      await page.waitForTimeout(350);
+      const collapsedAfterTouchTap = await readSheetSnapshot();
+      if (
+        !collapsedAfterTouchTap.panelBounds ||
+        collapsedAfterTouchTap.panelBounds.height >= expandedAfterTouchTap.panelBounds.height - 40
+      ) {
+        throw new Error(
+          `Phone sheet touch tap should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await dragHandleWithMouse(-180);
+      await page.waitForTimeout(350);
+      const expandedAfterPointerDrag = await readSheetSnapshot();
+      if (
+        !expandedAfterPointerDrag.panelBounds ||
+        expandedAfterPointerDrag.panelBounds.height <= collapsedAfterTouchTap.panelBounds.height + 40
+      ) {
+        throw new Error(
+          `Phone sheet pointer drag-up should expand panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await dragHandleWithMouse(220);
+      await page.waitForTimeout(350);
+      const collapsedAfterPointerDrag = await readSheetSnapshot();
+      if (
+        !collapsedAfterPointerDrag.panelBounds ||
+        collapsedAfterPointerDrag.panelBounds.height >= expandedAfterPointerDrag.panelBounds.height - 40
+      ) {
+        throw new Error(
+          `Phone sheet pointer drag-down should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await dragHandleWithTouch(-180);
+      await page.waitForTimeout(350);
+      const expandedAfterTouchDrag = await readSheetSnapshot();
+      if (
+        !expandedAfterTouchDrag.panelBounds ||
+        expandedAfterTouchDrag.panelBounds.height <= collapsedAfterPointerDrag.panelBounds.height + 40
+      ) {
+        throw new Error(
+          `Phone sheet touch drag-up should expand panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+
+      await dragHandleWithTouch(220);
+      await page.waitForTimeout(350);
+      const collapsedAfterTouchDrag = await readSheetSnapshot();
+      if (
+        !collapsedAfterTouchDrag.panelBounds ||
+        collapsedAfterTouchDrag.panelBounds.height >= expandedAfterTouchDrag.panelBounds.height - 40
+      ) {
+        throw new Error(
+          `Phone sheet touch drag-down should collapse panel at ${viewport.width}x${viewport.height}.`
         );
       }
 
@@ -8080,6 +8255,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const openingCameraBaselineCheck = await verifyOpeningCameraBaseline(
+      browser,
+      staticServer.baseUrl
+    );
     const overviewLabelReadabilityCheck = await verifyOverviewLabelReadabilityAcrossViewports(
       browser,
       staticServer.baseUrl
@@ -8238,6 +8417,7 @@ async function run() {
       panelMapDomStability,
       pinLabelRegression,
       importantPlacesFirstCheck,
+      openingCameraBaselineCheck,
       overviewLabelReadabilityCheck,
       jerusalemGalileeZoom6Check,
       asiaMinorSevenChurchesZoom65Check,

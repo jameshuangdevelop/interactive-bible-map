@@ -1635,6 +1635,7 @@ export function PlacePanel({
                 border: "none",
                 borderRadius: "999px",
                 backgroundColor: "transparent",
+                touchAction: "none",
                 cursor: "pointer",
                 position: "absolute",
                 left: "50%",
@@ -1717,6 +1718,7 @@ export function PlacePanel({
               border: "none",
               borderRadius: "999px",
               backgroundColor: "transparent",
+              touchAction: "none",
               cursor: "pointer",
               position: "absolute",
               left: "50%",
@@ -2677,6 +2679,7 @@ const aboutPlaceLinkStyle: CSSProperties = {
 
 const showAllControlStyle: CSSProperties = {
   ...textActionStyle,
+  minWidth: "44px",
   minHeight: "44px",
   padding: "0 4px"
 };
