@@ -1,25 +1,15 @@
+// AWMC's AD 69 and AD 14 province partitions for the ancient layer: AWMC's province lines, extent and
+// coastline are polygonised into faces and cut to Natural Earth land, and the faces that hold a reference
+// town are named. Where a province line stops short of another line, it is extended straight on for up
+// to EXTENSION_LIMIT_KM to close the face. scripts/build-ancient-geo.mjs calls buildAncientPartitions.
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
-import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
-import sharp from "sharp";
-
-const execFileAsync = promisify(execFile);
+import mapshaper from "mapshaper";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = path.resolve(moduleDirectory, "..");
+const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
 
-const AWMC_COMMIT = "7ecf8bccea2efe1e1e9df2daf6001942de73fb87";
-const NATURAL_EARTH_COMMIT = "ca96624a56bd078437bca8184e78163e5039ad19";
-const AWMC_BASE_URL = `https://raw.githubusercontent.com/AWMC/geodata/${AWMC_COMMIT}`;
-const NATURAL_EARTH_LAND_URL = `https://raw.githubusercontent.com/nvkelso/natural-earth-vector/${NATURAL_EARTH_COMMIT}/geojson/ne_10m_land.geojson`;
-const CULTURAL_ZIP_URL = `${AWMC_BASE_URL}/${encodeURIComponent("Cultural Shapefiles Apr 2024.zip")}`;
-const COASTLINE_ZIP_URL = `${AWMC_BASE_URL}/Physical%20Data/shoreline/coastline.zip`;
-
-const WORK_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03b-work");
-const REPORT_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03b");
 // The frame lies outside AWMC's AD 69 extent on every side (the extent spans 9.5°W–40.7°E and
 // 22.9–54.4°N), so no face inside the empire is cut by a straight frame edge.
 const BBOX = Object.freeze({ minLon: -11, minLat: 22.5, maxLon: 50, maxLat: 56 });
@@ -95,57 +85,8 @@ const REFERENCE_TOWNS = Object.freeze([
   { town: "Ctesiphon", territory: "Parthia", expectedKm2: 800000 }
 ]);
 
-function mapshaperCommand(args) {
-  if (process.platform === "win32") {
-    return { command: process.env.ComSpec ?? "cmd.exe", args: ["/d", "/s", "/c", "npx", "mapshaper", ...args] };
-  }
-  return { command: "npx", args: ["mapshaper", ...args] };
-}
-
 async function runMapshaper(args) {
-  const { command, args: commandArgs } = mapshaperCommand(args);
-  await execFileAsync(command, commandArgs, { cwd: repositoryRoot, windowsHide: true, maxBuffer: 1024 * 1024 * 20 });
-}
-
-async function downloadFile(url, destinationPath) {
-  try {
-    await fs.access(destinationPath);
-    return;
-  } catch {
-    // Download below.
-  }
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
-  }
-  await fs.mkdir(path.dirname(destinationPath), { recursive: true });
-  await fs.writeFile(destinationPath, Buffer.from(await response.arrayBuffer()));
-}
-
-async function extractZip(zipPath, destinationDirectory) {
-  await fs.rm(destinationDirectory, { recursive: true, force: true });
-  await fs.mkdir(destinationDirectory, { recursive: true });
-  const escapedZip = zipPath.replaceAll("'", "''");
-  const escapedDest = destinationDirectory.replaceAll("'", "''");
-  await execFileAsync(
-    "powershell",
-    ["-NoProfile", "-Command", `Expand-Archive -Path '${escapedZip}' -DestinationPath '${escapedDest}' -Force`],
-    { windowsHide: true }
-  );
-}
-
-async function findFirstFile(directory, predicate) {
-  const entries = await fs.readdir(directory, { withFileTypes: true });
-  for (const entry of entries) {
-    const entryPath = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      const nested = await findFirstFile(entryPath, predicate);
-      if (nested) return nested;
-    } else if (predicate(entryPath)) {
-      return entryPath;
-    }
-  }
-  return null;
+  await mapshaper.runCommands(args);
 }
 
 function pointInRing([x, y], ring) {
@@ -215,24 +156,6 @@ function distanceToGeometryKm(point, geometry) {
     }
   }
   return minimum;
-}
-
-function centroidApprox(geometry) {
-  const points = [];
-  const collect = (node) => {
-    if (!Array.isArray(node)) return;
-    if (typeof node[0] === "number" && typeof node[1] === "number") {
-      points.push(node);
-      return;
-    }
-    for (const child of node) collect(child);
-  };
-  collect(geometry?.coordinates);
-  if (points.length === 0) return [0, 0];
-  return [
-    points.reduce((sum, point) => sum + point[0], 0) / points.length,
-    points.reduce((sum, point) => sum + point[1], 0) / points.length
-  ];
 }
 
 function kmProject(point, origin) {
@@ -480,72 +403,8 @@ function nameFaces(faceCollection, referenceTowns) {
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
-async function writeCsv(filePath, rows, columns) {
-  const escape = (value) => {
-    const text = value === null || value === undefined ? "" : String(value);
-    return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-  };
-  const lines = [columns.join(",")];
-  for (const row of rows) {
-    lines.push(columns.map((column) => escape(row[column])).join(","));
-  }
-  await fs.writeFile(filePath, `${lines.join("\n")}\n`, "utf8");
-}
-
-function colorForKey(key) {
-  let hash = 0;
-  for (let index = 0; index < key.length; index += 1) hash = (hash << 5) - hash + key.charCodeAt(index);
-  return `hsl(${Math.abs(hash) % 360},58%,76%)`;
-}
-
-function projectPoint([lon, lat], width, height) {
-  return [
-    ((lon - BBOX.minLon) / (BBOX.maxLon - BBOX.minLon)) * width,
-    ((BBOX.maxLat - lat) / (BBOX.maxLat - BBOX.minLat)) * height
-  ];
-}
-
-function svgPathForRing(ring, width, height) {
-  return ring
-    .map((point, index) => {
-      const [x, y] = projectPoint(point, width, height);
-      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
-}
-
-async function writePreview(tag, faceCollection, namedRows) {
-  const width = 1800;
-  const height = 1050;
-  const labelByGeometry = new Map(namedRows.map((row) => [row.geometry, row]));
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
-  svg += `<rect width="${width}" height="${height}" fill="#eef3f7"/>`;
-  svg += `<rect x="0" y="0" width="${width}" height="${height}" fill="#f7f2e8" opacity="0.8"/>`;
-  for (const feature of faceCollection.features) {
-    const row = labelByGeometry.get(feature.geometry);
-    const key = row?.name ?? "unlabelled";
-    for (const polygon of polygonsFromGeometry(feature.geometry)) {
-      const outer = polygon[0];
-      if (!outer) continue;
-      svg += `<path d="${svgPathForRing(outer, width, height)} Z" fill="${colorForKey(key)}" stroke="#333" stroke-width="0.8" fill-opacity="0.78"/>`;
-    }
-  }
-  for (const row of namedRows) {
-    const [x, y] = projectPoint(centroidApprox(row.geometry), width, height);
-    const label = `${row.name}${row.territoryCount > 1 ? "*" : ""}`;
-    svg += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="Arial, sans-serif" font-size="15" text-anchor="middle" fill="#111" stroke="#fff" stroke-width="3" paint-order="stroke">${label}</text>`;
-  }
-  svg += `<text x="22" y="34" font-family="Arial, sans-serif" font-size="24" fill="#111">${tag.toUpperCase()} AWMC-line partition; * = merged reference towns</text>`;
-  svg += `</svg>`;
-  const svgPath = path.join(REPORT_DIRECTORY, `${tag}-partition-preview.svg`);
-  const pngPath = path.join(REPORT_DIRECTORY, `${tag}-partition-preview.png`);
-  await fs.writeFile(svgPath, `${svg}\n`, "utf8");
-  await sharp(Buffer.from(svg)).png().toFile(pngPath);
-  return { svgPath, pngPath };
-}
-
-async function preparePartitionInputs(tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, extensionFeatures) {
-  const directory = path.join(WORK_DIRECTORY, tag);
+async function preparePartitionInputs(workDirectory, tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, extensionFeatures) {
+  const directory = path.join(workDirectory, tag);
   await fs.mkdir(directory, { recursive: true });
   const provinceLinesPath = path.join(directory, "province-lines.geojson");
   const extentLinePath = path.join(directory, "extent-line.geojson");
@@ -597,9 +456,9 @@ async function preparePartitionInputs(tag, provinceShpPath, extentShpPath, coast
   return { provinceLinesPath, extentLinePath, coastlinePath, landMaskPath, extensionPath, bboxPath };
 }
 
-async function polygonizePartition(tag, inputPaths) {
-  const allFacesPath = path.join(WORK_DIRECTORY, tag, "all-faces.geojson");
-  const landFacesPath = path.join(WORK_DIRECTORY, tag, "land-faces.geojson");
+async function polygonizePartition(workDirectory, tag, inputPaths) {
+  const allFacesPath = path.join(workDirectory, tag, "all-faces.geojson");
+  const landFacesPath = path.join(workDirectory, tag, "land-faces.geojson");
   await runMapshaper([
     "-i",
     inputPaths.provinceLinesPath,
@@ -653,8 +512,8 @@ async function polygonizePartition(tag, inputPaths) {
   };
 }
 
-async function buildPartition(tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, referenceTowns) {
-  const initialInputs = await preparePartitionInputs(tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, []);
+async function buildPartition(workDirectory, tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, referenceTowns) {
+  const initialInputs = await preparePartitionInputs(workDirectory, tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, []);
   const provinceLines = JSON.parse(await fs.readFile(initialInputs.provinceLinesPath, "utf8"));
   const extentLines = JSON.parse(await fs.readFile(initialInputs.extentLinePath, "utf8"));
   const coastline = JSON.parse(await fs.readFile(initialInputs.coastlinePath, "utf8"));
@@ -663,78 +522,26 @@ async function buildPartition(tag, provinceShpPath, extentShpPath, coastShpPath,
     { source: "extent", features: extentLines.features ?? [] },
     { source: "awmc-coastline", features: coastline.features ?? [] }
   ]);
-  const inputs = await preparePartitionInputs(tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, dangleReport.extensions);
-  const faces = await polygonizePartition(tag, inputs);
+  const inputs = await preparePartitionInputs(workDirectory, tag, provinceShpPath, extentShpPath, coastShpPath, neLandPath, dangleReport.extensions);
+  const faces = await polygonizePartition(workDirectory, tag, inputs);
   const named = nameFaces(faces.landFaces, referenceTowns);
   return { ...faces, named, dangleReport };
 }
 
-async function writeDangleOutputs(partitions) {
-  const dangleRows = [];
-  const extensionRows = [];
-  for (const [tag, partition] of Object.entries(partitions)) {
-    for (const row of partition.dangleReport.dangles) dangleRows.push({ partition: tag.toUpperCase(), ...row, nearestKm: Number.isFinite(row.nearestKm) ? row.nearestKm.toFixed(3) : "" });
-    for (const row of partition.dangleReport.extensions) extensionRows.push({ partition: tag.toUpperCase(), ...row, lengthKm: row.lengthKm.toFixed(3) });
-  }
-  const dangleCsvPath = path.join(REPORT_DIRECTORY, "dangles.csv");
-  const extensionCsvPath = path.join(REPORT_DIRECTORY, "dangle-extensions.csv");
-  await writeCsv(dangleCsvPath, dangleRows, ["partition", "dangleId", "featureId", "end", "lon", "lat", "nearestKm", "nearestSource"]);
-  await writeCsv(extensionCsvPath, extensionRows, ["partition", "extensionId", "dangleId", "fromLon", "fromLat", "toLon", "toLat", "lengthKm", "targetSource", "targetFeatureId"]);
-  const reportPath = path.join(REPORT_DIRECTORY, "dangle-report.md");
-  const lines = ["# Ancient partition dangles", ""];
-  for (const [tag, partition] of Object.entries(partitions)) {
-    const unresolved = partition.dangleReport.dangles.length - partition.dangleReport.extensions.length;
-    lines.push(
-      `- ${tag.toUpperCase()}: ${partition.dangleReport.dangles.length} dangling province-line endpoints from ${partition.dangleReport.endpointCount} endpoints; ${partition.dangleReport.extensions.length} extensions within ${EXTENSION_LIMIT_KM} km; ${unresolved} unresolved.`
-    );
-  }
-  lines.push("", `CSV: ${dangleCsvPath}`, `Extensions: ${extensionCsvPath}`);
-  await fs.writeFile(reportPath, `${lines.join("\n")}\n`, "utf8");
-  return { dangleCsvPath, extensionCsvPath, reportPath };
-}
-
-async function main() {
-  await fs.rm(REPORT_DIRECTORY, { recursive: true, force: true });
-  await fs.mkdir(REPORT_DIRECTORY, { recursive: true });
-  await fs.mkdir(WORK_DIRECTORY, { recursive: true });
-
-  const culturalZipPath = path.join(WORK_DIRECTORY, "Cultural-Shapefiles-Apr-2024.zip");
-  const coastlineZipPath = path.join(WORK_DIRECTORY, "coastline.zip");
-  const neLandPath = path.join(WORK_DIRECTORY, "ne_10m_land.geojson");
-  await Promise.all([
-    downloadFile(CULTURAL_ZIP_URL, culturalZipPath),
-    downloadFile(COASTLINE_ZIP_URL, coastlineZipPath),
-    downloadFile(NATURAL_EARTH_LAND_URL, neLandPath)
-  ]);
-
-  const culturalExtractPath = path.join(WORK_DIRECTORY, "awmc-cultural");
-  const coastlineExtractPath = path.join(WORK_DIRECTORY, "awmc-coastline");
-  await Promise.all([extractZip(culturalZipPath, culturalExtractPath), extractZip(coastlineZipPath, coastlineExtractPath)]);
-  const coastShpPath = await findFirstFile(coastlineExtractPath, (filePath) => path.basename(filePath).toLowerCase() === "coastline.shp");
-  if (!coastShpPath) throw new Error("Could not find AWMC coastline.shp");
-
+// Builds the AD 69 and AD 14 partitions in `workDirectory` (a folder for each, holding its land faces,
+// land mask and AWMC coastline) and writes each one's named faces there as `<tag>-named-faces.geojson`.
+// Returns counts for the composition report.
+export async function buildAncientPartitions({ culturalRoot, coastShpPath, neLandPath, workDirectory }) {
   const referenceTowns = await loadReferenceTownPoints();
-  const paths = {
-    ad69Province: path.join(culturalExtractPath, "political_shading", "roman_empire_ad_69_provinces", "roman_empire_ad_69_provinces.shp"),
-    ad69Extent: path.join(culturalExtractPath, "political_shading", "roman_empire_ad_69_extent", "roman_empire_ad_69_extent.shp"),
-    ad14Province: path.join(culturalExtractPath, "political_shading", "roman_empire_ad_14_provinces", "roman_empire_ad_14_provinces.shp"),
-    ad14Extent: path.join(culturalExtractPath, "political_shading", "roman_empire_ad_14_extent", "roman_empire_ad_14_extent.shp")
-  };
-
-  const ad69 = await buildPartition("ad69", paths.ad69Province, paths.ad69Extent, coastShpPath, neLandPath, referenceTowns);
-  const ad14 = await buildPartition("ad14", paths.ad14Province, paths.ad14Extent, coastShpPath, neLandPath, referenceTowns);
-
-  const csvColumns = ["faceId", "name", "towns", "observedKm2", "expectedKm2", "check", "note"];
-  for (const [tag, partition] of Object.entries({ ad69, ad14 })) {
-    const rows = partition.named.map((row) => ({
-      ...row,
-      observedKm2: row.observedKm2.toFixed(0),
-      expectedKm2: row.expectedKm2.toFixed(0)
-    }));
-    const csvPath = path.join(REPORT_DIRECTORY, `${tag}-named-faces.csv`);
-    await writeCsv(csvPath, rows, csvColumns);
+  const shapefile = (folder) => path.join(culturalRoot, "political_shading", folder, `${folder}.shp`);
+  const summary = {};
+  for (const [tag, provinces, extent] of [
+    ["ad69", "roman_empire_ad_69_provinces", "roman_empire_ad_69_extent"],
+    ["ad14", "roman_empire_ad_14_provinces", "roman_empire_ad_14_extent"]
+  ]) {
+    const partition = await buildPartition(workDirectory, tag, shapefile(provinces), shapefile(extent), coastShpPath, neLandPath, referenceTowns);
     await fs.writeFile(
-      path.join(REPORT_DIRECTORY, `${tag}-named-faces.geojson`),
+      path.join(workDirectory, `${tag}-named-faces.geojson`),
       JSON.stringify({
         type: "FeatureCollection",
         features: partition.named.map((row) => ({
@@ -753,30 +560,13 @@ async function main() {
       }),
       "utf8"
     );
+    summary[tag] = {
+      rawFaces: partition.allFaces.features.length,
+      landFaces: partition.landFaces.features.length,
+      namedFaces: partition.named.length,
+      dangles: partition.dangleReport.dangles.length,
+      extensions: partition.dangleReport.extensions.length
+    };
   }
-
-  const ad69Preview = await writePreview("ad69", ad69.landFaces, ad69.named);
-  const ad14Preview = await writePreview("ad14", ad14.landFaces, ad14.named);
-  const dangleOutputs = await writeDangleOutputs({ ad69, ad14 });
-
-  const summary = [
-    "# Ancient partition prep summary",
-    "",
-    `- AWMC commit: \`${AWMC_COMMIT}\``,
-    `- Natural Earth commit: \`${NATURAL_EARTH_COMMIT}\``,
-    `- BBox: ${BBOX_STRING}`,
-    `- AD 69: ${ad69.allFaces.features.length} raw faces; ${ad69.landFaces.features.length} land faces; ${ad69.named.length} named faces.`,
-    `- AD 14: ${ad14.allFaces.features.length} raw faces; ${ad14.landFaces.features.length} land faces; ${ad14.named.length} named faces.`,
-    `- AD 69 preview: ${ad69Preview.pngPath}`,
-    `- AD 14 preview: ${ad14Preview.pngPath}`,
-    `- Dangles: ${dangleOutputs.reportPath}`
-  ];
-  await fs.writeFile(path.join(REPORT_DIRECTORY, "summary.md"), `${summary.join("\n")}\n`, "utf8");
-
-  console.log(summary.join("\n"));
+  return summary;
 }
-
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});

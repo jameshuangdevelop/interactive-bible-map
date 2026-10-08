@@ -70,6 +70,11 @@ const DEFAULT_ANCIENT_EMPIRE_EDGE_SCHEMA_PATH = path.join(
   "schema",
   "ancient-empire-edge.schema.json"
 );
+const DEFAULT_OSM_WATERWAYS_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "osm-waterways.schema.json"
+);
 const DEFAULT_GEO_PROVENANCE_SCHEMA_PATH = path.join(
   repositoryRoot,
   "schema",
@@ -406,6 +411,7 @@ async function loadSchemas(
   ancientRoadsSchemaPath,
   ancientCoastlineSchemaPath,
   ancientEmpireEdgeSchemaPath,
+  osmWaterwaysSchemaPath,
   geoProvenanceSchemaPath
 ) {
   const [
@@ -418,6 +424,7 @@ async function loadSchemas(
     ancientRoadsSchema,
     ancientCoastlineSchema,
     ancientEmpireEdgeSchema,
+    osmWaterwaysSchema,
     geoProvenanceSchema
   ] =
     await Promise.all([
@@ -430,6 +437,7 @@ async function loadSchemas(
       readJsonFile(ancientRoadsSchemaPath),
       readJsonFile(ancientCoastlineSchemaPath),
       readJsonFile(ancientEmpireEdgeSchemaPath),
+      readJsonFile(osmWaterwaysSchemaPath),
       readJsonFile(geoProvenanceSchemaPath)
     ]);
   return {
@@ -442,6 +450,7 @@ async function loadSchemas(
     ancientRoadsSchema,
     ancientCoastlineSchema,
     ancientEmpireEdgeSchema,
+    osmWaterwaysSchema,
     geoProvenanceSchema
   };
 }
@@ -1789,6 +1798,14 @@ export async function validateData(options = {}) {
   const ancientEmpireEdgeSchemaPath = path.resolve(
     options.ancientEmpireEdgeSchemaPath ?? DEFAULT_ANCIENT_EMPIRE_EDGE_SCHEMA_PATH
   );
+  // The pinned OpenStreetMap rivers the ancient layer's build reads: validated when present.
+  const osmWaterwaysPath = path.resolve(
+    options.osmWaterwaysPath ??
+      path.join(inferredDataRoot, "geo", "sources", "osm-waterways.geojson")
+  );
+  const osmWaterwaysSchemaPath = path.resolve(
+    options.osmWaterwaysSchemaPath ?? DEFAULT_OSM_WATERWAYS_SCHEMA_PATH
+  );
   const geoProvenanceSchemaPath = path.resolve(
     options.geoProvenanceSchemaPath ?? DEFAULT_GEO_PROVENANCE_SCHEMA_PATH
   );
@@ -1843,6 +1860,7 @@ export async function validateData(options = {}) {
     ancientRoadsSchema,
     ancientCoastlineSchema,
     ancientEmpireEdgeSchema,
+    osmWaterwaysSchema,
     geoProvenanceSchema
   } = await loadSchemas(
     locationSchemaPath,
@@ -1854,6 +1872,7 @@ export async function validateData(options = {}) {
     ancientRoadsSchemaPath,
     ancientCoastlineSchemaPath,
     ancientEmpireEdgeSchemaPath,
+    osmWaterwaysSchemaPath,
     geoProvenanceSchemaPath
   );
 
@@ -1869,6 +1888,7 @@ export async function validateData(options = {}) {
   const validateAncientRoadsSchema = ajv.compile(ancientRoadsSchema);
   const validateAncientCoastlineSchema = ajv.compile(ancientCoastlineSchema);
   const validateAncientEmpireEdgeSchema = ajv.compile(ancientEmpireEdgeSchema);
+  const validateOsmWaterwaysSchema = ajv.compile(osmWaterwaysSchema);
   const validateSourceIdSchema = ajv.compile({
     $ref: "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
   });
@@ -1951,25 +1971,29 @@ export async function validateData(options = {}) {
     ancientAreasExists,
     ancientRoadsExists,
     ancientCoastlineExists,
-    ancientEmpireEdgeExists
+    ancientEmpireEdgeExists,
+    osmWaterwaysExists
   ] = await Promise.all([
     pathExists(ancientAreasPath),
     pathExists(ancientRoadsPath),
     pathExists(ancientCoastlinePath),
-    pathExists(ancientEmpireEdgePath)
+    pathExists(ancientEmpireEdgePath),
+    pathExists(osmWaterwaysPath)
   ]);
 
-  const [ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData] =
+  const [ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData, osmWaterwaysData] =
     await Promise.all([
       ancientAreasExists ? readFeatureCollection(ancientAreasPath, errors) : null,
       ancientRoadsExists ? readFeatureCollection(ancientRoadsPath, errors) : null,
       ancientCoastlineExists ? readFeatureCollection(ancientCoastlinePath, errors) : null,
-      ancientEmpireEdgeExists ? readFeatureCollection(ancientEmpireEdgePath, errors) : null
+      ancientEmpireEdgeExists ? readFeatureCollection(ancientEmpireEdgePath, errors) : null,
+      osmWaterwaysExists ? readFeatureCollection(osmWaterwaysPath, errors) : null
     ]);
   const ancientAreasRelativePath = relativeFromRepositoryRoot(ancientAreasPath);
   const ancientRoadsRelativePath = relativeFromRepositoryRoot(ancientRoadsPath);
   const ancientCoastlineRelativePath = relativeFromRepositoryRoot(ancientCoastlinePath);
   const ancientEmpireEdgeRelativePath = relativeFromRepositoryRoot(ancientEmpireEdgePath);
+  const osmWaterwaysRelativePath = relativeFromRepositoryRoot(osmWaterwaysPath);
 
   if (usingRepositoryDataRoot) {
     if (!ancientAreasExists) {
@@ -2036,6 +2060,17 @@ export async function validateData(options = {}) {
       recordError(
         errors,
         ancientEmpireEdgeRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
+    }
+  }
+
+  if (osmWaterwaysData && !validateOsmWaterwaysSchema(osmWaterwaysData)) {
+    for (const issue of validateOsmWaterwaysSchema.errors ?? []) {
+      recordError(
+        errors,
+        osmWaterwaysRelativePath,
         pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
         `Schema validation failed: ${issue.message}`
       );
@@ -2454,6 +2489,11 @@ export async function validateData(options = {}) {
   validateCoordinateRanges({
     featureCollection: ancientEmpireEdgeData,
     file: ancientEmpireEdgeRelativePath,
+    errors
+  });
+  validateCoordinateRanges({
+    featureCollection: osmWaterwaysData,
+    file: osmWaterwaysRelativePath,
     errors
   });
   validatePolygonRings({
@@ -3335,6 +3375,7 @@ export async function validateData(options = {}) {
   validateGeoLayerProvenance(ancientRoadsData, ancientRoadsRelativePath);
   validateGeoLayerProvenance(ancientCoastlineData, ancientCoastlineRelativePath);
   validateGeoLayerProvenance(ancientEmpireEdgeData, ancientEmpireEdgeRelativePath);
+  validateGeoLayerProvenance(osmWaterwaysData, osmWaterwaysRelativePath);
 
   return { errors, warnings };
 }

@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parseReference } from "../scripts/lib/books.mjs";
+import { serializeWaterways, waterwayFeatures } from "../scripts/lib/osm-waterways.mjs";
 import {
   validateData,
   REQUIRE_EMPIRE_ROOT,
@@ -2319,6 +2320,43 @@ test("ancient shapes catch open rings, out-of-range coordinates, and self-inters
     hasError(selfIntersecting, (error) => /self-intersection/u.test(error.message)),
     true
   );
+});
+
+test("pinned OpenStreetMap waterways are validated when present", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-waterways-"));
+  try {
+    const way = { id: 101, version: 4, nodeIds: [7, 8, 9], coordinates: [[35.6, 33.1], [35.61, 33.0], [35.62, 32.9]] };
+    const writeWaterways = (mutate) => {
+      const collection = { asOf: "2026-10-08T00:00:00Z", features: waterwayFeatures("jordan", [way], { asOf: "2026-10-08T00:00:00Z" }) };
+      mutate?.(collection);
+      const filePath = path.join(directory, "osm-waterways.geojson");
+      fs.writeFileSync(filePath, serializeWaterways(collection));
+      return filePath;
+    };
+    const isWaterwaysError = (error) => /osm-waterways\.geojson$/u.test(error.file);
+
+    const valid = await runWithTemporaryAncientCase(undefined, { osmWaterwaysPath: writeWaterways() });
+    assert.equal(valid.errors.filter(isWaterwaysError).length, 0);
+
+    const noVersion = await runWithTemporaryAncientCase(undefined, {
+      osmWaterwaysPath: writeWaterways((collection) => {
+        delete collection.features[0].properties.version;
+      })
+    });
+    assert.equal(
+      hasError(noVersion, (error) => isWaterwaysError(error) && error.path === "$.features[0].properties.version" && /Schema validation failed/u.test(error.message)),
+      true
+    );
+
+    const undatedAttic = await runWithTemporaryAncientCase(undefined, {
+      osmWaterwaysPath: writeWaterways((collection) => {
+        collection.asOf = "yesterday";
+      })
+    });
+    assert.equal(hasError(undatedAttic, (error) => isWaterwaysError(error) && /Schema validation failed/u.test(error.message)), true);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test("ancient empire edge is optional and validated when present", async () => {

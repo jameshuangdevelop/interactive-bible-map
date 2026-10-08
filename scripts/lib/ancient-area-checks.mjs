@@ -54,6 +54,61 @@ export function distancePointToSegmentKm(point, start, end) {
   return Math.hypot(a[0] + t * dx, a[1] + t * dy);
 }
 
+// The stretches of the areas' borders that lie within `withinKm` of a line, walked along every ring in
+// steps of about 50 m: [{ areaId, lengthKm, start, closestKm }]. A border that crosses the line spends a
+// short stretch near it (about 2 × withinKm / sin of the crossing angle); one that follows it, a long one.
+export function borderStretchesNear(features, line, withinKm) {
+  const lats = line.map(([, lat]) => lat);
+  const latMargin = withinKm / 110.574 + 0.001;
+  const lonMargin = withinKm / (111.32 * Math.cos((Math.max(...lats.map(Math.abs)) * Math.PI) / 180)) + 0.001;
+  const box = [Math.min(...line.map(([lon]) => lon)) - lonMargin, Math.min(...lats) - latMargin, Math.max(...line.map(([lon]) => lon)) + lonMargin, Math.max(...lats) + latMargin];
+  const nearest = (point) => Math.min(...line.slice(1).map((end, index) => distancePointToSegmentKm(point, line[index], end)));
+  const segmentKm = (start, end) => Math.hypot((end[0] - start[0]) * 111.32 * Math.cos((((start[1] + end[1]) / 2) * Math.PI) / 180), (end[1] - start[1]) * 110.574);
+  const stretches = [];
+  for (const feature of features) {
+    const areaId = feature.properties?.areaId;
+    for (const ring of polygonsOf(feature.geometry).flat()) {
+      const ringStretches = [];
+      let open = null;
+      let startsAtRingStart = false;
+      for (let index = 1; index < ring.length; index += 1) {
+        const [start, end] = [ring[index - 1], ring[index]];
+        if (Math.max(start[0], end[0]) < box[0] || Math.min(start[0], end[0]) > box[2] || Math.max(start[1], end[1]) < box[1] || Math.min(start[1], end[1]) > box[3]) {
+          if (open) ringStretches.push(open);
+          open = null;
+          continue;
+        }
+        const lengthKm = segmentKm(start, end);
+        const steps = Math.max(1, Math.ceil(lengthKm / 0.05));
+        for (let step = 0; step < steps; step += 1) {
+          const t = (step + 0.5) / steps;
+          const point = [start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1])];
+          const distance = nearest(point);
+          if (distance <= withinKm) {
+            if (!open) {
+              open = { areaId, lengthKm: 0, start: point, closestKm: distance };
+              if (index === 1 && step === 0) startsAtRingStart = true;
+            }
+            open.lengthKm += lengthKm / steps;
+            open.closestKm = Math.min(open.closestKm, distance);
+          } else if (open) {
+            ringStretches.push(open);
+            open = null;
+          }
+        }
+      }
+      // A stretch still open at the ring's end runs on through its first vertex.
+      if (open && startsAtRingStart && ringStretches.length > 0) {
+        ringStretches[0] = { ...ringStretches[0], lengthKm: ringStretches[0].lengthKm + open.lengthKm, start: open.start, closestKm: Math.min(ringStretches[0].closestKm, open.closestKm) };
+      } else if (open) {
+        ringStretches.push(open);
+      }
+      stretches.push(...ringStretches);
+    }
+  }
+  return stretches.sort((left, right) => right.lengthKm - left.lengthKm);
+}
+
 export function distanceToGeometryKm(point, geometry) {
   let minimum = Number.POSITIVE_INFINITY;
   for (const polygon of polygonsOf(geometry)) {
@@ -128,6 +183,33 @@ export async function coverageRows(domainFeatures, collection, explanations, min
   }
   rows.sort((left, right) => right.areaKm2 - left.areaKm2);
   return { rows, smallCount, smallKm2 };
+}
+
+// The geometry acceptance checks of M4-03 and the Fact-Checker's fixes, over the lists the composition
+// reports: every expected area built, valid and without repeated vertices; no overlap larger than
+// `maxOverlapKm2`; no unexplained coverage gap; every place inside its area, within 3 km of it or with
+// an explanation; every anchor in its area; the old-sea points in no area; no stretch of the empire's
+// edge longer than `maxCoastStretchKm` along today's coast; and no stretch of border longer than
+// `maxAidStretchKm` near a processing aid (`aidStretches`, from borderStretchesNear), which would mean a
+// border follows a line that is only meant to help an intermediate step. Returns the failures, in words.
+export function acceptanceFailures({ builtAreaIds, expectedAreaIds, validity, overlaps, coverageGaps, places, anchors, emptyPoints, coastStretches, aidStretches = [] }, { maxOverlapKm2 = 1, maxCoastStretchKm = 10, maxAidStretchKm = 5 } = {}) {
+  const failures = [];
+  const at = (point) => point.map((value) => value.toFixed(3)).join(", ");
+  for (const areaId of expectedAreaIds) if (!builtAreaIds.includes(areaId)) failures.push(`${areaId} was not built`);
+  for (const row of validity) {
+    if (!row.valid) failures.push(`${row.areaId} is not a valid polygon`);
+    if (row.duplicateVertices > 0) failures.push(`${row.areaId} repeats ${row.duplicateVertices} vertices`);
+  }
+  for (const row of overlaps) if (row.areaKm2 > maxOverlapKm2) failures.push(`${row.pair} overlap by ${row.areaKm2.toFixed(2)} km²`);
+  for (const row of coverageGaps) if (!row.explanation) failures.push(`${row.areaKm2.toFixed(1)} km² at ${at(row.point)} lies in no area, unexplained`);
+  for (const row of places) {
+    if (row.status !== "inside" && row.status !== "near-border" && !row.explanation) failures.push(`${row.label} is ${row.status === "area-not-built" ? "linked to an area that wasn't built" : `${row.distanceKm.toFixed(1)} km outside`} \`${row.areaId}\`, unexplained`);
+  }
+  for (const check of anchors) if (!check.areaIds.includes(check.expected)) failures.push(`${check.name} lies in ${check.areaIds.join(", ") || "no area"}, not ${check.expected}`);
+  for (const check of emptyPoints) if (check.areaIds.length > 0) failures.push(`${check.name} lies in ${check.areaIds.join(", ")}, which should hold no land there`);
+  for (const stretch of coastStretches) if (stretch.lengthKm > maxCoastStretchKm) failures.push(`the empire's edge runs ${stretch.lengthKm.toFixed(1)} km along today's coast from ${at(stretch.start)}`);
+  for (const stretch of aidStretches) if (stretch.lengthKm > maxAidStretchKm) failures.push(`${stretch.areaId}'s border runs ${stretch.lengthKm.toFixed(1)} km close to ${stretch.aid} from ${at(stretch.start)}, so that line would shape a border`);
+  return failures;
 }
 
 // Every place with a place-level link is checked at each of its candidate sites; candidate-level
