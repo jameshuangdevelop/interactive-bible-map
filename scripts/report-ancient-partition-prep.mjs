@@ -12,180 +12,107 @@ const repositoryRoot = path.resolve(moduleDirectory, "..");
 
 const AWMC_COMMIT = "7ecf8bccea2efe1e1e9df2daf6001942de73fb87";
 const NATURAL_EARTH_COMMIT = "ca96624a56bd078437bca8184e78163e5039ad19";
-const AWMC_BASE_URL = `https://raw.githubusercontent.com/AWMC/geodata/${AWMC_COMMIT}`;
-const NATURAL_EARTH_BASE_URL = `https://raw.githubusercontent.com/nvkelso/natural-earth-vector/${NATURAL_EARTH_COMMIT}`;
-
-const AWMC_PROVINCE_LINES_PATH =
-  "Cultural-Data/political_shading/roman_empire_ce_200_provinces/roman_empire_ce_200_provinces.geojson";
-const AWMC_COASTLINE_PATH = "Physical Data/shoreline/shoreline.geojson";
-const AWMC_EMPIRE_117_PATH =
-  "Cultural-Data/political_shading/roman_empire_ce_117_extent/roman_empire_ce_117_extent.geojson";
-const AWMC_EMPIRE_200_EXTENT_PATH =
-  "Cultural-Data/political_shading/roman_empire_ce_200_extent/roman_empire_ce_200_extent.geojson";
-const NATURAL_EARTH_LAND_PATH = "geojson/ne_10m_land.geojson";
-
-const FOCUS_BOUNDS = Object.freeze({
-  minLon: 10,
-  maxLon: 50,
-  minLat: 25,
-  maxLat: 47
-});
-const FOCUS_BBOX = `${FOCUS_BOUNDS.minLon},${FOCUS_BOUNDS.minLat},${FOCUS_BOUNDS.maxLon},${FOCUS_BOUNDS.maxLat}`;
+const AWMC_ZIP_URL = `https://raw.githubusercontent.com/AWMC/geodata/${AWMC_COMMIT}/${encodeURIComponent("Cultural Shapefiles Apr 2024.zip")}`;
+const NATURAL_EARTH_LAND_URL = `https://raw.githubusercontent.com/nvkelso/natural-earth-vector/${NATURAL_EARTH_COMMIT}/geojson/ne_10m_land.geojson`;
 
 const WORK_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03-method");
 const REPORT_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03");
+const BBOX = Object.freeze({ minLon: 9, minLat: 24, maxLon: 50, maxLat: 48 });
+const BBOX_STRING = `${BBOX.minLon},${BBOX.minLat},${BBOX.maxLon},${BBOX.maxLat}`;
 
-const PROVINCE_REFERENCES = [
-  { areaName: "Achaia", referenceTown: "Corinth", coordinates: [22.878614, 37.905642] },
-  { areaName: "Macedonia", referenceTown: "Thessalonica", coordinates: [22.952885, 40.628342] },
-  { areaName: "Epirus", referenceTown: "Nicopolis", coordinates: [20.75, 39.02] },
-  { areaName: "Thracia", referenceTown: "Byzantium", coordinates: [28.98, 41.01] },
-  { areaName: "Moesia Inferior", referenceTown: "Odessos", coordinates: [27.915, 43.214] },
-  { areaName: "Asia", referenceTown: "Ephesus", coordinates: [27.342403, 37.940164] },
-  { areaName: "Bithynia et Pontus", referenceTown: "Nicomedia", coordinates: [29.92, 40.77] },
-  { areaName: "Galatia", referenceTown: "Ancyra", coordinates: [32.86, 39.93] },
-  { areaName: "Cappadocia", referenceTown: "Caesarea Mazaca", coordinates: [35.49, 38.73] },
-  { areaName: "Lycia et Pamphylia", referenceTown: "Perga", coordinates: [30.852, 36.959] },
-  { areaName: "Cilicia", referenceTown: "Tarsus", coordinates: [34.896467, 36.914043] },
-  { areaName: "Syria Coele", referenceTown: "Antioch on the Orontes", coordinates: [36.181667, 36.204722] },
-  { areaName: "Syria Phoenice", referenceTown: "Tyre", coordinates: [35.209358, 33.268071] },
-  { areaName: "Syria Palaestina", referenceTown: "Jerusalem", coordinates: [35.234156, 31.776679] },
-  { areaName: "Arabia", referenceTown: "Petra", coordinates: [35.444, 30.328] },
-  { areaName: "Aegyptus", referenceTown: "Alexandria", coordinates: [29.9, 31.2] },
-  { areaName: "Cyprus", referenceTown: "Paphos", coordinates: [32.406593, 34.757212] },
-  { areaName: "Creta et Cyrene", referenceTown: "Crete", coordinates: [24.893333, 35.309722] },
-  { areaName: "Creta et Cyrene", referenceTown: "Cyrene", coordinates: [21.86, 32.83] },
-  { areaName: "Italia", referenceTown: "Rome", coordinates: [12.491258, 41.889977] },
-  { areaName: "Sicilia", referenceTown: "Syracuse", coordinates: [15.287, 37.067] },
-  { areaName: "Dalmatia", referenceTown: "Salona", coordinates: [16.44, 43.51] },
-  { areaName: "Pannonia", referenceTown: "Sirmium", coordinates: [19.61, 44.98] },
-  { areaName: "Mesopotamia", referenceTown: "Edessa", coordinates: [39.028, 37.16] },
-  { areaName: "Osroene", referenceTown: "Nisibis", coordinates: [41.22, 37.07] },
-  { areaName: "Africa", referenceTown: "Leptis Magna", coordinates: [14.292, 32.639] },
-  { areaName: "outside-parthia", referenceTown: "Ctesiphon", coordinates: [44.58, 33.1] },
-  { areaName: "outside-armenia", referenceTown: "Artaxata", coordinates: [44.57, 39.96] }
-];
+const REFERENCE_TOWNS = Object.freeze([
+  { name: "Aegyptus", town: "Alexandria", lon: 29.9, lat: 31.2 },
+  { name: "Africa", town: "Leptis Magna", lon: 14.292, lat: 32.639 },
+  { name: "Achaia", town: "Corinth", lon: 22.878614, lat: 37.905642 },
+  { name: "Arabia", town: "Petra", lon: 35.444, lat: 30.328 },
+  { name: "Asia", town: "Ephesus", lon: 27.342403, lat: 37.940164 },
+  { name: "Bithynia et Pontus", town: "Nicomedia", lon: 29.92, lat: 40.77 },
+  { name: "Cappadocia", town: "Caesarea Mazaca", lon: 35.49, lat: 38.73 },
+  { name: "Cilicia", town: "Tarsus", lon: 34.896467, lat: 36.914043 },
+  { name: "Creta et Cyrene", town: "Gortyna (Crete)", lon: 24.944, lat: 35.06 },
+  { name: "Creta et Cyrene", town: "Cyrene", lon: 21.86, lat: 32.83 },
+  { name: "Cyprus", town: "Paphos", lon: 32.43, lat: 34.77 },
+  { name: "Dalmatia", town: "Delminium hinterland", lon: 17.2, lat: 43.8 },
+  { name: "Epirus", town: "Nicopolis", lon: 20.75, lat: 39.02 },
+  { name: "Galatia", town: "Ancyra", lon: 32.86, lat: 39.93 },
+  { name: "Italia", town: "Rome", lon: 12.491258, lat: 41.889977 },
+  { name: "Lycia et Pamphylia", town: "Perga", lon: 30.852, lat: 36.959 },
+  { name: "Macedonia", town: "Thessalonica", lon: 22.952885, lat: 40.628342 },
+  { name: "Mesopotamia", town: "Edessa", lon: 39.028, lat: 37.16 },
+  { name: "Moesia Inferior", town: "Odessos", lon: 27.915, lat: 43.214 },
+  { name: "Osroene", town: "Nisibis", lon: 41.22, lat: 37.07 },
+  { name: "Pannonia", town: "Sirmium", lon: 19.61, lat: 44.98 },
+  { name: "Sicilia", town: "Syracuse", lon: 15.2, lat: 37.12 },
+  { name: "Syria Coele", town: "Antioch", lon: 36.181667, lat: 36.204722 },
+  { name: "Syria Palaestina", town: "Jerusalem", lon: 35.234156, lat: 31.776679 },
+  { name: "Syria Phoenice", town: "Tyre", lon: 35.209358, lat: 33.268071 },
+  { name: "Thracia", town: "Hadrianopolis", lon: 26.56, lat: 41.68 },
+  { name: "outside-armenia", town: "Artaxata", lon: 44.57, lat: 39.96 },
+  { name: "outside-parthia", town: "Ctesiphon", lon: 44.58, lat: 33.1 }
+]);
 
-function pathForMapshaper() {
-  if (process.platform === "win32") {
-    return {
-      command: process.env.ComSpec ?? "cmd.exe",
-      argsPrefix: ["/d", "/s", "/c", "npx", "mapshaper"]
-    };
-  }
-  return {
-    command: "npx",
-    argsPrefix: ["mapshaper"]
-  };
-}
-
-async function runMapshaper(args) {
-  const mapshaper = pathForMapshaper();
-  await execFileAsync(mapshaper.command, [...mapshaper.argsPrefix, ...args], {
-    cwd: repositoryRoot,
-    windowsHide: true
-  });
-}
-
-async function downloadJson(url, destinationPath) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
-  }
-  const content = await response.text();
-  await fs.mkdir(path.dirname(destinationPath), { recursive: true });
-  await fs.writeFile(destinationPath, content, "utf8");
-  return JSON.parse(content);
-}
-
-function geometryIntersectsBounds(geometry, bounds) {
-  let minLon = Number.POSITIVE_INFINITY;
-  let maxLon = Number.NEGATIVE_INFINITY;
-  let minLat = Number.POSITIVE_INFINITY;
-  let maxLat = Number.NEGATIVE_INFINITY;
-
-  const ingest = (value) => {
-    if (!Array.isArray(value)) {
-      return;
-    }
-    if (typeof value[0] === "number" && typeof value[1] === "number") {
-      minLon = Math.min(minLon, value[0]);
-      maxLon = Math.max(maxLon, value[0]);
-      minLat = Math.min(minLat, value[1]);
-      maxLat = Math.max(maxLat, value[1]);
-      return;
-    }
-    for (const nested of value) {
-      ingest(nested);
-    }
-  };
-  ingest(geometry?.coordinates);
-
-  if (!Number.isFinite(minLon)) {
-    return false;
-  }
-
-  return !(
-    maxLon < bounds.minLon ||
-    minLon > bounds.maxLon ||
-    maxLat < bounds.minLat ||
-    minLat > bounds.maxLat
-  );
-}
+const SIZE_CHECKS = Object.freeze([
+  { key: "Cyprus", expectedKm2: 9250, tolerance: 0.3 },
+  { key: "Sicilia", expectedKm2: 25700, tolerance: 0.3 },
+  { key: "Creta et Cyrene::Gortyna (Crete)", expectedKm2: 8300, tolerance: 0.3 },
+  { key: "Achaia", expectedKm2: 30000, tolerance: 0.3 },
+  { key: "Thracia", expectedKm2: 85000, tolerance: 0.3 },
+  { key: "Dalmatia", expectedKm2: 90000, tolerance: 0.3 }
+]);
 
 function pointInRing([x, y], ring) {
   let inside = false;
-  for (let index = 0, previous = ring.length - 1; index < ring.length; previous = index, index += 1) {
-    const [xi, yi] = ring[index];
-    const [xj, yj] = ring[previous];
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
     const intersects = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi + 1e-15) + xi;
-    if (intersects) {
-      inside = !inside;
-    }
+    if (intersects) inside = !inside;
   }
   return inside;
 }
 
-function pointInPolygon(point, geometry) {
-  if (!geometry) {
-    return false;
-  }
+function pointInPolygon([x, y], geometry) {
+  if (!geometry) return false;
   if (geometry.type === "Polygon") {
-    return pointInRing(point, geometry.coordinates[0]);
+    const [outer, ...holes] = geometry.coordinates;
+    if (!pointInRing([x, y], outer)) return false;
+    return !holes.some((ring) => pointInRing([x, y], ring));
   }
   if (geometry.type === "MultiPolygon") {
-    return geometry.coordinates.some((polygon) => pointInRing(point, polygon[0]));
+    return geometry.coordinates.some((polygon) => {
+      const [outer, ...holes] = polygon;
+      if (!pointInRing([x, y], outer)) return false;
+      return !holes.some((ring) => pointInRing([x, y], ring));
+    });
   }
   return false;
 }
 
 function polygonsFromGeometry(geometry) {
-  if (!geometry) {
-    return [];
-  }
-  if (geometry.type === "Polygon") {
-    return [geometry.coordinates];
-  }
-  if (geometry.type === "MultiPolygon") {
-    return geometry.coordinates;
-  }
+  if (!geometry) return [];
+  if (geometry.type === "Polygon") return [geometry.coordinates];
+  if (geometry.type === "MultiPolygon") return geometry.coordinates;
   return [];
 }
 
 function polygonAreaApproxKm2(polygonCoordinates) {
+  const ringAreaDegrees2 = (ring) => {
+    if (!ring || ring.length < 4) return 0;
+    let shoelace = 0;
+    for (let i = 0; i < ring.length - 1; i += 1) {
+      const [x1, y1] = ring[i];
+      const [x2, y2] = ring[i + 1];
+      shoelace += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(shoelace) / 2;
+  };
   const outerRing = polygonCoordinates[0] ?? [];
-  if (outerRing.length < 4) {
-    return 0;
-  }
-  let shoelace = 0;
+  if (outerRing.length < 4) return 0;
   let latitudeSum = 0;
-  for (let index = 0; index < outerRing.length - 1; index += 1) {
-    const [x1, y1] = outerRing[index];
-    const [x2, y2] = outerRing[index + 1];
-    shoelace += x1 * y2 - x2 * y1;
-    latitudeSum += y1;
-  }
-  const areaDegrees2 = Math.abs(shoelace) / 2;
+  for (let i = 0; i < outerRing.length - 1; i += 1) latitudeSum += outerRing[i][1];
+  const outerArea = ringAreaDegrees2(outerRing);
+  const holesArea = polygonCoordinates.slice(1).reduce((sum, ring) => sum + ringAreaDegrees2(ring), 0);
+  const areaDegrees2 = Math.max(0, outerArea - holesArea);
   const latitudeRadians = (latitudeSum / Math.max(1, outerRing.length - 1)) * (Math.PI / 180);
   const kmPerDegreeLat = 111.32;
   const kmPerDegreeLon = 111.32 * Math.cos(latitudeRadians);
@@ -198,49 +125,208 @@ function geometryAreaApproxKm2(geometry) {
     .reduce((sum, value) => sum + value, 0);
 }
 
-function geometryCentroid(geometry) {
-  let sumX = 0;
-  let sumY = 0;
+function centroidApprox(geometry) {
+  let sx = 0;
+  let sy = 0;
   let count = 0;
-  const ingest = (value) => {
-    if (!Array.isArray(value)) {
-      return;
-    }
-    if (typeof value[0] === "number" && typeof value[1] === "number") {
-      sumX += value[0];
-      sumY += value[1];
+  const walk = (node) => {
+    if (!Array.isArray(node)) return;
+    if (typeof node[0] === "number" && typeof node[1] === "number") {
+      sx += node[0];
+      sy += node[1];
       count += 1;
       return;
     }
-    for (const nested of value) {
-      ingest(nested);
-    }
+    for (const child of node) walk(child);
   };
-  ingest(geometry?.coordinates);
-  if (count === 0) {
-    return null;
-  }
-  return [sumX / count, sumY / count];
+  walk(geometry?.coordinates);
+  return count > 0 ? [sx / count, sy / count] : [0, 0];
 }
 
 function ensureFeatureCollection(geojson) {
-  if (geojson.type === "FeatureCollection") {
-    return geojson;
-  }
+  if (geojson.type === "FeatureCollection") return geojson;
   const geometries = Array.isArray(geojson.geometries) ? geojson.geometries : [];
   return {
     type: "FeatureCollection",
-    features: geometries.map((geometry, index) => ({
-      type: "Feature",
-      properties: { cellId: `c${String(index + 1).padStart(4, "0")}` },
-      geometry
-    }))
+    features: geometries.map((geometry) => ({ type: "Feature", properties: {}, geometry }))
   };
 }
 
-async function writeJson(filePath, payload) {
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+async function runMapshaper(args) {
+  if (process.platform === "win32") {
+    await execFileAsync(process.env.ComSpec ?? "cmd.exe", ["/d", "/s", "/c", "npx", "mapshaper", ...args], {
+      cwd: repositoryRoot,
+      windowsHide: true
+    });
+    return;
+  }
+  await execFileAsync("npx", ["mapshaper", ...args], { cwd: repositoryRoot, windowsHide: true });
+}
+
+async function downloadFile(url, destinationPath) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
+  }
+  const payload = Buffer.from(await response.arrayBuffer());
+  await fs.mkdir(path.dirname(destinationPath), { recursive: true });
+  await fs.writeFile(destinationPath, payload);
+}
+
+async function extractZip(zipPath, destinationDirectory) {
+  const escapedZip = zipPath.replaceAll("'", "''");
+  const escapedDest = destinationDirectory.replaceAll("'", "''");
+  const command = `Expand-Archive -Path '${escapedZip}' -DestinationPath '${escapedDest}' -Force`;
+  await execFileAsync("powershell", ["-NoProfile", "-Command", command], { windowsHide: true });
+}
+
+async function buildLandMask(paths) {
+  await runMapshaper([
+    "-i",
+    paths.neLandPath,
+    "-clip",
+    `bbox=${BBOX_STRING}`,
+    "-dissolve",
+    "-clean",
+    "-o",
+    "format=geojson",
+    paths.landMaskPath
+  ]);
+  await runMapshaper(["-i", paths.landMaskPath, "-lines", "-o", "format=geojson", paths.landBoundaryPath]);
+}
+
+async function buildFaces(tag, lineShpPath, extentShpPath, paths) {
+  const facesPath = path.join(WORK_DIRECTORY, `${tag}-faces.geojson`);
+  await runMapshaper([
+    "-i",
+    lineShpPath,
+    "name=prov",
+    "-i",
+    extentShpPath,
+    "name=extent",
+    "-target",
+    "extent",
+    "-dissolve",
+    "-lines",
+    "name=extentline",
+    "-i",
+    paths.landBoundaryPath,
+    "name=land",
+    "-target",
+    "prov,extentline,land",
+    "-merge-layers",
+    "force",
+    "name=linework",
+    "-target",
+    "linework",
+    "-snap",
+    "interval=0.002",
+    "-clean",
+    "snap-interval=0.002",
+    "-polygons",
+    "gap-tolerance=0.006",
+    "-clip",
+    paths.landMaskPath,
+    "-filter-slivers",
+    "min-area=50km2",
+    "-explode",
+    "-o",
+    "format=geojson",
+    facesPath
+  ]);
+  return facesPath;
+}
+
+function assignNames(features) {
+  const assigned = [];
+  for (const reference of REFERENCE_TOWNS) {
+    const matchIndex = features.findIndex((feature) =>
+      pointInPolygon([reference.lon, reference.lat], feature.geometry)
+    );
+    if (matchIndex === -1) continue;
+    assigned.push({
+      name: reference.name,
+      referenceTown: reference.town,
+      faceId: `f${String(matchIndex + 1).padStart(4, "0")}`,
+      areaKm2: geometryAreaApproxKm2(features[matchIndex].geometry),
+      centroid: centroidApprox(features[matchIndex].geometry),
+      geometry: features[matchIndex].geometry
+    });
+  }
+  return assigned.sort((a, b) => a.name.localeCompare(b.name) || a.referenceTown.localeCompare(b.referenceTown));
+}
+
+function svgPathForRing(ring, width, height) {
+  const project = ([lon, lat]) => {
+    const x = ((lon - BBOX.minLon) / (BBOX.maxLon - BBOX.minLon)) * width;
+    const y = ((BBOX.maxLat - lat) / (BBOX.maxLat - BBOX.minLat)) * height;
+    return [x, y];
+  };
+  return ring
+    .map((point, index) => {
+      const [x, y] = project(point);
+      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(" ");
+}
+
+function colorForKey(key) {
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) hash = (hash << 5) - hash + key.charCodeAt(i);
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue},55%,78%)`;
+}
+
+async function writePreviewSvg(tag, allFaces, namedFaces) {
+  const width = 1800;
+  const height = 1050;
+  const labelsByGeometry = new Map(namedFaces.map((face) => [face.geometry, `${face.name}`]));
+  let body = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n`;
+  body += `<rect x="0" y="0" width="${width}" height="${height}" fill="#f7f7f7"/>\n`;
+  for (const feature of allFaces) {
+    const labelRow = namedFaces.find((row) => row.geometry === feature.geometry);
+    const label = labelRow ? labelRow.name : "unlabeled";
+    const fill = colorForKey(label);
+    for (const polygon of polygonsFromGeometry(feature.geometry)) {
+      const ring = polygon[0];
+      if (!ring || ring.length < 4) continue;
+      body += `<path d="${svgPathForRing(ring, width, height)} Z" fill="${fill}" stroke="#333" stroke-width="0.9" fill-opacity="0.75"/>\n`;
+    }
+  }
+  for (const row of namedFaces) {
+    const [lon, lat] = row.centroid;
+    const x = ((lon - BBOX.minLon) / (BBOX.maxLon - BBOX.minLon)) * width;
+    const y = ((BBOX.maxLat - lat) / (BBOX.maxLat - BBOX.minLat)) * height;
+    body += `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="16" font-family="Arial, sans-serif" text-anchor="middle" fill="#111" stroke="#fff" stroke-width="3" paint-order="stroke">${row.name}</text>\n`;
+  }
+  body += `<text x="20" y="30" font-size="24" font-family="Arial, sans-serif" fill="#111">${tag.toUpperCase()} partition preview (9°E–50°E, 24°N–48°N)</text>\n`;
+  body += "</svg>\n";
+  const outPath = path.join(REPORT_DIRECTORY, `${tag}-partition-preview.svg`);
+  await fs.writeFile(outPath, body, "utf8");
+  return outPath;
+}
+
+function buildSizeChecks(namedRows) {
+  return SIZE_CHECKS.map((check) => {
+    let matched;
+    if (check.key.includes("::")) {
+      const [name, town] = check.key.split("::");
+      matched = namedRows.find((row) => row.name === name && row.referenceTown === town);
+    } else {
+      matched = namedRows.find((row) => row.name === check.key);
+    }
+    if (!matched) {
+      return { ...check, observedKm2: null, withinTolerance: false };
+    }
+    const deltaFraction = Math.abs(matched.areaKm2 - check.expectedKm2) / check.expectedKm2;
+    return { ...check, observedKm2: matched.areaKm2, withinTolerance: deltaFraction <= check.tolerance };
+  });
+}
+
+async function writeCsv(outputPath, rows) {
+  const header = "name,referenceTown,faceId,approxAreaKm2";
+  const lines = rows.map((row) => `${row.name},"${row.referenceTown}",${row.faceId},${row.areaKm2.toFixed(1)}`);
+  await fs.writeFile(outputPath, `${[header, ...lines].join("\n")}\n`, "utf8");
 }
 
 async function main() {
@@ -248,247 +334,78 @@ async function main() {
   await fs.mkdir(REPORT_DIRECTORY, { recursive: true });
 
   const paths = {
-    coastPath: path.join(WORK_DIRECTORY, "ancient-shoreline.geojson"),
-    neLandPath: path.join(WORK_DIRECTORY, "ne-land.geojson"),
-    provinceLinesPath: path.join(WORK_DIRECTORY, "province-lines.geojson"),
-    extent117Path: path.join(WORK_DIRECTORY, "extent-117.geojson"),
-    extent200Path: path.join(WORK_DIRECTORY, "extent-200.geojson"),
-    awmcCoastFacesPath: path.join(WORK_DIRECTORY, "awmc-coast-faces.geojson"),
-    landMaskInputPath: path.join(WORK_DIRECTORY, "land-mask-input.geojson"),
+    awmcZipPath: path.join(WORK_DIRECTORY, "Cultural-Shapefiles-Apr-2024.zip"),
+    awmcExtractPath: path.join(WORK_DIRECTORY, "awmc-shp-2024"),
+    neLandPath: path.join(WORK_DIRECTORY, "ne_10m_land.geojson"),
     landMaskPath: path.join(WORK_DIRECTORY, "land-mask.geojson"),
-    landMaskFocusPath: path.join(WORK_DIRECTORY, "land-mask-focus.geojson"),
-    landMaskLinesPath: path.join(WORK_DIRECTORY, "land-mask-lines.geojson"),
-    partitionRawPath: path.join(WORK_DIRECTORY, "ad200-partition-raw.geojson")
+    landBoundaryPath: path.join(WORK_DIRECTORY, "land-boundary-lines.geojson")
   };
 
-  const [neLand, extent117, extent200] = await Promise.all([
-    downloadJson(`${NATURAL_EARTH_BASE_URL}/${NATURAL_EARTH_LAND_PATH}`, paths.neLandPath),
-    downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_117_PATH}`, paths.extent117Path),
-    downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_200_EXTENT_PATH}`, paths.extent200Path),
-    downloadJson(`${AWMC_BASE_URL}/${AWMC_COASTLINE_PATH}`, paths.coastPath),
-    downloadJson(`${AWMC_BASE_URL}/${AWMC_PROVINCE_LINES_PATH}`, paths.provinceLinesPath)
-  ]).then((values) => [values[0], values[1], values[2]]);
+  await Promise.all([downloadFile(AWMC_ZIP_URL, paths.awmcZipPath), downloadFile(NATURAL_EARTH_LAND_URL, paths.neLandPath)]);
+  await extractZip(paths.awmcZipPath, paths.awmcExtractPath);
+  await buildLandMask(paths);
 
+  const ad69Shp = path.join(paths.awmcExtractPath, "political_shading", "roman_empire_ad_69_provinces", "roman_empire_ad_69_provinces.shp");
+  const ad14Shp = path.join(paths.awmcExtractPath, "political_shading", "roman_empire_ad_14_provinces", "roman_empire_ad_14_provinces.shp");
+  const ad69ExtentShp = path.join(paths.awmcExtractPath, "political_shading", "roman_empire_ad_69_extent", "roman_empire_ad_69_extent.shp");
+  const ad14ExtentShp = path.join(paths.awmcExtractPath, "political_shading", "roman_empire_ad_14_extent", "roman_empire_ad_14_extent.shp");
+  const herodShp = path.join(paths.awmcExtractPath, "political_shading", "herod", "herod.shp");
+
+  const ad69FacesPath = await buildFaces("ad69", ad69Shp, ad69ExtentShp, paths);
+  const ad14FacesPath = await buildFaces("ad14", ad14Shp, ad14ExtentShp, paths);
+
+  const ad69Faces = ensureFeatureCollection(JSON.parse(await fs.readFile(ad69FacesPath, "utf8"))).features;
+  const ad14Faces = ensureFeatureCollection(JSON.parse(await fs.readFile(ad14FacesPath, "utf8"))).features;
+  const ad69Named = assignNames(ad69Faces);
+  const ad14Named = assignNames(ad14Faces);
+
+  const ad69CsvPath = path.join(REPORT_DIRECTORY, "ad69-faces.csv");
+  const ad14CsvPath = path.join(REPORT_DIRECTORY, "ad14-faces.csv");
+  await writeCsv(ad69CsvPath, ad69Named);
+  await writeCsv(ad14CsvPath, ad14Named);
+
+  const ad69PreviewPath = await writePreviewSvg("ad69", ad69Faces, ad69Named);
+  const ad14PreviewPath = await writePreviewSvg("ad14", ad14Faces, ad14Named);
+
+  const herodRecord12Path = path.join(REPORT_DIRECTORY, "herod-record-12.geojson");
   await runMapshaper([
     "-i",
-    paths.coastPath,
-    "-snap",
-    "interval=0.01",
-    "-clean",
-    "-polygons",
-    "gap-tolerance=0.02",
+    herodShp,
+    "-each",
+    "_idx=this.id",
+    "-filter",
+    "_idx==12",
     "-o",
     "format=geojson",
-    paths.awmcCoastFacesPath
+    herodRecord12Path
   ]);
 
-  const awmcCoastFaces = ensureFeatureCollection(
-    JSON.parse(await fs.readFile(paths.awmcCoastFacesPath, "utf8"))
-  );
-  const neLandFeatures = ensureFeatureCollection(neLand).features.filter((feature) =>
-    geometryIntersectsBounds(feature.geometry, FOCUS_BOUNDS)
-  );
-
-  const awmcLandFeatures = awmcCoastFaces.features.filter((feature) => {
-    if (!geometryIntersectsBounds(feature.geometry, FOCUS_BOUNDS)) {
-      return false;
-    }
-    const center = geometryCentroid(feature.geometry);
-    if (!center) {
-      return false;
-    }
-    return neLandFeatures.some((landFeature) => pointInPolygon(center, landFeature.geometry));
-  });
-
-  await writeJson(paths.landMaskInputPath, {
-    type: "FeatureCollection",
-    features: [...awmcLandFeatures, ...neLandFeatures]
-  });
-
-  await runMapshaper([
-    "-i",
-    paths.landMaskInputPath,
-    "-dissolve",
-    "-clean",
-    "-o",
-    "format=geojson",
-    paths.landMaskPath
-  ]);
-
-  await runMapshaper([
-    "-i",
-    paths.landMaskPath,
-    "-clip",
-    `bbox=${FOCUS_BBOX}`,
-    "-clean",
-    "-o",
-    "format=geojson",
-    paths.landMaskFocusPath
-  ]);
-
-  await runMapshaper([
-    "-i",
-    paths.landMaskFocusPath,
-    "-lines",
-    "-o",
-    "format=geojson",
-    paths.landMaskLinesPath
-  ]);
-
-  await runMapshaper([
-    "-i",
-    paths.provinceLinesPath,
-    "name=prov",
-    "-i",
-    paths.extent200Path,
-    "name=ext200",
-    "-target",
-    "ext200",
-    "-dissolve",
-    "-lines",
-    "name=ext200l",
-    "-i",
-    paths.landMaskLinesPath,
-    "name=land",
-    "-target",
-    "prov,land,ext200l",
-    "-merge-layers",
-    "force",
-    "name=linework",
-    "-target",
-    "linework",
-    "-snap",
-    "interval=0.01",
-    "-clean",
-    "-polygons",
-    "gap-tolerance=0.01",
-    "-o",
-    "format=geojson",
-    paths.partitionRawPath
-  ]);
-
-  const partitionRaw = ensureFeatureCollection(
-    JSON.parse(await fs.readFile(paths.partitionRawPath, "utf8"))
-  );
-  const landMask = ensureFeatureCollection(
-    JSON.parse(await fs.readFile(paths.landMaskFocusPath, "utf8"))
-  );
-  const landMaskGeometries = landMask.features.map((feature) => feature.geometry);
-  const extent117Geometries = ensureFeatureCollection(extent117).features.map((feature) => feature.geometry);
-  const extent200Geometries = ensureFeatureCollection(extent200).features.map((feature) => feature.geometry);
-
-  const cells = partitionRaw.features
-    .map((feature, index) => ({
-      cellId: `c${String(index + 1).padStart(4, "0")}`,
-      geometry: feature.geometry
-    }))
-    .filter((cell) => {
-      const center = geometryCentroid(cell.geometry);
-      if (!center) {
-        return false;
-      }
-      return landMaskGeometries.some((geometry) => pointInPolygon(center, geometry));
-    });
-
-  const assignments = [];
-  const assignmentByCellId = new Map();
-
-  for (const reference of PROVINCE_REFERENCES) {
-    const matched = cells.find(
-      (cell) =>
-        !assignmentByCellId.has(cell.cellId) && pointInPolygon(reference.coordinates, cell.geometry)
-    );
-    if (!matched) {
-      continue;
-    }
-    const assignment = {
-      ...reference,
-      cellId: matched.cellId,
-      areaKm2: geometryAreaApproxKm2(matched.geometry)
-    };
-    assignments.push(assignment);
-    assignmentByCellId.set(matched.cellId, assignment);
+  const sizeChecks = [
+    ...buildSizeChecks(ad69Named).map((row) => ({ ...row, partition: "AD 69" })),
+    ...buildSizeChecks(ad14Named).map((row) => ({ ...row, partition: "AD 14" }))
+  ];
+  const checksPath = path.join(REPORT_DIRECTORY, "partition-size-checks.md");
+  let md = "# AD69/AD14 partition size checks\n\n";
+  md += `- AWMC commit: \`${AWMC_COMMIT}\`\n`;
+  md += `- Natural Earth commit: \`${NATURAL_EARTH_COMMIT}\`\n`;
+  md += `- Scope: ${BBOX_STRING}\n\n`;
+  md += "| Partition | Face | Expected km² | Observed km² | Within ±30% |\n|---|---|---:|---:|---|\n";
+  for (const row of sizeChecks) {
+    md += `| ${row.partition} | ${row.key} | ${row.expectedKm2.toFixed(0)} | ${
+      row.observedKm2 === null ? "n/a" : row.observedKm2.toFixed(1)
+    } | ${row.withinTolerance ? "yes" : "no"} |\n`;
   }
+  await fs.writeFile(checksPath, md, "utf8");
 
-  const provinceRows = [];
-  const grouped = new Map();
-  for (const assignment of assignments) {
-    if (!grouped.has(assignment.areaName)) {
-      grouped.set(assignment.areaName, {
-        areaName: assignment.areaName,
-        referenceTowns: new Set(),
-        areaKm2: 0
-      });
-    }
-    const row = grouped.get(assignment.areaName);
-    row.referenceTowns.add(assignment.referenceTown);
-    row.areaKm2 += assignment.areaKm2;
-  }
-  for (const row of grouped.values()) {
-    provinceRows.push({
-      areaName: row.areaName,
-      referenceTowns: [...row.referenceTowns].join("; "),
-      areaKm2: row.areaKm2
-    });
-  }
-  provinceRows.sort((left, right) => left.areaName.localeCompare(right.areaName));
-
-  const unassignedInScope = [];
-  for (const cell of cells) {
-    if (assignmentByCellId.has(cell.cellId)) {
-      continue;
-    }
-    const center = geometryCentroid(cell.geometry);
-    if (!center) {
-      continue;
-    }
-    const in117 = extent117Geometries.some((geometry) => pointInPolygon(center, geometry));
-    const in200 = extent200Geometries.some((geometry) => pointInPolygon(center, geometry));
-    if (!in117 && !in200) {
-      continue;
-    }
-    if (!geometryIntersectsBounds(cell.geometry, FOCUS_BOUNDS)) {
-      continue;
-    }
-    unassignedInScope.push({
-      cellId: cell.cellId,
-      centroidLon: center[0],
-      centroidLat: center[1],
-      areaKm2: geometryAreaApproxKm2(cell.geometry)
-    });
-  }
-  unassignedInScope.sort((left, right) => right.areaKm2 - left.areaKm2);
-
-  const provincesListPath = path.join(REPORT_DIRECTORY, "ad200-province-names.csv");
-  const provinceCsv = [
-    "name,referenceTown,approxAreaKm2",
-    ...provinceRows.map((row) => `${row.areaName},${row.referenceTowns},${row.areaKm2.toFixed(1)}`)
-  ].join("\n");
-  await fs.writeFile(provincesListPath, `${provinceCsv}\n`, "utf8");
-
-  const coveragePath = path.join(REPORT_DIRECTORY, "m4-03-coverage-report.md");
-  let coverageReport = "# M4-03 Coverage Report (method-prep)\n\n";
-  coverageReport += `- Land-mask faces (ancient coastline + NE fallback): ${awmcLandFeatures.length + neLandFeatures.length}\n`;
-  coverageReport += `- Partition cells on land: ${cells.length}\n`;
-  coverageReport += `- Assigned named cells: ${assignmentByCellId.size}\n`;
-  coverageReport += `- Unassigned cells in AD 117/200 scope: ${unassignedInScope.length}\n\n`;
-  coverageReport += "## Largest unassigned cells in scope\n\n";
-  coverageReport += "| cellId | centroidLon | centroidLat | approxKm2 |\n|---|---:|---:|---:|\n";
-  for (const row of unassignedInScope.slice(0, 250)) {
-    coverageReport += `| ${row.cellId} | ${row.centroidLon.toFixed(4)} | ${row.centroidLat.toFixed(4)} | ${row.areaKm2.toFixed(1)} |\n`;
-  }
-  coverageReport += "\n## Province naming rows\n\n";
-  coverageReport += "| name | referenceTown(s) | approxAreaKm2 |\n|---|---|---:|\n";
-  for (const row of provinceRows) {
-    coverageReport += `| ${row.areaName} | ${row.referenceTowns} | ${row.areaKm2.toFixed(1)} |\n`;
-  }
-  await fs.writeFile(coveragePath, coverageReport, "utf8");
-
-  console.log(`Wrote ${provincesListPath}`);
-  console.log(`Wrote ${coveragePath}`);
+  console.log(`Wrote ${ad69CsvPath}`);
+  console.log(`Wrote ${ad14CsvPath}`);
+  console.log(`Wrote ${checksPath}`);
+  console.log(`Wrote ${ad69PreviewPath}`);
+  console.log(`Wrote ${ad14PreviewPath}`);
+  console.log(`Wrote ${herodRecord12Path}`);
 }
 
 main().catch((error) => {
-  console.error(error.message);
+  console.error(error);
   process.exitCode = 1;
 });
