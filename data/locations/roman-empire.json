@@ -108,7 +108,7 @@
     },
     {
       "fromYear": 68,
-      "toYear": 69,
+      "toYear": 70,
       "entity": "Galba, Otho and Vitellius in turn (the \"Year of the Four Emperors\")",
       "sources": [
         "bib:cassius-dio-roman-history",
@@ -116,11 +116,12 @@
       ]
     },
     {
-      "fromYear": 69,
+      "fromYear": 70,
       "toYear": 79,
       "entity": "Reign of Vespasian",
       "sources": [
-        "bib:josephus-jewish-war"
+        "bib:josephus-jewish-war",
+        "bib:worldhistory-vespasian"
       ]
     },
     {
