@@ -29,6 +29,7 @@ import {
   validityRows,
   writePreviewPng
 } from "./lib/ancient-area-checks.mjs";
+import { validateGeometryTopology } from "./lib/validator.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -55,6 +56,14 @@ const COVERAGE_TOLERANCE_KM2 = 5;
 const FINE_SIMPLIFY_AREAS = ["judea-samaria-idumea", "galilee-perea", "philip-tetrarchy-lands"];
 const FINE_SIMPLIFY_METRES = 25;
 const COARSE_SIMPLIFY_METRES = 600;
+// `other-roman-lands` lies far from our places, so its own borders are simplified more coarsely, which
+// keeps the app's ancient files within their size budget; its islands within NEAR_PLACES_KM of one of
+// our places (such as the Aegean's) keep COARSE_SIMPLIFY_METRES like the areas around them. Edges it
+// shares with another area are simplified once, at the finer of the two tolerances, so neighbours keep
+// identical edges.
+const OTHER_ROMAN_LANDS_SIMPLIFY_METRES = 3500;
+const NEAR_PLACES_KM = 150;
+const NEAR_ISLAND_MAX_KM2 = 10000;
 // Coordinates are written to 5 decimals (about 1 m), the precision the app's build uses.
 const OUTPUT_PRECISION = 0.00001;
 
@@ -81,7 +90,8 @@ const AREA_ORDER = [
   "italy",
   "sicily",
   "illyricum",
-  "thrace"
+  "thrace",
+  "other-roman-lands"
 ];
 
 const OMITTED_BY_RULING = [
@@ -112,7 +122,8 @@ const SOURCE_BY_AREA = {
   thrace: ["awmc:roman-empire-ad-69-provinces"],
   "judea-samaria-idumea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378"],
   "galilee-perea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728"],
-  "philip-tetrarchy-lands": ["bib:josephus-jewish-war"]
+  "philip-tetrarchy-lands": ["bib:josephus-jewish-war"],
+  "other-roman-lands": ["awmc:roman-empire-ad-69-extent", "awmc:roman-empire-ad-69-provinces"]
 };
 
 const POINTS = {
@@ -145,7 +156,11 @@ const POINTS = {
   cos: [27.29, 36.89],
   rhodes: [28.22, 36.18],
   nicopolis: [20.75, 39.02],
-  rome: [12.4913, 41.89]
+  rome: [12.4913, 41.89],
+  // Strabo 12.2.7: Mazaca, the metropolis of the Cappadocians. The label point is the one on the
+  // `cappadocia` location record.
+  caesareaMazaca: [35.48, 38.72],
+  cappadociaLabel: [34.8392, 38.6706]
 };
 
 const HEROD_ANCHORS = {
@@ -185,28 +200,78 @@ const OSM_RIVERS = {
 const LAMUS_SEA_EXTENSION_KM = 5;
 const LAMUS_NORTH_EXTENSION_LATITUDE = 37.55;
 
-// Points inside AD 69 provinces that M4-02's area list leaves out; used to label coverage gaps.
+// Perea ends just south of Machaerus (Josephus, War 3.3.3), so the fortress itself stays in Perea.
+const MACHAERUS_CUT_MARGIN_KM = 1;
+
+// AWMC draws no first-century Galatia–Cappadocia line; the edge between the two faces is the AD 14
+// extent, from Cappadocia's years as a client kingdom. It is moved locally so that the province's label
+// point lies in Cappadocia: two straight segments from points CAPPADOCIA_DETOUR_HALF_KM either side
+// along the edge to a point CAPPADOCIA_DETOUR_BEYOND_KM beyond the label point.
+const CAPPADOCIA_DETOUR_HALF_KM = 25;
+const CAPPADOCIA_DETOUR_BEYOND_KM = 3;
+
+// Land outside every area but joined by land to exactly one of them, and smaller than this, is a
+// peninsula that AWMC's extent cut off at its neck (or the rest of an island an area already holds).
+const PENINSULA_MAX_KM2 = 2000;
+// Islands inside AWMC's AD 69 extent smaller than this are left out of `other-roman-lands`.
+const MIN_ISLAND_KM2 = 5;
+// ADR-0037 item 2: an island joins one of the timeline's areas only where a cited source places it
+// there. These are the Research Lead's sourced islands (docs/research/M4-timeline.md §2.25, "Islands",
+// quoting Smith's Dictionary of Greek and Roman Geography); every other island stays in
+// `other-roman-lands`. Each point lies inside the island.
+const SOURCED_ISLANDS = [
+  { name: "Euboea", point: [23.78, 38.55], areaId: "achaia", citation: "Smith's Dictionary of Greek and Roman Geography, \"Euboea\": \"Under the Romans, Euboea was included in the province of Achaia.\"" },
+  { name: "Brattia (Brač)", point: [16.62, 43.32], areaId: "illyricum", citation: "Smith's Dictionary of Greek and Roman Geography, \"Brattia\": \"an island off the Dalmatian coast of Illyricum.\"" },
+  { name: "Curicta (Krk)", point: [14.58, 45.1], areaId: "illyricum", citation: "Smith's Dictionary of Greek and Roman Geography, \"Curicta\" (citing Pliny, Natural History 3.21): \"an island off the coast of Illyricum.\"" }
+];
+// Natural Earth land is clipped to this frame only to keep the computation small; the frame lies well
+// outside AWMC's AD 69 extent, so no area or edge touches it.
+const ROMAN_WORLD_FRAME = "-14,18,56,60";
+// Londinium and Lutetia identify Great Britain and the continent in Natural Earth's land polygons.
+const BRITAIN_POINT = [-0.12, 51.51];
+const CONTINENT_POINT = [2.35, 48.86];
+
+// The empire's edge is the shared boundary between the Roman world and land outside it larger than
+// OUTSIDE_LAND_MIN_KM2 (smaller pieces are slivers between AWMC's and Natural Earth's coastlines), less
+// any stretch within EDGE_COAST_TOLERANCE_KM of today's coastline and pieces shorter than EDGE_MIN_PIECE_KM.
+const OUTSIDE_LAND_MIN_KM2 = 1000;
+const EDGE_COAST_TOLERANCE_KM = 2;
+const EDGE_MIN_PIECE_KM = 3;
+const outputEmpireEdgePath = path.join(repositoryRoot, "data", "geo", "ancient-empire-edge.geojson");
+
+// Points inside AD 69 provinces that M4-02's area list leaves out. The rule-4 pass never gives their
+// land to a listed area, and the coverage report names them.
 const OUTSIDE_LIST_PROBES = [
   ["Pannonia", [[16.37, 45.48], [19.61, 44.98], [15.87, 46.42], [16.62, 47.23], [18.9, 47.4]]],
   ["Moesia", [[21.9, 43.32], [21.21, 44.74], [24.47, 43.7], [27.27, 44.12], [25.39, 43.61], [28.65, 44.17]]],
   ["Noricum", [[14.37, 46.7], [15.26, 46.23], [13.04, 47.8]]],
-  ["Raetia", [[9.74, 47.5], [9.53, 46.85], [10.31, 47.73], [11.4, 47.27]]],
-  ["Africa Proconsularis", [[10.32, 36.85], [10.64, 35.83], [10.71, 35.3], [14.29, 32.64], [12.48, 32.8], [13.18, 32.89], [10.1, 33.88], [9.5, 35.5], [11.0, 31.0], [10.91, 33.8]]],
+  ["Raetia", [[9.74, 47.5], [9.53, 46.85], [10.31, 47.73], [11.4, 47.27], [10.89, 48.37]]],
+  ["Africa Proconsularis", [[10.32, 36.85], [10.64, 35.83], [10.71, 35.3], [14.29, 32.64], [12.48, 32.8], [13.18, 32.89], [10.1, 33.88], [9.5, 35.5], [11.0, 31.0], [10.91, 33.8], [8.12, 35.4]]],
+  ["Mauretania and Numidia", [[2.19, 36.6], [-5.8, 35.77], [-1.0, 35.2], [6.6, 36.37], [5.4, 35.55]]],
   ["Sardinia et Corsica", [[9.11, 39.22], [9.5, 40.92], [9.51, 42.11]]],
-  ["Alpine provinces", [[9.1, 46.2], [9.6, 46.4]]]
+  ["Gallia and the Alps", [[4.83, 45.76], [3.0, 43.18], [-0.58, 44.84], [2.35, 48.86], [6.9, 45.6], [7.03, 45.14], [9.1, 46.2], [9.6, 46.4]]],
+  ["Germania", [[6.96, 50.94], [8.27, 50.0], [7.6, 47.56], [5.7, 51.8]]],
+  ["Hispania", [[1.25, 41.12], [-4.78, 37.88], [-6.34, 38.92], [-3.7, 40.4], [-8.6, 42.9]]],
+  ["Britannia", [[-0.09, 51.51], [0.9, 51.89], [-3.53, 50.72], [-2.89, 53.19], [-1.08, 53.96]]]
 ];
 
-// Names for the island (and cut-off peninsula) faces that no area holds, so the coverage report can be
-// read without a map. Each point lies inside the named land.
-const ISLAND_NAMES = [
+// Names for detached land (islands and peninsulas cut off at the neck), so the report can be read
+// without a map. Each point lies inside the named land.
+const LAND_NAMES = [
   ["Euboea", [23.78, 38.55]], ["Cephallenia", [20.59, 38.19]], ["Corcyra (Corfu)", [19.77, 39.72]], ["Lemnos", [25.14, 39.93]],
   ["Naxos", [25.48, 37.05]], ["Brattia (Brač)", [16.62, 43.32]], ["Curicta (Krk)", [14.58, 45.1]], ["Thasos", [24.67, 40.69]],
-  ["Acte (the Athos peninsula, cut off in the partition)", [24.03, 40.35]], ["Andros", [24.88, 37.85]], ["Zacynthus", [20.79, 37.77]],
-  ["Pallene (the Kassandra peninsula, cut off in the partition)", [23.43, 40.02]], ["Crexa (Cres)", [14.4, 44.85]], ["Leucas", [20.65, 38.73]],
+  ["Acte (the Athos peninsula)", [24.03, 40.35]], ["Andros", [24.88, 37.85]], ["Zacynthus", [20.79, 37.77]],
+  ["Pallene (the Kassandra peninsula)", [23.43, 40.02]], ["Crexa (Cres)", [14.4, 44.85]], ["Leucas", [20.65, 38.73]],
   ["Cythera", [22.99, 36.24]], ["Imbros", [25.82, 40.16]], ["Icaria", [26.08, 37.59]], ["Carpathos", [27.16, 35.55]],
-  ["the Cnidian peninsula (Datça, cut off in the partition)", [27.62, 36.72]], ["Paros", [25.2, 37.06]], ["Scyros", [24.52, 38.9]],
-  ["Tenos", [25.18, 37.59]], ["Samothrace", [25.58, 40.46]], ["Ceos", [24.32, 37.62]]
+  ["the Cnidian peninsula (Datça)", [27.62, 36.72]], ["Paros", [25.2, 37.06]], ["Scyros", [24.52, 38.9]],
+  ["Tenos", [25.18, 37.59]], ["Samothrace", [25.58, 40.46]], ["Ceos", [24.32, 37.62]],
+  ["the Pelješac peninsula", [17.1, 43.0]], ["western Cos", [26.95, 36.74]], ["the Nile delta by Damietta", [32.0, 31.41]],
+  ["the south of the Magnesia (Pelion) peninsula", [23.24, 39.16]]
 ];
+
+function landName(geometry, fallback) {
+  return LAND_NAMES.find(([, point]) => pointInGeometry(point, geometry))?.[0] ?? fallback;
+}
 
 function quote(filePath) {
   return `"${filePath.replaceAll("\\", "/")}"`;
@@ -478,7 +543,15 @@ async function buildHerodianPieces(herodBase, jordan, yarmuk, notes) {
     notes.push(`${pereaExtra.length} piece(s) (${rounded(pereaExtra.reduce((sum, part) => sum + geometryAreaKm2(part.geometry), 0), 1)} km²) north-east of the straight Pella–Philadelphia segment are not connected to Gadara's land and stay with Perea.`);
     perea = [...perea, ...pereaExtra];
   }
-  return { rift, yarmukLine, judea, galilee, perea, philip, gadara };
+
+  // Josephus (War 3.3.3): "the length of Perea is from Machaerus to Pella". Perea ends at an east–west
+  // line just south of the fortress, so Machaerus stays in Perea; the land beyond is Moab (Nabataea).
+  const machaerusCutLatitude = HEROD_ANCHORS.machaerus[1] - MACHAERUS_CUT_MARGIN_KM / 110.574;
+  const southOfMachaerus = geometryFeature({ type: "Polygon", coordinates: [[[35.0, machaerusCutLatitude], [37.0, machaerusCutLatitude], [37.0, 29.5], [35.0, 29.5], [35.0, machaerusCutLatitude]]] });
+  const pereaSouth = await booleanOp("herod-perea-south-of-machaerus", "clip", perea, [southOfMachaerus]);
+  perea = await booleanOp("herod-perea-north-of-machaerus", "erase", perea, [southOfMachaerus]);
+  notes.push(`Perea ends ${MACHAERUS_CUT_MARGIN_KM} km south of Machaerus (${machaerusCutLatitude.toFixed(4)}°N): ${rounded(pereaSouth.reduce((sum, part) => sum + geometryAreaKm2(part.geometry), 0))} km² south of it, Herod's outline and the AD 69 Judaea face's Dead Sea shore, go to Arabia.`);
+  return { rift, yarmukLine, judea, galilee, perea, pereaSouth, machaerusCutLatitude, philip, gadara };
 }
 
 async function buildCiliciaWhole(f0031, ad200Cells, notes) {
@@ -495,7 +568,7 @@ async function buildCiliciaWhole(f0031, ad200Cells, notes) {
   if (clipped.length === 0) throw new Error("Cilicia whole: clip produced no geometry");
   const whole = await unionFeatures("cilicia-whole", clipped);
   const areaKm2 = geometryAreaKm2(whole.geometry);
-  notes.push(`Cilicia whole (AD 69 face f0031 clipped by AD 200 cells ${cells.map((cell) => cell.cellId).join(" + ")}): ${rounded(areaKm2)} km², bbox ${bboxOf(whole.geometry).map((value) => value.toFixed(2)).join(", ")}.`);
+  notes.push(`Cilicia whole (AD 69 face ${f0031.properties.faceId} clipped by AD 200 cells ${cells.map((cell) => cell.cellId).join(" + ")}): ${rounded(areaKm2)} km², bbox ${bboxOf(whole.geometry).map((value) => value.toFixed(2)).join(", ")}.`);
   return { whole, cellIds: cells.map((cell) => cell.cellId) };
 }
 
@@ -590,6 +663,9 @@ function nearSegmentGrid(point, { grid, cellDegrees }, toleranceKm) {
 }
 
 // Share of a piece's boundary vertices that lie on (within toleranceKm of) each candidate's boundary.
+// Segment grids are cached per candidate, because large candidates are tested against many pieces.
+const segmentGridCache = new WeakMap();
+
 function sharedBoundaryShares(piece, candidates, toleranceKm = 0.2) {
   const vertices = polygonsOf(piece.geometry).flatMap((polygon) => polygon.flatMap((ring) => ring.slice(1)));
   const [minLon, minLat, maxLon, maxLat] = bboxOf(piece.geometry);
@@ -600,7 +676,8 @@ function sharedBoundaryShares(piece, candidates, toleranceKm = 0.2) {
       return box[0] <= maxLon + margin && box[2] >= minLon - margin && box[1] <= maxLat + margin && box[3] >= minLat - margin;
     })
     .map((candidate) => {
-      const index = segmentGrid(candidate.geometry);
+      if (!segmentGridCache.has(candidate.geometry)) segmentGridCache.set(candidate.geometry, segmentGrid(candidate.geometry));
+      const index = segmentGridCache.get(candidate.geometry);
       const shared = vertices.filter((vertex) => nearSegmentGrid(vertex, index, toleranceKm)).length;
       return { candidate, share: shared / Math.max(1, vertices.length) };
     })
@@ -609,19 +686,29 @@ function sharedBoundaryShares(piece, candidates, toleranceKm = 0.2) {
 }
 
 // ADR-0037 rule 4: land whose border no source describes stays with the area around it. AD 69 land
-// faces (or parts of them) that no area covers are given to the one area they border; pieces that
-// border nothing (islands), border an unlisted province, or border two areas about equally are left
-// for the coverage report.
+// faces (or parts of them) that no area covers are given to the one area they border. Pieces that
+// border nothing (islands), belong to an unlisted province (they hold one of OUTSIDE_LIST_PROBES or are
+// joined to such a piece), or border two areas about equally are left for `other-roman-lands`.
 async function assignLeftoverLand(built, domainFeatures, explanations, notes) {
   const leftover = await booleanOp("leftover", "erase", domainFeatures, built);
   const pieces = (await explodeFeatures("leftover", leftover)).filter((piece) => geometryAreaKm2(piece.geometry) > COVERAGE_TOLERANCE_KM2);
-  const outsideList = pieces.filter((piece) => explanations.some((explanation) => pointInGeometry(explanation.point, piece.geometry)));
+  const unlisted = new Set(pieces.filter((piece) => explanations.some((explanation) => pointInGeometry(explanation.point, piece.geometry))));
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const piece of pieces) {
+      if (unlisted.has(piece)) continue;
+      if (sharedBoundaryShares(piece, [...unlisted], 0.05).length > 0) {
+        unlisted.add(piece);
+        grew = true;
+      }
+    }
+  }
   const additions = new Map();
   for (const piece of pieces) {
-    if (outsideList.includes(piece)) continue;
-    const touchesOutsideList = sharedBoundaryShares(piece, outsideList.filter((other) => other !== piece), 0.05).length > 0;
+    if (unlisted.has(piece)) continue;
     const shares = sharedBoundaryShares(piece, built);
-    if (touchesOutsideList || shares.length === 0) continue;
+    if (shares.length === 0) continue;
     const [first, second] = shares;
     if (second && second.share > first.share * 0.33) continue;
     const areaId = first.candidate.properties.areaId;
@@ -637,11 +724,295 @@ async function assignLeftoverLand(built, domainFeatures, explanations, notes) {
   }
 }
 
+// Natural Earth land around the Roman world, as separate land polygons (continents and islands).
+async function prepareRomanWorldLand() {
+  const sourcePath = path.join(partitionWorkDirectory, "ne_10m_land.geojson");
+  const outputPath = path.join(workDirectory, "roman-world-land.geojson");
+  await removeIfExists(outputPath);
+  await mapshaper.runCommands(`-i ${quote(sourcePath)} -clip bbox=${ROMAN_WORLD_FRAME} -explode -o format=geojson ${quote(outputPath)}`);
+  return ensureFeatureCollection(await readJson(outputPath)).features.filter((feature) => feature.geometry);
+}
+
+function featureContaining(features, point) {
+  return features.find((feature) => {
+    const [minLon, minLat, maxLon, maxLat] = bboxOf(feature.geometry);
+    return point[0] >= minLon && point[0] <= maxLon && point[1] >= minLat && point[1] <= maxLat && pointInGeometry(point, feature.geometry);
+  });
+}
+
+// Great Britain and its islands: land in Britain's Natural Earth polygon, or islands in the British
+// Isles' waters that lie nearer to it than to the continent (so the Channel Islands stay with Gaul).
+async function britainTest(landParts) {
+  const britain = featureContaining(landParts, BRITAIN_POINT);
+  const continent = featureContaining(landParts, CONTINENT_POINT);
+  if (!britain || !continent) throw new Error("Natural Earth land lacks Great Britain or the continent");
+  const continentNearBritain = await booleanOp("continent-near-britain", "clip", [continent], [geometryFeature({ type: "Polygon", coordinates: [[[-12, 46], [10, 46], [10, 60], [-12, 60], [-12, 46]]] })]);
+  return (geometry) => {
+    const point = labelPoint(geometry);
+    if (!point) return false;
+    if (pointInGeometry(point, britain.geometry)) return true;
+    if (point[1] < 49 || point[0] > 2.5) return false;
+    const toBritain = distanceToGeometryKm(point, britain.geometry);
+    const toContinent = Math.min(...continentNearBritain.map((part) => distanceToGeometryKm(point, part.geometry)));
+    return toBritain < toContinent;
+  };
+}
+
+// AWMC's AD 69 extent on Natural Earth land, minus the areas, as separate pieces.
+async function extentLandOutsideAreas(tag, extentFeature, landParts, built) {
+  const extentLand = await booleanOp(`${tag}-extent-land`, "clip", [extentFeature], landParts);
+  return explodeFeatures(`${tag}-inside`, await booleanOp(`${tag}-inside`, "erase", extentLand, built));
+}
+
+// ADR-0037: a peninsula belongs to the area it's attached to. AWMC's extent sometimes cuts a peninsula
+// off at its neck, leaving a piece of Roman land that touches no area. Where the Natural Earth land
+// outside every area that holds such a piece is joined to exactly one area (and is not continent-sized),
+// that land joins the area: peninsula, neck and all.
+async function attachCutOffPeninsulas(built, extentFeature, landParts, notes) {
+  const insidePieces = await extentLandOutsideAreas("peninsula", extentFeature, landParts, built);
+  const landPieces = await explodeFeatures("peninsula-land", await booleanOp("peninsula-land", "erase", landParts, built));
+  const detached = insidePieces.filter((piece) => geometryAreaKm2(piece.geometry) >= MIN_ISLAND_KM2 && sharedBoundaryShares(piece, built, 0.05).length === 0);
+  const attachments = new Map();
+  for (const piece of detached) {
+    const landPiece = featureContaining(landPieces, labelPoint(piece.geometry));
+    if (!landPiece || attachments.has(landPiece) || geometryAreaKm2(landPiece.geometry) > PENINSULA_MAX_KM2) continue;
+    const shares = sharedBoundaryShares(landPiece, built, 0.05);
+    if (shares.length === 0) continue;
+    const [first, second] = shares;
+    if (second && second.share > first.share * 0.33) {
+      notes.push(`Peninsula check: land at ${labelPoint(landPiece.geometry).map((value) => value.toFixed(2)).join(", ")} is joined to two areas about equally and is left out.`);
+      continue;
+    }
+    attachments.set(landPiece, first.candidate.properties.areaId);
+  }
+  const byArea = new Map();
+  for (const [landPiece, areaId] of attachments) {
+    if (!byArea.has(areaId)) byArea.set(areaId, []);
+    byArea.get(areaId).push(landPiece);
+    notes.push(`Peninsula: ${landName(landPiece.geometry, "land")} (${rounded(geometryAreaKm2(landPiece.geometry))} km² at ${labelPoint(landPiece.geometry).map((value) => value.toFixed(2)).join(", ")}) is cut off from \`${areaId}\` in AWMC's extent but joined to it by land, and joins it.`);
+  }
+  for (const [areaId, pieces] of byArea) {
+    const index = built.findIndex((feature) => feature.properties.areaId === areaId);
+    const current = built[index];
+    const change = { kind: "peninsula", detail: `Adds ${pieces.map((piece) => landName(piece.geometry, "a peninsula")).join(", ")}: Natural Earth land joined to this area by land that AWMC's AD 69 extent cuts off at the neck (ADR-0037: a peninsula belongs to the area it is attached to).`, sources: ["awmc:roman-empire-ad-69-extent"] };
+    built[index] = await finishArea(areaId, [current, ...pieces], current.properties.provenance.changes[0].detail, current.properties.provenance.upstreamFeatureIds, notes, [...current.properties.provenance.changes.slice(1), change]);
+  }
+  return [...attachments.keys()];
+}
+
+// Nearest point on a ring (local planar approximation) and the index of the segment it lies on.
+function nearestPointOnRing(point, ring) {
+  const kmPerDegreeLon = 111.32 * Math.cos((point[1] * Math.PI) / 180);
+  let best = { distance: Infinity, point: ring[0], segmentIndex: 0 };
+  for (let index = 1; index < ring.length; index += 1) {
+    const [ax, ay] = [(ring[index - 1][0] - point[0]) * kmPerDegreeLon, (ring[index - 1][1] - point[1]) * 110.574];
+    const [bx, by] = [(ring[index][0] - point[0]) * kmPerDegreeLon, (ring[index][1] - point[1]) * 110.574];
+    const dx = bx - ax;
+    const dy = by - ay;
+    const denominator = dx * dx + dy * dy;
+    const t = denominator === 0 ? 0 : Math.max(0, Math.min(1, -(ax * dx + ay * dy) / denominator));
+    const [px, py] = [ax + t * dx, ay + t * dy];
+    const distance = Math.hypot(px, py);
+    if (distance < best.distance) best = { distance, point: [point[0] + px / kmPerDegreeLon, point[1] + py / 110.574], segmentIndex: index - 1 };
+  }
+  return best;
+}
+
+// Moves the Galatia–Cappadocia edge locally so that the province's label point lies in Cappadocia.
+async function moveCappadociaLineLocally(built, notes) {
+  const cappadociaIndex = built.findIndex((feature) => feature.properties.areaId === "cappadocia");
+  const galatiaIndex = built.findIndex((feature) => feature.properties.areaId === "galatia");
+  const cappadocia = built[cappadociaIndex];
+  const galatia = built[galatiaIndex];
+  const label = POINTS.cappadociaLabel;
+  if (pointInGeometry(label, cappadocia.geometry)) {
+    notes.push("Cappadocia: the province's label point already lies in Cappadocia; the edge is unchanged.");
+    return null;
+  }
+  const outer = polygonsOf(cappadocia.geometry).find((polygon) => distanceToGeometryKm(label, { type: "Polygon", coordinates: polygon }) < 20);
+  if (!outer) throw new Error("Cappadocia's edge is not near the province's label point");
+  const ring = outer[0].slice(0, -1);
+  const count = ring.length;
+  const nearest = nearestPointOnRing(label, outer[0]);
+  const walk = (startIndex, step) => {
+    const path = [];
+    let index = startIndex;
+    let previous = nearest.point;
+    let travelled = 0;
+    while (travelled < CAPPADOCIA_DETOUR_HALF_KM && path.length < count) {
+      travelled += distanceKm(previous, ring[index]);
+      path.push(ring[index]);
+      previous = ring[index];
+      index = (index + step + count) % count;
+    }
+    return path;
+  };
+  const forward = walk((nearest.segmentIndex + 1) % count, 1);
+  const backward = walk(nearest.segmentIndex % count, -1);
+  const borderPath = [...backward.reverse(), nearest.point, ...forward];
+  const galatiaGrid = segmentGrid(galatia.geometry);
+  if (!borderPath.every((vertex) => nearSegmentGrid(vertex, galatiaGrid, 0.05))) throw new Error("The Cappadocia detour would leave the Galatia–Cappadocia edge");
+  const kmPerDegreeLon = 111.32 * Math.cos((label[1] * Math.PI) / 180);
+  const east = (label[0] - nearest.point[0]) * kmPerDegreeLon;
+  const north = (label[1] - nearest.point[1]) * 110.574;
+  const length = Math.hypot(east, north);
+  const apex = [label[0] + ((east / length) * CAPPADOCIA_DETOUR_BEYOND_KM) / kmPerDegreeLon, label[1] + ((north / length) * CAPPADOCIA_DETOUR_BEYOND_KM) / 110.574];
+  const detour = geometryFeature({ type: "Polygon", coordinates: [[...borderPath, apex, borderPath[0]]] });
+  if (!booleanValid(detour)) throw new Error("The Cappadocia detour polygon is not simple");
+  const moved = await booleanOp("cappadocia-detour-moved", "clip", [galatia], [detour]);
+  const galatiaRest = await booleanOp("cappadocia-detour-galatia", "erase", [galatia], [detour]);
+  const movedKm2 = moved.reduce((sum, piece) => sum + geometryAreaKm2(piece.geometry), 0);
+  const detail = `AWMC draws no first-century line between Galatia and Cappadocia; this edge is AWMC's AD 14 extent, from Cappadocia's years as a client kingdom. Strabo (12.2.7) makes Mazaca the metropolis of the Cappadocians, and the province's label point (Nevşehir) lay ${rounded(nearest.distance, 1)} km beyond that edge, so the edge is moved locally: two straight segments from points ${CAPPADOCIA_DETOUR_HALF_KM} km either side along it to a point ${CAPPADOCIA_DETOUR_BEYOND_KM} km beyond the label point (${rounded(movedKm2)} km² moved; approximate).`;
+  const change = { kind: "local-adjustment", detail, sources: ["bib:strabo-geography"] };
+  built[cappadociaIndex] = await finishArea("cappadocia", [cappadocia, ...moved], cappadocia.properties.provenance.changes[0].detail, cappadocia.properties.provenance.upstreamFeatureIds, notes, [...cappadocia.properties.provenance.changes.slice(1), change]);
+  built[galatiaIndex] = await finishArea("galatia", galatiaRest, galatia.properties.provenance.changes[0].detail, galatia.properties.provenance.upstreamFeatureIds, notes, [...galatia.properties.provenance.changes.slice(1), { ...change, detail: `${rounded(movedKm2)} km² near Nevşehir moved to Cappadocia. ${detail}` }]);
+  assertInside(built[cappadociaIndex], { "the province's label point": label, "Caesarea Mazaca": POINTS.caesareaMazaca }, "cappadocia");
+  notes.push(`Cappadocia: ${detail}`);
+  return [...borderPath.slice(0, 1), apex, ...borderPath.slice(-1)];
+}
+
+// ADR-0037: Roman land that isn't one of the timeline's areas is `other-roman-lands`, held by the Roman
+// Empire. It is AWMC's AD 69 land faces inside the extent, less the areas, plus the islands inside the
+// extent that no area holds, less Great Britain and its islands (Roman only from AD 43). Using AWMC's
+// faces keeps its coastline the same as its neighbours', so no slivers run along their coasts.
+async function buildOtherRomanLands(built, ad69Raw, extentFeature, landParts, isBritain, notes) {
+  const facesInside = ad69Raw.features.filter((feature) => {
+    const point = labelPoint(feature.geometry);
+    return point && pointInGeometry(point, extentFeature.geometry);
+  });
+  const fromFaces = await booleanOp("other-roman-lands-faces", "erase", facesInside, built);
+  const insidePieces = await extentLandOutsideAreas("other-roman-lands", extentFeature, landParts, built);
+  const islands = insidePieces.filter((piece) => geometryAreaKm2(piece.geometry) >= MIN_ISLAND_KM2 && sharedBoundaryShares(piece, built, 0.05).length === 0);
+  const parts = await explodeFeatures("other-roman-lands-parts", [await unionFeatures("other-roman-lands-sources", [...fromFaces, ...islands])]);
+  const britain = parts.filter((part) => isBritain(part.geometry));
+  const kept = parts.filter((part) => !isBritain(part.geometry));
+  const britainKm2 = britain.reduce((sum, part) => sum + geometryAreaKm2(part.geometry), 0);
+  notes.push(`other-roman-lands: ${facesInside.length} AD 69 land faces inside the extent less the areas, plus ${islands.length} island piece(s) of ${MIN_ISLAND_KM2} km² or more; Great Britain and its islands left out (${britain.length} part(s), ${rounded(britainKm2)} km²).`);
+  return finishArea(
+    "other-roman-lands",
+    kept,
+    "AWMC's AD 69 extent on land (its AD 69 land faces, with islands from Natural Earth land), less the 23 timeline areas and less Great Britain and its islands. Rule 3: the extent's edge is AWMC's, an approximation for the whole period.",
+    ["awmc:roman-empire-ad-69-extent", "awmc:roman-empire-ad-69-provinces"],
+    notes,
+    [{ kind: "left-out", detail: `Great Britain and its islands (${rounded(britainKm2)} km²) are left out: Rome conquered Britain from AD 43, after the timeline begins (ADR-0037).`, sources: ["awmc:roman-empire-ad-69-extent"] }]
+  );
+}
+
+// AWMC's AD 69 lines leave thin faces where they do not quite meet, and the partition drops faces thinner
+// than its sliver limit, but the coverage domain (AWMC's land faces, dissolved) still holds that land.
+// A gap that touches `other-roman-lands` is part of the extent less the other areas (ADR-0037 item 1),
+// so it joins it. Britain stays out.
+async function fillRomanWorldGaps(built, coverageDomain, isBritain, notes) {
+  const otherIndex = built.findIndex((feature) => feature.properties.areaId === "other-roman-lands");
+  const other = built[otherIndex];
+  const { rows } = await coverageRows(coverageDomain, featureCollection(built), [], 0);
+  const gaps = rows.filter((row) => !isBritain(row.geometry) && sharedBoundaryShares(geometryFeature(row.geometry), [other], 0.05).length > 0);
+  if (gaps.length === 0) return;
+  const gapKm2 = gaps.reduce((sum, row) => sum + row.areaKm2, 0);
+  const largest = gaps[0];
+  const change = { kind: "extent-gaps", detail: `Adds ${gaps.length} gap(s) inside AWMC's AD 69 extent (${rounded(gapKm2, 1)} km² in all; the largest, ${rounded(largest.areaKm2, 1)} km² at ${largest.point.map((value) => value.toFixed(2)).join(", ")}) where AWMC's lines do not quite meet and no area holds the land (ADR-0037 item 1: the extent less the other areas).`, sources: ["awmc:roman-empire-ad-69-extent", "awmc:roman-empire-ad-69-provinces"] };
+  built[otherIndex] = await finishArea("other-roman-lands", [other, ...gaps.map((row) => geometryFeature(row.geometry))], other.properties.provenance.changes[0].detail, other.properties.provenance.upstreamFeatureIds, notes, [...other.properties.provenance.changes.slice(1), change]);
+  notes.push(`other-roman-lands: ${change.detail}`);
+}
+
+// Moves each sourced island (SOURCED_ISLANDS) from `other-roman-lands` to the area its source names.
+// The island must be a separate part of `other-roman-lands` that touches no other area.
+async function assignSourcedIslands(built, notes) {
+  const otherIndex = built.findIndex((feature) => feature.properties.areaId === "other-roman-lands");
+  const other = built[otherIndex];
+  const neighbours = built.filter((feature) => feature !== other);
+  const remaining = [];
+  const moves = new Map();
+  for (const polygon of polygonsOf(other.geometry)) {
+    const part = geometryFeature({ type: "Polygon", coordinates: polygon });
+    const island = SOURCED_ISLANDS.find((entry) => pointInGeometry(entry.point, part.geometry));
+    if (!island) {
+      remaining.push(part);
+      continue;
+    }
+    if (sharedBoundaryShares(part, neighbours, 0.05).length > 0) throw new Error(`${island.name} is not a separate island in other-roman-lands`);
+    if (!moves.has(island.areaId)) moves.set(island.areaId, []);
+    moves.get(island.areaId).push({ island, part });
+  }
+  const found = [...moves.values()].flat().map(({ island }) => island.name);
+  const missing = SOURCED_ISLANDS.filter((entry) => !found.includes(entry.name));
+  if (missing.length > 0) throw new Error(`Sourced island(s) not found in other-roman-lands: ${missing.map((entry) => entry.name).join(", ")}`);
+  for (const [areaId, entries] of moves) {
+    const index = built.findIndex((feature) => feature.properties.areaId === areaId);
+    const current = built[index];
+    const detail = entries.map(({ island, part }) => `${island.name} (${rounded(geometryAreaKm2(part.geometry))} km²): ${island.citation}`).join(" ");
+    const change = { kind: "sourced-island", detail: `Adds ${entries.length === 1 ? "an island" : "islands"} that a cited source places in this area (ADR-0037 item 2; the Research Lead's §2.25 "Islands" table). ${detail}`, sources: ["awmc:roman-empire-ad-69-extent"] };
+    built[index] = await finishArea(areaId, [current, ...entries.map(({ part }) => part)], current.properties.provenance.changes[0].detail, current.properties.provenance.upstreamFeatureIds, notes, [...current.properties.provenance.changes.slice(1), change]);
+    for (const { island, part } of entries) notes.push(`Sourced island: ${island.name} (${rounded(geometryAreaKm2(part.geometry))} km²) moves from \`other-roman-lands\` to \`${areaId}\`.`);
+  }
+  const movedNames = SOURCED_ISLANDS.map((entry) => `${entry.name} (\`${entry.areaId}\`)`).join(", ");
+  const otherChange = { kind: "sourced-islands-moved", detail: `${movedNames} are left to the areas a cited source places them in (the Research Lead's §2.25 "Islands" table); every other island inside the extent stays here (ADR-0037 item 2).`, sources: ["awmc:roman-empire-ad-69-extent"] };
+  built[otherIndex] = await finishArea("other-roman-lands", remaining, other.properties.provenance.changes[0].detail, other.properties.provenance.upstreamFeatureIds, notes, [...other.properties.provenance.changes.slice(1), otherChange]);
+}
+
+// The empire's edge (ADR-0037): where the Roman world's land meets land outside it. It is the shared
+// boundary between the union of all areas and outside land larger than OUTSIDE_LAND_MIN_KM2, less any
+// stretch within EDGE_COAST_TOLERANCE_KM of today's coastline, in pieces of at least EDGE_MIN_PIECE_KM.
+async function buildEmpireEdge(collection, landParts, notes) {
+  const romanWorld = await unionFeatures("empire-roman-world", collection.features);
+  const outside = (await explodeFeatures("empire-outside", await booleanOp("empire-outside", "erase", landParts, [romanWorld]))).filter((piece) => geometryAreaKm2(piece.geometry) >= OUTSIDE_LAND_MIN_KM2);
+  const inputPath = path.join(workDirectory, "empire-edge-input.geojson");
+  const rawPath = path.join(workDirectory, "empire-edge-raw.geojson");
+  await writeJson(inputPath, featureCollection([geometryFeature(romanWorld.geometry, { side: "roman" }), ...outside.map((piece) => geometryFeature(piece.geometry, { side: "outside" }))]));
+  await removeIfExists(rawPath);
+  await mapshaper.runCommands(`-i ${quote(inputPath)} snap -innerlines -o format=geojson ${quote(rawPath)}`);
+  const rawLines = ensureFeatureCollection(await readJson(rawPath)).features.flatMap((feature) => (feature.geometry?.type === "LineString" ? [feature.geometry.coordinates] : feature.geometry?.type === "MultiLineString" ? feature.geometry.coordinates : []));
+  const coastGrids = landParts.map((part) => ({ box: bboxOf(part.geometry), part }));
+  const nearCoast = (point) => coastGrids.some(({ box, part }) => {
+    const margin = 0.05;
+    if (point[0] < box[0] - margin || point[0] > box[2] + margin || point[1] < box[1] - margin || point[1] > box[3] + margin) return false;
+    if (!segmentGridCache.has(part.geometry)) segmentGridCache.set(part.geometry, segmentGrid(part.geometry));
+    return nearSegmentGrid(point, segmentGridCache.get(part.geometry), EDGE_COAST_TOLERANCE_KM);
+  });
+  const pieces = [];
+  for (const line of rawLines) {
+    let run = [];
+    const flush = () => {
+      const lengthKm = run.slice(1).reduce((sum, point, index) => sum + distanceKm(run[index], point), 0);
+      if (run.length >= 2 && lengthKm >= EDGE_MIN_PIECE_KM) pieces.push(run.map(([lon, lat]) => [Number(lon.toFixed(5)), Number(lat.toFixed(5))]));
+      run = [];
+    };
+    for (const point of line) {
+      if (nearCoast(point)) flush();
+      else run.push(point);
+    }
+    flush();
+  }
+  const lengthKm = pieces.reduce((sum, piece) => sum + piece.slice(1).reduce((total, point, index) => total + distanceKm(piece[index], point), 0), 0);
+  const edge = featureCollection([
+    geometryFeature(
+      { type: "MultiLineString", coordinates: pieces },
+      {
+        edgeId: "roman-world-ad-69",
+        provenance: {
+          dataset: "AWMC geodata; Natural Earth",
+          version: `commit:${AWMC_COMMIT}; naturalearth-commit:${NATURAL_EARTH_COMMIT}`,
+          upstreamFeatureIds: ["awmc:roman-empire-ad-69-extent"],
+          changes: [
+            {
+              kind: "union-boundary",
+              detail: `Where the union of all ${collection.features.length} areas (AWMC's AD 69 extent and the timeline areas on Natural Earth land) meets Natural Earth land outside it, less stretches within ${EDGE_COAST_TOLERANCE_KM} km of today's coastline. Static: every area is on Rome's side in every year; before AD 9 it follows the Rhine rather than the Elbe, an approximation (ADR-0037).`,
+              sources: ["awmc:roman-empire-ad-69-extent", "awmc:roman-empire-ad-69-provinces"]
+            }
+          ]
+        }
+      }
+    )
+  ]);
+  await fs.writeFile(outputEmpireEdgePath, `${JSON.stringify(edge)}\n`, "utf8");
+  notes.push(`Empire edge: ${pieces.length} piece(s), ${rounded(lengthKm)} km, against ${outside.length} outside landmass(es) of ${OUTSIDE_LAND_MIN_KM2} km² or more.`);
+  return { edge, lengthKm, pieceCount: pieces.length };
+}
+
 async function buildItaly(culturalRoot, ad69Raw, notes) {
-  // The AD 69 partition is framed at 9°E and 48°N and its Italian faces were once picked by a box, which
-  // took in half of Sardinia and Corsica and the Alpine provinces. Italy is now the AD 69 faces that lie
-  // within AWMC's own outline of Roman Italy (Italy_shading), united with that outline on land so that
-  // north-west Italy beyond the 9°E frame is included.
+  // Italy is the AD 69 faces that lie within AWMC's own outline of Roman Italy (Italy_shading), united
+  // with that outline on land. Picking faces by a box once took in half of Sardinia and Corsica and the
+  // Alpine provinces.
   const landPath = path.join(partitionWorkDirectory, "ne_10m_land.geojson");
   const italyShapefile = path.join(culturalRoot, "political_shading", "Italy_shading", "Italy_shading.shp");
   const outputPath = path.join(workDirectory, "italy-shading-land.geojson");
@@ -694,7 +1065,7 @@ async function loadLocationRecordsForPlaceCheck(notes) {
 const PLACE_EXPLANATIONS = {
   pisidia: "Label point for the region. The research note keeps AWMC's whole AD 14 'Pamphylia' face with `pamphylia`, so southern Pisidia's hills are drawn there; the point is in that face, not in Galatia's.",
   cappadocia: "Label point for the province, placed near Caesarea Mazaca; AWMC's AD 14 face for Cappadocia ends a few kilometres away.",
-  "malta candidate 1": "The alternative identification of Melita, Mljet in the Adriatic, lies in Illyricum. The record links the place, not each candidate, to `sicily`.",
+  "malta candidate 1": "The alternative identification of Melita, Mljet in the Adriatic, lies outside AWMC's AD 69 extent, which leaves out several Dalmatian islands, so no area holds it. The record links the place, not each candidate, to `sicily`.",
   galilee: "Label point for the region, in the hills north of AWMC's Herod outline and AD 69 Judaea face, in the land AWMC gives to Tyre (Syria).",
   nicopolis: "Coastal city on the Preveza isthmus: AWMC's coastline at the Ambracian Gulf leaves it in the sea (a boundary-precision issue, per the research note's Nicopolis ruling).",
   "sea-of-galilee": "Label point for the lake, 0.9 km east of the median line that divides the lake between Galilee and Philip's lands."
@@ -707,7 +1078,7 @@ function placeExplanation(row) {
   return "";
 }
 
-async function writeReport({ collection, omitted, notes, validity, overlaps, coverage, places, jordanSites, previewPaths, osmSummary, simplifyNote }) {
+async function writeReport({ collection, omitted, notes, validity, overlaps, compositionCoverage, coverage, places, jordanSites, anchorChecks, empireEdge, previewPaths, osmSummary, simplifyNote }) {
   const lines = ["# M4-03 area composition", ""];
   lines.push(`Built ${collection.features.length} of ${AREA_ORDER.length} areas. ${simplifyNote}`, "");
   lines.push("## Areas", "", "| Area | km² | Parts | Valid | Repeated vertices | Composition |", "|---|---:|---:|---|---:|---|");
@@ -722,9 +1093,17 @@ async function writeReport({ collection, omitted, notes, validity, overlaps, cov
   const bigOverlaps = overlaps.filter((row) => row.areaKm2 > 1);
   lines.push(bigOverlaps.length === 0 ? `None larger than 1 km² (largest: ${overlaps[0] ? `${overlaps[0].pair}, ${rounded(overlaps[0].areaKm2, 3)} km²` : "none"}).` : "Overlaps larger than 1 km²:");
   for (const row of bigOverlaps) lines.push(`- ${row.pair}: ${rounded(row.areaKm2, 2)} km²`);
-  lines.push("", "## Coverage", "", `Domain: AWMC's AD 69 land faces inside the AD 69 extent (Natural Earth land cut by AWMC's lines, within 9–50°E, 22.5–48°N), plus Nabataea and Sinai outside it. Gaps of ${COVERAGE_TOLERANCE_KM2} km² or less: ${coverage.smallCount} (${rounded(coverage.smallKm2, 1)} km² in all).`, "");
-  lines.push("| Gap km² | Centre (lon, lat) | Explanation |", "|---:|---|---|");
-  for (const row of coverage.rows) lines.push(`| ${rounded(row.areaKm2, 1)} | ${row.point.map((value) => value.toFixed(3)).join(", ")} | ${row.explanation ?? "**unexplained**"} |`);
+  const coverageTable = (coverageResult) => {
+    lines.push("| Gap km² | Centre (lon, lat) | Explanation |", "|---:|---|---|");
+    for (const row of coverageResult.rows) lines.push(`| ${rounded(row.areaKm2, 1)} | ${row.point.map((value) => value.toFixed(3)).join(", ")} | ${row.explanation ?? "**unexplained**"} |`);
+  };
+  lines.push("", "## Coverage", "", `Domain: AWMC's AD 69 land faces inside the AD 69 extent (Natural Earth land cut by AWMC's lines; the partition's frame lies outside the extent), plus Nabataea and Sinai outside it.`);
+  lines.push("", "### Composition (before simplification)", "", `Gaps larger than ${COVERAGE_TOLERANCE_KM2} km²: ${compositionCoverage.rows.length}. Gaps of ${COVERAGE_TOLERANCE_KM2} km² or less: ${compositionCoverage.smallCount} (${rounded(compositionCoverage.smallKm2, 1)} km² in all).`, "");
+  coverageTable(compositionCoverage);
+  const sliverRows = coverage.rows.filter((row) => !row.britain);
+  lines.push("", "### Written file (after simplification)", "", `Gaps larger than ${COVERAGE_TOLERANCE_KM2} km² other than Britain: ${sliverRows.length} (${rounded(sliverRows.reduce((sum, row) => sum + row.areaKm2, 0))} km² in all; largest ${sliverRows[0] ? `${rounded(sliverRows[0].areaKm2, 1)} km²` : "none"}). Gaps of ${COVERAGE_TOLERANCE_KM2} km² or less: ${coverage.smallCount} (${rounded(coverage.smallKm2, 1)} km² in all). Gaps that the composition does not have are slivers between a simplified outer edge (coast or frontier) and AWMC's land faces.`, "");
+  coverageTable(coverage);
+  lines.push("", "## Empire edge", "", `\`data/geo/ancient-empire-edge.geojson\`: ${empireEdge.pieceCount} piece(s), ${rounded(empireEdge.lengthKm)} km in all, where the union of the ${collection.features.length} areas meets Natural Earth land outside it, less stretches within ${EDGE_COAST_TOLERANCE_KM} km of today's coastline.`);
   lines.push("", "## Place check", "", "Each candidate site is tested against its record's `politicalAreaId` (or its own candidate-level link). Near the border means within 3 km.", "");
   const mismatches = places.filter((row) => row.status !== "inside");
   lines.push(`${places.length} checks; ${places.length - mismatches.length} inside; ${mismatches.filter((row) => row.status === "near-border").length} near the border; ${mismatches.filter((row) => row.status === "outside").length} further out; ${mismatches.filter((row) => row.status === "area-not-built").length} with no area.`, "");
@@ -734,6 +1113,8 @@ async function writeReport({ collection, omitted, notes, validity, overlaps, cov
   }
   lines.push("", "## Jordan check: Bethany beyond the Jordan", "");
   for (const site of jordanSites) lines.push(`- ${site.name} (${site.point.join(", ")}): in ${site.areaIds.map((areaId) => `\`${areaId}\``).join(", ") || "no area"}; ${rounded(site.riverKm * 1000)} m from the OSM Jordan.`);
+  lines.push("", "## Anchor checks", "");
+  for (const check of anchorChecks) lines.push(`- ${check.name} (${check.point.join(", ")}): in ${check.areaIds.map((areaId) => `\`${areaId}\``).join(", ") || "no area"} (expected \`${check.expected}\`); ${rounded(check.borderKm, 1)} km from that area's edge.`);
   lines.push("", "## OpenStreetMap ways", "");
   for (const line of osmSummary) lines.push(`- ${line}`);
   lines.push("", "## Composition notes", "");
@@ -746,6 +1127,10 @@ async function writeReport({ collection, omitted, notes, validity, overlaps, cov
 
 async function main() {
   await fs.mkdir(workDirectory, { recursive: true });
+  await fs.mkdir(previewDirectory, { recursive: true });
+  for (const file of await fs.readdir(previewDirectory)) {
+    if (file.endsWith(".png")) await fs.rm(path.join(previewDirectory, file), { force: true });
+  }
   // ANCIENT_GEO_REUSE_PREP=1 reuses the previous partition-prep outputs (a debugging shortcut).
   if (process.env.ANCIENT_GEO_REUSE_PREP !== "1") {
     await execFileAsync(process.execPath, [path.join(repositoryRoot, "scripts", "report-ancient-partition-prep.mjs")], {
@@ -787,6 +1172,7 @@ async function main() {
   const bithyniaAd69 = namedFace(ad69Named, "Bithynia et Pontus / Thracia");
   const pontusCoast = await booleanOp("bithynia-ad69-pontus-coast", "erase", [bithyniaAd69], [bithyniaAd14, ...built.filter((feature) => ["cappadocia", "galatia"].includes(feature.properties.areaId))]);
   built.push(await finishArea("bithynia", [bithyniaAd14, ...pontusCoast], `AD14 face ${bithyniaAd14.properties.faceId} (Bithynia et Pontus / Thracia), plus the AD69 face ${bithyniaAd69.properties.faceId}'s Pontic coast east of it (${rounded(pontusCoast.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0))} km²), per the research note's ruling that coastal, western Pontus lies in Bithynia.`, [`awmc:ad14-face-${bithyniaAd14.properties.faceId}`, `awmc:ad69-face-${bithyniaAd69.properties.faceId}`], notes));
+  const cappadociaDetour = await moveCappadociaLineLocally(built, notes);
   await addDirect("macedonia", ad69Named, "Macedonia", "ad69");
   await addDirect("cyprus", ad69Named, "Cyprus", "ad69");
   await addDirect("egypt", ad69Named, "Aegyptus", "ad69");
@@ -801,8 +1187,8 @@ async function main() {
     const face = optionalFeatureAtPointOrNearest(ad69Raw, point, `Asia island ${label}`, notes, 20);
     if (face) islandFaces.push(face);
   }
-  const landParts = await explodeFeatures("land-mask", landMask);
-  const patmosLand = landParts.find((part) => pointInGeometry(POINTS.patmos, part.geometry) || distanceToGeometryKm(POINTS.patmos, part.geometry) < 2);
+  const maskParts = await explodeFeatures("land-mask", landMask);
+  const patmosLand = maskParts.find((part) => pointInGeometry(POINTS.patmos, part.geometry) || distanceToGeometryKm(POINTS.patmos, part.geometry) < 2);
   if (patmosLand && geometryAreaKm2(patmosLand.geometry) < 100) {
     islandFaces.push(patmosLand);
     notes.push(`Asia: added Patmos from Natural Earth 10m land (${rounded(geometryAreaKm2(patmosLand.geometry), 1)} km²), per the Research Lead's ruling (the AD 69 partition drops land faces under 50 km²).`);
@@ -823,7 +1209,7 @@ async function main() {
   const sicilyArea = built.find((feature) => feature.properties.areaId === "sicily");
   const italyUnion = await unionFeatures("italy-sources", [...italy.faces, ...italy.outlineLand]);
   const italyPieces = await booleanOp("italy", "erase", [italyUnion], [illyricumArea, sicilyArea]);
-  built.push(await finishArea("italy", italyPieces, `Union of ${italy.faces.length} AD69 land faces lying within AWMC Italy_shading (Roman Italy) and Italy_shading itself on Natural Earth 10m land, minus Dalmatia and Sicily.`, ["awmc:italy-shading", "awmc:roman-empire-ad-69-provinces"], notes, [{ kind: "clip", detail: `Italy_shading clipped to Natural Earth 10m land (commit ${NATURAL_EARTH_COMMIT}); it supplies Italy west of the AD 69 partition's 9°E frame.`, sources: ["awmc:italy-shading"] }]));
+  built.push(await finishArea("italy", italyPieces, `Union of ${italy.faces.length} AD69 land faces lying within AWMC Italy_shading (Roman Italy) and Italy_shading itself on Natural Earth 10m land, minus Dalmatia and Sicily.`, ["awmc:italy-shading", "awmc:roman-empire-ad-69-provinces"], notes, [{ kind: "clip", detail: `Italy_shading clipped to Natural Earth 10m land (commit ${NATURAL_EARTH_COMMIT}); it carries Italy's coast out to Natural Earth's where AWMC's faces stop short of it.`, sources: ["awmc:italy-shading"] }]));
 
   // Herod's lands, Gadara's Decapolis land, Syria, Cilicia and Arabia.
   const jordan = await loadRiver("jordan");
@@ -851,9 +1237,14 @@ async function main() {
     sources: [`osm:relation/${OSM_RIVERS.yarmuk.relationId}`, ...yarmukIds]
   };
   const herodUpstream = ["awmc:herod-record-12-land-clipped", `awmc:ad69-face-${judaeaFace.properties.faceId}`];
+  const machaerusChange = {
+    kind: "described-line",
+    detail: `Perea ends at an east–west line ${MACHAERUS_CUT_MARGIN_KM} km south of Machaerus, which stays in Perea: Josephus (War 3.3.3) gives Perea's length as "from Machaerus to Pella". The land south of the line, Herod's outline and the AD 69 Judaea face's Dead Sea shore, is Moab's and goes to arabia. Approximate: a straight line through a named anchor.`,
+    sources: ["bib:josephus-jewish-war"]
+  };
   const judea = await finishArea("judea-samaria-idumea", herod.judea, "Herod record 12 with the AD 69 Judaea face, west of the Jordan and the Dead Sea median and south of the Galilee/Samaria line.", [...herodUpstream, ...jordanIds], notes, [riftChange, anchorChange]);
   assertInside(judea, { Jerusalem: HEROD_ANCHORS.jerusalem, "Qasr al-Yahud": HEROD_ANCHORS.qasrAlYahud }, "judea-samaria-idumea");
-  const galileePerea = await finishArea("galilee-perea", [...herod.galilee, ...herod.perea], "Herod record 12 with the AD 69 Judaea face: Galilee (west of the Jordan, north of the Galilee/Samaria line) and Perea (east of the Jordan and the Dead Sea median, south of the Yarmuk and of Perea's northern line at Pella).", [...herodUpstream, ...jordanIds, ...yarmukIds], notes, [riftChange, anchorChange, yarmukChange]);
+  const galileePerea = await finishArea("galilee-perea", [...herod.galilee, ...herod.perea], "Herod record 12 with the AD 69 Judaea face: Galilee (west of the Jordan, north of the Galilee/Samaria line) and Perea (east of the Jordan and the Dead Sea median, south of the Yarmuk and of Perea's northern line at Pella, north of Machaerus).", [...herodUpstream, ...jordanIds, ...yarmukIds], notes, [riftChange, anchorChange, yarmukChange, machaerusChange]);
   assertInside(galileePerea, { Nazareth: HEROD_ANCHORS.nazareth, Capernaum: HEROD_ANCHORS.capernaum, "Al-Maghtas": HEROD_ANCHORS.alMaghtas, Machaerus: HEROD_ANCHORS.machaerus }, "galilee-perea");
   const philip = await finishArea("philip-tetrarchy-lands", herod.philip, "Herod record 12 east of the Jordan and north of the Yarmuk (Gaulanitis, Batanea, Trachonitis, Auranitis); keeps Caesarea Philippi, Bethsaida and Hippos.", [...herodUpstream, ...jordanIds, ...yarmukIds], notes, [riftChange, yarmukChange]);
   assertInside(philip, { "Caesarea Philippi": HEROD_ANCHORS.caesareaPhilippi, Bethsaida: HEROD_ANCHORS.bethsaida, Hippos: HEROD_ANCHORS.hippos }, "philip-tetrarchy-lands");
@@ -912,9 +1303,13 @@ async function main() {
   notes.push(`Sinai: AD 69 faces east of Aegyptus: ${sinaiAd69Faces.map((face) => `${rounded(geometryAreaKm2(face.geometry))} km² at ${labelPoint(face.geometry).map((value) => value.toFixed(2)).join(", ")} (${pointInGeometry(labelPoint(face.geometry), ad69Extent.geometry) ? "inside" : "outside"} the AD 69 extent)`).join("; ")}. Outside the AD 69 extent, AD 200 cell ${sinaiCell.cellId} adds ${rounded(geometryAreaKm2(sinaiOutside[0].geometry))} km² (southern Sinai, Aila and the Hejaz coast inside the AD 200 extent).`);
   const ad200Sources = await booleanOp("arabia-ad200", "clip", [await unionFeatures("arabia-ad200-sources", [petraCell.feature, sinaiOutside[0]])], [ad200Extent]);
   const arabiaPieces = await booleanOp("arabia", "erase", [...ad200Sources, ...sinaiAd69Faces], [egyptArea, f0031, herodBase]);
-  const arabia = await finishArea("arabia", arabiaPieces, `AD200 cell ${petraCell.cellId} (Petra and Bostra) and, outside the AD 69 extent, AD200 cell ${sinaiCell.cellId} (Sinai), clipped to the AD 200 extent; plus the AD69 Sinai faces east of Aegyptus; minus Aegyptus, the AD69 Syria face and the Herodian base.`, [`awmc:ad200-province-cell-${petraCell.cellId}`, `awmc:ad200-province-cell-${sinaiCell.cellId}`, "awmc:ad69-sinai-faces", "awmc:roman-empire-ad-200-extent", "awmc:herod-record-12-land-clipped"], notes);
+  const arabia = await finishArea("arabia", [...arabiaPieces, ...herod.pereaSouth], `AD200 cell ${petraCell.cellId} (Petra and Bostra) and, outside the AD 69 extent, AD200 cell ${sinaiCell.cellId} (Sinai), clipped to the AD 200 extent; plus the AD69 Sinai faces east of Aegyptus; minus Aegyptus, the AD69 Syria face and the Herodian base; plus the Herodian land south of Machaerus.`, [`awmc:ad200-province-cell-${petraCell.cellId}`, `awmc:ad200-province-cell-${sinaiCell.cellId}`, "awmc:ad69-sinai-faces", "awmc:roman-empire-ad-200-extent", "awmc:herod-record-12-land-clipped"], notes, [machaerusChange]);
   assertInside(arabia, { Petra: POINTS.petra, Bostra: POINTS.bostra, "Mount Sinai": POINTS.stCatherine }, "arabia");
   built.push(arabia);
+
+  // Peninsulas that AWMC's extent cuts off at the neck join the area they are attached to.
+  const landParts = await prepareRomanWorldLand();
+  await attachCutOffPeninsulas(built, ad69Extent, landParts, notes);
 
   // Coverage is measured on AWMC's AD 69 land faces inside the extent (NE land, cut by AWMC's lines),
   // so slivers where AWMC's coastline and Natural Earth's disagree are not counted as gaps.
@@ -927,52 +1322,88 @@ async function main() {
   const explanations = OUTSIDE_LIST_PROBES.flatMap(([label, probes]) => probes.map((point) => ({ label, point })));
   await assignLeftoverLand(built, coverageDomain, explanations, notes);
 
+  // The rest of the Roman world.
+  const isBritain = await britainTest(landParts);
+  built.push(await buildOtherRomanLands(built, ad69Raw, ad69Extent, landParts, isBritain, notes));
+  await assignSourcedIslands(built, notes);
+  await fillRomanWorldGaps(built, coverageDomain, isBritain, notes);
+
   // Final file: fixed area order, topology-aware simplification (shared borders are simplified once, so
   // neighbours keep identical edges), coordinates rounded to OUTPUT_PRECISION, then the same clean-up
   // again (simplification and rounding can leave repeated vertices).
   const ordered = AREA_ORDER.filter((areaId) => built.some((feature) => feature.properties.areaId === areaId)).map((areaId) => built.find((feature) => feature.properties.areaId === areaId));
   for (const areaId of AREA_ORDER) if (!built.some((feature) => feature.properties.areaId === areaId)) omitted.push([areaId, "Not built; see composition notes."]);
+  const records = await loadLocationRecordsForPlaceCheck(notes);
+  const placePoints = records.flatMap((record) => (record.candidates ?? []).map((candidate) => candidate.coordinates).filter(Array.isArray));
+  const simplifyInput = ordered.flatMap((feature) => {
+    const { areaId } = feature.properties;
+    if (areaId !== "other-roman-lands") {
+      return [geometryFeature(feature.geometry, { ...feature.properties, simplifyMetres: FINE_SIMPLIFY_AREAS.includes(areaId) ? FINE_SIMPLIFY_METRES : COARSE_SIMPLIFY_METRES })];
+    }
+    const near = [];
+    const far = [];
+    for (const polygon of polygonsOf(feature.geometry)) {
+      const part = { type: "Polygon", coordinates: polygon };
+      const isNearIsland = geometryAreaKm2(part) < NEAR_ISLAND_MAX_KM2 && placePoints.some((point) => distanceToGeometryKm(point, part) <= NEAR_PLACES_KM);
+      (isNearIsland ? near : far).push(polygon);
+    }
+    notes.push(`other-roman-lands: ${near.length} island(s) within ${NEAR_PLACES_KM} km of our places keep the ${COARSE_SIMPLIFY_METRES} m tolerance; its other ${far.length} part(s) use ${OTHER_ROMAN_LANDS_SIMPLIFY_METRES} m.`);
+    return [
+      ...(near.length > 0 ? [geometryFeature({ type: "MultiPolygon", coordinates: near }, { ...feature.properties, simplifyMetres: COARSE_SIMPLIFY_METRES })] : []),
+      ...(far.length > 0 ? [geometryFeature({ type: "MultiPolygon", coordinates: far }, { ...feature.properties, simplifyMetres: OTHER_ROMAN_LANDS_SIMPLIFY_METRES })] : [])
+    ];
+  });
   const rawOutputPath = path.join(workDirectory, "ancient-areas-raw.geojson");
   const simplifiedPath = path.join(workDirectory, "ancient-areas-simplified.geojson");
-  await writeJson(rawOutputPath, featureCollection(ordered));
+  await writeJson(rawOutputPath, featureCollection(simplifyInput));
   await removeIfExists(simplifiedPath);
-  const intervalExpression = `${JSON.stringify(FINE_SIMPLIFY_AREAS).replaceAll('"', "'")}.includes(areaId) ? ${FINE_SIMPLIFY_METRES} : ${COARSE_SIMPLIFY_METRES}`;
-  await mapshaper.runCommands(`-i ${quote(rawOutputPath)} -simplify dp variable interval="${intervalExpression}" keep-shapes -o format=geojson precision=${OUTPUT_PRECISION} ${quote(simplifiedPath)}`);
+  await mapshaper.runCommands(`-i ${quote(rawOutputPath)} -simplify dp variable interval="simplifyMetres" keep-shapes -o format=geojson precision=${OUTPUT_PRECISION} ${quote(simplifiedPath)}`);
   const simplified = await readJson(simplifiedPath);
-  const finalFeatures = simplified.features.map((feature) => {
-    const { geometry } = cleanPolygonGeometry(feature.geometry, { minPartKm2: 0 });
-    const cleaned = geometryFeature(geometry, feature.properties);
-    if (!booleanValid(cleaned)) throw new Error(`${feature.properties.areaId}: invalid after simplification`);
+  const finalFeatures = ordered.map((source) => {
+    const { areaId } = source.properties;
+    const parts = simplified.features.filter((feature) => feature.properties.areaId === areaId).flatMap((feature) => polygonsOf(feature.geometry));
+    const { geometry } = cleanPolygonGeometry({ type: "MultiPolygon", coordinates: parts }, { minPartKm2: 0 });
+    const cleaned = geometryFeature(geometry, source.properties);
+    if (!booleanValid(cleaned)) throw new Error(`${areaId}: invalid after simplification`);
     return cleaned;
   });
   const collection = featureCollection(finalFeatures);
+  // The data validator also rejects rings that touch or cross themselves; fail here rather than in CI.
+  const topologyErrors = [];
+  validateGeometryTopology({ featureCollection: collection, file: "data/geo/ancient-areas.geojson", errors: topologyErrors });
+  if (topologyErrors.length > 0) {
+    throw new Error(`Validator topology check failed: ${topologyErrors.map((error) => `${collection.features[Number(/\[(\d+)\]/u.exec(error.path)?.[1])]?.properties.areaId ?? error.path}: ${error.message}`).join("; ")}`);
+  }
   await fs.writeFile(outputAreasPath, `${JSON.stringify(collection)}\n`, "utf8");
+  const empireEdge = await buildEmpireEdge(collection, landParts, notes);
 
   // Checks.
   const validity = validityRows(collection);
   const overlaps = await overlapRows(collection);
-  const coverage = await coverageRows(coverageDomain, collection, explanations, COVERAGE_TOLERANCE_KM2);
-  const explainedGaps = coverage.rows.filter((row) => row.explanation);
-  for (const row of explainedGaps) row.explanation = `${row.explanation}: AD 69 province(s) not in M4-02's area list`;
-  for (const row of coverage.rows.filter((candidate) => !candidate.explanation)) {
-    const piece = geometryFeature(row.geometry);
-    const touchingUnlisted = sharedBoundaryShares(piece, explainedGaps.map((gap) => geometryFeature(gap.geometry, { explanation: gap.explanation })), 0.05)[0];
-    if (touchingUnlisted) {
-      row.explanation = `Borders ${touchingUnlisted.candidate.properties.explanation}`;
-      continue;
+  const explainCoverage = (coverageResult, features, sliverPrefix = "") => {
+    for (const row of coverageResult.rows) {
+      row.britain = isBritain(row.geometry);
+      if (row.britain) {
+        row.explanation = "Great Britain and its islands: left out of `other-roman-lands` (ADR-0037; Rome conquered Britain from AD 43)";
+        continue;
+      }
+      if (row.explanation) {
+        row.explanation = `${row.explanation}: should be in \`other-roman-lands\``;
+        continue;
+      }
+      const touchingAreas = sharedBoundaryShares(geometryFeature(row.geometry), features);
+      const name = landName(row.geometry, touchingAreas.length > 0 ? "Land" : "Island");
+      row.explanation = sliverPrefix + (touchingAreas.length > 0
+        ? `${name} bordering ${touchingAreas.map((share) => `\`${share.candidate.properties.areaId}\` (${rounded(share.share * 100)}% of its edge)`).join(" and ")}`
+        : `${name} that no area holds`);
     }
-    const touchingAreas = sharedBoundaryShares(piece, collection.features);
-    if (touchingAreas.length > 0) {
-      row.explanation = `Borders ${touchingAreas.map((share) => `\`${share.candidate.properties.areaId}\` (${rounded(share.share * 100)}% of its edge)`).join(" and ")} about equally; no ruling picks one`;
-      continue;
-    }
-    const name = ISLAND_NAMES.find(([, point]) => pointInGeometry(point, row.geometry))?.[0] ?? "Island face";
-    const nearest = collection.features
-      .map((feature) => ({ areaId: feature.properties.areaId, distanceKm: distanceToGeometryKm(row.point, feature.geometry) }))
-      .sort((left, right) => left.distanceKm - right.distanceKm)[0];
-    row.explanation = `${name}: detached land that no area holds and no ruling assigns (nearest area \`${nearest.areaId}\`, ${rounded(nearest.distanceKm, 1)} km from its centre)`;
-  }
-  const records = await loadLocationRecordsForPlaceCheck(notes);
+    return coverageResult;
+  };
+  // Composition coverage is measured before simplification: it shows whether any land was left without
+  // an area. The written file is measured too; its extra gaps are slivers where simplification moved an
+  // outer edge (coast or frontier) inside AWMC's land, and their widths are bounded by the tolerances.
+  const compositionCoverage = explainCoverage(await coverageRows(coverageDomain, featureCollection(ordered), explanations, COVERAGE_TOLERANCE_KM2), ordered);
+  const coverage = explainCoverage(await coverageRows(coverageDomain, collection, [], COVERAGE_TOLERANCE_KM2), collection.features, "Simplification sliver: ");
   const places = placeRows(records, collection);
   const jordanSites = [
     ["Qasr al-Yahud (west bank)", HEROD_ANCHORS.qasrAlYahud],
@@ -983,30 +1414,61 @@ async function main() {
     areaIds: collection.features.filter((feature) => pointInGeometry(point, feature.geometry)).map((feature) => feature.properties.areaId),
     riverKm: Math.min(...herod.rift.coordinates.slice(1).map((coordinate, index) => distancePointToSegmentKm(point, herod.rift.coordinates[index], coordinate)))
   }));
+  const anchorChecks = [
+    ["Machaerus (fortress)", HEROD_ANCHORS.machaerus, "galilee-perea"],
+    ["Caesarea Mazaca", POINTS.caesareaMazaca, "cappadocia"],
+    ["Cappadocia's label point", POINTS.cappadociaLabel, "cappadocia"]
+  ].map(([name, point, expected]) => ({
+    name,
+    point,
+    expected,
+    areaIds: collection.features.filter((feature) => pointInGeometry(point, feature.geometry)).map((feature) => feature.properties.areaId),
+    borderKm: distanceToGeometryKm(point, collection.features.find((feature) => feature.properties.areaId === expected).geometry)
+  }));
 
   const anchorPoints = Object.entries(HEROD_ANCHORS).map(([name, coordinates]) => ({ name, coordinates }));
+  const machaerusLine = [[35.3, herod.machaerusCutLatitude], [36.2, herod.machaerusCutLatitude]];
+  const edgeLines = empireEdge.edge.features[0].geometry.coordinates.map((coordinates) => ({ coordinates, color: "#b00000", width: 2.6 }));
   const previewPaths = [
-    await writePreviewPng(path.join(previewDirectory, "areas-italy-to-mesopotamia.png"), {
-      title: `Ancient areas (${collection.features.length}) — Italy to Mesopotamia`,
-      bounds: [6.5, 26, 46, 48.5],
-      areas: collection
+    await writePreviewPng(path.join(previewDirectory, "areas-whole-empire.png"), {
+      title: `The Roman world, AD 69 extent: ${collection.features.length} areas, with the empire's edge in red`,
+      bounds: [-11, 21.5, 47, 56.5],
+      areas: collection,
+      lines: edgeLines,
+      width: 2200
+    }),
+    await writePreviewPng(path.join(previewDirectory, "areas-aegean.png"), {
+      title: "The Aegean: provinces, peninsulas and the islands in other-roman-lands",
+      bounds: [19.2, 34.6, 30.2, 41.6],
+      areas: collection,
+      lines: edgeLines,
+      points: [{ name: "Patmos", coordinates: POINTS.patmos }, { name: "Mount Athos", coordinates: [24.33, 40.16] }, { name: "Cnidus", coordinates: [27.374, 36.686] }, { name: "Corinth", coordinates: [22.88, 37.91] }, { name: "Ephesus", coordinates: [27.34, 37.94] }]
     }),
     await writePreviewPng(path.join(previewDirectory, "areas-levant-anchors.png"), {
-      title: "Levant: Herodian cuts, Gadara, Syria and Arabia, with anchor points",
+      title: "Levant: Herodian cuts, Perea's end at Machaerus, Gadara, Syria and Arabia",
       bounds: [34.15, 30.85, 37.0, 33.55],
       areas: collection,
       lines: [
         { coordinates: herod.rift.coordinates, color: "#1a4fd6" },
         { coordinates: herod.yarmukLine, color: "#1a4fd6" },
         { coordinates: GALILEE_SAMARIA_LINE, color: "#a00", dash: "6,4" },
-        { coordinates: PELLA_LINE, color: "#a00", dash: "6,4" }
+        { coordinates: PELLA_LINE, color: "#a00", dash: "6,4" },
+        { coordinates: machaerusLine, color: "#a00", dash: "6,4" }
       ],
       points: [...anchorPoints, { name: "petra", coordinates: POINTS.petra }, { name: "bostra", coordinates: POINTS.bostra }, { name: "damascus", coordinates: POINTS.damascus }]
+    }),
+    await writePreviewPng(path.join(previewDirectory, "areas-cappadocia.png"), {
+      title: "Galatia and Cappadocia: the edge moved locally near Nevşehir",
+      bounds: [31.5, 37.0, 38.0, 40.6],
+      areas: collection,
+      lines: cappadociaDetour ? [{ coordinates: cappadociaDetour, color: "#a00", dash: "6,4" }] : [],
+      points: [{ name: "Caesarea Mazaca", coordinates: POINTS.caesareaMazaca }, { name: "cappadocia label", coordinates: POINTS.cappadociaLabel }, { name: "Ancyra", coordinates: [32.85, 39.93] }, { name: "Tyana", coordinates: [34.62, 37.83] }]
     }),
     await writePreviewPng(path.join(previewDirectory, "areas-sinai-arabia.png"), {
       title: "Southern Levant, Sinai and Arabia",
       bounds: [31.5, 27.4, 38.5, 34.0],
       areas: collection,
+      lines: edgeLines,
       points: [{ name: "petra", coordinates: POINTS.petra }, { name: "bostra", coordinates: POINTS.bostra }, { name: "Mount Sinai", coordinates: POINTS.stCatherine }]
     }),
     await writePreviewPng(path.join(previewDirectory, "areas-cilicia.png"), {
@@ -1030,14 +1492,18 @@ async function main() {
     notes,
     validity,
     overlaps,
+    compositionCoverage,
     coverage,
     places,
     jordanSites,
+    anchorChecks,
+    empireEdge,
     previewPaths,
     osmSummary,
-    simplifyNote: `Written after topology-aware Douglas–Peucker simplification (${FINE_SIMPLIFY_METRES} m for ${FINE_SIMPLIFY_AREAS.map((areaId) => `\`${areaId}\``).join(", ")}, whose borders follow the Jordan; ${COARSE_SIMPLIFY_METRES} m elsewhere) with coordinates rounded to ${OUTPUT_PRECISION}°; areas are cleaned before and after.`
+    simplifyNote: `Written after topology-aware Douglas–Peucker simplification (${FINE_SIMPLIFY_METRES} m for ${FINE_SIMPLIFY_AREAS.map((areaId) => `\`${areaId}\``).join(", ")}, whose borders follow the Jordan; ${OTHER_ROMAN_LANDS_SIMPLIFY_METRES} m for \`other-roman-lands\` except its islands within ${NEAR_PLACES_KM} km of our places; ${COARSE_SIMPLIFY_METRES} m elsewhere; a shared edge takes the finer tolerance) with coordinates rounded to ${OUTPUT_PRECISION}°; areas are cleaned before and after.`
   });
   console.log(`Wrote ${outputAreasPath} (${collection.features.length} areas)`);
+  console.log(`Wrote ${outputEmpireEdgePath} (${empireEdge.pieceCount} pieces, ${rounded(empireEdge.lengthKm)} km)`);
   console.log(`Wrote ${path.join(reportDirectory, "composition-report.md")}`);
   for (const previewPath of previewPaths) console.log(`Wrote ${previewPath}`);
 }

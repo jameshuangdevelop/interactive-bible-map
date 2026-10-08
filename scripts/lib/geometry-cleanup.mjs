@@ -31,6 +31,36 @@ function samePosition(left, right) {
   return left[0] === right[0] && left[1] === right[1];
 }
 
+// Removes zero-width spikes: a vertex where the ring turns back along the line it came in on
+// (within `toleranceDegrees`, about 1 m by default). Boolean operations leave these where a cut line
+// ends inside an area; they enclose no area but make a ring cross itself after rounding.
+export function removeSpikes(ring, toleranceDegrees = 0.00001) {
+  let open = removeConsecutiveDuplicateVertices(ring).slice(0, -1);
+  let changed = true;
+  while (changed && open.length > 3) {
+    changed = false;
+    for (let index = 0; index < open.length && open.length > 3; index += 1) {
+      const previous = open[(index - 1 + open.length) % open.length];
+      const vertex = open[index];
+      const next = open[(index + 1) % open.length];
+      const inX = vertex[0] - previous[0];
+      const inY = vertex[1] - previous[1];
+      const outX = next[0] - vertex[0];
+      const outY = next[1] - vertex[1];
+      if (inX * outX + inY * outY >= 0) continue;
+      const cross = Math.abs(inX * outY - inY * outX);
+      const longest = Math.max(Math.hypot(inX, inY), Math.hypot(outX, outY));
+      if (cross / longest > toleranceDegrees) continue;
+      open.splice(index, 1);
+      open = removeConsecutiveDuplicateVertices([...open, open[0]]).slice(0, -1);
+      changed = true;
+      index -= 1;
+    }
+  }
+  if (open.length === 0) return [];
+  return [...open.map(([lon, lat]) => [lon, lat]), [open[0][0], open[0][1]]];
+}
+
 // Removes vertices that repeat the previous one and returns a closed ring.
 export function removeConsecutiveDuplicateVertices(ring) {
   const cleaned = [];
@@ -58,14 +88,45 @@ export function countConsecutiveDuplicateVertices(geometry) {
   return count;
 }
 
-// Removes repeated vertices, drops rings with fewer than 3 distinct positions (fewer than 4 positions
-// once closed), drops polygon parts smaller than `minPartKm2`, and returns a Polygon or MultiPolygon.
-// Returns null when nothing is left. `dropped` reports what was removed, for the composition report.
+// Parts of a MultiPolygon must not touch each other, even at a single point. Where a later part repeats a
+// vertex of an earlier one, that vertex is moved `nudgeDegrees` (about 5 m by default) towards the
+// midpoint of its two neighbours, which for the usual convex tip moves it into its own part.
+export function separateTouchingParts(polygons, nudgeDegrees = 0.00005) {
+  const owner = new Map();
+  return polygons.map((polygon, partIndex) =>
+    polygon.map((ring) => {
+      const open = ring.slice(0, -1);
+      const moved = open.map((vertex, index) => {
+        const key = `${vertex[0]},${vertex[1]}`;
+        const first = owner.get(key);
+        if (first === undefined) {
+          owner.set(key, partIndex);
+          return vertex;
+        }
+        if (first === partIndex) return vertex;
+        const previous = open[(index - 1 + open.length) % open.length];
+        const next = open[(index + 1) % open.length];
+        const dx = (previous[0] + next[0]) / 2 - vertex[0];
+        const dy = (previous[1] + next[1]) / 2 - vertex[1];
+        const length = Math.hypot(dx, dy);
+        if (length === 0) return vertex;
+        const step = Math.min(nudgeDegrees, length / 2);
+        return [vertex[0] + (dx / length) * step, vertex[1] + (dy / length) * step];
+      });
+      return [...moved, [moved[0][0], moved[0][1]]];
+    })
+  );
+}
+
+// Removes repeated vertices and zero-width spikes, drops rings with fewer than 3 distinct positions
+// (fewer than 4 positions once closed), drops polygon parts smaller than `minPartKm2`, separates parts
+// that touch at a point, and returns a Polygon or MultiPolygon. Returns null when nothing is left.
+// `dropped` reports what was removed, for the composition report.
 export function cleanPolygonGeometry(geometry, { minPartKm2 = 0 } = {}) {
   const dropped = { degenerateRings: 0, smallParts: 0, smallPartsKm2: 0 };
   const polygons = [];
   for (const polygon of polygonsOf(geometry)) {
-    const [outer, ...holes] = polygon.map(removeConsecutiveDuplicateVertices);
+    const [outer, ...holes] = polygon.map((ring) => removeSpikes(ring));
     if (!outer || distinctPositionCount(outer) < 3) {
       dropped.degenerateRings += 1;
       continue;
@@ -85,10 +146,8 @@ export function cleanPolygonGeometry(geometry, { minPartKm2 = 0 } = {}) {
     polygons.push(cleanedPolygon);
   }
   if (polygons.length === 0) return { geometry: null, dropped };
-  return {
-    geometry: polygons.length === 1 ? { type: "Polygon", coordinates: polygons[0] } : { type: "MultiPolygon", coordinates: polygons },
-    dropped
-  };
+  if (polygons.length === 1) return { geometry: { type: "Polygon", coordinates: polygons[0] }, dropped };
+  return { geometry: { type: "MultiPolygon", coordinates: separateTouchingParts(polygons) }, dropped };
 }
 
 // Closes a polyline into a polygon ring by walking through `framePoints` from the line's last

@@ -6,7 +6,9 @@ import {
   countConsecutiveDuplicateVertices,
   geometryAreaKm2,
   polygonFromLineAndFrame,
-  removeConsecutiveDuplicateVertices
+  removeConsecutiveDuplicateVertices,
+  removeSpikes,
+  separateTouchingParts
 } from "../scripts/lib/geometry-cleanup.mjs";
 
 const square = (lon, lat, size) => [
@@ -57,6 +59,31 @@ test("cleanPolygonGeometry keeps holes that are real rings and drops collapsed o
 test("cleanPolygonGeometry returns null when nothing is left", () => {
   const { geometry } = cleanPolygonGeometry({ type: "Polygon", coordinates: [square(0, 0, 0.001)] }, { minPartKm2: 1 });
   assert.equal(geometry, null);
+});
+
+test("separateTouchingParts moves a shared vertex into the later part", () => {
+  const left = square(0, 0, 1);
+  const right = [[1, 1], [2, 1], [2, 2], [1, 2], [1, 1]];
+  const [first, second] = separateTouchingParts([[left], [right]]);
+  assert.deepEqual(first, [left]);
+  assert.notDeepEqual(second[0][0], [1, 1]);
+  assert.deepEqual(second[0][0], second[0].at(-1));
+  assert.ok(second[0][0][0] > 1 && second[0][0][1] > 1, "moved into the second square");
+  assert.ok(Math.hypot(second[0][0][0] - 1, second[0][0][1] - 1) <= 0.00005 + 1e-12);
+});
+
+test("removeSpikes drops a vertex where the ring doubles back on itself", () => {
+  // From (0, 1) the ring runs out to (0.6, -0.5) and back along the same line, 0.1 m off after rounding.
+  const spiked = [[0, 0], [1, 0], [1, 1], [0, 1], [0.6, -0.5], [0.2, 0.5000009], [0, 0]];
+  assert.deepEqual(removeSpikes(spiked), [[0, 0], [1, 0], [1, 1], [0, 1], [0.2, 0.5000009], [0, 0]]);
+  assert.deepEqual(removeSpikes(square(0, 0, 1)), square(0, 0, 1));
+  const { geometry } = cleanPolygonGeometry({ type: "Polygon", coordinates: [spiked] });
+  assert.equal(geometry.coordinates[0].length, 6);
+});
+
+test("removeSpikes keeps narrow but real angles", () => {
+  const narrow = [[0, 0], [1, 0], [1, 1], [0, 1], [0.5, -0.5], [0.4, 0.5], [0, 0]];
+  assert.deepEqual(removeSpikes(narrow), narrow);
 });
 
 test("polygonFromLineAndFrame closes a border line into the polygon on one side of it", () => {

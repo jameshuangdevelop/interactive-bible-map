@@ -20,8 +20,9 @@ const COASTLINE_ZIP_URL = `${AWMC_BASE_URL}/Physical%20Data/shoreline/coastline.
 
 const WORK_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03b-work");
 const REPORT_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03b");
-// The frame's south edge lies below AWMC's AD 69 extent (22.9°N), so Egypt keeps its own southern line.
-const BBOX = Object.freeze({ minLon: 9, minLat: 22.5, maxLon: 50, maxLat: 48 });
+// The frame lies outside AWMC's AD 69 extent on every side (the extent spans 9.5°W–40.7°E and
+// 22.9–54.4°N), so no face inside the empire is cut by a straight frame edge.
+const BBOX = Object.freeze({ minLon: -11, minLat: 22.5, maxLon: 50, maxLat: 56 });
 const BBOX_STRING = `${BBOX.minLon},${BBOX.minLat},${BBOX.maxLon},${BBOX.maxLat}`;
 const DANGLE_TOLERANCE_KM = 0.1;
 const EXTENSION_LIMIT_KM = 30;
