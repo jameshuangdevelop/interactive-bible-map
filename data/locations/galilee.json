@@ -19,14 +19,15 @@
       "label": "Galilee (historical region)",
       "coordinates": [
         35.3,
-        33
+        32.9
       ],
       "coordinateSource": "wikidata:Q83241",
       "confidence": "high",
-      "support": "Wikidata's current representative point for the Galilee region sits roughly 30 km north of the point OpenBible.info recorded for the same Wikidata item in its own snapshot; both are reasonable approximations for a large, imprecisely bounded historical region rather than a single site, and both fall within the broad area described as Galilee in first-century sources.",
+      "support": "Wikidata's current representative point for the Galilee region sits roughly 30 km north of the point OpenBible.info recorded for the same Wikidata item in its own snapshot; both are reasonable approximations for a large, imprecisely bounded historical region rather than a single site. Wikidata's own point, however, falls north of Baca, the village Josephus names as Galilee's own border with Tyre's territory (Jewish War 3.3.1), so this record's point is moved about 11 km south, to 32.90 degrees N, to stay within the region described in first-century sources.",
       "sources": [
         "wikidata:Q83241",
-        "openbible:galilee-1"
+        "openbible:galilee-1",
+        "bib:josephus-jewish-war"
       ]
     }
   ],

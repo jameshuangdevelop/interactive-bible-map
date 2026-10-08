@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
+import { pointInGeometry } from "./lib/ancient-area-checks.mjs";
+import { polygonsOf } from "./lib/geometry-cleanup.mjs";
+
 const execFileAsync = promisify(execFile);
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -12,7 +15,6 @@ const repositoryRoot = path.resolve(moduleDirectory, "..");
 
 const OUTPUT_DIRECTORY = path.join(repositoryRoot, "data", "geo");
 const OUTPUT_AREAS_PATH = path.join(OUTPUT_DIRECTORY, "ancient-areas.geojson");
-const OUTPUT_ROADS_PATH = path.join(OUTPUT_DIRECTORY, "ancient-roads.geojson");
 const OUTPUT_COASTLINE_PATH = path.join(OUTPUT_DIRECTORY, "ancient-coastline.geojson");
 
 const WORK_DIRECTORY = path.join(os.tmpdir(), "ibm-m4-03-build");
@@ -36,6 +38,7 @@ const AWMC_HEROD_PATH = "Cultural-Data/political_shading/herod/herods_kingdom.ge
 const AWMC_ROADS_PATH = "Cultural-Data/roads/roads.geojson";
 const AWMC_COASTLINE_PATH = "Physical Data/shoreline/shoreline.geojson";
 const NATURAL_EARTH_COASTLINE_PATH = "geojson/ne_10m_coastline.geojson";
+const NATURAL_EARTH_LAND_PATH = "geojson/ne_10m_land.geojson";
 const NATURAL_EARTH_RIVERS_PATH = "geojson/ne_10m_rivers_lake_centerlines.geojson";
 
 const PROJECT_BOUNDS = Object.freeze({
@@ -43,12 +46,6 @@ const PROJECT_BOUNDS = Object.freeze({
   maxLon: 60,
   minLat: -5,
   maxLat: 50
-});
-const ROAD_FOCUS_BOUNDS = Object.freeze({
-  minLon: 10,
-  maxLon: 40,
-  minLat: 28,
-  maxLat: 45
 });
 
 const COASTLINE_TARGETS = [
@@ -214,8 +211,6 @@ const AREA_DEFINITIONS = [
   }
 ];
 
-const EXCLUDED_POST_AD100_ROAD_NAMES = ["Via Nova Traiana"];
-
 function pathForMapshaper() {
   if (process.platform === "win32") {
     return {
@@ -237,10 +232,6 @@ async function runMapshaper(args) {
   });
 }
 
-function ensureLineGeometry(geometry) {
-  return geometry?.type === "LineString" || geometry?.type === "MultiLineString";
-}
-
 function roundNumber(value, decimals = 5) {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
@@ -251,42 +242,6 @@ function roundCoordinates(value, decimals = 5) {
     return value.map((item) => roundCoordinates(item, decimals));
   }
   return typeof value === "number" ? roundNumber(value, decimals) : value;
-}
-
-function geometryIntersectsBounds(geometry, bounds) {
-  let minLon = Number.POSITIVE_INFINITY;
-  let maxLon = Number.NEGATIVE_INFINITY;
-  let minLat = Number.POSITIVE_INFINITY;
-  let maxLat = Number.NEGATIVE_INFINITY;
-
-  const ingest = (value) => {
-    if (!Array.isArray(value)) {
-      return;
-    }
-    if (typeof value[0] === "number" && typeof value[1] === "number") {
-      const [lon, lat] = value;
-      minLon = Math.min(minLon, lon);
-      maxLon = Math.max(maxLon, lon);
-      minLat = Math.min(minLat, lat);
-      maxLat = Math.max(maxLat, lat);
-      return;
-    }
-    for (const nested of value) {
-      ingest(nested);
-    }
-  };
-
-  ingest(geometry?.coordinates);
-  if (!Number.isFinite(minLon) || !Number.isFinite(minLat)) {
-    return false;
-  }
-
-  return !(
-    maxLon < bounds.minLon ||
-    minLon > bounds.maxLon ||
-    maxLat < bounds.minLat ||
-    minLat > bounds.maxLat
-  );
 }
 
 async function downloadJson(url, destinationPath) {
@@ -759,93 +714,33 @@ async function buildAncientAreas(cellFeatures, workDirectory) {
   };
 }
 
-function buildRoadFeature(sourceFeature, fallbackIndex) {
-  const properties = sourceFeature.properties ?? {};
-  const objectIdRaw = properties.OBJECTID;
-  const objectId =
-    Number.isFinite(Number(objectIdRaw)) && Number(objectIdRaw) >= 0
-      ? Number(objectIdRaw)
-      : fallbackIndex + 1;
-  const roadName = typeof properties.Name === "string" ? properties.Name.trim() : "";
-  const timeperiod = typeof properties.timeperiod === "string" ? properties.timeperiod.trim() : "";
-  const known = String(properties.Known_or_a ?? "").trim() === "1";
-  const major = String(properties.Major_or_M ?? "").trim() === "1";
-  const roadId = `awmc-road-${objectId}-${fallbackIndex + 1}`;
-
-  return {
-    type: "Feature",
-    properties: {
-      roadId,
-      major,
-      known,
-      timeperiod,
-      provenance: {
-        dataset: "AWMC geodata",
-        version: `commit:${AWMC_COMMIT};path:${AWMC_ROADS_PATH}`,
-        upstreamFeatureIds: [`awmc:roads-objectid-${objectId}`, `awmc:roads-feature-${fallbackIndex + 1}`],
-        changes: [
-          {
-            kind: "filter",
-            detail:
-              "Kept only AWMC Roman-period major roads that intersect the Interactive Bible Map extent; excluded post-AD-100 roads by cited name filter.",
-            sources: ["awmc:roads-major-filter", "awmc:roads-roman-period-filter"]
-          }
-        ]
-      }
-    },
-    geometry: {
-      ...sourceFeature.geometry,
-      coordinates: roundCoordinates(sourceFeature.geometry.coordinates)
-    },
-    _derived: {
-      roadName
-    }
-  };
-}
-
-function buildAncientRoads(roadsSource) {
-  const roadFeatures = [];
-  for (let index = 0; index < (roadsSource.features ?? []).length; index += 1) {
-    const sourceFeature = roadsSource.features[index];
-    const properties = sourceFeature.properties ?? {};
-    const major = String(properties.Major_or_M ?? "").trim() === "1";
-    const timeperiod = typeof properties.timeperiod === "string" ? properties.timeperiod : "";
-    const roadName = typeof properties.Name === "string" ? properties.Name.trim() : "";
-
-    if (!major || !timeperiod.includes("R")) {
-      continue;
-    }
-    if (!ensureLineGeometry(sourceFeature.geometry)) {
-      continue;
-    }
-    if (!geometryIntersectsBounds(sourceFeature.geometry, ROAD_FOCUS_BOUNDS)) {
-      continue;
-    }
-    if (
-      EXCLUDED_POST_AD100_ROAD_NAMES.some(
-        (excludedRoad) => roadName.toLowerCase() === excludedRoad.toLowerCase()
-      )
-    ) {
-      continue;
-    }
-
-    roadFeatures.push(buildRoadFeature(sourceFeature, index));
-  }
-
-  return {
-    type: "FeatureCollection",
-    features: roadFeatures
-      .sort((left, right) => left.properties.roadId.localeCompare(right.properties.roadId))
-      .map(({ _derived, ...feature }) => feature)
-  };
-}
-
-function buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource) {
+function buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource, modernLandSource) {
+  // The layer shows old shores that silting has since left inland (ADR-0037 item 5): AWMC's shoreline is
+  // kept where it lies well inland of today's coast. Today's coast is Natural Earth's coastline and the
+  // outlines of its land, which also hold small islands the coastline layer leaves out (Agathonisi and
+  // Farmakonisi off Miletus are in both datasets, so their shores are not ancient differences). Land
+  // outlines are cut into short pieces so the bounding-box test stays quick.
+  const modernLand = (modernLandSource.features ?? []).filter((feature) => feature.geometry);
   const modernLines = [];
   for (const feature of modernCoastlineSource.features ?? []) {
     modernLines.push(...toLineCoordinateArrays(feature.geometry ?? {}));
   }
+  for (const feature of modernLand) {
+    for (const polygon of polygonsOf(feature.geometry)) {
+      for (const ring of polygon) {
+        for (let start = 0; start < ring.length - 1; start += 200) modernLines.push(ring.slice(start, start + 201));
+      }
+    }
+  }
   const modernBboxes = modernLines.map((line) => bboxFromLine(line));
+  // A stretch that lies in today's sea is not an old shore left inland either, so most of its points
+  // must be on today's land.
+  const modernLandBboxes = modernLand.map((feature) => bboxFromLine(polygonsOf(feature.geometry).flatMap((polygon) => polygon[0])));
+  const onModernLand = (point) => modernLand.some((feature, index) => {
+    const box = modernLandBboxes[index];
+    return point[0] >= box.minLon && point[0] <= box.maxLon && point[1] >= box.minLat && point[1] <= box.maxLat && pointInGeometry(point, feature.geometry);
+  });
+  const droppedInSea = [];
 
   const features = [];
 
@@ -883,6 +778,13 @@ function buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource) {
         if (averageDistance < 0.03) {
           continue;
         }
+        const step = Math.max(1, Math.floor(line.length / 20));
+        const samples = line.filter((_, index) => index % step === 0);
+        if (samples.filter(onModernLand).length < samples.length / 2) {
+          const box = bboxFromLine(line);
+          droppedInSea.push(`${box.minLon.toFixed(2)}–${box.maxLon.toFixed(2)}°E, ${box.minLat.toFixed(2)}–${box.maxLat.toFixed(2)}°N`);
+          continue;
+        }
 
         keptSegments.push(line);
         if (Number.isFinite(objectId)) {
@@ -907,7 +809,7 @@ function buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource) {
             {
               kind: "ancient-modern-coast-compare",
               detail:
-                "Kept ancient shoreline segments inside target coastal bbox only when their sampled points are >= ~0.03° from modern Natural Earth coastline.",
+                "Kept ancient shoreline segments inside target coastal bbox only when their sampled points are >= ~0.03° from today's coast (Natural Earth's coastline and the outlines of its land, which include small islands) and most of them lie on today's land: old shores that silting has left inland. Shores of islands that both datasets hold, such as Agathonisi, and stretches in today's sea are left out.",
               sources: ["awmc:shoreline"]
             }
           ]
@@ -921,8 +823,8 @@ function buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource) {
   }
 
   return {
-    type: "FeatureCollection",
-    features
+    collection: { type: "FeatureCollection", features },
+    droppedInSea
   };
 }
 
@@ -939,31 +841,33 @@ async function main() {
     roadsPath: path.join(WORK_DIRECTORY, "roads.geojson"),
     awmcCoastlinePath: path.join(WORK_DIRECTORY, "ancient-shoreline.geojson"),
     modernCoastlinePath: path.join(WORK_DIRECTORY, "modern-coastline.geojson"),
+    modernLandPath: path.join(WORK_DIRECTORY, "modern-land.geojson"),
     riversAllPath: path.join(WORK_DIRECTORY, "rivers-all.geojson"),
     riversPath: path.join(WORK_DIRECTORY, "rivers-boundary-lines.geojson"),
     customSplitLinesPath: path.join(WORK_DIRECTORY, "custom-split-lines.geojson")
   };
 
-  const [roadsSource, ancientCoastlineSource, modernCoastlineSource, riversAllSource] = await Promise.all([
-    downloadJson(`${AWMC_BASE_URL}/${AWMC_ROADS_PATH}`, paths.roadsPath),
+  // AWMC's roads are downloaded here; the composition step picks and clips them once the areas exist.
+  const [ancientCoastlineSource, modernCoastlineSource, riversAllSource, modernLandSource] = await Promise.all([
     downloadJson(`${AWMC_BASE_URL}/${AWMC_COASTLINE_PATH}`, paths.awmcCoastlinePath),
     downloadJson(`${NATURAL_EARTH_BASE_URL}/${NATURAL_EARTH_COASTLINE_PATH}`, paths.modernCoastlinePath),
     downloadJson(`${NATURAL_EARTH_BASE_URL}/${NATURAL_EARTH_RIVERS_PATH}`, paths.riversAllPath),
+    downloadJson(`${NATURAL_EARTH_BASE_URL}/${NATURAL_EARTH_LAND_PATH}`, paths.modernLandPath),
+    downloadJson(`${AWMC_BASE_URL}/${AWMC_ROADS_PATH}`, paths.roadsPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_PROVINCE_LINES_PATH}`, paths.provinceLinesPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_117_PATH}`, paths.empireExtentPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_200_EXTENT_PATH}`, paths.empireExtent200Path),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_60_BCE_PATH}`, paths.empireExtent60Path),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_SENATORIAL_PROVINCES_PATH}`, paths.senatorialPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_HEROD_PATH}`, paths.herodPath)
-  ]).then((values) => [values[0], values[1], values[2], values[3]]);
+  ]).then((values) => values.slice(0, 4));
 
   await writeJson(paths.riversPath, selectRiverBoundaryFeatures(riversAllSource));
   await writeJson(paths.customSplitLinesPath, buildCustomSplitLines());
 
   const provinceCells = await buildProvinceCells(WORK_DIRECTORY, paths);
   const areaBuildResult = await buildAncientAreas(provinceCells, WORK_DIRECTORY);
-  const roads = buildAncientRoads(roadsSource);
-  const coastline = buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource);
+  const coastline = buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource, modernLandSource);
 
   const rawAreasPath = path.join(WORK_DIRECTORY, "ancient-areas-raw.geojson");
   await writeJson(rawAreasPath, areaBuildResult.collection);
@@ -982,15 +886,11 @@ async function main() {
     OUTPUT_AREAS_PATH
   ]);
 
-  await Promise.all([
-    writeJson(OUTPUT_ROADS_PATH, roads),
-    writeJson(OUTPUT_COASTLINE_PATH, coastline)
-  ]);
+  await writeJson(OUTPUT_COASTLINE_PATH, coastline.collection);
 
   const cleanedAreas = JSON.parse(await fs.readFile(OUTPUT_AREAS_PATH, "utf8"));
   console.log(`Wrote ${OUTPUT_AREAS_PATH} (${(cleanedAreas.features ?? []).length} features)`);
-  console.log(`Wrote ${OUTPUT_ROADS_PATH} (${roads.features.length} features)`);
-  console.log(`Wrote ${OUTPUT_COASTLINE_PATH} (${coastline.features.length} features)`);
+  console.log(`Wrote ${OUTPUT_COASTLINE_PATH} (${coastline.collection.features.length} features; left out ${coastline.droppedInSea.length} shoreline stretch(es) in today's sea: ${coastline.droppedInSea.join("; ") || "none"})`);
 
   if (areaBuildResult.unresolvedAreas.length > 0) {
     console.log("Unresolved areas:");

@@ -10,11 +10,13 @@ import {
   extendLineEnd,
   fetchOsmRelationFull,
   orientFrom,
+  OVERPASS_ENDPOINTS,
+  overpassRelationQuery,
   relationMainStreamWays
 } from "../scripts/lib/osm-waterways.mjs";
 
-// A small relation in the OSM API "full" format: three main-stream ways (one drawn backwards), a
-// tributary and a way that runs through a lake.
+// A small relation in the Overpass (and OSM API "full") format: three main-stream ways (one drawn
+// backwards), a tributary and a way that runs through a lake.
 const relationFull = {
   elements: [
     { type: "node", id: 1, lon: 35.62, lat: 33.2 },
@@ -91,18 +93,40 @@ test("extendLineEnd refuses to extend away from the requested latitude", () => {
   assert.throws(() => extendLineEnd(line, { atEnd: false, baseKm: 3, untilLatitude: 37.55 }), /does not point towards latitude/);
 });
 
-test("fetchOsmRelationFull reuses the cached response", async () => {
+test("fetchOsmRelationFull asks Overpass for the relation and reuses the cached response", async () => {
   const cacheDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "osm-cache-test-"));
   try {
-    let calls = 0;
-    const fetchImpl = async () => {
-      calls += 1;
+    const requests = [];
+    const fetchImpl = async (url, options) => {
+      requests.push({ url, options });
       return { ok: true, json: async () => relationFull };
     };
     const first = await fetchOsmRelationFull(9, cacheDirectory, { fetchImpl });
     const second = await fetchOsmRelationFull(9, cacheDirectory, { fetchImpl });
-    assert.equal(calls, 1);
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].url, OVERPASS_ENDPOINTS[0]);
+    assert.equal(requests[0].options.method, "POST");
+    assert.equal(decodeURIComponent(requests[0].options.body), `data=${overpassRelationQuery(9)}`);
+    assert.match(overpassRelationQuery(9), /relation\(9\);\(\._;>;\);out meta;/);
     assert.deepEqual(second, first);
+  } finally {
+    await fs.rm(cacheDirectory, { recursive: true, force: true });
+  }
+});
+
+test("fetchOsmRelationFull tries the next Overpass mirror when one fails", async () => {
+  const cacheDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "osm-cache-test-"));
+  try {
+    const urls = [];
+    const fetchImpl = async (url) => {
+      urls.push(url);
+      return urls.length === 1
+        ? { ok: false, status: 504, statusText: "Gateway Timeout" }
+        : { ok: true, json: async () => relationFull };
+    };
+    const data = await fetchOsmRelationFull(9, cacheDirectory, { fetchImpl, endpoints: ["https://a.example/api", "https://b.example/api"] });
+    assert.deepEqual(urls, ["https://a.example/api", "https://b.example/api"]);
+    assert.equal(data.elements.at(-1).id, 9);
   } finally {
     await fs.rm(cacheDirectory, { recursive: true, force: true });
   }
@@ -112,7 +136,9 @@ test("fetchOsmRelationFull reports a failed request", async () => {
   const cacheDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "osm-cache-test-"));
   try {
     const fetchImpl = async () => ({ ok: false, status: 504, statusText: "Gateway Timeout" });
-    await assert.rejects(fetchOsmRelationFull(9, cacheDirectory, { fetchImpl }), /504 Gateway Timeout/);
+    await assert.rejects(fetchOsmRelationFull(9, cacheDirectory, { fetchImpl, retryDelayMs: 0 }), /504 Gateway Timeout/);
+    const wrongRelation = async () => ({ ok: true, json: async () => ({ elements: [{ type: "relation", id: 10, members: [] }] }) });
+    await assert.rejects(fetchOsmRelationFull(9, cacheDirectory, { fetchImpl: wrongRelation, retryDelayMs: 0 }), /holds no relation 9/);
   } finally {
     await fs.rm(cacheDirectory, { recursive: true, force: true });
   }

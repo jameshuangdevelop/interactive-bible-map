@@ -3,29 +3,60 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-export const OSM_API_BASE_URL = "https://api.openstreetmap.org/api/0.6";
+// Read-only downloads go through Overpass, not the editing API, which the OSMF API Usage Policy reserves
+// for editing. The mirrors are tried in order.
+export const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter"
+];
 const USER_AGENT = "interactive-bible-map-ancient-geo/1.0 (+https://github.com/jameshuangdevelop/interactive-bible-map)";
 const EARTH_RADIUS_KM = 6371.0088;
 
-// Fetches a relation with all member ways and nodes from the OSM API and caches the raw response.
-// The OSM API is used instead of Overpass because a relation download is a single, stable request.
-export async function fetchOsmRelationFull(relationId, cacheDirectory, { fetchImpl = fetch } = {}) {
-  const cachePath = path.join(cacheDirectory, `osm-relation-${relationId}-full.json`);
+// A relation with its member ways and their nodes, with each element's version (`out meta`).
+export function overpassRelationQuery(relationId) {
+  return `[out:json][timeout:180];relation(${relationId});(._;>;);out meta;`;
+}
+
+// Fetches a relation with all member ways and nodes from Overpass and caches the raw response. The
+// response has the same element format as the OSM API's "full" download. Busy mirrors answer 429, 500
+// or 504, so every mirror is tried, for up to `rounds` rounds `retryDelayMs` apart.
+export async function fetchOsmRelationFull(relationId, cacheDirectory, { fetchImpl = fetch, endpoints = OVERPASS_ENDPOINTS, timeoutMs = 240000, rounds = 3, retryDelayMs = 30000 } = {}) {
+  const cachePath = path.join(cacheDirectory, `overpass-relation-${relationId}.json`);
   try {
     return JSON.parse(await fs.readFile(cachePath, "utf8"));
   } catch {
     // Not cached yet; download below.
   }
-  const response = await fetchImpl(`${OSM_API_BASE_URL}/relation/${relationId}/full.json`, {
-    headers: { "user-agent": USER_AGENT }
-  });
-  if (!response.ok) {
-    throw new Error(`OSM API request for relation ${relationId} failed: ${response.status} ${response.statusText}`);
+  const failures = [];
+  for (let round = 1; round <= rounds; round += 1) {
+    if (round > 1) await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetchImpl(endpoint, {
+          method: "POST",
+          headers: { "user-agent": USER_AGENT, "content-type": "application/x-www-form-urlencoded" },
+          body: `data=${encodeURIComponent(overpassRelationQuery(relationId))}`,
+          signal: AbortSignal.timeout(timeoutMs)
+        });
+        if (!response.ok) {
+          failures.push(`${endpoint}: ${response.status} ${response.statusText}`);
+          continue;
+        }
+        const data = await response.json();
+        if (!(data?.elements ?? []).some((element) => element.type === "relation" && element.id === relationId)) {
+          failures.push(`${endpoint}: the response holds no relation ${relationId}`);
+          continue;
+        }
+        await fs.mkdir(cacheDirectory, { recursive: true });
+        await fs.writeFile(cachePath, JSON.stringify(data), "utf8");
+        return data;
+      } catch (error) {
+        failures.push(`${endpoint}: ${error.message}`);
+      }
+    }
   }
-  const data = await response.json();
-  await fs.mkdir(cacheDirectory, { recursive: true });
-  await fs.writeFile(cachePath, JSON.stringify(data), "utf8");
-  return data;
+  throw new Error(`Overpass request for relation ${relationId} failed: ${failures.join("; ")}`);
 }
 
 // Returns the relation's main-stream ways in member order as { id, version, nodeIds, coordinates }.

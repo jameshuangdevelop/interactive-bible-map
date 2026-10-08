@@ -118,15 +118,53 @@ export function separateTouchingParts(polygons, nudgeDegrees = 0.00005) {
   );
 }
 
-// Removes repeated vertices and zero-width spikes, drops rings with fewer than 3 distinct positions
-// (fewer than 4 positions once closed), drops polygon parts smaller than `minPartKm2`, separates parts
-// that touch at a point, and returns a Polygon or MultiPolygon. Returns null when nothing is left.
-// `dropped` reports what was removed, for the composition report.
+// A ring must not touch itself either. Simplification can pinch a narrow inlet shut, so that the ring
+// passes through the same vertex twice. Each later visit to a vertex is moved `nudgeDegrees` (about 5 m by
+// default, and never more than half of either of its edges) along the bisector of its own two edges, on
+// the side away from the earlier visit's edges, which opens the pinch without crossing them.
+export function separateSelfTouchingRing(ring, nudgeDegrees = 0.00005) {
+  const open = ring.slice(0, -1);
+  if (open.length < 4) return ring;
+  const at = (index) => open[(index + open.length) % open.length];
+  const cross = (left, right) => left[0] * right[1] - left[1] * right[0];
+  const firstVisit = new Map();
+  const moved = open.map((vertex, index) => {
+    const key = `${vertex[0]},${vertex[1]}`;
+    if (!firstVisit.has(key)) {
+      firstVisit.set(key, index);
+      return [vertex[0], vertex[1]];
+    }
+    const earlier = firstVisit.get(key);
+    const towards = (target) => {
+      const dx = target[0] - vertex[0];
+      const dy = target[1] - vertex[1];
+      const length = Math.hypot(dx, dy);
+      return { unit: length === 0 ? [0, 0] : [dx / length, dy / length], length };
+    };
+    const [previous, next] = [towards(at(index - 1)), towards(at(index + 1))];
+    let bisector = [previous.unit[0] + next.unit[0], previous.unit[1] + next.unit[1]];
+    if (Math.hypot(bisector[0], bisector[1]) < 1e-12) bisector = [-previous.unit[1], previous.unit[0]];
+    // The bisector points into the smaller angle between this visit's edges; if an edge of the earlier
+    // visit lies in that angle, the opening is on the other side.
+    const turn = cross(previous.unit, next.unit);
+    const inSmallerAngle = (direction) => (turn >= 0 ? cross(previous.unit, direction) > 0 && cross(direction, next.unit) > 0 : cross(previous.unit, direction) < 0 && cross(direction, next.unit) < 0);
+    if ([at(earlier - 1), at(earlier + 1)].some((neighbour) => inSmallerAngle(towards(neighbour).unit))) bisector = [-bisector[0], -bisector[1]];
+    const length = Math.hypot(bisector[0], bisector[1]);
+    const step = Math.min(nudgeDegrees, previous.length / 2, next.length / 2);
+    return [vertex[0] + (bisector[0] / length) * step, vertex[1] + (bisector[1] / length) * step];
+  });
+  return [...moved, [moved[0][0], moved[0][1]]];
+}
+
+// Removes repeated vertices and zero-width spikes, opens rings that touch themselves, drops rings with
+// fewer than 3 distinct positions (fewer than 4 positions once closed), drops polygon parts smaller than
+// `minPartKm2`, separates parts that touch at a point, and returns a Polygon or MultiPolygon. Returns null
+// when nothing is left. `dropped` reports what was removed, for the composition report.
 export function cleanPolygonGeometry(geometry, { minPartKm2 = 0 } = {}) {
   const dropped = { degenerateRings: 0, smallParts: 0, smallPartsKm2: 0 };
   const polygons = [];
   for (const polygon of polygonsOf(geometry)) {
-    const [outer, ...holes] = polygon.map((ring) => removeSpikes(ring));
+    const [outer, ...holes] = polygon.map((ring) => separateSelfTouchingRing(removeSpikes(ring)));
     if (!outer || distinctPositionCount(outer) < 3) {
       dropped.degenerateRings += 1;
       continue;

@@ -474,9 +474,26 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     );
     assert.equal(shapesPayload.areas.features.length, 4);
     assert.equal(shapesPayload.areasSimplifiedForZoom10.features.length, 4);
+    // Provenance stays in data/geo/; the app's shapes carry only each area's id.
+    for (const shapes of [shapesPayload.areas, shapesPayload.areasSimplifiedForZoom10]) {
+      for (const shape of shapes.features) {
+        assert.deepEqual(Object.keys(shape.properties), ["areaId"]);
+      }
+    }
 
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.roads.geojson"));
+    // The app's roads keep the drawing flags but, like the shapes, leave the provenance in data/geo/.
+    const roadsPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
+    );
+    assert.equal(roadsPayload.features.length, 1);
+    assert.deepEqual(roadsPayload.features[0].properties, {
+      roadId: "fixture-road-1",
+      major: true,
+      known: false,
+      timeperiod: "R"
+    });
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
     // No empire-edge source sits next to the valid case's data, so none is written.
     assert.equal(outputFiles.includes("ancient.empire-edge.geojson"), false);

@@ -1,6 +1,6 @@
 # M4-03 verification — The ancient layer's shapes, roads and coastline
 
-Independent verification of the GIS Engineer's work on branch `data/m4-ancient-geometry` (head `461f322` when I started): `data/geo/ancient-areas.geojson` (24 areas), `ancient-empire-edge.geojson`, `ancient-roads.geojson` and `ancient-coastline.geojson`, with their provenance and the scripts that build them. I checked them against card `docs/tasks/M4-03-ancient-geometry.md`, ADR-0017, ADR-0037 with all its updates (border rules 1–5, the correction on eastern Pontus, and "the rest of the Roman world, islands and the empire's edge"), the research note `docs/research/M4-timeline.md` §2.24–§2.25, `schema/README.md` ("Timeline and ancient layer"), the GIS composition report and the previews. Reviewed 2026-10-08.
+Independent verification of the GIS Engineer's work on branch `data/m4-ancient-geometry` (head `461f322` when I started): `data/geo/ancient-areas.geojson` (24 areas), `ancient-empire-edge.geojson`, `ancient-roads.geojson` and `ancient-coastline.geojson`, with their provenance and the scripts that build them. I checked them against card `docs/tasks/M4-03-ancient-geometry.md`, ADR-0017, ADR-0037 with all its updates (border rules 1–5, the correction on eastern Pontus, and "the rest of the Roman world, islands and the empire's edge"), the research note `docs/research/M4-timeline.md` §2.24–§2.25, `schema/README.md` ("Timeline and ancient layer"), the GIS composition report and the previews. Reviewed 2026-10-08. **Re-checked the same day after the fixes; see "Re-check" at the end.**
 
 **Result: needs GIS fixes.** The licensing passes, with a corrected attribution string. Most borders follow their sources, and every cited anchor agrees with Pleiades and Wikidata. But the rest of the Roman world loses 10,974 km² of Raetia to a dissolve bug, seven roads date from after AD 100, and the empire's edge runs along a coast in two places.
 
@@ -248,4 +248,152 @@ Run on this branch after my changes:
 - `npm run validate:data`: 0 errors, 203 warnings (unchanged).
 - `npm test`: 216 of 216.
 - `npm run build:data`: passes; the ancient layer is 301,164 bytes gzip.
+- `npm run test:app`: 136 of 136.
+
+## Re-check (2026-10-08)
+
+**Scope.** Branch head `6606bf1`:
+- the GIS Engineer's `bc49a37`, `52f44f4`, `e019f2b`, `e6b4a11` and `6606bf1`;
+- the Research Lead's `9db4930`, merged as `a96131f`;
+- the PO's ADR-0037 update of 2026-10-08 (`61a29a1`, revised in `2ed1a23`): the budget is 300,000 bytes gzip, the app's shapes and roads leave out provenance, and only AWMC's dated major roads are drawn.
+
+**Result: two fixes left.** G1–G9 are fixed, and G6's new line agrees with Strabo. RL1, RL2 and RL5 pass, and RL4 passes apart from a citation. But RL3 fails against Josephus and Strabo, and the G4 fix shades the silted gulfs at Miletus and Ephesus as land (G10). The branch is not ready until G10, G11 and the Research Lead's RL7–RL8 are done.
+
+### G1–G9
+| Item | Status | Evidence |
+|---|---|---|
+| G1 Raetia | Fixed | Turicum (28 km inside), Vitudurum (25), Ad Fines (22), Arbor Felix (45) and Veldidena (51) lie in `other-roman-lands`, and so does the old gap's centre (55 km inside). The AD 69 extent now comes from `-clean -dissolve2`; the GIS's copy matches my test copy byte for byte. |
+| G2 Gulf of Sirte | Fixed | No stretch of the edge runs along the Gulf of Sirte; the African edge follows the desert only. One stretch lies within 5 km of today's coast (5.4 km long, in the Danube delta, where the river meets the sea). My own scan finds the same, 29 km within 10 km of the coast at 4.7–8.1 km. |
+| G3 Guadalquivir | Fixed | No edge round the marshes. The composition report lists 1,533 km² there among land that Roman land and the sea enclose, drawn without an edge. |
+| G4 IJ, lower Danube, Hauran | Fixed | The edge is 8 open pieces, 9,945 km, with no closed loops. The IJ gap (4.75°E 52.42°N) is in `other-roman-lands`, 8.5 km inside; the Danube piece (27.89°E 44.84°N) 2.9 km inside; the Hauran strip in `syria`. **Correction to my first report:** its Carsium point (28.0°E 44.5°N) was about 20 km off. At Pleiades 216753 (27.95°E 44.68°N) the fort lies in `other-roman-lands`, 0.47 km inside the edge. |
+| G5 Roads | Fixed | See "The roads and the size". |
+| G6 Galatia–Cappadocia | Fixed | See below. |
+| G7 Peninsulas | Fixed | Nicopolis is in `achaia` (1.1 km inside), and so is the Actium promontory; Sinope is in `bithynia` (0.1 km inside). |
+| G8 OpenStreetMap | Fixed | `scripts/lib/osm-waterways.mjs` reads the river relations from three Overpass servers with `out meta`. The 46 way ids and versions are the same as before (composition report). |
+| G9 Coastline | Fixed | The ring at 26.93–27.00°E 37.36–37.39°N is gone, as are the shores of Agathonisi and Farmakonisi; the gulfs at Ephesus and Miletus remain. |
+
+### G6 with RL4: the Galatia–Cappadocia line
+**Pass.** The line runs equidistant between Cappadocia's anchors and Galatia's (rule 2, labelled approximate). North of where it meets AWMC's AD 14 edge, that edge stays, labelled rule 3. The unsourced move near Nevşehir is gone.
+- **Cappadocian side:** Tyana is 41.8 km inside `cappadocia`, Garsaura 18.8 km, Nazianzos 34.7, Mazaca 95.2 and the record's label point 43.3. Cybistra, not an anchor, also falls in `cappadocia` (3.8 km inside), as Strabo's eleventh prefecture "round Castabala and Cybistra" requires (12.1.4).
+- **Galatian side:** Iconium is 58.2 km inside `galatia`, Lystra 31.9, Derbe 7.1 (both candidates), and Lake Tatta's centre 43.4.
+- **The whole lake as Galatian:** right. Strabo 12.5.4: "After Galatia towards the south are situated Lake Tatta, which lies alongside Greater Cappadocia near Morimenê but is a part of Greater Phrygia, and the country continuous with this lake and extending as far as the Taurus, most of which was held by Amyntas." The lake is Phrygian, and Amyntas's lands became the province of Galatia, so its whole shore is Galatian and Cappadocia begins beyond it.
+- **Provenance:** I added the Pleiades ids of Iconium (648647), Lystra (648699) and Derbe (648620) to the line's sources, from our own place records, which give the anchors' exact coordinates.
+- **RL4's citation (RL7):** §2.24 row 9 cites 12.1.4 for Garsaura and quotes "the greater part of the rest of the country" and "Lycaonia and Morimene". Those words are from 12.2.10, which says where wild asses graze. Garsaura's place rests on 12.1.4 (Garsauritis among the ten prefectures) and 12.2.6: "Situated on the borders of Lycaonia is also a town called Garsauira."
+
+### New: G10, the silted gulfs at Miletus and Ephesus
+**Fail.** The G4 fix counts land of the AD 69 extent that no AWMC face covers as land to cover, wherever it doesn't touch today's coast. AWMC's faces stop at its ancient coastline, so that rule also takes in old sea that silting has turned into land. Two such pieces now join `asia` through the rule-4 pass:
+- 142 km² at 27.32°E 37.54°N: the Latmian Gulf between Miletus, Myus and Heraclea under Latmus;
+- 48 km² at 27.34°E 37.98°N: the old bay by Ephesus.
+
+At `2e22c83`, 27.38°E 37.55°N, 27.47°E 37.50°N and 27.30°E 37.97°N were in no area; now they are in `asia`. Both pieces lie inside the old shores that the coastline layer draws, so the map would show the ancient coast running across land shaded as Asia. The card asks for "the silted gulfs at Ephesus and Miletus, as shapes of land that was then sea", and the PO's open question 6 considers joining only strips "that weren't sea".
+
+**Fix (GIS):** leave out of the land to cover any piece that AWMC's shoreline marks as sea, at least inside the coastline layer's two gulfs. Acceptance: the three points above are in no area again, and the coastline layer is unchanged. The 29 km² now joined to `italy` at 12.24°E 44.60°N, by the lagoons of the Po, is the same kind of land and should follow the same rule.
+
+### RL1–RL6
+| Item | Status | Evidence |
+|---|---|---|
+| RL1 | Fixed | Galilee's label point is now 35.30°E 32.90°N, 4.2 km inside `galilee-perea`. |
+| RL2 | Fixed | §2.25's Islands table has Lesbos, Samos and Cos (ISBE "Asia"), Chios (its "others near the Asia Minor coast") and Rhodes (ISBE "Rhodes", quoted exactly; new entry `bib:isbe-rhodes`). The Rhodes sentence now gives both views: ISBE's AD 44, and Suetonius (*Vespasian* 8.4). |
+| RL3 | **Fail** | See below. |
+| RL4 | Pass, citation to fix (RL7) | See above. |
+| RL5 | Fixed | Smith's "Epeirus" (Perseus) has Epirus "extending from the Acroceraunian promontory and the boundaries of Illyria and Macedonia on the north to the Ambracian gulf on the south", as quoted. With Dio 53.12's "Greece with Epirus" (verified in M4-02), Karaburun is in `achaia` (1.5 km inside). The new entry `bib:smith-dictionary-epeirus` resolves. |
+| RL6 | Unruled (optional) | Mljet stays an explained exception. |
+
+### RL3: Raphia's coast
+**Fail.** The ruling rests on one sentence in Livius "Nabataeans", a cite-only source: it lists Rhinocolura and Gaza among the kingdom's towns in the west. That sentence comes from an undated overview of the kingdom's reach after 63 BC. The same paragraph names Herod's kingdom as the Nabataeans' western neighbour, and calls their control of Damascus brief and of the Decapolis partial. For the first century AD, sources the project already cites say otherwise:
+- Josephus, *Antiquities* 17.11.4 (4 BC): "as to Gaza, and Gadara, and Hippos, they were Grecian cities, which Caesar separated from his government, and added them to the province of Syria."
+- Strabo 16.2.21: "the seaboard from Orthosia to Pelusium is called Phoenicia, which is a narrow country and lies flat along the sea, whereas the interior above Phoenicia, as far as the Arabians, between Gaza and Antilibanus, is called Judaea."
+- Strabo 16.2.31 follows that seaboard from Gaza to Raphia and on to Rhinocolura, and 16.4.24 ends the Nabataeans' caravan road at "Rhinocolura, which is in Phoenicia near Aegypt".
+
+In Strabo's day, then, the coast from Gaza to Rhinocolura was part of Phoenicia, in Syria, and the Nabataeans traded at Rhinocolura rather than holding it. Livius's list can't place that coast in their kingdom for AD 1–100. The same §2.25 paragraph still bases Sinai on the Livius sentence and on "Sinai (between the two)", which M4-02's check failed (R14) and which the data no longer uses: the timeline's `arabia` note rests on ISBE. Open question 19 and §9 repeat it.
+
+**Mechanical fix:**
+- **G11 (GIS):** move the AD 69 face between Rhinocolura and Gaza (1,814 km², label point 34.32°E 31.19°N) from `arabia` to `judea-samaria-idumea`, where the map already draws Gaza's land under rule 4 (a small unit's land stays with the area around it). AWMC's AD 69 extent holds the face as Roman, and Strabo's Phoenicia runs to Pelusium, so it belongs on the Roman side, not in the Nabataean kingdom. Sources: Josephus, *Antiquities* 17.11.4; Strabo 16.2.21, 16.2.31 and 16.4.24.
+- **RL8 (Research Lead):** rewrite that §2.25 paragraph (Sinai on ISBE "Arabia" and a rule-3 line, as the `arabia` note already says; RL3 as above), open question 19 and the line in §9.
+- **No change** to the edge with Egypt. AWMC's Aegyptus face takes in Rhinocolura (El-Arish, 1.7 km inside `egypt`), which Strabo puts "in Phoenicia near Aegypt"; at the border town itself, that is within the approximation.
+
+### The roads and the size
+- **Roads:** 175, all AWMC major roads with "R" among their Barrington periods (85 known, 90 conjectured), and no minor road.
+  - None of the seven OBJECTIDs the first report dated after AD 100 is left.
+  - The Via Nova Traiana, the Strata Diocletiana, the Via Hadriana and the Via Severiana have no period in AWMC, so the period rule leaves them out, as the provenance says.
+  - 26 km of road lies more than 3 km outside the drawn areas, all of it along coasts or across lagoons. The report shortens five roads by 166 km where the Roman world ends.
+  - I changed the provenance's "1203 (the Via Traiana Nova, Trajanic)" to "103 or later". Trajan reigned from 98; what dates the road after AD 100 is the milestones' fifth consulship, which Livius "Trajan" puts in 103.
+- **Provenance in the app:** `ancient.shapes.json` and `ancient.roads.geojson` carry none (checked in the files); the coastline and edge files still do, which the ADR allows.
+- **Size:** `npm run build:data` writes 288,497 bytes gzip for the 20 ancient files, within the 300,000 budget with 11,503 to spare:
+  - shapes 120,201; roads 31,803; coastline 3,156; edge 4,429; timeline 5,424;
+  - the 15 stops, 123,484.
+
+  My provenance fixes don't change the app's files.
+
+### The PR body
+- **Accurate:** its counts match the composition report and my runs:
+  - 24 valid areas;
+  - the edge's 8 pieces and 9,945 km;
+  - 175 roads (18,040 km, 85 known), with 5 shortened by 166 km;
+  - 94 place checks: 86 inside, 6 near the border, 2 explained;
+  - the size table, and the tests (221 of 221; 136 of 136).
+
+  All 14 learning links open, including the four mapshaper anchors, and so does the stacking link I added.
+- **GIS ideas:** the card's six (turning lines into shapes, dissolving, simplification, topology, buffering, clipping and erasing) each get one plain sentence and a link, and eight more ideas follow.
+- **Fixed:**
+  - It had no stacking note; it now says the PR is stacked on M4-02 (`data/m4-timeline`), so M4-02 merges first.
+  - RL3's line, the sign-off and the open questions now point to this re-check.
+  - It isn't marked ready.
+
+### My small fixes in this commit
+- `scripts/lib/ancient-roads.mjs` and `data/geo/ancient-roads.geojson`: road 1203's date is now "103 or later" (and the evidence wording).
+- `scripts/compose-ancient-areas-safe.mjs` and `data/geo/ancient-areas.geojson`: Pleiades ids for Iconium, Lystra and Derbe in the Galatia–Cappadocia line's sources.
+- The PR body (`.git/PR_BODY-M4-03.md`, not committed): the stacking note, RL3, the sign-off and the open questions.
+
+### Checks
+Run on this branch after my changes:
+- `npm run validate:data`: 0 errors, 203 warnings (unchanged).
+- `npm test`: 221 of 221.
+- `npm run build:data`: passes; the ancient layer is 288,497 bytes gzip.
+- `npm run test:app`: 136 of 136.
+
+### Still open
+- **GIS:** G10 (the silted gulfs), and G11 (Raphia's coast) once the Research Lead confirms RL8.
+- **Research Lead:** RL7 (RL4's citation) and RL8 (RL3, the §2.25 Sinai paragraph, open question 19 and §9).
+- **Then:** I re-check G10, G11, RL7 and RL8.
+
+## Final re-check (2026-10-08)
+
+**Scope.** Branch head `de82b19`:
+- the GIS Engineer's `cc7b81c` (G10, G11) and `de82b19`;
+- the Research Lead's `648676e` (RL7, RL8), merged as `b78f108`.
+
+**Result: verified.** G10, G11, RL7 and RL8 pass. I reworded the new reader-facing notes on Gaza's coast myself (see below). The branch is ready.
+
+| Item | Status | Evidence |
+|---|---|---|
+| G10 | Fixed | My four points (27.38°E 37.55°N, 27.47°E 37.50°N, 27.30°E 37.97°N and 12.24°E 44.60°N) lie in no area. In the Miletus and Ephesus boxes, today's land in no area is 294.0 km² and 108.8 km², the same as in the first round. `data/geo/ancient-coastline.geojson` and `ancient-roads.geojson` are unchanged since `8f7071c`. |
+| The IJ | Acceptable | Inside the AD 69 extent, the strip is 195 km², and 40% of its outline runs along AWMC's ancient shoreline, which draws an estuary there. ADR-0037 makes the rest of the Roman world the extent "on land" and draws the edge only "where the Roman world's land meets land outside it". So the strip stays unshaded, and the edge stops at it and resumes beyond: 9 open pieces, no loop. The rule agrees with AWMC's data. |
+| G11 | Fixed | The face is in `judea-samaria-idumea`: Raphia is 3.6 km inside, and the face's centre 16.4 km. Gaza is in the same area, and Rhinocolura in `egypt`. The provenance cites `bib:josephus-antiquities` (17.11.4) and `bib:strabo-geography` (16.2.21, 16.2.31, 16.4.24) with exact quotations, and `arabia`'s no longer claims the face. |
+| RL7 | Fixed | §2.24 row 9 now cites 12.1.4 (Garsauritis among the ten prefectures) and 12.2.6, quoted exactly. |
+| RL8 | Fixed | §2.25's paragraph rests on Josephus and Strabo, quoted correctly, and calls Livius's list an undated overview, without quoting the cite-only page. Open question 19 and §9 agree. I changed its "1,814 km²" to "1,570 km² as drawn", to match the data. |
+
+**The reader-facing notes (ADR-0033).** The Research Lead added a sentence on Gaza's coast to five `judea-samaria-idumea` periods, and `fill:political-history` copies it into the political history of 18 places, Jerusalem's among them. As written, it needed changes:
+- it said "the coastal strip north to Rhinocolura", but the strip runs south-west from Gaza;
+- it used team terms ("rule 4", "see the -4-to-6 period's note", "drawn shape");
+- the first note named Josephus without introducing him;
+- it said the coast was "in the province of Syria throughout", including AD 41–44, but no cited source says so. Josephus gives Agrippa I "all that country over which Herod, who was his grandfather, had reigned, that is, Judea and Samaria" (*Antiquities* 19.5.1), and nothing after 4 BC places Gaza.
+
+I rewrote the sentence as small fixes, as M4-02's verification did for other notes:
+- **4 BC:** "The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area." This matches *Antiquities* 17.11.4: "which Caesar separated from his government, and added them to the province of Syria".
+- **The four later periods:** "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+
+The wording names no town that the period's sources don't support: "as far as Egypt" describes the map, where the strip ends at `egypt`. I then re-ran `npm run fill:political-history`, which updated the 18 places, and the derived-history check passes.
+
+**Small fixes in this commit:** the notes above in `data/timeline.json` and the 18 place records, and the figure in the research note.
+
+**The PR body:**
+- It is accurate for this round: G10, the IJ, G11, the size table and the tests.
+- I updated the size (289,312 bytes gzip) and RL8's line, ticked the sign-off and marked it ready.
+- Its two new ideas, silting and period shorelines, have working links. AWMC's shoreline does carry a period code for each shore (A, H, HR, R and L near Miletus and Ephesus).
+
+### Checks
+- `npm run validate:data`: 0 errors, 203 warnings (unchanged), with the derived-history check.
+- `npm test`: 223 of 223.
+- `npm run build:data`: passes; the ancient layer is 289,312 bytes gzip of 300,000.
 - `npm run test:app`: 136 of 136.
