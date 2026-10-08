@@ -44,14 +44,20 @@ const libertyLicensePartUrls = [
   "https://raw.githubusercontent.com/mapbox/mapbox-gl-styles/master/LICENSE.md"
 ];
 
+const naturalEarthAttribution =
+  '<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>';
+
+// The places where the modern styles draw no border line (ADR-0037, "borders on the modern map",
+// item 6). docs/LICENSES.md and the "Sources & credits" text repeat this wording.
+const modernNoBorderLineStatement =
+  "No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places.";
+
 const libertyModernName = "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)";
-const libertyModernMetadataLicense =
-  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; points of interest and airport labels removed; Natural Earth low-zoom boundary source with geometry masks for contested areas; OpenMapTiles country boundaries only at z5+ with disputed filters and shared adm0 pair exclusions; no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus; neutrality treatment, not a sovereignty claim); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0; Natural Earth boundary lines and masks: public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
+const libertyModernMetadataLicense = `Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. ${modernNoBorderLineStatement} Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.`;
 
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
-const versaTilesModernMetadataNotice =
-  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; points of interest and airport labels removed; tile boundary layers removed; Natural Earth boundary lines used at all zooms with geometry masks and shared adm0 pair exclusions; no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus; neutrality treatment, not a sovereignty claim); max zoom set to 14.";
+const versaTilesModernMetadataNotice = `Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels and state names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. ${modernNoBorderLineStatement} Max zoom set to 14.`;
 
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
@@ -77,15 +83,18 @@ Source style license: CC0 1.0 (metadata.license in upstream style)
 Fallback policy: use this style only when the primary OpenFreeMap Liberty modern basemap is unavailable.
 
 Modifications in this copy:
-- Modern-map treatment: use English-only labels from name_en only
-- Remove points of interest and airport labels
-- Remove tile boundary layers (including maritime)
-- Use Natural Earth boundary lines (public domain) for country borders at all zooms
-- Apply geometry masks and shared adm0 pair exclusions so no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus (neutrality treatment; this is not a sovereignty claim)
+- Modern-map treatment: labels in English only (name_en)
+- Remove points of interest, airport labels and state names
+- Remove the tiles' boundary lines, including maritime boundaries
+- Draw the country borders at every zoom from Natural Earth's boundary lines (public domain), simplified
+- ${modernNoBorderLineStatement}
 - Max zoom set to 14
 
 Attribution string used in the vector source:
 ${versaTilesAttribution}
+
+Attribution string used in the Natural Earth boundary source:
+${naturalEarthAttribution}
 `;
 
 const libertySourceLandcoverLayerIds = new Set([
@@ -646,7 +655,7 @@ function createNeutralBoundarySourceDefinition() {
   return {
     type: "geojson",
     data: modernNeutralBoundaryGeoJsonRelativeUrl,
-    attribution: '<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>'
+    attribution: naturalEarthAttribution
   };
 }
 
