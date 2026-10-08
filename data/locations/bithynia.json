@@ -68,8 +68,10 @@
       "holderId": "bithynia-province",
       "entity": "Roman province of Bithynia",
       "sources": [
-        "bib:isbe-bithynia"
-      ]
+        "bib:isbe-bithynia",
+        "bib:isbe-pontus"
+      ],
+      "note": "This area's drawn extent also covers coastal, western Pontus (e.g. Amastris, Sinope, Amisus), administered with Bithynia from Pompey's settlement on; it is not drawable on its own."
     }
   ],
   "status": "draft",

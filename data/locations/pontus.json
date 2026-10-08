@@ -72,35 +72,33 @@
   "otConnections": [],
   "politicalHistory": [
     {
-      "fromYear": -36,
+      "fromYear": -65,
       "toYear": -2,
-      "holderId": "polemon-pontus",
-      "entity": "Kingdom of Pontus (Polemon dynasty) (ruler: Polemon I, then his descendants)",
+      "entity": "Divided by Rome after Pompey's defeat of Mithridates VI: most of Pontus administered with the province of Bithynia; the eastern part became a separate kingdom, ruled by Polemon and his descendants from 36 BC",
       "sources": [
         "bib:isbe-pontus",
-        "bib:isbe-galatia"
+        "bib:worldhistory-pompey"
       ]
     },
     {
       "fromYear": -2,
       "toYear": 64,
-      "holderId": "uncertain-roman-side",
-      "entity": "Status uncertain (Roman-side)",
+      "entity": "The southwestern part (\"Pontus Galaticus\") also joins the province of Galatia; the rest stays divided between Bithynia's administration and Polemon's kingdom",
+      "note": "Suetonius dates Polemon's kingdom becoming a province to AD 63; this project's timeline (data/timeline.json) follows the International Standard Bible Encyclopedia's AD 64 for the map's stop.",
       "sources": [
-        "bib:isbe-galatia"
-      ],
-      "note": "Part of this area (the part later called \"Pontus Galaticus\") had already joined the Roman province of Galatia by 2 BC; the rest remained Polemon's independent kingdom (\"Pontus Polemoniacus\" once it too joined Galatia in AD 64). No source found distinguishing exactly where the dividing line between the two ran."
+        "bib:isbe-galatia",
+        "bib:isbe-pontus",
+        "bib:suetonius-twelve-caesars"
+      ]
     },
     {
       "fromYear": 64,
       "toYear": 101,
-      "holderId": "galatia-province",
-      "entity": "Roman province of Galatia (ruler: Pontus Polemoniacus)",
+      "entity": "Polemon's former kingdom (\"Pontus Polemoniacus\") also joins the province of Galatia; the west stays administered with Bithynia",
       "sources": [
         "bib:isbe-galatia"
       ]
     }
   ],
-  "status": "draft",
-  "politicalAreaId": "pontus"
+  "status": "draft"
 }

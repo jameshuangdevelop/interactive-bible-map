@@ -82,8 +82,10 @@
       "entity": "Roman province of Cappadocia (ruler: Quintus Veranius, first governor)",
       "sources": [
         "bib:tacitus-annals",
-        "bib:isbe-cappadocia"
-      ]
+        "bib:isbe-cappadocia",
+        "bib:livius-cappadocia"
+      ],
+      "note": "This area's drawn extent also covers the former Pontus Galaticus, Pontus Polemoniacus and Armenia Minor, none of them drawable on their own (see the AD 6 and AD 70 stops for their own holder changes); this does not change Cappadocia's own holder."
     }
   ],
   "status": "draft",

@@ -305,17 +305,6 @@
       ]
     },
     {
-      "id": "polemon-pontus",
-      "name": "Kingdom of Pontus (Polemon dynasty)",
-      "kind": "client-kingdom",
-      "romanSide": true,
-      "locationId": "pontus",
-      "sources": [
-        "bib:isbe-pontus",
-        "bib:isbe-galatia"
-      ]
-    },
-    {
       "id": "bithynia-province",
       "name": "Roman province of Bithynia",
       "kind": "roman-province",
@@ -866,9 +855,11 @@
           "toYear": 101,
           "holderId": "cappadocia-province",
           "ruler": "Quintus Veranius, first governor",
+          "note": "This area's drawn extent also covers the former Pontus Galaticus, Pontus Polemoniacus and Armenia Minor, none of them drawable on their own (see the AD 6 and AD 70 stops for their own holder changes); this does not change Cappadocia's own holder.",
           "sources": [
             "bib:tacitus-annals",
-            "bib:isbe-cappadocia"
+            "bib:isbe-cappadocia",
+            "bib:livius-cappadocia"
           ]
         }
       ]
@@ -950,41 +941,6 @@
       ]
     },
     {
-      "id": "pontus",
-      "locationId": "pontus",
-      "focus": true,
-      "periods": [
-        {
-          "fromYear": -36,
-          "toYear": -2,
-          "holderId": "polemon-pontus",
-          "ruler": "Polemon I, then his descendants",
-          "sources": [
-            "bib:isbe-pontus",
-            "bib:isbe-galatia"
-          ]
-        },
-        {
-          "fromYear": -2,
-          "toYear": 64,
-          "holderId": "uncertain-roman-side",
-          "note": "Part of this area (the part later called \"Pontus Galaticus\") had already joined the Roman province of Galatia by 2 BC; the rest remained Polemon's independent kingdom (\"Pontus Polemoniacus\" once it too joined Galatia in AD 64). No source found distinguishing exactly where the dividing line between the two ran.",
-          "sources": [
-            "bib:isbe-galatia"
-          ]
-        },
-        {
-          "fromYear": 64,
-          "toYear": 101,
-          "holderId": "galatia-province",
-          "ruler": "Pontus Polemoniacus",
-          "sources": [
-            "bib:isbe-galatia"
-          ]
-        }
-      ]
-    },
-    {
       "id": "bithynia",
       "locationId": "bithynia",
       "focus": true,
@@ -993,8 +949,10 @@
           "fromYear": -74,
           "toYear": 101,
           "holderId": "bithynia-province",
+          "note": "This area's drawn extent also covers coastal, western Pontus (e.g. Amastris, Sinope, Amisus), administered with Bithynia from Pompey's settlement on; it is not drawable on its own.",
           "sources": [
-            "bib:isbe-bithynia"
+            "bib:isbe-bithynia",
+            "bib:isbe-pontus"
           ]
         }
       ]
