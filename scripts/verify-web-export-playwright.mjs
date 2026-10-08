@@ -725,6 +725,34 @@ function assertMinimumHitArea(elementBounds, elementLabel, scenarioLabel) {
   }
 }
 
+function boundsIntersect(left, right) {
+  if (!left || !right) {
+    return false;
+  }
+
+  return !(
+    left.right <= right.left ||
+    left.left >= right.right ||
+    left.bottom <= right.top ||
+    left.top >= right.bottom
+  );
+}
+
+function parseScaleLabelMeters(labelText) {
+  const trimmed = String(labelText ?? "").trim();
+  const match = /^([0-9]+(?:\.[0-9]+)?)\s*(m|km)$/i.exec(trimmed);
+  if (!match) {
+    return null;
+  }
+
+  const value = Number(match[1]);
+  if (!Number.isFinite(value) || value <= 0) {
+    return null;
+  }
+
+  return match[2].toLowerCase() === "km" ? value * 1000 : value;
+}
+
 function assertGalleryLabelContrast(labelStyle, scenarioLabel) {
   if (!labelStyle) {
     throw new Error(`${scenarioLabel}: missing gallery label style.`);
@@ -7883,12 +7911,34 @@ async function verifyPhoneBasics(browser, baseUrl) {
         const reachability = await page.evaluate((toggleSelector) => {
           const toggle = document.querySelector(toggleSelector);
           const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+          const resetControl = document.querySelector("button[data-map-control='reset-view']");
+          const zoomInControl = document.querySelector("button[data-map-control='zoom-in']");
+          const zoomOutControl = document.querySelector("button[data-map-control='zoom-out']");
+          const scaleControl = document.querySelector("[data-map-scale='metric']");
+          const toBounds = (element) => {
+            if (!(element instanceof HTMLElement)) {
+              return null;
+            }
+            const bounds = element.getBoundingClientRect();
+            return {
+              left: bounds.left,
+              top: bounds.top,
+              right: bounds.right,
+              bottom: bounds.bottom,
+              width: bounds.width,
+              height: bounds.height
+            };
+          };
           if (!(toggle instanceof HTMLElement)) {
             return {
               toggleBounds: null,
               centerElementTag: null,
               centerMatchesToggle: false,
-              isExpanded: null
+              isExpanded: null,
+              resetBounds: null,
+              zoomInBounds: null,
+              zoomOutBounds: null,
+              scaleBounds: null
             };
           }
 
@@ -7910,7 +7960,11 @@ async function verifyPhoneBasics(browser, baseUrl) {
             isExpanded:
               compactControl instanceof HTMLElement
                 ? compactControl.classList.contains("maplibregl-compact-show")
-                : null
+                : null,
+            resetBounds: toBounds(resetControl),
+            zoomInBounds: toBounds(zoomInControl),
+            zoomOutBounds: toBounds(zoomOutControl),
+            scaleBounds: toBounds(scaleControl)
           };
         }, selector);
 
@@ -7925,6 +7979,23 @@ async function verifyPhoneBasics(browser, baseUrl) {
               reachability.toggleBounds
             )}`
           );
+        }
+        for (const [controlLabel, controlBounds] of [
+          ["reset", reachability.resetBounds],
+          ["zoom-in", reachability.zoomInBounds],
+          ["zoom-out", reachability.zoomOutBounds],
+          ["scale", reachability.scaleBounds]
+        ]) {
+          if (!controlBounds) {
+            continue;
+          }
+          if (boundsIntersect(reachability.toggleBounds, controlBounds)) {
+            throw new Error(
+              `Attribution toggle intersects ${controlLabel} control in ${sheetStateLabel} state at ${viewport.width}x${viewport.height}. toggle=${JSON.stringify(
+                reachability.toggleBounds
+              )} control=${JSON.stringify(controlBounds)}`
+            );
+          }
         }
 
         await page.click(selector);
@@ -7952,17 +8023,19 @@ async function verifyPhoneBasics(browser, baseUrl) {
 
         return reachability;
       };
-      const boundsIntersect = (left, right) => {
-        if (!left || !right) {
-          return false;
-        }
-        return !(
-          left.right <= right.left ||
-          left.left >= right.right ||
-          left.bottom <= right.top ||
-          left.top >= right.bottom
-        );
-      };
+
+      await page.getByRole("button", { name: "Close place panel" }).click();
+      await page.waitForSelector("section[aria-label='Place details']", {
+        state: "hidden",
+        timeout: 30_000
+      });
+      const attributionClosedReachability = await verifyCompactAttributionToggle("closed");
+      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+      await page.waitForSelector("section[aria-label='Place details']", {
+        state: "visible",
+        timeout: 45_000
+      });
 
       const collapsedSheet = await readSheetSnapshot();
       if (!collapsedSheet.panelBounds || !collapsedSheet.handleBounds || !collapsedSheet.closeBounds) {
@@ -8190,6 +8263,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
         openingOverviewSnapshot,
         openingCoverage: coverage,
         attributionSnapshot,
+        attributionClosedReachability,
         attributionCollapsedReachability,
         attributionExpandedReachability,
         collapsedHeightRatio: collapsedRatio,
@@ -8203,6 +8277,271 @@ async function verifyPhoneBasics(browser, baseUrl) {
   }
 
   return results;
+}
+
+async function verifyDesktopAttributionReachability(browser, baseUrl) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+
+  try {
+    await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+    await waitForMapToSettle(page);
+
+    const snapshot = await page.evaluate(() => {
+      const toggle = document.querySelector("summary.maplibregl-ctrl-attrib-button");
+      const reset = document.querySelector("button[data-map-control='reset-view']");
+      const zoomIn = document.querySelector("button[data-map-control='zoom-in']");
+      const zoomOut = document.querySelector("button[data-map-control='zoom-out']");
+      const scale = document.querySelector("[data-map-scale='metric']");
+      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+      const toBounds = (element) => {
+        if (!(element instanceof HTMLElement)) {
+          return null;
+        }
+        const bounds = element.getBoundingClientRect();
+        return {
+          left: bounds.left,
+          top: bounds.top,
+          right: bounds.right,
+          bottom: bounds.bottom,
+          width: bounds.width,
+          height: bounds.height
+        };
+      };
+
+      if (!(toggle instanceof HTMLElement)) {
+        return {
+          toggleBounds: null,
+          centerMatchesToggle: false,
+          centerElementTag: null,
+          resetBounds: toBounds(reset),
+          zoomInBounds: toBounds(zoomIn),
+          zoomOutBounds: toBounds(zoomOut),
+          scaleBounds: toBounds(scale),
+          expanded: null
+        };
+      }
+
+      const bounds = toggle.getBoundingClientRect();
+      const centerX = bounds.left + bounds.width / 2;
+      const centerY = bounds.top + bounds.height / 2;
+      const centerElement = document.elementFromPoint(centerX, centerY);
+      return {
+        toggleBounds: {
+          left: bounds.left,
+          top: bounds.top,
+          right: bounds.right,
+          bottom: bounds.bottom,
+          width: bounds.width,
+          height: bounds.height
+        },
+        centerMatchesToggle: centerElement === toggle,
+        centerElementTag: centerElement?.tagName?.toLowerCase() ?? null,
+        resetBounds: toBounds(reset),
+        zoomInBounds: toBounds(zoomIn),
+        zoomOutBounds: toBounds(zoomOut),
+        scaleBounds: toBounds(scale),
+        expanded:
+          compactControl instanceof HTMLElement
+            ? compactControl.classList.contains("maplibregl-compact-show")
+            : null
+      };
+    });
+
+    if (!snapshot.toggleBounds || !snapshot.centerMatchesToggle) {
+      throw new Error(
+        `Desktop attribution toggle is occluded or missing: center=${snapshot.centerElementTag} toggle=${JSON.stringify(
+          snapshot.toggleBounds
+        )}`
+      );
+    }
+
+    for (const [label, bounds] of [
+      ["reset", snapshot.resetBounds],
+      ["zoom-in", snapshot.zoomInBounds],
+      ["zoom-out", snapshot.zoomOutBounds],
+      ["scale", snapshot.scaleBounds]
+    ]) {
+      if (!bounds) {
+        continue;
+      }
+      if (boundsIntersect(snapshot.toggleBounds, bounds)) {
+        throw new Error(
+          `Desktop attribution toggle intersects ${label} control: toggle=${JSON.stringify(
+            snapshot.toggleBounds
+          )} control=${JSON.stringify(bounds)}`
+        );
+      }
+    }
+
+    await page.click("summary.maplibregl-ctrl-attrib-button");
+    await page.waitForFunction(
+      () => {
+        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+        return (
+          compactControl instanceof HTMLElement &&
+          compactControl.classList.contains("maplibregl-compact-show")
+        );
+      },
+      { timeout: 5_000 }
+    );
+    await page.click("summary.maplibregl-ctrl-attrib-button");
+    await page.waitForFunction(
+      () => {
+        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+        return (
+          compactControl instanceof HTMLElement &&
+          !compactControl.classList.contains("maplibregl-compact-show")
+        );
+      },
+      { timeout: 5_000 }
+    );
+
+    return snapshot;
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
+async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+
+  const readScaleSnapshot = async () =>
+    page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const scaleBar = document.querySelector("[data-map-scale='metric']");
+      if (!(scaleBar instanceof HTMLElement)) {
+        throw new Error("Scale bar is unavailable.");
+      }
+      const scaleFill = scaleBar.firstElementChild;
+      const scaleLabel = scaleBar.querySelector("span");
+      if (!(scaleFill instanceof HTMLElement) || !(scaleLabel instanceof HTMLElement)) {
+        throw new Error("Scale bar internals are unavailable.");
+      }
+
+      const fillRect = scaleFill.getBoundingClientRect();
+      const labelText = scaleLabel.textContent?.trim() ?? "";
+      const y = fillRect.top + fillRect.height / 2;
+      const left = map.unproject([0, y]);
+      const right = map.unproject([1, y]);
+      const radians = (value) => (value * Math.PI) / 180;
+      const earthRadiusMeters = 6_371_008.8;
+      const deltaLatitude = radians(right.lat - left.lat);
+      const deltaLongitude = radians(right.lng - left.lng);
+      const latitudeA = radians(left.lat);
+      const latitudeB = radians(right.lat);
+      const chord =
+        Math.sin(deltaLatitude / 2) ** 2 +
+        Math.cos(latitudeA) * Math.cos(latitudeB) * Math.sin(deltaLongitude / 2) ** 2;
+      const arc = 2 * Math.atan2(Math.sqrt(chord), Math.sqrt(1 - chord));
+      const metersPerPixel = earthRadiusMeters * arc;
+      return {
+        labelText,
+        fillWidthPx: fillRect.width,
+        metersPerPixel,
+        zoom: map.getZoom()
+      };
+    }, mapTestHookKey);
+
+  const assertScaleMatchesGeometry = (snapshot, label) => {
+    const labelMeters = parseScaleLabelMeters(snapshot.labelText);
+    if (labelMeters === null) {
+      throw new Error(`Scale label did not parse for ${label}: '${snapshot.labelText}'.`);
+    }
+    const representedMeters = snapshot.fillWidthPx * snapshot.metersPerPixel;
+    const deltaRatio = Math.abs(representedMeters - labelMeters) / labelMeters;
+    if (deltaRatio > 0.1) {
+      throw new Error(
+        `Scale bar geometry mismatch for ${label}: label=${labelMeters}m represented=${representedMeters.toFixed(
+          2
+        )}m delta=${(deltaRatio * 100).toFixed(2)}%.`
+      );
+    }
+    return {
+      labelMeters,
+      representedMeters: Number(representedMeters.toFixed(2)),
+      deltaRatio: Number(deltaRatio.toFixed(4))
+    };
+  };
+
+  try {
+    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 90_000 });
+    await waitForMapToSettle(page);
+
+    const before = await readScaleSnapshot();
+
+    await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      map.jumpTo({ zoom: Math.max(map.getMinZoom(), map.getZoom() - 4) });
+    }, mapTestHookKey);
+    await waitForMapToSettle(page);
+    const afterJump = await readScaleSnapshot();
+
+    if (afterJump.labelText === before.labelText) {
+      throw new Error(
+        `Scale label did not change after 4-level zoom-out. before='${before.labelText}' after='${afterJump.labelText}'.`
+      );
+    }
+
+    const mapCanvas = page.locator("canvas.maplibregl-canvas");
+    const mapCanvasBounds = await mapCanvas.boundingBox();
+    if (!mapCanvasBounds) {
+      throw new Error("Map canvas bounds are unavailable for wheel zoom.");
+    }
+
+    await page.mouse.move(
+      mapCanvasBounds.x + mapCanvasBounds.width * 0.5,
+      mapCanvasBounds.y + mapCanvasBounds.height * 0.5
+    );
+    const zoomBeforeWheel = afterJump.zoom;
+    await page.mouse.wheel(0, -1500);
+    await page.waitForFunction(
+      ({ testHookKey, previousZoom }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          return false;
+        }
+        return Math.abs(map.getZoom() - previousZoom) > 0.25;
+      },
+      { testHookKey: mapTestHookKey, previousZoom: zoomBeforeWheel },
+      { timeout: 10_000 }
+    );
+    await waitForMapToSettle(page);
+    const afterWheel = await readScaleSnapshot();
+
+    if (afterWheel.labelText === afterJump.labelText) {
+      throw new Error(
+        `Scale label did not change after wheel zoom. afterJump='${afterJump.labelText}' afterWheel='${afterWheel.labelText}'.`
+      );
+    }
+
+    return {
+      before: {
+        ...before,
+        consistency: assertScaleMatchesGeometry(before, "initial")
+      },
+      afterJump: {
+        ...afterJump,
+        consistency: assertScaleMatchesGeometry(afterJump, "zoom-out")
+      },
+      afterWheel: {
+        ...afterWheel,
+        consistency: assertScaleMatchesGeometry(afterWheel, "wheel-zoom")
+      }
+    };
+  } finally {
+    await page.close();
+    await context.close();
+  }
 }
 
 async function run() {
@@ -8415,7 +8754,12 @@ async function run() {
       screenshotPaths.creditsDrawer,
       expectedDrawerText
     );
+    const desktopAttributionReachabilityCheck = await verifyDesktopAttributionReachability(
+      browser,
+      staticServer.baseUrl
+    );
     const phoneBasicsChecks = await verifyPhoneBasics(browser, staticServer.baseUrl);
+    const scaleBarUpdateCheck = await verifyScaleBarUpdatesWithZoom(browser, staticServer.baseUrl);
     const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
       page,
       staticServer.baseUrl
@@ -8548,7 +8892,9 @@ async function run() {
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
       searchAndMenuChecks,
+      desktopAttributionReachabilityCheck,
       phoneBasicsChecks,
+      scaleBarUpdateCheck,
       keyboardDisclosureChecks,
       placeDetailsRaceCheck,
       galileePinOverlap,

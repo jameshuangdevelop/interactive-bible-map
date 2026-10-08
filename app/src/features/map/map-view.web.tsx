@@ -1976,6 +1976,7 @@ export function MapView({
   const gestureInProgressRef = useRef(false);
   const gestureReleaseTimeoutRef = useRef<number | null>(null);
   const visibleListRefreshFrameRef = useRef<number | null>(null);
+  const scaleBarRefreshFrameRef = useRef<number | null>(null);
   const activeTooltipEntryIdRef = useRef<string | null>(null);
   const mapCanvasHasPointerCursorRef = useRef(false);
   const attributionControlRef = useRef<AttributionControl | null>(null);
@@ -2138,6 +2139,17 @@ export function MapView({
     scaleFill.style.width = `${width}px`;
     scaleLabel.textContent = formatScaleDistance(roundedMeters);
   }, []);
+
+  const scheduleScaleBarUpdate = useCallback(() => {
+    if (scaleBarRefreshFrameRef.current !== null) {
+      return;
+    }
+
+    scaleBarRefreshFrameRef.current = window.requestAnimationFrame(() => {
+      scaleBarRefreshFrameRef.current = null;
+      updateScaleBar();
+    });
+  }, [updateScaleBar]);
 
   const refreshVisibleEntryState = useCallback(() => {
     const map = mapRef.current;
@@ -2780,14 +2792,19 @@ export function MapView({
     const handleMoveEnd = () => {
       scheduleVisibleEntryRefreshRef.current();
     };
+    const handleMove = () => {
+      scheduleScaleBarUpdate();
+    };
     const handleResize = () => {
       scheduleVisibleEntryRefreshRef.current();
+      scheduleScaleBarUpdate();
     };
 
     document.addEventListener("pointerdown", handleDocumentPointerDown, true);
     document.addEventListener("keydown", handleMapKeyboardShortcuts, true);
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
+    map.on("move", handleMove);
     map.on("moveend", handleMoveEnd);
     map.on("resize", handleResize);
     map.on("dragstart", markGestureStarted);
@@ -2813,6 +2830,9 @@ export function MapView({
       if (visibleListRefreshFrameRef.current !== null) {
         window.cancelAnimationFrame(visibleListRefreshFrameRef.current);
       }
+      if (scaleBarRefreshFrameRef.current !== null) {
+        window.cancelAnimationFrame(scaleBarRefreshFrameRef.current);
+      }
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
       }
@@ -2822,6 +2842,7 @@ export function MapView({
       document.removeEventListener("keydown", handleMapKeyboardShortcuts, true);
       map.off("load", handleStyleReady);
       map.off("style.load", handleStyleReady);
+      map.off("move", handleMove);
       map.off("moveend", handleMoveEnd);
       map.off("resize", handleResize);
       map.off("dragstart", markGestureStarted);
@@ -2871,6 +2892,7 @@ export function MapView({
     clearMainSourceLoadTimeout,
     hideTooltip,
     resolveInteractiveEntryAtPoint,
+    scheduleScaleBarUpdate,
     scheduleMainSourceLoadTimeout,
     setInteractiveCursor,
     switchToFallback,
@@ -2975,6 +2997,7 @@ export function MapView({
     ? Math.max(bottomInset + 16, 88)
     : bottomInset + 16;
   const compactAttributionBottomOffset = isSmallScreen ? bottomInset : 0;
+  const compactAttributionRightOffset = 72;
 
   return (
     <div
@@ -2998,7 +3021,7 @@ export function MapView({
           border: 0;
         }
         .ibm-map-root .maplibregl-ctrl-bottom-right {
-          right: 16px;
+          right: ${compactAttributionRightOffset}px;
           bottom: ${compactAttributionBottomOffset}px;
         }
       `}</style>
