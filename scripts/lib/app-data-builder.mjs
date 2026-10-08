@@ -13,6 +13,7 @@ const DEFAULT_LOCATIONS_DIRECTORY = path.join(repositoryRoot, "data", "locations
 const DEFAULT_MEDIA_DIRECTORY = path.join(repositoryRoot, "data", "media");
 const DEFAULT_BIBLIOGRAPHY_PATH = path.join(repositoryRoot, "data", "bibliography.json");
 const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "generated");
+const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 300_000;
 
 async function listJsonFiles(directoryPath) {
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -162,6 +163,8 @@ export async function buildAppData(options = {}) {
     options.timelinePath ?? path.join(ancientDataRoot, "timeline.json")
   );
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
+  const maxAncientLayerGzipBytes =
+    options.maxAncientLayerGzipBytes ?? DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES;
 
   const validationResult = await validateData({
     locationsDirectory,
@@ -265,7 +268,9 @@ export async function buildAppData(options = {}) {
   let ancientBuild = {
     generated: false,
     skippedReason:
-      "Skipped ancient generated files because timeline or ancient geo source files are missing."
+      "Skipped ancient generated files because timeline or ancient geo source files are missing.",
+    gzipBytes: 0,
+    maxGzipBytes: maxAncientLayerGzipBytes
   };
 
   if (timelineExists && areasExists && roadsExists && coastlineExists) {
@@ -288,10 +293,21 @@ export async function buildAppData(options = {}) {
       ancientEmpireEdgeData,
       outputDirectory
     });
+    const ancientLayerGzipBytes = ancientBuildResult.writtenFiles.reduce(
+      (sum, file) => sum + file.gzipBytes,
+      0
+    );
+    if (ancientLayerGzipBytes > maxAncientLayerGzipBytes) {
+      throw new Error(
+        `Ancient layer generated files exceed ${maxAncientLayerGzipBytes} bytes gzip (${ancientLayerGzipBytes} bytes).`
+      );
+    }
     outputFiles.push(...ancientBuildResult.writtenFiles);
     ancientBuild = {
       generated: true,
-      skippedReason: null
+      skippedReason: null,
+      gzipBytes: ancientLayerGzipBytes,
+      maxGzipBytes: maxAncientLayerGzipBytes
     };
   }
 

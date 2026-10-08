@@ -378,45 +378,66 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) 
 
     for (const polygon of polygonsFromGeometry(areaFeature.geometry)) {
       const area = polygonArea(polygon[0]);
-      const existing = holderPieces.get(assignment.holderId);
-      if (!existing || area > existing.area) {
-        holderPieces.set(assignment.holderId, {
-          polygon,
-          area
-        });
-      }
+      const pieces = holderPieces.get(assignment.holderId) ?? [];
+      pieces.push({
+        polygon,
+        area
+      });
+      holderPieces.set(assignment.holderId, pieces);
     }
   }
 
   const labels = [];
-  for (const [holderId, piece] of holderPieces.entries()) {
+  for (const [holderId, pieces] of holderPieces.entries()) {
     const holder = entitiesById.get(holderId);
-    if (!holder || !piece?.polygon) {
+    if (!holder || !Array.isArray(pieces) || pieces.length === 0) {
       continue;
     }
-    if (holder.kind === "uncertain") {
+    if (holder.kind === "uncertain" || holder.locationId) {
       continue;
     }
-    const bounds = polygonBoundingBox(piece.polygon);
-    const smallerSide = bounds
-      ? Math.max(1e-6, Math.min(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY))
-      : 1;
-    const precision = Math.max(1e-6, smallerSide / 100);
-    let labelPoint = polylabel(piece.polygon, precision);
-    if (!pointInPolygon(labelPoint, piece.polygon)) {
-      labelPoint = findGuaranteedInteriorPoint(piece.polygon) ?? labelPoint;
+
+    const largestPieceArea = pieces.reduce(
+      (maxArea, piece) => Math.max(maxArea, piece.area),
+      0
+    );
+    const minimumPieceArea = largestPieceArea / 3;
+
+    for (const piece of pieces) {
+      if (!piece?.polygon || piece.area < minimumPieceArea) {
+        continue;
+      }
+
+      const bounds = polygonBoundingBox(piece.polygon);
+      const smallerSide = bounds
+        ? Math.max(1e-6, Math.min(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY))
+        : 1;
+      const precision = Math.max(1e-6, smallerSide / 100);
+      let labelPoint = polylabel(piece.polygon, precision);
+      if (!pointInPolygon(labelPoint, piece.polygon)) {
+        labelPoint = findGuaranteedInteriorPoint(piece.polygon) ?? labelPoint;
+      }
+
+      labels.push({
+        holderId,
+        name: holder.name,
+        kind: holder.kind,
+        romanSide: holder.romanSide,
+        locationId: null,
+        labelPoint: [roundNumber(labelPoint[0]), roundNumber(labelPoint[1])]
+      });
     }
-    labels.push({
-      holderId,
-      name: holder.name,
-      kind: holder.kind,
-      romanSide: holder.romanSide,
-      locationId: holder.locationId ?? null,
-      labelPoint: [roundNumber(labelPoint[0]), roundNumber(labelPoint[1])]
-    });
   }
 
-  return labels.sort((left, right) => left.holderId.localeCompare(right.holderId));
+  return labels.sort((left, right) => {
+    if (left.holderId !== right.holderId) {
+      return left.holderId.localeCompare(right.holderId);
+    }
+    if (left.labelPoint[0] !== right.labelPoint[0]) {
+      return left.labelPoint[0] - right.labelPoint[0];
+    }
+    return left.labelPoint[1] - right.labelPoint[1];
+  });
 }
 
 function buildStopBorderCollections({

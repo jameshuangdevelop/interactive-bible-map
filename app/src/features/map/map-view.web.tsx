@@ -1236,7 +1236,6 @@ function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): Anc
 
 function buildAncientHolderLabelFeatures(
   stopPayload: AncientStopPayload | null,
-  placeById: Map<string, PlaceIndexRecord>,
   currentYear: number,
   timelineRangeEndYear: number
 ) {
@@ -1248,44 +1247,28 @@ function buildAncientHolderLabelFeatures(
     type: "FeatureCollection" as const,
     features: stopPayload.holderLabels
       .map((label) => {
-        const place = label.locationId ? placeById.get(label.locationId) : null;
-        const holderAssignment = stopPayload.areas.find((area) => area.holderId === label.holderId);
-        const labelText = label.name.toUpperCase();
-        if (!place || !label.locationId) {
-          const yearRangeText = holderAssignment
-            ? formatHolderYearRange({
-                heldFromYear: holderAssignment.heldFromYear,
-                heldToYear: holderAssignment.heldToYear,
-                timelineRangeEndYear
-              })
-            : formatTimelineYear(currentYear);
-          const rulerText = holderAssignment?.ruler ? ` · ${holderAssignment.ruler}` : "";
-          return {
-            type: "Feature" as const,
-            properties: {
-              labelText,
-              clickable: false,
-              tooltipText: `${label.name} · ${holderKindLabel(label.kind)}${rulerText} · ${yearRangeText}`
-            },
-            geometry: {
-              type: "Point" as const,
-              coordinates: label.labelPoint
-            }
-          };
+        if (label.locationId) {
+          return null;
         }
 
+        const holderAssignment = stopPayload.areas.find((area) => area.holderId === label.holderId);
+        const labelText = label.name.toUpperCase();
+        const yearRangeText = holderAssignment
+          ? formatHolderYearRange({
+              heldFromYear: holderAssignment.heldFromYear,
+              heldToYear: holderAssignment.heldToYear,
+              timelineRangeEndYear
+            })
+          : formatTimelineYear(currentYear);
+        const rulerText = holderAssignment?.ruler ? ` · ${holderAssignment.ruler}` : "";
         return {
           type: "Feature" as const,
           properties: {
-            entryId: `ancient-holder:${label.holderId}`,
-            placeId: label.locationId,
-            placeName: place.names.ancient[0] ?? label.name,
-            typeLabel: place.type.replace("-", " "),
-            accessibleName: `${place.names.ancient[0] ?? label.name}, ${place.type.replace("-", " ")}`,
-            candidateIndex: null,
-            interactionRank: 2,
+            holderId: label.holderId,
+            holderLocationId: null,
             labelText,
-            clickable: true
+            clickable: false,
+            tooltipText: `${label.name} · ${holderKindLabel(label.kind)}${rulerText} · ${yearRangeText}`
           },
           geometry: {
             type: "Point" as const,
@@ -1293,6 +1276,7 @@ function buildAncientHolderLabelFeatures(
           }
         };
       })
+      .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
   };
 }
 
@@ -1471,6 +1455,8 @@ function ensureMapLayers(
       id: layerAncientHolderLabelId,
       source: sourceAncientHolderLabelsId,
       type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
       filter: toLayerFilter(["==", ["get", "clickable"], false]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -1478,13 +1464,8 @@ function ensureMapLayers(
         "text-font": ["Noto Sans Bold"],
         "text-size": 13,
         "text-letter-spacing": 0.18,
-        "text-variable-anchor": ["top", "bottom", "left", "right"] as [
-          "top",
-          "bottom",
-          "left",
-          "right"
-        ],
-        "text-radial-offset": 0.65,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
         "symbol-sort-key": 900000
       },
       paint: {
@@ -1500,6 +1481,8 @@ function ensureMapLayers(
       id: layerAncientHolderLabelClickableId,
       source: sourceAncientHolderLabelsId,
       type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
       filter: toLayerFilter(["==", ["get", "clickable"], true]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -1507,13 +1490,8 @@ function ensureMapLayers(
         "text-font": ["Noto Sans Bold"],
         "text-size": 13,
         "text-letter-spacing": 0.18,
-        "text-variable-anchor": ["top", "bottom", "left", "right"] as [
-          "top",
-          "bottom",
-          "left",
-          "right"
-        ],
-        "text-radial-offset": 0.65,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
         "symbol-sort-key": 800000
       },
       paint: {
@@ -2524,6 +2502,7 @@ export function MapView({
   highlightedPlaceId,
   leftPanelWidth,
   bottomPanelInset,
+  timelineOverlayInset,
   isSmallScreen,
   mapMode,
   selectedTimelineStopId,
@@ -2672,11 +2651,10 @@ export function MapView({
     const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
     return buildAncientHolderLabelFeatures(
       selectedAncientStopPayload,
-      placeById,
       currentYear,
       timelineRangeEndYear
     );
-  }, [ancientTimeline, placeById, selectedAncientStopPayload]);
+  }, [ancientTimeline, selectedAncientStopPayload]);
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
@@ -3180,7 +3158,10 @@ export function MapView({
           return;
         }
 
-        const infoCoordinates = asCoordinates(infoFeature);
+        const fallbackLngLat = map.unproject([pointer.x, pointer.y]);
+        const infoCoordinates =
+          asCoordinates(infoFeature) ??
+          ([fallbackLngLat.lng, fallbackLngLat.lat] as Coordinates);
         if (!infoCoordinates) {
           setInteractiveCursor(false);
           hideTooltip();
@@ -3958,6 +3939,10 @@ export function MapView({
     ? Math.max(controlBottomInset + 16, 88)
     : bottomInset + 16;
   const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
+  const compactAttributionBottomWithTimelineOffset = Math.max(
+    compactAttributionBottomOffset,
+    Math.max(0, timelineOverlayInset)
+  );
   const compactAttributionRightOffset = 72;
 
   return (
@@ -3989,7 +3974,7 @@ export function MapView({
 
         .ibm-map-root .maplibregl-ctrl-bottom-right {
           right: ${compactAttributionRightOffset}px;
-          bottom: ${compactAttributionBottomOffset}px;
+          bottom: ${compactAttributionBottomWithTimelineOffset}px;
         }
       `}</style>
       <div

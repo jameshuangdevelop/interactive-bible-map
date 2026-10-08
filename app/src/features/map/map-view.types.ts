@@ -7,6 +7,7 @@ export interface MapViewProps {
   highlightedPlaceId: string | null;
   leftPanelWidth: number;
   bottomPanelInset: number;
+  timelineOverlayInset: number;
   isSmallScreen: boolean;
   mapMode: MapDisplayMode;
   selectedTimelineStopId: string | null;

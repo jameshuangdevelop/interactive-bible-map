@@ -52,6 +52,10 @@ const TIMELINE_DEFAULT_YEAR = 50;
 const TIMELINE_TRACK_THICKNESS_PX = 2;
 const TIMELINE_TRACK_THUMB_DIAMETER_PX = 20;
 const TIMELINE_TRACK_THUMB_INSET_PX = TIMELINE_TRACK_THUMB_DIAMETER_PX / 2;
+const TIMELINE_MAX_WIDTH_PX = 800;
+const TIMELINE_MIN_STOP_SPACING_PX = 36;
+const TIMELINE_NAV_BUTTON_WIDTH_PX = 44;
+const TIMELINE_TRACK_AND_BUTTON_GAP_PX = 12;
 
 function toRgba(hexColor: string, opacity: number) {
   const normalized = hexColor.replace("#", "");
@@ -220,6 +224,9 @@ export function AppShell() {
   const [viewportHeightPx, setViewportHeightPx] = useState(
     typeof window !== "undefined" ? window.innerHeight : 0
   );
+  const [viewportWidthPx, setViewportWidthPx] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
   const [placeDetailsById, setPlaceDetailsById] = useState<Record<string, PlaceDetailsPayload>>(
     {}
   );
@@ -291,6 +298,7 @@ export function AppShell() {
 
     const onResize = () => {
       setViewportHeightPx(window.innerHeight);
+      setViewportWidthPx(window.innerWidth);
       const nextIsSmallScreen = window.innerWidth < SMALL_SCREEN_BREAKPOINT;
       setIsSmallScreen(nextIsSmallScreen);
       if (!nextIsSmallScreen) {
@@ -809,6 +817,36 @@ export function AppShell() {
   const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
   const timelineVisible = mapMode === "ancient" && hasAncientTimeline;
   const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
+  const timelineOverlayInsetForAttribution = timelineVisible
+    ? isSmallScreen
+      ? 208
+      : 176
+    : 0;
+  const timelineWidthLimitPx = Math.max(
+    280,
+    isSmallScreen
+      ? viewportWidthPx - 32
+      : selectedPlace
+        ? viewportWidthPx - PANEL_WIDTH - 32
+        : viewportWidthPx - 32
+  );
+  const timelineWidthPx = Math.min(TIMELINE_MAX_WIDTH_PX, timelineWidthLimitPx);
+  const timelineMapCenterLeft = selectedPlace && !isSmallScreen ? `calc(50% + ${PANEL_WIDTH / 2}px)` : "50%";
+  const timelineHorizontalPaddingPx = tokens.spacing.md;
+  const timelineTrackColumnWidthPx = Math.max(
+    120,
+    timelineWidthPx -
+      timelineHorizontalPaddingPx * 2 -
+      TIMELINE_NAV_BUTTON_WIDTH_PX * 2 -
+      TIMELINE_TRACK_AND_BUTTON_GAP_PX * 2
+  );
+  const timelineStopSpacingPx =
+    sortedTimelineStops.length > 1
+      ? Math.max(0, timelineTrackColumnWidthPx - TIMELINE_TRACK_THUMB_INSET_PX * 2) /
+        (sortedTimelineStops.length - 1)
+      : Number.POSITIVE_INFINITY;
+  const showOnlyEdgeTickLabels =
+    sortedTimelineStops.length > 2 && timelineStopSpacingPx < TIMELINE_MIN_STOP_SPACING_PX;
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -1032,9 +1070,9 @@ export function AppShell() {
                 <span>Status unclear in the sources</span>
                 <span style={{ height: "0", borderTop: `2px solid ${ANCIENT_LAYER_STYLE.border.romanSideColor}` }} />
                 <span>Roman Empire edge</span>
-                <span style={{ height: "0", borderTop: `2px solid ${ANCIENT_LAYER_STYLE.roads.color}` }} />
+                <span style={{ height: "0", borderTop: `1px solid ${ANCIENT_LAYER_STYLE.roads.color}` }} />
                 <span>Known roads</span>
-                <span style={{ height: "0", borderTop: `2px dashed ${ANCIENT_LAYER_STYLE.roads.color}` }} />
+                <span style={{ height: "0", borderTop: `1px dashed ${ANCIENT_LAYER_STYLE.roads.color}` }} />
                 <span>Conjectured roads</span>
                 <span style={{ height: "0", borderTop: `2px dotted ${ANCIENT_LAYER_STYLE.coastline.color}` }} />
                 <span>Ancient coastline</span>
@@ -1065,21 +1103,23 @@ export function AppShell() {
             places={places}
             selectedTimelineStopId={selectedTimelineStopId}
             selection={selection}
+            timelineOverlayInset={timelineOverlayInsetForAttribution}
           />
         </Suspense>
       )}
 
       {timelineVisible ? (
         <div
+          data-timeline-card="true"
           style={{
             position: "absolute",
-            left: "50%",
+            left: timelineMapCenterLeft,
             bottom: isSmallScreen
               ? `${tokens.spacing.md}px`
               : `${Math.max(tokens.spacing.md, panelBottomInsetForMap + tokens.spacing.md)}px`,
             transform: "translateX(-50%)",
-            width: isSmallScreen ? "calc(100vw - 32px)" : "760px",
-            maxWidth: "calc(100vw - 48px)",
+            width: `${Math.round(timelineWidthPx)}px`,
+            maxWidth: `${Math.round(timelineWidthPx)}px`,
             borderRadius: "8px",
             border: `1px solid ${tokens.color.divider}`,
             backgroundColor: "#FFFFFF",
@@ -1129,6 +1169,7 @@ export function AppShell() {
               </div>
               {timelineSourcesOpen ? (
                 <div
+                  data-timeline-sources-popover="true"
                   style={{
                     marginTop: `${tokens.spacing.xs}px`,
                     padding: `${tokens.spacing.sm}px`,
@@ -1181,7 +1222,9 @@ export function AppShell() {
               <div
                 style={{
                   marginTop: `${tokens.spacing.sm}px`,
-                  display: "flex",
+                  display: "grid",
+                  gridTemplateColumns: `${TIMELINE_NAV_BUTTON_WIDTH_PX}px minmax(0, 1fr) ${TIMELINE_NAV_BUTTON_WIDTH_PX}px`,
+                  gridTemplateRows: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px auto`,
                   alignItems: "center",
                   columnGap: `${tokens.spacing.sm}px`
                 }}
@@ -1203,7 +1246,7 @@ export function AppShell() {
                 >
                   ‹
                 </button>
-                <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ minWidth: 0, gridColumn: 2, gridRow: 1 }}>
                   <div
                     style={{
                       position: "relative",
@@ -1265,38 +1308,46 @@ export function AppShell() {
                       value={Math.max(0, selectedTimelineStopIndex)}
                     />
                   </div>
-                  <div
-                    aria-hidden="true"
-                    style={{
-                      position: "relative",
-                      marginTop: `${tokens.spacing.xs}px`,
-                      height: "40px"
-                    }}
-                  >
-                    {sortedTimelineStops.map((stop, stopIndex) => {
-                      const denominator = Math.max(1, sortedTimelineStops.length - 1);
-                      const fraction = denominator === 0 ? 0 : stopIndex / denominator;
-                      return (
-                        <div
-                          data-timeline-tick-stop-id={stop.id}
-                          key={stop.id}
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    gridColumn: 2,
+                    gridRow: 2,
+                    position: "relative",
+                    marginTop: `${tokens.spacing.xs}px`,
+                    height: "40px"
+                  }}
+                >
+                  {sortedTimelineStops.map((stop, stopIndex) => {
+                    const denominator = Math.max(1, sortedTimelineStops.length - 1);
+                    const fraction = denominator === 0 ? 0 : stopIndex / denominator;
+                    const showTickLabel =
+                      !showOnlyEdgeTickLabels ||
+                      stopIndex === 0 ||
+                      stopIndex === sortedTimelineStops.length - 1;
+                    return (
+                      <div
+                        data-timeline-tick-stop-id={stop.id}
+                        key={stop.id}
+                        style={{
+                          position: "absolute",
+                          left: timelineTickPosition(fraction),
+                          transform: "translateX(-50%)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          minWidth: "2px"
+                        }}
+                      >
+                        <span
                           style={{
-                            position: "absolute",
-                            left: timelineTickPosition(fraction),
-                            transform: "translateX(-50%)",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            minWidth: "2px"
+                            width: "1px",
+                            height: "8px",
+                            backgroundColor: "#5F6368"
                           }}
-                        >
-                          <span
-                            style={{
-                              width: "1px",
-                              height: "8px",
-                              backgroundColor: "#5F6368"
-                            }}
-                          />
+                        />
+                        {showTickLabel ? (
                           <span
                             style={{
                               marginTop: "4px",
@@ -1307,10 +1358,10 @@ export function AppShell() {
                           >
                             {timelineStopTickLabel(sortedTimelineStops, stopIndex)}
                           </span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
                 </div>
                 <button
                   aria-label="Later change"

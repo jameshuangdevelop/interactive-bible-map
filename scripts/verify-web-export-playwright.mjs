@@ -79,7 +79,10 @@ const mapLayerIds = {
     "ibm-pin-label-standard",
     "ibm-selected-major-pin-label",
     "ibm-selected-pin-label"
-  ]
+  ],
+  ancientHolderLabels: ["ibm-ancient-holder-label", "ibm-ancient-holder-label-clickable"],
+  ancientAreaFill: "ibm-ancient-area-fill",
+  ancientUncertainFill: "ibm-ancient-uncertain-fill"
 };
 const allClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.clusterPins];
 const allClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers, mapLayerIds.clusterPins];
@@ -4659,6 +4662,11 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
       requiredSliderWidthPx
     };
   });
+  if (labelFit.collisions.length > 0) {
+    throw new Error(
+      `Default timeline tick labels overlap at 1440x960: ${JSON.stringify(labelFit.collisions)}`
+    );
+  }
 
   await page.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
@@ -4734,16 +4742,188 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   if (judeaProvinceShownAtAd50 && judeaAtAd44) {
     throw new Error("Judea province label should be hidden in AD 44.");
   }
-
-  const holderEntry = page.locator("button[data-place-entry-id^='ancient-holder:']").first();
-  let holderTooltipText = null;
-  if ((await holderEntry.count()) > 0) {
-    await holderEntry.focus();
-    await page.waitForTimeout(150);
-    holderTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-    if (!holderTooltipText) {
-      throw new Error("Expected holder label focus to show tooltip in default timeline.");
+  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const judeaAtAd41 = await page.evaluate(({ testHookKey, areaLayerIds }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
     }
+    const rendered = map.queryRenderedFeatures(undefined, {
+      layers: areaLayerIds
+    });
+    return rendered.some((feature) => feature.properties?.placeId === "judea-province");
+  }, { testHookKey: mapTestHookKey, areaLayerIds: mapLayerIds.areaLabels });
+  if (judeaProvinceShownAtAd50 && judeaAtAd41) {
+    throw new Error("Judea province label should be hidden in AD 41.");
+  }
+
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.getByRole("button", { name: "Sources" }).click();
+  await page.locator("[data-timeline-sources-popover='true']").waitFor({
+    state: "visible",
+    timeout: 5_000
+  });
+  const defaultPopoverSnapshot = await page.evaluate(() => {
+    const popover = document.querySelector("[data-timeline-sources-popover='true']");
+    if (!(popover instanceof HTMLElement)) {
+      return null;
+    }
+
+    const passageItems = Array.from(popover.querySelectorAll("li"))
+      .map((item) => item.textContent?.trim() ?? "")
+      .filter((value) => value.length > 0);
+    const sourceTexts = passageItems.filter((value) => !/^[A-Z][a-z]{1,}\s+\d+:\d+/u.test(value));
+    return {
+      text: popover.textContent?.trim() ?? "",
+      sourceTexts
+    };
+  });
+  if (!defaultPopoverSnapshot || defaultPopoverSnapshot.text.length === 0) {
+    throw new Error("Expected AD 44 timeline sources popover content.");
+  }
+  if (defaultPopoverSnapshot.sourceTexts.some((text) => text.includes("Bibliography "))) {
+    throw new Error(
+      `Default AD 44 sources popover showed bibliography fallback text: ${JSON.stringify(defaultPopoverSnapshot.sourceTexts)}`
+    );
+  }
+
+  const holderTooltipText = await page.evaluate(
+    async ({ testHookKey, holderLayerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const rendered = map.queryRenderedFeatures(undefined, { layers: [holderLayerId] });
+      const holderFeature = rendered.find((feature) => {
+        const coordinates = feature?.geometry?.coordinates;
+        return (
+          feature?.geometry?.type === "Point" &&
+          Array.isArray(coordinates) &&
+          coordinates.length >= 2 &&
+          typeof coordinates[0] === "number" &&
+          typeof coordinates[1] === "number"
+        );
+      });
+      if (!holderFeature) {
+        return null;
+      }
+
+      const [lng, lat] = holderFeature.geometry.coordinates;
+      const projected = map.project([lng, lat]);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, holderLayerId: mapLayerIds.ancientHolderLabels[0] }
+  );
+  let holderTooltipValue = null;
+  if (holderTooltipText) {
+    await page.mouse.move(holderTooltipText.x, holderTooltipText.y);
+    await page.waitForTimeout(150);
+    holderTooltipValue = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
+    if (!holderTooltipValue || (!holderTooltipValue.includes(" – ") && !holderTooltipValue.includes("from "))) {
+      throw new Error(`Expected holder tooltip with years, got '${holderTooltipValue ?? ""}'.`);
+    }
+  }
+
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const unclearTooltipText = await page.evaluate(
+    async ({ testHookKey, uncertainLayerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      await new Promise((resolve) => {
+        map.once("moveend", resolve);
+        map.easeTo({
+          center: [30.88, 37.22],
+          zoom: 7,
+          duration: 0
+        });
+      });
+
+      const center = map.project(map.getCenter());
+      const offsets = [
+        [0, 0], [20, 0], [-20, 0], [0, 20], [0, -20], [30, 30], [-30, -30], [30, -30], [-30, 30]
+      ];
+      for (const [dx, dy] of offsets) {
+        const point = [center.x + dx, center.y + dy];
+        const features = map.queryRenderedFeatures(point, { layers: [uncertainLayerId] });
+        const match = features.find((feature) => {
+          const tooltipText = feature?.properties?.tooltipText;
+          return (
+            typeof tooltipText === "string" &&
+            tooltipText.startsWith("Status unclear in the sources")
+          );
+        });
+        if (match) {
+          return { x: point[0], y: point[1] };
+        }
+      }
+
+      return null;
+    },
+    {
+      testHookKey: mapTestHookKey,
+      uncertainLayerId: mapLayerIds.ancientUncertainFill
+    }
+  );
+  let unclearTooltipValue = null;
+  if (unclearTooltipText) {
+    await page.mouse.move(unclearTooltipText.x, unclearTooltipText.y);
+    await page.waitForTimeout(150);
+    unclearTooltipValue = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
+    if (!unclearTooltipValue || !unclearTooltipValue.startsWith("Status unclear in the sources")) {
+      throw new Error(`Expected unclear-area tooltip, got '${unclearTooltipValue ?? ""}'.`);
+    }
+  }
+
+  const renderedHolderLabelsWithLocation = await page.evaluate(
+    async ({ testHookKey, holderLayerIds, sortedStopIds }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const slider = document.querySelector("input[data-timeline-slider='true']");
+      const stopIndex = slider instanceof HTMLInputElement ? Number.parseInt(slider.value, 10) : -1;
+      const stopId = Number.isFinite(stopIndex) && stopIndex >= 0 ? sortedStopIds[stopIndex] : null;
+      if (!stopId) {
+        return [];
+      }
+
+      const stopResponse = await fetch(`/generated/ancient.stop.${encodeURIComponent(stopId)}.json`, {
+        cache: "no-store"
+      });
+      if (!stopResponse.ok) {
+        throw new Error(`Could not load stop payload for '${stopId}' (${stopResponse.status}).`);
+      }
+      const stopPayload = await stopResponse.json();
+      const holdersWithLocation = new Set(
+        Array.isArray(stopPayload.areas)
+          ? stopPayload.areas
+              .filter((area) => typeof area?.holderLocationId === "string" && area.holderLocationId.length > 0)
+              .map((area) => area.holderId)
+          : []
+      );
+
+      const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
+      return rendered
+        .map((feature) => String(feature.properties?.holderId ?? "").trim())
+        .filter((holderId) => holderId.length > 0 && holdersWithLocation.has(holderId));
+    },
+    {
+      testHookKey: mapTestHookKey,
+      holderLayerIds: mapLayerIds.ancientHolderLabels,
+      sortedStopIds: sortedStops.map((stop) => stop.id)
+    }
+  );
+  if (renderedHolderLabelsWithLocation.length > 0) {
+    throw new Error(
+      `AD 44 rendered holder labels should exclude holders with locationId, got ${JSON.stringify(renderedHolderLabelsWithLocation)}`
+    );
   }
 
   return {
@@ -4752,8 +4932,11 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     labelFit,
     provinceLabelsAtAd50: labelsAtAd50.provinceLabelIds,
     judeaProvinceShownAtAd50,
+    judeaProvinceVisibleAtAd41: judeaAtAd41,
     judeaProvinceVisibleAtAd44: judeaAtAd44,
-    holderTooltipText
+    holderTooltipText: holderTooltipValue,
+    unclearTooltipText: unclearTooltipValue,
+    renderedHolderLabelsWithLocation
   };
 }
 
@@ -9371,6 +9554,235 @@ async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
   return results;
 }
 
+function rectanglesOverlap(first, second) {
+  return (
+    first.left < second.right &&
+    first.right > second.left &&
+    first.top < second.bottom &&
+    first.bottom > second.top
+  );
+}
+
+async function verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(browser, baseUrl) {
+  const scenarios = [
+    {
+      label: "desktop-opening-1440x900",
+      viewport: { width: 1440, height: 900 },
+      url: baseUrl,
+      contextOptions: {}
+    },
+    {
+      label: "desktop-panel-open-1024x768",
+      viewport: { width: 1024, height: 768 },
+      url: `${baseUrl}/?place=ephesus`,
+      contextOptions: {}
+    },
+    {
+      label: "phone-opening-390x844",
+      viewport: { width: 390, height: 844 },
+      url: baseUrl,
+      contextOptions: {
+        hasTouch: true,
+        isMobile: true
+      }
+    }
+  ];
+  const results = [];
+
+  for (const scenario of scenarios) {
+    const context = await browser.newContext({
+      viewport: scenario.viewport,
+      ...scenario.contextOptions
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+      await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
+
+      const tickSnapshot = await page.evaluate(() => {
+        const labels = Array.from(
+          document.querySelectorAll("[data-timeline-tick-stop-id] span:nth-child(2)")
+        )
+          .map((node) => {
+            if (!(node instanceof HTMLElement)) {
+              return null;
+            }
+            const bounds = node.getBoundingClientRect();
+            if (bounds.width <= 0 || bounds.height <= 0) {
+              return null;
+            }
+            return {
+              text: node.textContent?.trim() ?? "",
+              left: bounds.left,
+              right: bounds.right,
+              top: bounds.top,
+              bottom: bounds.bottom
+            };
+          })
+          .filter((entry) => entry !== null);
+
+        const overlaps = [];
+        for (let index = 1; index < labels.length; index += 1) {
+          const previous = labels[index - 1];
+          const current = labels[index];
+          if (previous.right > current.left) {
+            overlaps.push({
+              leftLabel: previous.text,
+              rightLabel: current.text,
+              overlapPx: previous.right - current.left
+            });
+          }
+        }
+
+        return {
+          visibleLabels: labels.map((entry) => entry.text),
+          overlaps
+        };
+      });
+
+      if (tickSnapshot.overlaps.length > 0) {
+        throw new Error(
+          `Timeline tick labels overlap in ${scenario.label}: ${JSON.stringify(tickSnapshot.overlaps)}`
+        );
+      }
+
+      results.push({
+        label: scenario.label,
+        viewport: scenario.viewport,
+        visibleLabels: tickSnapshot.visibleLabels
+      });
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  }
+
+  return results;
+}
+
+async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
+  const scenarios = [
+    {
+      label: "desktop-opening-1440x900",
+      viewport: { width: 1440, height: 900 },
+      url: baseUrl,
+      contextOptions: {}
+    },
+    {
+      label: "desktop-panel-open-1024x768",
+      viewport: { width: 1024, height: 768 },
+      url: `${baseUrl}/?place=ephesus`,
+      contextOptions: {}
+    },
+    {
+      label: "phone-opening-390x844",
+      viewport: { width: 390, height: 844 },
+      url: baseUrl,
+      contextOptions: {
+        hasTouch: true,
+        isMobile: true
+      }
+    }
+  ];
+  const results = [];
+
+  for (const scenario of scenarios) {
+    const context = await browser.newContext({
+      viewport: scenario.viewport,
+      ...scenario.contextOptions
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+      await page.waitForSelector("summary.maplibregl-ctrl-attrib-button", {
+        state: "visible",
+        timeout: 30_000
+      });
+      await page.click("summary.maplibregl-ctrl-attrib-button");
+      await page.waitForFunction(
+        () => {
+          const compact = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+          return compact instanceof HTMLElement && compact.classList.contains("maplibregl-compact-show");
+        },
+        { timeout: 5_000 }
+      );
+
+      const snapshot = await page.evaluate(() => {
+        const toBounds = (element) => {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+          const rect = element.getBoundingClientRect();
+          return {
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+            width: rect.width,
+            height: rect.height
+          };
+        };
+
+        const timelineCard = document.querySelector("[data-timeline-card='true']");
+        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+        const toggle = document.querySelector("summary.maplibregl-ctrl-attrib-button");
+        let centerElementTag = null;
+        let toggleHit = false;
+        if (toggle instanceof HTMLElement) {
+          const rect = toggle.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const centerElement = document.elementFromPoint(centerX, centerY);
+          centerElementTag = centerElement?.tagName?.toLowerCase() ?? null;
+          toggleHit =
+            centerElement === toggle ||
+            (centerElement instanceof HTMLElement && toggle.contains(centerElement));
+        }
+
+        return {
+          timelineBounds: toBounds(timelineCard),
+          attributionBounds: toBounds(compactControl),
+          toggleBounds: toBounds(toggle),
+          centerElementTag,
+          toggleHit
+        };
+      });
+
+      if (!snapshot.timelineBounds || !snapshot.attributionBounds || !snapshot.toggleBounds) {
+        throw new Error(
+          `Missing timeline or attribution bounds in ${scenario.label}: ${JSON.stringify(snapshot)}`
+        );
+      }
+      if (rectanglesOverlap(snapshot.timelineBounds, snapshot.attributionBounds)) {
+        throw new Error(
+          `Expanded attribution intersects timeline card in ${scenario.label}. timeline=${JSON.stringify(
+            snapshot.timelineBounds
+          )} attribution=${JSON.stringify(snapshot.attributionBounds)}`
+        );
+      }
+      if (!snapshot.toggleHit) {
+        throw new Error(
+          `Attribution toggle is occluded in ${scenario.label}: centerElement=${snapshot.centerElementTag}`
+        );
+      }
+
+      results.push({
+        label: scenario.label,
+        viewport: scenario.viewport,
+        timelineBounds: snapshot.timelineBounds,
+        attributionBounds: snapshot.attributionBounds
+      });
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  }
+
+  return results;
+}
+
 async function run() {
   const staticServer = await startStaticServer(distDirectory);
   const browser = await chromium.launch({ headless: true });
@@ -9606,8 +10018,16 @@ async function run() {
       browser,
       staticServer.baseUrl
     );
+    const expandedAttributionPlacementChecks = await verifyExpandedAttributionAboveTimeline(
+      browser,
+      staticServer.baseUrl
+    );
     const phoneBasicsChecks = await verifyPhoneBasics(browser, staticServer.baseUrl);
     const scaleBarUpdateCheck = await verifyScaleBarUpdatesWithZoom(browser, staticServer.baseUrl);
+    const timelineTickLabelOverlapChecks = await verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(
+      browser,
+      staticServer.baseUrl
+    );
     const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
       page,
       staticServer.baseUrl
@@ -9759,8 +10179,10 @@ async function run() {
       timelineFixtureChecks,
       searchAndMenuChecks,
       desktopAttributionReachabilityCheck,
+      expandedAttributionPlacementChecks,
       phoneBasicsChecks,
       scaleBarUpdateCheck,
+      timelineTickLabelOverlapChecks,
       keyboardDisclosureChecks,
       placeDetailsRaceCheck,
       galileePinOverlap,

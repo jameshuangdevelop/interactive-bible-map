@@ -624,6 +624,27 @@ test("buildAppData supports ancient-source fixture directory", async () => {
   });
 });
 
+test("buildAppData fails when ancient generated files exceed the gzip budget", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(validCaseDirectory, "locations"),
+          mediaDirectory: path.join(validCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          ancientSourceDirectory: ancientFixtureDirectory,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          requireEmpireRoot: false,
+          requireModernCountries: false,
+          outputDirectory,
+          maxAncientLayerGzipBytes: 1
+        }),
+      /Ancient layer generated files exceed/u
+    );
+  });
+});
+
 test("buildAncientAppData keeps label points inside concave polygons", async () => {
   await withTempDirectory(async (outputDirectory) => {
     const timelineData = {
@@ -716,6 +737,70 @@ test("buildAncientAppData keeps label points inside concave polygons", async () 
     const label = stopPayload.holderLabels.find((entry) => entry.holderId === "holder-concave");
     assert.ok(label, "expected concave holder label");
     assert.equal(pointInPolygon(label.labelPoint, [concavePolygon]), true);
+  });
+});
+
+test("buildAppData keeps every holder label point inside at least one held area", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      timelinePath: ancientTimelinePath,
+      ancientAreasPath,
+      ancientRoadsPath,
+      ancientCoastlinePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    const shapesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.shapes.json"), "utf8")
+    );
+    const geometryByAreaId = new Map(
+      shapesPayload.areas.features.map((feature) => [feature.properties.areaId, feature.geometry])
+    );
+    const timelinePayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.timeline.json"), "utf8")
+    );
+
+    for (const stop of timelinePayload.stops) {
+      const stopPayload = JSON.parse(
+        await fs.readFile(path.join(outputDirectory, `ancient.stop.${stop.id}.json`), "utf8")
+      );
+      const holderPolygonsById = new Map();
+      for (const assignment of stopPayload.areas) {
+        const geometry = geometryByAreaId.get(assignment.areaId);
+        if (!geometry) {
+          continue;
+        }
+
+        const polygons =
+          geometry.type === "Polygon"
+            ? [geometry.coordinates]
+            : geometry.type === "MultiPolygon"
+              ? geometry.coordinates
+              : [];
+
+        const existing = holderPolygonsById.get(assignment.holderId) ?? [];
+        for (const polygon of polygons) {
+          existing.push(polygon);
+        }
+        holderPolygonsById.set(assignment.holderId, existing);
+      }
+
+      for (const label of stopPayload.holderLabels) {
+        const holderPolygons = holderPolygonsById.get(label.holderId) ?? [];
+        assert.equal(
+          holderPolygons.some((polygon) => pointInPolygon(label.labelPoint, polygon)),
+          true,
+          `holder label '${label.holderId}' in stop '${stop.id}' must lie inside one of its areas`
+        );
+      }
+    }
   });
 });
 
