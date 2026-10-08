@@ -99,7 +99,7 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
   |---|---|---|
   | Roman province | Warm tint, `#B3261E` at 6% | Solid, `#7D5A50`, 1 px (1.5 px from zoom 7) |
   | Allied ("client") kingdom, tetrarchy, or free city or league under Rome | Ochre tint, `#E8A33D` at 12% | Dashed, `#7D5A50`, 1 px |
-  | Outside the empire (for example the Parthian Empire) | Grey tint, `#5F6368` at 6% | Solid, `#80868B`, 1 px |
+  | Outside the empire (for example the Parthian Empire, where a source gives its extent; none is drawn in M4, ADR-0037) | Grey tint, `#5F6368` at 6% | Solid, `#80868B`, 1 px |
   | Status unclear in the sources (for example Chalcis in AD 48–50) | No tint; thin diagonal hatching in `#80868B` | Dotted, `#80868B`, 1 px |
   | The Roman Empire's outer edge | — | Solid, `#7D5A50`, 2 px |
 
