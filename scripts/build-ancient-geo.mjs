@@ -908,7 +908,7 @@ function buildAncientCoastline(ancientCoastlineSource, modernCoastlineSource) {
               kind: "ancient-modern-coast-compare",
               detail:
                 "Kept ancient shoreline segments inside target coastal bbox only when their sampled points are >= ~0.03° from modern Natural Earth coastline.",
-              sources: ["awmc:shoreline", "awmc:natural-earth-10m-coastline-comparison"]
+              sources: ["awmc:shoreline"]
             }
           ]
         }

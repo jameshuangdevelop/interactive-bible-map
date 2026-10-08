@@ -198,6 +198,9 @@ const OSM_RIVERS = {
 };
 const LAMUS_SEA_EXTENSION_KM = 5;
 const LAMUS_NORTH_EXTENSION_LATITUDE = 37.55;
+// Where AWMC's AD 200 Cilicia cells cut the AD 69 face, chiefly on the edge with Syria, the line is
+// AD 200's, an approximation for the first century (ADR-0037 rule 3).
+const CILICIA_RULE_3_NOTE = " Rule 3: where the AD 200 cells cut the AD 69 face, as on the edge with Syria, AWMC's AD 200 line is an approximation for the first century.";
 
 // Perea ends just south of Machaerus (Josephus, War 3.3.3), so the fortress itself stays in Perea.
 const MACHAERUS_CUT_MARGIN_KM = 1;
@@ -861,7 +864,7 @@ async function moveCappadociaLineLocally(built, notes) {
   const moved = await booleanOp("cappadocia-detour-moved", "clip", [galatia], [detour]);
   const galatiaRest = await booleanOp("cappadocia-detour-galatia", "erase", [galatia], [detour]);
   const movedKm2 = moved.reduce((sum, piece) => sum + geometryAreaKm2(piece.geometry), 0);
-  const detail = `AWMC draws no first-century line between Galatia and Cappadocia; this edge is AWMC's AD 14 extent, from Cappadocia's years as a client kingdom. Strabo (12.2.7) makes Mazaca the metropolis of the Cappadocians, and the province's label point (Nevşehir) lay ${rounded(nearest.distance, 1)} km beyond that edge, so the edge is moved locally: two straight segments from points ${CAPPADOCIA_DETOUR_HALF_KM} km either side along it to a point ${CAPPADOCIA_DETOUR_BEYOND_KM} km beyond the label point (${rounded(movedKm2)} km² moved; approximate).`;
+  const detail = `AWMC draws no first-century line between Galatia and Cappadocia; this edge is AWMC's AD 14 extent, from Cappadocia's years as a client kingdom (rule 3, an approximation). No source describes the local move: so that the cappadocia record's label point (Nevşehir), ${rounded(nearest.distance, 1)} km beyond the edge, falls inside, the edge runs in two straight segments from points ${CAPPADOCIA_DETOUR_HALF_KM} km either side along it to a point ${CAPPADOCIA_DETOUR_BEYOND_KM} km beyond the label point (${rounded(movedKm2)} km² moved; approximate). Mazaca, which Strabo (12.2.7) calls the metropolis of the Cappadocians, lies inside either way.`;
   const change = { kind: "local-adjustment", detail, sources: ["bib:strabo-geography"] };
   built[cappadociaIndex] = await finishArea("cappadocia", [cappadocia, ...moved], cappadocia.properties.provenance.changes[0].detail, cappadocia.properties.provenance.upstreamFeatureIds, notes, [...cappadocia.properties.provenance.changes.slice(1), change]);
   built[galatiaIndex] = await finishArea("galatia", galatiaRest, galatia.properties.provenance.changes[0].detail, galatia.properties.provenance.upstreamFeatureIds, notes, [...galatia.properties.provenance.changes.slice(1), { ...change, detail: `${rounded(movedKm2)} km² near Nevşehir moved to Cappadocia. ${detail}` }]);
@@ -1175,7 +1178,7 @@ async function main() {
   } else {
     notes.push("Asia: no Natural Earth land polygon found for Patmos.");
   }
-  await addDirect("asia", ad69Named, "Asia", "ad69", islandFaces, " Added AD69 raw island faces for Samos, Chios, Lesbos, Cos and Rhodes, and Natural Earth land for Patmos, per Research Lead ruling.", ["awmc:ad69-asia-island-faces"]);
+  await addDirect("asia", ad69Named, "Asia", "ad69", islandFaces, " Added the AD69 island faces of Lesbos, Chios, Samos, Cos and Rhodes, and Natural Earth land for Patmos. ISBE 'Asia': the province apparently included 'the islands of Lesbos, Samos, Patmos, Cos and others near the Asia Minor coast'; ISBE 'Rhodes': Rhodes was 'made a part of the Roman province of Asia (44 AD)'.", ["awmc:ad69-asia-island-faces"]);
 
   const thraceFaces = await buildThrace(ad69Raw, notes);
   built.push(await finishArea("thrace", thraceFaces, `Union of ${thraceFaces.length} AD69 face(s) on the European side containing Philippopolis, Perinthus, Bizye and Byzantium; the Bosporus and Hellespont divide it from Bithynia.`, thraceFaces.map((_, index) => `awmc:ad69-thrace-face-${index + 1}`), notes));
@@ -1209,12 +1212,12 @@ async function main() {
   const anchorChange = {
     kind: "anchor-line",
     detail: "Galilee/Samaria line through Mount Carmel, Ginea (Jenin, after ISBE 'En-gannim') and Scythopolis, and Perea's northern line through Pella and Philadelphia: straight segments between named anchors (approximate).",
-    sources: ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728"]
+    sources: ["bib:josephus-jewish-war", "bib:isbe-en-gannim", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728"]
   };
   const yarmukChange = {
     kind: "osm-river-cut",
     detail: "Yarmuk (OSM main stream), the southern edge of Gaulanitis (ISBE, 'Golan; Gaulonitis').",
-    sources: [`osm:relation/${OSM_RIVERS.yarmuk.relationId}`, ...yarmukIds]
+    sources: ["bib:isbe-golan", `osm:relation/${OSM_RIVERS.yarmuk.relationId}`, ...yarmukIds]
   };
   const herodUpstream = ["awmc:herod-record-12-land-clipped", `awmc:ad69-face-${judaeaFace.properties.faceId}`];
   const machaerusChange = {
@@ -1255,14 +1258,14 @@ async function main() {
   const edgesEast = ciliciaEdges.length > 0 ? await booleanOp("cilicia-edges-east", "erase", ciliciaEdges, [lamusSplit.westOfLamus]) : [];
   notes.push(`Syria: the AD 69 merged face minus Cilicia, the Herodian base and Commagene leaves ${syriaMain.length} main part and ${detached.length} detached part(s); ${ciliciaEdges.length} of them (${rounded(ciliciaEdges.reduce((sum, part) => sum + geometryAreaKm2(part.geometry), 0), 1)} km²) touch Cilicia's whole and join Cilicia (${rounded(edgesWest.reduce((sum, part) => sum + geometryAreaKm2(part.geometry), 0), 1)} km² west of the Lamus, ${rounded(edgesEast.reduce((sum, part) => sum + geometryAreaKm2(part.geometry), 0), 1)} km² east of it).`);
   const ciliciaEdgeChange = { kind: "edge-pieces", detail: "Adds the AD 69 merged face's land along Cilicia's coast and edges that the AD 200 cells leave out (rule 4: it borders only Cilicia).", sources: ["awmc:roman-empire-ad-69-provinces"] };
-  const ciliciaPedias = await finishArea("cilicia", [...lamusSplit.pedias, ...edgesEast], `AD69 face ${f0031.properties.faceId} clipped by AD200 Cilicia cells ${cilicia.cellIds.join(" + ")}; the part east of the Lamus (the plain).`, [...ciliciaUpstream, ...lamusIds], notes, [lamusChange, ciliciaEdgeChange]);
+  const ciliciaPedias = await finishArea("cilicia", [...lamusSplit.pedias, ...edgesEast], `AD69 face ${f0031.properties.faceId} clipped by AD200 Cilicia cells ${cilicia.cellIds.join(" + ")}; the part east of the Lamus (the plain).${CILICIA_RULE_3_NOTE}`, [...ciliciaUpstream, ...lamusIds], notes, [lamusChange, ciliciaEdgeChange]);
   assertInside(ciliciaPedias, { Tarsus: POINTS.tarsus, Anazarbus: POINTS.anazarbus, Soli: POINTS.soli }, "cilicia", notes);
-  const ciliciaTracheia = await finishArea("cilicia-tracheia", [...lamusSplit.tracheia, ...edgesWest], `AD69 face ${f0031.properties.faceId} clipped by AD200 Cilicia cells ${cilicia.cellIds.join(" + ")}; the part west of the Lamus (the rough west).`, [...ciliciaUpstream, ...lamusIds], notes, [lamusChange, ciliciaEdgeChange]);
+  const ciliciaTracheia = await finishArea("cilicia-tracheia", [...lamusSplit.tracheia, ...edgesWest], `AD69 face ${f0031.properties.faceId} clipped by AD200 Cilicia cells ${cilicia.cellIds.join(" + ")}; the part west of the Lamus (the rough west).${CILICIA_RULE_3_NOTE}`, [...ciliciaUpstream, ...lamusIds], notes, [lamusChange, ciliciaEdgeChange]);
   const tracheiaAnchors = { "Seleucia on the Calycadnus": POINTS.seleuciaCalycadnus, Olba: POINTS.olba, Corycus: POINTS.corycus, Elaeussa: POINTS.elaeussa, Laranda: POINTS.laranda, Coracesium: POINTS.coracesium };
   assertInside(ciliciaTracheia, tracheiaAnchors, "cilicia-tracheia", notes);
   built.push(ciliciaPedias, ciliciaTracheia);
 
-  const syria = await finishArea("syria", [...syriaMain, ...syriaKeeps, ...herod.gadara], `AD69 merged face ${f0031.properties.faceId} (Agrippa II kingdom / Cilicia / Emesa / Syria) minus Cilicia's whole, the Herodian base and Commagene, plus Gadara's land between the Yarmuk and Pella (Decapolis, held by Syria). Small units such as Abilene, Chalcis and Emesa stay inside Syria (ADR-0037 rule 4).`, [`awmc:ad69-face-${f0031.properties.faceId}`, "awmc:herod-record-12-land-clipped", ...yarmukIds], notes, [yarmukChange, anchorChange]);
+  const syria = await finishArea("syria", [...syriaMain, ...syriaKeeps, ...herod.gadara], `AD69 merged face ${f0031.properties.faceId} (Agrippa II kingdom / Cilicia / Emesa / Syria) minus Cilicia's whole, the Herodian base and Commagene, plus Gadara's land between the Yarmuk and Pella (Decapolis, held by Syria). Small units such as Abilene, Chalcis and Emesa stay inside Syria (ADR-0037 rule 4). Its edge with Cilicia is AWMC's AD 200 line (rule 3, an approximation).`, [`awmc:ad69-face-${f0031.properties.faceId}`, "awmc:herod-record-12-land-clipped", ...yarmukIds], notes, [yarmukChange, anchorChange]);
   assertInside(syria, { Antioch: POINTS.antioch, Damascus: POINTS.damascus, Emesa: POINTS.emesa, Gadara: HEROD_ANCHORS.gadara }, "syria");
   built.push(syria);
 
@@ -1283,7 +1286,7 @@ async function main() {
   notes.push(`Sinai: AD 69 faces east of Aegyptus: ${sinaiAd69Faces.map((face) => `${rounded(geometryAreaKm2(face.geometry))} km² at ${labelPoint(face.geometry).map((value) => value.toFixed(2)).join(", ")} (${pointInGeometry(labelPoint(face.geometry), ad69Extent.geometry) ? "inside" : "outside"} the AD 69 extent)`).join("; ")}. Outside the AD 69 extent, AD 200 cell ${sinaiCell.cellId} adds ${rounded(geometryAreaKm2(sinaiOutside[0].geometry))} km² (southern Sinai, Aila and the Hejaz coast inside the AD 200 extent).`);
   const ad200Sources = await booleanOp("arabia-ad200", "clip", [await unionFeatures("arabia-ad200-sources", [petraCell.feature, sinaiOutside[0]])], [ad200Extent]);
   const arabiaPieces = await booleanOp("arabia", "erase", [...ad200Sources, ...sinaiAd69Faces], [egyptArea, f0031, herodBase]);
-  const arabia = await finishArea("arabia", [...arabiaPieces, ...herod.pereaSouth], `AD200 cell ${petraCell.cellId} (Petra and Bostra) and, outside the AD 69 extent, AD200 cell ${sinaiCell.cellId} (Sinai), clipped to the AD 200 extent; plus the AD69 Sinai faces east of Aegyptus; minus Aegyptus, the AD69 Syria face and the Herodian base; plus the Herodian land south of Machaerus.`, [`awmc:ad200-province-cell-${petraCell.cellId}`, `awmc:ad200-province-cell-${sinaiCell.cellId}`, "awmc:ad69-sinai-faces", "awmc:roman-empire-ad-200-extent", "awmc:herod-record-12-land-clipped"], notes, [machaerusChange]);
+  const arabia = await finishArea("arabia", [...arabiaPieces, ...herod.pereaSouth], `AD200 cell ${petraCell.cellId} (Petra and Bostra) and, outside the AD 69 extent, AD200 cell ${sinaiCell.cellId} (Sinai), clipped to the AD 200 extent; plus the AD69 Sinai faces east of Aegyptus; minus Aegyptus, the AD69 Syria face and the Herodian base; plus the Herodian land south of Machaerus. Rule 3: AWMC's AD 200 lines and extent stand in for the Nabataean kingdom's edges, an approximation; they put Philadelphia and Gerasa, Decapolis cities that aren't drawn (ADR-0037 item 3), on Arabia's side. Its edge with Egypt is AWMC's AD 69 Aegyptus face.`, [`awmc:ad200-province-cell-${petraCell.cellId}`, `awmc:ad200-province-cell-${sinaiCell.cellId}`, "awmc:ad69-sinai-faces", "awmc:roman-empire-ad-200-extent", "awmc:herod-record-12-land-clipped"], notes, [machaerusChange]);
   assertInside(arabia, { Petra: POINTS.petra, Bostra: POINTS.bostra, "Mount Sinai": POINTS.stCatherine }, "arabia");
   built.push(arabia);
 
