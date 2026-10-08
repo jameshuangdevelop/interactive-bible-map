@@ -39,6 +39,7 @@ import {
   type BasemapMode
 } from "./basemap-fallback";
 import { getScaleControlLeftOffset } from "./map-layout";
+import { roundScaleDistanceMeters } from "./map-scale";
 import {
   MAX_VISIBLE_PLACE_LIST_ENTRIES,
   buildPlaceRenderData,
@@ -1933,14 +1934,6 @@ function distanceMeters(left: Coordinates, right: Coordinates) {
   return earthRadiusMeters * arc;
 }
 
-function roundedDistanceMeters(value: number) {
-  const leading = [1, 2, 3, 5, 10];
-  const power = Math.pow(10, Math.floor(Math.log10(value)));
-  const normalized = value / power;
-  const candidate = leading.find((entry) => entry >= normalized) ?? 10;
-  return candidate * power;
-}
-
 function formatScaleDistance(valueMeters: number) {
   if (valueMeters >= 1000) {
     const kilometers = valueMeters / 1000;
@@ -2133,7 +2126,7 @@ export function MapView({
     const left = map.unproject([0, y] as PointLike);
     const right = map.unproject([maxWidth, y] as PointLike);
     const measuredMeters = distanceMeters([left.lng, left.lat], [right.lng, right.lat]);
-    const roundedMeters = roundedDistanceMeters(measuredMeters);
+    const roundedMeters = roundScaleDistanceMeters(measuredMeters);
     const width = Math.max(24, Math.min(maxWidth, Math.round((roundedMeters / measuredMeters) * maxWidth)));
 
     scaleFill.style.width = `${width}px`;

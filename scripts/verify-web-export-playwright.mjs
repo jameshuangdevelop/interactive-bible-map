@@ -8405,143 +8405,138 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
 }
 
 async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  const page = await context.newPage();
-
-  const readScaleSnapshot = async () =>
-    page.evaluate((testHookKey) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-
-      const scaleBar = document.querySelector("[data-map-scale='metric']");
-      if (!(scaleBar instanceof HTMLElement)) {
-        throw new Error("Scale bar is unavailable.");
-      }
-      const scaleFill = scaleBar.firstElementChild;
-      const scaleLabel = scaleBar.querySelector("span");
-      if (!(scaleFill instanceof HTMLElement) || !(scaleLabel instanceof HTMLElement)) {
-        throw new Error("Scale bar internals are unavailable.");
-      }
-
-      const fillRect = scaleFill.getBoundingClientRect();
-      const labelText = scaleLabel.textContent?.trim() ?? "";
-      const y = fillRect.top + fillRect.height / 2;
-      const left = map.unproject([0, y]);
-      const right = map.unproject([1, y]);
-      const radians = (value) => (value * Math.PI) / 180;
-      const earthRadiusMeters = 6_371_008.8;
-      const deltaLatitude = radians(right.lat - left.lat);
-      const deltaLongitude = radians(right.lng - left.lng);
-      const latitudeA = radians(left.lat);
-      const latitudeB = radians(right.lat);
-      const chord =
-        Math.sin(deltaLatitude / 2) ** 2 +
-        Math.cos(latitudeA) * Math.cos(latitudeB) * Math.sin(deltaLongitude / 2) ** 2;
-      const arc = 2 * Math.atan2(Math.sqrt(chord), Math.sqrt(1 - chord));
-      const metersPerPixel = earthRadiusMeters * arc;
-      return {
-        labelText,
-        fillWidthPx: fillRect.width,
-        metersPerPixel,
-        zoom: map.getZoom()
-      };
-    }, mapTestHookKey);
+  const targetViewports = [
+    { width: 1440, height: 900, hasTouch: false, isMobile: false, label: "desktop" },
+    { width: 390, height: 844, hasTouch: true, isMobile: true, label: "phone-390x844" }
+  ];
+  const targetZooms = [4, 5, 7, 9, 11];
+  const results = [];
 
   const assertScaleMatchesGeometry = (snapshot, label) => {
     const labelMeters = parseScaleLabelMeters(snapshot.labelText);
     if (labelMeters === null) {
       throw new Error(`Scale label did not parse for ${label}: '${snapshot.labelText}'.`);
     }
-    const representedMeters = snapshot.fillWidthPx * snapshot.metersPerPixel;
-    const deltaRatio = Math.abs(representedMeters - labelMeters) / labelMeters;
-    if (deltaRatio > 0.1) {
+
+    const deltaRatio = Math.abs(snapshot.realDistanceMeters - labelMeters) / snapshot.realDistanceMeters;
+    if (deltaRatio > 0.05) {
       throw new Error(
-        `Scale bar geometry mismatch for ${label}: label=${labelMeters}m represented=${representedMeters.toFixed(
+        `Scale bar mismatch for ${label}: label=${labelMeters}m real=${snapshot.realDistanceMeters.toFixed(
           2
         )}m delta=${(deltaRatio * 100).toFixed(2)}%.`
       );
     }
+
     return {
       labelMeters,
-      representedMeters: Number(representedMeters.toFixed(2)),
+      realDistanceMeters: Number(snapshot.realDistanceMeters.toFixed(2)),
       deltaRatio: Number(deltaRatio.toFixed(4))
     };
   };
 
-  try {
-    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 90_000 });
-    await waitForMapToSettle(page);
+  for (const viewport of targetViewports) {
+    const context = await browser.newContext({
+      viewport: { width: viewport.width, height: viewport.height },
+      hasTouch: viewport.hasTouch,
+      isMobile: viewport.isMobile
+    });
+    const page = await context.newPage();
 
-    const before = await readScaleSnapshot();
-
-    await page.evaluate((testHookKey) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      map.jumpTo({ zoom: Math.max(map.getMinZoom(), map.getZoom() - 4) });
-    }, mapTestHookKey);
-    await waitForMapToSettle(page);
-    const afterJump = await readScaleSnapshot();
-
-    if (afterJump.labelText === before.labelText) {
-      throw new Error(
-        `Scale label did not change after 4-level zoom-out. before='${before.labelText}' after='${afterJump.labelText}'.`
-      );
-    }
-
-    const mapCanvas = page.locator("canvas.maplibregl-canvas");
-    const mapCanvasBounds = await mapCanvas.boundingBox();
-    if (!mapCanvasBounds) {
-      throw new Error("Map canvas bounds are unavailable for wheel zoom.");
-    }
-
-    await page.mouse.move(
-      mapCanvasBounds.x + mapCanvasBounds.width * 0.5,
-      mapCanvasBounds.y + mapCanvasBounds.height * 0.5
-    );
-    const zoomBeforeWheel = afterJump.zoom;
-    await page.mouse.wheel(0, -1500);
-    await page.waitForFunction(
-      ({ testHookKey, previousZoom }) => {
+    const readScaleSnapshot = async () =>
+      page.evaluate((testHookKey) => {
         const map = window[testHookKey];
         if (!map) {
-          return false;
+          throw new Error("Map test hook is unavailable.");
         }
-        return Math.abs(map.getZoom() - previousZoom) > 0.25;
-      },
-      { testHookKey: mapTestHookKey, previousZoom: zoomBeforeWheel },
-      { timeout: 10_000 }
-    );
-    await waitForMapToSettle(page);
-    const afterWheel = await readScaleSnapshot();
 
-    if (afterWheel.labelText === afterJump.labelText) {
-      throw new Error(
-        `Scale label did not change after wheel zoom. afterJump='${afterJump.labelText}' afterWheel='${afterWheel.labelText}'.`
-      );
-    }
+        const scaleBar = document.querySelector("[data-map-scale='metric']");
+        if (!(scaleBar instanceof HTMLElement)) {
+          throw new Error("Scale bar is unavailable.");
+        }
+        const scaleFill = scaleBar.firstElementChild;
+        const scaleLabel = scaleBar.querySelector("span");
+        if (!(scaleFill instanceof HTMLElement) || !(scaleLabel instanceof HTMLElement)) {
+          throw new Error("Scale bar internals are unavailable.");
+        }
 
-    return {
-      before: {
-        ...before,
-        consistency: assertScaleMatchesGeometry(before, "initial")
-      },
-      afterJump: {
-        ...afterJump,
-        consistency: assertScaleMatchesGeometry(afterJump, "zoom-out")
-      },
-      afterWheel: {
-        ...afterWheel,
-        consistency: assertScaleMatchesGeometry(afterWheel, "wheel-zoom")
+        const canvas = map.getCanvas();
+        const canvasRect = canvas.getBoundingClientRect();
+        const fillRect = scaleFill.getBoundingClientRect();
+        const y = fillRect.top + fillRect.height / 2 - canvasRect.top;
+        const fillLeft = fillRect.left - canvasRect.left;
+        const fillRight = fillRect.right - canvasRect.left;
+        const leftPoint = map.unproject([fillLeft, y]);
+        const rightPoint = map.unproject([fillRight, y]);
+        const realDistanceMeters = leftPoint.distanceTo(rightPoint);
+
+        return {
+          labelText: scaleLabel.textContent?.trim() ?? "",
+          zoom: map.getZoom(),
+          fillWidthPx: fillRect.width,
+          realDistanceMeters
+        };
+      }, mapTestHookKey);
+
+    try {
+      await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 90_000 });
+      await waitForMapToSettle(page);
+
+      const beforeZoomOut = await readScaleSnapshot();
+      await page.evaluate((testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        map.jumpTo({ zoom: Math.max(map.getMinZoom(), map.getZoom() - 4) });
+      }, mapTestHookKey);
+      await waitForMapToSettle(page);
+      const afterZoomOut = await readScaleSnapshot();
+      if (afterZoomOut.labelText === beforeZoomOut.labelText) {
+        throw new Error(
+          `${viewport.label}: scale label did not change after 4-level zoom-out. before='${beforeZoomOut.labelText}' after='${afterZoomOut.labelText}'.`
+        );
       }
-    };
-  } finally {
-    await page.close();
-    await context.close();
+
+      const zoomChecks = [];
+      for (const targetZoom of targetZooms) {
+        await page.evaluate(
+          ({ testHookKey, zoom }) => {
+            const map = window[testHookKey];
+            if (!map) {
+              throw new Error("Map test hook is unavailable.");
+            }
+            map.jumpTo({ zoom });
+          },
+          { testHookKey: mapTestHookKey, zoom: targetZoom }
+        );
+        await waitForMapToSettle(page);
+        const snapshot = await readScaleSnapshot();
+        zoomChecks.push({
+          zoom: Number(snapshot.zoom.toFixed(3)),
+          labelText: snapshot.labelText,
+          fillWidthPx: Number(snapshot.fillWidthPx.toFixed(2)),
+          consistency: assertScaleMatchesGeometry(
+            snapshot,
+            `${viewport.label} zoom ${targetZoom}`
+          )
+        });
+      }
+
+      results.push({
+        viewport: { width: viewport.width, height: viewport.height },
+        zoomOutChangedLabel: {
+          before: beforeZoomOut.labelText,
+          after: afterZoomOut.labelText
+        },
+        zoomChecks
+      });
+    } finally {
+      await page.close();
+      await context.close();
+    }
   }
+
+  return results;
 }
 
 async function run() {
