@@ -21,6 +21,8 @@ import {
   ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
   ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
   ANCIENT_MAIN_BASEMAP_STYLE_URL,
+  DEFAULT_MAP_CENTER,
+  DEFAULT_MAP_ZOOM,
   MAP_WORKER_URL,
   MODERN_FALLBACK_BASEMAP_ATTRIBUTION,
   MODERN_FALLBACK_BASEMAP_STYLE_URL,
@@ -28,7 +30,12 @@ import {
   MODERN_MAIN_BASEMAP_STYLE_URL,
   MAX_MAP_ZOOM,
 } from "./constants";
-import { openingAreaBounds, openingAreaFitOptions, resolveMapFitPadding } from "./map-camera";
+import {
+  openingAreaBounds,
+  openingAreaFitOptions,
+  openingCameraMode,
+  resolveMapFitPadding
+} from "./map-camera";
 import {
   BasemapFallbackController,
   MainSourceLoadTimeoutController,
@@ -36,6 +43,7 @@ import {
   type BasemapMode
 } from "./basemap-fallback";
 import { getScaleControlLeftOffset } from "./map-layout";
+import { roundScaleDistanceMeters } from "./map-scale";
 import {
   MAX_VISIBLE_PLACE_LIST_ENTRIES,
   buildPlaceRenderData,
@@ -520,6 +528,34 @@ function getMapLabelPadding(leftInset: number, bottomInset: number) {
     bottom: bottomInset + mapLabelPaddingEdge,
     left: leftInset + mapLabelPaddingEdge
   };
+}
+
+function openOverviewForCurrentViewport(
+  map: MapLibreMap,
+  insets: { left: number; bottom: number },
+  durationMs: number
+) {
+  const viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth;
+  const mode = openingCameraMode(viewportWidth);
+  if (mode === "desktop-fixed") {
+    flyOrJump(
+      map,
+      {
+        center: DEFAULT_MAP_CENTER,
+        zoom: DEFAULT_MAP_ZOOM
+      },
+      durationMs
+    );
+    return;
+  }
+
+  map.fitBounds(
+    openingAreaBounds(),
+    openingAreaFitOptions({
+      insets,
+      durationMs: prefersReducedMotion() ? 0 : durationMs
+    })
+  );
 }
 
 function collapseCompactAttribution(container: HTMLElement | null) {
@@ -1923,14 +1959,6 @@ function distanceMeters(left: Coordinates, right: Coordinates) {
   return earthRadiusMeters * arc;
 }
 
-function roundedDistanceMeters(value: number) {
-  const leading = [1, 2, 3, 5, 10];
-  const power = Math.pow(10, Math.floor(Math.log10(value)));
-  const normalized = value / power;
-  const candidate = leading.find((entry) => entry >= normalized) ?? 10;
-  return candidate * power;
-}
-
 function formatScaleDistance(valueMeters: number) {
   if (valueMeters >= 1000) {
     const kilometers = valueMeters / 1000;
@@ -1968,6 +1996,7 @@ export function MapView({
   const gestureInProgressRef = useRef(false);
   const gestureReleaseTimeoutRef = useRef<number | null>(null);
   const visibleListRefreshFrameRef = useRef<number | null>(null);
+  const scaleBarRefreshFrameRef = useRef<number | null>(null);
   const activeTooltipEntryIdRef = useRef<string | null>(null);
   const mapCanvasHasPointerCursorRef = useRef(false);
   const attributionControlRef = useRef<AttributionControl | null>(null);
@@ -2121,25 +2150,41 @@ export function MapView({
 
   const updateScaleBar = useCallback(() => {
     const map = mapRef.current;
+    const mapContainer = mapContainerRef.current;
     const scaleBar = scaleBarRef.current;
     const scaleFill = scaleBarFillRef.current;
     const scaleLabel = scaleBarLabelRef.current;
-    if (!map || !scaleBar || !scaleFill || !scaleLabel) {
+    if (!map || !mapContainer || !scaleBar || !scaleFill || !scaleLabel) {
       return;
     }
 
-    const mapHeight = map.getContainer().clientHeight;
     const maxWidth = 110;
-    const y = Math.max(32, mapHeight - 48);
+    const mapBounds = mapContainer.getBoundingClientRect();
+    const scaleBounds = scaleBar.getBoundingClientRect();
+    const y = Math.max(
+      0,
+      Math.min(mapBounds.height, scaleBounds.top + scaleBounds.height / 2 - mapBounds.top)
+    );
     const left = map.unproject([0, y] as PointLike);
     const right = map.unproject([maxWidth, y] as PointLike);
     const measuredMeters = distanceMeters([left.lng, left.lat], [right.lng, right.lat]);
-    const roundedMeters = roundedDistanceMeters(measuredMeters);
+    const roundedMeters = roundScaleDistanceMeters(measuredMeters);
     const width = Math.max(24, Math.min(maxWidth, Math.round((roundedMeters / measuredMeters) * maxWidth)));
 
     scaleFill.style.width = `${width}px`;
     scaleLabel.textContent = formatScaleDistance(roundedMeters);
   }, []);
+
+  const scheduleScaleBarUpdate = useCallback(() => {
+    if (scaleBarRefreshFrameRef.current !== null) {
+      return;
+    }
+
+    scaleBarRefreshFrameRef.current = window.requestAnimationFrame(() => {
+      scaleBarRefreshFrameRef.current = null;
+      updateScaleBar();
+    });
+  }, [updateScaleBar]);
 
   const refreshVisibleEntryState = useCallback(() => {
     const map = mapRef.current;
@@ -2496,8 +2541,8 @@ export function MapView({
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode, mapModeRef.current),
-      center: [22.5, 35],
-      zoom: 3.5,
+      center: DEFAULT_MAP_CENTER,
+      zoom: DEFAULT_MAP_ZOOM,
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
@@ -2743,21 +2788,27 @@ export function MapView({
       setMapReadyVersion((value) => value + 1);
 
       if (!openingOverviewAppliedRef.current && !selectionRef.current) {
-        map.fitBounds(
-          openingAreaBounds(),
-          openingAreaFitOptions({
-            insets: { left: panelInsetRef.current, bottom: bottomInsetRef.current },
-            durationMs: 0
-          })
+        openOverviewForCurrentViewport(
+          map,
+          { left: panelInsetRef.current, bottom: bottomInsetRef.current },
+          0
         );
         openingOverviewAppliedRef.current = true;
       }
 
-      if (!cleanupAttributionRef.current) {
+      const shouldExpandAttribution =
+        typeof window !== "undefined" ? openingCameraMode(window.innerWidth) === "desktop-fixed" : true;
+      if (!cleanupAttributionRef.current && shouldExpandAttribution) {
         cleanupAttributionRef.current = expandCompactAttributionOnFirstPaint(
           map,
           mapContainerRef.current
         );
+      } else if (!shouldExpandAttribution) {
+        const compactAttribution =
+          mapContainerRef.current?.querySelector<HTMLDivElement>(
+            ".maplibregl-ctrl-attrib.maplibregl-compact"
+          ) ?? null;
+        collapseCompactAttribution(compactAttribution);
       }
     };
 
@@ -2780,14 +2831,19 @@ export function MapView({
     const handleMoveEnd = () => {
       scheduleVisibleEntryRefreshRef.current();
     };
+    const handleMove = () => {
+      scheduleScaleBarUpdate();
+    };
     const handleResize = () => {
       scheduleVisibleEntryRefreshRef.current();
+      scheduleScaleBarUpdate();
     };
 
     document.addEventListener("pointerdown", handleDocumentPointerDown, true);
     document.addEventListener("keydown", handleMapKeyboardShortcuts, true);
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
+    map.on("move", handleMove);
     map.on("moveend", handleMoveEnd);
     map.on("resize", handleResize);
     map.on("dragstart", markGestureStarted);
@@ -2813,6 +2869,9 @@ export function MapView({
       if (visibleListRefreshFrameRef.current !== null) {
         window.cancelAnimationFrame(visibleListRefreshFrameRef.current);
       }
+      if (scaleBarRefreshFrameRef.current !== null) {
+        window.cancelAnimationFrame(scaleBarRefreshFrameRef.current);
+      }
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
       }
@@ -2822,6 +2881,7 @@ export function MapView({
       document.removeEventListener("keydown", handleMapKeyboardShortcuts, true);
       map.off("load", handleStyleReady);
       map.off("style.load", handleStyleReady);
+      map.off("move", handleMove);
       map.off("moveend", handleMoveEnd);
       map.off("resize", handleResize);
       map.off("dragstart", markGestureStarted);
@@ -2871,10 +2931,12 @@ export function MapView({
     clearMainSourceLoadTimeout,
     hideTooltip,
     resolveInteractiveEntryAtPoint,
+    scheduleScaleBarUpdate,
     scheduleMainSourceLoadTimeout,
     setInteractiveCursor,
     switchToFallback,
     syncAttributionControl,
+    isSmallScreen,
     runtimeTuning
   ]);
 
@@ -2919,8 +2981,9 @@ export function MapView({
     }
 
     map.setPadding(getMapLabelPadding(panelInset, bottomInset));
-    refreshVisibleEntryState();
-  }, [bottomInset, panelInset, refreshVisibleEntryState]);
+    scheduleVisibleEntryRefresh();
+    scheduleScaleBarUpdate();
+  }, [bottomInset, panelInset, scheduleScaleBarUpdate, scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2963,12 +3026,10 @@ export function MapView({
       return;
     }
 
-    map.fitBounds(
-      openingAreaBounds(),
-      openingAreaFitOptions({
-        insets: { left: panelInset, bottom: bottomInset },
-        durationMs: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
-      })
+    openOverviewForCurrentViewport(
+      map,
+      { left: panelInset, bottom: bottomInset },
+      runtimeTuning.flyToDurationMs
     );
   }, [bottomInset, panelInset, runtimeTuning.flyToDurationMs]);
 
@@ -2993,6 +3054,11 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
   }, [runtimeTuning.controlZoomDurationMs]);
+  const resetButtonBottomOffset = isSmallScreen
+    ? Math.max(bottomInset + 16, 88)
+    : bottomInset + 16;
+  const compactAttributionBottomOffset = isSmallScreen ? bottomInset : 0;
+  const compactAttributionRightOffset = 72;
 
   return (
     <div
@@ -3014,6 +3080,10 @@ export function MapView({
           clip: rect(0, 0, 0, 0);
           white-space: nowrap;
           border: 0;
+        }
+        .ibm-map-root .maplibregl-ctrl-bottom-right {
+          right: ${compactAttributionRightOffset}px;
+          bottom: ${compactAttributionBottomOffset}px;
         }
       `}</style>
       <div
@@ -3140,7 +3210,7 @@ export function MapView({
         style={{
           position: "absolute",
           right: "16px",
-          bottom: `${bottomInset + 16}px`,
+          bottom: `${resetButtonBottomOffset}px`,
           width: "44px",
           height: "44px",
           borderRadius: "999px",

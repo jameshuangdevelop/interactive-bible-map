@@ -101,37 +101,64 @@
     {
       "fromYear": -27,
       "toYear": 15,
-      "entity": "Senatorial province of Achaia, governed by a proconsul",
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:isbe-macedonia",
-        "bib:tacitus-annals"
+        "bib:isbe-macedonia"
       ]
     },
     {
       "fromYear": 15,
       "toYear": 44,
-      "entity": "Imperial province, governed with Macedonia by the legate of Moesia",
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Imperial legate of Moesia (governed with Macedonia))",
       "sources": [
         "bib:tacitus-annals",
-        "bib:isbe-macedonia",
-        "bib:cassius-dio-roman-history"
+        "bib:isbe-macedonia"
       ]
     },
     {
       "fromYear": 44,
       "toYear": 67,
-      "entity": "Senatorial province again, restored by Claudius (in force at AD 50) until Nero declared Greece free",
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by the emperor Claudius))",
       "sources": [
-        "bib:cassius-dio-roman-history",
-        "bib:suetonius-twelve-caesars",
-        "bib:isbe-macedonia",
-        "bib:worldhistory-corinth",
-        "wikipedia:Achaia_(Roman_province)"
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "fromYear": 67,
+      "toYear": 70,
+      "holderId": "achaia-free",
+      "entity": "Free Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius: on his departure from Greece, the emperor Nero \"presented the entire province with freedom.\""
+    },
+    {
+      "fromYear": 70,
+      "toYear": 79,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+    },
+    {
+      "fromYear": 79,
+      "toYear": 101,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
       ]
     }
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "achaia"
 }

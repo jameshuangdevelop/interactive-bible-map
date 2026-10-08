@@ -79,8 +79,20 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 101,
+      "holderId": "illyricum-province",
+      "entity": "Roman province of Illyricum",
+      "sources": [
+        "bib:isbe-illyricum"
+      ],
+      "note": "The emperor Augustus organized it as one province in AD 10, under an imperial legate residing at Salona on the Dalmatian coast; already under Roman control in the years before that."
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "illyricum"
 }

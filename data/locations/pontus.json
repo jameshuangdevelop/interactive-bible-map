@@ -70,8 +70,36 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -66,
+      "toYear": -2,
+      "entity": "Divided by Rome after Pompey's defeat of Mithridates VI: most of Pontus administered with the province of Bithynia; the eastern part became a separate kingdom, ruled by Polemon and his descendants from 36 BC",
+      "sources": [
+        "bib:isbe-pontus",
+        "bib:worldhistory-pompey"
+      ]
+    },
+    {
+      "fromYear": -2,
+      "toYear": 64,
+      "entity": "The southwestern part (\"Pontus Galaticus\") also joins the province of Galatia; the rest stays divided between Bithynia's administration and Polemon's kingdom",
+      "note": "The International Standard Bible Encyclopedia (1915) dates Polemon's kingdom becoming a province to AD 63 in its \"Pontus\" entry and to AD 64 in its \"Galatia\" entry. This map uses AD 64.",
+      "sources": [
+        "bib:isbe-galatia",
+        "bib:isbe-pontus"
+      ]
+    },
+    {
+      "fromYear": 64,
+      "toYear": 101,
+      "entity": "Polemon's former kingdom (\"Pontus Polemoniacus\") also joins the province of Galatia; the west stays administered with Bithynia",
+      "sources": [
+        "bib:isbe-galatia"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08"
 }

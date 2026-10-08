@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-bible-map/schemas/timeline.schema.json",
+  "title": "Timeline and ancient political areas",
+  "description": "Canonical timeline and political-holder model in data/timeline.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "range",
+    "stops",
+    "entities",
+    "areas"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fromYear",
+        "toYear",
+        "defaultYear"
+      ],
+      "properties": {
+        "fromYear": {
+          "$ref": "#/$defs/yearNoZero"
+        },
+        "toYear": {
+          "$ref": "#/$defs/yearNoZero"
+        },
+        "defaultYear": {
+          "$ref": "#/$defs/yearNoZero"
+        }
+      }
+    },
+    "stops": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "year",
+          "title",
+          "summary",
+          "sources"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "year": {
+            "$ref": "#/$defs/yearNoZero"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scripture": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/scriptureSourceId"
+            }
+          },
+          "sources": {
+            "$ref": "#/$defs/sourceArray"
+          }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "romanSide",
+          "sources"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "roman-province",
+              "client-kingdom",
+              "client-tetrarchy",
+              "free-city-or-league",
+              "outside-empire",
+              "uncertain"
+            ]
+          },
+          "romanSide": {
+            "type": "boolean"
+          },
+          "locationId": {
+            "$ref": "#/$defs/id"
+          },
+          "sources": {
+            "$ref": "#/$defs/sourceArray"
+          }
+        }
+      }
+    },
+    "areas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "periods"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "locationId": {
+            "$ref": "#/$defs/id"
+          },
+          "focus": {
+            "type": "boolean"
+          },
+          "periods": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fromYear",
+                "toYear",
+                "holderId",
+                "sources"
+              ],
+              "properties": {
+                "fromYear": {
+                  "$ref": "#/$defs/yearNoZero"
+                },
+                "toYear": {
+                  "$ref": "#/$defs/yearNoZero"
+                },
+                "holderId": {
+                  "$ref": "#/$defs/id"
+                },
+                "ruler": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "note": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sources": {
+                  "$ref": "#/$defs/sourceArray"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "yearNoZero": {
+      "type": "integer",
+      "not": {
+        "const": 0
+      }
+    },
+    "sourceArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+      }
+    }
+  }
+}

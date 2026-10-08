@@ -117,6 +117,11 @@
       "description": "Optional parent location ID, for example a city inside a region.",
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
     },
+    "politicalAreaId": {
+      "type": "string",
+      "description": "Optional timeline area ID from data/timeline.json used to derive politicalHistory.",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
     "candidates": {
       "type": "array",
       "description": "Candidate coordinate locations with confidence and sources.",
@@ -177,6 +182,59 @@
             "type": "string",
             "description": "Neutral summary of why this candidate is proposed.",
             "minLength": 1
+          },
+          "politicalAreaId": {
+            "type": "string",
+            "description": "Optional timeline area ID for candidate-specific political history derivation.",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "politicalHistoryOverrides": {
+            "type": "array",
+            "description": "Optional candidate-specific overrides applied over this candidate's timeline-derived political history.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fromYear",
+                "toYear",
+                "holderId",
+                "sources"
+              ],
+              "properties": {
+                "fromYear": {
+                  "$ref": "#/$defs/yearNoZero",
+                  "description": "Start year as an integer, with BC negative and no year 0."
+                },
+                "toYear": {
+                  "$ref": "#/$defs/yearNoZero",
+                  "description": "First year after this override interval."
+                },
+                "holderId": {
+                  "type": "string",
+                  "description": "Timeline entity ID from data/timeline.json.",
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "ruler": {
+                  "type": "string",
+                  "description": "Optional ruler label for this override interval.",
+                  "minLength": 1
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Optional short note for this override interval.",
+                  "minLength": 1
+                },
+                "sources": {
+                  "type": "array",
+                  "description": "Sources for this override interval.",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+                  }
+                }
+              }
+            }
           },
           "sources": {
             "type": "array",
@@ -379,7 +437,7 @@
     },
     "politicalHistory": {
       "type": "array",
-      "description": "Date-bounded political entities connected to this location.",
+      "description": "Date-bounded political entities connected to this location. Intervals are half-open [fromYear, toYear).",
       "items": {
         "type": "object",
         "description": "One political history interval with sources.",
@@ -397,7 +455,22 @@
           },
           "toYear": {
             "$ref": "#/$defs/yearNoZero",
-            "description": "End year as an integer, with BC negative and no year 0."
+            "description": "First year of the next interval as an integer, with BC negative and no year 0."
+          },
+          "holderId": {
+            "type": "string",
+            "description": "Optional holder entity ID from data/timeline.json.",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "candidate": {
+            "type": "integer",
+            "description": "Optional candidate index when politicalHistory is derived per candidate.",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional short note for uncertainty or brief explanation on this interval.",
+            "minLength": 1
           },
           "entity": {
             "type": "string",
@@ -407,6 +480,54 @@
           "sources": {
             "type": "array",
             "description": "Sources for this political history interval.",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+            }
+          }
+        }
+      }
+    },
+    "politicalHistoryOverrides": {
+      "type": "array",
+      "description": "Optional place-specific overrides applied over the area's timeline-derived political history.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fromYear",
+          "toYear",
+          "holderId",
+          "sources"
+        ],
+        "properties": {
+          "fromYear": {
+            "$ref": "#/$defs/yearNoZero",
+            "description": "Start year as an integer, with BC negative and no year 0."
+          },
+          "toYear": {
+            "$ref": "#/$defs/yearNoZero",
+            "description": "First year after this override interval."
+          },
+          "holderId": {
+            "type": "string",
+            "description": "Timeline entity ID from data/timeline.json.",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "ruler": {
+            "type": "string",
+            "description": "Optional ruler label for this override interval.",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional short note for this override interval.",
+            "minLength": 1
+          },
+          "sources": {
+            "type": "array",
+            "description": "Sources for this override interval.",
             "minItems": 1,
             "uniqueItems": true,
             "items": {
