@@ -6,7 +6,7 @@ Source style license: CC0 1.0 (metadata.license in upstream style)
 Fallback policy: use this style only when the primary OpenFreeMap Liberty modern basemap is unavailable.
 
 Modifications in this copy:
-- Modern-map treatment: use English-only labels (name_en, then Latin-script fields where present)
+- Modern-map treatment: use English-only labels from name_en only
 - Hide disputed borders
 - Remove points of interest and airport labels
 - Max zoom set to 14

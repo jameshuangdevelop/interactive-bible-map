@@ -38,7 +38,7 @@ const libertyModernMetadataLicense =
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
 const versaTilesModernMetadataNotice =
-  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels with name_en fallback to Latin-script fields where present; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14.";
+  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14.";
 
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
@@ -64,7 +64,7 @@ Source style license: CC0 1.0 (metadata.license in upstream style)
 Fallback policy: use this style only when the primary OpenFreeMap Liberty modern basemap is unavailable.
 
 Modifications in this copy:
-- Modern-map treatment: use English-only labels (name_en, then Latin-script fields where present)
+- Modern-map treatment: use English-only labels from name_en only
 - Hide disputed borders
 - Remove points of interest and airport labels
 - Max zoom set to 14
@@ -202,8 +202,13 @@ function removeLibertyModernExcludedLayers(style) {
 }
 
 function updateLibertyModernLabelFields(style) {
-  const englishOnlyExpression = modernEnglishLabelExpression(["name:en", "name_en", "name:latin"]);
-  const replaceFieldNames = new Set(["name:nonlatin", "name:latin", "name_en", "name"]);
+  const englishOnlyExpression = [
+    "case",
+    ["==", ["get", "name:en"], "T"],
+    ["get", "name:latin"],
+    modernEnglishLabelExpression(["name:en", "name:latin"])
+  ];
+  const replaceFieldNames = new Set(["name", "name:en", "name:latin", "name:nonlatin", "name_en"]);
 
   for (const layer of style.layers) {
     if (layer.type !== "symbol" || labelSourceLayerIdsToExclude.has(layer["source-layer"])) {
@@ -291,7 +296,7 @@ function updateVersaTilesModernBoundaryFilters(style) {
 }
 
 function updateVersaTilesModernLabelFields(style) {
-  const englishOnlyExpression = modernEnglishLabelExpression(["name_en", "name:latin", "name_int"]);
+  const englishOnlyExpression = modernEnglishLabelExpression(["name_en"]);
   for (const layer of style.layers) {
     if (!layer.layout || !("text-field" in layer.layout)) {
       continue;

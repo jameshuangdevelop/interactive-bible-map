@@ -3,7 +3,7 @@
   "name": "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)",
   "metadata": {
     "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels with name_en fallback to Latin-script fields where present; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
+    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
   },
   "glyphs": "https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf",
   "sprite": [
@@ -15144,14 +15144,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15201,14 +15193,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15258,14 +15242,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15315,14 +15291,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15372,14 +15340,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15429,14 +15389,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15486,14 +15438,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15543,14 +15487,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15600,14 +15536,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "line",
@@ -15657,14 +15585,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "point",
@@ -15725,14 +15645,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "center",
@@ -15827,14 +15739,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "center",
@@ -15929,14 +15833,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "center",
@@ -16031,14 +15927,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "center",
@@ -16120,14 +16008,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "center",
@@ -16183,14 +16063,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "center",
@@ -16240,14 +16112,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "point",
@@ -16302,14 +16166,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "point",
@@ -16370,14 +16226,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-placement": "point",
@@ -16432,14 +16280,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -16514,14 +16354,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -16596,14 +16428,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -16690,14 +16514,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -16784,14 +16600,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -16877,14 +16685,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -16987,14 +16787,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "top",
@@ -17051,14 +16843,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -17144,14 +16928,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -17237,14 +17013,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "symbol-sort-key": [
@@ -17358,14 +17126,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "top",
@@ -17458,14 +17218,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "top",
@@ -17550,14 +17302,6 @@
           [
             "get",
             "name_en"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "get",
-            "name_int"
           ]
         ],
         "text-anchor": "top",

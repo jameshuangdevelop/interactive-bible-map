@@ -366,7 +366,12 @@ function assertNoLayerIdsMatching(style, pattern, styleName, description) {
 }
 
 function assertLibertyModernLabels(style) {
-  const expected = ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name:latin"]];
+  const expected = [
+    "case",
+    ["==", ["get", "name:en"], "T"],
+    ["get", "name:latin"],
+    ["coalesce", ["get", "name:en"], ["get", "name:latin"]]
+  ];
   const layers = style.layers.filter((layer) =>
     [
       "waterway_line_label",
@@ -397,7 +402,7 @@ function assertLibertyModernLabels(style) {
 }
 
 function assertVersaTilesModernNameFields(style) {
-  const expected = ["coalesce", ["get", "name_en"], ["get", "name:latin"], ["get", "name_int"]];
+  const expected = ["coalesce", ["get", "name_en"]];
   const layers = style.layers.filter((layer) =>
     [
       "label-place-city",
@@ -416,6 +421,87 @@ function assertVersaTilesModernNameFields(style) {
       expected,
       `VersaTiles modern layer '${layer.id}' must use English-only text field`
     );
+  }
+}
+
+function listTextFieldGetFields(textField) {
+  if (Array.isArray(textField)) {
+    const fields = [];
+    if (
+      textField.length === 2 &&
+      textField[0] === "get" &&
+      typeof textField[1] === "string"
+    ) {
+      fields.push(textField[1]);
+    }
+    for (const entry of textField) {
+      fields.push(...listTextFieldGetFields(entry));
+    }
+    return fields;
+  }
+
+  if (textField && typeof textField === "object") {
+    return Object.values(textField).flatMap((entry) => listTextFieldGetFields(entry));
+  }
+
+  return [];
+}
+
+function listTextFieldStrings(textField) {
+  if (typeof textField === "string") {
+    return [textField];
+  }
+
+  if (Array.isArray(textField)) {
+    return textField.flatMap((entry) => listTextFieldStrings(entry));
+  }
+
+  if (textField && typeof textField === "object") {
+    return Object.values(textField).flatMap((entry) => listTextFieldStrings(entry));
+  }
+
+  return [];
+}
+
+function assertNoForbiddenModernNameFallbacks(style, styleName, allowedNameFields) {
+  const forbiddenFields = new Set(["name", "name:nonlatin", "name_int", "name:local"]);
+  for (const layer of style.layers) {
+    if (layer.type !== "symbol" || !layer.layout || !("text-field" in layer.layout)) {
+      continue;
+    }
+
+    const textField = layer.layout["text-field"];
+    const getFields = listTextFieldGetFields(textField);
+    const hasNameField = getFields.some((fieldName) => /^name(?::|_|$)/u.test(fieldName));
+    if (!hasNameField) {
+      continue;
+    }
+
+    for (const fieldName of getFields) {
+      if (!/^name(?::|_|$)/u.test(fieldName)) {
+        continue;
+      }
+
+      assert.equal(
+        forbiddenFields.has(fieldName),
+        false,
+        `${styleName} layer '${layer.id}' text-field must not read forbidden field '${fieldName}'`
+      );
+      assert.equal(
+        allowedNameFields.has(fieldName),
+        true,
+        `${styleName} layer '${layer.id}' text-field must not read '${fieldName}'`
+      );
+    }
+
+    const textFieldStrings = listTextFieldStrings(textField);
+    for (const value of textFieldStrings) {
+      assert.equal(
+        /\{name(?::|_|\})/u.test(value),
+        false,
+        `${styleName} layer '${layer.id}' text-field must not use token fallback '${value}'`
+      );
+    }
   }
 }
 
@@ -514,7 +600,7 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   );
   assert.equal(
     style.metadata["interactive-bible-map:notice"],
-    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels with name_en fallback to Latin-script fields where present; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
   assertNoLayerIdsMatching(style, /^poi-/u, "VersaTiles modern", "POI layers");
@@ -523,4 +609,20 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   assertNoDisputedBoundaryFilters(style, "VersaTiles modern");
   assertVersaTilesModernNameFields(style);
   assertMaxZoom14(style, "VersaTiles modern");
+});
+
+test("Modern styles do not allow non-English or local-script name fallbacks in symbol text", async () => {
+  const libertyStyle = await readStyle(libertyModernStylePath);
+  const versaTilesStyle = await readStyle(versaTilesModernStylePath);
+
+  assertNoForbiddenModernNameFallbacks(
+    libertyStyle,
+    "Liberty modern",
+    new Set(["name:en", "name:latin"])
+  );
+  assertNoForbiddenModernNameFallbacks(
+    versaTilesStyle,
+    "VersaTiles modern",
+    new Set(["name_en"])
+  );
 });
