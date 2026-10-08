@@ -400,12 +400,7 @@ function assertNoLayerIdsMatching(style, pattern, styleName, description) {
 }
 
 function assertLibertyModernLabels(style) {
-  const expected = [
-    "case",
-    ["==", ["get", "name:en"], "T"],
-    ["get", "name:latin"],
-    ["coalesce", ["get", "name:en"], ["get", "name:latin"]]
-  ];
+  const expected = ["coalesce", ["get", "name:en"], ["get", "name:latin"]];
   const layers = style.layers.filter((layer) =>
     [
       "waterway_line_label",
@@ -811,7 +806,7 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   );
   assert.equal(
     style.metadata["interactive-bible-map:license"],
-    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   );
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
   assertLayerMissing(style, "boundary_disputed", "Liberty modern");
@@ -870,7 +865,7 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   );
   assert.equal(
     style.metadata["interactive-bible-map:notice"],
-    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
@@ -973,17 +968,23 @@ test("Modern shared Natural Earth boundaries keep mask areas line-free", async (
   );
 
   const hiddenPairsStillPresentInNe = new Set();
+  let inspectedNePairCount = 0;
   for (const feature of neutralBoundaryGeoJson.features ?? []) {
     const leftCode = feature?.properties?.adm0_a3_l;
     const rightCode = feature?.properties?.adm0_a3_r;
     if (typeof leftCode !== "string" || typeof rightCode !== "string") {
       continue;
     }
+    inspectedNePairCount += 1;
     const pair = canonicalPair(leftCode, rightCode);
     if (expectedHiddenBoundaryPairs.includes(pair)) {
       hiddenPairsStillPresentInNe.add(pair);
     }
   }
+  assert.ok(
+    inspectedNePairCount > 0,
+    "Natural Earth shared boundary output must include inferable country-pair codes for pair checks"
+  );
   assert.deepEqual(
     [...hiddenPairsStillPresentInNe].sort(),
     [],
@@ -1044,6 +1045,14 @@ test("Liberty modern boundary_2 filter hides ARM/AZE exclaves by feature propert
       `boundary_2 filter visibility mismatch for decoded feature ${feature.key} (${feature.note})`
     );
   }
+
+  const partialCrossingFeature = (fixture.tileFeatures ?? []).find(
+    (feature) => feature.note === "partial-mask-crossing-syr-jor"
+  );
+  assert.ok(
+    partialCrossingFeature,
+    "Fixture must include a real partial-mask-crossing tile feature for mask/pair-rule coverage"
+  );
 });
 
 test("Natural Earth boundary output near Armenia hides configured ids and keeps non-hidden lines", async () => {

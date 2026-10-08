@@ -49,7 +49,8 @@ function parseArguments(argv) {
     target: "both",
     appQuery: "",
     outJson: null,
-    outMarkdown: null
+    outMarkdown: null,
+    chromiumArgs: []
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -106,6 +107,17 @@ function parseArguments(argv) {
 
     if (argument.startsWith("--app-query=")) {
       options.appQuery = argument.slice("--app-query=".length);
+      continue;
+    }
+
+    if (argument === "--chromium-arg" && argv[index + 1]) {
+      options.chromiumArgs.push(argv[index + 1]);
+      index += 1;
+      continue;
+    }
+
+    if (argument.startsWith("--chromium-arg=")) {
+      options.chromiumArgs.push(argument.slice("--chromium-arg=".length));
       continue;
     }
   }
@@ -1381,7 +1393,8 @@ async function runBenchmarks(options) {
     options: {
       mode: options.mode,
       target: options.target,
-      appQuery: options.appQuery
+      appQuery: options.appQuery,
+      chromiumArgs: options.chromiumArgs
     },
     modes: {}
   };
@@ -1390,7 +1403,8 @@ async function runBenchmarks(options) {
     for (const mode of benchmarkModesToRun(options.mode)) {
       const headless = mode === "headless";
       const browser = await chromium.launch({
-        headless
+        headless,
+        args: options.chromiumArgs
       });
 
       try {

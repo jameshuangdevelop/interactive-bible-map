@@ -53,11 +53,11 @@ const modernNoBorderLineStatement =
   "No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places.";
 
 const libertyModernName = "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)";
-const libertyModernMetadataLicense = `Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. ${modernNoBorderLineStatement} Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.`;
+const libertyModernMetadataLicense = `Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. ${modernNoBorderLineStatement} Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.`;
 
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
-const versaTilesModernMetadataNotice = `Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. ${modernNoBorderLineStatement} Max zoom set to 14.`;
+const versaTilesModernMetadataNotice = `Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. ${modernNoBorderLineStatement} Max zoom set to 14.`;
 
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
@@ -85,6 +85,7 @@ Fallback policy: use this style only when the primary OpenFreeMap Liberty modern
 Modifications in this copy:
 - Modern-map treatment: labels in English only (name_en)
 - Remove points of interest, airport labels, and state and province names
+- Remove detail layers for smooth dragging: 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels
 - Remove the tiles' boundary lines, including maritime boundaries
 - Draw the country borders at every zoom from Natural Earth's boundary lines (public domain), simplified
 - ${modernNoBorderLineStatement}
@@ -192,6 +193,24 @@ const hiddenBoundaryNeIdsByPair = new Map([
   ["ARM|AZE", new Set([1746705689, 1746705697, 1746706155, 1746706169])],
   ["GEO|RUS", new Set([1746705547])]
 ]);
+const libertyModernPerformanceExcludedLayerIds = new Set([
+  "building-3d",
+  "park_outline",
+  "aeroway_runway",
+  "aeroway_taxiway",
+  "road_one_way_arrow",
+  "road_one_way_arrow_opposite",
+  "highway-shield-non-us",
+  "highway-shield-us-interstate",
+  "road_shield_us"
+]);
+const versaTilesModernPerformanceExcludedLayerIds = new Set([
+  "label-address-housenumber",
+  "marking-oneway",
+  "marking-oneway-reverse",
+  "label-motorway-exit",
+  "label-motorway-shield"
+]);
 
 function modernEnglishLabelExpression(preferredFields) {
   const expression = ["coalesce"];
@@ -199,6 +218,50 @@ function modernEnglishLabelExpression(preferredFields) {
     expression.push(["get", field]);
   }
   return expression;
+}
+
+function tuneLibertyModernPerformance(style) {
+  style.layers = style.layers.filter((layer) => !libertyModernPerformanceExcludedLayerIds.has(layer.id));
+  for (const layer of style.layers) {
+    if (layer.id === "highway-name-minor" || layer.id === "highway-name-path") {
+      layer.minzoom = Math.max(12, layer.minzoom ?? 0);
+      continue;
+    }
+    if (layer.id === "label_town") {
+      layer.minzoom = Math.max(10, layer.minzoom ?? 0);
+      continue;
+    }
+    if (layer.id === "label_village") {
+      layer.minzoom = Math.max(10, layer.minzoom ?? 0);
+      continue;
+    }
+    if (layer.id === "label_other") {
+      layer.minzoom = Math.max(12, layer.minzoom ?? 0);
+    }
+  }
+}
+
+function tuneVersaTilesModernPerformance(style) {
+  style.layers = style.layers.filter((layer) => !versaTilesModernPerformanceExcludedLayerIds.has(layer.id));
+  for (const layer of style.layers) {
+    if (layer.id === "label-place-town") {
+      layer.minzoom = Math.max(10, layer.minzoom ?? 0);
+      continue;
+    }
+    if (layer.id === "label-place-village" || layer.id === "label-place-hamlet") {
+      layer.minzoom = Math.max(10, layer.minzoom ?? 0);
+      continue;
+    }
+    if (
+      layer.id === "label-street-track" ||
+      layer.id === "label-street-pedestrian" ||
+      layer.id === "label-street-livingstreet" ||
+      layer.id === "label-street-residential" ||
+      layer.id === "label-street-unclassified"
+    ) {
+      layer.minzoom = Math.max(13, layer.minzoom ?? 0);
+    }
+  }
 }
 
 function replaceLabelFieldExpression(value, predicate, replacement) {
@@ -322,16 +385,22 @@ function canonicalPairCode(leftCode, rightCode) {
   return [leftCode, rightCode].sort().join("|");
 }
 
-function featureMatchesHiddenAdm0Pair(properties, hiddenPairs) {
+function featureMatchesHiddenAdm0Pair(properties, hiddenPairs, inferredPairCodes = null) {
   const leftCode = properties?.ADM0_A3_L ?? properties?.adm0_a3_l ?? properties?.adm0_l;
   const rightCode = properties?.ADM0_A3_R ?? properties?.adm0_a3_r ?? properties?.adm0_r;
-  if (typeof leftCode !== "string" || typeof rightCode !== "string") {
+  const fallbackLeftCode = inferredPairCodes?.[0];
+  const fallbackRightCode = inferredPairCodes?.[1];
+  const normalizedLeftCode =
+    typeof leftCode === "string" && leftCode.length === 3 ? leftCode : fallbackLeftCode;
+  const normalizedRightCode =
+    typeof rightCode === "string" && rightCode.length === 3 ? rightCode : fallbackRightCode;
+  if (typeof normalizedLeftCode !== "string" || typeof normalizedRightCode !== "string") {
     return false;
   }
   return hiddenPairs.some(
     ([pairLeftCode, pairRightCode]) =>
-      (leftCode === pairLeftCode && rightCode === pairRightCode) ||
-      (leftCode === pairRightCode && rightCode === pairLeftCode)
+      (normalizedLeftCode === pairLeftCode && normalizedRightCode === pairRightCode) ||
+      (normalizedLeftCode === pairRightCode && normalizedRightCode === pairLeftCode)
   );
 }
 
@@ -391,6 +460,112 @@ function collectCountryPolygons(countryGeoJson, targetCountries) {
     polygons.push(...asPolygonCoordinates(feature.geometry));
   }
   return polygons;
+}
+
+function countryCodeFromProperties(properties) {
+  const codeCandidates = [
+    properties?.ADM0_A3,
+    properties?.adm0_a3,
+    properties?.ISO_A3,
+    properties?.iso_a3
+  ];
+  for (const candidate of codeCandidates) {
+    if (typeof candidate === "string" && candidate.length === 3) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+function buildCountryPolygonIndex(countryGeoJson) {
+  const index = [];
+  for (const feature of countryGeoJson.features ?? []) {
+    if (!feature?.geometry || !feature?.properties) {
+      continue;
+    }
+    const code = countryCodeFromProperties(feature.properties);
+    if (code == null) {
+      continue;
+    }
+    for (const polygonCoordinates of asPolygonCoordinates(feature.geometry)) {
+      const outerRing = polygonCoordinates[0];
+      if (!Array.isArray(outerRing) || outerRing.length < 4) {
+        continue;
+      }
+      let minLng = Infinity;
+      let minLat = Infinity;
+      let maxLng = -Infinity;
+      let maxLat = -Infinity;
+      for (const [lng, lat] of outerRing) {
+        minLng = Math.min(minLng, lng);
+        minLat = Math.min(minLat, lat);
+        maxLng = Math.max(maxLng, lng);
+        maxLat = Math.max(maxLat, lat);
+      }
+      index.push({
+        code,
+        bbox: [minLng, minLat, maxLng, maxLat],
+        polygonCoordinates
+      });
+    }
+  }
+  return index;
+}
+
+function locateCountryCodeByPoint(point, countryPolygonIndex) {
+  for (const entry of countryPolygonIndex) {
+    const [minLng, minLat, maxLng, maxLat] = entry.bbox;
+    if (point[0] < minLng || point[0] > maxLng || point[1] < minLat || point[1] > maxLat) {
+      continue;
+    }
+    if (isPointStrictlyInsidePolygon(point, entry.polygonCoordinates)) {
+      return entry.code;
+    }
+  }
+  return null;
+}
+
+function inferBoundaryPairCodesFromGeometry(geometry, countryPolygonIndex) {
+  const lines =
+    geometry?.type === "LineString"
+      ? [geometry.coordinates]
+      : geometry?.type === "MultiLineString"
+        ? geometry.coordinates
+        : [];
+  const offsetDegrees = 0.02;
+
+  for (const lineCoordinates of lines) {
+    if (!Array.isArray(lineCoordinates) || lineCoordinates.length < 2) {
+      continue;
+    }
+    for (let index = 1; index < lineCoordinates.length; index += 1) {
+      const [x1, y1] = lineCoordinates[index - 1];
+      const [x2, y2] = lineCoordinates[index];
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const length = Math.hypot(dx, dy);
+      if (!Number.isFinite(length) || length === 0) {
+        continue;
+      }
+      const midPoint = [(x1 + x2) / 2, (y1 + y2) / 2];
+      const normal = [-dy / length, dx / length];
+      const leftPoint = [
+        midPoint[0] + normal[0] * offsetDegrees,
+        midPoint[1] + normal[1] * offsetDegrees
+      ];
+      const rightPoint = [
+        midPoint[0] - normal[0] * offsetDegrees,
+        midPoint[1] - normal[1] * offsetDegrees
+      ];
+      const leftCode = locateCountryCodeByPoint(leftPoint, countryPolygonIndex);
+      const rightCode = locateCountryCodeByPoint(rightPoint, countryPolygonIndex);
+      if (leftCode == null || rightCode == null || leftCode === rightCode) {
+        continue;
+      }
+      return [leftCode, rightCode];
+    }
+  }
+  return null;
 }
 
 function collectDisputedAreaPolygons(disputedAreasGeoJson, targetAreaNames) {
@@ -602,34 +777,60 @@ function simplifyFeature(feature, toleranceDegrees) {
   };
 }
 
-function createNeutralBoundaryGeoJson(boundaryGeoJson, maskPolygons, simplifyToleranceDegrees) {
+function createNeutralBoundaryGeoJson(
+  boundaryGeoJson,
+  countryPolygonIndex,
+  maskPolygons,
+  simplifyToleranceDegrees
+) {
   const relevantFeatures = (boundaryGeoJson.features ?? []).filter(
-    (feature) =>
-      (feature?.properties?.FEATURECLA ?? feature?.properties?.featurecla) ===
+    (feature) => {
+      const inferredPairCodes = inferBoundaryPairCodesFromGeometry(
+        feature?.geometry,
+        countryPolygonIndex
+      );
+      return (
+        (feature?.properties?.FEATURECLA ?? feature?.properties?.featurecla) ===
         "International boundary (verify)" &&
-      !featureMatchesHiddenAdm0Pair(feature?.properties, hiddenBoundaryAdm0Pairs) &&
-      !featureMatchesHiddenNeIdForPair(
-        feature?.properties,
-        hiddenBoundaryAdm0Pairs,
-        hiddenBoundaryNeIdsByPair
-      )
+        !featureMatchesHiddenAdm0Pair(feature?.properties, hiddenBoundaryAdm0Pairs, inferredPairCodes) &&
+        !featureMatchesHiddenNeIdForPair(
+          feature?.properties,
+          hiddenBoundaryAdm0Pairs,
+          hiddenBoundaryNeIdsByPair
+        )
+      );
+    }
   );
 
   const boundaryFeatureCollection = {
     type: "FeatureCollection",
     features: relevantFeatures.map((feature, index) => ({
       type: "Feature",
-      properties: {
+      properties: (() => {
+        const inferredPairCodes = inferBoundaryPairCodesFromGeometry(
+          feature.geometry,
+          countryPolygonIndex
+        );
+        const leftCode =
+          feature.properties?.ADM0_A3_L ??
+          feature.properties?.adm0_a3_l ??
+          feature.properties?.adm0_l ??
+          inferredPairCodes?.[0];
+        const rightCode =
+          feature.properties?.ADM0_A3_R ??
+          feature.properties?.adm0_a3_r ??
+          feature.properties?.adm0_r ??
+          inferredPairCodes?.[1];
+        return {
         id: feature.properties?.NE_ID ?? feature.properties?.ne_id ?? `boundary-${index + 1}`,
         featurecla:
           feature.properties?.FEATURECLA ??
           feature.properties?.featurecla ??
           "International boundary (verify)",
-        adm0_a3_l:
-          feature.properties?.ADM0_A3_L ?? feature.properties?.adm0_a3_l ?? feature.properties?.adm0_l,
-        adm0_a3_r:
-          feature.properties?.ADM0_A3_R ?? feature.properties?.adm0_a3_r ?? feature.properties?.adm0_r
-      },
+          adm0_a3_l: leftCode,
+          adm0_a3_r: rightCode
+        };
+      })(),
       geometry: feature.geometry
     }))
   };
@@ -765,12 +966,7 @@ function appendClassExclusions(existingFilter, fieldName, disallowedValues) {
 }
 
 function updateLibertyModernLabelFields(style) {
-  const englishOnlyExpression = [
-    "case",
-    ["==", ["get", "name:en"], "T"],
-    ["get", "name:latin"],
-    modernEnglishLabelExpression(["name:en", "name:latin"])
-  ];
+  const englishOnlyExpression = modernEnglishLabelExpression(["name:en", "name:latin"]);
   const replaceFieldNames = new Set(["name", "name:en", "name:latin", "name:nonlatin", "name_en"]);
 
   for (const layer of style.layers) {
@@ -1060,6 +1256,7 @@ function buildModernLibertyStyle(upstreamStyle) {
     maxzoom: 5
   });
   updateLibertyModernLabelFields(style);
+  tuneLibertyModernPerformance(style);
   clampVectorSourceMaxZoomTo14(style);
   normalizeMaxZoom(style);
   return style;
@@ -1089,6 +1286,7 @@ function buildModernVersaTilesStyle(upstreamStyle) {
     layerId: versaTilesModernNeutralBoundaryLayerId
   });
   updateVersaTilesModernLabelFields(style);
+  tuneVersaTilesModernPerformance(style);
   clampVectorSourceMaxZoomTo14(style);
   normalizeMaxZoom(style);
   return style;
@@ -1180,8 +1378,10 @@ async function buildStyles() {
     lineClipBufferDegrees
   );
   const allNeutralMaskPolygonCoordinates = bufferedMaskPolygonCoordinates;
+  const countryPolygonIndex = buildCountryPolygonIndex(naturalEarthCountriesGeoJson);
   const neutralBoundaryGeoJson = createNeutralBoundaryGeoJson(
     naturalEarthBoundaryGeoJson,
+    countryPolygonIndex,
     allNeutralMaskPolygonCoordinates,
     simplifiedBoundaryToleranceDegrees
   );

@@ -47,6 +47,7 @@ const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
+const MAP_MODE_ORDER: readonly MapDisplayMode[] = ["ancient", "modern"];
 const TIMELINE_DEFAULT_YEAR = 50;
 const TIMELINE_TRACK_THICKNESS_PX = 2;
 const TIMELINE_TRACK_THUMB_DIAMETER_PX = 20;
@@ -740,24 +741,42 @@ export function AppShell() {
   );
   const handleMapModeRadioKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLButtonElement>) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight" && event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+      if (
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowRight" &&
+        event.key !== "ArrowUp" &&
+        event.key !== "ArrowDown" &&
+        event.key !== "Home" &&
+        event.key !== "End"
+      ) {
         return;
       }
 
       event.preventDefault();
-      const nextMode =
-        event.key === "ArrowLeft" || event.key === "ArrowUp"
-          ? mapMode === "modern"
-            ? "ancient"
-            : "modern"
-          : mapMode === "ancient"
-            ? "modern"
-            : "ancient";
+      const currentIndex = MAP_MODE_ORDER.indexOf(mapMode);
+      let nextMode: MapDisplayMode = mapMode;
+
+      if (event.key === "Home") {
+        nextMode = MAP_MODE_ORDER[0];
+      } else if (event.key === "End") {
+        nextMode = MAP_MODE_ORDER[MAP_MODE_ORDER.length - 1];
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        const nextIndex = currentIndex <= 0 ? MAP_MODE_ORDER.length - 1 : currentIndex - 1;
+        nextMode = MAP_MODE_ORDER[nextIndex];
+      } else {
+        const nextIndex = currentIndex >= MAP_MODE_ORDER.length - 1 ? 0 : currentIndex + 1;
+        nextMode = MAP_MODE_ORDER[nextIndex];
+      }
+
       if (nextMode !== "ancient") {
         setTimelineSourcesOpen(false);
         setMapKeyOpen(false);
       }
       setMapMode(nextMode);
+      event.currentTarget
+        .closest("[role='radiogroup']")
+        ?.querySelector<HTMLButtonElement>(`button[role='radio'][data-map-mode='${nextMode}']`)
+        ?.focus();
     },
     [mapMode]
   );
@@ -892,6 +911,7 @@ export function AppShell() {
               }}
               onKeyDown={handleMapModeRadioKeyDown}
               role="radio"
+              tabIndex={selected ? 0 : -1}
               style={{
                 minWidth: "86px",
                 height: "36px",

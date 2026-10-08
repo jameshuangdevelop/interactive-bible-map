@@ -108,4 +108,17 @@ Then hide NE_IDs 1746706155 and 1746706169 (Artsvashen's ring, which the simplif
 
 **Commands.** `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:app`, `npm run build:data`, `npm run build:basemap-styles` (no change) and `npm run export:web` pass. `npm run verify:web:playwright` passes on a second run. The first run stopped at the ancient backup's check that VersaTiles tiles have loaded one second after the outage notice; VersaTiles was answering in 1–2 seconds per tile, and this change doesn't touch that check. The passing run shows the new backup credits line, and "Natural Earth \| VersaTiles …" on the modern backup at zoom 8.
 
-**Verdict.** N1, N3 and N4 pass. N2 fails, so "no border line … along the border between Armenia and Azerbaijan" isn't true yet, and the PR shouldn't merge until it is fixed.
+**Verdict.** N1, N3 and N4 pass. N2 fails, so "no border line … along the border between Armenia and Azerbaijan" isn't true yet, and the PR shouldn't merge until it is fixed. *Re-checked in §9.*
+
+## 9. Re-check of `98b06bd` (2026-10-08)
+`98b06bd` replaces the three exclave boxes with the rule suggested in §8 and hides NE_IDs 1746706155 and 1746706169. Nothing else in the build changed. The rebuild reproduces the committed files. In the modern Liberty style only `boundary_2`'s filter differs, the Natural Earth lines lost exactly those two rings, and the masks lost only the three exclave boxes. The VersaTiles styles, `docs/LICENSES.md`, `ATTRIBUTION.md` and the app code are unchanged. The Playwright change only waits up to 10 seconds for VersaTiles tiles instead of a fixed second.
+
+| Check | Result |
+|---|---|
+| N2: main map, zooms 5–14 | **Pass.** In the tiles all three rings are hidden at every zoom from 5 to 14, including where zooms 5–7 merge them into one feature. In the app none renders at zooms 5, 6, 8, 10, 12 or 14. |
+| N2: Natural Earth below zoom 5, and the backup | **Pass.** No Armenia–Azerbaijan segment is left in the built lines. The leftover is gone below zoom 5 on the main map, and at zooms 4, 8 and 12 on the backup after the outage switch. |
+| Recognised borders nearby | **Pass.** Armenia–Türkiye, Armenia–Georgia, Azerbaijan–Iran and Azerbaijan–Georgia are drawn in every tile checked at zooms 5, 7, 9 and 11–14, and so are Armenia–Iran, Azerbaijan–Türkiye and Azerbaijan–Russia. In the app they are drawn from the tiles at zooms 6, 10 and 14, and from Natural Earth at zoom 4 on the main map and at 4, 8 and 12 on the backup. |
+
+**Commands.** `npm run lint`, `npm run typecheck`, `npm test` (178), `npm run test:app` (142), `npm run build:data`, `npm run build:basemap-styles` (no change), `npm run export:web` and `npm run verify:web:playwright` pass.
+
+**Verdict.** N1–N4 pass. The notices, `docs/LICENSES.md` and ADR-0037 item 6's list match what the map draws, so the notices and attribution are right and the Fact-Checker signs off on M4-04. The low items in §5 remain for the reviewer.
