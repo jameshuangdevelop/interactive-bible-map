@@ -44,6 +44,22 @@ const versaTilesModernStylePath = path.join(
   "versatiles-colorful-modern",
   "style.json"
 );
+const sharedModernNeutralBoundaryGeoJsonPath = path.join(
+  repositoryRoot,
+  "app",
+  "public",
+  "styles",
+  "shared",
+  "modern-neutral-boundaries.geojson"
+);
+const sharedModernNeutralBoundaryMasksGeoJsonPath = path.join(
+  repositoryRoot,
+  "app",
+  "public",
+  "styles",
+  "shared",
+  "modern-neutral-boundary-masks.geojson"
+);
 
 const libertyAllowedLayerIds = new Set([
   "background",
@@ -537,6 +553,46 @@ function expressionContainsOperator(expression, operator) {
   return expression.some((entry) => expressionContainsOperator(entry, operator));
 }
 
+function expressionContainsString(expression, target) {
+  if (typeof expression === "string") {
+    return expression === target;
+  }
+  if (!Array.isArray(expression)) {
+    return false;
+  }
+  return expression.some((entry) => expressionContainsString(entry, target));
+}
+
+function pointInRing(point, ring) {
+  let intersects = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const intersectsHorizontal = yi > point[1] !== yj > point[1];
+    if (!intersectsHorizontal) {
+      continue;
+    }
+    const x = ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi;
+    if (point[0] < x) {
+      intersects = !intersects;
+    }
+  }
+  return intersects;
+}
+
+function isPointStrictlyInsidePolygon(point, polygonCoordinates) {
+  const [outerRing, ...holes] = polygonCoordinates;
+  if (!outerRing || !pointInRing(point, outerRing)) {
+    return false;
+  }
+  for (const hole of holes) {
+    if (pointInRing(point, hole)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function collectAdminLevelChecks(filter, levels = []) {
   if (!Array.isArray(filter)) {
     return levels;
@@ -653,7 +709,7 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   );
   assert.equal(
     style.metadata["interactive-bible-map:license"],
-    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; points of interest and airport labels removed; Natural Earth low-zoom boundary source with geometry masks for contested areas; OpenMapTiles country boundaries only at z5+ with disputed filters, ISR/PSE side exclusions and a regional neutrality mask, without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0; Natural Earth boundary lines and masks: public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   );
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
   assertLayerMissing(style, "boundary_disputed", "Liberty modern");
@@ -664,10 +720,35 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   assertOnlyCountryBoundaryLayers(style, "Liberty modern");
   const libertyBoundary2Layer = style.layers.find((layer) => layer.id === "boundary_2");
   assert.ok(libertyBoundary2Layer, "Liberty modern must keep boundary_2");
+  assert.equal(libertyBoundary2Layer.minzoom, 5, "Liberty modern boundary_2 must start at zoom 5");
   assert.equal(
     expressionContainsOperator(libertyBoundary2Layer.filter ?? [], "within"),
     true,
     "Liberty modern boundary_2 filter must include a contested-area mask with within"
+  );
+  assert.equal(
+    expressionContainsString(libertyBoundary2Layer.filter ?? [], "adm0_l"),
+    true,
+    "Liberty modern boundary_2 filter must include adm0_l checks"
+  );
+  assert.equal(
+    expressionContainsString(libertyBoundary2Layer.filter ?? [], "adm0_r"),
+    true,
+    "Liberty modern boundary_2 filter must include adm0_r checks"
+  );
+  const neutralBoundaryLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-neutral-boundary"
+  );
+  assert.ok(neutralBoundaryLayer, "Liberty modern must include low-zoom Natural Earth boundary layer");
+  assert.equal(
+    neutralBoundaryLayer.source,
+    "ibm-modern-neutral-boundaries",
+    "Liberty modern low-zoom boundary layer must use shared Natural Earth source"
+  );
+  assert.equal(
+    neutralBoundaryLayer.maxzoom,
+    5,
+    "Liberty modern low-zoom boundary layer must end at zoom 5"
   );
   assertMaxZoom14(style, "Liberty modern");
 });
@@ -681,27 +762,35 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   );
   assert.equal(
     style.metadata["interactive-bible-map:notice"],
-    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14."
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; points of interest and airport labels removed; tile boundary layers removed; Natural Earth boundary lines used at all zooms with geometry masks for contested areas, without asserting sovereignty); max zoom set to 14."
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state", "VersaTiles modern");
   assertLayerMissing(style, "label-boundary-state", "VersaTiles modern");
+  assertLayerMissing(style, "boundary-country:outline", "VersaTiles modern");
+  assertLayerMissing(style, "boundary-country", "VersaTiles modern");
+  assertLayerMissing(style, "boundary-country-maritime", "VersaTiles modern");
   assertNoLayerIdsMatching(style, /^poi-/u, "VersaTiles modern", "POI layers");
   assertLayerMissing(style, "symbol-transit-airfield", "VersaTiles modern");
   assertLayerMissing(style, "symbol-transit-airport", "VersaTiles modern");
   assertNoDisputedBoundaryFilters(style, "VersaTiles modern");
   assertVersaTilesModernNameFields(style);
   assertOnlyCountryBoundaryLayers(style, "VersaTiles modern");
-  for (const layerId of ["boundary-country:outline", "boundary-country", "boundary-country-maritime"]) {
-    const layer = style.layers.find((candidate) => candidate.id === layerId);
-    assert.ok(layer, `VersaTiles modern must keep '${layerId}'`);
-    assert.equal(
-      expressionContainsOperator(layer.filter ?? [], "within"),
-      true,
-      `VersaTiles modern layer '${layerId}' must include a contested-area mask with within`
-    );
-  }
+  const neutralBoundaryLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-neutral-boundary"
+  );
+  assert.ok(neutralBoundaryLayer, "VersaTiles modern must include Natural Earth boundary layer");
+  assert.equal(
+    neutralBoundaryLayer.source,
+    "ibm-modern-neutral-boundaries",
+    "VersaTiles modern boundary layer must use shared Natural Earth source"
+  );
+  assert.equal(
+    neutralBoundaryLayer.maxzoom,
+    undefined,
+    "VersaTiles modern boundary layer must render at all zoom levels"
+  );
   assertMaxZoom14(style, "VersaTiles modern");
 });
 
@@ -719,4 +808,29 @@ test("Modern styles do not allow non-English or local-script name fallbacks in s
     "VersaTiles modern",
     new Set(["name_en"])
   );
+});
+
+test("Modern shared Natural Earth boundaries keep mask areas line-free", async () => {
+  const neutralBoundaryGeoJson = JSON.parse(
+    await fs.readFile(sharedModernNeutralBoundaryGeoJsonPath, "utf8")
+  );
+  const neutralMaskGeoJson = JSON.parse(
+    await fs.readFile(sharedModernNeutralBoundaryMasksGeoJsonPath, "utf8")
+  );
+  const maskPolygons = (neutralMaskGeoJson.features ?? []).map((feature) => feature.geometry?.coordinates);
+
+  for (const feature of neutralBoundaryGeoJson.features ?? []) {
+    if (feature?.geometry?.type !== "LineString") {
+      continue;
+    }
+    for (const coordinate of feature.geometry.coordinates) {
+      assert.equal(
+        maskPolygons.some((polygonCoordinates) =>
+          isPointStrictlyInsidePolygon(coordinate, polygonCoordinates)
+        ),
+        false,
+        "Shared Natural Earth boundary vertices must not fall strictly inside any contested-area mask"
+      );
+    }
+  }
 });

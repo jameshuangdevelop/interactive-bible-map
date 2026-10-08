@@ -7,9 +7,10 @@ Fallback policy: use this style only when the primary OpenFreeMap Liberty modern
 
 Modifications in this copy:
 - Modern-map treatment: use English-only labels from name_en only
-- Hide disputed borders
 - Remove points of interest and airport labels
-- Apply neutrality masks so contested-area boundary lines are not drawn (this is not a sovereignty claim)
+- Remove tile boundary layers (including maritime)
+- Use Natural Earth boundary lines (public domain) for country borders at all zooms
+- Apply geometry masks in contested areas as a neutrality treatment (this is not a sovereignty claim)
 - Max zoom set to 14
 
 Attribution string used in the vector source:

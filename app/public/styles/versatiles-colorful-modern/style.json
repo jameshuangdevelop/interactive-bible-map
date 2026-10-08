@@ -3,7 +3,7 @@
   "name": "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)",
   "metadata": {
     "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14."
+    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; points of interest and airport labels removed; tile boundary layers removed; Natural Earth boundary lines used at all zooms with geometry masks for contested areas, without asserting sovereignty); max zoom set to 14."
   },
   "glyphs": "https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf",
   "sprite": [
@@ -27,6 +27,11 @@
         90
       ],
       "attribution": "<a href=\"https://versatiles.org\" target=\"_blank\">VersaTiles</a> <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">&copy; OpenStreetMap contributors</a> · <a href=\"https://esa-worldcover.org/en/data-access\" target=\"_blank\">&copy; ESA WorldCover 2021</a> (<a href=\"https://creativecommons.org/licenses/by/4.0/\" target=\"_blank\">CC BY 4.0</a>)"
+    },
+    "ibm-modern-neutral-boundaries": {
+      "type": "geojson",
+      "data": "/styles/shared/modern-neutral-boundaries.geojson",
+      "attribution": "Boundary lines: Natural Earth (public domain); filtered and masked by Interactive Bible Map as a neutrality treatment"
     }
   },
   "layers": [
@@ -14506,395 +14511,6 @@
       }
     },
     {
-      "id": "boundary-country:outline",
-      "type": "line",
-      "source-layer": "boundaries",
-      "filter": [
-        "all",
-        [
-          "all",
-          [
-            "==",
-            [
-              "get",
-              "admin_level"
-            ],
-            2
-          ],
-          [
-            "!=",
-            [
-              "get",
-              "disputed"
-            ],
-            true
-          ],
-          [
-            "!=",
-            [
-              "get",
-              "maritime"
-            ],
-            true
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      34.05,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      29.35
-                    ]
-                  ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      32.95,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      34.95
-                    ]
-                  ]
-                ]
-              }
-            ]
-          ]
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(248,244,240)",
-        "line-opacity": 0.75,
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          0,
-          0,
-          3,
-          2,
-          10,
-          8
-        ]
-      },
-      "layout": {
-        "line-cap": "round",
-        "line-join": "round"
-      },
-      "minzoom": 0,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "boundary-country",
-      "type": "line",
-      "source-layer": "boundaries",
-      "filter": [
-        "all",
-        [
-          "all",
-          [
-            "==",
-            [
-              "get",
-              "admin_level"
-            ],
-            2
-          ],
-          [
-            "!=",
-            [
-              "get",
-              "disputed"
-            ],
-            true
-          ],
-          [
-            "!=",
-            [
-              "get",
-              "maritime"
-            ],
-            true
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      34.05,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      29.35
-                    ]
-                  ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      32.95,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      34.95
-                    ]
-                  ]
-                ]
-              }
-            ]
-          ]
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(166,166,200)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          0,
-          0,
-          3,
-          1,
-          10,
-          4
-        ]
-      },
-      "layout": {
-        "line-cap": "round",
-        "line-join": "round"
-      },
-      "minzoom": 0,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "boundary-country-maritime",
-      "type": "line",
-      "source-layer": "boundaries",
-      "filter": [
-        "all",
-        [
-          "all",
-          [
-            "==",
-            [
-              "get",
-              "admin_level"
-            ],
-            2
-          ],
-          [
-            "==",
-            [
-              "get",
-              "maritime"
-            ],
-            true
-          ],
-          [
-            "!=",
-            [
-              "get",
-              "disputed"
-            ],
-            true
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      34.05,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      29.35
-                    ]
-                  ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      32.95,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      34.95
-                    ]
-                  ]
-                ]
-              }
-            ]
-          ]
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(185,210,235)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          0,
-          0,
-          3,
-          1,
-          10,
-          4
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          4,
-          0,
-          5,
-          1
-        ]
-      },
-      "layout": {
-        "line-cap": "round",
-        "line-join": "round"
-      },
-      "minzoom": 4,
-      "source": "versatiles-shortbread"
-    },
-    {
       "id": "label-address-housenumber",
       "type": "symbol",
       "source-layer": "addresses",
@@ -17347,6 +16963,29 @@
       "minzoom": 2,
       "maxzoom": 9,
       "source": "versatiles-shortbread"
+    },
+    {
+      "id": "ibm-modern-neutral-boundary",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(0, 0%, 50%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.5,
+          4,
+          1
+        ],
+        "line-opacity": 1
+      }
     }
   ],
   "sky": {

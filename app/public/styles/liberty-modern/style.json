@@ -14,6 +14,11 @@
       "url": "https://tiles.openfreemap.org/planet",
       "attribution": "<a href=\"https://openfreemap.org\" target=\"_blank\">OpenFreeMap</a> <a href=\"https://www.openmaptiles.org/\" target=\"_blank\">&copy; OpenMapTiles</a> Data from <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
       "maxzoom": 14
+    },
+    "ibm-modern-neutral-boundaries": {
+      "type": "geojson",
+      "data": "/styles/shared/modern-neutral-boundaries.geojson",
+      "attribution": "Boundary lines: Natural Earth (public domain); filtered and masked by Interactive Bible Map as a neutrality treatment"
     }
   },
   "sprite": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm",
@@ -3945,6 +3950,30 @@
       }
     },
     {
+      "id": "ibm-modern-neutral-boundary",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(0, 0%, 50%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.5,
+          4,
+          1
+        ],
+        "line-opacity": 1
+      },
+      "maxzoom": 5
+    },
+    {
       "id": "boundary_2",
       "type": "line",
       "source": "openmaptiles",
@@ -3988,68 +4017,67 @@
         [
           "!",
           [
-            "any",
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
+            "within",
+            {
+              "type": "Polygon",
+              "coordinates": [
+                [
                   [
-                    [
-                      34.05,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      29.35
-                    ],
-                    [
-                      36.3,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      33.65
-                    ],
-                    [
-                      34.05,
-                      29.35
-                    ]
+                    34.05,
+                    29.35
+                  ],
+                  [
+                    36.3,
+                    29.35
+                  ],
+                  [
+                    36.3,
+                    33.65
+                  ],
+                  [
+                    34.05,
+                    33.65
+                  ],
+                  [
+                    34.05,
+                    29.35
                   ]
                 ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      32.95,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      34.95
-                    ],
-                    [
-                      33.75,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      35.5
-                    ],
-                    [
-                      32.95,
-                      34.95
-                    ]
-                  ]
-                ]
-              }
-            ]
+              ]
+            }
           ]
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "adm0_l"
+          ],
+          "ISR"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "adm0_l"
+          ],
+          "PSE"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "adm0_r"
+          ],
+          "ISR"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "adm0_r"
+          ],
+          "PSE"
         ]
       ],
       "layout": {
@@ -4086,7 +4114,8 @@
           12,
           3
         ]
-      }
+      },
+      "minzoom": 5
     },
     {
       "id": "waterway_line_label",
@@ -5478,7 +5507,7 @@
   ],
   "name": "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)",
   "metadata": {
-    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; points of interest and airport labels removed; Natural Earth low-zoom boundary source with geometry masks for contested areas; OpenMapTiles country boundaries only at z5+ with disputed filters, ISR/PSE side exclusions and a regional neutrality mask, without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0; Natural Earth boundary lines and masks: public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   },
   "zoom": 14,
   "maxzoom": 14
