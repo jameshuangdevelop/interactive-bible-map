@@ -7088,7 +7088,17 @@ async function verifyFallbackOutageMode({
         { cause: error instanceof Error ? error : undefined }
       );
     }
-    await page.waitForTimeout(1_000);
+
+    const versaTilesLoadedDeadline = Date.now() + 10_000;
+    while (Date.now() < versaTilesLoadedDeadline) {
+      const versaTilesRequestsFinished = requestUrls.some((url) =>
+        url.includes("tiles.versatiles.org")
+      );
+      if (versaTilesRequestsFinished) {
+        break;
+      }
+      await page.waitForTimeout(250);
+    }
 
     const attributionText = await readAttributionText(page);
     assertFallbackAttributionText(attributionText, `Fallback outage ${mode} ${pathWithQuery}`);

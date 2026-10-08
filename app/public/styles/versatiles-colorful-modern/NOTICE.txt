@@ -6,11 +6,15 @@ Source style license: CC0 1.0 (metadata.license in upstream style)
 Fallback policy: use this style only when the primary OpenFreeMap Liberty modern basemap is unavailable.
 
 Modifications in this copy:
-- Modern-map treatment: use English-only labels from name_en only
-- Hide disputed borders
-- Remove points of interest and airport labels
-- Apply neutrality masks so contested-area boundary lines are not drawn (this is not a sovereignty claim)
+- Modern-map treatment: labels in English only (name_en)
+- Remove points of interest, airport labels, and state and province names
+- Remove the tiles' boundary lines, including maritime boundaries
+- Draw the country borders at every zoom from Natural Earth's boundary lines (public domain), simplified
+- No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places.
 - Max zoom set to 14
 
 Attribution string used in the vector source:
 <a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)
+
+Attribution string used in the Natural Earth boundary source:
+<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>

@@ -14,6 +14,11 @@
       "url": "https://tiles.openfreemap.org/planet",
       "attribution": "<a href=\"https://openfreemap.org\" target=\"_blank\">OpenFreeMap</a> <a href=\"https://www.openmaptiles.org/\" target=\"_blank\">&copy; OpenMapTiles</a> Data from <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a>",
       "maxzoom": 14
+    },
+    "ibm-modern-neutral-boundaries": {
+      "type": "geojson",
+      "data": "/styles/shared/modern-neutral-boundaries.geojson",
+      "attribution": "<a href=\"https://www.naturalearthdata.com/\" target=\"_blank\">Natural Earth</a>"
     }
   },
   "sprite": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm",
@@ -3945,6 +3950,30 @@
       }
     },
     {
+      "id": "ibm-modern-neutral-boundary",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(0, 0%, 50%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.5,
+          4,
+          1
+        ],
+        "line-opacity": 1
+      },
+      "maxzoom": 5
+    },
+    {
       "id": "boundary_2",
       "type": "line",
       "source": "openmaptiles",
@@ -4026,28 +4055,406 @@
                 "coordinates": [
                   [
                     [
-                      32.95,
-                      34.95
+                      32.53,
+                      34.93
                     ],
                     [
-                      33.75,
-                      34.95
+                      34.65,
+                      34.93
                     ],
                     [
-                      33.75,
-                      35.5
+                      34.65,
+                      35.75
                     ],
                     [
-                      32.95,
-                      35.5
+                      32.53,
+                      35.75
                     ],
                     [
-                      32.95,
-                      34.95
+                      32.53,
+                      34.93
                     ]
                   ]
                 ]
               }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      19.97,
+                      41.79
+                    ],
+                    [
+                      21.83,
+                      41.79
+                    ],
+                    [
+                      21.83,
+                      43.32
+                    ],
+                    [
+                      19.97,
+                      43.32
+                    ],
+                    [
+                      19.97,
+                      41.79
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -17.16,
+                      20.71
+                    ],
+                    [
+                      -8.63,
+                      20.71
+                    ],
+                    [
+                      -8.63,
+                      27.72
+                    ],
+                    [
+                      -17.16,
+                      27.72
+                    ],
+                    [
+                      -17.16,
+                      20.71
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "ISR"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "PSE"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "PSE"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "ISR"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "XKK"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "SRB"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "SRB"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "XKK"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "MAR"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "ESH"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "ESH"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "MAR"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "RUS"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "GEO"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "GEO"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "RUS"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "ARM"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "AZE"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "AZE"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "ARM"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "CYP"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "XNC"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "XNC"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "CYP"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "!",
+                [
+                  "has",
+                  "adm0_l"
+                ]
+              ],
+              [
+                "in",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                [
+                  "literal",
+                  [
+                    "ARM",
+                    "AZE"
+                  ]
+                ]
+              ]
+            ],
+            [
+              "all",
+              [
+                "!",
+                [
+                  "has",
+                  "adm0_r"
+                ]
+              ],
+              [
+                "in",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                [
+                  "literal",
+                  [
+                    "ARM",
+                    "AZE"
+                  ]
+                ]
+              ]
             ]
           ]
         ]
@@ -4086,7 +4493,8 @@
           12,
           3
         ]
-      }
+      },
+      "minzoom": 5
     },
     {
       "id": "waterway_line_label",
@@ -4750,21 +5158,40 @@
       "source-layer": "place",
       "minzoom": 8,
       "filter": [
-        "match",
+        "all",
         [
-          "get",
-          "class"
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "city",
+            "continent",
+            "country",
+            "state",
+            "town",
+            "village"
+          ],
+          false,
+          true
         ],
         [
-          "city",
-          "continent",
-          "country",
-          "state",
-          "town",
-          "village"
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
         ],
-        false,
-        true
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "text-field": [
@@ -4827,12 +5254,31 @@
       "source-layer": "place",
       "minzoom": 9,
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "class"
+          "==",
+          [
+            "get",
+            "class"
+          ],
+          "village"
         ],
-        "village"
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "icon-allow-overlap": true,
@@ -4907,12 +5353,31 @@
       "source-layer": "place",
       "minzoom": 6,
       "filter": [
-        "==",
+        "all",
         [
-          "get",
-          "class"
+          "==",
+          [
+            "get",
+            "class"
+          ],
+          "town"
         ],
-        "town"
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
+        ]
       ],
       "layout": {
         "icon-allow-overlap": true,
@@ -4981,75 +5446,6 @@
       }
     },
     {
-      "id": "label_state",
-      "type": "symbol",
-      "source": "openmaptiles",
-      "source-layer": "place",
-      "minzoom": 5,
-      "maxzoom": 8,
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
-        ],
-        "state"
-      ],
-      "layout": {
-        "text-field": [
-          "case",
-          [
-            "==",
-            [
-              "get",
-              "name:en"
-            ],
-            "T"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "coalesce",
-            [
-              "get",
-              "name:en"
-            ],
-            [
-              "get",
-              "name:latin"
-            ]
-          ]
-        ],
-        "text-font": [
-          "Noto Sans Italic"
-        ],
-        "text-letter-spacing": 0.2,
-        "text-max-width": 9,
-        "text-size": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          10,
-          8,
-          14
-        ],
-        "text-transform": "uppercase"
-      },
-      "paint": {
-        "text-color": "#333",
-        "text-halo-blur": 1,
-        "text-halo-color": "#fff",
-        "text-halo-width": 1
-      }
-    },
-    {
       "id": "label_city",
       "type": "symbol",
       "source": "openmaptiles",
@@ -5072,6 +5468,22 @@
             "capital"
           ],
           2
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5169,6 +5581,22 @@
             "capital"
           ],
           2
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5267,6 +5695,22 @@
             "rank"
           ],
           3
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5344,6 +5788,22 @@
             "rank"
           ],
           2
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5421,6 +5881,22 @@
             "rank"
           ],
           1
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "state"
+        ],
+        [
+          "!=",
+          [
+            "get",
+            "class"
+          ],
+          "province"
         ]
       ],
       "layout": {
@@ -5478,7 +5954,7 @@
   ],
   "name": "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)",
   "metadata": {
-    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   },
   "zoom": 14,
   "maxzoom": 14
