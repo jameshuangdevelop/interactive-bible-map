@@ -3972,8 +3972,10 @@ export function MapView({
           text-decoration: underline;
         }
 
-        .ibm-map-root .maplibregl-ctrl-bottom-right {
+        .ibm-map-root .maplibregl-ctrl-bottom-right,
+        .ibm-map-root .maplibregl-ctrl-top-right {
           right: ${compactAttributionRightOffset}px;
+          top: auto;
           bottom: ${compactAttributionBottomWithTimelineOffset}px;
         }
       `}</style>
