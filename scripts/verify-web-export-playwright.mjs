@@ -7315,9 +7315,19 @@ async function installGestureMonitor(page) {
         return;
       }
 
+      const controlContainerSelector = ".maplibregl-ctrl, [data-map-control], [data-map-scale]";
+      const isMapControlMutationTarget = (node) => {
+        if (node instanceof Element) {
+          return Boolean(node.closest(controlContainerSelector));
+        }
+        return node instanceof Node && node.parentElement instanceof Element
+          ? Boolean(node.parentElement.closest(controlContainerSelector))
+          : false;
+      };
+
       for (const mutation of mutations) {
         const target = mutation.target;
-        if (target instanceof Element && target.closest(".maplibregl-ctrl")) {
+        if (isMapControlMutationTarget(target)) {
           continue;
         }
 
@@ -8266,6 +8276,21 @@ async function verifyPhoneBasics(browser, baseUrl) {
 
         return reachability;
       };
+      const readMapModeToggleVisibility = async () =>
+        page.evaluate(() => {
+          const toggleGroup = document.querySelector("[role='radiogroup'][aria-label='Map type']");
+          if (!(toggleGroup instanceof HTMLElement)) {
+            return { rendered: false, visible: false, tabStopCount: 0 };
+          }
+
+          const computed = window.getComputedStyle(toggleGroup);
+          const visible =
+            computed.display !== "none" &&
+            computed.visibility !== "hidden" &&
+            toggleGroup.getClientRects().length > 0;
+          const tabStopCount = toggleGroup.querySelectorAll("button[role='radio'][tabindex='0']").length;
+          return { rendered: true, visible, tabStopCount };
+        });
 
       await page.getByRole("button", { name: "Close place panel" }).click();
       await page.waitForSelector("section[aria-label='Place details']", {
@@ -8347,6 +8372,14 @@ async function verifyPhoneBasics(browser, baseUrl) {
       }
 
       const attributionCollapsedReachability = await verifyCompactAttributionToggle("collapsed");
+      const mapModeToggleCollapsedVisibility = await readMapModeToggleVisibility();
+      if (!mapModeToggleCollapsedVisibility.rendered || !mapModeToggleCollapsedVisibility.visible) {
+        throw new Error(
+          `Map toggle should be visible in collapsed phone sheet state at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleCollapsedVisibility
+          )}.`
+        );
+      }
 
       if (collapsedSheet.selectedPointPx.y >= collapsedSheet.panelBounds.top - 8) {
         throw new Error(
@@ -8415,6 +8448,21 @@ async function verifyPhoneBasics(browser, baseUrl) {
         );
       }
       const attributionExpandedReachability = await verifyCompactAttributionToggle("expanded");
+      const mapModeToggleExpandedVisibility = await readMapModeToggleVisibility();
+      if (mapModeToggleExpandedVisibility.rendered || mapModeToggleExpandedVisibility.visible) {
+        throw new Error(
+          `Map toggle should be hidden in expanded phone sheet state at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleExpandedVisibility
+          )}.`
+        );
+      }
+      if (mapModeToggleExpandedVisibility.tabStopCount !== 0) {
+        throw new Error(
+          `Map toggle should have no tab stops in expanded phone sheet state at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleExpandedVisibility
+          )}.`
+        );
+      }
 
       const pointerCollapseCenter = await readHandleCenter();
       await page.mouse.click(pointerCollapseCenter.x, pointerCollapseCenter.y);
@@ -8426,6 +8474,14 @@ async function verifyPhoneBasics(browser, baseUrl) {
       ) {
         throw new Error(
           `Phone sheet pointer tap should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+      const mapModeToggleAfterCollapseVisibility = await readMapModeToggleVisibility();
+      if (!mapModeToggleAfterCollapseVisibility.rendered || !mapModeToggleAfterCollapseVisibility.visible) {
+        throw new Error(
+          `Map toggle should be visible again after collapsing the phone sheet at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleAfterCollapseVisibility
+          )}.`
         );
       }
 

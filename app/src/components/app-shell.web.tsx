@@ -626,6 +626,8 @@ export function AppShell() {
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
   const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
+  const hideMapModeToggleOnPhoneExpandedSheet =
+    isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded";
 
   const panelStyle: CSSProperties | null = selectedPlace
     ? isSmallScreen
@@ -681,55 +683,57 @@ export function AppShell() {
         places={places}
       />
 
-      <div
-        aria-label="Map type"
-        role="radiogroup"
-        style={{
-          position: "absolute",
-          right: `${tokens.spacing.md}px`,
-          top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
-          display: "inline-flex",
-          borderRadius: "999px",
-          border: `1px solid ${tokens.color.divider}`,
-          backgroundColor: tokens.color.surface,
-          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
-          padding: "2px",
-          zIndex: 45
-        }}
-      >
-        {([
-          ["ancient", "Ancient"],
-          ["modern", "Modern"]
-        ] as const).map(([value, label]) => {
-          const selected = mapMode === value;
-          return (
-            <button
-              aria-checked={selected}
-              data-map-mode={value}
-              key={value}
-              onClick={() => setMapMode(value)}
-              onKeyDown={handleMapModeRadioKeyDown}
-              role="radio"
-              tabIndex={selected ? 0 : -1}
-              style={{
-                minWidth: "86px",
-                height: "36px",
-                borderRadius: "999px",
-                border: "none",
-                backgroundColor: selected ? "#1A73E8" : "transparent",
-                color: selected ? "#FFFFFF" : tokens.color.textPrimary,
-                fontFamily: tokens.typography.uiFont,
-                fontSize: `${tokens.typography.captionSize}px`,
-                fontWeight: 600,
-                cursor: "pointer"
-              }}
-              type="button"
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      {!hideMapModeToggleOnPhoneExpandedSheet ? (
+        <div
+          aria-label="Map type"
+          role="radiogroup"
+          style={{
+            position: "absolute",
+            right: `${tokens.spacing.md}px`,
+            top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
+            display: "inline-flex",
+            borderRadius: "999px",
+            border: `1px solid ${tokens.color.divider}`,
+            backgroundColor: tokens.color.surface,
+            boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+            padding: "2px",
+            zIndex: 45
+          }}
+        >
+          {([
+            ["ancient", "Ancient"],
+            ["modern", "Modern"]
+          ] as const).map(([value, label]) => {
+            const selected = mapMode === value;
+            return (
+              <button
+                aria-checked={selected}
+                data-map-mode={value}
+                key={value}
+                onClick={() => setMapMode(value)}
+                onKeyDown={handleMapModeRadioKeyDown}
+                role="radio"
+                tabIndex={selected ? 0 : -1}
+                style={{
+                  minWidth: "86px",
+                  height: "36px",
+                  borderRadius: "999px",
+                  border: "none",
+                  backgroundColor: selected ? "#1A73E8" : "transparent",
+                  color: selected ? "#FFFFFF" : tokens.color.textPrimary,
+                  fontFamily: tokens.typography.uiFont,
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+                type="button"
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       {mapMode === "ancient" ? (
         <div
