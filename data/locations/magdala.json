@@ -83,8 +83,7 @@
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ]
     },
     {
@@ -107,16 +106,40 @@
     },
     {
       "fromYear": 44,
-      "toYear": 101,
+      "toYear": 54,
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
         "bib:josephus-antiquities",
         "bib:jewish-encyclopedia-agrippa-ii"
       ],
-      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae, and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not drawable land of their own, so this area's own extent does not change."
+      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change."
+    },
+    {
+      "fromYear": 54,
+      "toYear": 101,
+      "holderId": "agrippa-ii-kingdom",
+      "entity": "Kingdom of Herod Agrippa II (ruler: Herod Agrippa II)",
+      "sources": [
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Josephus records that Nero gave Agrippa II \"a certain part of Galilee, Tiberias, and Tarichaeae,\" naming this town by its other name; Josephus dates the grant to Nero's first year (AD 54), but the Jewish Encyclopedia reads Agrippa II's own coinage as pointing to AD 61 instead for this specific addition. The rest of Galilee stayed under the Roman procurators throughout."
     }
   ],
   "status": "draft",
-  "politicalAreaId": "galilee-perea"
+  "politicalAreaId": "galilee-perea",
+  "politicalHistoryOverrides": [
+    {
+      "fromYear": 54,
+      "toYear": 101,
+      "holderId": "agrippa-ii-kingdom",
+      "ruler": "Herod Agrippa II",
+      "note": "Josephus records that Nero gave Agrippa II \"a certain part of Galilee, Tiberias, and Tarichaeae,\" naming this town by its other name; Josephus dates the grant to Nero's first year (AD 54), but the Jewish Encyclopedia reads Agrippa II's own coinage as pointing to AD 61 instead for this specific addition. The rest of Galilee stayed under the Roman procurators throughout.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii"
+      ]
+    }
+  ]
 }

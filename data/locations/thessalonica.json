@@ -139,7 +139,7 @@
   "politicalHistory": [
     {
       "fromYear": -148,
-      "toYear": -27,
+      "toYear": -42,
       "holderId": "macedonia-province",
       "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
       "sources": [
@@ -148,34 +148,27 @@
       ]
     },
     {
-      "fromYear": -27,
-      "toYear": 15,
-      "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
-      "sources": [
-        "bib:isbe-macedonia",
-        "bib:livius-macedonia"
-      ]
-    },
-    {
-      "fromYear": 15,
-      "toYear": 44,
-      "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
-      "sources": [
-        "bib:tacitus-annals"
-      ]
-    },
-    {
-      "fromYear": 44,
+      "fromYear": -42,
       "toYear": 101,
       "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by Claudius))",
+      "entity": "Roman province of Macedonia",
       "sources": [
-        "bib:cassius-dio-roman-history"
-      ]
+        "bib:isbe-thessalonica"
+      ],
+      "note": "ISBE records that after the Battle of Philippi (42 BC) Thessalonica \"proved loyal to Antony and Octavian, and was rewarded by receiving the status and privileges of a 'free city'\" (citing Pliny, Natural History 4.36): a free city, self-governing with its own politarchs, though still within the province."
     }
   ],
   "status": "draft",
-  "politicalAreaId": "macedonia"
+  "politicalAreaId": "macedonia",
+  "politicalHistoryOverrides": [
+    {
+      "fromYear": -42,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "note": "ISBE records that after the Battle of Philippi (42 BC) Thessalonica \"proved loyal to Antony and Octavian, and was rewarded by receiving the status and privileges of a 'free city'\" (citing Pliny, Natural History 4.36): a free city, self-governing with its own politarchs, though still within the province.",
+      "sources": [
+        "bib:isbe-thessalonica"
+      ]
+    }
+  ]
 }

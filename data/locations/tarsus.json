@@ -87,10 +87,9 @@
       "holderId": "roman-province-syria",
       "entity": "Roman province of Syria",
       "sources": [
-        "bib:cassius-dio-roman-history",
-        "bib:strabo-geography"
+        "bib:isbe-tarsus"
       ],
-      "note": "Administered from Syria throughout; Tarsus sits in this plain."
+      "note": "ISBE records that Tarsus \"received the position of an independent and duty-free state (civitas libera et immunis)\" under Antony, a status \"confirmed by Augustus after the victory of Actium\" in 31 BC: a free city, self-governing and exempt from tribute, though still within the province."
     },
     {
       "fromYear": 72,
@@ -104,5 +103,16 @@
     }
   ],
   "status": "draft",
-  "politicalAreaId": "cilicia"
+  "politicalAreaId": "cilicia",
+  "politicalHistoryOverrides": [
+    {
+      "fromYear": -27,
+      "toYear": 72,
+      "holderId": "roman-province-syria",
+      "note": "ISBE records that Tarsus \"received the position of an independent and duty-free state (civitas libera et immunis)\" under Antony, a status \"confirmed by Augustus after the victory of Actium\" in 31 BC: a free city, self-governing and exempt from tribute, though still within the province.",
+      "sources": [
+        "bib:isbe-tarsus"
+      ]
+    }
+  ]
 }
