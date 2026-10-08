@@ -8929,9 +8929,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
               height: bounds.height
             },
             centerElementTag: centerElement?.tagName?.toLowerCase() ?? null,
-            centerMatchesToggle:
-              centerElement === toggle ||
-              (centerElement instanceof HTMLElement && toggle.contains(centerElement)),
+            centerMatchesToggle: centerElement === toggle,
             isExpanded:
               compactControl instanceof HTMLElement
                 ? compactControl.classList.contains("maplibregl-compact-show")
@@ -8973,13 +8971,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
           }
         }
 
-        await page.evaluate((selectorParam) => {
-          const toggle = document.querySelector(selectorParam);
-          if (!(toggle instanceof HTMLElement)) {
-            throw new Error(`Attribution toggle '${selectorParam}' not found.`);
-          }
-          toggle.click();
-        }, selector);
+        await page.click(selector);
         await page.waitForFunction(
           () => {
             const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
@@ -8990,13 +8982,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
           },
           { timeout: 5_000 }
         );
-        await page.evaluate((selectorParam) => {
-          const toggle = document.querySelector(selectorParam);
-          if (!(toggle instanceof HTMLElement)) {
-            throw new Error(`Attribution toggle '${selectorParam}' not found.`);
-          }
-          toggle.click();
-        }, selector);
+        await page.click(selector);
         await page.waitForFunction(
           () => {
             const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
