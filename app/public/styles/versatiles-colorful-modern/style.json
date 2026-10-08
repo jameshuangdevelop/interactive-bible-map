@@ -14511,317 +14511,11 @@
       }
     },
     {
-      "id": "label-address-housenumber",
-      "type": "symbol",
-      "source-layer": "addresses",
-      "filter": [
-        "has",
-        "housenumber"
-      ],
-      "layout": {
-        "text-field": [
-          "case",
-          [
-            "has",
-            "unit"
-          ],
-          [
-            "concat",
-            [
-              "get",
-              "housenumber"
-            ],
-            "/",
-            [
-              "get",
-              "unit"
-            ]
-          ],
-          [
-            "get",
-            "housenumber"
-          ]
-        ],
-        "symbol-placement": "point",
-        "text-anchor": "center",
-        "text-size": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          17,
-          8,
-          19,
-          10
-        ],
-        "text-font": [
-          "noto_sans_regular"
-        ]
-      },
-      "paint": {
-        "icon-color": "rgba(15,11,7,0.302)",
-        "text-color": "rgba(15,11,7,0.302)"
-      },
-      "minzoom": 17,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "marking-oneway",
-      "type": "symbol",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "oneway"
-          ],
-          true
-        ],
-        [
-          "in",
-          [
-            "get",
-            "kind"
-          ],
-          [
-            "literal",
-            [
-              "trunk",
-              "primary",
-              "secondary",
-              "tertiary",
-              "unclassified",
-              "residential",
-              "living_street"
-            ]
-          ]
-        ]
-      ],
-      "layout": {
-        "symbol-placement": "line",
-        "symbol-spacing": 175,
-        "icon-rotate": 90,
-        "icon-rotation-alignment": "map",
-        "icon-padding": 5,
-        "symbol-avoid-edges": true,
-        "icon-image": "base:marking-oneway"
-      },
-      "minzoom": 14,
-      "paint": {
-        "icon-color": "rgb(0,0,0)",
-        "text-color": "rgb(0,0,0)",
-        "icon-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          16,
-          0,
-          17,
-          0.4,
-          20,
-          0.4
-        ],
-        "text-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          16,
-          0,
-          17,
-          0.4,
-          20,
-          0.4
-        ]
-      },
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "marking-oneway-reverse",
-      "type": "symbol",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "oneway_reverse"
-          ],
-          true
-        ],
-        [
-          "in",
-          [
-            "get",
-            "kind"
-          ],
-          [
-            "literal",
-            [
-              "trunk",
-              "primary",
-              "secondary",
-              "tertiary",
-              "unclassified",
-              "residential",
-              "living_street"
-            ]
-          ]
-        ]
-      ],
-      "layout": {
-        "symbol-placement": "line",
-        "symbol-spacing": 75,
-        "icon-rotate": -90,
-        "icon-rotation-alignment": "map",
-        "icon-padding": 5,
-        "symbol-avoid-edges": true,
-        "icon-image": "base:marking-oneway"
-      },
-      "minzoom": 14,
-      "paint": {
-        "icon-color": "rgb(0,0,0)",
-        "text-color": "rgb(0,0,0)",
-        "icon-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          16,
-          0,
-          17,
-          0.4,
-          20,
-          0.4
-        ],
-        "text-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          16,
-          0,
-          17,
-          0.4,
-          20,
-          0.4
-        ]
-      },
-      "source": "versatiles-shortbread"
-    },
-    {
       "id": "slot-below-labels",
       "type": "background",
       "paint": {
         "background-opacity": 0
       }
-    },
-    {
-      "id": "label-motorway-exit",
-      "type": "symbol",
-      "source-layer": "street_labels_points",
-      "filter": [
-        "==",
-        [
-          "get",
-          "kind"
-        ],
-        "motorway_junction"
-      ],
-      "layout": {
-        "text-field": "{ref}",
-        "symbol-placement": "point",
-        "text-anchor": "center",
-        "text-size": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          9,
-          18,
-          11
-        ],
-        "text-font": [
-          "noto_sans_regular"
-        ]
-      },
-      "paint": {
-        "icon-color": "rgb(51,51,68)",
-        "text-color": "rgb(51,51,68)",
-        "text-halo-color": "rgba(255,255,255,0.8)",
-        "text-halo-width": 1,
-        "text-halo-blur": 1
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "label-motorway-shield",
-      "type": "symbol",
-      "source-layer": "street_labels",
-      "filter": [
-        "==",
-        [
-          "get",
-          "kind"
-        ],
-        "motorway"
-      ],
-      "layout": {
-        "text-field": "{ref}",
-        "symbol-placement": "line",
-        "text-anchor": "center",
-        "text-size": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          10,
-          18,
-          12,
-          20,
-          16
-        ],
-        "text-font": [
-          "noto_sans_bold"
-        ]
-      },
-      "paint": {
-        "icon-color": "rgb(255,255,255)",
-        "text-color": "rgb(255,255,255)",
-        "text-halo-color": "rgb(255,204,136)",
-        "text-halo-width": 0.1,
-        "text-halo-blur": 1
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
     },
     {
       "id": "label-street-track",
@@ -14869,7 +14563,7 @@
         "text-halo-width": 2,
         "text-halo-blur": 1
       },
-      "minzoom": 12,
+      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -14918,7 +14612,7 @@
         "text-halo-width": 2,
         "text-halo-blur": 1
       },
-      "minzoom": 12,
+      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -14967,7 +14661,7 @@
         "text-halo-width": 2,
         "text-halo-blur": 1
       },
-      "minzoom": 12,
+      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -15016,7 +14710,7 @@
         "text-halo-width": 2,
         "text-halo-blur": 1
       },
-      "minzoom": 12,
+      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -15065,7 +14759,7 @@
         "text-halo-width": 2,
         "text-halo-blur": 1
       },
-      "minzoom": 12,
+      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -16559,7 +16253,7 @@
         "text-halo-width": 2,
         "text-halo-blur": 1
       },
-      "minzoom": 7,
+      "minzoom": 10,
       "maxzoom": 15,
       "source": "versatiles-shortbread"
     },

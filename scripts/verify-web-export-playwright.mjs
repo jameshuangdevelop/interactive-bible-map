@@ -4304,10 +4304,30 @@ async function verifyModernMapToggle(page, baseUrl) {
 
   const ancientRadio = page.locator("button[role='radio'][data-map-mode='ancient']");
   const modernRadio = page.locator("button[role='radio'][data-map-mode='modern']");
+  const mapModeRadios = page.locator("button[role='radio'][data-map-mode]");
   await ancientRadio.waitFor({ state: "visible", timeout: 30_000 });
   await modernRadio.waitFor({ state: "visible", timeout: 30_000 });
   if ((await ancientRadio.getAttribute("aria-checked")) !== "true") {
     throw new Error("Ancient map should start selected at /?place=galilee.");
+  }
+  const initialTabIndices = await mapModeRadios.evaluateAll((elements) =>
+    elements.map((element) => ({
+      mode: element.getAttribute("data-map-mode"),
+      tabIndex: element.tabIndex,
+      checked: element.getAttribute("aria-checked")
+    }))
+  );
+  const initialFocusableCount = initialTabIndices.filter((entry) => entry.tabIndex === 0).length;
+  if (initialFocusableCount !== 1) {
+    throw new Error(
+      `Map mode radios must have exactly one tab stop, got ${JSON.stringify(initialTabIndices)}`
+    );
+  }
+  const initialActiveMode = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (initialActiveMode !== null) {
+    await ancientRadio.focus();
   }
 
   await ancientRadio.focus();
@@ -4324,6 +4344,31 @@ async function verifyModernMapToggle(page, baseUrl) {
   }
   if ((await modernRadio.getAttribute("aria-checked")) !== "true") {
     throw new Error("Modern radio should be selected after keyboard toggle.");
+  }
+  const focusedModeAfterArrowRight = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterArrowRight !== "modern") {
+    throw new Error(
+      `ArrowRight should move focus to modern radio, got '${focusedModeAfterArrowRight ?? "none"}'.`
+    );
+  }
+  const tabIndicesAfterArrowRight = await mapModeRadios.evaluateAll((elements) =>
+    elements.map((element) => ({
+      mode: element.getAttribute("data-map-mode"),
+      tabIndex: element.tabIndex,
+      checked: element.getAttribute("aria-checked")
+    }))
+  );
+  if (
+    tabIndicesAfterArrowRight.filter((entry) => entry.tabIndex === 0).length !== 1 ||
+    !tabIndicesAfterArrowRight.some(
+      (entry) => entry.mode === "modern" && entry.tabIndex === 0 && entry.checked === "true"
+    )
+  ) {
+    throw new Error(
+      `Roving tabindex should follow modern selection, got ${JSON.stringify(tabIndicesAfterArrowRight)}`
+    );
   }
 
   const heading = await page
@@ -4378,11 +4423,45 @@ async function verifyModernMapToggle(page, baseUrl) {
   assertMainAttributionText(modernAttribution, "Modern toggle");
 
   await modernRadio.focus();
+  await modernRadio.press("Home");
+  await waitForMapStyleLoaded(page);
+  await waitForMapToSettle(page);
+  if ((await ancientRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Home should move map mode selection to ancient.");
+  }
+  const focusedModeAfterHome = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterHome !== "ancient") {
+    throw new Error(`Home should move focus to ancient, got '${focusedModeAfterHome ?? "none"}'.`);
+  }
+
+  await ancientRadio.press("End");
+  await waitForMapStyleLoaded(page);
+  await waitForMapToSettle(page);
+  if ((await modernRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("End should move map mode selection to modern.");
+  }
+  const focusedModeAfterEnd = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterEnd !== "modern") {
+    throw new Error(`End should move focus to modern, got '${focusedModeAfterEnd ?? "none"}'.`);
+  }
+
   await modernRadio.press("ArrowLeft");
   await waitForMapStyleLoaded(page);
   await waitForMapToSettle(page);
   if ((await ancientRadio.getAttribute("aria-checked")) !== "true") {
     throw new Error("Ancient radio should be selected after toggling back.");
+  }
+  const focusedModeAfterArrowLeft = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterArrowLeft !== "ancient") {
+    throw new Error(
+      `ArrowLeft should move focus to ancient radio, got '${focusedModeAfterArrowLeft ?? "none"}'.`
+    );
   }
   if (page.url().includes("map=modern")) {
     throw new Error(`Switching back to ancient should clear map=modern, got '${page.url()}'.`);

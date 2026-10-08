@@ -400,12 +400,7 @@ function assertNoLayerIdsMatching(style, pattern, styleName, description) {
 }
 
 function assertLibertyModernLabels(style) {
-  const expected = [
-    "case",
-    ["==", ["get", "name:en"], "T"],
-    ["get", "name:latin"],
-    ["coalesce", ["get", "name:en"], ["get", "name:latin"]]
-  ];
+  const expected = ["coalesce", ["get", "name:en"], ["get", "name:latin"]];
   const layers = style.layers.filter((layer) =>
     [
       "waterway_line_label",
@@ -973,17 +968,23 @@ test("Modern shared Natural Earth boundaries keep mask areas line-free", async (
   );
 
   const hiddenPairsStillPresentInNe = new Set();
+  let inspectedNePairCount = 0;
   for (const feature of neutralBoundaryGeoJson.features ?? []) {
     const leftCode = feature?.properties?.adm0_a3_l;
     const rightCode = feature?.properties?.adm0_a3_r;
     if (typeof leftCode !== "string" || typeof rightCode !== "string") {
       continue;
     }
+    inspectedNePairCount += 1;
     const pair = canonicalPair(leftCode, rightCode);
     if (expectedHiddenBoundaryPairs.includes(pair)) {
       hiddenPairsStillPresentInNe.add(pair);
     }
   }
+  assert.ok(
+    inspectedNePairCount > 0,
+    "Natural Earth shared boundary output must include inferable country-pair codes for pair checks"
+  );
   assert.deepEqual(
     [...hiddenPairsStillPresentInNe].sort(),
     [],
@@ -1044,6 +1045,14 @@ test("Liberty modern boundary_2 filter hides ARM/AZE exclaves by feature propert
       `boundary_2 filter visibility mismatch for decoded feature ${feature.key} (${feature.note})`
     );
   }
+
+  const partialCrossingFeature = (fixture.tileFeatures ?? []).find(
+    (feature) => feature.note === "partial-mask-crossing-syr-jor"
+  );
+  assert.ok(
+    partialCrossingFeature,
+    "Fixture must include a real partial-mask-crossing tile feature for mask/pair-rule coverage"
+  );
 });
 
 test("Natural Earth boundary output near Armenia hides configured ids and keeps non-hidden lines", async () => {
