@@ -346,6 +346,8 @@ AWMC has the provincial borders of AD 200 as lines, Herod's kingdom as one outli
 
 M4-03 builds shapes by cutting AWMC's layers — the AD 200 provincial lines, the empire's extent at 60 BC/AD 117/AD 200, Herod's kingdom outline, the coastline, and the landmarks in §2.24 — into cells, one per area in `data/timeline.json`. This section gives, for each area, the AD 200 province(s) whose land it draws from, any other AWMC layer that restricts it, which ADR-0037 rule justifies the choice, and the source. The GIS Engineer's own reading of which AD 200 provinces AWMC's data distinguishes is the authority on names and lines actually present in that dataset; this section proposes the match and flags doubts, but does not see that dataset directly.
 
+**Provisional, pending revision:** after this section was written, the PO found that AWMC's archive also has provincial lines for AD 14, AD 69 and AD 100, and extents for AD 14 and AD 69 — much closer to this note's own 4 BC–AD 100 window than AD 200. M4-03 is building its named partitions from the AD 69 and AD 14 lines instead. The table below still gives each area's AD 200 match only, since it was written before this was known; it should be revised to AD 69/AD 14 terms (AD 200 only where nothing better exists) once the PO forwards the GIS Engineer's list of AD 69/AD 14 faces. Until then, treat every row below as a fallback, not a final answer.
+
 **Areas matching one AD 200 province directly (rule 1 or 2; no further restriction needed):**
 
 | Area | AD 200 province (reference town) | Rule | Source |
