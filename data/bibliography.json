@@ -829,6 +829,32 @@
       "accessed": "2026-09-30"
     },
     {
+      "id": "isbe-derbe",
+      "type": "chapter",
+      "title": "Derbe",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/derbe.html",
+      "accessed": "2026-10-08"
+    },
+    {
+      "id": "isbe-philadelphia-lydia",
+      "type": "chapter",
+      "title": "Philadelphia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/philadelphia.html",
+      "accessed": "2026-10-08"
+    },
+    {
       "id": "isbe-mysia",
       "type": "chapter",
       "title": "Mysia",
@@ -1177,6 +1203,19 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/P/philippi.html",
       "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-tarsus",
+      "type": "chapter",
+      "title": "Tarsus",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/tarsus.html",
+      "accessed": "2026-10-08"
     },
     {
       "id": "isbe-thessalonica",
