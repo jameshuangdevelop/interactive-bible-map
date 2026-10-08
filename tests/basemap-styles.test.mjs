@@ -525,6 +525,66 @@ function assertNoDisputedBoundaryFilters(style, styleName) {
   }
 }
 
+function collectAdminLevelChecks(filter, levels = []) {
+  if (!Array.isArray(filter)) {
+    return levels;
+  }
+
+  if (
+    filter.length >= 3 &&
+    filter[0] === "==" &&
+    Array.isArray(filter[1]) &&
+    filter[1][0] === "get" &&
+    filter[1][1] === "admin_level"
+  ) {
+    levels.push(filter[2]);
+  }
+
+  if (
+    filter.length >= 3 &&
+    filter[0] === "in" &&
+    Array.isArray(filter[1]) &&
+    filter[1][0] === "get" &&
+    filter[1][1] === "admin_level" &&
+    Array.isArray(filter[2]) &&
+    filter[2][0] === "literal" &&
+    Array.isArray(filter[2][1])
+  ) {
+    levels.push(...filter[2][1]);
+  }
+
+  for (const entry of filter) {
+    collectAdminLevelChecks(entry, levels);
+  }
+
+  return levels;
+}
+
+function assertOnlyCountryBoundaryLayers(style, styleName) {
+  for (const layer of style.layers) {
+    if (
+      layer["source-layer"] !== "boundary" &&
+      layer["source-layer"] !== "boundaries" &&
+      layer["source-layer"] !== "boundary_labels"
+    ) {
+      continue;
+    }
+
+    const adminLevels = collectAdminLevelChecks(layer.filter ?? []);
+    if (adminLevels.length === 0) {
+      continue;
+    }
+
+    for (const value of adminLevels) {
+      assert.equal(
+        value === 2 || value === "2",
+        true,
+        `${styleName} boundary layer '${layer.id}' must only target admin level 2, got '${value}'`
+      );
+    }
+  }
+}
+
 test("Liberty hosted style is physical-only and keeps required attribution", async () => {
   const style = await readStyle(libertyStylePath);
 
@@ -585,9 +645,11 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   );
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
   assertLayerMissing(style, "boundary_disputed", "Liberty modern");
+  assertLayerMissing(style, "boundary_3", "Liberty modern");
   assertLayerMissing(style, "airport", "Liberty modern");
   assertNoLayerIdsMatching(style, /^poi_/u, "Liberty modern", "POI layers");
   assertLibertyModernLabels(style);
+  assertOnlyCountryBoundaryLayers(style, "Liberty modern");
   assertMaxZoom14(style, "Liberty modern");
 });
 
@@ -603,11 +665,15 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
     "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
+  assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
+  assertLayerMissing(style, "boundary-state", "VersaTiles modern");
+  assertLayerMissing(style, "label-boundary-state", "VersaTiles modern");
   assertNoLayerIdsMatching(style, /^poi-/u, "VersaTiles modern", "POI layers");
   assertLayerMissing(style, "symbol-transit-airfield", "VersaTiles modern");
   assertLayerMissing(style, "symbol-transit-airport", "VersaTiles modern");
   assertNoDisputedBoundaryFilters(style, "VersaTiles modern");
   assertVersaTilesModernNameFields(style);
+  assertOnlyCountryBoundaryLayers(style, "VersaTiles modern");
   assertMaxZoom14(style, "VersaTiles modern");
 });
 

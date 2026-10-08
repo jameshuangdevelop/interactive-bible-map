@@ -119,6 +119,7 @@ const versaTilesAllowedLayerIds = new Set([
 
 const labelSourceLayerIdsToExclude = new Set(["pois"]);
 const libertyDisputedBoundaryLayerId = "boundary_disputed";
+const libertySubNationalBoundaryLayerId = "boundary_3";
 const versaTilesDisputedBoundaryLayerId = "boundary-country-disputed";
 const libertyPoiLayerIdPattern = /^poi_/u;
 
@@ -189,6 +190,10 @@ function removeLibertyModernExcludedLayers(style) {
       return false;
     }
 
+    if (layer.id === libertySubNationalBoundaryLayerId) {
+      return false;
+    }
+
     if (layer.id === "airport") {
       return false;
     }
@@ -228,6 +233,14 @@ function updateLibertyModernLabelFields(style) {
 function removeVersaTilesModernExcludedLayers(style) {
   style.layers = style.layers.filter((layer) => {
     if (layer.id === versaTilesDisputedBoundaryLayerId) {
+      return false;
+    }
+
+    if (layer.id === "boundary-state:outline" || layer.id === "boundary-state") {
+      return false;
+    }
+
+    if (layer.id === "label-boundary-state") {
       return false;
     }
 
