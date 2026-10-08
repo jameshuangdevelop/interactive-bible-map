@@ -130,6 +130,30 @@ export async function coverageRows(domainFeatures, collection, explanations, min
   return { rows, smallCount, smallKm2 };
 }
 
+// The geometry acceptance checks of M4-03 and the Fact-Checker's fixes, over the lists the composition
+// reports: every expected area built, valid and without repeated vertices; no overlap larger than
+// `maxOverlapKm2`; no unexplained coverage gap; every place inside its area, within 3 km of it or with
+// an explanation; every anchor in its area; the old-sea points in no area; and no stretch of the empire's
+// edge longer than `maxCoastStretchKm` along today's coast. Returns the failures, in words.
+export function acceptanceFailures({ builtAreaIds, expectedAreaIds, validity, overlaps, coverageGaps, places, anchors, emptyPoints, coastStretches }, { maxOverlapKm2 = 1, maxCoastStretchKm = 10 } = {}) {
+  const failures = [];
+  const at = (point) => point.map((value) => value.toFixed(3)).join(", ");
+  for (const areaId of expectedAreaIds) if (!builtAreaIds.includes(areaId)) failures.push(`${areaId} was not built`);
+  for (const row of validity) {
+    if (!row.valid) failures.push(`${row.areaId} is not a valid polygon`);
+    if (row.duplicateVertices > 0) failures.push(`${row.areaId} repeats ${row.duplicateVertices} vertices`);
+  }
+  for (const row of overlaps) if (row.areaKm2 > maxOverlapKm2) failures.push(`${row.pair} overlap by ${row.areaKm2.toFixed(2)} km²`);
+  for (const row of coverageGaps) if (!row.explanation) failures.push(`${row.areaKm2.toFixed(1)} km² at ${at(row.point)} lies in no area, unexplained`);
+  for (const row of places) {
+    if (row.status !== "inside" && row.status !== "near-border" && !row.explanation) failures.push(`${row.label} is ${row.status === "area-not-built" ? "linked to an area that wasn't built" : `${row.distanceKm.toFixed(1)} km outside`} \`${row.areaId}\`, unexplained`);
+  }
+  for (const check of anchors) if (!check.areaIds.includes(check.expected)) failures.push(`${check.name} lies in ${check.areaIds.join(", ") || "no area"}, not ${check.expected}`);
+  for (const check of emptyPoints) if (check.areaIds.length > 0) failures.push(`${check.name} lies in ${check.areaIds.join(", ")}, which should hold no land there`);
+  for (const stretch of coastStretches) if (stretch.lengthKm > maxCoastStretchKm) failures.push(`the empire's edge runs ${stretch.lengthKm.toFixed(1)} km along today's coast from ${at(stretch.start)}`);
+  return failures;
+}
+
 // Every place with a place-level link is checked at each of its candidate sites; candidate-level
 // links are checked at their own site.
 export function placeRows(records, collection) {

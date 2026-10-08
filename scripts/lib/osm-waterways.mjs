@@ -1,7 +1,20 @@
 // OpenStreetMap waterway helpers for the ancient-area cuts (rivers as described borders).
 // OSM data is © OpenStreetMap contributors, ODbL 1.0 (compatible with data/geo/, ADR-0012).
-import fs from "node:fs/promises";
-import path from "node:path";
+//
+// The build reads the river ways from the committed file data/geo/sources/osm-waterways.geojson, so it
+// never depends on OpenStreetMap's live data. `npm run refresh:osm-waterways -- --date <ISO date>`
+// rewrites that file from Overpass's attic data as of a given date; refreshing is a deliberate step.
+
+// The rivers whose courses cut areas: their waterway relations, and ways the build leaves out.
+export const OSM_RIVERS = Object.freeze({
+  jordan: { relationId: 2246907, label: "Jordan", throughSeaOfGalileeWayId: 1421105372 },
+  yarmuk: { relationId: 1355013, label: "Yarmuk" },
+  lamus: { relationId: 15952690, label: "Lamus (Limonlu Çayı)" }
+});
+// The committed file the build reads the rivers from, relative to the repository root.
+export const PINNED_WATERWAYS_PATH = "data/geo/sources/osm-waterways.geojson";
+// Overpass's attic queries take a UTC timestamp in this form.
+export const ATTIC_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
 // Read-only downloads go through Overpass, not the editing API, which the OSMF API Usage Policy reserves
 // for editing. The mirrors are tried in order.
@@ -12,22 +25,19 @@ export const OVERPASS_ENDPOINTS = [
 ];
 const USER_AGENT = "interactive-bible-map-ancient-geo/1.0 (+https://github.com/jameshuangdevelop/interactive-bible-map)";
 const EARTH_RADIUS_KM = 6371.0088;
+// Chains with fewer vertices are stray pieces of a river's relation, such as culverts, not its course.
+export const MIN_CHAIN_VERTICES = 10;
 
-// A relation with its member ways and their nodes, with each element's version (`out meta`).
-export function overpassRelationQuery(relationId) {
-  return `[out:json][timeout:180];relation(${relationId});(._;>;);out meta;`;
+// A relation with its member ways and their nodes, with each element's version (`out meta`). With a
+// `date`, Overpass answers from its attic data: the elements as they were at that moment.
+export function overpassRelationQuery(relationId, { date = null } = {}) {
+  return `[out:json][timeout:180]${date ? `[date:"${date}"]` : ""};relation(${relationId});(._;>;);out meta;`;
 }
 
-// Fetches a relation with all member ways and nodes from Overpass and caches the raw response. The
-// response has the same element format as the OSM API's "full" download. Busy mirrors answer 429, 500
-// or 504, so every mirror is tried, for up to `rounds` rounds `retryDelayMs` apart.
-export async function fetchOsmRelationFull(relationId, cacheDirectory, { fetchImpl = fetch, endpoints = OVERPASS_ENDPOINTS, timeoutMs = 240000, rounds = 3, retryDelayMs = 30000 } = {}) {
-  const cachePath = path.join(cacheDirectory, `overpass-relation-${relationId}.json`);
-  try {
-    return JSON.parse(await fs.readFile(cachePath, "utf8"));
-  } catch {
-    // Not cached yet; download below.
-  }
+// Fetches a relation with all member ways and nodes from Overpass. The response has the same element
+// format as the OSM API's "full" download. Busy mirrors answer 429, 500 or 504, so every mirror is
+// tried, for up to `rounds` rounds `retryDelayMs` apart.
+export async function fetchOsmRelationFull(relationId, { date = null, fetchImpl = fetch, endpoints = OVERPASS_ENDPOINTS, timeoutMs = 240000, rounds = 3, retryDelayMs = 30000 } = {}) {
   const failures = [];
   for (let round = 1; round <= rounds; round += 1) {
     if (round > 1) await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
@@ -36,7 +46,7 @@ export async function fetchOsmRelationFull(relationId, cacheDirectory, { fetchIm
         const response = await fetchImpl(endpoint, {
           method: "POST",
           headers: { "user-agent": USER_AGENT, "content-type": "application/x-www-form-urlencoded" },
-          body: `data=${encodeURIComponent(overpassRelationQuery(relationId))}`,
+          body: `data=${encodeURIComponent(overpassRelationQuery(relationId, { date }))}`,
           signal: AbortSignal.timeout(timeoutMs)
         });
         if (!response.ok) {
@@ -48,8 +58,12 @@ export async function fetchOsmRelationFull(relationId, cacheDirectory, { fetchIm
           failures.push(`${endpoint}: the response holds no relation ${relationId}`);
           continue;
         }
-        await fs.mkdir(cacheDirectory, { recursive: true });
-        await fs.writeFile(cachePath, JSON.stringify(data), "utf8");
+        // A mirror whose database is older than the attic date answers with its older state.
+        const base = data.osm3s?.timestamp_osm_base ?? null;
+        if (date && !(Date.parse(base) >= Date.parse(date))) {
+          failures.push(`${endpoint}: its data (as of ${base}) is older than ${date}`);
+          continue;
+        }
         return data;
       } catch (error) {
         failures.push(`${endpoint}: ${error.message}`);
@@ -135,6 +149,65 @@ export function assembleWayChains(ways) {
     chains.push({ wayIds, nodeIds, coordinates });
   }
   return chains.sort((left, right) => right.coordinates.length - left.coordinates.length);
+}
+
+// A river's course: its ways joined into chains, less stray pieces.
+export function riverChains(ways) {
+  return assembleWayChains(ways).filter((chain) => chain.coordinates.length >= MIN_CHAIN_VERTICES);
+}
+
+// The ways a river's course uses, in relation member order: its main-stream ways, less the ones the
+// build leaves out (the Jordan's course through the Sea of Galilee) and stray pieces.
+export function riverCourseWays(relationFull, riverKey) {
+  const river = OSM_RIVERS[riverKey];
+  const ways = relationMainStreamWays(relationFull, { excludeWayIds: river.throughSeaOfGalileeWayId ? [river.throughSeaOfGalileeWayId] : [] });
+  const used = new Set(riverChains(ways).flatMap((chain) => chain.wayIds));
+  return ways.filter((way) => used.has(way.id));
+}
+
+// The pinned file holds one LineString feature per way, with the way's id and version, the ids of its
+// two end nodes (where ways join) and provenance. `asOf` is the Overpass attic date it was read at.
+export function waterwayFeatures(riverKey, ways, { asOf }) {
+  const river = OSM_RIVERS[riverKey];
+  return ways.map((way) => ({
+    type: "Feature",
+    properties: {
+      river: riverKey,
+      relationId: river.relationId,
+      wayId: way.id,
+      version: way.version,
+      endNodeIds: [way.nodeIds[0], way.nodeIds.at(-1)],
+      provenance: {
+        dataset: "OpenStreetMap",
+        version: `overpass-attic:${asOf}; way ${way.id} v${way.version}`,
+        upstreamFeatureIds: [`osm:way/${way.id}`, `osm:relation/${river.relationId}`],
+        changes: [
+          {
+            kind: "overpass-attic-download",
+            detail: `A main-stream way of the ${river.label}'s waterway relation, as OpenStreetMap held it at ${asOf}, read through Overpass. © OpenStreetMap contributors, ODbL 1.0.`,
+            sources: [`osm:relation/${river.relationId}`]
+          }
+        ]
+      }
+    },
+    geometry: { type: "LineString", coordinates: way.coordinates }
+  }));
+}
+
+// One feature per line, so that a refresh reads as a diff of the ways that changed.
+export function serializeWaterways({ asOf, features }) {
+  return `{"type":"FeatureCollection","asOf":${JSON.stringify(asOf)},"features":[\n${features.map((feature) => JSON.stringify(feature)).join(",\n")}\n]}\n`;
+}
+
+// A river as the build uses it, from the pinned FeatureCollection: its ways in file order and the
+// chains they join into.
+export function pinnedRiver(collection, riverKey) {
+  const river = OSM_RIVERS[riverKey];
+  const ways = (collection.features ?? [])
+    .filter((feature) => feature.properties?.river === riverKey)
+    .map((feature) => ({ id: feature.properties.wayId, version: feature.properties.version, nodeIds: feature.properties.endNodeIds, coordinates: feature.geometry.coordinates }));
+  if (ways.length === 0) throw new Error(`The pinned waterways hold no ways for the ${river.label}`);
+  return { ...river, key: riverKey, ways, chains: riverChains(ways), asOf: collection.asOf ?? null };
 }
 
 export function distanceKm([lon1, lat1], [lon2, lat2]) {

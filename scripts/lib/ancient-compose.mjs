@@ -1,25 +1,23 @@
-// Composes data/geo/ancient-areas.geojson from AWMC faces, cut lines and OpenStreetMap rivers.
-// Run through `npm run build:ancient-geo` (after scripts/build-ancient-geo.mjs). It writes the report
-// %TEMP%/ibm-m4-03b/composition-report.md and PNG previews in %TEMP%/ibm-m4-03c/.
+// Composes the ancient layer's areas, the empire's edge and the roads from AWMC faces, cut lines and the
+// pinned OpenStreetMap rivers, and checks them. scripts/build-ancient-geo.mjs calls composeAncientAreas
+// with the checked inputs and the cache's folders; it writes the composition report and its previews to
+// the cache, and stops with an error when an acceptance check fails.
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
-import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
 import mapshaper from "mapshaper";
 import booleanValid from "@turf/boolean-valid";
 import {
-  assembleWayChains,
   distanceKm,
   extendLineEnd,
-  fetchOsmRelationFull,
   orientFrom,
-  OVERPASS_ENDPOINTS,
-  relationMainStreamWays
-} from "./lib/osm-waterways.mjs";
-import { cleanPolygonGeometry, geometryAreaKm2, polygonFromLineAndFrame, polygonsOf } from "./lib/geometry-cleanup.mjs";
+  OSM_RIVERS,
+  PINNED_WATERWAYS_PATH,
+  pinnedRiver
+} from "./osm-waterways.mjs";
+import { cleanPolygonGeometry, geometryAreaKm2, polygonFromLineAndFrame, polygonsOf } from "./geometry-cleanup.mjs";
 import {
+  acceptanceFailures,
   coverageRows,
   distancePointToSegmentKm,
   distanceToGeometryKm,
@@ -29,23 +27,24 @@ import {
   pointInGeometry,
   validityRows,
   writePreviewPng
-} from "./lib/ancient-area-checks.mjs";
-import { validateGeometryTopology } from "./lib/validator.mjs";
-import { EXCLUDED_POST_AD100_ROADS, roadLines, selectAncientRoads } from "./lib/ancient-roads.mjs";
-
-const execFileAsync = promisify(execFile);
+} from "./ancient-area-checks.mjs";
+import { validateGeometryTopology } from "./validator.mjs";
+import { EXCLUDED_POST_AD100_ROADS, roadLines, selectAncientRoads } from "./ancient-roads.mjs";
+import { ANCIENT_GEO_INPUTS, AWMC_COMMIT, NATURAL_EARTH_COMMIT } from "./ancient-geo-inputs.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = path.resolve(moduleDirectory, "..");
-const reportDirectory = path.join(os.tmpdir(), "ibm-m4-03b");
-const previewDirectory = path.join(os.tmpdir(), "ibm-m4-03c");
-const workDirectory = path.join(os.tmpdir(), "ibm-m4-03b-compose");
-const partitionWorkDirectory = path.join(os.tmpdir(), "ibm-m4-03b-work");
-const buildWorkDirectory = path.join(os.tmpdir(), "ibm-m4-03-build");
-const osmCacheDirectory = path.join(os.tmpdir(), "ibm-m4-03-osm");
-const outputAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
-const AWMC_COMMIT = "7ecf8bccea2efe1e1e9df2daf6001942de73fb87";
-const NATURAL_EARTH_COMMIT = "ca96624a56bd078437bca8184e78163e5039ad19";
+const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
+// The folders and files of one run, set by composeAncientAreas: `workDirectory` for this module's
+// intermediates, `partitionWorkDirectory` for the AD 69 and AD 14 partitions, and the input files.
+let reportDirectory;
+let previewDirectory;
+let workDirectory;
+let partitionWorkDirectory;
+let inputFiles;
+let outputAreasPath;
+let outputEmpireEdgePath;
+let outputRoadsPath;
+let pinnedWaterwaysAsOf;
 
 // Parts smaller than this are slivers left where two datasets' lines nearly coincide.
 const MIN_PART_KM2 = 1;
@@ -209,12 +208,6 @@ const DEAD_SEA_MEDIAN_AND_ARABAH = [[35.5, 31.72], [35.5, 31.2], [35.48, 30.75],
 const GALILEE_SAMARIA_LINE = [[34.65, 32.86], HEROD_ANCHORS.mountCarmel, HEROD_ANCHORS.gineaJenin, HEROD_ANCHORS.scythopolis, [35.63, 32.5]];
 const PELLA_LINE = [HEROD_ANCHORS.scythopolis, HEROD_ANCHORS.pella, HEROD_ANCHORS.philadelphia, [36.15, 31.62]];
 
-// OpenStreetMap waterway relations (© OpenStreetMap contributors, ODbL 1.0).
-const OSM_RIVERS = {
-  jordan: { relationId: 2246907, label: "Jordan", throughSeaOfGalileeWayId: 1421105372 },
-  yarmuk: { relationId: 1355013, label: "Yarmuk" },
-  lamus: { relationId: 15952690, label: "Lamus (Limonlu Çayı)" }
-};
 const LAMUS_SEA_EXTENSION_KM = 5;
 const LAMUS_NORTH_EXTENSION_LATITUDE = 37.55;
 // Where AWMC's AD 200 Cilicia cells cut the AD 69 face, chiefly on the edge with Syria, the line is
@@ -288,9 +281,6 @@ const EDGE_MIN_PIECE_KM = 3;
 const EDGE_COAST_TEST_KM = 5;
 // Land beyond the empire is simplified with the areas under this id, then dropped.
 const OUTSIDE_PSEUDO_AREA_ID = "__beyond-the-empire__";
-const outputEmpireEdgePath = path.join(repositoryRoot, "data", "geo", "ancient-empire-edge.geojson");
-const outputRoadsPath = path.join(repositoryRoot, "data", "geo", "ancient-roads.geojson");
-const AWMC_ROADS_PATH = "Cultural-Data/roads/roads.geojson";
 
 // Points inside AD 69 provinces that M4-02's area list leaves out. The rule-4 pass never gives their
 // land to a listed area, and the coverage report names them.
@@ -414,7 +404,7 @@ function provenance(upstreamIds, detail, areaId, extraChanges = []) {
   const usesOsm = [...upstreamIds, ...changes.flatMap((change) => change.sources)].some((id) => id.startsWith("osm:"));
   return {
     dataset: usesOsm ? "AWMC geodata; Natural Earth; OpenStreetMap" : "AWMC geodata; Natural Earth",
-    version: `commit:${AWMC_COMMIT}; naturalearth-commit:${NATURAL_EARTH_COMMIT}${usesOsm ? "; osm: current ways read through Overpass (ids and versions in the composition report)" : ""}`,
+    version: `commit:${AWMC_COMMIT}; naturalearth-commit:${NATURAL_EARTH_COMMIT}${usesOsm ? `; osm: ways as of ${pinnedWaterwaysAsOf} pinned in ${PINNED_WATERWAYS_PATH}` : ""}`,
     upstreamFeatureIds: upstreamIds,
     changes
   };
@@ -491,13 +481,10 @@ async function clippedHerodOutline(herodRecord12, landMaskPath) {
   return ensureFeatureCollection(await readJson(outputPath)).features[0];
 }
 
-async function loadRiver(key) {
-  const river = OSM_RIVERS[key];
-  const relation = await fetchOsmRelationFull(river.relationId, osmCacheDirectory);
-  const excluded = river.throughSeaOfGalileeWayId ? [river.throughSeaOfGalileeWayId] : [];
-  const ways = relationMainStreamWays(relation, { excludeWayIds: excluded });
-  const chains = assembleWayChains(ways).filter((chain) => chain.coordinates.length >= 10);
-  return { ...river, ways, chains, dataTimestamp: relation.osm3s?.timestamp_osm_base ?? null };
+// A river from the pinned OpenStreetMap ways (data/geo/sources/osm-waterways.geojson): its ways and the
+// chains they join into.
+function loadRiver(waterways, key) {
+  return pinnedRiver(waterways, key);
 }
 
 // Ways actually drawn: the assembled main-stream chains (stray short pieces such as culverts are left out).
@@ -614,9 +601,9 @@ async function buildHerodianPieces(herodBase, jordan, yarmuk, notes) {
 
 async function buildCiliciaWhole(f0031, ad200Cells, notes) {
   const cells = [
-    { ...cellAtPoint(ad200Cells, POINTS.tarsus, "Tarsus"), expected: "f0228" },
-    { ...cellAtPoint(ad200Cells, POINTS.lamusMouth, "the Lamus mouth (Corycus coast)"), expected: "f14078" },
-    { ...cellAtPoint(ad200Cells, POINTS.coracesium, "Coracesium"), expected: "f14001" }
+    { ...cellAtPoint(ad200Cells, POINTS.tarsus, "Tarsus"), expected: "f0226" },
+    { ...cellAtPoint(ad200Cells, POINTS.lamusMouth, "the Lamus mouth (Corycus coast)"), expected: "f14051" },
+    { ...cellAtPoint(ad200Cells, POINTS.coracesium, "Coracesium"), expected: "f13974" }
   ];
   for (const cell of cells) {
     if (cell.cellId !== cell.expected) notes.push(`AD 200 cell ${cell.cellId} was used where ${cell.expected} was expected; the AD 200 cells were renumbered.`);
@@ -793,7 +780,7 @@ async function assignLeftoverLand(built, domainFeatures, explanations, notes) {
 
 // Natural Earth land around the Roman world, as separate land polygons (continents and islands).
 async function prepareRomanWorldLand() {
-  const sourcePath = path.join(partitionWorkDirectory, "ne_10m_land.geojson");
+  const sourcePath = inputFiles.naturalEarthLand;
   const outputPath = path.join(workDirectory, "roman-world-land.geojson");
   await removeIfExists(outputPath);
   await mapshaper.runCommands(`-i ${quote(sourcePath)} -clip bbox=${ROMAN_WORLD_FRAME} -explode -o format=geojson ${quote(outputPath)}`);
@@ -964,7 +951,7 @@ async function leaveOutOldSea(built, oldSea, notes) {
 // Natural Earth's outline of Lake Tatta (Tuz Gölü): the lake that holds Pleiades' point for it.
 async function loadLakeTatta() {
   const anchor = GALATIA_CAPPADOCIA_ANCHORS.galatia.find((entry) => entry.name === "Lake Tatta");
-  const lakes = ensureFeatureCollection(await readJson(path.join(partitionWorkDirectory, "ne_10m_lakes.geojson"))).features;
+  const lakes = ensureFeatureCollection(await readJson(inputFiles.naturalEarthLakes)).features;
   const lake = lakes.find((feature) => feature.geometry && pointInGeometry(anchor.point, feature.geometry));
   if (!lake) throw new Error("Natural Earth has no lake at Lake Tatta's point");
   const shore = polygonsOf(lake.geometry).flatMap((polygon) => polygon[0].slice(0, -1));
@@ -1317,7 +1304,7 @@ async function buildItaly(culturalRoot, ad69Raw, notes) {
   // Italy is the AD 69 faces that lie within AWMC's own outline of Roman Italy (Italy_shading), united
   // with that outline on land. Picking faces by a box once took in half of Sardinia and Corsica and the
   // Alpine provinces.
-  const landPath = path.join(partitionWorkDirectory, "ne_10m_land.geojson");
+  const landPath = inputFiles.naturalEarthLand;
   const italyShapefile = path.join(culturalRoot, "political_shading", "Italy_shading", "Italy_shading.shp");
   const outputPath = path.join(workDirectory, "italy-shading-land.geojson");
   const outlinePath = path.join(workDirectory, "italy-shading.geojson");
@@ -1382,9 +1369,12 @@ function placeExplanation(row) {
   return "";
 }
 
-async function writeReport({ collection, omitted, notes, validity, overlaps, compositionCoverage, coverage, oldSea, places, jordanSites, anchorChecks, empireEdge, outsideLandNote, roadSummary, roadClip, previewPaths, osmSummary, simplifyNote }) {
+async function writeReport({ collection, omitted, notes, validity, overlaps, compositionCoverage, coverage, oldSea, places, jordanSites, anchorChecks, acceptance, empireEdge, outsideLandNote, roadSummary, roadClip, previewPaths, osmSummary, simplifyNote }) {
   const lines = ["# M4-03 area composition", ""];
   lines.push(`Built ${collection.features.length} of ${AREA_ORDER.length} areas. ${simplifyNote}`, "");
+  lines.push("## Acceptance checks", "", acceptance.length === 0 ? "All pass: every area is built, valid and free of repeated vertices; no overlap is larger than 1 km²; every coverage gap is explained; every place lies in its area, within 3 km of it or with an explanation; every anchor lies in its area; the old-sea points lie in no area; and no stretch of the empire's edge longer than 10 km runs along today's coast." : `**${acceptance.length} failed:**`, "");
+  for (const failure of acceptance) lines.push(`- ${failure}`);
+  if (acceptance.length > 0) lines.push("");
   lines.push("## Areas", "", "| Area | km² | Parts | Valid | Repeated vertices | Composition |", "|---|---:|---:|---|---:|---|");
   const validityById = new Map(validity.map((row) => [row.areaId, row]));
   for (const feature of collection.features) {
@@ -1443,26 +1433,31 @@ async function writeReport({ collection, omitted, notes, validity, overlaps, com
   await fs.writeFile(path.join(reportDirectory, "composition-report.md"), `${lines.join("\n")}\n`, "utf8");
 }
 
-async function main() {
+// Composes the areas, the empire's edge and the roads, writing them to `outputDirectory`, the report to
+// `reportDirectory` and its previews to `previewDirectory`. `inputs` maps the keys of
+// ANCIENT_GEO_INPUTS to checked files; `partitionDirectory` holds the AD 69 and AD 14 partitions and
+// their named faces; `culturalRoot` is AWMC's unpacked cultural shapefiles; `ad200CellsPath` holds the
+// AD 200 cells; `coastlinePath` is this run's ancient coastline. Throws when an acceptance check fails,
+// after writing the report.
+export async function composeAncientAreas(options) {
+  ({ reportDirectory, previewDirectory } = options);
+  workDirectory = options.workDirectory;
+  partitionWorkDirectory = options.partitionDirectory;
+  inputFiles = options.inputs;
+  outputAreasPath = path.join(options.outputDirectory, "ancient-areas.geojson");
+  outputEmpireEdgePath = path.join(options.outputDirectory, "ancient-empire-edge.geojson");
+  outputRoadsPath = path.join(options.outputDirectory, "ancient-roads.geojson");
   await fs.mkdir(workDirectory, { recursive: true });
   await fs.mkdir(previewDirectory, { recursive: true });
-  for (const file of await fs.readdir(previewDirectory)) {
-    if (file.endsWith(".png")) await fs.rm(path.join(previewDirectory, file), { force: true });
-  }
-  // ANCIENT_GEO_REUSE_PREP=1 reuses the previous partition-prep outputs (a debugging shortcut).
-  if (process.env.ANCIENT_GEO_REUSE_PREP !== "1") {
-    await execFileAsync(process.execPath, [path.join(repositoryRoot, "scripts", "report-ancient-partition-prep.mjs")], {
-      cwd: repositoryRoot,
-      windowsHide: true,
-      maxBuffer: 1024 * 1024 * 20
-    });
-  }
+  await fs.mkdir(options.outputDirectory, { recursive: true });
 
-  const ad69Named = await readJson(path.join(reportDirectory, "ad69-named-faces.geojson"));
-  const ad14Named = await readJson(path.join(reportDirectory, "ad14-named-faces.geojson"));
+  const ad69Named = await readJson(path.join(partitionWorkDirectory, "ad69-named-faces.geojson"));
+  const ad14Named = await readJson(path.join(partitionWorkDirectory, "ad14-named-faces.geojson"));
   const ad69Raw = ensureFeatureCollection(await readJson(path.join(partitionWorkDirectory, "ad69", "land-faces.geojson")));
-  const culturalRoot = path.join(partitionWorkDirectory, "awmc-cultural");
-  const ad200Cells = ensureFeatureCollection(await readJson(path.join(buildWorkDirectory, "province-cells.geojson")));
+  const { culturalRoot } = options;
+  const ad200Cells = ensureFeatureCollection(await readJson(options.ad200CellsPath));
+  const waterways = await readJson(path.join(repositoryRoot, PINNED_WATERWAYS_PATH));
+  pinnedWaterwaysAsOf = waterways.asOf;
   const landMaskPath = path.join(partitionWorkDirectory, "ad69", "ne-land-mask.geojson");
   const landMask = ensureFeatureCollection(await readJson(landMaskPath)).features;
   // AWMC's extents are several polygons, some of which overlap (the AD 69 extent over Raetia). A plain
@@ -1533,9 +1528,9 @@ async function main() {
   built.push(await finishArea("italy", italyPieces, `Union of ${italy.faces.length} AD69 land faces lying within AWMC Italy_shading (Roman Italy) and Italy_shading itself on Natural Earth 10m land, minus Dalmatia and Sicily.`, ["awmc:italy-shading", "awmc:roman-empire-ad-69-provinces"], notes, [{ kind: "clip", detail: `Italy_shading clipped to Natural Earth 10m land (commit ${NATURAL_EARTH_COMMIT}); it carries Italy's coast out to Natural Earth's where AWMC's faces stop short of it.`, sources: ["awmc:italy-shading"] }]));
 
   // Herod's lands, Gadara's Decapolis land, Syria, Cilicia and Arabia.
-  const jordan = await loadRiver("jordan");
-  const yarmuk = await loadRiver("yarmuk");
-  const lamus = await loadRiver("lamus");
+  const jordan = loadRiver(waterways, "jordan");
+  const yarmuk = loadRiver(waterways, "yarmuk");
+  const lamus = loadRiver(waterways, "lamus");
   const judaeaFace = namedFace(ad69Named, "Judaea");
   const herodBase = await unionFeatures("herod-base", [herodLand, judaeaFace]);
   notes.push(`Herodian base: AWMC Herod record 12 (clipped to land, ${rounded(geometryAreaKm2(herodLand.geometry))} km²) united with AWMC's AD 69 Judaea face ${judaeaFace.properties.faceId}, so that the Dead Sea, the Carmel and Gaza coasts and the Jordan valley by Pella, which the AD 69 face holds but Herod's outline leaves out, are cut by the same lines: ${rounded(geometryAreaKm2(herodBase.geometry))} km².`);
@@ -1739,8 +1734,8 @@ async function main() {
 
   // Roads: AWMC's roads of the Roman period, picked (G5; ADR-0037's update of 2026-10-08, item 1) and
   // clipped to the drawn Roman world.
-  const roadsSource = await readJson(path.join(buildWorkDirectory, "roads.geojson"));
-  const { roads: selectedRoads, excludedRoadIds } = selectAncientRoads(roadsSource, { awmcCommit: AWMC_COMMIT, awmcRoadsPath: AWMC_ROADS_PATH });
+  const roadsSource = await readJson(inputFiles.awmcRoads);
+  const { roads: selectedRoads, excludedRoadIds } = selectAncientRoads(roadsSource, { awmcCommit: AWMC_COMMIT, awmcRoadsPath: ANCIENT_GEO_INPUTS.awmcRoads.upstreamPath });
   const outsideAfter = await classifyOutsideLand("roads", collection.features, landParts, oldSea);
   const roadClip = await clipRoadsToRomanWorld(selectedRoads, outsideAfter, notes);
   await fs.writeFile(outputRoadsPath, `${JSON.stringify(roadClip.roads)}\n`, "utf8");
@@ -1776,11 +1771,12 @@ async function main() {
   const coverage = explainCoverage(await coverageRows(coverageDomain, collection, [], COVERAGE_TOLERANCE_KM2), collection.features, "Simplification sliver: ");
   const places = placeRows(records, collection);
   const jordanSites = [
-    ["Qasr al-Yahud (west bank)", HEROD_ANCHORS.qasrAlYahud],
-    ["Al-Maghtas (east bank)", HEROD_ANCHORS.alMaghtas]
-  ].map(([name, point]) => ({
+    ["Qasr al-Yahud (west bank)", HEROD_ANCHORS.qasrAlYahud, "judea-samaria-idumea"],
+    ["Al-Maghtas (east bank)", HEROD_ANCHORS.alMaghtas, "galilee-perea"]
+  ].map(([name, point, expected]) => ({
     name,
     point,
+    expected,
     areaIds: collection.features.filter((feature) => pointInGeometry(point, feature.geometry)).map((feature) => feature.properties.areaId),
     riverKm: Math.min(...herod.rift.coordinates.slice(1).map((coordinate, index) => distancePointToSegmentKm(point, herod.rift.coordinates[index], coordinate)))
   }));
@@ -1869,7 +1865,7 @@ async function main() {
       title: "The Latmian Gulf and the bay by Ephesus: the old shores (blue) and land that was sea, in no area (G10)",
       bounds: [26.95, 37.35, 27.75, 38.15],
       areas: collection,
-      lines: ensureFeatureCollection(await readJson(path.join(repositoryRoot, "data", "geo", "ancient-coastline.geojson"))).features.flatMap((feature) => roadLines(feature.geometry)).map((coordinates) => ({ coordinates, color: "#1a4fd6", width: 2 })),
+      lines: ensureFeatureCollection(await readJson(options.coastlinePath)).features.flatMap((feature) => roadLines(feature.geometry)).map((coordinates) => ({ coordinates, color: "#1a4fd6", width: 2 })),
       points: [...OLD_SEA_POINTS.filter(([, [lon]]) => lon > 26.95 && lon < 27.75).map(([name, coordinates]) => ({ name, coordinates })), { name: "Miletus", coordinates: [27.278, 37.531] }, { name: "Ephesus", coordinates: [27.341, 37.941] }, { name: "Priene", coordinates: [27.297, 37.659] }]
     }),
     await writePreviewPng(path.join(previewDirectory, "areas-cilicia.png"), {
@@ -1885,8 +1881,19 @@ async function main() {
     `Jordan, relation ${OSM_RIVERS.jordan.relationId} main stream without way ${OSM_RIVERS.jordan.throughSeaOfGalileeWayId} (its course drawn through the Sea of Galilee): ${osmWayVersions(jordan)}.`,
     `Yarmuk, relation ${OSM_RIVERS.yarmuk.relationId} main stream: ${osmWayVersions(yarmuk)}.`,
     `Lamus (Limonlu Çayı), relation ${OSM_RIVERS.lamus.relationId} main stream: ${osmWayVersions(lamus)}.`,
-    `Read through Overpass (${OVERPASS_ENDPOINTS.join(", ")}; data as of ${[...new Set([jordan, yarmuk, lamus].map((river) => river.dataTimestamp).filter(Boolean))].join(", ") || "unknown"}) and cached in ${osmCacheDirectory}; © OpenStreetMap contributors, ODbL 1.0.`
+    `Read from \`${PINNED_WATERWAYS_PATH}\`, Overpass's attic data as of ${waterways.asOf}; © OpenStreetMap contributors, ODbL 1.0.`
   ];
+  const acceptance = acceptanceFailures({
+    builtAreaIds: collection.features.map((feature) => feature.properties.areaId),
+    expectedAreaIds: AREA_ORDER,
+    validity,
+    overlaps,
+    coverageGaps: compositionCoverage.rows,
+    places: places.map((row) => ({ ...row, explanation: placeExplanation(row) })),
+    anchors: [...anchorChecks, ...jordanSites],
+    emptyPoints: oldSeaChecks,
+    coastStretches: empireEdge.coastStretches
+  });
   await writeReport({
     collection,
     omitted,
@@ -1899,6 +1906,7 @@ async function main() {
     places,
     jordanSites,
     anchorChecks,
+    acceptance,
     empireEdge,
     outsideLandNote: `Land outside every area before simplification: ${outsideBefore.beyond.length} piece(s) beyond the empire; ${outsideBefore.enclosed.length} enclosed by Roman land and the sea (${rounded(outsideBefore.enclosed.reduce((sum, piece) => sum + geometryAreaKm2(piece.geometry), 0))} km², drawn without an edge; the largest ${[...outsideBefore.enclosed].sort((left, right) => geometryAreaKm2(right.geometry) - geometryAreaKm2(left.geometry)).slice(0, 3).map((piece) => `${rounded(geometryAreaKm2(piece.geometry))} km² at ${labelPoint(piece.geometry).map((value) => value.toFixed(2)).join(", ")}`).join("; ")}); ${outsideBefore.islands.length} island(s) that no area touches.`,
     roadSummary,
@@ -1907,14 +1915,17 @@ async function main() {
     osmSummary,
     simplifyNote: `Written after topology-aware Douglas–Peucker simplification (${FINE_SIMPLIFY_METRES} m for ${FINE_SIMPLIFY_AREAS.map((areaId) => `\`${areaId}\``).join(", ")}, whose borders follow the Jordan; ${OTHER_ROMAN_LANDS_SIMPLIFY_METRES} m for \`other-roman-lands\` except its islands within ${NEAR_PLACES_KM} km of our places and its frontier with land beyond the empire; ${COARSE_SIMPLIFY_METRES} m elsewhere; a shared edge takes the finer tolerance) with coordinates rounded to ${OUTPUT_PRECISION}°; areas are cleaned before and after.`
   });
-  console.log(`Wrote ${outputAreasPath} (${collection.features.length} areas)`);
-  console.log(`Wrote ${outputEmpireEdgePath} (${empireEdge.pieceCount} pieces, ${rounded(empireEdge.lengthKm)} km)`);
-  console.log(`Wrote ${outputRoadsPath} (${roadClip.roads.features.length} major roads)`);
-  console.log(`Wrote ${path.join(reportDirectory, "composition-report.md")}`);
-  for (const previewPath of previewPaths) console.log(`Wrote ${previewPath}`);
+  const reportPath = path.join(reportDirectory, "composition-report.md");
+  if (acceptance.length > 0) {
+    throw new Error(`The ancient layer failed ${acceptance.length} acceptance check(s); see ${reportPath}:\n${acceptance.map((failure) => `- ${failure}`).join("\n")}`);
+  }
+  return {
+    areaCount: collection.features.length,
+    edgePieces: empireEdge.pieceCount,
+    edgeKm: empireEdge.lengthKm,
+    roadCount: roadClip.roads.features.length,
+    placeChecks: places.length,
+    reportPath,
+    previewPaths
+  };
 }
-
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
