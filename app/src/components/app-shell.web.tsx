@@ -26,6 +26,12 @@ const SEARCH_HEIGHT = 48;
 const PANEL_CONTENT_TOP_PADDING = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + tokens.spacing.md;
 const MAP_PLACEHOLDER_COLOR = "#F1EEE4";
 const SMALL_SCREEN_BREAKPOINT = 768;
+const SMALL_SCREEN_SHEET_EDGE_GAP_PX = 16;
+const SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX = PANEL_CONTENT_TOP_PADDING + 56;
+const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.53;
+const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
+const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
+type SmallScreenSheetMode = "collapsed" | "expanded";
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -134,7 +140,13 @@ export function AppShell() {
   const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== "undefined" ? window.innerWidth < SMALL_SCREEN_BREAKPOINT : false
   );
-  const [isSmallScreenPanelExpanded, setIsSmallScreenPanelExpanded] = useState(false);
+  const [smallScreenSheetMode, setSmallScreenSheetMode] = useState<SmallScreenSheetMode>("collapsed");
+  const [smallScreenSheetDragHeightPx, setSmallScreenSheetDragHeightPx] = useState<number | null>(
+    null
+  );
+  const [viewportHeightPx, setViewportHeightPx] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 0
+  );
   const [placeDetailsById, setPlaceDetailsById] = useState<Record<string, PlaceDetailsPayload>>(
     {}
   );
@@ -146,9 +158,27 @@ export function AppShell() {
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
   const unmountedRef = useRef(false);
+  const smallScreenSheetDragStateRef = useRef<{
+    pointerId: number;
+    startY: number;
+    startHeightPx: number;
+    movedPx: number;
+  } | null>(null);
+  const suppressNextHandleClickRef = useRef(false);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
+  const smallScreenSheetMaxHeightPx = Math.max(
+    0,
+    viewportHeightPx - SMALL_SCREEN_SHEET_EDGE_GAP_PX - SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX
+  );
+  const smallScreenSheetCollapsedHeightPx = Math.min(
+    smallScreenSheetMaxHeightPx,
+    Math.max(
+      SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX,
+      Math.round(smallScreenSheetMaxHeightPx * SMALL_SCREEN_SHEET_COLLAPSED_RATIO)
+    )
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -156,13 +186,94 @@ export function AppShell() {
     }
 
     const onResize = () => {
-      setIsSmallScreen(window.innerWidth < SMALL_SCREEN_BREAKPOINT);
+      setViewportHeightPx(window.innerHeight);
+      const nextIsSmallScreen = window.innerWidth < SMALL_SCREEN_BREAKPOINT;
+      setIsSmallScreen(nextIsSmallScreen);
+      if (!nextIsSmallScreen) {
+        setSmallScreenSheetDragHeightPx(null);
+      }
     };
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("resize", onResize);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isSmallScreen) {
+      smallScreenSheetDragStateRef.current = null;
+      return undefined;
+    }
+
+    const onPointerMove = (event: PointerEvent) => {
+      const dragState = smallScreenSheetDragStateRef.current;
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const nextHeightPx = Math.min(
+        smallScreenSheetMaxHeightPx,
+        Math.max(
+          smallScreenSheetCollapsedHeightPx,
+          dragState.startHeightPx + (dragState.startY - event.clientY)
+        )
+      );
+      dragState.movedPx = Math.max(dragState.movedPx, Math.abs(event.clientY - dragState.startY));
+      setSmallScreenSheetDragHeightPx(nextHeightPx);
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      const dragState = smallScreenSheetDragStateRef.current;
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      smallScreenSheetDragStateRef.current = null;
+      const movedLessThanTapThreshold =
+        dragState.movedPx <= SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX;
+      const startedExpanded =
+        dragState.startHeightPx >=
+        (smallScreenSheetCollapsedHeightPx +
+          (smallScreenSheetMaxHeightPx - smallScreenSheetCollapsedHeightPx) / 2);
+      if (movedLessThanTapThreshold) {
+        setSmallScreenSheetMode(startedExpanded ? "collapsed" : "expanded");
+        setSmallScreenSheetDragHeightPx(null);
+        suppressNextHandleClickRef.current = true;
+        return;
+      }
+
+      const finalHeightPx = Math.min(
+        smallScreenSheetMaxHeightPx,
+        Math.max(smallScreenSheetCollapsedHeightPx, smallScreenSheetDragHeightPx ?? dragState.startHeightPx)
+      );
+      const dragRangePx = smallScreenSheetMaxHeightPx - smallScreenSheetCollapsedHeightPx;
+      const dragThresholdPx = Math.min(120, Math.max(48, dragRangePx * 0.33));
+      const nextMode = startedExpanded
+        ? finalHeightPx <= smallScreenSheetMaxHeightPx - dragThresholdPx
+          ? "collapsed"
+          : "expanded"
+        : finalHeightPx >= smallScreenSheetCollapsedHeightPx + dragThresholdPx
+          ? "expanded"
+          : "collapsed";
+      setSmallScreenSheetMode(nextMode);
+      setSmallScreenSheetDragHeightPx(null);
+      suppressNextHandleClickRef.current = true;
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, [
+    isSmallScreen,
+    smallScreenSheetCollapsedHeightPx,
+    smallScreenSheetDragHeightPx,
+    smallScreenSheetMaxHeightPx
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -323,7 +434,8 @@ export function AppShell() {
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
 
     if (!restoreFocus) {
       return;
@@ -368,7 +480,8 @@ export function AppShell() {
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
 
     const activeElement = document.activeElement;
     lastSelectionActivatorEntryIdRef.current =
@@ -382,14 +495,16 @@ export function AppShell() {
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
     setSelection(nextSelection);
   }, []);
 
   const handlePanelSelectPlaceFromAbout = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     writeSelectionToUrl(nextSelection, "push");
     setSelection(nextSelection);
@@ -420,7 +535,8 @@ export function AppShell() {
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     setSelection(nextSelection);
   }, []);
@@ -436,6 +552,13 @@ export function AppShell() {
     [placesById]
   );
 
+  const panelHeightPx =
+    smallScreenSheetDragHeightPx ??
+    (smallScreenSheetMode === "expanded"
+      ? smallScreenSheetMaxHeightPx
+      : smallScreenSheetCollapsedHeightPx);
+  const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
+
   const panelStyle: CSSProperties | null = selectedPlace
     ? isSmallScreen
       ? {
@@ -443,7 +566,7 @@ export function AppShell() {
           left: `${tokens.spacing.md}px`,
           right: `${tokens.spacing.md}px`,
           bottom: `${tokens.spacing.md}px`,
-          height: isSmallScreenPanelExpanded ? "calc(100% - 32px)" : "40%",
+          height: `${Math.round(panelHeightPx)}px`,
           maxHeight: "calc(100% - 32px)",
           boxSizing: "border-box" as const,
           backgroundColor: tokens.color.surface,
@@ -495,7 +618,9 @@ export function AppShell() {
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
+            bottomPanelInset={panelBottomInsetForMap}
             highlightedPlaceId={highlightedPlaceId}
+            isSmallScreen={isSmallScreen}
             leftPanelWidth={panelWidthForMap}
             onSelectPlace={handleSelectFromMap}
             places={places}
@@ -510,16 +635,43 @@ export function AppShell() {
             key={selectedPlace.id}
             isLoading={selectedPlaceLoading}
             isSmallScreen={isSmallScreen}
-            isSmallScreenExpanded={isSmallScreenPanelExpanded}
+            isSmallScreenExpanded={smallScreenSheetMode === "expanded"}
             loadErrorMessage={selectedPlaceLoadError}
             onClose={() => closePanel(false)}
             onHighlightPlace={handlePanelHighlightPlace}
+            onSmallScreenHandlePointerDown={(event) => {
+              if (!isSmallScreen) {
+                return;
+              }
+
+              const currentHeightPx =
+                smallScreenSheetDragHeightPx ??
+                (smallScreenSheetMode === "expanded"
+                  ? smallScreenSheetMaxHeightPx
+                  : smallScreenSheetCollapsedHeightPx);
+
+              smallScreenSheetDragStateRef.current = {
+                pointerId: event.pointerId,
+                startY: event.clientY,
+                startHeightPx: currentHeightPx,
+                movedPx: 0
+              };
+              suppressNextHandleClickRef.current = false;
+              setSmallScreenSheetDragHeightPx(currentHeightPx);
+            }}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
             onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
-            onToggleSmallScreenExpanded={() =>
-              setIsSmallScreenPanelExpanded((current) => !current)
-            }
+            onToggleSmallScreenExpanded={() => {
+              setSmallScreenSheetDragHeightPx(null);
+              if (suppressNextHandleClickRef.current) {
+                suppressNextHandleClickRef.current = false;
+                return;
+              }
+              setSmallScreenSheetMode((current) =>
+                current === "expanded" ? "collapsed" : "expanded"
+              );
+            }}
             placeDetails={selectedPlaceDetails}
             places={places}
             placesById={placesById}
