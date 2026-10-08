@@ -12,6 +12,11 @@ export const FALLBACK_BASEMAP_ATTRIBUTION =
 
 export const DEFAULT_MAP_CENTER: Coordinates = [22.5, 35];
 export const DEFAULT_MAP_ZOOM = 4.7;
+export const DESKTOP_FIXED_OPENING_MIN_WIDTH = 1024;
+export const PHONE_OPENING_AREA_BOUNDS: readonly [Coordinates, Coordinates] = [
+  [8.708, 27.106441978611198],
+  [36.292, 42.2]
+];
 export const MAX_MAP_ZOOM = 14;
 
 export const CLUSTER_MAX_ZOOM = 6;
