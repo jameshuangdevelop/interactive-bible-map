@@ -44,7 +44,6 @@ const osmCacheDirectory = path.join(os.tmpdir(), "ibm-m4-03-osm");
 const outputAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
 const AWMC_COMMIT = "7ecf8bccea2efe1e1e9df2daf6001942de73fb87";
 const NATURAL_EARTH_COMMIT = "ca96624a56bd078437bca8184e78163e5039ad19";
-const TIMELINE_BRANCH = "data/m4-timeline";
 
 // Parts smaller than this are slivers left where two datasets' lines nearly coincide.
 const MIN_PART_KM2 = 1;
@@ -1032,33 +1031,14 @@ async function buildItaly(culturalRoot, ad69Raw, notes) {
   return { faces, outlineLand };
 }
 
-// Location records with `politicalAreaId` links: the timeline branch's copies while it is unmerged,
-// otherwise the local records.
+// Location records with `politicalAreaId` links, from this branch's data/locations.
 async function loadLocationRecordsForPlaceCheck(notes) {
-  try {
-    const { stdout } = await execFileAsync("git", ["ls-tree", "-r", "--name-only", `${TIMELINE_BRANCH}:data/locations`], {
-      cwd: repositoryRoot,
-      windowsHide: true,
-      maxBuffer: 1024 * 1024 * 10
-    });
-    const files = stdout.split(/\r?\n/).filter((line) => line.endsWith(".json"));
-    const records = [];
-    for (const file of files) {
-      const show = await execFileAsync("git", ["show", `${TIMELINE_BRANCH}:data/locations/${file}`], {
-        cwd: repositoryRoot,
-        windowsHide: true,
-        maxBuffer: 1024 * 1024 * 5
-      });
-      records.push(JSON.parse(show.stdout));
-    }
-    notes.push(`Place check uses the ${files.length} location records on branch ${TIMELINE_BRANCH}.`);
-    return records;
-  } catch {
-    const directory = path.join(repositoryRoot, "data", "locations");
-    const files = (await fs.readdir(directory)).filter((file) => file.endsWith(".json"));
-    notes.push(`Place check uses the ${files.length} local location records (branch ${TIMELINE_BRANCH} not found).`);
-    return Promise.all(files.map((file) => readJson(path.join(directory, file))));
-  }
+  const directory = path.join(repositoryRoot, "data", "locations");
+  const files = (await fs.readdir(directory)).filter((file) => file.endsWith(".json"));
+  const records = await Promise.all(files.map((file) => readJson(path.join(directory, file))));
+  const linked = records.filter((record) => record.politicalAreaId || (record.candidates ?? []).some((candidate) => candidate.politicalAreaId)).length;
+  notes.push(`Place check uses the ${files.length} location records in data/locations, ${linked} of them linked to an area.`);
+  return records;
 }
 
 // Explanations for place-check results that are not border-precision issues.
