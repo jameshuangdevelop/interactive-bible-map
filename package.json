@@ -11,7 +11,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "build:ancient-geo": "node scripts/build-ancient-geo.mjs",
+    "build:ancient-geo": "node scripts/build-ancient-geo.mjs && node scripts/compose-ancient-areas-safe.mjs",
     "fill:scripture": "node scripts/fill-scripture-text.mjs",
     "fill:political-history": "node scripts/fill-political-history.mjs",
     "fill:image-sizes": "node scripts/fill-image-sizes.mjs",
