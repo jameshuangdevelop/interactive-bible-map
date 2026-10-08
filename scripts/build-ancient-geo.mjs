@@ -26,10 +26,17 @@ const AWMC_PROVINCE_LINES_PATH =
   "Cultural-Data/political_shading/roman_empire_ce_200_provinces/roman_empire_ce_200_provinces.geojson";
 const AWMC_EMPIRE_117_PATH =
   "Cultural-Data/political_shading/roman_empire_ce_117_extent/roman_empire_ce_117_extent.geojson";
+const AWMC_EMPIRE_200_EXTENT_PATH =
+  "Cultural-Data/political_shading/roman_empire_ce_200_extent/roman_empire_ce_200_extent.geojson";
+const AWMC_EMPIRE_60_BCE_PATH =
+  "Cultural-Data/political_shading/roman_empire_bce_60/roman_empire_bce_60.geojson";
+const AWMC_SENATORIAL_PROVINCES_PATH =
+  "Cultural-Data/political_shading/senatorial_province/roman_senatorial_provinces.geojson";
 const AWMC_HEROD_PATH = "Cultural-Data/political_shading/herod/herods_kingdom.geojson";
 const AWMC_ROADS_PATH = "Cultural-Data/roads/roads.geojson";
 const AWMC_COASTLINE_PATH = "Physical Data/shoreline/shoreline.geojson";
 const NATURAL_EARTH_COASTLINE_PATH = "geojson/ne_10m_coastline.geojson";
+const NATURAL_EARTH_RIVERS_PATH = "geojson/ne_10m_rivers_lake_centerlines.geojson";
 
 const PROJECT_BOUNDS = Object.freeze({
   minLon: -20,
@@ -89,10 +96,7 @@ const AREA_DEFINITIONS = [
   },
   {
     areaId: "thrace",
-    references: [
-      { label: "Byzantium", coordinates: [28.98, 41.01] },
-      { label: "Perinthus", coordinates: [27.97, 40.98] }
-    ]
+    references: [{ label: "Byzantium", coordinates: [28.98, 41.01] }]
   },
   {
     areaId: "illyricum",
@@ -117,10 +121,7 @@ const AREA_DEFINITIONS = [
   },
   {
     areaId: "cyprus",
-    references: [
-      { label: "Paphos", coordinates: [32.406593, 34.757212] },
-      { label: "Salamis", coordinates: [33.903589, 35.175101] }
-    ]
+    references: [{ label: "Paphos", coordinates: [32.406593, 34.757212] }]
   },
   {
     areaId: "crete-cyrene",
@@ -131,17 +132,27 @@ const AREA_DEFINITIONS = [
   },
   {
     areaId: "syria",
-    references: [
-      { label: "Antioch on the Orontes", coordinates: [36.181667, 36.204722] },
-      { label: "Damascus", coordinates: [36.309102, 33.511612] },
-      { label: "Tyre", coordinates: [35.209358, 33.268071] }
-    ]
+    references: [{ label: "Damascus", coordinates: [36.309102, 33.511612] }]
   },
   {
-    areaId: "judea-province",
+    areaId: "judea-samaria-idumea",
     references: [
       { label: "Jerusalem", coordinates: [35.234156, 31.776679] },
       { label: "Samaria", coordinates: [35.190436, 32.276529] }
+    ]
+  },
+  {
+    areaId: "galilee-perea",
+    references: [
+      { label: "Nazareth", coordinates: [35.303, 32.699] },
+      { label: "Perea near Machaerus", coordinates: [35.66, 31.73] }
+    ]
+  },
+  {
+    areaId: "philip-tetrarchy-lands",
+    references: [
+      { label: "Paneas (Caesarea Philippi)", coordinates: [35.692, 33.247] },
+      { label: "Bethsaida Julias", coordinates: [35.622, 32.893] }
     ]
   },
   {
@@ -149,8 +160,57 @@ const AREA_DEFINITIONS = [
     references: [{ label: "Tarsus", coordinates: [34.896467, 36.914043] }]
   },
   {
+    areaId: "cilicia-tracheia",
+    references: [{ label: "Coracesium", coordinates: [32.0, 36.55] }]
+  },
+  {
+    areaId: "pamphylia",
+    references: [{ label: "Perga", coordinates: [30.852, 36.959] }]
+  },
+  {
+    areaId: "lycia",
+    references: [{ label: "Phaselis", coordinates: [30.55, 36.53] }]
+  },
+  {
+    areaId: "galatia",
+    references: [
+      { label: "Antioch of Pisidia", coordinates: [31.184, 38.321] },
+      { label: "Iconium", coordinates: [32.484, 37.874] }
+    ]
+  },
+  {
+    areaId: "cappadocia-pontus-east",
+    references: [
+      { label: "Caesarea Mazaca", coordinates: [35.49, 38.73] },
+      { label: "Trapezus", coordinates: [39.72, 41.0] }
+    ]
+  },
+  {
+    areaId: "paphlagonia-pontus-galaticus",
+    references: [
+      { label: "Amastris", coordinates: [32.39, 41.75] },
+      { label: "Amisus", coordinates: [36.33, 41.29] }
+    ]
+  },
+  {
+    areaId: "commagene",
+    references: [{ label: "Samosata", coordinates: [38.606, 37.58] }]
+  },
+  {
+    areaId: "arabia",
+    references: [{ label: "Petra", coordinates: [35.444, 30.328] }]
+  },
+  {
     areaId: "egypt",
     references: [{ label: "Alexandria", coordinates: [29.9, 31.2] }]
+  },
+  {
+    areaId: "armenia",
+    references: [{ label: "Artaxata", coordinates: [44.57, 39.96] }]
+  },
+  {
+    areaId: "parthian-empire",
+    references: [{ label: "Ctesiphon", coordinates: [44.58, 33.1] }]
   }
 ];
 
@@ -353,7 +413,7 @@ function multiPolygonFromCells(cellGeometries) {
   }
   return {
     type: "MultiPolygon",
-    coordinates: roundCoordinates(coordinates)
+    coordinates
   };
 }
 
@@ -399,7 +459,7 @@ async function dissolveCellGeometries(cellGeometries, workDirectory, areaId) {
 
   return {
     ...dissolvedFeatures[0].geometry,
-    coordinates: roundCoordinates(dissolvedFeatures[0].geometry.coordinates)
+    coordinates: dissolvedFeatures[0].geometry.coordinates
   };
 }
 
@@ -408,12 +468,156 @@ async function writeJson(filePath, payload) {
   await fs.writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
+function buildCustomSplitLines() {
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {
+          splitId: "galilee-samaria-ginea-line",
+          source: "bib:josephus-jewish-war-3.3.1-and-3.3.4"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [34.74, 32.85],
+            [35.25, 32.47],
+            [35.55, 32.52]
+          ]
+        }
+      },
+      {
+        type: "Feature",
+        properties: {
+          splitId: "achaia-macedonia-approx",
+          source: "awmc:roman-empire-ce-200-provinces"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [20.95, 39.5],
+            [24.25, 39.5]
+          ]
+        }
+      },
+      {
+        type: "Feature",
+        properties: {
+          splitId: "perea-north-edge-at-pella",
+          source: "bib:josephus-jewish-war-3.3.3"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [35.62, 32.47],
+            [36.24, 32.47]
+          ]
+        }
+      },
+      {
+        type: "Feature",
+        properties: {
+          splitId: "egypt-arabia-approx-ad200-sinai",
+          source: "awmc:roman-empire-ce-200-provinces"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [33.4, 31.45],
+            [34.4, 30.8],
+            [35.2, 30.1],
+            [35.95, 29.15]
+          ]
+        }
+      },
+      {
+        type: "Feature",
+        properties: {
+          splitId: "cilicia-pedias-tracheia-lamus-approx",
+          source: "bib:strabo-geography-14.5.6"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [34.2, 36.45],
+            [34.2, 36.15]
+          ]
+        }
+      },
+      {
+        type: "Feature",
+        properties: {
+          splitId: "galatia-cappadocia-approx-lake-tatta",
+          source: "bib:strabo-geography-12.5.4"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [33.2, 39.05],
+            [34.6, 38.95],
+            [36.15, 38.75]
+          ]
+        }
+      }
+    ]
+  };
+}
+
+function selectRiverBoundaryFeatures(allRiversSource) {
+  const names = new Set(["Jordan", "Euphrates", "Tigris", "Kiz?lirmak", "Kizilirmak", "Aras"]);
+  return {
+    type: "FeatureCollection",
+    features: (allRiversSource.features ?? []).filter((feature) =>
+      names.has(String(feature.properties?.name_en ?? feature.properties?.name ?? "").trim())
+    )
+  };
+}
+
 async function buildProvinceCells(workDirectory, sources) {
   const cellPath = path.join(workDirectory, "province-cells.geojson");
   await runMapshaper([
     "-i",
     sources.provinceLinesPath,
     "name=prov",
+    "-i",
+    sources.empireExtent200Path,
+    "name=emp200",
+    "-i",
+    sources.empireExtent60Path,
+    "name=emp60",
+    "-i",
+    sources.herodPath,
+    "name=herod",
+    "-i",
+    sources.senatorialPath,
+    "name=sen",
+    "-i",
+    sources.riversPath,
+    "name=rivers",
+    "-i",
+    sources.customSplitLinesPath,
+    "name=customsplits",
+    "-target",
+    "emp200",
+    "-dissolve",
+    "-lines",
+    "name=emp200_line",
+    "-target",
+    "emp60",
+    "-dissolve",
+    "-lines",
+    "name=emp60_line",
+    "-target",
+    "herod",
+    "-dissolve",
+    "-lines",
+    "name=herod_line",
+    "-target",
+    "sen",
+    "-dissolve",
+    "-lines",
+    "name=sen_line",
     "-i",
     sources.awmcCoastlinePath,
     "name=coast",
@@ -426,7 +630,7 @@ async function buildProvinceCells(workDirectory, sources) {
     "-lines",
     "name=emp_line",
     "-target",
-    "prov,coast,emp_line",
+    "prov,coast,emp_line,emp200_line,emp60_line,herod_line,sen_line,rivers,customsplits",
     "-merge-layers",
     "force",
     "name=linework",
@@ -436,7 +640,7 @@ async function buildProvinceCells(workDirectory, sources) {
     "interval=0.001",
     "-clean",
     "-polygons",
-    "gap-tolerance=0.2",
+    "gap-tolerance=0.02",
     "-rename-layers",
     "cells",
     "-o",
@@ -509,7 +713,7 @@ async function buildAncientAreas(cellFeatures, workDirectory) {
         areaId: definition.areaId,
         provenance: {
           dataset: "AWMC geodata",
-          version: `commit:${AWMC_COMMIT};paths:${AWMC_PROVINCE_LINES_PATH}|${AWMC_COASTLINE_PATH}|${AWMC_EMPIRE_117_PATH}`,
+          version: `commit:${AWMC_COMMIT};paths:${AWMC_PROVINCE_LINES_PATH}|${AWMC_COASTLINE_PATH}|${AWMC_EMPIRE_117_PATH}|${AWMC_EMPIRE_200_EXTENT_PATH}|${AWMC_EMPIRE_60_BCE_PATH}|${AWMC_HEROD_PATH}|${AWMC_SENATORIAL_PROVINCES_PATH};ne-commit:${NATURAL_EARTH_COMMIT};ne-path:${NATURAL_EARTH_RIVERS_PATH}`,
           upstreamFeatureIds: cellIds.map((cellId) => `awmc:province-cell-${cellId}`),
           changes: [
             {
@@ -520,7 +724,13 @@ async function buildAncientAreas(cellFeatures, workDirectory) {
               sources: [
                 "awmc:roman-empire-ce-200-provinces",
                 "awmc:roman-empire-ce-117-extent",
-                "awmc:shoreline"
+                "awmc:roman-empire-ce-200-extent",
+                "awmc:roman-empire-bce-60-extent",
+                "awmc:herod-outline",
+                "awmc:roman-senatorial-provinces",
+                "awmc:shoreline",
+                "bib:josephus-jewish-war",
+                "bib:strabo-geography"
               ]
             },
             {
@@ -722,20 +932,33 @@ async function main() {
   const paths = {
     provinceLinesPath: path.join(WORK_DIRECTORY, "provinces200-lines.geojson"),
     empireExtentPath: path.join(WORK_DIRECTORY, "empire117.geojson"),
+    empireExtent200Path: path.join(WORK_DIRECTORY, "empire200.geojson"),
+    empireExtent60Path: path.join(WORK_DIRECTORY, "empire60bce.geojson"),
+    senatorialPath: path.join(WORK_DIRECTORY, "roman-senatorial-provinces.geojson"),
     herodPath: path.join(WORK_DIRECTORY, "herod.geojson"),
     roadsPath: path.join(WORK_DIRECTORY, "roads.geojson"),
     awmcCoastlinePath: path.join(WORK_DIRECTORY, "ancient-shoreline.geojson"),
-    modernCoastlinePath: path.join(WORK_DIRECTORY, "modern-coastline.geojson")
+    modernCoastlinePath: path.join(WORK_DIRECTORY, "modern-coastline.geojson"),
+    riversAllPath: path.join(WORK_DIRECTORY, "rivers-all.geojson"),
+    riversPath: path.join(WORK_DIRECTORY, "rivers-boundary-lines.geojson"),
+    customSplitLinesPath: path.join(WORK_DIRECTORY, "custom-split-lines.geojson")
   };
 
-  const [roadsSource, ancientCoastlineSource, modernCoastlineSource] = await Promise.all([
+  const [roadsSource, ancientCoastlineSource, modernCoastlineSource, riversAllSource] = await Promise.all([
     downloadJson(`${AWMC_BASE_URL}/${AWMC_ROADS_PATH}`, paths.roadsPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_COASTLINE_PATH}`, paths.awmcCoastlinePath),
     downloadJson(`${NATURAL_EARTH_BASE_URL}/${NATURAL_EARTH_COASTLINE_PATH}`, paths.modernCoastlinePath),
+    downloadJson(`${NATURAL_EARTH_BASE_URL}/${NATURAL_EARTH_RIVERS_PATH}`, paths.riversAllPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_PROVINCE_LINES_PATH}`, paths.provinceLinesPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_117_PATH}`, paths.empireExtentPath),
+    downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_200_EXTENT_PATH}`, paths.empireExtent200Path),
+    downloadJson(`${AWMC_BASE_URL}/${AWMC_EMPIRE_60_BCE_PATH}`, paths.empireExtent60Path),
+    downloadJson(`${AWMC_BASE_URL}/${AWMC_SENATORIAL_PROVINCES_PATH}`, paths.senatorialPath),
     downloadJson(`${AWMC_BASE_URL}/${AWMC_HEROD_PATH}`, paths.herodPath)
-  ]).then((values) => [values[0], values[1], values[2]]);
+  ]).then((values) => [values[0], values[1], values[2], values[3]]);
+
+  await writeJson(paths.riversPath, selectRiverBoundaryFeatures(riversAllSource));
+  await writeJson(paths.customSplitLinesPath, buildCustomSplitLines());
 
   const provinceCells = await buildProvinceCells(WORK_DIRECTORY, paths);
   const areaBuildResult = await buildAncientAreas(provinceCells, WORK_DIRECTORY);
@@ -747,6 +970,12 @@ async function main() {
   await runMapshaper([
     "-i",
     rawAreasPath,
+    "-filter-islands",
+    "min-area=5km2",
+    "-simplify",
+    "weighted",
+    "12%",
+    "keep-shapes",
     "-clean",
     "-o",
     "format=geojson",
