@@ -87,7 +87,7 @@
       "fromYear": -27,
       "toYear": 101,
       "holderId": "italy-direct",
-      "entity": "Italy (governed directly from Rome)",
+      "entity": "Italy",
       "sources": [
         "bib:cassius-dio-roman-history"
       ]

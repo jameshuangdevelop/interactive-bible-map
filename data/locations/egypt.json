@@ -91,8 +91,10 @@
       "holderId": "egypt-prefecture",
       "entity": "Roman Egypt (special imperial prefecture) (ruler: Equestrian prefect; senators barred without the emperor's leave)",
       "sources": [
+        "bib:suetonius-twelve-caesars",
         "bib:tacitus-annals"
-      ]
+      ],
+      "note": "Suetonius: after Cleopatra's death, Augustus \"reduced Egypt to the form of a province.\""
     }
   ],
   "status": "draft",

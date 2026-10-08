@@ -129,22 +129,32 @@
     },
     {
       "fromYear": 67,
-      "toYear": 69,
+      "toYear": 70,
+      "holderId": "achaia-free",
+      "entity": "Free Achaia",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "Suetonius: on his departure from Greece, Nero \"presented the entire province with freedom.\""
+    },
+    {
+      "fromYear": 70,
+      "toYear": 79,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "Suetonius records that Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+    },
+    {
+      "fromYear": 79,
+      "toYear": 101,
       "holderId": "achaia-province",
-      "entity": "Roman province of Achaia (ruler: Free (exempted by Nero))",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
       "sources": [
         "bib:suetonius-twelve-caesars"
       ]
-    },
-    {
-      "fromYear": 69,
-      "toYear": 101,
-      "holderId": "achaia-province",
-      "entity": "Roman province of Achaia (ruler: Senate, proconsul (Nero's grant of freedom reversed under Vespasian))",
-      "sources": [
-        "bib:worldhistory-vespasian"
-      ],
-      "note": "The exact year of the reversal was not found; shown at Vespasian's accession."
     }
   ],
   "status": "draft",

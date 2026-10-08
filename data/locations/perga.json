@@ -85,7 +85,7 @@
         "bib:tacitus-histories",
         "bib:livius-pamphylia"
       ],
-      "note": "Already held open in the existing records (Cassius Dio 60.17.3-4 read against Tacitus's Histories 2.9): this note holds it open too rather than defaulting to Galatia. AWMC's nearest face (AD 14 \"Pamphylia\") is far larger than Pamphylia's own coastal plain and likely also covers southern Pisidia (part of Galatia throughout); no finer line is available, so this area's drawn land may include some of Galatia's own territory for these years."
+      "note": "Cassius Dio (60.17.3-4) and Tacitus's Histories (2.9, with the Loeb editor's note) disagree on Pamphylia's standing in this span, so it is shown as unclear rather than as part of Galatia. The nearest mapped shape for this period is far larger than Pamphylia's own coastal plain and likely also covers southern Pisidia (part of Galatia throughout); this area's drawn land may therefore include some of Galatia's own territory for these years."
     },
     {
       "fromYear": 74,
@@ -93,7 +93,8 @@
       "holderId": "lycia-pamphylia-province",
       "entity": "Roman province of Lycia and Pamphylia",
       "sources": [
-        "bib:cassius-dio-roman-history"
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
       ]
     }
   ],

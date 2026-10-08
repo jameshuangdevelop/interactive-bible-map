@@ -80,7 +80,8 @@
       "entity": "Roman province of Syria",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:strabo-geography"
+        "bib:strabo-geography",
+        "bib:livius-cilicia"
       ],
       "note": "Administered from Syria throughout; Tarsus sits in this plain."
     },

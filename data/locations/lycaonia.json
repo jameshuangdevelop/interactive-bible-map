@@ -65,7 +65,7 @@
   "otConnections": [],
   "politicalHistory": [
     {
-      "fromYear": -4,
+      "fromYear": -25,
       "toYear": 101,
       "holderId": "galatia-province",
       "entity": "Roman province of Galatia",
@@ -73,9 +73,10 @@
         "bib:isbe-galatia",
         "bib:isbe-pisidia",
         "bib:zondervan-who-were-galatians",
-        "bib:strabo-geography"
+        "bib:strabo-geography",
+        "bib:livius-cappadocia"
       ],
-      "note": "Includes Pisidia, Lycaonia (the western part) and Paphlagonia, which had already joined the province of Galatia (Pisidia and Lycaonia in 25 BC on King Amyntas's death; Paphlagonia in 6 BC) before this note's window begins. Vespasian detached most of Pisidia to the new province of Lycia and Pamphylia in AD 74; no source describing exactly where that internal line ran was found, so this area is kept whole rather than guessing at a split."
+      "note": "Includes Pisidia, Lycaonia (the western part) and Paphlagonia, which had already joined the province of Galatia (Pisidia and Lycaonia in 25 BC on King Amyntas's death; Paphlagonia in 6 BC) before 4 BC. Vespasian detached most of Pisidia to the new province of Lycia and Pamphylia in AD 74; no source describing exactly where that internal line ran was found, so this area is kept whole rather than guessing at a split. Galatia and Cappadocia may have shared one governor from about AD 69 (see the Cappadocia area's own note), though no ancient source states a merger outright, so they stay two areas with their own holders."
     }
   ],
   "status": "draft",

@@ -70,8 +70,7 @@
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ]
     },
     {
@@ -90,9 +89,10 @@
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
       "sources": [
-        "bib:josephus-antiquities"
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
       ],
-      "note": "Quirinius, governing Syria, conducted a census at the start of this period. Luke 2:1-2 is dated by some instead to the time of Herod's birth narrative, before 4 BC, rather than to Quirinius's AD 6 census; this note does not resolve the question."
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; Josephus dates Quirinius's own census of Judea to this year. How the accounts relate is debated."
     },
     {
       "fromYear": 41,
@@ -109,7 +109,8 @@
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
       "sources": [
-        "bib:josephus-antiquities"
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
       ]
     },
     {
@@ -121,7 +122,7 @@
         "bib:josephus-jewish-war",
         "bib:livius-titus"
       ],
-      "note": "An administrative upgrade (a praetorian legate instead of a procurator), not a border or name change."
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
     }
   ],
   "status": "draft",

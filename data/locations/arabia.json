@@ -84,9 +84,10 @@
       "holderId": "nabataean-kingdom",
       "entity": "Nabataean kingdom (\"Arabia\") (ruler: Aretas IV)",
       "sources": [
-        "bib:livius-nabataeans"
+        "bib:livius-nabataeans",
+        "bib:isbe-arabia"
       ],
-      "note": "This area's drawn extent includes the Sinai peninsula: the Nabataean kingdom's own towns reached \"Rhinocolura (Al-Arish) and Gaza\" in the west, Egypt's conventional edge, so Sinai (between the two) falls with this area rather than Egypt."
+      "note": "ISBE's \"Arabia\" entry classes the Sinai peninsula with \"Arabia Petrea,\" the region named for Petra, this kingdom's own capital. This area's drawn extent includes Sinai on that geographic basis; no ancient source describes exactly where the line between Arabia and Egypt ran, so a conventional modern approximation is used instead."
     },
     {
       "fromYear": 40,

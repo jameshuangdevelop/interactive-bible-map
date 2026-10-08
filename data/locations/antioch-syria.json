@@ -199,9 +199,10 @@
       "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:livius-cilicia"
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
       ],
-      "note": "Administers the Cilician plain throughout; also administered Philip's former tetrarchy (34-37, 44-53) and briefly Commagene and Cilicia Tracheia (17-38)."
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
     }
   ],
   "status": "draft",

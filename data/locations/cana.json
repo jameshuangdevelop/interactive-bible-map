@@ -156,8 +156,7 @@
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ],
       "candidate": 0
     },
@@ -183,14 +182,26 @@
     },
     {
       "fromYear": 44,
-      "toYear": 101,
+      "toYear": 70,
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
         "bib:josephus-antiquities",
         "bib:jewish-encyclopedia-agrippa-ii"
       ],
-      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae, and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not drawable land of their own, so this area's own extent does not change.",
+      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change.",
+      "candidate": 0
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
       "candidate": 0
     },
     {
@@ -199,8 +210,7 @@
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ],
       "candidate": 1
     },
@@ -226,14 +236,26 @@
     },
     {
       "fromYear": 44,
-      "toYear": 101,
+      "toYear": 70,
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
         "bib:josephus-antiquities",
         "bib:jewish-encyclopedia-agrippa-ii"
       ],
-      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae, and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not drawable land of their own, so this area's own extent does not change.",
+      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change.",
+      "candidate": 1
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
       "candidate": 1
     },
     {
@@ -253,9 +275,10 @@
       "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:livius-cilicia"
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
       ],
-      "note": "Administers the Cilician plain throughout; also administered Philip's former tetrarchy (34-37, 44-53) and briefly Commagene and Cilicia Tracheia (17-38).",
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6).",
       "candidate": 2
     }
   ],

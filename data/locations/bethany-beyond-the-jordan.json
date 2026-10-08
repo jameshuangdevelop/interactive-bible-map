@@ -135,8 +135,7 @@
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ],
       "candidate": 0
     },
@@ -162,14 +161,26 @@
     },
     {
       "fromYear": 44,
-      "toYear": 101,
+      "toYear": 70,
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
         "bib:josephus-antiquities",
         "bib:jewish-encyclopedia-agrippa-ii"
       ],
-      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae, and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not drawable land of their own, so this area's own extent does not change.",
+      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change.",
+      "candidate": 0
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
       "candidate": 0
     },
     {
@@ -178,8 +189,7 @@
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:josephus-antiquities",
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ],
       "candidate": 1
     },
@@ -200,9 +210,10 @@
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
       "sources": [
-        "bib:josephus-antiquities"
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
       ],
-      "note": "Quirinius, governing Syria, conducted a census at the start of this period. Luke 2:1-2 is dated by some instead to the time of Herod's birth narrative, before 4 BC, rather than to Quirinius's AD 6 census; this note does not resolve the question.",
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; Josephus dates Quirinius's own census of Judea to this year. How the accounts relate is debated.",
       "candidate": 1
     },
     {
@@ -221,7 +232,8 @@
       "holderId": "roman-province-judea",
       "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
       "sources": [
-        "bib:josephus-antiquities"
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
       ],
       "candidate": 1
     },
@@ -234,7 +246,7 @@
         "bib:josephus-jewish-war",
         "bib:livius-titus"
       ],
-      "note": "An administrative upgrade (a praetorian legate instead of a procurator), not a border or name change.",
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
       "candidate": 1
     }
   ],
