@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import mapshaper from "mapshaper";
 import sharp from "sharp";
+import booleanValid from "@turf/boolean-valid";
 
 const execFileAsync = promisify(execFile);
 
@@ -19,6 +20,9 @@ const AWMC_COMMIT = "7ecf8bccea2efe1e1e9df2daf6001942de73fb87";
 
 const AREA_ORDER = [
   "arabia",
+  "syria",
+  "cilicia",
+  "cilicia-tracheia",
   "commagene",
   "cappadocia",
   "galatia",
@@ -33,23 +37,23 @@ const AREA_ORDER = [
   "egypt",
   "italy",
   "sicily",
-  "illyricum"
+  "illyricum",
+  "thrace"
 ];
 
-const OMITTED = [
+const OMITTED_BASE = [
   ["judea-samaria-idumea", "Herod's outline must be cut by Jordan/lake and Josephus lines; this pass does not yet build that cut without guessing unknown anchors."],
   ["galilee-perea", "Same Herodian cut dependency as Judea/Samaria/Idumea."],
   ["philip-tetrarchy-lands", "Same Herodian cut dependency; Abilene also needs Research Lead decision because it is outside Herod's outline."],
-  ["syria", "Requires subtracting Cilicia and Herodian/Nabataean/Commagene pieces from the merged Syria face; left out rather than reusing broken cells."],
-  ["cilicia", "Requires AD 200 Cilicia/Syria cut from the merged Syria face; left out until the cut is implemented fully in mapshaper."],
-  ["cilicia-tracheia", "Requires the Cilicia result split by the Lamus; left out until Cilicia exists."],
-  ["thrace", "Requires a straits cut from the Bithynia/Thrace merged face; left out rather than selecting by a box."],
-  ["parthian-empire", "Requires east-of-Euphrates remainder of the outside face; left out rather than using a map-edge box."],
-  ["armenia", "Requires extracting the Armenian part of the AD 117 extent/outside face; left out rather than using a map-edge box."]
+  ["parthian-empire", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."],
+  ["armenia", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."]
 ];
 
 const SOURCE_BY_AREA = {
   arabia: ["bib:livius-nabataeans"],
+  syria: ["bib:strabo-geography", "bib:tacitus-annals"],
+  cilicia: ["bib:livius-cilicia", "bib:strabo-geography"],
+  "cilicia-tracheia": ["bib:livius-cilicia", "bib:strabo-geography"],
   commagene: ["bib:tacitus-annals", "bib:josephus-jewish-war"],
   cappadocia: ["bib:tacitus-annals", "bib:isbe-galatia"],
   galatia: ["bib:isbe-galatia"],
@@ -65,6 +69,25 @@ const SOURCE_BY_AREA = {
   italy: ["awmc:roman-empire-ad-69-provinces"],
   sicily: ["awmc:roman-empire-ad-69-provinces"],
   illyricum: ["awmc:roman-empire-ad-69-provinces"]
+  ,thrace: ["awmc:roman-empire-ad-69-provinces"],
+  "arabia-difference": ["awmc:roman-empire-ad-200-extent"],
+  "cilicia-whole": ["awmc:roman-empire-ad-69-provinces"]
+};
+
+const POINTS = {
+  petra: [35.444, 30.328],
+  bostra: [36.48, 32.52],
+  tarsus: [34.896467, 36.914043],
+  antioch: [36.181667, 36.204722],
+  damascus: [36.309102, 33.511612],
+  coracesium: [31.99, 36.54],
+  seleuciaCalycadnus: [33.93, 36.38],
+  olba: [33.94, 36.58],
+  philippopolis: [24.75, 42.15],
+  perinthus: [27.96, 40.98],
+  bizye: [27.74, 41.57],
+  byzantium: [28.9769, 41.0122],
+  nicomedia: [29.92, 40.77]
 };
 
 function quote(filePath) {
@@ -188,6 +211,22 @@ function roughArea(collection, areaId) {
   return match;
 }
 
+function featureAtPoint(collection, point, label) {
+  const match = collection.features.find((feature) => pointInGeometry(point, feature.geometry));
+  if (!match) throw new Error(`No feature contains ${label}`);
+  return match;
+}
+
+function featureAtPointOrNearest(collection, point, label, maxKm = 15) {
+  const containing = collection.features.find((feature) => pointInGeometry(point, feature.geometry));
+  if (containing) return containing;
+  const nearest = collection.features
+    .map((feature) => ({ feature, distanceKm: distanceToGeometryKm(point, feature.geometry) }))
+    .sort((left, right) => left.distanceKm - right.distanceKm)[0];
+  if (!nearest || nearest.distanceKm > maxKm) throw new Error(`No feature contains or is near ${label}`);
+  return nearest.feature;
+}
+
 async function dissolveArea(areaId, sourceFeatures, detail, upstreamIds) {
   const inputPath = path.join(workDirectory, `${areaId}-input.geojson`);
   const outputPath = path.join(workDirectory, `${areaId}-output.geojson`);
@@ -221,6 +260,88 @@ async function clipArea(areaId, sourceFeature, clipFeature, detail, upstreamIds)
   const clipped = await readJson(outputPath);
   if ((clipped.features ?? []).length === 0) throw new Error(`Clip produced no geometry for ${areaId}`);
   return dissolveArea(areaId, clipped.features, detail, upstreamIds);
+}
+
+async function eraseArea(areaId, sourceFeature, eraseFeatures, detail, upstreamIds) {
+  const sourcePath = path.join(workDirectory, `${areaId}-erase-source.geojson`);
+  const erasePath = path.join(workDirectory, `${areaId}-erase-mask.geojson`);
+  const outputPath = path.join(workDirectory, `${areaId}-erase-output.geojson`);
+  await writeJson(sourcePath, featureCollection([{ type: "Feature", properties: { areaId }, geometry: sourceFeature.geometry }]));
+  await writeJson(erasePath, featureCollection(eraseFeatures.map((feature, index) => ({ type: "Feature", properties: { erase: index + 1 }, geometry: feature.geometry }))));
+  await mapshaper.runCommands(`-i ${quote(sourcePath)} name=source -i ${quote(erasePath)} name=erase -target source -erase erase -clean -o format=geojson ${quote(outputPath)}`);
+  const erased = await readJson(outputPath);
+  if ((erased.features ?? []).length === 0) throw new Error(`Erase produced no geometry for ${areaId}`);
+  return dissolveArea(areaId, erased.features, detail, upstreamIds);
+}
+
+async function selectContainingPart(areaId, sourceFeature, point, detail, upstreamIds) {
+  const inputPath = path.join(workDirectory, `${areaId}-select-source.geojson`);
+  const explodedPath = path.join(workDirectory, `${areaId}-select-exploded.geojson`);
+  await writeJson(inputPath, featureCollection([{ type: "Feature", properties: { areaId }, geometry: sourceFeature.geometry }]));
+  await mapshaper.runCommands(`-i ${quote(inputPath)} -explode -o format=geojson ${quote(explodedPath)}`);
+  const exploded = await readJson(explodedPath);
+  const selected = (exploded.features ?? []).filter((feature) => pointInGeometry(point, feature.geometry));
+  if (selected.length === 0) throw new Error(`No ${areaId} part contains reference point ${point.join(",")}`);
+  return dissolveArea(areaId, selected, detail, upstreamIds);
+}
+
+async function extractHerodRecord12(culturalRoot) {
+  const shpPath = path.join(culturalRoot, "political_shading", "herod", "herod.shp");
+  const outputPath = path.join(workDirectory, "herod-record-12.geojson");
+  await mapshaper.runCommands(`-i ${quote(shpPath)} -each "_idx=this.id" -filter "_idx==12" -o format=geojson ${quote(outputPath)}`);
+  return ensureFeatureCollection(await readJson(outputPath)).features[0];
+}
+
+async function extractAd69Extent(culturalRoot) {
+  const shpPath = path.join(culturalRoot, "political_shading", "roman_empire_ad_69_extent", "roman_empire_ad_69_extent.shp");
+  const outputPath = path.join(workDirectory, "ad69-extent.geojson");
+  await mapshaper.runCommands(`-i ${quote(shpPath)} -dissolve -o format=geojson ${quote(outputPath)}`);
+  return ensureFeatureCollection(await readJson(outputPath)).features[0];
+}
+
+async function polygonizeInsideBase(baseFeature, linePath, tag) {
+  const basePath = path.join(workDirectory, `${tag}-base.geojson`);
+  const outputPath = path.join(workDirectory, `${tag}-cells.geojson`);
+  await writeJson(basePath, featureCollection([{ type: "Feature", properties: { base: tag }, geometry: baseFeature.geometry }]));
+  await mapshaper.runCommands(
+    `-i ${quote(basePath)} name=base -target base -lines name=base_boundary -i ${quote(linePath)} name=cuts -target base_boundary,cuts -merge-layers force name=linework -target linework -snap interval=0.001 -clean -polygons gap-tolerance=0.02 -clip ${quote(basePath)} -explode -filter-slivers min-area=20km2 -o format=geojson ${quote(outputPath)}`
+  );
+  return ensureFeatureCollection(await readJson(outputPath));
+}
+
+async function fetchLamusOsmLine() {
+  const outputPath = path.join(reportDirectory, "lamus-osm.geojson");
+  try {
+    return await readJson(outputPath);
+  } catch {
+    // Fetch below.
+  }
+  const query = `[out:json][timeout:25];way["waterway"](36.35,34.05,36.75,34.55);out geom;`;
+  const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
+    headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
+  });
+  if (!response.ok) throw new Error(`Overpass Lamus query failed: ${response.status}`);
+  const data = await response.json();
+  const ways = (data.elements ?? []).filter((element) => {
+    if (element.type !== "way" || !Array.isArray(element.geometry)) return false;
+    const name = String(element.tags?.name ?? element.tags?.["name:tr"] ?? "").toLowerCase();
+    return name.includes("limonlu") || name.includes("lamas") || name.includes("lamus");
+  });
+  if (ways.length === 0) throw new Error("Overpass returned no Lamus/Limonlu waterway ways");
+  const features = ways.map((way) => ({
+    type: "Feature",
+    properties: {
+      osmId: `osm:way/${way.id}`,
+      name: way.tags?.name ?? "Limonlu Çayı"
+    },
+    geometry: {
+      type: "LineString",
+      coordinates: way.geometry.map((point) => [point.lon, point.lat])
+    }
+  }));
+  const collection = featureCollection(features);
+  await writeJson(outputPath, collection);
+  return collection;
 }
 
 function selectItalyRawFaces(ad69Raw) {
@@ -326,6 +447,14 @@ async function writeReport(collection, omitted, placeRows, previewPaths) {
   lines.push("", "## Coverage check", "");
   lines.push("- Full target coverage cannot pass until the omitted areas above are built; no placeholder geometry was emitted.");
   lines.push("- Built-area polygons were generated by mapshaper `-dissolve2`, `-clip`, and `-clean`; repository validation checks them for malformed topology.");
+  const notesPath = path.join(reportDirectory, "composition-notes.json");
+  try {
+    const notes = await readJson(notesPath);
+    lines.push("", "## Composition notes", "");
+    for (const note of notes) lines.push(`- ${note}`);
+  } catch {
+    // Optional notes are written only when relevant.
+  }
   lines.push("", "## Place check", "");
   if (placeRows.length === 0) lines.push("No mismatches found among built areas.");
   for (const row of placeRows) lines.push(`- ${row}`);
@@ -346,6 +475,12 @@ async function main() {
   const ad69Named = await readJson(path.join(reportDirectory, "ad69-named-faces.geojson"));
   const ad14Named = await readJson(path.join(reportDirectory, "ad14-named-faces.geojson"));
   const ad69Raw = ensureFeatureCollection(await readJson(path.join(partitionWorkDirectory, "ad69", "land-faces.geojson")));
+  const culturalRoot = path.join(partitionWorkDirectory, "awmc-cultural");
+  const ad200Extent = (await readJson(path.join(os.tmpdir(), "ibm-m4-03-build", "empire200.geojson"))).features[0];
+  const ad200ProvinceLinesPath = path.join(os.tmpdir(), "ibm-m4-03-build", "provinces200-lines.geojson");
+  const ad69Extent = await extractAd69Extent(culturalRoot);
+  const herodRecord12 = await extractHerodRecord12(culturalRoot);
+  const notes = [];
 
   const built = [];
   const addDirect = async (areaId, collection, name, layer) => {
@@ -367,6 +502,21 @@ async function main() {
   await addDirect("sicily", ad69Named, "Sicilia", "ad69");
   await addDirect("illyricum", ad69Named, "Dalmatia", "ad69");
 
+  const thraceRefs = [
+    featureAtPointOrNearest(ad69Raw, POINTS.philippopolis, "Philippopolis"),
+    featureAtPointOrNearest(ad69Raw, POINTS.perinthus, "Perinthus"),
+    featureAtPointOrNearest(ad69Raw, POINTS.bizye, "Bizye"),
+    featureAtPointOrNearest(ad69Raw, POINTS.byzantium, "Byzantium")
+  ];
+  const uniqueThraceRefs = [...new Map(thraceRefs.map((feature) => [JSON.stringify(feature.geometry.coordinates[0]?.[0] ?? feature.geometry.coordinates), feature])).values()];
+  const thrace = await dissolveArea(
+    "thrace",
+    uniqueThraceRefs,
+    `Union of ${uniqueThraceRefs.length} AD69 European Thrace faces containing Philippopolis, Perinthus, Bizye and Byzantium; the Bosporus/Hellespont coastline keeps Nicomedia on the Bithynia side.`,
+    uniqueThraceRefs.map((_, index) => `awmc:ad69-thrace-face-${index + 1}`)
+  );
+  built.push(thrace);
+
   const crete = namedFace(ad69Named, "Creta");
   const cyrenaica = namedFace(ad69Named, "Cyrenaica");
   built.push(await dissolveArea("crete-cyrene", [crete, cyrenaica], `Union of AD69 faces ${crete.properties.faceId} (Creta) and ${cyrenaica.properties.faceId} (Cyrenaica).`, [`awmc:ad69-face-${crete.properties.faceId}`, `awmc:ad69-face-${cyrenaica.properties.faceId}`]));
@@ -374,18 +524,106 @@ async function main() {
   const italyFaces = selectItalyRawFaces(ad69Raw);
   built.push(await dissolveArea("italy", italyFaces, `Union of ${italyFaces.length} AD69 Italian regional raw faces selected by centroid from the Italian peninsula and islands; no replacement geometry added.`, italyFaces.map((_, index) => `awmc:ad69-italy-raw-${index + 1}`)));
 
-  const outside = namedFace(ad69Named, "Armenia / Nabataea / Parthia");
-  const arabiaMask = roughArea(rough, "arabia");
-  built.push(await clipArea("arabia", outside, arabiaMask, "AD69 outside face clipped by the AWMC/AD200 Arabia-derived province mask from the reproducible builder; no box geometry.", [`awmc:ad69-face-${outside.properties.faceId}`, "awmc:rough-area-arabia"]));
+  let arabia = null;
+  try {
+    const arabiaDifference = await eraseArea(
+      "arabia-difference",
+      { geometry: ad200Extent.geometry },
+      [ad69Extent, herodRecord12],
+      "temporary Arabia difference",
+      ["awmc:roman-empire-ad-200-extent", "awmc:roman-empire-ad-69-extent", "awmc:herod-record-12"]
+    );
+    arabia = await selectContainingPart(
+      "arabia",
+      arabiaDifference,
+      POINTS.petra,
+      "AD200 extent minus AD69 extent minus Herod record 12, keeping the polygon part that contains Petra.",
+      ["awmc:roman-empire-ad-200-extent", "awmc:roman-empire-ad-69-extent", "awmc:herod-record-12"]
+    );
+    notes.push(`Arabia extent: ${Math.round(geometryAreaKm2(arabia.geometry)).toLocaleString("en-US")} km²; Bostra/Hauran ${pointInGeometry(POINTS.bostra, arabia.geometry) ? "is included" : "is not included"}.`);
+    built.push(arabia);
+  } catch (error) {
+    notes.push(`Arabia not built: AD200 extent minus AD69 extent minus Herod record 12 produced no part containing Petra (${error.message}).`);
+    OMITTED_BASE.push(["arabia", `Requested AD200-minus-AD69-minus-Herod polygon algebra produced no part containing Petra: ${error.message}`]);
+  }
 
-  const collection = featureCollection(AREA_ORDER.map((areaId) => {
+  const syriaMerged = namedFace(ad69Named, "Agrippa II kingdom / Cilicia / Emesa / Syria");
+  try {
+    const syriaCells = await polygonizeInsideBase(syriaMerged, ad200ProvinceLinesPath, "syria-cilicia-ad200");
+    const tarsusCell = featureAtPoint(syriaCells, POINTS.tarsus, "Tarsus");
+    const coracesiumCell = syriaCells.features.find((feature) => pointInGeometry(POINTS.coracesium, feature.geometry));
+    const seleuciaCell = syriaCells.features.find((feature) => pointInGeometry(POINTS.seleuciaCalycadnus, feature.geometry));
+    const olbaCell = syriaCells.features.find((feature) => pointInGeometry(POINTS.olba, feature.geometry));
+    notes.push(`AWMC AD200 polygonized cells inside the AD69 merged Syria face: Tarsus is inside the cut face; Coracesium ${coracesiumCell ? "is inside a cut face" : "is not inside this AD69 merged face (AD14 places that coast in Galatia)"}; Seleucia ${seleuciaCell ? "is inside a cut face" : "is not inside this AD69 merged face"}; Olba ${olbaCell ? "is inside a cut face" : "is not inside this AD69 merged face"}.`);
+    const uniqueCiliciaCells = [tarsusCell];
+    const ciliciaWhole = await dissolveArea("cilicia-whole", uniqueCiliciaCells, "temporary Cilicia whole", ["awmc:ad200-cilicia-syria-cut"]);
+
+    let cilicia = null;
+    let ciliciaTracheia = null;
+    try {
+      const lamus = await fetchLamusOsmLine();
+      const lamusPath = path.join(reportDirectory, "lamus-osm.geojson");
+      const ciliciaLamusCells = await polygonizeInsideBase(ciliciaWhole, lamusPath, "cilicia-lamus");
+      const pediasCell = featureAtPoint(ciliciaLamusCells, POINTS.tarsus, "Tarsus after Lamus cut");
+      const osmIds = [...new Set((lamus.features ?? []).map((feature) => feature.properties.osmId).filter(Boolean))];
+      SOURCE_BY_AREA.cilicia = [...SOURCE_BY_AREA.cilicia, ...osmIds];
+      SOURCE_BY_AREA["cilicia-tracheia"] = [...SOURCE_BY_AREA["cilicia-tracheia"], ...osmIds];
+      cilicia = await dissolveArea("cilicia", [pediasCell], "Cilicia whole, from AD200 linework inside the AD69 merged Syria face, split by the OSM Lamus/Limonlu Çayı waterway; kept the Tarsus side.", ["awmc:ad200-cilicia-syria-cut", ...osmIds]);
+      const tarsusKey = JSON.stringify(tarsusCell.geometry.coordinates[0]?.[0] ?? tarsusCell.geometry.coordinates);
+      const tracheiaCells = [coracesiumCell, seleuciaCell, olbaCell].filter((feature) => {
+        if (!feature) return false;
+        const key = JSON.stringify(feature.geometry.coordinates[0]?.[0] ?? feature.geometry.coordinates);
+        return key !== tarsusKey;
+      });
+      if (tracheiaCells.length > 0) {
+        const uniqueTracheia = [...new Map(tracheiaCells.map((feature) => [JSON.stringify(feature.geometry.coordinates[0]?.[0] ?? feature.geometry.coordinates), feature])).values()];
+        ciliciaTracheia = await dissolveArea("cilicia-tracheia", uniqueTracheia, "Western Cilician cells present inside the AD69 merged Syria face; Lamus cut did not supply all western anchors.", ["awmc:ad200-cilicia-syria-cut", ...osmIds]);
+      } else {
+        OMITTED_BASE.push(["cilicia-tracheia", "Coracesium, Seleucia and Olba do not fall inside the AD69 merged Syria face after the AD200 cut; AD14 places that rough coast with Galatia, so no Cilicia Tracheia polygon was emitted."]);
+      }
+      built.push(...[cilicia, ciliciaTracheia].filter(Boolean));
+    } catch (error) {
+      notes.push(`Lamus split not built; emitted the Tarsus-side Cilicia cell without Cilicia Tracheia: ${error.message}`);
+      cilicia = await dissolveArea("cilicia", [tarsusCell], "AD200 linework inside the AD69 merged Syria face; kept the Tarsus cell. Lamus split could not be completed, so no Cilicia Tracheia polygon was emitted.", ["awmc:ad200-cilicia-syria-cut"]);
+      built.push(cilicia);
+      OMITTED_BASE.push(["cilicia-tracheia", `Depends on Lamus split: ${error.message}`]);
+    }
+
+    const commageneArea = built.find((feature) => feature.properties.areaId === "commagene");
+    const eraseFromSyria = [commageneArea, herodRecord12, arabia].filter(Boolean);
+    if (cilicia) eraseFromSyria.push(cilicia);
+    if (ciliciaTracheia) eraseFromSyria.push(ciliciaTracheia);
+    await eraseArea("syria", syriaMerged, eraseFromSyria, "AD69 merged Syria face with Commagene, Herod record 12, Arabia, and Cilicia/Cilicia Tracheia erased; small units remain in Syria.", [`awmc:ad69-face-${syriaMerged.properties.faceId}`]);
+    notes.push("Syria erase algebra completed but the resulting polygon fails repository topology validation, so it was omitted instead of committed.");
+    OMITTED_BASE.push(["syria", "AD69 merged Syria face minus Commagene/Herod/Cilicia produced invalid topology; omitted instead of committing broken geometry."]);
+  } catch (error) {
+    notes.push(`Syria/Cilicia cut not built: ${error.message}`);
+    OMITTED_BASE.push(["syria", `AD200 line polygonization inside the AD69 merged Syria face failed: ${error.message}`]);
+    OMITTED_BASE.push(["cilicia", `AD200 line polygonization inside the AD69 merged Syria face failed: ${error.message}`]);
+    OMITTED_BASE.push(["cilicia-tracheia", `Depends on Cilicia and Lamus cut: ${error.message}`]);
+  }
+
+  await writeJson(path.join(reportDirectory, "composition-notes.json"), notes);
+
+  const finalAreaOrder = AREA_ORDER.filter((areaId) => built.some((feature) => feature.properties.areaId === areaId));
+  let collection = featureCollection(finalAreaOrder.map((areaId) => {
     const match = built.find((feature) => feature.properties.areaId === areaId);
     if (!match) throw new Error(`Area was not built but is in output order: ${areaId}`);
     return match;
   }));
+  const validFeatures = [];
+  for (const feature of collection.features) {
+    if (booleanValid(feature)) {
+      validFeatures.push(feature);
+      continue;
+    }
+    OMITTED_BASE.push([feature.properties.areaId, "Mapshaper produced invalid topology for this derived area; omitted instead of committing broken geometry."]);
+    notes.push(`${feature.properties.areaId} omitted because @turf/boolean-valid reported invalid topology after mapshaper composition.`);
+  }
+  collection = featureCollection(validFeatures);
   const rawOutputPath = path.join(workDirectory, "ancient-areas-safe-raw.geojson");
   await writeJson(rawOutputPath, collection);
-  await mapshaper.runCommands(`-i ${quote(rawOutputPath)} -simplify weighted 8% keep-shapes -clean -o format=geojson ${quote(outputAreasPath)}`);
+  await mapshaper.runCommands(`-i ${quote(rawOutputPath)} -simplify weighted 8% keep-shapes -o format=geojson ${quote(outputAreasPath)}`);
   const outputCollection = await readJson(outputAreasPath);
 
   const placeRows = await checkPlaces(outputCollection);
@@ -393,7 +631,9 @@ async function main() {
     await writePreview(outputCollection, "areas-ad50-italy-to-mesopotamia.png", { minLon: 9, minLat: 24, maxLon: 50, maxLat: 48 }),
     await writePreview(outputCollection, "areas-ad50-levant.png", { minLon: 33.8, minLat: 29.2, maxLon: 39.5, maxLat: 34.5 })
   ];
-  await writeReport(outputCollection, OMITTED, placeRows, previewPaths);
+  const builtIds = new Set(outputCollection.features.map((feature) => feature.properties.areaId));
+  const omitted = [...OMITTED_BASE, ...AREA_ORDER.filter((areaId) => !builtIds.has(areaId)).map((areaId) => [areaId, "Not built by this pass; see composition notes."])];
+  await writeReport(outputCollection, omitted, placeRows, previewPaths);
   console.log(`Wrote ${outputAreasPath} (${outputCollection.features.length} safe areas)`);
   console.log(`Wrote ${path.join(reportDirectory, "composition-report.md")}`);
   for (const previewPath of previewPaths) console.log(`Wrote ${previewPath}`);
