@@ -99,7 +99,11 @@ export async function overlapRows(collection) {
 export async function coverageRows(domainFeatures, collection, explanations, minimumKm2) {
   const domain = featureCollection(domainFeatures.map((feature) => ({ type: "Feature", properties: {}, geometry: feature.geometry })));
   const areas = featureCollection(collection.features.map((feature) => ({ type: "Feature", properties: {}, geometry: feature.geometry })));
-  const leftover = await runInMemory("-i domain.json name=domain -i areas.json name=areas -target domain -dissolve -erase areas -explode -o out.json format=geojson", {
+  // The domain is erased piece by piece and only then united: uniting first (with -dissolve2 or
+  // -dissolve) and erasing every area from that one large polygon can return nothing at all in
+  // mapshaper 0.6.113, where the leftover is small. `-dissolve2` (not `-dissolve`) unites overlapping
+  // pieces without leaving holes.
+  const leftover = await runInMemory("-i domain.json name=domain -i areas.json name=areas -target domain -erase areas -dissolve2 -explode -o out.json format=geojson", {
     "domain.json": domain,
     "areas.json": areas
   });

@@ -554,7 +554,9 @@ async function preparePartitionInputs(tag, provinceShpPath, extentShpPath, coast
   const extensionPath = path.join(directory, "extensions.geojson");
   const bboxPath = path.join(directory, "bbox-frame.geojson");
   await runMapshaper(["-i", provinceShpPath, "-clip", `bbox=${BBOX_STRING}`, "-each", "_ibmLineId=this.id", "-o", "format=geojson", provinceLinesPath]);
-  await runMapshaper(["-i", extentShpPath, "-dissolve", "-lines", "-clip", `bbox=${BBOX_STRING}`, "-o", "format=geojson", extentLinePath]);
+  // The extent's polygons overlap in places (AD 69 over Raetia); `-clean -dissolve2` unites them where a
+  // plain `-dissolve` would leave land covered twice as a hole.
+  await runMapshaper(["-i", extentShpPath, "-clean", "-dissolve2", "-lines", "-clip", `bbox=${BBOX_STRING}`, "-o", "format=geojson", extentLinePath]);
   await runMapshaper(["-i", coastShpPath, "-clip", `bbox=${BBOX_STRING}`, "-each", "_ibmLineId=this.id", "-o", "format=geojson", coastlinePath]);
   await runMapshaper(["-i", neLandPath, "-clip", `bbox=${BBOX_STRING}`, "-dissolve", "-o", "format=geojson", landMaskPath]);
   await fs.writeFile(
