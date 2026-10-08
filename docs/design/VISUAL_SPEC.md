@@ -99,14 +99,15 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
   |---|---|---|
   | Roman province | Warm tint, `#B3261E` at 6% | Solid, `#7D5A50`, 1 px (1.5 px from zoom 7) |
   | Allied ("client") kingdom, tetrarchy, or free city or league under Rome | Ochre tint, `#E8A33D` at 12% | Dashed, `#7D5A50`, 1 px |
-  | Outside the empire (for example the Parthian Empire) | Grey tint, `#5F6368` at 6% | Solid, `#80868B`, 1 px |
+  | Outside the empire (for example the Parthian Empire, where a source gives its extent; none is drawn in M4, ADR-0037) | Grey tint, `#5F6368` at 6% | Solid, `#80868B`, 1 px |
+  | Status unclear in the sources (for example Chalcis in AD 48–50) | No tint; thin diagonal hatching in `#80868B` | Dotted, `#80868B`, 1 px |
   | The Roman Empire's outer edge | — | Solid, `#7D5A50`, 2 px |
 
   Above zoom 10 the fills fade out; the borders stay.
-- **Area labels:** spaced capitals, like province labels (§2 "Places on the map"), from the timeline data's English names. An area that is one of our records (for example Syria, Galatia, or Judea the province) uses that record's label, which opens the record as now. An area without a record (for example the tetrarchy of Philip) has a plain label, without the pointer cursor: hovering or focusing it shows a tooltip with its name, kind, ruler and years. A province record whose area doesn't exist in the selected year is hidden then; for example, the province of Judea in AD 41–44, when Agrippa I ruled it as king. Region labels (Galilee, Samaria and the others) stay as they are.
+- **Area labels:** one label for each holder of that year (a province, kingdom, tetrarchy, free league, or a state outside the empire), placed on its largest piece, in spaced capitals like province labels (§2 "Places on the map"), from the timeline data's English names. A holder that is one of our records (for example Syria, Galatia, or Judea the province) uses that record's label, which opens the record as now. A holder without a record (for example the tetrarchy of Philip) has a plain label, without the pointer cursor: hovering or focusing it shows a tooltip with its name, kind, ruler and years. An area whose status is unclear has no label; hovering it shows "Status unclear in the sources" with the reason. A province record that holds no land in the selected year is hidden then; for example, the province of Judea in AD 41–44, when Agrippa I ruled it as king. Region labels (Galilee, Samaria and the others) stay as they are.
 - **Roads:** major Roman roads (ADR-0037) as thin lines in `#8D6E63`, from 1 px at zoom 5 to 2 px at zoom 9; roads the data marks as known are solid, and conjectured ones dashed. They appear from zoom 5, under every label. No road names in M4.
 - **Ancient coastline,** only where it differs from today's (ADR-0037): land that was sea is drawn in the basemap's water colour with a dotted edge.
-- **Map key:** a small "Map key" button below the toggle opens a compact card: the three kinds of area, the empire's edge, known and conjectured roads, the ancient coastline, and "Borders are approximate. Sources are under Sources & credits."
+- **Map key:** a small "Map key" button below the toggle opens a compact card: the four kinds of area, the empire's edge, known and conjectured roads, the ancient coastline, and "Borders are approximate. Lands whose borders aren't known, such as Abilene or Polemon's kingdom of Pontus, aren't drawn. Sources are under Sources & credits."
 - **Smoothness:** the layer is drawn by MapLibre, like the pins (ADR-0024), so it moves with every drag and zoom.
 
 ### Timeline (M4)
@@ -117,7 +118,7 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
 - **Opening year:** the stop in force in AD 50 (ADR-0037). The URL keeps the stop (§10).
 
 ### Modern map (M4)
-- **Basemap:** our copy of Liberty with today's towns, roads, railways and country borders, labelled in English (`name:en`, falling back to the name in Latin script), with **disputed borders hidden** (ADR-0009) and **no points of interest**. Its zoom range is the same as the ancient map's. The fallback is VersaTiles Colorful, given the same treatment.
+- **Basemap:** our copy of Liberty with today's towns, roads, railways and country borders, labelled in English (`name:en`, falling back to the name in Latin script), with **disputed borders hidden** (ADR-0009) and **no points of interest**. Only country borders are drawn, never state or district lines, and no border lines at all inside a mask over Israel, the West Bank, Gaza and the Golan Heights, or over any other contested place where the data draws an unflagged line (ADR-0037). Its zoom range is the same as the ancient map's. The fallback is VersaTiles Colorful, given the same treatment.
 - **Our places:** the pins, clusters, badges, candidate letters and their Bible names stay as on the ancient map, the way Google Maps marks historic sites (ADR-0037; the PO's default until the human confirms it at MC6). The area labels (empires, provinces and regions), the ancient layer and the timeline are hidden.
 - **The panel** is the same on both maps.
 - **The toggle:** a two-part control, "Ancient | Modern", 40 px tall, on the panel's white surface and shadow; the selected part is filled with the accent colour, with white text. Switching keeps the camera and the selected place. The URL keeps the choice (§10).
