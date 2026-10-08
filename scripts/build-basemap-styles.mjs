@@ -33,12 +33,12 @@ const libertyLicensePartUrls = [
 
 const libertyModernName = "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)";
 const libertyModernMetadataLicense =
-  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
+  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
 
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
 const versaTilesModernMetadataNotice =
-  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14.";
+  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14.";
 
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
@@ -67,6 +67,7 @@ Modifications in this copy:
 - Modern-map treatment: use English-only labels from name_en only
 - Hide disputed borders
 - Remove points of interest and airport labels
+- Apply neutrality masks so contested-area boundary lines are not drawn (this is not a sovereignty claim)
 - Max zoom set to 14
 
 Attribution string used in the vector source:
@@ -122,6 +123,28 @@ const libertyDisputedBoundaryLayerId = "boundary_disputed";
 const libertySubNationalBoundaryLayerId = "boundary_3";
 const versaTilesDisputedBoundaryLayerId = "boundary-country-disputed";
 const libertyPoiLayerIdPattern = /^poi_/u;
+const contestedBoundaryMaskPolygons = [
+  {
+    type: "Polygon",
+    coordinates: [[
+      [34.05, 29.35],
+      [36.30, 29.35],
+      [36.30, 33.65],
+      [34.05, 33.65],
+      [34.05, 29.35]
+    ]]
+  },
+  {
+    type: "Polygon",
+    coordinates: [[
+      [32.95, 34.95],
+      [33.75, 34.95],
+      [33.75, 35.50],
+      [32.95, 35.50],
+      [32.95, 34.95]
+    ]]
+  }
+];
 
 function modernEnglishLabelExpression(preferredFields) {
   const expression = ["coalesce"];
@@ -182,6 +205,20 @@ function appendDisputedFilterExclusion(existingFilter) {
   }
 
   return ["all", existingFilter, disputedFilter];
+}
+
+function appendContestedMaskExclusion(existingFilter) {
+  const withinMasks = contestedBoundaryMaskPolygons.map((polygon) => ["within", polygon]);
+  const maskExclusion =
+    withinMasks.length === 1
+      ? ["!", withinMasks[0]]
+      : ["!", ["any", ...withinMasks]];
+
+  if (!existingFilter) {
+    return maskExclusion;
+  }
+
+  return ["all", existingFilter, maskExclusion];
 }
 
 function removeLibertyModernExcludedLayers(style) {
@@ -260,12 +297,12 @@ function updateVersaTilesModernBoundaryFilters(style) {
   for (const layer of style.layers) {
     if (layer["source-layer"] === "boundaries") {
       if (layer.id === "boundary-country:outline") {
-        layer.filter = [
+        layer.filter = appendContestedMaskExclusion([
           "all",
           ["==", ["get", "admin_level"], 2],
           ["!=", ["get", "disputed"], true],
           ["!=", ["get", "maritime"], true]
-        ];
+        ]);
         continue;
       }
 
@@ -280,22 +317,22 @@ function updateVersaTilesModernBoundaryFilters(style) {
       }
 
       if (layer.id === "boundary-country") {
-        layer.filter = [
+        layer.filter = appendContestedMaskExclusion([
           "all",
           ["==", ["get", "admin_level"], 2],
           ["!=", ["get", "disputed"], true],
           ["!=", ["get", "maritime"], true]
-        ];
+        ]);
         continue;
       }
 
       if (layer.id === "boundary-country-maritime") {
-        layer.filter = [
+        layer.filter = appendContestedMaskExclusion([
           "all",
           ["==", ["get", "admin_level"], 2],
           ["==", ["get", "maritime"], true],
           ["!=", ["get", "disputed"], true]
-        ];
+        ]);
         continue;
       }
     }
@@ -503,6 +540,10 @@ function buildModernLibertyStyle(upstreamStyle) {
   }
 
   removeLibertyModernExcludedLayers(style);
+  const countryBoundaryLayer = style.layers.find((layer) => layer.id === "boundary_2");
+  if (countryBoundaryLayer) {
+    countryBoundaryLayer.filter = appendContestedMaskExclusion(countryBoundaryLayer.filter);
+  }
   updateLibertyModernLabelFields(style);
   clampVectorSourceMaxZoomTo14(style);
   normalizeMaxZoom(style);

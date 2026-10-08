@@ -3,7 +3,7 @@
   "name": "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)",
   "metadata": {
     "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
+    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14."
   },
   "glyphs": "https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf",
   "sprite": [
@@ -14512,28 +14512,97 @@
       "filter": [
         "all",
         [
-          "==",
+          "all",
           [
-            "get",
-            "admin_level"
+            "==",
+            [
+              "get",
+              "admin_level"
+            ],
+            2
           ],
-          2
+          [
+            "!=",
+            [
+              "get",
+              "disputed"
+            ],
+            true
+          ],
+          [
+            "!=",
+            [
+              "get",
+              "maritime"
+            ],
+            true
+          ]
         ],
         [
-          "!=",
+          "!",
           [
-            "get",
-            "disputed"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "maritime"
-          ],
-          true
+            "any",
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      34.05,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      29.35
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      32.95,
+                      34.95
+                    ],
+                    [
+                      33.75,
+                      34.95
+                    ],
+                    [
+                      33.75,
+                      35.5
+                    ],
+                    [
+                      32.95,
+                      35.5
+                    ],
+                    [
+                      32.95,
+                      34.95
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
         ]
       ],
       "paint": {
@@ -14569,28 +14638,97 @@
       "filter": [
         "all",
         [
-          "==",
+          "all",
           [
-            "get",
-            "admin_level"
+            "==",
+            [
+              "get",
+              "admin_level"
+            ],
+            2
           ],
-          2
+          [
+            "!=",
+            [
+              "get",
+              "disputed"
+            ],
+            true
+          ],
+          [
+            "!=",
+            [
+              "get",
+              "maritime"
+            ],
+            true
+          ]
         ],
         [
-          "!=",
+          "!",
           [
-            "get",
-            "disputed"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "maritime"
-          ],
-          true
+            "any",
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      34.05,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      29.35
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      32.95,
+                      34.95
+                    ],
+                    [
+                      33.75,
+                      34.95
+                    ],
+                    [
+                      33.75,
+                      35.5
+                    ],
+                    [
+                      32.95,
+                      35.5
+                    ],
+                    [
+                      32.95,
+                      34.95
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
         ]
       ],
       "paint": {
@@ -14625,28 +14763,97 @@
       "filter": [
         "all",
         [
-          "==",
+          "all",
           [
-            "get",
-            "admin_level"
+            "==",
+            [
+              "get",
+              "admin_level"
+            ],
+            2
           ],
-          2
+          [
+            "==",
+            [
+              "get",
+              "maritime"
+            ],
+            true
+          ],
+          [
+            "!=",
+            [
+              "get",
+              "disputed"
+            ],
+            true
+          ]
         ],
         [
-          "==",
+          "!",
           [
-            "get",
-            "maritime"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "disputed"
-          ],
-          true
+            "any",
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      34.05,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      29.35
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      32.95,
+                      34.95
+                    ],
+                    [
+                      33.75,
+                      34.95
+                    ],
+                    [
+                      33.75,
+                      35.5
+                    ],
+                    [
+                      32.95,
+                      35.5
+                    ],
+                    [
+                      32.95,
+                      34.95
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
         ]
       ],
       "paint": {

@@ -525,6 +525,18 @@ function assertNoDisputedBoundaryFilters(style, styleName) {
   }
 }
 
+function expressionContainsOperator(expression, operator) {
+  if (!Array.isArray(expression)) {
+    return false;
+  }
+
+  if (expression[0] === operator) {
+    return true;
+  }
+
+  return expression.some((entry) => expressionContainsOperator(entry, operator));
+}
+
 function collectAdminLevelChecks(filter, levels = []) {
   if (!Array.isArray(filter)) {
     return levels;
@@ -641,7 +653,7 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   );
   assert.equal(
     style.metadata["interactive-bible-map:license"],
-    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   );
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
   assertLayerMissing(style, "boundary_disputed", "Liberty modern");
@@ -650,6 +662,13 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   assertNoLayerIdsMatching(style, /^poi_/u, "Liberty modern", "POI layers");
   assertLibertyModernLabels(style);
   assertOnlyCountryBoundaryLayers(style, "Liberty modern");
+  const libertyBoundary2Layer = style.layers.find((layer) => layer.id === "boundary_2");
+  assert.ok(libertyBoundary2Layer, "Liberty modern must keep boundary_2");
+  assert.equal(
+    expressionContainsOperator(libertyBoundary2Layer.filter ?? [], "within"),
+    true,
+    "Liberty modern boundary_2 filter must include a contested-area mask with within"
+  );
   assertMaxZoom14(style, "Liberty modern");
 });
 
@@ -662,7 +681,7 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   );
   assert.equal(
     style.metadata["interactive-bible-map:notice"],
-    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed); max zoom set to 14."
+    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; disputed borders hidden; points of interest and airport labels removed; neutrality masks suppress boundary lines in specific contested areas without asserting sovereignty); max zoom set to 14."
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
@@ -674,6 +693,15 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   assertNoDisputedBoundaryFilters(style, "VersaTiles modern");
   assertVersaTilesModernNameFields(style);
   assertOnlyCountryBoundaryLayers(style, "VersaTiles modern");
+  for (const layerId of ["boundary-country:outline", "boundary-country", "boundary-country-maritime"]) {
+    const layer = style.layers.find((candidate) => candidate.id === layerId);
+    assert.ok(layer, `VersaTiles modern must keep '${layerId}'`);
+    assert.equal(
+      expressionContainsOperator(layer.filter ?? [], "within"),
+      true,
+      `VersaTiles modern layer '${layerId}' must include a contested-area mask with within`
+    );
+  }
   assertMaxZoom14(style, "VersaTiles modern");
 });
 
