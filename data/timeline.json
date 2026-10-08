@@ -641,6 +641,7 @@
           "toYear": 40,
           "holderId": "nabataean-kingdom",
           "ruler": "Aretas IV",
+          "note": "This area's drawn extent includes the Sinai peninsula: the Nabataean kingdom's own towns reached \"Rhinocolura (Al-Arish) and Gaza\" in the west, Egypt's conventional edge, so Sinai (between the two) falls with this area rather than Egypt.",
           "sources": [
             "bib:livius-nabataeans"
           ]

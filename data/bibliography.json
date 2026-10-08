@@ -2168,6 +2168,18 @@
       "publisher": "International Standard Bible Encyclopedia",
       "url": "https://www.internationalstandardbible.com/E/en-gannim.html",
       "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-golan",
+      "type": "web",
+      "title": "Golan; Gaulonitis",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "International Standard Bible Encyclopedia",
+      "url": "https://www.internationalstandardbible.com/G/golan-gaulonitis.html",
+      "accessed": "2026-10-07"
     }
   ]
 }
