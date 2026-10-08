@@ -356,3 +356,44 @@ Run on this branch after my changes:
 - **GIS:** G10 (the silted gulfs), and G11 (Raphia's coast) once the Research Lead confirms RL8.
 - **Research Lead:** RL7 (RL4's citation) and RL8 (RL3, the §2.25 Sinai paragraph, open question 19 and §9).
 - **Then:** I re-check G10, G11, RL7 and RL8.
+
+## Final re-check (2026-10-08)
+
+**Scope.** Branch head `de82b19`:
+- the GIS Engineer's `cc7b81c` (G10, G11) and `de82b19`;
+- the Research Lead's `648676e` (RL7, RL8), merged as `b78f108`.
+
+**Result: verified.** G10, G11, RL7 and RL8 pass. I reworded the new reader-facing notes on Gaza's coast myself (see below). The branch is ready.
+
+| Item | Status | Evidence |
+|---|---|---|
+| G10 | Fixed | My four points (27.38°E 37.55°N, 27.47°E 37.50°N, 27.30°E 37.97°N and 12.24°E 44.60°N) lie in no area. In the Miletus and Ephesus boxes, today's land in no area is 294.0 km² and 108.8 km², the same as in the first round. `data/geo/ancient-coastline.geojson` and `ancient-roads.geojson` are unchanged since `8f7071c`. |
+| The IJ | Acceptable | Inside the AD 69 extent, the strip is 195 km², and 40% of its outline runs along AWMC's ancient shoreline, which draws an estuary there. ADR-0037 makes the rest of the Roman world the extent "on land" and draws the edge only "where the Roman world's land meets land outside it". So the strip stays unshaded, and the edge stops at it and resumes beyond: 9 open pieces, no loop. The rule agrees with AWMC's data. |
+| G11 | Fixed | The face is in `judea-samaria-idumea`: Raphia is 3.6 km inside, and the face's centre 16.4 km. Gaza is in the same area, and Rhinocolura in `egypt`. The provenance cites `bib:josephus-antiquities` (17.11.4) and `bib:strabo-geography` (16.2.21, 16.2.31, 16.4.24) with exact quotations, and `arabia`'s no longer claims the face. |
+| RL7 | Fixed | §2.24 row 9 now cites 12.1.4 (Garsauritis among the ten prefectures) and 12.2.6, quoted exactly. |
+| RL8 | Fixed | §2.25's paragraph rests on Josephus and Strabo, quoted correctly, and calls Livius's list an undated overview, without quoting the cite-only page. Open question 19 and §9 agree. I changed its "1,814 km²" to "1,570 km² as drawn", to match the data. |
+
+**The reader-facing notes (ADR-0033).** The Research Lead added a sentence on Gaza's coast to five `judea-samaria-idumea` periods, and `fill:political-history` copies it into the political history of 18 places, Jerusalem's among them. As written, it needed changes:
+- it said "the coastal strip north to Rhinocolura", but the strip runs south-west from Gaza;
+- it used team terms ("rule 4", "see the -4-to-6 period's note", "drawn shape");
+- the first note named Josephus without introducing him;
+- it said the coast was "in the province of Syria throughout", including AD 41–44, but no cited source says so. Josephus gives Agrippa I "all that country over which Herod, who was his grandfather, had reigned, that is, Judea and Samaria" (*Antiquities* 19.5.1), and nothing after 4 BC places Gaza.
+
+I rewrote the sentence as small fixes, as M4-02's verification did for other notes:
+- **4 BC:** "The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area." This matches *Antiquities* 17.11.4: "which Caesar separated from his government, and added them to the province of Syria".
+- **The four later periods:** "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+
+The wording names no town that the period's sources don't support: "as far as Egypt" describes the map, where the strip ends at `egypt`. I then re-ran `npm run fill:political-history`, which updated the 18 places, and the derived-history check passes.
+
+**Small fixes in this commit:** the notes above in `data/timeline.json` and the 18 place records, and the figure in the research note.
+
+**The PR body:**
+- It is accurate for this round: G10, the IJ, G11, the size table and the tests.
+- I updated the size (289,312 bytes gzip) and RL8's line, ticked the sign-off and marked it ready.
+- Its two new ideas, silting and period shorelines, have working links. AWMC's shoreline does carry a period code for each shore (A, H, HR, R and L near Miletus and Ephesus).
+
+### Checks
+- `npm run validate:data`: 0 errors, 203 warnings (unchanged), with the derived-history check.
+- `npm test`: 223 of 223.
+- `npm run build:data`: passes; the ancient layer is 289,312 bytes gzip of 300,000.
+- `npm run test:app`: 136 of 136.
