@@ -121,7 +121,9 @@ export const PROJECT_BOUNDS = Object.freeze({
 export const REQUIRE_EMPIRE_ROOT = true;
 export const REQUIRE_MODERN_COUNTRIES = true;
 export const REQUIRE_MAJOR_IMAGES = true;
-export const REQUIRE_ANCIENT_SHAPES = false;
+// On since M4-03's shapes landed: every timeline area with `focus: true` needs a shape in
+// data/geo/ancient-areas.geojson. REQUIRE_ANCIENT_SHAPES=false in the environment relaxes it.
+export const REQUIRE_ANCIENT_SHAPES = true;
 export const REQUIRE_DERIVED_POLITICAL_HISTORY = false;
 export const MAJOR_PLACE_MIN_IMAGE_COUNT = 4;
 export const MAJOR_PLACE_MAX_IMAGE_COUNT = 7;
