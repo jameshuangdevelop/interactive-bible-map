@@ -19,8 +19,8 @@ export const EXCLUDED_POST_AD100_ROADS = Object.freeze([
   {
     objectId: 1203,
     road: "the Via Traiana Nova, Volsinii to the borders of Clusium",
-    evidence: "Trajan's road: its milestone names him Dacicus, titles of 102–103 (W. V. Harris, ZPE 85, 1991; Livius \"Trajan\")",
-    short: "the Via Traiana Nova, Trajanic",
+    evidence: "Trajan's road: its milestones name him Dacicus and consul for the fifth time, titles of 102 and 103 (W. V. Harris, ZPE 85, 1991; Livius \"Trajan\")",
+    short: "the Via Traiana Nova, 103 or later",
     sources: ["bib:livius-trajan"]
   },
   {

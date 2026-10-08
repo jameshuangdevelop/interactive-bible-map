@@ -219,9 +219,9 @@ const GALATIA_CAPPADOCIA_ANCHORS = {
   ],
   galatia: [
     { name: "Lake Tatta", point: [33.3333, 38.8333], source: "pleiades:619268" },
-    { name: "Iconium", point: [32.4923, 37.8725] },
-    { name: "Lystra", point: [32.3445, 37.5883] },
-    { name: "Derbe", point: [33.3615, 37.3486] }
+    { name: "Iconium", point: [32.4923, 37.8725], source: "pleiades:648647" },
+    { name: "Lystra", point: [32.3445, 37.5883], source: "pleiades:648699" },
+    { name: "Derbe", point: [33.3615, 37.3486], source: "pleiades:648620" }
   ]
 };
 
