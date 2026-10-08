@@ -621,6 +621,19 @@
       "accessed": "2026-09-28"
     },
     {
+      "id": "isbe-rhodes",
+      "type": "chapter",
+      "title": "Rhodes",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/R/rhodes.html",
+      "accessed": "2026-10-08"
+    },
+    {
       "id": "isbe-crete",
       "type": "chapter",
       "title": "Crete",
@@ -2099,6 +2112,19 @@
       "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
       "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=thracia-geo",
       "accessed": "2026-10-07"
+    },
+    {
+      "id": "smith-dictionary-epeirus",
+      "type": "chapter",
+      "title": "Epeirus",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=epeirus-geo",
+      "accessed": "2026-10-08"
     },
     {
       "id": "livius-herod-agrippa-ii",
