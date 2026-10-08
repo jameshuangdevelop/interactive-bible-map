@@ -90,6 +90,7 @@ Generated app payloads:
 - `app/public/generated/ancient.coastline.geojson`
 - `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
   - Stop-area assignments carry each period's optional `note`.
+  - Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year.
   - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
 
 Places and political history:

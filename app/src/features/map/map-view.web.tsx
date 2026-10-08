@@ -62,6 +62,7 @@ import {
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
 import { formatTimelineYear } from "./timeline";
+import { ANCIENT_LAYER_STYLE } from "./ancient-layer-style";
 import type { MapViewProps } from "./map-view.types";
 import type {
   AncientEntityRecord,
@@ -861,7 +862,7 @@ function createTransparentCollisionImage(sizePx: number) {
 function createUncertainHatchImage() {
   return createCanvasImage(8, (context, size) => {
     context.clearRect(0, 0, size, size);
-    context.strokeStyle = "#80868B";
+    context.strokeStyle = ANCIENT_LAYER_STYLE.uncertain.hatchColor;
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(0, size);
@@ -1070,6 +1071,29 @@ function holderKindLabel(kind: AncientEntityRecord["kind"]) {
   return "Status unclear";
 }
 
+function previousTimelineYear(boundaryYear: number) {
+  if (boundaryYear === 1) {
+    return -1;
+  }
+  return boundaryYear - 1;
+}
+
+function formatHolderYearRange({
+  heldFromYear,
+  heldToYear,
+  timelineRangeEndYear
+}: {
+  heldFromYear: number;
+  heldToYear: number;
+  timelineRangeEndYear: number;
+}) {
+  if (heldToYear >= timelineRangeEndYear) {
+    return `from ${formatTimelineYear(heldFromYear)}`;
+  }
+
+  return `${formatTimelineYear(heldFromYear)} – ${formatTimelineYear(previousTimelineYear(heldToYear))}`;
+}
+
 function buildAncientAreaFeatures(
   shapes: AncientShapesPayload | null,
   stopPayload: AncientStopPayload | null,
@@ -1121,18 +1145,18 @@ function borderStyleFromKinds(
   right: AncientEntityRecord["kind"]
 ) {
   if (left === "uncertain" || right === "uncertain") {
-    return { borderStyle: "dotted", borderColor: "#80868B" };
+    return { borderStyle: "dotted", borderColor: ANCIENT_LAYER_STYLE.border.outsideColor };
   }
 
   if (left === "outside-empire" || right === "outside-empire") {
-    return { borderStyle: "solid", borderColor: "#80868B" };
+    return { borderStyle: "solid", borderColor: ANCIENT_LAYER_STYLE.border.outsideColor };
   }
 
   if (isClientKind(left) || isClientKind(right)) {
-    return { borderStyle: "dashed", borderColor: "#7D5A50" };
+    return { borderStyle: "dashed", borderColor: ANCIENT_LAYER_STYLE.border.romanSideColor };
   }
 
-  return { borderStyle: "solid", borderColor: "#7D5A50" };
+  return { borderStyle: "solid", borderColor: ANCIENT_LAYER_STYLE.border.romanSideColor };
 }
 
 function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): AncientLineFeatureCollection {
@@ -1156,7 +1180,8 @@ function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): Anc
 function buildAncientHolderLabelFeatures(
   stopPayload: AncientStopPayload | null,
   placeById: Map<string, PlaceIndexRecord>,
-  currentYear: number
+  currentYear: number,
+  timelineRangeEndYear: number
 ) {
   if (!stopPayload) {
     return createEmptyFeatureCollection();
@@ -1167,14 +1192,23 @@ function buildAncientHolderLabelFeatures(
     features: stopPayload.holderLabels
       .map((label) => {
         const place = label.locationId ? placeById.get(label.locationId) : null;
+        const holderAssignment = stopPayload.areas.find((area) => area.holderId === label.holderId);
         const labelText = label.name.toUpperCase();
         if (!place || !label.locationId) {
+          const yearRangeText = holderAssignment
+            ? formatHolderYearRange({
+                heldFromYear: holderAssignment.heldFromYear,
+                heldToYear: holderAssignment.heldToYear,
+                timelineRangeEndYear
+              })
+            : formatTimelineYear(currentYear);
+          const rulerText = holderAssignment?.ruler ? ` · ${holderAssignment.ruler}` : "";
           return {
             type: "Feature" as const,
             properties: {
               labelText,
               clickable: false,
-              tooltipText: `${label.name} · ${holderKindLabel(label.kind)} · ${formatTimelineYear(currentYear)}`
+              tooltipText: `${label.name} · ${holderKindLabel(label.kind)}${rulerText} · ${yearRangeText}`
             },
             geometry: {
               type: "Point" as const,
@@ -1223,16 +1257,16 @@ function ensureMapLayers(
           "match",
           ["get", "holderKind"],
           "roman-province",
-          "#B3261E",
+          ANCIENT_LAYER_STYLE.areaFill.romanProvince.color,
           "client-kingdom",
-          "#E8A33D",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
           "client-tetrarchy",
-          "#E8A33D",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
           "free-city-or-league",
-          "#E8A33D",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
           "outside-empire",
-          "#5F6368",
-          "#5F6368"
+          ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color,
+          ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color
         ],
         "fill-opacity": [
           "interpolate",
@@ -1243,15 +1277,15 @@ function ensureMapLayers(
             "match",
             ["get", "holderKind"],
             "roman-province",
-            0.06,
+            ANCIENT_LAYER_STYLE.areaFill.romanProvince.opacity,
             "client-kingdom",
-            0.12,
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
             "client-tetrarchy",
-            0.12,
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
             "free-city-or-league",
-            0.12,
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
             "outside-empire",
-            0.06,
+            ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.opacity,
             0
           ],
           10,
@@ -1281,7 +1315,7 @@ function ensureMapLayers(
       type: "line",
       filter: toLayerFilter(["==", ["get", "borderStyle"], "solid"]),
       paint: {
-        "line-color": ["coalesce", ["get", "borderColor"], "#7D5A50"],
+        "line-color": ["coalesce", ["get", "borderColor"], ANCIENT_LAYER_STYLE.border.romanSideColor],
         "line-width": ["interpolate", ["linear"], ["zoom"], 4, 1, 7, 1.5]
       }
     });
@@ -1294,7 +1328,7 @@ function ensureMapLayers(
       type: "line",
       filter: toLayerFilter(["==", ["get", "borderStyle"], "dashed"]),
       paint: {
-        "line-color": ["coalesce", ["get", "borderColor"], "#7D5A50"],
+        "line-color": ["coalesce", ["get", "borderColor"], ANCIENT_LAYER_STYLE.border.romanSideColor],
         "line-width": 1,
         "line-dasharray": [2, 2]
       }
@@ -1308,7 +1342,7 @@ function ensureMapLayers(
       type: "line",
       filter: toLayerFilter(["==", ["get", "borderStyle"], "dotted"]),
       paint: {
-        "line-color": ["coalesce", ["get", "borderColor"], "#80868B"],
+        "line-color": ["coalesce", ["get", "borderColor"], ANCIENT_LAYER_STYLE.border.outsideColor],
         "line-width": 1,
         "line-dasharray": [1, 2]
       }
@@ -1321,7 +1355,7 @@ function ensureMapLayers(
       source: sourceAncientEmpireEdgeId,
       type: "line",
       paint: {
-        "line-color": "#7D5A50",
+        "line-color": ANCIENT_LAYER_STYLE.border.romanSideColor,
         "line-width": 2
       }
     });
@@ -1335,7 +1369,7 @@ function ensureMapLayers(
       minzoom: 5,
       filter: toLayerFilter(["==", ["get", "known"], true]),
       paint: {
-        "line-color": "#8D6E63",
+        "line-color": ANCIENT_LAYER_STYLE.roads.color,
         "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2]
       }
     });
@@ -1349,7 +1383,7 @@ function ensureMapLayers(
       minzoom: 5,
       filter: toLayerFilter(["!=", ["get", "known"], true]),
       paint: {
-        "line-color": "#8D6E63",
+        "line-color": ANCIENT_LAYER_STYLE.roads.color,
         "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2],
         "line-dasharray": [2, 2]
       }
@@ -1362,7 +1396,7 @@ function ensureMapLayers(
       source: sourceAncientCoastlineId,
       type: "line",
       paint: {
-        "line-color": "#5D9AD0",
+        "line-color": ANCIENT_LAYER_STYLE.coastline.color,
         "line-width": 1.5,
         "line-dasharray": [1, 2]
       }
@@ -2478,6 +2512,8 @@ export function MapView({
   const scheduleVisibleEntryRefreshRef = useRef<() => void>(() => undefined);
   const syncSourcesAndLayersRef = useRef<() => void>(() => undefined);
   const updateScaleBarRef = useRef<() => void>(() => undefined);
+  const stopPayloadRequestIdsRef = useRef(new Set<string>());
+  const stopPrefetchScheduledRef = useRef(false);
 
   const runtimeTuning = useMemo(
     () =>
@@ -2550,8 +2586,14 @@ export function MapView({
   );
   const ancientHolderLabelFeatures = useMemo(() => {
     const currentYear = selectedAncientStopPayload?.year ?? timelineDefaultYear;
-    return buildAncientHolderLabelFeatures(selectedAncientStopPayload, placeById, currentYear);
-  }, [placeById, selectedAncientStopPayload]);
+    const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
+    return buildAncientHolderLabelFeatures(
+      selectedAncientStopPayload,
+      placeById,
+      currentYear,
+      timelineRangeEndYear
+    );
+  }, [ancientTimeline, placeById, selectedAncientStopPayload]);
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
@@ -2577,6 +2619,38 @@ export function MapView({
   useEffect(() => {
     mapModeRef.current = mapMode;
   }, [mapMode]);
+
+  const loadStopPayload = useCallback(async (stopId: string) => {
+    if (!stopId || stopPayloadRequestIdsRef.current.has(stopId)) {
+      return;
+    }
+
+    stopPayloadRequestIdsRef.current.add(stopId);
+    try {
+      const response = await fetch(`/generated/ancient.stop.${encodeURIComponent(stopId)}.json`, {
+        cache: "no-store"
+      });
+      if (!response.ok) {
+        throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
+      }
+
+      const payload = (await response.json()) as AncientStopPayload;
+      setAncientStopsById((previous) => {
+        if (previous[payload.stopId]) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [payload.stopId]: payload
+        };
+      });
+    } catch (error) {
+      console.error("Failed to load ancient stop payload.", error);
+    } finally {
+      stopPayloadRequestIdsRef.current.delete(stopId);
+    }
+  }, []);
 
   useEffect(() => {
     if (mapReadyVersion === 0 || ancientShapes) {
@@ -2630,37 +2704,48 @@ export function MapView({
       return;
     }
 
-    let cancelled = false;
-    void fetch(`/generated/ancient.stop.${encodeURIComponent(selectedTimelineStopId)}.json`, {
-      cache: "no-store"
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(
-            `Could not load ancient stop payload '${selectedTimelineStopId}' (${response.status})`
-          );
+    void loadStopPayload(selectedTimelineStopId);
+  }, [ancientStopsById, loadStopPayload, selectedTimelineStopId]);
+
+  useEffect(() => {
+    if (
+      stopPrefetchScheduledRef.current ||
+      !ancientTimeline ||
+      !ancientShapes ||
+      !selectedAncientStopPayload ||
+      mapReadyVersion === 0
+    ) {
+      return;
+    }
+
+    stopPrefetchScheduledRef.current = true;
+    const pendingStopIds = ancientTimeline.stops
+      .map((stop) => stop.id)
+      .filter((stopId) => stopId !== selectedAncientStopPayload.stopId);
+    if (pendingStopIds.length === 0) {
+      return;
+    }
+
+    const scheduleIdle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback.bind(window)
+        : (callback: () => void) => window.setTimeout(callback, 50);
+
+    scheduleIdle(() => {
+      for (const stopId of pendingStopIds) {
+        if (!ancientStopsById[stopId]) {
+          void loadStopPayload(stopId);
         }
-
-        return (await response.json()) as AncientStopPayload;
-      })
-      .then((payload) => {
-        if (cancelled) {
-          return;
-        }
-
-        setAncientStopsById((previous) => ({
-          ...previous,
-          [payload.stopId]: payload
-        }));
-      })
-      .catch((error) => {
-        console.error("Failed to load ancient stop payload.", error);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [ancientStopsById, selectedTimelineStopId]);
+      }
+    });
+  }, [
+    ancientShapes,
+    ancientStopsById,
+    ancientTimeline,
+    loadStopPayload,
+    mapReadyVersion,
+    selectedAncientStopPayload
+  ]);
 
   useEffect(() => {
     majorClusterTooltipByEntryIdRef.current.clear();

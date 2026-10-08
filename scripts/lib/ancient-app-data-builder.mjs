@@ -194,16 +194,43 @@ function polygonsFromGeometry(geometry) {
   return [];
 }
 
-function holderForYear(area, year) {
+function holderSpanForYear(area, year) {
   if (!Array.isArray(area?.periods)) {
     return null;
   }
-  for (const period of area.periods) {
-    if (period.fromYear <= year && year < period.toYear) {
-      return period;
-    }
+
+  const activeIndex = area.periods.findIndex(
+    (period) => period.fromYear <= year && year < period.toYear
+  );
+  if (activeIndex < 0) {
+    return null;
   }
-  return null;
+
+  const active = area.periods[activeIndex];
+  let heldFromYear = active.fromYear;
+  let heldToYear = active.toYear;
+
+  for (let index = activeIndex - 1; index >= 0; index -= 1) {
+    const period = area.periods[index];
+    if (period.holderId !== active.holderId || period.toYear !== heldFromYear) {
+      break;
+    }
+    heldFromYear = period.fromYear;
+  }
+
+  for (let index = activeIndex + 1; index < area.periods.length; index += 1) {
+    const period = area.periods[index];
+    if (period.holderId !== active.holderId || period.fromYear !== heldToYear) {
+      break;
+    }
+    heldToYear = period.toYear;
+  }
+
+  return {
+    period: active,
+    heldFromYear,
+    heldToYear
+  };
 }
 
 function normalizePair(left, right) {
@@ -520,10 +547,11 @@ export async function buildAncientAppData({
     const assignments = [];
     const assignmentsByAreaId = new Map();
     for (const area of areasById.values()) {
-      const period = holderForYear(area, stop.year);
-      if (!period) {
+      const holderSpan = holderSpanForYear(area, stop.year);
+      if (!holderSpan) {
         continue;
       }
+      const { period, heldFromYear, heldToYear } = holderSpan;
       const holder = entitiesById.get(period.holderId);
       if (!holder) {
         continue;
@@ -536,6 +564,8 @@ export async function buildAncientAppData({
         holderRomanSide: holder.romanSide,
         holderLocationId: holder.locationId ?? null,
         ruler: period.ruler ?? null,
+        heldFromYear,
+        heldToYear,
         note: period.note ?? null,
         hasShape: areaFeatureById.has(area.id)
       };

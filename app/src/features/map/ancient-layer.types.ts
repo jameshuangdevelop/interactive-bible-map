@@ -76,6 +76,8 @@ export interface AncientAreaAssignment {
   holderRomanSide: boolean;
   holderLocationId: string | null;
   ruler: string | null;
+  heldFromYear: TimelineYear;
+  heldToYear: TimelineYear;
   note: string | null;
   hasShape: boolean;
 }

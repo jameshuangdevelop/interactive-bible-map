@@ -12,7 +12,9 @@ import {
 
 import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
+import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
+import { ANCIENT_LAYER_STYLE } from "../features/map/ancient-layer-style";
 import {
   applyMapModeToSearch,
   applyTimelineYearToSearch,
@@ -45,6 +47,24 @@ const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const TIMELINE_DEFAULT_YEAR = 50;
+const TIMELINE_TRACK_THUMB_INSET_PX = 14;
+const EMPTY_BIBLIOGRAPHY_BY_ID = new Map();
+
+function toRgba(hexColor: string, opacity: number) {
+  const normalized = hexColor.replace("#", "");
+  if (normalized.length !== 6) {
+    return hexColor;
+  }
+
+  const red = Number.parseInt(normalized.slice(0, 2), 16);
+  const green = Number.parseInt(normalized.slice(2, 4), 16);
+  const blue = Number.parseInt(normalized.slice(4, 6), 16);
+  if (![red, green, blue].every(Number.isFinite)) {
+    return hexColor;
+  }
+
+  return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
+}
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -132,6 +152,23 @@ async function fetchAncientTimeline() {
 function visiblePlaceEntrySelectorById(entryId: string) {
   const escaped = entryId.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
   return `button[data-place-entry-id="${escaped}"]`;
+}
+
+function timelineStopTickLabel(stops: { year: number }[], index: number) {
+  const stop = stops[index];
+  if (stop.year < 0) {
+    const isFirstBc = !stops.slice(0, index).some((item) => item.year < 0);
+    return isFirstBc ? `${Math.abs(stop.year)} BC` : `${Math.abs(stop.year)}`;
+  }
+
+  const isFirstAd = !stops.slice(0, index).some((item) => item.year >= 0);
+  return isFirstAd ? `AD ${stop.year}` : `${stop.year}`;
+}
+
+function timelineTickPosition(fraction: number) {
+  const clamped = Math.max(0, Math.min(1, fraction));
+  const thumbInsetOffset = (1 - 2 * clamped) * TIMELINE_TRACK_THUMB_INSET_PX;
+  return `calc(${clamped * 100}% + ${thumbInsetOffset}px)`;
 }
 
 function MapLoadingPlaceholder() {
@@ -889,8 +926,66 @@ export function AppShell() {
                 boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)"
               }}
             >
-              <p style={{ margin: 0 }}>Roman province; client kingdom/tetrarchy/free city or league; outside the empire; status unclear.</p>
-              <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>Roman Empire edge; known roads (solid), conjectured roads (dashed); ancient coastline.</p>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "44px 1fr",
+                  rowGap: `${tokens.spacing.xs}px`,
+                  columnGap: `${tokens.spacing.sm}px`,
+                  alignItems: "center"
+                }}
+              >
+                <span
+                  style={{
+                    height: "14px",
+                    border: `1px solid ${ANCIENT_LAYER_STYLE.border.romanSideColor}`,
+                    backgroundColor: toRgba(
+                      ANCIENT_LAYER_STYLE.areaFill.romanProvince.color,
+                      ANCIENT_LAYER_STYLE.areaFill.romanProvince.opacity
+                    )
+                  }}
+                />
+                <span>Roman province</span>
+                <span
+                  style={{
+                    height: "14px",
+                    border: `1px dashed ${ANCIENT_LAYER_STYLE.border.romanSideColor}`,
+                    backgroundColor: toRgba(
+                      ANCIENT_LAYER_STYLE.areaFill.client.color,
+                      ANCIENT_LAYER_STYLE.areaFill.client.opacity
+                    )
+                  }}
+                />
+                <span>Client kingdom/tetrarchy/free city or league</span>
+                <span
+                  style={{
+                    height: "14px",
+                    border: `1px solid ${ANCIENT_LAYER_STYLE.border.outsideColor}`,
+                    backgroundColor: toRgba(
+                      ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color,
+                      ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.opacity
+                    )
+                  }}
+                />
+                <span>Outside the empire</span>
+                <span
+                  style={{
+                    height: "14px",
+                    border: `1px dotted ${ANCIENT_LAYER_STYLE.border.outsideColor}`,
+                    background:
+                      `repeating-linear-gradient(135deg, transparent 0, transparent 5px, ${ANCIENT_LAYER_STYLE.uncertain.hatchColor} 5px, ${ANCIENT_LAYER_STYLE.uncertain.hatchColor} 6px)`
+                  }}
+                />
+                <span>Status unclear in the sources</span>
+                <span style={{ height: "0", borderTop: `2px solid ${ANCIENT_LAYER_STYLE.border.romanSideColor}` }} />
+                <span>Roman Empire edge</span>
+                <span style={{ height: "0", borderTop: `2px solid ${ANCIENT_LAYER_STYLE.roads.color}` }} />
+                <span>Known roads</span>
+                <span style={{ height: "0", borderTop: `2px dashed ${ANCIENT_LAYER_STYLE.roads.color}` }} />
+                <span>Conjectured roads</span>
+                <span style={{ height: "0", borderTop: `2px dotted ${ANCIENT_LAYER_STYLE.coastline.color}` }} />
+                <span>Ancient coastline</span>
+              </div>
               <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
                 Borders are approximate. Lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn. Sources are under Sources &amp; credits.
               </p>
@@ -968,14 +1063,40 @@ export function AppShell() {
             >
               <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
               {selectedTimelineStop.scripture.length > 0 ? (
-                <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
-                  <strong>Passages:</strong> {selectedTimelineStop.scripture.join("; ")}
-                </p>
+                <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                  <strong>Passages:</strong>
+                  <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                    {selectedTimelineStop.scripture.map((reference) => (
+                      <li key={reference}>{reference}</li>
+                    ))}
+                  </ul>
+                </div>
               ) : null}
               {selectedTimelineStop.sources.length > 0 ? (
-                <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
-                  <strong>Sources:</strong> {selectedTimelineStop.sources.join("; ")}
-                </p>
+                <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                  <strong>Sources:</strong>
+                  <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                    {selectedTimelineStop.sources.map((sourceId) => {
+                      const source = formatSourceCitation(sourceId, EMPTY_BIBLIOGRAPHY_BY_ID);
+                      return (
+                        <li key={sourceId}>
+                          {source.url ? (
+                            <a
+                              href={source.url}
+                              rel="noopener noreferrer"
+                              style={{ color: "#1A73E8" }}
+                              target="_blank"
+                            >
+                              {source.label}
+                            </a>
+                          ) : (
+                            source.label
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               ) : null}
             </div>
           ) : null}
@@ -983,7 +1104,7 @@ export function AppShell() {
             style={{
               marginTop: `${tokens.spacing.sm}px`,
               display: "grid",
-              gridTemplateColumns: "44px 1fr 44px",
+              gridTemplateColumns: "44px minmax(0, 1fr) 44px",
               alignItems: "center",
               columnGap: `${tokens.spacing.sm}px`
             }}
@@ -1014,6 +1135,7 @@ export function AppShell() {
                 setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
               }}
               step={1}
+              style={{ width: "100%", margin: 0 }}
               type="range"
               value={Math.max(0, selectedTimelineStopIndex)}
             />
@@ -1036,19 +1158,49 @@ export function AppShell() {
             </button>
           </div>
           <div
+            aria-hidden="true"
             style={{
+              position: "relative",
               marginTop: `${tokens.spacing.xs}px`,
-              display: "grid",
-              gridTemplateColumns: `repeat(${Math.max(1, sortedTimelineStops.length)}, minmax(0, 1fr))`,
-              fontSize: `${tokens.typography.captionSize}px`,
-              color: tokens.color.textSecondary
+              height: "40px"
             }}
           >
-            {sortedTimelineStops.map((stop) => (
-              <span key={stop.id} style={{ textAlign: "center" }}>
-                {formatTimelineYear(stop.year)}
-              </span>
-            ))}
+            {sortedTimelineStops.map((stop, stopIndex) => {
+              const denominator = Math.max(1, sortedTimelineStops.length - 1);
+              const fraction = denominator === 0 ? 0 : stopIndex / denominator;
+              return (
+                <div
+                  key={stop.id}
+                  style={{
+                    position: "absolute",
+                    left: timelineTickPosition(fraction),
+                    transform: "translateX(-50%)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    minWidth: "2px"
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "1px",
+                      height: "8px",
+                      backgroundColor: "#5F6368"
+                    }}
+                  />
+                  <span
+                    style={{
+                      marginTop: "4px",
+                      whiteSpace: "nowrap",
+                      fontSize: `${tokens.typography.captionSize}px`,
+                      color: tokens.color.textSecondary
+                    }}
+                  >
+                    {timelineStopTickLabel(sortedTimelineStops, stopIndex)}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : null}

@@ -420,6 +420,9 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     const stopPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
     );
+    const galileeAt4bc = stopPayload.areas.find((area) => area.areaId === "galilee");
+    assert.equal(galileeAt4bc?.heldFromYear, -4);
+    assert.equal(galileeAt4bc?.heldToYear, 44);
     assert.ok(
       stopPayload.holderLabels.some((entry) => entry.holderId === "client-antipas"),
       "expected holder label for client-antipas"
@@ -440,7 +443,13 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     const ad44Payload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
     );
-    assert.equal(ad44Payload.areas.find((area) => area.areaId === "perea")?.note, "Status in the sources is unclear for this interval (fixture).");
+    const pereaAtAd44 = ad44Payload.areas.find((area) => area.areaId === "perea");
+    assert.equal(
+      pereaAtAd44?.note,
+      "Status in the sources is unclear for this interval (fixture)."
+    );
+    assert.equal(pereaAtAd44?.heldFromYear, 44);
+    assert.equal(pereaAtAd44?.heldToYear, 101);
     assert.equal(
       ad44Payload.holderBorders.features.some(
         (feature) =>
