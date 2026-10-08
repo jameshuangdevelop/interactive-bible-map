@@ -7,6 +7,11 @@ import { feature, mesh, neighbors } from "topojson-client";
 import { topology } from "topojson-server";
 import { presimplify, simplify } from "topojson-simplify";
 
+// Full shapes keep 5 decimals (about 1 m), which the Jordan border near Bethany beyond the Jordan
+// needs. The zoom-10 shapes, the per-stop border lines drawn from the same simplified topology and
+// the static empire edge use 4 decimals (about 11 m), well below their simplification.
+const SIMPLIFIED_COORDINATE_DECIMALS = 4;
+
 function toMapById(records) {
   const map = new Map();
   for (const record of records ?? []) {
@@ -324,7 +329,7 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
       ...simplifiedFeatures,
       features: simplifiedFeatures.features.map((item) => ({
         ...item,
-        geometry: roundGeometry(item.geometry)
+        geometry: roundGeometry(item.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
       }))
     }
   };
@@ -457,7 +462,7 @@ function buildStopBorderCollections({
         holderBKind: normalizedPair.second.kind,
         holderBRomanSide: normalizedPair.second.romanSide
       },
-      geometry: roundGeometry(geometry)
+      geometry: roundGeometry(geometry, SIMPLIFIED_COORDINATE_DECIMALS)
     });
   }
 
@@ -494,7 +499,7 @@ function buildStopBorderCollections({
       romanEmpireEdge &&
       Array.isArray(romanEmpireEdge.coordinates) &&
       romanEmpireEdge.coordinates.length > 0
-        ? roundGeometry(romanEmpireEdge)
+        ? roundGeometry(romanEmpireEdge, SIMPLIFIED_COORDINATE_DECIMALS)
         : null
   };
 }
@@ -504,6 +509,7 @@ export async function buildAncientAppData({
   ancientAreasData,
   ancientRoadsData,
   ancientCoastlineData,
+  ancientEmpireEdgeData = null,
   outputDirectory,
   simplifyThreshold = 0.00002,
   roadSimplifyTolerance = 0.0015
@@ -588,6 +594,24 @@ export async function buildAncientAppData({
       }
     )
   );
+
+  // The empire edge does not change between stops, so it is written once rather
+  // than per stop. Per-stop `romanEmpireEdge` lines still cover drawn non-Roman areas.
+  if (Array.isArray(ancientEmpireEdgeData?.features)) {
+    writtenFiles.push(
+      await writeJsonWithSize(
+        outputDirectory,
+        "ancient.empire-edge.geojson",
+        {
+          ...ancientEmpireEdgeData,
+          features: ancientEmpireEdgeData.features.map((feature) => ({
+            ...feature,
+            geometry: roundGeometry(feature.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
+          }))
+        }
+      )
+    );
+  }
 
   for (const stop of stops) {
     const assignments = [];

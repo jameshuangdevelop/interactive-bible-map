@@ -39,9 +39,12 @@ All example values below are **illustrative only** (not verified historical clai
   - `schema/ancient-areas.schema.json`
   - `schema/ancient-roads.schema.json`
   - `schema/ancient-coastline.schema.json`
+  - `schema/ancient-empire-edge.schema.json` (optional layer: validated when `data/geo/ancient-empire-edge.geojson` exists, never required)
 - In production/CI, if `data/timeline.json` is absent, validation skips timeline rules and `build:data` skips ancient generated outputs.
 - For development before M4-02 lands factual timeline data, generate ancient app payloads from the fixture with `npm run build:data -- --ancient-source tests/fixtures/ancient`.
-- To regenerate `data/geo/*.geojson` from pinned AWMC and Natural Earth sources, run `npm run build:ancient-geo`. Area borders that follow rivers (the Jordan, the Yarmuk and the Lamus) use OpenStreetMap's river relations, fetched from the OSM API and cached under the system temp folder (`ibm-m4-03-osm`); their way ids are kept in each area's provenance. The run writes a composition report (areas, overlaps, coverage and a place check) to `%TEMP%/ibm-m4-03b/composition-report.md` and preview images to `%TEMP%/ibm-m4-03c/`.
+- To regenerate `data/geo/*.geojson` from pinned AWMC and Natural Earth sources, run `npm run build:ancient-geo`. Area borders that follow rivers (the Jordan, the Yarmuk and the Lamus) use OpenStreetMap's river relations, fetched from the OSM API and cached under the system temp folder (`ibm-m4-03-osm`); their way ids are kept in each area's provenance. The run writes a composition report (areas, overlaps, coverage before and after simplification, the empire edge and a place check) to `%TEMP%/ibm-m4-03b/composition-report.md` and preview images to `%TEMP%/ibm-m4-03c/`.
+- `other-roman-lands` is the Roman land that isn't one of the timeline's other areas (ADR-0037): AWMC's AD 69 extent on land less those areas, without Great Britain. An island joins one of the other areas only where a cited source places it there (`SOURCED_ISLANDS` in `scripts/compose-ancient-areas-safe.mjs`); a peninsula that AWMC's extent cuts off at its neck joins the area it is attached to.
+- `data/geo/ancient-empire-edge.geojson` is the empire's edge: one static line where the land of all the areas meets land outside them, less stretches along today's coastline. Each feature has an `edgeId` and the same `provenance` object as the other layers, and its geometry is a `LineString` or `MultiLineString`.
 - The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
 - Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
 - Periods may start before `range.fromYear` or end after `range.toYear` (for example a kingdom lasting to AD 106); validation allows this and build-time stop assignment clips naturally to the configured timeline range.
@@ -89,8 +92,11 @@ Generated app payloads:
 - `app/public/generated/ancient.shapes.json` (full + zoom<=10 simplified shapes)
 - `app/public/generated/ancient.roads.geojson`
 - `app/public/generated/ancient.coastline.geojson`
+- `app/public/generated/ancient.empire-edge.geojson` (the static empire edge, written once rather than per stop, and only when `data/geo/ancient-empire-edge.geojson` exists)
 - `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
+- The per-stop `romanEmpireEdge` is the line between drawn Roman-side and drawn non-Roman areas in that stop; it is `null` while no area outside the empire is drawn (ADR-0037 rule 5), and the static `ancient.empire-edge.geojson` shows the empire's edge instead.
 - `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size; `data/geo/ancient-roads.geojson` remains the full-detail source.
+- Full shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
 - Stop-area assignments carry each period's optional `note`.
 - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
 
@@ -107,6 +113,8 @@ GIS terms used here:
 - **Topology-aware simplification** means simplifying shared boundaries once so neighboring polygons still share exactly the same border, which avoids slivers and overlaps; see TopoJSON simplification docs: <https://github.com/topojson/topojson-simplify>.
 - A **mesh** is a derived line layer of shared polygon edges, which we use to draw one border per holder pair; see `topojson-client` mesh: <https://github.com/topojson/topojson-client#mesh>.
 - **Polylabel** finds a point deep inside a polygon for stable labels, even on irregular shapes: <https://github.com/mapbox/polylabel>.
+- **Douglas–Peucker simplification** drops vertices that lie within a set distance of the simplified line, so no border moves further than that distance: <https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm>.
+- A **union** (or dissolve) merges polygons into one shape and removes the borders between them; the empire edge is the outline of the union of all areas, less the coast: <https://github.com/mbloch/mapshaper/wiki/Command-Reference#-dissolve>.
 
 ### Zoom tiers
 - `mediterranean`: broad world context.

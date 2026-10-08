@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "edgeId": "fixture-empire-edge",
+        "provenance": {
+          "dataset": "AWMC fixture",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "awmc:fixture-empire-extent"
+          ],
+          "changes": [
+            {
+              "kind": "derived",
+              "detail": "Fixture empire edge between perea and parthia-west",
+              "sources": [
+                "bib:pleiades-place-resource"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            1
+          ]
+        ]
+      }
+    }
+  ]
+}
