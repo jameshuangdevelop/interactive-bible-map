@@ -46,12 +46,12 @@ const libertyLicensePartUrls = [
 
 const libertyModernName = "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)";
 const libertyModernMetadataLicense =
-  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; points of interest and airport labels removed; Natural Earth low-zoom boundary source with geometry masks for contested areas; OpenMapTiles country boundaries only at z5+ with disputed filters, ISR/PSE side exclusions and a regional neutrality mask, without asserting sovereignty); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0; Natural Earth boundary lines and masks: public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
+  "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment (English-only labels with name:en fallback to name:latin; points of interest and airport labels removed; Natural Earth low-zoom boundary source with geometry masks for contested areas; OpenMapTiles country boundaries only at z5+ with disputed filters and shared adm0 pair exclusions; no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus; neutrality treatment, not a sovereignty claim); max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0; Natural Earth boundary lines and masks: public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.";
 
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
 const versaTilesModernMetadataNotice =
-  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; points of interest and airport labels removed; tile boundary layers removed; Natural Earth boundary lines used at all zooms with geometry masks for contested areas, without asserting sovereignty); max zoom set to 14.";
+  "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment (English-only labels from name_en only; points of interest and airport labels removed; tile boundary layers removed; Natural Earth boundary lines used at all zooms with geometry masks and shared adm0 pair exclusions; no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus; neutrality treatment, not a sovereignty claim); max zoom set to 14.";
 
 const versaTilesNotice = `This file is part of Interactive Bible Map's outage-only fallback basemap.
 
@@ -81,7 +81,7 @@ Modifications in this copy:
 - Remove points of interest and airport labels
 - Remove tile boundary layers (including maritime)
 - Use Natural Earth boundary lines (public domain) for country borders at all zooms
-- Apply geometry masks in contested areas as a neutrality treatment (this is not a sovereignty claim)
+- Apply geometry masks and shared adm0 pair exclusions so no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus (neutrality treatment; this is not a sovereignty claim)
 - Max zoom set to 14
 
 Attribution string used in the vector source:
@@ -181,13 +181,18 @@ const neutralMaskRegionDefinitions = [
   { id: "transnistria", disputedAreas: ["Transnistria"] },
   { id: "nagorno-karabakh", disputedAreas: ["Nagorno-Karabakh"] }
 ];
-const contestedAdm0BoundaryPairs = [
+const hiddenBoundaryAdm0Pairs = [
+  ["ISR", "PSE"], // Israel and the Palestinian territories
   ["XKK", "SRB"], // Kosovo
   ["MAR", "ESH"], // Western Sahara
-  ["RUS", "GEO"], // Abkhazia and South Ossetia
+  ["RUS", "GEO"], // Whole Russia-Georgia border
   ["ARM", "AZE"], // Nagorno-Karabakh area
   ["CYP", "XNC"] // Northern Cyprus
 ];
+const hiddenBoundaryNeIdsByPair = new Map([
+  ["ARM|AZE", new Set([1746705689, 1746705697])],
+  ["GEO|RUS", new Set([1746705547])]
+]);
 
 function modernEnglishLabelExpression(preferredFields) {
   const expression = ["coalesce"];
@@ -264,25 +269,6 @@ function appendContestedMaskExclusion(existingFilter) {
   return ["all", existingFilter, maskExclusion];
 }
 
-function appendLibertyIsraPalExclusion(existingFilter) {
-  const exclusions = [
-    ["!=", ["get", "adm0_l"], "ISR"],
-    ["!=", ["get", "adm0_l"], "PSE"],
-    ["!=", ["get", "adm0_r"], "ISR"],
-    ["!=", ["get", "adm0_r"], "PSE"]
-  ];
-
-  if (!existingFilter) {
-    return ["all", ...exclusions];
-  }
-
-  if (Array.isArray(existingFilter) && existingFilter[0] === "all") {
-    return [...existingFilter, ...exclusions];
-  }
-
-  return ["all", existingFilter, ...exclusions];
-}
-
 function appendAdm0PairExclusions(existingFilter, excludedPairs) {
   const pairExclusions = excludedPairs.map(([leftCode, rightCode]) => [
     "!",
@@ -302,6 +288,38 @@ function appendAdm0PairExclusions(existingFilter, excludedPairs) {
   }
 
   return ["all", existingFilter, ...pairExclusions];
+}
+
+function canonicalPairCode(leftCode, rightCode) {
+  return [leftCode, rightCode].sort().join("|");
+}
+
+function featureMatchesHiddenAdm0Pair(properties, hiddenPairs) {
+  const leftCode = properties?.ADM0_A3_L ?? properties?.adm0_a3_l ?? properties?.adm0_l;
+  const rightCode = properties?.ADM0_A3_R ?? properties?.adm0_a3_r ?? properties?.adm0_r;
+  if (typeof leftCode !== "string" || typeof rightCode !== "string") {
+    return false;
+  }
+  return hiddenPairs.some(
+    ([pairLeftCode, pairRightCode]) =>
+      (leftCode === pairLeftCode && rightCode === pairRightCode) ||
+      (leftCode === pairRightCode && rightCode === pairLeftCode)
+  );
+}
+
+function featureMatchesHiddenNeIdForPair(properties, hiddenPairs, hiddenNeIdsByPair) {
+  const neId = properties?.NE_ID ?? properties?.ne_id;
+  if (typeof neId !== "number") {
+    return false;
+  }
+  for (const [leftCode, rightCode] of hiddenPairs) {
+    const key = canonicalPairCode(leftCode, rightCode);
+    const hiddenIds = hiddenNeIdsByPair.get(key);
+    if (hiddenIds?.has(neId)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function normalizeDisputedAreaName(value) {
@@ -560,7 +578,13 @@ function createNeutralBoundaryGeoJson(boundaryGeoJson, maskPolygons, simplifyTol
   const relevantFeatures = (boundaryGeoJson.features ?? []).filter(
     (feature) =>
       (feature?.properties?.FEATURECLA ?? feature?.properties?.featurecla) ===
-      "International boundary (verify)"
+        "International boundary (verify)" &&
+      !featureMatchesHiddenAdm0Pair(feature?.properties, hiddenBoundaryAdm0Pairs) &&
+      !featureMatchesHiddenNeIdForPair(
+        feature?.properties,
+        hiddenBoundaryAdm0Pairs,
+        hiddenBoundaryNeIdsByPair
+      )
   );
 
   const boundaryFeatureCollection = {
@@ -572,7 +596,11 @@ function createNeutralBoundaryGeoJson(boundaryGeoJson, maskPolygons, simplifyTol
         featurecla:
           feature.properties?.FEATURECLA ??
           feature.properties?.featurecla ??
-          "International boundary (verify)"
+          "International boundary (verify)",
+        adm0_a3_l:
+          feature.properties?.ADM0_A3_L ?? feature.properties?.adm0_a3_l ?? feature.properties?.adm0_l,
+        adm0_a3_r:
+          feature.properties?.ADM0_A3_R ?? feature.properties?.adm0_a3_r ?? feature.properties?.adm0_r
       },
       geometry: feature.geometry
     }))
@@ -999,8 +1027,8 @@ function buildModernLibertyStyle(upstreamStyle) {
   if (countryBoundaryLayer) {
     countryBoundaryLayer.minzoom = 5;
     countryBoundaryLayer.filter = appendAdm0PairExclusions(
-      appendLibertyIsraPalExclusion(appendContestedMaskExclusion(countryBoundaryLayer.filter)),
-      contestedAdm0BoundaryPairs
+      appendContestedMaskExclusion(countryBoundaryLayer.filter),
+      hiddenBoundaryAdm0Pairs
     );
   }
   applyNaturalEarthBoundaryLayerForLowZoom({

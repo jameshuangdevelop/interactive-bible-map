@@ -10,7 +10,7 @@ Modifications in this copy:
 - Remove points of interest and airport labels
 - Remove tile boundary layers (including maritime)
 - Use Natural Earth boundary lines (public domain) for country borders at all zooms
-- Apply geometry masks in contested areas as a neutrality treatment (this is not a sovereignty claim)
+- Apply geometry masks and shared adm0 pair exclusions so no border line is drawn in these areas: Israel, the West Bank, Gaza and the Golan Heights, Kosovo, Western Sahara, the whole Russia-Georgia border, the Armenia-Azerbaijan border, and the line across Cyprus (neutrality treatment; this is not a sovereignty claim)
 - Max zoom set to 14
 
 Attribution string used in the vector source:
