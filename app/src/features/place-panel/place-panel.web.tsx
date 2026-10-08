@@ -62,7 +62,7 @@ const DIALOG_FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const PHOTO_CREDITS_NOTE =
   "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
-const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 1_500;
+const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 2_500;
 type CollapsibleSectionId =
   | "about"
   | "places-in"
@@ -1217,7 +1217,13 @@ export function PlacePanel({
   const panelFrameWidth = isSmallScreen
     ? Math.max(330, viewportWidth - VIEWER_DIALOG_VIEWPORT_MARGIN)
     : PANEL_IMAGE_DESKTOP_WIDTH;
-  const panelFrameHeight = panelFrameWidth / PANEL_IMAGE_ASPECT_RATIO;
+  const panelFrameHeightDefault = panelFrameWidth / PANEL_IMAGE_ASPECT_RATIO;
+  const collapsedSmallScreenMaxPhotoHeight = Math.max(44, Math.round(viewportHeight * 0.05));
+  const panelFrameHeight =
+    isSmallScreen && !isSmallScreenExpanded
+      ? Math.min(panelFrameHeightDefault, collapsedSmallScreenMaxPhotoHeight)
+      : panelFrameHeightDefault;
+  const showCollapsedSummaryOnly = isSmallScreen && !isSmallScreenExpanded;
   const selectedImageAspectRatio =
     selectedImage &&
     typeof selectedImage.width === "number" &&
@@ -1610,7 +1616,9 @@ export function PlacePanel({
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
+            position: "relative",
+            minHeight: "44px",
             marginBottom: `${tokens.spacing.md}px`
           }}
         >
@@ -1628,7 +1636,10 @@ export function PlacePanel({
                 borderRadius: "999px",
                 backgroundColor: "transparent",
                 cursor: "pointer",
-                alignSelf: "center"
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                top: 0
               }}
               type="button"
             >
@@ -1687,12 +1698,14 @@ export function PlacePanel({
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
+          position: "relative",
+          minHeight: "44px",
           marginBottom: `${tokens.spacing.md}px`
         }}
       >
-        {isSmallScreen ? (
-          <button
+      {isSmallScreen ? (
+        <button
             aria-label={
               isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
             }
@@ -1704,7 +1717,11 @@ export function PlacePanel({
               border: "none",
               borderRadius: "999px",
               backgroundColor: "transparent",
-              cursor: "pointer"
+              cursor: "pointer",
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              top: 0
             }}
             type="button"
           >
@@ -1814,25 +1831,29 @@ export function PlacePanel({
               {locationStatusIndicator}
             </p>
           ) : null}
-          {alsoKnownAs.length > 0 ? (
-            <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
+          {!showCollapsedSummaryOnly ? (
+            <>
+              {alsoKnownAs.length > 0 ? (
+                <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
+              ) : null}
+              <p style={secondaryTextStyle}>
+                {hierarchyItems.map((item, index) => (
+                  <span key={`${item.label}:${item.placeId ?? "none"}`}>
+                    {index > 0 ? " · " : null}
+                    {item.placeId ? (
+                      <LinkLikeButton
+                        label={item.label}
+                        onSelectPlace={onSelectPlace}
+                        placeId={item.placeId}
+                      />
+                    ) : (
+                      item.label
+                    )}
+                  </span>
+                ))}
+              </p>
+            </>
           ) : null}
-          <p style={secondaryTextStyle}>
-            {hierarchyItems.map((item, index) => (
-              <span key={`${item.label}:${item.placeId ?? "none"}`}>
-                {index > 0 ? " · " : null}
-                {item.placeId ? (
-                  <LinkLikeButton
-                    label={item.label}
-                    onSelectPlace={onSelectPlace}
-                    placeId={item.placeId}
-                  />
-                ) : (
-                  item.label
-                )}
-              </span>
-            ))}
-          </p>
         </section>
 
         {location && hasMultipleCandidates ? (

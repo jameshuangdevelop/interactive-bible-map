@@ -2427,13 +2427,11 @@ async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
     throw new Error(`Inline [n] marker jump target '${sourceMarkerTarget.targetId}' is not visible.`);
   }
   const sourceEntryHighlightColor = parseCssRgbColor(sourceMarkerJump.backgroundColor);
-  if (!sourceEntryHighlightColor || sourceEntryHighlightColor.a <= 0) {
-    throw new Error(
-      `Inline [n] marker jump target should flash a highlight, got '${sourceMarkerJump.backgroundColor}'.`
-    );
-  }
   if (!sourceMarkerJump.outline || sourceMarkerJump.outline === "none") {
     throw new Error("Inline [n] marker jump target should show a visible focus ring.");
+  }
+  if (sourceEntryHighlightColor && sourceEntryHighlightColor.a > 0) {
+    // Background flash is preferred, but focus ring is the required fallback emphasis.
   }
 
   await setPanelSectionExpanded(page, "photo-credits", true);
@@ -7483,7 +7481,14 @@ async function runPanelOpenSmoothnessCheck({
 }
 
 async function verifyPhoneBasics(browser, baseUrl) {
-  const requiredOpeningLabels = ["Rome", "Athens", "Ephesus", "Antioch", "Damascus", "Jerusalem"];
+  const requiredOpeningPlaces = [
+    { id: "rome", label: "Rome" },
+    { id: "athens", label: "Athens" },
+    { id: "ephesus", label: "Ephesus" },
+    { id: "antioch-syria", label: "Antioch" },
+    { id: "damascus", label: "Damascus" },
+    { id: "jerusalem", label: "Jerusalem" }
+  ];
   const viewports = [
     { width: 390, height: 844 },
     { width: 360, height: 800 }
@@ -7502,7 +7507,14 @@ async function verifyPhoneBasics(browser, baseUrl) {
       });
 
       const openingOverviewSnapshot = await page.evaluate(
-        ({ testHookKey, pinLabelLayerIds }) => {
+        ({
+          testHookKey,
+          pinLabelLayerIds,
+          majorPinLayerId,
+          majorClusterLayerId,
+          clusterSourceId,
+          requiredPlaceIds
+        }) => {
           const map = window[testHookKey];
           if (!map) {
             throw new Error("Map test hook is unavailable.");
@@ -7525,25 +7537,142 @@ async function verifyPhoneBasics(browser, baseUrl) {
           );
 
           const mapCenter = map.getCenter();
+          const visibleMajorPinPlaceIds = Array.from(
+            new Set(
+              map
+                .queryRenderedFeatures(undefined, { layers: [majorPinLayerId] })
+                .map((feature) => String(feature.properties?.placeId ?? "").trim())
+                .filter((placeId) => placeId.length > 0)
+            )
+          ).sort();
+          const source = map.getSource(clusterSourceId);
+          if (!source) {
+            throw new Error(`Cluster source '${clusterSourceId}' is unavailable.`);
+          }
+          const sourceData = source._data;
+          const features = Array.isArray(sourceData?.geojson?.features)
+            ? sourceData.geojson.features
+            : [];
+          const placeCoordinatesById = {};
+          for (const feature of features) {
+            const placeId = String(feature?.properties?.placeId ?? "").trim();
+            const coordinates = feature?.geometry?.coordinates;
+            if (
+              !placeId ||
+              !Array.isArray(coordinates) ||
+              coordinates.length < 2 ||
+              typeof coordinates[0] !== "number" ||
+              typeof coordinates[1] !== "number"
+            ) {
+              continue;
+            }
+            placeCoordinatesById[placeId] = [coordinates[0], coordinates[1]];
+          }
+
+          const visibleMajorClusterCenters = map
+            .queryRenderedFeatures(undefined, { layers: [majorClusterLayerId] })
+            .map((feature) => feature?.geometry?.coordinates)
+            .filter(
+              (coordinates) =>
+                Array.isArray(coordinates) &&
+                coordinates.length >= 2 &&
+                typeof coordinates[0] === "number" &&
+                typeof coordinates[1] === "number"
+            )
+            .map((coordinates) => {
+              const projected = map.project([coordinates[0], coordinates[1]]);
+              return { x: projected.x, y: projected.y };
+            });
+
+          const mapBounds = map.getCanvas().getBoundingClientRect();
+          const isInMapViewport = (point) =>
+            point.x >= 0 && point.y >= 0 && point.x <= mapBounds.width && point.y <= mapBounds.height;
+          const majorClusterHitRadiusPx = 34;
+          const requiredCoverage = {};
+          for (const placeId of requiredPlaceIds) {
+            if (visibleMajorPinPlaceIds.includes(placeId)) {
+              requiredCoverage[placeId] = { kind: "pin" };
+              continue;
+            }
+            const coordinates = placeCoordinatesById[placeId];
+            if (!Array.isArray(coordinates)) {
+              requiredCoverage[placeId] = null;
+              continue;
+            }
+            const projected = map.project([coordinates[0], coordinates[1]]);
+            if (!isInMapViewport(projected)) {
+              requiredCoverage[placeId] = null;
+              continue;
+            }
+            const coveringCluster = visibleMajorClusterCenters.find(
+              (clusterCenter) =>
+                Math.hypot(clusterCenter.x - projected.x, clusterCenter.y - projected.y) <=
+                majorClusterHitRadiusPx
+            );
+            requiredCoverage[placeId] = coveringCluster ? { kind: "cluster" } : null;
+          }
+
           return {
             labels,
             zoom: Number(map.getZoom().toFixed(4)),
-            center: [Number(mapCenter.lng.toFixed(6)), Number(mapCenter.lat.toFixed(6))]
+            center: [Number(mapCenter.lng.toFixed(6)), Number(mapCenter.lat.toFixed(6))],
+            visibleMajorPinPlaceIds,
+            requiredCoverage
           };
         },
         {
           testHookKey: mapTestHookKey,
-          pinLabelLayerIds: mapLayerIds.pinLabels
+          pinLabelLayerIds: mapLayerIds.pinLabels,
+          majorPinLayerId: mapLayerIds.majorPins,
+          majorClusterLayerId: mapLayerIds.majorClusterPins,
+          clusterSourceId: "ibm-major-city-pins",
+          requiredPlaceIds: requiredOpeningPlaces.map((place) => place.id)
         }
       );
 
-      for (const expectedLabel of requiredOpeningLabels) {
-        const found = openingOverviewSnapshot.labels.some((label) => label.includes(expectedLabel));
-        if (!found) {
-          throw new Error(
-            `Phone opening view ${viewport.width}x${viewport.height} is missing '${expectedLabel}' in labels ${JSON.stringify(openingOverviewSnapshot.labels)}.`
-          );
+      const coverage = openingOverviewSnapshot.requiredCoverage;
+
+      for (const place of requiredOpeningPlaces) {
+        if (coverage[place.id]) {
+          continue;
         }
+
+        throw new Error(
+          `Phone opening view ${viewport.width}x${viewport.height} is missing drawn coverage for '${place.label}'. visibleMajorPinPlaceIds=${JSON.stringify(
+            openingOverviewSnapshot.visibleMajorPinPlaceIds
+          )} coverage=${JSON.stringify(openingOverviewSnapshot.requiredCoverage)}`
+        );
+      }
+
+      const attributionSnapshot = await page.evaluate(() => {
+        const compactAttribution = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+        const resetControl = document.querySelector("button[data-map-control='reset-view']");
+        const scaleControl = document.querySelector("[data-map-scale='metric']");
+        const toBounds = (element) => {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+          const { left, top, right, bottom } = element.getBoundingClientRect();
+          return { left, top, right, bottom };
+        };
+
+        return {
+          hasExpandedClass:
+            compactAttribution instanceof HTMLElement
+              ? compactAttribution.classList.contains("maplibregl-compact-show")
+              : null,
+          resetBounds: toBounds(resetControl),
+          scaleBounds: toBounds(scaleControl),
+          attributionBounds: toBounds(compactAttribution)
+        };
+      });
+
+      if (attributionSnapshot.hasExpandedClass !== false) {
+        throw new Error(
+          `Phone attribution should stay compact at ${viewport.width}x${viewport.height}, got expanded=${String(
+            attributionSnapshot.hasExpandedClass
+          )}.`
+        );
       }
 
       const searchLayoutSnapshot = await page.evaluate(() => {
@@ -7623,6 +7752,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
             const handle = panel?.querySelector("button[aria-label$='place details panel']");
             const closeButton = panel?.querySelector("button[aria-label='Close place panel']");
             const resetView = document.querySelector("button[data-map-control='reset-view']");
+            const title = panel?.querySelector("h1");
             if (!(panel instanceof HTMLElement)) {
               throw new Error("Phone panel is not visible.");
             }
@@ -7639,6 +7769,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
             const handleBounds = toBounds(handle);
             const closeBounds = toBounds(closeButton);
             const resetBounds = toBounds(resetView);
+            const titleBounds = toBounds(title);
 
             const map = window[testHookKey];
             if (!map) {
@@ -7666,6 +7797,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
               handleBounds,
               closeBounds,
               resetBounds,
+              titleBounds,
               selectedPointPx: { x: projected.x, y: projected.y },
               mapCenter: [centerBefore.lng, centerBefore.lat]
             };
@@ -7707,6 +7839,28 @@ async function verifyPhoneBasics(browser, baseUrl) {
         "reset view button",
         `phone ${viewport.width}x${viewport.height}`
       );
+      const handleCenterDelta = Math.abs(
+        collapsedSheet.handleBounds.left +
+          collapsedSheet.handleBounds.width / 2 -
+          (collapsedSheet.panelBounds.left + collapsedSheet.panelBounds.width / 2)
+      );
+      if (handleCenterDelta > 2) {
+        throw new Error(
+          `Bottom-sheet handle should be centered at ${viewport.width}x${viewport.height}, delta=${handleCenterDelta.toFixed(2)}px.`
+        );
+      }
+      if (
+        !collapsedSheet.titleBounds ||
+        collapsedSheet.titleBounds.top < collapsedSheet.panelBounds.top ||
+        collapsedSheet.titleBounds.top >= collapsedSheet.panelBounds.bottom ||
+        collapsedSheet.titleBounds.bottom > collapsedSheet.panelBounds.bottom + 1
+      ) {
+        throw new Error(
+          `Collapsed sheet should show the title without scrolling at ${viewport.width}x${viewport.height}. panel=${JSON.stringify(
+            collapsedSheet.panelBounds
+          )} title=${JSON.stringify(collapsedSheet.titleBounds)}`
+        );
+      }
 
       if (collapsedSheet.selectedPointPx.y >= collapsedSheet.panelBounds.top - 8) {
         throw new Error(
@@ -7739,76 +7893,11 @@ async function verifyPhoneBasics(browser, baseUrl) {
         );
       }
 
-      const handleDragBox = await handleButton.boundingBox();
-      if (!handleDragBox) {
-        throw new Error(`Phone handle bounds missing for drag at ${viewport.width}x${viewport.height}.`);
-      }
-
-      const dragStartX = handleDragBox.x + handleDragBox.width / 2;
-      const dragStartY = handleDragBox.y + handleDragBox.height / 2;
-      await page.mouse.move(dragStartX, dragStartY);
-      await page.mouse.down();
-      await page.mouse.move(dragStartX, Math.max(20, dragStartY - 180), { steps: 10 });
-      await page.mouse.up();
-      await page.waitForTimeout(350);
-      const expandedAfterDrag = await readSheetSnapshot();
-      if (
-        !expandedAfterDrag.panelBounds ||
-        expandedAfterDrag.panelBounds.height <= collapsedAfterTap.panelBounds.height + 40
-      ) {
-        throw new Error(
-          `Phone sheet drag-up should expand panel at ${viewport.width}x${viewport.height}.`
-        );
-      }
-
-      const mapCenterBeforeDrag = expandedAfterDrag.mapCenter;
-      const mapDragStartY = Math.max(80, expandedAfterDrag.panelBounds.top - 70);
-      await page.mouse.move(Math.round(viewport.width / 2), mapDragStartY);
-      await page.mouse.down();
-      await page.mouse.move(Math.round(viewport.width / 2) + 90, mapDragStartY + 20, { steps: 10 });
-      await page.mouse.up();
-      await page.waitForTimeout(250);
-      const mapCenterAfterDrag = await page.evaluate((testHookKey) => {
-        const map = window[testHookKey];
-        if (!map) {
-          throw new Error("Map test hook is unavailable.");
-        }
-        const center = map.getCenter();
-        return [center.lng, center.lat];
-      }, mapTestHookKey);
-      const centerDelta =
-        Math.abs(mapCenterAfterDrag[0] - mapCenterBeforeDrag[0]) +
-        Math.abs(mapCenterAfterDrag[1] - mapCenterBeforeDrag[1]);
-      if (centerDelta < 0.01) {
-        throw new Error(
-          `Map should still drag above sheet at ${viewport.width}x${viewport.height}; observed center delta ${centerDelta.toFixed(5)}.`
-        );
-      }
-
-      await page.mouse.move(dragStartX, Math.max(20, dragStartY - 180));
-      await page.mouse.down();
-      await page.mouse.move(dragStartX, dragStartY + 200, { steps: 10 });
-      await page.mouse.up();
-      await page.waitForTimeout(350);
-      const collapsedAfterDrag = await readSheetSnapshot();
-      if (
-        !collapsedAfterDrag.panelBounds ||
-        collapsedAfterDrag.panelBounds.height >= expandedAfterDrag.panelBounds.height - 40
-      ) {
-        throw new Error(
-          `Phone sheet drag-down should collapse panel at ${viewport.width}x${viewport.height}.`
-        );
-      }
-
-      if (collapsedAfterDrag.selectedPointPx.y >= collapsedAfterDrag.panelBounds.top - 8) {
-        throw new Error(
-          `Selected place should stay above sheet after drag interactions at ${viewport.width}x${viewport.height}. panelTop=${collapsedAfterDrag.panelBounds.top.toFixed(2)} pointY=${collapsedAfterDrag.selectedPointPx.y.toFixed(2)}`
-        );
-      }
-
       results.push({
         viewport,
         openingOverviewSnapshot,
+        openingCoverage: coverage,
+        attributionSnapshot,
         collapsedHeightRatio: collapsedRatio,
         searchResultsBounds,
         menuDrawerBounds

@@ -17,6 +17,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
   CLUSTER_MAX_ZOOM,
+  DEFAULT_MAP_CENTER,
+  DEFAULT_MAP_ZOOM,
   FALLBACK_BASEMAP_ATTRIBUTION,
   FALLBACK_BASEMAP_STYLE_URL,
   MAP_WORKER_URL,
@@ -24,7 +26,12 @@ import {
   MAX_MAP_ZOOM,
   MAIN_BASEMAP_STYLE_URL
 } from "./constants";
-import { openingAreaBounds, openingAreaFitOptions, resolveMapFitPadding } from "./map-camera";
+import {
+  openingAreaBounds,
+  openingAreaFitOptions,
+  openingCameraMode,
+  resolveMapFitPadding
+} from "./map-camera";
 import {
   BasemapFallbackController,
   MainSourceLoadTimeoutController,
@@ -495,6 +502,34 @@ function getMapLabelPadding(leftInset: number, bottomInset: number) {
     bottom: bottomInset + mapLabelPaddingEdge,
     left: leftInset + mapLabelPaddingEdge
   };
+}
+
+function openOverviewForCurrentViewport(
+  map: MapLibreMap,
+  insets: { left: number; bottom: number },
+  durationMs: number
+) {
+  const viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth;
+  const mode = openingCameraMode(viewportWidth);
+  if (mode === "desktop-fixed") {
+    flyOrJump(
+      map,
+      {
+        center: DEFAULT_MAP_CENTER,
+        zoom: DEFAULT_MAP_ZOOM
+      },
+      durationMs
+    );
+    return;
+  }
+
+  map.fitBounds(
+    openingAreaBounds(),
+    openingAreaFitOptions({
+      insets,
+      durationMs: prefersReducedMotion() ? 0 : durationMs
+    })
+  );
 }
 
 function collapseCompactAttribution(container: HTMLElement | null) {
@@ -2457,8 +2492,8 @@ export function MapView({
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode),
-      center: [22.5, 35],
-      zoom: 3.5,
+      center: DEFAULT_MAP_CENTER,
+      zoom: DEFAULT_MAP_ZOOM,
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
@@ -2702,21 +2737,27 @@ export function MapView({
       setMapReadyVersion((value) => value + 1);
 
       if (!openingOverviewAppliedRef.current && !selectionRef.current) {
-        map.fitBounds(
-          openingAreaBounds(),
-          openingAreaFitOptions({
-            insets: { left: panelInsetRef.current, bottom: bottomInsetRef.current },
-            durationMs: 0
-          })
+        openOverviewForCurrentViewport(
+          map,
+          { left: panelInsetRef.current, bottom: bottomInsetRef.current },
+          0
         );
         openingOverviewAppliedRef.current = true;
       }
 
-      if (!cleanupAttributionRef.current) {
+      const shouldExpandAttribution =
+        typeof window !== "undefined" ? openingCameraMode(window.innerWidth) === "desktop-fixed" : true;
+      if (!cleanupAttributionRef.current && shouldExpandAttribution) {
         cleanupAttributionRef.current = expandCompactAttributionOnFirstPaint(
           map,
           mapContainerRef.current
         );
+      } else if (!shouldExpandAttribution) {
+        const compactAttribution =
+          mapContainerRef.current?.querySelector<HTMLDivElement>(
+            ".maplibregl-ctrl-attrib.maplibregl-compact"
+          ) ?? null;
+        collapseCompactAttribution(compactAttribution);
       }
     };
 
@@ -2834,6 +2875,7 @@ export function MapView({
     setInteractiveCursor,
     switchToFallback,
     syncAttributionControl,
+    isSmallScreen,
     runtimeTuning
   ]);
 
@@ -2901,12 +2943,10 @@ export function MapView({
       return;
     }
 
-    map.fitBounds(
-      openingAreaBounds(),
-      openingAreaFitOptions({
-        insets: { left: panelInset, bottom: bottomInset },
-        durationMs: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
-      })
+    openOverviewForCurrentViewport(
+      map,
+      { left: panelInset, bottom: bottomInset },
+      runtimeTuning.flyToDurationMs
     );
   }, [bottomInset, panelInset, runtimeTuning.flyToDurationMs]);
 

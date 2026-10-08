@@ -27,7 +27,8 @@ const PANEL_CONTENT_TOP_PADDING = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + tokens.spa
 const MAP_PLACEHOLDER_COLOR = "#F1EEE4";
 const SMALL_SCREEN_BREAKPOINT = 768;
 const SMALL_SCREEN_SHEET_EDGE_GAP_PX = 16;
-const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.4;
+const SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX = PANEL_CONTENT_TOP_PADDING + 56;
+const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.53;
 const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 
@@ -166,7 +167,9 @@ export function AppShell() {
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
   const smallScreenSheetMaxHeightPx = Math.max(
     0,
-    (typeof window !== "undefined" ? window.innerHeight : 0) - SMALL_SCREEN_SHEET_EDGE_GAP_PX * 2
+    (typeof window !== "undefined" ? window.innerHeight : 0) -
+      SMALL_SCREEN_SHEET_EDGE_GAP_PX -
+      SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX
   );
   const smallScreenSheetCollapsedHeightPx = Math.min(
     smallScreenSheetMaxHeightPx,
@@ -227,9 +230,6 @@ export function AppShell() {
       const movedLessThanTapThreshold =
         dragState.movedPx <= SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX;
       if (movedLessThanTapThreshold) {
-        setSmallScreenSheetMode((current) =>
-          current === "expanded" ? "collapsed" : "expanded"
-        );
         setSmallScreenSheetDragHeightPx(null);
         return;
       }
@@ -241,7 +241,17 @@ export function AppShell() {
         smallScreenSheetMaxHeightPx,
         Math.max(smallScreenSheetCollapsedHeightPx, smallScreenSheetDragHeightPx ?? dragState.startHeightPx)
       );
-      setSmallScreenSheetMode(finalHeightPx >= midPointPx ? "expanded" : "collapsed");
+      const dragRangePx = smallScreenSheetMaxHeightPx - smallScreenSheetCollapsedHeightPx;
+      const dragThresholdPx = Math.min(120, Math.max(48, dragRangePx * 0.33));
+      const startedExpanded = dragState.startHeightPx >= midPointPx;
+      const nextMode = startedExpanded
+        ? finalHeightPx <= smallScreenSheetMaxHeightPx - dragThresholdPx
+          ? "collapsed"
+          : "expanded"
+        : finalHeightPx >= smallScreenSheetCollapsedHeightPx + dragThresholdPx
+          ? "expanded"
+          : "collapsed";
+      setSmallScreenSheetMode(nextMode);
       setSmallScreenSheetDragHeightPx(null);
     };
 
@@ -627,11 +637,6 @@ export function AppShell() {
             onSmallScreenHandlePointerDown={(event) => {
               if (!isSmallScreen) {
                 return;
-              }
-
-              event.preventDefault();
-              if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
-                event.currentTarget.setPointerCapture(event.pointerId);
               }
 
               const currentHeightPx =
