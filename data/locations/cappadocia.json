@@ -65,8 +65,27 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -33,
+      "toYear": 17,
+      "holderId": "cappadocia-kingdom",
+      "entity": "Kingdom of Cappadocia (ruler: Archelaus)",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 17,
+      "toYear": 101,
+      "holderId": "cappadocia-province",
+      "entity": "Roman province of Cappadocia (ruler: Quintus Veranius, first governor)",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-cappadocia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "cappadocia"
 }

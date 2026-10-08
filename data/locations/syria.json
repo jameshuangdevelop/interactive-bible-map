@@ -114,24 +114,24 @@
     {
       "fromYear": -64,
       "toYear": -27,
+      "holderId": "roman-province-syria",
       "entity": "Roman province of Syria",
       "sources": [
-        "bib:livius-damascus",
-        "wikidata:Q207118"
+        "bib:livius-damascus"
       ]
     },
     {
       "fromYear": -27,
-      "toYear": 72,
-      "entity": "Province of Syria kept by the emperor, governed from Antioch and administering the Cilician plain (in force at AD 50)",
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:livius-cilicia",
-        "wikidata:Q207118"
-      ]
+        "bib:livius-cilicia"
+      ],
+      "note": "Administers the Cilician plain throughout; also administered Philip's former tetrarchy (34-37, 44-53) and briefly Commagene and Cilicia Tracheia (17-38)."
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "status": "draft",
+  "politicalAreaId": "syria"
 }

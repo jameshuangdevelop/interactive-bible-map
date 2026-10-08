@@ -90,8 +90,17 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "asia"
 }

@@ -70,8 +70,37 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -36,
+      "toYear": -2,
+      "holderId": "polemon-pontus",
+      "entity": "Kingdom of Pontus (Polemon dynasty) (ruler: Polemon I, then his descendants)",
+      "sources": [
+        "bib:isbe-pontus",
+        "bib:isbe-galatia"
+      ]
+    },
+    {
+      "fromYear": -2,
+      "toYear": 64,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:isbe-galatia"
+      ],
+      "note": "Part of this area (the part later called \"Pontus Galaticus\") had already joined the Roman province of Galatia by 2 BC; the rest remained Polemon's independent kingdom (\"Pontus Polemoniacus\" once it too joined Galatia in AD 64). No source found distinguishing exactly where the dividing line between the two ran."
+    },
+    {
+      "fromYear": 64,
+      "toYear": 101,
+      "holderId": "galatia-province",
+      "entity": "Roman province of Galatia (ruler: Pontus Polemoniacus)",
+      "sources": [
+        "bib:isbe-galatia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "pontus"
 }

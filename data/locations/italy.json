@@ -82,8 +82,17 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "italy-direct",
+      "entity": "Italy (governed directly from Rome)",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "italy"
 }

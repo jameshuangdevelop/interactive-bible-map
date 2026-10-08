@@ -74,8 +74,29 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 74,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-histories",
+        "bib:livius-pamphylia"
+      ],
+      "note": "Already held open in the existing records (Cassius Dio 60.17.3-4 read against Tacitus's Histories 2.9): this note holds it open too rather than defaulting to Galatia."
+    },
+    {
+      "fromYear": 74,
+      "toYear": 101,
+      "holderId": "lycia-pamphylia-province",
+      "entity": "Roman province of Lycia and Pamphylia",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "pamphylia"
 }

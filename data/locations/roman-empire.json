@@ -97,9 +97,64 @@
       "sources": [
         "bib:suetonius-twelve-caesars"
       ]
+    },
+    {
+      "fromYear": 54,
+      "toYear": 68,
+      "entity": "Reign of Nero",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    },
+    {
+      "fromYear": 68,
+      "toYear": 69,
+      "entity": "Galba, Otho and Vitellius in turn (the \"Year of the Four Emperors\")",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-histories"
+      ]
+    },
+    {
+      "fromYear": 69,
+      "toYear": 79,
+      "entity": "Reign of Vespasian",
+      "sources": [
+        "bib:josephus-jewish-war"
+      ]
+    },
+    {
+      "fromYear": 79,
+      "toYear": 81,
+      "entity": "Reign of Titus",
+      "sources": [
+        "bib:livius-titus"
+      ]
+    },
+    {
+      "fromYear": 81,
+      "toYear": 96,
+      "entity": "Reign of Domitian",
+      "sources": [
+        "bib:livius-domitian"
+      ]
+    },
+    {
+      "fromYear": 96,
+      "toYear": 98,
+      "entity": "Reign of Nerva",
+      "sources": [
+        "bib:livius-nerva"
+      ]
+    },
+    {
+      "fromYear": 98,
+      "toYear": 117,
+      "entity": "Reign of Trajan (continues past this project's AD 100 timeline end)",
+      "sources": [
+        "bib:livius-trajan"
+      ]
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "status": "draft"
 }

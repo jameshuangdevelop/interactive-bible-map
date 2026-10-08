@@ -74,8 +74,76 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -20,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:isbe-ituraea"
+      ],
+      "note": "Added to Herod's kingdom from the \"House of Zenodorus.\""
+    },
+    {
+      "fromYear": -4,
+      "toYear": 34,
+      "holderId": "philip-tetrarchy",
+      "entity": "Tetrarchy of Philip's lands (Gaulanitis, Batanea, Trachonitis and Auranitis) (ruler: Herod Philip)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 34,
+      "toYear": 37,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Governor of Syria)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 37,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 53,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, during Agrippa II's minority)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:isbe-trachonitis"
+      ]
+    },
+    {
+      "fromYear": 53,
+      "toYear": 100,
+      "holderId": "agrippa-ii-kingdom",
+      "entity": "Kingdom of Herod Agrippa II (ruler: Herod Agrippa II)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:isbe-trachonitis"
+      ]
+    },
+    {
+      "fromYear": 100,
+      "toYear": 106,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:isbe-abilene",
+        "bib:isbe-trachonitis"
+      ],
+      "note": "In 106 this area, with the Nabataean kingdom, became the new province of Arabia."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "philip-tetrarchy-lands"
 }

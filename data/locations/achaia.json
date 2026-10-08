@@ -101,37 +101,52 @@
     {
       "fromYear": -27,
       "toYear": 15,
-      "entity": "Senatorial province of Achaia, governed by a proconsul",
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
       "sources": [
         "bib:cassius-dio-roman-history",
-        "bib:isbe-macedonia",
-        "bib:tacitus-annals"
+        "bib:isbe-macedonia"
       ]
     },
     {
       "fromYear": 15,
       "toYear": 44,
-      "entity": "Imperial province, governed with Macedonia by the legate of Moesia",
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Imperial legate of Moesia (governed with Macedonia))",
       "sources": [
         "bib:tacitus-annals",
-        "bib:isbe-macedonia",
-        "bib:cassius-dio-roman-history"
+        "bib:isbe-macedonia"
       ]
     },
     {
       "fromYear": 44,
       "toYear": 67,
-      "entity": "Senatorial province again, restored by Claudius (in force at AD 50) until Nero declared Greece free",
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by Claudius))",
       "sources": [
-        "bib:cassius-dio-roman-history",
-        "bib:suetonius-twelve-caesars",
-        "bib:isbe-macedonia",
-        "bib:worldhistory-corinth",
-        "wikipedia:Achaia_(Roman_province)"
+        "bib:cassius-dio-roman-history"
       ]
+    },
+    {
+      "fromYear": 67,
+      "toYear": 69,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Free (exempted by Nero))",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    },
+    {
+      "fromYear": 69,
+      "toYear": 101,
+      "holderId": "achaia-province",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (Nero's grant of freedom reversed under Vespasian))",
+      "sources": [
+        "bib:worldhistory-vespasian"
+      ],
+      "note": "The exact year of the reversal was not found; shown at Vespasian's accession."
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "status": "draft",
+  "politicalAreaId": "achaia"
 }

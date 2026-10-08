@@ -73,8 +73,17 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -241,
+      "toYear": 101,
+      "holderId": "sicily-province",
+      "entity": "Roman province of Sicily",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "sicily"
 }

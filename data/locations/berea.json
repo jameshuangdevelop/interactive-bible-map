@@ -75,8 +75,46 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -148,
+      "toYear": -27,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "macedonia"
 }

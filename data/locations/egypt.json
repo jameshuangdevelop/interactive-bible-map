@@ -84,8 +84,17 @@
       ]
     }
   ],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -30,
+      "toYear": 101,
+      "holderId": "egypt-prefecture",
+      "entity": "Roman Egypt (special imperial prefecture) (ruler: Equestrian prefect; senators barred without the emperor's leave)",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "egypt"
 }

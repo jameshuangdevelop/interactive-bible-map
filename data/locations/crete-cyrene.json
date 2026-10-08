@@ -79,8 +79,17 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "crete-cyrene"
 }

@@ -77,8 +77,35 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "politicalHistory": [
+    {
+      "fromYear": -9,
+      "toYear": 40,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Aretas IV)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "fromYear": 40,
+      "toYear": 71,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Malichus II)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "fromYear": 71,
+      "toYear": 106,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Rabbel II)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "arabia"
 }

@@ -80,38 +80,43 @@
     {
       "fromYear": -37,
       "toYear": -4,
-      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
+        "bib:josephus-antiquities",
         "bib:rainey-notley-sacred-bridge"
       ]
     },
     {
       "fromYear": -4,
       "toYear": 39,
-      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "holderId": "antipas-tetrarchy",
+      "entity": "Tetrarchy of Galilee and Perea (ruler: Herod Antipas)",
       "sources": [
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ]
     },
     {
       "fromYear": 39,
       "toYear": 44,
-      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
       "sources": [
-        "bib:rainey-notley-sacred-bridge"
+        "bib:josephus-antiquities"
       ]
     },
     {
       "fromYear": 44,
-      "toYear": 70,
-      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
-        "wikidata:Q1003997",
-        "bib:rainey-notley-sacred-bridge"
-      ]
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii"
+      ],
+      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae, and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not drawable land of their own, so this area's own extent does not change."
     }
   ],
-  "status": "verified",
-  "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "status": "draft",
+  "politicalAreaId": "galilee-perea"
 }
