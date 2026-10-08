@@ -118,7 +118,7 @@
     },
     {
       "fromYear": 54,
-      "toYear": 101,
+      "toYear": 100,
       "holderId": "agrippa-ii-kingdom",
       "entity": "Kingdom of Herod Agrippa II (ruler: Herod Agrippa II)",
       "sources": [
@@ -127,6 +127,17 @@
         "bib:josephus-antiquities"
       ],
       "note": "The Jewish historian Josephus records that the emperor Nero gave Agrippa II \"a certain part of Galilee, Tiberias, and Tarichae,\" naming this town by its other name; Josephus dates the grant to Nero's first year (AD 54), but the Jewish Encyclopedia (1906) reads Agrippa II's own coinage as pointing to AD 61 instead for this specific addition. The rest of Galilee stayed under the Roman procurators throughout."
+    },
+    {
+      "fromYear": 100,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
     }
   ],
   "status": "draft",
@@ -134,7 +145,7 @@
   "politicalHistoryOverrides": [
     {
       "fromYear": 54,
-      "toYear": 101,
+      "toYear": 100,
       "holderId": "agrippa-ii-kingdom",
       "ruler": "Herod Agrippa II",
       "note": "The Jewish historian Josephus records that the emperor Nero gave Agrippa II \"a certain part of Galilee, Tiberias, and Tarichae,\" naming this town by its other name; Josephus dates the grant to Nero's first year (AD 54), but the Jewish Encyclopedia (1906) reads Agrippa II's own coinage as pointing to AD 61 instead for this specific addition. The rest of Galilee stayed under the Roman procurators throughout.",

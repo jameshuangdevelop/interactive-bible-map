@@ -79,18 +79,24 @@
       "fromYear": 17,
       "toYear": 69,
       "holderId": "cappadocia-province",
-      "entity": "Roman province of Cappadocia (ruler: Equestrian governors, the first being Quintus Veranius)",
+      "entity": "Roman province of Cappadocia (ruler: Quintus Veranius, sent to organize the province; then equestrian governors)",
       "sources": [
         "bib:tacitus-annals",
-        "bib:isbe-cappadocia"
+        "bib:isbe-cappadocia",
+        "bib:livius-cappadocia",
+        "bib:isbe-galatia",
+        "bib:isbe-pontus",
+        "bib:cassius-dio-roman-history",
+        "bib:josephus-antiquities",
+        "bib:worldhistory-vespasian"
       ],
-      "note": "This area's drawn extent also covers Pontus Galaticus (part of the province of Galatia from 2 BC), Polemon's kingdom of Pontus (a client kingdom until 63 or 64, when it too joined Galatia), and Lesser Armenia (ruled by client kings from AD 38 to 72); none of these three lands is its own area on this map, so they are not shown separately as unclear. This does not change Cappadocia's own holder; see the AD 6 and AD 70 stops for their own changes."
+      "note": "Tacitus calls Veranius the province's \"governor,\" though a translator's note calls his appointment \"only a temporary expedient\"; he later appears on the staff of Germanicus, a Roman prince. Livius likewise describes equestrian governors (procurators) for this span. This area's drawn extent also covers Pontus Galaticus (part of the province of Galatia from 2 BC, ISBE \"Galatia\"), Polemon's kingdom of Pontus (a client kingdom until 63, ISBE \"Pontus\", or 64, ISBE \"Galatia\", when it too joined Galatia), and Lesser Armenia (held by Archelaus of Cappadocia from 20 BC, Cassius Dio 54.9.2; by Cotys from 38, Dio 59.12.2; by Aristobulus from 54, Antiquities 20.8.4; annexed in 72, World History Encyclopedia's \"Vespasian\"); none of these three lands is its own area on this map, so they are not shown separately as unclear. This does not change Cappadocia's own holder; see the AD 6, AD 39 and AD 67 stops for their own changes."
     },
     {
       "fromYear": 69,
       "toYear": 101,
       "holderId": "cappadocia-province",
-      "entity": "Roman province of Cappadocia (ruler: Consular governors, the first being Gnaeus Pompeius Collega (AD 69))",
+      "entity": "Roman province of Cappadocia (ruler: Gnaeus Pompeius Collega, the first governor of senatorial rank (AD 69))",
       "sources": [
         "bib:suetonius-twelve-caesars",
         "bib:livius-cappadocia"
