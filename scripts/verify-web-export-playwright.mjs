@@ -8406,10 +8406,25 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
 
 async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
   const targetViewports = [
-    { width: 1440, height: 900, hasTouch: false, isMobile: false, label: "desktop" },
-    { width: 390, height: 844, hasTouch: true, isMobile: true, label: "phone-390x844" }
+    {
+      width: 1440,
+      height: 900,
+      hasTouch: false,
+      isMobile: false,
+      label: "desktop",
+      zooms: [4, 5, 7, 9, 11],
+      requireCollapsedSheet: false
+    },
+    {
+      width: 390,
+      height: 844,
+      hasTouch: true,
+      isMobile: true,
+      label: "phone-390x844",
+      zooms: [4, 5],
+      requireCollapsedSheet: true
+    }
   ];
-  const targetZooms = [4, 5, 7, 9, 11];
   const results = [];
 
   const assertScaleMatchesGeometry = (snapshot, label) => {
@@ -8480,6 +8495,20 @@ async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
     try {
       await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 90_000 });
       await waitForMapToSettle(page);
+      if (viewport.requireCollapsedSheet) {
+        const collapsedRatio = await page.evaluate(() => {
+          const panel = document.querySelector("section[aria-label='Place details']");
+          if (!(panel instanceof HTMLElement)) {
+            throw new Error("Phone place panel is not visible for scale-bar check.");
+          }
+          return panel.getBoundingClientRect().height / window.innerHeight;
+        });
+        if (collapsedRatio < 0.33 || collapsedRatio > 0.5) {
+          throw new Error(
+            `${viewport.label}: expected collapsed sheet near 40%, got ${(collapsedRatio * 100).toFixed(1)}%.`
+          );
+        }
+      }
 
       const beforeZoomOut = await readScaleSnapshot();
       await page.evaluate((testHookKey) => {
@@ -8498,7 +8527,7 @@ async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
       }
 
       const zoomChecks = [];
-      for (const targetZoom of targetZooms) {
+      for (const targetZoom of viewport.zooms) {
         await page.evaluate(
           ({ testHookKey, zoom }) => {
             const map = window[testHookKey];

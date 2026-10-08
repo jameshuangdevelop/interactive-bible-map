@@ -2113,16 +2113,21 @@ export function MapView({
 
   const updateScaleBar = useCallback(() => {
     const map = mapRef.current;
+    const mapContainer = mapContainerRef.current;
     const scaleBar = scaleBarRef.current;
     const scaleFill = scaleBarFillRef.current;
     const scaleLabel = scaleBarLabelRef.current;
-    if (!map || !scaleBar || !scaleFill || !scaleLabel) {
+    if (!map || !mapContainer || !scaleBar || !scaleFill || !scaleLabel) {
       return;
     }
 
-    const mapHeight = map.getContainer().clientHeight;
     const maxWidth = 110;
-    const y = Math.max(32, mapHeight - 48);
+    const mapBounds = mapContainer.getBoundingClientRect();
+    const scaleBounds = scaleBar.getBoundingClientRect();
+    const y = Math.max(
+      0,
+      Math.min(mapBounds.height, scaleBounds.top + scaleBounds.height / 2 - mapBounds.top)
+    );
     const left = map.unproject([0, y] as PointLike);
     const right = map.unproject([maxWidth, y] as PointLike);
     const measuredMeters = distanceMeters([left.lng, left.lat], [right.lng, right.lat]);
@@ -2915,7 +2920,8 @@ export function MapView({
 
     map.setPadding(getMapLabelPadding(panelInset, bottomInset));
     scheduleVisibleEntryRefresh();
-  }, [bottomInset, panelInset, scheduleVisibleEntryRefresh]);
+    scheduleScaleBarUpdate();
+  }, [bottomInset, panelInset, scheduleScaleBarUpdate, scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
     const map = mapRef.current;
