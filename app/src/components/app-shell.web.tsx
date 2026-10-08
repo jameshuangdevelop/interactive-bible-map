@@ -788,7 +788,8 @@ export function AppShell() {
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
   const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
-  const timelineVisible = mapMode === "ancient" && !isSmallScreen && hasAncientTimeline;
+  const timelineVisible = mapMode === "ancient" && hasAncientTimeline;
+  const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -1019,7 +1020,7 @@ export function AppShell() {
                 <span>Ancient coastline</span>
               </div>
               <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
-                Borders are approximate. Lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn. Sources are under Sources &amp; credits.
+                Borders are approximate. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn. Sources are under Sources &amp; credits.
               </p>
             </div>
           ) : null}
@@ -1033,7 +1034,7 @@ export function AppShell() {
           <LazyMapView
             ancientTimeline={ancientTimeline}
             ancientLayerRetryToken={ancientLayerRetryToken}
-            bottomPanelInset={panelBottomInsetForMap}
+            bottomPanelInset={Math.max(panelBottomInsetForMap, timelineBottomInsetForMap)}
             highlightedPlaceId={highlightedPlaceId}
             isSmallScreen={isSmallScreen}
             leftPanelWidth={panelWidthForMap}
@@ -1053,16 +1054,18 @@ export function AppShell() {
           style={{
             position: "absolute",
             left: "50%",
-            bottom: `${Math.max(tokens.spacing.md, panelBottomInsetForMap + tokens.spacing.md)}px`,
+            bottom: isSmallScreen
+              ? `${tokens.spacing.md}px`
+              : `${Math.max(tokens.spacing.md, panelBottomInsetForMap + tokens.spacing.md)}px`,
             transform: "translateX(-50%)",
-            width: "560px",
+            width: isSmallScreen ? "calc(100vw - 32px)" : "760px",
             maxWidth: "calc(100vw - 48px)",
             borderRadius: "8px",
             border: `1px solid ${tokens.color.divider}`,
             backgroundColor: "#FFFFFF",
             boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
             padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
-            zIndex: 30
+            zIndex: isSmallScreen ? 11 : 30
           }}
         >
           {ancientLayerStatus === "error" || !selectedTimelineStop ? (

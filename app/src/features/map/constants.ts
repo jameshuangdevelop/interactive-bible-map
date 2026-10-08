@@ -14,7 +14,7 @@ export const ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION =
 export const MODERN_MAIN_BASEMAP_ATTRIBUTION = ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
 export const MODERN_FALLBACK_BASEMAP_ATTRIBUTION = ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION;
 export const ANCIENT_AWMC_ATTRIBUTION =
-  "Contains information from AWMC Geodata (awmc.unc.edu), made available under the Open Database License (ODbL).";
+  'Contains information from <a href="https://github.com/AWMC/geodata" target="_blank">AWMC Geodata</a>, which is made available here under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank">Open Database License (ODbL)</a>.';
 
 export const DEFAULT_MAP_CENTER: Coordinates = [22.5, 35];
 export const DEFAULT_MAP_ZOOM = 4.7;

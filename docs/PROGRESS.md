@@ -57,7 +57,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M4-02 | The timeline: who held each area, and when | research-lead → fact-checker | `data/m4-timeline` | Verified: all 89 place records verified, no fixes open (`docs/verification/M4-timeline.md`, "Second re-verification"); PR body ready, stacked on M4-01 | |
 | M4-03 | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Verified with fixes needed: licensing passes and the AWMC credit is corrected; GIS fixes G1–G9 (Raetia, seven roads after AD 100, the edge along two coasts, Galatia–Cappadocia, missed peninsulas) and Research Lead items RL1–RL6 are open (`docs/verification/M4-ancient-geometry.md`) | |
 | M4-04 | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | `feat/m4-modern-map` | Waiting for M7-01 | |
-| M4-05 | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | Waiting for M4-01 and M4-04 | |
+| M4-05 | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | Done on branch: merged M7-01, M4-03 and M4-04 heads; real-data ancient layer, timeline, phone placement, accessibility, and perf checks wired; waiting for PO push/review | |
 
 ## Open questions
 - **For the Fact-Checker and the Research Lead (M4-03 shapes, 2026-10-07; updated 2026-10-08 for the second round):**

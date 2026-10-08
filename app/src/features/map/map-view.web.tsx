@@ -132,8 +132,10 @@ const layerAncientBorderSolidId = "ibm-ancient-border-solid";
 const layerAncientBorderDashedId = "ibm-ancient-border-dashed";
 const layerAncientBorderDottedId = "ibm-ancient-border-dotted";
 const layerAncientEmpireEdgeId = "ibm-ancient-empire-edge";
-const layerAncientRoadKnownId = "ibm-ancient-road-known";
-const layerAncientRoadConjecturedId = "ibm-ancient-road-conjectured";
+const layerAncientRoadMajorKnownId = "ibm-ancient-road-major-known";
+const layerAncientRoadMajorConjecturedId = "ibm-ancient-road-major-conjectured";
+const layerAncientRoadMinorKnownId = "ibm-ancient-road-minor-known";
+const layerAncientRoadMinorConjecturedId = "ibm-ancient-road-minor-conjectured";
 const layerAncientCoastlineId = "ibm-ancient-coastline";
 const layerAncientHolderLabelId = "ibm-ancient-holder-label";
 const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
@@ -305,8 +307,10 @@ function applyMapModeOverlayVisibility(
     layerAncientBorderDashedId,
     layerAncientBorderDottedId,
     layerAncientEmpireEdgeId,
-    layerAncientRoadKnownId,
-    layerAncientRoadConjecturedId,
+    layerAncientRoadMajorKnownId,
+    layerAncientRoadMajorConjecturedId,
+    layerAncientRoadMinorKnownId,
+    layerAncientRoadMinorConjecturedId,
     layerAncientCoastlineId,
     layerAncientHolderLabelId,
     layerAncientHolderLabelClickableId
@@ -317,6 +321,17 @@ function applyMapModeOverlayVisibility(
 
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
+
+function isFeatureCollectionData(
+  value: GeoJsonSourceData
+): value is Exclude<GeoJsonSourceData, string> & { features: unknown[] } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "features" in value &&
+    Array.isArray((value as { features: unknown }).features)
+  );
+}
 
 function toLayerFilter(filter: unknown): LayerFilter {
   return filter as LayerFilter;
@@ -1407,13 +1422,17 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerAncientRoadKnownId)) {
+  if (!map.getLayer(layerAncientRoadMajorKnownId)) {
     map.addLayer({
-      id: layerAncientRoadKnownId,
+      id: layerAncientRoadMajorKnownId,
       source: sourceAncientRoadsId,
       type: "line",
       minzoom: 5,
-      filter: toLayerFilter(["==", ["get", "known"], true]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "major"], true],
+        ["==", ["get", "known"], true]
+      ]),
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.roads.color,
         "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2]
@@ -1421,16 +1440,57 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerAncientRoadConjecturedId)) {
+  if (!map.getLayer(layerAncientRoadMajorConjecturedId)) {
     map.addLayer({
-      id: layerAncientRoadConjecturedId,
+      id: layerAncientRoadMajorConjecturedId,
       source: sourceAncientRoadsId,
       type: "line",
       minzoom: 5,
-      filter: toLayerFilter(["!=", ["get", "known"], true]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "major"], true],
+        ["!=", ["get", "known"], true]
+      ]),
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.roads.color,
         "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2],
+        "line-dasharray": [2, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMinorKnownId)) {
+    map.addLayer({
+      id: layerAncientRoadMinorKnownId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 7,
+      filter: toLayerFilter([
+        "all",
+        ["!=", ["get", "major"], true],
+        ["==", ["get", "known"], true]
+      ]),
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.color,
+        "line-width": 0.75
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMinorConjecturedId)) {
+    map.addLayer({
+      id: layerAncientRoadMinorConjecturedId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 7,
+      filter: toLayerFilter([
+        "all",
+        ["!=", ["get", "major"], true],
+        ["!=", ["get", "known"], true]
+      ]),
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.color,
+        "line-width": 0.75,
         "line-dasharray": [2, 2]
       }
     });
@@ -2590,6 +2650,7 @@ export function MapView({
   const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
   const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientStopsById, setAncientStopsById] = useState<Record<string, AncientStopPayload>>({});
   const ancientEntitiesById = useMemo(
     () => new Map((ancientTimeline?.entities ?? []).map((entity) => [entity.id, entity] as const)),
@@ -2642,10 +2703,13 @@ export function MapView({
     () => buildAncientBorderFeatures(selectedAncientStopPayload),
     [selectedAncientStopPayload]
   );
-  const ancientEmpireEdgeFeatures = useMemo(
-    () => asLineFeatureCollection(selectedAncientStopPayload?.romanEmpireEdge),
-    [selectedAncientStopPayload]
-  );
+  const ancientEmpireEdgeFeatures = useMemo(() => {
+    if (isFeatureCollectionData(ancientEmpireEdge) && ancientEmpireEdge.features.length > 0) {
+      return ancientEmpireEdge;
+    }
+
+    return asLineFeatureCollection(selectedAncientStopPayload?.romanEmpireEdge);
+  }, [ancientEmpireEdge, selectedAncientStopPayload]);
   const ancientHolderLabelFeatures = useMemo(() => {
     const currentYear = selectedAncientStopPayload?.year ?? timelineDefaultYear;
     const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
@@ -2667,6 +2731,7 @@ export function MapView({
     setAncientShapes(null);
     setAncientRoads(createEmptyFeatureCollection());
     setAncientCoastline(createEmptyFeatureCollection());
+    setAncientEmpireEdge(createEmptyFeatureCollection());
     setAncientStopsById({});
     stopPrefetchScheduledRef.current = false;
     stopPayloadRequestIdsRef.current.clear();
@@ -2782,9 +2847,20 @@ export function MapView({
         }
 
         return (await response.json()) as GeoJsonSourceData;
+      }),
+      fetch("/generated/ancient.empire-edge.geojson", { cache: "no-store" }).then(async (response) => {
+        if (response.status === 404) {
+          return createEmptyFeatureCollection() as GeoJsonSourceData;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Could not load ancient empire edge (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
       })
     ])
-      .then(([shapesPayload, roadsPayload, coastlinePayload]) => {
+      .then(([shapesPayload, roadsPayload, coastlinePayload, empireEdgePayload]) => {
         if (cancelled) {
           return;
         }
@@ -2792,6 +2868,7 @@ export function MapView({
         setAncientShapes(shapesPayload);
         setAncientRoads(roadsPayload);
         setAncientCoastline(coastlinePayload);
+        setAncientEmpireEdge(empireEdgePayload);
       })
       .catch((error) => {
         console.error("Failed to load ancient map layer data.", error);
@@ -3910,10 +3987,20 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
   }, [runtimeTuning.controlZoomDurationMs]);
+  const timelineOverlayBottomInset =
+    isSmallScreen && mapMode === "ancient" && hasAncientTimeline ? 192 : 0;
+  const maxReachableControlInset =
+    isSmallScreen && typeof window !== "undefined"
+      ? Math.max(0, window.innerHeight - 124)
+      : Number.POSITIVE_INFINITY;
+  const controlBottomInset = Math.min(
+    Math.max(bottomInset, timelineOverlayBottomInset),
+    maxReachableControlInset
+  );
   const resetButtonBottomOffset = isSmallScreen
-    ? Math.max(bottomInset + 16, 88)
+    ? Math.max(controlBottomInset + 16, 88)
     : bottomInset + 16;
-  const compactAttributionBottomOffset = isSmallScreen ? bottomInset : 0;
+  const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
   const compactAttributionRightOffset = 72;
 
   return (
@@ -3979,7 +4066,7 @@ export function MapView({
         style={{
           position: "absolute",
           left: `${getScaleControlLeftOffset(panelInset)}px`,
-          bottom: `${bottomInset + 16}px`,
+          bottom: `${controlBottomInset + 16}px`,
           backgroundColor: "#FFFFFF",
           border: "1px solid rgba(95,99,104,0.35)",
           borderRadius: "4px",
