@@ -41,7 +41,6 @@ const fullLicenseDetailsUrl =
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const minimumControlHitAreaPx = 44;
-const timelineTrackThumbInsetPx = 14;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -4561,17 +4560,17 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
       await page.waitForTimeout(150);
       const tickLocator = page.locator(`[data-timeline-tick-stop-id="${stop.id}"]`).first();
       await tickLocator.waitFor({ state: "visible", timeout: 30_000 });
+      const thumbLocator = page.locator("[data-timeline-slider-thumb='true']").first();
+      await thumbLocator.waitFor({ state: "visible", timeout: 30_000 });
       const sliderBox = await timelineSlider.boundingBox();
       const tickBox = await tickLocator.boundingBox();
-      if (!sliderBox || !tickBox) {
+      const thumbBox = await thumbLocator.boundingBox();
+      if (!sliderBox || !tickBox || !thumbBox) {
         throw new Error(
           `Missing geometry for timeline alignment at stop '${stop.id}'. Missing fixture files: ${Array.from(missingFixtureFiles).join(", ")}. Console errors: ${consoleErrors.join(" | ")}`
         );
       }
-      const denominator = Math.max(1, stopIds.length - 1);
-      const fraction = denominator === 0 ? 0 : index / denominator;
-      const thumbCenterX =
-        sliderBox.x + fraction * sliderBox.width + (1 - 2 * fraction) * timelineTrackThumbInsetPx;
+      const thumbCenterX = thumbBox.x + thumbBox.width / 2;
       const tickCenterX = tickBox.x + tickBox.width / 2;
       const alignment = {
         stopId: stop.id,

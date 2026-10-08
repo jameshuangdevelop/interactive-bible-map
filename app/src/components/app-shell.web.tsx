@@ -47,7 +47,9 @@ const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const TIMELINE_DEFAULT_YEAR = 50;
-const TIMELINE_TRACK_THUMB_INSET_PX = 14;
+const TIMELINE_TRACK_THICKNESS_PX = 2;
+const TIMELINE_TRACK_THUMB_DIAMETER_PX = 20;
+const TIMELINE_TRACK_THUMB_INSET_PX = TIMELINE_TRACK_THUMB_DIAMETER_PX / 2;
 
 function toRgba(hexColor: string, opacity: number) {
   const normalized = hexColor.replace("#", "");
@@ -1141,8 +1143,7 @@ export function AppShell() {
               <div
                 style={{
                   marginTop: `${tokens.spacing.sm}px`,
-                  display: "grid",
-                  gridTemplateColumns: "44px minmax(0, 1fr) 44px",
+                  display: "flex",
                   alignItems: "center",
                   columnGap: `${tokens.spacing.sm}px`
                 }}
@@ -1164,21 +1165,68 @@ export function AppShell() {
                 >
                   ‹
                 </button>
-                <div style={{ minWidth: 0 }}>
-                  <input
-                    aria-label="Year"
-                    aria-valuetext={formatTimelineValueText(selectedTimelineStop)}
-                    data-timeline-slider="true"
-                    max={Math.max(0, sortedTimelineStops.length - 1)}
-                    min={0}
-                    onChange={(event) => {
-                      setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div
+                    style={{
+                      position: "relative",
+                      height: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px`
                     }}
-                    step={1}
-                    style={{ width: "100%", margin: 0 }}
-                    type="range"
-                    value={Math.max(0, selectedTimelineStopIndex)}
-                  />
+                  >
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        left: `${TIMELINE_TRACK_THUMB_INSET_PX}px`,
+                        right: `${TIMELINE_TRACK_THUMB_INSET_PX}px`,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        height: `${TIMELINE_TRACK_THICKNESS_PX}px`,
+                        borderRadius: `${TIMELINE_TRACK_THICKNESS_PX / 2}px`,
+                        backgroundColor: "#C9CDD1"
+                      }}
+                    />
+                    <div
+                      aria-hidden="true"
+                      data-timeline-slider-thumb="true"
+                      style={{
+                        position: "absolute",
+                        left: timelineTickPosition(
+                          Math.max(0, selectedTimelineStopIndex) / Math.max(1, sortedTimelineStops.length - 1)
+                        ),
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px`,
+                        height: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px`,
+                        borderRadius: "50%",
+                        border: "2px solid #1A73E8",
+                        backgroundColor: "#FFFFFF",
+                        boxSizing: "border-box"
+                      }}
+                    />
+                    <input
+                      aria-label="Year"
+                      aria-valuetext={formatTimelineValueText(selectedTimelineStop)}
+                      className="ibm-timeline-slider-input"
+                      data-timeline-slider="true"
+                      max={Math.max(0, sortedTimelineStops.length - 1)}
+                      min={0}
+                      onChange={(event) => {
+                        setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
+                      }}
+                      step={1}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        margin: 0,
+                        opacity: 0,
+                        cursor: "pointer"
+                      }}
+                      type="range"
+                      value={Math.max(0, selectedTimelineStopIndex)}
+                    />
+                  </div>
                   <div
                     aria-hidden="true"
                     style={{
