@@ -113,7 +113,7 @@ const SOURCE_BY_AREA = {
   bithynia: ["bib:isbe-bithynia", "bib:isbe-pontus"],
   achaia: ["awmc:roman-empire-ad-69-provinces"],
   macedonia: ["bib:isbe-macedonia", "bib:livius-macedonia"],
-  asia: ["bib:isbe-asia"],
+  asia: ["bib:isbe-asia", "bib:isbe-rhodes"],
   cyprus: ["awmc:roman-empire-ad-69-provinces"],
   "crete-cyrene": ["bib:isbe-crete"],
   egypt: ["bib:tacitus-annals"],
@@ -161,6 +161,7 @@ const POINTS = {
   // Strabo 12.2.7: Mazaca, the metropolis of the Cappadocians. The label point is the one on the
   // `cappadocia` location record.
   caesareaMazaca: [35.48, 38.72],
+  raphia: [34.25, 31.29],
   cappadociaLabel: [34.8392, 38.6706]
 };
 
@@ -207,12 +208,22 @@ const CILICIA_RULE_3_NOTE = " Rule 3: where the AD 200 cells cut the AD 69 face,
 // Perea ends just south of Machaerus (Josephus, War 3.3.3), so the fortress itself stays in Perea.
 const MACHAERUS_CUT_MARGIN_KM = 1;
 
-// AWMC draws no first-century Galatia–Cappadocia line; the edge between the two faces is the AD 14
-// extent, from Cappadocia's years as a client kingdom. It is moved locally so that the province's label
-// point lies in Cappadocia: two straight segments from points CAPPADOCIA_DETOUR_HALF_KM either side
-// along the edge to a point CAPPADOCIA_DETOUR_BEYOND_KM beyond the label point.
-const CAPPADOCIA_DETOUR_HALF_KM = 25;
-const CAPPADOCIA_DETOUR_BEYOND_KM = 3;
+// Galatia–Cappadocia (ADR-0037 rule 2; the Research Lead's RL4 anchors, docs/research/M4-timeline.md
+// §2.24, row 9). Strabo puts Tyana and Garsaura in Cappadocia's prefectures (12.1.4, 12.2.7), and Lake
+// Tatta (12.5.4) and the Lycaonian cities Iconium, Lystra and Derbe, which joined Galatia in 25 BC,
+// lie on Galatia's side. The line runs equidistant between the nearest anchors of the two sides.
+const GALATIA_CAPPADOCIA_ANCHORS = {
+  cappadocia: [
+    { name: "Tyana", point: [34.5722, 37.8232], source: "pleiades:648801" },
+    { name: "Garsaura", point: [34.0269, 38.3705], source: "pleiades:619164" }
+  ],
+  galatia: [
+    { name: "Lake Tatta", point: [33.3333, 38.8333], source: "pleiades:619268" },
+    { name: "Iconium", point: [32.4923, 37.8725] },
+    { name: "Lystra", point: [32.3445, 37.5883] },
+    { name: "Derbe", point: [33.3615, 37.3486] }
+  ]
+};
 
 // Land outside every area but joined by land to exactly one of them, and smaller than this, is a
 // peninsula that AWMC's extent cut off at its neck (or the rest of an island an area already holds).
@@ -222,7 +233,15 @@ const PENINSULA_MAX_KM2 = 2000;
 const NAMED_CUT_OFF_PENINSULAS = [
   { name: "the Preveza peninsula (Nicopolis)", point: [20.738, 38.99], areaId: "achaia" },
   { name: "the Actium promontory", point: [20.774, 38.918], areaId: "achaia" },
-  { name: "Sinope's peninsula (Boztepe)", point: [35.175, 42.032], areaId: "bithynia" }
+  { name: "Sinope's peninsula (Boztepe)", point: [35.175, 42.032], areaId: "bithynia" },
+  // Joined to both Macedonia and Achaia at its neck, so the Research Lead ruled on it (RL5).
+  {
+    name: "the Acroceraunian promontory (Karaburun)",
+    point: [19.39, 40.34],
+    areaId: "achaia",
+    ruling: "the Research Lead's ruling RL5: Smith's Dictionary of Greek and Roman Geography, \"Epeirus\", makes the promontory Epirus's northern tip, and Cassius Dio's \"Greece with Epirus\" (27 BC) puts Epirus in Achaia",
+    sources: ["bib:smith-dictionary-epeirus", "bib:cassius-dio-roman-history"]
+  }
 ];
 // Natural Earth land polygons up to this size are islands (Sicily is the largest the map draws).
 const ISLAND_MAX_KM2 = 30000;
@@ -287,6 +306,7 @@ const LAND_NAMES = [
   ["the south of the Magnesia (Pelion) peninsula", [23.24, 39.16]],
   ["the Preveza peninsula (Nicopolis)", [20.738, 38.99]], ["the Actium promontory", [20.774, 38.918]],
   ["Sinope's peninsula (Boztepe)", [35.175, 42.032]], ["Pharos (Hvar)", [16.497, 43.188]],
+  ["the Acroceraunian promontory (Karaburun)", [19.39, 40.34]],
   ["Corcyra (Corfu)", [20.068, 39.414]], ["Ilva (Elba)", [10.396, 42.801]], ["Cossyra (Pantelleria)", [12.031, 36.774]],
   ["the Karpas peninsula of Cyprus", [34.46, 35.62]], ["the Akrotiri peninsula of Cyprus", [32.98, 34.6]]
 ];
@@ -808,6 +828,7 @@ async function attachCutOffPeninsulas(built, extentFeature, landParts, notes) {
     attachments.set(landPiece, first.candidate.properties.areaId);
   }
   // Peninsulas that AWMC's coastline leaves out altogether, so that no piece of the extent marks them.
+  const rulings = new Map();
   for (const peninsula of NAMED_CUT_OFF_PENINSULAS) {
     const landPiece = featureContaining(landPieces, peninsula.point);
     if (!landPiece) {
@@ -816,10 +837,12 @@ async function attachCutOffPeninsulas(built, extentFeature, landParts, notes) {
     }
     if (attachments.has(landPiece)) continue;
     const touches = sharedBoundaryShares(landPiece, built, 0.05).map((share) => share.candidate.properties.areaId);
-    if (geometryAreaKm2(landPiece.geometry) > PENINSULA_MAX_KM2 || touches.length !== 1 || touches[0] !== peninsula.areaId) {
-      throw new Error(`${peninsula.name}: the land there touches ${touches.join(", ") || "no area"}, not only ${peninsula.areaId}`);
+    const joined = peninsula.ruling ? touches.includes(peninsula.areaId) : touches.length === 1 && touches[0] === peninsula.areaId;
+    if (geometryAreaKm2(landPiece.geometry) > PENINSULA_MAX_KM2 || !joined) {
+      throw new Error(`${peninsula.name}: the land there touches ${touches.join(", ") || "no area"}, not ${peninsula.ruling ? "" : "only "}${peninsula.areaId}`);
     }
     attachments.set(landPiece, peninsula.areaId);
+    if (peninsula.ruling) rulings.set(peninsula.areaId, [...(rulings.get(peninsula.areaId) ?? []), peninsula]);
   }
   const byArea = new Map();
   for (const [landPiece, areaId] of attachments) {
@@ -831,7 +854,8 @@ async function attachCutOffPeninsulas(built, extentFeature, landParts, notes) {
     const index = built.findIndex((feature) => feature.properties.areaId === areaId);
     const current = built[index];
     const change = { kind: "peninsula", detail: `Adds ${pieces.map((piece) => landName(piece.geometry, "a peninsula")).join(", ")}: Natural Earth land joined to this area by land that AWMC's AD 69 extent or coastline cuts off (ADR-0037: a peninsula belongs to the area it is attached to).`, sources: ["awmc:roman-empire-ad-69-extent"] };
-    built[index] = await finishArea(areaId, [current, ...pieces], current.properties.provenance.changes[0].detail, current.properties.provenance.upstreamFeatureIds, notes, [...current.properties.provenance.changes.slice(1), change]);
+    const rulingChanges = (rulings.get(areaId) ?? []).map((peninsula) => ({ kind: "ruling", detail: `${peninsula.name} is joined to more than one area at its neck; it belongs here by ${peninsula.ruling}.`, sources: peninsula.sources }));
+    built[index] = await finishArea(areaId, [current, ...pieces], current.properties.provenance.changes[0].detail, current.properties.provenance.upstreamFeatureIds, notes, [...current.properties.provenance.changes.slice(1), change, ...rulingChanges]);
   }
   return [...attachments.keys()];
 }
@@ -886,75 +910,80 @@ async function attachExtentSlivers(built, inlandExtentGaps, notes) {
   }
 }
 
-// Nearest point on a ring (local planar approximation) and the index of the segment it lies on.
-function nearestPointOnRing(point, ring) {
-  const kmPerDegreeLon = 111.32 * Math.cos((point[1] * Math.PI) / 180);
-  let best = { distance: Infinity, point: ring[0], segmentIndex: 0 };
-  for (let index = 1; index < ring.length; index += 1) {
-    const [ax, ay] = [(ring[index - 1][0] - point[0]) * kmPerDegreeLon, (ring[index - 1][1] - point[1]) * 110.574];
-    const [bx, by] = [(ring[index][0] - point[0]) * kmPerDegreeLon, (ring[index][1] - point[1]) * 110.574];
-    const dx = bx - ax;
-    const dy = by - ay;
-    const denominator = dx * dx + dy * dy;
-    const t = denominator === 0 ? 0 : Math.max(0, Math.min(1, -(ax * dx + ay * dy) / denominator));
-    const [px, py] = [ax + t * dx, ay + t * dy];
-    const distance = Math.hypot(px, py);
-    if (distance < best.distance) best = { distance, point: [point[0] + px / kmPerDegreeLon, point[1] + py / 110.574], segmentIndex: index - 1 };
-  }
-  return best;
+// Natural Earth's outline of Lake Tatta (Tuz Gölü): the lake that holds Pleiades' point for it.
+async function loadLakeTatta() {
+  const anchor = GALATIA_CAPPADOCIA_ANCHORS.galatia.find((entry) => entry.name === "Lake Tatta");
+  const lakes = ensureFeatureCollection(await readJson(path.join(partitionWorkDirectory, "ne_10m_lakes.geojson"))).features;
+  const lake = lakes.find((feature) => feature.geometry && pointInGeometry(anchor.point, feature.geometry));
+  if (!lake) throw new Error("Natural Earth has no lake at Lake Tatta's point");
+  const shore = polygonsOf(lake.geometry).flatMap((polygon) => polygon[0].slice(0, -1));
+  const eastShore = shore.reduce((best, point) => (point[0] > best[0] ? point : best), shore[0]);
+  return { shore, eastShore };
 }
 
-// Moves the Galatia–Cappadocia edge locally so that the province's label point lies in Cappadocia.
-async function moveCappadociaLineLocally(built, notes) {
+// Galatia–Cappadocia (rule 2): the land nearer to a Cappadocian anchor than to every Galatian one is the
+// union of the Cappadocian anchors' Voronoi cells, computed in a local projection where a degree of
+// longitude is scaled by cos(latitude) so that equal distances are equal. The part of Galatia in it that
+// holds the Cappadocian anchors moves to Cappadocia; north of where the dividing line meets AWMC's AD 14
+// edge, that edge stays (rule 3). Returns the dividing line for the preview.
+async function drawGalatiaCappadociaLine(built, lakeTatta, notes) {
   const cappadociaIndex = built.findIndex((feature) => feature.properties.areaId === "cappadocia");
   const galatiaIndex = built.findIndex((feature) => feature.properties.areaId === "galatia");
   const cappadocia = built[cappadociaIndex];
   const galatia = built[galatiaIndex];
-  const label = POINTS.cappadociaLabel;
-  if (pointInGeometry(label, cappadocia.geometry)) {
-    notes.push("Cappadocia: the province's label point already lies in Cappadocia; the edge is unchanged.");
-    return null;
-  }
-  const outer = polygonsOf(cappadocia.geometry).find((polygon) => distanceToGeometryKm(label, { type: "Polygon", coordinates: polygon }) < 20);
-  if (!outer) throw new Error("Cappadocia's edge is not near the province's label point");
-  const ring = outer[0].slice(0, -1);
-  const count = ring.length;
-  const nearest = nearestPointOnRing(label, outer[0]);
-  const walk = (startIndex, step) => {
-    const path = [];
-    let index = startIndex;
-    let previous = nearest.point;
-    let travelled = 0;
-    while (travelled < CAPPADOCIA_DETOUR_HALF_KM && path.length < count) {
-      travelled += distanceKm(previous, ring[index]);
-      path.push(ring[index]);
-      previous = ring[index];
-      index = (index + step + count) % count;
+  const scale = Math.cos((38.1 * Math.PI) / 180);
+  const project = ([lon, lat]) => [lon * scale, lat];
+  const unproject = ([x, y]) => [x / scale, y];
+  // Keeps the part of a convex ring on the side of the bisector `middle`–`normal` that `normal` points away from.
+  const clipHalfPlane = (ring, middle, normal) => {
+    const side = (point) => (point[0] - middle[0]) * normal[0] + (point[1] - middle[1]) * normal[1];
+    const kept = [];
+    for (let index = 0; index < ring.length - 1; index += 1) {
+      const [start, end] = [ring[index], ring[index + 1]];
+      const [startSide, endSide] = [side(start), side(end)];
+      if (startSide <= 0) kept.push(start);
+      if ((startSide < 0 && endSide > 0) || (startSide > 0 && endSide < 0)) {
+        const t = startSide / (startSide - endSide);
+        kept.push([start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1])]);
+      }
     }
-    return path;
+    return kept.length > 0 ? [...kept, kept[0]] : kept;
   };
-  const forward = walk((nearest.segmentIndex + 1) % count, 1);
-  const backward = walk(nearest.segmentIndex % count, -1);
-  const borderPath = [...backward.reverse(), nearest.point, ...forward];
-  const galatiaGrid = segmentGrid(galatia.geometry);
-  if (!borderPath.every((vertex) => nearSegmentGrid(vertex, galatiaGrid, 0.05))) throw new Error("The Cappadocia detour would leave the Galatia–Cappadocia edge");
-  const kmPerDegreeLon = 111.32 * Math.cos((label[1] * Math.PI) / 180);
-  const east = (label[0] - nearest.point[0]) * kmPerDegreeLon;
-  const north = (label[1] - nearest.point[1]) * 110.574;
-  const length = Math.hypot(east, north);
-  const apex = [label[0] + ((east / length) * CAPPADOCIA_DETOUR_BEYOND_KM) / kmPerDegreeLon, label[1] + ((north / length) * CAPPADOCIA_DETOUR_BEYOND_KM) / 110.574];
-  const detour = geometryFeature({ type: "Polygon", coordinates: [[...borderPath, apex, borderPath[0]]] });
-  if (!booleanValid(detour)) throw new Error("The Cappadocia detour polygon is not simple");
-  const moved = await booleanOp("cappadocia-detour-moved", "clip", [galatia], [detour]);
-  const galatiaRest = await booleanOp("cappadocia-detour-galatia", "erase", [galatia], [detour]);
+  const frame = [[26, 33], [44, 33], [44, 44], [26, 44], [26, 33]].map(project);
+  // Lake Tatta is Galatian as a whole (Strabo 12.5.4), so every point of its shore (Natural Earth's lake
+  // outline) is a Galatian anchor too, not only Pleiades' point in the middle of it.
+  const galatianSites = [...GALATIA_CAPPADOCIA_ANCHORS.galatia.map((anchor) => anchor.point), ...lakeTatta.shore];
+  const cells = GALATIA_CAPPADOCIA_ANCHORS.cappadocia.map((anchor) => {
+    const own = project(anchor.point);
+    let ring = frame;
+    for (const site of galatianSites) {
+      const theirs = project(site);
+      ring = clipHalfPlane(ring, [(own[0] + theirs[0]) / 2, (own[1] + theirs[1]) / 2], [theirs[0] - own[0], theirs[1] - own[1]]);
+    }
+    return geometryFeature({ type: "Polygon", coordinates: [ring.map(unproject)] });
+  });
+  const cappadocianSide = await unionFeatures("galatia-cappadocia-side", cells);
+  const pieces = await explodeFeatures("galatia-cappadocia-moved", await booleanOp("galatia-cappadocia-moved", "clip", [galatia], [cappadocianSide]));
+  const moved = pieces.filter((piece) => GALATIA_CAPPADOCIA_ANCHORS.cappadocia.some((anchor) => pointInGeometry(anchor.point, piece.geometry)));
+  if (moved.length === 0) throw new Error("Galatia–Cappadocia: no part of Galatia holds a Cappadocian anchor");
+  const galatiaRest = await booleanOp("galatia-cappadocia-rest", "erase", [galatia], moved);
   const movedKm2 = moved.reduce((sum, piece) => sum + geometryAreaKm2(piece.geometry), 0);
-  const detail = `AWMC draws no first-century line between Galatia and Cappadocia; this edge is AWMC's AD 14 extent, from Cappadocia's years as a client kingdom (rule 3, an approximation). No source describes the local move: so that the cappadocia record's label point (Nevşehir), ${rounded(nearest.distance, 1)} km beyond the edge, falls inside, the edge runs in two straight segments from points ${CAPPADOCIA_DETOUR_HALF_KM} km either side along it to a point ${CAPPADOCIA_DETOUR_BEYOND_KM} km beyond the label point (${rounded(movedKm2)} km² moved; approximate). Mazaca, which Strabo (12.2.7) calls the metropolis of the Cappadocians, lies inside either way.`;
-  const change = { kind: "local-adjustment", detail, sources: ["bib:strabo-geography"] };
+  const names = (side) => side.map((anchor) => anchor.name).join(", ");
+  const detail = `Galatia–Cappadocia (rule 2; the Research Lead's RL4 anchors): the line runs equidistant between the nearest anchors of the two sides, ${names(GALATIA_CAPPADOCIA_ANCHORS.cappadocia)} in Cappadocia's prefectures (Strabo 12.1.4, 12.2.7) and ${names(GALATIA_CAPPADOCIA_ANCHORS.galatia)} on Galatia's side (Lake Tatta, all of whose shore counts, Strabo 12.5.4; Lycaonia's cities joined Galatia in 25 BC), in straight segments from where it meets AWMC's AD 14 edge north-east of Lake Tatta to Galatia's southern border. The land east of it, ${rounded(movedKm2)} km² with Tyana and Garsaura, belongs to Cappadocia; north of that meeting point the edge is still AWMC's AD 14 extent (rule 3). Strabo gives the districts, not the line, so the exact course between the anchors is approximate.`;
+  const sources = ["bib:strabo-geography", ...[...GALATIA_CAPPADOCIA_ANCHORS.cappadocia, ...GALATIA_CAPPADOCIA_ANCHORS.galatia].map((anchor) => anchor.source).filter(Boolean)];
+  const change = { kind: "described-line", detail, sources };
   built[cappadociaIndex] = await finishArea("cappadocia", [cappadocia, ...moved], cappadocia.properties.provenance.changes[0].detail, cappadocia.properties.provenance.upstreamFeatureIds, notes, [...cappadocia.properties.provenance.changes.slice(1), change]);
-  built[galatiaIndex] = await finishArea("galatia", galatiaRest, galatia.properties.provenance.changes[0].detail, galatia.properties.provenance.upstreamFeatureIds, notes, [...galatia.properties.provenance.changes.slice(1), { ...change, detail: `${rounded(movedKm2)} km² near Nevşehir moved to Cappadocia. ${detail}` }]);
-  assertInside(built[cappadociaIndex], { "the province's label point": label, "Caesarea Mazaca": POINTS.caesareaMazaca }, "cappadocia");
-  notes.push(`Cappadocia: ${detail}`);
-  return [...borderPath.slice(0, 1), apex, ...borderPath.slice(-1)];
+  built[galatiaIndex] = await finishArea("galatia", galatiaRest, galatia.properties.provenance.changes[0].detail, galatia.properties.provenance.upstreamFeatureIds, notes, [...galatia.properties.provenance.changes.slice(1), change]);
+  assertInside(built[cappadociaIndex], Object.fromEntries([...GALATIA_CAPPADOCIA_ANCHORS.cappadocia.map((anchor) => [anchor.name, anchor.point]), ["Caesarea Mazaca", POINTS.caesareaMazaca]]), "cappadocia");
+  assertInside(built[galatiaIndex], Object.fromEntries([...GALATIA_CAPPADOCIA_ANCHORS.galatia.map((anchor) => [anchor.name, anchor.point]), ["Lake Tatta's east shore", lakeTatta.eastShore]]), "galatia");
+  notes.push(`Galatia–Cappadocia: ${rounded(movedKm2)} km² east of the anchor line move from Galatia to Cappadocia.`);
+  // The border as drawn: the edge between the land that moved and the rest of Galatia.
+  const borderInput = path.join(workDirectory, "galatia-cappadocia-border-input.geojson");
+  const borderOutput = path.join(workDirectory, "galatia-cappadocia-border.geojson");
+  await writeJson(borderInput, featureCollection([geometryFeature((await unionFeatures("galatia-cappadocia-moved-union", moved)).geometry, { side: "cappadocia" }), ...galatiaRest.map((piece) => geometryFeature(piece.geometry, { side: "galatia" }))]));
+  await removeIfExists(borderOutput);
+  await mapshaper.runCommands(`-i ${quote(borderInput)} snap -innerlines where="A.side != B.side" -o format=geojson ${quote(borderOutput)}`);
+  return ensureFeatureCollection(await readJson(borderOutput)).features.flatMap((feature) => roadLines(feature.geometry));
 }
 
 // A piece is coastal when part of its outline is today's coastline (Natural Earth's land outlines).
@@ -1262,8 +1291,9 @@ async function loadLocationRecordsForPlaceCheck(notes) {
 }
 
 // Sites the Fact-Checker's fixes name (docs/verification/M4-ancient-geometry.md): the Raetian towns inside
-// AWMC's AD 69 extent that a dissolve bug had left out (G1), and the IJ and Carsium on the edge (G4).
-// Each must lie in its area.
+// AWMC's AD 69 extent that a dissolve bug had left out (G1), and the IJ and Carsium on the edge (G4); and
+// the Research Lead's rulings on its RL items (docs/research/M4-timeline.md §2.25): Asia's islands (RL2),
+// Raphia's coast (RL3) and Karaburun (RL5). Each must lie in its area.
 const VERIFICATION_ANCHORS = [
   ["Turicum (Zürich)", [8.54, 47.37], "other-roman-lands"],
   ["Vitudurum (Winterthur)", [8.75, 47.51], "other-roman-lands"],
@@ -1272,15 +1302,20 @@ const VERIFICATION_ANCHORS = [
   ["Veldidena (Innsbruck)", [11.4, 47.25], "other-roman-lands"],
   ["the Raetian gap's centre", [9.38, 47.39], "other-roman-lands"],
   ["the IJ gap's centre", [4.75, 52.42], "other-roman-lands"],
-  ["Carsium (Hârșova)", [27.95, 44.68], "other-roman-lands"]
+  ["Carsium (Hârșova)", [27.95, 44.68], "other-roman-lands"],
+  ["Lesbos", [26.3, 39.3], "asia"],
+  ["Chios", [25.98, 38.4], "asia"],
+  ["Samos", [26.8, 37.73], "asia"],
+  ["Cos", [27.15, 36.83], "asia"],
+  ["Rhodes", [28.0, 36.2], "asia"],
+  ["Raphia, on the coast between Rhinocolura and Gaza", [34.25, 31.29], "arabia"],
+  ["Karaburun (the Acroceraunian promontory)", [19.39, 40.34], "achaia"]
 ];
 
 // Explanations for place-check results that are not border-precision issues.
 const PLACE_EXPLANATIONS = {
   pisidia: "Label point for the region. The research note keeps AWMC's whole AD 14 'Pamphylia' face with `pamphylia`, so southern Pisidia's hills are drawn there; the point is in that face, not in Galatia's.",
-  cappadocia: "Label point for the province, placed near Caesarea Mazaca; AWMC's AD 14 face for Cappadocia ends a few kilometres away.",
   "malta candidate 1": "The alternative identification of Melita, Mljet in the Adriatic, lies outside AWMC's AD 69 extent, which leaves out several Dalmatian islands, so no area holds it. The record links the place, not each candidate, to `sicily`.",
-  galilee: "Label point for the region, in the hills north of AWMC's Herod outline and AD 69 Judaea face, in the land AWMC gives to Tyre (Syria).",
   nicopolis: "Coastal city on the Preveza isthmus: AWMC's coastline at the Ambracian Gulf leaves it in the sea (a boundary-precision issue, per the research note's Nicopolis ruling).",
   "sea-of-galilee": "Label point for the lake, 0.9 km east of the median line that divides the lake between Galilee and Philip's lands."
 };
@@ -1394,7 +1429,8 @@ async function main() {
   const bithyniaAd69 = namedFace(ad69Named, "Bithynia et Pontus / Thracia");
   const pontusCoast = await booleanOp("bithynia-ad69-pontus-coast", "erase", [bithyniaAd69], [bithyniaAd14, ...built.filter((feature) => ["cappadocia", "galatia"].includes(feature.properties.areaId))]);
   built.push(await finishArea("bithynia", [bithyniaAd14, ...pontusCoast], `AD14 face ${bithyniaAd14.properties.faceId} (Bithynia et Pontus / Thracia), plus the AD69 face ${bithyniaAd69.properties.faceId}'s Pontic coast east of it (${rounded(pontusCoast.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0))} km²), per the research note's ruling that coastal, western Pontus lies in Bithynia.`, [`awmc:ad14-face-${bithyniaAd14.properties.faceId}`, `awmc:ad69-face-${bithyniaAd69.properties.faceId}`], notes));
-  const cappadociaDetour = await moveCappadociaLineLocally(built, notes);
+  const lakeTatta = await loadLakeTatta();
+  const galatiaCappadociaLine = await drawGalatiaCappadociaLine(built, lakeTatta, notes);
   await addDirect("macedonia", ad69Named, "Macedonia", "ad69");
   await addDirect("cyprus", ad69Named, "Cyprus", "ad69");
   await addDirect("egypt", ad69Named, "Aegyptus", "ad69");
@@ -1525,8 +1561,11 @@ async function main() {
   notes.push(`Sinai: AD 69 faces east of Aegyptus: ${sinaiAd69Faces.map((face) => `${rounded(geometryAreaKm2(face.geometry))} km² at ${labelPoint(face.geometry).map((value) => value.toFixed(2)).join(", ")} (${pointInGeometry(labelPoint(face.geometry), ad69Extent.geometry) ? "inside" : "outside"} the AD 69 extent)`).join("; ")}. Outside the AD 69 extent, AD 200 cell ${sinaiCell.cellId} adds ${rounded(geometryAreaKm2(sinaiOutside[0].geometry))} km² (southern Sinai, Aila and the Hejaz coast inside the AD 200 extent).`);
   const ad200Sources = await booleanOp("arabia-ad200", "clip", [await unionFeatures("arabia-ad200-sources", [petraCell.feature, sinaiOutside[0]])], [ad200Extent]);
   const arabiaPieces = await booleanOp("arabia", "erase", [...ad200Sources, ...sinaiAd69Faces], [egyptArea, f0031, herodBase]);
-  const arabia = await finishArea("arabia", [...arabiaPieces, ...herod.pereaSouth], `AD200 cell ${petraCell.cellId} (Petra and Bostra) and, outside the AD 69 extent, AD200 cell ${sinaiCell.cellId} (Sinai), clipped to the AD 200 extent; plus the AD69 Sinai faces east of Aegyptus; minus Aegyptus, the AD69 Syria face and the Herodian base; plus the Herodian land south of Machaerus. Rule 3: AWMC's AD 200 lines and extent stand in for the Nabataean kingdom's edges, an approximation; they put Philadelphia and Gerasa, Decapolis cities that aren't drawn (ADR-0037 item 3), on Arabia's side. Its edge with Egypt is AWMC's AD 69 Aegyptus face.`, [`awmc:ad200-province-cell-${petraCell.cellId}`, `awmc:ad200-province-cell-${sinaiCell.cellId}`, "awmc:ad69-sinai-faces", "awmc:roman-empire-ad-200-extent", "awmc:herod-record-12-land-clipped"], notes, [machaerusChange]);
-  assertInside(arabia, { Petra: POINTS.petra, Bostra: POINTS.bostra, "Mount Sinai": POINTS.stCatherine }, "arabia");
+  const raphiaFace = sinaiAd69Faces.find((face) => pointInGeometry(POINTS.raphia, face.geometry));
+  if (!raphiaFace) throw new Error("No AD 69 face east of Aegyptus holds Raphia");
+  const raphiaChange = { kind: "ruling", detail: `The AD 69 coastal face between Rhinocolura and Gaza (${rounded(geometryAreaKm2(raphiaFace.geometry))} km², with Raphia), which AWMC's AD 69 extent holds as Roman, is here by the Research Lead's ruling RL3: Livius names Rhinocolura and Gaza among the Nabataean kingdom's towns. The ruling stands for now; the Fact-Checker is to check its source.`, sources: ["bib:livius-nabataeans"] };
+  const arabia = await finishArea("arabia", [...arabiaPieces, ...herod.pereaSouth], `AD200 cell ${petraCell.cellId} (Petra and Bostra) and, outside the AD 69 extent, AD200 cell ${sinaiCell.cellId} (Sinai), clipped to the AD 200 extent; plus the AD69 Sinai faces east of Aegyptus; minus Aegyptus, the AD69 Syria face and the Herodian base; plus the Herodian land south of Machaerus. Rule 3: AWMC's AD 200 lines and extent stand in for the Nabataean kingdom's edges, an approximation; they put Philadelphia and Gerasa, Decapolis cities that aren't drawn (ADR-0037 item 3), on Arabia's side. Its edge with Egypt is AWMC's AD 69 Aegyptus face.`, [`awmc:ad200-province-cell-${petraCell.cellId}`, `awmc:ad200-province-cell-${sinaiCell.cellId}`, "awmc:ad69-sinai-faces", "awmc:roman-empire-ad-200-extent", "awmc:herod-record-12-land-clipped"], notes, [machaerusChange, raphiaChange]);
+  assertInside(arabia, { Petra: POINTS.petra, Bostra: POINTS.bostra, "Mount Sinai": POINTS.stCatherine, Raphia: POINTS.raphia }, "arabia");
   built.push(arabia);
 
   // Peninsulas that AWMC's extent cuts off at the neck join the area they are attached to.
@@ -1661,6 +1700,9 @@ async function main() {
     ["Machaerus (fortress)", HEROD_ANCHORS.machaerus, "galilee-perea"],
     ["Caesarea Mazaca", POINTS.caesareaMazaca, "cappadocia"],
     ["Cappadocia's label point", POINTS.cappadociaLabel, "cappadocia"],
+    ...GALATIA_CAPPADOCIA_ANCHORS.cappadocia.map((anchor) => [anchor.name, anchor.point, "cappadocia"]),
+    ...GALATIA_CAPPADOCIA_ANCHORS.galatia.map((anchor) => [anchor.name, anchor.point, "galatia"]),
+    ["Lake Tatta's east shore", lakeTatta.eastShore, "galatia"],
     ...VERIFICATION_ANCHORS
   ].map(([name, point, expected]) => ({
     name,
@@ -1733,11 +1775,11 @@ async function main() {
       points: [...anchorPoints, { name: "petra", coordinates: POINTS.petra }, { name: "bostra", coordinates: POINTS.bostra }, { name: "damascus", coordinates: POINTS.damascus }]
     }),
     await writePreviewPng(path.join(previewDirectory, "areas-cappadocia.png"), {
-      title: "Galatia and Cappadocia: the edge moved locally near Nevşehir",
-      bounds: [31.5, 37.0, 38.0, 40.6],
+      title: "Galatia and Cappadocia: the line between the Cappadocian anchors (Tyana, Garsaura) and the Galatian ones (dashed)",
+      bounds: [31.5, 36.8, 38.0, 40.6],
       areas: collection,
-      lines: cappadociaDetour ? [{ coordinates: cappadociaDetour, color: "#a00", dash: "6,4" }] : [],
-      points: [{ name: "Caesarea Mazaca", coordinates: POINTS.caesareaMazaca }, { name: "cappadocia label", coordinates: POINTS.cappadociaLabel }, { name: "Ancyra", coordinates: [32.85, 39.93] }, { name: "Tyana", coordinates: [34.62, 37.83] }]
+      lines: galatiaCappadociaLine.map((coordinates) => ({ coordinates, color: "#a00", dash: "6,4" })),
+      points: [...GALATIA_CAPPADOCIA_ANCHORS.cappadocia, ...GALATIA_CAPPADOCIA_ANCHORS.galatia].map((anchor) => ({ name: anchor.name, coordinates: anchor.point })).concat([{ name: "Caesarea Mazaca", coordinates: POINTS.caesareaMazaca }, { name: "cappadocia label", coordinates: POINTS.cappadociaLabel }, { name: "Ancyra", coordinates: [32.85, 39.93] }])
     }),
     await writePreviewPng(path.join(previewDirectory, "areas-sinai-arabia.png"), {
       title: "Southern Levant, Sinai and Arabia",
