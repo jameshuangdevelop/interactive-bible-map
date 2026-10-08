@@ -998,7 +998,7 @@
       "sources": [
         "bib:josephus-antiquities"
       ],
-      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\""
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura; Josephus records that Augustus took Gaza itself, with Gadara and Hippos, from Herod's kingdom at his death and added it to the province of Syria, but since none of these is its own area on this map, Gaza's land and this coastal strip stay within the area around them."
     },
     {
       "fromYear": 6,
@@ -1009,7 +1009,7 @@
         "bib:josephus-antiquities",
         "bib:livius-judaea"
       ],
-      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate."
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, which stayed in the province of Syria from 4 BC on (rule 4, as in the previous period's note)."
     },
     {
       "fromYear": 41,
@@ -1018,7 +1018,8 @@
       "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
       "sources": [
         "bib:josephus-antiquities"
-      ]
+      ],
+      "note": "This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, in the province of Syria throughout (rule 4; see the -4-to-6 period's note)."
     },
     {
       "fromYear": 44,
@@ -1028,7 +1029,8 @@
       "sources": [
         "bib:josephus-antiquities",
         "bib:livius-judaea"
-      ]
+      ],
+      "note": "This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, in the province of Syria throughout (rule 4; see the -4-to-6 period's note)."
     },
     {
       "fromYear": 70,
@@ -1039,7 +1041,7 @@
         "bib:josephus-jewish-war",
         "bib:livius-titus"
       ],
-      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, in the province of Syria throughout (rule 4; see the -4-to-6 period's note)."
     }
   ],
   "status": "verified",
