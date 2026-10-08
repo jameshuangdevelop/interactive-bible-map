@@ -87,7 +87,15 @@ const POINTS = {
   perinthus: [27.96, 40.98],
   bizye: [27.74, 41.57],
   byzantium: [28.9769, 41.0122],
-  nicomedia: [29.92, 40.77]
+  nicomedia: [29.92, 40.77],
+  malta: [14.4, 35.9],
+  patmos: [26.55, 37.31],
+  samos: [26.98, 37.75],
+  chios: [26.14, 38.37],
+  lesbos: [26.36, 39.11],
+  cos: [27.29, 36.89],
+  rhodes: [28.22, 36.18],
+  nicopolis: [20.75, 39.02]
 };
 
 function quote(filePath) {
@@ -225,6 +233,15 @@ function featureAtPointOrNearest(collection, point, label, maxKm = 15) {
     .sort((left, right) => left.distanceKm - right.distanceKm)[0];
   if (!nearest || nearest.distanceKm > maxKm) throw new Error(`No feature contains or is near ${label}`);
   return nearest.feature;
+}
+
+function optionalFeatureAtPointOrNearest(collection, point, label, notes, maxKm = 15) {
+  try {
+    return featureAtPointOrNearest(collection, point, label, maxKm);
+  } catch (error) {
+    notes.push(`${label} was not added: ${error.message}.`);
+    return null;
+  }
 }
 
 async function dissolveArea(areaId, sourceFeatures, detail, upstreamIds) {
@@ -516,6 +533,40 @@ async function main() {
     uniqueThraceRefs.map((_, index) => `awmc:ad69-thrace-face-${index + 1}`)
   );
   built.push(thrace);
+
+  const replaceBuiltArea = async (areaId, extraFaces, detailSuffix, upstreamSuffix) => {
+    const index = built.findIndex((feature) => feature.properties.areaId === areaId);
+    const current = built[index];
+    built[index] = await dissolveArea(
+      areaId,
+      [current, ...extraFaces],
+      `${current.properties.provenance.changes[0].detail} ${detailSuffix}`,
+      [...current.properties.provenance.upstreamFeatureIds, ...extraFaces.map((_, extraIndex) => `awmc:${upstreamSuffix}-${extraIndex + 1}`)]
+    );
+  };
+  await replaceBuiltArea(
+    "sicily",
+    [featureAtPointOrNearest(ad69Raw, POINTS.malta, "Malta", 20)],
+    "Added the AD69 raw face containing Malta per Research Lead ruling.",
+    "ad69-malta-face"
+  );
+  const asiaIslandFaces = [POINTS.patmos, POINTS.samos, POINTS.chios, POINTS.lesbos, POINTS.cos, POINTS.rhodes]
+    .map((point, index) => optionalFeatureAtPointOrNearest(ad69Raw, point, `Aegean Asia island ${index + 1}`, notes, 20))
+    .filter(Boolean);
+  if (asiaIslandFaces.length > 0) {
+    await replaceBuiltArea(
+      "asia",
+      asiaIslandFaces,
+      "Added available AD69 raw island faces for Patmos, Samos, Chios, Lesbos, Cos and Rhodes per Research Lead ruling.",
+      "ad69-asia-island-face"
+    );
+  }
+  await replaceBuiltArea(
+    "achaia",
+    [featureAtPointOrNearest(ad69Raw, POINTS.nicopolis, "Nicopolis/Epirus", 20)],
+    "Added the AD69 raw face containing Nicopolis/Epirus per Research Lead ruling.",
+    "ad69-epirus-face"
+  );
 
   const crete = namedFace(ad69Named, "Creta");
   const cyrenaica = namedFace(ad69Named, "Cyrenaica");
