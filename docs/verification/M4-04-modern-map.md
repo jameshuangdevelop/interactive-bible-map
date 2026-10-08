@@ -83,4 +83,29 @@ The "Sources & credits" Markdown equals the LICENSES.md drawer blocks, and the "
 - **Licensing:** pass. Every license is confirmed at its source and compatible.
 - **Strings:** updated and pass: `docs/LICENSES.md` (Basemap section), `ATTRIBUTION.md`, the modern styles' notices and the app's credits.
 - **Neutrality wording:** pass.
-- **Build against the notices:** needs change (N1–N4). The notices describe ADR-0037's design and become accurate once N1, N2 and N4 are fixed and the PO rules on N3. The PR shouldn't merge before then.
+- **Build against the notices:** needs change (N1–N4). The notices describe ADR-0037's design and become accurate once N1, N2 and N4 are fixed and the PO rules on N3. The PR shouldn't merge before then. *Re-checked in §8.*
+
+## 8. Re-check of `f5846b2` (2026-10-08)
+Same method as §5, on the branch head, with tiles from the same OpenFreeMap build run through the rebuilt filters at zooms 5 to 14 and VersaTiles tiles through the backup's label layers. I also re-ran the built Natural Earth lines against their countries and checked a fresh export in Chromium: the main map, and the backup after the outage switch. The PO ruled on N3: remove the Transnistria box. The committed styles rebuild byte for byte from the script.
+
+| Item | Result | Evidence |
+|---|---|---|
+| N1: state and province names | **Pass** | The tiles hold state and province features at every zoom from 5 to 14 (up to 218 per tile at zoom 5). None passes a place-label layer of the main modern style or a label layer of the backup. In the app, none renders around either Crimea name or Hatay at zooms 6–12 on the main map, or at 6 and 8.5 on the backup. |
+| N2: exclave outlines | **Fail** | The main map still draws the rings: Yukhari Askipara at zooms 5–12, Barxudarlı at 5–14 and Karki at 5–6 (app; the tiles agree). Natural Earth keeps a 5.8 km piece of Yukhari Askipara's ring (NE_ID 1746706155), from 44.961°E 41.079°N to 44.969°E 41.027°N. It is drawn below zoom 5 and on the backup at every zoom (`%TEMP%\ibm-fc-m4-04-recheck\backup-z12-exclave-leftover.png`). |
+| N3: Moldova–Ukraine | **Pass** | Natural Earth no longer removes any of it, and the tiles draw it at zooms 5–12. In the app it is drawn along the former Transnistria stretch at zoom 4 (Natural Earth) and 5–12 (tiles), and on the backup at 4, 6 and 10. |
+| N4: backup after the outage switch | **Pass** | The backup's layer is now `ibm-modern-neutral-boundary-fallback`, with no zoom limits. It draws borders at zooms 4, 6 and 10, and at each the credit reads: Natural Earth \| VersaTiles © OpenStreetMap contributors · © ESA WorldCover 2021 (CC BY 4.0). |
+| Item 6's other places | **Pass** | No line is drawn around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along Russia–Georgia, or across Cyprus: the tiles at zooms 5 and 9 draw none, and Natural Earth keeps none of these pairs. Removing the Crimea, Abkhazia, South Ossetia and Nagorno-Karabakh boxes adds no line there; only recognised country borders are drawn. |
+
+**Why N2 still fails, and a suggested fix (Frontend Engineer).** The new boxes are narrower than the rings: Yukhari Askipara spans 44.9712–45.0480°E against a box of 44.98–45.04, and Barxudarlı reaches 45.2335°E against 45.23. At zooms 5–7 the tiles also merge two or three rings into one feature, which no single box can contain. A rule on the features themselves avoids both problems: each ring has `ARM` on one side and no country code on the other, and in the tiles checked no other non-maritime line does. For example, add to `boundary_2`'s filter:
+```json
+["!", ["any",
+  ["all", ["!", ["has", "adm0_l"]], ["in", ["get", "adm0_r"], ["literal", ["ARM", "AZE"]]]],
+  ["all", ["!", ["has", "adm0_r"]], ["in", ["get", "adm0_l"], ["literal", ["ARM", "AZE"]]]]]]
+```
+Then hide NE_IDs 1746706155 and 1746706169 (Artsvashen's ring, which the simplification happens to collapse) with the other Armenia–Azerbaijan ids. A test should run the filter on tile features, as this check did, because the current tests pass while the rings are drawn.
+
+**Small fixes in this commit.** `docs/LICENSES.md` string 3 now matches the backup's built notice, which `f5846b2` changed to "state and province names", and the backup's "Sources & credits" line says the same. The notices, `docs/LICENSES.md` and item 6's list match what is drawn, except along the border between Armenia and Azerbaijan until N2 is fixed. Low items 1–4 in §5 are unchanged.
+
+**Commands.** `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:app`, `npm run build:data`, `npm run build:basemap-styles` (no change) and `npm run export:web` pass. `npm run verify:web:playwright` passes on a second run. The first run stopped at the ancient backup's check that VersaTiles tiles have loaded one second after the outage notice; VersaTiles was answering in 1–2 seconds per tile, and this change doesn't touch that check. The passing run shows the new backup credits line, and "Natural Earth \| VersaTiles …" on the modern backup at zoom 8.
+
+**Verdict.** N1, N3 and N4 pass. N2 fails, so "no border line … along the border between Armenia and Azerbaijan" isn't true yet, and the PR shouldn't merge until it is fixed.
