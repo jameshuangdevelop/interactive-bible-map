@@ -42,9 +42,6 @@ const AREA_ORDER = [
 ];
 
 const OMITTED_BASE = [
-  ["judea-samaria-idumea", "Herod's outline must be cut by Jordan/lake and Josephus lines; this pass does not yet build that cut without guessing unknown anchors."],
-  ["galilee-perea", "Same Herodian cut dependency as Judea/Samaria/Idumea."],
-  ["philip-tetrarchy-lands", "Same Herodian cut dependency; Abilene also needs Research Lead decision because it is outside Herod's outline."],
   ["parthian-empire", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."],
   ["armenia", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."]
 ];
@@ -71,7 +68,10 @@ const SOURCE_BY_AREA = {
   illyricum: ["awmc:roman-empire-ad-69-provinces"]
   ,thrace: ["awmc:roman-empire-ad-69-provinces"],
   "arabia-difference": ["awmc:roman-empire-ad-200-extent"],
-  "cilicia-whole": ["awmc:roman-empire-ad-69-provinces"]
+  "cilicia-whole": ["awmc:roman-empire-ad-69-provinces"],
+  "judea-samaria-idumea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378"],
+  "galilee-perea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326"],
+  "philip-tetrarchy-lands": ["bib:josephus-jewish-war", "bib:isbe-golan-gaulonitis"]
 };
 
 const POINTS = {
@@ -96,6 +96,20 @@ const POINTS = {
   cos: [27.29, 36.89],
   rhodes: [28.22, 36.18],
   nicopolis: [20.75, 39.02]
+};
+
+const HEROD_ANCHORS = {
+  mountCarmel: [35.02, 32.67],
+  gineaJenin: [35.30, 32.46],
+  scythopolis: [35.50, 32.50],
+  pella: [35.62, 32.45],
+  philadelphia: [35.93, 31.95],
+  jerusalem: [35.234156, 31.776679],
+  nazareth: [35.303, 32.699],
+  machaerusPerea: [35.66, 31.73],
+  caesareaPhilippi: [35.693333, 33.246111],
+  bethsaida: [35.622, 32.893],
+  hippos: [35.65, 32.78]
 };
 
 function quote(filePath) {
@@ -333,6 +347,41 @@ async function fetchLamusOsmLine() {
   } catch {
     // Fetch below.
   }
+
+  async function fetchYarmukOsmLine() {
+    const outputPath = path.join(reportDirectory, "yarmuk-osm.geojson");
+    try {
+      return await readJson(outputPath);
+    } catch {
+      // Fetch below.
+    }
+    const query = `[out:json][timeout:25];way["waterway"](32.3,35.4,33.0,36.2);out tags geom;`;
+    const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
+      headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
+    });
+    if (!response.ok) throw new Error(`Overpass Yarmuk query failed: ${response.status}`);
+    const data = await response.json();
+    const ways = (data.elements ?? []).filter((element) => {
+      if (element.type !== "way" || !Array.isArray(element.geometry)) return false;
+      const name = String(element.tags?.name ?? element.tags?.["name:en"] ?? "").toLowerCase();
+      return name.includes("yarm") || name.includes("يرموك") || name.includes("ירמוך");
+    });
+    if (ways.length === 0) throw new Error("Overpass returned no Yarmuk waterway ways");
+    const collection = featureCollection(ways.map((way) => ({
+      type: "Feature",
+      properties: { osmId: `osm:way/${way.id}`, name: way.tags?.name ?? "Yarmuk" },
+      geometry: { type: "LineString", coordinates: way.geometry.map((point) => [point.lon, point.lat]) }
+    })));
+    await writeJson(outputPath, collection);
+    return collection;
+  }
+
+  function selectRiverFeaturesByName(rivers, names) {
+    return (rivers.features ?? []).filter((feature) => {
+      const name = String(feature.properties?.name_en ?? feature.properties?.name ?? "").toLowerCase();
+      return names.some((candidate) => name.includes(candidate));
+    });
+  }
   const query = `[out:json][timeout:25];way["waterway"](36.35,34.05,36.75,34.55);out geom;`;
   const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
     headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
@@ -359,6 +408,41 @@ async function fetchLamusOsmLine() {
   const collection = featureCollection(features);
   await writeJson(outputPath, collection);
   return collection;
+}
+
+async function fetchYarmukOsmLine() {
+  const outputPath = path.join(reportDirectory, "yarmuk-osm.geojson");
+  try {
+    return await readJson(outputPath);
+  } catch {
+    // Fetch below.
+  }
+  const query = `[out:json][timeout:25];way["waterway"](32.3,35.4,33.0,36.2);out tags geom;`;
+  const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`, {
+    headers: { "user-agent": "interactive-bible-map-m4-03/1.0" }
+  });
+  if (!response.ok) throw new Error(`Overpass Yarmuk query failed: ${response.status}`);
+  const data = await response.json();
+  const ways = (data.elements ?? []).filter((element) => {
+    if (element.type !== "way" || !Array.isArray(element.geometry)) return false;
+    const name = String(element.tags?.name ?? element.tags?.["name:en"] ?? "").toLowerCase();
+    return name.includes("yarm") || name.includes("يرموك") || name.includes("ירמוך");
+  });
+  if (ways.length === 0) throw new Error("Overpass returned no Yarmuk waterway ways");
+  const collection = featureCollection(ways.map((way) => ({
+    type: "Feature",
+    properties: { osmId: `osm:way/${way.id}`, name: way.tags?.name ?? "Yarmuk" },
+    geometry: { type: "LineString", coordinates: way.geometry.map((point) => [point.lon, point.lat]) }
+  })));
+  await writeJson(outputPath, collection);
+  return collection;
+}
+
+function selectRiverFeaturesByName(rivers, names) {
+  return (rivers.features ?? []).filter((feature) => {
+    const name = String(feature.properties?.name_en ?? feature.properties?.name ?? "").toLowerCase();
+    return names.some((candidate) => name.includes(candidate));
+  });
 }
 
 function selectItalyRawFaces(ad69Raw) {
@@ -495,6 +579,7 @@ async function main() {
   const culturalRoot = path.join(partitionWorkDirectory, "awmc-cultural");
   const ad200Extent = (await readJson(path.join(os.tmpdir(), "ibm-m4-03-build", "empire200.geojson"))).features[0];
   const ad200ProvinceLinesPath = path.join(os.tmpdir(), "ibm-m4-03-build", "provinces200-lines.geojson");
+  const riversAll = await readJson(path.join(os.tmpdir(), "ibm-m4-03-build", "rivers-all.geojson"));
   const ad69Extent = await extractAd69Extent(culturalRoot);
   const herodRecord12 = await extractHerodRecord12(culturalRoot);
   const notes = [];
@@ -567,6 +652,89 @@ async function main() {
     "Added the AD69 raw face containing Nicopolis/Epirus per Research Lead ruling.",
     "ad69-epirus-face"
   );
+
+  try {
+    const yarmuk = await fetchYarmukOsmLine();
+    const jordanFeatures = selectRiverFeaturesByName(riversAll, ["jordan"]);
+    const herodCuts = featureCollection([
+      {
+        type: "Feature",
+        properties: {
+          cutId: "galilee-samaria",
+          sources: "bib:josephus-jewish-war;wikidata:Q185318;wikidata:Q374748;pleiades:678378"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [34.65, 32.86],
+            HEROD_ANCHORS.mountCarmel,
+            HEROD_ANCHORS.gineaJenin,
+            HEROD_ANCHORS.scythopolis,
+            [35.63, 32.50]
+          ]
+        }
+      },
+      {
+        type: "Feature",
+        properties: {
+          cutId: "perea-pella-philadelphia",
+          sources: "bib:josephus-jewish-war;pleiades:678326;pleiades:697728"
+        },
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [35.50, 32.50],
+            HEROD_ANCHORS.pella,
+            HEROD_ANCHORS.philadelphia,
+            [36.15, 31.62]
+          ]
+        }
+      },
+      ...jordanFeatures,
+      ...(yarmuk.features ?? [])
+    ]);
+    const herodCutsPath = path.join(workDirectory, "herod-cuts.geojson");
+    await writeJson(herodCutsPath, herodCuts);
+    const herodCells = await polygonizeInsideBase(herodRecord12, herodCutsPath, "herod-lands");
+    const judeaCells = [featureAtPoint(herodCells, HEROD_ANCHORS.jerusalem, "Jerusalem")];
+    const galileePereaCells = [
+      featureAtPoint(herodCells, HEROD_ANCHORS.nazareth, "Nazareth/Galilee"),
+      featureAtPoint(herodCells, HEROD_ANCHORS.machaerusPerea, "Perea near Machaerus")
+    ];
+    const philipCells = [
+      featureAtPoint(herodCells, HEROD_ANCHORS.caesareaPhilippi, "Caesarea Philippi"),
+      featureAtPoint(herodCells, HEROD_ANCHORS.bethsaida, "Bethsaida"),
+      featureAtPointOrNearest(herodCells, HEROD_ANCHORS.hippos, "Hippos", 10)
+    ];
+    const yarmukIds = [...new Set((yarmuk.features ?? []).map((feature) => feature.properties.osmId).filter(Boolean))];
+    SOURCE_BY_AREA["judea-samaria-idumea"] = [...SOURCE_BY_AREA["judea-samaria-idumea"], ...yarmukIds];
+    SOURCE_BY_AREA["galilee-perea"] = [...SOURCE_BY_AREA["galilee-perea"], ...yarmukIds];
+    SOURCE_BY_AREA["philip-tetrarchy-lands"] = [...SOURCE_BY_AREA["philip-tetrarchy-lands"], ...yarmukIds];
+    built.push(await dissolveArea(
+      "judea-samaria-idumea",
+      judeaCells,
+      "Herod record 12 clipped by straight Galilee/Samaria anchor line (Mount Carmel, Ginea/Jenin, Scythopolis), Jordan linework and Pella/Philadelphia/Yarmuk working cuts; kept the Jerusalem side. Approximate: straight segments between named anchors.",
+      ["awmc:herod-record-12", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", ...yarmukIds]
+    ));
+    built.push(await dissolveArea(
+      "galilee-perea",
+      galileePereaCells,
+      "Herod record 12 clipped by the Galilee/Samaria anchor line, Jordan linework and Pella/Philadelphia/Yarmuk working cuts; kept Nazareth and Perea near Machaerus cells. Approximate: straight segments between named anchors.",
+      ["awmc:herod-record-12", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728", ...yarmukIds]
+    ));
+    built.push(await dissolveArea(
+      "philip-tetrarchy-lands",
+      philipCells,
+      "Herod record 12 clipped by Jordan/Yarmuk linework and Pella/Philadelphia working cut; kept Caesarea Philippi, Bethsaida and Hippos north of the Yarmuk. Approximate where straight anchor lines are used.",
+      ["awmc:herod-record-12", "pleiades:678326", "pleiades:697728", ...yarmukIds]
+    ));
+    notes.push(`Herodian lands built with ${jordanFeatures.length} Natural Earth Jordan features and Yarmuk OSM ids ${yarmukIds.join(", ")}; the Gadara/Decapolis zone between Yarmuk and the Pella line remains a working split and is not assigned to Syria until Syria topology is buildable.`);
+  } catch (error) {
+    notes.push(`Herodian lands not built: ${error.message}`);
+    OMITTED_BASE.push(["judea-samaria-idumea", `Herodian cut failed: ${error.message}`]);
+    OMITTED_BASE.push(["galilee-perea", `Herodian cut failed: ${error.message}`]);
+    OMITTED_BASE.push(["philip-tetrarchy-lands", `Herodian cut failed: ${error.message}`]);
+  }
 
   const crete = namedFace(ad69Named, "Creta");
   const cyrenaica = namedFace(ad69Named, "Cyrenaica");

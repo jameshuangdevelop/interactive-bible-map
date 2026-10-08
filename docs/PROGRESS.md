@@ -55,7 +55,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M7-01 | Phone basics | frontend-engineer | `feat/m7-phone-basics` | Running | |
 | M4-01 | Timeline and ancient layer: schema and build | gis-engineer | `feat/m4-ancient-schema` | Done, waiting for review | |
 | M4-02 | The timeline: who held each area, and when | research-lead → fact-checker | `data/m4-timeline` | Running (research note) | |
-| M4-03 | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Second safe composition pass done; Herodian/Arabia/Syria follow-ups listed | |
+| M4-03 | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Yarmuk/Herodian cut attempted; invalid outputs omitted; follow-ups listed | |
 | M4-04 | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | `feat/m4-modern-map` | Waiting for M7-01 | |
 | M4-05 | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | Waiting for M4-01 and M4-04 | |
 
