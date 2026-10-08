@@ -1,6 +1,12 @@
 export { MapView } from "./map-view";
 export type { MapViewProps } from "./map-view.types";
 export type { PlaceIndexRecord, PlaceSelection } from "./types";
+export type {
+  AncientEntityRecord,
+  AncientShapesPayload,
+  AncientStopPayload,
+  AncientTimelinePayload
+} from "./ancient-layer.types";
 export {
   candidateIndexToLetter,
   isAreaLabelType,
