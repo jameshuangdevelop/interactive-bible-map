@@ -314,6 +314,9 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
 
   const fullFeatures = feature(baseTopology, baseTopology.objects.areas);
   const simplifiedFeatures = feature(simplifiedTopology, simplifiedTopology.objects.areas);
+  // The app's copy of the shapes carries only each area's id: provenance stays in data/geo/ for the
+  // sources list and the Fact-Checker (ADR-0037's update of 2026-10-08, item 2).
+  const appProperties = (item) => ({ areaId: item.properties?.areaId });
 
   return {
     baseTopology,
@@ -322,6 +325,7 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
       ...fullFeatures,
       features: fullFeatures.features.map((item) => ({
         ...item,
+        properties: appProperties(item),
         geometry: roundGeometry(item.geometry)
       }))
     },
@@ -329,6 +333,7 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
       ...simplifiedFeatures,
       features: simplifiedFeatures.features.map((item) => ({
         ...item,
+        properties: appProperties(item),
         geometry: roundGeometry(item.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
       }))
     }

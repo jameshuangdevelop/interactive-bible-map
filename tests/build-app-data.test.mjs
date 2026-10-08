@@ -462,6 +462,12 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     );
     assert.equal(shapesPayload.areas.features.length, 4);
     assert.equal(shapesPayload.areasSimplifiedForZoom10.features.length, 4);
+    // Provenance stays in data/geo/; the app's shapes carry only each area's id.
+    for (const shapes of [shapesPayload.areas, shapesPayload.areasSimplifiedForZoom10]) {
+      for (const shape of shapes.features) {
+        assert.deepEqual(Object.keys(shape.properties), ["areaId"]);
+      }
+    }
 
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.roads.geojson"));
