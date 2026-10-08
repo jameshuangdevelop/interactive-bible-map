@@ -416,6 +416,9 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     );
     assert.equal(timelinePayload.stops.length, 2);
     assert.equal(timelinePayload.defaultStopId, "ad44");
+    assert.equal(Array.isArray(timelinePayload.bibliography), true);
+    assert.equal(timelinePayload.bibliography.length, 1);
+    assert.equal(timelinePayload.bibliography[0].id, "pleiades-place-resource");
 
     const stopPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")

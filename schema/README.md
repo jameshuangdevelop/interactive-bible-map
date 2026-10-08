@@ -84,7 +84,7 @@ Small area-shape example with provenance:
 ```
 
 Generated app payloads:
-- `app/public/generated/ancient.timeline.json` (stops + entities)
+- `app/public/generated/ancient.timeline.json` (stops + entities + bibliography entries referenced by stop `sources`)
 - `app/public/generated/ancient.shapes.json` (full + zoom<=10 simplified shapes)
 - `app/public/generated/ancient.roads.geojson`
 - `app/public/generated/ancient.coastline.geojson`

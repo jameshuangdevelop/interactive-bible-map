@@ -42,6 +42,7 @@ export interface PlaceIndexRecord {
   type: PlaceType;
   zoomTier: ZoomTier;
   parentId: string | null;
+  politicalAreaId?: string;
   prominence: PlaceProminence;
   passageCount: number;
   candidates: PlaceCandidate[];

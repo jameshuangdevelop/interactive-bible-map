@@ -11,6 +11,8 @@ export interface MapViewProps {
   mapMode: MapDisplayMode;
   selectedTimelineStopId: string | null;
   ancientTimeline: AncientTimelinePayload | null;
+  ancientLayerRetryToken: number;
+  onAncientLayerLoadStateChange: (state: "idle" | "loading" | "ready" | "error") => void;
   pinLabelSource: PinLabelSource;
   onSelectPlace: (selection: PlaceSelection) => void;
 }

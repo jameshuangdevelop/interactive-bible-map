@@ -115,6 +115,7 @@ function toIndexRecord(locationRecord) {
     names: toAppNames(locationRecord.names),
     type: locationRecord.type,
     zoomTier: locationRecord.zoomTier,
+    politicalAreaId: locationRecord.politicalAreaId,
     prominence: locationRecord.prominence,
     passageCount: Array.isArray(locationRecord.scripture)
       ? locationRecord.scripture.length
@@ -274,6 +275,7 @@ export async function buildAppData(options = {}) {
       ancientAreasData,
       ancientRoadsData,
       ancientCoastlineData,
+      bibliographyById,
       outputDirectory
     });
     outputFiles.push(...ancientBuildResult.writtenFiles);

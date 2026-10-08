@@ -462,6 +462,7 @@ export async function buildAncientAppData({
   ancientAreasData,
   ancientRoadsData,
   ancientCoastlineData,
+  bibliographyById = new Map(),
   outputDirectory,
   simplifyThreshold = 0.00002
 }) {
@@ -485,6 +486,19 @@ export async function buildAncientAppData({
   const topologyData = buildTopologyFeatureCollection(baseAreas, simplifyThreshold);
   const writtenFiles = [];
 
+  const bibliographyEntryIds = new Set();
+  for (const stop of stops) {
+    for (const sourceId of stop.sources ?? []) {
+      if (typeof sourceId !== "string" || !sourceId.startsWith("bib:")) {
+        continue;
+      }
+      bibliographyEntryIds.add(sourceId.slice("bib:".length));
+    }
+  }
+  const timelineBibliography = [...bibliographyEntryIds]
+    .map((id) => bibliographyById.get(id))
+    .filter((entry) => entry !== undefined);
+
   writtenFiles.push(
     await writeJsonWithSize(outputDirectory, "ancient.timeline.json", {
       version: timelineData.version,
@@ -498,6 +512,7 @@ export async function buildAncientAppData({
         scripture: stop.scripture ?? [],
         sources: stop.sources ?? []
       })),
+      bibliography: timelineBibliography,
       entities: (timelineData.entities ?? []).map((entity) => ({
         id: entity.id,
         name: entity.name,

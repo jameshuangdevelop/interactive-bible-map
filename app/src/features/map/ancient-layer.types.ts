@@ -66,6 +66,20 @@ export interface AncientTimelinePayload {
   };
   defaultStopId: string | null;
   stops: AncientStopRecord[];
+  bibliography: {
+    id: string;
+    type: "book" | "article" | "chapter" | "web" | "dataset";
+    title: string;
+    authors: string[];
+    year: number;
+    publisher?: string;
+    journal?: string;
+    containerTitle?: string;
+    doi?: string;
+    isbn?: string;
+    url?: string;
+    accessed?: string;
+  }[];
   entities: AncientEntityRecord[];
 }
 

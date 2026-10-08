@@ -48,7 +48,6 @@ const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const TIMELINE_DEFAULT_YEAR = 50;
 const TIMELINE_TRACK_THUMB_INSET_PX = 14;
-const EMPTY_BIBLIOGRAPHY_BY_ID = new Map();
 
 function toRgba(hexColor: string, opacity: number) {
   const normalized = hexColor.replace("#", "");
@@ -142,6 +141,10 @@ async function fetchAncientTimeline() {
     cache: "no-store"
   });
 
+  if (response.status === 404) {
+    return null;
+  }
+
   if (!response.ok) {
     throw new Error(`Could not load ancient timeline (${response.status})`);
   }
@@ -218,6 +221,8 @@ export function AppShell() {
     {}
   );
   const [ancientTimeline, setAncientTimeline] = useState<AncientTimelinePayload | null>(null);
+  const [ancientLayerStatus, setAncientLayerStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [ancientLayerRetryToken, setAncientLayerRetryToken] = useState(0);
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
   const [mapKeyOpen, setMapKeyOpen] = useState(false);
@@ -248,6 +253,11 @@ export function AppShell() {
 
     return [...ancientTimeline.stops].sort((left, right) => left.year - right.year);
   }, [ancientTimeline]);
+  const timelineBibliographyById = useMemo(
+    () => new Map((ancientTimeline?.bibliography ?? []).map((entry) => [entry.id, entry] as const)),
+    [ancientTimeline]
+  );
+  const hasAncientTimeline = sortedTimelineStops.length > 0;
   const selectedTimelineStopIndex = useMemo(() => {
     if (!selectedTimelineStop) {
       return -1;
@@ -414,6 +424,11 @@ export function AppShell() {
         }
 
         setAncientTimeline(payload);
+        if (!payload || payload.stops.length === 0) {
+          setSelectedTimelineStopId(null);
+          return;
+        }
+
         const requestedYear = parseTimelineYearFromSearch(window.location.search) ?? TIMELINE_DEFAULT_YEAR;
         const resolvedStop = resolveStopForYear(payload.stops, requestedYear);
         setSelectedTimelineStopId(resolvedStop?.id ?? payload.defaultStopId ?? payload.stops[0]?.id ?? null);
@@ -756,7 +771,7 @@ export function AppShell() {
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
   const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
-  const timelineVisible = mapMode === "ancient" && !isSmallScreen && sortedTimelineStops.length > 0;
+  const timelineVisible = mapMode === "ancient" && !isSmallScreen && hasAncientTimeline;
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -879,7 +894,7 @@ export function AppShell() {
         })}
       </div>
 
-      {mapMode === "ancient" ? (
+      {mapMode === "ancient" && hasAncientTimeline ? (
         <div
           style={{
             position: "absolute",
@@ -956,7 +971,7 @@ export function AppShell() {
                     )
                   }}
                 />
-                <span>Client kingdom/tetrarchy/free city or league</span>
+                <span>Allied kingdom, tetrarchy, or free city or league</span>
                 <span
                   style={{
                     height: "14px",
@@ -1000,11 +1015,13 @@ export function AppShell() {
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
             ancientTimeline={ancientTimeline}
+            ancientLayerRetryToken={ancientLayerRetryToken}
             bottomPanelInset={panelBottomInsetForMap}
             highlightedPlaceId={highlightedPlaceId}
             isSmallScreen={isSmallScreen}
             leftPanelWidth={panelWidthForMap}
             mapMode={mapMode}
+            onAncientLayerLoadStateChange={setAncientLayerStatus}
             onSelectPlace={handleSelectFromMap}
             pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
@@ -1014,7 +1031,7 @@ export function AppShell() {
         </Suspense>
       )}
 
-      {timelineVisible && selectedTimelineStop ? (
+      {timelineVisible ? (
         <div
           style={{
             position: "absolute",
@@ -1031,177 +1048,204 @@ export function AppShell() {
             zIndex: 30
           }}
         >
-          <div aria-live="polite" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px`, lineHeight: `${tokens.typography.captionLineHeight}px` }}>
-            {formatTimelineYear(selectedTimelineStop.year)} · {selectedTimelineStop.title}{" "}
-            <button
-              aria-expanded={timelineSourcesOpen}
-              onClick={() => setTimelineSourcesOpen((value) => !value)}
-              style={{
-                border: "none",
-                background: "none",
-                color: "#1A73E8",
-                cursor: "pointer",
-                fontSize: `${tokens.typography.captionSize}px`,
-                padding: 0
-              }}
-              type="button"
-            >
-              Sources
-            </button>
-          </div>
-          {timelineSourcesOpen ? (
-            <div
-              style={{
-                marginTop: `${tokens.spacing.xs}px`,
-                padding: `${tokens.spacing.sm}px`,
-                borderRadius: "8px",
-                backgroundColor: tokens.color.subtleSurface,
-                color: tokens.color.textSecondary,
-                fontSize: `${tokens.typography.captionSize}px`,
-                lineHeight: `${tokens.typography.captionLineHeight}px`
-              }}
-            >
-              <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
-              {selectedTimelineStop.scripture.length > 0 ? (
-                <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
-                  <strong>Passages:</strong>
-                  <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
-                    {selectedTimelineStop.scripture.map((reference) => (
-                      <li key={reference}>{reference}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              {selectedTimelineStop.sources.length > 0 ? (
-                <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
-                  <strong>Sources:</strong>
-                  <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
-                    {selectedTimelineStop.sources.map((sourceId) => {
-                      const source = formatSourceCitation(sourceId, EMPTY_BIBLIOGRAPHY_BY_ID);
-                      return (
-                        <li key={sourceId}>
-                          {source.url ? (
-                            <a
-                              href={source.url}
-                              rel="noopener noreferrer"
-                              style={{ color: "#1A73E8" }}
-                              target="_blank"
-                            >
-                              {source.label}
-                            </a>
-                          ) : (
-                            source.label
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ) : null}
+          {ancientLayerStatus === "error" || !selectedTimelineStop ? (
+            <div role="status" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px` }}>
+              Ancient layer data failed to load.{" "}
+              <button
+                onClick={() => setAncientLayerRetryToken((value) => value + 1)}
+                style={{
+                  border: "none",
+                  background: "none",
+                  color: "#1A73E8",
+                  cursor: "pointer",
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  padding: 0,
+                  textDecoration: "underline"
+                }}
+                type="button"
+              >
+                Try again
+              </button>
             </div>
-          ) : null}
-          <div
-            style={{
-              marginTop: `${tokens.spacing.sm}px`,
-              display: "grid",
-              gridTemplateColumns: "44px minmax(0, 1fr) 44px",
-              alignItems: "center",
-              columnGap: `${tokens.spacing.sm}px`
-            }}
-          >
-            <button
-              aria-label="Earlier change"
-              disabled={selectedTimelineStopIndex <= 0}
-              onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex - 1)}
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "22px",
-                border: `1px solid ${tokens.color.divider}`,
-                backgroundColor: "#FFFFFF",
-                color: tokens.color.textPrimary,
-                cursor: "pointer"
-              }}
-              type="button"
-            >
-              ‹
-            </button>
-            <input
-              aria-label="Year"
-              aria-valuetext={formatTimelineValueText(selectedTimelineStop)}
-              max={Math.max(0, sortedTimelineStops.length - 1)}
-              min={0}
-              onChange={(event) => {
-                setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
-              }}
-              step={1}
-              style={{ width: "100%", margin: 0 }}
-              type="range"
-              value={Math.max(0, selectedTimelineStopIndex)}
-            />
-            <button
-              aria-label="Later change"
-              disabled={selectedTimelineStopIndex < 0 || selectedTimelineStopIndex >= sortedTimelineStops.length - 1}
-              onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex + 1)}
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "22px",
-                border: `1px solid ${tokens.color.divider}`,
-                backgroundColor: "#FFFFFF",
-                color: tokens.color.textPrimary,
-                cursor: "pointer"
-              }}
-              type="button"
-            >
-              ›
-            </button>
-          </div>
-          <div
-            aria-hidden="true"
-            style={{
-              position: "relative",
-              marginTop: `${tokens.spacing.xs}px`,
-              height: "40px"
-            }}
-          >
-            {sortedTimelineStops.map((stop, stopIndex) => {
-              const denominator = Math.max(1, sortedTimelineStops.length - 1);
-              const fraction = denominator === 0 ? 0 : stopIndex / denominator;
-              return (
-                <div
-                  key={stop.id}
+          ) : (
+            <>
+              <div aria-live="polite" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px`, lineHeight: `${tokens.typography.captionLineHeight}px` }}>
+                {formatTimelineYear(selectedTimelineStop.year)} · {selectedTimelineStop.title}{" "}
+                <button
+                  aria-expanded={timelineSourcesOpen}
+                  onClick={() => setTimelineSourcesOpen((value) => !value)}
                   style={{
-                    position: "absolute",
-                    left: timelineTickPosition(fraction),
-                    transform: "translateX(-50%)",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    minWidth: "2px"
+                    border: "none",
+                    background: "none",
+                    color: "#1A73E8",
+                    cursor: "pointer",
+                    fontSize: `${tokens.typography.captionSize}px`,
+                    padding: 0
+                  }}
+                  type="button"
+                >
+                  Sources
+                </button>
+              </div>
+              {timelineSourcesOpen ? (
+                <div
+                  style={{
+                    marginTop: `${tokens.spacing.xs}px`,
+                    padding: `${tokens.spacing.sm}px`,
+                    borderRadius: "8px",
+                    backgroundColor: tokens.color.subtleSurface,
+                    color: tokens.color.textSecondary,
+                    fontSize: `${tokens.typography.captionSize}px`,
+                    lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  <span
-                    style={{
-                      width: "1px",
-                      height: "8px",
-                      backgroundColor: "#5F6368"
+                  <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
+                  {selectedTimelineStop.scripture.length > 0 ? (
+                    <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                      <strong>Passages:</strong>
+                      <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                        {selectedTimelineStop.scripture.map((reference) => (
+                          <li key={reference}>{reference}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  {selectedTimelineStop.sources.length > 0 ? (
+                    <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                      <strong>Sources:</strong>
+                      <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                        {selectedTimelineStop.sources.map((sourceId) => {
+                          const source = formatSourceCitation(sourceId, timelineBibliographyById);
+                          return (
+                            <li key={sourceId}>
+                              {source.url ? (
+                                <a
+                                  href={source.url}
+                                  rel="noopener noreferrer"
+                                  style={{ color: "#1A73E8" }}
+                                  target="_blank"
+                                >
+                                  {source.label}
+                                </a>
+                              ) : (
+                                source.label
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              <div
+                style={{
+                  marginTop: `${tokens.spacing.sm}px`,
+                  display: "grid",
+                  gridTemplateColumns: "44px minmax(0, 1fr) 44px",
+                  alignItems: "center",
+                  columnGap: `${tokens.spacing.sm}px`
+                }}
+              >
+                <button
+                  aria-label="Earlier change"
+                  disabled={selectedTimelineStopIndex <= 0}
+                  onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex - 1)}
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "22px",
+                    border: `1px solid ${tokens.color.divider}`,
+                    backgroundColor: "#FFFFFF",
+                    color: tokens.color.textPrimary,
+                    cursor: "pointer"
+                  }}
+                  type="button"
+                >
+                  ‹
+                </button>
+                <div style={{ minWidth: 0 }}>
+                  <input
+                    aria-label="Year"
+                    aria-valuetext={formatTimelineValueText(selectedTimelineStop)}
+                    data-timeline-slider="true"
+                    max={Math.max(0, sortedTimelineStops.length - 1)}
+                    min={0}
+                    onChange={(event) => {
+                      setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
                     }}
+                    step={1}
+                    style={{ width: "100%", margin: 0 }}
+                    type="range"
+                    value={Math.max(0, selectedTimelineStopIndex)}
                   />
-                  <span
+                  <div
+                    aria-hidden="true"
                     style={{
-                      marginTop: "4px",
-                      whiteSpace: "nowrap",
-                      fontSize: `${tokens.typography.captionSize}px`,
-                      color: tokens.color.textSecondary
+                      position: "relative",
+                      marginTop: `${tokens.spacing.xs}px`,
+                      height: "40px"
                     }}
                   >
-                    {timelineStopTickLabel(sortedTimelineStops, stopIndex)}
-                  </span>
+                    {sortedTimelineStops.map((stop, stopIndex) => {
+                      const denominator = Math.max(1, sortedTimelineStops.length - 1);
+                      const fraction = denominator === 0 ? 0 : stopIndex / denominator;
+                      return (
+                        <div
+                          data-timeline-tick-stop-id={stop.id}
+                          key={stop.id}
+                          style={{
+                            position: "absolute",
+                            left: timelineTickPosition(fraction),
+                            transform: "translateX(-50%)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            minWidth: "2px"
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: "1px",
+                              height: "8px",
+                              backgroundColor: "#5F6368"
+                            }}
+                          />
+                          <span
+                            style={{
+                              marginTop: "4px",
+                              whiteSpace: "nowrap",
+                              fontSize: `${tokens.typography.captionSize}px`,
+                              color: tokens.color.textSecondary
+                            }}
+                          >
+                            {timelineStopTickLabel(sortedTimelineStops, stopIndex)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+                <button
+                  aria-label="Later change"
+                  disabled={selectedTimelineStopIndex < 0 || selectedTimelineStopIndex >= sortedTimelineStops.length - 1}
+                  onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex + 1)}
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "22px",
+                    border: `1px solid ${tokens.color.divider}`,
+                    backgroundColor: "#FFFFFF",
+                    color: tokens.color.textPrimary,
+                    cursor: "pointer"
+                  }}
+                  type="button"
+                >
+                  ›
+                </button>
+              </div>
+            </>
+          )}
         </div>
       ) : null}
 

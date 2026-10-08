@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright";
+import { buildAppData } from "./lib/app-data-builder.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
@@ -17,6 +18,7 @@ const generatedPlacesPath = path.join(
   "generated",
   "places.index.json"
 );
+const fixtureAncientSourceDirectory = path.join(repositoryRoot, "tests", "fixtures", "ancient");
 const licensesDocumentPath = path.join(repositoryRoot, "docs", "LICENSES.md");
 
 const smoothnessLongTaskLimitMs = 50;
@@ -39,6 +41,7 @@ const fullLicenseDetailsUrl =
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const minimumControlHitAreaPx = 44;
+const timelineTrackThumbInsetPx = 14;
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -179,7 +182,9 @@ async function startStaticServer(rootDirectory) {
       response.end(fileData);
     } catch {
       const requestUrl = new URL(request.url ?? "/", "http://localhost");
-      notFoundPaths.push(requestUrl.pathname);
+      if (requestUrl.pathname !== "/generated/ancient.timeline.json") {
+        notFoundPaths.push(requestUrl.pathname);
+      }
       response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
       response.end("Not found");
     }
@@ -974,6 +979,12 @@ async function verifyGalleryFixtureBoundsAtViewport(
 ) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
+  const consoleErrors = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
+  });
 
   await routeGalleryFixtureRequests(page, galleryFixturePayload);
 
@@ -4396,6 +4407,287 @@ async function verifyModernMapToggle(page, baseUrl) {
       zoomDelta
     }
   };
+}
+
+async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+
+  const timelineSliderCount = await page.locator("input[data-timeline-slider='true']").count();
+  const sourcesButtonCount = await page.getByRole("button", { name: "Sources" }).count();
+  const mapKeyCount = await page.getByRole("button", { name: "Map key" }).count();
+
+  if (timelineSliderCount !== 0 || sourcesButtonCount !== 0 || mapKeyCount !== 0) {
+    throw new Error(
+      `Default build should hide timeline/layer UI when ancient data is absent. slider=${timelineSliderCount}, sources=${sourcesButtonCount}, mapKey=${mapKeyCount}`
+    );
+  }
+
+  return {
+    timelineSliderCount,
+    sourcesButtonCount,
+    mapKeyCount
+  };
+}
+
+async function buildFixtureGeneratedOutput() {
+  const outputDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-m4-05-fixture-generated-"));
+  await buildAppData({
+    ancientSourceDirectory: fixtureAncientSourceDirectory,
+    outputDirectory,
+    skipSnapshotChecksumCheck: true
+  });
+  return outputDirectory;
+}
+
+async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGeneratedDirectory) {
+  const timelinePayload = JSON.parse(
+    await fs.readFile(path.join(fixtureGeneratedDirectory, "ancient.timeline.json"), "utf8")
+  );
+  const sortedStops = [...timelinePayload.stops].sort((left, right) => left.year - right.year);
+  const stopIds = sortedStops.map((stop) => stop.id);
+  const expectedDefaultStopId =
+    timelinePayload.defaultStopId ??
+    sortedStops.find((stop) => stop.year <= timelinePayload.range.defaultYear)?.id ??
+    sortedStops[0]?.id ??
+    null;
+  if (!expectedDefaultStopId) {
+    throw new Error("Fixture timeline payload did not contain any stops.");
+  }
+
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  const consoleErrors = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
+  });
+  const failureScreenshotPath = temporaryScreenshotPath("ibm-m4-05-stepb-failure-state.png");
+  const popoverScreenshotPath = temporaryScreenshotPath("ibm-m4-05-stepb-sources-popover.png");
+
+  const missingFixtureFiles = new Set();
+  await page.route("**/generated/ancient.*", async (route) => {
+    const requestUrl = new URL(route.request().url());
+    const fileName = path.basename(requestUrl.pathname);
+    const fixturePath = path.join(fixtureGeneratedDirectory, fileName);
+    try {
+      const content = await fs.readFile(fixturePath);
+      const contentType = contentTypeFor(fixturePath);
+      await route.fulfill({
+        status: 200,
+        headers: {
+          "content-type": contentType,
+          "cache-control": "no-store"
+        },
+        body: content
+      });
+    } catch {
+      missingFixtureFiles.add(fileName);
+      await route.continue();
+    }
+  });
+
+  try {
+    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
+    const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
+    await page.waitForTimeout(1_000);
+    await page.evaluate(() => {
+      window.__ibmTimelineLongTasks = [];
+      if (
+        typeof PerformanceObserver === "undefined" ||
+        !Array.isArray(PerformanceObserver.supportedEntryTypes) ||
+        !PerformanceObserver.supportedEntryTypes.includes("longtask")
+      ) {
+        return;
+      }
+
+      const observer = new PerformanceObserver((list) => {
+        const bucket = window.__ibmTimelineLongTasks ?? [];
+        for (const entry of list.getEntries()) {
+          bucket.push(entry.duration);
+        }
+        window.__ibmTimelineLongTasks = bucket;
+      });
+      observer.observe({ entryTypes: ["longtask"] });
+      window.__ibmTimelineLongTaskObserver = observer;
+    });
+
+    const tickIds = await page
+      .locator("[data-timeline-tick-stop-id]")
+      .evaluateAll((elements) =>
+        elements
+          .map((element) => element.getAttribute("data-timeline-tick-stop-id"))
+          .filter((id) => typeof id === "string" && id.length > 0)
+      );
+    if (tickIds.length !== stopIds.length) {
+      throw new Error(`Expected ${stopIds.length} timeline ticks, got ${tickIds.length}.`);
+    }
+
+    const selectedStopId = await timelineSlider.evaluate(
+      (slider, stopIds) => {
+        const currentIndex = Number.parseInt(slider.value, 10);
+        return stopIds[currentIndex] ?? null;
+      },
+      stopIds
+    );
+
+    if (selectedStopId !== expectedDefaultStopId) {
+      throw new Error(
+        `Timeline default stop mismatch. expected='${expectedDefaultStopId}' actual='${selectedStopId}'.`
+      );
+    }
+
+    const alignmentChecks = [];
+    const earlierButton = page.getByRole("button", { name: "Earlier change" });
+    const laterButton = page.getByRole("button", { name: "Later change" });
+    for (let index = 0; index < sortedStops.length; index += 1) {
+      const stop = sortedStops[index];
+      const currentIndex = Number.parseInt(await timelineSlider.inputValue(), 10);
+      if (Number.isNaN(currentIndex)) {
+        throw new Error("Timeline slider value was not a number.");
+      }
+      if (currentIndex < index) {
+        for (let nextIndex = currentIndex; nextIndex < index; nextIndex += 1) {
+          await laterButton.click();
+        }
+      } else if (currentIndex > index) {
+        for (let nextIndex = currentIndex; nextIndex > index; nextIndex -= 1) {
+          await earlierButton.click();
+        }
+      }
+      await page.waitForTimeout(150);
+      const tickLocator = page.locator(`[data-timeline-tick-stop-id="${stop.id}"]`).first();
+      await tickLocator.waitFor({ state: "visible", timeout: 30_000 });
+      const sliderBox = await timelineSlider.boundingBox();
+      const tickBox = await tickLocator.boundingBox();
+      if (!sliderBox || !tickBox) {
+        throw new Error(
+          `Missing geometry for timeline alignment at stop '${stop.id}'. Missing fixture files: ${Array.from(missingFixtureFiles).join(", ")}. Console errors: ${consoleErrors.join(" | ")}`
+        );
+      }
+      const denominator = Math.max(1, stopIds.length - 1);
+      const fraction = denominator === 0 ? 0 : index / denominator;
+      const thumbCenterX =
+        sliderBox.x + fraction * sliderBox.width + (1 - 2 * fraction) * timelineTrackThumbInsetPx;
+      const tickCenterX = tickBox.x + tickBox.width / 2;
+      const alignment = {
+        stopId: stop.id,
+        deltaPx: Math.abs(thumbCenterX - tickCenterX)
+      };
+
+      if (alignment.deltaPx > 2) {
+        throw new Error(
+          `Timeline tick misaligned for stop '${stop.id}': ${alignment.deltaPx.toFixed(2)}px from thumb center.`
+        );
+      }
+
+      const currentUrl = new URL(page.url());
+      const expectedYear = String(stop.year);
+      if (currentUrl.searchParams.get("year") !== expectedYear) {
+        throw new Error(
+          `Timeline URL year mismatch at stop '${stop.id}'. expected='${expectedYear}' actual='${currentUrl.searchParams.get("year")}'.`
+        );
+      }
+
+      alignmentChecks.push(alignment);
+    }
+
+    const stopChangeLongTasks = await page.evaluate(() => {
+      const durations = Array.isArray(window.__ibmTimelineLongTasks)
+        ? [...window.__ibmTimelineLongTasks]
+        : [];
+      if (window.__ibmTimelineLongTaskObserver) {
+        window.__ibmTimelineLongTaskObserver.disconnect();
+      }
+      delete window.__ibmTimelineLongTaskObserver;
+      delete window.__ibmTimelineLongTasks;
+      return durations;
+    });
+    const longTasksOverBudget = stopChangeLongTasks.filter((duration) => duration > 50);
+    if (longTasksOverBudget.length > 0) {
+      throw new Error(
+        `Timeline stop changes exceeded 50ms budget: ${longTasksOverBudget.map((value) => value.toFixed(2)).join(", ")}`
+      );
+    }
+
+    await page.getByRole("button", { name: "Sources" }).click();
+    await page.waitForTimeout(250);
+    await page.screenshot({ path: popoverScreenshotPath, fullPage: true });
+
+    const sourceTexts = await page.locator("div[style] li").allInnerTexts();
+    if (sourceTexts.some((text) => text.includes("Bibliography "))) {
+      throw new Error(`Timeline sources showed bibliography fallback text: ${JSON.stringify(sourceTexts)}`);
+    }
+
+    const holderEntry = page.locator("button[data-place-entry-id^='ancient-holder:']").first();
+    if ((await holderEntry.count()) > 0) {
+      await holderEntry.focus();
+      await page.waitForTimeout(150);
+      const tooltipText = await page.locator("div[role='tooltip']").textContent();
+      if (!tooltipText || tooltipText.trim().length === 0) {
+        throw new Error("Expected holder-label keyboard focus to show tooltip text.");
+      }
+    }
+
+    const failureContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const failurePage = await failureContext.newPage();
+    let failInitialShapesRequest = true;
+    await failurePage.route("**/generated/ancient.*", async (route) => {
+      const requestUrl = new URL(route.request().url());
+      const fileName = path.basename(requestUrl.pathname);
+      const fixturePath = path.join(fixtureGeneratedDirectory, fileName);
+      try {
+        if (fileName === "ancient.shapes.json" && failInitialShapesRequest) {
+          failInitialShapesRequest = false;
+          await route.abort("failed");
+          return;
+        }
+
+        const content = await fs.readFile(fixturePath);
+        const contentType = contentTypeFor(fixturePath);
+        await route.fulfill({
+          status: 200,
+          headers: {
+            "content-type": contentType,
+            "cache-control": "no-store"
+          },
+          body: content
+        });
+      } catch {
+        await route.continue();
+      }
+    });
+    try {
+      await failurePage.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await waitForMapToSettle(failurePage);
+      await failurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
+      await failurePage.screenshot({ path: failureScreenshotPath, fullPage: true });
+      await failurePage.getByRole("button", { name: "Try again" }).click();
+      await failurePage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
+    } finally {
+      await failurePage.close();
+      await failureContext.close();
+    }
+
+    return {
+      stopCount: sortedStops.length,
+      stopIds,
+      expectedDefaultStopId,
+      alignmentChecks,
+      stopChangeLongTasks,
+      sourceTexts,
+      screenshotPaths: {
+        failureState: failureScreenshotPath,
+        sourcesPopover: popoverScreenshotPath
+      }
+    };
+  } finally {
+    await page.close();
+    await context.close();
+  }
 }
 
 async function verifyAreaLabelsAvoidPins(page, url) {
@@ -7939,6 +8231,7 @@ async function run() {
     jerusalemPanelHeader: temporaryPanelHeaderScreenshotPath("jerusalem-panel.png"),
     ephesusSearchResult: temporaryPanelHeaderScreenshotPath("ephesus-search-result.png")
   };
+  let fixtureGeneratedDirectory = null;
 
   try {
     const expectedDrawerText = await loadExpectedDrawerTextFromLicenses();
@@ -8081,6 +8374,13 @@ async function run() {
       staticServer.baseUrl
     );
     const modernMapToggleChecks = await verifyModernMapToggle(page, staticServer.baseUrl);
+    const noTimelineUiCheck = await verifyNoTimelineUiOnDefaultBuild(page, staticServer.baseUrl);
+    fixtureGeneratedDirectory = await buildFixtureGeneratedOutput();
+    const timelineFixtureChecks = await verifyTimelineUiWithFixtureData(
+      browser,
+      staticServer.baseUrl,
+      fixtureGeneratedDirectory
+    );
     const searchAndMenuChecks = await verifySearchMenuAndAccessibility(
       page,
       staticServer.baseUrl,
@@ -8234,6 +8534,8 @@ async function run() {
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
       modernMapToggleChecks,
+      noTimelineUiCheck,
+      timelineFixtureChecks,
       searchAndMenuChecks,
       phoneBasicsChecks,
       keyboardDisclosureChecks,
@@ -8270,6 +8572,9 @@ async function run() {
       process.exitCode = 1;
     }
   } finally {
+    if (fixtureGeneratedDirectory) {
+      await fs.rm(fixtureGeneratedDirectory, { recursive: true, force: true });
+    }
     await page.close();
     await context.close();
     await browser.close();

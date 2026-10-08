@@ -273,7 +273,11 @@ interface WebGlRendererInfo {
   isSoftwareRenderer: boolean;
 }
 
-function applyMapModeOverlayVisibility(map: MapLibreMap, mapMode: MapDisplayMode) {
+function applyMapModeOverlayVisibility(
+  map: MapLibreMap,
+  mapMode: MapDisplayMode,
+  ancientLayerEnabled: boolean
+) {
   const showAreaLabels = mapMode === "ancient";
   for (const layerId of [
     layerAreaLabelOverviewId,
@@ -285,7 +289,7 @@ function applyMapModeOverlayVisibility(map: MapLibreMap, mapMode: MapDisplayMode
     setLayerVisibility(map, layerId, showAreaLabels);
   }
 
-  const showAncientLayer = mapMode === "ancient";
+  const showAncientLayer = mapMode === "ancient" && ancientLayerEnabled;
   for (const layerId of [
     layerAncientAreaFillId,
     layerAncientUncertainFillId,
@@ -1061,14 +1065,20 @@ function holderKindLabel(kind: AncientEntityRecord["kind"]) {
   if (kind === "roman-province") {
     return "Roman province";
   }
-  if (isClientKind(kind)) {
-    return "Client kingdom/tetrarchy/free league";
+  if (kind === "client-kingdom") {
+    return "Allied kingdom";
+  }
+  if (kind === "client-tetrarchy") {
+    return "Tetrarchy under Rome";
+  }
+  if (kind === "free-city-or-league") {
+    return "Free city or league";
   }
   if (kind === "outside-empire") {
     return "Outside the empire";
   }
 
-  return "Status unclear";
+  return "Status unclear in the sources";
 }
 
 function previousTimelineYear(boundaryYear: number) {
@@ -2473,6 +2483,8 @@ export function MapView({
   mapMode,
   selectedTimelineStopId,
   ancientTimeline,
+  ancientLayerRetryToken,
+  onAncientLayerLoadStateChange,
   pinLabelSource,
   onSelectPlace
 }: MapViewProps) {
@@ -2514,6 +2526,12 @@ export function MapView({
   const updateScaleBarRef = useRef<() => void>(() => undefined);
   const stopPayloadRequestIdsRef = useRef(new Set<string>());
   const stopPrefetchScheduledRef = useRef(false);
+  const failedStopIdsRef = useRef(new Set<string>());
+  const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
+
+  useEffect(() => {
+    selectedTimelineStopIdRef.current = selectedTimelineStopId;
+  }, [selectedTimelineStopId]);
 
   const runtimeTuning = useMemo(
     () =>
@@ -2532,31 +2550,14 @@ export function MapView({
   );
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
+  const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(() => {
-    const data = buildPlaceRenderData(places, selection, highlightedPlaceId, {
+    return buildPlaceRenderData(places, selection, highlightedPlaceId, {
       includeAreaLabels: mapMode === "ancient",
       pinLabelSource
     });
-
-    if (mapMode !== "ancient") {
-      return data;
-    }
-
-    return {
-      ...data,
-      areaLabels: {
-        ...data.areaLabels,
-        features: data.areaLabels.features.filter(
-          (feature) => feature.properties.areaKind === "region"
-        )
-      }
-    };
   }, [highlightedPlaceId, mapMode, pinLabelSource, places, selection]);
-  const majorPlaceByRank = useMemo(
-    () => buildMajorPlaceReferenceByRank(renderData),
-    [renderData]
-  );
   const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
   const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
@@ -2571,6 +2572,38 @@ export function MapView({
         ? ancientStopsById[selectedTimelineStopId]
         : null,
     [ancientStopsById, selectedTimelineStopId]
+  );
+  const effectiveRenderData = useMemo(() => {
+    if (mapMode !== "ancient" || !hasAncientTimeline) {
+      return renderData;
+    }
+
+    const activePoliticalAreaIds = new Set(
+      (selectedAncientStopPayload?.areas ?? []).map((assignment) => assignment.areaId)
+    );
+
+    return {
+      ...renderData,
+      areaLabels: {
+        ...renderData.areaLabels,
+        features: renderData.areaLabels.features.filter((feature) => {
+          if (feature.properties.areaKind !== "province") {
+            return true;
+          }
+
+          const place = placeById.get(feature.properties.placeId);
+          if (!place?.politicalAreaId) {
+            return true;
+          }
+
+          return activePoliticalAreaIds.has(place.politicalAreaId);
+        })
+      }
+    };
+  }, [hasAncientTimeline, mapMode, placeById, renderData, selectedAncientStopPayload]);
+  const majorPlaceByRank = useMemo(
+    () => buildMajorPlaceReferenceByRank(effectiveRenderData),
+    [effectiveRenderData]
   );
   const ancientAreaFeatures = useMemo(
     () => buildAncientAreaFeatures(ancientShapes, selectedAncientStopPayload, ancientEntitiesById),
@@ -2599,6 +2632,23 @@ export function MapView({
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
   const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
+  const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const ancientLayerLoadStateRef = useRef<"idle" | "loading" | "ready" | "error">("idle");
+  const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
+    setAncientShapes(null);
+    setAncientRoads(createEmptyFeatureCollection());
+    setAncientCoastline(createEmptyFeatureCollection());
+    setAncientStopsById({});
+    stopPrefetchScheduledRef.current = false;
+    stopPayloadRequestIdsRef.current.clear();
+    failedStopIdsRef.current.clear();
+    setAncientLayerLoadState(nextState);
+  }, []);
+
+  useEffect(() => {
+    onAncientLayerLoadStateChange(ancientLayerLoadState);
+    ancientLayerLoadStateRef.current = ancientLayerLoadState;
+  }, [ancientLayerLoadState, onAncientLayerLoadStateChange]);
 
   useEffect(() => {
     majorPlaceByRankRef.current = majorPlaceByRank;
@@ -2620,8 +2670,27 @@ export function MapView({
     mapModeRef.current = mapMode;
   }, [mapMode]);
 
+  useEffect(() => {
+    if (!hasAncientTimeline) {
+      queueMicrotask(() => {
+        resetAncientLayerData("idle");
+      });
+      return;
+    }
+
+    queueMicrotask(() => {
+      resetAncientLayerData("loading");
+    });
+  }, [ancientLayerRetryToken, hasAncientTimeline, resetAncientLayerData]);
+
   const loadStopPayload = useCallback(async (stopId: string) => {
-    if (!stopId || stopPayloadRequestIdsRef.current.has(stopId)) {
+    if (
+      !hasAncientTimeline ||
+      ancientLayerLoadStateRef.current === "error" ||
+      !stopId ||
+      failedStopIdsRef.current.has(stopId) ||
+      stopPayloadRequestIdsRef.current.has(stopId)
+    ) {
       return;
     }
 
@@ -2645,15 +2714,20 @@ export function MapView({
           [payload.stopId]: payload
         };
       });
+      if (selectedTimelineStopIdRef.current === payload.stopId) {
+        setAncientLayerLoadState("ready");
+      }
     } catch (error) {
       console.error("Failed to load ancient stop payload.", error);
+      failedStopIdsRef.current.add(stopId);
+      setAncientLayerLoadState("error");
     } finally {
       stopPayloadRequestIdsRef.current.delete(stopId);
     }
-  }, []);
+  }, [hasAncientTimeline]);
 
   useEffect(() => {
-    if (mapReadyVersion === 0 || ancientShapes) {
+    if (mapReadyVersion === 0 || ancientShapes || !hasAncientTimeline || ancientLayerLoadState === "error") {
       return;
     }
 
@@ -2692,24 +2766,34 @@ export function MapView({
       })
       .catch((error) => {
         console.error("Failed to load ancient map layer data.", error);
+        setAncientLayerLoadState("error");
       });
 
     return () => {
       cancelled = true;
     };
-  }, [ancientShapes, mapReadyVersion]);
+  }, [ancientLayerLoadState, ancientShapes, hasAncientTimeline, mapReadyVersion]);
 
   useEffect(() => {
-    if (!selectedTimelineStopId || ancientStopsById[selectedTimelineStopId]) {
+    if (
+      !hasAncientTimeline ||
+      ancientLayerLoadState === "error" ||
+      !selectedTimelineStopId ||
+      ancientStopsById[selectedTimelineStopId]
+    ) {
       return;
     }
 
-    void loadStopPayload(selectedTimelineStopId);
-  }, [ancientStopsById, loadStopPayload, selectedTimelineStopId]);
+    queueMicrotask(() => {
+      void loadStopPayload(selectedTimelineStopId);
+    });
+  }, [ancientLayerLoadState, ancientStopsById, hasAncientTimeline, loadStopPayload, selectedTimelineStopId]);
 
   useEffect(() => {
     if (
       stopPrefetchScheduledRef.current ||
+      !hasAncientTimeline ||
+      ancientLayerLoadState === "error" ||
       !ancientTimeline ||
       !ancientShapes ||
       !selectedAncientStopPayload ||
@@ -2740,7 +2824,9 @@ export function MapView({
     });
   }, [
     ancientShapes,
+    ancientLayerLoadState,
     ancientStopsById,
+    hasAncientTimeline,
     ancientTimeline,
     loadStopPayload,
     mapReadyVersion,
@@ -2885,7 +2971,7 @@ export function MapView({
       return;
     }
 
-    ensureGeoJsonSource(map, sourceMajorCityPinsId, renderData.majorCityPins, {
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins, {
       cluster: true,
       clusterMaxZoom: majorClusterMaxZoom,
       clusterRadius: majorClusterRadiusPx,
@@ -2893,14 +2979,14 @@ export function MapView({
         minImportanceRank: ["min", ["get", "importanceRank"]]
       }
     });
-    ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
       clusterRadius: standardClusterRadiusPx
     });
-    ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
-    ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
-    ensureGeoJsonSource(map, sourceAreaLabelsId, renderData.areaLabels);
+    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins);
+    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins);
+    ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
     ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
     ensureGeoJsonSource(map, sourceAncientBordersId, ancientBorderFeatures);
@@ -2910,7 +2996,7 @@ export function MapView({
     ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
 
     ensureQuestionBadgeImage(map);
-    ensureCandidateImages(map, renderData);
+    ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map, majorPlaceByRank);
   }, [
     ancientAreaFeatures,
@@ -2920,7 +3006,7 @@ export function MapView({
     ancientHolderLabelFeatures,
     ancientRoads,
     majorPlaceByRank,
-    renderData
+    effectiveRenderData
   ]);
 
   const resolveMajorClusterTooltipText = useCallback(
@@ -3104,6 +3190,24 @@ export function MapView({
     [onSelectPlace, zoomToCluster]
   );
 
+  const showTooltipForVisibleEntry = useCallback(
+    (entry: VisibleListEntry) => {
+      const map = mapRef.current;
+      const tooltip = tooltipRef.current;
+      if (!map || !tooltip) {
+        return;
+      }
+
+      const projected = map.project(entry.coordinates as LngLatLike);
+      tooltip.textContent = entry.tooltipText;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${projected.x}px`;
+      tooltip.style.top = `${projected.y - 22}px`;
+      activeTooltipEntryIdRef.current = entry.id;
+    },
+    []
+  );
+
   const setVisibleEntryFocus = useCallback(
     (entry: VisibleListEntry) => {
       const map = mapRef.current;
@@ -3119,8 +3223,9 @@ export function MapView({
         panelInset,
         runtimeTuning.controlZoomDurationMs
       );
+      showTooltipForVisibleEntry(entry);
     },
-    [panelInset, runtimeTuning.controlZoomDurationMs]
+    [panelInset, runtimeTuning.controlZoomDurationMs, showTooltipForVisibleEntry]
   );
 
   useEffect(() => {
@@ -3487,7 +3592,7 @@ export function MapView({
       }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayersRef.current();
-      applyMapModeOverlayVisibility(map, nextMapMode);
+      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -3619,6 +3724,7 @@ export function MapView({
   }, [
     basemapController,
     clearMainSourceLoadTimeout,
+    hasAncientTimeline,
     hideTooltip,
     resolveInteractiveEntryAtPoint,
     scheduleMainSourceLoadTimeout,
@@ -3653,10 +3759,10 @@ export function MapView({
     syncSourcesAndLayers();
     const map = mapRef.current;
     if (map) {
-      applyMapModeOverlayVisibility(map, mapModeRef.current);
+      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline);
     }
     refreshVisibleEntryState();
-  }, [refreshVisibleEntryState, syncSourcesAndLayers]);
+  }, [hasAncientTimeline, refreshVisibleEntryState, syncSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBar();
@@ -3764,6 +3870,11 @@ export function MapView({
           clip: rect(0, 0, 0, 0);
           white-space: nowrap;
           border: 0;
+        }
+
+        .ibm-map-root .maplibregl-ctrl-attrib a {
+          color: #1a73e8;
+          text-decoration: underline;
         }
       `}</style>
       <div
