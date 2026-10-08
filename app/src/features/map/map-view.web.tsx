@@ -134,8 +134,6 @@ const layerAncientBorderDottedId = "ibm-ancient-border-dotted";
 const layerAncientEmpireEdgeId = "ibm-ancient-empire-edge";
 const layerAncientRoadMajorKnownId = "ibm-ancient-road-major-known";
 const layerAncientRoadMajorConjecturedId = "ibm-ancient-road-major-conjectured";
-const layerAncientRoadMinorKnownId = "ibm-ancient-road-minor-known";
-const layerAncientRoadMinorConjecturedId = "ibm-ancient-road-minor-conjectured";
 const layerAncientCoastlineId = "ibm-ancient-coastline";
 const layerAncientHolderLabelId = "ibm-ancient-holder-label";
 const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
@@ -309,8 +307,6 @@ function applyMapModeOverlayVisibility(
     layerAncientEmpireEdgeId,
     layerAncientRoadMajorKnownId,
     layerAncientRoadMajorConjecturedId,
-    layerAncientRoadMinorKnownId,
-    layerAncientRoadMinorConjecturedId,
     layerAncientCoastlineId,
     layerAncientHolderLabelId,
     layerAncientHolderLabelClickableId
@@ -1430,7 +1426,6 @@ function ensureMapLayers(
       minzoom: 5,
       filter: toLayerFilter([
         "all",
-        ["==", ["get", "major"], true],
         ["==", ["get", "known"], true]
       ]),
       paint: {
@@ -1448,49 +1443,11 @@ function ensureMapLayers(
       minzoom: 5,
       filter: toLayerFilter([
         "all",
-        ["==", ["get", "major"], true],
         ["!=", ["get", "known"], true]
       ]),
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.roads.color,
         "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2],
-        "line-dasharray": [2, 2]
-      }
-    });
-  }
-
-  if (!map.getLayer(layerAncientRoadMinorKnownId)) {
-    map.addLayer({
-      id: layerAncientRoadMinorKnownId,
-      source: sourceAncientRoadsId,
-      type: "line",
-      minzoom: 7,
-      filter: toLayerFilter([
-        "all",
-        ["!=", ["get", "major"], true],
-        ["==", ["get", "known"], true]
-      ]),
-      paint: {
-        "line-color": ANCIENT_LAYER_STYLE.roads.color,
-        "line-width": 0.75
-      }
-    });
-  }
-
-  if (!map.getLayer(layerAncientRoadMinorConjecturedId)) {
-    map.addLayer({
-      id: layerAncientRoadMinorConjecturedId,
-      source: sourceAncientRoadsId,
-      type: "line",
-      minzoom: 7,
-      filter: toLayerFilter([
-        "all",
-        ["!=", ["get", "major"], true],
-        ["!=", ["get", "known"], true]
-      ]),
-      paint: {
-        "line-color": ANCIENT_LAYER_STYLE.roads.color,
-        "line-width": 0.75,
         "line-dasharray": [2, 2]
       }
     });
