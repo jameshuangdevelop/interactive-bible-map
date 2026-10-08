@@ -2159,25 +2159,27 @@
     },
     {
       "id": "isbe-en-gannim",
-      "type": "web",
+      "type": "chapter",
       "title": "En-gannim",
       "authors": [
         "W. Ewing"
       ],
       "year": 1915,
-      "publisher": "International Standard Bible Encyclopedia",
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/E/en-gannim.html",
       "accessed": "2026-10-07"
     },
     {
       "id": "isbe-golan",
-      "type": "web",
+      "type": "chapter",
       "title": "Golan; Gaulonitis",
       "authors": [
         "W. Ewing"
       ],
       "year": 1915,
-      "publisher": "International Standard Bible Encyclopedia",
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/G/golan-gaulonitis.html",
       "accessed": "2026-10-07"
     }
