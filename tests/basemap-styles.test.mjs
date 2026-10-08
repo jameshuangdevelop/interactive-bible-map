@@ -60,6 +60,12 @@ const sharedModernNeutralBoundaryMasksGeoJsonPath = path.join(
   "shared",
   "modern-neutral-boundary-masks.geojson"
 );
+const modernBoundaryFilterFixturePath = path.join(
+  repositoryRoot,
+  "tests",
+  "fixtures",
+  "modern-boundary-filter-fixture.json"
+);
 const expectedHiddenBoundaryPairs = [
   "ARM|AZE",
   "CYP|XNC",
@@ -69,7 +75,7 @@ const expectedHiddenBoundaryPairs = [
   "SRB|XKK"
 ];
 const expectedHiddenNeIdsForSharedPairs = new Map([
-  ["ARM|AZE", new Set([1746705689, 1746705697])],
+  ["ARM|AZE", new Set([1746705689, 1746705697, 1746706155, 1746706169])],
   ["GEO|RUS", new Set([1746705547])]
 ]);
 
@@ -996,6 +1002,75 @@ test("Modern shared Natural Earth boundaries keep mask areas line-free", async (
       [...remainingIds].sort(),
       [],
       `Natural Earth shared boundary output must not include hidden ids for ${pair}`
+    );
+  }
+});
+
+test("Liberty modern boundary_2 filter hides ARM/AZE exclaves by feature properties", async () => {
+  const [style, fixture] = await Promise.all([
+    readStyle(libertyModernStylePath),
+    fs.readFile(modernBoundaryFilterFixturePath, "utf8").then((value) => JSON.parse(value))
+  ]);
+  const maplibreStyleSpecPath = path.join(
+    repositoryRoot,
+    "node_modules",
+    "@maplibre",
+    "maplibre-gl-style-spec",
+    "dist",
+    "index.mjs"
+  );
+  const { featureFilter } = await import(pathToFileURL(maplibreStyleSpecPath).href);
+
+  const boundaryLayerIndex = style.layers.findIndex((layer) => layer.id === "boundary_2");
+  assert.notEqual(boundaryLayerIndex, -1, "Liberty modern must include boundary_2 layer");
+  const boundaryLayer = style.layers[boundaryLayerIndex];
+  assert.ok(boundaryLayer.filter, "Liberty modern boundary_2 must define a filter");
+  const compiledFilter = featureFilter(boundaryLayer.filter, `layers[${boundaryLayerIndex}].filter`, {});
+
+  for (const feature of fixture.tileFeatures ?? []) {
+    const drawn = compiledFilter.filter(
+      { zoom: feature.z },
+      {
+        type: feature.type,
+        properties: feature.properties,
+        geometry: feature.geometry,
+        id: feature.id
+      },
+      { z: feature.z, x: feature.x, y: feature.y }
+    );
+    assert.equal(
+      drawn,
+      feature.expectedVisible,
+      `boundary_2 filter visibility mismatch for decoded feature ${feature.key} (${feature.note})`
+    );
+  }
+});
+
+test("Natural Earth boundary output near Armenia hides configured ids and keeps non-hidden lines", async () => {
+  const [fixture, neutralBoundaryGeoJson] = await Promise.all([
+    fs.readFile(modernBoundaryFilterFixturePath, "utf8").then((value) => JSON.parse(value)),
+    fs.readFile(sharedModernNeutralBoundaryGeoJsonPath, "utf8").then((value) => JSON.parse(value))
+  ]);
+
+  const boundaryIds = new Set(
+    (neutralBoundaryGeoJson.features ?? [])
+      .map((feature) => feature?.properties?.id)
+      .filter((id) => typeof id === "number")
+  );
+
+  for (const hiddenId of fixture.naturalEarthNearArmenia?.hiddenIds ?? []) {
+    assert.equal(
+      boundaryIds.has(hiddenId),
+      false,
+      `Natural Earth boundary output must hide Armenia-region id ${hiddenId}`
+    );
+  }
+
+  for (const keptId of fixture.naturalEarthNearArmenia?.keepIds ?? []) {
+    assert.equal(
+      boundaryIds.has(keptId),
+      true,
+      `Natural Earth boundary output must keep nearby non-hidden id ${keptId}`
     );
   }
 });

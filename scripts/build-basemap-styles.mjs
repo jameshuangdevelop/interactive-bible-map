@@ -156,10 +156,7 @@ const libertyContestedMaskRectangles = [
   [34.05, 29.35, 36.30, 33.65], // Israel, West Bank, Gaza, Golan
   [32.53, 34.93, 34.65, 35.75], // Northern Cyprus and UN buffer area
   [19.97, 41.79, 21.83, 43.32], // Kosovo
-  [-17.16, 20.71, -8.63, 27.72], // Western Sahara
-  [44.98, 40.99, 45.04, 41.10], // Armenian-exclave cluster (north)
-  [44.93, 39.75, 44.99, 39.83], // Armenian-exclave cluster (southwest)
-  [45.17, 40.95, 45.23, 41.03] // Armenian-exclave cluster (east)
+  [-17.16, 20.71, -8.63, 27.72] // Western Sahara
 ].map(([minLng, minLat, maxLng, maxLat]) => ({
   type: "Polygon",
   coordinates: [[
@@ -192,20 +189,9 @@ const hiddenBoundaryAdm0Pairs = [
   ["CYP", "XNC"] // Northern Cyprus
 ];
 const hiddenBoundaryNeIdsByPair = new Map([
-  ["ARM|AZE", new Set([1746705689, 1746705697])],
+  ["ARM|AZE", new Set([1746705689, 1746705697, 1746706155, 1746706169])],
   ["GEO|RUS", new Set([1746705547])]
 ]);
-const neOnlyExclaveMaskRectangles = [
-  [44.98, 40.99, 45.04, 41.10],
-  [44.93, 39.75, 44.99, 39.83],
-  [45.17, 40.95, 45.23, 41.03]
-].map(([minLng, minLat, maxLng, maxLat]) => [[
-  [minLng, minLat],
-  [maxLng, minLat],
-  [maxLng, maxLat],
-  [minLng, maxLat],
-  [minLng, minLat]
-]]);
 
 function modernEnglishLabelExpression(preferredFields) {
   const expression = ["coalesce"];
@@ -301,6 +287,35 @@ function appendAdm0PairExclusions(existingFilter, excludedPairs) {
   }
 
   return ["all", existingFilter, ...pairExclusions];
+}
+
+function appendArmeniaAzerbaijanMissingSideCodeExclusion(existingFilter) {
+  const missingSideCodeExclusion = [
+    "!",
+    [
+      "any",
+      [
+        "all",
+        ["!", ["has", "adm0_l"]],
+        ["in", ["get", "adm0_r"], ["literal", ["ARM", "AZE"]]]
+      ],
+      [
+        "all",
+        ["!", ["has", "adm0_r"]],
+        ["in", ["get", "adm0_l"], ["literal", ["ARM", "AZE"]]]
+      ]
+    ]
+  ];
+
+  if (!existingFilter) {
+    return missingSideCodeExclusion;
+  }
+
+  if (Array.isArray(existingFilter) && existingFilter[0] === "all") {
+    return [...existingFilter, missingSideCodeExclusion];
+  }
+
+  return ["all", existingFilter, missingSideCodeExclusion];
 }
 
 function canonicalPairCode(leftCode, rightCode) {
@@ -1031,9 +1046,11 @@ function buildModernLibertyStyle(upstreamStyle) {
   const countryBoundaryLayer = style.layers.find((layer) => layer.id === "boundary_2");
   if (countryBoundaryLayer) {
     countryBoundaryLayer.minzoom = 5;
-    countryBoundaryLayer.filter = appendAdm0PairExclusions(
-      appendContestedMaskExclusion(countryBoundaryLayer.filter),
-      hiddenBoundaryAdm0Pairs
+    countryBoundaryLayer.filter = appendArmeniaAzerbaijanMissingSideCodeExclusion(
+      appendAdm0PairExclusions(
+        appendContestedMaskExclusion(countryBoundaryLayer.filter),
+        hiddenBoundaryAdm0Pairs
+      )
     );
   }
   applyNaturalEarthBoundaryLayerForLowZoom({
@@ -1162,10 +1179,7 @@ async function buildStyles() {
     neutralMaskPolygonCoordinates,
     lineClipBufferDegrees
   );
-  const allNeutralMaskPolygonCoordinates = [
-    ...bufferedMaskPolygonCoordinates,
-    ...neOnlyExclaveMaskRectangles
-  ];
+  const allNeutralMaskPolygonCoordinates = bufferedMaskPolygonCoordinates;
   const neutralBoundaryGeoJson = createNeutralBoundaryGeoJson(
     naturalEarthBoundaryGeoJson,
     allNeutralMaskPolygonCoordinates,
