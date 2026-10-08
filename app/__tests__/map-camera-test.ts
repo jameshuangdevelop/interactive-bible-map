@@ -1,12 +1,26 @@
-import { OPENING_AREA_BOUNDS } from "../src/features/map/constants";
-import { openingAreaFitOptions, resolveMapFitPadding } from "../src/features/map/map-camera";
+import {
+  DEFAULT_MAP_ZOOM,
+  DESKTOP_FIXED_OPENING_MIN_WIDTH,
+  PHONE_OPENING_AREA_BOUNDS
+} from "../src/features/map/constants";
+import {
+  openingAreaFitOptions,
+  openingCameraMode,
+  resolveMapFitPadding
+} from "../src/features/map/map-camera";
 
 describe("map camera helpers", () => {
-  test("uses stable opening bounds from the prior desktop overview", () => {
-    expect(OPENING_AREA_BOUNDS).toEqual([
-      [3.0229106482542534, 24.45351319358689],
-      [41.97708935174575, 44.345035689593246]
+  test("uses stable phone opening bounds centered on the baseline overview", () => {
+    expect(PHONE_OPENING_AREA_BOUNDS).toEqual([
+      [8.708, 27.106441978611198],
+      [36.292, 42.2]
     ]);
+  });
+
+  test("keeps the legacy fixed opening camera on desktop widths", () => {
+    expect(openingCameraMode(DESKTOP_FIXED_OPENING_MIN_WIDTH)).toBe("desktop-fixed");
+    expect(openingCameraMode(1440)).toBe("desktop-fixed");
+    expect(openingCameraMode(1023)).toBe("fit-bounds");
   });
 
   test("combines UI insets into fit padding", () => {
@@ -34,11 +48,12 @@ describe("map camera helpers", () => {
       })
     ).toEqual({
       padding: {
-        top: 0,
-        right: 0,
-        bottom: 64,
-        left: 32
+        top: 96,
+        right: 16,
+        bottom: 80,
+        left: 48
       },
+      maxZoom: DEFAULT_MAP_ZOOM,
       duration: 250
     });
   });

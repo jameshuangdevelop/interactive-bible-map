@@ -62,7 +62,7 @@ const DIALOG_FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const PHOTO_CREDITS_NOTE =
   "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
-const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 1_500;
+const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 2_500;
 type CollapsibleSectionId =
   | "about"
   | "places-in"
@@ -372,6 +372,7 @@ function WikimediaImage({
   onPreviousImage,
   onNextImage,
   showInlineCreditLine = true,
+  showMetadata = true,
   activeImageOrdinal = 1,
   photoCreditLinkTargetId,
   onPhotoCreditLinkSelect
@@ -390,6 +391,7 @@ function WikimediaImage({
   onPreviousImage?: () => void;
   onNextImage?: () => void;
   showInlineCreditLine?: boolean;
+  showMetadata?: boolean;
   activeImageOrdinal?: number;
   photoCreditLinkTargetId?: string;
   onPhotoCreditLinkSelect?: () => void;
@@ -419,6 +421,7 @@ function WikimediaImage({
       }}
     >
       <div
+        data-panel-photo-frame="true"
         style={{
           width: "100%",
           height: `${Math.max(1, Math.round(frameHeight))}px`,
@@ -536,6 +539,40 @@ function WikimediaImage({
           </>
         ) : null}
       </div>
+      {showMetadata ? (
+        <PhotoCaptionAndCredit
+          activeImageOrdinal={activeImageOrdinal}
+          caption={image.caption}
+          onPhotoCreditLinkSelect={onPhotoCreditLinkSelect}
+          photoCreditLinkTargetId={photoCreditLinkTargetId}
+          photoCreditSegments={photoCredit.segments}
+          showInlineCreditLine={showInlineCreditLine}
+          showPhotoCreditLink={showCreditJumpLink}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function PhotoCaptionAndCredit({
+  caption,
+  showInlineCreditLine,
+  photoCreditSegments,
+  showPhotoCreditLink,
+  activeImageOrdinal,
+  photoCreditLinkTargetId,
+  onPhotoCreditLinkSelect
+}: {
+  caption: string;
+  showInlineCreditLine: boolean;
+  photoCreditSegments: ReturnType<typeof buildPhotoCreditEntry>["segments"];
+  showPhotoCreditLink: boolean;
+  activeImageOrdinal: number;
+  photoCreditLinkTargetId?: string;
+  onPhotoCreditLinkSelect?: () => void;
+}) {
+  return (
+    <>
       {showInlineCreditLine ? (
         <p
           data-photo-credit="true"
@@ -548,7 +585,7 @@ function WikimediaImage({
             overflowWrap: "anywhere"
           }}
         >
-          {renderCreditSegments(photoCredit.segments)}
+          {renderCreditSegments(photoCreditSegments)}
         </p>
       ) : null}
       <p
@@ -562,9 +599,12 @@ function WikimediaImage({
           overflowWrap: "anywhere"
         }}
       >
-        {image.caption}
+        {caption}
       </p>
-      {showCreditJumpLink ? (
+      {showPhotoCreditLink &&
+      typeof onPhotoCreditLinkSelect === "function" &&
+      typeof photoCreditLinkTargetId === "string" &&
+      photoCreditLinkTargetId.length > 0 ? (
         <p
           style={{
             marginTop: `${tokens.spacing.xs}px`,
@@ -592,7 +632,7 @@ function WikimediaImage({
           </a>
         </p>
       ) : null}
-    </div>
+    </>
   );
 }
 
@@ -1217,7 +1257,16 @@ export function PlacePanel({
   const panelFrameWidth = isSmallScreen
     ? Math.max(330, viewportWidth - VIEWER_DIALOG_VIEWPORT_MARGIN)
     : PANEL_IMAGE_DESKTOP_WIDTH;
-  const panelFrameHeight = panelFrameWidth / PANEL_IMAGE_ASPECT_RATIO;
+  const panelFrameHeightDefault = panelFrameWidth / PANEL_IMAGE_ASPECT_RATIO;
+  const collapsedSmallScreenMaxPhotoHeight = Math.max(
+    120,
+    Math.min(180, Math.round(viewportHeight * 0.18))
+  );
+  const panelFrameHeight =
+    isSmallScreen && !isSmallScreenExpanded
+      ? Math.min(panelFrameHeightDefault, collapsedSmallScreenMaxPhotoHeight)
+      : panelFrameHeightDefault;
+  const showCollapsedSummaryOnly = isSmallScreen && !isSmallScreenExpanded;
   const selectedImageAspectRatio =
     selectedImage &&
     typeof selectedImage.width === "number" &&
@@ -1610,7 +1659,9 @@ export function PlacePanel({
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
+            position: "relative",
+            minHeight: "44px",
             marginBottom: `${tokens.spacing.md}px`
           }}
         >
@@ -1627,8 +1678,12 @@ export function PlacePanel({
                 border: "none",
                 borderRadius: "999px",
                 backgroundColor: "transparent",
+                touchAction: "none",
                 cursor: "pointer",
-                alignSelf: "center"
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                top: 0
               }}
               type="button"
             >
@@ -1687,12 +1742,14 @@ export function PlacePanel({
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
+          position: "relative",
+          minHeight: "44px",
           marginBottom: `${tokens.spacing.md}px`
         }}
       >
-        {isSmallScreen ? (
-          <button
+      {isSmallScreen ? (
+        <button
             aria-label={
               isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
             }
@@ -1704,7 +1761,12 @@ export function PlacePanel({
               border: "none",
               borderRadius: "999px",
               backgroundColor: "transparent",
-              cursor: "pointer"
+              touchAction: "none",
+              cursor: "pointer",
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              top: 0
             }}
             type="button"
           >
@@ -1782,7 +1844,44 @@ export function PlacePanel({
                 jumpToPhotoCredit(normalizedActiveImageIndex);
               }}
               showInlineCreditLine={false}
+              showMetadata={!showCollapsedSummaryOnly}
             />
+            {showCollapsedSummaryOnly ? (
+              <section data-panel-section="names">
+                <h1
+                  style={{
+                    margin: 0,
+                    color: tokens.color.textPrimary,
+                    fontSize: `${tokens.typography.titleSize}px`,
+                    lineHeight: `${tokens.typography.titleLineHeight}px`,
+                    fontWeight: 600
+                  }}
+                >
+                  {titleName}
+                </h1>
+                {modernLocationLabel || locationStatusIndicator ? (
+                  <p data-modern-name-line="true" style={todayLineStyle}>
+                    {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
+                    {locationStatusIndicator}
+                  </p>
+                ) : null}
+                <PhotoCaptionAndCredit
+                  activeImageOrdinal={normalizedActiveImageIndex + 1}
+                  caption={selectedImage.caption}
+                  onPhotoCreditLinkSelect={() => {
+                    jumpToPhotoCredit(normalizedActiveImageIndex);
+                  }}
+                  photoCreditLinkTargetId={
+                    photoCreditEntries[normalizedActiveImageIndex]?.entryId
+                  }
+                  photoCreditSegments={
+                    buildPhotoCreditEntry(selectedImage, placeForDisplay.id).segments
+                  }
+                  showInlineCreditLine={false}
+                  showPhotoCreditLink={true}
+                />
+              </section>
+            ) : null}
             {showThumbnailStrip ? (
               <GalleryThumbnails
                 activeImageIndex={normalizedActiveImageIndex}
@@ -1796,44 +1895,46 @@ export function PlacePanel({
           </section>
         ) : null}
 
-        <section data-panel-section="names">
-          <h1
-            style={{
-              margin: 0,
-              color: tokens.color.textPrimary,
-              fontSize: `${tokens.typography.titleSize}px`,
-              lineHeight: `${tokens.typography.titleLineHeight}px`,
-              fontWeight: 600
-            }}
-          >
-            {titleName}
-          </h1>
-          {modernLocationLabel || locationStatusIndicator ? (
-            <p data-modern-name-line="true" style={todayLineStyle}>
-              {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
-              {locationStatusIndicator}
+        {!showCollapsedSummaryOnly ? (
+          <section data-panel-section="names">
+            <h1
+              style={{
+                margin: 0,
+                color: tokens.color.textPrimary,
+                fontSize: `${tokens.typography.titleSize}px`,
+                lineHeight: `${tokens.typography.titleLineHeight}px`,
+                fontWeight: 600
+              }}
+            >
+              {titleName}
+            </h1>
+            {modernLocationLabel || locationStatusIndicator ? (
+              <p data-modern-name-line="true" style={todayLineStyle}>
+                {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
+                {locationStatusIndicator}
+              </p>
+            ) : null}
+            {alsoKnownAs.length > 0 ? (
+              <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
+            ) : null}
+            <p style={secondaryTextStyle}>
+              {hierarchyItems.map((item, index) => (
+                <span key={`${item.label}:${item.placeId ?? "none"}`}>
+                  {index > 0 ? " · " : null}
+                  {item.placeId ? (
+                    <LinkLikeButton
+                      label={item.label}
+                      onSelectPlace={onSelectPlace}
+                      placeId={item.placeId}
+                    />
+                  ) : (
+                    item.label
+                  )}
+                </span>
+              ))}
             </p>
-          ) : null}
-          {alsoKnownAs.length > 0 ? (
-            <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
-          ) : null}
-          <p style={secondaryTextStyle}>
-            {hierarchyItems.map((item, index) => (
-              <span key={`${item.label}:${item.placeId ?? "none"}`}>
-                {index > 0 ? " · " : null}
-                {item.placeId ? (
-                  <LinkLikeButton
-                    label={item.label}
-                    onSelectPlace={onSelectPlace}
-                    placeId={item.placeId}
-                  />
-                ) : (
-                  item.label
-                )}
-              </span>
-            ))}
-          </p>
-        </section>
+          </section>
+        ) : null}
 
         {location && hasMultipleCandidates ? (
           <section data-panel-section="candidates">
@@ -2656,6 +2757,7 @@ const aboutPlaceLinkStyle: CSSProperties = {
 
 const showAllControlStyle: CSSProperties = {
   ...textActionStyle,
+  minWidth: "44px",
   minHeight: "44px",
   padding: "0 4px"
 };

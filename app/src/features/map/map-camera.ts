@@ -1,8 +1,14 @@
 import type { FitBoundsOptions, LngLatBoundsLike } from "maplibre-gl";
 
-import { OPENING_AREA_BOUNDS } from "./constants";
+import {
+  DEFAULT_MAP_ZOOM,
+  DESKTOP_FIXED_OPENING_MIN_WIDTH,
+  PHONE_OPENING_AREA_BOUNDS
+} from "./constants";
 
-const OPENING_AREA_PADDING_PX = 0;
+const OPENING_AREA_SIDE_PADDING_PX = 16;
+const OPENING_AREA_TOP_PADDING_PX = 96;
+const OPENING_AREA_BOTTOM_PADDING_PX = 16;
 
 export interface CameraInsets {
   left: number;
@@ -15,6 +21,8 @@ export interface FitPadding {
   bottom: number;
   left: number;
 }
+
+export type OpeningCameraMode = "desktop-fixed" | "fit-bounds";
 
 export function resolveMapFitPadding({
   leftInset,
@@ -37,8 +45,12 @@ export function resolveMapFitPadding({
   };
 }
 
+export function openingCameraMode(viewportWidth: number): OpeningCameraMode {
+  return viewportWidth >= DESKTOP_FIXED_OPENING_MIN_WIDTH ? "desktop-fixed" : "fit-bounds";
+}
+
 export function openingAreaBounds(): LngLatBoundsLike {
-  return OPENING_AREA_BOUNDS as LngLatBoundsLike;
+  return PHONE_OPENING_AREA_BOUNDS as LngLatBoundsLike;
 }
 
 export function openingAreaFitOptions({
@@ -47,15 +59,16 @@ export function openingAreaFitOptions({
 }: {
   insets: CameraInsets;
   durationMs: number;
-}): Omit<FitBoundsOptions, "maxZoom"> {
+}): Pick<FitBoundsOptions, "padding" | "duration" | "maxZoom"> {
   return {
     padding: resolveMapFitPadding({
       leftInset: insets.left,
       bottomInset: insets.bottom,
-      top: OPENING_AREA_PADDING_PX,
-      side: OPENING_AREA_PADDING_PX,
-      bottom: OPENING_AREA_PADDING_PX
+      top: OPENING_AREA_TOP_PADDING_PX,
+      side: OPENING_AREA_SIDE_PADDING_PX,
+      bottom: OPENING_AREA_BOTTOM_PADDING_PX
     }),
+    maxZoom: DEFAULT_MAP_ZOOM,
     duration: durationMs
   };
 }
