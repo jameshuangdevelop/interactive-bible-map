@@ -22,6 +22,10 @@ const AREA_ORDER = [
   "judea-samaria-idumea",
   "galilee-perea",
   "philip-tetrarchy-lands",
+  "arabia",
+  "syria",
+  "cilicia",
+  "cilicia-tracheia",
   "commagene",
   "cappadocia",
   "galatia",
@@ -43,10 +47,6 @@ const AREA_ORDER = [
 const OMITTED_BASE = [
   ["parthian-empire", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."],
   ["armenia", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."],
-  ["arabia", "Omitted: AD200 Petra/Bostra plus Sinai composition still covers a multi-million-km² outside-empire mass, so it is not committed."],
-  ["cilicia", "Omitted: AD200 linework inside the AD69 merged Syria face still returns an overlarge Cilicia/Syria cell, so it is not committed."],
-  ["cilicia-tracheia", "Omitted: depends on a valid Cilicia result and Lamus split; rough-coast diagnostics are reported instead."],
-  ["syria", "Omitted: AD69 merged Syria face minus Commagene/Herod/Cilicia produced invalid topology."]
 ];
 
 const SOURCE_BY_AREA = {
@@ -99,7 +99,8 @@ const POINTS = {
   lesbos: [26.36, 39.11],
   cos: [27.29, 36.89],
   rhodes: [28.22, 36.18],
-  nicopolis: [20.75, 39.02]
+  nicopolis: [20.75, 39.02],
+  laranda: [33.22, 37.18]
 };
 
 const HEROD_ANCHORS = {
@@ -262,6 +263,12 @@ function optionalFeatureAtPointOrNearest(collection, point, label, notes, maxKm 
   }
 }
 
+function featureByOneBasedId(collection, oneBasedId, label) {
+  const feature = collection.features[oneBasedId - 1];
+  if (!feature) throw new Error(`Missing ${label} face f${String(oneBasedId).padStart(4, "0")}`);
+  return feature;
+}
+
 async function dissolveArea(areaId, sourceFeatures, detail, upstreamIds) {
   const inputPath = path.join(workDirectory, `${areaId}-input.geojson`);
   const outputPath = path.join(workDirectory, `${areaId}-output.geojson`);
@@ -307,6 +314,18 @@ async function eraseArea(areaId, sourceFeature, eraseFeatures, detail, upstreamI
   const erased = await readJson(outputPath);
   if ((erased.features ?? []).length === 0) throw new Error(`Erase produced no geometry for ${areaId}`);
   return dissolveArea(areaId, erased.features, detail, upstreamIds);
+}
+
+async function eraseAreaRaw(areaId, sourceFeature, eraseFeatures, detail, upstreamIds) {
+  const sourcePath = path.join(workDirectory, `${areaId}-erase-source.geojson`);
+  const erasePath = path.join(workDirectory, `${areaId}-erase-mask.geojson`);
+  const outputPath = path.join(workDirectory, `${areaId}-erase-output.geojson`);
+  await writeJson(sourcePath, featureCollection([{ type: "Feature", properties: { areaId }, geometry: sourceFeature.geometry }]));
+  await writeJson(erasePath, featureCollection(eraseFeatures.map((feature, index) => ({ type: "Feature", properties: { erase: index + 1 }, geometry: feature.geometry }))));
+  await mapshaper.runCommands(`-i ${quote(sourcePath)} name=source -i ${quote(erasePath)} name=erase -target source -erase erase -snap interval=0.0005 -clean snap-interval=0.0005 -filter-slivers min-area=5km2 -o format=geojson ${quote(outputPath)}`);
+  const erased = ensureFeatureCollection(await readJson(outputPath));
+  if ((erased.features ?? []).length === 0) throw new Error(`Erase produced no geometry for ${areaId}`);
+  return erased.features;
 }
 
 async function selectContainingPart(areaId, sourceFeature, point, detail, upstreamIds) {
@@ -359,7 +378,7 @@ async function fetchLamusOsmLine() {
     } catch {
       // Fetch below.
     }
-    const query = `[out:json][timeout:25];way["waterway"](32.3,35.4,33.0,36.2);out tags geom;`;
+    const query = `[out:json][timeout:25];way(id:30154751,60104091,92734694,112450371,142813593,168680011,940677809,940677810,941426308,941426309,969126995,969126996,1194778773);out tags geom;`;
     const endpoints = [
       "https://overpass-api.de/api/interpreter",
       "https://overpass.kumi.systems/api/interpreter"
@@ -472,6 +491,16 @@ async function fetchLamusOsmLine() {
   const collection = featureCollection(features);
   await writeJson(outputPath, collection);
   return collection;
+}
+
+function extendedLamusLine(lamusCollection) {
+  const coordinates = [];
+  for (const feature of lamusCollection.features ?? []) {
+    for (const line of lineCoordinateArrays(feature.geometry)) coordinates.push(...line);
+  }
+  coordinates.sort((left, right) => left[1] - right[1]);
+  const filtered = coordinates.filter(([lon, lat]) => lon > 34.0 && lon < 34.5 && lat > 36.2 && lat < 36.9);
+  return featureCollection([lineFeature("lamus-extended", [[34.26, 36.15], ...filtered, [34.26, 36.9]], (lamusCollection.features ?? []).map((feature) => feature.properties.osmId).filter(Boolean))]);
 }
 
 async function fetchYarmukOsmLine() {
@@ -827,6 +856,23 @@ async function main() {
       featureAtPoint(herodCells, HEROD_ANCHORS.bethsaida, "Bethsaida"),
       featureAtPointOrNearest(herodCells, HEROD_ANCHORS.hippos, "Hippos", 10)
     ];
+    const selectedKeys = new Set([...judeaCells, ...galileePereaCells, ...philipCells].map((feature) => JSON.stringify(feature.geometry.coordinates?.[0]?.[0] ?? feature.geometry.coordinates)));
+    let unassignedHerodFaces = 0;
+    for (const cell of herodCells.features) {
+      const key = JSON.stringify(cell.geometry.coordinates?.[0]?.[0] ?? cell.geometry.coordinates);
+      if (selectedKeys.has(key)) continue;
+      unassignedHerodFaces += 1;
+      const [lon, lat] = centroidApprox(cell.geometry);
+      if (lat > 32.55 && lon > 35.55) {
+        philipCells.push(cell);
+      } else if (lon > 35.45) {
+        galileePereaCells.push(cell);
+      } else if (lat > 32.5) {
+        galileePereaCells.push(cell);
+      } else {
+        judeaCells.push(cell);
+      }
+    }
     const yarmukIds = [...new Set((yarmuk.features ?? []).map((feature) => feature.properties.osmId).filter(Boolean))];
     SOURCE_BY_AREA["judea-samaria-idumea"] = [...SOURCE_BY_AREA["judea-samaria-idumea"], ...yarmukIds];
     SOURCE_BY_AREA["galilee-perea"] = [...SOURCE_BY_AREA["galilee-perea"], ...yarmukIds];
@@ -849,7 +895,7 @@ async function main() {
       "Herod record 12 clipped by Jordan/Yarmuk linework and Pella/Philadelphia working cut; kept Caesarea Philippi, Bethsaida and Hippos north of the Yarmuk. Approximate where straight anchor lines are used.",
       ["awmc:herod-record-12-land-clipped", "pleiades:678326", "pleiades:697728", ...yarmukIds]
     ));
-    notes.push(`Herodian lands built from land-clipped Herod record 12 with ${jordanFeatures.length} Natural Earth Jordan features, repaired lake-median rift joins and Yarmuk OSM ids ${yarmukIds.join(", ")}; the Gadara/Decapolis zone between Yarmuk and the Pella line remains a working split and is not assigned to Syria until Syria topology is buildable.`);
+    notes.push(`Herodian lands built from land-clipped Herod record 12 with ${jordanFeatures.length} Natural Earth Jordan features, repaired lake-median rift joins and Yarmuk OSM ids ${yarmukIds.join(", ")}; ${unassignedHerodFaces} Herod faces were unassigned before the centroid side-rule fix and are now assigned to Judea/Samaria/Idumea, Galilee/Perea, or Philip's lands.`);
   } catch (error) {
     notes.push(`Herodian lands not built: ${error.message}`);
     OMITTED_BASE.push(["judea-samaria-idumea", `Herodian cut failed: ${error.message}`]);
@@ -866,9 +912,10 @@ async function main() {
 
   let arabia = null;
   try {
+    const petraFace = featureAtPoint(ad200Cells, POINTS.petra, "Petra in AD200 province cells");
+    const petraClipped = await clipArea("arabia-petra-clipped", petraFace, ad200Extent, "temporary clipped Petra/Bostra AD200 face", ["awmc:ad200-face-petra", "awmc:ad200-extent"]);
     const arabiaCells = [
-      featureAtPoint(ad200Cells, POINTS.petra, "Petra in AD200 province cells"),
-      featureAtPointOrNearest(ad200Cells, POINTS.bostra, "Bostra/Hauran in AD200 province cells", 20),
+      petraClipped,
       featureAtPoint(ad69Raw, [34.45, 30.75], "Sinai AD69 face east of Aegyptus")
     ];
     const arabiaUnion = await dissolveArea("arabia-union", arabiaCells, "temporary Arabia union", ["awmc:ad200-petra-bostra-cells", "awmc:ad69-sinai-face"]);
@@ -888,28 +935,30 @@ async function main() {
 
   const syriaMerged = namedFace(ad69Named, "Agrippa II kingdom / Cilicia / Emesa / Syria");
   try {
-    const syriaCells = await polygonizeInsideBase(syriaMerged, ad200ProvinceLinesPath, "syria-cilicia-ad200");
-    const tarsusCell = featureAtPoint(syriaCells, POINTS.tarsus, "Tarsus");
-    const coracesiumCell = syriaCells.features.find((feature) => pointInGeometry(POINTS.coracesium, feature.geometry));
-    const seleuciaCell = syriaCells.features.find((feature) => pointInGeometry(POINTS.seleuciaCalycadnus, feature.geometry));
-    const olbaCell = syriaCells.features.find((feature) => pointInGeometry(POINTS.olba, feature.geometry));
-    notes.push(`AWMC AD200 polygonized cells inside the AD69 merged Syria face: Tarsus is inside the cut face; Coracesium ${coracesiumCell ? "is inside a cut face" : "is not inside this AD69 merged face (AD14 places that coast in Galatia)"}; Seleucia ${seleuciaCell ? "is inside a cut face" : "is not inside this AD69 merged face"}; Olba ${olbaCell ? "is inside a cut face" : "is not inside this AD69 merged face"}.`);
-    const uniqueCiliciaCells = [tarsusCell];
-    const ciliciaWhole = await dissolveArea("cilicia-whole", uniqueCiliciaCells, "temporary Cilicia whole", ["awmc:ad200-cilicia-syria-cut"]);
+    const ad200CiliciaFaces = [
+      featureByOneBasedId(ad200Cells, 228, "AD200 Cilicia"),
+      featureByOneBasedId(ad200Cells, 14078, "AD200 Corycus/Lamus coast"),
+      featureByOneBasedId(ad200Cells, 14001, "AD200 Coracesium coast")
+    ];
+    const ad200CiliciaUnion = await dissolveArea("cilicia-whole", ad200CiliciaFaces, "Union of AD200 face f0228 plus coastal faces f14078 and f14001.", ["awmc:ad200-face-f0228", "awmc:ad200-face-f14078", "awmc:ad200-face-f14001"]);
+    const ciliciaWhole = await clipArea("cilicia-whole", syriaMerged, ad200CiliciaUnion, "AD69 merged Syria face clipped by AD200 Cilicia/coastal-face union.", ["awmc:ad69-face-f0031", "awmc:ad200-face-f0228", "awmc:ad200-face-f14078", "awmc:ad200-face-f14001"]);
+    notes.push("Cilicia whole built by clipping AD69 merged Syria face with AD200 f0228+f14078+f14001 instead of re-polygonizing AD200 lines inside the merged face.");
 
     let cilicia = null;
     let ciliciaTracheia = null;
     try {
       const lamus = await fetchLamusOsmLine();
-      const lamusPath = path.join(reportDirectory, "lamus-osm.geojson");
+      const lamusExtended = extendedLamusLine(lamus);
+      const lamusPath = path.join(workDirectory, "lamus-extended.geojson");
+      await writeJson(lamusPath, lamusExtended);
       const ciliciaLamusCells = await polygonizeInsideBase(ciliciaWhole, lamusPath, "cilicia-lamus");
       const pediasCell = featureAtPoint(ciliciaLamusCells, POINTS.tarsus, "Tarsus after Lamus cut");
       const osmIds = [...new Set((lamus.features ?? []).map((feature) => feature.properties.osmId).filter(Boolean))];
       SOURCE_BY_AREA.cilicia = [...SOURCE_BY_AREA.cilicia, ...osmIds];
       SOURCE_BY_AREA["cilicia-tracheia"] = [...SOURCE_BY_AREA["cilicia-tracheia"], ...osmIds];
       cilicia = await dissolveArea("cilicia", [pediasCell], "Cilicia whole, from AD200 linework inside the AD69 merged Syria face, split by the OSM Lamus/Limonlu Çayı waterway; kept the Tarsus side.", ["awmc:ad200-cilicia-syria-cut", ...osmIds]);
-      const tarsusKey = JSON.stringify(tarsusCell.geometry.coordinates[0]?.[0] ?? tarsusCell.geometry.coordinates);
-      const tracheiaCells = [coracesiumCell, seleuciaCell, olbaCell].filter((feature) => {
+      const tarsusKey = JSON.stringify(pediasCell.geometry.coordinates[0]?.[0] ?? pediasCell.geometry.coordinates);
+      const tracheiaCells = [POINTS.seleuciaCalycadnus, POINTS.olba, POINTS.laranda, POINTS.coracesium].map((point) => ciliciaLamusCells.features.find((feature) => pointInGeometry(point, feature.geometry))).filter((feature) => {
         if (!feature) return false;
         const key = JSON.stringify(feature.geometry.coordinates[0]?.[0] ?? feature.geometry.coordinates);
         return key !== tarsusKey;
@@ -918,18 +967,17 @@ async function main() {
         const uniqueTracheia = [...new Map(tracheiaCells.map((feature) => [JSON.stringify(feature.geometry.coordinates[0]?.[0] ?? feature.geometry.coordinates), feature])).values()];
         ciliciaTracheia = await dissolveArea("cilicia-tracheia", uniqueTracheia, "Western Cilician cells present inside the AD69 merged Syria face; Lamus cut did not supply all western anchors.", ["awmc:ad200-cilicia-syria-cut", ...osmIds]);
       } else {
-        OMITTED_BASE.push(["cilicia-tracheia", "Coracesium, Seleucia and Olba do not fall inside the AD69 merged Syria face after the AD200 cut; AD14 places that rough coast with Galatia, so no Cilicia Tracheia polygon was emitted."]);
+        OMITTED_BASE.push(["cilicia-tracheia", "Lamus split did not create a western cell containing Seleucia, Olba, Laranda or Coracesium."]);
       }
       built.push(...[cilicia, ciliciaTracheia].filter(Boolean));
     } catch (error) {
-      notes.push(`Lamus split not built; emitted the Tarsus-side Cilicia cell without Cilicia Tracheia: ${error.message}`);
-      cilicia = await dissolveArea("cilicia", [tarsusCell], "AD200 linework inside the AD69 merged Syria face; kept the Tarsus cell. Lamus split could not be completed, so no Cilicia Tracheia polygon was emitted.", ["awmc:ad200-cilicia-syria-cut"]);
-      built.push(cilicia);
+      notes.push(`Lamus split not built; Cilicia and Cilicia Tracheia omitted because the whole Cilicia polygon cannot be assigned to either timeline area without the split: ${error.message}`);
+      OMITTED_BASE.push(["cilicia", `Depends on Lamus split: ${error.message}`]);
       OMITTED_BASE.push(["cilicia-tracheia", `Depends on Lamus split: ${error.message}`]);
     }
 
     const commageneArea = built.find((feature) => feature.properties.areaId === "commagene");
-    const eraseFromSyria = [commageneArea, herodLand, arabia].filter(Boolean);
+    const eraseFromSyria = [commageneArea, herodLand, arabia, ciliciaWhole].filter(Boolean);
     if (cilicia) eraseFromSyria.push(cilicia);
     if (ciliciaTracheia) eraseFromSyria.push(ciliciaTracheia);
     await eraseArea("syria", syriaMerged, eraseFromSyria, "AD69 merged Syria face with Commagene, Herod record 12, Arabia, and Cilicia/Cilicia Tracheia erased; small units remain in Syria.", [`awmc:ad69-face-${syriaMerged.properties.faceId}`]);
