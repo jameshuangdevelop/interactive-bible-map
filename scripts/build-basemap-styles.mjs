@@ -143,16 +143,26 @@ const versaTilesModernNeutralBoundaryLayerId = "ibm-modern-neutral-boundary";
 const modernNeutralBoundaryGeoJsonRelativeUrl = "/styles/shared/modern-neutral-boundaries.geojson";
 const simplifiedBoundaryToleranceDegrees = 0.25;
 const lineClipBufferDegrees = 0.05;
-const israelRegionMaskRectangle = {
+const libertyContestedMaskRectangles = [
+  [34.05, 29.35, 36.30, 33.65], // Israel, West Bank, Gaza, Golan
+  [32.53, 34.93, 34.65, 35.75], // Northern Cyprus and UN buffer area
+  [32.43, 44.33, 36.69, 46.27], // Crimea
+  [19.97, 41.79, 21.83, 43.32], // Kosovo
+  [-17.16, 20.71, -8.63, 27.72], // Western Sahara
+  [39.93, 42.35, 42.21, 43.63], // Abkhazia
+  [43.50, 41.93, 44.71, 42.81], // South Ossetia
+  [28.45, 46.50, 30.01, 48.21], // Transnistria
+  [46.24, 39.48, 47.26, 40.47] // Nagorno-Karabakh
+].map(([minLng, minLat, maxLng, maxLat]) => ({
   type: "Polygon",
   coordinates: [[
-    [34.05, 29.35],
-    [36.30, 29.35],
-    [36.30, 33.65],
-    [34.05, 33.65],
-    [34.05, 29.35]
+    [minLng, minLat],
+    [maxLng, minLat],
+    [maxLng, maxLat],
+    [minLng, maxLat],
+    [minLng, minLat]
   ]]
-};
+}));
 const neutralMaskRegionDefinitions = [
   {
     id: "israel-palestine-golan",
@@ -170,6 +180,13 @@ const neutralMaskRegionDefinitions = [
   { id: "south-ossetia", disputedAreas: ["South Ossetia"] },
   { id: "transnistria", disputedAreas: ["Transnistria"] },
   { id: "nagorno-karabakh", disputedAreas: ["Nagorno-Karabakh"] }
+];
+const contestedAdm0BoundaryPairs = [
+  ["XKK", "SRB"], // Kosovo
+  ["MAR", "ESH"], // Western Sahara
+  ["RUS", "GEO"], // Abkhazia and South Ossetia
+  ["ARM", "AZE"], // Nagorno-Karabakh area
+  ["CYP", "XNC"] // Northern Cyprus
 ];
 
 function modernEnglishLabelExpression(preferredFields) {
@@ -234,7 +251,11 @@ function appendDisputedFilterExclusion(existingFilter) {
 }
 
 function appendContestedMaskExclusion(existingFilter) {
-  const maskExclusion = ["!", ["within", israelRegionMaskRectangle]];
+  const withinMasks = libertyContestedMaskRectangles.map((rectanglePolygon) => [
+    "within",
+    rectanglePolygon
+  ]);
+  const maskExclusion = ["!", ["any", ...withinMasks]];
 
   if (!existingFilter) {
     return maskExclusion;
@@ -260,6 +281,27 @@ function appendLibertyIsraPalExclusion(existingFilter) {
   }
 
   return ["all", existingFilter, ...exclusions];
+}
+
+function appendAdm0PairExclusions(existingFilter, excludedPairs) {
+  const pairExclusions = excludedPairs.map(([leftCode, rightCode]) => [
+    "!",
+    [
+      "any",
+      ["all", ["==", ["get", "adm0_l"], leftCode], ["==", ["get", "adm0_r"], rightCode]],
+      ["all", ["==", ["get", "adm0_l"], rightCode], ["==", ["get", "adm0_r"], leftCode]]
+    ]
+  ]);
+
+  if (!existingFilter) {
+    return ["all", ...pairExclusions];
+  }
+
+  if (Array.isArray(existingFilter) && existingFilter[0] === "all") {
+    return [...existingFilter, ...pairExclusions];
+  }
+
+  return ["all", existingFilter, ...pairExclusions];
 }
 
 function normalizeDisputedAreaName(value) {
@@ -576,8 +618,7 @@ function createNeutralBoundarySourceDefinition() {
   return {
     type: "geojson",
     data: modernNeutralBoundaryGeoJsonRelativeUrl,
-    attribution:
-      "Boundary lines: Natural Earth (public domain); filtered and masked by Interactive Bible Map as a neutrality treatment"
+    attribution: '<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>'
   };
 }
 
@@ -642,12 +683,41 @@ function removeLibertyModernExcludedLayers(style) {
       return false;
     }
 
+    if (layer.id === "label_state") {
+      return false;
+    }
+
     if (libertyPoiLayerIdPattern.test(layer.id)) {
       return false;
     }
 
     return true;
   });
+}
+
+function removeStateOrProvincePlaceClassesFromLayerFilter(filterExpression) {
+  if (
+    !Array.isArray(filterExpression) ||
+    filterExpression.length < 3 ||
+    filterExpression[0] !== "match" ||
+    !Array.isArray(filterExpression[1]) ||
+    filterExpression[1][0] !== "get" ||
+    filterExpression[1][1] !== "class" ||
+    !Array.isArray(filterExpression[2])
+  ) {
+    return filterExpression;
+  }
+
+  const remainingClasses = filterExpression[2].filter(
+    (value) => value !== "state" && value !== "province"
+  );
+  return [
+    filterExpression[0],
+    filterExpression[1],
+    remainingClasses,
+    filterExpression[3],
+    filterExpression[4]
+  ];
 }
 
 function updateLibertyModernLabelFields(style) {
@@ -666,6 +736,10 @@ function updateLibertyModernLabelFields(style) {
 
     if (!layer.layout || !("text-field" in layer.layout)) {
       continue;
+    }
+
+    if (layer.id === "label_other") {
+      layer.filter = removeStateOrProvincePlaceClassesFromLayerFilter(layer.filter);
     }
 
     if (expressionContainsGetField(layer.layout["text-field"], replaceFieldNames)) {
@@ -693,6 +767,14 @@ function removeVersaTilesModernExcludedLayers(style) {
     }
 
     if (layer.id === "label-boundary-state") {
+      return false;
+    }
+
+    if (
+      layer.id === "label-place-state" ||
+      layer.id === "label-place-province" ||
+      layer.id === "label-place-region"
+    ) {
       return false;
     }
 
@@ -916,8 +998,9 @@ function buildModernLibertyStyle(upstreamStyle) {
   const countryBoundaryLayer = style.layers.find((layer) => layer.id === "boundary_2");
   if (countryBoundaryLayer) {
     countryBoundaryLayer.minzoom = 5;
-    countryBoundaryLayer.filter = appendLibertyIsraPalExclusion(
-      appendContestedMaskExclusion(countryBoundaryLayer.filter)
+    countryBoundaryLayer.filter = appendAdm0PairExclusions(
+      appendLibertyIsraPalExclusion(appendContestedMaskExclusion(countryBoundaryLayer.filter)),
+      contestedAdm0BoundaryPairs
     );
   }
   applyNaturalEarthBoundaryLayerForLowZoom({

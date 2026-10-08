@@ -18,7 +18,7 @@
     "ibm-modern-neutral-boundaries": {
       "type": "geojson",
       "data": "/styles/shared/modern-neutral-boundaries.geojson",
-      "attribution": "Boundary lines: Natural Earth (public domain); filtered and masked by Interactive Bible Map as a neutrality treatment"
+      "attribution": "<a href=\"https://www.naturalearthdata.com/\" target=\"_blank\">Natural Earth</a>"
     }
   },
   "sprite": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm",
@@ -4017,34 +4017,277 @@
         [
           "!",
           [
-            "within",
-            {
-              "type": "Polygon",
-              "coordinates": [
-                [
+            "any",
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
                   [
-                    34.05,
-                    29.35
-                  ],
-                  [
-                    36.3,
-                    29.35
-                  ],
-                  [
-                    36.3,
-                    33.65
-                  ],
-                  [
-                    34.05,
-                    33.65
-                  ],
-                  [
-                    34.05,
-                    29.35
+                    [
+                      34.05,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      29.35
+                    ],
+                    [
+                      36.3,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      33.65
+                    ],
+                    [
+                      34.05,
+                      29.35
+                    ]
                   ]
                 ]
-              ]
-            }
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      32.53,
+                      34.93
+                    ],
+                    [
+                      34.65,
+                      34.93
+                    ],
+                    [
+                      34.65,
+                      35.75
+                    ],
+                    [
+                      32.53,
+                      35.75
+                    ],
+                    [
+                      32.53,
+                      34.93
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      32.43,
+                      44.33
+                    ],
+                    [
+                      36.69,
+                      44.33
+                    ],
+                    [
+                      36.69,
+                      46.27
+                    ],
+                    [
+                      32.43,
+                      46.27
+                    ],
+                    [
+                      32.43,
+                      44.33
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      19.97,
+                      41.79
+                    ],
+                    [
+                      21.83,
+                      41.79
+                    ],
+                    [
+                      21.83,
+                      43.32
+                    ],
+                    [
+                      19.97,
+                      43.32
+                    ],
+                    [
+                      19.97,
+                      41.79
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -17.16,
+                      20.71
+                    ],
+                    [
+                      -8.63,
+                      20.71
+                    ],
+                    [
+                      -8.63,
+                      27.72
+                    ],
+                    [
+                      -17.16,
+                      27.72
+                    ],
+                    [
+                      -17.16,
+                      20.71
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      39.93,
+                      42.35
+                    ],
+                    [
+                      42.21,
+                      42.35
+                    ],
+                    [
+                      42.21,
+                      43.63
+                    ],
+                    [
+                      39.93,
+                      43.63
+                    ],
+                    [
+                      39.93,
+                      42.35
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      43.5,
+                      41.93
+                    ],
+                    [
+                      44.71,
+                      41.93
+                    ],
+                    [
+                      44.71,
+                      42.81
+                    ],
+                    [
+                      43.5,
+                      42.81
+                    ],
+                    [
+                      43.5,
+                      41.93
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      28.45,
+                      46.5
+                    ],
+                    [
+                      30.01,
+                      46.5
+                    ],
+                    [
+                      30.01,
+                      48.21
+                    ],
+                    [
+                      28.45,
+                      48.21
+                    ],
+                    [
+                      28.45,
+                      46.5
+                    ]
+                  ]
+                ]
+              }
+            ],
+            [
+              "within",
+              {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      46.24,
+                      39.48
+                    ],
+                    [
+                      47.26,
+                      39.48
+                    ],
+                    [
+                      47.26,
+                      40.47
+                    ],
+                    [
+                      46.24,
+                      40.47
+                    ],
+                    [
+                      46.24,
+                      39.48
+                    ]
+                  ]
+                ]
+              }
+            ]
           ]
         ],
         [
@@ -4078,6 +4321,226 @@
             "adm0_r"
           ],
           "PSE"
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "XKK"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "SRB"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "SRB"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "XKK"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "MAR"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "ESH"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "ESH"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "MAR"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "RUS"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "GEO"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "GEO"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "RUS"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "ARM"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "AZE"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "AZE"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "ARM"
+              ]
+            ]
+          ]
+        ],
+        [
+          "!",
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "CYP"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "XNC"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "XNC"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "CYP"
+              ]
+            ]
+          ]
         ]
       ],
       "layout": {
@@ -4788,7 +5251,6 @@
           "city",
           "continent",
           "country",
-          "state",
           "town",
           "village"
         ],
@@ -5004,75 +5466,6 @@
       },
       "paint": {
         "text-color": "#000",
-        "text-halo-blur": 1,
-        "text-halo-color": "#fff",
-        "text-halo-width": 1
-      }
-    },
-    {
-      "id": "label_state",
-      "type": "symbol",
-      "source": "openmaptiles",
-      "source-layer": "place",
-      "minzoom": 5,
-      "maxzoom": 8,
-      "filter": [
-        "==",
-        [
-          "get",
-          "class"
-        ],
-        "state"
-      ],
-      "layout": {
-        "text-field": [
-          "case",
-          [
-            "==",
-            [
-              "get",
-              "name:en"
-            ],
-            "T"
-          ],
-          [
-            "get",
-            "name:latin"
-          ],
-          [
-            "coalesce",
-            [
-              "get",
-              "name:en"
-            ],
-            [
-              "get",
-              "name:latin"
-            ]
-          ]
-        ],
-        "text-font": [
-          "Noto Sans Italic"
-        ],
-        "text-letter-spacing": 0.2,
-        "text-max-width": 9,
-        "text-size": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5,
-          10,
-          8,
-          14
-        ],
-        "text-transform": "uppercase"
-      },
-      "paint": {
-        "text-color": "#333",
         "text-halo-blur": 1,
         "text-halo-color": "#fff",
         "text-halo-width": 1

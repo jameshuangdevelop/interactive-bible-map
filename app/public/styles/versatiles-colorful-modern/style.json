@@ -31,7 +31,7 @@
     "ibm-modern-neutral-boundaries": {
       "type": "geojson",
       "data": "/styles/shared/modern-neutral-boundaries.geojson",
-      "attribution": "Boundary lines: Natural Earth (public domain); filtered and masked by Interactive Bible Map as a neutrality treatment"
+      "attribution": "<a href=\"https://www.naturalearthdata.com/\" target=\"_blank\">Natural Earth</a>"
     }
   },
   "layers": [

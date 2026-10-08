@@ -399,7 +399,6 @@ function assertLibertyModernLabels(style) {
       "label_other",
       "label_village",
       "label_town",
-      "label_state",
       "label_city",
       "label_city_capital",
       "label_country_3",
@@ -414,6 +413,29 @@ function assertLibertyModernLabels(style) {
       expected,
       `Liberty modern layer '${layer.id}' must use English-only text field`
     );
+  }
+
+  function assertNoStateOrProvincePlaceClassLayers(style, styleName) {
+    for (const layer of style.layers) {
+      if (layer.type !== "symbol") {
+        continue;
+      }
+      const sourceLayer = layer["source-layer"];
+      if (sourceLayer !== "place" && sourceLayer !== "place_labels") {
+        continue;
+      }
+      const filterText = JSON.stringify(layer.filter ?? []);
+      assert.equal(
+        filterText.includes('"state"'),
+        false,
+        `${styleName} layer '${layer.id}' must not target place class/kind 'state'`
+      );
+      assert.equal(
+        filterText.includes('"province"'),
+        false,
+        `${styleName} layer '${layer.id}' must not target place class/kind 'province'`
+      );
+    }
   }
 }
 
@@ -715,6 +737,7 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   assertLayerMissing(style, "boundary_disputed", "Liberty modern");
   assertLayerMissing(style, "boundary_3", "Liberty modern");
   assertLayerMissing(style, "airport", "Liberty modern");
+  assertLayerMissing(style, "label_state", "Liberty modern");
   assertNoLayerIdsMatching(style, /^poi_/u, "Liberty modern", "POI layers");
   assertLibertyModernLabels(style);
   assertOnlyCountryBoundaryLayers(style, "Liberty modern");
@@ -746,6 +769,11 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     "Liberty modern low-zoom boundary layer must use shared Natural Earth source"
   );
   assert.equal(
+    style.sources["ibm-modern-neutral-boundaries"]?.attribution,
+    '<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>',
+    "Liberty modern shared Natural Earth source attribution must be compact"
+  );
+  assert.equal(
     neutralBoundaryLayer.maxzoom,
     5,
     "Liberty modern low-zoom boundary layer must end at zoom 5"
@@ -768,6 +796,8 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state", "VersaTiles modern");
   assertLayerMissing(style, "label-boundary-state", "VersaTiles modern");
+  assertLayerMissing(style, "label-place-state", "VersaTiles modern");
+  assertLayerMissing(style, "label-place-province", "VersaTiles modern");
   assertLayerMissing(style, "boundary-country:outline", "VersaTiles modern");
   assertLayerMissing(style, "boundary-country", "VersaTiles modern");
   assertLayerMissing(style, "boundary-country-maritime", "VersaTiles modern");
@@ -785,6 +815,11 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
     neutralBoundaryLayer.source,
     "ibm-modern-neutral-boundaries",
     "VersaTiles modern boundary layer must use shared Natural Earth source"
+  );
+  assert.equal(
+    style.sources["ibm-modern-neutral-boundaries"]?.attribution,
+    '<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>',
+    "VersaTiles modern shared Natural Earth source attribution must be compact"
   );
   assert.equal(
     neutralBoundaryLayer.maxzoom,
@@ -808,6 +843,8 @@ test("Modern styles do not allow non-English or local-script name fallbacks in s
     "VersaTiles modern",
     new Set(["name_en"])
   );
+  assertNoStateOrProvincePlaceClassLayers(libertyStyle, "Liberty modern");
+  assertNoStateOrProvincePlaceClassLayers(versaTilesStyle, "VersaTiles modern");
 });
 
 test("Modern shared Natural Earth boundaries keep mask areas line-free", async () => {
