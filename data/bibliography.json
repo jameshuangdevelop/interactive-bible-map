@@ -2156,6 +2156,18 @@
       "publisher": "Livius.org",
       "url": "https://www.livius.org/articles/place/lycia/",
       "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-en-gannim",
+      "type": "web",
+      "title": "En-gannim",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "International Standard Bible Encyclopedia",
+      "url": "https://www.internationalstandardbible.com/E/en-gannim.html",
+      "accessed": "2026-10-07"
     }
   ]
 }
