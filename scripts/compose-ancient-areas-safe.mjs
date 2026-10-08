@@ -22,10 +22,6 @@ const AREA_ORDER = [
   "judea-samaria-idumea",
   "galilee-perea",
   "philip-tetrarchy-lands",
-  "arabia",
-  "syria",
-  "cilicia",
-  "cilicia-tracheia",
   "commagene",
   "cappadocia",
   "galatia",
@@ -46,7 +42,11 @@ const AREA_ORDER = [
 
 const OMITTED_BASE = [
   ["parthian-empire", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."],
-  ["armenia", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."]
+  ["armenia", "Dropped for M4 per PO/ADR-0037 rule 5: AWMC gives no first-century drawable extent."],
+  ["arabia", "Omitted: AD200 Petra/Bostra plus Sinai composition still covers a multi-million-km² outside-empire mass, so it is not committed."],
+  ["cilicia", "Omitted: AD200 linework inside the AD69 merged Syria face still returns an overlarge Cilicia/Syria cell, so it is not committed."],
+  ["cilicia-tracheia", "Omitted: depends on a valid Cilicia result and Lamus split; rough-coast diagnostics are reported instead."],
+  ["syria", "Omitted: AD69 merged Syria face minus Commagene/Herod/Cilicia produced invalid topology."]
 ];
 
 const SOURCE_BY_AREA = {
