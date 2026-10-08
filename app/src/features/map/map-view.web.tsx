@@ -2974,6 +2974,7 @@ export function MapView({
   const resetButtonBottomOffset = isSmallScreen
     ? Math.max(bottomInset + 16, 88)
     : bottomInset + 16;
+  const compactAttributionBottomOffset = isSmallScreen ? bottomInset : 0;
 
   return (
     <div
@@ -2995,6 +2996,10 @@ export function MapView({
           clip: rect(0, 0, 0, 0);
           white-space: nowrap;
           border: 0;
+        }
+        .ibm-map-root .maplibregl-ctrl-bottom-right {
+          right: 16px;
+          bottom: ${compactAttributionBottomOffset}px;
         }
       `}</style>
       <div

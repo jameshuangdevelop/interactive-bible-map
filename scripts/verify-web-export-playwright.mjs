@@ -7807,6 +7807,10 @@ async function verifyPhoneBasics(browser, baseUrl) {
             const closeButton = panel?.querySelector("button[aria-label='Close place panel']");
             const resetView = document.querySelector("button[data-map-control='reset-view']");
             const title = panel?.querySelector("h1");
+            const photoFrame = panel?.querySelector("[data-panel-photo-frame='true']");
+            const photoKindLabel = panel?.querySelector("[data-photo-kind-label='true']");
+            const previousImageButton = panel?.querySelector("button[aria-label='Previous image']");
+            const nextImageButton = panel?.querySelector("button[aria-label='Next image']");
             if (!(panel instanceof HTMLElement)) {
               throw new Error("Phone panel is not visible.");
             }
@@ -7824,6 +7828,10 @@ async function verifyPhoneBasics(browser, baseUrl) {
             const closeBounds = toBounds(closeButton);
             const resetBounds = toBounds(resetView);
             const titleBounds = toBounds(title);
+            const photoFrameBounds = toBounds(photoFrame);
+            const photoKindLabelBounds = toBounds(photoKindLabel);
+            const previousImageButtonBounds = toBounds(previousImageButton);
+            const nextImageButtonBounds = toBounds(nextImageButton);
 
             const map = window[testHookKey];
             if (!map) {
@@ -7852,6 +7860,10 @@ async function verifyPhoneBasics(browser, baseUrl) {
               closeBounds,
               resetBounds,
               titleBounds,
+              photoFrameBounds,
+              photoKindLabelBounds,
+              previousImageButtonBounds,
+              nextImageButtonBounds,
               selectedPointPx: { x: projected.x, y: projected.y },
               mapCenter: [centerBefore.lng, centerBefore.lat]
             };
@@ -7866,6 +7878,91 @@ async function verifyPhoneBasics(browser, baseUrl) {
             ]
           }
         );
+      const verifyCompactAttributionToggle = async (sheetStateLabel) => {
+        const selector = "summary.maplibregl-ctrl-attrib-button";
+        const reachability = await page.evaluate((toggleSelector) => {
+          const toggle = document.querySelector(toggleSelector);
+          const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+          if (!(toggle instanceof HTMLElement)) {
+            return {
+              toggleBounds: null,
+              centerElementTag: null,
+              centerMatchesToggle: false,
+              isExpanded: null
+            };
+          }
+
+          const bounds = toggle.getBoundingClientRect();
+          const centerX = bounds.left + bounds.width / 2;
+          const centerY = bounds.top + bounds.height / 2;
+          const centerElement = document.elementFromPoint(centerX, centerY);
+          return {
+            toggleBounds: {
+              left: bounds.left,
+              top: bounds.top,
+              right: bounds.right,
+              bottom: bounds.bottom,
+              width: bounds.width,
+              height: bounds.height
+            },
+            centerElementTag: centerElement?.tagName?.toLowerCase() ?? null,
+            centerMatchesToggle: centerElement === toggle,
+            isExpanded:
+              compactControl instanceof HTMLElement
+                ? compactControl.classList.contains("maplibregl-compact-show")
+                : null
+          };
+        }, selector);
+
+        if (!reachability.toggleBounds) {
+          throw new Error(
+            `Attribution toggle missing in ${sheetStateLabel} phone sheet state at ${viewport.width}x${viewport.height}.`
+          );
+        }
+        if (!reachability.centerMatchesToggle) {
+          throw new Error(
+            `Attribution toggle is occluded in ${sheetStateLabel} phone sheet state at ${viewport.width}x${viewport.height}: centerElement=${reachability.centerElementTag}. bounds=${JSON.stringify(
+              reachability.toggleBounds
+            )}`
+          );
+        }
+
+        await page.click(selector);
+        await page.waitForFunction(
+          () => {
+            const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+            return (
+              compactControl instanceof HTMLElement &&
+              compactControl.classList.contains("maplibregl-compact-show")
+            );
+          },
+          { timeout: 5_000 }
+        );
+        await page.click(selector);
+        await page.waitForFunction(
+          () => {
+            const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+            return (
+              compactControl instanceof HTMLElement &&
+              !compactControl.classList.contains("maplibregl-compact-show")
+            );
+          },
+          { timeout: 5_000 }
+        );
+
+        return reachability;
+      };
+      const boundsIntersect = (left, right) => {
+        if (!left || !right) {
+          return false;
+        }
+        return !(
+          left.right <= right.left ||
+          left.left >= right.right ||
+          left.bottom <= right.top ||
+          left.top >= right.bottom
+        );
+      };
 
       const collapsedSheet = await readSheetSnapshot();
       if (!collapsedSheet.panelBounds || !collapsedSheet.handleBounds || !collapsedSheet.closeBounds) {
@@ -7915,6 +8012,25 @@ async function verifyPhoneBasics(browser, baseUrl) {
           )} title=${JSON.stringify(collapsedSheet.titleBounds)}`
         );
       }
+      if (!collapsedSheet.photoFrameBounds || collapsedSheet.photoFrameBounds.height < 120) {
+        throw new Error(
+          `Collapsed sheet photo should remain at least 120px tall at ${viewport.width}x${viewport.height}, got ${collapsedSheet.photoFrameBounds?.height ?? "missing"}.`
+        );
+      }
+      if (
+        boundsIntersect(collapsedSheet.photoKindLabelBounds, collapsedSheet.previousImageButtonBounds) ||
+        boundsIntersect(collapsedSheet.photoKindLabelBounds, collapsedSheet.nextImageButtonBounds)
+      ) {
+        throw new Error(
+          `Photo kind badge should not overlap carousel arrows at ${viewport.width}x${viewport.height}. badge=${JSON.stringify(
+            collapsedSheet.photoKindLabelBounds
+          )} prev=${JSON.stringify(collapsedSheet.previousImageButtonBounds)} next=${JSON.stringify(
+            collapsedSheet.nextImageButtonBounds
+          )}`
+        );
+      }
+
+      const attributionCollapsedReachability = await verifyCompactAttributionToggle("collapsed");
 
       if (collapsedSheet.selectedPointPx.y >= collapsedSheet.panelBounds.top - 8) {
         throw new Error(
@@ -7982,6 +8098,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
           `Phone sheet pointer tap should expand panel at ${viewport.width}x${viewport.height}.`
         );
       }
+      const attributionExpandedReachability = await verifyCompactAttributionToggle("expanded");
 
       const pointerCollapseCenter = await readHandleCenter();
       await page.mouse.click(pointerCollapseCenter.x, pointerCollapseCenter.y);
@@ -8073,6 +8190,8 @@ async function verifyPhoneBasics(browser, baseUrl) {
         openingOverviewSnapshot,
         openingCoverage: coverage,
         attributionSnapshot,
+        attributionCollapsedReachability,
+        attributionExpandedReachability,
         collapsedHeightRatio: collapsedRatio,
         searchResultsBounds,
         menuDrawerBounds
