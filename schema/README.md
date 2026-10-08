@@ -41,7 +41,7 @@ All example values below are **illustrative only** (not verified historical clai
   - `schema/ancient-coastline.schema.json`
 - In production/CI, if `data/timeline.json` is absent, validation skips timeline rules and `build:data` skips ancient generated outputs.
 - For development before M4-02 lands factual timeline data, generate ancient app payloads from the fixture with `npm run build:data -- --ancient-source tests/fixtures/ancient`.
-- To regenerate `data/geo/*.geojson` from pinned AWMC sources, run `npm run build:ancient-geo`.
+- To regenerate `data/geo/*.geojson` from pinned AWMC and Natural Earth sources, run `npm run build:ancient-geo`. Area borders that follow rivers (the Jordan, the Yarmuk and the Lamus) use OpenStreetMap's river relations, fetched from the OSM API and cached under the system temp folder (`ibm-m4-03-osm`); their way ids are kept in each area's provenance. The run writes a composition report (areas, overlaps, coverage and a place check) to `%TEMP%/ibm-m4-03b/composition-report.md` and preview images to `%TEMP%/ibm-m4-03c/`.
 - The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
 - Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
 - Periods may start before `range.fromYear` or end after `range.toYear` (for example a kingdom lasting to AD 106); validation allows this and build-time stop assignment clips naturally to the configured timeline range.
