@@ -110,7 +110,13 @@ export async function coverageRows(domainFeatures, collection, explanations, min
   const rows = [];
   let smallCount = 0;
   let smallKm2 = 0;
+  // mapshaper's erase can return a piece that lies in no domain feature, where an area's edges coincide
+  // with a domain feature's round a hole that both leave out (such as a lagoon); such a piece isn't land
+  // to cover, so every piece must have its inner point in the domain.
+  const domainBoxes = domain.features.map((feature) => polygonsOf(feature.geometry).flatMap((polygon) => polygon[0]).reduce((box, [lon, lat]) => [Math.min(box[0], lon), Math.min(box[1], lat), Math.max(box[2], lon), Math.max(box[3], lat)], [Infinity, Infinity, -Infinity, -Infinity]));
+  const inDomain = (point) => domain.features.some((feature, index) => point[0] >= domainBoxes[index][0] && point[0] <= domainBoxes[index][2] && point[1] >= domainBoxes[index][1] && point[1] <= domainBoxes[index][3] && pointInGeometry(point, feature.geometry));
   for (const piece of leftover.features) {
+    if (!inDomain(labelPoint(piece.geometry))) continue;
     const areaKm2 = geometryAreaKm2(piece.geometry);
     if (areaKm2 <= minimumKm2) {
       smallCount += 1;

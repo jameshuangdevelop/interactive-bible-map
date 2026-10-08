@@ -8,8 +8,10 @@ import {
   polygonFromLineAndFrame,
   removeConsecutiveDuplicateVertices,
   removeSpikes,
+  separateSelfTouchingRing,
   separateTouchingParts
 } from "../scripts/lib/geometry-cleanup.mjs";
+import { booleanValid } from "@turf/boolean-valid";
 
 const square = (lon, lat, size) => [
   [lon, lat],
@@ -70,6 +72,27 @@ test("separateTouchingParts moves a shared vertex into the later part", () => {
   assert.deepEqual(second[0][0], second[0].at(-1));
   assert.ok(second[0][0][0] > 1 && second[0][0][1] > 1, "moved into the second square");
   assert.ok(Math.hypot(second[0][0][0] - 1, second[0][0][1] - 1) <= 0.00005 + 1e-12);
+});
+
+test("separateSelfTouchingRing opens a lagoon whose inlet simplification pinched shut", () => {
+  // The coast runs west along the top edge into a lagoon and back out through the same vertex (2, 4).
+  const pinched = [[0, 0], [4, 0], [4, 4], [2, 4], [2.5, 3], [1.5, 3], [2, 4], [0, 4], [0, 0]];
+  const polygon = (ring) => ({ type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [ring] } });
+  assert.equal(booleanValid(polygon(pinched)), false);
+  const opened = separateSelfTouchingRing(pinched);
+  assert.equal(opened.length, pinched.length);
+  assert.deepEqual(opened.slice(0, 6), pinched.slice(0, 6), "the first visit stays put");
+  assert.ok(Math.hypot(opened[6][0] - 2, opened[6][1] - 4) <= 0.00005 + 1e-12, "the second visit moves at most about 5 m");
+  assert.ok(opened[6][0] < 2 && opened[6][1] < 4, "it moves away from the first visit's edges");
+  assert.equal(booleanValid(polygon(opened)), true);
+  const { geometry } = cleanPolygonGeometry({ type: "Polygon", coordinates: [pinched] });
+  assert.equal(booleanValid({ type: "Feature", properties: {}, geometry }), true);
+  assert.ok(Math.abs(geometryAreaKm2(geometry) - geometryAreaKm2({ type: "Polygon", coordinates: [pinched] })) < 1, "the lagoon stays outside");
+});
+
+test("separateSelfTouchingRing leaves simple rings unchanged", () => {
+  const ring = square(10, 10, 1);
+  assert.deepEqual(separateSelfTouchingRing(ring), ring);
 });
 
 test("removeSpikes drops a vertex where the ring doubles back on itself", () => {
