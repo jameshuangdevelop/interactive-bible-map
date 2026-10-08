@@ -167,9 +167,10 @@
       "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
         "bib:josephus-antiquities",
-        "bib:jewish-encyclopedia-agrippa-ii"
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:iaa-magdala-excavation"
       ],
-      "note": "Nero later added the Galilean towns of Tiberias and Tarichaeae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; Josephus dates this to AD 54, but the Jewish Encyclopedia reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change."
+      "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change."
     },
     {
       "fromYear": 70,
@@ -183,6 +184,8 @@
       "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "galilee-perea"
 }

@@ -155,17 +155,19 @@
       "sources": [
         "bib:isbe-thessalonica"
       ],
-      "note": "ISBE records that after the Battle of Philippi (42 BC) Thessalonica \"proved loyal to Antony and Octavian, and was rewarded by receiving the status and privileges of a 'free city'\" (citing Pliny, Natural History 4.36): a free city, self-governing with its own politarchs, though still within the province."
+      "note": "The International Standard Bible Encyclopedia (1915) records that after the Battle of Philippi (42 BC) Thessalonica \"proved loyal to Antony and Octavian, and was rewarded by receiving the status and privileges of a 'free city'\" (citing Pliny, Natural History 4.36): a free city, self-governing with its own politarchs, though still within the province."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "macedonia",
   "politicalHistoryOverrides": [
     {
       "fromYear": -42,
       "toYear": 101,
       "holderId": "macedonia-province",
-      "note": "ISBE records that after the Battle of Philippi (42 BC) Thessalonica \"proved loyal to Antony and Octavian, and was rewarded by receiving the status and privileges of a 'free city'\" (citing Pliny, Natural History 4.36): a free city, self-governing with its own politarchs, though still within the province.",
+      "note": "The International Standard Bible Encyclopedia (1915) records that after the Battle of Philippi (42 BC) Thessalonica \"proved loyal to Antony and Octavian, and was rewarded by receiving the status and privileges of a 'free city'\" (citing Pliny, Natural History 4.36): a free city, self-governing with its own politarchs, though still within the province.",
       "sources": [
         "bib:isbe-thessalonica"
       ]

@@ -83,13 +83,13 @@
       "sources": [
         "bib:isbe-ituraea"
       ],
-      "note": "\"The country of Zenodorus, lying between Trachonitis and Galilee, and including Paneas and Ulatha, Augustus bestowed on Herod\" in 20 BC."
+      "note": "The International Standard Bible Encyclopedia (1915): \"The country of Zenodorus, lying between Trachonitis and Galilee, and including Paneas and Ulatha, Augustus bestowed on Herod\" in 20 BC."
     },
     {
       "fromYear": -4,
       "toYear": 34,
       "holderId": "philip-tetrarchy",
-      "entity": "Tetrarchy of Philip (Ituraea and Trachonitis) (ruler: Philip)",
+      "entity": "Tetrarchy of Philip (Iturea and Trachonitis) (ruler: Philip)",
       "sources": [
         "bib:josephus-antiquities"
       ]
@@ -129,7 +129,8 @@
       "entity": "Kingdom of Herod Agrippa II (ruler: Herod Agrippa II)",
       "sources": [
         "bib:josephus-antiquities",
-        "bib:isbe-trachonitis"
+        "bib:isbe-trachonitis",
+        "bib:kokkinos-justus-josephus-agrippa-coins"
       ],
       "note": "Some historians instead place Agrippa II's death, and so the end of this period, before AD 93, reading the Jewish historian Josephus's own wording in the Antiquities; this is the view of, among others, the standard reference work The History of the Jewish People in the Age of Jesus Christ as revised by Vermes and Millar (1973). This area follows the later, AD 100 dating; see that stop for the sources on both sides."
     },
@@ -140,11 +141,14 @@
       "entity": "Roman province of Syria",
       "sources": [
         "bib:isbe-abilene",
-        "bib:isbe-trachonitis"
+        "bib:isbe-trachonitis",
+        "bib:livius-nabataeans"
       ],
-      "note": "ISBE's \"Trachonitis\" entry states that district specifically \"was incorporated in the new province of Arabia\" in 106, together with the Nabataean kingdom. No source separately confirmed an end point for the other three districts (Gaulanitis, Batanea and Auranitis), so the same year is shown for all four."
+      "note": "The International Standard Bible Encyclopedia (1915) states that Trachonitis \"was incorporated in the new province of Arabia\" in 106, together with the Nabataean kingdom. No source gives an end point for the other three districts (Gaulanitis, Batanea and Auranitis), so the same year is shown for all four."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "philip-tetrarchy-lands"
 }

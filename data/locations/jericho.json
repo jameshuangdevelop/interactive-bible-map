@@ -167,7 +167,7 @@
       "sources": [
         "bib:josephus-antiquities"
       ],
-      "note": "Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\""
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\""
     },
     {
       "fromYear": 6,
@@ -178,7 +178,7 @@
         "bib:josephus-antiquities",
         "bib:livius-judaea"
       ],
-      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; Josephus dates Quirinius's own census of Judea to this year. How the accounts relate is debated."
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate."
     },
     {
       "fromYear": 41,
@@ -211,6 +211,8 @@
       "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "judea-samaria-idumea"
 }

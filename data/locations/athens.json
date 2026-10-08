@@ -161,7 +161,7 @@
       "fromYear": 44,
       "toYear": 67,
       "holderId": "achaia-province",
-      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by Claudius))",
+      "entity": "Roman province of Achaia (ruler: Senate, proconsul (restored by the emperor Claudius))",
       "sources": [
         "bib:cassius-dio-roman-history"
       ]
@@ -174,7 +174,7 @@
       "sources": [
         "bib:suetonius-twelve-caesars"
       ],
-      "note": "Suetonius: on his departure from Greece, Nero \"presented the entire province with freedom.\""
+      "note": "The Roman biographer Suetonius: on his departure from Greece, the emperor Nero \"presented the entire province with freedom.\""
     },
     {
       "fromYear": 70,
@@ -184,18 +184,20 @@
       "sources": [
         "bib:suetonius-twelve-caesars"
       ],
-      "note": "Suetonius records that Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
     },
     {
       "fromYear": 79,
       "toYear": 101,
       "holderId": "achaia-province",
-      "entity": "Roman province of Achaia (ruler: Senate, proconsul)",
+      "entity": "Roman province of Achaia",
       "sources": [
         "bib:suetonius-twelve-caesars"
       ]
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "achaia"
 }

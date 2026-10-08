@@ -84,7 +84,7 @@
       "fromYear": -2,
       "toYear": 64,
       "entity": "The southwestern part (\"Pontus Galaticus\") also joins the province of Galatia; the rest stays divided between Bithynia's administration and Polemon's kingdom",
-      "note": "ISBE's \"Pontus\" entry dates Polemon's kingdom becoming a province to AD 63; ISBE's \"Galatia\" entry gives AD 64 for the same event. This map uses AD 64.",
+      "note": "The International Standard Bible Encyclopedia (1915) dates Polemon's kingdom becoming a province to AD 63 in its \"Pontus\" entry and to AD 64 in its \"Galatia\" entry. This map uses AD 64.",
       "sources": [
         "bib:isbe-galatia",
         "bib:isbe-pontus"
@@ -99,5 +99,7 @@
       ]
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08"
 }

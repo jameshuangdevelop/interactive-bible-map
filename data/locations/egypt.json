@@ -94,9 +94,11 @@
         "bib:suetonius-twelve-caesars",
         "bib:tacitus-annals"
       ],
-      "note": "Suetonius: after Cleopatra's death, Augustus \"reduced Egypt to the form of a province.\""
+      "note": "The Roman biographer Suetonius: after Cleopatra's death, the emperor Augustus \"reduced Egypt to the form of a province.\""
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "egypt"
 }

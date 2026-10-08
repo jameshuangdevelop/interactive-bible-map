@@ -1,8 +1,8 @@
 # M4-02 verification — The first-century timeline
 
-Independent verification of the Research Lead's work on branch `data/m4-timeline` (head `1bc3adb` when I started): `data/timeline.json`, the research note `docs/research/M4-timeline.md`, the place records' political links and histories, and 18 new bibliography entries. I checked them against card `docs/tasks/M4-02-timeline.md`, ADR-0017, ADR-0026, ADR-0027, ADR-0033, ADR-0037 with its two 2026-10-07 updates, CP2 decision 5, CP3b decision 2 and `docs/verification/M3-ancient-regions.md`. The baseline for the semantic diff is `main` at `d359e3b`. Reviewed 2026-10-07 and 2026-10-08.
+Independent verification of the Research Lead's work on branch `data/m4-timeline` (head `1bc3adb` when I started): `data/timeline.json`, the research note `docs/research/M4-timeline.md`, the place records' political links and histories, and 18 new bibliography entries. I checked them against card `docs/tasks/M4-02-timeline.md`, ADR-0017, ADR-0026, ADR-0027, ADR-0033, ADR-0037 with its two 2026-10-07 updates, CP2 decision 5, CP3b decision 2 and `docs/verification/M3-ancient-regions.md`. The baseline for the semantic diff is `main` at `d359e3b`. Reviewed 2026-10-07 and 2026-10-08. **Re-verified on 2026-10-08 after the Research Lead's fixes and the PO's decisions: see "Re-verification (2026-10-08)" at the end.**
 
-**Result: needs Research Lead fixes.**
+**Result of the first round: needs Research Lead fixes.**
 
 | Item | Pass | Needs change | Fail |
 |---|---|---|---|
@@ -274,3 +274,127 @@ Each item lists the source to use. Re-run `npm run fill:political-history` after
 - `npm run validate:data`: 0 errors and 203 warnings, before and after this commit (unchanged).
 - `npm test`: 195 of 195 pass.
 - `npm run test:app`: 136 of 136 pass. The first run failed one test, which checks that the app's "Sources & credits" list matches the table in `ATTRIBUTION.md`. This commit's two new names in that table are now copied into `app/src/features/search/sources-credits-content.ts`. `npm run lint` and `npm run typecheck` are clean.
+
+## Re-verification (2026-10-08)
+
+**Scope.** The Research Lead's fixes on `data/m4-timeline`:
+- `08dd826`: entities, areas and stops.
+- `ea957f1`: place overrides for Magdala, Tarsus, Thessalonica and Damascus.
+- `6ea1459`: the hand-written histories.
+- `20495e6`: the research note and three new ISBE entries (Derbe, Philadelphia, Tarsus).
+- `636fbe6`: PROGRESS and BUDGET.
+
+I also checked the PO's decisions on P1–P5 (ADR-0037, merged as `669abe4`). I re-ran the semantic diff and the per-stop map-change script, re-opened every source behind a changed text, and searched for sources that might settle the five spans the Research Lead marked unclear.
+
+**Result: almost ready; needs Research Lead fixes R30–R38.**
+- R1–R29: 20 fixed, 9 partly fixed, none open.
+- 86 of 89 place records are now `verified`. The other 3 (`cappadocia`, `damascus`, `magdala`) wait on R33, R36 and R37.
+- Of the five spans marked unclear, four stay unclear and one is settled: Thrace was a Roman province from AD 46.
+- Small fixes I made myself are listed below. The branch isn't ready for a PR, so I haven't written the PR body yet.
+
+### R1–R29
+
+| Item | Status | Evidence |
+|---|---|---|
+| R1 Herod's kingdom | Fixed | Both −37 to −4 periods cite only Josephus (*Antiquities* 17.8.1). |
+| R2 The census | Fixed | The AD 6 stop and the 6–41 note set Luke 2:1–2, Luke 1:5 and Matthew 2:1 beside Josephus without choosing. No project source says the question "is debated" (ISBE's "Quirinius" and "Census" entries are cross-references only), so I reworded that clause to "this map takes no position on how the two accounts relate". |
+| R3 Prefect and procurator | Fixed | `bib:livius-judaea` is cited on 6–41, 44–70 and the AD 6 stop. |
+| R4 After AD 70 | Fixed | "Praetorian" and "ending Jewish self-government" are gone, and `galilee-perea` is split at 70. |
+| R5 Commagene | Partly | 17–38 is now the `roman-province-commagene` entity (Tacitus *Annals* 2.56; Strabo 16.2.3), and Caligula's removal shows as unclear for 39–41. I corrected the note, which named Caligula where Dio 60.8.1 names Claudius. Open: the invented −31 became an invented −50 with "Antiochus III" (R31). |
+| R6 Cilicia Tracheia | Partly | Archelaus to AD 17 (Strabo 14.5.6), unclear for 17–38 (*Annals* 6.41), and Polemon's land noted. Open: the start year (R32). |
+| R7 The AD 17 stop | Fixed | Retitled, with Tacitus's own wording, and no side taken. I reworded "no source says what became of it", which *Annals* 6.41 contradicts. |
+| R8 The `syria` note | Fixed | |
+| R9 Lycia | Fixed | 43–74 is unclear, `lycia-province` is gone, the AD 44 clause quotes Dio, and the League cites Strabo. |
+| R10 The AD 74 stop | Fixed (with my edits) | The Research Lead fixed the title, the direction and the sources. I removed the leftover "not its south" and "from 'Galatia'", and a new verbatim quotation of Zondervan (cite-only), now paraphrased. |
+| R11 Thrace | Partly | The unclear span ends at 69 (*Histories* 1.11), and Rhoemetalces II rules from 38. Open: 4 BC–AD 38 was made unclear although Tacitus describes client kings throughout, and Livius settles the annexation year (R30). |
+| R12 Cappadocia and its small units | Partly | P1 and P2 are applied, with 2 BC, "client kingdom" and "63 or 64" corrected. Open: the ruler labels and the note's sources (R33), and naming the small units' changes in the stop summaries (R34). |
+| R13 Achaia | Partly | P3 is applied. I removed the unsourced "Senate, proconsul" after 79. Open: the AD 70 summary doesn't name Achaia's change (R35). |
+| R14 Sinai | Fixed | The note rests on ISBE "Arabia" (Sinai in Arabia Petrea) and calls the line an approximation. The Livius quotation is gone. |
+| R15 Philip's former tetrarchy | Fixed | ISBE's 20 BC wording is used, and the 106 claim is limited to Trachonitis. I added `bib:livius-nabataeans` for "together with the Nabataean kingdom", and `bib:kokkinos-justus-josephus-agrippa-coins` for the before-AD 93 view. |
+| R16 Magdala | Partly | The override from AD 54 and the §6 row are in. I corrected the quotation to Whiston's "Tarichae", cited the IAA report ("identified with the settlement Migdal Nunia (Taricheae)"), and fixed §6's leftover sentence that said no place was affected. Open: the override runs to 101 (R37). |
+| R17 Free cities | Fixed | Tarsus (ISBE "Tarsus": "civitas libera et immunis ... confirmed by Augustus") and Thessalonica (ISBE "Thessalonica"; Pliny, *Natural History* 4.36) carry place notes. Their holder stays the province, which ADR-0037 item 3 allows. No source I or the Research Lead opened confirms Athens or Antioch. |
+| R18 Damascus | Partly | An unclear override for 37–40 gives both views. Open: the coin clause inverts ISBE (R36). |
+| R19 What the stops name | Partly | Malichus II (41), Rabbel II (72), Lesser Armenia's annexation (72) and the Thrace changes (53, 70) are named. Open: the small units (R34), Achaia at AD 70 (R35) and the renamings (R38). |
+| R20 Renamings in §5.2 | Fixed | Iconium as Claudiconium, Derbe as "Claudio-Derbe", and Philadelphia as "Neo-kaisaria", later "Flavia", all match ISBE. |
+| R21 Names | Fixed (with my edit) | "Bithynia and Pontus" and "Italy" are in. Philip's tetrarchy now follows Luke 3:1, but the Research Lead used the WEB's "Ituraea". ADR-0026 takes "Iturea" (NIV, NLT, NKJV, CSB; "Ituraea" only in ESV and KJV; checked on Bible Gateway), so I changed it. |
+| R22 Reader-facing text | Partly | Team wording, database names and the two cite-only quotations are gone. Writers and emperors were still often named without introduction, and a new cite-only quotation appeared. I fixed all of these except the three Thrace notes, which R30 rewrites. |
+| R23 The AD 100 lead weight | Fixed | "On his reading ... disputed among specialists". |
+| R24 The AD 41 stop | Fixed | Josephus's own words are used, and Commagene's restoration is stated. I added ISBE "Ituraea" as the source for "capital of the earlier Iturean kingdom". |
+| R25, R26 The AD 37 and AD 53 stops | Fixed | In the data. The research note's §4 still had the old text, so I marked §4 as superseded by the data. |
+| R27 Period starts | Fixed | Cilicia now cites Livius; Egypt cites Suetonius, *Augustus* 18 ("He reduced Egypt to the form of a province"); Sicily starts at −27 and Galatia at −25; the Bithynia note quotes ISBE "Bithynia" ("the Black Sea littoral as far as Amisus"). |
+| R28 Hand-written histories | Fixed | `roman-empire`: Galba, Otho and Vitellius cover 68–70, and Vespasian 70–79 (World History Encyclopedia). `pontus`: 63 is attributed to ISBE "Pontus", and −66 to ISBE's "Pompey, appointed in 66 BC". `parthian-empire` describes only the empire. |
+| R29 Ginea | Fixed | "Probably" is restored, and Pleiades 678163 is cited. |
+
+### The PO's decisions
+- **P1 (eastern Pontus and Lesser Armenia as small units):** applied. Their land is drawn with `cappadocia`, the Cappadocia note names all three, and the visual spec's map key names Polemon's kingdom. The stop summaries still miss some of their changes (R34).
+- **P2 (Galatia and Cappadocia stay two areas):** applied. Both notes give Livius's "probable" joint government.
+- **P3 (AD 67 a stop; Achaia unclear 70–79):** applied, as `achaia-free` for 67–70, unclear for 70–79, a province from 79, and stops at 67 and 79. One gap: the AD 70 summary (R35).
+- **P4:** for information.
+- **P5 (ADR-0033 for all timeline text):** met after my wording fixes, except the three Thrace notes (R30).
+
+### The five spans marked unclear
+| Span | Ruling | Evidence |
+|---|---|---|
+| Commagene 39–41 | **Unclear confirmed** | Dio 60.8.1 gives no year for Caligula's removal. Suetonius (*Caligula* 16.3) records only the restoration of 38 ("to Antiochus of Commagene, a hundred million sesterces"). Livius's "Caligula" page has nothing on it. |
+| Achaia 70–79 | **Unclear confirmed** | Suetonius (*Vespasian* 8.4) gives no year. Livius's "Vespasian" and World History Encyclopedia's "Vespasian" don't mention the reversal. |
+| Cilicia Tracheia 17–38 | **Unclear confirmed** | *Annals* 6.41 has a King Archelaus ruling the Cietae in AD 36, and the Loeb note puts them "on the coast of Cilicia Trachea". Nothing says who held the rest, or that Syria governed it. The note could add the Loeb location (optional, R32). |
+| Lycia 43–74 | **Unclear confirmed** | The sources disagree. Dio 60.17.3: in 43 the Lycians were put into Pamphylia's prefecture. ISBE "Lycia": "In 53 AD ... it became a Roman province, and in 74 AD it was united with Pamphylia". Suetonius (*Vespasian* 8.4): Vespasian took Lycia's freedom away. The Loeb note to *Histories* 2.9: one province with Galatia and Pamphylia in 69. |
+| Thrace 47–69 | **Settled: a Roman province from AD 46** (R30) | Livius, "Claudius" (Jona Lendering): "45/46 Annexation of Thrace". Tacitus, *Histories* 1.11, lists Thrace among "the other districts which were in charge of imperial agents" in January 69. Smith reports the Eusebian Chronicle's 47. The only contrary view, Vespasian's reign, rests on Smith's reading of Suetonius (*Vespasian* 8) and Eutropius. *Histories* 1.11 contradicts it, and the cited Loeb Suetonius reads "Trachian Cilicia" there. |
+| Thrace 4 BC–AD 38 (also marked unclear) | **Settled: a client kingdom** (R30) | Tacitus, *Annals* 2.64: "The whole of that country had been subject to Rhoemetalces; after whose death Augustus conferred one half on his brother Rhescuporis, the other on his son Cotys." *Annals* 2.67: from AD 19, "Thrace was divided between his son Rhoemetalces ... and the children of Cotys", under a Roman regent, Trebellenus Rufus. |
+
+### Reader-facing text, the stop summaries and the semantic diff
+- **ADR-0033.** I scanned every stop title and summary, entity name, ruler and period note for writers, works, emperors, databases and team wording. Every first mention now introduces the person or work, for example "the Roman historian Cassius Dio" or "the emperor Nero". No database is named except as a cited work ("the International Standard Bible Encyclopedia (1915)"). No cite-only source is quoted word for word. The exceptions are the three Thrace notes (R30) and an ISBE quotation that contains "Augustus".
+- **What the stops name** (ADR-0037 item 1), checked by script against the map's holder and ruler changes at all 15 stops. Every change is named, except Achaia at AD 70 (R35), the small units' changes (R34) and the renamings (R38).
+- **Semantic diff.** Against `d359e3b`, only `politicalHistory`, `politicalAreaId`, `candidates[].politicalAreaId`, `politicalHistoryOverrides` (4 records) and the status fields have changed. Since `4a173eb`, only derived histories and the four overrides changed, and no record I had verified changed.
+
+### My small fixes in this commit
+Wording, quotations, spelling and sources only; no holder or year changed.
+- **Introductions (ADR-0033):** writers and emperors are introduced throughout the stops and notes; "ISBE" is spelled out; "the Loeb edition" is now "a translator's note".
+- **Quotations:** Dio's subject is corrected from Caligula to Claudius in the Commagene note; Whiston's "Tarichae" is restored in the Magdala note and three times in the research note; "Taricheae" is used in prose, as in the Magdala record.
+- **Spelling:** "Iturea" per ADR-0026.
+- **Cited sources added:** ISBE "Ituraea" (AD 41); the IAA report for Taricheae (AD 53, `galilee-perea`, Magdala); Livius "Nabataeans" and Kokkinos (`philip-tetrarchy-lands`).
+- **Unsupported wording removed or corrected:**
+  - "within this same year" (AD 39);
+  - "is debated" (AD 6 stop and the 6–41 note);
+  - "no source says" (AD 17);
+  - the AD 74 wording (see R10);
+  - "from Vespasian's accession", now "from AD 70" (AD 79);
+  - Achaia's unsourced ruler after 79.
+- **The research note:** §4 is marked as superseded by the data, and §6's leftover sentence is corrected.
+- **Re-runs:** `npm run fill:political-history`, then status updates for the 58 records that now pass.
+
+### New fixes for the Research Lead
+Each item comes with its exact source, so the fix is mechanical.
+- **R30. Thrace.**
+  - 4 BC–AD 38: the client kingdom, not unclear. Ruler, for example: "Rhoemetalces, then Rhescuporis and Cotys, then (from AD 19) Rhoemetalces II and the sons of Cotys". Cite Tacitus *Annals* 2.64 and 2.67.
+  - AD 38–46: Rhoemetalces II (Smith).
+  - From AD 46: `thrace-province`, citing a new entry `bib:livius-claudius` ("Claudius", Livius.org, Jona Lendering, <https://www.livius.org/articles/person/claudius/>: "45/46 Annexation of Thrace") and Tacitus *Histories* 1.11.
+  - Note: Smith reports the Eusebian Chronicle's 47, and the Vespasian dating from Suetonius and Eutropius; the Loeb Suetonius reads "Trachian Cilicia" at *Vespasian* 8.4.
+  - Introduce the writers in all three notes.
+  - Summaries: name the AD 46 annexation at the AD 53 stop, and drop the AD 70 Thrace sentence, which also calls Tacitus's January 69 "this same January".
+- **R31. Commagene.** Replace −50 to 17 "Antiochus III" with −20 to 17, the client kingdom, ruler "Mithridates (from 20 BC), then Antiochus (died AD 17)". Cite Dio 54.9.3 ("to one Mithridates, though still a mere boy, he gave Commagene") and Tacitus *Annals* 2.42.
+- **R32. Cilicia Tracheia's start.** −33 becomes −20. Dio 54.9.2: Augustus gave Tarcondimotus "the kingdom of Cilicia ... except for a few places on the coast. These latter together with Lesser Armenia he granted to Archelaus." Note Dio's "a few places on the coast" beside Strabo's "Cilicia Tracheia". Optional: add the Loeb note's location to the 17–38 note.
+- **R33. Cappadocia's rulers and sources.**
+  - 17–69: Tacitus calls Veranius the province's "governor" (2.56), "only a temporary expedient" (Loeb note), and he appears among the legates and senators of Germanicus's staff (2.74). So "Equestrian governors, the first being Quintus Veranius" mislabels him. Suggested ruler: "Quintus Veranius, sent to organize the province; then equestrian governors". Add Livius "Cappadocia (3)" ("equestrian governors (procurators)") and Suetonius *Vespasian* 8.4.
+  - 69–101: Livius calls Gnaeus Pompeius Collega the first "governor of senatorial rank" (69); Suetonius says Vespasian gave Cappadocia "a consular governor". Word the ruler to match.
+  - Cite sources for the note's claims about the small units: ISBE "Galatia" (2 BC; 64), ISBE "Pontus" (63), Dio 54.9.2 (Lesser Armenia to Archelaus in 20 BC) and 59.12.2 (to Cotys in 38), Josephus *Antiquities* 20.8.4 (to Aristobulus in 54), and World History Encyclopedia "Vespasian" (annexed in 72).
+- **R34. Small units in the summaries (P1).**
+  - AD 39: name Caligula's grants of 38: "to Cotys Lesser Armenia" and "to Polemon, the son of Polemon, his ancestral domain" (Dio 59.12.2).
+  - AD 67: name Aristobulus's Lesser Armenia (54; *Antiquities* 20.8.4) and Polemon II's surrender of Pontus (63/64; ISBE). Move the latter from AD 70, since 67 is now the next stop after 64.
+  - Update the Cappadocia note's "see the AD 6 and AD 70 stops".
+- **R35. The AD 70 summary.** Name Achaia's change to an unclear status (P3).
+- **R36. The Damascus note.** ISBE "Aretas" says: "This date is further fixed by a Damascus coin, with the image of King Aretas and the date 101. If that date points to the Pompeian era, it equals 37 AD." The note says no such coins survive. Correct it, or cite an accepted source for that other view.
+- **R37. Magdala.** End the override at 100, the year the data gives for Agrippa II's death.
+- **R38. Renamings in the stop summaries** (ADR-0037 item 1). Mention each in the summary of the first stop after it:
+  - Paneas as Caesarea and Bethsaida as Julias (*Antiquities* 18.2.1, under Philip);
+  - Iconium as Claudiconium and Derbe as "Claudio-Derbe" (ISBE, under Claudius);
+  - Caesarea Philippi as Neronias (the Jewish Encyclopedia, citing *Antiquities* 20.9.4);
+  - Philadelphia as "Neo-kaisaria", then "Flavia" under Vespasian (ISBE).
+
+A nit, not a fix: several summaries open folded changes with "Folded in here:", a term from ADR-0037. "Also from this stop:" would read more naturally.
+
+### Checks
+- `npm run validate:data`: 0 errors and 203 warnings (unchanged).
+- `npm test`: 195 of 195 pass.
+- `npm run test:app`: 136 of 136 pass.
+- `npm run build:data` succeeds and writes the 15 stop files.

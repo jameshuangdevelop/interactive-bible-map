@@ -71,9 +71,11 @@
         "bib:isbe-bithynia",
         "bib:isbe-pontus"
       ],
-      "note": "This area's drawn extent also covers coastal, western Pontus; ISBE states \"the Black Sea littoral as far as Amisus was more or less closely joined with Bithynia in administration.\" That land is not its own area on this map."
+      "note": "This area's drawn extent also covers coastal, western Pontus; the International Standard Bible Encyclopedia (1915) states that \"the Black Sea littoral as far as Amisus was more or less closely joined with Bithynia in administration.\" That land is not its own area on this map."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "bithynia"
 }
