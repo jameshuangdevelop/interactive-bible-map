@@ -15,10 +15,13 @@ export {
 } from "./place-visibility";
 export {
   applyMapModeToSearch,
+  applyTimelineYearToSearch,
   applySelectionToSearch,
   parseMapModeFromSearch,
+  parseTimelineYearFromSearch,
   parseSelectionFromSearch
 } from "./selection-url";
+export { formatTimelineValueText, formatTimelineYear, resolveStopForYear } from "./timeline";
 export {
   BasemapFallbackController,
   resolveInitialBasemapMode,

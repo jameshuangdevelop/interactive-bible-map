@@ -15,10 +15,14 @@ import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { sortPlacesByImportance } from "../features/map/place-importance";
 import {
   applyMapModeToSearch,
+  applyTimelineYearToSearch,
   applySelectionToSearch,
   parseMapModeFromSearch,
+  parseTimelineYearFromSearch,
   parseSelectionFromSearch
 } from "../features/map/selection-url";
+import type { AncientTimelinePayload } from "../features/map/ancient-layer.types";
+import { formatTimelineValueText, formatTimelineYear, resolveStopForYear } from "../features/map/timeline";
 import type {
   MapDisplayMode,
   PinLabelSource,
@@ -40,6 +44,7 @@ const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
+const TIMELINE_DEFAULT_YEAR = 50;
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -112,6 +117,18 @@ async function fetchPlaceDetails(placeId: string) {
   return (await response.json()) as PlaceDetailsPayload;
 }
 
+async function fetchAncientTimeline() {
+  const response = await fetch("/generated/ancient.timeline.json", {
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not load ancient timeline (${response.status})`);
+  }
+
+  return (await response.json()) as AncientTimelinePayload;
+}
+
 function visiblePlaceEntrySelectorById(entryId: string) {
   const escaped = entryId.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
   return `button[data-place-entry-id="${escaped}"]`;
@@ -163,6 +180,10 @@ export function AppShell() {
   const [placeDetailsErrorsById, setPlaceDetailsErrorsById] = useState<Record<string, string>>(
     {}
   );
+  const [ancientTimeline, setAncientTimeline] = useState<AncientTimelinePayload | null>(null);
+  const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
+  const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
+  const [mapKeyOpen, setMapKeyOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
@@ -177,6 +198,26 @@ export function AppShell() {
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
+  const selectedTimelineStop = useMemo(
+    () =>
+      ancientTimeline?.stops.find((stop) => stop.id === selectedTimelineStopId) ??
+      null,
+    [ancientTimeline, selectedTimelineStopId]
+  );
+  const sortedTimelineStops = useMemo(() => {
+    if (!ancientTimeline) {
+      return [];
+    }
+
+    return [...ancientTimeline.stops].sort((left, right) => left.year - right.year);
+  }, [ancientTimeline]);
+  const selectedTimelineStopIndex = useMemo(() => {
+    if (!selectedTimelineStop) {
+      return -1;
+    }
+
+    return sortedTimelineStops.findIndex((stop) => stop.id === selectedTimelineStop.id);
+  }, [selectedTimelineStop, sortedTimelineStops]);
   const smallScreenSheetMaxHeightPx = Math.max(
     0,
     (typeof window !== "undefined" ? window.innerHeight : 0) - SMALL_SCREEN_SHEET_EDGE_GAP_PX * 2
@@ -290,6 +331,10 @@ export function AppShell() {
         );
         const parsedSelection = parseSelectionFromSearch(window.location.search);
         const parsedMapMode = parseMapModeFromSearch(window.location.search);
+        if (parsedMapMode !== "ancient") {
+          setTimelineSourcesOpen(false);
+          setMapKeyOpen(false);
+        }
         setMapMode(parsedMapMode);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
@@ -315,6 +360,34 @@ export function AppShell() {
         setErrorMessage(message);
         setLoading(false);
         setUrlStateReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchAncientTimeline()
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientTimeline(payload);
+        const requestedYear = parseTimelineYearFromSearch(window.location.search) ?? TIMELINE_DEFAULT_YEAR;
+        const resolvedStop = resolveStopForYear(payload.stops, requestedYear);
+        setSelectedTimelineStopId(resolvedStop?.id ?? payload.defaultStopId ?? payload.stops[0]?.id ?? null);
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientTimeline(null);
+        setSelectedTimelineStopId(null);
       });
 
     return () => {
@@ -408,6 +481,19 @@ export function AppShell() {
   }, [mapMode, urlStateReady]);
 
   useEffect(() => {
+    if (!urlStateReady || !selectedTimelineStop) {
+      return;
+    }
+
+    const nextSearch = applyTimelineYearToSearch(window.location.search, selectedTimelineStop.year);
+    const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState({}, "", nextUrl);
+    }
+  }, [selectedTimelineStop, urlStateReady]);
+
+  useEffect(() => {
     if (loading || !urlStateReady) {
       return undefined;
     }
@@ -415,8 +501,25 @@ export function AppShell() {
     const onPopState = () => {
       const parsedSelection = parseSelectionFromSearch(window.location.search);
       const parsedMapMode = parseMapModeFromSearch(window.location.search);
+      const parsedYear = parseTimelineYearFromSearch(window.location.search);
       const normalized = normalizeSelection(parsedSelection, placesById);
+      if (parsedMapMode !== "ancient") {
+        setTimelineSourcesOpen(false);
+        setMapKeyOpen(false);
+      }
       setMapMode(parsedMapMode);
+      if (ancientTimeline) {
+        const resolvedStop = resolveStopForYear(
+          ancientTimeline.stops,
+          parsedYear ?? TIMELINE_DEFAULT_YEAR
+        );
+        setSelectedTimelineStopId(
+          resolvedStop?.id ??
+            ancientTimeline.defaultStopId ??
+            ancientTimeline.stops[0]?.id ??
+            null
+        );
+      }
 
       if (!parsedSelection) {
         lastSelectionActivatorEntryIdRef.current = null;
@@ -444,7 +547,7 @@ export function AppShell() {
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [loading, placesById, urlStateReady]);
+  }, [ancientTimeline, loading, placesById, urlStateReady]);
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
@@ -581,10 +684,34 @@ export function AppShell() {
           : mapMode === "ancient"
             ? "modern"
             : "ancient";
+      if (nextMode !== "ancient") {
+        setTimelineSourcesOpen(false);
+        setMapKeyOpen(false);
+      }
       setMapMode(nextMode);
     },
     [mapMode]
   );
+
+  useEffect(() => {
+    if (!mapKeyOpen && !timelineSourcesOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setMapKeyOpen(false);
+      setTimelineSourcesOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mapKeyOpen, timelineSourcesOpen]);
 
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
@@ -592,6 +719,19 @@ export function AppShell() {
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
   const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
+  const timelineVisible = mapMode === "ancient" && !isSmallScreen && sortedTimelineStops.length > 0;
+
+  const setTimelineStopByIndex = useCallback(
+    (index: number) => {
+      if (sortedTimelineStops.length === 0) {
+        return;
+      }
+
+      const clampedIndex = Math.max(0, Math.min(sortedTimelineStops.length - 1, index));
+      setSelectedTimelineStopId(sortedTimelineStops[clampedIndex].id);
+    },
+    [sortedTimelineStops]
+  );
 
   const panelStyle: CSSProperties | null = selectedPlace
     ? isSmallScreen
@@ -673,7 +813,13 @@ export function AppShell() {
               aria-checked={selected}
               data-map-mode={value}
               key={value}
-              onClick={() => setMapMode(value)}
+              onClick={() => {
+                if (value !== "ancient") {
+                  setTimelineSourcesOpen(false);
+                  setMapKeyOpen(false);
+                }
+                setMapMode(value);
+              }}
               onKeyDown={handleMapModeRadioKeyDown}
               role="radio"
               style={{
@@ -698,17 +844,59 @@ export function AppShell() {
 
       {mapMode === "ancient" ? (
         <div
-          aria-hidden="true"
-          data-ancient-map-only-controls-slot="true"
           style={{
             position: "absolute",
             right: `${tokens.spacing.md}px`,
             top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX + 48}px` : `${tokens.spacing.md + 48}px`,
-            width: "176px",
-            height: "1px",
+            width: "220px",
             zIndex: 44
           }}
-        />
+        >
+          <button
+            aria-expanded={mapKeyOpen}
+            aria-haspopup="dialog"
+            onClick={() => setMapKeyOpen((value) => !value)}
+            style={{
+              width: "100%",
+              height: "36px",
+              borderRadius: "18px",
+              border: `1px solid ${tokens.color.divider}`,
+              backgroundColor: "#FFFFFF",
+              color: tokens.color.textPrimary,
+              fontFamily: tokens.typography.uiFont,
+              fontSize: `${tokens.typography.captionSize}px`,
+              fontWeight: 600,
+              cursor: "pointer",
+              boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)"
+            }}
+            type="button"
+          >
+            Map key
+          </button>
+          {mapKeyOpen ? (
+            <div
+              aria-label="Map key"
+              role="dialog"
+              style={{
+                marginTop: `${tokens.spacing.sm}px`,
+                borderRadius: "8px",
+                border: `1px solid ${tokens.color.divider}`,
+                backgroundColor: "#FFFFFF",
+                color: tokens.color.textSecondary,
+                fontSize: `${tokens.typography.captionSize}px`,
+                lineHeight: `${tokens.typography.captionLineHeight}px`,
+                padding: `${tokens.spacing.sm}px`,
+                boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)"
+              }}
+            >
+              <p style={{ margin: 0 }}>Roman province; client kingdom/tetrarchy/free city or league; outside the empire; status unclear.</p>
+              <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>Roman Empire edge; known roads (solid), conjectured roads (dashed); ancient coastline.</p>
+              <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
+                Borders are approximate. Lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn. Sources are under Sources &amp; credits.
+              </p>
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
       {loading ? (
@@ -716,6 +904,7 @@ export function AppShell() {
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
+            ancientTimeline={ancientTimeline}
             bottomPanelInset={panelBottomInsetForMap}
             highlightedPlaceId={highlightedPlaceId}
             isSmallScreen={isSmallScreen}
@@ -724,10 +913,145 @@ export function AppShell() {
             onSelectPlace={handleSelectFromMap}
             pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
+            selectedTimelineStopId={selectedTimelineStopId}
             selection={selection}
           />
         </Suspense>
       )}
+
+      {timelineVisible && selectedTimelineStop ? (
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            bottom: `${Math.max(tokens.spacing.md, panelBottomInsetForMap + tokens.spacing.md)}px`,
+            transform: "translateX(-50%)",
+            width: "560px",
+            maxWidth: "calc(100vw - 48px)",
+            borderRadius: "8px",
+            border: `1px solid ${tokens.color.divider}`,
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+            padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
+            zIndex: 30
+          }}
+        >
+          <div aria-live="polite" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px`, lineHeight: `${tokens.typography.captionLineHeight}px` }}>
+            {formatTimelineYear(selectedTimelineStop.year)} · {selectedTimelineStop.title}{" "}
+            <button
+              aria-expanded={timelineSourcesOpen}
+              onClick={() => setTimelineSourcesOpen((value) => !value)}
+              style={{
+                border: "none",
+                background: "none",
+                color: "#1A73E8",
+                cursor: "pointer",
+                fontSize: `${tokens.typography.captionSize}px`,
+                padding: 0
+              }}
+              type="button"
+            >
+              Sources
+            </button>
+          </div>
+          {timelineSourcesOpen ? (
+            <div
+              style={{
+                marginTop: `${tokens.spacing.xs}px`,
+                padding: `${tokens.spacing.sm}px`,
+                borderRadius: "8px",
+                backgroundColor: tokens.color.subtleSurface,
+                color: tokens.color.textSecondary,
+                fontSize: `${tokens.typography.captionSize}px`,
+                lineHeight: `${tokens.typography.captionLineHeight}px`
+              }}
+            >
+              <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
+              {selectedTimelineStop.scripture.length > 0 ? (
+                <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
+                  <strong>Passages:</strong> {selectedTimelineStop.scripture.join("; ")}
+                </p>
+              ) : null}
+              {selectedTimelineStop.sources.length > 0 ? (
+                <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
+                  <strong>Sources:</strong> {selectedTimelineStop.sources.join("; ")}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+          <div
+            style={{
+              marginTop: `${tokens.spacing.sm}px`,
+              display: "grid",
+              gridTemplateColumns: "44px 1fr 44px",
+              alignItems: "center",
+              columnGap: `${tokens.spacing.sm}px`
+            }}
+          >
+            <button
+              aria-label="Earlier change"
+              disabled={selectedTimelineStopIndex <= 0}
+              onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex - 1)}
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "22px",
+                border: `1px solid ${tokens.color.divider}`,
+                backgroundColor: "#FFFFFF",
+                color: tokens.color.textPrimary,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              ‹
+            </button>
+            <input
+              aria-label="Year"
+              aria-valuetext={formatTimelineValueText(selectedTimelineStop)}
+              max={Math.max(0, sortedTimelineStops.length - 1)}
+              min={0}
+              onChange={(event) => {
+                setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
+              }}
+              step={1}
+              type="range"
+              value={Math.max(0, selectedTimelineStopIndex)}
+            />
+            <button
+              aria-label="Later change"
+              disabled={selectedTimelineStopIndex < 0 || selectedTimelineStopIndex >= sortedTimelineStops.length - 1}
+              onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex + 1)}
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "22px",
+                border: `1px solid ${tokens.color.divider}`,
+                backgroundColor: "#FFFFFF",
+                color: tokens.color.textPrimary,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              ›
+            </button>
+          </div>
+          <div
+            style={{
+              marginTop: `${tokens.spacing.xs}px`,
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.max(1, sortedTimelineStops.length)}, minmax(0, 1fr))`,
+              fontSize: `${tokens.typography.captionSize}px`,
+              color: tokens.color.textSecondary
+            }}
+          >
+            {sortedTimelineStops.map((stop) => (
+              <span key={stop.id} style={{ textAlign: "center" }}>
+                {formatTimelineYear(stop.year)}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {selectedPlace && panelStyle ? (
         <section aria-label="Place details" style={panelStyle}>

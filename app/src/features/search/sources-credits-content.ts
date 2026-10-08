@@ -8,7 +8,7 @@ export const ABOUT_THIS_MAP_TEXT =
   "Interactive Bible Map shows the places of the New Testament on a map of the ancient world, with their English Bible names, candidate sites where the location is uncertain, and the passages that mention them (World English Bible).";
 
 export const DATA_LICENSE_TEXT =
-  "Data license: all non-reference data and content are CC BY-SA 4.0. No OSM- or AWMC-derived geometry is included yet; when added in M4, that geometry will be ODbL 1.0.";
+  "Data license: all non-reference data and content are CC BY-SA 4.0. OSM- and AWMC-derived geometry in the map layer is ODbL 1.0.";
 
 export const LICENSE_DETAILS_URL =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";

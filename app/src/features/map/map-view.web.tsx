@@ -21,6 +21,7 @@ import {
   ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
   ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
   ANCIENT_MAIN_BASEMAP_STYLE_URL,
+  ANCIENT_AWMC_ATTRIBUTION,
   MAP_WORKER_URL,
   MODERN_FALLBACK_BASEMAP_ATTRIBUTION,
   MODERN_FALLBACK_BASEMAP_STYLE_URL,
@@ -60,7 +61,16 @@ import {
   pickNearestCandidateWithPreferredRank,
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
+import { formatTimelineYear } from "./timeline";
 import type { MapViewProps } from "./map-view.types";
+import type {
+  AncientEntityRecord,
+  AncientShapesPayload,
+  AncientStopPayload,
+  FeatureCollection,
+  LineStringGeometry,
+  MultiLineStringGeometry
+} from "./ancient-layer.types";
 import type { Coordinates, MapDisplayMode, PlaceIndexRecord, PlaceSelection } from "./types";
 
 setWorkerUrl(MAP_WORKER_URL);
@@ -72,6 +82,12 @@ const sourceSitePinsId = "ibm-site-pins";
 const sourceCandidatePinsId = "ibm-candidate-pins";
 const sourceAreaLabelsId = "ibm-area-labels";
 const sourceKeyboardFocusId = "ibm-keyboard-focus";
+const sourceAncientAreasId = "ibm-ancient-areas";
+const sourceAncientBordersId = "ibm-ancient-borders";
+const sourceAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const sourceAncientRoadsId = "ibm-ancient-roads";
+const sourceAncientCoastlineId = "ibm-ancient-coastline";
+const sourceAncientHolderLabelsId = "ibm-ancient-holder-labels";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
@@ -101,8 +117,20 @@ const layerAreaLabelOverviewId = "ibm-area-label-overview";
 const layerAreaLabelId = "ibm-area-label";
 const layerSelectedAreaLabelId = "ibm-selected-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
+const layerAncientAreaFillId = "ibm-ancient-area-fill";
+const layerAncientUncertainFillId = "ibm-ancient-area-uncertain-fill";
+const layerAncientBorderSolidId = "ibm-ancient-border-solid";
+const layerAncientBorderDashedId = "ibm-ancient-border-dashed";
+const layerAncientBorderDottedId = "ibm-ancient-border-dotted";
+const layerAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const layerAncientRoadKnownId = "ibm-ancient-road-known";
+const layerAncientRoadConjecturedId = "ibm-ancient-road-conjectured";
+const layerAncientCoastlineId = "ibm-ancient-coastline";
+const layerAncientHolderLabelId = "ibm-ancient-holder-label";
+const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
 
 const questionBadgeImageId = "ibm-question-badge-image";
+const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
@@ -111,6 +139,7 @@ const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
 const gestureReleaseDelayMs = 1_000;
+const timelineDefaultYear = 50;
 const mapLabelPaddingTop = 96;
 const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
@@ -158,7 +187,8 @@ const interactiveLayerIds = [
   layerMajorAreaLabelId,
   layerAreaLabelOverviewId,
   layerAreaLabelId,
-  layerSelectedAreaLabelId
+  layerSelectedAreaLabelId,
+  layerAncientHolderLabelClickableId
 ] as const;
 
 const candidateVisibilityFilter = [
@@ -252,6 +282,23 @@ function applyMapModeOverlayVisibility(map: MapLibreMap, mapMode: MapDisplayMode
     layerSelectedAreaLabelId
   ]) {
     setLayerVisibility(map, layerId, showAreaLabels);
+  }
+
+  const showAncientLayer = mapMode === "ancient";
+  for (const layerId of [
+    layerAncientAreaFillId,
+    layerAncientUncertainFillId,
+    layerAncientBorderSolidId,
+    layerAncientBorderDashedId,
+    layerAncientBorderDottedId,
+    layerAncientEmpireEdgeId,
+    layerAncientRoadKnownId,
+    layerAncientRoadConjecturedId,
+    layerAncientCoastlineId,
+    layerAncientHolderLabelId,
+    layerAncientHolderLabelClickableId
+  ]) {
+    setLayerVisibility(map, layerId, showAncientLayer);
   }
 }
 
@@ -414,7 +461,9 @@ function getAttributionMarkup(mode: BasemapMode, mapMode: MapDisplayMode) {
     return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
   }
 
-  return mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
+  const basemapAttribution =
+    mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
+  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}`;
 }
 
 function prefersReducedMotion() {
@@ -809,6 +858,26 @@ function createTransparentCollisionImage(sizePx: number) {
   });
 }
 
+function createUncertainHatchImage() {
+  return createCanvasImage(8, (context, size) => {
+    context.clearRect(0, 0, size, size);
+    context.strokeStyle = "#80868B";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(0, size);
+    context.lineTo(size, 0);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(-2, size);
+    context.lineTo(2, size - 4);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(size - 2, 2);
+    context.lineTo(size + 2, -2);
+    context.stroke();
+  });
+}
+
 function createCircularSdfImage({
   canvasSizePx,
   radiusPx
@@ -939,11 +1008,424 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
   }
 }
 
+function ensureUncertainHatchImage(map: MapLibreMap) {
+  if (map.hasImage(uncertainHatchImageId)) {
+    return;
+  }
+
+  const image = createUncertainHatchImage();
+  if (image) {
+    map.addImage(uncertainHatchImageId, image.image, { pixelRatio: image.pixelRatio });
+  }
+}
+
+type AncientLineGeometry = LineStringGeometry | MultiLineStringGeometry;
+type AncientLineFeatureCollection = FeatureCollection<AncientLineGeometry, Record<string, unknown>>;
+
+function emptyAncientLineFeatureCollection(): AncientLineFeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: []
+  };
+}
+
+function asLineFeatureCollection(
+  value: AncientLineGeometry | null | undefined
+): AncientLineFeatureCollection {
+  if (!value) {
+    return emptyAncientLineFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: value
+      }
+    ]
+  };
+}
+
+function isClientKind(kind: AncientEntityRecord["kind"]) {
+  return (
+    kind === "client-kingdom" ||
+    kind === "client-tetrarchy" ||
+    kind === "free-city-or-league"
+  );
+}
+
+function holderKindLabel(kind: AncientEntityRecord["kind"]) {
+  if (kind === "roman-province") {
+    return "Roman province";
+  }
+  if (isClientKind(kind)) {
+    return "Client kingdom/tetrarchy/free league";
+  }
+  if (kind === "outside-empire") {
+    return "Outside the empire";
+  }
+
+  return "Status unclear";
+}
+
+function buildAncientAreaFeatures(
+  shapes: AncientShapesPayload | null,
+  stopPayload: AncientStopPayload | null,
+  entitiesById: Map<string, AncientEntityRecord>
+) {
+  const empty = createEmptyFeatureCollection();
+  if (!shapes || !stopPayload) {
+    return empty;
+  }
+
+  const shapeByAreaId = new Map(
+    shapes.areas.features.map((feature) => [feature.properties.areaId, feature.geometry] as const)
+  );
+
+  return {
+    type: "FeatureCollection" as const,
+    features: stopPayload.areas
+      .map((area) => {
+        const geometry = shapeByAreaId.get(area.areaId);
+        if (!geometry) {
+          return null;
+        }
+
+        const holder = entitiesById.get(area.holderId);
+        const tooltipText =
+          area.holderKind === "uncertain"
+            ? area.note
+              ? `Status unclear in the sources: ${area.note}`
+              : "Status unclear in the sources"
+            : `${holder?.name ?? area.holderId} (${holderKindLabel(area.holderKind)})`;
+
+        return {
+          type: "Feature" as const,
+          properties: {
+            areaId: area.areaId,
+            holderId: area.holderId,
+            holderKind: area.holderKind,
+            tooltipText
+          },
+          geometry
+        };
+      })
+      .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
+  };
+}
+
+function borderStyleFromKinds(
+  left: AncientEntityRecord["kind"],
+  right: AncientEntityRecord["kind"]
+) {
+  if (left === "uncertain" || right === "uncertain") {
+    return { borderStyle: "dotted", borderColor: "#80868B" };
+  }
+
+  if (left === "outside-empire" || right === "outside-empire") {
+    return { borderStyle: "solid", borderColor: "#80868B" };
+  }
+
+  if (isClientKind(left) || isClientKind(right)) {
+    return { borderStyle: "dashed", borderColor: "#7D5A50" };
+  }
+
+  return { borderStyle: "solid", borderColor: "#7D5A50" };
+}
+
+function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): AncientLineFeatureCollection {
+  if (!stopPayload) {
+    return emptyAncientLineFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: stopPayload.holderBorders.features.map((feature) => ({
+      type: "Feature",
+      properties: {
+        ...feature.properties,
+        ...borderStyleFromKinds(feature.properties.holderAKind, feature.properties.holderBKind)
+      },
+      geometry: feature.geometry
+    }))
+  };
+}
+
+function buildAncientHolderLabelFeatures(
+  stopPayload: AncientStopPayload | null,
+  placeById: Map<string, PlaceIndexRecord>,
+  currentYear: number
+) {
+  if (!stopPayload) {
+    return createEmptyFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection" as const,
+    features: stopPayload.holderLabels
+      .map((label) => {
+        const place = label.locationId ? placeById.get(label.locationId) : null;
+        const labelText = label.name.toUpperCase();
+        if (!place || !label.locationId) {
+          return {
+            type: "Feature" as const,
+            properties: {
+              labelText,
+              clickable: false,
+              tooltipText: `${label.name} · ${holderKindLabel(label.kind)} · ${formatTimelineYear(currentYear)}`
+            },
+            geometry: {
+              type: "Point" as const,
+              coordinates: label.labelPoint
+            }
+          };
+        }
+
+        return {
+          type: "Feature" as const,
+          properties: {
+            entryId: `ancient-holder:${label.holderId}`,
+            placeId: label.locationId,
+            placeName: place.names.ancient[0] ?? label.name,
+            typeLabel: place.type.replace("-", " "),
+            accessibleName: `${place.names.ancient[0] ?? label.name}, ${place.type.replace("-", " ")}`,
+            candidateIndex: null,
+            interactionRank: 2,
+            labelText,
+            clickable: true
+          },
+          geometry: {
+            type: "Point" as const,
+            coordinates: label.labelPoint
+          }
+        };
+      })
+  };
+}
+
 function ensureMapLayers(
   map: MapLibreMap,
   majorPlaceByRank: Map<number, MajorPlaceReference>
 ) {
   ensureCollisionImages(map);
+  ensureUncertainHatchImage(map);
+
+  if (!map.getLayer(layerAncientAreaFillId)) {
+    map.addLayer({
+      id: layerAncientAreaFillId,
+      source: sourceAncientAreasId,
+      type: "fill",
+      filter: toLayerFilter(["!=", ["get", "holderKind"], "uncertain"]),
+      paint: {
+        "fill-color": [
+          "match",
+          ["get", "holderKind"],
+          "roman-province",
+          "#B3261E",
+          "client-kingdom",
+          "#E8A33D",
+          "client-tetrarchy",
+          "#E8A33D",
+          "free-city-or-league",
+          "#E8A33D",
+          "outside-empire",
+          "#5F6368",
+          "#5F6368"
+        ],
+        "fill-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          3,
+          [
+            "match",
+            ["get", "holderKind"],
+            "roman-province",
+            0.06,
+            "client-kingdom",
+            0.12,
+            "client-tetrarchy",
+            0.12,
+            "free-city-or-league",
+            0.12,
+            "outside-empire",
+            0.06,
+            0
+          ],
+          10,
+          0
+        ]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientUncertainFillId)) {
+    map.addLayer({
+      id: layerAncientUncertainFillId,
+      source: sourceAncientAreasId,
+      type: "fill",
+      filter: toLayerFilter(["==", ["get", "holderKind"], "uncertain"]),
+      paint: {
+        "fill-pattern": uncertainHatchImageId,
+        "fill-opacity": 0.55
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderSolidId)) {
+    map.addLayer({
+      id: layerAncientBorderSolidId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter(["==", ["get", "borderStyle"], "solid"]),
+      paint: {
+        "line-color": ["coalesce", ["get", "borderColor"], "#7D5A50"],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 1, 7, 1.5]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderDashedId)) {
+    map.addLayer({
+      id: layerAncientBorderDashedId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter(["==", ["get", "borderStyle"], "dashed"]),
+      paint: {
+        "line-color": ["coalesce", ["get", "borderColor"], "#7D5A50"],
+        "line-width": 1,
+        "line-dasharray": [2, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderDottedId)) {
+    map.addLayer({
+      id: layerAncientBorderDottedId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter(["==", ["get", "borderStyle"], "dotted"]),
+      paint: {
+        "line-color": ["coalesce", ["get", "borderColor"], "#80868B"],
+        "line-width": 1,
+        "line-dasharray": [1, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientEmpireEdgeId)) {
+    map.addLayer({
+      id: layerAncientEmpireEdgeId,
+      source: sourceAncientEmpireEdgeId,
+      type: "line",
+      paint: {
+        "line-color": "#7D5A50",
+        "line-width": 2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadKnownId)) {
+    map.addLayer({
+      id: layerAncientRoadKnownId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      filter: toLayerFilter(["==", ["get", "known"], true]),
+      paint: {
+        "line-color": "#8D6E63",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadConjecturedId)) {
+    map.addLayer({
+      id: layerAncientRoadConjecturedId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      filter: toLayerFilter(["!=", ["get", "known"], true]),
+      paint: {
+        "line-color": "#8D6E63",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2],
+        "line-dasharray": [2, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientCoastlineId)) {
+    map.addLayer({
+      id: layerAncientCoastlineId,
+      source: sourceAncientCoastlineId,
+      type: "line",
+      paint: {
+        "line-color": "#5D9AD0",
+        "line-width": 1.5,
+        "line-dasharray": [1, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "clickable"], false]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-variable-anchor": ["top", "bottom", "left", "right"] as [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "text-radial-offset": 0.65,
+        "symbol-sort-key": 900000
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelClickableId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelClickableId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "clickable"], true]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-variable-anchor": ["top", "bottom", "left", "right"] as [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "text-radial-offset": 0.65,
+        "symbol-sort-key": 800000
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
 
   if (!map.getLayer(layerClusterCircleId)) {
     map.addLayer({
@@ -1644,6 +2126,8 @@ function ensureMapLayers(
   }
 
   const areaLayersNeedingStandardClusterClearance = [
+    layerAncientHolderLabelId,
+    layerAncientHolderLabelClickableId,
     layerAreaLabelOverviewId,
     layerAreaLabelId,
     layerMajorAreaLabelOverviewId,
@@ -1953,6 +2437,8 @@ export function MapView({
   bottomPanelInset,
   isSmallScreen,
   mapMode,
+  selectedTimelineStopId,
+  ancientTimeline,
   pinLabelSource,
   onSelectPlace
 }: MapViewProps) {
@@ -2011,18 +2497,61 @@ export function MapView({
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
-  const renderData = useMemo(
-    () =>
-      buildPlaceRenderData(places, selection, highlightedPlaceId, {
-        includeAreaLabels: mapMode === "ancient",
-        pinLabelSource
-      }),
-    [highlightedPlaceId, mapMode, pinLabelSource, places, selection]
-  );
+  const renderData = useMemo(() => {
+    const data = buildPlaceRenderData(places, selection, highlightedPlaceId, {
+      includeAreaLabels: mapMode === "ancient",
+      pinLabelSource
+    });
+
+    if (mapMode !== "ancient") {
+      return data;
+    }
+
+    return {
+      ...data,
+      areaLabels: {
+        ...data.areaLabels,
+        features: data.areaLabels.features.filter(
+          (feature) => feature.properties.areaKind === "region"
+        )
+      }
+    };
+  }, [highlightedPlaceId, mapMode, pinLabelSource, places, selection]);
   const majorPlaceByRank = useMemo(
     () => buildMajorPlaceReferenceByRank(renderData),
     [renderData]
   );
+  const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
+  const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientStopsById, setAncientStopsById] = useState<Record<string, AncientStopPayload>>({});
+  const ancientEntitiesById = useMemo(
+    () => new Map((ancientTimeline?.entities ?? []).map((entity) => [entity.id, entity] as const)),
+    [ancientTimeline]
+  );
+  const selectedAncientStopPayload = useMemo(
+    () =>
+      selectedTimelineStopId && ancientStopsById[selectedTimelineStopId]
+        ? ancientStopsById[selectedTimelineStopId]
+        : null,
+    [ancientStopsById, selectedTimelineStopId]
+  );
+  const ancientAreaFeatures = useMemo(
+    () => buildAncientAreaFeatures(ancientShapes, selectedAncientStopPayload, ancientEntitiesById),
+    [ancientEntitiesById, ancientShapes, selectedAncientStopPayload]
+  );
+  const ancientBorderFeatures = useMemo(
+    () => buildAncientBorderFeatures(selectedAncientStopPayload),
+    [selectedAncientStopPayload]
+  );
+  const ancientEmpireEdgeFeatures = useMemo(
+    () => asLineFeatureCollection(selectedAncientStopPayload?.romanEmpireEdge),
+    [selectedAncientStopPayload]
+  );
+  const ancientHolderLabelFeatures = useMemo(() => {
+    const currentYear = selectedAncientStopPayload?.year ?? timelineDefaultYear;
+    return buildAncientHolderLabelFeatures(selectedAncientStopPayload, placeById, currentYear);
+  }, [placeById, selectedAncientStopPayload]);
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
@@ -2048,6 +2577,90 @@ export function MapView({
   useEffect(() => {
     mapModeRef.current = mapMode;
   }, [mapMode]);
+
+  useEffect(() => {
+    if (mapReadyVersion === 0 || ancientShapes) {
+      return;
+    }
+
+    let cancelled = false;
+    void Promise.all([
+      fetch("/generated/ancient.shapes.json", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient shapes (${response.status})`);
+        }
+
+        return (await response.json()) as AncientShapesPayload;
+      }),
+      fetch("/generated/ancient.roads.geojson", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient roads (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      }),
+      fetch("/generated/ancient.coastline.geojson", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient coastline (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      })
+    ])
+      .then(([shapesPayload, roadsPayload, coastlinePayload]) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientShapes(shapesPayload);
+        setAncientRoads(roadsPayload);
+        setAncientCoastline(coastlinePayload);
+      })
+      .catch((error) => {
+        console.error("Failed to load ancient map layer data.", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ancientShapes, mapReadyVersion]);
+
+  useEffect(() => {
+    if (!selectedTimelineStopId || ancientStopsById[selectedTimelineStopId]) {
+      return;
+    }
+
+    let cancelled = false;
+    void fetch(`/generated/ancient.stop.${encodeURIComponent(selectedTimelineStopId)}.json`, {
+      cache: "no-store"
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Could not load ancient stop payload '${selectedTimelineStopId}' (${response.status})`
+          );
+        }
+
+        return (await response.json()) as AncientStopPayload;
+      })
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientStopsById((previous) => ({
+          ...previous,
+          [payload.stopId]: payload
+        }));
+      })
+      .catch((error) => {
+        console.error("Failed to load ancient stop payload.", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ancientStopsById, selectedTimelineStopId]);
 
   useEffect(() => {
     majorClusterTooltipByEntryIdRef.current.clear();
@@ -2204,11 +2817,26 @@ export function MapView({
     ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
     ensureGeoJsonSource(map, sourceAreaLabelsId, renderData.areaLabels);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
+    ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
+    ensureGeoJsonSource(map, sourceAncientBordersId, ancientBorderFeatures);
+    ensureGeoJsonSource(map, sourceAncientEmpireEdgeId, ancientEmpireEdgeFeatures);
+    ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
+    ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
+    ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
 
     ensureQuestionBadgeImage(map);
     ensureCandidateImages(map, renderData);
     ensureMapLayers(map, majorPlaceByRank);
-  }, [majorPlaceByRank, renderData]);
+  }, [
+    ancientAreaFeatures,
+    ancientBorderFeatures,
+    ancientCoastline,
+    ancientEmpireEdgeFeatures,
+    ancientHolderLabelFeatures,
+    ancientRoads,
+    majorPlaceByRank,
+    renderData
+  ]);
 
   const resolveMajorClusterTooltipText = useCallback(
     async (entry: VisibleMajorClusterEntry) => {
@@ -2277,8 +2905,45 @@ export function MapView({
 
       const entry = resolveInteractiveEntryAtPoint(point);
       if (!entry) {
+        const pointer = asScreenPoint(point);
+        if (!pointer || mapModeRef.current !== "ancient") {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const infoFeature = map
+          .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
+            layers: [layerAncientHolderLabelId, layerAncientUncertainFillId]
+          })
+          .find((feature) => {
+            const properties = asObject(feature.properties);
+            const tooltipText = properties ? asString(properties.tooltipText) : null;
+            return Boolean(tooltipText);
+          });
+        const infoProperties = infoFeature ? asObject(infoFeature.properties) : null;
+        const infoText = infoProperties ? asString(infoProperties.tooltipText) : null;
+
+        if (!infoFeature || !infoText) {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const infoCoordinates = asCoordinates(infoFeature);
+        if (!infoCoordinates) {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const projectedInfo = map.project(infoCoordinates as LngLatLike);
+        tooltip.textContent = infoText;
+        tooltip.style.display = "block";
+        tooltip.style.left = `${projectedInfo.x}px`;
+        tooltip.style.top = `${projectedInfo.y - 22}px`;
+        activeTooltipEntryIdRef.current = `info:${infoText}`;
         setInteractiveCursor(false);
-        hideTooltip();
         return;
       }
 
