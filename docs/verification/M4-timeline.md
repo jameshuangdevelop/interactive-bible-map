@@ -1,6 +1,6 @@
 # M4-02 verification — The first-century timeline
 
-Independent verification of the Research Lead's work on branch `data/m4-timeline` (head `1bc3adb` when I started): `data/timeline.json`, the research note `docs/research/M4-timeline.md`, the place records' political links and histories, and 18 new bibliography entries. I checked them against card `docs/tasks/M4-02-timeline.md`, ADR-0017, ADR-0026, ADR-0027, ADR-0033, ADR-0037 with its two 2026-10-07 updates, CP2 decision 5, CP3b decision 2 and `docs/verification/M3-ancient-regions.md`. The baseline for the semantic diff is `main` at `d359e3b`. Reviewed 2026-10-07 and 2026-10-08. **Re-verified on 2026-10-08 after the Research Lead's fixes and the PO's decisions: see "Re-verification (2026-10-08)" at the end.**
+Independent verification of the Research Lead's work on branch `data/m4-timeline` (head `1bc3adb` when I started): `data/timeline.json`, the research note `docs/research/M4-timeline.md`, the place records' political links and histories, and 18 new bibliography entries. I checked them against card `docs/tasks/M4-02-timeline.md`, ADR-0017, ADR-0026, ADR-0027, ADR-0033, ADR-0037 with its two 2026-10-07 updates, CP2 decision 5, CP3b decision 2 and `docs/verification/M3-ancient-regions.md`. The baseline for the semantic diff is `main` at `d359e3b`. Reviewed 2026-10-07 and 2026-10-08. **Re-verified twice on 2026-10-08, after the Research Lead's fixes and the PO's decisions. The final result is verified; see "Re-verification (2026-10-08)" and "Second re-verification (2026-10-08)" at the end.**
 
 **Result of the first round: needs Research Lead fixes.**
 
@@ -398,3 +398,47 @@ A nit, not a fix: several summaries open folded changes with "Folded in here:", 
 - `npm test`: 195 of 195 pass.
 - `npm run test:app`: 136 of 136 pass.
 - `npm run build:data` succeeds and writes the 15 stop files.
+
+## Second re-verification (2026-10-08)
+
+**Scope.** I checked the Research Lead's `d4fa940` (fixes R30–R38 and the new area) and `736119c` (the research note) against ADR-0037's update "the rest of the Roman world, islands and the empire's edge" (`edf826f`).
+
+**Result: verified.** R30–R38 are all fixed. The new area, the island assignments and the two border sources pass after small fixes. All 89 place records are `verified`, and no R-items remain.
+
+| Item | Status | Evidence |
+|---|---|---|
+| R30 Thrace | Fixed | A client kingdom to AD 38 (Tacitus, *Annals* 2.64 and 2.67, quoted correctly), Rhoemetalces II alone to 46, and a province from 46 (Livius "Claudius"; Tacitus, *Histories* 1.11). The AD 53 stop names the annexation, and the AD 70 sentence is gone. I corrected "two years earlier (AD 46)", since AD 46 is seven years before AD 53. |
+| R31 Commagene | Fixed | Starts in 20 BC under "Mithridates (from 20 BC), then Antiochus (died AD 17)" (Dio 54.9.3). I rewrote the note: it called the two kings possibly one, against its own ruler label. |
+| R32 Cilicia Tracheia | Fixed | Starts in 20 BC (Dio 54.9.2, quoted exactly), with the Loeb note's "on the coast of Cilicia Trachea". |
+| R33 Cappadocia | Fixed | The rulers now read "Quintus Veranius, sent to organize the province; then equestrian governors" and "Gnaeus Pompeius Collega, the first governor of senatorial rank (AD 69)" (Livius). Every claim about the small units is sourced. I rewrote the note to remove "Livius", "ISBE" and inline citations (ADR-0033). |
+| R34 Small units in the stops | Fixed | Cotys and Polemon II (38) are named at AD 39, quoting Dio 59.12.2 exactly. Aristobulus (54) and Pontus (63/64) are at AD 67. I replaced a code identifier, `cappadocia`, in the AD 39 text. |
+| R35 Achaia at AD 70 | Fixed | |
+| R36 Damascus | Fixed | The note now quotes ISBE "Aretas" correctly ("a Damascus coin, with the image of King Aretas and the date 101"). I removed a clause that neither cited source states ("rather than merely posting a representative there under Roman sufferance"). |
+| R37 Magdala | Fixed | The override ends in AD 100, and the town follows its area from then. |
+| R38 Renamings | Fixed | Philip's towns (AD 17), Claudiconium and Claudio-Derbe (41), Neronias (67), and Neo-kaisaria and Flavia (70). None of these sources gives a year, so I replaced "about this same time" and "about this time" with wording that dates nothing. |
+
+**ADR-0037's update:**
+- **`other-roman-lands`, held by the new entity `roman-empire`:** one period from 4 BC to AD 100, `focus: false`, and the entity's `locationId` is `roman-empire`, as the ADR asks. The note cited Dio 53.12 alone, but Dio doesn't name Moesia or Pannonia. I added Tacitus, *Annals* 1.80 ("Poppaeus Sabinus was continued in his province of Moesia", AD 15), and ISBE "Illyricum" (Pannonia a separate province from AD 9). I also dropped "far from the New Testament's places", since Romans 15:24 names Spain. Dio 60.19–21 supports Britain "conquered from AD 43".
+- **Islands (§2.25):** each citation matches Smith's *Dictionary of Greek and Roman Geography* on Perseus word for word:
+  - Euboea: "Under the Romans, Euboea was included in the province of Achaia."
+  - Brattia: "an island off the Dalmatian coast of Illyricum".
+  - Curicta: "(Plin. Nat. 3.21 …), an island off the coast of Illyricum".
+  - Corcyra: "The Romans made the capital a free state".
+  - Samothrace: "In Pliny's time Samothrace was a free state", and the Synecdemus places it "with Thasos, in the province of Illyricum", which is late, as the note says.
+  - Thasos: "continued to be a free (*libera*) town in the time of Pliny".
+
+  Leaving the three free towns unassigned (that is, in `other-roman-lands`) follows ADR-0037 item 2.
+- **Border sources:**
+  - *Jewish War* 3.3.3: Perea's length is "from Macherus to Pella". I corrected the research note's quotation, which read "Machaerus".
+  - Strabo 12.2.7 matches: "Mazaca, the metropolis of the tribe, is in the Cilician prefecture, as it is called".
+  - Wikidata confirms Pleiades 697700 as Machaerus and 629035 as Caesarea of Cappadocia (Mazaca).
+
+**Other small fixes in this commit:**
+- Writers and people introduced: Aristobulus as "son of Herod of Chalcis"; William Smith's *Dictionary* by its title; "the fourth-century Chronicle of Eusebius"; "the emperor Augustus".
+- "Livius" no longer named in the Thrace note.
+- `bib:worldhistory-vespasian` cited for "Flavia, after the emperor's own family name".
+- `npm run fill:political-history` re-run, then `cappadocia`, `damascus` and `magdala` set to `verified`.
+
+**Semantic diff against `d359e3b`:** only `politicalHistory`, `politicalAreaId`, `candidates[].politicalAreaId`, `politicalHistoryOverrides` (4) and `lastReviewed` differ.
+
+**Checks:** `npm run validate:data` gives 0 errors and 203 warnings (unchanged); `npm test` passes 195 of 195; `npm run test:app` passes 136 of 136; `npm run build:data` writes the 15 stop files.

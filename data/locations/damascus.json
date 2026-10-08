@@ -282,7 +282,7 @@
         "bib:livius-damascus",
         "bib:livius-nabataeans"
       ],
-      "note": "Paul writes that \"the governor under King Aretas guarded the Damascenes' city\" around the time of his escape (2 Corinthians 11:32). How far the Nabataean king Aretas IV actually controlled Damascus, rather than merely posting a representative there under Roman sufferance, is debated; ISBE's \"Aretas\" entry cites \"a Damascus coin, with the image of King Aretas and the date 101,\" which, read as the Pompeian era, equals AD 37. One proposal is that the Roman emperor Caligula gave him the city about that year. Aretas IV's reign ended in AD 40."
+      "note": "Paul writes that \"the governor under King Aretas guarded the Damascenes' city\" around the time of his escape (2 Corinthians 11:32). How far the Nabataean king Aretas IV actually controlled Damascus is uncertain; the International Standard Bible Encyclopedia (1915) cites \"a Damascus coin, with the image of King Aretas and the date 101,\" which, read as the Pompeian era, equals AD 37. One proposal is that the Roman emperor Caligula gave him the city about that year. Aretas IV's reign ended in AD 40."
     },
     {
       "fromYear": 40,
@@ -297,14 +297,16 @@
       "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-08",
   "politicalAreaId": "syria",
   "politicalHistoryOverrides": [
     {
       "fromYear": 37,
       "toYear": 40,
       "holderId": "uncertain-roman-side",
-      "note": "Paul writes that \"the governor under King Aretas guarded the Damascenes' city\" around the time of his escape (2 Corinthians 11:32). How far the Nabataean king Aretas IV actually controlled Damascus, rather than merely posting a representative there under Roman sufferance, is debated; ISBE's \"Aretas\" entry cites \"a Damascus coin, with the image of King Aretas and the date 101,\" which, read as the Pompeian era, equals AD 37. One proposal is that the Roman emperor Caligula gave him the city about that year. Aretas IV's reign ended in AD 40.",
+      "note": "Paul writes that \"the governor under King Aretas guarded the Damascenes' city\" around the time of his escape (2 Corinthians 11:32). How far the Nabataean king Aretas IV actually controlled Damascus is uncertain; the International Standard Bible Encyclopedia (1915) cites \"a Damascus coin, with the image of King Aretas and the date 101,\" which, read as the Pompeian era, equals AD 37. One proposal is that the Roman emperor Caligula gave him the city about that year. Aretas IV's reign ended in AD 40.",
       "sources": [
         "scripture:2 Corinthians 11:32",
         "bib:isbe-aretas",
