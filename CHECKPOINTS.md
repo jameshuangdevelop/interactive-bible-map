@@ -27,7 +27,7 @@ Lighter stops between checkpoints: the PO opens the app with the work so far on 
 | MC4 | CP3b | Important places first on the opening map (M3-23), on the full stack | Nothing (the push is approved) | Done 2026-10-07: opened on a local preview; the human had already approved the push |
 | MC5 | CP4 | Phone basics (M7-01): the opening map fits a phone, and the panel works as a bottom sheet. Try it with your browser's device view, or on a phone once its preview link is up. | M7-01's review | Done 2026-10-08: opened on a local preview after M7-01's review |
 | MC6 | CP4 | The modern map and the "Ancient \| Modern" toggle (M4-04) | Whether the pins keep their Bible names on the modern map (ADR-0037 item 4) | Opened 2026-10-08 on a local preview; the pin-name question is CP4's decision 1 |
-| MC7 | CP4 | The ancient layer and the timeline (M4-05) with the first verified data (M4-02, M4-03) | The colours and the list of stops (ADR-0037 item 1) | Opened 2026-10-09 on a local preview; the colours and the stops are CP4's decision 2 |
+| MC7 | CP4 | The ancient layer and the timeline (M4-05) with the first verified data (M4-02, M4-03) | The colours and the list of stops (ADR-0037 item 1) | Done 2026-10-09: you asked for lines that need no map key, a name on every area, and roads that read as roads, so the ancient layer now draws its lines the way the modern map does (ADR-0037's updates). The colours and the stops are CP4's decision 2 |
 | MC8 | CP4 | Everything merged and built as it will deploy, with the speed results | The push | Done 2026-10-09: the assembled stack passed the full browser suite and the desktop speed check (CP4, below); it waits for the push |
 
 ---
@@ -418,12 +418,12 @@ The ancient map now shows who held each land of the New Testament world, from 4 
 | M4-02 | The timeline: who held each of 24 areas, in 15 stops from 4 BC to AD 100, and every place's political history ([verification](docs/verification/M4-timeline.md)) | #54 |
 | M4-03 | The ancient layer's shapes: the 24 areas, the Roman Empire's edge, 175 dated Roman roads, and the old coastline at Ephesus and Miletus, rebuilt byte for byte from pinned sources ([verification](docs/verification/M4-ancient-geometry.md)) | #55 |
 | M4-04 | The modern map and the "Ancient \| Modern" toggle, with country borders kept neutral ([verification](docs/verification/M4-04-modern-map.md)) | #56 |
-| M4-05 | The ancient layer and the timeline in the app: shaded areas with their names, roads, the old coastline, a map key, and a timeline that stops at each year when something changed | #57 |
+| M4-05 | The ancient layer and the timeline in the app: every area shaded and named; borders, roads and the old coastline drawn the way the modern map draws them, so there's no map key (your MC7 request); and a timeline that stops at each year when something changed | #57 |
 
 **The data now:** 89 places, all `verified`, each with a political history from the timeline; 185 bibliography entries, up from 161. The timeline has 15 stops and 32 holders: 19 Roman provinces, 7 allied kingdoms, 3 tetrarchies, 2 free leagues or cities, and "status unclear" where the sources disagree or are silent. Everything the ancient layer loads is 287,801 bytes gzip, within its 300,000-byte budget.
 
 ### How quality was checked
-- **Mini checkpoints:** MC5 to MC8 opened each part on a local preview as it finished. You were away for MC6 and MC7, so their questions are decisions 1 and 2 below.
+- **Mini checkpoints:** MC5 to MC8 opened each part on a local preview as it finished. At MC7 you asked for an ancient layer that needs no map key. It now names every area, shows a border only where the names on both sides fit, and draws roads and the old coastline the way the modern map does. Your question about the road from Ephesus to Laodicea found 56 small breaks in the roads, left by how the atlas was digitised, such as where two of its map sheets meet; the app now joins breaks of up to 4 km. You were away for MC6, so its question is decision 1 below.
 - **The Fact-Checker opened every source** behind the timeline, and checked the shapes by script and on zoomed previews: all 89 places' political history, every border rule, the roads' dates, the old coastline and every license.
 - **Each M4 PR (#51 to #57) had a cross-vendor review:** Claude Sonnet 5 reviewed the GPT work, and GPT-5.4 the Claude work. Every finding was fixed or answered, and each PR carries its review.
 - **I checked the map itself, not only the tests.** I decoded the live map tiles to confirm that no border line shows inside the contested places at any zoom, measured the scale bar against real distances (within 1%), rebuilt the ancient layer from an empty cache (identical), and checked which labels actually appear on screen. That last check found missing labels that the tests had passed; they're fixed, and the tests now check the screen.
@@ -435,7 +435,7 @@ The ancient map now shows who held each land of the New Testament world, from 4 
 | # | Decision | Recommendation | Alternative |
 |---|---|---|---|
 | 1 | Pin names on the modern map (MC6; ADR-0037 item 4) | **Keep the Bible names**, such as "Capernaum", the way Google Maps marks historic sites. The panel's "Today" line gives the place's modern name. | Show today's names on the modern map |
-| 2 | The ancient layer's colours and the 15 stops (MC7; ADR-0037 item 1) | **Keep them as delivered.** | Name the colours or stops to change |
+| 2 | The ancient layer's colours and the 15 stops (MC7; ADR-0037 item 1) | **Keep them as they are now,** after your MC7 changes: no map key, every area named, and lines drawn the way the modern map draws them. The tints tell Roman provinces from allied kingdoms. | Name the colours or stops to change, or use one tint for all Roman land |
 | 3 | Dragging speed on both maps (M4-04, M4-05) | **Accept it if dragging both maps feels smooth on your computer and phone.** On this machine, which has no graphics card, the slowest moment while dragging takes 77–130 ms on the ancient map and 59–116 ms on the modern map; a graphics card is much faster. If either feels slow, I'd trim the modern map's details (listed in `BACKLOG.md`) or simplify the ancient shapes at low zoom. | Trim before merging |
 | 4 | What comes next | **Start M5, the routes:** Paul's journeys and the well-attested parts of Jesus' travels, with citations. | More places (M6) or phone polish (M7) first |
 
@@ -450,7 +450,7 @@ The ancient map now shows who held each land of the New Testament world, from 4 
 - **Reproducible build.** The same inputs always give the same output, byte for byte, so anyone can check that the map's shapes come from the sources we cite. [Reproducible builds](https://reproducible-builds.org/docs/definition/)
 
 ### Risks
-- **Borders are approximate.** Ancient sources rarely describe borders. Where they're silent, the map follows written rules (ADR-0037), and where they disagree, it shows "status unclear". The map key says borders are approximate.
+- **Borders are approximate.** Ancient sources rarely describe borders. Where they're silent, the map follows written rules (ADR-0037), and where they disagree, it shows "status unclear". The note at the top of the timeline's Sources popover says that borders are approximate and that the routes of some roads are conjectured.
 - **Speed on weaker devices:** see decision 3. The ancient layer downloads its 15 stops in the background, about 290 KB in all.
 - **Free services:** unchanged. AWMC's data is copied into the repository, so it can't break the live site.
 

@@ -25,7 +25,7 @@ The Routes tabs are **not built yet**. The wireframes show the reserved areas wi
 - The place panel becomes a **bottom sheet**: it opens at about 40% height (photo and title), and is dragged or tapped to open fully. A close button sits at the top right.
 - The zoom buttons are hidden, since pinch zoom replaces them; reset view stays.
 - **The opening view fits the screen** (M7-01): the same area as on desktop, from Rome to Damascus and down to the Nile delta, is fitted to the screen's width, so a phone sees all of it at a lower zoom instead of only Greece.
-- **Toggle and timeline (M4):** the toggle sits at the top right, just below the search box, with the map key button below it. The timeline spans the bottom with 16 px margins while no place is open; the bottom sheet covers it while a place is open, and it returns when the sheet closes. While the sheet is fully open, it covers the map's controls too, so the toggle and the map key button are hidden until the sheet is lowered.
+- **Toggle and timeline (M4):** the toggle sits at the top right, just below the search box. The timeline spans the bottom with 16 px margins while no place is open; the bottom sheet covers it while a place is open, and it returns when the sheet closes. While the sheet is fully open, it covers the map's controls too, so the toggle is hidden until the sheet is lowered.
 - Full responsive polish is M7.
 
 ## 2. The map
