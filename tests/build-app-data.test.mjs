@@ -651,6 +651,37 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
         assert.equal(agrippaInPhilipLands?.heldFromYear, 37);
         assert.equal(agrippaInPhilipLands?.heldToYear, 44);
         assert.equal(agrippaInPhilipLands?.heldFromKnown, true);
+        const formatAdRange = (assignment) => {
+          assert.equal(assignment.heldFromKnown, true);
+          return `AD ${assignment.heldFromYear} – ${assignment.heldToYear}`;
+        };
+        const agrippaLabelsAt40 = stopAt40.holderLabels.filter(
+          (label) => label.holderId === "agrippa-i-kingdom"
+        );
+        assert.equal(agrippaLabelsAt40.length, 3);
+        const agrippaPhilipLabel = agrippaLabelsAt40.find(
+          (label) => label.areaId === "philip-tetrarchy-lands"
+        );
+        assert.ok(agrippaPhilipLabel);
+        const agrippaGalileeLabels = agrippaLabelsAt40.filter(
+          (label) => label.areaId === "galilee-perea"
+        );
+        assert.equal(agrippaGalileeLabels.length, 2);
+        const agrippaPhilipAssignment = stopAt40.areas.find(
+          (area) => area.areaId === agrippaPhilipLabel.areaId
+        );
+        assert.ok(agrippaPhilipAssignment);
+        assert.equal(formatAdRange(agrippaPhilipAssignment), "AD 37 – 44");
+        for (const galileeLabel of agrippaGalileeLabels) {
+          const galileeAssignment = stopAt40.areas.find(
+            (area) => area.areaId === galileeLabel.areaId
+          );
+          assert.ok(galileeAssignment);
+          assert.equal(
+            formatAdRange(galileeAssignment),
+            "AD 39 – 44"
+          );
+        }
 
         const stopAt1 = await readStopPayload(1);
         const archelausAt1 = stopAt1.areas.find((area) => area.areaId === "judea-samaria-idumea");

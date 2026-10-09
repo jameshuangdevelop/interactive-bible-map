@@ -108,6 +108,7 @@ export interface AncientHolderBorderFeatureProperties {
 
 export interface AncientHolderLabelPoint {
   holderId: string;
+  areaId: string;
   name: string;
   labelText: string;
   minZoom: number;

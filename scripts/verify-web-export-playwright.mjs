@@ -5259,6 +5259,61 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(`Philip tooltip should show '4 BC – AD 34', got '${philipTooltipText ?? ""}'.`);
   }
 
+  const agrippaPhilipTooltipProbe = await page.evaluate(async ({ testHookKey }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const timeline = await fetch("/generated/ancient.timeline.json").then((response) => response.json());
+    const sortedStops = [...(timeline?.stops ?? [])].sort((left, right) => left.year - right.year);
+    let stopForYear40 = sortedStops[0] ?? null;
+    for (const stop of sortedStops) {
+      if (stop.year <= 40) {
+        stopForYear40 = stop;
+      } else {
+        break;
+      }
+    }
+    if (!stopForYear40) {
+      throw new Error("No stop found for AD 40.");
+    }
+
+    const stopPayload = await fetch(`/generated/ancient.stop.${stopForYear40.id}.json`).then((response) =>
+      response.json()
+    );
+    const label = (stopPayload?.holderLabels ?? []).find(
+      (entry) => entry?.holderId === "agrippa-i-kingdom" && entry?.areaId === "philip-tetrarchy-lands"
+    );
+    if (!label || !Array.isArray(label.labelPoint) || label.labelPoint.length < 2) {
+      throw new Error("Missing Agrippa I label point in Philip's former lands.");
+    }
+    return { labelPoint: label.labelPoint };
+  }, { testHookKey: mapTestHookKey });
+
+  await page.goto(`${baseUrl}/?year=40`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await moveMapAndSettle({ center: agrippaPhilipTooltipProbe.labelPoint, zoom: 8 });
+  const agrippaProjectedAtZoom8 = await page.evaluate(
+    ({ testHookKey, labelPoint }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const projected = map.project(labelPoint);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, labelPoint: agrippaPhilipTooltipProbe.labelPoint }
+  );
+  await page.mouse.move(agrippaProjectedAtZoom8.x, agrippaProjectedAtZoom8.y);
+  await page.waitForTimeout(150);
+  const agrippaTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
+  if (!agrippaTooltipText?.includes("AD 37 – 44")) {
+    throw new Error(
+      `Agrippa I tooltip over Philip's former lands should show 'AD 37 – 44', got '${agrippaTooltipText ?? ""}'.`
+    );
+  }
+
   const browser = page.context().browser();
   if (!browser) {
     throw new Error("Browser instance is unavailable for timeline failure-state checks.");

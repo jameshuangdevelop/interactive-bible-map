@@ -1234,7 +1234,7 @@ function buildAncientHolderLabelFeatures(
           return null;
         }
 
-        const holderAssignment = stopPayload.areas.find((area) => area.holderId === label.holderId);
+        const holderAssignment = stopPayload.areas.find((area) => area.areaId === label.areaId);
         const labelText = label.labelText;
         const yearRangeText = holderAssignment
           ? formatHolderYearRange({

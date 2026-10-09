@@ -687,6 +687,7 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
       const bounds = polygonBoundingBox(polygon);
       const pieces = holderPieces.get(assignment.holderId) ?? [];
       pieces.push({
+        areaId: assignment.areaId,
         polygon,
         area,
         majorPins: (majorPlacePinCoordinates ?? [])
@@ -755,6 +756,7 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
 
       labels.push({
         holderId,
+        areaId: piece.areaId,
         name: holder.name,
         labelText: wrappedLabel.wrappedText,
         minZoom,

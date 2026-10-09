@@ -114,7 +114,7 @@ Generated app payloads:
 - Stop-area assignments carry each period's optional `note`.
 - Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year. They also include `heldFromKnown`, which is `false` when that span starts at the timeline range's `fromYear` and there is no earlier period in that area's data.
 - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
-- Each `holderLabels` entry includes `labelText` (uppercase, bracketed suffix removed, deterministic line breaks) and `minZoom` (the first zoom where the full label box fits inside that piece).
+- Each `holderLabels` entry includes `areaId`, `labelText` (uppercase, bracketed suffix removed, deterministic line breaks) and `minZoom` (the first zoom where the full label box fits inside that piece).
 
 Places and political history:
 - `politicalAreaId` links a location to one timeline area.
