@@ -4572,6 +4572,24 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   if (tickCount !== sortedStops.length) {
     throw new Error(`Expected ${sortedStops.length} timeline ticks in default build, got ${tickCount}.`);
   }
+  await timelineSlider.focus();
+  await timelineSlider.press("ArrowRight");
+  await page.waitForTimeout(150);
+  const timelineAriaValueText = await timelineSlider.getAttribute("aria-valuetext");
+  const timelineLiveRegionText = await page
+    .locator("[data-timeline-stop-live-region='true']")
+    .first()
+    .textContent();
+  const normalizedLiveRegionText = (timelineLiveRegionText ?? "").replace(/\s+/gu, " ").trim();
+  const normalizedAriaValueText = (timelineAriaValueText ?? "").replace(/\s+/gu, " ").trim();
+  if (!normalizedLiveRegionText || normalizedLiveRegionText !== normalizedAriaValueText) {
+    throw new Error(
+      `Timeline live-region text should match slider value text after one key press. live='${normalizedLiveRegionText}' slider='${normalizedAriaValueText}'.`
+    );
+  }
+  if (normalizedLiveRegionText.includes("Sources")) {
+    throw new Error(`Timeline live-region text should not include Sources link text: '${normalizedLiveRegionText}'.`);
+  }
 
   const earlierButton = page.getByRole("button", { name: "Earlier change" });
   const laterButton = page.getByRole("button", { name: "Later change" });

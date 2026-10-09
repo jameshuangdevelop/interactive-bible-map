@@ -56,6 +56,17 @@ const TIMELINE_MAX_WIDTH_PX = 800;
 const TIMELINE_MIN_STOP_SPACING_PX = 36;
 const TIMELINE_NAV_BUTTON_WIDTH_PX = 44;
 const TIMELINE_TRACK_AND_BUTTON_GAP_PX = 12;
+const srOnlyStyle: CSSProperties = {
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: 0,
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0
+};
 
 function toRgba(hexColor: string, opacity: number) {
   const normalized = hexColor.replace("#", "");
@@ -1192,7 +1203,13 @@ export function AppShell() {
             </div>
           ) : (
             <>
-              <div aria-live="polite" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px`, lineHeight: `${tokens.typography.captionLineHeight}px` }}>
+              <div
+                style={{
+                  color: tokens.color.textPrimary,
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  lineHeight: `${tokens.typography.captionLineHeight}px`
+                }}
+              >
                 {formatTimelineYear(selectedTimelineStop.year)} · {selectedTimelineStop.title}{" "}
                 <button
                   aria-expanded={timelineSourcesOpen}
@@ -1209,6 +1226,13 @@ export function AppShell() {
                 >
                   Sources
                 </button>
+              </div>
+              <div
+                aria-live="polite"
+                data-timeline-stop-live-region="true"
+                style={srOnlyStyle}
+              >
+                {formatTimelineValueText(selectedTimelineStop)}
               </div>
               {timelineSourcesOpen ? (
                 <div
