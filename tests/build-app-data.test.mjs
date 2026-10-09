@@ -6,7 +6,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { buildAppData } from "../scripts/lib/app-data-builder.mjs";
-import { buildAncientAppData } from "../scripts/lib/ancient-app-data-builder.mjs";
+import {
+  __testOnly as ancientBuilderTestOnly,
+  buildAncientAppData
+} from "../scripts/lib/ancient-app-data-builder.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
@@ -85,6 +88,59 @@ function pointInPolygon(point, polygon) {
   if (!pointInRing(point, polygon[0])) {
     return false;
   }
+
+  test("holder-label projection uses MapLibre world size (512 tiles)", () => {
+    const [x] = ancientBuilderTestOnly.projectLngLatToPixels(0, 0, 0);
+    assert.equal(x, 256);
+  });
+
+  test("holder-label width estimate is at least real Noto Sans Bold advances", () => {
+    const advanceAt24 = {
+      A: 16,
+      B: 16,
+      C: 15,
+      D: 17,
+      E: 13,
+      F: 13,
+      G: 17,
+      H: 18,
+      I: 9,
+      J: 7,
+      K: 15,
+      L: 13,
+      M: 22,
+      N: 19,
+      O: 19,
+      P: 15,
+      Q: 19,
+      R: 15,
+      S: 13,
+      T: 13,
+      U: 18,
+      V: 15,
+      W: 23,
+      X: 16,
+      Y: 14,
+      Z: 13,
+      " ": 6
+    };
+
+    const realAdvanceWidth = (text) => {
+      const characters = [...text];
+      const glyphSum = characters.reduce((sum, character) => {
+        const advance = advanceAt24[character] ?? advanceAt24[character.toUpperCase()] ?? 23;
+        return sum + (advance * 13) / 24;
+      }, 0);
+      const letterSpacing = Math.max(0, characters.length - 1) * 13 * 0.18;
+      return glyphSum + letterSpacing;
+    };
+
+    const tetrarchyEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("TETRARCHY OF");
+    const romanProvinceEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("ROMAN PROVINCE OF");
+
+    assert.ok(tetrarchyEstimate >= realAdvanceWidth("TETRARCHY OF"));
+    assert.ok(romanProvinceEstimate >= realAdvanceWidth("ROMAN PROVINCE OF"));
+  });
   for (let index = 1; index < polygon.length; index += 1) {
     if (pointInRing(point, polygon[index])) {
       return false;

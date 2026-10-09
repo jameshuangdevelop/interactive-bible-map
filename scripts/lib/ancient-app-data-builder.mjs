@@ -20,6 +20,43 @@ const HOLDER_LABEL_MAX_LINE_WIDTH_PX = 150;
 const HOLDER_LABEL_EDGE_PADDING_PX = 0;
 const HOLDER_LABEL_PIN_BUFFER_PX_AT_ZOOM8 = 36;
 const HOLDER_LABEL_GRID_STEPS = 56;
+const MAPLIBRE_GLYPH_METRICS_EM_SIZE = 24;
+const HOLDER_LABEL_GLYPH_WIDTH_SAFETY_FACTOR = 1.05;
+// Source: https://tiles.openfreemap.org/fonts/Noto%20Sans%20Bold/0-255.pbf
+// Advances are at 24 px because MapLibre glyph metrics are emitted at that em size.
+const MAPLIBRE_GLYPH_ADVANCES_AT_24PX = Object.freeze({
+  A: 16,
+  B: 16,
+  C: 15,
+  D: 17,
+  E: 13,
+  F: 13,
+  G: 17,
+  H: 18,
+  I: 9,
+  J: 7,
+  K: 15,
+  L: 13,
+  M: 22,
+  N: 19,
+  O: 19,
+  P: 15,
+  Q: 19,
+  R: 15,
+  S: 13,
+  T: 13,
+  U: 18,
+  V: 15,
+  W: 23,
+  X: 16,
+  Y: 14,
+  Z: 13,
+  " ": 6,
+  "-": 7,
+  "(": 8,
+  ")": 8
+});
+const FALLBACK_GLYPH_ADVANCE_AT_24PX = 23;
 
 function toMapById(records) {
   const map = new Map();
@@ -126,7 +163,7 @@ function simplifyRoadGeometry(geometry, tolerance) {
 }
 
 function projectLngLatToPixels(longitude, latitude, zoom) {
-  const worldSize = 256 * 2 ** zoom;
+  const worldSize = 512 * 2 ** zoom;
   const clampedLatitude = Math.max(-85.05112878, Math.min(85.05112878, latitude));
   const latitudeRadians = (clampedLatitude * Math.PI) / 180;
   const x = ((longitude + 180) / 360) * worldSize;
@@ -170,7 +207,13 @@ function estimateHolderLabelLineWidthPx(textLine) {
 
   let width = 0;
   for (const character of characters) {
-    width += character === " " ? 3.8 : 6.4;
+    const upperCharacter = character.toUpperCase();
+    const advanceAt24Px =
+      MAPLIBRE_GLYPH_ADVANCES_AT_24PX[upperCharacter] ?? FALLBACK_GLYPH_ADVANCE_AT_24PX;
+    width +=
+      (advanceAt24Px / MAPLIBRE_GLYPH_METRICS_EM_SIZE) *
+      HOLDER_LABEL_FONT_SIZE_PX *
+      HOLDER_LABEL_GLYPH_WIDTH_SAFETY_FACTOR;
   }
   width += Math.max(0, characters.length - 1) * HOLDER_LABEL_FONT_SIZE_PX * HOLDER_LABEL_LETTER_SPACING_EM;
   return width;
@@ -1047,3 +1090,8 @@ export async function buildAncientAppData({
 
   return { writtenFiles, totalBytes, totalGzipBytes };
 }
+
+export const __testOnly = {
+  projectLngLatToPixels,
+  estimateHolderLabelLineWidthPx
+};
