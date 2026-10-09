@@ -134,13 +134,14 @@ const layerSelectedAreaLabelId = "ibm-selected-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
 const layerAncientAreaFillId = "ibm-ancient-area-fill";
 const layerAncientUncertainFillId = "ibm-ancient-area-uncertain-fill";
-const layerAncientBorderSolidId = "ibm-ancient-border-solid";
-const layerAncientBorderDashedId = "ibm-ancient-border-dashed";
-const layerAncientBorderDottedId = "ibm-ancient-border-dotted";
+const layerAncientBorderStateId = "ibm-ancient-border-state";
+const layerAncientBorderDisputedId = "ibm-ancient-border-disputed";
 const layerAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const layerAncientRoadMajorCasingId = "ibm-ancient-road-major-casing";
 const layerAncientRoadMajorKnownId = "ibm-ancient-road-major-known";
 const layerAncientRoadMajorConjecturedId = "ibm-ancient-road-major-conjectured";
 const layerAncientCoastlineId = "ibm-ancient-coastline";
+const layerAncientCoastlineLabelId = "ibm-ancient-coastline-label";
 const layerAncientHolderLabelId = "ibm-ancient-holder-label";
 const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
 
@@ -307,13 +308,14 @@ function applyMapModeOverlayVisibility(
   for (const layerId of [
     layerAncientAreaFillId,
     layerAncientUncertainFillId,
-    layerAncientBorderSolidId,
-    layerAncientBorderDashedId,
-    layerAncientBorderDottedId,
+    layerAncientBorderStateId,
+    layerAncientBorderDisputedId,
     layerAncientEmpireEdgeId,
+    layerAncientRoadMajorCasingId,
     layerAncientRoadMajorKnownId,
     layerAncientRoadMajorConjecturedId,
     layerAncientCoastlineId,
+    layerAncientCoastlineLabelId,
     layerAncientHolderLabelId,
     layerAncientHolderLabelClickableId
   ]) {
@@ -1106,14 +1108,6 @@ function asLineFeatureCollection(
   };
 }
 
-function isClientKind(kind: AncientEntityRecord["kind"]) {
-  return (
-    kind === "client-kingdom" ||
-    kind === "client-tetrarchy" ||
-    kind === "free-city-or-league"
-  );
-}
-
 function holderKindLabel(kind: AncientEntityRecord["kind"]) {
   if (kind === "roman-province") {
     return "Roman province";
@@ -1185,18 +1179,10 @@ function borderStyleFromKinds(
   right: AncientEntityRecord["kind"]
 ) {
   if (left === "uncertain" || right === "uncertain") {
-    return { borderStyle: "dotted", borderColor: ANCIENT_LAYER_STYLE.border.outsideColor };
+    return { borderStyle: "disputed" };
   }
 
-  if (left === "outside-empire" || right === "outside-empire") {
-    return { borderStyle: "solid", borderColor: ANCIENT_LAYER_STYLE.border.outsideColor };
-  }
-
-  if (isClientKind(left) || isClientKind(right)) {
-    return { borderStyle: "dashed", borderColor: ANCIENT_LAYER_STYLE.border.romanSideColor };
-  }
-
-  return { borderStyle: "solid", borderColor: ANCIENT_LAYER_STYLE.border.romanSideColor };
+  return { borderStyle: "state" };
 }
 
 function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): AncientLineFeatureCollection {
@@ -1335,42 +1321,29 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerAncientBorderSolidId)) {
+  if (!map.getLayer(layerAncientBorderStateId)) {
     map.addLayer({
-      id: layerAncientBorderSolidId,
+      id: layerAncientBorderStateId,
       source: sourceAncientBordersId,
       type: "line",
-      filter: toLayerFilter(["==", ["get", "borderStyle"], "solid"]),
+      filter: toLayerFilter(["==", ["get", "borderStyle"], "state"]),
       paint: {
-        "line-color": ["coalesce", ["get", "borderColor"], ANCIENT_LAYER_STYLE.border.romanSideColor],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 4, 1, 7, 1.5]
+        "line-color": ANCIENT_LAYER_STYLE.border.stateColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 7, 1, 11, 2],
+        "line-dasharray": [1, 1]
       }
     });
   }
 
-  if (!map.getLayer(layerAncientBorderDashedId)) {
+  if (!map.getLayer(layerAncientBorderDisputedId)) {
     map.addLayer({
-      id: layerAncientBorderDashedId,
+      id: layerAncientBorderDisputedId,
       source: sourceAncientBordersId,
       type: "line",
-      filter: toLayerFilter(["==", ["get", "borderStyle"], "dashed"]),
+      filter: toLayerFilter(["==", ["get", "borderStyle"], "disputed"]),
       paint: {
-        "line-color": ["coalesce", ["get", "borderColor"], ANCIENT_LAYER_STYLE.border.romanSideColor],
-        "line-width": 1,
-        "line-dasharray": [2, 2]
-      }
-    });
-  }
-
-  if (!map.getLayer(layerAncientBorderDottedId)) {
-    map.addLayer({
-      id: layerAncientBorderDottedId,
-      source: sourceAncientBordersId,
-      type: "line",
-      filter: toLayerFilter(["==", ["get", "borderStyle"], "dotted"]),
-      paint: {
-        "line-color": ["coalesce", ["get", "borderColor"], ANCIENT_LAYER_STYLE.border.outsideColor],
-        "line-width": 1,
+        "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
         "line-dasharray": [1, 2]
       }
     });
@@ -1382,8 +1355,30 @@ function ensureMapLayers(
       source: sourceAncientEmpireEdgeId,
       type: "line",
       paint: {
-        "line-color": ANCIENT_LAYER_STYLE.border.romanSideColor,
-        "line-width": 2
+        "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 4, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMajorCasingId)) {
+    map.addLayer({
+      id: layerAncientRoadMajorCasingId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "known"], true]
+      ]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.casingColor,
+        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0.4, 6, 0.7, 7, 1.75, 20, 22]
       }
     });
   }
@@ -1398,9 +1393,13 @@ function ensureMapLayers(
         "all",
         ["==", ["get", "known"], true]
       ]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
       paint: {
-        "line-color": ANCIENT_LAYER_STYLE.roads.color,
-        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2]
+        "line-color": ANCIENT_LAYER_STYLE.roads.knownColor,
+        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0, 7, 1, 20, 18]
       }
     });
   }
@@ -1415,10 +1414,14 @@ function ensureMapLayers(
         "all",
         ["!=", ["get", "known"], true]
       ]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
       paint: {
-        "line-color": ANCIENT_LAYER_STYLE.roads.color,
-        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1, 9, 2],
-        "line-dasharray": [2, 2]
+        "line-color": ANCIENT_LAYER_STYLE.roads.casingColor,
+        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0.4, 6, 0.7, 7, 1.75, 20, 22],
+        "line-dasharray": [2, 1.5]
       }
     });
   }
@@ -1429,9 +1432,31 @@ function ensureMapLayers(
       source: sourceAncientCoastlineId,
       type: "line",
       paint: {
-        "line-color": ANCIENT_LAYER_STYLE.coastline.color,
-        "line-width": 1.5,
-        "line-dasharray": [1, 2]
+        "line-color": ANCIENT_LAYER_STYLE.coastline.lineColor,
+        "line-width": 1.5
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientCoastlineLabelId)) {
+    map.addLayer({
+      id: layerAncientCoastlineLabelId,
+      source: sourceAncientCoastlineId,
+      type: "symbol",
+      minzoom: 9,
+      layout: {
+        "symbol-placement": "line",
+        "symbol-spacing": 250,
+        "text-field": "Roman shore",
+        "text-font": ["Noto Sans Italic"],
+        "text-size": 12,
+        "text-letter-spacing": 0.1,
+        "text-max-angle": 60
+      },
+      paint: {
+        "text-color": ANCIENT_LAYER_STYLE.coastline.labelColor,
+        "text-halo-color": ANCIENT_LAYER_STYLE.coastline.labelHaloColor,
+        "text-halo-width": 1.5
       }
     });
   }

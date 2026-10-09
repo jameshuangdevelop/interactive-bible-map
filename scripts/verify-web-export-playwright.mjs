@@ -49,6 +49,8 @@ const fullLicenseDetailsUrl =
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const minimumControlHitAreaPx = 44;
+const timelineBorderNote =
+  "Borders are approximate. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene or Polemon's kingdom of Pontus, aren't drawn.";
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",
@@ -82,7 +84,15 @@ const mapLayerIds = {
   ],
   ancientHolderLabels: ["ibm-ancient-holder-label", "ibm-ancient-holder-label-clickable"],
   ancientAreaFill: "ibm-ancient-area-fill",
-  ancientUncertainFill: "ibm-ancient-uncertain-fill"
+  ancientUncertainFill: "ibm-ancient-uncertain-fill",
+  ancientBorderState: "ibm-ancient-border-state",
+  ancientBorderDisputed: "ibm-ancient-border-disputed",
+  ancientEmpireEdge: "ibm-ancient-empire-edge",
+  ancientRoadMajorCasing: "ibm-ancient-road-major-casing",
+  ancientRoadMajorKnown: "ibm-ancient-road-major-known",
+  ancientRoadMajorConjectured: "ibm-ancient-road-major-conjectured",
+  ancientCoastline: "ibm-ancient-coastline",
+  ancientCoastlineLabel: "ibm-ancient-coastline-label"
 };
 const allClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.clusterPins];
 const allClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers, mapLayerIds.clusterPins];
@@ -1134,11 +1144,25 @@ async function getActiveElementSnapshot(page) {
       };
     }
 
+    if (element.matches("[role='radio'][data-map-mode]")) {
+      return {
+        category: "toggle",
+        descriptor: element.textContent?.trim() ?? "map mode toggle"
+      };
+    }
+
     if (element.matches("button[data-map-control]") || element.closest(".maplibregl-ctrl")) {
       return {
         category: "map-control",
         descriptor:
           element.getAttribute("aria-label") ?? element.textContent?.trim() ?? "map control"
+      };
+    }
+
+    if (element.closest("[data-timeline-card='true']")) {
+      return {
+        category: "timeline",
+        descriptor: element.getAttribute("aria-label") ?? element.textContent?.trim() ?? element.tagName.toLowerCase()
       };
     }
 
@@ -1183,7 +1207,9 @@ async function collectTabSequence(page, tabCount, stopAtCategory = null) {
 
 function assertTabOrder(sequence) {
   const firstSearchIndex = sequence.findIndex((item) => item.category === "search");
+  const firstToggleIndex = sequence.findIndex((item) => item.category === "toggle");
   const firstMapControlIndex = sequence.findIndex((item) => item.category === "map-control");
+  const firstTimelineIndex = sequence.findIndex((item) => item.category === "timeline");
   const firstPlaceIndex = sequence.findIndex((item) => item.category === "place-list");
   const firstPanelIndex = sequence.findIndex((item) => item.category === "panel");
   const hasCanvasStop = sequence.some((item) => item.category === "canvas");
@@ -1199,11 +1225,15 @@ function assertTabOrder(sequence) {
   }
 
   if (
+    firstToggleIndex < 0 ||
     firstMapControlIndex < 0 ||
+    firstTimelineIndex < 0 ||
     firstPlaceIndex < 0 ||
     firstPanelIndex < 0 ||
-    firstMapControlIndex <= firstSearchIndex ||
-    firstPlaceIndex <= firstMapControlIndex ||
+    firstToggleIndex <= firstSearchIndex ||
+    firstMapControlIndex <= firstToggleIndex ||
+    firstTimelineIndex <= firstMapControlIndex ||
+    firstPlaceIndex <= firstTimelineIndex ||
     firstPanelIndex <= firstPlaceIndex
   ) {
     throw new Error(
@@ -4546,18 +4576,16 @@ async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
 
   const timelineSliderCount = await page.locator("input[data-timeline-slider='true']").count();
   const sourcesButtonCount = await page.getByRole("button", { name: "Sources" }).count();
-  const mapKeyCount = await page.getByRole("button", { name: "Map key" }).count();
 
-  if (timelineSliderCount !== 0 || sourcesButtonCount !== 0 || mapKeyCount !== 0) {
+  if (timelineSliderCount !== 0 || sourcesButtonCount !== 0) {
     throw new Error(
-      `Default build should hide timeline/layer UI when ancient data is absent. slider=${timelineSliderCount}, sources=${sourcesButtonCount}, mapKey=${mapKeyCount}`
+      `Default build should hide timeline/layer UI when ancient data is absent. slider=${timelineSliderCount}, sources=${sourcesButtonCount}`
     );
   }
 
   return {
     timelineSliderCount,
-    sourcesButtonCount,
-    mapKeyCount
+    sourcesButtonCount
   };
 }
 
@@ -4567,6 +4595,10 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   await waitForMapToSettle(page);
   const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
   await timelineSlider.waitFor({ state: "visible", timeout: 30_000 });
+  const mapKeyButtonCount = await page.getByRole("button", { name: "Map key" }).count();
+  if (mapKeyButtonCount !== 0) {
+    throw new Error(`Map key button should not be rendered, found ${mapKeyButtonCount}.`);
+  }
 
   const tickCount = await page.locator("[data-timeline-tick-stop-id]").count();
   if (tickCount !== sortedStops.length) {
@@ -4589,6 +4621,236 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   }
   if (normalizedLiveRegionText.includes("Sources")) {
     throw new Error(`Timeline live-region text should not include Sources link text: '${normalizedLiveRegionText}'.`);
+  }
+
+  const layerStyleSnapshot = await page.evaluate(({ testHookKey, layerIds }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    const readLayer = (layerId) => {
+      const layer = map.getLayer(layerId);
+      if (!layer) {
+        throw new Error(`Layer '${layerId}' is missing.`);
+      }
+      return {
+        minzoom: layer.minzoom ?? null,
+        maxzoom: layer.maxzoom ?? null
+      };
+    };
+    return {
+      borderState: {
+        ...readLayer(layerIds.ancientBorderState),
+        color: map.getPaintProperty(layerIds.ancientBorderState, "line-color"),
+        dash: map.getPaintProperty(layerIds.ancientBorderState, "line-dasharray"),
+        width: map.getPaintProperty(layerIds.ancientBorderState, "line-width")
+      },
+      borderDisputed: {
+        ...readLayer(layerIds.ancientBorderDisputed),
+        color: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-color"),
+        dash: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-dasharray"),
+        width: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-width")
+      },
+      empireEdge: {
+        ...readLayer(layerIds.ancientEmpireEdge),
+        color: map.getPaintProperty(layerIds.ancientEmpireEdge, "line-color"),
+        width: map.getPaintProperty(layerIds.ancientEmpireEdge, "line-width"),
+        opacity: map.getPaintProperty(layerIds.ancientEmpireEdge, "line-opacity")
+      },
+      roadCasing: {
+        ...readLayer(layerIds.ancientRoadMajorCasing),
+        color: map.getPaintProperty(layerIds.ancientRoadMajorCasing, "line-color"),
+        width: map.getPaintProperty(layerIds.ancientRoadMajorCasing, "line-width"),
+        cap: map.getLayoutProperty(layerIds.ancientRoadMajorCasing, "line-cap"),
+        join: map.getLayoutProperty(layerIds.ancientRoadMajorCasing, "line-join")
+      },
+      roadKnown: {
+        ...readLayer(layerIds.ancientRoadMajorKnown),
+        color: map.getPaintProperty(layerIds.ancientRoadMajorKnown, "line-color"),
+        width: map.getPaintProperty(layerIds.ancientRoadMajorKnown, "line-width"),
+        cap: map.getLayoutProperty(layerIds.ancientRoadMajorKnown, "line-cap"),
+        join: map.getLayoutProperty(layerIds.ancientRoadMajorKnown, "line-join")
+      },
+      roadConjectured: {
+        ...readLayer(layerIds.ancientRoadMajorConjectured),
+        color: map.getPaintProperty(layerIds.ancientRoadMajorConjectured, "line-color"),
+        width: map.getPaintProperty(layerIds.ancientRoadMajorConjectured, "line-width"),
+        dash: map.getPaintProperty(layerIds.ancientRoadMajorConjectured, "line-dasharray"),
+        cap: map.getLayoutProperty(layerIds.ancientRoadMajorConjectured, "line-cap"),
+        join: map.getLayoutProperty(layerIds.ancientRoadMajorConjectured, "line-join")
+      },
+      coastline: {
+        ...readLayer(layerIds.ancientCoastline),
+        color: map.getPaintProperty(layerIds.ancientCoastline, "line-color"),
+        width: map.getPaintProperty(layerIds.ancientCoastline, "line-width")
+      },
+      coastlineLabel: {
+        ...readLayer(layerIds.ancientCoastlineLabel),
+        placement: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "symbol-placement"),
+        spacing: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "symbol-spacing"),
+        text: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-field"),
+        font: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-font"),
+        size: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-size"),
+        letterSpacing: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-letter-spacing"),
+        maxAngle: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-max-angle"),
+        color: map.getPaintProperty(layerIds.ancientCoastlineLabel, "text-color"),
+        haloColor: map.getPaintProperty(layerIds.ancientCoastlineLabel, "text-halo-color"),
+        haloWidth: map.getPaintProperty(layerIds.ancientCoastlineLabel, "text-halo-width")
+      }
+    };
+  }, { testHookKey: mapTestHookKey, layerIds: mapLayerIds });
+  const expectJson = (actual, expected, label) => {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+      throw new Error(`${label} mismatch. expected=${JSON.stringify(expected)} actual=${JSON.stringify(actual)}`);
+    }
+  };
+  expectJson(layerStyleSnapshot.borderDisputed.color, "hsl(248, 1%, 41%)", "Ancient disputed border color");
+  expectJson(layerStyleSnapshot.borderDisputed.dash, [1, 2], "Ancient disputed border dash");
+  expectJson(
+    layerStyleSnapshot.borderDisputed.width,
+    ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+    "Ancient disputed border width"
+  );
+  expectJson(layerStyleSnapshot.borderState.color, "hsl(0, 0%, 55%)", "Ancient state border color");
+  expectJson(layerStyleSnapshot.borderState.dash, [1, 1], "Ancient state border dash");
+  expectJson(
+    layerStyleSnapshot.borderState.width,
+    ["interpolate", ["linear"], ["zoom"], 7, 1, 11, 2],
+    "Ancient state border width"
+  );
+  expectJson(layerStyleSnapshot.empireEdge.color, "hsl(248, 1%, 41%)", "Ancient empire edge color");
+  expectJson(
+    layerStyleSnapshot.empireEdge.width,
+    ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+    "Ancient empire edge width"
+  );
+  expectJson(
+    layerStyleSnapshot.empireEdge.opacity,
+    ["interpolate", ["linear"], ["zoom"], 0, 0.4, 4, 1],
+    "Ancient empire edge opacity"
+  );
+  if (layerStyleSnapshot.roadCasing.minzoom !== 5 || layerStyleSnapshot.roadKnown.minzoom !== 5 || layerStyleSnapshot.roadConjectured.minzoom !== 5) {
+    throw new Error(`Ancient roads should all have minzoom 5. got casing=${layerStyleSnapshot.roadCasing.minzoom}, known=${layerStyleSnapshot.roadKnown.minzoom}, conjectured=${layerStyleSnapshot.roadConjectured.minzoom}`);
+  }
+  expectJson(layerStyleSnapshot.roadCasing.color, "#e9ac77", "Ancient road casing color");
+  expectJson(
+    layerStyleSnapshot.roadCasing.width,
+    ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0.4, 6, 0.7, 7, 1.75, 20, 22],
+    "Ancient road casing width"
+  );
+  expectJson(layerStyleSnapshot.roadKnown.color, "#fea", "Ancient known road color");
+  expectJson(
+    layerStyleSnapshot.roadKnown.width,
+    ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0, 7, 1, 20, 18],
+    "Ancient known road width"
+  );
+  expectJson(layerStyleSnapshot.roadConjectured.color, "#e9ac77", "Ancient conjectured road color");
+  expectJson(layerStyleSnapshot.roadConjectured.dash, [2, 1.5], "Ancient conjectured road dash");
+  expectJson(
+    layerStyleSnapshot.roadConjectured.width,
+    ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0.4, 6, 0.7, 7, 1.75, 20, 22],
+    "Ancient conjectured road width"
+  );
+  for (const [label, value] of [
+    ["road casing line-cap", layerStyleSnapshot.roadCasing.cap],
+    ["road known line-cap", layerStyleSnapshot.roadKnown.cap],
+    ["road conjectured line-cap", layerStyleSnapshot.roadConjectured.cap]
+  ]) {
+    if (value !== "round") {
+      throw new Error(`${label} should be 'round', got '${String(value)}'.`);
+    }
+  }
+  for (const [label, value] of [
+    ["road casing line-join", layerStyleSnapshot.roadCasing.join],
+    ["road known line-join", layerStyleSnapshot.roadKnown.join],
+    ["road conjectured line-join", layerStyleSnapshot.roadConjectured.join]
+  ]) {
+    if (value !== "round") {
+      throw new Error(`${label} should be 'round', got '${String(value)}'.`);
+    }
+  }
+  expectJson(layerStyleSnapshot.coastline.color, "#a0c8f0", "Ancient coastline color");
+  expectJson(layerStyleSnapshot.coastline.width, 1.5, "Ancient coastline width");
+  if (layerStyleSnapshot.coastlineLabel.minzoom !== 9) {
+    throw new Error(`Ancient coastline label minzoom should be 9, got ${String(layerStyleSnapshot.coastlineLabel.minzoom)}.`);
+  }
+  expectJson(layerStyleSnapshot.coastlineLabel.placement, "line", "Ancient coastline label placement");
+  expectJson(layerStyleSnapshot.coastlineLabel.spacing, 250, "Ancient coastline label spacing");
+  expectJson(layerStyleSnapshot.coastlineLabel.text, "Roman shore", "Ancient coastline label text");
+  expectJson(layerStyleSnapshot.coastlineLabel.font, ["Noto Sans Italic"], "Ancient coastline label font");
+  expectJson(layerStyleSnapshot.coastlineLabel.size, 12, "Ancient coastline label size");
+  expectJson(layerStyleSnapshot.coastlineLabel.letterSpacing, 0.1, "Ancient coastline label letter spacing");
+  expectJson(layerStyleSnapshot.coastlineLabel.maxAngle, 60, "Ancient coastline label max angle");
+  expectJson(layerStyleSnapshot.coastlineLabel.color, "#74aee9", "Ancient coastline label color");
+  expectJson(layerStyleSnapshot.coastlineLabel.haloColor, "rgba(255,255,255,0.7)", "Ancient coastline label halo color");
+  expectJson(layerStyleSnapshot.coastlineLabel.haloWidth, 1.5, "Ancient coastline label halo width");
+
+  await page.evaluate(
+    ({ testHookKey, center, zoom }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      map.jumpTo({ center, zoom });
+    },
+    { testHookKey: mapTestHookKey, center: [27.4, 37.58], zoom: 10 }
+  );
+  await waitForMapToSettle(page);
+  const coastLabelFeatureCount = await page.evaluate(
+    ({ testHookKey, layerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      return map.queryRenderedFeatures(undefined, { layers: [layerId] }).length;
+    },
+    { testHookKey: mapTestHookKey, layerId: mapLayerIds.ancientCoastlineLabel }
+  );
+  if (coastLabelFeatureCount < 1) {
+    throw new Error("Ancient coastline label should render near Miletus at AD 50 zoom 10.");
+  }
+
+  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const coastLabelHiddenOnModern = await page.evaluate(
+    ({ testHookKey, layerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const visibility = map.getLayoutProperty(layerId, "visibility");
+      const renderedCount = map.queryRenderedFeatures(undefined, { layers: [layerId] }).length;
+      return { visibility, renderedCount };
+    },
+    { testHookKey: mapTestHookKey, layerId: mapLayerIds.ancientCoastlineLabel }
+  );
+  if (coastLabelHiddenOnModern.visibility !== "none" || coastLabelHiddenOnModern.renderedCount !== 0) {
+    throw new Error(
+      `Ancient coastline label should be hidden on modern map. visibility=${String(
+        coastLabelHiddenOnModern.visibility
+      )} rendered=${coastLabelHiddenOnModern.renderedCount}.`
+    );
+  }
+
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await page.getByRole("button", { name: "Sources" }).click();
+  await page.locator("[data-timeline-sources-popover='true']").waitFor({
+    state: "visible",
+    timeout: 5_000
+  });
+  const firstPopoverParagraph = await page.evaluate(() => {
+    const popover = document.querySelector("[data-timeline-sources-popover='true']");
+    if (!(popover instanceof HTMLElement)) {
+      throw new Error("Timeline Sources popover is unavailable.");
+    }
+    const firstParagraph = popover.querySelector("p");
+    return firstParagraph?.textContent?.replace(/\s+/gu, " ").trim() ?? "";
+  });
+  if (firstPopoverParagraph !== timelineBorderNote) {
+    throw new Error(
+      `Sources popover first paragraph mismatch. expected='${timelineBorderNote}' actual='${firstPopoverParagraph}'.`
+    );
   }
 
   const earlierButton = page.getByRole("button", { name: "Earlier change" });
@@ -9522,20 +9784,14 @@ async function verifyPhoneBasics(browser, baseUrl) {
       const readPhoneMapControlVisibility = async () =>
         page.evaluate(() => {
           const mapTypeGroup = document.querySelector("[role='radiogroup'][aria-label='Map type']");
-          const mapKeyButtons = Array.from(document.querySelectorAll("button")).filter(
-            (button) => button.textContent?.trim() === "Map key"
-          );
-          const mapKeyDialogs = document.querySelectorAll("[role='dialog'][aria-label='Map key']");
           return {
-            hasMapTypeToggle: mapTypeGroup instanceof HTMLElement,
-            mapKeyButtonCount: mapKeyButtons.length,
-            mapKeyDialogCount: mapKeyDialogs.length
+            hasMapTypeToggle: mapTypeGroup instanceof HTMLElement
           };
         });
       const assertPhoneExpandedControlVisibility = async (stateLabel, shouldHide) => {
         const visibility = await readPhoneMapControlVisibility();
         if (shouldHide) {
-          if (visibility.hasMapTypeToggle || visibility.mapKeyButtonCount > 0 || visibility.mapKeyDialogCount > 0) {
+          if (visibility.hasMapTypeToggle) {
             throw new Error(
               `Phone expanded sheet should hide map controls at ${viewport.width}x${viewport.height}. state=${stateLabel} visibility=${JSON.stringify(
                 visibility
@@ -9544,7 +9800,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
           }
           return;
         }
-        if (!visibility.hasMapTypeToggle || visibility.mapKeyButtonCount !== 1) {
+        if (!visibility.hasMapTypeToggle) {
           throw new Error(
             `Phone non-expanded sheet should show map controls at ${viewport.width}x${viewport.height}. state=${stateLabel} visibility=${JSON.stringify(
               visibility

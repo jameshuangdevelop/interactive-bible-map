@@ -14,7 +14,6 @@ import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
-import { ANCIENT_LAYER_STYLE } from "../features/map/ancient-layer-style";
 import {
   applyMapModeToSearch,
   applyTimelineYearToSearch,
@@ -67,22 +66,6 @@ const srOnlyStyle: CSSProperties = {
   whiteSpace: "nowrap",
   border: 0
 };
-
-function toRgba(hexColor: string, opacity: number) {
-  const normalized = hexColor.replace("#", "");
-  if (normalized.length !== 6) {
-    return hexColor;
-  }
-
-  const red = Number.parseInt(normalized.slice(0, 2), 16);
-  const green = Number.parseInt(normalized.slice(2, 4), 16);
-  const blue = Number.parseInt(normalized.slice(4, 6), 16);
-  if (![red, green, blue].every(Number.isFinite)) {
-    return hexColor;
-  }
-
-  return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
-}
 type SmallScreenSheetMode = "collapsed" | "expanded";
 
 const LazyMapView = lazy(async () => {
@@ -257,7 +240,6 @@ export function AppShell() {
   const [ancientLayerRetryToken, setAncientLayerRetryToken] = useState(0);
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
-  const [mapKeyOpen, setMapKeyOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
@@ -425,7 +407,6 @@ export function AppShell() {
         const parsedMapMode = parseMapModeFromSearch(window.location.search);
         if (parsedMapMode !== "ancient") {
           setTimelineSourcesOpen(false);
-          setMapKeyOpen(false);
         }
         setMapMode(parsedMapMode);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
@@ -622,7 +603,6 @@ export function AppShell() {
       const normalized = normalizeSelection(parsedSelection, placesById);
       if (parsedMapMode !== "ancient") {
         setTimelineSourcesOpen(false);
-        setMapKeyOpen(false);
       }
       setMapMode(parsedMapMode);
       if (ancientTimeline) {
@@ -817,7 +797,6 @@ export function AppShell() {
 
       if (nextMode !== "ancient") {
         setTimelineSourcesOpen(false);
-        setMapKeyOpen(false);
       }
       setMapMode(nextMode);
       event.currentTarget
@@ -829,7 +808,7 @@ export function AppShell() {
   );
 
   useEffect(() => {
-    if (!mapKeyOpen && !timelineSourcesOpen) {
+    if (!timelineSourcesOpen) {
       return undefined;
     }
 
@@ -838,7 +817,6 @@ export function AppShell() {
         return;
       }
 
-      setMapKeyOpen(false);
       setTimelineSourcesOpen(false);
     };
 
@@ -846,7 +824,7 @@ export function AppShell() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [mapKeyOpen, timelineSourcesOpen]);
+  }, [timelineSourcesOpen]);
 
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
@@ -897,7 +875,6 @@ export function AppShell() {
     sortedTimelineStops.length > 2 && timelineStopSpacingPx < TIMELINE_MIN_STOP_SPACING_PX;
   const hideMapModeToggleOnPhoneExpandedSheet =
     isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded";
-  const hideMapKeyOnPhoneExpandedSheet = hideMapModeToggleOnPhoneExpandedSheet;
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -995,7 +972,6 @@ export function AppShell() {
                 onClick={() => {
                   if (value !== "ancient") {
                     setTimelineSourcesOpen(false);
-                    setMapKeyOpen(false);
                   }
                   setMapMode(value);
                 }}
@@ -1020,121 +996,6 @@ export function AppShell() {
               </button>
             );
           })}
-        </div>
-      ) : null}
-
-      {mapMode === "ancient" && hasAncientTimeline && !hideMapKeyOnPhoneExpandedSheet ? (
-        <div
-          style={{
-            position: "absolute",
-            right: `${tokens.spacing.md}px`,
-            top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX + 48}px` : `${tokens.spacing.md + 48}px`,
-            width: "220px",
-            zIndex: 44
-          }}
-        >
-          <button
-            aria-expanded={mapKeyOpen}
-            aria-haspopup="dialog"
-            onClick={() => setMapKeyOpen((value) => !value)}
-            style={{
-              width: "100%",
-              height: "36px",
-              borderRadius: "18px",
-              border: `1px solid ${tokens.color.divider}`,
-              backgroundColor: "#FFFFFF",
-              color: tokens.color.textPrimary,
-              fontFamily: tokens.typography.uiFont,
-              fontSize: `${tokens.typography.captionSize}px`,
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)"
-            }}
-            type="button"
-          >
-            Map key
-          </button>
-          {mapKeyOpen ? (
-            <div
-              aria-label="Map key"
-              role="dialog"
-              style={{
-                marginTop: `${tokens.spacing.sm}px`,
-                borderRadius: "8px",
-                border: `1px solid ${tokens.color.divider}`,
-                backgroundColor: "#FFFFFF",
-                color: tokens.color.textSecondary,
-                fontSize: `${tokens.typography.captionSize}px`,
-                lineHeight: `${tokens.typography.captionLineHeight}px`,
-                padding: `${tokens.spacing.sm}px`,
-                boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)"
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "44px 1fr",
-                  rowGap: `${tokens.spacing.xs}px`,
-                  columnGap: `${tokens.spacing.sm}px`,
-                  alignItems: "center"
-                }}
-              >
-                <span
-                  style={{
-                    height: "14px",
-                    border: `1px solid ${ANCIENT_LAYER_STYLE.border.romanSideColor}`,
-                    backgroundColor: toRgba(
-                      ANCIENT_LAYER_STYLE.areaFill.romanProvince.color,
-                      ANCIENT_LAYER_STYLE.areaFill.romanProvince.opacity
-                    )
-                  }}
-                />
-                <span>Roman province</span>
-                <span
-                  style={{
-                    height: "14px",
-                    border: `1px dashed ${ANCIENT_LAYER_STYLE.border.romanSideColor}`,
-                    backgroundColor: toRgba(
-                      ANCIENT_LAYER_STYLE.areaFill.client.color,
-                      ANCIENT_LAYER_STYLE.areaFill.client.opacity
-                    )
-                  }}
-                />
-                <span>Allied kingdom, tetrarchy, or free city or league</span>
-                <span
-                  style={{
-                    height: "14px",
-                    border: `1px solid ${ANCIENT_LAYER_STYLE.border.outsideColor}`,
-                    backgroundColor: toRgba(
-                      ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color,
-                      ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.opacity
-                    )
-                  }}
-                />
-                <span>Outside the empire</span>
-                <span
-                  style={{
-                    height: "14px",
-                    border: `1px dotted ${ANCIENT_LAYER_STYLE.border.outsideColor}`,
-                    background:
-                      `repeating-linear-gradient(135deg, transparent 0, transparent 5px, ${ANCIENT_LAYER_STYLE.uncertain.hatchColor} 5px, ${ANCIENT_LAYER_STYLE.uncertain.hatchColor} 6px)`
-                  }}
-                />
-                <span>Status unclear in the sources</span>
-                <span style={{ height: "0", borderTop: `2px solid ${ANCIENT_LAYER_STYLE.border.romanSideColor}` }} />
-                <span>Roman Empire edge</span>
-                <span style={{ height: "0", borderTop: `1px solid ${ANCIENT_LAYER_STYLE.roads.color}` }} />
-                <span>Known roads</span>
-                <span style={{ height: "0", borderTop: `1px dashed ${ANCIENT_LAYER_STYLE.roads.color}` }} />
-                <span>Conjectured roads</span>
-                <span style={{ height: "0", borderTop: `2px dotted ${ANCIENT_LAYER_STYLE.coastline.color}` }} />
-                <span>Ancient coastline</span>
-              </div>
-              <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
-                Borders are approximate. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn. Sources are under Sources &amp; credits.
-              </p>
-            </div>
-          ) : null}
         </div>
       ) : null}
 
@@ -1247,7 +1108,10 @@ export function AppShell() {
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
+                  <p style={{ margin: 0 }}>
+                    Borders are approximate. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                  </p>
+                  <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>{selectedTimelineStop.summary}</p>
                   {selectedTimelineStop.scripture.length > 0 ? (
                     <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
                       <strong>Passages:</strong>
