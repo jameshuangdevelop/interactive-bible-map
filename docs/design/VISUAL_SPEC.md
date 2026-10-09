@@ -15,7 +15,7 @@ This spec describes how the map app looks and behaves. It is low fidelity on pur
 | Bottom right | Zoom in, zoom out and reset view, then the map attribution (compact "ⓘ") | M3 |
 | Bottom left | Scale bar (metric) | M3 |
 | Top centre | "Map" and "Routes" tabs | Reserved for M5 |
-| Top right | The "Ancient" and "Modern" toggle, with the map key button below it (§2 "Ancient layer") | M4 |
+| Top right | The "Ancient" and "Modern" toggle | M4 |
 | Bottom centre | The timeline (4 BC – AD 100, snapping to the years the map changes), on the ancient map only (§2 "Timeline") | M4 |
 
 The Routes tabs are **not built yet**. The wireframes show the reserved areas with dashed outlines.
@@ -92,28 +92,28 @@ A place is **disputed** when at least one of its candidates has confidence `disp
 - Clicking any candidate opens the place, with that candidate highlighted in the panel.
 
 ### Ancient layer (M4)
-On the ancient map only, drawn under the pins and labels, for the year the timeline shows (ADR-0037). The colours below are a starting point; the human tunes them at mini checkpoint MC7.
-- **Areas:** each political area of that year is a shape. Kinds are told apart by fill, line and label text, never by colour alone:
+On the ancient map only, drawn under the pins and labels, for the year the timeline shows (ADR-0037). **It has no map key** (the human at mini checkpoint MC7, 2026-10-09: "if we need to spell out the legend, then that means our lines can be clearer"). Its lines follow the modern map's conventions, the way everyday maps draw borders, roads and water, so they need no explaining. Every area names itself with its label, and the fills tell the kinds of rule apart.
+- **Areas:** each political area of that year is a shape:
 
   | Kind | Fill | Border |
   |---|---|---|
-  | Roman province | Warm tint, `#B3261E` at 6% | Solid, `#7D5A50`, 1 px (1.5 px from zoom 7) |
-  | Allied ("client") kingdom, tetrarchy, or free city or league under Rome | Ochre tint, `#E8A33D` at 12% | Dashed, `#7D5A50`, 1 px |
-  | Outside the empire (for example the Parthian Empire, where a source gives its extent; none is drawn in M4, ADR-0037) | Grey tint, `#5F6368` at 6% | Solid, `#80868B`, 1 px |
-  | Status unclear in the sources (for example Chalcis in AD 48–50) | No tint; thin diagonal hatching in `#80868B` | Dotted, `#80868B`, 1 px |
-  | The Roman Empire's outer edge | — | Solid, `#7D5A50`, 2 px |
+  | Roman province | Warm tint, `#B3261E` at 6% | Like a state border on everyday maps: grey `hsl(0, 0%, 55%)`, dashed `[1, 1]`, 1 px, widening to 2 px from zoom 7 to 11 (the dashes and widths of Liberty's state borders; the grey is darker than Liberty's so that provinces stay visible on the tints) |
+  | Allied ("client") kingdom, tetrarchy, or free city or league under Rome | Ochre tint, `#E8A33D` at 12% | The same as a province's |
+  | Outside the empire (for example the Parthian Empire, where a source gives its extent; none is drawn in M4, ADR-0037) | Grey tint, `#5F6368` at 6% | The same as a province's |
+  | Status unclear in the sources (for example Chalcis in AD 48–50) | No tint; thin diagonal hatching in `#80868B` | Like a disputed border on the modern map's source style (Liberty's): `hsl(248, 1%, 41%)`, dotted `[1, 2]`, as wide as the empire's edge |
+  | The Roman Empire's outer edge | — | Like a country border on the modern map: `hsl(248, 1%, 41%)`, 1 px at zoom 3, 1.2 px at zoom 5 and 3 px at zoom 12, at 40% opacity at zoom 0 rising to full at zoom 4 |
 
-  Above zoom 10 the fills fade out; the borders stay. Roman lands far from our places, such as Africa or Moesia, form one area held by the Roman Empire, with no borders inside it (ADR-0037).
+  A border between two areas takes the dotted style if either side's status is unclear, and the state-border style otherwise. Above zoom 10 the fills fade out; the borders stay. Roman lands far from our places, such as Africa or Moesia, form one area held by the Roman Empire, with no borders inside it (ADR-0037).
 - **Area labels:** one label for each holder of that year (a province, kingdom, tetrarchy, free league, or a state outside the empire), at the centre of its largest piece, and of any other piece at least a third as large (for example the kingdom of Commagene, which also held part of Rough Cilicia from AD 41). The centre is the point of the piece farthest from both its edges and the pins of our major places on it, so that a pin such as Nazareth doesn't take the spot where Galilee's label goes. The label stays on its piece: at zooms where its text doesn't fit inside the piece, it's hidden rather than moved onto a neighbouring area. Labels are in spaced capitals like province labels (§2 "Places on the map"), from the timeline data's English names, leaving out any part in brackets (so the tetrarchy of Philip is labelled "TETRARCHY OF PHILIP"). A holder that is one of our records (for example Syria, Galatia, or Judea the province) adds no label of its own: the record's existing label shows, where it always has, and opens the record as now. A holder without a record (for example the tetrarchy of Philip) has a plain label, without the pointer cursor: hovering or focusing it shows a tooltip with its full name, kind, ruler and years. The years are those of the changes that began and ended its hold on that area without a break, the way reigns are written: for example "4 BC – AD 34" for Philip, or "AD 37 – 44" for Agrippa I in Philip's former lands. Where the data doesn't say when a hold began (it starts at the timeline's first year with nothing earlier), only its end is shown, for example "until AD 43" for the Lycian League; a hold that lasts to the timeline's end shows only its start, for example "from AD 74" for the province of Lycia and Pamphylia (and one that does both shows no years). An area whose status is unclear has no label; hovering it shows "Status unclear in the sources" with the reason. A province record that holds no land in the selected year is hidden then; for example, the province of Judea in AD 41–44, when Agrippa I ruled it as king. Region labels (Galilee, Samaria and the others) stay as they are.
-- **Roads:** major Roman roads (ADR-0037) as thin lines in `#8D6E63`, from 1 px at zoom 5 to 2 px at zoom 9; roads the data marks as known are solid, and conjectured ones dashed. They appear from zoom 5, under every label. No road names in M4. AWMC dates no road in the Holy Land, so none is drawn there; M5's routes show the journeys.
-- **Ancient coastline,** only where it differs from today's (ADR-0037): the old shoreline is drawn as a dotted line in a darker tone of the water colour, so the land that silting has added since lies between it and today's coast.
-- **Map key:** a small "Map key" button below the toggle opens a compact card: the four kinds of area, the empire's edge, known and conjectured roads, the ancient coastline, and "Borders are approximate. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene or Polemon's kingdom of Pontus, aren't drawn. Sources are under Sources & credits."
+- **Roads:** major Roman roads (ADR-0037), drawn like the main roads on the modern map: a pale yellow `#fea` road over a `#e9ac77` edge, with round ends and the same widths at each zoom (the edge 0.4 px at zoom 5, 0.7 px at zoom 6 and 1.75 px at zoom 7, the road from zoom 7; both widening exponentially, by a factor of 1.2 a zoom, to 22 and 18 px at zoom 20). So at zooms 5 and 6 a road is a thin tan line, and from zoom 7 a full road. Roads the data marks as conjectured are drawn the way maps draw tracks: a dashed `#e9ac77` line (`[2, 1.5]`) as wide as the edge, with no yellow. They appear from zoom 5, under every label. No road names in M4. AWMC dates no road in the Holy Land, so none is drawn there; M5's routes show the journeys.
+- **Ancient coastline,** only where it differs from today's (ADR-0037): the old shoreline is a solid 1.5 px line in the modern map's river colour, `#a0c8f0`, labelled along the line "Roman shore" in the modern map's style for water labels (Noto Sans Italic, 12 px, letter spacing 0.1 em, `#74aee9`, with a white halo at 70% opacity and 1.5 px), from zoom 9, every 250 px where the line is straight enough (bends up to 60°). So the land that silting has added since lies between it and today's coast.
+- **Notes on the borders:** the top of the timeline's Sources popover (§2 "Timeline") says: "Borders are approximate. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene or Polemon's kingdom of Pontus, aren't drawn."
 - **Smoothness:** the layer is drawn by MapLibre, like the pins (ADR-0024), so it moves with every drag and zoom.
 
 ### Timeline (M4)
 - **Where:** bottom centre on the ancient map, up to about 800 px wide on desktop and never wider than the map area beside an open panel, less 16 px margins, on a white card with the panel's shadow. It is hidden on the modern map. The map's credit, when expanded, sits above the card and is never covered by it, and it doesn't cover the scale bar either.
 - **Track:** one tick per stop, evenly spaced rather than spaced by year, so that close years stay apart, each labelled with its year under its tick. To fit, only the first BC label and the first AD label name the era ("4 BC", "AD 6", "17", "34" and so on); the caption and the slider's spoken value always give the full year. When the track gives each stop less than about 36 px, as on phones, only the first and last ticks are labelled. The handle snaps to stops only. "Earlier" and "Later" buttons (‹ and ›, 44 × 44 px) sit at the ends.
-- **Caption:** above the track, the stop's year and title on one line, for example "AD 44 · Agrippa I dies, and Judea is a Roman province again", then a "Sources" link. The link opens a small popover with the stop's one-paragraph summary, its Bible passages and its sources.
+- **Caption:** above the track, the stop's year and title on one line, for example "AD 44 · Agrippa I dies, and Judea is a Roman province again", then a "Sources" link. The link opens a small popover that starts with the notes on the borders (§2 "Ancient layer"), then gives the stop's one-paragraph summary, its Bible passages and its sources.
 - **Changing the stop** redraws the ancient layer in place, without moving the map. The selected place stays open.
 - **Opening year:** the stop in force in AD 50 (ADR-0037). The URL keeps the stop (§10).
 
@@ -197,13 +197,12 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 7. Accessibility (WCAG 2.2 AA)
 - **Contrast:** text at least 4.5:1; pins, outlines and controls at least 3:1 against the basemap. From M4 this holds over every area fill of the ancient layer too, and its border lines reach 3:1 against the land.
 - **Keyboard:**
-  - Everything is reachable, in this order: search, the toggle and map key, the map controls, the timeline, the places on the map, then the panel.
+  - Everything is reachable, in this order: search, the toggle, the map controls, the timeline, the places on the map, then the panel.
   - The map draws its pins itself (ADR-0024), so keyboard and screen-reader users get a **list of the places currently on the map**, kept in step with it after each pan or zoom ends. Each entry is a button named like "Capernaum, city", "Jerusalem and 4 nearby places", or "Cluster of 7 places". Tab moves through the list in reading order (top to bottom, then left to right). A focus ring is drawn around the focused pin on the map, the map pans if the pin is hidden under the panel, and Enter selects the place or zooms into the cluster. The list is capped at 200 entries, with "Zoom in or search to reach more places" after them.
   - The focus ring is 2 px `#1A73E8` with a 2 px offset.
   - Esc closes search results and the panel.
   - **Toggle (M4):** a radio group named "Map", with "Ancient" and "Modern"; the arrow keys switch.
   - **Timeline (M4):** a slider named "Year". Its value text is the stop's year and title ("AD 44: Agrippa I dies, and Judea is a Roman province again"). Left and Right move one stop, and Home and End go to the first and last. The end buttons are labelled "Earlier change" and "Later change". Each change of stop is announced politely.
-  - **Map key (M4):** a labelled dialog; Esc closes it.
 - **Screen readers:**
   - The panel is a labelled region, with the place name as its level-1 heading.
   - Search follows the ARIA combobox pattern.
