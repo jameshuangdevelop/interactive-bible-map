@@ -70,7 +70,13 @@ import {
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
 import { formatTimelineYear } from "./timeline";
+import { formatHolderYearRange } from "./holder-year-range";
 import { ANCIENT_LAYER_STYLE } from "./ancient-layer-style";
+import {
+  activeHolderLocationIds,
+  filterAreaLabelsForAncientStop,
+  linkedTimelineLocationIds
+} from "./ancient-area-label-visibility";
 import type { MapViewProps } from "./map-view.types";
 import type {
   AncientEntityRecord,
@@ -1128,29 +1134,6 @@ function holderKindLabel(kind: AncientEntityRecord["kind"]) {
   return "Status unclear in the sources";
 }
 
-function previousTimelineYear(boundaryYear: number) {
-  if (boundaryYear === 1) {
-    return -1;
-  }
-  return boundaryYear - 1;
-}
-
-function formatHolderYearRange({
-  heldFromYear,
-  heldToYear,
-  timelineRangeEndYear
-}: {
-  heldFromYear: number;
-  heldToYear: number;
-  timelineRangeEndYear: number;
-}) {
-  if (heldToYear >= timelineRangeEndYear) {
-    return `from ${formatTimelineYear(heldFromYear)}`;
-  }
-
-  return `${formatTimelineYear(heldFromYear)} – ${formatTimelineYear(previousTimelineYear(heldToYear))}`;
-}
-
 function buildAncientAreaFeatures(
   shapes: AncientShapesPayload | null,
   stopPayload: AncientStopPayload | null,
@@ -1252,23 +1235,26 @@ function buildAncientHolderLabelFeatures(
         }
 
         const holderAssignment = stopPayload.areas.find((area) => area.holderId === label.holderId);
-        const labelText = label.name.toUpperCase();
+        const labelText = label.labelText;
         const yearRangeText = holderAssignment
           ? formatHolderYearRange({
               heldFromYear: holderAssignment.heldFromYear,
               heldToYear: holderAssignment.heldToYear,
+              heldFromKnown: holderAssignment.heldFromKnown,
               timelineRangeEndYear
             })
           : formatTimelineYear(currentYear);
         const rulerText = holderAssignment?.ruler ? ` · ${holderAssignment.ruler}` : "";
+        const yearRangePart = yearRangeText.length > 0 ? ` · ${yearRangeText}` : "";
         return {
           type: "Feature" as const,
           properties: {
             holderId: label.holderId,
             holderLocationId: null,
             labelText,
+            minZoom: label.minZoom,
             clickable: false,
-            tooltipText: `${label.name} · ${holderKindLabel(label.kind)}${rulerText} · ${yearRangeText}`
+            tooltipText: `${label.name} · ${holderKindLabel(label.kind)}${rulerText}${yearRangePart}`
           },
           geometry: {
             type: "Point" as const,
@@ -1457,16 +1443,21 @@ function ensureMapLayers(
       type: "symbol",
       minzoom: 4,
       maxzoom: 10,
-      filter: toLayerFilter(["==", ["get", "clickable"], false]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], false],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
       layout: {
         "text-field": ["get", "labelText"],
         "text-transform": "uppercase",
         "text-font": ["Noto Sans Bold"],
         "text-size": 13,
         "text-letter-spacing": 0.18,
+        "text-max-width": 30,
         "text-anchor": "center",
         "text-offset": [0, 0],
-        "symbol-sort-key": 900000
+        "symbol-sort-key": 0
       },
       paint: {
         "text-color": "#5F6368",
@@ -1483,16 +1474,21 @@ function ensureMapLayers(
       type: "symbol",
       minzoom: 4,
       maxzoom: 10,
-      filter: toLayerFilter(["==", ["get", "clickable"], true]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], true],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
       layout: {
         "text-field": ["get", "labelText"],
         "text-transform": "uppercase",
         "text-font": ["Noto Sans Bold"],
         "text-size": 13,
         "text-letter-spacing": 0.18,
+        "text-max-width": 30,
         "text-anchor": "center",
         "text-offset": [0, 0],
-        "symbol-sort-key": 800000
+        "symbol-sort-key": 0
       },
       paint: {
         "text-color": "#202124",
@@ -2604,29 +2600,18 @@ export function MapView({
       return renderData;
     }
 
-    const activePoliticalAreaIds = new Set(
-      (selectedAncientStopPayload?.areas ?? []).map((assignment) => assignment.areaId)
-    );
+    const linkedLocationIds = linkedTimelineLocationIds(ancientTimeline?.entities);
+    const activeLocationIds = activeHolderLocationIds(selectedAncientStopPayload?.areas);
 
     return {
       ...renderData,
-      areaLabels: {
-        ...renderData.areaLabels,
-        features: renderData.areaLabels.features.filter((feature) => {
-          if (feature.properties.areaKind !== "province") {
-            return true;
-          }
-
-          const place = placeById.get(feature.properties.placeId);
-          if (!place?.politicalAreaId) {
-            return true;
-          }
-
-          return activePoliticalAreaIds.has(place.politicalAreaId);
-        })
-      }
+      areaLabels: filterAreaLabelsForAncientStop({
+        areaLabels: renderData.areaLabels,
+        linkedLocationIds,
+        activeLocationIds
+      })
     };
-  }, [hasAncientTimeline, mapMode, placeById, renderData, selectedAncientStopPayload]);
+  }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData, selectedAncientStopPayload?.areas]);
   const majorPlaceByRank = useMemo(
     () => buildMajorPlaceReferenceByRank(effectiveRenderData),
     [effectiveRenderData]
@@ -2662,6 +2647,7 @@ export function MapView({
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
   const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const ancientLayerLoadStateRef = useRef<"idle" | "loading" | "ready" | "error">("idle");
+  const previousAncientLayerRetryTokenRef = useRef(ancientLayerRetryToken);
   const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
     setAncientShapes(null);
     setAncientRoads(createEmptyFeatureCollection());
@@ -2710,17 +2696,25 @@ export function MapView({
     queueMicrotask(() => {
       resetAncientLayerData("loading");
     });
-  }, [ancientLayerRetryToken, hasAncientTimeline, resetAncientLayerData]);
+  }, [hasAncientTimeline, resetAncientLayerData]);
 
-  const loadStopPayload = useCallback(async (stopId: string) => {
+  const loadStopPayload = useCallback(async (stopId: string, options?: { prefetch?: boolean; forceRetry?: boolean }) => {
+    const prefetch = options?.prefetch ?? false;
+    const forceRetry = options?.forceRetry ?? false;
+    const selectedStopId = selectedTimelineStopIdRef.current;
+    const isSelectedStop = selectedStopId === stopId;
     if (
       !hasAncientTimeline ||
-      ancientLayerLoadStateRef.current === "error" ||
       !stopId ||
-      failedStopIdsRef.current.has(stopId) ||
+      (ancientLayerLoadStateRef.current === "error" && !forceRetry) ||
+      (failedStopIdsRef.current.has(stopId) && !forceRetry && !isSelectedStop) ||
       stopPayloadRequestIdsRef.current.has(stopId)
     ) {
       return;
+    }
+
+    if (forceRetry) {
+      failedStopIdsRef.current.delete(stopId);
     }
 
     stopPayloadRequestIdsRef.current.add(stopId);
@@ -2743,17 +2737,45 @@ export function MapView({
           [payload.stopId]: payload
         };
       });
+      failedStopIdsRef.current.delete(payload.stopId);
       if (selectedTimelineStopIdRef.current === payload.stopId) {
         setAncientLayerLoadState("ready");
       }
     } catch (error) {
       console.error("Failed to load ancient stop payload.", error);
       failedStopIdsRef.current.add(stopId);
-      setAncientLayerLoadState("error");
+      if (!prefetch || selectedTimelineStopIdRef.current === stopId) {
+        setAncientLayerLoadState("error");
+      }
     } finally {
       stopPayloadRequestIdsRef.current.delete(stopId);
     }
   }, [hasAncientTimeline]);
+
+  useEffect(() => {
+    if (ancientLayerRetryToken === previousAncientLayerRetryTokenRef.current) {
+      return;
+    }
+    previousAncientLayerRetryTokenRef.current = ancientLayerRetryToken;
+
+    if (!hasAncientTimeline) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      setAncientLayerLoadState("loading");
+    });
+
+    if (selectedTimelineStopIdRef.current && failedStopIdsRef.current.has(selectedTimelineStopIdRef.current)) {
+      queueMicrotask(() => {
+        const stopId = selectedTimelineStopIdRef.current;
+        if (!stopId) {
+          return;
+        }
+        void loadStopPayload(stopId, { forceRetry: true });
+      });
+    }
+  }, [ancientLayerRetryToken, hasAncientTimeline, loadStopPayload]);
 
   useEffect(() => {
     if (mapReadyVersion === 0 || ancientShapes || !hasAncientTimeline || ancientLayerLoadState === "error") {
@@ -2859,7 +2881,7 @@ export function MapView({
     scheduleIdle(() => {
       for (const stopId of pendingStopIds) {
         if (!ancientStopsById[stopId]) {
-          void loadStopPayload(stopId);
+          void loadStopPayload(stopId, { prefetch: true });
         }
       }
     });
@@ -3938,6 +3960,9 @@ export function MapView({
   const resetButtonBottomOffset = isSmallScreen
     ? Math.max(controlBottomInset + 16, 88)
     : bottomInset + 16;
+  const scaleBarBottomOffset = isSmallScreen
+    ? Math.max(controlBottomInset + 176, 320)
+    : controlBottomInset + 16;
   const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
   const compactAttributionBottomWithTimelineOffset = Math.max(
     compactAttributionBottomOffset,
@@ -4010,7 +4035,7 @@ export function MapView({
         style={{
           position: "absolute",
           left: `${getScaleControlLeftOffset(panelInset)}px`,
-          bottom: `${controlBottomInset + 16}px`,
+          bottom: `${scaleBarBottomOffset}px`,
           backgroundColor: "#FFFFFF",
           border: "1px solid rgba(95,99,104,0.35)",
           borderRadius: "4px",

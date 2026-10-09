@@ -29,6 +29,22 @@ const ancientEmpireEdgePath = path.join(
   "geo",
   "ancient-empire-edge.geojson"
 );
+const repositoryLocationsDirectory = path.join(repositoryRoot, "data", "locations");
+const repositoryTimelinePath = path.join(repositoryRoot, "data", "timeline.json");
+const repositoryAncientAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
+const repositoryAncientRoadsPath = path.join(repositoryRoot, "data", "geo", "ancient-roads.geojson");
+const repositoryAncientCoastlinePath = path.join(
+  repositoryRoot,
+  "data",
+  "geo",
+  "ancient-coastline.geojson"
+);
+const repositoryAncientEmpireEdgePath = path.join(
+  repositoryRoot,
+  "data",
+  "geo",
+  "ancient-empire-edge.geojson"
+);
 const repositoryImagePromptsDirectory = path.join(
   repositoryRoot,
   "content",
@@ -431,10 +447,14 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     const galileeAt4bc = stopPayload.areas.find((area) => area.areaId === "galilee");
     assert.equal(galileeAt4bc?.heldFromYear, -4);
     assert.equal(galileeAt4bc?.heldToYear, 44);
+    assert.equal(galileeAt4bc?.heldFromKnown, false);
     assert.ok(
       stopPayload.holderLabels.some((entry) => entry.holderId === "client-antipas"),
       "expected holder label for client-antipas"
     );
+    const antipasLabel = stopPayload.holderLabels.find((entry) => entry.holderId === "client-antipas");
+    assert.equal(typeof antipasLabel?.labelText, "string");
+    assert.equal(typeof antipasLabel?.minZoom, "number");
     assert.equal(
       stopPayload.holderLabels.some((entry) => entry.holderId === "uncertain-roman-side"),
       false
@@ -458,6 +478,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     );
     assert.equal(pereaAtAd44?.heldFromYear, 44);
     assert.equal(pereaAtAd44?.heldToYear, 101);
+    assert.equal(pereaAtAd44?.heldFromKnown, true);
     assert.equal(
       ad44Payload.holderBorders.features.some(
         (feature) =>
@@ -493,6 +514,111 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       major: true,
       known: false,
       timeperiod: "R"
+    });
+
+    test("buildAncientAppData computes holder label fit/minZoom and known-start spans for real data", async () => {
+      await withTempDirectory(async (outputDirectory) => {
+        const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData] =
+          await Promise.all([
+            fs.readFile(repositoryTimelinePath, "utf8").then((content) => JSON.parse(content)),
+            fs.readFile(repositoryAncientAreasPath, "utf8").then((content) => JSON.parse(content)),
+            fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content)),
+            fs.readFile(repositoryAncientCoastlinePath, "utf8").then((content) => JSON.parse(content)),
+            fs.readFile(repositoryAncientEmpireEdgePath, "utf8").then((content) => JSON.parse(content))
+          ]);
+
+        const locationRecords = await Promise.all(
+          (await fs.readdir(repositoryLocationsDirectory))
+            .filter((fileName) => fileName.endsWith(".json"))
+            .map((fileName) =>
+              fs.readFile(path.join(repositoryLocationsDirectory, fileName), "utf8").then((content) => JSON.parse(content))
+            )
+        );
+        const majorPlacePinCoordinates = locationRecords
+          .filter((locationRecord) => locationRecord.prominence === "major" && locationRecord.zoomTier === "city")
+          .flatMap((locationRecord) =>
+            (locationRecord.candidates ?? [])
+              .filter(
+                (candidate) =>
+                  Array.isArray(candidate?.coordinates) &&
+                  candidate.coordinates.length >= 2 &&
+                  typeof candidate.coordinates[0] === "number" &&
+                  typeof candidate.coordinates[1] === "number"
+              )
+              .map((candidate) => ({
+                placeId: locationRecord.id,
+                coordinates: [candidate.coordinates[0], candidate.coordinates[1]]
+              }))
+          );
+
+        await buildAncientAppData({
+          timelineData,
+          ancientAreasData,
+          ancientRoadsData,
+          ancientCoastlineData,
+          ancientEmpireEdgeData,
+          majorPlacePinCoordinates,
+          outputDirectory
+        });
+
+        const stopForYear = (year) =>
+          [...timelineData.stops]
+            .sort((left, right) => left.year - right.year)
+            .filter((stop) => stop.year <= year)
+            .at(-1);
+        const readStopPayload = async (year) => {
+          const stop = stopForYear(year);
+          assert.ok(stop, `expected stop in force for year ${year}`);
+          return fs
+            .readFile(path.join(outputDirectory, `ancient.stop.${stop.id}.json`), "utf8")
+            .then((content) => JSON.parse(content));
+        };
+
+        const stopAt30 = await readStopPayload(30);
+        const philipAt30 = stopAt30.areas.find((area) => area.areaId === "philip-tetrarchy-lands");
+        assert.equal(philipAt30?.heldFromYear, -4);
+        assert.equal(philipAt30?.heldToYear, 34);
+        assert.equal(philipAt30?.heldFromKnown, true);
+        const antipasAt30 = stopAt30.areas.find((area) => area.areaId === "galilee-perea");
+        assert.equal(antipasAt30?.heldFromYear, -4);
+        assert.equal(antipasAt30?.heldToYear, 39);
+        assert.equal(antipasAt30?.heldFromKnown, true);
+        const commageneLabelAt30 = stopAt30.holderLabels.find(
+          (label) =>
+            label.holderId === stopAt30.areas.find((area) => area.areaId === "commagene")?.holderId
+        );
+        assert.ok(commageneLabelAt30);
+        assert.ok(commageneLabelAt30.minZoom > 5, "Commagene label should be hidden at zoom 5.");
+
+        const stopAt40 = await readStopPayload(40);
+        const agrippaInPhilipLands = stopAt40.areas.find((area) => area.areaId === "philip-tetrarchy-lands");
+        assert.equal(agrippaInPhilipLands?.heldFromYear, 37);
+        assert.equal(agrippaInPhilipLands?.heldToYear, 44);
+        assert.equal(agrippaInPhilipLands?.heldFromKnown, true);
+
+        const stopAt1 = await readStopPayload(1);
+        const archelausAt1 = stopAt1.areas.find((area) => area.areaId === "judea-samaria-idumea");
+        assert.equal(archelausAt1?.heldFromYear, -4);
+        assert.equal(archelausAt1?.heldToYear, 6);
+        assert.equal(archelausAt1?.heldFromKnown, true);
+        const commageneAt10 = (await readStopPayload(10)).areas.find((area) => area.areaId === "commagene");
+        assert.equal(commageneAt10?.heldFromYear, -20);
+        assert.equal(commageneAt10?.heldToYear, 17);
+        assert.equal(commageneAt10?.heldFromKnown, true);
+
+        const lyciaAt30 = stopAt30.areas.find((area) => area.areaId === "lycia");
+        assert.equal(lyciaAt30?.heldFromYear, -4);
+        assert.equal(lyciaAt30?.heldToYear, 43);
+        assert.equal(lyciaAt30?.heldFromKnown, false);
+        const thraceAt30 = stopAt30.areas.find((area) => area.areaId === "thrace");
+        assert.equal(thraceAt30?.heldFromYear, -4);
+        assert.equal(thraceAt30?.heldToYear, 46);
+        assert.equal(thraceAt30?.heldFromKnown, false);
+        const lyciaPamphyliaAt80 = (await readStopPayload(80)).areas.find((area) => area.areaId === "lycia");
+        assert.equal(lyciaPamphyliaAt80?.heldFromYear, 74);
+        assert.equal(lyciaPamphyliaAt80?.heldToYear, 101);
+        assert.equal(lyciaPamphyliaAt80?.heldFromKnown, true);
+      });
     });
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
     // No empire-edge source sits next to the valid case's data, so none is written.

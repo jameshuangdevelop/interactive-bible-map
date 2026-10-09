@@ -155,7 +155,11 @@ async function fetchAncientTimeline() {
   }
 
   if (!response.ok) {
-    throw new Error(`Could not load ancient timeline (${response.status})`);
+    const error = new Error(`Could not load ancient timeline (${response.status})`) as Error & {
+      status: number;
+    };
+    error.status = response.status;
+    throw error;
   }
 
   return (await response.json()) as AncientTimelinePayload;
@@ -234,7 +238,11 @@ export function AppShell() {
     {}
   );
   const [ancientTimeline, setAncientTimeline] = useState<AncientTimelinePayload | null>(null);
+  const [ancientTimelineLoadState, setAncientTimelineLoadState] = useState<
+    "loading" | "ready" | "absent" | "error"
+  >("loading");
   const [ancientLayerStatus, setAncientLayerStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [ancientTimelineRetryToken, setAncientTimelineRetryToken] = useState(0);
   const [ancientLayerRetryToken, setAncientLayerRetryToken] = useState(0);
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
@@ -442,6 +450,11 @@ export function AppShell() {
 
   useEffect(() => {
     let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setAncientTimelineLoadState("loading");
+      }
+    });
 
     fetchAncientTimeline()
       .then((payload) => {
@@ -451,27 +464,42 @@ export function AppShell() {
 
         setAncientTimeline(payload);
         if (!payload || payload.stops.length === 0) {
+          setAncientTimelineLoadState("absent");
           setSelectedTimelineStopId(null);
           return;
         }
 
+        setAncientTimelineLoadState("ready");
         const requestedYear = parseTimelineYearFromSearch(window.location.search) ?? TIMELINE_DEFAULT_YEAR;
         const resolvedStop = resolveStopForYear(payload.stops, requestedYear);
         setSelectedTimelineStopId(resolvedStop?.id ?? payload.defaultStopId ?? payload.stops[0]?.id ?? null);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (cancelled) {
           return;
         }
 
+        const status =
+          error && typeof error === "object" && "status" in error && typeof error.status === "number"
+            ? error.status
+            : null;
+        if (status === 404) {
+          setAncientTimelineLoadState("absent");
+          setAncientTimeline(null);
+          setSelectedTimelineStopId(null);
+          return;
+        }
+
+        console.error("Failed to load ancient timeline.", error);
         setAncientTimeline(null);
+        setAncientTimelineLoadState("error");
         setSelectedTimelineStopId(null);
       });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [ancientTimelineRetryToken]);
 
   useEffect(() => {
     return () => {
@@ -815,7 +843,16 @@ export function AppShell() {
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
   const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
-  const timelineVisible = mapMode === "ancient" && hasAncientTimeline;
+  const timelineVisible =
+    mapMode === "ancient" && (hasAncientTimeline || ancientTimelineLoadState === "error");
+  const retryAncientLayer = useCallback(() => {
+    setTimelineSourcesOpen(false);
+    if (ancientTimelineLoadState === "error") {
+      setAncientTimelineRetryToken((value) => value + 1);
+      return;
+    }
+    setAncientLayerRetryToken((value) => value + 1);
+  }, [ancientTimelineLoadState]);
   const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
   const timelineOverlayInsetForAttribution = timelineVisible
     ? isSmallScreen
@@ -1129,15 +1166,16 @@ export function AppShell() {
             border: `1px solid ${tokens.color.divider}`,
             backgroundColor: "#FFFFFF",
             boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+            boxSizing: "border-box",
             padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
             zIndex: isSmallScreen ? 11 : 30
           }}
         >
-          {ancientLayerStatus === "error" || !selectedTimelineStop ? (
+          {ancientTimelineLoadState === "error" || ancientLayerStatus === "error" || !selectedTimelineStop ? (
             <div role="status" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px` }}>
               Ancient layer data failed to load.{" "}
               <button
-                onClick={() => setAncientLayerRetryToken((value) => value + 1)}
+                onClick={retryAncientLayer}
                 style={{
                   border: "none",
                   background: "none",

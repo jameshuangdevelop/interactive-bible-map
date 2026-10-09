@@ -201,6 +201,29 @@ export async function buildAppData(options = {}) {
   const locationRecords = await Promise.all(locationFiles.map((filePath) => readJsonFile(filePath)));
   const mediaRecords = await Promise.all(mediaFiles.map((filePath) => readJsonFile(filePath)));
   locationRecords.sort((a, b) => a.id.localeCompare(b.id));
+  const majorPlacePinCoordinates = locationRecords
+    .filter(
+      (locationRecord) =>
+        (locationRecord.type === "place" ||
+          locationRecord.type === "region" ||
+          locationRecord.type === "province" ||
+          locationRecord.type === "empire") &&
+        Array.isArray(locationRecord.candidates)
+    )
+    .flatMap((locationRecord) =>
+      (locationRecord.candidates ?? [])
+        .filter(
+          (candidate) =>
+            Array.isArray(candidate?.coordinates) &&
+            candidate.coordinates.length >= 2 &&
+            typeof candidate.coordinates[0] === "number" &&
+            typeof candidate.coordinates[1] === "number"
+        )
+        .map((candidate) => ({
+          placeId: locationRecord.id,
+          coordinates: [candidate.coordinates[0], candidate.coordinates[1]]
+        }))
+    );
 
   const mediaByLocationId = new Map(
     mediaRecords
@@ -291,6 +314,7 @@ export async function buildAppData(options = {}) {
       ancientCoastlineData,
       bibliographyById,
       ancientEmpireEdgeData,
+      majorPlacePinCoordinates,
       outputDirectory
     });
     const ancientLayerGzipBytes = ancientBuildResult.writtenFiles.reduce(

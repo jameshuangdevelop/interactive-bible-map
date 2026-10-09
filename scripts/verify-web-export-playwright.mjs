@@ -4711,51 +4711,121 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
-  await waitForMapToSettle(page);
-  await page.evaluate(async ({ testHookKey }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    await new Promise((resolve) => {
-      map.once("moveend", resolve);
-      map.easeTo({
-        center: [35.2, 31.8],
-        zoom: 7,
-        duration: 0
-      });
-    });
-  }, { testHookKey: mapTestHookKey });
-  await waitForMapToSettle(page);
-  const judeaAtAd44 = await page.evaluate(({ testHookKey, areaLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const rendered = map.queryRenderedFeatures(undefined, {
-      layers: areaLayerIds
-    });
-    return rendered.some((feature) => feature.properties?.placeId === "judea-province");
-  }, { testHookKey: mapTestHookKey, areaLayerIds: mapLayerIds.areaLabels });
-  const judeaProvinceShownAtAd50 = labelsAtAd50.provinceLabelIds.includes("judea-province");
-  if (judeaProvinceShownAtAd50 && judeaAtAd44) {
-    throw new Error("Judea province label should be hidden in AD 44.");
+  const moveMapAndSettle = async ({ center, zoom }) => {
+    await page.evaluate(
+      async ({ testHookKey, nextCenter, nextZoom }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        await new Promise((resolve) => {
+          map.once("moveend", resolve);
+          map.easeTo({
+            center: nextCenter,
+            zoom: nextZoom,
+            duration: 0
+          });
+        });
+      },
+      {
+        testHookKey: mapTestHookKey,
+        nextCenter: center,
+        nextZoom: zoom
+      }
+    );
+    await waitForMapToSettle(page);
+  };
+
+  const renderedProvinceLabelVisible = async ({ year, center, zoom, placeId }) => {
+    await page.goto(`${baseUrl}/?year=${year}`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    await moveMapAndSettle({ center, zoom });
+    return page.evaluate(
+      ({ testHookKey, areaLayerIds, expectedPlaceId }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        const rendered = map.queryRenderedFeatures(undefined, {
+          layers: areaLayerIds
+        });
+        return rendered.some((feature) => feature.properties?.placeId === expectedPlaceId);
+      },
+      {
+        testHookKey: mapTestHookKey,
+        areaLayerIds: mapLayerIds.areaLabels,
+        expectedPlaceId: placeId
+      }
+    );
+  };
+
+  const cappadociaAtAd6 = await renderedProvinceLabelVisible({
+    year: 6,
+    center: [35.5, 38.7],
+    zoom: 6,
+    placeId: "cappadocia"
+  });
+  if (cappadociaAtAd6) {
+    throw new Error("Cappadocia label should be hidden at AD 6.");
   }
-  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "networkidle", timeout: 60_000 });
-  await waitForMapToSettle(page);
-  const judeaAtAd41 = await page.evaluate(({ testHookKey, areaLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const rendered = map.queryRenderedFeatures(undefined, {
-      layers: areaLayerIds
-    });
-    return rendered.some((feature) => feature.properties?.placeId === "judea-province");
-  }, { testHookKey: mapTestHookKey, areaLayerIds: mapLayerIds.areaLabels });
-  if (judeaProvinceShownAtAd50 && judeaAtAd41) {
-    throw new Error("Judea province label should be hidden in AD 41.");
+
+  const cappadociaAtAd17 = await renderedProvinceLabelVisible({
+    year: 17,
+    center: [35.5, 38.7],
+    zoom: 6,
+    placeId: "cappadocia"
+  });
+  if (!cappadociaAtAd17) {
+    throw new Error("Cappadocia label should render at AD 17.");
+  }
+
+  const achaiaAtAd53 = await renderedProvinceLabelVisible({
+    year: 53,
+    center: [22.4, 38.0],
+    zoom: 8,
+    placeId: "achaia"
+  });
+  if (!achaiaAtAd53) {
+    throw new Error("Achaia label should render at AD 53.");
+  }
+
+  const achaiaAtAd67 = await renderedProvinceLabelVisible({
+    year: 67,
+    center: [22.4, 38.0],
+    zoom: 8,
+    placeId: "achaia"
+  });
+  if (achaiaAtAd67) {
+    throw new Error("Achaia label should be hidden at AD 67.");
+  }
+
+  const judeaInSourceByYear = {};
+  for (const year of [41, 44, 50]) {
+    await page.goto(`${baseUrl}/?year=${year}`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(page);
+    judeaInSourceByYear[year] = await page.evaluate(({ testHookKey }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const source = map.getSource("ibm-area-labels");
+      if (!source) {
+        throw new Error("Area labels source is unavailable.");
+      }
+
+      const sourceFeatures = map.querySourceFeatures("ibm-area-labels");
+      return sourceFeatures.some((feature) => feature.properties?.placeId === "judea-province");
+    }, { testHookKey: mapTestHookKey });
+  }
+  if (judeaInSourceByYear[41]) {
+    throw new Error("Judea province should be absent from area-label source data at AD 41.");
+  }
+  if (!judeaInSourceByYear[44]) {
+    throw new Error("Judea province should be present in area-label source data at AD 44.");
+  }
+  if (!judeaInSourceByYear[50]) {
+    throw new Error("Judea province should be present in area-label source data at AD 50.");
   }
 
   await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
@@ -4926,15 +4996,375 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
+  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  const holyLandLabelTargets = await page.evaluate(
+    async ({ sortedStops }) => {
+      const stopInForce = [...sortedStops]
+        .sort((left, right) => left.year - right.year)
+        .filter((stop) => stop.year <= 30)
+        .at(-1);
+      if (!stopInForce?.id) {
+        throw new Error("Could not resolve timeline stop in force at AD 30.");
+      }
+
+      const [stopPayloadResponse, shapesResponse] = await Promise.all([
+        fetch(`/generated/ancient.stop.${encodeURIComponent(stopInForce.id)}.json`, { cache: "no-store" }),
+        fetch("/generated/ancient.shapes.json", { cache: "no-store" })
+      ]);
+      if (!stopPayloadResponse.ok) {
+        throw new Error(`Could not load stop payload '${stopInForce.id}' (${stopPayloadResponse.status}).`);
+      }
+      if (!shapesResponse.ok) {
+        throw new Error(`Could not load ancient shapes (${shapesResponse.status}).`);
+      }
+      const [stopPayload, shapesPayload] = await Promise.all([stopPayloadResponse.json(), shapesResponse.json()]);
+      const geometryByAreaId = new Map(
+        (shapesPayload?.areas?.features ?? []).map((feature) => [feature?.properties?.areaId, feature?.geometry])
+      );
+
+      const pointInRing = (point, ring) => {
+        let inside = false;
+        for (let index = 0, previousIndex = ring.length - 1; index < ring.length; previousIndex = index, index += 1) {
+          const [x1, y1] = ring[index];
+          const [x2, y2] = ring[previousIndex];
+          const intersects =
+            (y1 > point[1]) !== (y2 > point[1]) &&
+            point[0] < ((x2 - x1) * (point[1] - y1)) / (y2 - y1) + x1;
+          if (intersects) {
+            inside = !inside;
+          }
+        }
+        return inside;
+      };
+      const pointInPolygon = (point, polygon) => {
+        if (!Array.isArray(polygon) || polygon.length === 0) {
+          return false;
+        }
+        if (!pointInRing(point, polygon[0])) {
+          return false;
+        }
+        for (let index = 1; index < polygon.length; index += 1) {
+          if (pointInRing(point, polygon[index])) {
+            return false;
+          }
+        }
+        return true;
+      };
+      const pointInGeometry = (point, geometry) => {
+        if (!geometry) {
+          return false;
+        }
+        if (geometry.type === "Polygon") {
+          return pointInPolygon(point, geometry.coordinates);
+        }
+        if (geometry.type === "MultiPolygon") {
+          return geometry.coordinates.some((polygon) => pointInPolygon(point, polygon));
+        }
+        return false;
+      };
+
+      const holderIdByAreaId = new Map((stopPayload?.areas ?? []).map((area) => [area.areaId, area.holderId]));
+      const findPieceLabels = (areaId) => {
+        const holderId = holderIdByAreaId.get(areaId);
+        if (!holderId) {
+          return [];
+        }
+        const areaGeometry = geometryByAreaId.get(areaId);
+        if (!areaGeometry) {
+          return [];
+        }
+        return (stopPayload?.holderLabels ?? []).filter(
+          (label) =>
+            label?.holderId === holderId &&
+            Array.isArray(label?.labelPoint) &&
+            pointInGeometry(label.labelPoint, areaGeometry)
+        );
+      };
+
+      const philipLabel = findPieceLabels("philip-tetrarchy-lands")[0] ?? null;
+      const antipasAreaIds = (stopPayload?.areas ?? [])
+        .filter((area) => area?.holderId === "antipas-tetrarchy")
+        .map((area) => area.areaId)
+        .filter((areaId) => typeof areaId === "string");
+      const antipasPreferredAreaId =
+        antipasAreaIds.find((areaId) => areaId.toLowerCase().includes("galilee")) ?? antipasAreaIds[0] ?? null;
+      const antipasGalileeLabel =
+        (antipasPreferredAreaId
+          ? findPieceLabels(antipasPreferredAreaId)
+              .sort((left, right) => (right?.labelPoint?.[1] ?? 0) - (left?.labelPoint?.[1] ?? 0))[0]
+          : null) ?? null;
+      const commageneLabel = findPieceLabels("commagene")[0] ?? null;
+      if (!philipLabel || !antipasGalileeLabel || !commageneLabel) {
+        throw new Error(
+          `Missing expected holder-piece labels at AD 30. philip=${Boolean(philipLabel)} antipasGalilee=${Boolean(antipasGalileeLabel)} commagene=${Boolean(commageneLabel)}`
+        );
+      }
+      return {
+        philipLabel,
+        antipasGalileeLabel,
+        commageneLabel
+      };
+    },
+    { sortedStops: sortedStops.map((stop) => ({ id: stop.id, year: stop.year })) }
+  );
+  const isHolderRenderedAtCurrentView = async (holderId, labelPoint) =>
+    page.evaluate(
+      ({ testHookKey, holderLayerIds, expectedHolderId, expectedLabelPoint }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
+        return rendered.some((feature) => {
+          const featureHolderId = String(feature?.properties?.holderId ?? "").trim();
+          if (featureHolderId !== expectedHolderId) {
+            return false;
+          }
+          const coordinates = feature?.geometry?.coordinates;
+          if (!(feature?.geometry?.type === "Point" && Array.isArray(coordinates) && coordinates.length >= 2)) {
+            return false;
+          }
+          const longitudeDelta = Math.min(
+            Math.abs(coordinates[0] - expectedLabelPoint[0]),
+            Math.abs(coordinates[0] - (expectedLabelPoint[0] - 360)),
+            Math.abs(coordinates[0] - (expectedLabelPoint[0] + 360))
+          );
+          const latitudeDelta = Math.abs(coordinates[1] - expectedLabelPoint[1]);
+          return longitudeDelta <= 0.35 && latitudeDelta <= 0.35;
+        });
+      },
+      {
+        testHookKey: mapTestHookKey,
+        holderLayerIds: mapLayerIds.ancientHolderLabels,
+        expectedHolderId: holderId,
+        expectedLabelPoint: labelPoint
+      }
+    );
+  const positiveLabelControlAtCurrentView = async () =>
+    page.evaluate(
+      ({ testHookKey, areaLayerIds, pinLabelLayerIds }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        return {
+          areaLabelCount: map.queryRenderedFeatures(undefined, { layers: areaLayerIds }).length,
+          pinLabelCount: map.queryRenderedFeatures(undefined, { layers: pinLabelLayerIds }).length
+        };
+      },
+      {
+        testHookKey: mapTestHookKey,
+        areaLayerIds: mapLayerIds.areaLabels,
+        pinLabelLayerIds: mapLayerIds.pinLabels
+      }
+    );
+
+  let philipFirstZoom = null;
+  for (let zoom = 6; zoom <= 12; zoom += 1) {
+    await moveMapAndSettle({ center: holyLandLabelTargets.philipLabel.labelPoint, zoom });
+    if (
+      await isHolderRenderedAtCurrentView(
+        holyLandLabelTargets.philipLabel.holderId,
+        holyLandLabelTargets.philipLabel.labelPoint
+      )
+    ) {
+      philipFirstZoom = zoom;
+      break;
+    }
+  }
+
+  let antipasGalileeFirstZoom = null;
+  for (let zoom = 6; zoom <= 12; zoom += 1) {
+    await moveMapAndSettle({ center: holyLandLabelTargets.antipasGalileeLabel.labelPoint, zoom });
+    if (
+      await isHolderRenderedAtCurrentView(
+        holyLandLabelTargets.antipasGalileeLabel.holderId,
+        holyLandLabelTargets.antipasGalileeLabel.labelPoint
+      )
+    ) {
+      antipasGalileeFirstZoom = zoom;
+      break;
+    }
+  }
+
+  await moveMapAndSettle({ center: holyLandLabelTargets.commageneLabel.labelPoint, zoom: 5 });
+  const commageneControlAtZoom5 = await positiveLabelControlAtCurrentView();
+  const commageneRenderedAt5 = await isHolderRenderedAtCurrentView(
+    holyLandLabelTargets.commageneLabel.holderId,
+    holyLandLabelTargets.commageneLabel.labelPoint
+  );
+  await moveMapAndSettle({ center: holyLandLabelTargets.commageneLabel.labelPoint, zoom: 8 });
+  const commageneRenderedAt8 = await isHolderRenderedAtCurrentView(
+    holyLandLabelTargets.commageneLabel.holderId,
+    holyLandLabelTargets.commageneLabel.labelPoint
+  );
+
+  await moveMapAndSettle({ center: holyLandLabelTargets.philipLabel.labelPoint, zoom: 8 });
+  const philipProjectedAtZoom8 = await page.evaluate(
+    ({ testHookKey, labelPoint }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const projected = map.project(labelPoint);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, labelPoint: holyLandLabelTargets.philipLabel.labelPoint }
+  );
+  const holyLandLabelVisibility = {
+    philipFirstZoom,
+    antipasGalileeFirstZoom,
+    commageneRenderedAt5,
+    commageneRenderedAt8,
+    commageneControlAtZoom5,
+    philipProjectedAtZoom8
+  };
+  if (holyLandLabelVisibility.philipFirstZoom === null || holyLandLabelVisibility.philipFirstZoom > 8) {
+    throw new Error(
+      `Philip's holder label must render by zoom 8 at AD 30; first rendered zoom was ${String(holyLandLabelVisibility.philipFirstZoom)}.`
+    );
+  }
+  if (
+    holyLandLabelVisibility.antipasGalileeFirstZoom === null ||
+    holyLandLabelVisibility.antipasGalileeFirstZoom > 9
+  ) {
+    throw new Error(
+      `Antipas's Galilee-piece holder label must render by zoom 9 at AD 30; first rendered zoom was ${String(
+        holyLandLabelVisibility.antipasGalileeFirstZoom
+      )}.`
+    );
+  }
+  if (holyLandLabelVisibility.commageneRenderedAt5) {
+    throw new Error("Commagene holder label must be hidden at zoom 5 in AD 30.");
+  }
+  if (
+    holyLandLabelVisibility.commageneControlAtZoom5.areaLabelCount +
+      holyLandLabelVisibility.commageneControlAtZoom5.pinLabelCount <=
+    0
+  ) {
+    throw new Error("Commagene zoom-5 check is vacuous: no other labels rendered at that camera.");
+  }
+  if (!holyLandLabelVisibility.commageneRenderedAt8) {
+    throw new Error("Commagene holder label should render at zoom 8.");
+  }
+
+  await page.mouse.move(
+    holyLandLabelVisibility.philipProjectedAtZoom8.x,
+    holyLandLabelVisibility.philipProjectedAtZoom8.y
+  );
+  await page.waitForTimeout(150);
+  const philipTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
+  if (!philipTooltipText?.includes("4 BC – AD 34")) {
+    throw new Error(`Philip tooltip should show '4 BC – AD 34', got '${philipTooltipText ?? ""}'.`);
+  }
+
+  const browser = page.context().browser();
+  if (!browser) {
+    throw new Error("Browser instance is unavailable for timeline failure-state checks.");
+  }
+
+  const stopBlockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const stopBlockedPage = await stopBlockedContext.newPage();
+  let stopBlocked = true;
+  const blockedStopId = sortedStops[sortedStops.length - 1]?.id;
+  if (!blockedStopId) {
+    throw new Error("Could not resolve a stop to block for background-prefetch check.");
+  }
+  await stopBlockedPage.route("**/generated/ancient.*", async (route) => {
+    const requestUrl = new URL(route.request().url());
+    const fileName = path.basename(requestUrl.pathname);
+    if (fileName === `ancient.stop.${blockedStopId}.json` && stopBlocked) {
+      await route.abort("failed");
+      return;
+    }
+    await route.continue();
+  });
+  try {
+    await stopBlockedPage.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(stopBlockedPage);
+    await stopBlockedPage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
+    const initialFailureCount = await stopBlockedPage.getByText("Ancient layer data failed to load.", { exact: true }).count();
+    if (initialFailureCount !== 0) {
+      throw new Error("Failure state should not appear while only an unselected stop is blocked.");
+    }
+    const ad50Rendered = await stopBlockedPage.evaluate(({ testHookKey, ancientAreaFillLayerId }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      return map.queryRenderedFeatures(undefined, { layers: [ancientAreaFillLayerId] }).length > 0;
+    }, { testHookKey: mapTestHookKey, ancientAreaFillLayerId: mapLayerIds.ancientAreaFill });
+    if (!ad50Rendered) {
+      throw new Error("AD 50 stop should still render while a background-prefetch stop is blocked.");
+    }
+
+    await stopBlockedPage.goto(`${baseUrl}/?year=100`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(stopBlockedPage);
+    await stopBlockedPage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
+
+    stopBlocked = false;
+    await stopBlockedPage.getByRole("button", { name: "Try again" }).click();
+    await stopBlockedPage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await stopBlockedPage.getByText("AD 100").first().waitFor({ state: "visible", timeout: 30_000 });
+    const failureAfterRetry = await stopBlockedPage
+      .getByText("Ancient layer data failed to load.", { exact: true })
+      .count();
+    if (failureAfterRetry !== 0) {
+      throw new Error("Failure state should clear after unblocking and clicking Try again.");
+    }
+  } finally {
+    await stopBlockedPage.close();
+    await stopBlockedContext.close();
+  }
+
+  const timelineFailureContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const timelineFailurePage = await timelineFailureContext.newPage();
+  let blockTimeline = true;
+  await timelineFailurePage.route("**/generated/ancient.timeline.json", async (route) => {
+    if (blockTimeline) {
+      await route.fulfill({
+        status: 500,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+        body: "timeline error"
+      });
+      return;
+    }
+    await route.continue();
+  });
+  try {
+    await timelineFailurePage.goto(`${baseUrl}/?map=ancient`, { waitUntil: "networkidle", timeout: 60_000 });
+    await waitForMapToSettle(timelineFailurePage);
+    await timelineFailurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
+    const sliderCountOnFailure = await timelineFailurePage.locator("input[data-timeline-slider='true']").count();
+    if (sliderCountOnFailure !== 0) {
+      throw new Error("Timeline slider should be hidden when ancient.timeline.json returns 500.");
+    }
+    blockTimeline = false;
+    await timelineFailurePage.getByRole("button", { name: "Try again" }).click();
+    await timelineFailurePage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
+  } finally {
+    await timelineFailurePage.close();
+    await timelineFailureContext.close();
+  }
+
   return {
     stopCount: sortedStops.length,
     alignmentChecks,
     labelFit,
     provinceLabelsAtAd50: labelsAtAd50.provinceLabelIds,
-    judeaProvinceShownAtAd50,
-    judeaProvinceVisibleAtAd41: judeaAtAd41,
-    judeaProvinceVisibleAtAd44: judeaAtAd44,
+    judeaInSourceByYear,
+    cappadociaLabelVisibility: {
+      ad6: cappadociaAtAd6,
+      ad17: cappadociaAtAd17
+    },
+    achaiaLabelVisibility: {
+      ad53: achaiaAtAd53,
+      ad67: achaiaAtAd67
+    },
     holderTooltipText: holderTooltipValue,
+    philipTooltipText,
+    holyLandLabelVisibility,
     unclearTooltipText: unclearTooltipValue,
     renderedHolderLabelsWithLocation
   };
@@ -5145,7 +5575,17 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
       return durations;
     });
     const longTasksOverBudget = stopChangeLongTasks.filter((duration) => duration > 50);
-    if (longTasksOverBudget.length > 0) {
+    const fixtureRenderer = await detectWebGlRenderer(page);
+    const fixtureSoftwareRenderer = softwareRendererPattern.test(fixtureRenderer ?? "");
+    if (
+      longTasksOverBudget.length > 0 &&
+      fixtureSoftwareRenderer &&
+      process.env.SMOOTHNESS_REQUIRE_GPU !== "1"
+    ) {
+      console.warn(
+        `fixture timeline stop changes: ${longTasksOverBudget.length} long task(s) over 50 ms not enforced on software renderer (${fixtureRenderer}).`
+      );
+    } else if (longTasksOverBudget.length > 0) {
       throw new Error(
         `Timeline stop changes exceeded 50ms budget: ${longTasksOverBudget.map((value) => value.toFixed(2)).join(", ")}`
       );
@@ -9623,6 +10063,15 @@ async function verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(browser, baseUr
         hasTouch: true,
         isMobile: true
       }
+    },
+    {
+      label: "phone-opening-360x640",
+      viewport: { width: 360, height: 640 },
+      url: baseUrl,
+      contextOptions: {
+        hasTouch: true,
+        isMobile: true
+      }
     }
   ];
   const results = [];
@@ -9721,6 +10170,15 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         hasTouch: true,
         isMobile: true
       }
+    },
+    {
+      label: "phone-opening-360x640",
+      viewport: { width: 360, height: 640 },
+      url: baseUrl,
+      contextOptions: {
+        hasTouch: true,
+        isMobile: true
+      }
     }
   ];
   const results = [];
@@ -9738,7 +10196,11 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         state: "visible",
         timeout: 30_000
       });
-      await page.click("summary.maplibregl-ctrl-attrib-button");
+      if (scenario.contextOptions.isMobile) {
+        await page.tap("summary.maplibregl-ctrl-attrib-button");
+      } else {
+        await page.click("summary.maplibregl-ctrl-attrib-button");
+      }
       await page.waitForFunction(
         () => {
           const compact = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
@@ -9766,6 +10228,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         const timelineCard = document.querySelector("[data-timeline-card='true']");
         const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
         const toggle = document.querySelector("summary.maplibregl-ctrl-attrib-button");
+        const scaleBar = document.querySelector("[data-map-scale='metric']");
         let centerElementTag = null;
         let toggleHit = false;
         if (toggle instanceof HTMLElement) {
@@ -9780,6 +10243,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         return {
           timelineBounds: toBounds(timelineCard),
           attributionBounds: toBounds(compactControl),
+          scaleBounds: toBounds(scaleBar),
           toggleBounds: toBounds(toggle),
           centerElementTag,
           toggleHit
@@ -9798,6 +10262,13 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
           )} attribution=${JSON.stringify(snapshot.attributionBounds)}`
         );
       }
+      if (snapshot.scaleBounds && rectanglesOverlap(snapshot.scaleBounds, snapshot.attributionBounds)) {
+        throw new Error(
+          `Expanded attribution intersects scale bar in ${scenario.label}. scale=${JSON.stringify(
+            snapshot.scaleBounds
+          )} attribution=${JSON.stringify(snapshot.attributionBounds)}`
+        );
+      }
       if (!snapshot.toggleHit) {
         throw new Error(
           `Attribution toggle is occluded in ${scenario.label}: centerElement=${snapshot.centerElementTag}`
@@ -9808,7 +10279,8 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         label: scenario.label,
         viewport: scenario.viewport,
         timelineBounds: snapshot.timelineBounds,
-        attributionBounds: snapshot.attributionBounds
+        attributionBounds: snapshot.attributionBounds,
+        scaleBounds: snapshot.scaleBounds
       });
     } finally {
       await page.close();

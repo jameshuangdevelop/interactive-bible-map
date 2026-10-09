@@ -11,6 +11,15 @@ import { presimplify, simplify } from "topojson-simplify";
 // needs. The zoom-10 shapes, the per-stop border lines drawn from the same simplified topology and
 // the static empire edge use 4 decimals (about 11 m), well below their simplification.
 const SIMPLIFIED_COORDINATE_DECIMALS = 4;
+const HOLDER_LABEL_MIN_ZOOM = 4;
+const HOLDER_LABEL_MAX_ZOOM = 9;
+const HOLDER_LABEL_FONT_SIZE_PX = 13;
+const HOLDER_LABEL_LETTER_SPACING_EM = 0.18;
+const HOLDER_LABEL_LINE_HEIGHT_PX = 12;
+const HOLDER_LABEL_MAX_LINE_WIDTH_PX = 150;
+const HOLDER_LABEL_EDGE_PADDING_PX = 0;
+const HOLDER_LABEL_PIN_BUFFER_PX_AT_ZOOM8 = 36;
+const HOLDER_LABEL_GRID_STEPS = 56;
 
 function toMapById(records) {
   const map = new Map();
@@ -116,6 +125,249 @@ function simplifyRoadGeometry(geometry, tolerance) {
   return geometry;
 }
 
+function projectLngLatToPixels(longitude, latitude, zoom) {
+  const worldSize = 256 * 2 ** zoom;
+  const clampedLatitude = Math.max(-85.05112878, Math.min(85.05112878, latitude));
+  const latitudeRadians = (clampedLatitude * Math.PI) / 180;
+  const x = ((longitude + 180) / 360) * worldSize;
+  const y =
+    (0.5 -
+      Math.log((1 + Math.sin(latitudeRadians)) / (1 - Math.sin(latitudeRadians))) /
+        (4 * Math.PI)) *
+    worldSize;
+  return [x, y];
+}
+
+function projectPolygonToPixels(polygonCoordinates, zoom) {
+  return polygonCoordinates.map((ring) =>
+    ring.map(([longitude, latitude]) => projectLngLatToPixels(longitude, latitude, zoom))
+  );
+}
+
+function pointDistance(pointA, pointB) {
+  return Math.hypot(pointA[0] - pointB[0], pointA[1] - pointB[1]);
+}
+
+function distanceToPolygonEdges(point, polygonCoordinates) {
+  let minimumDistance = Number.POSITIVE_INFINITY;
+  for (const ring of polygonCoordinates) {
+    for (let index = 0; index < ring.length - 1; index += 1) {
+      minimumDistance = Math.min(minimumDistance, perpendicularDistance(point, ring[index], ring[index + 1]));
+    }
+  }
+  return minimumDistance;
+}
+
+function stripBracketedLabelSuffix(value) {
+  return value.replace(/\s*\([^)]*\)/gu, "").replace(/\s+/gu, " ").trim();
+}
+
+function estimateHolderLabelLineWidthPx(textLine) {
+  const characters = [...textLine];
+  if (characters.length === 0) {
+    return 0;
+  }
+
+  let width = 0;
+  for (const character of characters) {
+    width += character === " " ? 3.8 : 6.4;
+  }
+  width += Math.max(0, characters.length - 1) * HOLDER_LABEL_FONT_SIZE_PX * HOLDER_LABEL_LETTER_SPACING_EM;
+  return width;
+}
+
+function wrapHolderLabelText(text) {
+  const words = text.split(/\s+/u).filter((word) => word.length > 0);
+  if (words.length === 0) {
+    return { wrappedText: "", lineWidths: [0], lineCount: 1 };
+  }
+
+  const lines = [];
+  let currentLine = words[0];
+  for (let index = 1; index < words.length; index += 1) {
+    const nextWord = words[index];
+    const candidateLine = `${currentLine} ${nextWord}`;
+    if (estimateHolderLabelLineWidthPx(candidateLine) <= HOLDER_LABEL_MAX_LINE_WIDTH_PX) {
+      currentLine = candidateLine;
+      continue;
+    }
+    lines.push(currentLine);
+    currentLine = nextWord;
+  }
+  lines.push(currentLine);
+
+  const lineWidths = lines.map((line) => estimateHolderLabelLineWidthPx(line));
+  return {
+    wrappedText: lines.join("\n"),
+    lineWidths,
+    lineCount: lines.length
+  };
+}
+
+function holderLabelFitsInsidePolygonAtZoom({
+  labelPoint,
+  polygonCoordinates,
+  lineWidths,
+  lineCount,
+  zoom
+}) {
+  const projectedPolygon = projectPolygonToPixels(polygonCoordinates, zoom);
+  const projectedLabelPoint = projectLngLatToPixels(labelPoint[0], labelPoint[1], zoom);
+  const halfWidth = Math.max(0, ...lineWidths) / 2 + HOLDER_LABEL_EDGE_PADDING_PX;
+  const halfHeight = (lineCount * HOLDER_LABEL_LINE_HEIGHT_PX) / 2 + HOLDER_LABEL_EDGE_PADDING_PX;
+
+  const samplePoints = [
+    [projectedLabelPoint[0] - halfWidth, projectedLabelPoint[1] - halfHeight],
+    [projectedLabelPoint[0] + halfWidth, projectedLabelPoint[1] - halfHeight],
+    [projectedLabelPoint[0] + halfWidth, projectedLabelPoint[1] + halfHeight],
+    [projectedLabelPoint[0] - halfWidth, projectedLabelPoint[1] + halfHeight],
+    [projectedLabelPoint[0], projectedLabelPoint[1] - halfHeight],
+    [projectedLabelPoint[0], projectedLabelPoint[1] + halfHeight],
+    [projectedLabelPoint[0] - halfWidth, projectedLabelPoint[1]],
+    [projectedLabelPoint[0] + halfWidth, projectedLabelPoint[1]],
+    projectedLabelPoint
+  ];
+
+  return samplePoints.every((samplePoint) => pointInPolygon(samplePoint, projectedPolygon));
+}
+
+function calculateHolderLabelMinZoom({
+  labelPoint,
+  polygonCoordinates,
+  lineWidths,
+  lineCount
+}) {
+  for (let zoom = HOLDER_LABEL_MIN_ZOOM; zoom <= HOLDER_LABEL_MAX_ZOOM; zoom += 1) {
+    if (
+      holderLabelFitsInsidePolygonAtZoom({
+        labelPoint,
+        polygonCoordinates,
+        lineWidths,
+        lineCount,
+        zoom
+      })
+    ) {
+      return zoom;
+    }
+  }
+  return HOLDER_LABEL_MAX_ZOOM + 1;
+}
+
+function selectHolderLabelPoint({
+  polygonCoordinates,
+  majorPinsInPiece,
+  lineWidths,
+  lineCount,
+  fallbackPoint
+}) {
+  const bounds = polygonBoundingBox(polygonCoordinates);
+  if (!bounds) {
+    return {
+      point: fallbackPoint,
+      minZoom: calculateHolderLabelMinZoom({
+        labelPoint: fallbackPoint,
+        polygonCoordinates,
+        lineWidths,
+        lineCount
+      })
+    };
+  }
+
+  const projectedPolygon = projectPolygonToPixels(polygonCoordinates, 8);
+  const projectedPins = (majorPinsInPiece ?? []).map((pin) => projectLngLatToPixels(pin[0], pin[1], 8));
+  const candidates = [];
+
+  const evaluateCandidate = (candidatePoint) => {
+    if (!candidatePoint || !pointInPolygon(candidatePoint, polygonCoordinates)) {
+      return;
+    }
+
+    const projectedCandidate = projectLngLatToPixels(candidatePoint[0], candidatePoint[1], 8);
+    const edgeDistance = distanceToPolygonEdges(projectedCandidate, projectedPolygon);
+    const pinDistance =
+      projectedPins.length === 0
+        ? Number.POSITIVE_INFINITY
+        : projectedPins.reduce(
+            (minimumDistance, projectedPin) =>
+              Math.min(minimumDistance, pointDistance(projectedCandidate, projectedPin)),
+            Number.POSITIVE_INFINITY
+          );
+
+    candidates.push({
+      point: candidatePoint,
+      minZoom: calculateHolderLabelMinZoom({
+        labelPoint: candidatePoint,
+        polygonCoordinates,
+        lineWidths,
+        lineCount
+      }),
+      pinDistance,
+      edgeDistance
+    });
+  };
+
+  evaluateCandidate(fallbackPoint);
+
+  for (let stepY = 0; stepY < HOLDER_LABEL_GRID_STEPS; stepY += 1) {
+    const latitude =
+      bounds.minY + ((stepY + 0.5) / HOLDER_LABEL_GRID_STEPS) * (bounds.maxY - bounds.minY);
+    for (let stepX = 0; stepX < HOLDER_LABEL_GRID_STEPS; stepX += 1) {
+      const longitude =
+        bounds.minX + ((stepX + 0.5) / HOLDER_LABEL_GRID_STEPS) * (bounds.maxX - bounds.minX);
+      const candidatePoint = [longitude, latitude];
+      evaluateCandidate(candidatePoint);
+    }
+  }
+
+  if (candidates.length === 0) {
+    return {
+      point: fallbackPoint,
+      minZoom: calculateHolderLabelMinZoom({
+        labelPoint: fallbackPoint,
+        polygonCoordinates,
+        lineWidths,
+        lineCount
+      })
+    };
+  }
+
+  const bestCandidate = candidates.sort((left, right) => {
+    if (left.minZoom !== right.minZoom) {
+      return left.minZoom - right.minZoom;
+    }
+
+    const leftBufferClear = left.pinDistance - HOLDER_LABEL_PIN_BUFFER_PX_AT_ZOOM8;
+    const rightBufferClear = right.pinDistance - HOLDER_LABEL_PIN_BUFFER_PX_AT_ZOOM8;
+    const leftClearsBuffer = leftBufferClear >= 0;
+    const rightClearsBuffer = rightBufferClear >= 0;
+    if (leftClearsBuffer !== rightClearsBuffer) {
+      return leftClearsBuffer ? -1 : 1;
+    }
+
+    if (left.pinDistance !== right.pinDistance) {
+      return right.pinDistance - left.pinDistance;
+    }
+    if (left.edgeDistance !== right.edgeDistance) {
+      return right.edgeDistance - left.edgeDistance;
+    }
+
+    const leftScore = Math.min(left.edgeDistance, leftBufferClear);
+    const rightScore = Math.min(right.edgeDistance, rightBufferClear);
+    if (leftScore !== rightScore) {
+      return rightScore - leftScore;
+    }
+    if (left.point[0] !== right.point[0]) {
+      return left.point[0] - right.point[0];
+    }
+    return left.point[1] - right.point[1];
+  })[0];
+
+  return {
+    point: bestCandidate.point,
+    minZoom: bestCandidate.minZoom
+  };
+}
+
 function polygonArea(linearRing) {
   if (!Array.isArray(linearRing) || linearRing.length < 4) {
     return 0;
@@ -134,6 +386,12 @@ function pointOnSegment(point, segmentStart, segmentEnd, epsilon = 1e-9) {
   const [px, py] = point;
   const [x1, y1] = segmentStart;
   const [x2, y2] = segmentEnd;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const squaredLength = dx ** 2 + dy ** 2;
+  if (squaredLength <= epsilon) {
+    return Math.hypot(px - x1, py - y1) <= epsilon;
+  }
   const cross = (px - x1) * (y2 - y1) - (py - y1) * (x2 - x1);
   if (Math.abs(cross) > epsilon) {
     return false;
@@ -142,7 +400,6 @@ function pointOnSegment(point, segmentStart, segmentEnd, epsilon = 1e-9) {
   if (dot < -epsilon) {
     return false;
   }
-  const squaredLength = (x2 - x1) ** 2 + (y2 - y1) ** 2;
   return dot - squaredLength <= epsilon;
 }
 
@@ -283,6 +540,8 @@ function holderSpanForYear(area, year) {
   const active = area.periods[activeIndex];
   let heldFromYear = active.fromYear;
   let heldToYear = active.toYear;
+  let runStartIndex = activeIndex;
+  let runEndIndex = activeIndex;
 
   for (let index = activeIndex - 1; index >= 0; index -= 1) {
     const period = area.periods[index];
@@ -290,6 +549,7 @@ function holderSpanForYear(area, year) {
       break;
     }
     heldFromYear = period.fromYear;
+    runStartIndex = index;
   }
 
   for (let index = activeIndex + 1; index < area.periods.length; index += 1) {
@@ -298,12 +558,15 @@ function holderSpanForYear(area, year) {
       break;
     }
     heldToYear = period.toYear;
+    runEndIndex = index;
   }
 
   return {
     period: active,
     heldFromYear,
-    heldToYear
+    heldToYear,
+    runStartIndex,
+    runEndIndex
   };
 }
 
@@ -367,7 +630,7 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
   };
 }
 
-function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) {
+function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, majorPlacePinCoordinates }) {
   const holderPieces = new Map();
 
   for (const assignment of assignments) {
@@ -378,10 +641,25 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) 
 
     for (const polygon of polygonsFromGeometry(areaFeature.geometry)) {
       const area = polygonArea(polygon[0]);
+      const bounds = polygonBoundingBox(polygon);
       const pieces = holderPieces.get(assignment.holderId) ?? [];
       pieces.push({
         polygon,
-        area
+        area,
+        majorPins: (majorPlacePinCoordinates ?? [])
+          .filter((majorPin) => {
+            if (!bounds) {
+              return false;
+            }
+            const [longitude, latitude] = majorPin.coordinates;
+            return (
+              longitude >= bounds.minX - 1.2 &&
+              longitude <= bounds.maxX + 1.2 &&
+              latitude >= bounds.minY - 1.2 &&
+              latitude <= bounds.maxY + 1.2
+            );
+          })
+          .map((majorPin) => majorPin.coordinates)
       });
       holderPieces.set(assignment.holderId, pieces);
     }
@@ -417,10 +695,26 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById }) 
       if (!pointInPolygon(labelPoint, piece.polygon)) {
         labelPoint = findGuaranteedInteriorPoint(piece.polygon) ?? labelPoint;
       }
+      const labelName = stripBracketedLabelSuffix(holder.name).toUpperCase();
+      const wrappedLabel = wrapHolderLabelText(labelName);
+      const selectedLabel = selectHolderLabelPoint({
+        polygonCoordinates: piece.polygon,
+        majorPinsInPiece: piece.majorPins,
+        lineWidths: wrappedLabel.lineWidths,
+        lineCount: wrappedLabel.lineCount,
+        fallbackPoint: labelPoint
+      });
+      labelPoint = selectedLabel.point;
+      const minZoom = selectedLabel.minZoom;
+      if (minZoom > HOLDER_LABEL_MAX_ZOOM) {
+        continue;
+      }
 
       labels.push({
         holderId,
         name: holder.name,
+        labelText: wrappedLabel.wrappedText,
+        minZoom,
         kind: holder.kind,
         romanSide: holder.romanSide,
         locationId: null,
@@ -564,6 +858,7 @@ export async function buildAncientAppData({
   ancientCoastlineData,
   bibliographyById = new Map(),
   ancientEmpireEdgeData = null,
+  majorPlacePinCoordinates = [],
   outputDirectory,
   simplifyThreshold = 0.00002,
   roadSimplifyTolerance = 0.0015
@@ -695,11 +990,16 @@ export async function buildAncientAppData({
       if (!holderSpan) {
         continue;
       }
-      const { period, heldFromYear, heldToYear } = holderSpan;
+      const { period, heldFromYear, heldToYear, runStartIndex } = holderSpan;
       const holder = entitiesById.get(period.holderId);
       if (!holder) {
         continue;
       }
+      const runStartsAtTimelineStart = heldFromYear === timelineData.range.fromYear;
+      const noEarlierPeriodInData =
+        runStartIndex === 0 &&
+        area.periods[0]?.fromYear === timelineData.range.fromYear;
+      const heldFromKnown = !(runStartsAtTimelineStart && noEarlierPeriodInData);
 
       const assignment = {
         areaId: area.id,
@@ -710,6 +1010,7 @@ export async function buildAncientAppData({
         ruler: period.ruler ?? null,
         heldFromYear,
         heldToYear,
+        heldFromKnown,
         note: period.note ?? null,
         hasShape: areaFeatureById.has(area.id)
       };
@@ -725,7 +1026,8 @@ export async function buildAncientAppData({
     const holderLabels = buildHolderLabelPoints({
       assignments,
       areaFeatureById,
-      entitiesById
+      entitiesById,
+      majorPlacePinCoordinates
     });
 
     writtenFiles.push(

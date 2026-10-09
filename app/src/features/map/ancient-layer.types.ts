@@ -92,6 +92,7 @@ export interface AncientAreaAssignment {
   ruler: string | null;
   heldFromYear: TimelineYear;
   heldToYear: TimelineYear;
+  heldFromKnown: boolean;
   note: string | null;
   hasShape: boolean;
 }
@@ -108,6 +109,8 @@ export interface AncientHolderBorderFeatureProperties {
 export interface AncientHolderLabelPoint {
   holderId: string;
   name: string;
+  labelText: string;
+  minZoom: number;
   kind: AncientEntityRecord["kind"];
   romanSide: boolean;
   locationId: string | null;

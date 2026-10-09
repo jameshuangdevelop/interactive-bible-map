@@ -112,8 +112,9 @@ Generated app payloads:
 - Full shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
 - Everything the ancient layer loads (the `ancient.*` files) must stay within 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-08).
 - Stop-area assignments carry each period's optional `note`.
-- Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year.
+- Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year. They also include `heldFromKnown`, which is `false` when that span starts at the timeline range's `fromYear` and there is no earlier period in that area's data.
 - `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
+- Each `holderLabels` entry includes `labelText` (uppercase, bracketed suffix removed, deterministic line breaks) and `minZoom` (the first zoom where the full label box fits inside that piece).
 
 Places and political history:
 - `politicalAreaId` links a location to one timeline area.
