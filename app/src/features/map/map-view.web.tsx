@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   AttributionControl,
   LngLatBounds,
@@ -3994,6 +3995,41 @@ export function MapView({
     Math.max(0, timelineOverlayInset)
   );
   const compactAttributionRightOffset = 72;
+  const visiblePlacesList = (
+    <div
+      aria-label="Visible places on map"
+      className="ibm-hidden-visible-places"
+      style={{
+        position: "absolute",
+        width: "1px",
+        height: "1px",
+        padding: 0,
+        margin: "-1px",
+        overflow: "hidden",
+        clip: "rect(0, 0, 0, 0)",
+        whiteSpace: "nowrap",
+        border: 0
+      }}
+    >
+      {visibleEntries.map((entry) => (
+        <button
+          key={entry.id}
+          aria-label={entry.accessibleName}
+          data-place-entry-id={entry.id}
+          onClick={() => activateVisibleEntry(entry)}
+          onFocus={() => setVisibleEntryFocus(entry)}
+          type="button"
+        >
+          {entry.accessibleName}
+        </button>
+      ))}
+      {visibleEntryOverflow ? (
+        <p role="note">Zoom in or search to reach more places</p>
+      ) : null}
+    </div>
+  );
+  const visiblePlacesPortalHost =
+    typeof document !== "undefined" ? document.getElementById("ibm-visible-places-portal-root") : null;
 
   return (
     <div
@@ -4172,23 +4208,7 @@ export function MapView({
       >
         ⟳
       </button>
-      <div aria-label="Visible places on map" className="ibm-hidden-visible-places">
-        {visibleEntries.map((entry) => (
-          <button
-            key={entry.id}
-            aria-label={entry.accessibleName}
-            data-place-entry-id={entry.id}
-            onClick={() => activateVisibleEntry(entry)}
-            onFocus={() => setVisibleEntryFocus(entry)}
-            type="button"
-          >
-            {entry.accessibleName}
-          </button>
-        ))}
-        {visibleEntryOverflow ? (
-          <p role="note">Zoom in or search to reach more places</p>
-        ) : null}
-      </div>
+      {visiblePlacesPortalHost ? createPortal(visiblePlacesList, visiblePlacesPortalHost) : visiblePlacesList}
       {basemapState.message ? (
         <div
           role="status"

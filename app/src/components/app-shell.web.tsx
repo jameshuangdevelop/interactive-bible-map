@@ -3,6 +3,7 @@ import {
   lazy,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -240,7 +241,9 @@ export function AppShell() {
   const [ancientLayerRetryToken, setAncientLayerRetryToken] = useState(0);
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
+  const [timelineOverlayInsetForAttribution, setTimelineOverlayInsetForAttribution] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const timelineCardRef = useRef<HTMLDivElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
@@ -843,11 +846,39 @@ export function AppShell() {
     setAncientLayerRetryToken((value) => value + 1);
   }, [ancientTimelineLoadState]);
   const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
-  const timelineOverlayInsetForAttribution = timelineVisible
-    ? isSmallScreen
-      ? 208
-      : 176
-    : 0;
+  useLayoutEffect(() => {
+    if (!timelineVisible) {
+      return undefined;
+    }
+
+    const updateTimelineOverlayInset = () => {
+      const card = timelineCardRef.current;
+      if (!card) {
+        setTimelineOverlayInsetForAttribution(0);
+        return;
+      }
+
+      const bounds = card.getBoundingClientRect();
+      const nextInset = Math.max(0, Math.ceil(window.innerHeight - bounds.top + 8));
+      setTimelineOverlayInsetForAttribution((currentInset) =>
+        currentInset === nextInset ? currentInset : nextInset
+      );
+    };
+
+    updateTimelineOverlayInset();
+    window.addEventListener("resize", updateTimelineOverlayInset);
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && timelineCardRef.current) {
+      observer = new ResizeObserver(updateTimelineOverlayInset);
+      observer.observe(timelineCardRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateTimelineOverlayInset);
+      observer?.disconnect();
+    };
+  }, [timelineVisible]);
+  const effectiveTimelineOverlayInsetForAttribution = timelineVisible ? timelineOverlayInsetForAttribution : 0;
   const timelineWidthLimitPx = Math.max(
     280,
     isSmallScreen
@@ -1017,7 +1048,7 @@ export function AppShell() {
             places={places}
             selectedTimelineStopId={selectedTimelineStopId}
             selection={selection}
-            timelineOverlayInset={timelineOverlayInsetForAttribution}
+            timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
           />
         </Suspense>
       )}
@@ -1025,6 +1056,7 @@ export function AppShell() {
       {timelineVisible ? (
         <div
           data-timeline-card="true"
+          ref={timelineCardRef}
           style={{
             position: "absolute",
             left: timelineMapCenterLeft,
@@ -1117,7 +1149,7 @@ export function AppShell() {
                       <strong>Passages:</strong>
                       <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
                         {selectedTimelineStop.scripture.map((reference) => (
-                          <li key={reference}>{reference}</li>
+                          <li key={reference}>{reference.replace(/^scripture:/u, "")}</li>
                         ))}
                       </ul>
                     </div>
@@ -1316,6 +1348,7 @@ export function AppShell() {
           )}
         </div>
       ) : null}
+      <div id="ibm-visible-places-portal-root" style={srOnlyStyle} />
 
       {selectedPlace && panelStyle ? (
         <section aria-label="Place details" style={panelStyle}>

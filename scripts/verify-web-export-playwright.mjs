@@ -4852,6 +4852,12 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
       `Sources popover first paragraph mismatch. expected='${timelineBorderNote}' actual='${firstPopoverParagraph}'.`
     );
   }
+  const popoverTextWithoutSpacing = (
+    (await page.locator("[data-timeline-sources-popover='true']").textContent()) ?? ""
+  ).replace(/\s+/gu, " ");
+  if (/scripture:/iu.test(popoverTextWithoutSpacing)) {
+    throw new Error(`Sources popover should not include raw scripture: ids, got '${popoverTextWithoutSpacing}'.`);
+  }
 
   const earlierButton = page.getByRole("button", { name: "Earlier change" });
   const laterButton = page.getByRole("button", { name: "Later change" });
@@ -10508,6 +10514,23 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         hasTouch: true,
         isMobile: true
       }
+    },
+    {
+      label: "desktop-sources-open-1440x900",
+      viewport: { width: 1440, height: 900 },
+      url: `${baseUrl}/?year=44`,
+      contextOptions: {},
+      openSourcesPopover: true
+    },
+    {
+      label: "phone-sources-open-390x844",
+      viewport: { width: 390, height: 844 },
+      url: `${baseUrl}/?year=44`,
+      contextOptions: {
+        hasTouch: true,
+        isMobile: true
+      },
+      openSourcesPopover: true
     }
   ];
   const results = [];
@@ -10521,6 +10544,17 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
     try {
       await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
       await waitForMapToSettle(page);
+      if (scenario.openSourcesPopover) {
+        if (scenario.contextOptions.isMobile) {
+          await page.getByRole("button", { name: "Sources" }).tap();
+        } else {
+          await page.getByRole("button", { name: "Sources" }).click();
+        }
+        await page.locator("[data-timeline-sources-popover='true']").waitFor({
+          state: "visible",
+          timeout: 10_000
+        });
+      }
       await page.waitForSelector("summary.maplibregl-ctrl-attrib-button", {
         state: "visible",
         timeout: 30_000
@@ -10558,6 +10592,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
         const toggle = document.querySelector("summary.maplibregl-ctrl-attrib-button");
         const scaleBar = document.querySelector("[data-map-scale='metric']");
+        const sourcesPopover = document.querySelector("[data-timeline-sources-popover='true']");
         let centerElementTag = null;
         let toggleHit = false;
         if (toggle instanceof HTMLElement) {
@@ -10571,6 +10606,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
 
         return {
           timelineBounds: toBounds(timelineCard),
+          sourcesPopoverBounds: toBounds(sourcesPopover),
           attributionBounds: toBounds(compactControl),
           scaleBounds: toBounds(scaleBar),
           toggleBounds: toBounds(toggle),
@@ -10598,6 +10634,17 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
           )} attribution=${JSON.stringify(snapshot.attributionBounds)}`
         );
       }
+      if (
+        scenario.openSourcesPopover &&
+        snapshot.sourcesPopoverBounds &&
+        rectanglesOverlap(snapshot.sourcesPopoverBounds, snapshot.attributionBounds)
+      ) {
+        throw new Error(
+          `Expanded attribution intersects Sources popover in ${scenario.label}. popover=${JSON.stringify(
+            snapshot.sourcesPopoverBounds
+          )} attribution=${JSON.stringify(snapshot.attributionBounds)}`
+        );
+      }
       if (!snapshot.toggleHit) {
         throw new Error(
           `Attribution toggle is occluded in ${scenario.label}: centerElement=${snapshot.centerElementTag}`
@@ -10608,6 +10655,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
         label: scenario.label,
         viewport: scenario.viewport,
         timelineBounds: snapshot.timelineBounds,
+        sourcesPopoverBounds: snapshot.sourcesPopoverBounds,
         attributionBounds: snapshot.attributionBounds,
         scaleBounds: snapshot.scaleBounds
       });
