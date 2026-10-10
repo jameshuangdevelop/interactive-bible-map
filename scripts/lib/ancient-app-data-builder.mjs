@@ -20,6 +20,8 @@ const HOLDER_LABEL_MAX_LINE_WIDTH_PX = 150;
 const HOLDER_LABEL_EDGE_PADDING_PX = 0;
 const HOLDER_LABEL_PIN_BUFFER_PX_AT_ZOOM8 = 36;
 const HOLDER_LABEL_GRID_STEPS = 56;
+const ROAD_JOIN_MIN_DISTANCE_KM = 0.2;
+const ROAD_JOIN_MAX_DISTANCE_KM = 4;
 const MAPLIBRE_GLYPH_METRICS_EM_SIZE = 24;
 const HOLDER_LABEL_GLYPH_WIDTH_SAFETY_FACTOR = 1.05;
 // Source: https://tiles.openfreemap.org/fonts/Noto%20Sans%20Bold/0-255.pbf
@@ -160,6 +162,206 @@ function simplifyRoadGeometry(geometry, tolerance) {
     };
   }
   return geometry;
+}
+
+function toRadians(value) {
+  return (value * Math.PI) / 180;
+}
+
+function haversineDistanceKm(pointA, pointB) {
+  const [lonA, latA] = pointA;
+  const [lonB, latB] = pointB;
+  const latitudeDelta = toRadians(latB - latA);
+  const longitudeDelta = toRadians(lonB - lonA);
+  const latitudeA = toRadians(latA);
+  const latitudeB = toRadians(latB);
+  const sinLatitude = Math.sin(latitudeDelta / 2);
+  const sinLongitude = Math.sin(longitudeDelta / 2);
+  const haversine =
+    sinLatitude * sinLatitude +
+    Math.cos(latitudeA) * Math.cos(latitudeB) * sinLongitude * sinLongitude;
+  const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(Math.max(0, 1 - haversine)));
+  return 6371.0088 * arc;
+}
+
+function localMetersByLongitude(longitude, latitude, referenceLatitude) {
+  const latitudeRadians = toRadians(referenceLatitude);
+  const x = longitude * 111320 * Math.cos(latitudeRadians);
+  const y = latitude * 111320;
+  return [x, y];
+}
+
+function nearestPointOnSegmentLngLat(point, segmentStart, segmentEnd) {
+  const referenceLatitude = point[1];
+  const [pointX, pointY] = localMetersByLongitude(point[0], point[1], referenceLatitude);
+  const [startX, startY] = localMetersByLongitude(
+    segmentStart[0],
+    segmentStart[1],
+    referenceLatitude
+  );
+  const [endX, endY] = localMetersByLongitude(segmentEnd[0], segmentEnd[1], referenceLatitude);
+  const deltaX = endX - startX;
+  const deltaY = endY - startY;
+  if (deltaX === 0 && deltaY === 0) {
+    return {
+      point: [segmentStart[0], segmentStart[1]],
+      factor: 0
+    };
+  }
+
+  const t = ((pointX - startX) * deltaX + (pointY - startY) * deltaY) / (deltaX * deltaX + deltaY * deltaY);
+  const clampedT = Math.max(0, Math.min(1, t));
+  return {
+    point: [
+      segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * clampedT,
+      segmentStart[1] + (segmentEnd[1] - segmentStart[1]) * clampedT
+    ],
+    factor: clampedT
+  };
+}
+
+function normalizeRoadLineStrings(geometry) {
+  if (!geometry || typeof geometry !== "object") {
+    return [];
+  }
+  if (geometry.type === "LineString" && Array.isArray(geometry.coordinates)) {
+    return [geometry.coordinates];
+  }
+  if (geometry.type === "MultiLineString" && Array.isArray(geometry.coordinates)) {
+    return geometry.coordinates.filter((line) => Array.isArray(line));
+  }
+  return [];
+}
+
+function endpointKey(point) {
+  return `${roundNumber(point[0], 6)},${roundNumber(point[1], 6)}`;
+}
+
+function joinKey(pointA, pointB) {
+  const a = endpointKey(pointA);
+  const b = endpointKey(pointB);
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+function buildRoadJoinFeatures(roadFeatures) {
+  const roadLines = [];
+  for (let featureIndex = 0; featureIndex < roadFeatures.length; featureIndex += 1) {
+    const lines = normalizeRoadLineStrings(roadFeatures[featureIndex]?.geometry);
+    lines.forEach((line) => {
+      if (Array.isArray(line) && line.length >= 2) {
+        roadLines.push({ featureIndex, coordinates: line });
+      }
+    });
+  }
+
+  const joins = [];
+  const seenFacingJoinKeys = new Set();
+  let totalJoinLengthKm = 0;
+  let maxJoinLengthKm = 0;
+  const segments = roadLines.flatMap((lineEntry) => {
+    const parts = [];
+    for (let index = 0; index < lineEntry.coordinates.length - 1; index += 1) {
+      parts.push({
+        featureIndex: lineEntry.featureIndex,
+        start: lineEntry.coordinates[index],
+        end: lineEntry.coordinates[index + 1]
+      });
+    }
+    return parts;
+  });
+  const roadVertices = roadLines.flatMap((lineEntry) =>
+    lineEntry.coordinates.map((coordinate) => ({
+      featureIndex: lineEntry.featureIndex,
+      coordinate
+    }))
+  );
+  const roadEndpoints = roadLines.flatMap((lineEntry) => [
+    {
+      featureIndex: lineEntry.featureIndex,
+      coordinate: lineEntry.coordinates[0]
+    },
+    {
+      featureIndex: lineEntry.featureIndex,
+      coordinate: lineEntry.coordinates[lineEntry.coordinates.length - 1]
+    }
+  ]);
+  const roadEndpointKeys = new Set(roadEndpoints.map((endpoint) => endpointKey(endpoint.coordinate)));
+
+  for (const lineEntry of roadLines) {
+    const endpoints = [lineEntry.coordinates[0], lineEntry.coordinates[lineEntry.coordinates.length - 1]];
+    for (const endpoint of endpoints) {
+      let nearestVertexRoad = null;
+      for (const candidateVertex of roadVertices) {
+        if (candidateVertex.featureIndex === lineEntry.featureIndex) {
+          continue;
+        }
+        const distanceKm = haversineDistanceKm(endpoint, candidateVertex.coordinate);
+        if (distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM || distanceKm > ROAD_JOIN_MAX_DISTANCE_KM) {
+          continue;
+        }
+        if (!nearestVertexRoad || distanceKm < nearestVertexRoad.distanceKm) {
+          nearestVertexRoad = {
+            featureIndex: candidateVertex.featureIndex,
+            distanceKm
+          };
+        }
+      }
+
+      if (!nearestVertexRoad) {
+        continue;
+      }
+
+      let bestMatch = null;
+      for (const segment of segments) {
+        if (segment.featureIndex !== nearestVertexRoad.featureIndex) {
+          continue;
+        }
+        const nearest = nearestPointOnSegmentLngLat(endpoint, segment.start, segment.end);
+        const distanceKm = haversineDistanceKm(endpoint, nearest.point);
+        if (!bestMatch || distanceKm < bestMatch.distanceKm) {
+          bestMatch = {
+            nearestPoint: nearest.point,
+            distanceKm
+          };
+        }
+      }
+
+      if (!bestMatch || bestMatch.distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM || bestMatch.distanceKm > ROAD_JOIN_MAX_DISTANCE_KM) {
+        continue;
+      }
+
+      const targetEndpointKey = endpointKey(bestMatch.nearestPoint);
+      if (roadEndpointKeys.has(targetEndpointKey)) {
+        const facingJoinKey = joinKey(endpoint, bestMatch.nearestPoint);
+        if (seenFacingJoinKeys.has(facingJoinKey)) {
+          continue;
+        }
+        seenFacingJoinKeys.add(facingJoinKey);
+      }
+
+      const sourceProperties = { ...(roadFeatures[lineEntry.featureIndex]?.properties ?? {}) };
+      joins.push({
+        type: "Feature",
+        properties: sourceProperties,
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [endpoint[0], endpoint[1]],
+            [bestMatch.nearestPoint[0], bestMatch.nearestPoint[1]]
+          ]
+        }
+      });
+      totalJoinLengthKm += bestMatch.distanceKm;
+      maxJoinLengthKm = Math.max(maxJoinLengthKm, bestMatch.distanceKm);
+    }
+  }
+
+  return {
+    joinFeatures: joins,
+    joinCount: joins.length,
+    totalJoinLengthKm,
+    maxJoinLengthKm
+  };
 }
 
 function projectLngLatToPixels(longitude, latitude, zoom) {
@@ -1050,23 +1252,27 @@ export async function buildAncientAppData({
 
   // Like the shapes, the app's roads leave out each road's provenance, which stays in data/geo/
   // (ADR-0037's update of 2026-10-08, item 2).
+  const simplifiedRoadFeatures = (ancientRoadsData.features ?? []).map((feature) => {
+    const { provenance: _provenance, ...properties } = feature.properties ?? {};
+    return {
+      ...feature,
+      properties,
+      geometry: roundGeometry(
+        simplifyRoadGeometry(feature.geometry, roadSimplifyTolerance),
+        4
+      )
+    };
+  });
+  const roadJoinResult = buildRoadJoinFeatures(simplifiedRoadFeatures);
+  const roadsWithJoins = [...simplifiedRoadFeatures, ...roadJoinResult.joinFeatures];
+
   writtenFiles.push(
     await writeJsonWithSize(
       outputDirectory,
       "ancient.roads.geojson",
       {
         ...ancientRoadsData,
-        features: (ancientRoadsData.features ?? []).map((feature) => {
-          const { provenance: _provenance, ...properties } = feature.properties ?? {};
-          return {
-            ...feature,
-            properties,
-            geometry: roundGeometry(
-              simplifyRoadGeometry(feature.geometry, roadSimplifyTolerance),
-              4
-            )
-          };
-        })
+        features: roadsWithJoins
       }
     )
   );
@@ -1168,7 +1374,14 @@ export async function buildAncientAppData({
   const totalBytes = writtenFiles.reduce((sum, item) => sum + item.bytes, 0);
   const totalGzipBytes = writtenFiles.reduce((sum, item) => sum + item.gzipBytes, 0);
 
-  return { writtenFiles, totalBytes, totalGzipBytes };
+  return {
+    writtenFiles,
+    totalBytes,
+    totalGzipBytes,
+    roadJoinCount: roadJoinResult.joinCount,
+    roadJoinTotalLengthKm: roadJoinResult.totalJoinLengthKm,
+    roadJoinMaxLengthKm: roadJoinResult.maxJoinLengthKm
+  };
 }
 
 export const __testOnly = {

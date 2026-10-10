@@ -108,7 +108,7 @@ Generated app payloads:
 - `ancient.shapes.json` keeps only each shape's `areaId` in properties; provenance stays in `data/geo/`.
 - `ancient.roads.geojson` keeps only `roadId`, `major`, `known` and `timeperiod` in properties; provenance stays in `data/geo/`.
 - The per-stop `romanEmpireEdge` is the line between drawn Roman-side and drawn non-Roman areas in that stop; it is `null` while no area outside the empire is drawn (ADR-0037 rule 5), and the static `ancient.empire-edge.geojson` shows the empire's edge instead.
-- `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size; `data/geo/ancient-roads.geojson` remains the full-detail source.
+- `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size, and the builder adds straight join segments where one road end sits more than 0.2 km and at most 4 km from another road so sheet-edge digitising breaks draw as continuous roads; `data/geo/ancient-roads.geojson` remains the full-detail source and is not edited.
 - Full shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
 - Everything the ancient layer loads (the `ancient.*` files) must stay within 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-08).
 - Stop-area assignments carry each period's optional `note`.

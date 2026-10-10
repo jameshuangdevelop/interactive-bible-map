@@ -56,6 +56,11 @@ try {
   console.log(
     `Total generated size: ${totalBytes} bytes (${totalGzipBytes} bytes gzip)`
   );
+  if (result.ancientBuild.generated) {
+    console.log(
+      `Ancient roads joins: ${result.ancientBuild.roadJoinCount} join(s), ${result.ancientBuild.roadJoinTotalLengthKm.toFixed(1)} km total`
+    );
+  }
 
   if (!result.ancientBuild.generated && result.ancientBuild.skippedReason) {
     console.log(result.ancientBuild.skippedReason);

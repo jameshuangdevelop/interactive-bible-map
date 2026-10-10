@@ -149,6 +149,50 @@ function pointInPolygon(point, polygon) {
   return true;
 }
 
+function toRadians(value) {
+  return (value * Math.PI) / 180;
+}
+
+function haversineDistanceKm(pointA, pointB) {
+  const [lonA, latA] = pointA;
+  const [lonB, latB] = pointB;
+  const latitudeDelta = toRadians(latB - latA);
+  const longitudeDelta = toRadians(lonB - lonA);
+  const latitudeA = toRadians(latA);
+  const latitudeB = toRadians(latB);
+  const sinLatitude = Math.sin(latitudeDelta / 2);
+  const sinLongitude = Math.sin(longitudeDelta / 2);
+  const haversine =
+    sinLatitude * sinLatitude +
+    Math.cos(latitudeA) * Math.cos(latitudeB) * sinLongitude * sinLongitude;
+  const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(Math.max(0, 1 - haversine)));
+  return 6371.0088 * arc;
+}
+
+function distancePointToSegmentKm(point, segmentStart, segmentEnd) {
+  const referenceLatitude = point[1];
+  const metersPerDegree = 111320;
+  const metersPerDegreeLon = metersPerDegree * Math.cos((referenceLatitude * Math.PI) / 180);
+  const pointX = point[0] * metersPerDegreeLon;
+  const pointY = point[1] * metersPerDegree;
+  const startX = segmentStart[0] * metersPerDegreeLon;
+  const startY = segmentStart[1] * metersPerDegree;
+  const endX = segmentEnd[0] * metersPerDegreeLon;
+  const endY = segmentEnd[1] * metersPerDegree;
+  const deltaX = endX - startX;
+  const deltaY = endY - startY;
+  if (deltaX === 0 && deltaY === 0) {
+    return haversineDistanceKm(point, segmentStart);
+  }
+  const t = ((pointX - startX) * deltaX + (pointY - startY) * deltaY) / (deltaX * deltaX + deltaY * deltaY);
+  const clampedT = Math.max(0, Math.min(1, t));
+  const nearestPoint = [
+    segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * clampedT,
+    segmentStart[1] + (segmentEnd[1] - segmentStart[1]) * clampedT
+  ];
+  return haversineDistanceKm(point, nearestPoint);
+}
+
 test("buildAppData writes compact index fields and candidate fields", async () => {
   await withTempDirectory(async (outputDirectory) => {
     await buildAppData({
@@ -609,7 +653,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
               }))
           );
 
-        await buildAncientAppData({
+        const ancientBuildResult = await buildAncientAppData({
           timelineData,
           ancientAreasData,
           ancientRoadsData,
@@ -618,6 +662,74 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
           majorPlacePinCoordinates,
           outputDirectory
         });
+
+        const roadsPayload = await fs
+          .readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
+          .then((content) => JSON.parse(content));
+        const roadFeatures = roadsPayload.features ?? [];
+        const joinsFrom817230 = roadFeatures.filter((feature) => {
+          const roadId = feature?.properties?.roadId;
+          if (roadId !== "awmc-road-817-230") {
+            return false;
+          }
+          if (feature?.geometry?.type !== "LineString" || !Array.isArray(feature.geometry.coordinates)) {
+            return false;
+          }
+          return feature.geometry.coordinates.length === 2;
+        });
+        assert.ok(joinsFrom817230.length > 0, "expected at least one generated join from awmc-road-817-230");
+        const ephesusRoadBreakStart = [28.6193, 37.8916];
+        const targetRoadIds = new Set(["awmc-road-614-2686", "awmc-road-642-2241"]);
+        const targetRoadGeometries = roadFeatures
+          .filter((feature) => targetRoadIds.has(feature?.properties?.roadId))
+          .map((feature) => feature.geometry)
+          .filter(Boolean);
+        assert.ok(targetRoadGeometries.length > 0, "expected target roads for Ephesus–Laodicea join");
+        const matchingJoin = joinsFrom817230.find((joinFeature) => {
+          const [a, b] = joinFeature.geometry.coordinates;
+          const startDistance = Math.min(
+            haversineDistanceKm(a, ephesusRoadBreakStart),
+            haversineDistanceKm(b, ephesusRoadBreakStart)
+          );
+          if (startDistance > 0.05) {
+            return false;
+          }
+          const otherPoint =
+            haversineDistanceKm(a, ephesusRoadBreakStart) <= haversineDistanceKm(b, ephesusRoadBreakStart)
+              ? b
+              : a;
+          const minDistanceToTargetRoad = targetRoadGeometries.reduce((minimum, geometry) => {
+            const lines =
+              geometry.type === "LineString"
+                ? [geometry.coordinates]
+                : geometry.type === "MultiLineString"
+                  ? geometry.coordinates
+                  : [];
+            for (const line of lines) {
+              for (let index = 0; index < line.length - 1; index += 1) {
+                minimum = Math.min(
+                  minimum,
+                  distancePointToSegmentKm(otherPoint, line[index], line[index + 1])
+                );
+              }
+            }
+            return minimum;
+          }, Number.POSITIVE_INFINITY);
+          return minDistanceToTargetRoad <= 0.02;
+        });
+        assert.ok(
+          matchingJoin,
+          "expected awmc-road-817-230 start (28.6193,37.8916) to join the awmc-road-614-2686 / awmc-road-642-2241 road"
+        );
+
+        assert.ok(
+          ancientBuildResult.roadJoinCount > 0,
+          "expected generated road joins in ancient.roads.geojson"
+        );
+        assert.ok(
+          ancientBuildResult.roadJoinMaxLengthKm <= 4.001,
+          `expected no generated road join longer than 4 km, got ${ancientBuildResult.roadJoinMaxLengthKm.toFixed(3)} km`
+        );
 
         const stopForYear = (year) =>
           [...timelineData.stops]
