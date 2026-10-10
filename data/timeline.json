@@ -1,0 +1,1351 @@
+{
+  "version": 1,
+  "range": {
+    "fromYear": -4,
+    "toYear": 101,
+    "defaultYear": 50
+  },
+  "stops": [
+    {
+      "id": "herod-kingdom-divided",
+      "year": -4,
+      "title": "Herod's kingdom is divided",
+      "summary": "Herod the Great dies. The emperor Augustus confirms his sons' claims but not as Herod willed them: Archelaus becomes ethnarch (not king) of Judea, Samaria and Idumea; Antipas becomes tetrarch of Galilee and Perea; Philip becomes tetrarch of Gaulanitis, Batanea, Trachonitis and Auranitis. Three Greek cities -- Gaza, Gadara and Hippos -- are cut away and added to the province of Syria.",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "scripture": [
+        "scripture:Matthew 2:22"
+      ]
+    },
+    {
+      "id": "judea-becomes-province",
+      "year": 6,
+      "title": "Judea becomes a Roman province",
+      "summary": "Rome deposes Archelaus and turns his ethnarchy into a province under a prefect (the Jewish historian Josephus's own term is \"procurator\"). Quirinius, governing Syria, conducts a census of Judea. Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew separately place in King Herod's days; this map takes no position on how the two accounts relate. Antipas's and Philip's territories are unaffected. Also from this stop: in 2 BC, the district called \"Pontus Galaticus,\" part of the land this map draws as one area with Cappadocia, had already joined the province of Galatia; Cappadocia's own holder does not change.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:isbe-galatia",
+        "bib:livius-judaea"
+      ],
+      "scripture": [
+        "scripture:Luke 2:1-2",
+        "scripture:Luke 1:5",
+        "scripture:Matthew 2:1",
+        "scripture:Luke 3:1"
+      ]
+    },
+    {
+      "id": "cappadocia-direct-rule",
+      "year": 17,
+      "title": "Cappadocia becomes a Roman province",
+      "summary": "King Archelaus of Cappadocia, summoned to Rome and accused before the Senate, dies there, and his kingdom becomes a province. The Roman historian Tacitus records that two neighboring kings, \"Antiochus of Commagene and Philopator of Cilicia,\" also died about the same time, and that in their countries \"the majority of men desired a Roman governor, and the minority a monarch\" -- though a translator's note adds that Philopator's own rule covered only a small part of eastern Cilicia, not Cilicia Tracheia. Commagene gets its own Roman governor about this time. The geographer Strabo elsewhere records that Cilicia Tracheia had been part of Archelaus's own former kingdom, but the sources don't make clear who held it after his death, so this map shows its holder as unclear from this year. At some point in his rule, in a year the Jewish historian Josephus doesn't give, Philip the tetrarch also renamed two of his own towns: Paneas became Caesarea (the Gospels' Caesarea Philippi), and Bethsaida became Julias.",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:strabo-geography",
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "philip-tetrarchy-to-syria",
+      "year": 34,
+      "title": "Philip's tetrarchy is absorbed into Syria",
+      "summary": "Philip dies without an heir after many years as tetrarch. Rome does not appoint a successor tetrarch; his territory is attached to the province of Syria, though its own revenues stay earmarked for it.",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "agrippa-i-made-king",
+      "year": 37,
+      "title": "The emperor Caligula makes Agrippa I a king",
+      "summary": "The new emperor frees his friend Agrippa (Agrippa I, grandson of Herod the Great) from a Roman prison and makes him king over Philip's former tetrarchy and the neighboring territory of Abilene. Abilene is too small, and its borders too poorly known, to show as its own area on this map, so this change in its ruler appears only in this stop's text.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:isbe-abilene"
+      ]
+    },
+    {
+      "id": "antipas-banished",
+      "year": 39,
+      "title": "Antipas is banished; his tetrarchy joins Agrippa I's kingdom",
+      "summary": "Herodias presses her husband Antipas to seek the royal title the emperor Caligula gave her brother. Caligula instead banishes Antipas and gives Galilee and Perea to Agrippa I. Also from this stop: the previous year, Caligula had made Rhoemetalces II sole ruler over all of Thrace -- a different area -- and had restored the kingdom of Commagene, together with coastal Cilicia Tracheia, to Antiochus IV; Caligula later took Commagene away from Antiochus IV again, and the Roman historian Cassius Dio gives no year for it, so from this stop the map shows that area's holder as unclear until the next emperor, Claudius, restores it. Dio also records that Caligula granted \"to Cotys Lesser Armenia\" and \"to Polemon, the son of Polemon, his ancestral domain\" the same year -- two more changes in small lands that this map draws as part of Cappadocia.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:cassius-dio-roman-history",
+        "bib:smith-dictionary-thracia"
+      ]
+    },
+    {
+      "id": "agrippa-i-kingdom-whole",
+      "year": 41,
+      "title": "Agrippa I's kingdom is made whole; new neighbors appear",
+      "summary": "The new emperor Claudius adds to Agrippa I's kingdom, the Jewish historian Josephus writes, \"all that country over which Herod, who was his grandfather, had reigned, that is, Judea and Samaria.\" At the same time Claudius makes Agrippa I's brother Herod king of Chalcis, capital of the earlier Iturean kingdom, and restores Commagene (with its hold on coastal Cilicia Tracheia) to Antiochus IV, whom the emperor Caligula had deprived of it. The Nabataean king Aretas IV dies about this year; Malichus II succeeds him. During his reign Claudius also gave new names to two towns in Galatia: Iconium became \"Claudiconium,\" and Derbe \"Claudio-Derbe.\"",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:cassius-dio-roman-history",
+        "bib:livius-nabataeans",
+        "bib:isbe-ituraea",
+        "bib:isbe-iconium",
+        "bib:isbe-derbe"
+      ],
+      "scripture": [
+        "scripture:Acts 12:1"
+      ]
+    },
+    {
+      "id": "agrippa-i-dies",
+      "year": 44,
+      "title": "Agrippa I dies; direct Roman rule returns",
+      "summary": "Agrippa I dies at Caesarea. Rather than let his young son inherit, the emperor Claudius places the whole kingdom -- Judea, Samaria, Galilee, Perea and Philip's former tetrarchy -- under Roman procurators. Also from this stop: the previous year, the Roman historian Cassius Dio records that Claudius \"reduced the Lycians to servitude because they had revolted and slain some Romans, and he incorporated them in the prefecture of Pamphylia\" -- a different area, whose status in the years that follow is itself debated among the sources (see the Lycia area's own note).",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:cassius-dio-roman-history"
+      ],
+      "scripture": [
+        "scripture:Acts 12:20-23"
+      ]
+    },
+    {
+      "id": "agrippa-ii-trades-chalcis",
+      "year": 53,
+      "title": "Agrippa II trades Chalcis for the northern tetrarchy",
+      "summary": "The emperor Claudius, in the twelfth year of his reign, takes Chalcis back from the younger Agrippa (Agrippa I's son, ruling Chalcis since 50) and gives him Philip's former tetrarchy and Abilene instead. Within the next few years, the emperor Nero enlarges this grant with the Galilean towns of Tiberias and Taricheae (identified with Magdala) and, in Perea, Julias (a different town from Philip's own Bethsaida-Julias in the north) with fourteen villages; the Jewish historian Josephus dates this to Nero's first year (AD 54), but the Jewish Encyclopedia (1906) reads Agrippa II's own coinage as pointing to AD 61 for this specific addition instead. Neither of these towns is its own area on this map, so this grant does not move any border; it is recorded on the towns themselves. Also from this stop: in AD 46, Thrace -- a different area -- had become a Roman province under Claudius. A nineteenth-century dictionary puts this under the emperor Vespasian instead, decades later, but the Roman historian Tacitus already lists Thrace among the districts under imperial agents in AD 69, before Vespasian's reign (see the Thrace area's own note).",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:smith-dictionary-thracia",
+        "bib:iaa-magdala-excavation",
+        "bib:livius-claudius",
+        "bib:tacitus-histories"
+      ]
+    },
+    {
+      "id": "achaia-freed",
+      "year": 67,
+      "title": "The emperor Nero frees Achaia from provincial rule",
+      "summary": "Touring Greece to compete in its games, the emperor Nero grants the province of Achaia its freedom. The Roman biographer Suetonius records that \"he presented the entire province with freedom\" -- the home of Corinth, Athens, Cenchreae and Nicopolis, among this map's places. In these years Agrippa II also renamed his capital, Caesarea Philippi, \"Neronias,\" to honor the emperor. Also from this stop: Aristobulus, son of Herod of Chalcis, had received the small kingdom of Lesser Armenia in 54, and Polemon II gave up his own kingdom of eastern Pontus in 63 or 64, which the province of Galatia then absorbed as \"Pontus Polemoniacus\"; neither of these lands is its own area on this map (see the Cappadocia area's own note).",
+      "sources": [
+        "bib:suetonius-twelve-caesars",
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:isbe-galatia",
+        "bib:isbe-pontus"
+      ]
+    },
+    {
+      "id": "jerusalem-falls",
+      "year": 70,
+      "title": "Jerusalem falls",
+      "summary": "After four years of war, the forces of the Roman general Titus take Jerusalem and destroy the Second Temple. The province of Judea is now governed by a legate, with a legion based at Jerusalem, rather than a procurator. Agrippa II, who had sided with Rome, keeps his own separate kingdom. Also from this stop: the emperor Vespasian is known to have reversed Nero's grant of freedom to Achaia, a different area, at some point in his reign, though no source gives the year, so this map shows Achaia's own status as unclear from here (see the Achaia area's own note). Philadelphia, in the province of Asia, gains a new name under Vespasian too: \"Flavia,\" after the emperor's own family name; the International Standard Bible Encyclopedia records it had already been called \"Neo-kaisaria\" earlier in the century.",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:suetonius-twelve-caesars",
+        "bib:isbe-philadelphia-lydia",
+        "bib:worldhistory-vespasian"
+      ]
+    },
+    {
+      "id": "commagene-annexed-cilicia-reunited",
+      "year": 72,
+      "title": "Commagene is annexed; Cilicia is reunited",
+      "summary": "The emperor Vespasian's governor of Syria accuses Antiochus IV of Commagene of plotting with Parthia and annexes his kingdom, including the coastal part of Cilicia Tracheia he held. Lesser Armenia, a small kingdom whose land this map draws together with Cappadocia, is also annexed about this year. The same year, Cilicia Pedias and Cilicia Tracheia are joined again as one province for the first time since the emperor Augustus divided them. The Nabataean king Malichus II dies about this year; Rabbel II succeeds him. Cappadocia's own governor from AD 69 on may also have governed Galatia from about this time, though this map keeps them as two areas (see the Cappadocia area's own note).",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-cilicia",
+        "bib:worldhistory-vespasian",
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "id": "pamphylia-joins-lycia",
+      "year": 74,
+      "title": "Lycia and Pamphylia become one province",
+      "summary": "The emperor Vespasian joins Pamphylia with Lycia, which lies to its west, forming one new province. The Bible scholar Thomas Schreiner writes that Vespasian also took almost all of Pisidia from Galatia that year; the International Standard Bible Encyclopedia gives the same year and records that the cities of southern Pisidia \"now ranked as Pamphylian,\" but no source describes exactly where the new internal line between Pisidia and Galatia ran, so Pisidia's own area stays whole, within Galatia, on this map. Perga, in Pamphylia, is now in the province of Lycia and Pamphylia.",
+      "sources": [
+        "bib:zondervan-who-were-galatians",
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
+      ]
+    },
+    {
+      "id": "achaia-province-again",
+      "year": 79,
+      "title": "Achaia becomes a province again",
+      "summary": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" without giving a year for it; this map shows Achaia's status as unclear from AD 70, his first full year as emperor, until his death in 79, the year by which his reversal of the emperor Nero's grant was certainly in force.",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    },
+    {
+      "id": "agrippa-ii-dies",
+      "year": 100,
+      "title": "Agrippa II dies; his kingdom joins Syria",
+      "summary": "The last Herodian ruler dies. Justus of Tiberias, Agrippa II's own secretary, gave this year, read from the lost works of Justus by the ninth-century Byzantine scholar Photius. The historian Nikos Kokkinos defends this date, reading a lead weight found near Tiberias -- on his reading, dated to Agrippa II's own 43rd regnal year (AD 97/98) -- as showing him still reigning shortly before; this reading of the weight's date is disputed among specialists. Other historians instead read the Jewish historian Josephus's own wording in his Antiquities to place Agrippa II's death earlier, before AD 93 -- the view of, among others, the standard reference work The History of the Jewish People in the Age of Jesus Christ as revised by Vermes and Millar (1973). His kingdom (Gaulanitis, Batanea, Trachonitis, Auranitis and Abilene) is added to the province of Syria; one modern account notes signs that he had already lost some territory after AD 93.",
+      "sources": [
+        "bib:livius-herod-agrippa-ii",
+        "bib:kokkinos-justus-josephus-agrippa-coins",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:isbe-abilene"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "id": "herod-the-great",
+      "name": "Kingdom of Herod the Great",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "archelaus-ethnarchy",
+      "name": "Ethnarchy of Judea, Samaria and Idumea",
+      "kind": "client-tetrarchy",
+      "romanSide": true,
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "antipas-tetrarchy",
+      "name": "Tetrarchy of Galilee and Perea",
+      "kind": "client-tetrarchy",
+      "romanSide": true,
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "philip-tetrarchy",
+      "name": "Tetrarchy of Philip (Iturea and Trachonitis)",
+      "kind": "client-tetrarchy",
+      "romanSide": true,
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "roman-province-judea",
+      "name": "Roman province of Judea",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "judea-province",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "agrippa-i-kingdom",
+      "name": "Kingdom of Herod Agrippa I",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "agrippa-ii-kingdom",
+      "name": "Kingdom of Herod Agrippa II",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "id": "roman-province-syria",
+      "name": "Roman province of Syria",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "syria",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-damascus"
+      ]
+    },
+    {
+      "id": "commagene-kingdom",
+      "name": "Kingdom of Commagene",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "id": "roman-province-commagene",
+      "name": "Roman province of Commagene",
+      "kind": "roman-province",
+      "romanSide": true,
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:strabo-geography"
+      ]
+    },
+    {
+      "id": "cilicia-province",
+      "name": "Roman province of Cilicia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "cilicia",
+      "sources": [
+        "bib:livius-cilicia"
+      ]
+    },
+    {
+      "id": "cappadocia-kingdom",
+      "name": "Kingdom of Cappadocia",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "id": "cappadocia-province",
+      "name": "Roman province of Cappadocia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "cappadocia",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-cappadocia"
+      ]
+    },
+    {
+      "id": "galatia-province",
+      "name": "Roman province of Galatia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "galatia",
+      "sources": [
+        "bib:isbe-galatia",
+        "bib:zondervan-who-were-galatians"
+      ]
+    },
+    {
+      "id": "lycia-league",
+      "name": "Lycian League",
+      "kind": "free-city-or-league",
+      "romanSide": true,
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
+      ]
+    },
+    {
+      "id": "lycia-pamphylia-province",
+      "name": "Roman province of Lycia and Pamphylia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "sources": [
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
+      ]
+    },
+    {
+      "id": "bithynia-province",
+      "name": "Roman province of Bithynia and Pontus",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "bithynia",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-pontus"
+      ]
+    },
+    {
+      "id": "thrace-kingdom",
+      "name": "Kingdom of Thrace",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "sources": [
+        "bib:smith-dictionary-thracia"
+      ]
+    },
+    {
+      "id": "thrace-province",
+      "name": "Roman province of Thrace",
+      "kind": "roman-province",
+      "romanSide": true,
+      "sources": [
+        "bib:smith-dictionary-thracia"
+      ]
+    },
+    {
+      "id": "achaia-province",
+      "name": "Roman province of Achaia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "achaia",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-achaia"
+      ]
+    },
+    {
+      "id": "achaia-free",
+      "name": "Free Achaia",
+      "kind": "free-city-or-league",
+      "romanSide": true,
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ]
+    },
+    {
+      "id": "macedonia-province",
+      "name": "Roman province of Macedonia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "macedonia",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "id": "asia-province",
+      "name": "Roman province of Asia",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    },
+    {
+      "id": "cyprus-province",
+      "name": "Roman province of Cyprus",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "cyprus",
+      "sources": [
+        "bib:isbe-cyprus"
+      ]
+    },
+    {
+      "id": "crete-cyrene-province",
+      "name": "Roman province of Crete and Cyrene",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "crete-cyrene",
+      "sources": [
+        "bib:isbe-crete",
+        "bib:isbe-cyrene"
+      ]
+    },
+    {
+      "id": "egypt-prefecture",
+      "name": "Roman Egypt (special imperial prefecture)",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "egypt",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "id": "italy-direct",
+      "name": "Italy",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "italy",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "id": "sicily-province",
+      "name": "Roman province of Sicily",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "sicily",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "id": "illyricum-province",
+      "name": "Roman province of Illyricum",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "illyricum",
+      "sources": [
+        "bib:isbe-illyricum"
+      ]
+    },
+    {
+      "id": "nabataean-kingdom",
+      "name": "Nabataean kingdom (\"Arabia\")",
+      "kind": "client-kingdom",
+      "romanSide": true,
+      "locationId": "arabia",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "id": "roman-empire",
+      "name": "Roman Empire",
+      "kind": "roman-province",
+      "romanSide": true,
+      "locationId": "roman-empire",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "id": "uncertain-roman-side",
+      "name": "Status uncertain (Roman-side)",
+      "kind": "uncertain",
+      "romanSide": true,
+      "sources": [
+        "bib:tacitus-histories",
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "areas": [
+    {
+      "id": "judea-samaria-idumea",
+      "locationId": "judea-province",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -37,
+          "toYear": -4,
+          "holderId": "herod-the-great",
+          "ruler": "Herod the Great",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": -4,
+          "toYear": 6,
+          "holderId": "archelaus-ethnarchy",
+          "ruler": "Herod Archelaus",
+          "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura; Josephus records that Augustus took Gaza itself, with Gadara and Hippos, from Herod's kingdom at his death and added it to the province of Syria, but since none of these is its own area on this map, Gaza's land and this coastal strip stay within the area around them.",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 6,
+          "toYear": 41,
+          "holderId": "roman-province-judea",
+          "ruler": "Prefects, e.g. Pontius Pilate",
+          "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, which stayed in the province of Syria from 4 BC on (rule 4, as in the previous period's note).",
+          "sources": [
+            "bib:josephus-antiquities",
+            "bib:livius-judaea"
+          ]
+        },
+        {
+          "fromYear": 41,
+          "toYear": 44,
+          "holderId": "agrippa-i-kingdom",
+          "ruler": "Herod Agrippa I",
+          "note": "This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, in the province of Syria throughout (rule 4; see the -4-to-6 period's note).",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 44,
+          "toYear": 70,
+          "holderId": "roman-province-judea",
+          "ruler": "Procurators, e.g. Antonius Felix, Porcius Festus",
+          "note": "This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, in the province of Syria throughout (rule 4; see the -4-to-6 period's note).",
+          "sources": [
+            "bib:josephus-antiquities",
+            "bib:livius-judaea"
+          ]
+        },
+        {
+          "fromYear": 70,
+          "toYear": 101,
+          "holderId": "roman-province-judea",
+          "ruler": "Legates, with a legion now based at Jerusalem",
+          "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. This area's drawn shape also includes Gaza and the coastal strip north to Rhinocolura, in the province of Syria throughout (rule 4; see the -4-to-6 period's note).",
+          "sources": [
+            "bib:josephus-jewish-war",
+            "bib:livius-titus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "galilee-perea",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -37,
+          "toYear": -4,
+          "holderId": "herod-the-great",
+          "ruler": "Herod the Great",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": -4,
+          "toYear": 39,
+          "holderId": "antipas-tetrarchy",
+          "ruler": "Herod Antipas",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 39,
+          "toYear": 44,
+          "holderId": "agrippa-i-kingdom",
+          "ruler": "Herod Agrippa I",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 44,
+          "toYear": 70,
+          "holderId": "roman-province-judea",
+          "ruler": "Procurators",
+          "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change.",
+          "sources": [
+            "bib:josephus-antiquities",
+            "bib:jewish-encyclopedia-agrippa-ii",
+            "bib:iaa-magdala-excavation"
+          ]
+        },
+        {
+          "fromYear": 70,
+          "toYear": 101,
+          "holderId": "roman-province-judea",
+          "ruler": "Legates, with a legion now based at Jerusalem",
+          "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
+          "sources": [
+            "bib:josephus-jewish-war",
+            "bib:livius-titus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "philip-tetrarchy-lands",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -20,
+          "toYear": -4,
+          "holderId": "herod-the-great",
+          "ruler": "Herod the Great",
+          "note": "The International Standard Bible Encyclopedia (1915): \"The country of Zenodorus, lying between Trachonitis and Galilee, and including Paneas and Ulatha, Augustus bestowed on Herod\" in 20 BC.",
+          "sources": [
+            "bib:isbe-ituraea"
+          ]
+        },
+        {
+          "fromYear": -4,
+          "toYear": 34,
+          "holderId": "philip-tetrarchy",
+          "ruler": "Philip",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 34,
+          "toYear": 37,
+          "holderId": "roman-province-syria",
+          "ruler": "Governor of Syria",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 37,
+          "toYear": 44,
+          "holderId": "agrippa-i-kingdom",
+          "ruler": "Herod Agrippa I",
+          "sources": [
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 44,
+          "toYear": 53,
+          "holderId": "roman-province-judea",
+          "ruler": "Procurators, during Agrippa II's minority",
+          "sources": [
+            "bib:josephus-antiquities",
+            "bib:isbe-trachonitis"
+          ]
+        },
+        {
+          "fromYear": 53,
+          "toYear": 100,
+          "holderId": "agrippa-ii-kingdom",
+          "ruler": "Herod Agrippa II",
+          "note": "Some historians instead place Agrippa II's death, and so the end of this period, before AD 93, reading the Jewish historian Josephus's own wording in the Antiquities; this is the view of, among others, the standard reference work The History of the Jewish People in the Age of Jesus Christ as revised by Vermes and Millar (1973). This area follows the later, AD 100 dating; see that stop for the sources on both sides.",
+          "sources": [
+            "bib:josephus-antiquities",
+            "bib:isbe-trachonitis",
+            "bib:kokkinos-justus-josephus-agrippa-coins"
+          ]
+        },
+        {
+          "fromYear": 100,
+          "toYear": 106,
+          "holderId": "roman-province-syria",
+          "note": "The International Standard Bible Encyclopedia (1915) states that Trachonitis \"was incorporated in the new province of Arabia\" in 106, together with the Nabataean kingdom. No source gives an end point for the other three districts (Gaulanitis, Batanea and Auranitis), so the same year is shown for all four.",
+          "sources": [
+            "bib:isbe-abilene",
+            "bib:isbe-trachonitis",
+            "bib:livius-nabataeans"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arabia",
+      "locationId": "arabia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -9,
+          "toYear": 40,
+          "holderId": "nabataean-kingdom",
+          "ruler": "Aretas IV",
+          "note": "The International Standard Bible Encyclopedia (1915) classes the Sinai peninsula with \"Arabia Petrea,\" the region named for Petra, this kingdom's own capital. This area's drawn extent includes Sinai on that geographic basis; no ancient source describes exactly where the line between Arabia and Egypt ran, so a conventional modern approximation is used instead.",
+          "sources": [
+            "bib:livius-nabataeans",
+            "bib:isbe-arabia"
+          ]
+        },
+        {
+          "fromYear": 40,
+          "toYear": 71,
+          "holderId": "nabataean-kingdom",
+          "ruler": "Malichus II",
+          "sources": [
+            "bib:livius-nabataeans"
+          ]
+        },
+        {
+          "fromYear": 71,
+          "toYear": 106,
+          "holderId": "nabataean-kingdom",
+          "ruler": "Rabbel II",
+          "sources": [
+            "bib:livius-nabataeans"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "syria",
+      "locationId": "syria",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -64,
+          "toYear": -27,
+          "holderId": "roman-province-syria",
+          "sources": [
+            "bib:livius-damascus"
+          ]
+        },
+        {
+          "fromYear": -27,
+          "toYear": 101,
+          "holderId": "roman-province-syria",
+          "ruler": "Imperial legates, governed from Antioch",
+          "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6).",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:livius-cilicia",
+            "bib:josephus-antiquities"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "commagene",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -20,
+          "toYear": 17,
+          "holderId": "commagene-kingdom",
+          "ruler": "Mithridates (from 20 BC), then Antiochus (died AD 17)",
+          "note": "The Roman historian Cassius Dio says Augustus gave Commagene in 20 BC \"to one Mithridates, though still a mere boy\"; the Roman historian Tacitus records the death of \"Antiochus of Commagene\" in AD 17. Neither source says when Antiochus began to reign.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:tacitus-annals"
+          ]
+        },
+        {
+          "fromYear": 17,
+          "toYear": 38,
+          "holderId": "roman-province-commagene",
+          "ruler": "Quintus Servaeus, first governor",
+          "note": "\"Quintus Servaeus was appointed to Commagene, now for the first time transferred to praetorian jurisdiction\" (the Roman historian Tacitus); the geographer Strabo likewise calls it a province by his own day.",
+          "sources": [
+            "bib:tacitus-annals",
+            "bib:strabo-geography"
+          ]
+        },
+        {
+          "fromYear": 38,
+          "toYear": 39,
+          "holderId": "commagene-kingdom",
+          "ruler": "Antiochus IV",
+          "sources": [
+            "bib:cassius-dio-roman-history"
+          ]
+        },
+        {
+          "fromYear": 39,
+          "toYear": 41,
+          "holderId": "uncertain-roman-side",
+          "note": "The Roman historian Cassius Dio records that the emperor Claudius \"restored Commagene to Antiochus [IV], since Gaius [Caligula], though he had himself given him the district, had taken it away again\"; he gives no year for Caligula's removal of it.",
+          "sources": [
+            "bib:cassius-dio-roman-history"
+          ]
+        },
+        {
+          "fromYear": 41,
+          "toYear": 72,
+          "holderId": "commagene-kingdom",
+          "ruler": "Antiochus IV",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 72,
+          "toYear": 101,
+          "holderId": "roman-province-syria",
+          "sources": [
+            "bib:josephus-jewish-war"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cilicia",
+      "locationId": "cilicia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -27,
+          "toYear": 72,
+          "holderId": "roman-province-syria",
+          "note": "Administered from Syria throughout; Tarsus sits in this plain.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:strabo-geography",
+            "bib:livius-cilicia"
+          ]
+        },
+        {
+          "fromYear": 72,
+          "toYear": 101,
+          "holderId": "cilicia-province",
+          "ruler": "Reunited with Cilicia Tracheia as one province",
+          "sources": [
+            "bib:livius-cilicia",
+            "bib:josephus-jewish-war"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cilicia-tracheia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -20,
+          "toYear": 17,
+          "holderId": "cappadocia-kingdom",
+          "ruler": "Archelaus",
+          "note": "The Roman historian Cassius Dio: Augustus gave Tarcondimotus \"the kingdom of Cilicia, which his father had held, except for a few places on the coast. These latter together with Lesser Armenia he granted to Archelaus\" (of Cappadocia) in 20 BC. The geographer Strabo separately calls the whole of \"Cilicia Tracheia\" part of Archelaus's kingdom, a wider claim than Dio's \"a few places on the coast\"; the sources leave the difference unresolved. The Roman historian Tacitus separately records that \"Philopator of Cilicia\" died in AD 17; a translator's note in the English edition places Philopator's own principality in the east of Cilicia, not Tracheia, so Philopator is not treated as a possible ruler of this area.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:strabo-geography",
+            "bib:tacitus-annals"
+          ]
+        },
+        {
+          "fromYear": 17,
+          "toYear": 38,
+          "holderId": "uncertain-roman-side",
+          "note": "The Roman historian Tacitus records a tribe here, the Cietae, as still \"subject to Archelaus of Cappadocia\" and fighting \"the forces of the king\" in AD 36, nearly twenty years after Cappadocia itself became a province; a translator's note in the English edition places the Cietae \"on the coast of Cilicia Trachea.\" This leaves how Cilicia Tracheia was actually governed in this span unclear.",
+          "sources": [
+            "bib:tacitus-annals"
+          ]
+        },
+        {
+          "fromYear": 38,
+          "toYear": 72,
+          "holderId": "commagene-kingdom",
+          "ruler": "Antiochus IV (also king of Commagene)",
+          "note": "The Roman historian Cassius Dio gives Antiochus IV only \"the coast region of Cilicia,\" not all of Tracheia, and separately records that in 41 the emperor Claudius gave \"some land in Cilicia\" to Polemon (of the Pontic dynasty) as well, without saying how the two holdings related. Held by Commagene's king, but not part of Commagene's own territory.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:josephus-antiquities"
+          ]
+        },
+        {
+          "fromYear": 72,
+          "toYear": 101,
+          "holderId": "cilicia-province",
+          "ruler": "Reunited with Cilicia Pedias as one province",
+          "sources": [
+            "bib:josephus-jewish-war",
+            "bib:livius-cilicia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cappadocia",
+      "locationId": "cappadocia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -33,
+          "toYear": 17,
+          "holderId": "cappadocia-kingdom",
+          "ruler": "Archelaus",
+          "sources": [
+            "bib:tacitus-annals"
+          ]
+        },
+        {
+          "fromYear": 17,
+          "toYear": 69,
+          "holderId": "cappadocia-province",
+          "ruler": "Quintus Veranius, sent to organize the province; then equestrian governors",
+          "note": "The Roman historian Tacitus calls Veranius the province's \"governor,\" though a translator's note calls his appointment \"only a temporary expedient\"; he later appears on the staff of Germanicus, a Roman prince. Equestrian governors (procurators) followed. This area's drawn land also covers three lands that aren't drawn separately: Pontus Galaticus, part of the province of Galatia from 2 BC; Polemon's kingdom of Pontus, a client kingdom until 63 or 64, when it too joined Galatia; and Lesser Armenia, held by Archelaus of Cappadocia from 20 BC, by Cotys from AD 38 and by Aristobulus, son of Herod of Chalcis, from AD 54, and annexed in AD 72. Their changes don't change Cappadocia's own holder; the AD 6, AD 39, AD 67 and AD 72 stops name them.",
+          "sources": [
+            "bib:tacitus-annals",
+            "bib:isbe-cappadocia",
+            "bib:livius-cappadocia",
+            "bib:isbe-galatia",
+            "bib:isbe-pontus",
+            "bib:cassius-dio-roman-history",
+            "bib:josephus-antiquities",
+            "bib:worldhistory-vespasian"
+          ]
+        },
+        {
+          "fromYear": 69,
+          "toYear": 101,
+          "holderId": "cappadocia-province",
+          "ruler": "Gnaeus Pompeius Collega, the first governor of senatorial rank (AD 69)",
+          "note": "The Roman biographer Suetonius records that the emperor Vespasian \"gave [Cappadocia] a consular governor in place of a Roman knight.\" Cappadocia and Galatia may have shared one governor from about this time on, which one modern history of the province calls likely, but no ancient source states a merger outright, so the map keeps Cappadocia and Galatia as two areas with their own holders.",
+          "sources": [
+            "bib:suetonius-twelve-caesars",
+            "bib:livius-cappadocia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "galatia",
+      "locationId": "galatia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -25,
+          "toYear": 101,
+          "holderId": "galatia-province",
+          "note": "Includes Pisidia, Lycaonia (the western part) and Paphlagonia, which had already joined the province of Galatia (Pisidia and Lycaonia in 25 BC on King Amyntas's death; Paphlagonia in 6 BC) before 4 BC. The emperor Vespasian detached most of Pisidia to the new province of Lycia and Pamphylia in AD 74; no source describing exactly where that internal line ran was found, so this area is kept whole rather than guessing at a split. Galatia and Cappadocia may have shared one governor from about AD 69 (see the Cappadocia area's own note), though no ancient source states a merger outright, so they stay two areas with their own holders.",
+          "sources": [
+            "bib:isbe-galatia",
+            "bib:isbe-pisidia",
+            "bib:zondervan-who-were-galatians",
+            "bib:strabo-geography",
+            "bib:livius-cappadocia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pamphylia",
+      "locationId": "pamphylia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -4,
+          "toYear": 74,
+          "holderId": "uncertain-roman-side",
+          "note": "The Roman historians Cassius Dio (60.17.3-4) and Tacitus (Histories 2.9, with its translator's note) disagree on Pamphylia's standing in this span, so it is shown as unclear rather than as part of Galatia. The nearest mapped shape for this period is far larger than Pamphylia's own coastal plain and likely also covers southern Pisidia (part of Galatia throughout); this area's drawn land may therefore include some of Galatia's own territory for these years.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:tacitus-histories",
+            "bib:livius-pamphylia"
+          ]
+        },
+        {
+          "fromYear": 74,
+          "toYear": 101,
+          "holderId": "lycia-pamphylia-province",
+          "sources": [
+            "bib:isbe-pisidia",
+            "bib:livius-pamphylia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lycia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -4,
+          "toYear": 43,
+          "holderId": "lycia-league",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:strabo-geography"
+          ]
+        },
+        {
+          "fromYear": 43,
+          "toYear": 74,
+          "holderId": "uncertain-roman-side",
+          "note": "The Roman historian Cassius Dio says the emperor Claudius \"incorporated them in the prefecture of Pamphylia,\" not that Lycia became its own province; the Roman biographer Suetonius separately records that the emperor Vespasian made a province of Lycia, implying it had freedom again by his reign, and a translator's note to the Roman historian Tacitus's Histories (2.9) states that \"Galatia, Pamphylia, and Lycia\" formed one province together by AD 69, leaving Lycia's exact status across this span unclear.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:suetonius-twelve-caesars",
+            "bib:tacitus-histories"
+          ]
+        },
+        {
+          "fromYear": 74,
+          "toYear": 101,
+          "holderId": "lycia-pamphylia-province",
+          "sources": [
+            "bib:isbe-pisidia",
+            "bib:livius-pamphylia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bithynia",
+      "locationId": "bithynia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -74,
+          "toYear": 101,
+          "holderId": "bithynia-province",
+          "note": "This area's drawn extent also covers coastal, western Pontus; the International Standard Bible Encyclopedia (1915) states that \"the Black Sea littoral as far as Amisus was more or less closely joined with Bithynia in administration.\" That land is not its own area on this map.",
+          "sources": [
+            "bib:isbe-bithynia",
+            "bib:isbe-pontus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thrace",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -4,
+          "toYear": 38,
+          "holderId": "thrace-kingdom",
+          "ruler": "Rhoemetalces, then Rhescuporis and Cotys, then (from AD 19) Rhoemetalces II and the sons of Cotys",
+          "note": "The Roman historian Tacitus records that \"the whole of that country had been subject to Rhoemetalces; after whose death Augustus conferred one half on his brother Rhescuporis, the other on his son Cotys,\" and that after Rhescuporis had Cotys killed, \"Thrace was divided between his son Rhoemetalces [II], who was known to have opposed his father's designs, and the children of Cotys,\" with a Roman guardian, Trebellenus Rufus, managing the kingdom for Cotys's underage sons.",
+          "sources": [
+            "bib:tacitus-annals"
+          ]
+        },
+        {
+          "fromYear": 38,
+          "toYear": 46,
+          "holderId": "thrace-kingdom",
+          "ruler": "Rhoemetalces II",
+          "note": "William Smith's Dictionary of Greek and Roman Geography (1854): Rhoemetalces II was \"made by Caligula ruler over the whole country\" in AD 38.",
+          "sources": [
+            "bib:smith-dictionary-thracia"
+          ]
+        },
+        {
+          "fromYear": 46,
+          "toYear": 101,
+          "holderId": "thrace-province",
+          "note": "A modern chronology of the emperor Claudius's reign dates Thrace's annexation to \"45/46,\" and the Roman historian Tacitus lists Thrace among the districts \"in charge of imperial agents\" in January AD 69. William Smith's Dictionary of Greek and Roman Geography (1854) reports that the fourth-century Chronicle of Eusebius dates Thrace's reduction to a province to AD 47, while the Roman biographer Suetonius and the fourth-century historian Eutropius, as Smith reads them, put it under the emperor Vespasian (69-79); the English translation of Suetonius used here reads \"Trachian Cilicia,\" not Thrace, at that point.",
+          "sources": [
+            "bib:livius-claudius",
+            "bib:tacitus-histories",
+            "bib:smith-dictionary-thracia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "achaia",
+      "locationId": "achaia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -27,
+          "toYear": 15,
+          "holderId": "achaia-province",
+          "ruler": "Senate, proconsul",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:isbe-macedonia"
+          ]
+        },
+        {
+          "fromYear": 15,
+          "toYear": 44,
+          "holderId": "achaia-province",
+          "ruler": "Imperial legate of Moesia (governed with Macedonia)",
+          "sources": [
+            "bib:tacitus-annals",
+            "bib:isbe-macedonia"
+          ]
+        },
+        {
+          "fromYear": 44,
+          "toYear": 67,
+          "holderId": "achaia-province",
+          "ruler": "Senate, proconsul (restored by the emperor Claudius)",
+          "sources": [
+            "bib:cassius-dio-roman-history"
+          ]
+        },
+        {
+          "fromYear": 67,
+          "toYear": 70,
+          "holderId": "achaia-free",
+          "note": "The Roman biographer Suetonius: on his departure from Greece, the emperor Nero \"presented the entire province with freedom.\"",
+          "sources": [
+            "bib:suetonius-twelve-caesars"
+          ]
+        },
+        {
+          "fromYear": 70,
+          "toYear": 79,
+          "holderId": "uncertain-roman-side",
+          "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again.",
+          "sources": [
+            "bib:suetonius-twelve-caesars"
+          ]
+        },
+        {
+          "fromYear": 79,
+          "toYear": 101,
+          "holderId": "achaia-province",
+          "sources": [
+            "bib:suetonius-twelve-caesars"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "macedonia",
+      "locationId": "macedonia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -148,
+          "toYear": -27,
+          "holderId": "macedonia-province",
+          "ruler": "Governed with Achaia",
+          "sources": [
+            "bib:isbe-macedonia",
+            "bib:livius-macedonia"
+          ]
+        },
+        {
+          "fromYear": -27,
+          "toYear": 15,
+          "holderId": "macedonia-province",
+          "ruler": "Senate, proconsul",
+          "sources": [
+            "bib:isbe-macedonia",
+            "bib:livius-macedonia"
+          ]
+        },
+        {
+          "fromYear": 15,
+          "toYear": 44,
+          "holderId": "macedonia-province",
+          "ruler": "Imperial legate of Moesia (governed with Achaia)",
+          "sources": [
+            "bib:tacitus-annals"
+          ]
+        },
+        {
+          "fromYear": 44,
+          "toYear": 101,
+          "holderId": "macedonia-province",
+          "ruler": "Senate, proconsul (restored by the emperor Claudius)",
+          "sources": [
+            "bib:cassius-dio-roman-history"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "asia",
+      "locationId": "asia",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -129,
+          "toYear": 101,
+          "holderId": "asia-province",
+          "sources": [
+            "bib:isbe-asia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cyprus",
+      "locationId": "cyprus",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -58,
+          "toYear": -27,
+          "holderId": "cyprus-province",
+          "ruler": "Attached to Cilicia",
+          "sources": [
+            "bib:isbe-cyprus"
+          ]
+        },
+        {
+          "fromYear": -27,
+          "toYear": -22,
+          "holderId": "cyprus-province",
+          "ruler": "Kept by the emperor",
+          "sources": [
+            "bib:isbe-cyprus"
+          ]
+        },
+        {
+          "fromYear": -22,
+          "toYear": 101,
+          "holderId": "cyprus-province",
+          "ruler": "Senate, proconsul",
+          "sources": [
+            "bib:isbe-cyprus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "crete-cyrene",
+      "locationId": "crete-cyrene",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -67,
+          "toYear": 101,
+          "holderId": "crete-cyrene-province",
+          "ruler": "Crete joined with Cyrenaica",
+          "sources": [
+            "bib:isbe-crete"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "egypt",
+      "locationId": "egypt",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -30,
+          "toYear": 101,
+          "holderId": "egypt-prefecture",
+          "ruler": "Equestrian prefect; senators barred without the emperor's leave",
+          "note": "The Roman biographer Suetonius: after Cleopatra's death, the emperor Augustus \"reduced Egypt to the form of a province.\"",
+          "sources": [
+            "bib:suetonius-twelve-caesars",
+            "bib:tacitus-annals"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "italy",
+      "locationId": "italy",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -27,
+          "toYear": 101,
+          "holderId": "italy-direct",
+          "sources": [
+            "bib:cassius-dio-roman-history"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sicily",
+      "locationId": "sicily",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -27,
+          "toYear": 101,
+          "holderId": "sicily-province",
+          "sources": [
+            "bib:cassius-dio-roman-history"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "illyricum",
+      "locationId": "illyricum",
+      "focus": true,
+      "periods": [
+        {
+          "fromYear": -4,
+          "toYear": 101,
+          "holderId": "illyricum-province",
+          "note": "The emperor Augustus organized it as one province in AD 10, under an imperial legate residing at Salona on the Dalmatian coast; already under Roman control in the years before that.",
+          "sources": [
+            "bib:isbe-illyricum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "other-roman-lands",
+      "focus": false,
+      "periods": [
+        {
+          "fromYear": -4,
+          "toYear": 101,
+          "holderId": "roman-empire",
+          "note": "Covers Roman provinces and small allied kingdoms that this map doesn't show separately, such as Africa, Sardinia, Moesia, Pannonia, Gaul and Spain. The Roman historian Cassius Dio lists Africa, Sardinia, Spain and \"all the Gauls\" among the provinces of the emperor Augustus's settlement of 27 BC; the Roman historian Tacitus names a governor of Moesia in AD 15; and the International Standard Bible Encyclopedia (1915) records that Pannonia became a province of its own in AD 9. Britain, conquered from AD 43, is not drawn.",
+          "sources": [
+            "bib:cassius-dio-roman-history",
+            "bib:tacitus-annals",
+            "bib:isbe-illyricum"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -80,8 +80,41 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 72,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:isbe-tarsus"
+      ],
+      "note": "The International Standard Bible Encyclopedia (1915) records that Tarsus \"received the position of an independent and duty-free state (civitas libera et immunis)\" under Antony, a status \"confirmed by Augustus after the victory of Actium\" in 31 BC: a free city, self-governing and exempt from tribute, though still within the province."
+    },
+    {
+      "fromYear": 72,
+      "toYear": 101,
+      "holderId": "cilicia-province",
+      "entity": "Roman province of Cilicia (ruler: Reunited with Cilicia Tracheia as one province)",
+      "sources": [
+        "bib:livius-cilicia",
+        "bib:josephus-jewish-war"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "cilicia",
+  "politicalHistoryOverrides": [
+    {
+      "fromYear": -27,
+      "toYear": 72,
+      "holderId": "roman-province-syria",
+      "note": "The International Standard Bible Encyclopedia (1915) records that Tarsus \"received the position of an independent and duty-free state (civitas libera et immunis)\" under Antony, a status \"confirmed by Augustus after the victory of Actium\" in 31 BC: a free city, self-governing and exempt from tribute, though still within the province.",
+      "sources": [
+        "bib:isbe-tarsus"
+      ]
+    }
+  ]
 }

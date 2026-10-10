@@ -77,8 +77,39 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -9,
+      "toYear": 40,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Aretas IV)",
+      "sources": [
+        "bib:livius-nabataeans",
+        "bib:isbe-arabia"
+      ],
+      "note": "The International Standard Bible Encyclopedia (1915) classes the Sinai peninsula with \"Arabia Petrea,\" the region named for Petra, this kingdom's own capital. This area's drawn extent includes Sinai on that geographic basis; no ancient source describes exactly where the line between Arabia and Egypt ran, so a conventional modern approximation is used instead."
+    },
+    {
+      "fromYear": 40,
+      "toYear": 71,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Malichus II)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    },
+    {
+      "fromYear": 71,
+      "toYear": 106,
+      "holderId": "nabataean-kingdom",
+      "entity": "Nabataean kingdom (\"Arabia\") (ruler: Rabbel II)",
+      "sources": [
+        "bib:livius-nabataeans"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "arabia"
 }
