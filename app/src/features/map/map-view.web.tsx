@@ -3756,43 +3756,11 @@ export function MapView({
 
     const handleMapClick = (event: { point: PointLike }) => {
       const entry = resolveInteractiveEntryAtPoint(event.point);
-      if (entry) {
-        activateVisibleEntryRef.current(entry);
+      if (!entry) {
         return;
       }
 
-      if (mapModeRef.current !== "ancient") {
-        return;
-      }
-
-      const pointer = asScreenPoint(event.point);
-      if (!pointer) {
-        return;
-      }
-
-      const holderFeature = map
-        .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
-          layers: [layerAncientHolderLabelClickableId, layerAncientHolderLabelClickTargetId]
-        })
-        .find((feature) => {
-          const properties = asObject(feature.properties);
-          return (
-            properties !== null &&
-            propertyIsTrue(properties.clickable) &&
-            typeof asString(properties.holderLocationId) === "string"
-          );
-        });
-
-      const holderProperties = holderFeature ? asObject(holderFeature.properties) : null;
-      const holderLocationId = holderProperties ? asString(holderProperties.holderLocationId) : null;
-      if (!holderLocationId) {
-        return;
-      }
-
-      onSelectPlace({
-        placeId: holderLocationId,
-        candidateIndex: null
-      });
+      activateVisibleEntryRef.current(entry);
     };
     const handleMouseMove = (event: { point: PointLike }) => {
       scheduleTooltipUpdate(event.point);

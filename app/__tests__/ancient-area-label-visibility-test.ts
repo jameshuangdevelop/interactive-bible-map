@@ -16,6 +16,16 @@ function readGeneratedJson(relativePath: string) {
 }
 
 describe("ancient area label visibility", () => {
+  test("linked timeline location ids include expected province labels and exclude Galilee", () => {
+    const timeline = readGeneratedJson("ancient.timeline.json") as AncientTimelinePayload;
+    const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
+
+    expect(linkedLocationIds.has("judea-province")).toBe(true);
+    expect(linkedLocationIds.has("cappadocia")).toBe(true);
+    expect(linkedLocationIds.has("galatia")).toBe(true);
+    expect(linkedLocationIds.has("galilee")).toBe(false);
+  });
+
   test("hides M3 area labels for every record linked from timeline entities", () => {
     const timeline = readGeneratedJson("ancient.timeline.json") as AncientTimelinePayload;
     const places = readGeneratedJson("places.index.json") as PlaceIndexRecord[];

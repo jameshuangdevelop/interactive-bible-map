@@ -5244,13 +5244,13 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   if (!galatiaTooltipText.includes("Galatia")) {
     throw new Error(`Expected Galatia tooltip from mouse hover, got '${galatiaTooltipText}'.`);
   }
-  const galatiaCursor = await page.evaluate(({ testHookKey }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
+  const galatiaCursor = await page.evaluate(({ screenX, screenY }) => {
+    const element = document.elementFromPoint(screenX, screenY);
+    if (!element) {
+      return null;
     }
-    return map.getCanvas().style.cursor || "";
-  }, { testHookKey: mapTestHookKey });
+    return window.getComputedStyle(element).cursor;
+  }, { screenX: galatiaPointerProbe.screenX, screenY: galatiaPointerProbe.screenY });
   if (galatiaCursor !== "pointer") {
     throw new Error(`Expected pointer cursor over clickable Galatia holder label, got '${galatiaCursor}'.`);
   }
@@ -5303,6 +5303,76 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(
       `Expected Philip plain-label tooltip to include '4 BC – AD 34', got '${philipPointerTooltipText}'.`
     );
+  }
+  const philipCursor = await page.evaluate(({ screenX, screenY }) => {
+    const element = document.elementFromPoint(screenX, screenY);
+    if (!element) {
+      return null;
+    }
+    return window.getComputedStyle(element).cursor;
+  }, { screenX: philipPointerProbe.screenX, screenY: philipPointerProbe.screenY });
+  if (philipCursor === "pointer") {
+    throw new Error("Plain 'TETRARCHY OF PHILIP' label should not use pointer cursor.");
+  }
+  await page.mouse.click(philipPointerProbe.screenX, philipPointerProbe.screenY);
+  await page.waitForTimeout(150);
+  const philipUrl = new URL(page.url());
+  if (philipUrl.searchParams.has("place")) {
+    throw new Error(`Clicking plain Philip label should not set ?place=..., got '${page.url()}'.`);
+  }
+
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
+  const judeaPresenceAt44 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
+    const normalizedText = (value) =>
+      typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
+    const judeaRendered = rendered.some(
+      (feature) => normalizedText(feature.properties?.labelText) === "PROVINCE OF JUDEA"
+    );
+    return { judeaRendered, positiveControlCount: rendered.length };
+  }, { testHookKey: mapTestHookKey, holderLayerIds: mapLayerIds.ancientHolderLabels });
+  if (!judeaPresenceAt44.judeaRendered) {
+    throw new Error(
+      `Expected 'PROVINCE OF JUDEA' to render at ?year=44. Holder-label count=${judeaPresenceAt44.positiveControlCount}.`
+    );
+  }
+
+  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
+  const judeaAbsenceAt41 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
+    const normalizedText = (value) =>
+      typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
+    const judeaRendered = rendered.some(
+      (feature) => normalizedText(feature.properties?.labelText) === "PROVINCE OF JUDEA"
+    );
+    const agrippaRendered = rendered.some((feature) =>
+      normalizedText(feature.properties?.labelText).includes("KINGDOM OF HEROD AGRIPPA I")
+    );
+    return {
+      judeaRendered,
+      agrippaRendered,
+      positiveControlCount: rendered.length
+    };
+  }, { testHookKey: mapTestHookKey, holderLayerIds: mapLayerIds.ancientHolderLabels });
+  if (!judeaAbsenceAt41.agrippaRendered || judeaAbsenceAt41.positiveControlCount <= 0) {
+    throw new Error(
+      `AD 41 Judea-hide check lacked positive control; agrippaRendered=${judeaAbsenceAt41.agrippaRendered}, holder-label count=${judeaAbsenceAt41.positiveControlCount}.`
+    );
+  }
+  if (judeaAbsenceAt41.judeaRendered) {
+    throw new Error("PROVINCE OF JUDEA should not render at ?year=41.");
   }
 
   await moveMapAndSettle({ center: [35.6, 32.3], zoom: 6 });

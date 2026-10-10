@@ -247,113 +247,189 @@ function buildRoadJoinFeatures(roadFeatures) {
   const roadLines = [];
   for (let featureIndex = 0; featureIndex < roadFeatures.length; featureIndex += 1) {
     const lines = normalizeRoadLineStrings(roadFeatures[featureIndex]?.geometry);
-    lines.forEach((line) => {
+    lines.forEach((line, lineIndex) => {
       if (Array.isArray(line) && line.length >= 2) {
-        roadLines.push({ featureIndex, coordinates: line });
+        roadLines.push({
+          featureIndex,
+          lineIndex,
+          lineKey: `${featureIndex}:${lineIndex}`,
+          coordinates: line
+        });
       }
     });
   }
 
-  const joins = [];
-  const seenFacingJoinKeys = new Set();
-  let totalJoinLengthKm = 0;
-  let maxJoinLengthKm = 0;
-  const segments = roadLines.flatMap((lineEntry) => {
-    const parts = [];
-    for (let index = 0; index < lineEntry.coordinates.length - 1; index += 1) {
-      parts.push({
+  const roadEndpoints = [];
+  const roadEndpointsByLineKey = new Map();
+  const roadEndpointByKey = new Map();
+  const roadSegments = [];
+  for (const lineEntry of roadLines) {
+    const endpoints = [
+      {
         featureIndex: lineEntry.featureIndex,
+        lineIndex: lineEntry.lineIndex,
+        lineKey: lineEntry.lineKey,
+        coordinate: lineEntry.coordinates[0]
+      },
+      {
+        featureIndex: lineEntry.featureIndex,
+        lineIndex: lineEntry.lineIndex,
+        lineKey: lineEntry.lineKey,
+        coordinate: lineEntry.coordinates[lineEntry.coordinates.length - 1]
+      }
+    ];
+
+    for (const endpoint of endpoints) {
+      endpoint.key = endpointKey(endpoint.coordinate);
+      roadEndpoints.push(endpoint);
+      roadEndpointByKey.set(endpoint.key, endpoint);
+      if (!roadEndpointsByLineKey.has(endpoint.lineKey)) {
+        roadEndpointsByLineKey.set(endpoint.lineKey, []);
+      }
+      roadEndpointsByLineKey.get(endpoint.lineKey).push(endpoint);
+    }
+
+    for (let index = 0; index < lineEntry.coordinates.length - 1; index += 1) {
+      const segment = {
+        featureIndex: lineEntry.featureIndex,
+        lineIndex: lineEntry.lineIndex,
+        lineKey: lineEntry.lineKey,
         start: lineEntry.coordinates[index],
         end: lineEntry.coordinates[index + 1]
-      });
+      };
+      roadSegments.push(segment);
     }
-    return parts;
+  }
+
+  const candidates = [];
+  for (const endpoint of roadEndpoints) {
+    let nearestRoadPoint = null;
+    for (const segment of roadSegments) {
+      if (segment.featureIndex === endpoint.featureIndex && segment.lineIndex === endpoint.lineIndex) {
+        continue;
+      }
+
+      const nearest = nearestPointOnSegmentLngLat(
+        endpoint.coordinate,
+        segment.start,
+        segment.end
+      );
+      const distanceKm = haversineDistanceKm(endpoint.coordinate, nearest.point);
+      if (!nearestRoadPoint || distanceKm < nearestRoadPoint.distanceKm) {
+        nearestRoadPoint = {
+          featureIndex: segment.featureIndex,
+          lineKey: segment.lineKey,
+          point: nearest.point,
+          distanceKm
+        };
+      }
+    }
+
+    if (
+      !nearestRoadPoint ||
+      nearestRoadPoint.distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM ||
+      nearestRoadPoint.distanceKm > ROAD_JOIN_MAX_DISTANCE_KM
+    ) {
+      continue;
+    }
+
+    const targetRoadEndpoints = roadEndpointsByLineKey.get(nearestRoadPoint.lineKey) ?? [];
+    const nearestTargetEndpoint = targetRoadEndpoints.reduce((nearest, candidateEndpoint) => {
+      const distanceKm = haversineDistanceKm(nearestRoadPoint.point, candidateEndpoint.coordinate);
+      if (!nearest || distanceKm < nearest.distanceKm) {
+        return {
+          endpoint: candidateEndpoint,
+          distanceKm
+        };
+      }
+      return nearest;
+    }, null);
+
+    const useEndpointTarget =
+      nearestTargetEndpoint &&
+      nearestTargetEndpoint.distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM;
+    const targetCoordinate = useEndpointTarget
+      ? nearestTargetEndpoint.endpoint.coordinate
+      : nearestRoadPoint.point;
+    const distanceKm = haversineDistanceKm(endpoint.coordinate, targetCoordinate);
+    if (distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM || distanceKm > ROAD_JOIN_MAX_DISTANCE_KM) {
+      continue;
+    }
+
+    candidates.push({
+      sourceEndpoint: endpoint,
+      targetCoordinate,
+      distanceKm,
+      isEndToEnd: Boolean(useEndpointTarget),
+      sourceProperties: { ...(roadFeatures[endpoint.featureIndex]?.properties ?? {}) }
+    });
+  }
+
+  candidates.sort((left, right) => {
+    if (left.isEndToEnd !== right.isEndToEnd) {
+      return left.isEndToEnd ? -1 : 1;
+    }
+    const leftSourceKey = left.sourceEndpoint.key;
+    const rightSourceKey = right.sourceEndpoint.key;
+    if (leftSourceKey !== rightSourceKey) {
+      return leftSourceKey.localeCompare(rightSourceKey);
+    }
+    if (left.distanceKm !== right.distanceKm) {
+      return left.distanceKm - right.distanceKm;
+    }
+    const leftTargetKey = endpointKey(left.targetCoordinate);
+    const rightTargetKey = endpointKey(right.targetCoordinate);
+    return leftTargetKey.localeCompare(rightTargetKey);
   });
-  const roadVertices = roadLines.flatMap((lineEntry) =>
-    lineEntry.coordinates.map((coordinate) => ({
-      featureIndex: lineEntry.featureIndex,
-      coordinate
-    }))
-  );
-  const roadEndpoints = roadLines.flatMap((lineEntry) => [
-    {
-      featureIndex: lineEntry.featureIndex,
-      coordinate: lineEntry.coordinates[0]
-    },
-    {
-      featureIndex: lineEntry.featureIndex,
-      coordinate: lineEntry.coordinates[lineEntry.coordinates.length - 1]
+
+  const joins = [];
+  const acceptedEndpointKeys = new Set();
+  const acceptedPairKeys = new Set();
+  let totalJoinLengthKm = 0;
+  let maxJoinLengthKm = 0;
+
+  for (const candidate of candidates) {
+    const sourceCoordinate = candidate.sourceEndpoint.coordinate;
+    const targetCoordinate = candidate.targetCoordinate;
+    const sourceKey = candidate.sourceEndpoint.key;
+    const targetKey = endpointKey(targetCoordinate);
+    const targetRoadEndpoint = roadEndpointByKey.get(targetKey);
+    const targetEndpointKey =
+      targetRoadEndpoint &&
+      haversineDistanceKm(targetRoadEndpoint.coordinate, targetCoordinate) <= ROAD_JOIN_MIN_DISTANCE_KM
+        ? targetRoadEndpoint.key
+        : null;
+
+    if (acceptedEndpointKeys.has(sourceKey)) {
+      continue;
     }
-  ]);
-  const roadEndpointKeys = new Set(roadEndpoints.map((endpoint) => endpointKey(endpoint.coordinate)));
-
-  for (const lineEntry of roadLines) {
-    const endpoints = [lineEntry.coordinates[0], lineEntry.coordinates[lineEntry.coordinates.length - 1]];
-    for (const endpoint of endpoints) {
-      let nearestVertexRoad = null;
-      for (const candidateVertex of roadVertices) {
-        if (candidateVertex.featureIndex === lineEntry.featureIndex) {
-          continue;
-        }
-        const distanceKm = haversineDistanceKm(endpoint, candidateVertex.coordinate);
-        if (distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM || distanceKm > ROAD_JOIN_MAX_DISTANCE_KM) {
-          continue;
-        }
-        if (!nearestVertexRoad || distanceKm < nearestVertexRoad.distanceKm) {
-          nearestVertexRoad = {
-            featureIndex: candidateVertex.featureIndex,
-            distanceKm
-          };
-        }
-      }
-
-      if (!nearestVertexRoad) {
-        continue;
-      }
-
-      let bestMatch = null;
-      for (const segment of segments) {
-        if (segment.featureIndex !== nearestVertexRoad.featureIndex) {
-          continue;
-        }
-        const nearest = nearestPointOnSegmentLngLat(endpoint, segment.start, segment.end);
-        const distanceKm = haversineDistanceKm(endpoint, nearest.point);
-        if (!bestMatch || distanceKm < bestMatch.distanceKm) {
-          bestMatch = {
-            nearestPoint: nearest.point,
-            distanceKm
-          };
-        }
-      }
-
-      if (!bestMatch || bestMatch.distanceKm <= ROAD_JOIN_MIN_DISTANCE_KM || bestMatch.distanceKm > ROAD_JOIN_MAX_DISTANCE_KM) {
-        continue;
-      }
-
-      const targetEndpointKey = endpointKey(bestMatch.nearestPoint);
-      if (roadEndpointKeys.has(targetEndpointKey)) {
-        const facingJoinKey = joinKey(endpoint, bestMatch.nearestPoint);
-        if (seenFacingJoinKeys.has(facingJoinKey)) {
-          continue;
-        }
-        seenFacingJoinKeys.add(facingJoinKey);
-      }
-
-      const sourceProperties = { ...(roadFeatures[lineEntry.featureIndex]?.properties ?? {}) };
-      joins.push({
-        type: "Feature",
-        properties: sourceProperties,
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [endpoint[0], endpoint[1]],
-            [bestMatch.nearestPoint[0], bestMatch.nearestPoint[1]]
-          ]
-        }
-      });
-      totalJoinLengthKm += bestMatch.distanceKm;
-      maxJoinLengthKm = Math.max(maxJoinLengthKm, bestMatch.distanceKm);
+    if (targetEndpointKey && acceptedEndpointKeys.has(targetEndpointKey)) {
+      continue;
     }
+
+    const pairKey = joinKey(sourceCoordinate, targetCoordinate);
+    if (acceptedPairKeys.has(pairKey)) {
+      continue;
+    }
+    acceptedPairKeys.add(pairKey);
+    acceptedEndpointKeys.add(sourceKey);
+    if (targetEndpointKey) {
+      acceptedEndpointKeys.add(targetEndpointKey);
+    }
+
+    joins.push({
+      type: "Feature",
+      properties: candidate.sourceProperties,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [sourceCoordinate[0], sourceCoordinate[1]],
+          [targetCoordinate[0], targetCoordinate[1]]
+        ]
+      }
+    });
+    totalJoinLengthKm += candidate.distanceKm;
+    maxJoinLengthKm = Math.max(maxJoinLengthKm, candidate.distanceKm);
   }
 
   return {
