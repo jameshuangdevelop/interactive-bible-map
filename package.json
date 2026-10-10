@@ -11,6 +11,9 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "build:ancient-geo": "node scripts/build-ancient-geo.mjs",
+    "check:ancient-geo": "node scripts/check-ancient-geo.mjs",
+    "refresh:osm-waterways": "node scripts/refresh-osm-waterways.mjs",
     "fill:scripture": "node scripts/fill-scripture-text.mjs",
     "fill:political-history": "node scripts/fill-political-history.mjs",
     "fill:image-sizes": "node scripts/fill-image-sizes.mjs",
@@ -46,7 +49,9 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.11.0",
+    "fflate": "0.8.2",
     "lighthouse": "^12.8.2",
+    "mapshaper": "0.6.113",
     "playwright": "1.63.0",
     "sharp": "^0.35.5-rc.0",
     "undici": "^7.24.4"

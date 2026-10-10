@@ -7,6 +7,11 @@ import { feature, mesh, neighbors } from "topojson-client";
 import { topology } from "topojson-server";
 import { presimplify, simplify } from "topojson-simplify";
 
+// Full shapes keep 5 decimals (about 1 m), which the Jordan border near Bethany beyond the Jordan
+// needs. The zoom-10 shapes, the per-stop border lines drawn from the same simplified topology and
+// the static empire edge use 4 decimals (about 11 m), well below their simplification.
+const SIMPLIFIED_COORDINATE_DECIMALS = 4;
+
 function toMapById(records) {
   const map = new Map();
   for (const record of records ?? []) {
@@ -40,6 +45,75 @@ function roundGeometry(geometry, decimals = 5) {
     ...geometry,
     coordinates: roundCoordinates(geometry.coordinates, decimals)
   };
+}
+
+function perpendicularDistance(point, start, end) {
+  const [px, py] = point;
+  const [sx, sy] = start;
+  const [ex, ey] = end;
+  const dx = ex - sx;
+  const dy = ey - sy;
+  if (dx === 0 && dy === 0) {
+    return Math.hypot(px - sx, py - sy);
+  }
+  const t = ((px - sx) * dx + (py - sy) * dy) / (dx * dx + dy * dy);
+  const clampedT = Math.max(0, Math.min(1, t));
+  const nx = sx + clampedT * dx;
+  const ny = sy + clampedT * dy;
+  return Math.hypot(px - nx, py - ny);
+}
+
+function simplifyLineString(coordinates, tolerance) {
+  if (!Array.isArray(coordinates) || coordinates.length <= 2) {
+    return coordinates;
+  }
+
+  const keepIndexes = new Set([0, coordinates.length - 1]);
+  const stack = [[0, coordinates.length - 1]];
+
+  while (stack.length > 0) {
+    const [startIndex, endIndex] = stack.pop();
+    const start = coordinates[startIndex];
+    const end = coordinates[endIndex];
+    let maxDistance = 0;
+    let maxDistanceIndex = -1;
+
+    for (let index = startIndex + 1; index < endIndex; index += 1) {
+      const distance = perpendicularDistance(coordinates[index], start, end);
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        maxDistanceIndex = index;
+      }
+    }
+
+    if (maxDistanceIndex > -1 && maxDistance > tolerance) {
+      keepIndexes.add(maxDistanceIndex);
+      stack.push([startIndex, maxDistanceIndex], [maxDistanceIndex, endIndex]);
+    }
+  }
+
+  return [...keepIndexes]
+    .sort((left, right) => left - right)
+    .map((index) => coordinates[index]);
+}
+
+function simplifyRoadGeometry(geometry, tolerance) {
+  if (!geometry || typeof geometry !== "object") {
+    return geometry;
+  }
+  if (geometry.type === "LineString") {
+    return {
+      ...geometry,
+      coordinates: simplifyLineString(geometry.coordinates, tolerance)
+    };
+  }
+  if (geometry.type === "MultiLineString") {
+    return {
+      ...geometry,
+      coordinates: geometry.coordinates.map((line) => simplifyLineString(line, tolerance))
+    };
+  }
+  return geometry;
 }
 
 function polygonArea(linearRing) {
@@ -240,6 +314,9 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
 
   const fullFeatures = feature(baseTopology, baseTopology.objects.areas);
   const simplifiedFeatures = feature(simplifiedTopology, simplifiedTopology.objects.areas);
+  // The app's copy of the shapes carries only each area's id: provenance stays in data/geo/ for the
+  // sources list and the Fact-Checker (ADR-0037's update of 2026-10-08, item 2).
+  const appProperties = (item) => ({ areaId: item.properties?.areaId });
 
   return {
     baseTopology,
@@ -248,6 +325,7 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
       ...fullFeatures,
       features: fullFeatures.features.map((item) => ({
         ...item,
+        properties: appProperties(item),
         geometry: roundGeometry(item.geometry)
       }))
     },
@@ -255,7 +333,8 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
       ...simplifiedFeatures,
       features: simplifiedFeatures.features.map((item) => ({
         ...item,
-        geometry: roundGeometry(item.geometry)
+        properties: appProperties(item),
+        geometry: roundGeometry(item.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
       }))
     }
   };
@@ -388,7 +467,7 @@ function buildStopBorderCollections({
         holderBKind: normalizedPair.second.kind,
         holderBRomanSide: normalizedPair.second.romanSide
       },
-      geometry: roundGeometry(geometry)
+      geometry: roundGeometry(geometry, SIMPLIFIED_COORDINATE_DECIMALS)
     });
   }
 
@@ -425,7 +504,7 @@ function buildStopBorderCollections({
       romanEmpireEdge &&
       Array.isArray(romanEmpireEdge.coordinates) &&
       romanEmpireEdge.coordinates.length > 0
-        ? roundGeometry(romanEmpireEdge)
+        ? roundGeometry(romanEmpireEdge, SIMPLIFIED_COORDINATE_DECIMALS)
         : null
   };
 }
@@ -435,8 +514,10 @@ export async function buildAncientAppData({
   ancientAreasData,
   ancientRoadsData,
   ancientCoastlineData,
+  ancientEmpireEdgeData = null,
   outputDirectory,
-  simplifyThreshold = 0.00002
+  simplifyThreshold = 0.00002,
+  roadSimplifyTolerance = 0.0015
 }) {
   const entitiesById = toMapById(timelineData.entities ?? []);
   const areasById = toMapById(timelineData.areas ?? []);
@@ -488,16 +569,25 @@ export async function buildAncientAppData({
     })
   );
 
+  // Like the shapes, the app's roads leave out each road's provenance, which stays in data/geo/
+  // (ADR-0037's update of 2026-10-08, item 2).
   writtenFiles.push(
     await writeJsonWithSize(
       outputDirectory,
       "ancient.roads.geojson",
       {
         ...ancientRoadsData,
-        features: (ancientRoadsData.features ?? []).map((feature) => ({
-          ...feature,
-          geometry: roundGeometry(feature.geometry)
-        }))
+        features: (ancientRoadsData.features ?? []).map((feature) => {
+          const { provenance: _provenance, ...properties } = feature.properties ?? {};
+          return {
+            ...feature,
+            properties,
+            geometry: roundGeometry(
+              simplifyRoadGeometry(feature.geometry, roadSimplifyTolerance),
+              4
+            )
+          };
+        })
       }
     )
   );
@@ -515,6 +605,24 @@ export async function buildAncientAppData({
       }
     )
   );
+
+  // The empire edge does not change between stops, so it is written once rather
+  // than per stop. Per-stop `romanEmpireEdge` lines still cover drawn non-Roman areas.
+  if (Array.isArray(ancientEmpireEdgeData?.features)) {
+    writtenFiles.push(
+      await writeJsonWithSize(
+        outputDirectory,
+        "ancient.empire-edge.geojson",
+        {
+          ...ancientEmpireEdgeData,
+          features: ancientEmpireEdgeData.features.map((feature) => ({
+            ...feature,
+            geometry: roundGeometry(feature.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
+          }))
+        }
+      )
+    );
+  }
 
   for (const stop of stops) {
     const assignments = [];

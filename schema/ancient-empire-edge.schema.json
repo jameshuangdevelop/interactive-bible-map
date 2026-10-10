@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-bible-map/schemas/ancient-empire-edge.schema.json",
+  "title": "Ancient empire edge",
+  "description": "ODbL linework for the edge of the Roman world: where the land of all ancient areas meets land outside it. The line is static across the timeline. This layer is optional.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "features"
+  ],
+  "properties": {
+    "type": {
+      "const": "FeatureCollection"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/lineFeature"
+      }
+    }
+  },
+  "$defs": {
+    "position": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        }
+      ]
+    },
+    "lineStringGeometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "properties": {
+        "type": {
+          "const": "LineString"
+        },
+        "coordinates": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/position"
+          }
+        }
+      }
+    },
+    "multiLineStringGeometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "properties": {
+        "type": {
+          "const": "MultiLineString"
+        },
+        "coordinates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "$ref": "#/$defs/position"
+            }
+          }
+        }
+      }
+    },
+    "lineFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "properties",
+        "geometry"
+      ],
+      "properties": {
+        "type": {
+          "const": "Feature"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "edgeId",
+            "provenance"
+          ],
+          "properties": {
+            "edgeId": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "provenance": {
+              "$ref": "https://interactive-bible-map/schemas/geo-provenance.schema.json"
+            }
+          }
+        },
+        "geometry": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/lineStringGeometry"
+            },
+            {
+              "$ref": "#/$defs/multiLineStringGeometry"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

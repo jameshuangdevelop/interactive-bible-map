@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { parseReference } from "../scripts/lib/books.mjs";
+import { serializeWaterways, waterwayFeatures } from "../scripts/lib/osm-waterways.mjs";
 import {
   validateData,
   REQUIRE_EMPIRE_ROOT,
@@ -44,6 +45,11 @@ const ancientCoastlineFixturePath = path.join(
   ancientFixtureDirectory,
   "geo",
   "ancient-coastline.geojson"
+);
+const ancientEmpireEdgeFixturePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "ancient-empire-edge.geojson"
 );
 
 const locationSchemaPath = path.join(
@@ -314,23 +320,31 @@ async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
       path.join(mediaDirectory, "capernaum.json")
     );
 
-    const timeline = JSON.parse(fs.readFileSync(ancientTimelineFixturePath, "utf8"));
-    const areas = JSON.parse(fs.readFileSync(ancientAreasFixturePath, "utf8"));
-    const roads = JSON.parse(fs.readFileSync(ancientRoadsFixturePath, "utf8"));
-    const coastline = JSON.parse(fs.readFileSync(ancientCoastlineFixturePath, "utf8"));
+    const ancient = {
+      timeline: JSON.parse(fs.readFileSync(ancientTimelineFixturePath, "utf8")),
+      areas: JSON.parse(fs.readFileSync(ancientAreasFixturePath, "utf8")),
+      roads: JSON.parse(fs.readFileSync(ancientRoadsFixturePath, "utf8")),
+      coastline: JSON.parse(fs.readFileSync(ancientCoastlineFixturePath, "utf8")),
+      // Set to null in a mutation to leave the optional empire-edge file out.
+      empireEdge: JSON.parse(fs.readFileSync(ancientEmpireEdgeFixturePath, "utf8"))
+    };
 
     if (typeof mutateAncient === "function") {
-      mutateAncient({ timeline, areas, roads, coastline });
+      mutateAncient(ancient);
     }
 
     const timelinePath = path.join(temporaryDirectory, "timeline.json");
     const areasPath = path.join(geoDirectory, "ancient-areas.geojson");
     const roadsPath = path.join(geoDirectory, "ancient-roads.geojson");
     const coastlinePath = path.join(geoDirectory, "ancient-coastline.geojson");
-    fs.writeFileSync(timelinePath, `${JSON.stringify(timeline, null, 2)}\n`);
-    fs.writeFileSync(areasPath, `${JSON.stringify(areas, null, 2)}\n`);
-    fs.writeFileSync(roadsPath, `${JSON.stringify(roads, null, 2)}\n`);
-    fs.writeFileSync(coastlinePath, `${JSON.stringify(coastline, null, 2)}\n`);
+    const empireEdgePath = path.join(geoDirectory, "ancient-empire-edge.geojson");
+    fs.writeFileSync(timelinePath, `${JSON.stringify(ancient.timeline, null, 2)}\n`);
+    fs.writeFileSync(areasPath, `${JSON.stringify(ancient.areas, null, 2)}\n`);
+    fs.writeFileSync(roadsPath, `${JSON.stringify(ancient.roads, null, 2)}\n`);
+    fs.writeFileSync(coastlinePath, `${JSON.stringify(ancient.coastline, null, 2)}\n`);
+    if (ancient.empireEdge !== null) {
+      fs.writeFileSync(empireEdgePath, `${JSON.stringify(ancient.empireEdge, null, 2)}\n`);
+    }
 
     const { webVplPath = webFixturePath, ...validationOptions } = options;
     return await validateData({
@@ -340,6 +354,7 @@ async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
       ancientAreasPath: areasPath,
       ancientRoadsPath: roadsPath,
       ancientCoastlinePath: coastlinePath,
+      ancientEmpireEdgePath: empireEdgePath,
       imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
       aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
@@ -2303,6 +2318,119 @@ test("ancient shapes catch open rings, out-of-range coordinates, and self-inters
   });
   assert.equal(
     hasError(selfIntersecting, (error) => /self-intersection/u.test(error.message)),
+    true
+  );
+});
+
+test("pinned OpenStreetMap waterways are validated when present", async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-waterways-"));
+  try {
+    const way = { id: 101, version: 4, nodeIds: [7, 8, 9], coordinates: [[35.6, 33.1], [35.61, 33.0], [35.62, 32.9]] };
+    const writeWaterways = (mutate) => {
+      const collection = { asOf: "2026-10-08T00:00:00Z", features: waterwayFeatures("jordan", [way], { asOf: "2026-10-08T00:00:00Z" }) };
+      mutate?.(collection);
+      const filePath = path.join(directory, "osm-waterways.geojson");
+      fs.writeFileSync(filePath, serializeWaterways(collection));
+      return filePath;
+    };
+    const isWaterwaysError = (error) => /osm-waterways\.geojson$/u.test(error.file);
+
+    const valid = await runWithTemporaryAncientCase(undefined, { osmWaterwaysPath: writeWaterways() });
+    assert.equal(valid.errors.filter(isWaterwaysError).length, 0);
+
+    const noVersion = await runWithTemporaryAncientCase(undefined, {
+      osmWaterwaysPath: writeWaterways((collection) => {
+        delete collection.features[0].properties.version;
+      })
+    });
+    assert.equal(
+      hasError(noVersion, (error) => isWaterwaysError(error) && error.path === "$.features[0].properties.version" && /Schema validation failed/u.test(error.message)),
+      true
+    );
+
+    const undatedAttic = await runWithTemporaryAncientCase(undefined, {
+      osmWaterwaysPath: writeWaterways((collection) => {
+        collection.asOf = "yesterday";
+      })
+    });
+    assert.equal(hasError(undatedAttic, (error) => isWaterwaysError(error) && /Schema validation failed/u.test(error.message)), true);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("ancient empire edge is optional and validated when present", async () => {
+  const isEmpireEdgeError = (error) => /ancient-empire-edge\.geojson$/u.test(error.file);
+
+  const present = await runWithTemporaryAncientCase(undefined);
+  assert.equal(present.errors.length, 0);
+
+  const absent = await runWithTemporaryAncientCase((ancient) => {
+    ancient.empireEdge = null;
+  });
+  assert.equal(absent.errors.length, 0);
+
+  const polygonEdge = await runWithTemporaryAncientCase(({ empireEdge }) => {
+    empireEdge.features[0].geometry = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [3, 0],
+          [3, 1],
+          [4, 1],
+          [3, 0]
+        ]
+      ]
+    };
+  });
+  assert.equal(
+    hasError(
+      polygonEdge,
+      (error) => isEmpireEdgeError(error) && /Schema validation failed/u.test(error.message)
+    ),
+    true
+  );
+
+  const missingEdgeId = await runWithTemporaryAncientCase(({ empireEdge }) => {
+    delete empireEdge.features[0].properties.edgeId;
+  });
+  assert.equal(
+    hasError(
+      missingEdgeId,
+      (error) =>
+        isEmpireEdgeError(error) &&
+        error.path === "$.features[0].properties.edgeId" &&
+        /Schema validation failed/u.test(error.message)
+    ),
+    true
+  );
+
+  const outOfRange = await runWithTemporaryAncientCase(({ empireEdge }) => {
+    empireEdge.features[0].geometry.coordinates[1] = [999, 999];
+  });
+  assert.equal(
+    hasError(
+      outOfRange,
+      (error) =>
+        isEmpireEdgeError(error) &&
+        /Geometry coordinates must stay within \[lon, lat\]/u.test(error.message)
+    ),
+    true
+  );
+
+  const unknownSource = await runWithTemporaryAncientCase(({ empireEdge }) => {
+    empireEdge.features[0].properties.provenance.changes[0].sources = [
+      "bib:missing-edge-source"
+    ];
+  });
+  assert.equal(
+    hasError(
+      unknownSource,
+      (error) =>
+        isEmpireEdgeError(error) &&
+        error.path === "$.features[0].properties.provenance.changes[0].sources[0]" &&
+        /was not found in data\/bibliography\.json/u.test(error.message)
+    ),
     true
   );
 });

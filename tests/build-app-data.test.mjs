@@ -24,6 +24,11 @@ const ancientCoastlinePath = path.join(
   "geo",
   "ancient-coastline.geojson"
 );
+const ancientEmpireEdgePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "ancient-empire-edge.geojson"
+);
 const repositoryImagePromptsDirectory = path.join(
   repositoryRoot,
   "content",
@@ -457,10 +462,100 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     );
     assert.equal(shapesPayload.areas.features.length, 4);
     assert.equal(shapesPayload.areasSimplifiedForZoom10.features.length, 4);
+    // Provenance stays in data/geo/; the app's shapes carry only each area's id.
+    for (const shapes of [shapesPayload.areas, shapesPayload.areasSimplifiedForZoom10]) {
+      for (const shape of shapes.features) {
+        assert.deepEqual(Object.keys(shape.properties), ["areaId"]);
+      }
+    }
 
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.roads.geojson"));
+    // The app's roads keep the drawing flags but, like the shapes, leave the provenance in data/geo/.
+    const roadsPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
+    );
+    assert.equal(roadsPayload.features.length, 1);
+    assert.deepEqual(roadsPayload.features[0].properties, {
+      roadId: "fixture-road-1",
+      major: true,
+      known: false,
+      timeperiod: "R"
+    });
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
+    // No empire-edge source sits next to the valid case's data, so none is written.
+    assert.equal(outputFiles.includes("ancient.empire-edge.geojson"), false);
+  });
+});
+
+test("buildAppData writes the static empire edge once when the layer is present", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const result = await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      timelinePath: ancientTimelinePath,
+      ancientAreasPath,
+      ancientRoadsPath,
+      ancientCoastlinePath,
+      ancientEmpireEdgePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    const edgeFiles = result.outputFiles.filter(
+      (entry) => entry.file === "ancient.empire-edge.geojson"
+    );
+    assert.equal(edgeFiles.length, 1);
+    assert.ok(edgeFiles[0].gzipBytes > 0);
+
+    const edgePayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.empire-edge.geojson"), "utf8")
+    );
+    assert.equal(edgePayload.type, "FeatureCollection");
+    assert.equal(edgePayload.features.length, 1);
+    assert.equal(edgePayload.features[0].properties.edgeId, "fixture-empire-edge");
+    assert.deepEqual(edgePayload.features[0].geometry.coordinates, [
+      [3, 0],
+      [3, 1]
+    ]);
+
+    // Stops keep their own per-year edge alongside the static file.
+    const stopPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
+    );
+    assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
+  });
+});
+
+test("buildAppData fails when the empire edge layer is invalid", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const invalidEdgePath = path.join(temporaryDirectory, "ancient-empire-edge.geojson");
+    const edgeData = JSON.parse(await fs.readFile(ancientEmpireEdgePath, "utf8"));
+    delete edgeData.features[0].properties.edgeId;
+    await fs.writeFile(invalidEdgePath, `${JSON.stringify(edgeData, null, 2)}\n`);
+
+    await assert.rejects(
+      buildAppData({
+        locationsDirectory: path.join(validCaseDirectory, "locations"),
+        mediaDirectory: path.join(validCaseDirectory, "media"),
+        bibliographyPath: bibliographyFixturePath,
+        timelinePath: ancientTimelinePath,
+        ancientAreasPath,
+        ancientRoadsPath,
+        ancientCoastlinePath,
+        ancientEmpireEdgePath: invalidEdgePath,
+        webVplPath: webFixturePath,
+        skipSnapshotChecksumCheck: true,
+        requireEmpireRoot: false,
+        requireModernCountries: false,
+        outputDirectory: path.join(temporaryDirectory, "output")
+      }),
+      /Data validation failed/u
+    );
   });
 });
 
@@ -511,6 +606,9 @@ test("buildAppData supports ancient-source fixture directory", async () => {
       await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
     );
     assert.ok(Array.isArray(stopPayload.holderLabels));
+
+    const outputFiles = await fs.readdir(outputDirectory);
+    assert.ok(outputFiles.includes("ancient.empire-edge.geojson"));
   });
 });
 

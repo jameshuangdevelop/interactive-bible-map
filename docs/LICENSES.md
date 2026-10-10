@@ -1,11 +1,11 @@
 # Licenses
 
-License decisions for this project. Maintained by the Fact-Checker & Licensing agent. Every upstream source and its required attribution is listed in [ATTRIBUTION.md](../ATTRIBUTION.md). Decisions below were made in M1-03 (`docs/verification/M1.md`), independently re-verifying every source's license on its own site on 2026-09-23. The basemap decisions were made in M3-07 (`docs/verification/M3-basemap.md`), reading every license on the provider's own pages on 2026-09-28.
+License decisions for this project. Maintained by the Fact-Checker & Licensing agent. Every upstream source and its required attribution is listed in [ATTRIBUTION.md](../ATTRIBUTION.md). Decisions below were made in M1-03 (`docs/verification/M1.md`), independently re-verifying every source's license on its own site on 2026-09-23. The basemap decisions were made in M3-07 (`docs/verification/M3-basemap.md`), reading every license on the provider's own pages on 2026-09-28. The ancient layer's decisions were made in M4-03 (`docs/verification/M4-ancient-geometry.md`), reading each license at its source on 2026-10-08.
 
 | Content | License | Status |
 |---|---|---|
 | Code | MIT ([LICENSE](../LICENSE)) | Decided |
-| `data/geo/` (geometry extracted from AWMC and OpenStreetmap-derived sources: ancient roads/provinces/coastlines, and any modern boundary/geometry pulled directly from OSM) | **ODbL 1.0** — required because extracting this content into our own database makes it a "Derivative Database" under ODbL §4.4(b), which AWMC's and OSM's own ODbL terms require to stay ODbL (or a licensor-designated compatible license; none is designated, so plain ODbL 1.0 it is). | Decided |
+| `data/geo/` (the ancient layer from M4-03: area shapes, the empire's edge, roads and coastline, derived from AWMC Geodata, three OpenStreetMap river ways and Natural Earth land; and any modern boundary/geometry pulled directly from OSM) | **ODbL 1.0** — required because extracting this content into our own database makes it a "Derivative Database" under ODbL §4.4(b), which AWMC's and OSM's own ODbL terms require to stay ODbL (or a licensor-designated compatible license; none is designated, so plain ODbL 1.0 it is). Natural Earth is public domain and adds no condition. Attribution and access: "Ancient layer (M4-03)" below. | Decided |
 | All other `data/` and `content/` **except `data/reference/`** (location records, scripture references, routes, timeline, narrative summaries, image metadata, image prompts) | **CC BY-SA 4.0** — the strictest license among the non-ODbL upstream sources we combine (DARE is CC BY-SA 3.0). CC BY-SA 3.0's own ShareAlike clause permits relicensing Adapted Material under "a later version of this License with the same License Elements" (confirmed in the CC BY-SA 3.0 legal code, §4(b)), so CC BY-SA 4.0 satisfies DARE. It is also a strict superset of the plainer CC BY 4.0/3.0 obligations from OpenBible.info, Pleiades, and the ORBIS dataset, and is compatible with folding in CC0 Wikidata content. **One consistent OSM rule:** OpenBible.info's OSM-derived coordinate/geometry fields (any `coordinates_source`/`secondary_sources` entry with `type: "osm"`/`"osm_group"` in `modern.jsonl`, and `precise_geometry_id` in `ancient.jsonl` — see `docs/verification/M1.md` Q3) never go into these CC BY-SA 4.0 records; location coordinates come from a non-OSM source instead (Wikidata, DARE, or Pleiades, cross-checked). OpenBible.info's identification and candidate-site data (CC BY 4.0, not OSM-derived) is still fully used. | Decided |
 | `data/reference/` (WEB snapshot text and snapshot metadata) | **Public domain source text** (WEB `engwebp`) plus non-creative integrity metadata (`sha256`, source URL/date). This follows ADR-0012: WEB text remains public domain and is not relicensed under the project's CC BY-SA data layer. | Decided |
 | Bible text | World English Bible (WEB), Protestant-canon editions only (`engwebp`/`engwebpb`). Confirmed **public domain** on eBible.org's own pages; "World English Bible" is a **trademark** of eBible.org (not to be used to label a changed text). Public domain regardless of which JSON record the text sits inside — it is not covered by the project's CC BY-SA 4.0 data license. | Decided |
@@ -210,6 +210,35 @@ It reads: VersaTiles © OpenStreetMap contributors · © ESA WorldCover 2021 (CC
 - Labels in Noto Sans ([SIL Open Font License 1.1](https://openfontlicense.org/)). Icons from VersaTiles ([CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)).
 ```
 
+## Ancient layer (M4-03)
+Decided on 2026-10-08. The evidence for every line, with its source URL and the date read, is in [`docs/verification/M4-ancient-geometry.md`](verification/M4-ancient-geometry.md). The ancient layer is the area shapes, the empire's edge, the roads and the ancient coastline in `data/geo/`, and the copies of them that `npm run build:data` writes for the app.
+
+### What each part is licensed under (ancient layer)
+| Part | License, as read at the source | Credit required, and where |
+|---|---|---|
+| AWMC Geodata at commit `7ecf8bccea2efe1e1e9df2daf6001942de73fb87`: the GeoJSON roads, Herod's kingdom and the AD 117 and AD 200 layers; `Physical Data/shoreline/shoreline.geojson` (the ancient coastline); and two archives in the same commit, `Cultural Shapefiles Apr 2024.zip` (the AD 14 and AD 69 province lines and extents, Herod's kingdom and `Italy_shading`) and `Physical Data/shoreline/coastline.zip` | ODbL 1.0. The repository's `LICENSE.txt` is the ODbL 1.0 text. Its README says "The GeoJson files are offered under the ODC Open Database License" and calls the shapefile archives "archived copies of all AWMC geospatial data"; nothing in the repository offers them under other terms, and the shapefiles' own metadata has no licence statement. The README adds that the data "uses AWMC modifications to OpenStreetMap", and the shoreline's README that it is "derived from VMAP0, and was modified by the AWMC". | The ODbL §4.3 notice, in the ancient map's attribution control (A1) |
+| OpenStreetMap: the Jordan (relation 2246907), the Yarmuk (1355013) and the Lamus, today's Limonlu Çayı (15952690), 46 ways in all. The ways, with their ids and versions, are committed in `data/geo/sources/osm-waterways.geojson`, as Overpass's attic data held them at 2026-10-08T00:00:00Z; the build reads only that file (A5). | ODbL 1.0 | "OpenStreetMap", linked to the copyright page. The basemap's own credit shows it whenever the ancient map is on (A2). |
+| Natural Earth 10 m land, coastline and lakes, at commit `ca96624a56bd078437bca8184e78163e5039ad19` of `nvkelso/natural-earth-vector` | Public domain: "All versions of Natural Earth raster + vector map data found on this website are in the public domain", and "No permission is needed to use Natural Earth" (terms of use) | None |
+| Itiner-e (de Soto and others, *Scientific Data* 12, 1731, 2025) | Not used: no script or file in M4-03 reads it, so no licence decision is needed. A later card that uses it must read its licence at the source first. | None |
+
+All of these are compatible with the project. `data/geo/` combines ODbL and public-domain data, so it stays ODbL 1.0 (§4.4), and the code that builds it stays MIT.
+
+### Obligations for the Frontend Engineer (M4-05) and the GIS Engineer
+- **A1. Attribution control.** While the ancient layer is shown, the attribution control shows the string below, set as the `attribution` of the ancient layer's sources. Every ancient source carries the same string, so MapLibre shows it once. It is ODbL §4.3's own example notice, which says "DATABASE NAME should be replaced with the name of the Database and a hyperlink to the URI of the Database", with "Open Database License" linked to the licence text.
+- **A2. OpenStreetMap.** The ancient map needs no second OSM credit. The basemap's "Data from OpenStreetMap" (main) or "© OpenStreetMap contributors" (fallback) is always in the same control and links to OSM's copyright page, which OSM accepts for both of its requirements: the credit, and making clear that the data is under the ODbL. If the ancient layer is ever shown without that credit (over another basemap, or as a static image or print), add "© OpenStreetMap contributors", linked to `https://www.openstreetmap.org/copyright`, after A1's string.
+- **A3. Share-alike and access** (ODbL §4.4, §4.6). `data/geo/` stays ODbL 1.0 and public in this repository, together with the scripts that make it (`npm run build:ancient-geo`) and the OpenStreetMap ways they read (`data/geo/sources/osm-waterways.geojson`), so anyone shown the map can get the whole derived database. The app's generated `ancient.*` files are simplified copies of it and carry the same licence.
+- **A4. "Sources & credits".** The data-licence sentence (`DATA_LICENSE_TEXT`) says that the ancient layer's geometry is ODbL 1.0. AWMC Geodata, OpenStreetMap and Natural Earth are already in the list of upstream sources.
+- **A5. Reading OpenStreetMap.** The OSMF API Usage Policy says the editing API "is provided in order to edit the map data, not for read-only purposes or projects". The next time the river relations are fetched, they must come from Overpass or a planet extract instead. The licence and the credit don't change. *Done (M4-03, 2026-10-08): the build reads them through Overpass, which returned the same way ids, versions and nodes.* *Updated (2026-10-08, after the PR review): the ways are pinned in `data/geo/sources/osm-waterways.geojson`, each with its provenance and the ODbL notice. The build never contacts OpenStreetMap; only `npm run refresh:osm-waterways -- --date <UTC date>` reads Overpass, at that attic date.*
+
+### Ancient layer attribution string
+Paste this exactly. It is HTML for a source's `attribution` property.
+```html
+Contains information from <a href="https://github.com/AWMC/geodata" target="_blank">AWMC Geodata</a>, which is made available here under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank">Open Database License (ODbL)</a>.
+```
+It reads: Contains information from AWMC Geodata, which is made available here under the Open Database License (ODbL).
+
+It replaces the M1-03 wording, "Contains information from AWMC Geodata (awmc.unc.edu), made available under the Open Database License (ODbL).", with the ODbL's example notice: the name links to where the database is published, rather than naming the Center's website, and the licence name links to its text.
+
 ## Source compatibility
 | Source | License (verified 2026-09-23) | Compatible with project? | Use |
 |---|---|---|---|
@@ -219,11 +248,11 @@ It reads: VersaTiles © OpenStreetMap contributors · © ESA WorldCover 2021 (CC
 | Digital Atlas of the Roman Empire (DARE) | CC BY-SA 3.0 | Yes — drives the CC BY-SA 4.0 data-license choice above | Cross-check only |
 | ORBIS (Stanford) — dataset | CC BY 3.0 | Yes | Routes tab (M5) travel-time/route cross-check |
 | ORBIS (Stanford) — live web app | Unconfirmed; own tiles are CC BY-NC 3.0 (non-commercial) | **No** | Do not use; see do-not-use list |
-| AWMC Geodata | ODbL 1.0 | Yes, kept in `data/geo/` | Primary ancient roads/provinces/coastlines (M4) |
+| AWMC Geodata | ODbL 1.0 (confirmed at commit `7ecf8bc`, 2026-10-08) | Yes, kept in `data/geo/` | The ancient layer (M4-03): area shapes, the empire's edge, roads and coastline |
 | Wikidata | CC0 (statements); CC BY-SA 4.0 (prose, not used) | Yes | Cross-check / ID crosswalk |
 | Wikimedia Commons | Varies per file — Commons itself hosts far more than we accept (GFDL, FAL, GPL/LGPL, government licences, etc.) | Yes, restricted to the three accepted bands (see "Accepted image licenses") | Primary image source |
-| Natural Earth | Public domain | Yes | Modern basemap coastlines/borders (subject to M1-02) |
-| OpenStreetMap-based data | ODbL 1.0 (data); CC BY-SA 2.0 (docs) | Yes, kept in `data/geo/` under ODbL 1.0; never embedded as extracted facts in CC BY-SA 4.0 location records (see the one-rule policy above and `docs/verification/M1.md` Q3) | Modern basemap / cross-check only |
+| Natural Earth | Public domain | Yes | Modern basemap coastlines/borders (subject to M1-02); the land, coastline and lakes the ancient layer is built on (M4-03) |
+| OpenStreetMap-based data | ODbL 1.0 (data); CC BY-SA 2.0 (docs) | Yes, kept in `data/geo/` under ODbL 1.0; never embedded as extracted facts in CC BY-SA 4.0 location records (see the one-rule policy above and `docs/verification/M1.md` Q3) | Modern basemap / cross-check; the Jordan, Yarmuk and Lamus river ways that ancient borders follow (M4-03) |
 | eBible.org WEB (`engwebp`/`engwebpb`) | Public domain (name trademarked) | Yes | Primary and only Bible text |
 | Wikipedia | CC BY-SA (unversioned) / GFDL | Cite-only; never copied per brief rule #6 | Background pointer only |
 | Perseus Digital Library | **Unverified** — no reusable-content license found | **Not yet** | Do not quote; cite-only if ever confirmed |
