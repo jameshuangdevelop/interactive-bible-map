@@ -1367,7 +1367,7 @@ function ensureMapLayers(
       },
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.roads.casingColor,
-        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0.4, 6, 0.7, 7, 1.75, 20, 22]
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 2.6, 7, 3.6, 9, 5.5, 12, 9]
       }
     });
   }
@@ -1384,7 +1384,7 @@ function ensureMapLayers(
       },
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.roads.knownColor,
-        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 5, 0, 7, 1, 20, 18]
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1.2, 7, 2, 9, 3.5, 12, 6.5]
       }
     });
   }
