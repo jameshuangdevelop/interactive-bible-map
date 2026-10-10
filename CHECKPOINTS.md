@@ -28,7 +28,7 @@ Lighter stops between checkpoints: the PO opens the app with the work so far on 
 | MC5 | CP4 | Phone basics (M7-01): the opening map fits a phone, and the panel works as a bottom sheet. Try it with your browser's device view, or on a phone once its preview link is up. | M7-01's review | Done 2026-10-08: opened on a local preview after M7-01's review |
 | MC6 | CP4 | The modern map and the "Ancient \| Modern" toggle (M4-04) | Whether the pins keep their Bible names on the modern map (ADR-0037 item 4) | Opened 2026-10-08 on a local preview; the pin-name question is CP4's decision 1 |
 | MC7 | CP4 | The ancient layer and the timeline (M4-05) with the first verified data (M4-02, M4-03) | The colours and the list of stops (ADR-0037 item 1) | Done 2026-10-09: you asked for lines that need no map key, a name on every area, and roads that read as roads, so the ancient layer now draws its lines the way the modern map does (ADR-0037's updates). The colours and the stops are CP4's decision 2 |
-| MC8 | CP4 | Everything merged and built as it will deploy, with the speed results | The push | Done 2026-10-09: the assembled stack passed the full browser suite and the desktop speed check (CP4, below); it waits for the push |
+| MC8 | CP4 | Everything merged and built as it will deploy, with the speed results | The push | Done 2026-10-10: the assembled stack, with the MC7 changes, passed the full browser suite and the desktop speed check (CP4, below); you approved the push |
 
 ---
 
@@ -420,14 +420,14 @@ The ancient map now shows who held each land of the New Testament world, from 4 
 | M4-04 | The modern map and the "Ancient \| Modern" toggle, with country borders kept neutral ([verification](docs/verification/M4-04-modern-map.md)) | #56 |
 | M4-05 | The ancient layer and the timeline in the app: every area shaded and named; borders, roads and the old coastline drawn the way the modern map draws them, so there's no map key (your MC7 request); and a timeline that stops at each year when something changed | #57 |
 
-**The data now:** 89 places, all `verified`, each with a political history from the timeline; 185 bibliography entries, up from 161. The timeline has 15 stops and 32 holders: 19 Roman provinces, 7 allied kingdoms, 3 tetrarchies, 2 free leagues or cities, and "status unclear" where the sources disagree or are silent. Everything the ancient layer loads is 287,801 bytes gzip, within its 300,000-byte budget.
+**The data now:** 89 places, all `verified`, each with a political history from the timeline; 185 bibliography entries, up from 161. The timeline has 15 stops and 32 holders: 19 Roman provinces, 7 allied kingdoms, 3 tetrarchies, 2 free leagues or cities, and "status unclear" where the sources disagree or are silent. Everything the ancient layer loads is 299,646 bytes gzip, just within its 300,000-byte budget; the backlog has a change that frees about 10 KB, to make before anything else is added.
 
 ### How quality was checked
 - **Mini checkpoints:** MC5 to MC8 opened each part on a local preview as it finished. At MC7 you asked for an ancient layer that needs no map key. It now names every area, shows a border only where the names on both sides fit, and draws roads and the old coastline the way the modern map does. Your question about the road from Ephesus to Laodicea found 56 small breaks in the roads, left by how the atlas was digitised, such as where two of its map sheets meet; the app now joins breaks of up to 4 km. You were away for MC6, so its question is decision 1 below.
 - **The Fact-Checker opened every source** behind the timeline, and checked the shapes by script and on zoomed previews: all 89 places' political history, every border rule, the roads' dates, the old coastline and every license.
 - **Each M4 PR (#51 to #57) had a cross-vendor review:** Claude Sonnet 5 reviewed the GPT work, and GPT-5.4 the Claude work. Every finding was fixed or answered, and each PR carries its review.
 - **I checked the map itself, not only the tests.** I decoded the live map tiles to confirm that no border line shows inside the contested places at any zoom, measured the scale bar against real distances (within 1%), rebuilt the ancient layer from an empty cache (identical), and checked which labels actually appear on screen. That last check found missing labels that the tests had passed; they're fixed, and the tests now check the screen.
-- **The full browser suite** passes on the assembled stack, as do 264 tests of the data and build scripts and 158 app tests, and the smoke and accessibility checks find no blocking problems. **Desktop speed,** on a local build served compressed like the live site: median LCP 0.5–0.7 s against the 2.5 s limit, and TBT 0 ms against 200 ms.
+- **The full browser suite** passes on the assembled stack, as do 273 tests of the data and build scripts and 159 app tests, and the smoke and accessibility checks find no blocking problems. **Desktop speed,** on a local build served compressed like the live site: median LCP 0.49 s against the 2.5 s limit, and TBT 0 ms against 200 ms.
 
 ### Decisions needed from you
 **Merging this PR approves CP4 with the recommendations below.** To choose differently, comment on the PR. Try #57's preview link first, on your computer and on your phone.
@@ -436,7 +436,7 @@ The ancient map now shows who held each land of the New Testament world, from 4 
 |---|---|---|---|
 | 1 | Pin names on the modern map (MC6; ADR-0037 item 4) | **Keep the Bible names**, such as "Capernaum", the way Google Maps marks historic sites. The panel's "Today" line gives the place's modern name. | Show today's names on the modern map |
 | 2 | The ancient layer's colours and the 15 stops (MC7; ADR-0037 item 1) | **Keep them as they are now,** after your MC7 changes: no map key, every area named, and lines drawn the way the modern map draws them. The tints tell Roman provinces from allied kingdoms. | Name the colours or stops to change, or use one tint for all Roman land |
-| 3 | Dragging speed on both maps (M4-04, M4-05) | **Accept it if dragging both maps feels smooth on your computer and phone.** On this machine, which has no graphics card, the slowest moment while dragging takes 77–130 ms on the ancient map and 59–116 ms on the modern map; a graphics card is much faster. If either feels slow, I'd trim the modern map's details (listed in `BACKLOG.md`) or simplify the ancient shapes at low zoom. | Trim before merging |
+| 3 | Dragging speed on both maps (M4-04, M4-05) | **Accept it if dragging both maps feels smooth on your computer and phone.** On this machine, which has no graphics card, the slowest moment while dragging takes 57–62 ms on the ancient map and 52–79 ms on the modern map; a graphics card is much faster. If either feels slow, I'd trim the modern map's details (listed in `BACKLOG.md`) or simplify the ancient shapes at low zoom. | Trim before merging |
 | 4 | What comes next | **Start M5, the routes:** Paul's journeys and the well-attested parts of Jesus' travels, with citations. | More places (M6) or phone polish (M7) first |
 
 **For your information:**
@@ -451,19 +451,19 @@ The ancient map now shows who held each land of the New Testament world, from 4 
 
 ### Risks
 - **Borders are approximate.** Ancient sources rarely describe borders. Where they're silent, the map follows written rules (ADR-0037), and where they disagree, it shows "status unclear". The note at the top of the timeline's Sources popover says that borders are approximate and that the routes of some roads are conjectured.
-- **Speed on weaker devices:** see decision 3. The ancient layer downloads its 15 stops in the background, about 290 KB in all.
+- **Speed on weaker devices:** see decision 3. The ancient layer downloads its 15 stops in the background, about 300 KB in all.
 - **Free services:** unchanged. AWMC's data is copied into the repository, so it can't break the live site.
 
 ### Budget
-M4 used about **86,300 AI credits**, against the CP0 forecast of about 4,200:
-- the PO about 26,100 (planning, checking every result on screen, stacking the branches);
-- the GIS Engineer about 22,700 (the shapes took three models: GPT-5.3-Codex, GPT-5.5 and Claude Opus 5.5);
+M4 used about **101,500 AI credits**, against the CP0 forecast of about 4,200:
+- the PO about 34,000 (planning, checking every result on screen, stacking the branches, and your two MC7 rounds);
+- the GIS Engineer about 26,900 (the shapes took three models: GPT-5.3-Codex, GPT-5.5 and Claude Opus 5.5; about 1,300 of it was the towns task you cancelled at MC7);
 - the Research Lead about 14,500 and the Fact-Checker about 12,600 (the timeline took many rounds of research, and the Fact-Checker checked both the timeline and the shapes three times);
-- the Frontend Engineer about 8,400, and the seven reviews about 2,100.
+- the Frontend Engineer about 10,800, and the nine reviews about 2,800.
 
-The forecast assumed one session for each agent. In practice, sources that rarely describe borders meant many rounds of fixes, as in M2 (CP2). October stands at about **180,300 of 1,000,000 (18.0%)**. September closed at about 78,500 (7.9%) when measured the same way; its ledger had about 75,500.
-- **These figures are measured, not estimated.** Copilot CLI records the tokens of every model call, and I priced them at the ledger's rates. The agents' own estimates were off in both directions, by up to 12,000 credits each, and my own rows had left out about 25,500 of coordination. The errors largely cancelled, so the ledger's month total was within about 3% of the measurement. The ledger now has a measured row for my work and one reconciliation row. GitHub's billing report is still the authority (ADR-0005).
-- **For M5, plan on about 50,000–80,000 credits.** At that rate the budget still doesn't limit the pace: under 10% of a month.
+The forecast assumed one session for each agent. In practice, sources that rarely describe borders meant many rounds of fixes, as in M2 (CP2), and MC7 added two rounds of changes to the ancient layer. October stands at about **195,500 of 1,000,000 (19.5%)**. September closed at about 78,500 (7.9%) when measured the same way; its ledger had about 75,500.
+- **These figures are measured, not estimated.** Copilot CLI records the tokens and the cost of every model call. The agents' own estimates were off in both directions, by up to 12,000 credits each, and my own rows had left out about 25,500 of coordination. The errors largely cancelled, so the ledger's month total was within about 3% of the measurement. The ledger now has measured rows for my work and the reviews, and a reconciliation row at CP4 and another after MC7. GitHub's billing report is still the authority (ADR-0005).
+- **For M5, plan on about 60,000–100,000 credits.** At that rate the budget still doesn't limit the pace: under 10% of a month.
 
 ### Next: M5, the routes (after you approve)
 M5-00 will record this approval and plan M5 the way M4-00 planned M4. The M4 items on the backlog wait for a later milestone, unless you'd like one first.
