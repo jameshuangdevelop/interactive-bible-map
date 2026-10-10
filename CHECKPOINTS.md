@@ -9,8 +9,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP2 | M2 Schema & Core Data | Final schema and validation CI; 40 verified core sites; verification report | Approved 2026-09-24 | #8–#14 |
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
 | CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
-| CP3b | M3 MVP App | Working MVP deployed to a preview | **Waiting for your approval** (live at https://interactive-bible-map.pages.dev) | #38–#50 |
-| CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Not started | |
+| CP3b | M3 MVP App | Working MVP deployed to a preview | Approved 2026-10-07 (live at https://interactive-bible-map.pages.dev) | #38–#50 |
+| CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | **In progress** (plan below, under CP3b → "Next"; ADR-0037) | |
 | CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
 | CP7 | M7 Mobile-web polish | Responsive layout, touch gestures, performance | Not started | |
@@ -25,6 +25,10 @@ Lighter stops between checkpoints: the PO opens the app with the work so far on 
 | MC2 | CP3b | The longer "About" for the first 13 places (M3-16 half 1), and photo credits at the end of the panel with a pointer over pins (M3-19) | The second half's writing, and M3-19's review | Done 2026-10-05: About approved; introduce names, places in the About, collapsible sections (ADR-0033, M3-20 to M3-22) |
 | MC3 | CP3b | Everything merged and built as it will deploy, with the accessibility and speed results (M3-06, M3-14 to M3-16 and M3-18 to M3-22) | The push | Done 2026-10-06: Philadelphia quotes Revelation 3:9 the way Smyrna quotes 2:9 (option B); the candidate-site notes stay as they are; important places first on the opening map (ADR-0035, M3-23). The human approved the push once M3-23 is done. |
 | MC4 | CP3b | Important places first on the opening map (M3-23), on the full stack | Nothing (the push is approved) | Done 2026-10-07: opened on a local preview; the human had already approved the push |
+| MC5 | CP4 | Phone basics (M7-01): the opening map fits a phone, and the panel works as a bottom sheet. Try it with your browser's device view, or on a phone once its preview link is up. | M7-01's review | Planned |
+| MC6 | CP4 | The modern map and the "Ancient \| Modern" toggle (M4-04) | Whether the pins keep their Bible names on the modern map (ADR-0037 item 4) | Planned |
+| MC7 | CP4 | The ancient layer and the timeline (M4-05) with the first verified data (M4-02, M4-03) | The colours and the list of stops (ADR-0037 item 1) | Planned |
+| MC8 | CP4 | Everything merged and built as it will deploy, with the speed results | The push | Planned |
 
 ---
 
@@ -327,7 +331,7 @@ The rest of M3, then CP3b.
 
 ## CP3b — Working MVP
 
-**Outcome:** waiting for your approval.
+**Outcome:** approved as recommended on 2026-10-07 (#50). Under decision 1, M4 starts with a phone task beside it (M7-01). Under decision 2, older text whose sources no one could open stays, and is re-sourced when it is next edited.
 
 ### What was delivered
 The MVP is live at **https://interactive-bible-map.pages.dev**. It updates whenever a PR merges, and every PR gets its own preview link. This is more than CP3b asked for, which was a preview.
@@ -383,11 +387,18 @@ The rest of M3, after CP3.5 (M3-06, M3-14 to M3-24, their reviews and the PO's w
 - At this checkpoint the PO copied the 15 reviews' budget rows into the ledger. Five sessions recorded no row: two cut short when the PO session crashed on 2026-10-02, two CI fixes and one small fact-check. The PO added estimates for those, each marked as such.
 - These figures are the ledger's estimates. GitHub's billing report is the authority (ADR-0005), and your Copilot usage page would confirm them.
 
-### Next (after you approve)
-M4: the ancient layer and timeline. Its cards are written when it starts, so they reflect what M3 taught us (PO responsibility 4).
+### Next: M4, the ancient layer and timeline (started 2026-10-07)
+M4-00 recorded this approval and planned M4 (ADR-0037). Two lanes run in parallel: the data (schema, then the timeline and the shapes) and the app (phone basics, then the toggle, then the timeline). Each card says what it starts from.
 
 | ID | Task | Agent | Starts after |
 |---|---|---|---|
-| M4-00 | Record CP3b, plan M4 (the Modern↔Ancient toggle, ancient provinces and roads, and a timeline that snaps to the years when borders changed), and write its cards | project-owner | CP3b |
-| M7-01 | Phone basics, if you approve decision 1: the opening map fits a phone, and the panel works as a bottom sheet | frontend-engineer | CP3b |
+| M4-00 | Record CP3b, plan M4 (ADR-0037), update the visual spec, write the cards | project-owner | CP3b |
+| [M7-01](docs/tasks/M7-01-phone-basics.md) | Phone basics: the opening map fits a phone, and the panel works as a bottom sheet (decision 1) | frontend-engineer | M4-00 |
+| [M4-01](docs/tasks/M4-01-ancient-schema.md) | Timeline and ancient layer: schema and build | gis-engineer | M4-00 |
+| [M4-02](docs/tasks/M4-02-timeline.md) | The timeline: who held each area, and when | research-lead → fact-checker | M4-00 (research); M4-01 (data) |
+| [M4-03](docs/tasks/M4-03-ancient-geometry.md) | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | M4-01, and M4-02's list of areas |
+| [M4-04](docs/tasks/M4-04-modern-map.md) | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | M7-01 |
+| [M4-05](docs/tasks/M4-05-timeline-ui.md) | The ancient layer and the timeline in the app | frontend-engineer | M4-01 and M4-04; real data from M4-02 and M4-03 |
 | CP4 | The ancient layer and timeline | project-owner | M4's tasks merged |
+
+The mini checkpoints on the way (MC5 to MC8) are in the table at the top.
