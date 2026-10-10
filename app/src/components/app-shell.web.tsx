@@ -1141,7 +1141,7 @@ export function AppShell() {
                   }}
                 >
                   <p style={{ margin: 0 }}>
-                    Borders are approximate. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
                   </p>
                   <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>{selectedTimelineStop.summary}</p>
                   {selectedTimelineStop.scripture.length > 0 ? (

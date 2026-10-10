@@ -199,6 +199,27 @@ function stripBracketedLabelSuffix(value) {
   return value.replace(/\s*\([^)]*\)/gu, "").replace(/\s+/gu, " ").trim();
 }
 
+function holderLabelDisplayText(holder, areaId) {
+  const strippedName = stripBracketedLabelSuffix(holder.name);
+  if (holder.id === "roman-empire" || areaId === "other-roman-lands") {
+    return "OTHER ROMAN PROVINCES";
+  }
+
+  if (holder.kind === "roman-province") {
+    if (
+      holder.locationId === "egypt" ||
+      /^roman province of egypt$/iu.test(strippedName)
+    ) {
+      return "ROMAN EGYPT";
+    }
+
+    const provinceName = strippedName.replace(/^roman province of\s+/iu, "").trim();
+    return `PROVINCE OF ${provinceName}`.toUpperCase();
+  }
+
+  return strippedName.toUpperCase();
+}
+
 function estimateHolderLabelLineWidthPx(textLine) {
   const characters = [...textLine];
   if (characters.length === 0) {
@@ -623,11 +644,6 @@ function pairKey(leftId, rightId) {
   return leftId.localeCompare(rightId) <= 0 ? `${leftId}|${rightId}` : `${rightId}|${leftId}`;
 }
 
-function parsePairKey(value) {
-  const [leftId, rightId] = value.split("|");
-  return { leftId, rightId };
-}
-
 async function writeJsonWithSize(outputDirectory, relativePath, payload) {
   const destinationPath = path.join(outputDirectory, relativePath);
   await fs.mkdir(path.dirname(destinationPath), { recursive: true });
@@ -715,7 +731,7 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
     if (!holder || !Array.isArray(pieces) || pieces.length === 0) {
       continue;
     }
-    if (holder.kind === "uncertain" || holder.locationId) {
+    if (holder.kind === "uncertain") {
       continue;
     }
 
@@ -739,7 +755,7 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
       if (!pointInPolygon(labelPoint, piece.polygon)) {
         labelPoint = findGuaranteedInteriorPoint(piece.polygon) ?? labelPoint;
       }
-      const labelName = stripBracketedLabelSuffix(holder.name).toUpperCase();
+      const labelName = holderLabelDisplayText(holder, piece.areaId);
       const wrappedLabel = wrapHolderLabelText(labelName);
       const selectedLabel = selectHolderLabelPoint({
         polygonCoordinates: piece.polygon,
@@ -761,8 +777,9 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
         labelText: wrappedLabel.wrappedText,
         minZoom,
         kind: holder.kind,
-        romanSide: holder.romanSide,
-        locationId: null,
+        ...(typeof holder.locationId === "string" && holder.locationId.length > 0
+          ? { locationId: holder.locationId }
+          : {}),
         labelPoint: [roundNumber(labelPoint[0]), roundNumber(labelPoint[1])]
       });
     }
@@ -779,15 +796,53 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
   });
 }
 
+function buildAreaLabelMinZoomByAreaId(assignments, holderLabels) {
+  const minZoomByHolderId = new Map();
+  const minZoomByHolderAndArea = new Map();
+
+  for (const label of holderLabels) {
+    const holderMinZoom = minZoomByHolderId.get(label.holderId);
+    minZoomByHolderId.set(
+      label.holderId,
+      holderMinZoom === undefined ? label.minZoom : Math.min(holderMinZoom, label.minZoom)
+    );
+
+    const key = `${label.holderId}|${label.areaId}`;
+    const areaMinZoom = minZoomByHolderAndArea.get(key);
+    minZoomByHolderAndArea.set(key, areaMinZoom === undefined ? label.minZoom : Math.min(areaMinZoom, label.minZoom));
+  }
+
+  const minZoomByAreaId = new Map();
+  for (const assignment of assignments) {
+    if (assignment.holderKind === "uncertain") {
+      minZoomByAreaId.set(assignment.areaId, 0);
+      continue;
+    }
+
+    const areaKey = `${assignment.holderId}|${assignment.areaId}`;
+    const areaLabelMinZoom = minZoomByHolderAndArea.get(areaKey);
+    if (areaLabelMinZoom !== undefined) {
+      minZoomByAreaId.set(assignment.areaId, areaLabelMinZoom);
+      continue;
+    }
+
+    const holderLabelMinZoom = minZoomByHolderId.get(assignment.holderId);
+    minZoomByAreaId.set(assignment.areaId, holderLabelMinZoom ?? 0);
+  }
+
+  return minZoomByAreaId;
+}
+
 function buildStopBorderCollections({
   stopTopology,
   assignmentsByAreaId,
-  entitiesById
+  entitiesById,
+  areaLabelMinZoomByAreaId
 }) {
   const areaObject = stopTopology.objects.areas;
   const geometries = areaObject.geometries ?? [];
   const adjacentIndexes = neighbors(geometries);
-  const borderPairs = new Set();
+  const borderAreaPairs = new Map();
 
   const holderForGeometry = (geometry) => {
     const areaId = geometry?.properties?.areaId;
@@ -811,48 +866,69 @@ function buildStopBorderCollections({
       if (leftHolder.holderId === rightHolder.holderId) {
         continue;
       }
-      borderPairs.add(pairKey(leftHolder.holderId, rightHolder.holderId));
+
+      const leftAreaId = geometry?.properties?.areaId;
+      const rightAreaId = geometries[rightIndex]?.properties?.areaId;
+      if (typeof leftAreaId !== "string" || typeof rightAreaId !== "string") {
+        continue;
+      }
+
+      const areaPairKey = pairKey(leftAreaId, rightAreaId);
+      borderAreaPairs.set(areaPairKey, { leftAreaId, rightAreaId });
     }
   });
 
   const holderBorders = [];
 
-  for (const borderPair of borderPairs) {
-    const { leftId, rightId } = parsePairKey(borderPair);
-    const geometry = mesh(stopTopology, areaObject, (leftArea, rightArea) => {
-      if (!leftArea || !rightArea) {
-        return false;
-      }
-
-      const leftAssignment = assignmentsByAreaId.get(leftArea.properties?.areaId);
-      const rightAssignment = assignmentsByAreaId.get(rightArea.properties?.areaId);
-      if (!leftAssignment || !rightAssignment) {
-        return false;
-      }
-
-      return pairKey(leftAssignment.holderId, rightAssignment.holderId) === borderPair;
-    });
-
-    if (!geometry || !Array.isArray(geometry.coordinates) || geometry.coordinates.length === 0) {
+  for (const [areaPairKey, areaPair] of borderAreaPairs.entries()) {
+    const { leftAreaId, rightAreaId } = areaPair;
+    const leftAssignment = assignmentsByAreaId.get(leftAreaId);
+    const rightAssignment = assignmentsByAreaId.get(rightAreaId);
+    if (!leftAssignment || !rightAssignment) {
       continue;
     }
 
-    const leftHolder = entitiesById.get(leftId);
-    const rightHolder = entitiesById.get(rightId);
+    const leftHolder = entitiesById.get(leftAssignment.holderId);
+    const rightHolder = entitiesById.get(rightAssignment.holderId);
     if (!leftHolder || !rightHolder) {
       continue;
     }
 
     const normalizedPair = normalizePair(leftHolder, rightHolder);
+    const normalizedAreaAId =
+      normalizedPair.first.id === leftAssignment.holderId ? leftAreaId : rightAreaId;
+    const normalizedAreaBId =
+      normalizedPair.second.id === rightAssignment.holderId ? rightAreaId : leftAreaId;
+    const areaAMinZoom = areaLabelMinZoomByAreaId.get(normalizedAreaAId) ?? 0;
+    const areaBMinZoom = areaLabelMinZoomByAreaId.get(normalizedAreaBId) ?? 0;
+
+    const geometry = mesh(stopTopology, areaObject, (leftArea, rightArea) => {
+      if (!leftArea || !rightArea) {
+        return false;
+      }
+
+      const candidateLeftAreaId = leftArea.properties?.areaId;
+      const candidateRightAreaId = rightArea.properties?.areaId;
+      if (typeof candidateLeftAreaId !== "string" || typeof candidateRightAreaId !== "string") {
+        return false;
+      }
+
+      return pairKey(candidateLeftAreaId, candidateRightAreaId) === areaPairKey;
+    });
+
+    if (!geometry || !Array.isArray(geometry.coordinates) || geometry.coordinates.length === 0) {
+      continue;
+    }
     holderBorders.push({
       type: "Feature",
       properties: {
-        holderAId: normalizedPair.first.id,
-        holderAKind: normalizedPair.first.kind,
-        holderARomanSide: normalizedPair.first.romanSide,
-        holderBId: normalizedPair.second.id,
-        holderBKind: normalizedPair.second.kind,
-        holderBRomanSide: normalizedPair.second.romanSide
+        holderAAreaId: normalizedAreaAId,
+        holderBAreaId: normalizedAreaBId,
+        borderStyle:
+          normalizedPair.first.kind === "uncertain" || normalizedPair.second.kind === "uncertain"
+            ? "disputed"
+            : "state",
+        minZoom: Math.max(areaAMinZoom, areaBMinZoom)
       },
       geometry: roundGeometry(geometry, SIMPLIFIED_COORDINATE_DECIMALS)
     });
@@ -882,8 +958,8 @@ function buildStopBorderCollections({
     holderBorders: {
       type: "FeatureCollection",
       features: holderBorders.sort((left, right) => {
-        const leftKey = `${left.properties.holderAId}|${left.properties.holderBId}`;
-        const rightKey = `${right.properties.holderAId}|${right.properties.holderBId}`;
+        const leftKey = `${left.properties.holderAAreaId}|${left.properties.holderBAreaId}`;
+        const rightKey = `${right.properties.holderAAreaId}|${right.properties.holderBAreaId}`;
         return leftKey.localeCompare(rightKey);
       })
     },
@@ -1063,16 +1139,18 @@ export async function buildAncientAppData({
       assignmentsByAreaId.set(area.id, assignment);
     }
 
-    const borderCollections = buildStopBorderCollections({
-      stopTopology: topologyData.simplifiedTopology,
-      assignmentsByAreaId,
-      entitiesById
-    });
     const holderLabels = buildHolderLabelPoints({
       assignments,
       areaFeatureById,
       entitiesById,
       majorPlacePinCoordinates
+    });
+    const areaLabelMinZoomByAreaId = buildAreaLabelMinZoomByAreaId(assignments, holderLabels);
+    const borderCollections = buildStopBorderCollections({
+      stopTopology: topologyData.simplifiedTopology,
+      assignmentsByAreaId,
+      entitiesById,
+      areaLabelMinZoomByAreaId
     });
 
     writtenFiles.push(

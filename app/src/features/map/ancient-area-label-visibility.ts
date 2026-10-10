@@ -1,6 +1,6 @@
 import type { FeatureCollection, Point } from "geojson";
 
-import type { AncientAreaAssignment, AncientEntityRecord } from "./ancient-layer.types";
+import type { AncientEntityRecord } from "./ancient-layer.types";
 import type { AreaFeatureProperties } from "./map-render-data";
 
 export function linkedTimelineLocationIds(
@@ -13,52 +13,28 @@ export function linkedTimelineLocationIds(
   );
 }
 
-export function activeHolderLocationIds(
-  assignments: AncientAreaAssignment[] | null | undefined
-): Set<string> {
-  return new Set(
-    (assignments ?? [])
-      .map((assignment) => assignment.holderLocationId)
-      .filter((locationId): locationId is string => typeof locationId === "string" && locationId.length > 0)
-  );
-}
-
-export function shouldShowProvinceAreaLabelAtStop({
+export function shouldShowAreaLabelOnAncientMap({
   placeId,
-  linkedLocationIds,
-  activeLocationIds
+  linkedLocationIds
 }: {
   placeId: string;
   linkedLocationIds: ReadonlySet<string>;
-  activeLocationIds: ReadonlySet<string>;
 }) {
-  if (!linkedLocationIds.has(placeId)) {
-    return true;
-  }
-
-  return activeLocationIds.has(placeId);
+  return !linkedLocationIds.has(placeId);
 }
 
-export function filterAreaLabelsForAncientStop({
-  areaLabels,
-  linkedLocationIds,
-  activeLocationIds
-}: {
+export function filterAreaLabelsForAncientMap({
+  areaLabels, linkedLocationIds
+}:{
   areaLabels: FeatureCollection<Point, AreaFeatureProperties>;
   linkedLocationIds: ReadonlySet<string>;
-  activeLocationIds: ReadonlySet<string>;
-}): FeatureCollection<Point, AreaFeatureProperties> {
+}) : FeatureCollection<Point, AreaFeatureProperties> {
   return {
     ...areaLabels,
     features: areaLabels.features.filter((feature) => {
-      if (feature.properties.areaKind !== "province") {
-        return true;
-      }
-
-      return shouldShowProvinceAreaLabelAtStop({
+      return shouldShowAreaLabelOnAncientMap({
         placeId: feature.properties.placeId,
-        linkedLocationIds,
-        activeLocationIds
+        linkedLocationIds
       });
     })
   };

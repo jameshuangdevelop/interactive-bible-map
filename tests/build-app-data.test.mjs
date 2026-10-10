@@ -136,10 +136,10 @@ function pointInPolygon(point, polygon) {
     };
 
     const tetrarchyEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("TETRARCHY OF");
-    const romanProvinceEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("ROMAN PROVINCE OF");
+    const romanProvinceEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("PROVINCE OF");
 
     assert.ok(tetrarchyEstimate >= realAdvanceWidth("TETRARCHY OF"));
-    assert.ok(romanProvinceEstimate >= realAdvanceWidth("ROMAN PROVINCE OF"));
+    assert.ok(romanProvinceEstimate >= realAdvanceWidth("PROVINCE OF"));
   });
   for (let index = 1; index < polygon.length; index += 1) {
     if (pointInRing(point, polygon[index])) {
@@ -518,8 +518,10 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.ok(
       stopPayload.holderBorders.features.some(
         (feature) =>
-          feature.properties.holderAId === "client-antipas" &&
-          feature.properties.holderBId === "province-judaea"
+          (feature.properties.holderAAreaId === "galilee" &&
+            feature.properties.holderBAreaId === "judaea-heartland") ||
+          (feature.properties.holderAAreaId === "judaea-heartland" &&
+            feature.properties.holderBAreaId === "galilee")
       ),
       "expected province/client border"
     );
@@ -538,10 +540,10 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.equal(
       ad44Payload.holderBorders.features.some(
         (feature) =>
-          (feature.properties.holderAId === "client-antipas" &&
-            feature.properties.holderBId === "province-judaea") ||
-          (feature.properties.holderAId === "province-judaea" &&
-            feature.properties.holderBId === "client-antipas")
+          (feature.properties.holderAAreaId === "galilee" &&
+            feature.properties.holderBAreaId === "judaea-heartland") ||
+          (feature.properties.holderAAreaId === "judaea-heartland" &&
+            feature.properties.holderBAreaId === "galilee")
       ),
       false
     );
@@ -645,6 +647,23 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
         );
         assert.ok(commageneLabelAt30);
         assert.ok(commageneLabelAt30.minZoom > 5, "Commagene label should be hidden at zoom 5.");
+        const galileeTouchingBordersAt30 = stopAt30.holderBorders.features.filter(
+          (feature) =>
+            feature.properties.holderAAreaId === "galilee-perea" ||
+            feature.properties.holderBAreaId === "galilee-perea"
+        );
+        assert.ok(galileeTouchingBordersAt30.length > 0, "expected borders touching galilee-perea at AD 30");
+        const galileeMinZooms = [...new Set(galileeTouchingBordersAt30.map((feature) => feature.properties.minZoom))]
+          .sort((left, right) => left - right);
+        assert.deepEqual(galileeMinZooms, [8]);
+
+        const asiaGalatiaBorderAt30 = stopAt30.holderBorders.features.find(
+          (feature) =>
+            (feature.properties.holderAAreaId === "asia" && feature.properties.holderBAreaId === "galatia") ||
+            (feature.properties.holderAAreaId === "galatia" && feature.properties.holderBAreaId === "asia")
+        );
+        assert.ok(asiaGalatiaBorderAt30, "expected Asia-Galatia border at AD 30");
+        assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 6);
 
         const stopAt40 = await readStopPayload(40);
         const agrippaInPhilipLands = stopAt40.areas.find((area) => area.areaId === "philip-tetrarchy-lands");
