@@ -293,7 +293,10 @@ export async function buildAppData(options = {}) {
     skippedReason:
       "Skipped ancient generated files because timeline or ancient geo source files are missing.",
     gzipBytes: 0,
-    maxGzipBytes: maxAncientLayerGzipBytes
+    maxGzipBytes: maxAncientLayerGzipBytes,
+    roadJoinCount: 0,
+    roadJoinTotalLengthKm: 0,
+    roadJoinMaxLengthKm: 0
   };
 
   if (timelineExists && areasExists && roadsExists && coastlineExists) {
@@ -331,7 +334,10 @@ export async function buildAppData(options = {}) {
       generated: true,
       skippedReason: null,
       gzipBytes: ancientLayerGzipBytes,
-      maxGzipBytes: maxAncientLayerGzipBytes
+      maxGzipBytes: maxAncientLayerGzipBytes,
+      roadJoinCount: ancientBuildResult.roadJoinCount ?? 0,
+      roadJoinTotalLengthKm: ancientBuildResult.roadJoinTotalLengthKm ?? 0,
+      roadJoinMaxLengthKm: ancientBuildResult.roadJoinMaxLengthKm ?? 0
     };
   }
 

@@ -98,12 +98,10 @@ export interface AncientAreaAssignment {
 }
 
 export interface AncientHolderBorderFeatureProperties {
-  holderAId: string;
-  holderAKind: AncientEntityRecord["kind"];
-  holderARomanSide: boolean;
-  holderBId: string;
-  holderBKind: AncientEntityRecord["kind"];
-  holderBRomanSide: boolean;
+  holderAAreaId: string;
+  holderBAreaId: string;
+  borderStyle: "state" | "disputed";
+  minZoom: number;
 }
 
 export interface AncientHolderLabelPoint {
@@ -113,8 +111,7 @@ export interface AncientHolderLabelPoint {
   labelText: string;
   minZoom: number;
   kind: AncientEntityRecord["kind"];
-  romanSide: boolean;
-  locationId: string | null;
+  locationId?: string;
   labelPoint: [number, number];
 }
 

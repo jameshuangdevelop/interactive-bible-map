@@ -5,14 +5,17 @@ export const ANCIENT_LAYER_STYLE = {
     outsideEmpire: { color: "#5F6368", opacity: 0.06 }
   },
   border: {
-    romanSideColor: "#7D5A50",
-    outsideColor: "#80868B"
+    stateColor: "hsl(0, 0%, 55%)",
+    disputedColor: "hsl(248, 1%, 41%)"
   },
   roads: {
-    color: "#8D6E63"
+    casingColor: "#e9ac77",
+    knownColor: "#fea"
   },
   coastline: {
-    color: "#5D9AD0"
+    lineColor: "#a0c8f0",
+    labelColor: "#74aee9",
+    labelHaloColor: "rgba(255,255,255,0.7)"
   },
   uncertain: {
     hatchColor: "#80868B"

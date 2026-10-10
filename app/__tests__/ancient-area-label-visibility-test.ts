@@ -2,14 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type {
-  AncientStopPayload,
   AncientTimelinePayload
 } from "../src/features/map/ancient-layer.types";
 import type { PlaceIndexRecord } from "../src/features/map/types";
 import {
-  activeHolderLocationIds,
   linkedTimelineLocationIds,
-  shouldShowProvinceAreaLabelAtStop
+  shouldShowAreaLabelOnAncientMap
 } from "../src/features/map/ancient-area-label-visibility";
 
 function readGeneratedJson(relativePath: string) {
@@ -17,51 +15,42 @@ function readGeneratedJson(relativePath: string) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
-describe("ancient province label visibility", () => {
-  test("hides only linked province records with no active holder record at each stop", () => {
+describe("ancient area label visibility", () => {
+  test("linked timeline location ids include expected province labels and exclude Galilee", () => {
+    const timeline = readGeneratedJson("ancient.timeline.json") as AncientTimelinePayload;
+    const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
+
+    expect(linkedLocationIds.has("judea-province")).toBe(true);
+    expect(linkedLocationIds.has("cappadocia")).toBe(true);
+    expect(linkedLocationIds.has("galatia")).toBe(true);
+    expect(linkedLocationIds.has("galilee")).toBe(false);
+  });
+
+  test("hides M3 area labels for every record linked from timeline entities", () => {
     const timeline = readGeneratedJson("ancient.timeline.json") as AncientTimelinePayload;
     const places = readGeneratedJson("places.index.json") as PlaceIndexRecord[];
     const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
-    const sortedStops = [...timeline.stops].sort((left, right) => left.year - right.year);
     const provinceOrEmpirePlaces = places.filter(
       (place) => place.type === "province" || place.type === "empire"
     );
 
-    const hiddenYearsByPlaceId = new Map<string, number[]>();
+    const hiddenPlaceIds = new Set<string>();
     for (const place of provinceOrEmpirePlaces) {
-      hiddenYearsByPlaceId.set(place.id, []);
-    }
-
-    for (const stop of sortedStops) {
-      const stopPayload = readGeneratedJson(
-        `ancient.stop.${stop.id}.json`
-      ) as AncientStopPayload;
-      const activeLocationIds = activeHolderLocationIds(stopPayload.areas);
-
-      for (const place of provinceOrEmpirePlaces) {
-        if (!linkedLocationIds.has(place.id)) {
-          continue;
-        }
-        const visible = shouldShowProvinceAreaLabelAtStop({
-          placeId: place.id,
-          linkedLocationIds,
-          activeLocationIds
-        });
-        if (!visible) {
-          hiddenYearsByPlaceId.get(place.id)?.push(stop.year);
-        }
+      const visible = shouldShowAreaLabelOnAncientMap({
+        placeId: place.id,
+        linkedLocationIds
+      });
+      if (!visible) {
+        hiddenPlaceIds.add(place.id);
       }
     }
 
-    expect(hiddenYearsByPlaceId.get("judea-province")).toEqual([-4, 41]);
-    expect(hiddenYearsByPlaceId.get("cappadocia")).toEqual([-4, 6]);
-    expect(hiddenYearsByPlaceId.get("achaia")).toEqual([67, 70, 72, 74]);
-
-    for (const [placeId, years] of hiddenYearsByPlaceId.entries()) {
-      if (placeId === "judea-province" || placeId === "cappadocia" || placeId === "achaia") {
-        continue;
+    for (const place of provinceOrEmpirePlaces) {
+      if (linkedLocationIds.has(place.id)) {
+        expect(hiddenPlaceIds.has(place.id)).toBe(true);
+      } else {
+        expect(hiddenPlaceIds.has(place.id)).toBe(false);
       }
-      expect(years).toEqual([]);
     }
   });
 });
