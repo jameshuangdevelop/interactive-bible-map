@@ -406,6 +406,9 @@ function holderLabelDisplayText(holder, areaId) {
   if (holder.id === "roman-empire" || areaId === "other-roman-lands") {
     return "OTHER ROMAN PROVINCES";
   }
+  if (holder.id === "italy-direct") {
+    return "ITALY";
+  }
 
   if (holder.kind === "roman-province") {
     if (

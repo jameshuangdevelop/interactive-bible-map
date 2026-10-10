@@ -1113,7 +1113,17 @@ function asLineFeatureCollection(
   };
 }
 
-function holderKindLabel(kind: AncientEntityRecord["kind"]) {
+function holderKindLabel(kind: AncientEntityRecord["kind"], holderId?: string) {
+  if (holderId === "italy-direct") {
+    return "Ruled from Rome, not a province";
+  }
+  if (holderId === "archelaus-ethnarchy") {
+    return "Ethnarchy under Rome";
+  }
+  if (holderId === "roman-empire") {
+    return "Roman provinces shown together";
+  }
+
   if (kind === "roman-province") {
     return "Roman province";
   }
@@ -1162,7 +1172,7 @@ function buildAncientAreaFeatures(
             ? area.note
               ? `Status unclear in the sources: ${area.note}`
               : "Status unclear in the sources"
-            : `${holder?.name ?? area.holderId} (${holderKindLabel(area.holderKind)})`;
+            : `${holder?.name ?? area.holderId} (${holderKindLabel(area.holderKind, area.holderId)})`;
 
         return {
           type: "Feature" as const,
@@ -1226,7 +1236,7 @@ function buildAncientHolderLabelFeatures(
             labelText,
             minZoom: label.minZoom,
             clickable: typeof label.locationId === "string" && label.locationId.length > 0,
-            tooltipText: `${label.name} · ${holderKindLabel(label.kind)}${rulerText}${yearRangePart}`
+            tooltipText: `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
           },
           geometry: {
             type: "Point" as const,

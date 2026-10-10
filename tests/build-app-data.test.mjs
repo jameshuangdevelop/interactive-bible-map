@@ -753,6 +753,11 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
         assert.equal(antipasAt30?.heldFromYear, -4);
         assert.equal(antipasAt30?.heldToYear, 39);
         assert.equal(antipasAt30?.heldFromKnown, true);
+        const italyLabelAt30 = stopAt30.holderLabels.find(
+          (label) => label.holderId === "italy-direct"
+        );
+        assert.ok(italyLabelAt30, "expected Italy holder label at AD 30");
+        assert.equal(italyLabelAt30.labelText, "ITALY");
         const commageneLabelAt30 = stopAt30.holderLabels.find(
           (label) =>
             label.holderId === stopAt30.areas.find((area) => area.areaId === "commagene")?.holderId

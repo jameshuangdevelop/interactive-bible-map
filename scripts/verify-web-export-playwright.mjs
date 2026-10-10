@@ -5511,6 +5511,64 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(`Philip tooltip should show '4 BC – AD 34', got '${philipTooltipText ?? ""}'.`);
   }
 
+  const italyTooltipProbe = await page.evaluate(async ({ testHookKey }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const timeline = await fetch("/generated/ancient.timeline.json").then((response) => response.json());
+    const sortedStops = [...(timeline?.stops ?? [])].sort((left, right) => left.year - right.year);
+    let stopForYear30 = sortedStops[0] ?? null;
+    for (const stop of sortedStops) {
+      if (stop.year <= 30) {
+        stopForYear30 = stop;
+      } else {
+        break;
+      }
+    }
+    if (!stopForYear30) {
+      throw new Error("No stop found for AD 30.");
+    }
+
+    const stopPayload = await fetch(`/generated/ancient.stop.${stopForYear30.id}.json`).then((response) =>
+      response.json()
+    );
+    const label = (stopPayload?.holderLabels ?? []).find((entry) => entry?.holderId === "italy-direct");
+    if (!label || !Array.isArray(label.labelPoint) || label.labelPoint.length < 2) {
+      throw new Error("Missing Italy holder label point.");
+    }
+
+    return {
+      labelPoint: label.labelPoint,
+      zoom: Math.max(6, Math.ceil(label.minZoom ?? 6))
+    };
+  }, { testHookKey: mapTestHookKey });
+
+  await moveMapAndSettle({ center: italyTooltipProbe.labelPoint, zoom: italyTooltipProbe.zoom });
+  const italyProjectedPoint = await page.evaluate(
+    ({ testHookKey, labelPoint }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const projected = map.project(labelPoint);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, labelPoint: italyTooltipProbe.labelPoint }
+  );
+  await page.mouse.move(italyProjectedPoint.x, italyProjectedPoint.y);
+  await page.waitForTimeout(150);
+  const italyTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
+  if (!italyTooltipText?.includes("Italy")) {
+    throw new Error(`Italy tooltip should include 'Italy', got '${italyTooltipText ?? ""}'.`);
+  }
+  if (!italyTooltipText.includes("Ruled from Rome, not a province")) {
+    throw new Error(
+      `Italy tooltip should include 'Ruled from Rome, not a province', got '${italyTooltipText}'.`
+    );
+  }
+
   const agrippaPhilipTooltipProbe = await page.evaluate(async ({ testHookKey }) => {
     const map = window[testHookKey];
     if (!map) {
