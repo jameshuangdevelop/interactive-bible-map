@@ -13,6 +13,8 @@ export const ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION =
   '<a href="https://versatiles.org" target="_blank">VersaTiles</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a> · <a href="https://esa-worldcover.org/en/data-access" target="_blank">&copy; ESA WorldCover 2021</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>)';
 export const MODERN_MAIN_BASEMAP_ATTRIBUTION = ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
 export const MODERN_FALLBACK_BASEMAP_ATTRIBUTION = ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION;
+export const ANCIENT_AWMC_ATTRIBUTION =
+  'Contains information from <a href="https://github.com/AWMC/geodata" target="_blank">AWMC Geodata</a>, which is made available here under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank">Open Database License (ODbL)</a>.';
 
 export const DEFAULT_MAP_CENTER: Coordinates = [22.5, 35];
 export const DEFAULT_MAP_ZOOM = 4.7;

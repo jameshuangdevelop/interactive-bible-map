@@ -72,3 +72,30 @@ export function applyMapModeToSearch(search: string, mapMode: MapDisplayMode) {
   const next = parameters.toString();
   return next.length > 0 ? `?${next}` : "";
 }
+
+export function parseTimelineYearFromSearch(search: string) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const year = parameters.get("year")?.trim();
+  if (!year) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(year, 10);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function applyTimelineYearToSearch(search: string, year: number | null) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (year === null || !Number.isFinite(year)) {
+    parameters.delete("year");
+  } else {
+    parameters.set("year", String(Math.trunc(year)));
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}

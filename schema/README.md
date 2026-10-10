@@ -54,7 +54,7 @@ All example values below are **illustrative only** (not verified historical clai
 - `other-roman-lands` is the Roman land that isn't one of the timeline's other areas (ADR-0037): AWMC's AD 69 extent on land less those areas, without Great Britain. An island joins one of the other areas only where a cited source places it there (`SOURCED_ISLANDS` in `scripts/lib/ancient-compose.mjs`); a peninsula that AWMC's extent or coastline cuts off at its neck joins the area it is attached to, and so does the rest of an island an area holds.
 - Today's land that AWMC's shoreline outlines as water lies in no area, because it was sea, lagoon or estuary in antiquity: gulfs that have silted up since, such as the Latmian Gulf by Miletus and the bay by Ephesus, the lagoons of the Po and the IJ by Velsen (the Fact-Checker's G10). The composition treats an inland piece of AWMC's extent that no AWMC face covers as water when AWMC's shoreline runs along at least 10% of its outline; the composition report lists every such piece.
 - `data/geo/ancient-empire-edge.geojson` is the empire's edge: one static line where the land of all the areas meets land beyond the empire, meaning land that runs on past the map's frame. Land that Roman land and the sea enclose, such as marshes or slivers between AWMC's coastline and today's, has no edge, nor does land that AWMC draws as water, and stretches along today's coastline are left out. Each feature has an `edgeId` and the same `provenance` object as the other layers, and its geometry is a `LineString` or `MultiLineString`.
-- `data/geo/ancient-roads.geojson` holds AWMC's major roads of the Roman period (Barrington "R") in 10–40°E, 28–45°N (ADR-0037 item 5). Minor roads are left out: AWMC gives the minor roads in the Holy Land, Egypt and Cyprus no date (ADR-0037's update of 2026-10-08, item 1). Roads that sources date after AD 100 are left out by AWMC OBJECTID (`EXCLUDED_POST_AD100_ROADS` in `scripts/lib/ancient-roads.mjs`), and every road is clipped where the drawn Roman world ends. Each road keeps `major` (always `true` for now) and `known` (solid; conjectured roads are dashed).
+- `data/geo/ancient-roads.geojson` holds AWMC's major roads of the Roman period (Barrington "R") in 10–40°E, 28–45°N (ADR-0037 item 5). Minor roads are left out: AWMC gives the minor roads in the Holy Land, Egypt and Cyprus no date (ADR-0037's update of 2026-10-08, item 1). Roads that sources date after AD 100 are left out by AWMC OBJECTID (`EXCLUDED_POST_AD100_ROADS` in `scripts/lib/ancient-roads.mjs`), and every road is clipped where the drawn Roman world ends. Each road keeps `major` (always `true` for now) and `known` for provenance and QA; the app now draws all roads with one shared style.
 - The geometry files hold only shapes + provenance; **all dates and holders** live in `data/timeline.json`.
 - Every area with `focus: true` must have a shape in `data/geo/ancient-areas.geojson` while `REQUIRE_ANCIENT_SHAPES` is on (the default since M4-03's shapes landed); `REQUIRE_ANCIENT_SHAPES=false` or `validateData({ requireAncientShapes: false })` relaxes it.
 - Each area in `timeline.json` must cover the whole configured range with no gaps or overlaps.
@@ -99,18 +99,22 @@ Small area-shape example with provenance:
 ```
 
 Generated app payloads:
-- `app/public/generated/ancient.timeline.json` (stops + entities)
-- `app/public/generated/ancient.shapes.json` (full + zoom<=10 simplified shapes; each shape's properties are only its `areaId`, and the provenance stays in `data/geo/`)
-- `app/public/generated/ancient.roads.geojson` (each road's properties are its `roadId`, `major`, `known` and `timeperiod`; the provenance stays in `data/geo/`)
+- `app/public/generated/ancient.timeline.json` (stops + entities + bibliography entries referenced by stop `sources`)
+- `app/public/generated/ancient.shapes.json` (full + zoom<=10 simplified shapes)
+- `app/public/generated/ancient.roads.geojson`
 - `app/public/generated/ancient.coastline.geojson`
 - `app/public/generated/ancient.empire-edge.geojson` (the static empire edge, written once rather than per stop, and only when `data/geo/ancient-empire-edge.geojson` exists)
 - `app/public/generated/ancient.stop.<stopId>.json` (area holders, holder borders, empire edge, holder label points)
+- `ancient.shapes.json` keeps only each shape's `areaId` in properties; provenance stays in `data/geo/`.
+- `ancient.roads.geojson` keeps only `roadId`, `major`, `known` and `timeperiod` in properties; provenance stays in `data/geo/`.
 - The per-stop `romanEmpireEdge` is the line between drawn Roman-side and drawn non-Roman areas in that stop; it is `null` while no area outside the empire is drawn (ADR-0037 rule 5), and the static `ancient.empire-edge.geojson` shows the empire's edge instead.
-- `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size; `data/geo/ancient-roads.geojson` remains the full-detail source.
+- `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size, and the builder adds straight join segments where one road end sits more than 0.2 km and at most 4 km from another road so sheet-edge digitising breaks draw as continuous roads; `data/geo/ancient-roads.geojson` remains the full-detail source and is not edited.
 - Full shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
 - Everything the ancient layer loads (the `ancient.*` files) must stay within 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-08).
 - Stop-area assignments carry each period's optional `note`.
-- `uncertain` holders are included in area assignments and borders but omitted from `holderLabels` (tooltip-only status in the app).
+- Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year. They also include `heldFromKnown`, which is `false` when that span starts at the timeline range's `fromYear` and there is no earlier period in that area's data.
+- `uncertain` holders are included in area assignments and borders but omitted from `holderLabels`.
+- Each `holderLabels` entry includes `areaId`, `labelText` (uppercase, bracketed suffix removed, deterministic line breaks) and `minZoom` (the first zoom where the full label box fits inside that piece).
 
 Places and political history:
 - `politicalAreaId` links a location to one timeline area.

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   AttributionControl,
   LngLatBounds,
@@ -21,6 +22,7 @@ import {
   ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
   ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
   ANCIENT_MAIN_BASEMAP_STYLE_URL,
+  ANCIENT_AWMC_ATTRIBUTION,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   MAP_WORKER_URL,
@@ -68,7 +70,21 @@ import {
   pickNearestCandidateWithPreferredRank,
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
+import { formatHolderYearRange } from "./holder-year-range";
+import { ANCIENT_LAYER_STYLE } from "./ancient-layer-style";
+import {
+  filterAreaLabelsForAncientMap,
+  linkedTimelineLocationIds
+} from "./ancient-area-label-visibility";
 import type { MapViewProps } from "./map-view.types";
+import type {
+  AncientEntityRecord,
+  AncientShapesPayload,
+  AncientStopPayload,
+  FeatureCollection,
+  LineStringGeometry,
+  MultiLineStringGeometry
+} from "./ancient-layer.types";
 import type { Coordinates, MapDisplayMode, PlaceIndexRecord, PlaceSelection } from "./types";
 
 setWorkerUrl(MAP_WORKER_URL);
@@ -80,6 +96,12 @@ const sourceSitePinsId = "ibm-site-pins";
 const sourceCandidatePinsId = "ibm-candidate-pins";
 const sourceAreaLabelsId = "ibm-area-labels";
 const sourceKeyboardFocusId = "ibm-keyboard-focus";
+const sourceAncientAreasId = "ibm-ancient-areas";
+const sourceAncientBordersId = "ibm-ancient-borders";
+const sourceAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const sourceAncientRoadsId = "ibm-ancient-roads";
+const sourceAncientCoastlineId = "ibm-ancient-coastline";
+const sourceAncientHolderLabelsId = "ibm-ancient-holder-labels";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
@@ -109,8 +131,21 @@ const layerAreaLabelOverviewId = "ibm-area-label-overview";
 const layerAreaLabelId = "ibm-area-label";
 const layerSelectedAreaLabelId = "ibm-selected-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
+const layerAncientAreaFillId = "ibm-ancient-area-fill";
+const layerAncientUncertainFillId = "ibm-ancient-area-uncertain-fill";
+const layerAncientBorderStateId = "ibm-ancient-border-state";
+const layerAncientBorderDisputedId = "ibm-ancient-border-disputed";
+const layerAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const layerAncientRoadMajorCasingId = "ibm-ancient-road-major-casing";
+const layerAncientRoadMajorKnownId = "ibm-ancient-road-major-known";
+const layerAncientCoastlineId = "ibm-ancient-coastline";
+const layerAncientCoastlineLabelId = "ibm-ancient-coastline-label";
+const layerAncientHolderLabelId = "ibm-ancient-holder-label";
+const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
+const layerAncientHolderLabelClickTargetId = "ibm-ancient-holder-label-click-target";
 
 const questionBadgeImageId = "ibm-question-badge-image";
+const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
@@ -166,7 +201,9 @@ const interactiveLayerIds = [
   layerMajorAreaLabelId,
   layerAreaLabelOverviewId,
   layerAreaLabelId,
-  layerSelectedAreaLabelId
+  layerSelectedAreaLabelId,
+  layerAncientHolderLabelClickableId,
+  layerAncientHolderLabelClickTargetId
 ] as const;
 
 const candidateVisibilityFilter = [
@@ -225,6 +262,12 @@ const areaLabelMajorVariableAnchorFilter = [
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const selectedAreaLabelFilter = ["all", areaLabelVisibilityFilter, ["==", ["get", "isSelectedPlace"], true]];
+const areaLabelTextFontExpression = toExpression([
+  "case",
+  ["==", ["get", "areaKind"], "region"],
+  ["literal", ["Noto Sans Italic"]],
+  ["literal", ["Noto Sans Bold"]]
+]);
 const areaLabelPointLayout = {
   "text-anchor": "center" as const,
   "text-justify": "center" as const,
@@ -250,7 +293,11 @@ interface WebGlRendererInfo {
   isSoftwareRenderer: boolean;
 }
 
-function applyMapModeOverlayVisibility(map: MapLibreMap, mapMode: MapDisplayMode) {
+function applyMapModeOverlayVisibility(
+  map: MapLibreMap,
+  mapMode: MapDisplayMode,
+  ancientLayerEnabled: boolean
+) {
   const showAreaLabels = mapMode === "ancient";
   for (const layerId of [
     layerAreaLabelOverviewId,
@@ -261,10 +308,39 @@ function applyMapModeOverlayVisibility(map: MapLibreMap, mapMode: MapDisplayMode
   ]) {
     setLayerVisibility(map, layerId, showAreaLabels);
   }
+
+  const showAncientLayer = mapMode === "ancient" && ancientLayerEnabled;
+  for (const layerId of [
+    layerAncientAreaFillId,
+    layerAncientUncertainFillId,
+    layerAncientBorderStateId,
+    layerAncientBorderDisputedId,
+    layerAncientEmpireEdgeId,
+    layerAncientRoadMajorCasingId,
+    layerAncientRoadMajorKnownId,
+    layerAncientCoastlineId,
+    layerAncientCoastlineLabelId,
+    layerAncientHolderLabelId,
+    layerAncientHolderLabelClickableId,
+    layerAncientHolderLabelClickTargetId
+  ]) {
+    setLayerVisibility(map, layerId, showAncientLayer);
+  }
 }
 
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
+
+function isFeatureCollectionData(
+  value: GeoJsonSourceData
+): value is Exclude<GeoJsonSourceData, string> & { features: unknown[] } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "features" in value &&
+    Array.isArray((value as { features: unknown }).features)
+  );
+}
 
 function toLayerFilter(filter: unknown): LayerFilter {
   return filter as LayerFilter;
@@ -422,7 +498,9 @@ function getAttributionMarkup(mode: BasemapMode, mapMode: MapDisplayMode) {
     return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
   }
 
-  return mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
+  const basemapAttribution =
+    mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
+  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}`;
 }
 
 function prefersReducedMotion() {
@@ -845,6 +923,26 @@ function createTransparentCollisionImage(sizePx: number) {
   });
 }
 
+function createUncertainHatchImage() {
+  return createCanvasImage(8, (context, size) => {
+    context.clearRect(0, 0, size, size);
+    context.strokeStyle = ANCIENT_LAYER_STYLE.uncertain.hatchColor;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(0, size);
+    context.lineTo(size, 0);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(-2, size);
+    context.lineTo(2, size - 4);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(size - 2, 2);
+    context.lineTo(size + 2, -2);
+    context.stroke();
+  });
+}
+
 function createCircularSdfImage({
   canvasSizePx,
   radiusPx
@@ -975,11 +1073,446 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
   }
 }
 
+function ensureUncertainHatchImage(map: MapLibreMap) {
+  if (map.hasImage(uncertainHatchImageId)) {
+    return;
+  }
+
+  const image = createUncertainHatchImage();
+  if (image) {
+    map.addImage(uncertainHatchImageId, image.image, { pixelRatio: image.pixelRatio });
+  }
+}
+
+type AncientLineGeometry = LineStringGeometry | MultiLineStringGeometry;
+type AncientLineFeatureCollection = FeatureCollection<AncientLineGeometry, Record<string, unknown>>;
+
+function emptyAncientLineFeatureCollection(): AncientLineFeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: []
+  };
+}
+
+function asLineFeatureCollection(
+  value: AncientLineGeometry | null | undefined
+): AncientLineFeatureCollection {
+  if (!value) {
+    return emptyAncientLineFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: value
+      }
+    ]
+  };
+}
+
+function holderKindLabel(kind: AncientEntityRecord["kind"], holderId?: string) {
+  if (holderId === "italy-direct") {
+    return "Ruled from Rome, not a province";
+  }
+  if (holderId === "archelaus-ethnarchy") {
+    return "Ethnarchy under Rome";
+  }
+  if (holderId === "roman-empire") {
+    return "Roman provinces shown together";
+  }
+
+  if (kind === "roman-province") {
+    return "Roman province";
+  }
+  if (kind === "client-kingdom") {
+    return "Allied kingdom";
+  }
+  if (kind === "client-tetrarchy") {
+    return "Tetrarchy under Rome";
+  }
+  if (kind === "free-city-or-league") {
+    return "Free city or league";
+  }
+  if (kind === "outside-empire") {
+    return "Outside the empire";
+  }
+
+  return "Status unclear in the sources";
+}
+
+function buildAncientAreaFeatures(
+  shapes: AncientShapesPayload | null,
+  stopPayload: AncientStopPayload | null,
+  entitiesById: Map<string, AncientEntityRecord>
+) {
+  const empty = createEmptyFeatureCollection();
+  if (!shapes || !stopPayload) {
+    return empty;
+  }
+
+  const shapeByAreaId = new Map(
+    shapes.areas.features.map((feature) => [feature.properties.areaId, feature.geometry] as const)
+  );
+
+  return {
+    type: "FeatureCollection" as const,
+    features: stopPayload.areas
+      .map((area) => {
+        const geometry = shapeByAreaId.get(area.areaId);
+        if (!geometry) {
+          return null;
+        }
+
+        const holder = entitiesById.get(area.holderId);
+        const tooltipText =
+          area.holderKind === "uncertain"
+            ? area.note
+              ? `Status unclear in the sources: ${area.note}`
+              : "Status unclear in the sources"
+            : `${holder?.name ?? area.holderId} (${holderKindLabel(area.holderKind, area.holderId)})`;
+
+        return {
+          type: "Feature" as const,
+          properties: {
+            areaId: area.areaId,
+            holderId: area.holderId,
+            holderKind: area.holderKind,
+            tooltipText
+          },
+          geometry
+        };
+      })
+      .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
+  };
+}
+
+function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): AncientLineFeatureCollection {
+  if (!stopPayload) {
+    return emptyAncientLineFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: stopPayload.holderBorders.features.map((feature) => ({
+      type: "Feature",
+      properties: { ...feature.properties },
+      geometry: feature.geometry
+    }))
+  };
+}
+
+function buildAncientHolderLabelFeatures(
+  stopPayload: AncientStopPayload | null,
+  timelineRangeEndYear: number
+) {
+  if (!stopPayload) {
+    return createEmptyFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection" as const,
+    features: stopPayload.holderLabels
+      .map((label) => {
+        const holderAssignment = stopPayload.areas.find((area) => area.areaId === label.areaId);
+        const labelText = label.labelText;
+        const yearRangeText = holderAssignment
+          ? formatHolderYearRange({
+              heldFromYear: holderAssignment.heldFromYear,
+              heldToYear: holderAssignment.heldToYear,
+              heldFromKnown: holderAssignment.heldFromKnown,
+              timelineRangeEndYear
+            })
+          : "";
+        const rulerText = holderAssignment?.ruler ? ` · ${holderAssignment.ruler}` : "";
+        const yearRangePart = yearRangeText.length > 0 ? ` · ${yearRangeText}` : "";
+        return {
+          type: "Feature" as const,
+          properties: {
+            holderId: label.holderId,
+            holderLocationId: label.locationId,
+            labelText,
+            minZoom: label.minZoom,
+            clickable: typeof label.locationId === "string" && label.locationId.length > 0,
+            tooltipText: `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
+          },
+          geometry: {
+            type: "Point" as const,
+            coordinates: label.labelPoint
+          }
+        };
+      })
+  };
+}
+
 function ensureMapLayers(
   map: MapLibreMap,
   majorPlaceByRank: Map<number, MajorPlaceReference>
 ) {
   ensureCollisionImages(map);
+  ensureUncertainHatchImage(map);
+
+  if (!map.getLayer(layerAncientAreaFillId)) {
+    map.addLayer({
+      id: layerAncientAreaFillId,
+      source: sourceAncientAreasId,
+      type: "fill",
+      filter: toLayerFilter(["!=", ["get", "holderKind"], "uncertain"]),
+      paint: {
+        "fill-color": [
+          "match",
+          ["get", "holderKind"],
+          "roman-province",
+          ANCIENT_LAYER_STYLE.areaFill.romanProvince.color,
+          "client-kingdom",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
+          "client-tetrarchy",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
+          "free-city-or-league",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
+          "outside-empire",
+          ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color,
+          ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color
+        ],
+        "fill-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          3,
+          [
+            "match",
+            ["get", "holderKind"],
+            "roman-province",
+            ANCIENT_LAYER_STYLE.areaFill.romanProvince.opacity,
+            "client-kingdom",
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
+            "client-tetrarchy",
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
+            "free-city-or-league",
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
+            "outside-empire",
+            ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.opacity,
+            0
+          ],
+          10,
+          0
+        ]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientUncertainFillId)) {
+    map.addLayer({
+      id: layerAncientUncertainFillId,
+      source: sourceAncientAreasId,
+      type: "fill",
+      filter: toLayerFilter(["==", ["get", "holderKind"], "uncertain"]),
+      paint: {
+        "fill-pattern": uncertainHatchImageId,
+        "fill-opacity": 0.55
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderStateId)) {
+    map.addLayer({
+      id: layerAncientBorderStateId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "borderStyle"], "state"],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]
+      ]),
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.border.stateColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 7, 1, 11, 2],
+        "line-dasharray": [1, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderDisputedId)) {
+    map.addLayer({
+      id: layerAncientBorderDisputedId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "borderStyle"], "disputed"],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]
+      ]),
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+        "line-dasharray": [1, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientEmpireEdgeId)) {
+    map.addLayer({
+      id: layerAncientEmpireEdgeId,
+      source: sourceAncientEmpireEdgeId,
+      type: "line",
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 4, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMajorCasingId)) {
+    map.addLayer({
+      id: layerAncientRoadMajorCasingId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.casingColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 2.6, 7, 3.6, 9, 5.5, 12, 9]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMajorKnownId)) {
+    map.addLayer({
+      id: layerAncientRoadMajorKnownId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.knownColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1.2, 7, 2, 9, 3.5, 12, 6.5]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientCoastlineId)) {
+    map.addLayer({
+      id: layerAncientCoastlineId,
+      source: sourceAncientCoastlineId,
+      type: "line",
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.coastline.lineColor,
+        "line-width": 1.5
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientCoastlineLabelId)) {
+    map.addLayer({
+      id: layerAncientCoastlineLabelId,
+      source: sourceAncientCoastlineId,
+      type: "symbol",
+      minzoom: 9,
+      layout: {
+        "symbol-placement": "line",
+        "symbol-spacing": 250,
+        "text-field": "Roman shore",
+        "text-font": ["Noto Sans Italic"],
+        "text-size": 12,
+        "text-letter-spacing": 0.1,
+        "text-max-angle": 60
+      },
+      paint: {
+        "text-color": ANCIENT_LAYER_STYLE.coastline.labelColor,
+        "text-halo-color": ANCIENT_LAYER_STYLE.coastline.labelHaloColor,
+        "text-halo-width": 1.5
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], false],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-max-width": 30,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
+        "symbol-sort-key": 0
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelClickableId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelClickTargetId,
+      source: sourceAncientHolderLabelsId,
+      type: "circle",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], true],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 12, 7, 14, 10, 18],
+        "circle-color": "rgba(0,0,0,0)",
+        "circle-opacity": 0.001
+      }
+    });
+
+    map.addLayer({
+      id: layerAncientHolderLabelClickableId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], true],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-max-width": 30,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
+        "symbol-sort-key": 0
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
 
   if (!map.getLayer(layerClusterCircleId)) {
     map.addLayer({
@@ -1368,7 +1901,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1392,7 +1925,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1416,7 +1949,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1440,7 +1973,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1592,7 +2125,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "text-allow-overlap": true,
@@ -1680,6 +2213,9 @@ function ensureMapLayers(
   }
 
   const areaLayersNeedingStandardClusterClearance = [
+    layerAncientHolderLabelId,
+    layerAncientHolderLabelClickableId,
+    layerAncientHolderLabelClickTargetId,
     layerAreaLabelOverviewId,
     layerAreaLabelId,
     layerMajorAreaLabelOverviewId,
@@ -1732,6 +2268,10 @@ function asNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function propertyIsTrue(value: unknown): boolean {
+  return value === true || value === "true" || value === 1;
+}
+
 function asScreenPoint(point: PointLike): HitScreenPoint | null {
   if (Array.isArray(point)) {
     const [x, y] = point;
@@ -1782,6 +2322,31 @@ function toVisibleEntry(
 
   const clusterId = asNumber(properties.cluster_id);
   const pointCount = asNumber(properties.point_count);
+  if (
+    layerId === layerAncientHolderLabelClickableId ||
+    layerId === layerAncientHolderLabelClickTargetId
+  ) {
+    const holderLocationId = asString(properties.holderLocationId);
+    const holderLabelText = asString(properties.labelText);
+    const holderTooltipText = asString(properties.tooltipText);
+    const clickable = propertyIsTrue(properties.clickable);
+    if (clickable && holderLocationId && holderLabelText && holderTooltipText) {
+      return {
+        id: `holder:${String(properties.holderId ?? holderLocationId)}:${holderLabelText}`,
+        kind: "place",
+        coordinates,
+        accessibleName: `${holderLabelText}, area`,
+        tooltipText: holderTooltipText,
+        selection: {
+          placeId: holderLocationId,
+          candidateIndex: null
+        },
+        interactionRank: 1
+      };
+    }
+    return null;
+  }
+
   if (clusterId !== null && pointCount !== null) {
     if (isMajorClusterLayerId(layerId)) {
       const minImportanceRank = asNumber(properties.minImportanceRank);
@@ -1979,8 +2544,13 @@ export function MapView({
   highlightedPlaceId,
   leftPanelWidth,
   bottomPanelInset,
+  timelineOverlayInset,
   isSmallScreen,
   mapMode,
+  selectedTimelineStopId,
+  ancientTimeline,
+  ancientLayerRetryToken,
+  onAncientLayerLoadStateChange,
   pinLabelSource,
   onSelectPlace
 }: MapViewProps) {
@@ -2021,6 +2591,14 @@ export function MapView({
   const scheduleVisibleEntryRefreshRef = useRef<() => void>(() => undefined);
   const syncSourcesAndLayersRef = useRef<() => void>(() => undefined);
   const updateScaleBarRef = useRef<() => void>(() => undefined);
+  const stopPayloadRequestIdsRef = useRef(new Set<string>());
+  const stopPrefetchScheduledRef = useRef(false);
+  const failedStopIdsRef = useRef(new Set<string>());
+  const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
+
+  useEffect(() => {
+    selectedTimelineStopIdRef.current = selectedTimelineStopId;
+  }, [selectedTimelineStopId]);
 
   const runtimeTuning = useMemo(
     () =>
@@ -2039,24 +2617,95 @@ export function MapView({
   );
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
+  const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
-  const renderData = useMemo(
+  const renderData = useMemo(() => {
+    return buildPlaceRenderData(places, selection, highlightedPlaceId, {
+      includeAreaLabels: mapMode === "ancient",
+      pinLabelSource
+    });
+  }, [highlightedPlaceId, mapMode, pinLabelSource, places, selection]);
+  const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
+  const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientStopsById, setAncientStopsById] = useState<Record<string, AncientStopPayload>>({});
+  const ancientEntitiesById = useMemo(
+    () => new Map((ancientTimeline?.entities ?? []).map((entity) => [entity.id, entity] as const)),
+    [ancientTimeline]
+  );
+  const selectedAncientStopPayload = useMemo(
     () =>
-      buildPlaceRenderData(places, selection, highlightedPlaceId, {
-        includeAreaLabels: mapMode === "ancient",
-        pinLabelSource
-      }),
-    [highlightedPlaceId, mapMode, pinLabelSource, places, selection]
+      selectedTimelineStopId && ancientStopsById[selectedTimelineStopId]
+        ? ancientStopsById[selectedTimelineStopId]
+        : null,
+    [ancientStopsById, selectedTimelineStopId]
   );
+  const effectiveRenderData = useMemo(() => {
+    if (mapMode !== "ancient" || !hasAncientTimeline) {
+      return renderData;
+    }
+
+    const linkedLocationIds = linkedTimelineLocationIds(ancientTimeline?.entities);
+
+    return {
+      ...renderData,
+      areaLabels: filterAreaLabelsForAncientMap({
+        areaLabels: renderData.areaLabels,
+        linkedLocationIds
+      })
+    };
+  }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData]);
   const majorPlaceByRank = useMemo(
-    () => buildMajorPlaceReferenceByRank(renderData),
-    [renderData]
+    () => buildMajorPlaceReferenceByRank(effectiveRenderData),
+    [effectiveRenderData]
   );
+  const ancientAreaFeatures = useMemo(
+    () => buildAncientAreaFeatures(ancientShapes, selectedAncientStopPayload, ancientEntitiesById),
+    [ancientEntitiesById, ancientShapes, selectedAncientStopPayload]
+  );
+  const ancientBorderFeatures = useMemo(
+    () => buildAncientBorderFeatures(selectedAncientStopPayload),
+    [selectedAncientStopPayload]
+  );
+  const ancientEmpireEdgeFeatures = useMemo(() => {
+    if (isFeatureCollectionData(ancientEmpireEdge) && ancientEmpireEdge.features.length > 0) {
+      return ancientEmpireEdge;
+    }
+
+    return asLineFeatureCollection(selectedAncientStopPayload?.romanEmpireEdge);
+  }, [ancientEmpireEdge, selectedAncientStopPayload]);
+  const ancientHolderLabelFeatures = useMemo(() => {
+    const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
+    return buildAncientHolderLabelFeatures(
+      selectedAncientStopPayload,
+      timelineRangeEndYear
+    );
+  }, [ancientTimeline, selectedAncientStopPayload]);
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
   const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
+  const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const ancientLayerLoadStateRef = useRef<"idle" | "loading" | "ready" | "error">("idle");
+  const previousAncientLayerRetryTokenRef = useRef(ancientLayerRetryToken);
+  const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
+    setAncientShapes(null);
+    setAncientRoads(createEmptyFeatureCollection());
+    setAncientCoastline(createEmptyFeatureCollection());
+    setAncientEmpireEdge(createEmptyFeatureCollection());
+    setAncientStopsById({});
+    stopPrefetchScheduledRef.current = false;
+    stopPayloadRequestIdsRef.current.clear();
+    failedStopIdsRef.current.clear();
+    setAncientLayerLoadState(nextState);
+  }, []);
+
+  useEffect(() => {
+    onAncientLayerLoadStateChange(ancientLayerLoadState);
+    ancientLayerLoadStateRef.current = ancientLayerLoadState;
+  }, [ancientLayerLoadState, onAncientLayerLoadStateChange]);
 
   useEffect(() => {
     majorPlaceByRankRef.current = majorPlaceByRank;
@@ -2077,6 +2726,217 @@ export function MapView({
   useEffect(() => {
     mapModeRef.current = mapMode;
   }, [mapMode]);
+
+  useEffect(() => {
+    if (!hasAncientTimeline) {
+      queueMicrotask(() => {
+        resetAncientLayerData("idle");
+      });
+      return;
+    }
+
+    queueMicrotask(() => {
+      resetAncientLayerData("loading");
+    });
+  }, [hasAncientTimeline, resetAncientLayerData]);
+
+  const loadStopPayload = useCallback(async (stopId: string, options?: { prefetch?: boolean; forceRetry?: boolean }) => {
+    const prefetch = options?.prefetch ?? false;
+    const forceRetry = options?.forceRetry ?? false;
+    const selectedStopId = selectedTimelineStopIdRef.current;
+    const isSelectedStop = selectedStopId === stopId;
+    if (
+      !hasAncientTimeline ||
+      !stopId ||
+      (ancientLayerLoadStateRef.current === "error" && !forceRetry) ||
+      (failedStopIdsRef.current.has(stopId) && !forceRetry && !isSelectedStop) ||
+      stopPayloadRequestIdsRef.current.has(stopId)
+    ) {
+      return;
+    }
+
+    if (forceRetry) {
+      failedStopIdsRef.current.delete(stopId);
+    }
+
+    stopPayloadRequestIdsRef.current.add(stopId);
+    try {
+      const response = await fetch(`/generated/ancient.stop.${encodeURIComponent(stopId)}.json`, {
+        cache: "no-store"
+      });
+      if (!response.ok) {
+        throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
+      }
+
+      const payload = (await response.json()) as AncientStopPayload;
+      setAncientStopsById((previous) => {
+        if (previous[payload.stopId]) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [payload.stopId]: payload
+        };
+      });
+      failedStopIdsRef.current.delete(payload.stopId);
+      if (selectedTimelineStopIdRef.current === payload.stopId) {
+        setAncientLayerLoadState("ready");
+      }
+    } catch (error) {
+      console.error("Failed to load ancient stop payload.", error);
+      failedStopIdsRef.current.add(stopId);
+      if (!prefetch || selectedTimelineStopIdRef.current === stopId) {
+        setAncientLayerLoadState("error");
+      }
+    } finally {
+      stopPayloadRequestIdsRef.current.delete(stopId);
+    }
+  }, [hasAncientTimeline]);
+
+  useEffect(() => {
+    if (ancientLayerRetryToken === previousAncientLayerRetryTokenRef.current) {
+      return;
+    }
+    previousAncientLayerRetryTokenRef.current = ancientLayerRetryToken;
+
+    if (!hasAncientTimeline) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      setAncientLayerLoadState("loading");
+    });
+
+    if (selectedTimelineStopIdRef.current && failedStopIdsRef.current.has(selectedTimelineStopIdRef.current)) {
+      queueMicrotask(() => {
+        const stopId = selectedTimelineStopIdRef.current;
+        if (!stopId) {
+          return;
+        }
+        void loadStopPayload(stopId, { forceRetry: true });
+      });
+    }
+  }, [ancientLayerRetryToken, hasAncientTimeline, loadStopPayload]);
+
+  useEffect(() => {
+    if (mapReadyVersion === 0 || ancientShapes || !hasAncientTimeline || ancientLayerLoadState === "error") {
+      return;
+    }
+
+    let cancelled = false;
+    void Promise.all([
+      fetch("/generated/ancient.shapes.json", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient shapes (${response.status})`);
+        }
+
+        return (await response.json()) as AncientShapesPayload;
+      }),
+      fetch("/generated/ancient.roads.geojson", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient roads (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      }),
+      fetch("/generated/ancient.coastline.geojson", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient coastline (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      }),
+      fetch("/generated/ancient.empire-edge.geojson", { cache: "no-store" }).then(async (response) => {
+        if (response.status === 404) {
+          return createEmptyFeatureCollection() as GeoJsonSourceData;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Could not load ancient empire edge (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      })
+    ])
+      .then(([shapesPayload, roadsPayload, coastlinePayload, empireEdgePayload]) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientShapes(shapesPayload);
+        setAncientRoads(roadsPayload);
+        setAncientCoastline(coastlinePayload);
+        setAncientEmpireEdge(empireEdgePayload);
+      })
+      .catch((error) => {
+        console.error("Failed to load ancient map layer data.", error);
+        setAncientLayerLoadState("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ancientLayerLoadState, ancientShapes, hasAncientTimeline, mapReadyVersion]);
+
+  useEffect(() => {
+    if (
+      !hasAncientTimeline ||
+      ancientLayerLoadState === "error" ||
+      !selectedTimelineStopId ||
+      ancientStopsById[selectedTimelineStopId]
+    ) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      void loadStopPayload(selectedTimelineStopId);
+    });
+  }, [ancientLayerLoadState, ancientStopsById, hasAncientTimeline, loadStopPayload, selectedTimelineStopId]);
+
+  useEffect(() => {
+    if (
+      stopPrefetchScheduledRef.current ||
+      !hasAncientTimeline ||
+      ancientLayerLoadState === "error" ||
+      !ancientTimeline ||
+      !ancientShapes ||
+      !selectedAncientStopPayload ||
+      mapReadyVersion === 0
+    ) {
+      return;
+    }
+
+    stopPrefetchScheduledRef.current = true;
+    const pendingStopIds = ancientTimeline.stops
+      .map((stop) => stop.id)
+      .filter((stopId) => stopId !== selectedAncientStopPayload.stopId);
+    if (pendingStopIds.length === 0) {
+      return;
+    }
+
+    const scheduleIdle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback.bind(window)
+        : (callback: () => void) => window.setTimeout(callback, 50);
+
+    scheduleIdle(() => {
+      for (const stopId of pendingStopIds) {
+        if (!ancientStopsById[stopId]) {
+          void loadStopPayload(stopId, { prefetch: true });
+        }
+      }
+    });
+  }, [
+    ancientShapes,
+    ancientLayerLoadState,
+    ancientStopsById,
+    hasAncientTimeline,
+    ancientTimeline,
+    loadStopPayload,
+    mapReadyVersion,
+    selectedAncientStopPayload
+  ]);
 
   useEffect(() => {
     majorClusterTooltipByEntryIdRef.current.clear();
@@ -2232,7 +3092,7 @@ export function MapView({
       return;
     }
 
-    ensureGeoJsonSource(map, sourceMajorCityPinsId, renderData.majorCityPins, {
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins, {
       cluster: true,
       clusterMaxZoom: majorClusterMaxZoom,
       clusterRadius: majorClusterRadiusPx,
@@ -2240,20 +3100,35 @@ export function MapView({
         minImportanceRank: ["min", ["get", "importanceRank"]]
       }
     });
-    ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
       clusterRadius: standardClusterRadiusPx
     });
-    ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
-    ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
-    ensureGeoJsonSource(map, sourceAreaLabelsId, renderData.areaLabels);
+    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins);
+    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins);
+    ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
+    ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
+    ensureGeoJsonSource(map, sourceAncientBordersId, ancientBorderFeatures);
+    ensureGeoJsonSource(map, sourceAncientEmpireEdgeId, ancientEmpireEdgeFeatures);
+    ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
+    ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
+    ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
 
     ensureQuestionBadgeImage(map);
-    ensureCandidateImages(map, renderData);
+    ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map, majorPlaceByRank);
-  }, [majorPlaceByRank, renderData]);
+  }, [
+    ancientAreaFeatures,
+    ancientBorderFeatures,
+    ancientCoastline,
+    ancientEmpireEdgeFeatures,
+    ancientHolderLabelFeatures,
+    ancientRoads,
+    majorPlaceByRank,
+    effectiveRenderData
+  ]);
 
   const resolveMajorClusterTooltipText = useCallback(
     async (entry: VisibleMajorClusterEntry) => {
@@ -2322,8 +3197,56 @@ export function MapView({
 
       const entry = resolveInteractiveEntryAtPoint(point);
       if (!entry) {
-        setInteractiveCursor(false);
-        hideTooltip();
+        const pointer = asScreenPoint(point);
+        if (!pointer || mapModeRef.current !== "ancient") {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const infoFeature = map
+          .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
+            layers: [
+              layerAncientHolderLabelClickableId,
+              layerAncientHolderLabelId,
+              layerAncientUncertainFillId
+            ]
+          })
+          .find((feature) => {
+            const properties = asObject(feature.properties);
+            const tooltipText = properties ? asString(properties.tooltipText) : null;
+            return Boolean(tooltipText);
+          });
+        const infoProperties = infoFeature ? asObject(infoFeature.properties) : null;
+        const infoText = infoProperties ? asString(infoProperties.tooltipText) : null;
+        const infoClickable =
+          infoProperties !== null &&
+          propertyIsTrue(infoProperties.clickable) &&
+          typeof asString(infoProperties.holderLocationId) === "string";
+
+        if (!infoFeature || !infoText) {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const fallbackLngLat = map.unproject([pointer.x, pointer.y]);
+        const infoCoordinates =
+          asCoordinates(infoFeature) ??
+          ([fallbackLngLat.lng, fallbackLngLat.lat] as Coordinates);
+        if (!infoCoordinates) {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const projectedInfo = map.project(infoCoordinates as LngLatLike);
+        tooltip.textContent = infoText;
+        tooltip.style.display = "block";
+        tooltip.style.left = `${projectedInfo.x}px`;
+        tooltip.style.top = `${projectedInfo.y - 22}px`;
+        activeTooltipEntryIdRef.current = `info:${infoText}`;
+        setInteractiveCursor(infoClickable);
         return;
       }
 
@@ -2399,6 +3322,24 @@ export function MapView({
     [onSelectPlace, zoomToCluster]
   );
 
+  const showTooltipForVisibleEntry = useCallback(
+    (entry: VisibleListEntry) => {
+      const map = mapRef.current;
+      const tooltip = tooltipRef.current;
+      if (!map || !tooltip) {
+        return;
+      }
+
+      const projected = map.project(entry.coordinates as LngLatLike);
+      tooltip.textContent = entry.tooltipText;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${projected.x}px`;
+      tooltip.style.top = `${projected.y - 22}px`;
+      activeTooltipEntryIdRef.current = entry.id;
+    },
+    []
+  );
+
   const setVisibleEntryFocus = useCallback(
     (entry: VisibleListEntry) => {
       const map = mapRef.current;
@@ -2414,8 +3355,9 @@ export function MapView({
         panelInset,
         runtimeTuning.controlZoomDurationMs
       );
+      showTooltipForVisibleEntry(entry);
     },
-    [panelInset, runtimeTuning.controlZoomDurationMs]
+    [panelInset, runtimeTuning.controlZoomDurationMs, showTooltipForVisibleEntry]
   );
 
   useEffect(() => {
@@ -2782,7 +3724,7 @@ export function MapView({
       }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayersRef.current();
-      applyMapModeOverlayVisibility(map, nextMapMode);
+      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -2929,6 +3871,7 @@ export function MapView({
   }, [
     basemapController,
     clearMainSourceLoadTimeout,
+    hasAncientTimeline,
     hideTooltip,
     resolveInteractiveEntryAtPoint,
     scheduleScaleBarUpdate,
@@ -2965,10 +3908,10 @@ export function MapView({
     syncSourcesAndLayers();
     const map = mapRef.current;
     if (map) {
-      applyMapModeOverlayVisibility(map, mapModeRef.current);
+      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline);
     }
     refreshVisibleEntryState();
-  }, [refreshVisibleEntryState, syncSourcesAndLayers]);
+  }, [hasAncientTimeline, refreshVisibleEntryState, syncSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBar();
@@ -3054,11 +3997,63 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
   }, [runtimeTuning.controlZoomDurationMs]);
+  const timelineOverlayBottomInset =
+    isSmallScreen && mapMode === "ancient" && hasAncientTimeline ? 192 : 0;
+  const maxReachableControlInset =
+    isSmallScreen && typeof window !== "undefined"
+      ? Math.max(0, window.innerHeight - 124)
+      : Number.POSITIVE_INFINITY;
+  const controlBottomInset = Math.min(
+    Math.max(bottomInset, timelineOverlayBottomInset),
+    maxReachableControlInset
+  );
   const resetButtonBottomOffset = isSmallScreen
-    ? Math.max(bottomInset + 16, 88)
+    ? Math.max(controlBottomInset + 16, 88)
     : bottomInset + 16;
-  const compactAttributionBottomOffset = isSmallScreen ? bottomInset : 0;
+  const scaleBarBottomOffset = isSmallScreen
+    ? Math.max(controlBottomInset + 176, 320)
+    : controlBottomInset + 16;
+  const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
+  const compactAttributionBottomWithTimelineOffset = Math.max(
+    compactAttributionBottomOffset,
+    Math.max(0, timelineOverlayInset)
+  );
   const compactAttributionRightOffset = 72;
+  const visiblePlacesList = (
+    <div
+      aria-label="Visible places on map"
+      className="ibm-hidden-visible-places"
+      style={{
+        position: "absolute",
+        width: "1px",
+        height: "1px",
+        padding: 0,
+        margin: "-1px",
+        overflow: "hidden",
+        clip: "rect(0, 0, 0, 0)",
+        whiteSpace: "nowrap",
+        border: 0
+      }}
+    >
+      {visibleEntries.map((entry) => (
+        <button
+          key={entry.id}
+          aria-label={entry.accessibleName}
+          data-place-entry-id={entry.id}
+          onClick={() => activateVisibleEntry(entry)}
+          onFocus={() => setVisibleEntryFocus(entry)}
+          type="button"
+        >
+          {entry.accessibleName}
+        </button>
+      ))}
+      {visibleEntryOverflow ? (
+        <p role="note">Zoom in or search to reach more places</p>
+      ) : null}
+    </div>
+  );
+  const visiblePlacesPortalHost =
+    typeof document !== "undefined" ? document.getElementById("ibm-visible-places-portal-root") : null;
 
   return (
     <div
@@ -3081,9 +4076,17 @@ export function MapView({
           white-space: nowrap;
           border: 0;
         }
-        .ibm-map-root .maplibregl-ctrl-bottom-right {
+
+        .ibm-map-root .maplibregl-ctrl-attrib a {
+          color: #1a73e8;
+          text-decoration: underline;
+        }
+
+        .ibm-map-root .maplibregl-ctrl-bottom-right,
+        .ibm-map-root .maplibregl-ctrl-top-right {
           right: ${compactAttributionRightOffset}px;
-          bottom: ${compactAttributionBottomOffset}px;
+          top: auto;
+          bottom: ${compactAttributionBottomWithTimelineOffset}px;
         }
       `}</style>
       <div
@@ -3117,7 +4120,7 @@ export function MapView({
         style={{
           position: "absolute",
           left: `${getScaleControlLeftOffset(panelInset)}px`,
-          bottom: `${bottomInset + 16}px`,
+          bottom: `${scaleBarBottomOffset}px`,
           backgroundColor: "#FFFFFF",
           border: "1px solid rgba(95,99,104,0.35)",
           borderRadius: "4px",
@@ -3229,23 +4232,7 @@ export function MapView({
       >
         ⟳
       </button>
-      <div aria-label="Visible places on map" className="ibm-hidden-visible-places">
-        {visibleEntries.map((entry) => (
-          <button
-            key={entry.id}
-            aria-label={entry.accessibleName}
-            data-place-entry-id={entry.id}
-            onClick={() => activateVisibleEntry(entry)}
-            onFocus={() => setVisibleEntryFocus(entry)}
-            type="button"
-          >
-            {entry.accessibleName}
-          </button>
-        ))}
-        {visibleEntryOverflow ? (
-          <p role="note">Zoom in or search to reach more places</p>
-        ) : null}
-      </div>
+      {visiblePlacesPortalHost ? createPortal(visiblePlacesList, visiblePlacesPortalHost) : visiblePlacesList}
       {basemapState.message ? (
         <div
           role="status"

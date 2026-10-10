@@ -13,6 +13,7 @@ const DEFAULT_LOCATIONS_DIRECTORY = path.join(repositoryRoot, "data", "locations
 const DEFAULT_MEDIA_DIRECTORY = path.join(repositoryRoot, "data", "media");
 const DEFAULT_BIBLIOGRAPHY_PATH = path.join(repositoryRoot, "data", "bibliography.json");
 const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "generated");
+const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 300_000;
 
 async function listJsonFiles(directoryPath) {
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -115,6 +116,7 @@ function toIndexRecord(locationRecord) {
     names: toAppNames(locationRecord.names),
     type: locationRecord.type,
     zoomTier: locationRecord.zoomTier,
+    politicalAreaId: locationRecord.politicalAreaId,
     prominence: locationRecord.prominence,
     passageCount: Array.isArray(locationRecord.scripture)
       ? locationRecord.scripture.length
@@ -161,6 +163,8 @@ export async function buildAppData(options = {}) {
     options.timelinePath ?? path.join(ancientDataRoot, "timeline.json")
   );
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
+  const maxAncientLayerGzipBytes =
+    options.maxAncientLayerGzipBytes ?? DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES;
 
   const validationResult = await validateData({
     locationsDirectory,
@@ -197,6 +201,29 @@ export async function buildAppData(options = {}) {
   const locationRecords = await Promise.all(locationFiles.map((filePath) => readJsonFile(filePath)));
   const mediaRecords = await Promise.all(mediaFiles.map((filePath) => readJsonFile(filePath)));
   locationRecords.sort((a, b) => a.id.localeCompare(b.id));
+  const majorPlacePinCoordinates = locationRecords
+    .filter(
+      (locationRecord) =>
+        (locationRecord.type === "place" ||
+          locationRecord.type === "region" ||
+          locationRecord.type === "province" ||
+          locationRecord.type === "empire") &&
+        Array.isArray(locationRecord.candidates)
+    )
+    .flatMap((locationRecord) =>
+      (locationRecord.candidates ?? [])
+        .filter(
+          (candidate) =>
+            Array.isArray(candidate?.coordinates) &&
+            candidate.coordinates.length >= 2 &&
+            typeof candidate.coordinates[0] === "number" &&
+            typeof candidate.coordinates[1] === "number"
+        )
+        .map((candidate) => ({
+          placeId: locationRecord.id,
+          coordinates: [candidate.coordinates[0], candidate.coordinates[1]]
+        }))
+    );
 
   const mediaByLocationId = new Map(
     mediaRecords
@@ -264,7 +291,12 @@ export async function buildAppData(options = {}) {
   let ancientBuild = {
     generated: false,
     skippedReason:
-      "Skipped ancient generated files because timeline or ancient geo source files are missing."
+      "Skipped ancient generated files because timeline or ancient geo source files are missing.",
+    gzipBytes: 0,
+    maxGzipBytes: maxAncientLayerGzipBytes,
+    roadJoinCount: 0,
+    roadJoinTotalLengthKm: 0,
+    roadJoinMaxLengthKm: 0
   };
 
   if (timelineExists && areasExists && roadsExists && coastlineExists) {
@@ -283,13 +315,29 @@ export async function buildAppData(options = {}) {
       ancientAreasData,
       ancientRoadsData,
       ancientCoastlineData,
+      bibliographyById,
       ancientEmpireEdgeData,
+      majorPlacePinCoordinates,
       outputDirectory
     });
+    const ancientLayerGzipBytes = ancientBuildResult.writtenFiles.reduce(
+      (sum, file) => sum + file.gzipBytes,
+      0
+    );
+    if (ancientLayerGzipBytes > maxAncientLayerGzipBytes) {
+      throw new Error(
+        `Ancient layer generated files exceed ${maxAncientLayerGzipBytes} bytes gzip (${ancientLayerGzipBytes} bytes).`
+      );
+    }
     outputFiles.push(...ancientBuildResult.writtenFiles);
     ancientBuild = {
       generated: true,
-      skippedReason: null
+      skippedReason: null,
+      gzipBytes: ancientLayerGzipBytes,
+      maxGzipBytes: maxAncientLayerGzipBytes,
+      roadJoinCount: ancientBuildResult.roadJoinCount ?? 0,
+      roadJoinTotalLengthKm: ancientBuildResult.roadJoinTotalLengthKm ?? 0,
+      roadJoinMaxLengthKm: ancientBuildResult.roadJoinMaxLengthKm ?? 0
     };
   }
 

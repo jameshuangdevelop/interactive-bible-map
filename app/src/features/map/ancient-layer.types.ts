@@ -66,6 +66,20 @@ export interface AncientTimelinePayload {
   };
   defaultStopId: string | null;
   stops: AncientStopRecord[];
+  bibliography: {
+    id: string;
+    type: "book" | "article" | "chapter" | "web" | "dataset";
+    title: string;
+    authors: string[];
+    year: number;
+    publisher?: string;
+    journal?: string;
+    containerTitle?: string;
+    doi?: string;
+    isbn?: string;
+    url?: string;
+    accessed?: string;
+  }[];
   entities: AncientEntityRecord[];
 }
 
@@ -76,25 +90,28 @@ export interface AncientAreaAssignment {
   holderRomanSide: boolean;
   holderLocationId: string | null;
   ruler: string | null;
+  heldFromYear: TimelineYear;
+  heldToYear: TimelineYear;
+  heldFromKnown: boolean;
   note: string | null;
   hasShape: boolean;
 }
 
 export interface AncientHolderBorderFeatureProperties {
-  holderAId: string;
-  holderAKind: AncientEntityRecord["kind"];
-  holderARomanSide: boolean;
-  holderBId: string;
-  holderBKind: AncientEntityRecord["kind"];
-  holderBRomanSide: boolean;
+  holderAAreaId: string;
+  holderBAreaId: string;
+  borderStyle: "state" | "disputed";
+  minZoom: number;
 }
 
 export interface AncientHolderLabelPoint {
   holderId: string;
+  areaId: string;
   name: string;
+  labelText: string;
+  minZoom: number;
   kind: AncientEntityRecord["kind"];
-  romanSide: boolean;
-  locationId: string | null;
+  locationId?: string;
   labelPoint: [number, number];
 }
 
