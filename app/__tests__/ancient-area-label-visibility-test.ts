@@ -4,20 +4,34 @@ import path from "node:path";
 import type {
   AncientTimelinePayload
 } from "../src/features/map/ancient-layer.types";
-import type { PlaceIndexRecord } from "../src/features/map/types";
 import {
   linkedTimelineLocationIds,
   shouldShowAreaLabelOnAncientMap
 } from "../src/features/map/ancient-area-label-visibility";
 
-function readGeneratedJson(relativePath: string) {
-  const filePath = path.resolve(__dirname, "..", "public", "generated", relativePath);
+interface LocationRecordForAreaLabelTest {
+  id: string;
+  type?: string;
+}
+
+function readRepositoryJson(relativePath: string) {
+  const filePath = path.resolve(__dirname, "..", "..", relativePath);
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+function readLocationRecords(): LocationRecordForAreaLabelTest[] {
+  const locationsDirectory = path.resolve(__dirname, "..", "..", "data", "locations");
+  return fs
+    .readdirSync(locationsDirectory)
+    .filter((fileName) => fileName.endsWith(".json"))
+    .map((fileName) =>
+      JSON.parse(fs.readFileSync(path.join(locationsDirectory, fileName), "utf8")) as LocationRecordForAreaLabelTest
+    );
 }
 
 describe("ancient area label visibility", () => {
   test("linked timeline location ids include expected province labels and exclude Galilee", () => {
-    const timeline = readGeneratedJson("ancient.timeline.json") as AncientTimelinePayload;
+    const timeline = readRepositoryJson("data/timeline.json") as AncientTimelinePayload;
     const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
 
     expect(linkedLocationIds.has("judea-province")).toBe(true);
@@ -27,8 +41,8 @@ describe("ancient area label visibility", () => {
   });
 
   test("hides M3 area labels for every record linked from timeline entities", () => {
-    const timeline = readGeneratedJson("ancient.timeline.json") as AncientTimelinePayload;
-    const places = readGeneratedJson("places.index.json") as PlaceIndexRecord[];
+    const timeline = readRepositoryJson("data/timeline.json") as AncientTimelinePayload;
+    const places = readLocationRecords();
     const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
     const provinceOrEmpirePlaces = places.filter(
       (place) => place.type === "province" || place.type === "empire"
