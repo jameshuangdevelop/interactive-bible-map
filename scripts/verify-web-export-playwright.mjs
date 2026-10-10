@@ -5199,8 +5199,112 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   if (galatiaHolderProbe.m3GalatiaAreaLabelRendered) {
     throw new Error("M3 area label for galatia should be hidden on the ancient map.");
   }
+
+  const galatiaPointerProbe = await page.evaluate(({ testHookKey, holderClickableLayerId }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const renderedClickable = map.queryRenderedFeatures(undefined, { layers: [holderClickableLayerId] });
+    const galatiaHolder = renderedClickable.find(
+      (feature) =>
+        feature.properties?.holderLocationId === "galatia" &&
+        typeof feature.properties?.labelText === "string" &&
+        feature.properties.labelText.replace(/\s+/gu, " ").trim() === "PROVINCE OF GALATIA"
+    );
+    if (!galatiaHolder) {
+      return { found: false, positiveControlCount: renderedClickable.length };
+    }
+
+    const coordinates = galatiaHolder.geometry?.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length < 2) {
+      throw new Error("Clickable Galatia holder label has invalid geometry.");
+    }
+
+    const projected = map.project([coordinates[0], coordinates[1]]);
+    const canvasRect = map.getCanvas().getBoundingClientRect();
+    return {
+      found: true,
+      screenX: canvasRect.left + projected.x,
+      screenY: canvasRect.top + projected.y
+    };
+  }, {
+    testHookKey: mapTestHookKey,
+    holderClickableLayerId: "ibm-ancient-holder-label-clickable"
+  });
+  if (!galatiaPointerProbe.found) {
+    throw new Error(
+      `Expected pointer probe for 'PROVINCE OF GALATIA'; clickable-count=${galatiaPointerProbe.positiveControlCount}.`
+    );
+  }
+  await page.mouse.move(galatiaPointerProbe.screenX, galatiaPointerProbe.screenY);
+  await page.waitForTimeout(150);
+  const galatiaTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? "";
+  if (!galatiaTooltipText.includes("Galatia")) {
+    throw new Error(`Expected Galatia tooltip from mouse hover, got '${galatiaTooltipText}'.`);
+  }
+  const galatiaCursor = await page.evaluate(({ testHookKey }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    return map.getCanvas().style.cursor || "";
+  }, { testHookKey: mapTestHookKey });
+  if (galatiaCursor !== "pointer") {
+    throw new Error(`Expected pointer cursor over clickable Galatia holder label, got '${galatiaCursor}'.`);
+  }
+  await page.mouse.click(galatiaPointerProbe.screenX, galatiaPointerProbe.screenY);
+  await page.waitForTimeout(150);
+  const galatiaClickedSearch = new URL(page.url()).searchParams.get("place");
+  if (galatiaClickedSearch !== "galatia") {
+    throw new Error(`Clicking PROVINCE OF GALATIA should open ?place=galatia, got '${page.url()}'.`);
+  }
+
   await page.goto(`${baseUrl}/?year=30`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
+  await moveMapAndSettle({ center: [35.4, 32.0], zoom: 8 });
+  const philipPointerProbe = await page.evaluate(({ testHookKey, holderLayerId }) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const renderedLabels = map.queryRenderedFeatures(undefined, { layers: [holderLayerId] });
+    const philipLabel = renderedLabels.find(
+      (feature) =>
+        typeof feature.properties?.labelText === "string" &&
+        feature.properties.labelText.replace(/\s+/gu, " ").trim() === "TETRARCHY OF PHILIP"
+    );
+    if (!philipLabel) {
+      return { found: false, positiveControlCount: renderedLabels.length };
+    }
+    const coordinates = philipLabel.geometry?.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length < 2) {
+      throw new Error("Philip holder label has invalid geometry.");
+    }
+    const projected = map.project([coordinates[0], coordinates[1]]);
+    const canvasRect = map.getCanvas().getBoundingClientRect();
+    return {
+      found: true,
+      screenX: canvasRect.left + projected.x,
+      screenY: canvasRect.top + projected.y
+    };
+  }, { testHookKey: mapTestHookKey, holderLayerId: "ibm-ancient-holder-label" });
+  if (!philipPointerProbe.found) {
+    throw new Error(
+      `Expected plain 'TETRARCHY OF PHILIP' holder label at AD 30 zoom 8; holder-count=${philipPointerProbe.positiveControlCount}.`
+    );
+  }
+  await page.mouse.move(philipPointerProbe.screenX, philipPointerProbe.screenY);
+  await page.waitForTimeout(150);
+  const philipPointerTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? "";
+  if (!philipPointerTooltipText.includes("4 BC – AD 34")) {
+    throw new Error(
+      `Expected Philip plain-label tooltip to include '4 BC – AD 34', got '${philipPointerTooltipText}'.`
+    );
+  }
+
   await moveMapAndSettle({ center: [35.6, 32.3], zoom: 6 });
   const galileeBordersAtZoom6 = await page.evaluate(({ testHookKey, borderLayerIds }) => {
     const map = window[testHookKey];

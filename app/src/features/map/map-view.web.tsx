@@ -2268,6 +2268,10 @@ function asNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function propertyIsTrue(value: unknown): boolean {
+  return value === true || value === "true" || value === 1;
+}
+
 function asScreenPoint(point: PointLike): HitScreenPoint | null {
   if (Array.isArray(point)) {
     const [x, y] = point;
@@ -2325,7 +2329,7 @@ function toVisibleEntry(
     const holderLocationId = asString(properties.holderLocationId);
     const holderLabelText = asString(properties.labelText);
     const holderTooltipText = asString(properties.tooltipText);
-    const clickable = properties.clickable === true;
+    const clickable = propertyIsTrue(properties.clickable);
     if (clickable && holderLocationId && holderLabelText && holderTooltipText) {
       return {
         id: `holder:${String(properties.holderId ?? holderLocationId)}:${holderLabelText}`,
@@ -3202,7 +3206,11 @@ export function MapView({
 
         const infoFeature = map
           .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
-            layers: [layerAncientHolderLabelId, layerAncientUncertainFillId]
+            layers: [
+              layerAncientHolderLabelClickableId,
+              layerAncientHolderLabelId,
+              layerAncientUncertainFillId
+            ]
           })
           .find((feature) => {
             const properties = asObject(feature.properties);
@@ -3211,6 +3219,10 @@ export function MapView({
           });
         const infoProperties = infoFeature ? asObject(infoFeature.properties) : null;
         const infoText = infoProperties ? asString(infoProperties.tooltipText) : null;
+        const infoClickable =
+          infoProperties !== null &&
+          propertyIsTrue(infoProperties.clickable) &&
+          typeof asString(infoProperties.holderLocationId) === "string";
 
         if (!infoFeature || !infoText) {
           setInteractiveCursor(false);
@@ -3234,7 +3246,7 @@ export function MapView({
         tooltip.style.left = `${projectedInfo.x}px`;
         tooltip.style.top = `${projectedInfo.y - 22}px`;
         activeTooltipEntryIdRef.current = `info:${infoText}`;
-        setInteractiveCursor(false);
+        setInteractiveCursor(infoClickable);
         return;
       }
 
@@ -3744,11 +3756,43 @@ export function MapView({
 
     const handleMapClick = (event: { point: PointLike }) => {
       const entry = resolveInteractiveEntryAtPoint(event.point);
-      if (!entry) {
+      if (entry) {
+        activateVisibleEntryRef.current(entry);
         return;
       }
 
-      activateVisibleEntryRef.current(entry);
+      if (mapModeRef.current !== "ancient") {
+        return;
+      }
+
+      const pointer = asScreenPoint(event.point);
+      if (!pointer) {
+        return;
+      }
+
+      const holderFeature = map
+        .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
+          layers: [layerAncientHolderLabelClickableId, layerAncientHolderLabelClickTargetId]
+        })
+        .find((feature) => {
+          const properties = asObject(feature.properties);
+          return (
+            properties !== null &&
+            propertyIsTrue(properties.clickable) &&
+            typeof asString(properties.holderLocationId) === "string"
+          );
+        });
+
+      const holderProperties = holderFeature ? asObject(holderFeature.properties) : null;
+      const holderLocationId = holderProperties ? asString(holderProperties.holderLocationId) : null;
+      if (!holderLocationId) {
+        return;
+      }
+
+      onSelectPlace({
+        placeId: holderLocationId,
+        candidateIndex: null
+      });
     };
     const handleMouseMove = (event: { point: PointLike }) => {
       scheduleTooltipUpdate(event.point);
