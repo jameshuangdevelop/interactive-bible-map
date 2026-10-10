@@ -3,6 +3,26 @@ import { chromium } from "playwright";
 
 import { waitForMapToSettle, withResolvedBaseUrl } from "./lib/web-checks.mjs";
 
+function resolveViewport() {
+  const raw = process.env.PLAYWRIGHT_VIEWPORT;
+  if (!raw) {
+    return { width: 1440, height: 960 };
+  }
+
+  const match = /^(\d+)x(\d+)$/u.exec(raw.trim());
+  if (!match) {
+    throw new Error(`Invalid PLAYWRIGHT_VIEWPORT '${raw}'. Expected '<width>x<height>'.`);
+  }
+
+  const width = Number.parseInt(match[1], 10);
+  const height = Number.parseInt(match[2], 10);
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+    throw new Error(`Invalid PLAYWRIGHT_VIEWPORT '${raw}'. Width and height must be positive integers.`);
+  }
+
+  return { width, height };
+}
+
 function toBlockingViolations(violations) {
   return violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical");
 }
@@ -34,9 +54,10 @@ async function runAxeScenario(page, baseUrl, scenario) {
 
 async function run() {
   await withResolvedBaseUrl(async ({ baseUrl, usingProvidedBaseUrl }) => {
+    const viewport = resolveViewport();
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 960 }
+      viewport
     });
     const page = await context.newPage();
 
@@ -87,6 +108,7 @@ async function run() {
       const summary = {
         baseUrl,
         usingProvidedBaseUrl,
+        viewport,
         scenarioCount: results.length,
         scenarios: results,
         blockingViolationCount: blockingViolations.length,
