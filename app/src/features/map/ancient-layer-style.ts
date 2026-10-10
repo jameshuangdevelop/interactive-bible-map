@@ -9,8 +9,8 @@ export const ANCIENT_LAYER_STYLE = {
     disputedColor: "hsl(248, 1%, 41%)"
   },
   roads: {
-    casingColor: "#ffffff",
-    knownColor: "#7c8188"
+    casingColor: "#e9ac77",
+    knownColor: "#fea"
   },
   coastline: {
     lineColor: "#a0c8f0",

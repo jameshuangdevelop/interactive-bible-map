@@ -4738,13 +4738,13 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   if (layerStyleSnapshot.roadCasing.minzoom !== 5 || layerStyleSnapshot.roadKnown.minzoom !== 5) {
     throw new Error(`Ancient roads should have minzoom 5. got casing=${layerStyleSnapshot.roadCasing.minzoom}, known=${layerStyleSnapshot.roadKnown.minzoom}`);
   }
-  expectJson(layerStyleSnapshot.roadCasing.color, "#ffffff", "Ancient road casing color");
+  expectJson(layerStyleSnapshot.roadCasing.color, "#e9ac77", "Ancient road casing color");
   expectJson(
     layerStyleSnapshot.roadCasing.width,
     ["interpolate", ["linear"], ["zoom"], 5, 2.6, 7, 3.6, 9, 5.5, 12, 9],
     "Ancient road casing width"
   );
-  expectJson(layerStyleSnapshot.roadKnown.color, "#7c8188", "Ancient known road color");
+  expectJson(layerStyleSnapshot.roadKnown.color, "#fea", "Ancient known road color");
   if (layerStyleSnapshot.roadKnown.filter !== undefined && layerStyleSnapshot.roadKnown.filter !== null) {
     throw new Error(
       `Ancient roads use one shared style filter mismatch. expected=null/undefined actual=${JSON.stringify(layerStyleSnapshot.roadKnown.filter)}`
