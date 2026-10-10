@@ -17,14 +17,18 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
   CLUSTER_MAX_ZOOM,
+  ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION,
+  ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
+  ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
+  ANCIENT_MAIN_BASEMAP_STYLE_URL,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
-  FALLBACK_BASEMAP_ATTRIBUTION,
-  FALLBACK_BASEMAP_STYLE_URL,
   MAP_WORKER_URL,
-  MAIN_BASEMAP_ATTRIBUTION,
+  MODERN_FALLBACK_BASEMAP_ATTRIBUTION,
+  MODERN_FALLBACK_BASEMAP_STYLE_URL,
+  MODERN_MAIN_BASEMAP_ATTRIBUTION,
+  MODERN_MAIN_BASEMAP_STYLE_URL,
   MAX_MAP_ZOOM,
-  MAIN_BASEMAP_STYLE_URL
 } from "./constants";
 import {
   openingAreaBounds,
@@ -65,7 +69,7 @@ import {
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
 import type { MapViewProps } from "./map-view.types";
-import type { Coordinates, PlaceIndexRecord, PlaceSelection } from "./types";
+import type { Coordinates, MapDisplayMode, PlaceIndexRecord, PlaceSelection } from "./types";
 
 setWorkerUrl(MAP_WORKER_URL);
 const configuredBasemapMode = resolveInitialBasemapMode(process.env.EXPO_PUBLIC_BASEMAP);
@@ -246,6 +250,19 @@ interface WebGlRendererInfo {
   isSoftwareRenderer: boolean;
 }
 
+function applyMapModeOverlayVisibility(map: MapLibreMap, mapMode: MapDisplayMode) {
+  const showAreaLabels = mapMode === "ancient";
+  for (const layerId of [
+    layerAreaLabelOverviewId,
+    layerAreaLabelId,
+    layerMajorAreaLabelOverviewId,
+    layerMajorAreaLabelId,
+    layerSelectedAreaLabelId
+  ]) {
+    setLayerVisibility(map, layerId, showAreaLabels);
+  }
+}
+
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
 
@@ -388,16 +405,24 @@ function createMajorClusterTopSideFilter(
   return expression;
 }
 
-function getStyleUrl(mode: BasemapMode) {
-  if (mode === "fallback") {
-    return FALLBACK_BASEMAP_STYLE_URL;
+function getStyleUrl(mode: BasemapMode, mapMode: MapDisplayMode) {
+  if (mapMode === "modern") {
+    return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_STYLE_URL : MODERN_MAIN_BASEMAP_STYLE_URL;
   }
 
-  return MAIN_BASEMAP_STYLE_URL;
+  if (mode === "fallback") {
+    return ANCIENT_FALLBACK_BASEMAP_STYLE_URL;
+  }
+
+  return ANCIENT_MAIN_BASEMAP_STYLE_URL;
 }
 
-function getAttributionMarkup(mode: BasemapMode) {
-  return mode === "fallback" ? FALLBACK_BASEMAP_ATTRIBUTION : MAIN_BASEMAP_ATTRIBUTION;
+function getAttributionMarkup(mode: BasemapMode, mapMode: MapDisplayMode) {
+  if (mapMode === "modern") {
+    return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
+  }
+
+  return mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
 }
 
 function prefersReducedMotion() {
@@ -1955,6 +1980,8 @@ export function MapView({
   leftPanelWidth,
   bottomPanelInset,
   isSmallScreen,
+  mapMode,
+  pinLabelSource,
   onSelectPlace
 }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1973,7 +2000,7 @@ export function MapView({
   const activeTooltipEntryIdRef = useRef<string | null>(null);
   const mapCanvasHasPointerCursorRef = useRef(false);
   const attributionControlRef = useRef<AttributionControl | null>(null);
-  const attributionModeRef = useRef<BasemapMode | null>(null);
+  const attributionModeRef = useRef<string | null>(null);
   const mainSourceLoadTimeoutRef = useRef<number | null>(null);
   const mainSourceLoadControllerRef = useRef(new MainSourceLoadTimeoutController());
   const mapKeyboardActiveRef = useRef(false);
@@ -1984,6 +2011,8 @@ export function MapView({
   const panelInsetRef = useRef(0);
   const bottomInsetRef = useRef(0);
   const selectionRef = useRef<PlaceSelection | null>(null);
+  const mapModeRef = useRef<MapDisplayMode>(mapMode);
+  const mapModeEffectInitializedRef = useRef(false);
   const majorPlaceByRankRef = useRef<Map<number, MajorPlaceReference>>(new Map());
   const majorClusterTooltipByEntryIdRef = useRef(new Map<string, string>());
   const activateVisibleEntryRef = useRef<(entry: VisibleListEntry) => void>(() => undefined);
@@ -2012,8 +2041,12 @@ export function MapView({
   const bottomInset = Math.max(0, bottomPanelInset);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(
-    () => buildPlaceRenderData(places, selection, highlightedPlaceId),
-    [highlightedPlaceId, places, selection]
+    () =>
+      buildPlaceRenderData(places, selection, highlightedPlaceId, {
+        includeAreaLabels: mapMode === "ancient",
+        pinLabelSource
+      }),
+    [highlightedPlaceId, mapMode, pinLabelSource, places, selection]
   );
   const majorPlaceByRank = useMemo(
     () => buildMajorPlaceReferenceByRank(renderData),
@@ -2040,6 +2073,10 @@ export function MapView({
   useEffect(() => {
     selectionRef.current = selection;
   }, [selection]);
+
+  useEffect(() => {
+    mapModeRef.current = mapMode;
+  }, [mapMode]);
 
   useEffect(() => {
     majorClusterTooltipByEntryIdRef.current.clear();
@@ -2414,8 +2451,9 @@ export function MapView({
     mainSourceLoadTimeoutRef.current = null;
   }, []);
 
-  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode) => {
-    if (attributionModeRef.current === mode && attributionControlRef.current) {
+  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode, nextMapMode: MapDisplayMode) => {
+    const attributionKey = `${mode}:${nextMapMode}`;
+    if (attributionModeRef.current === attributionKey && attributionControlRef.current) {
       return;
     }
 
@@ -2426,11 +2464,11 @@ export function MapView({
 
     const control = new AttributionControl({
       compact: true,
-      customAttribution: getAttributionMarkup(mode)
+      customAttribution: getAttributionMarkup(mode, nextMapMode)
     });
     map.addControl(control, "bottom-right");
     attributionControlRef.current = control;
-    attributionModeRef.current = mode;
+    attributionModeRef.current = attributionKey;
   }, []);
 
   const switchToFallback = useCallback(
@@ -2444,8 +2482,9 @@ export function MapView({
       clearMainSourceLoadTimeout();
       mainSourceLoadControllerRef.current.markLoaded();
       styleReadyRef.current = false;
-      syncAttributionControl(map, "fallback");
-      map.setStyle(getStyleUrl("fallback"));
+      const nextMapMode = mapModeRef.current;
+      syncAttributionControl(map, "fallback", nextMapMode);
+      map.setStyle(getStyleUrl("fallback", nextMapMode));
       return nextState;
     },
     [basemapController, clearMainSourceLoadTimeout, syncAttributionControl]
@@ -2501,7 +2540,7 @@ export function MapView({
     const effectivePixelRatioCap = resolveEffectivePixelRatioCap(effectiveRuntimeTuning, rendererInfo);
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
-      style: getStyleUrl(initialMode),
+      style: getStyleUrl(initialMode, mapModeRef.current),
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_MAP_ZOOM,
       minZoom: 3,
@@ -2535,7 +2574,7 @@ export function MapView({
     )[visibleEntryRefreshHookKey] = () => {
       refreshVisibleEntryStateRef.current();
     };
-    syncAttributionControl(map, initialMode);
+    syncAttributionControl(map, initialMode, mapModeRef.current);
 
     const cancelScheduledTooltipUpdate = () => {
       pendingTooltipPointRef.current = null;
@@ -2732,7 +2771,8 @@ export function MapView({
     const handleStyleReady = () => {
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
-      syncAttributionControl(map, currentMode);
+      const nextMapMode = mapModeRef.current;
+      syncAttributionControl(map, currentMode, nextMapMode);
       configureZoomGestures(map, effectiveRuntimeTuning);
       applyBasemapLayerVariants(map, currentMode, effectiveRuntimeTuning);
       if (currentMode === "main") {
@@ -2742,6 +2782,7 @@ export function MapView({
       }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayersRef.current();
+      applyMapModeOverlayVisibility(map, nextMapMode);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -2900,11 +2941,32 @@ export function MapView({
   ]);
 
   useEffect(() => {
+    if (!mapModeEffectInitializedRef.current) {
+      mapModeEffectInitializedRef.current = true;
+      return;
+    }
+
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    const basemapMode = basemapController.getState().mode;
+    styleReadyRef.current = false;
+    syncAttributionControl(map, basemapMode, mapMode);
+    map.setStyle(getStyleUrl(basemapMode, mapMode));
+  }, [basemapController, mapMode, syncAttributionControl]);
+
+  useEffect(() => {
     if (!styleReadyRef.current) {
       return;
     }
 
     syncSourcesAndLayers();
+    const map = mapRef.current;
+    if (map) {
+      applyMapModeOverlayVisibility(map, mapModeRef.current);
+    }
     refreshVisibleEntryState();
   }, [refreshVisibleEntryState, syncSourcesAndLayers]);
 

@@ -13,7 +13,12 @@ export {
   isDisputedPlace,
   isZoomTierVisible
 } from "./place-visibility";
-export { applySelectionToSearch, parseSelectionFromSearch } from "./selection-url";
+export {
+  applyMapModeToSearch,
+  applySelectionToSearch,
+  parseMapModeFromSearch,
+  parseSelectionFromSearch
+} from "./selection-url";
 export {
   BasemapFallbackController,
   resolveInitialBasemapMode,

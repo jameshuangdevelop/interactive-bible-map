@@ -117,9 +117,9 @@ async function setPanelSectionExpanded(page, sectionId, expanded) {
   );
 }
 
-async function verifyMapLoads(page, baseUrl) {
+async function verifyMapLoads(page, baseUrl, path = "") {
   // waitForMapToSettle waits for the real map-ready state.
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 90_000 });
+  await page.goto(`${baseUrl}${path}`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
 
   const snapshot = await page.evaluate(() => ({
@@ -132,12 +132,13 @@ async function verifyMapLoads(page, baseUrl) {
   return snapshot;
 }
 
-async function verifyCapernaumPanelAndImages(page, baseUrl) {
+async function verifyCapernaumPanelAndImages(page, baseUrl, mapQuery = "") {
   // waitForMapToSettle waits for the real map-ready state.
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 90_000 });
+  const queryPrefix = mapQuery.length > 0 ? `${mapQuery}&` : "?";
+  await page.goto(`${baseUrl}/${queryPrefix}place=capernaum`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   assert(
-    page.url().includes("?place=capernaum"),
+    page.url().includes("place=capernaum"),
     `Capernaum deep link did not resolve as expected, got '${page.url()}'.`
   );
   await page.getByRole("heading", { level: 1, name: "Capernaum" }).waitFor({ timeout: 45_000 });
@@ -336,7 +337,7 @@ async function verifyEmmausDisputedLayout(page, baseUrl) {
   await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await waitForMapToSettle(page);
   assert(
-    page.url().includes("?place=emmaus"),
+    page.url().includes("place=emmaus"),
     `Emmaus deep link did not resolve as expected, got '${page.url()}'.`
   );
   await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
@@ -384,7 +385,9 @@ async function run() {
         usingProvidedBaseUrl,
         viewport,
         mapLoad: await verifyMapLoads(page, baseUrl),
+        modernMapLoad: await verifyMapLoads(page, baseUrl, "/?map=modern"),
         capernaum: await verifyCapernaumPanelAndImages(page, baseUrl),
+        modernCapernaum: await verifyCapernaumPanelAndImages(page, baseUrl, "?map=modern"),
         antiochSearch: await verifyAntiochSearch(page, baseUrl),
         emmaus: await verifyEmmausDisputedLayout(page, baseUrl)
       };

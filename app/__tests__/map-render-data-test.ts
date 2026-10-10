@@ -267,6 +267,18 @@ describe("map render data", () => {
     });
   });
 
+  test("supports switching pin label source without changing render structure", () => {
+    const renderData = buildPlaceRenderData(fixtures, null, null, {
+      pinLabelSource: "modern"
+    });
+    const capernaumPin = renderData.clusteredCityPins.features.find(
+      (feature) => feature.properties.placeId === "capernaum"
+    );
+
+    expect(capernaumPin).toBeDefined();
+    expect(capernaumPin?.properties.labelText).toBe("Kfar Nahum");
+  });
+
   test("uses highlighted candidate icons for hovered multi-candidate places", () => {
     const renderData = buildPlaceRenderData(fixtures, null, "emmaus");
     const emmausCandidates = renderData.candidatePins.features.filter(

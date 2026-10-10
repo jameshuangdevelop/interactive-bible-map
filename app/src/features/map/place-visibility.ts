@@ -1,6 +1,13 @@
-import type { PlaceIndexRecord, PlaceType, ZoomTier } from "./types";
+import type { PinLabelSource, PlaceIndexRecord, PlaceType, ZoomTier } from "./types";
 
-export function getPrimaryPlaceName(place: PlaceIndexRecord) {
+export function getPrimaryPlaceName(
+  place: PlaceIndexRecord,
+  labelSource: PinLabelSource = "biblical"
+) {
+  if (labelSource === "modern") {
+    return place.names.modern ?? place.names.ancient[0] ?? place.id;
+  }
+
   return place.names.ancient[0] ?? place.names.modern ?? place.id;
 }
 
@@ -43,4 +50,3 @@ export function getSelectionZoomTarget(place: PlaceIndexRecord) {
 
   return 11;
 }
-

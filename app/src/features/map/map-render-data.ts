@@ -9,6 +9,7 @@ import {
 } from "./place-visibility";
 import type {
   Coordinates,
+  PinLabelSource,
   PlaceIndexRecord,
   PlaceProminence,
   PlaceSelection,
@@ -101,6 +102,11 @@ export interface PlaceRenderData {
   sitePins: FeatureCollection<Point, PinFeatureProperties>;
   candidatePins: FeatureCollection<Point, CandidateFeatureProperties>;
   areaLabels: FeatureCollection<Point, AreaFeatureProperties>;
+}
+
+interface BuildPlaceRenderDataOptions {
+  includeAreaLabels?: boolean;
+  pinLabelSource?: PinLabelSource;
 }
 
 export interface AreaLabelSpec {
@@ -479,7 +485,8 @@ export function candidateIconId(pinColor: string, candidateLetter: string, selec
 export function buildPlaceRenderData(
   places: PlaceIndexRecord[],
   selection: PlaceSelection | null,
-  highlightedPlaceId: string | null = null
+  highlightedPlaceId: string | null = null,
+  options: BuildPlaceRenderDataOptions = {}
 ): PlaceRenderData {
   // AppShell keeps places sorted by importance for search/list UX; render data reuses that order.
   const sortedPlaces = places;
@@ -490,16 +497,19 @@ export function buildPlaceRenderData(
   const candidatePins = emptyFeatureCollection<CandidateFeatureProperties>();
   const areaLabels = emptyFeatureCollection<AreaFeatureProperties>();
 
+  const includeAreaLabels = options.includeAreaLabels ?? true;
+  const pinLabelSource = options.pinLabelSource ?? "biblical";
+
   sortedPlaces.forEach((place, importanceRank) => {
     if (place.candidates.length === 0) {
       return;
     }
 
-    const placeName = getPrimaryPlaceName(place);
+    const placeName = getPrimaryPlaceName(place, pinLabelSource);
     const selectedPlace = selection?.placeId === place.id;
     const highlightedPlace = highlightedPlaceId === place.id;
 
-    if (isAreaLabelPlace(place)) {
+    if (includeAreaLabels && isAreaLabelPlace(place)) {
       areaLabels.features.push(
         toAreaFeature({
           place,

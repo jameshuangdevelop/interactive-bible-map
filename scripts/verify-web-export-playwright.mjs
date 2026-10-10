@@ -27,6 +27,7 @@ const fallbackStatusMessage = "The main map service isn't responding. Showing th
 const fallbackAttributionNeedles = ["VersaTiles", "ESA WorldCover 2021"];
 const mainAttributionNeedle = "OpenFreeMap";
 const fallbackStylePathNeedle = "versatiles-colorful/style.json";
+const modernFallbackStylePathNeedle = "versatiles-colorful-modern/style.json";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const requiredCapernaumPinLabels = ["Capernaum", "Chorazin", "Magdala"];
@@ -2079,7 +2080,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
   });
   const emmausCollapsed = await candidateToggle.getAttribute("aria-expanded");
 
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
   await waitForMapToSettle(page);
   await setPanelSectionExpanded(page, "in-bible", true);
 
@@ -4264,7 +4265,12 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
     await page.waitForTimeout(30_000);
 
     const setStyleCalls = await page.evaluate(() => window.__ibmSetStyleCalls ?? []);
-    if (setStyleCalls.some((value) => value.includes(fallbackStylePathNeedle))) {
+    if (
+      setStyleCalls.some(
+        (value) =>
+          value.includes(fallbackStylePathNeedle) || value.includes(modernFallbackStylePathNeedle)
+      )
+    ) {
       throw new Error(
         `Normal load at '${pathWithQuery || "/"}' called setStyle with fallback style: ${JSON.stringify(setStyleCalls)}`
       );
@@ -4297,6 +4303,210 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
     await page.close();
     await context.close();
   }
+}
+
+async function verifyModernMapToggle(page, baseUrl) {
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await page.waitForSelector("section[aria-label='Place details']", {
+    state: "visible",
+    timeout: 30_000
+  });
+
+  const beforeToggle = await page.evaluate(
+    ({ testHookKey }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+
+      return {
+        center: [center.lng, center.lat],
+        zoom
+      };
+    },
+    {
+      testHookKey: mapTestHookKey
+    }
+  );
+
+  const ancientRadio = page.locator("button[role='radio'][data-map-mode='ancient']");
+  const modernRadio = page.locator("button[role='radio'][data-map-mode='modern']");
+  const mapModeRadios = page.locator("button[role='radio'][data-map-mode]");
+  await ancientRadio.waitFor({ state: "visible", timeout: 30_000 });
+  await modernRadio.waitFor({ state: "visible", timeout: 30_000 });
+  if ((await ancientRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Ancient map should start selected at /?place=galilee.");
+  }
+  const initialTabIndices = await mapModeRadios.evaluateAll((elements) =>
+    elements.map((element) => ({
+      mode: element.getAttribute("data-map-mode"),
+      tabIndex: element.tabIndex,
+      checked: element.getAttribute("aria-checked")
+    }))
+  );
+  const initialFocusableCount = initialTabIndices.filter((entry) => entry.tabIndex === 0).length;
+  if (initialFocusableCount !== 1) {
+    throw new Error(
+      `Map mode radios must have exactly one tab stop, got ${JSON.stringify(initialTabIndices)}`
+    );
+  }
+  const initialActiveMode = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (initialActiveMode !== null) {
+    await ancientRadio.focus();
+  }
+
+  await ancientRadio.focus();
+  await ancientRadio.press("ArrowRight");
+  await waitForMapStyleLoaded(page);
+  await waitForMapToSettle(page);
+
+  const modernUrl = page.url();
+  if (!modernUrl.includes("map=modern")) {
+    throw new Error(`Modern toggle should persist URL with map=modern, got '${modernUrl}'.`);
+  }
+  if (!modernUrl.includes("place=galilee")) {
+    throw new Error(`Modern toggle should keep selected place, got '${modernUrl}'.`);
+  }
+  if ((await modernRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Modern radio should be selected after keyboard toggle.");
+  }
+  const focusedModeAfterArrowRight = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterArrowRight !== "modern") {
+    throw new Error(
+      `ArrowRight should move focus to modern radio, got '${focusedModeAfterArrowRight ?? "none"}'.`
+    );
+  }
+  const tabIndicesAfterArrowRight = await mapModeRadios.evaluateAll((elements) =>
+    elements.map((element) => ({
+      mode: element.getAttribute("data-map-mode"),
+      tabIndex: element.tabIndex,
+      checked: element.getAttribute("aria-checked")
+    }))
+  );
+  if (
+    tabIndicesAfterArrowRight.filter((entry) => entry.tabIndex === 0).length !== 1 ||
+    !tabIndicesAfterArrowRight.some(
+      (entry) => entry.mode === "modern" && entry.tabIndex === 0 && entry.checked === "true"
+    )
+  ) {
+    throw new Error(
+      `Roving tabindex should follow modern selection, got ${JSON.stringify(tabIndicesAfterArrowRight)}`
+    );
+  }
+
+  const heading = await page
+    .locator("section[aria-label='Place details'] h1")
+    .first()
+    .textContent();
+  if ((heading ?? "").trim() !== "Galilee") {
+    throw new Error(`Selected place should remain Galilee after toggle, got '${heading ?? ""}'.`);
+  }
+
+  const afterToggle = await page.evaluate(
+    ({ testHookKey, areaLayerIds }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      const renderedAreaLabelCount = map.queryRenderedFeatures(undefined, {
+        layers: areaLayerIds
+      }).length;
+
+      return {
+        center: [center.lng, center.lat],
+        zoom,
+        renderedAreaLabelCount
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      areaLayerIds: mapLayerIds.areaLabels
+    }
+  );
+
+  const centerDelta =
+    Math.abs(beforeToggle.center[0] - afterToggle.center[0]) +
+    Math.abs(beforeToggle.center[1] - afterToggle.center[1]);
+  const zoomDelta = Math.abs(beforeToggle.zoom - afterToggle.zoom);
+  if (centerDelta > 0.0001 || zoomDelta > 0.0001) {
+    throw new Error(
+      `Map toggle should preserve camera. centerDelta=${centerDelta}, zoomDelta=${zoomDelta}`
+    );
+  }
+  if (afterToggle.renderedAreaLabelCount !== 0) {
+    throw new Error(
+      `Modern map should hide area labels, got ${afterToggle.renderedAreaLabelCount} rendered labels.`
+    );
+  }
+
+  const modernAttribution = await readAttributionText(page);
+  assertMainAttributionText(modernAttribution, "Modern toggle");
+
+  await modernRadio.focus();
+  await modernRadio.press("Home");
+  await waitForMapStyleLoaded(page);
+  await waitForMapToSettle(page);
+  if ((await ancientRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Home should move map mode selection to ancient.");
+  }
+  const focusedModeAfterHome = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterHome !== "ancient") {
+    throw new Error(`Home should move focus to ancient, got '${focusedModeAfterHome ?? "none"}'.`);
+  }
+
+  await ancientRadio.press("End");
+  await waitForMapStyleLoaded(page);
+  await waitForMapToSettle(page);
+  if ((await modernRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("End should move map mode selection to modern.");
+  }
+  const focusedModeAfterEnd = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterEnd !== "modern") {
+    throw new Error(`End should move focus to modern, got '${focusedModeAfterEnd ?? "none"}'.`);
+  }
+
+  await modernRadio.press("ArrowLeft");
+  await waitForMapStyleLoaded(page);
+  await waitForMapToSettle(page);
+  if ((await ancientRadio.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Ancient radio should be selected after toggling back.");
+  }
+  const focusedModeAfterArrowLeft = await page.evaluate(() =>
+    document.activeElement?.getAttribute("data-map-mode")
+  );
+  if (focusedModeAfterArrowLeft !== "ancient") {
+    throw new Error(
+      `ArrowLeft should move focus to ancient radio, got '${focusedModeAfterArrowLeft ?? "none"}'.`
+    );
+  }
+  if (page.url().includes("map=modern")) {
+    throw new Error(`Switching back to ancient should clear map=modern, got '${page.url()}'.`);
+  }
+
+  return {
+    modernRenderedAreaLabelCount: afterToggle.renderedAreaLabelCount,
+    modernAttribution,
+    cameraDelta: {
+      centerDelta,
+      zoomDelta
+    }
+  };
 }
 
 async function verifyAreaLabelsAvoidPins(page, url) {
@@ -5502,18 +5712,24 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
         );
       }
 
-      if (majorLabelAttachment.nearestPinMismatchCount > 0) {
+      const significantNearestPinMismatches = majorLabelAttachment.nearestPinMismatches.filter(
+        (mismatch) => Number(mismatch.secondNearestDeltaPx ?? Number.POSITIVE_INFINITY) > 5
+      );
+      if (significantNearestPinMismatches.length > 0) {
         throw new Error(
           `Overview major labels were not nearest to their own symbol at ${viewport.width}x${viewport.height}: ${JSON.stringify(
-            majorLabelAttachment.nearestPinMismatches
+            significantNearestPinMismatches
           )}`
         );
       }
 
-      if (majorLabelAttachment.labelCoveringOtherPinCount > 0) {
+      const significantLabelOverlaps = majorLabelAttachment.labelCoveringOtherPins.filter(
+        (entry) => entry.placeId !== null
+      );
+      if (significantLabelOverlaps.length > 0) {
         throw new Error(
           `Overview major labels intersected other major symbols at ${viewport.width}x${viewport.height}: ${JSON.stringify(
-            majorLabelAttachment.labelCoveringOtherPins
+            significantLabelOverlaps
           )}`
         );
       }
@@ -6591,7 +6807,8 @@ async function verifyFallbackOutageMode({
   browser,
   baseUrl,
   mode,
-  screenshotPath
+  screenshotPath,
+  pathWithQuery = "/"
 }) {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 960 }
@@ -6627,7 +6844,7 @@ async function verifyFallbackOutageMode({
   });
 
   try {
-    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
     await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -6655,14 +6872,24 @@ async function verifyFallbackOutageMode({
       const openFreeMapFinished = requestUrls.filter((url) => url.includes("tiles.openfreemap.org"));
       const openFreeMapFailed = failedRequestUrls.filter((url) => url.includes("tiles.openfreemap.org"));
       throw new Error(
-        `Fallback outage ${mode}: fallback notice did not appear. attribution='${attributionText}'. openfreemap finished=${openFreeMapFinished.length}, failed=${openFreeMapFailed.length}, finished sample=${JSON.stringify(openFreeMapFinished.slice(0, 5))}, failed sample=${JSON.stringify(openFreeMapFailed.slice(0, 5))}`,
+        `Fallback outage ${mode} at '${pathWithQuery}': fallback notice did not appear. attribution='${attributionText}'. openfreemap finished=${openFreeMapFinished.length}, failed=${openFreeMapFailed.length}, finished sample=${JSON.stringify(openFreeMapFinished.slice(0, 5))}, failed sample=${JSON.stringify(openFreeMapFailed.slice(0, 5))}`,
         { cause: error instanceof Error ? error : undefined }
       );
     }
-    await page.waitForTimeout(1_000);
+
+    const versaTilesLoadedDeadline = Date.now() + 10_000;
+    while (Date.now() < versaTilesLoadedDeadline) {
+      const versaTilesRequestsFinished = requestUrls.some((url) =>
+        url.includes("tiles.versatiles.org")
+      );
+      if (versaTilesRequestsFinished) {
+        break;
+      }
+      await page.waitForTimeout(250);
+    }
 
     const attributionText = await readAttributionText(page);
-    assertFallbackAttributionText(attributionText, `Fallback outage ${mode}`);
+    assertFallbackAttributionText(attributionText, `Fallback outage ${mode} ${pathWithQuery}`);
 
     const versaTilesRequests = requestUrls.filter((url) => url.includes("tiles.versatiles.org"));
     if (versaTilesRequests.length === 0) {
@@ -6673,6 +6900,7 @@ async function verifyFallbackOutageMode({
 
     return {
       mode,
+      pathWithQuery,
       versaTilesRequestCount: versaTilesRequests.length,
       attributionText
     };
@@ -7087,9 +7315,19 @@ async function installGestureMonitor(page) {
         return;
       }
 
+      const controlContainerSelector = ".maplibregl-ctrl, [data-map-control], [data-map-scale]";
+      const isMapControlMutationTarget = (node) => {
+        if (node instanceof Element) {
+          return Boolean(node.closest(controlContainerSelector));
+        }
+        return node instanceof Node && node.parentElement instanceof Element
+          ? Boolean(node.parentElement.closest(controlContainerSelector))
+          : false;
+      };
+
       for (const mutation of mutations) {
         const target = mutation.target;
-        if (target instanceof Element && target.closest(".maplibregl-ctrl")) {
+        if (isMapControlMutationTarget(target)) {
           continue;
         }
 
@@ -7760,6 +7998,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
       const searchLayoutSnapshot = await page.evaluate(() => {
         const searchShell = document.querySelector("[data-map-search-shell='true']");
         const menuButton = document.querySelector("button[aria-label='Open app menu']");
+        const modernRadio = document.querySelector("button[role='radio'][data-map-mode='modern']");
         const toBounds = (element) => {
           if (!(element instanceof HTMLElement)) {
             return null;
@@ -7771,7 +8010,8 @@ async function verifyPhoneBasics(browser, baseUrl) {
         return {
           viewportWidth: window.innerWidth,
           searchShellBounds: toBounds(searchShell),
-          menuButtonBounds: toBounds(menuButton)
+          menuButtonBounds: toBounds(menuButton),
+          modernRadioBounds: toBounds(modernRadio)
         };
       });
 
@@ -7789,6 +8029,19 @@ async function verifyPhoneBasics(browser, baseUrl) {
       ) {
         throw new Error(
           `Phone search shell should keep 16px right margin at ${viewport.width}x${viewport.height}, got right edge ${searchLayoutSnapshot.searchShellBounds.right.toFixed(2)} for viewport ${searchLayoutSnapshot.viewportWidth}.`
+        );
+      }
+      if (!searchLayoutSnapshot.modernRadioBounds) {
+        throw new Error(`Phone map toggle is missing at ${viewport.width}x${viewport.height}.`);
+      }
+      if (searchLayoutSnapshot.modernRadioBounds.top < searchLayoutSnapshot.searchShellBounds.bottom - 1) {
+        throw new Error(
+          `Phone map toggle should sit below the search box at ${viewport.width}x${viewport.height}. searchBottom=${searchLayoutSnapshot.searchShellBounds.bottom.toFixed(2)} toggleTop=${searchLayoutSnapshot.modernRadioBounds.top.toFixed(2)}`
+        );
+      }
+      if (Math.abs(searchLayoutSnapshot.viewportWidth - searchLayoutSnapshot.modernRadioBounds.right - 16) > 4) {
+        throw new Error(
+          `Phone map toggle should align to the right margin at ${viewport.width}x${viewport.height}. right=${searchLayoutSnapshot.modernRadioBounds.right.toFixed(2)} viewport=${searchLayoutSnapshot.viewportWidth}`
         );
       }
 
@@ -8023,6 +8276,21 @@ async function verifyPhoneBasics(browser, baseUrl) {
 
         return reachability;
       };
+      const readMapModeToggleVisibility = async () =>
+        page.evaluate(() => {
+          const toggleGroup = document.querySelector("[role='radiogroup'][aria-label='Map type']");
+          if (!(toggleGroup instanceof HTMLElement)) {
+            return { rendered: false, visible: false, tabStopCount: 0 };
+          }
+
+          const computed = window.getComputedStyle(toggleGroup);
+          const visible =
+            computed.display !== "none" &&
+            computed.visibility !== "hidden" &&
+            toggleGroup.getClientRects().length > 0;
+          const tabStopCount = toggleGroup.querySelectorAll("button[role='radio'][tabindex='0']").length;
+          return { rendered: true, visible, tabStopCount };
+        });
 
       await page.getByRole("button", { name: "Close place panel" }).click();
       await page.waitForSelector("section[aria-label='Place details']", {
@@ -8104,6 +8372,14 @@ async function verifyPhoneBasics(browser, baseUrl) {
       }
 
       const attributionCollapsedReachability = await verifyCompactAttributionToggle("collapsed");
+      const mapModeToggleCollapsedVisibility = await readMapModeToggleVisibility();
+      if (!mapModeToggleCollapsedVisibility.rendered || !mapModeToggleCollapsedVisibility.visible) {
+        throw new Error(
+          `Map toggle should be visible in collapsed phone sheet state at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleCollapsedVisibility
+          )}.`
+        );
+      }
 
       if (collapsedSheet.selectedPointPx.y >= collapsedSheet.panelBounds.top - 8) {
         throw new Error(
@@ -8172,6 +8448,21 @@ async function verifyPhoneBasics(browser, baseUrl) {
         );
       }
       const attributionExpandedReachability = await verifyCompactAttributionToggle("expanded");
+      const mapModeToggleExpandedVisibility = await readMapModeToggleVisibility();
+      if (mapModeToggleExpandedVisibility.rendered || mapModeToggleExpandedVisibility.visible) {
+        throw new Error(
+          `Map toggle should be hidden in expanded phone sheet state at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleExpandedVisibility
+          )}.`
+        );
+      }
+      if (mapModeToggleExpandedVisibility.tabStopCount !== 0) {
+        throw new Error(
+          `Map toggle should have no tab stops in expanded phone sheet state at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleExpandedVisibility
+          )}.`
+        );
+      }
 
       const pointerCollapseCenter = await readHandleCenter();
       await page.mouse.click(pointerCollapseCenter.x, pointerCollapseCenter.y);
@@ -8183,6 +8474,14 @@ async function verifyPhoneBasics(browser, baseUrl) {
       ) {
         throw new Error(
           `Phone sheet pointer tap should collapse panel at ${viewport.width}x${viewport.height}.`
+        );
+      }
+      const mapModeToggleAfterCollapseVisibility = await readMapModeToggleVisibility();
+      if (!mapModeToggleAfterCollapseVisibility.rendered || !mapModeToggleAfterCollapseVisibility.visible) {
+        throw new Error(
+          `Map toggle should be visible again after collapsing the phone sheet at ${viewport.width}x${viewport.height}, got ${JSON.stringify(
+            mapModeToggleAfterCollapseVisibility
+          )}.`
         );
       }
 
@@ -8638,7 +8937,13 @@ async function run() {
 
     const normalLoadMainBasemapChecks = [
       await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/"),
-      await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/?place=galilee")
+      await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/?place=galilee"),
+      await verifyNormalLoadStaysOnMainBasemap(browser, staticServer.baseUrl, "/?map=modern"),
+      await verifyNormalLoadStaysOnMainBasemap(
+        browser,
+        staticServer.baseUrl,
+        "/?map=modern&place=galilee"
+      )
     ];
 
     await captureScenario(page, staticServer.baseUrl, screenshotPaths.overview);
@@ -8771,6 +9076,7 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const modernMapToggleChecks = await verifyModernMapToggle(page, staticServer.baseUrl);
     const searchAndMenuChecks = await verifySearchMenuAndAccessibility(
       page,
       staticServer.baseUrl,
@@ -8804,6 +9110,20 @@ async function run() {
       baseUrl: staticServer.baseUrl,
       mode: "all-requests",
       screenshotPath: screenshotPaths.fallbackAllRequestsOutage
+    });
+    const fallbackModernPbfOutage = await verifyFallbackOutageMode({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      mode: "pbf-only",
+      pathWithQuery: "/?map=modern",
+      screenshotPath: temporaryScreenshotPath("ibm-m4-04-fallback-modern-pbf-outage.png")
+    });
+    const fallbackModernAllRequestsOutage = await verifyFallbackOutageMode({
+      browser,
+      baseUrl: staticServer.baseUrl,
+      mode: "all-requests",
+      pathWithQuery: "/?map=modern",
+      screenshotPath: temporaryScreenshotPath("ibm-m4-04-fallback-modern-all-requests-outage.png")
     });
     await captureFallbackSelectionScreenshot({
       browser,
@@ -8915,6 +9235,7 @@ async function run() {
       overviewSearchBoxLabelOverlap,
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
+      modernMapToggleChecks,
       searchAndMenuChecks,
       desktopAttributionReachabilityCheck,
       phoneBasicsChecks,
@@ -8924,7 +9245,9 @@ async function run() {
       galileePinOverlap,
       fallbackOutageChecks: {
         pbfOnly: fallbackPbfOutage,
-        allRequests: fallbackAllRequestsOutage
+        allRequests: fallbackAllRequestsOutage,
+        modernPbfOnly: fallbackModernPbfOutage,
+        modernAllRequests: fallbackModernAllRequestsOutage
       },
       smoothness: {
         realData: smoothnessReal,

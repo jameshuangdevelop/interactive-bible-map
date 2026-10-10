@@ -1,4 +1,4 @@
-import type { PlaceSelection } from "./types";
+import type { MapDisplayMode, PlaceSelection } from "./types";
 
 export function candidateLetterToIndex(value: string | null) {
   if (!value) {
@@ -50,6 +50,23 @@ export function applySelectionToSearch(search: string, selection: PlaceSelection
         String.fromCharCode("a".charCodeAt(0) + selection.candidateIndex)
       );
     }
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}
+
+export function parseMapModeFromSearch(search: string): MapDisplayMode {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  return parameters.get("map")?.trim().toLowerCase() === "modern" ? "modern" : "ancient";
+}
+
+export function applyMapModeToSearch(search: string, mapMode: MapDisplayMode) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (mapMode === "modern") {
+    parameters.set("map", "modern");
+  } else {
+    parameters.delete("map");
   }
 
   const next = parameters.toString();
