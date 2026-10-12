@@ -2,7 +2,7 @@
 
 A Google-Maps-style interactive map of first-century New Testament locations, with the most detail for the Gospels and Acts. It is built for Bible study, written in a neutral and scholarly tone, and every fact is cited.
 
-**Status:** 57 verified core sites and a validated schema (CP2 approved). Now building the MVP app (milestone M3), starting with the visual spec.
+**Status:** the MVP is live at https://interactive-bible-map.pages.dev, with 89 verified places (CP3b approved). Now building the Modern↔Ancient toggle, the ancient borders and roads, and the first-century timeline (milestone M4).
 
 ## How this project is run
 A team of GitHub Copilot custom agents ([.github/agents/](.github/agents/)) does the work, coordinated by a Project Owner agent. A human owner approves each checkpoint and merges every PR. The full brief is [AGENT_TEAM_PROMPT.md](AGENT_TEAM_PROMPT.md).
