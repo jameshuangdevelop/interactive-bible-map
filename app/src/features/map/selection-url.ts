@@ -1,5 +1,7 @@
 import type { MapDisplayMode, PlaceSelection } from "./types";
 
+export type ViewTab = "map" | "routes";
+
 export function candidateLetterToIndex(value: string | null) {
   if (!value) {
     return null;
@@ -94,6 +96,71 @@ export function applyTimelineYearToSearch(search: string, year: number | null) {
     parameters.delete("year");
   } else {
     parameters.set("year", String(Math.trunc(year)));
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}
+
+export function parseViewTabFromSearch(search: string): ViewTab {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  return parameters.get("tab")?.trim().toLowerCase() === "routes" ? "routes" : "map";
+}
+
+export function applyViewTabToSearch(search: string, tab: ViewTab) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (tab === "routes") {
+    parameters.set("tab", "routes");
+  } else {
+    parameters.delete("tab");
+    parameters.delete("route");
+    parameters.delete("stage");
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}
+
+export function parseRouteIdFromSearch(search: string) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const value = parameters.get("route")?.trim();
+  return value && value.length > 0 ? value : null;
+}
+
+export function applyRouteIdToSearch(search: string, routeId: string | null) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (!routeId) {
+    parameters.delete("route");
+    parameters.delete("stage");
+  } else {
+    parameters.set("route", routeId);
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}
+
+export function parseRouteStageFromSearch(search: string) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const value = parameters.get("stage")?.trim();
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function applyRouteStageToSearch(search: string, stage: number | null) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (stage === null || !Number.isFinite(stage) || stage <= 0) {
+    parameters.delete("stage");
+  } else {
+    parameters.set("stage", String(Math.trunc(stage)));
   }
 
   const next = parameters.toString();

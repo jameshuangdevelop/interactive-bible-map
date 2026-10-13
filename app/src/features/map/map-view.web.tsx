@@ -102,6 +102,8 @@ const sourceAncientEmpireEdgeId = "ibm-ancient-empire-edge";
 const sourceAncientRoadsId = "ibm-ancient-roads";
 const sourceAncientCoastlineId = "ibm-ancient-coastline";
 const sourceAncientHolderLabelsId = "ibm-ancient-holder-labels";
+const sourceRoutesLinesId = "ibm-route-lines";
+const sourceRoutesPointsId = "ibm-route-points";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
@@ -143,6 +145,13 @@ const layerAncientCoastlineLabelId = "ibm-ancient-coastline-label";
 const layerAncientHolderLabelId = "ibm-ancient-holder-label";
 const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
 const layerAncientHolderLabelClickTargetId = "ibm-ancient-holder-label-click-target";
+const layerRoutesLinesBackgroundId = "ibm-routes-lines-background";
+const layerRoutesLinesForegroundId = "ibm-routes-lines-foreground";
+const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
+const layerRoutesLinesUnknownId = "ibm-routes-lines-unknown";
+const layerRoutesStopsId = "ibm-routes-stops";
+const layerRoutesStopLabelsId = "ibm-routes-stop-labels";
+const layerRoutesViaId = "ibm-routes-via";
 
 const questionBadgeImageId = "ibm-question-badge-image";
 const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
@@ -203,7 +212,10 @@ const interactiveLayerIds = [
   layerAreaLabelId,
   layerSelectedAreaLabelId,
   layerAncientHolderLabelClickableId,
-  layerAncientHolderLabelClickTargetId
+  layerAncientHolderLabelClickTargetId,
+  layerRoutesStopsId,
+  layerRoutesViaId,
+  layerRoutesLinesHighlightId
 ] as const;
 
 const candidateVisibilityFilter = [
@@ -296,7 +308,8 @@ interface WebGlRendererInfo {
 function applyMapModeOverlayVisibility(
   map: MapLibreMap,
   mapMode: MapDisplayMode,
-  ancientLayerEnabled: boolean
+  ancientLayerEnabled: boolean,
+  routesModeEnabled: boolean
 ) {
   const showAreaLabels = mapMode === "ancient";
   for (const layerId of [
@@ -325,6 +338,52 @@ function applyMapModeOverlayVisibility(
     layerAncientHolderLabelClickTargetId
   ]) {
     setLayerVisibility(map, layerId, showAncientLayer);
+  }
+
+  const showRouteLayers = routesModeEnabled;
+  for (const layerId of [
+    layerRoutesLinesBackgroundId,
+    layerRoutesLinesForegroundId,
+    layerRoutesLinesHighlightId,
+    layerRoutesLinesUnknownId,
+    layerRoutesStopsId,
+    layerRoutesStopLabelsId,
+    layerRoutesViaId
+  ]) {
+    setLayerVisibility(map, layerId, showRouteLayers);
+  }
+
+  const showPlaceLayers = !routesModeEnabled;
+  for (const layerId of [
+    layerMajorClusterCircleId,
+    layerMajorClusterLabelId,
+    layerMajorClusterLabelLeftId,
+    layerMajorPinShadowId,
+    layerMajorPinId,
+    layerMajorQuestionBadgeId,
+    layerMajorClusterCollisionMaskId,
+    layerMajorPinCollisionMaskId,
+    layerMajorPinLabelId,
+    layerMajorPinLabelLeftId,
+    layerMajorAreaLabelOverviewId,
+    layerMajorAreaLabelId,
+    layerClusterCircleId,
+    layerCityPinShadowId,
+    layerCityPinId,
+    layerSitePinShadowId,
+    layerSitePinId,
+    layerQuestionBadgeId,
+    layerCandidatePinId,
+    layerSitePinCollisionMaskId,
+    layerCandidatePinCollisionMaskId,
+    layerPinLabelId,
+    layerSelectedMajorPinLabelId,
+    layerSelectedPinLabelId,
+    layerAreaLabelOverviewId,
+    layerAreaLabelId,
+    layerSelectedAreaLabelId
+  ]) {
+    setLayerVisibility(map, layerId, showPlaceLayers);
   }
 }
 
@@ -1514,6 +1573,152 @@ function ensureMapLayers(
     });
   }
 
+  if (!map.getLayer(layerRoutesLinesBackgroundId)) {
+    map.addLayer({
+      id: layerRoutesLinesBackgroundId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": [
+          "case",
+          ["==", ["get", "isInSelectedRoute"], true],
+          "#FFFFFF",
+          "rgba(95,99,104,0.3)"
+        ],
+        "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 7, 2.5]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesForegroundId)) {
+    map.addLayer({
+      id: layerRoutesLinesForegroundId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      filter: toLayerFilter([
+        "all",
+        ["!=", ["get", "isPathUnknown"], true],
+        ["!=", ["get", "isSelectedStage"], true]
+      ]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": [
+          "case",
+          ["==", ["get", "isInSelectedRoute"], true],
+          "#1A73E8",
+          "#9AA0A6"
+        ],
+        "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 5, 1.6],
+        "line-dasharray": [
+          "case",
+          ["==", ["get", "travelMode"], "sea"],
+          ["literal", [2, 2]],
+          ["literal", [1, 0]]
+        ],
+        "line-opacity": ["case", ["==", ["get", "isInSelectedRoute"], true], 1, 0.8]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesUnknownId)) {
+    map.addLayer({
+      id: layerRoutesLinesUnknownId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      filter: toLayerFilter(["==", ["get", "isPathUnknown"], true]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": "#1A73E8",
+        "line-width": 3,
+        "line-dasharray": [1, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesHighlightId)) {
+    map.addLayer({
+      id: layerRoutesLinesHighlightId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      filter: toLayerFilter([
+        "any",
+        ["==", ["get", "isSelectedStage"], true],
+        ["==", ["get", "isHighlightedStage"], true]
+      ]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": "#1A73E8",
+        "line-width": 6
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopsId)) {
+    map.addLayer({
+      id: layerRoutesStopsId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter(["==", ["get", "kind"], "stop"]),
+      paint: {
+        "circle-radius": 10,
+        "circle-color": "#FFFFFF",
+        "circle-stroke-color": "#1A73E8",
+        "circle-stroke-width": 2,
+        "circle-opacity": ["case", ["==", ["get", "isInSelectedRoute"], true], 1, 0.8]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesViaId)) {
+    map.addLayer({
+      id: layerRoutesViaId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter(["==", ["get", "kind"], "via"]),
+      paint: {
+        "circle-radius": 4,
+        "circle-color": "#1A73E8",
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": 1.2
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopLabelsId)) {
+    map.addLayer({
+      id: layerRoutesStopLabelsId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "kind"], "stop"]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-offset": [1, 0],
+        "text-anchor": "left",
+        "text-optional": true
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2
+      }
+    });
+  }
+
   if (!map.getLayer(layerClusterCircleId)) {
     map.addLayer({
       id: layerClusterCircleId,
@@ -2550,6 +2755,9 @@ export function MapView({
   selectedTimelineStopId,
   ancientTimeline,
   ancientLayerRetryToken,
+  routesOverlay,
+  routeKeyboardEntries,
+  onSelectRouteMapEntry,
   onAncientLayerLoadStateChange,
   pinLabelSource,
   onSelectPlace
@@ -2618,6 +2826,7 @@ export function MapView({
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
   const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
+  const routesModeEnabled = Boolean(routesOverlay);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
@@ -3052,6 +3261,12 @@ export function MapView({
       return;
     }
 
+    if (routesModeEnabled && routeKeyboardEntries.length > 0) {
+      setVisibleEntryOverflow(false);
+      setVisibleEntries([]);
+      return;
+    }
+
     const rendered = map.queryRenderedFeatures({
       layers: [...interactiveLayerIds]
     });
@@ -3060,12 +3275,32 @@ export function MapView({
         .map((feature) => toVisibleEntry(feature, majorPlaceByRankRef.current))
         .filter((entry): entry is VisibleListEntry => entry !== null)
     );
+    if (deduplicated.length === 0 && places.length > 0) {
+      const fallbackEntries: VisibleListEntry[] = places
+        .filter((place) => place.candidates.length > 0)
+        .slice(0, MAX_VISIBLE_PLACE_LIST_ENTRIES)
+        .map((place, index) => ({
+          id: `fallback:${place.id}:${index}`,
+          kind: "place",
+          coordinates: place.candidates[0].coordinates,
+          accessibleName: `${place.names.ancient[0] ?? place.id}, ${place.type}`,
+          tooltipText: `${place.names.ancient[0] ?? place.id}, ${place.type}`,
+          selection: {
+            placeId: place.id,
+            candidateIndex: null
+          },
+          interactionRank: 1
+        }));
+      setVisibleEntryOverflow(places.length > MAX_VISIBLE_PLACE_LIST_ENTRIES);
+      setVisibleEntries(fallbackEntries);
+      return;
+    }
     deduplicated.sort((left, right) => compareByReadingOrder(map, left, right));
 
     const overflow = deduplicated.length > MAX_VISIBLE_PLACE_LIST_ENTRIES;
     setVisibleEntryOverflow(overflow);
     setVisibleEntries(deduplicated.slice(0, MAX_VISIBLE_PLACE_LIST_ENTRIES));
-  }, []);
+  }, [places, routeKeyboardEntries, routesModeEnabled]);
 
   const scheduleVisibleEntryRefresh = useCallback(() => {
     if (gestureInProgressRef.current) {
@@ -3115,6 +3350,16 @@ export function MapView({
     ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
     ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
     ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
+    ensureGeoJsonSource(
+      map,
+      sourceRoutesLinesId,
+      routesOverlay?.lines ?? createEmptyFeatureCollection()
+    );
+    ensureGeoJsonSource(
+      map,
+      sourceRoutesPointsId,
+      routesOverlay?.points ?? createEmptyFeatureCollection()
+    );
 
     ensureQuestionBadgeImage(map);
     ensureCandidateImages(map, effectiveRenderData);
@@ -3127,7 +3372,8 @@ export function MapView({
     ancientHolderLabelFeatures,
     ancientRoads,
     majorPlaceByRank,
-    effectiveRenderData
+    effectiveRenderData,
+    routesOverlay
   ]);
 
   const resolveMajorClusterTooltipText = useCallback(
@@ -3724,7 +3970,7 @@ export function MapView({
       }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayersRef.current();
-      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline);
+      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline, routesModeEnabled);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -3755,6 +4001,57 @@ export function MapView({
     };
 
     const handleMapClick = (event: { point: PointLike }) => {
+      if (routesModeEnabled) {
+        const routeFeatures = map.queryRenderedFeatures(event.point, {
+          layers: [layerRoutesStopsId, layerRoutesViaId, layerRoutesLinesHighlightId, layerRoutesLinesForegroundId]
+        });
+        const routeMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStopsId || feature.layer?.id === layerRoutesViaId);
+        if (routeMatch) {
+          const properties = asObject(routeMatch.properties);
+          const routeId = asString(properties?.routeId);
+          const stageId = asString(properties?.stageId);
+          const stageIndex = asNumber(properties?.stageIndex);
+          const stopId = asString(properties?.stopId);
+          const stopKind = asString(properties?.stopKind);
+          if (
+            routeId &&
+            stageId &&
+            stageIndex !== null &&
+            stopId &&
+            (stopKind === "location" || stopKind === "route-stop")
+          ) {
+            onSelectRouteMapEntry({
+              kind: "stop",
+              routeId,
+              stageId,
+              stageIndex,
+              stopKind,
+              stopId
+            });
+            return;
+          }
+        }
+
+        const lineMatch = routeFeatures.find((feature) =>
+          feature.layer?.id === layerRoutesLinesHighlightId || feature.layer?.id === layerRoutesLinesForegroundId
+        );
+        if (lineMatch) {
+          const properties = asObject(lineMatch.properties);
+          const routeId = asString(properties?.routeId);
+          const stageId = asString(properties?.stageId);
+          const stageIndex = asNumber(properties?.stageIndex);
+          if (routeId && stageId && stageIndex !== null) {
+            onSelectRouteMapEntry({
+              kind: "line",
+              routeId,
+              stageId,
+              stageIndex
+            });
+            return;
+          }
+        }
+      }
+
       const entry = resolveInteractiveEntryAtPoint(event.point);
       if (!entry) {
         return;
@@ -3879,7 +4176,9 @@ export function MapView({
     setInteractiveCursor,
     switchToFallback,
     syncAttributionControl,
+    onSelectRouteMapEntry,
     isSmallScreen,
+    routesModeEnabled,
     runtimeTuning
   ]);
 
@@ -3908,10 +4207,10 @@ export function MapView({
     syncSourcesAndLayers();
     const map = mapRef.current;
     if (map) {
-      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline);
+      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline, routesModeEnabled);
     }
     refreshVisibleEntryState();
-  }, [hasAncientTimeline, refreshVisibleEntryState, syncSourcesAndLayers]);
+  }, [hasAncientTimeline, refreshVisibleEntryState, routesModeEnabled, syncSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBar();
@@ -3962,6 +4261,29 @@ export function MapView({
     runtimeTuning.flyToDurationMs,
     selection
   ]);
+
+  useEffect(() => {
+    if (!routesOverlay?.focusKey || !routesOverlay.bounds) {
+      return;
+    }
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+    const [southWest, northEast] = routesOverlay.bounds;
+    const bounds = new LngLatBounds(southWest, northEast);
+    map.fitBounds(bounds, {
+      padding: resolveMapFitPadding({
+        leftInset: panelInset,
+        bottomInset,
+        top: focusPaddingTop,
+        side: 64,
+        bottom: 64
+      }),
+      maxZoom: 8.5,
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
+    });
+  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs]);
 
   const resetView = useCallback(() => {
     const map = mapRef.current;
@@ -4035,9 +4357,44 @@ export function MapView({
         border: 0
       }}
     >
-      {visibleEntries.map((entry) => (
-        <button
-          key={entry.id}
+        {routesModeEnabled
+          ? routeKeyboardEntries.map((entry) => (
+              <button
+                key={entry.id}
+                aria-label={entry.label}
+                data-place-entry-id={entry.id}
+                onClick={() => {
+                  onSelectRouteMapEntry({
+                    kind: "stop",
+                    routeId: entry.routeId,
+                    stageId: entry.stageId,
+                    stageIndex: entry.stageIndex,
+                    stopKind: entry.stopKind,
+                    stopId: entry.stopId
+                  });
+                }}
+                onFocus={() => {
+                  const map = mapRef.current;
+                  if (!map) {
+                    return;
+                  }
+                  updateKeyboardFocusRing(map, entry.coordinates, 13);
+                  panPointOutFromPanel(
+                    map,
+                    entry.coordinates,
+                    panelInset,
+                    runtimeTuning.controlZoomDurationMs
+                  );
+                }}
+                type="button"
+              >
+                {entry.label}
+              </button>
+            ))
+          : null}
+        {!routesModeEnabled ? visibleEntries.map((entry) => (
+          <button
+            key={entry.id}
           aria-label={entry.accessibleName}
           data-place-entry-id={entry.id}
           onClick={() => activateVisibleEntry(entry)}
@@ -4046,8 +4403,8 @@ export function MapView({
         >
           {entry.accessibleName}
         </button>
-      ))}
-      {visibleEntryOverflow ? (
+      )) : null}
+      {!routesModeEnabled && visibleEntryOverflow ? (
         <p role="note">Zoom in or search to reach more places</p>
       ) : null}
     </div>

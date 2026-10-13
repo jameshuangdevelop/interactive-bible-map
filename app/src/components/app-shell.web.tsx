@@ -16,10 +16,16 @@ import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
 import {
+  applyRouteIdToSearch,
+  applyRouteStageToSearch,
+  applyViewTabToSearch,
   applyMapModeToSearch,
   applyTimelineYearToSearch,
   applySelectionToSearch,
+  parseRouteIdFromSearch,
+  parseRouteStageFromSearch,
   parseMapModeFromSearch,
+  parseViewTabFromSearch,
   parseTimelineYearFromSearch,
   parseSelectionFromSearch
 } from "../features/map/selection-url";
@@ -32,6 +38,9 @@ import type {
   PlaceIndexRecord,
   PlaceSelection
 } from "../features/map/types";
+import { loadRoutesData, resolveRouteStop, routeLineFeatureByStage, stageHasDisputedStop } from "../features/routes/routes-data";
+import type { LoadedRoutesData } from "../features/routes/types";
+import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { tokens } from "../theme/tokens";
 
 const PANEL_WIDTH = 408;
@@ -46,8 +55,10 @@ const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.53;
 const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
+const VIEW_TABS_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const MAP_MODE_ORDER: readonly MapDisplayMode[] = ["ancient", "modern"];
+const VIEW_TAB_ORDER = ["map", "routes"] as const;
 const TIMELINE_DEFAULT_YEAR = 50;
 const TIMELINE_TRACK_THICKNESS_PX = 2;
 const TIMELINE_TRACK_THUMB_DIAMETER_PX = 20;
@@ -110,7 +121,29 @@ function writeSelectionToUrl(selection: PlaceSelection | null, mode: "replace" |
       window.history.pushState({}, "", nextUrl);
       return;
     }
+    window.history.replaceState({}, "", nextUrl);
+  }
+}
 
+function writeViewTabToUrl(tab: "map" | "routes", mode: "replace" | "push" = "replace") {
+  const nextSearch = applyViewTabToSearch(window.location.search, tab);
+  const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (nextUrl !== currentUrl) {
+    if (mode === "push") {
+      window.history.pushState({}, "", nextUrl);
+      return;
+    }
+    window.history.replaceState({}, "", nextUrl);
+  }
+}
+
+function writeRouteSelectionToUrl(routeId: string | null, stage: number | null) {
+  let nextSearch = applyRouteIdToSearch(window.location.search, routeId);
+  nextSearch = applyRouteStageToSearch(nextSearch, stage);
+  const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (nextUrl !== currentUrl) {
     window.history.replaceState({}, "", nextUrl);
   }
 }
@@ -182,6 +215,12 @@ function timelineTickPosition(fraction: number) {
   return `calc(${clamped * 100}% + ${thumbInsetOffset}px)`;
 }
 
+function formatApproximateYears(fromYear: number, toYear: number) {
+  const start = fromYear < 0 ? `${Math.abs(fromYear)} BC` : `AD ${fromYear}`;
+  const end = toYear < 0 ? `${Math.abs(toYear)} BC` : `AD ${toYear}`;
+  return `About ${start} – ${end}`;
+}
+
 function MapLoadingPlaceholder() {
   return (
     <div
@@ -205,6 +244,9 @@ function MapLoadingPlaceholder() {
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
+  const [viewTab, setViewTab] = useState<"map" | "routes">(() =>
+    typeof window === "undefined" ? "map" : parseViewTabFromSearch(window.location.search)
+  );
   const [mapMode, setMapMode] = useState<MapDisplayMode>(() =>
     typeof window === "undefined" ? "ancient" : parseMapModeFromSearch(window.location.search)
   );
@@ -242,12 +284,21 @@ export function AppShell() {
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
   const [timelineOverlayInsetForAttribution, setTimelineOverlayInsetForAttribution] = useState(0);
+  const [routesLoadState, setRoutesLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [routesData, setRoutesData] = useState<LoadedRoutesData | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
+  const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
+  const [hoveredRouteId, setHoveredRouteId] = useState<string | null>(null);
+  const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
+  const [routesReloadToken, setRoutesReloadToken] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const timelineCardRef = useRef<HTMLDivElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
   const unmountedRef = useRef(false);
+  const routesLoadStateRef = useRef(routesLoadState);
   const smallScreenSheetDragStateRef = useRef<{
     pointerId: number;
     startY: number;
@@ -258,6 +309,18 @@ export function AppShell() {
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
+  const routeStopsById = useMemo(
+    () => new Map((routesData?.stops.stops ?? []).map((stop) => [stop.id, stop] as const)),
+    [routesData]
+  );
+  const hydratedRoutes = useMemo(() => routesData?.routes ?? [], [routesData]);
+  const selectedRoute = useMemo(
+    () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
+    [hydratedRoutes, selectedRouteId]
+  );
+  useEffect(() => {
+    routesLoadStateRef.current = routesLoadState;
+  }, [routesLoadState]);
   const selectedTimelineStop = useMemo(
     () =>
       ancientTimeline?.stops.find((stop) => stop.id === selectedTimelineStopId) ??
@@ -408,10 +471,16 @@ export function AppShell() {
         );
         const parsedSelection = parseSelectionFromSearch(window.location.search);
         const parsedMapMode = parseMapModeFromSearch(window.location.search);
+        const parsedViewTab = parseViewTabFromSearch(window.location.search);
+        const parsedRouteId = parseRouteIdFromSearch(window.location.search);
+        const parsedStage = parseRouteStageFromSearch(window.location.search);
         if (parsedMapMode !== "ancient") {
           setTimelineSourcesOpen(false);
         }
         setMapMode(parsedMapMode);
+        setViewTab(parsedViewTab);
+        setSelectedRouteId(parsedRouteId);
+        setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
         if (parsedSelection && !normalized) {
@@ -442,6 +511,35 @@ export function AppShell() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (viewTab !== "routes" || routesLoadStateRef.current !== "idle") {
+      return;
+    }
+
+    let cancelled = false;
+    setRoutesLoadState("loading");
+    void loadRoutesData(window.location.search)
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+        setRoutesData(payload);
+        setRoutesLoadState("ready");
+      })
+      .catch((error) => {
+        console.error("Failed to load routes.", error);
+        if (cancelled) {
+          return;
+        }
+        setRoutesData(null);
+        setRoutesLoadState("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routesReloadToken, viewTab]);
 
   useEffect(() => {
     let cancelled = false;
@@ -572,6 +670,23 @@ export function AppShell() {
     if (!urlStateReady) {
       return;
     }
+    writeViewTabToUrl(viewTab);
+  }, [urlStateReady, viewTab]);
+
+  useEffect(() => {
+    if (!urlStateReady || viewTab !== "routes") {
+      return;
+    }
+    writeRouteSelectionToUrl(
+      selectedRouteId,
+      selectedStageIndex !== null ? selectedStageIndex + 1 : null
+    );
+  }, [selectedRouteId, selectedStageIndex, urlStateReady, viewTab]);
+
+  useEffect(() => {
+    if (!urlStateReady) {
+      return;
+    }
 
     const nextSearch = applyMapModeToSearch(window.location.search, mapMode);
     const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
@@ -603,11 +718,17 @@ export function AppShell() {
       const parsedSelection = parseSelectionFromSearch(window.location.search);
       const parsedMapMode = parseMapModeFromSearch(window.location.search);
       const parsedYear = parseTimelineYearFromSearch(window.location.search);
+      const parsedViewTab = parseViewTabFromSearch(window.location.search);
+      const parsedRouteId = parseRouteIdFromSearch(window.location.search);
+      const parsedStage = parseRouteStageFromSearch(window.location.search);
       const normalized = normalizeSelection(parsedSelection, placesById);
       if (parsedMapMode !== "ancient") {
         setTimelineSourcesOpen(false);
       }
       setMapMode(parsedMapMode);
+      setViewTab(parsedViewTab);
+      setSelectedRouteId(parsedRouteId);
+      setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
           ancientTimeline.stops,
@@ -698,6 +819,7 @@ export function AppShell() {
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setViewTab("map");
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
 
@@ -713,6 +835,7 @@ export function AppShell() {
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setViewTab("map");
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     setSelection(nextSelection);
@@ -721,6 +844,7 @@ export function AppShell() {
   const handlePanelSelectPlaceFromAbout = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setViewTab("map");
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
@@ -748,11 +872,13 @@ export function AppShell() {
     ? !selectedPlaceDetails && !placeDetailsErrorsById[selectedPlace.id]
     : false;
   const selectedPlaceLoadError = selectedPlace ? placeDetailsErrorsById[selectedPlace.id] ?? null : null;
-  const panelWidthForMap = selectedPlace && !isSmallScreen ? PANEL_WIDTH : 0;
+  const panelWidthForMap =
+    !isSmallScreen && (selectedPlace || viewTab === "routes") ? PANEL_WIDTH : 0;
 
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setViewTab("map");
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
@@ -809,6 +935,42 @@ export function AppShell() {
     },
     [mapMode]
   );
+  const handleViewTabKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+      if (
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowRight" &&
+        event.key !== "ArrowUp" &&
+        event.key !== "ArrowDown" &&
+        event.key !== "Home" &&
+        event.key !== "End"
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      const currentIndex = VIEW_TAB_ORDER.indexOf(viewTab);
+      let nextTab: "map" | "routes" = viewTab;
+      if (event.key === "Home") {
+        nextTab = VIEW_TAB_ORDER[0];
+      } else if (event.key === "End") {
+        nextTab = VIEW_TAB_ORDER[VIEW_TAB_ORDER.length - 1];
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        const nextIndex = currentIndex <= 0 ? VIEW_TAB_ORDER.length - 1 : currentIndex - 1;
+        nextTab = VIEW_TAB_ORDER[nextIndex];
+      } else {
+        const nextIndex = currentIndex >= VIEW_TAB_ORDER.length - 1 ? 0 : currentIndex + 1;
+        nextTab = VIEW_TAB_ORDER[nextIndex];
+      }
+
+      setViewTab(nextTab);
+      event.currentTarget
+        .closest("[role='tablist']")
+        ?.querySelector<HTMLButtonElement>(`[data-view-tab='${nextTab}']`)
+        ?.focus();
+    },
+    [viewTab]
+  );
 
   useEffect(() => {
     if (!timelineSourcesOpen) {
@@ -829,14 +991,259 @@ export function AppShell() {
     };
   }, [timelineSourcesOpen]);
 
+  const routeMapOverlay = useMemo<RouteMapOverlayData | null>(() => {
+    if (viewTab !== "routes" || !routesData) {
+      return null;
+    }
+
+    const selectedRouteEntry = selectedRoute;
+    const highlightedStageId =
+      selectedRouteEntry && highlightedStageIndex !== null && highlightedStageIndex >= 0
+        ? selectedRouteEntry.stages[highlightedStageIndex]?.id ?? null
+        : null;
+    const selectedStageId =
+      selectedRouteEntry && selectedStageIndex !== null && selectedStageIndex >= 0
+        ? selectedRouteEntry.stages[selectedStageIndex]?.id ?? null
+        : null;
+    const activeRouteId = selectedRouteEntry?.route.id ?? hoveredRouteId ?? null;
+
+    const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
+    for (const entry of routesData.routes) {
+      for (const [index, stage] of entry.stages.entries()) {
+        const feature = routeLineFeatureByStage(routesData.lines, entry.route.id, stage.id, stage.lineId);
+        if (!feature) {
+          continue;
+        }
+
+        if (feature.geometry.type === "LineString") {
+          lineFeatures.push({
+            type: "Feature",
+            geometry: {
+              type: "LineString",
+              coordinates: feature.geometry.coordinates as number[][]
+            },
+            properties: {
+              routeId: entry.route.id,
+              stageId: stage.id,
+              stageIndex: index,
+              travelMode: stage.travelMode,
+              isPathUnknown: stage.travelMode === "unknown",
+              isInSelectedRoute: activeRouteId ? entry.route.id === activeRouteId : false,
+              isSelectedStage: selectedStageId === stage.id,
+              isHighlightedStage: highlightedStageId === stage.id
+            }
+          });
+          continue;
+        }
+
+        lineFeatures.push({
+          type: "Feature",
+          geometry: {
+            type: "MultiLineString",
+            coordinates: feature.geometry.coordinates as number[][][]
+          },
+          properties: {
+            routeId: entry.route.id,
+            stageId: stage.id,
+            stageIndex: index,
+            travelMode: stage.travelMode,
+            isPathUnknown: stage.travelMode === "unknown",
+            isInSelectedRoute: activeRouteId ? entry.route.id === activeRouteId : false,
+            isSelectedStage: selectedStageId === stage.id,
+            isHighlightedStage: highlightedStageId === stage.id
+          }
+        });
+      }
+    }
+
+    const pointFeatures = routesData.routes.flatMap((entry) =>
+      entry.stages.flatMap((stage, index) => {
+        const resolvedFrom = resolveRouteStop(stage.from, placesById, routeStopsById);
+        const resolvedTo = resolveRouteStop(stage.to, placesById, routeStopsById);
+        const viaStops = (stage.via ?? []).map((via) => resolveRouteStop(via, placesById, routeStopsById));
+        const row = [];
+        const stageSelected = selectedStageId === stage.id;
+        const stageHighlighted = highlightedStageId === stage.id;
+        const routeSelected = activeRouteId ? activeRouteId === entry.route.id : false;
+
+        if (resolvedFrom.coordinates) {
+          row.push({
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: resolvedFrom.coordinates },
+            properties: {
+              id: `${entry.route.id}:${stage.id}:from:${resolvedFrom.id}`,
+              routeId: entry.route.id,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "stop" as const,
+              stopKind: resolvedFrom.kind,
+              stopId: resolvedFrom.id,
+              label: resolvedFrom.name,
+              orderLabel: entry.route.structure === "connected" ? `${index + 1}` : undefined,
+              isInSelectedRoute: routeSelected,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted
+            }
+          });
+        }
+
+        for (const via of viaStops) {
+          if (!via.coordinates) {
+            continue;
+          }
+          row.push({
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: via.coordinates },
+            properties: {
+              id: `${entry.route.id}:${stage.id}:via:${via.id}`,
+              routeId: entry.route.id,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "via" as const,
+              stopKind: via.kind,
+              stopId: via.id,
+              label: via.name,
+              isInSelectedRoute: routeSelected,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted
+            }
+          });
+        }
+
+        if (resolvedTo.coordinates) {
+          row.push({
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: resolvedTo.coordinates },
+            properties: {
+              id: `${entry.route.id}:${stage.id}:to:${resolvedTo.id}`,
+              routeId: entry.route.id,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "stop" as const,
+              stopKind: resolvedTo.kind,
+              stopId: resolvedTo.id,
+              label: resolvedTo.name,
+              orderLabel: entry.route.structure === "connected" ? `${index + 2}` : undefined,
+              isInSelectedRoute: routeSelected,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted
+            }
+          });
+        }
+
+        return row;
+      })
+    );
+
+    const allCoordinates = lineFeatures.flatMap((feature) =>
+      feature.geometry.type === "LineString"
+        ? feature.geometry.coordinates
+        : feature.geometry.coordinates.flatMap((segment) => segment)
+    ) as [number, number][];
+    const bounds = allCoordinates.length
+      ? ([
+          [
+            Math.min(...allCoordinates.map((coordinate) => coordinate[0])),
+            Math.min(...allCoordinates.map((coordinate) => coordinate[1]))
+          ],
+          [
+            Math.max(...allCoordinates.map((coordinate) => coordinate[0])),
+            Math.max(...allCoordinates.map((coordinate) => coordinate[1]))
+          ]
+        ] as [[number, number], [number, number]])
+      : null;
+
+    return {
+      lines: {
+        type: "FeatureCollection",
+        features: lineFeatures
+      },
+      points: {
+        type: "FeatureCollection",
+        features: pointFeatures
+      },
+      bounds,
+      focusKey:
+        selectedRouteEntry && bounds
+          ? `${selectedRouteEntry.route.id}:${selectedStageId ?? ""}:${mapMode}`
+          : null,
+      hideBasePlaces: true
+    };
+  }, [
+    highlightedStageIndex,
+    hoveredRouteId,
+    mapMode,
+    placesById,
+    routeStopsById,
+    routesData,
+    selectedRoute,
+    selectedStageIndex,
+    viewTab
+  ]);
+
+  const routeKeyboardEntries = useMemo(() => {
+    if (viewTab !== "routes" || !selectedRoute) {
+      return [];
+    }
+    const entries = selectedRoute.stages.flatMap((stage, stageIndex) => {
+      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
+      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
+      const result: {
+        id: string;
+        label: string;
+        coordinates: [number, number];
+        routeId: string;
+        stageId: string;
+        stageIndex: number;
+        stopKind: "location" | "route-stop";
+        stopId: string;
+      }[] = [];
+      if (from.coordinates) {
+        result.push({
+          id: `route-stop:${selectedRoute.route.id}:${stage.id}:from`,
+          label: `${from.name}, route stop`,
+          coordinates: from.coordinates,
+          routeId: selectedRoute.route.id,
+          stageId: stage.id,
+          stageIndex,
+          stopKind: from.kind,
+          stopId: from.id
+        });
+      }
+      if (to.coordinates) {
+        result.push({
+          id: `route-stop:${selectedRoute.route.id}:${stage.id}:to`,
+          label: `${to.name}, route stop`,
+          coordinates: to.coordinates,
+          routeId: selectedRoute.route.id,
+          stageId: stage.id,
+          stageIndex,
+          stopKind: to.kind,
+          stopId: to.id
+        });
+      }
+      return result.map((entry, index) => ({
+        ...entry,
+        id: `${entry.id}:${stageIndex}:${index}`
+      }));
+    });
+
+    return entries;
+  }, [placesById, routeStopsById, selectedRoute, viewTab]);
+
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
     (smallScreenSheetMode === "expanded"
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
-  const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
+  const panelBottomInsetForMap =
+    ((selectedPlace || viewTab === "routes") && isSmallScreen)
+      ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX
+      : 0;
   const timelineVisible =
-    mapMode === "ancient" && (hasAncientTimeline || ancientTimelineLoadState === "error");
+    viewTab === "map" &&
+    mapMode === "ancient" &&
+    (hasAncientTimeline || ancientTimelineLoadState === "error");
   const retryAncientLayer = useCallback(() => {
     setTimelineSourcesOpen(false);
     if (ancientTimelineLoadState === "error") {
@@ -845,7 +1252,8 @@ export function AppShell() {
     }
     setAncientLayerRetryToken((value) => value + 1);
   }, [ancientTimelineLoadState]);
-  const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
+  const timelineBottomInsetForMap =
+    timelineVisible && isSmallScreen && !selectedPlace && viewTab === "map" ? 192 : 0;
   useLayoutEffect(() => {
     if (!timelineVisible) {
       return undefined;
@@ -905,7 +1313,7 @@ export function AppShell() {
   const showOnlyEdgeTickLabels =
     sortedTimelineStops.length > 2 && timelineStopSpacingPx < TIMELINE_MIN_STOP_SPACING_PX;
   const hideMapModeToggleOnPhoneExpandedSheet =
-    isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded";
+    isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded" && viewTab === "map";
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -919,7 +1327,8 @@ export function AppShell() {
     [sortedTimelineStops]
   );
 
-  const panelStyle: CSSProperties | null = selectedPlace
+  const routePanelOpen = viewTab === "routes";
+  const panelStyle: CSSProperties | null = selectedPlace || routePanelOpen
     ? isSmallScreen
       ? {
           position: "absolute",
@@ -955,6 +1364,47 @@ export function AppShell() {
         }
     : null;
 
+  const handleSelectRoute = useCallback((routeId: string) => {
+    setSelectedRouteId(routeId);
+    setSelectedStageIndex(null);
+    setHighlightedStageIndex(null);
+    setSelectedRouteStopId(null);
+    setSelection(null);
+    setStatusMessage(null);
+  }, []);
+
+  const handleSelectRouteMapEntry = useCallback(
+    (
+      entry:
+        | { kind: "line"; routeId: string; stageId: string; stageIndex: number }
+        | {
+            kind: "stop";
+            routeId: string;
+            stageId: string;
+            stageIndex: number;
+            stopKind: "location" | "route-stop";
+            stopId: string;
+          }
+    ) => {
+      setViewTab("routes");
+      setSelectedRouteId(entry.routeId);
+      setSelectedStageIndex(entry.stageIndex);
+      if (entry.kind === "stop") {
+        if (entry.stopKind === "location") {
+          setSelection({ placeId: entry.stopId, candidateIndex: null });
+        } else {
+          setSelectedRouteStopId(entry.stopId);
+        }
+      }
+    },
+    []
+  );
+
+  const selectedRouteStop =
+    selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
+      ? routeStopsById.get(selectedRouteStopId) ?? null
+      : null;
+
   return (
     <div
       data-app-shell-root
@@ -972,6 +1422,57 @@ export function AppShell() {
         onSelectPlace={handleSearchSelection}
         places={places}
       />
+
+      <div
+        aria-label="View"
+        role="tablist"
+        style={{
+          position: "absolute",
+          left: isSmallScreen ? `${tokens.spacing.md}px` : "50%",
+          transform: isSmallScreen ? "none" : "translateX(-50%)",
+          top: isSmallScreen ? `${VIEW_TABS_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
+          display: "inline-flex",
+          borderRadius: "999px",
+          border: `1px solid ${tokens.color.divider}`,
+          backgroundColor: tokens.color.surface,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          padding: "2px",
+          zIndex: 46
+        }}
+      >
+        {([
+          ["map", "Map"],
+          ["routes", "Routes"]
+        ] as const).map(([value, label]) => {
+          const selected = viewTab === value;
+          return (
+            <button
+              aria-selected={selected}
+              data-view-tab={value}
+              key={value}
+              onClick={() => setViewTab(value)}
+              onKeyDown={handleViewTabKeyDown}
+              role="tab"
+              tabIndex={selected ? 0 : -1}
+              style={{
+                minWidth: "86px",
+                height: "36px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: selected ? "#1A73E8" : "transparent",
+                color: selected ? "#FFFFFF" : tokens.color.textPrimary,
+                fontFamily: tokens.typography.uiFont,
+                fontSize: `${tokens.typography.captionSize}px`,
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
 
       {!hideMapModeToggleOnPhoneExpandedSheet ? (
         <div
@@ -1043,9 +1544,12 @@ export function AppShell() {
             leftPanelWidth={panelWidthForMap}
             mapMode={mapMode}
             onAncientLayerLoadStateChange={setAncientLayerStatus}
+            onSelectRouteMapEntry={handleSelectRouteMapEntry}
             onSelectPlace={handleSelectFromMap}
             pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
+            routeKeyboardEntries={routeKeyboardEntries}
+            routesOverlay={routeMapOverlay}
             selectedTimelineStopId={selectedTimelineStopId}
             selection={selection}
             timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
@@ -1350,55 +1854,242 @@ export function AppShell() {
       ) : null}
       <div id="ibm-visible-places-portal-root" style={srOnlyStyle} />
 
-      {selectedPlace && panelStyle ? (
-        <section aria-label="Place details" style={panelStyle}>
-          <PlacePanel
-            key={selectedPlace.id}
-            isLoading={selectedPlaceLoading}
-            isSmallScreen={isSmallScreen}
-            isSmallScreenExpanded={smallScreenSheetMode === "expanded"}
-            loadErrorMessage={selectedPlaceLoadError}
-            onClose={() => closePanel(false)}
-            onHighlightPlace={handlePanelHighlightPlace}
-            onSmallScreenHandlePointerDown={(event) => {
-              if (!isSmallScreen) {
-                return;
-              }
+      {panelStyle ? (
+        <section aria-label={viewTab === "routes" ? "Route details" : "Place details"} style={panelStyle}>
+          {viewTab === "routes" ? (
+            <div data-routes-panel="true">
+              {routesLoadState === "loading" || routesLoadState === "idle" ? (
+                <p aria-live="polite">Loading routes…</p>
+              ) : routesLoadState === "error" ? (
+                <div role="status">
+                  Routes couldn&apos;t load.{" "}
+                  <button
+                    onClick={() => {
+                      setRoutesLoadState("idle");
+                      setRoutesReloadToken((value) => value + 1);
+                    }}
+                    style={{ border: "none", background: "none", color: "#1A73E8", textDecoration: "underline", cursor: "pointer", padding: 0 }}
+                    type="button"
+                  >
+                    Try again
+                  </button>
+                </div>
+              ) : routesData && hydratedRoutes.length === 0 ? (
+                <p>No routes yet.</p>
+              ) : selectedRoute ? (
+                <div>
+                  <button
+                    onClick={() => {
+                      setSelectedRouteId(null);
+                      setSelectedStageIndex(null);
+                      setHighlightedStageIndex(null);
+                      setSelectedRouteStopId(null);
+                    }}
+                    style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer" }}
+                    type="button"
+                  >
+                    ‹ All routes
+                  </button>
+                  <h1 style={{ fontSize: `${tokens.typography.titleSize}px`, lineHeight: `${tokens.typography.titleLineHeight}px`, margin: `${tokens.spacing.sm}px 0 0` }}>
+                    {selectedRoute.route.title}
+                  </h1>
+                  <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
+                    {formatApproximateYears(selectedRoute.route.fromYear, selectedRoute.route.toYear)}
+                  </p>
+                  <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
+                    Borders as in AD {selectedRoute.route.fromYear}
+                  </p>
+                  <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
+                    {selectedRoute.route.note} Lines show stop order and land or sea mode, not exact traveled paths.
+                  </p>
+                  {selectedRouteStop ? (
+                    <div style={{ border: `1px solid ${tokens.color.divider}`, borderRadius: "8px", padding: `${tokens.spacing.sm}px`, marginBottom: `${tokens.spacing.sm}px` }}>
+                      <strong>{selectedRouteStop.name}</strong>
+                      {selectedRouteStop.todayName ? <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>Today: {selectedRouteStop.todayName}</p> : null}
+                      <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>Not yet on the main map.</p>
+                    </div>
+                  ) : null}
+                  <ol style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}>
+                    {selectedRoute.stages.map((stage, stageIndex) => {
+                      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
+                      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
+                      const isActive = selectedStageIndex === stageIndex;
+                      const disputed = stageHasDisputedStop(stage, routeStopsById);
+                      return (
+                        <li
+                          data-route-stage-selected={isActive ? "true" : "false"}
+                          data-route-stage-index={stageIndex + 1}
+                          key={stage.id}
+                          onMouseEnter={() => setHighlightedStageIndex(stageIndex)}
+                          onMouseLeave={() => setHighlightedStageIndex(null)}
+                          style={{
+                            marginBottom: `${tokens.spacing.sm}px`,
+                            borderRadius: "8px",
+                            border: `1px solid ${isActive ? tokens.color.accent : tokens.color.divider}`,
+                            padding: `${tokens.spacing.sm}px`
+                          }}
+                        >
+                          <div style={{ fontWeight: 600 }}>
+                            {selectedRoute.route.structure === "standalone-segments"
+                              ? `Segment ${stageIndex + 1}`
+                              : `Stage ${stageIndex + 1}`}{" "}
+                            ·{" "}
+                            <button
+                              onClick={() => {
+                                setSelectedStageIndex(stageIndex);
+                                setSelectedRouteStopId(null);
+                                if (from.kind === "location") {
+                                  setSelection({ placeId: from.id, candidateIndex: null });
+                                } else {
+                                  setSelectedRouteStopId(from.id);
+                                }
+                              }}
+                              style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                              type="button"
+                            >
+                              {from.name}
+                            </button>{" "}
+                            →{" "}
+                            <button
+                              onClick={() => {
+                                setSelectedStageIndex(stageIndex);
+                                if (to.kind === "location") {
+                                  setSelection({ placeId: to.id, candidateIndex: null });
+                                } else {
+                                  setSelectedRouteStopId(to.id);
+                                }
+                              }}
+                              style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                              type="button"
+                            >
+                              {to.name}
+                            </button>
+                          </div>
+                          <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
+                            {stage.travelMode === "land"
+                              ? "By land"
+                              : stage.travelMode === "sea"
+                                ? "By sea"
+                                : `Path not known${stage.namedRegions?.length ? ` · Through ${stage.namedRegions.map((region) => region.name).join(", ")}` : ""}`}
+                          </div>
+                          {stage.via?.length ? (
+                            <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
+                              Passed: {stage.via.map((via) => resolveRouteStop(via, placesById, routeStopsById).name).join(", ")}
+                            </div>
+                          ) : null}
+                          {selectedRoute.route.structure === "standalone-segments" && stage.attestation ? (
+                            <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
+                              Told in {stage.attestation.gospels.join(" and ")}
+                            </div>
+                          ) : null}
+                          {(!stage.lineId || disputed) ? (
+                            <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
+                              {stage.noLineReason ?? "Line omitted for this stage."}
+                              {disputed && to.stop ? (
+                                <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                                  {to.stop.candidates.map((candidate) => (
+                                    <li key={`${to.stop?.id}:${candidate.label}`}>{candidate.label}</li>
+                                  ))}
+                                </ul>
+                              ) : null}
+                            </div>
+                          ) : null}
+                          <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                            {stage.scripture.map((passage) => (
+                              <details key={`${stage.id}:${passage.ref}`}>
+                                <summary style={{ cursor: "pointer", color: "#1A73E8" }}>{passage.ref}</summary>
+                                <p style={{ margin: `${tokens.spacing.xs}px 0 0`, fontFamily: tokens.typography.scriptureFont }}>{passage.textWEB}</p>
+                              </details>
+                            ))}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              ) : (
+                <div>
+                  <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Routes</h2>
+                  <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
+                    {hydratedRoutes.map((entry) => (
+                      <li key={entry.route.id}>
+                        <button
+                          onClick={() => handleSelectRoute(entry.route.id)}
+                          onFocus={() => setHoveredRouteId(entry.route.id)}
+                          onMouseEnter={() => setHoveredRouteId(entry.route.id)}
+                          onMouseLeave={() => setHoveredRouteId(null)}
+                          style={{
+                            width: "100%",
+                            textAlign: "left",
+                            borderRadius: "8px",
+                            border: `1px solid ${tokens.color.divider}`,
+                            background: "#FFFFFF",
+                            padding: `${tokens.spacing.sm}px`,
+                            marginBottom: `${tokens.spacing.sm}px`,
+                            cursor: "pointer"
+                          }}
+                          type="button"
+                        >
+                          <div style={{ fontWeight: 600 }}>{entry.route.title}</div>
+                          <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
+                            {formatApproximateYears(entry.route.fromYear, entry.route.toYear)} · {entry.stages.length} stages
+                          </div>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : selectedPlace ? (
+            <PlacePanel
+              key={selectedPlace.id}
+              isLoading={selectedPlaceLoading}
+              isSmallScreen={isSmallScreen}
+              isSmallScreenExpanded={smallScreenSheetMode === "expanded"}
+              loadErrorMessage={selectedPlaceLoadError}
+              onClose={() => closePanel(false)}
+              onHighlightPlace={handlePanelHighlightPlace}
+              onSmallScreenHandlePointerDown={(event) => {
+                if (!isSmallScreen) {
+                  return;
+                }
 
-              const currentHeightPx =
-                smallScreenSheetDragHeightPx ??
-                (smallScreenSheetMode === "expanded"
-                  ? smallScreenSheetMaxHeightPx
-                  : smallScreenSheetCollapsedHeightPx);
+                const currentHeightPx =
+                  smallScreenSheetDragHeightPx ??
+                  (smallScreenSheetMode === "expanded"
+                    ? smallScreenSheetMaxHeightPx
+                    : smallScreenSheetCollapsedHeightPx);
 
-              smallScreenSheetDragStateRef.current = {
-                pointerId: event.pointerId,
-                startY: event.clientY,
-                startHeightPx: currentHeightPx,
-                movedPx: 0
-              };
-              suppressNextHandleClickRef.current = false;
-              setSmallScreenSheetDragHeightPx(currentHeightPx);
-            }}
-            onSelectCandidate={handlePanelSelectCandidate}
-            onSelectPlace={handlePanelSelectPlace}
-            onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
-            onToggleSmallScreenExpanded={() => {
-              setSmallScreenSheetDragHeightPx(null);
-              if (suppressNextHandleClickRef.current) {
+                smallScreenSheetDragStateRef.current = {
+                  pointerId: event.pointerId,
+                  startY: event.clientY,
+                  startHeightPx: currentHeightPx,
+                  movedPx: 0
+                };
                 suppressNextHandleClickRef.current = false;
-                return;
-              }
-              setSmallScreenSheetMode((current) =>
-                current === "expanded" ? "collapsed" : "expanded"
-              );
-            }}
-            placeDetails={selectedPlaceDetails}
-            places={places}
-            placesById={placesById}
-            selectedPlace={selectedPlace}
-            selection={selection ?? { placeId: selectedPlace.id, candidateIndex: null }}
-          />
+                setSmallScreenSheetDragHeightPx(currentHeightPx);
+              }}
+              onSelectCandidate={handlePanelSelectCandidate}
+              onSelectPlace={handlePanelSelectPlace}
+              onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
+              onToggleSmallScreenExpanded={() => {
+                setSmallScreenSheetDragHeightPx(null);
+                if (suppressNextHandleClickRef.current) {
+                  suppressNextHandleClickRef.current = false;
+                  return;
+                }
+                setSmallScreenSheetMode((current) =>
+                  current === "expanded" ? "collapsed" : "expanded"
+                );
+              }}
+              placeDetails={selectedPlaceDetails}
+              places={places}
+              placesById={placesById}
+              selectedPlace={selectedPlace}
+              selection={selection ?? { placeId: selectedPlace.id, candidateIndex: null }}
+            />
+          ) : null}
         </section>
       ) : null}
 

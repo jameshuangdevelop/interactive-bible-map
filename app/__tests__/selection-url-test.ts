@@ -1,9 +1,15 @@
 import {
+  applyRouteIdToSearch,
+  applyRouteStageToSearch,
+  applyViewTabToSearch,
   applyMapModeToSearch,
   applyTimelineYearToSearch,
   applySelectionToSearch,
   candidateLetterToIndex,
+  parseRouteIdFromSearch,
+  parseRouteStageFromSearch,
   parseMapModeFromSearch,
+  parseViewTabFromSearch,
   parseTimelineYearFromSearch,
   parseSelectionFromSearch
 } from "../src/features/map/selection-url";
@@ -70,5 +76,25 @@ describe("selection URL helpers", () => {
     expect(applyTimelineYearToSearch("?place=jerusalem", -4)).toBe("?place=jerusalem&year=-4");
     expect(applyTimelineYearToSearch("?place=jerusalem&year=-4", 44)).toBe("?place=jerusalem&year=44");
     expect(applyTimelineYearToSearch("?place=jerusalem&year=44", null)).toBe("?place=jerusalem");
+  });
+
+  test("parses routes tab and route params", () => {
+    expect(parseViewTabFromSearch("?tab=routes")).toBe("routes");
+    expect(parseViewTabFromSearch("?tab=map")).toBe("map");
+    expect(parseRouteIdFromSearch("?route=paul-2")).toBe("paul-2");
+    expect(parseRouteIdFromSearch("?route=")).toBeNull();
+    expect(parseRouteStageFromSearch("?stage=4")).toBe(4);
+    expect(parseRouteStageFromSearch("?stage=0")).toBeNull();
+  });
+
+  test("writes route tab params without dropping unrelated params", () => {
+    expect(applyViewTabToSearch("?place=jerusalem", "routes")).toBe("?place=jerusalem&tab=routes");
+    expect(applyRouteIdToSearch("?tab=routes", "paul-2")).toBe("?tab=routes&route=paul-2");
+    expect(applyRouteStageToSearch("?tab=routes&route=paul-2", 4)).toBe(
+      "?tab=routes&route=paul-2&stage=4"
+    );
+    expect(applyViewTabToSearch("?place=jerusalem&tab=routes&route=paul-2&stage=4", "map")).toBe(
+      "?place=jerusalem"
+    );
   });
 });
