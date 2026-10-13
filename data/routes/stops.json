@@ -1,4 +1,903 @@
 {
   "version": 1,
-  "stops": []
+  "stops": [
+    {
+      "id": "seleucia",
+      "name": "Seleucia",
+      "todayName": "Hatay Province, Türkiye",
+      "candidates": [
+        {
+          "label": "Seleucia Pieria archaeological site",
+          "coordinates": [
+            35.922,
+            36.124
+          ],
+          "coordinateSource": "pleiades:658483",
+          "confidence": "high",
+          "support": "Seleucia Pieria, the port Antioch used, about 16 Roman miles from the city near the mouth of the Orontes. Pleiades, OpenBible.info and Wikidata agree on this coastal site; Wikidata's own record places it within Hatay Province, Türkiye.",
+          "sources": [
+            "pleiades:658483",
+            "openbible:seleucia",
+            "wikidata:Q1605894",
+            "bib:isbe-seleucia"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 13:4",
+          "book": "Acts",
+          "textWEB": "So, being sent out by the Holy Spirit, they went down to Seleucia. From there they sailed to Cyprus."
+        }
+      ],
+      "sources": [
+        "pleiades:658483",
+        "openbible:seleucia",
+        "wikidata:Q1605894",
+        "bib:isbe-seleucia"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "attalia",
+      "name": "Attalia",
+      "todayName": "Antalya, Türkiye",
+      "candidates": [
+        {
+          "label": "Attalia (modern Antalya)",
+          "coordinates": [
+            30.703614,
+            36.881272
+          ],
+          "coordinateSource": "wikidata:Q6487",
+          "confidence": "high",
+          "support": "A city on Pamphylia's coast founded by Attalus II Philadelphus, continuously inhabited today as Antalya, Türkiye. Pleiades, OpenBible.info and Wikidata agree on the site.",
+          "sources": [
+            "pleiades:638778",
+            "openbible:attalia",
+            "wikidata:Q6487",
+            "bib:isbe-attalia"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 14:25",
+          "book": "Acts",
+          "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
+        }
+      ],
+      "sources": [
+        "pleiades:638778",
+        "openbible:attalia",
+        "wikidata:Q6487",
+        "bib:isbe-attalia"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "samothrace",
+      "name": "Samothrace",
+      "todayName": "Samothraki, Greece",
+      "candidates": [
+        {
+          "label": "Samothrace (island)",
+          "coordinates": [
+            25.583333,
+            40.45
+          ],
+          "coordinateSource": "wikidata:Q203175",
+          "confidence": "high",
+          "support": "An island in the north Aegean Sea, south of Thrace, where ancient sources record a town at its northern end where ships could anchor overnight. Pleiades, OpenBible.info and Wikidata agree on the island, known today as Samothraki.",
+          "sources": [
+            "pleiades:501597",
+            "openbible:samothrace",
+            "wikidata:Q203175",
+            "bib:isbe-samothrace"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 16:11",
+          "book": "Acts",
+          "textWEB": "Setting sail therefore from Troas, we made a straight course to Samothrace, and the day following to Neapolis;"
+        }
+      ],
+      "sources": [
+        "pleiades:501597",
+        "openbible:samothrace",
+        "wikidata:Q203175",
+        "bib:isbe-samothrace"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "amphipolis",
+      "name": "Amphipolis",
+      "todayName": "Amphipolis, Greece",
+      "candidates": [
+        {
+          "label": "Amphipolis archaeological site",
+          "coordinates": [
+            23.847209,
+            40.820159
+          ],
+          "coordinateSource": "openbible:amphipolis",
+          "confidence": "high",
+          "support": "A town in Macedonia on the river Strymon, on the Via Egnatia. Pleiades, OpenBible.info and Wikidata agree on the site, near the modern village of Amphipolis.",
+          "sources": [
+            "pleiades:501347",
+            "openbible:amphipolis",
+            "wikidata:Q217414",
+            "bib:isbe-amphipolis"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 17:1",
+          "book": "Acts",
+          "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+        }
+      ],
+      "sources": [
+        "pleiades:501347",
+        "openbible:amphipolis",
+        "wikidata:Q217414",
+        "bib:isbe-amphipolis"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "apollonia-macedonia",
+      "name": "Apollonia",
+      "todayName": "Near Pollina, Greece",
+      "candidates": [
+        {
+          "label": "Apollonia (Macedonia, on the Via Egnatia)",
+          "coordinates": [
+            23.469685,
+            40.623703
+          ],
+          "coordinateSource": "openbible:apollonia",
+          "confidence": "high",
+          "support": "A town in Mygdonia, Macedonia, on the Via Egnatia between Amphipolis and Thessalonica, about a day's journey from each. The International Standard Bible Encyclopedia reports its name survives in the modern Pollina; Pleiades, OpenBible.info and Wikidata agree on the site's location.",
+          "sources": [
+            "pleiades:491526",
+            "openbible:apollonia",
+            "wikidata:Q1611799",
+            "bib:isbe-apollonia"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 17:1",
+          "book": "Acts",
+          "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+        }
+      ],
+      "sources": [
+        "pleiades:491526",
+        "openbible:apollonia",
+        "wikidata:Q1611799",
+        "bib:isbe-apollonia"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "assos",
+      "name": "Assos",
+      "todayName": "Behramkale, Türkiye",
+      "candidates": [
+        {
+          "label": "Assos archaeological site",
+          "coordinates": [
+            26.336667,
+            39.490556
+          ],
+          "coordinateSource": "wikidata:Q744631",
+          "confidence": "high",
+          "support": "An ancient city of the Troad on a rocky height on the south coast, in the Roman province of Asia. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Behramkale, an alternate name recorded on the Wikidata item itself.",
+          "sources": [
+            "pleiades:550463",
+            "openbible:assos",
+            "wikidata:Q744631",
+            "bib:isbe-assos"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 20:13",
+          "book": "Acts",
+          "textWEB": "But we, going ahead to the ship, set sail for Assos, intending to take Paul aboard there; for he had so arranged, intending himself to go by land."
+        },
+        {
+          "ref": "Acts 20:14",
+          "book": "Acts",
+          "textWEB": "When he met us at Assos, we took him aboard and came to Mitylene."
+        }
+      ],
+      "sources": [
+        "pleiades:550463",
+        "openbible:assos",
+        "wikidata:Q744631",
+        "bib:isbe-assos"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "mitylene",
+      "name": "Mitylene",
+      "todayName": "Mytilene, Greece",
+      "candidates": [
+        {
+          "label": "Mitylene (chief city of Lesbos)",
+          "coordinates": [
+            26.547048,
+            39.110475
+          ],
+          "coordinateSource": "openbible:mitylene",
+          "confidence": "high",
+          "support": "The chief city of the island of Lesbos, with two harbors. Pleiades, OpenBible.info and Wikidata agree on the site, the modern city of Mytilene, Greece.",
+          "sources": [
+            "pleiades:550763",
+            "openbible:mitylene",
+            "wikidata:Q189059",
+            "bib:isbe-mitylene"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 20:14",
+          "book": "Acts",
+          "textWEB": "When he met us at Assos, we took him aboard and came to Mitylene."
+        }
+      ],
+      "sources": [
+        "pleiades:550763",
+        "openbible:mitylene",
+        "wikidata:Q189059",
+        "bib:isbe-mitylene"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "chios",
+      "name": "Chios",
+      "todayName": "Chios, Greece",
+      "candidates": [
+        {
+          "label": "Chios (island)",
+          "coordinates": [
+            26.1375,
+            38.3725
+          ],
+          "coordinateSource": "wikidata:Q160483",
+          "confidence": "high",
+          "support": "An Aegean island south of Lesbos, close to the Asia Minor mainland. Pleiades, OpenBible.info and Wikidata agree on the island, which keeps the name Chios today.",
+          "sources": [
+            "pleiades:550496",
+            "openbible:chios",
+            "wikidata:Q160483",
+            "bib:isbe-chios"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 20:15",
+          "book": "Acts",
+          "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+        }
+      ],
+      "sources": [
+        "pleiades:550496",
+        "openbible:chios",
+        "wikidata:Q160483",
+        "bib:isbe-chios"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "samos",
+      "name": "Samos",
+      "todayName": "Samos, Greece",
+      "candidates": [
+        {
+          "label": "Samos (island)",
+          "coordinates": [
+            26.8333,
+            37.75
+          ],
+          "coordinateSource": "wikidata:Q156882",
+          "confidence": "high",
+          "support": "An Aegean island between Ephesus and Miletus, joined to the Roman province of Asia. Pleiades, OpenBible.info and Wikidata agree on the island, which keeps the name Samos today.",
+          "sources": [
+            "pleiades:599926",
+            "openbible:samos",
+            "wikidata:Q156882",
+            "bib:isbe-samos"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 20:15",
+          "book": "Acts",
+          "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+        }
+      ],
+      "sources": [
+        "pleiades:599926",
+        "openbible:samos",
+        "wikidata:Q156882",
+        "bib:isbe-samos"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "trogyllium",
+      "name": "Trogyllium",
+      "todayName": "Cape Mycale, Türkiye",
+      "candidates": [
+        {
+          "label": "Trogyllium (promontory opposite Samos)",
+          "coordinates": [
+            27.003279,
+            37.659431
+          ],
+          "coordinateSource": "openbible:trogyllium",
+          "confidence": "high",
+          "support": "A promontory on the Asia Minor coast opposite Samos, at the end of the Mycale ridge, where ships could anchor for the night. Pleiades, OpenBible.info and Wikidata agree on the site, today's Cape Mycale. Several early manuscripts omit the clause naming it in Acts 20:15; see the route's note.",
+          "sources": [
+            "pleiades:599991",
+            "openbible:trogyllium",
+            "wikidata:Q2937072",
+            "bib:isbe-trogyllium"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 20:15",
+          "book": "Acts",
+          "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+        }
+      ],
+      "sources": [
+        "pleiades:599991",
+        "openbible:trogyllium",
+        "wikidata:Q2937072",
+        "bib:isbe-trogyllium"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cos",
+      "name": "Cos",
+      "todayName": "Kos, Greece",
+      "candidates": [
+        {
+          "label": "Cos (island)",
+          "coordinates": [
+            27.110278,
+            36.815278
+          ],
+          "coordinateSource": "wikidata:Q187027",
+          "confidence": "high",
+          "support": "An Aegean island off the coast of Caria, one of the six cities of the Dorian Hexapolis. Pleiades, OpenBible.info and Wikidata agree on the island, known today as Kos.",
+          "sources": [
+            "pleiades:599581",
+            "openbible:cos",
+            "wikidata:Q187027",
+            "bib:isbe-cos"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 21:1",
+          "book": "Acts",
+          "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+        }
+      ],
+      "sources": [
+        "pleiades:599581",
+        "openbible:cos",
+        "wikidata:Q187027",
+        "bib:isbe-cos"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "rhodes",
+      "name": "Rhodes",
+      "todayName": "Rhodes, Greece",
+      "candidates": [
+        {
+          "label": "Rhodes (city)",
+          "coordinates": [
+            28.2109,
+            36.4402
+          ],
+          "coordinateSource": "wikidata:Q188731",
+          "confidence": "high",
+          "support": "The chief city of the island of Rhodes, at the southeastern Aegean. Pleiades, OpenBible.info and Wikidata agree on the city of Rhodes as the site; OpenBible.info separately records a minor, lower-scored reading that places the stop near Lindos instead, on its own authority alone.",
+          "sources": [
+            "pleiades:590030",
+            "openbible:rhodes-1",
+            "wikidata:Q188731",
+            "bib:isbe-rhodes"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 21:1",
+          "book": "Acts",
+          "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+        }
+      ],
+      "sources": [
+        "pleiades:590030",
+        "openbible:rhodes-1",
+        "wikidata:Q188731",
+        "bib:isbe-rhodes"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "patara",
+      "name": "Patara",
+      "todayName": "Gelemiş, Türkiye",
+      "candidates": [
+        {
+          "label": "Patara archaeological site",
+          "coordinates": [
+            29.314167,
+            36.260278
+          ],
+          "coordinateSource": "wikidata:Q233121",
+          "confidence": "high",
+          "support": "A coastal city of Lycia with a celebrated oracle of Apollo and a harbor serving trade with the interior. The International Standard Bible Encyclopedia gives Gelemiş as the modern name of the ruin; Pleiades, OpenBible.info and Wikidata agree on the site.",
+          "sources": [
+            "pleiades:639042",
+            "openbible:patara",
+            "wikidata:Q233121",
+            "bib:isbe-patara",
+            "bib:isbe-lycia"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 21:1",
+          "book": "Acts",
+          "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+        }
+      ],
+      "sources": [
+        "pleiades:639042",
+        "openbible:patara",
+        "wikidata:Q233121",
+        "bib:isbe-patara",
+        "bib:isbe-lycia"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "myra",
+      "name": "Myra",
+      "todayName": "Demre, Türkiye",
+      "candidates": [
+        {
+          "label": "Myra archaeological site",
+          "coordinates": [
+            29.985278,
+            36.259167
+          ],
+          "coordinateSource": "wikidata:Q652024",
+          "confidence": "high",
+          "support": "A Lycian city with a harbor used by grain ships from Alexandria. Pleiades, OpenBible.info and Wikidata agree on the site; Wikidata's own record places it within Demre district, Türkiye.",
+          "sources": [
+            "pleiades:639005",
+            "openbible:myra",
+            "wikidata:Q652024",
+            "bib:isbe-myra",
+            "bib:isbe-lycia"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:5",
+          "book": "Acts",
+          "textWEB": "When we had sailed across the sea which is off Cilicia and Pamphylia, we came to Myra, a city of Lycia."
+        }
+      ],
+      "sources": [
+        "pleiades:639005",
+        "openbible:myra",
+        "wikidata:Q652024",
+        "bib:isbe-myra",
+        "bib:isbe-lycia"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cnidus",
+      "name": "Cnidus",
+      "todayName": "Datça, Muğla Province, Türkiye",
+      "candidates": [
+        {
+          "label": "Cnidus (Cape Krio / Tekir site)",
+          "coordinates": [
+            27.375,
+            36.6858
+          ],
+          "coordinateSource": "pleiades:599575",
+          "confidence": "high",
+          "support": "A city of Caria at the tip of a long peninsula, with two harbors, described by the first-century geographer Strabo at this same site (quoted in Smith's 1854 Dictionary of Greek and Roman Geography). Pleiades, OpenBible.info and Wikidata agree on the Cape Krio (Tekir) location; Wikidata's own record places it within Datça, Muğla Province, Türkiye. Pleiades separately catalogs an inland 'Cnidus (Burgaz)' entry, read here as an earlier phase of the city rather than a dispute over the Roman-period site Paul's ship passed.",
+          "sources": [
+            "pleiades:599575",
+            "openbible:cnidus",
+            "wikidata:Q690575",
+            "bib:isbe-cnidus"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:7",
+          "book": "Acts",
+          "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+        }
+      ],
+      "sources": [
+        "pleiades:599575",
+        "openbible:cnidus",
+        "wikidata:Q690575",
+        "bib:isbe-cnidus"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "salmone",
+      "name": "Salmone",
+      "todayName": "Cape Sideros, Crete, Greece",
+      "candidates": [
+        {
+          "label": "Salmone (promontory, Crete)",
+          "coordinates": [
+            26.3116,
+            35.316
+          ],
+          "coordinateSource": "openbible:salmone",
+          "confidence": "high",
+          "support": "The promontory forming the northeastern corner of Crete. Pleiades, OpenBible.info and Wikidata agree on the site, identified with today's Cape Sideros.",
+          "sources": [
+            "pleiades:590037",
+            "openbible:salmone",
+            "wikidata:Q2937111",
+            "bib:isbe-phoenix"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:7",
+          "book": "Acts",
+          "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+        }
+      ],
+      "sources": [
+        "pleiades:590037",
+        "openbible:salmone",
+        "wikidata:Q2937111",
+        "bib:isbe-phoenix"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "fair-havens",
+      "name": "Fair Havens",
+      "todayName": "Kaloi Limenes, Crete, Greece",
+      "candidates": [
+        {
+          "label": "Fair Havens (Kaloi Limenes)",
+          "coordinates": [
+            24.800306,
+            34.929694
+          ],
+          "coordinateSource": "wikidata:Q11818846",
+          "confidence": "high",
+          "support": "A roadstead on Crete's south coast about 5 miles east of Cape Matala, sheltered from north and northwest winds but judged unsuitable for wintering. Pleiades, OpenBible.info and Wikidata agree on the site; its Greek name, Kaloi Limenes, is a direct translation of 'Fair Havens.'",
+          "sources": [
+            "pleiades:589834",
+            "openbible:fair-havens",
+            "wikidata:Q11818846",
+            "bib:isbe-fair-havens",
+            "bib:isbe-phoenix"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:8",
+          "book": "Acts",
+          "textWEB": "With difficulty sailing along it we came to a certain place called Fair Havens, near the city of Lasea."
+        }
+      ],
+      "sources": [
+        "pleiades:589834",
+        "openbible:fair-havens",
+        "wikidata:Q11818846",
+        "bib:isbe-fair-havens",
+        "bib:isbe-phoenix"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cauda",
+      "name": "Cauda",
+      "todayName": "Gavdos, Greece",
+      "candidates": [
+        {
+          "label": "Cauda (island south of Crete)",
+          "coordinates": [
+            24.083333,
+            34.833333
+          ],
+          "coordinateSource": "openbible:cauda",
+          "confidence": "high",
+          "support": "A small island south of Crete. Pleiades, OpenBible.info and Wikidata agree on the site, identified with today's Gavdos, whose modern Greek name reflects the 'Cauda' manuscript reading rather than 'Clauda.'",
+          "sources": [
+            "pleiades:589858",
+            "openbible:cauda",
+            "wikidata:Q213895",
+            "bib:isbe-phoenix"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:16",
+          "book": "Acts",
+          "textWEB": "Running under the lee of a small island called Clauda, we were able, with difficulty, to secure the boat."
+        }
+      ],
+      "sources": [
+        "pleiades:589858",
+        "openbible:cauda",
+        "wikidata:Q213895",
+        "bib:isbe-phoenix"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "sidon",
+      "name": "Sidon",
+      "todayName": "Sidon, Lebanon",
+      "candidates": [
+        {
+          "label": "Sidon (ancient Phoenician port)",
+          "coordinates": [
+            35.371944,
+            33.560985
+          ],
+          "coordinateSource": "wikidata:Q163490",
+          "confidence": "high",
+          "support": "An ancient Phoenician port city on the Mediterranean coast. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Sidon, Lebanon.",
+          "sources": [
+            "pleiades:678393",
+            "openbible:sidon",
+            "wikidata:Q163490",
+            "bib:isbe-sidon"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:3",
+          "book": "Acts",
+          "textWEB": "The next day, we touched at Sidon. Julius treated Paul kindly and gave him permission to go to his friends and refresh himself."
+        }
+      ],
+      "sources": [
+        "pleiades:678393",
+        "openbible:sidon",
+        "wikidata:Q163490",
+        "bib:isbe-sidon"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "syracuse",
+      "name": "Syracuse",
+      "todayName": "Syracuse, Italy",
+      "candidates": [
+        {
+          "label": "Syracuse (Sicily)",
+          "coordinates": [
+            15.293056,
+            37.063889
+          ],
+          "coordinateSource": "wikidata:Q13670",
+          "confidence": "high",
+          "support": "A Greek colony on Sicily's east coast and capital of the Roman province of Sicily. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Syracuse.",
+          "sources": [
+            "pleiades:462503",
+            "openbible:syracuse",
+            "wikidata:Q13670",
+            "bib:isbe-syracuse"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 28:12",
+          "book": "Acts",
+          "textWEB": "Touching at Syracuse, we stayed there three days."
+        }
+      ],
+      "sources": [
+        "pleiades:462503",
+        "openbible:syracuse",
+        "wikidata:Q13670",
+        "bib:isbe-syracuse"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "rhegium",
+      "name": "Rhegium",
+      "todayName": "Reggio Calabria, Italy",
+      "candidates": [
+        {
+          "label": "Rhegium (Sicilian Strait)",
+          "coordinates": [
+            15.64412,
+            38.1088
+          ],
+          "coordinateSource": "wikidata:Q8471",
+          "confidence": "high",
+          "support": "A city on the Italian shore of the Sicilian Strait. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Reggio Calabria.",
+          "sources": [
+            "pleiades:452416",
+            "openbible:rhegium",
+            "wikidata:Q8471",
+            "bib:isbe-rhegium"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 28:13",
+          "book": "Acts",
+          "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
+        }
+      ],
+      "sources": [
+        "pleiades:452416",
+        "openbible:rhegium",
+        "wikidata:Q8471",
+        "bib:isbe-rhegium"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "three-taverns",
+      "name": "Three Taverns",
+      "candidates": [
+        {
+          "label": "Three Taverns (Tres Tabernae, Appian Way)",
+          "coordinates": [
+            12.873889,
+            41.561944
+          ],
+          "coordinateSource": "wikidata:Q622536",
+          "confidence": "high",
+          "support": "A station on the Appian Way about 33 Roman miles from Rome. Pleiades, OpenBible.info and Wikidata agree on the site; no source opened for this note names a modern town there.",
+          "sources": [
+            "pleiades:423106",
+            "openbible:three-taverns",
+            "wikidata:Q622536",
+            "bib:isbe-taverns-three"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 28:15",
+          "book": "Acts",
+          "textWEB": "From there the brothers, when they heard of us, came to meet us as far as The Market of Appius and The Three Taverns. When Paul saw them, he thanked God and took courage."
+        }
+      ],
+      "sources": [
+        "pleiades:423106",
+        "openbible:three-taverns",
+        "wikidata:Q622536",
+        "bib:isbe-taverns-three"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "forum-of-appius",
+      "name": "The Forum of Appius",
+      "todayName": "In the comune of Latina, Italy",
+      "candidates": [
+        {
+          "label": "The Forum of Appius (Forum Appii, Appian Way)",
+          "coordinates": [
+            12.9975,
+            41.46639
+          ],
+          "coordinateSource": "wikidata:Q3748871",
+          "confidence": "high",
+          "support": "A station on the Appian Way about 43 Roman miles from Rome, at the edge of the Pontine Marshes. Pleiades, OpenBible.info and Wikidata agree on the site; Wikidata's own description places it within the comune of Latina, Italy. WEB's own wording, 'The Market of Appius,' is a minority reading among six compared English versions; see the route's note.",
+          "sources": [
+            "pleiades:422927",
+            "openbible:forum-of-appius",
+            "wikidata:Q3748871",
+            "bib:isbe-appii-forum"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 28:15",
+          "book": "Acts",
+          "textWEB": "From there the brothers, when they heard of us, came to meet us as far as The Market of Appius and The Three Taverns. When Paul saw them, he thanked God and took courage."
+        }
+      ],
+      "sources": [
+        "pleiades:422927",
+        "openbible:forum-of-appius",
+        "wikidata:Q3748871",
+        "bib:isbe-appii-forum"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "ptolemais",
+      "name": "Ptolemais",
+      "todayName": "Acre, Israel",
+      "candidates": [
+        {
+          "label": "Ptolemais (Phoenician coast)",
+          "coordinates": [
+            35.0692,
+            32.9214
+          ],
+          "coordinateSource": "wikidata:Q126084",
+          "confidence": "high",
+          "support": "A Phoenician coastal city, identified with the Old Testament's Acco. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Acre.",
+          "sources": [
+            "pleiades:678010",
+            "openbible:ptolemais",
+            "wikidata:Q126084",
+            "bib:isbe-ptolemais"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 21:7",
+          "book": "Acts",
+          "textWEB": "When we had finished the voyage from Tyre, we arrived at Ptolemais. We greeted the brothers and stayed with them one day."
+        }
+      ],
+      "sources": [
+        "pleiades:678010",
+        "openbible:ptolemais",
+        "wikidata:Q126084",
+        "bib:isbe-ptolemais"
+      ],
+      "status": "draft"
+    }
+  ]
 }

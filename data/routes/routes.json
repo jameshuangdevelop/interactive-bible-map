@@ -1,4 +1,1425 @@
 {
   "version": 1,
-  "routes": []
+  "routes": [
+    {
+      "id": "paul-1",
+      "title": "Paul's first journey",
+      "fromYear": 47,
+      "toYear": 48,
+      "yearNote": "About AD 47-48, per the International Standard Bible Encyclopedia's (1915) own stated span for Acts 13-14. A ten-scholar survey it reports ranges the journey from 45 to 50-51, anchored loosely by the famine relief visit that precedes it (Acts 11:27-30), commonly dated about AD 45-46.",
+      "structure": "connected",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Pisidia, Pamphylia and Lycaonia are regions the text names alongside the towns within them; this route does not resolve which part of Galatia Paul's later letter to that name addresses (see the galatia record).",
+      "sources": [
+        "scripture:Acts 13:1",
+        "scripture:Acts 14:28",
+        "bib:isbe-paul-the-apostle-5"
+      ],
+      "stages": [
+        {
+          "id": "stage-01",
+          "from": {
+            "kind": "location",
+            "locationId": "antioch-syria"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "seleucia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 13:4",
+              "book": "Acts",
+              "textWEB": "So, being sent out by the Holy Spirit, they went down to Seleucia. From there they sailed to Cyprus."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 13:4",
+            "bib:isbe-seleucia"
+          ]
+        },
+        {
+          "id": "stage-02",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "seleucia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "salamis-cyprus"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 13:4",
+              "book": "Acts",
+              "textWEB": "So, being sent out by the Holy Spirit, they went down to Seleucia. From there they sailed to Cyprus."
+            },
+            {
+              "ref": "Acts 13:5",
+              "book": "Acts",
+              "textWEB": "When they were at Salamis, they proclaimed God’s word in the Jewish synagogues. They also had John as their attendant."
+            }
+          ],
+          "travelMode": "sea",
+          "namedRegions": [
+            {
+              "name": "Cyprus",
+              "locationId": "cyprus",
+              "sources": [
+                "scripture:Acts 13:4"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 13:4",
+            "scripture:Acts 13:5"
+          ]
+        },
+        {
+          "id": "stage-03",
+          "from": {
+            "kind": "location",
+            "locationId": "salamis-cyprus"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "paphos"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 13:6",
+              "book": "Acts",
+              "textWEB": "When they had gone through the island to Paphos, they found a certain sorcerer, a false prophet, a Jew whose name was Bar Jesus,"
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 13:6"
+          ]
+        },
+        {
+          "id": "stage-04",
+          "from": {
+            "kind": "location",
+            "locationId": "paphos"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "perga"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 13:13",
+              "book": "Acts",
+              "textWEB": "Now Paul and his company set sail from Paphos and came to Perga in Pamphylia. John departed from them and returned to Jerusalem."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 13:13"
+          ]
+        },
+        {
+          "id": "stage-05",
+          "from": {
+            "kind": "location",
+            "locationId": "perga"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "antioch-pisidia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 13:14",
+              "book": "Acts",
+              "textWEB": "But they, passing on from Perga, came to Antioch of Pisidia. They went into the synagogue on the Sabbath day and sat down."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 13:14"
+          ]
+        },
+        {
+          "id": "stage-06",
+          "from": {
+            "kind": "location",
+            "locationId": "antioch-pisidia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "iconium"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 13:51",
+              "book": "Acts",
+              "textWEB": "But they shook off the dust of their feet against them, and came to Iconium."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 13:51"
+          ]
+        },
+        {
+          "id": "stage-07",
+          "from": {
+            "kind": "location",
+            "locationId": "iconium"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "lystra"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:6",
+              "book": "Acts",
+              "textWEB": "they became aware of it and fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region."
+            }
+          ],
+          "travelMode": "land",
+          "namedRegions": [
+            {
+              "name": "Lycaonia",
+              "locationId": "lycaonia",
+              "sources": [
+                "scripture:Acts 14:6"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 14:6"
+          ]
+        },
+        {
+          "id": "stage-08",
+          "from": {
+            "kind": "location",
+            "locationId": "lystra"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "derbe",
+            "candidateIndex": 0
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:6",
+              "book": "Acts",
+              "textWEB": "they became aware of it and fled to the cities of Lycaonia, Lystra, Derbe, and the surrounding region."
+            },
+            {
+              "ref": "Acts 14:20",
+              "book": "Acts",
+              "textWEB": "But as the disciples stood around him, he rose up, and entered into the city. On the next day he went out with Barnabas to Derbe."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 14:6",
+            "scripture:Acts 14:20"
+          ]
+        },
+        {
+          "id": "stage-09",
+          "from": {
+            "kind": "location",
+            "locationId": "derbe",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "antioch-pisidia"
+          },
+          "via": [
+            {
+              "kind": "location",
+              "locationId": "lystra"
+            },
+            {
+              "kind": "location",
+              "locationId": "iconium"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 14:21",
+              "book": "Acts",
+              "textWEB": "When they had preached the Good News to that city and had made many disciples, they returned to Lystra, Iconium, and Antioch,"
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 14:21"
+          ]
+        },
+        {
+          "id": "stage-10",
+          "from": {
+            "kind": "location",
+            "locationId": "antioch-pisidia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "perga"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:24",
+              "book": "Acts",
+              "textWEB": "They passed through Pisidia and came to Pamphylia."
+            },
+            {
+              "ref": "Acts 14:25",
+              "book": "Acts",
+              "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
+            }
+          ],
+          "travelMode": "land",
+          "namedRegions": [
+            {
+              "name": "Pisidia",
+              "locationId": "pisidia",
+              "sources": [
+                "scripture:Acts 14:24"
+              ]
+            },
+            {
+              "name": "Pamphylia",
+              "locationId": "pamphylia",
+              "sources": [
+                "scripture:Acts 14:24"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 14:24",
+            "scripture:Acts 14:25"
+          ]
+        },
+        {
+          "id": "stage-11",
+          "from": {
+            "kind": "location",
+            "locationId": "perga"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "attalia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:25",
+              "book": "Acts",
+              "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 14:25"
+          ]
+        },
+        {
+          "id": "stage-12",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "attalia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "antioch-syria"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:26",
+              "book": "Acts",
+              "textWEB": "From there they sailed to Antioch, from where they had been committed to the grace of God for the work which they had fulfilled."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 14:26"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "paul-2",
+      "title": "Paul's second journey",
+      "fromYear": 49,
+      "toYear": 52,
+      "yearNote": "About AD 49-52, per the International Standard Bible Encyclopedia's (1915) stated span of '49-51 (or 52)' for Acts 15:36-18:22. A Greek inscription from the emperor Claudius to the people of Delphi, usually dated to about AD 52, names Lucius Junius Gallio as proconsul of Achaia, the office Acts 18:12 records him holding when Paul had already spent eighteen months in Corinth (Acts 18:11); this is the firmest anchor in the whole chronology (Bible Odyssey, bib:bibleodyssey-erastus-gallio-paul; ISBE, bib:isbe-paul-the-apostle-3).",
+      "structure": "connected",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 16:6-8 names only regions (Phrygia and Galatia, then Mysia) between Lystra and Troas, and records that the party tried to enter Bithynia but was not allowed to; Bithynia is not recorded as a region passed through, since the text says they did not go there. Acts 18:22 says only that Paul 'went up and greeted the assembly' between landing at Caesarea and going down to Antioch; this is very likely Jerusalem, on Luke's standard idiom for travel to and from that city elsewhere in Acts, and the International Standard Bible Encyclopedia reads it the same way ('probably' Jerusalem), but the text does not name it, so this route records that stage as Caesarea to Antioch directly, with unknown travel mode.",
+      "sources": [
+        "scripture:Acts 15:36",
+        "scripture:Acts 18:22",
+        "bib:isbe-paul-the-apostle-5",
+        "bib:bibleodyssey-erastus-gallio-paul"
+      ],
+      "stages": [
+        {
+          "id": "stage-01",
+          "from": {
+            "kind": "location",
+            "locationId": "antioch-syria"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "derbe",
+            "candidateIndex": 0
+          },
+          "scripture": [
+            {
+              "ref": "Acts 15:41",
+              "book": "Acts",
+              "textWEB": "He went through Syria and Cilicia, strengthening the assemblies."
+            },
+            {
+              "ref": "Acts 16:1",
+              "book": "Acts",
+              "textWEB": "He came to Derbe and Lystra; and behold, a certain disciple was there, named Timothy, the son of a Jewess who believed, but his father was a Greek."
+            }
+          ],
+          "travelMode": "land",
+          "namedRegions": [
+            {
+              "name": "Syria",
+              "locationId": "syria",
+              "sources": [
+                "scripture:Acts 15:41"
+              ]
+            },
+            {
+              "name": "Cilicia",
+              "locationId": "cilicia",
+              "sources": [
+                "scripture:Acts 15:41"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 15:41",
+            "scripture:Acts 16:1"
+          ]
+        },
+        {
+          "id": "stage-02",
+          "from": {
+            "kind": "location",
+            "locationId": "derbe",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "lystra"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 16:1",
+              "book": "Acts",
+              "textWEB": "He came to Derbe and Lystra; and behold, a certain disciple was there, named Timothy, the son of a Jewess who believed, but his father was a Greek."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 16:1"
+          ]
+        },
+        {
+          "id": "stage-03",
+          "from": {
+            "kind": "location",
+            "locationId": "lystra"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "troas"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 16:6",
+              "book": "Acts",
+              "textWEB": "When they had gone through the region of Phrygia and Galatia, they were forbidden by the Holy Spirit to speak the word in Asia."
+            },
+            {
+              "ref": "Acts 16:7",
+              "book": "Acts",
+              "textWEB": "When they had come opposite Mysia, they tried to go into Bithynia, but the Spirit didn’t allow them."
+            },
+            {
+              "ref": "Acts 16:8",
+              "book": "Acts",
+              "textWEB": "Passing by Mysia, they came down to Troas."
+            }
+          ],
+          "travelMode": "land",
+          "namedRegions": [
+            {
+              "name": "Phrygia",
+              "locationId": "phrygia",
+              "sources": [
+                "scripture:Acts 16:6"
+              ]
+            },
+            {
+              "name": "Galatia",
+              "locationId": "galatia",
+              "sources": [
+                "scripture:Acts 16:6"
+              ]
+            },
+            {
+              "name": "Mysia",
+              "locationId": "mysia",
+              "sources": [
+                "scripture:Acts 16:7",
+                "scripture:Acts 16:8"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 16:6",
+            "scripture:Acts 16:7",
+            "scripture:Acts 16:8"
+          ]
+        },
+        {
+          "id": "stage-04",
+          "from": {
+            "kind": "location",
+            "locationId": "troas"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "samothrace"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 16:11",
+              "book": "Acts",
+              "textWEB": "Setting sail therefore from Troas, we made a straight course to Samothrace, and the day following to Neapolis;"
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 16:11"
+          ]
+        },
+        {
+          "id": "stage-05",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "samothrace"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "neapolis-macedonia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 16:11",
+              "book": "Acts",
+              "textWEB": "Setting sail therefore from Troas, we made a straight course to Samothrace, and the day following to Neapolis;"
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 16:11"
+          ]
+        },
+        {
+          "id": "stage-06",
+          "from": {
+            "kind": "location",
+            "locationId": "neapolis-macedonia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "philippi"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 16:12",
+              "book": "Acts",
+              "textWEB": "and from there to Philippi, which is a city of Macedonia, the foremost of the district, a Roman colony. We were staying some days in this city."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 16:12"
+          ]
+        },
+        {
+          "id": "stage-07",
+          "from": {
+            "kind": "location",
+            "locationId": "philippi"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "thessalonica"
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "amphipolis"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "apollonia-macedonia"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 17:1",
+              "book": "Acts",
+              "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 17:1"
+          ]
+        },
+        {
+          "id": "stage-08",
+          "from": {
+            "kind": "location",
+            "locationId": "thessalonica"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "berea"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 17:10",
+              "book": "Acts",
+              "textWEB": "The brothers immediately sent Paul and Silas away by night to Beroea. When they arrived, they went into the Jewish synagogue."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 17:10"
+          ]
+        },
+        {
+          "id": "stage-09",
+          "from": {
+            "kind": "location",
+            "locationId": "berea"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "athens"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 17:14",
+              "book": "Acts",
+              "textWEB": "Then the brothers immediately sent out Paul to go as far as to the sea, and Silas and Timothy still stayed there."
+            },
+            {
+              "ref": "Acts 17:15",
+              "book": "Acts",
+              "textWEB": "But those who escorted Paul brought him as far as Athens. Receiving a commandment to Silas and Timothy that they should come to him very quickly, they departed."
+            }
+          ],
+          "travelMode": "unknown",
+          "sources": [
+            "scripture:Acts 17:14",
+            "scripture:Acts 17:15"
+          ]
+        },
+        {
+          "id": "stage-10",
+          "from": {
+            "kind": "location",
+            "locationId": "athens"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "corinth"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 18:1",
+              "book": "Acts",
+              "textWEB": "After these things Paul departed from Athens and came to Corinth."
+            }
+          ],
+          "travelMode": "unknown",
+          "sources": [
+            "scripture:Acts 18:1"
+          ]
+        },
+        {
+          "id": "stage-11",
+          "from": {
+            "kind": "location",
+            "locationId": "corinth"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "ephesus"
+          },
+          "via": [
+            {
+              "kind": "location",
+              "locationId": "cenchreae"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 18:18",
+              "book": "Acts",
+              "textWEB": "Paul, having stayed after this many more days, took his leave of the brothers, and sailed from there for Syria, together with Priscilla and Aquila. He shaved his head in Cenchreae, for he had a vow."
+            },
+            {
+              "ref": "Acts 18:19",
+              "book": "Acts",
+              "textWEB": "He came to Ephesus, and he left them there; but he himself entered into the synagogue and reasoned with the Jews."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 18:18",
+            "scripture:Acts 18:19"
+          ]
+        },
+        {
+          "id": "stage-12",
+          "from": {
+            "kind": "location",
+            "locationId": "ephesus"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "caesarea-maritima"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 18:21",
+              "book": "Acts",
+              "textWEB": "but taking his leave of them, he said, “I must by all means keep this coming feast in Jerusalem, but I will return again to you if God wills.” Then he set sail from Ephesus."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 18:21"
+          ]
+        },
+        {
+          "id": "stage-13",
+          "from": {
+            "kind": "location",
+            "locationId": "caesarea-maritima"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "antioch-syria"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 18:22",
+              "book": "Acts",
+              "textWEB": "When he had landed at Caesarea, he went up and greeted the assembly, and went down to Antioch."
+            }
+          ],
+          "travelMode": "unknown",
+          "sources": [
+            "scripture:Acts 18:22",
+            "bib:isbe-paul-the-apostle-5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "paul-3",
+      "title": "Paul's third journey",
+      "fromYear": 52,
+      "toYear": 58,
+      "yearNote": "About AD 52-58, per the International Standard Bible Encyclopedia's (1915) stated span of '52 (or 53)-57 (or 58)' for Acts 18:23-21:17 (its own section heading states a narrower Ac 18:23-21:14, picking up again at exactly 21:17; see the note on this route's final stage). A ten-scholar survey it reports ranges the journey from 49 to 59.",
+      "structure": "connected",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 18:23 names 'the region of Galatia and Phrygia,' reversing 16:6's order ('Phrygia and Galatia'); this route does not read significance into the reversal. Acts 20:1-2 names Macedonia and Greece (Achaia) as real destinations reached, each already a location record in this project, rather than regions merely passed through; the text does not name a city for the three-month stay in Achaia, though many interpreters associate it with Corinth. Acts 20:13 records that Paul himself went to Assos by land while his companions sailed there; this route records that stage as land, tracing Paul's own path, and the sailing instruction is in the quoted text. Troas to Miletus includes Trogyllium (Acts 20:15); several early manuscripts omit the clause naming it, and some modern versions footnote it instead of printing it, but WEB includes it. OpenBible.info also records a minor, lower-confidence reading that the stop at Rhodes (21:1) was near Lindos instead of the city; this route follows the city of Rhodes. ISBE's own account ends this journey three verses before the arrival at Jerusalem (21:14); this route follows the card's choice and ends at the arrival itself (21:17), which is also where ISBE's next section begins.",
+      "sources": [
+        "scripture:Acts 18:23",
+        "scripture:Acts 21:17",
+        "bib:isbe-paul-the-apostle-5"
+      ],
+      "stages": [
+        {
+          "id": "stage-01",
+          "from": {
+            "kind": "location",
+            "locationId": "antioch-syria"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "ephesus"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 18:23",
+              "book": "Acts",
+              "textWEB": "Having spent some time there, he departed and went through the region of Galatia and Phrygia, in order, establishing all the disciples."
+            },
+            {
+              "ref": "Acts 19:1",
+              "book": "Acts",
+              "textWEB": "While Apollos was at Corinth, Paul, having passed through the upper country, came to Ephesus and found certain disciples."
+            }
+          ],
+          "travelMode": "land",
+          "namedRegions": [
+            {
+              "name": "Galatia",
+              "locationId": "galatia",
+              "sources": [
+                "scripture:Acts 18:23"
+              ]
+            },
+            {
+              "name": "Phrygia",
+              "locationId": "phrygia",
+              "sources": [
+                "scripture:Acts 18:23"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 18:23",
+            "scripture:Acts 19:1"
+          ]
+        },
+        {
+          "id": "stage-02",
+          "from": {
+            "kind": "location",
+            "locationId": "ephesus"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "macedonia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 20:1",
+              "book": "Acts",
+              "textWEB": "After the uproar had ceased, Paul sent for the disciples, took leave of them, and departed to go into Macedonia."
+            }
+          ],
+          "travelMode": "unknown",
+          "sources": [
+            "scripture:Acts 20:1"
+          ]
+        },
+        {
+          "id": "stage-03",
+          "from": {
+            "kind": "location",
+            "locationId": "macedonia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "achaia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 20:2",
+              "book": "Acts",
+              "textWEB": "When he had gone through those parts and had encouraged them with many words, he came into Greece."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 20:2"
+          ]
+        },
+        {
+          "id": "stage-04",
+          "from": {
+            "kind": "location",
+            "locationId": "achaia"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "philippi"
+          },
+          "via": [
+            {
+              "kind": "location",
+              "locationId": "macedonia"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 20:3",
+              "book": "Acts",
+              "textWEB": "When he had spent three months there, and a plot was made against him by Jews as he was about to set sail for Syria, he determined to return through Macedonia."
+            },
+            {
+              "ref": "Acts 20:4",
+              "book": "Acts",
+              "textWEB": "These accompanied him as far as Asia: Sopater of Beroea, Aristarchus and Secundus of the Thessalonians, Gaius of Derbe, Timothy, and Tychicus and Trophimus of Asia."
+            },
+            {
+              "ref": "Acts 20:5",
+              "book": "Acts",
+              "textWEB": "But these had gone ahead, and were waiting for us at Troas."
+            },
+            {
+              "ref": "Acts 20:6",
+              "book": "Acts",
+              "textWEB": "We sailed away from Philippi after the days of Unleavened Bread, and came to them at Troas in five days, where we stayed seven days."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 20:3",
+            "scripture:Acts 20:6"
+          ]
+        },
+        {
+          "id": "stage-05",
+          "from": {
+            "kind": "location",
+            "locationId": "philippi"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "troas"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 20:6",
+              "book": "Acts",
+              "textWEB": "We sailed away from Philippi after the days of Unleavened Bread, and came to them at Troas in five days, where we stayed seven days."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 20:6"
+          ]
+        },
+        {
+          "id": "stage-06",
+          "from": {
+            "kind": "location",
+            "locationId": "troas"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "assos"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 20:13",
+              "book": "Acts",
+              "textWEB": "But we, going ahead to the ship, set sail for Assos, intending to take Paul aboard there; for he had so arranged, intending himself to go by land."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 20:13"
+          ]
+        },
+        {
+          "id": "stage-07",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "assos"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "miletus"
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "mitylene"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "chios"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "samos"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "trogyllium"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 20:14",
+              "book": "Acts",
+              "textWEB": "When he met us at Assos, we took him aboard and came to Mitylene."
+            },
+            {
+              "ref": "Acts 20:15",
+              "book": "Acts",
+              "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 20:14",
+            "scripture:Acts 20:15"
+          ]
+        },
+        {
+          "id": "stage-08",
+          "from": {
+            "kind": "location",
+            "locationId": "miletus"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "patara"
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "cos"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "rhodes"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 21:1",
+              "book": "Acts",
+              "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 21:1"
+          ]
+        },
+        {
+          "id": "stage-09",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "patara"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "tyre"
+          },
+          "via": [
+            {
+              "kind": "location",
+              "locationId": "cyprus"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 21:2",
+              "book": "Acts",
+              "textWEB": "Having found a ship crossing over to Phoenicia, we went aboard and set sail."
+            },
+            {
+              "ref": "Acts 21:3",
+              "book": "Acts",
+              "textWEB": "When we had come in sight of Cyprus, leaving it on the left hand, we sailed to Syria and landed at Tyre, for the ship was there to unload her cargo."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 21:2",
+            "scripture:Acts 21:3"
+          ]
+        },
+        {
+          "id": "stage-10",
+          "from": {
+            "kind": "location",
+            "locationId": "tyre"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "ptolemais"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 21:7",
+              "book": "Acts",
+              "textWEB": "When we had finished the voyage from Tyre, we arrived at Ptolemais. We greeted the brothers and stayed with them one day."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 21:7"
+          ]
+        },
+        {
+          "id": "stage-11",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "ptolemais"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "caesarea-maritima"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 21:8",
+              "book": "Acts",
+              "textWEB": "On the next day, we who were Paul’s companions departed and came to Caesarea. We entered into the house of Philip the evangelist, who was one of the seven, and stayed with him."
+            }
+          ],
+          "travelMode": "unknown",
+          "sources": [
+            "scripture:Acts 21:8"
+          ]
+        },
+        {
+          "id": "stage-12",
+          "from": {
+            "kind": "location",
+            "locationId": "caesarea-maritima"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "jerusalem"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 21:15",
+              "book": "Acts",
+              "textWEB": "After these days we took up our baggage and went up to Jerusalem."
+            },
+            {
+              "ref": "Acts 21:16",
+              "book": "Acts",
+              "textWEB": "Some of the disciples from Caesarea also went with us, bringing one Mnason of Cyprus, an early disciple, with whom we would stay."
+            },
+            {
+              "ref": "Acts 21:17",
+              "book": "Acts",
+              "textWEB": "When we had come to Jerusalem, the brothers received us gladly."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 21:15",
+            "scripture:Acts 21:17"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "paul-rome",
+      "title": "Paul's voyage to Rome",
+      "fromYear": 59,
+      "toYear": 60,
+      "yearNote": "About AD 59-60: the International Standard Bible Encyclopedia reasons from the succession of the governor Festus (Acts 24:27) to place the sailing for Rome 'in the late summer of 59 AD' and the arrival 'in the early spring... of 60 AD'. A ten-scholar survey it reports ranges the arrival in Rome from 56 to 62.",
+      "structure": "connected",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 27:1 does not itself name the port of departure; the preceding narrative places Paul in Roman custody at Caesarea (Acts 25:4, 25:13-27; 26:32), so this route treats Caesarea as the starting point on that basis. The ship's intended winter harbor, Phoenix, and the town of Lasea named near Fair Havens are not recorded as stops: the storm kept the ship from ever reaching Phoenix (27:12-15), and Lasea is named only as a landmark near Fair Havens (27:8); both are researched in docs/research/M5-paul-journeys.md section 4.2 for a possible future record. The sandbars called Syrtis (27:17) were feared, not reached, and are not a stop either. WEB reads 'Clauda' at Acts 27:16; of six compared English versions, four (NIV, ESV, NLT, CSB) read 'Cauda' instead, the form reflected in the island's modern Greek name, Gavdos, so this route titles the stop Cauda. WEB reads 'The Market of Appius' at Acts 28:15; of six compared English versions, three (NIV, ESV, CSB) read 'Forum of Appius,' two (KJV, NKJV) read 'Appii Forum,' and one (NLT) reads only 'the Forum,' so this route titles the stop The Forum of Appius. Paul's party reached the Forum of Appius (43 Roman miles from Rome) before Three Taverns (33 Roman miles from Rome) while approaching the city, per their distances in the International Standard Bible Encyclopedia, even though Acts 28:15 names the Three Taverns party second.",
+      "sources": [
+        "scripture:Acts 27:1",
+        "scripture:Acts 28:16",
+        "bib:isbe-paul-the-apostle-3"
+      ],
+      "stages": [
+        {
+          "id": "stage-01",
+          "from": {
+            "kind": "location",
+            "locationId": "caesarea-maritima"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "sidon"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 27:1",
+              "book": "Acts",
+              "textWEB": "When it was determined that we should sail for Italy, they delivered Paul and certain other prisoners to a centurion named Julius, of the Augustan band."
+            },
+            {
+              "ref": "Acts 27:3",
+              "book": "Acts",
+              "textWEB": "The next day, we touched at Sidon. Julius treated Paul kindly and gave him permission to go to his friends and refresh himself."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 27:1",
+            "scripture:Acts 27:3",
+            "scripture:Acts 25:4"
+          ]
+        },
+        {
+          "id": "stage-02",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "sidon"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "myra"
+          },
+          "via": [
+            {
+              "kind": "location",
+              "locationId": "cyprus"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 27:4",
+              "book": "Acts",
+              "textWEB": "Putting to sea from there, we sailed under the lee of Cyprus, because the winds were contrary."
+            },
+            {
+              "ref": "Acts 27:5",
+              "book": "Acts",
+              "textWEB": "When we had sailed across the sea which is off Cilicia and Pamphylia, we came to Myra, a city of Lycia."
+            }
+          ],
+          "travelMode": "sea",
+          "namedRegions": [
+            {
+              "name": "Cilicia",
+              "locationId": "cilicia",
+              "sources": [
+                "scripture:Acts 27:5"
+              ]
+            },
+            {
+              "name": "Pamphylia",
+              "locationId": "pamphylia",
+              "sources": [
+                "scripture:Acts 27:5"
+              ]
+            }
+          ],
+          "sources": [
+            "scripture:Acts 27:4",
+            "scripture:Acts 27:5"
+          ]
+        },
+        {
+          "id": "stage-03",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "myra"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "fair-havens"
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "cnidus"
+            },
+            {
+              "kind": "location",
+              "locationId": "crete"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "salmone"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 27:7",
+              "book": "Acts",
+              "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+            },
+            {
+              "ref": "Acts 27:8",
+              "book": "Acts",
+              "textWEB": "With difficulty sailing along it we came to a certain place called Fair Havens, near the city of Lasea."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 27:7",
+            "scripture:Acts 27:8"
+          ]
+        },
+        {
+          "id": "stage-04",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "fair-havens"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "malta",
+            "candidateIndex": 0
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "cauda"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 27:9-26",
+              "book": "Acts",
+              "textWEB": "When much time had passed and the voyage was now dangerous because the Fast had now already gone by, Paul admonished them and said to them, “Sirs, I perceive that the voyage will be with injury and much loss, not only of the cargo and the ship, but also of our lives.” But the centurion gave more heed to the master and to the owner of the ship than to those things which were spoken by Paul. Because the haven was not suitable to winter in, the majority advised going to sea from there, if by any means they could reach Phoenix and winter there, which is a port of Crete, looking southwest and northwest. When the south wind blew softly, supposing that they had obtained their purpose, they weighed anchor and sailed along Crete, close to shore. But before long, a stormy wind beat down from shore, which is called Euroclydon. When the ship was caught and couldn’t face the wind, we gave way to it and were driven along. Running under the lee of a small island called Clauda, we were able, with difficulty, to secure the boat. After they had hoisted it up, they used cables to help reinforce the ship. Fearing that they would run aground on the Syrtis sand bars, they lowered the sea anchor, and so were driven along. As we labored exceedingly with the storm, the next day they began to throw things overboard. On the third day, they threw out the ship’s tackle with their own hands. When neither sun nor stars shone on us for many days, and no small storm pressed on us, all hope that we would be saved was now taken away. When they had been long without food, Paul stood up in the middle of them and said, “Sirs, you should have listened to me, and not have set sail from Crete and have gotten this injury and loss. Now I exhort you to cheer up, for there will be no loss of life among you, but only of the ship. For there stood by me this night an angel, belonging to the God whose I am and whom I serve, saying, ‘Don’t be afraid, Paul. You must stand before Caesar. Behold, God has granted you all those who sail with you.’ Therefore, sirs, cheer up! For I believe God, that it will be just as it has been spoken to me. But we must run aground on a certain island.”"
+            },
+            {
+              "ref": "Acts 27:27-44",
+              "book": "Acts",
+              "textWEB": "But when the fourteenth night had come, as we were driven back and forth in the Adriatic Sea, about midnight the sailors surmised that they were drawing near to some land. They took soundings and found twenty fathoms. After a little while, they took soundings again, and found fifteen fathoms. Fearing that we would run aground on rocky ground, they let go four anchors from the stern, and wished for daylight. As the sailors were trying to flee out of the ship and had lowered the boat into the sea, pretending that they would lay out anchors from the bow, Paul said to the centurion and to the soldiers, “Unless these stay in the ship, you can’t be saved.” Then the soldiers cut away the ropes of the boat and let it fall off. While the day was coming on, Paul begged them all to take some food, saying, “Today is the fourteenth day that you wait and continue fasting, having taken nothing. Therefore I beg you to take some food, for this is for your safety; for not a hair will perish from any of your heads.” When he had said this and had taken bread, he gave thanks to God in the presence of all; then he broke it and began to eat. Then they all cheered up, and they also took food. In all, we were two hundred seventy-six souls on the ship. When they had eaten enough, they lightened the ship, throwing out the wheat into the sea. When it was day, they didn’t recognize the land, but they noticed a certain bay with a beach, and they decided to try to drive the ship onto it. Casting off the anchors, they left them in the sea, at the same time untying the rudder ropes. Hoisting up the foresail to the wind, they made for the beach. But coming to a place where two seas met, they ran the vessel aground. The bow struck and remained immovable, but the stern began to break up by the violence of the waves. The soldiers’ counsel was to kill the prisoners, so that none of them would swim out and escape. But the centurion, desiring to save Paul, stopped them from their purpose, and commanded that those who could swim should throw themselves overboard first to go toward the land; and the rest should follow, some on planks and some on other things from the ship. So they all escaped safely to the land."
+            },
+            {
+              "ref": "Acts 28:1",
+              "book": "Acts",
+              "textWEB": "When we had escaped, then they learned that the island was called Malta."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 27:12",
+            "scripture:Acts 27:16",
+            "scripture:Acts 27:27",
+            "scripture:Acts 28:1"
+          ]
+        },
+        {
+          "id": "stage-05",
+          "from": {
+            "kind": "location",
+            "locationId": "malta",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "syracuse"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 28:11",
+              "book": "Acts",
+              "textWEB": "After three months, we set sail in a ship of Alexandria which had wintered in the island, whose figurehead was “The Twin Brothers.”"
+            },
+            {
+              "ref": "Acts 28:12",
+              "book": "Acts",
+              "textWEB": "Touching at Syracuse, we stayed there three days."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 28:11",
+            "scripture:Acts 28:12"
+          ]
+        },
+        {
+          "id": "stage-06",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "syracuse"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "rhegium"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 28:13",
+              "book": "Acts",
+              "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 28:13"
+          ]
+        },
+        {
+          "id": "stage-07",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "rhegium"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "puteoli"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 28:13",
+              "book": "Acts",
+              "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
+            },
+            {
+              "ref": "Acts 28:14",
+              "book": "Acts",
+              "textWEB": "where we found brothers, and were entreated to stay with them for seven days. So we came to Rome."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 28:13",
+            "scripture:Acts 28:14"
+          ]
+        },
+        {
+          "id": "stage-08",
+          "from": {
+            "kind": "location",
+            "locationId": "puteoli"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "rome"
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "forum-of-appius"
+            },
+            {
+              "kind": "route-stop",
+              "stopId": "three-taverns"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "Acts 28:14",
+              "book": "Acts",
+              "textWEB": "where we found brothers, and were entreated to stay with them for seven days. So we came to Rome."
+            },
+            {
+              "ref": "Acts 28:15",
+              "book": "Acts",
+              "textWEB": "From there the brothers, when they heard of us, came to meet us as far as The Market of Appius and The Three Taverns. When Paul saw them, he thanked God and took courage."
+            },
+            {
+              "ref": "Acts 28:16",
+              "book": "Acts",
+              "textWEB": "When we entered into Rome, the centurion delivered the prisoners to the captain of the guard, but Paul was allowed to stay by himself with the soldier who guarded him."
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 28:14",
+            "scripture:Acts 28:15",
+            "scripture:Acts 28:16"
+          ]
+        }
+      ]
+    }
+  ]
 }
