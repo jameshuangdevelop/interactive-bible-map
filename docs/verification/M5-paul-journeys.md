@@ -4,6 +4,8 @@ Independent verification of the Research Lead's work on branch `data/m5-paul-jou
 
 **Result: the 24 stop entries pass after my corrections and are set to `verified`. The routes need Research Lead changes before they pass:** the stage structure (places the text says they reached are recorded as places passed, and two provinces are used as stops), two travel modes, the route years (ADR-0038 item 7), and the notes' sourcing and debated points.
 
+**Round 2 (2026-10-13), after the Research Lead's fixes in `369cc43`: all pass**, with a few small corrections of mine to wording and citations. See §11.
+
 | Item | Pass | Pass after my corrections | Needs change (Research Lead) | Fail |
 |---|---|---|---|---|
 | Stages (45) | 33 | 1 (`paul-2` stage-12) | 11 | 0 |
@@ -293,3 +295,24 @@ The stop entries are verified. These items concern `data/routes/routes.json` and
 - `npm test`: 297 of 297 pass.
 - `npm run test:app`: 159 of 159 pass. The first run failed one test because `ATTRIBUTION.md`'s cite-only row had changed and the app's mirrored list hadn't; fixed as in §7.
 - My own script: all 95 `textWEB` strings in the routes and stops match `data/reference/engwebp_vpl.txt` exactly.
+
+## 11. Round 2: re-check after the Research Lead's fixes (`369cc43`)
+I re-checked everything in `git diff e827807..369cc43`: `data/routes/routes.json` (45 → 51 stages, the years, `yearNote`s, notes and sources), the research note, and one new bibliography entry. `data/routes/stops.json` didn't change, so its 24 entries stay `verified`. Routes and stages have no status field in the schema, so their result is recorded here. The PO kept "Forum of Appius" without "The".
+
+| Item | Result |
+|---|---|
+| R1, places reached | **Pass.** `paul-1` stages 09–11 run Derbe → Lystra → Iconium → Antioch (Pisidia) by land (14:21). `paul-2` stages 11–12 run Corinth → Cenchreae by land (Corinth lies inland; the sailing starts from the port) and Cenchreae → Ephesus by sea (18:18–19). `paul-3` stages 05–11 run Assos → Mitylene → Samos (via Chios) → Trogyllium → Miletus → Cos → Rhodes → Patara, all by sea (20:14–15, 21:1). `via` now holds only places passed or sailed by: Amphipolis and Apollonia, Chios, Cyprus (twice), Cnidus, Crete, Salmone, Cauda, and the Forum of Appius and Three Taverns. |
+| R2, provinces | **Pass.** `paul-3` stage-02 is Ephesus → Philippi (20:1–6), `unknown`, naming Macedonia (20:1), Greece (`achaia`, 20:2) and Macedonia (20:3). |
+| R3, regions | **Pass.** Cyprus and Lycaonia are gone from `paul-1` stages 02 and 07. |
+| R4, modes | **Pass.** `paul-1` stage-01 (Antioch → Seleucia) and stage-13 (Perga → Attalia) are `unknown`, and stage-01 no longer cites ISBE "Seleucia". |
+| R5, years | **Pass after my corrections.** The ranges 44–51, 46–53, 49–59 and 55–62 cover ISBE's ten-scholar table, and the quotations match ISBE and Bible Odyssey. I corrected four things. `paul-1` opened with "About AD 47-48", ISBE's dates, although its span is 44–51. `paul-2` attributed 46–53 to ISBE's "stated span of '49-51 (or 52)'", and said "Acts 18:11 says Paul had by then spent eighteen months", but the verse has no "by then" (ISBE's word is "apparently"). `paul-3` pointed readers to "the research note". `paul-rome` said the voyage began "the autumn before" each arrival, citing 27:9, but ISBE says "late summer" and 27:9 names "the Fast", not a season; it now says the year before each arrival, "since the party wintered on Malta on the way (Acts 28:11)" (ISBE: arrives "in the early spring ('had wintered,' Ac 28:11)"). I also removed an "instead": Bible Odyssey's 50–51 is Paul's stay and ISBE's 51 or 52 is Gallio's arrival, so they don't conflict. |
+| R6, wording and sourcing | **Pass after my correction.** Acts 18:22 now rests on ISBE's "probably", with no idiom claim; the team wording and the `docs/` pointer are gone; Corinth is attributed to ISBE; the Lindos tradition is given without naming a database; ISBE is introduced; and the Forum of Appius sentence now says the order matches Acts 28:15. I replaced `paul-3`'s closing "where Acts' own narrative turns to Paul's arrest" (the arrest is Acts 21:27–36) with "where the encyclopedia's next section, 'Five Years a Prisoner,' begins", ISBE's own heading for Acts 21:17–28:31. |
+| R7, debated points | **Pass after my correction.** All three missionary journeys give both Galatia views, paraphrasing Thomas Schreiner's Zondervan article (`bib:zondervan-who-were-galatians`, opened): the north view sends the letter to "ethnic Galatians located in the northern part of the Galatian province", the south view to "the cities Paul visited on his first missionary journey in Acts 13–14". Schreiner favors the south; the notes take no side. `paul-rome` gives Malta and Mljet, as HMML's story says (`bib:hmml-contesting-shipwreck`, opened: Ignjat Đurđević's "Melite Illyrica (modern Mljet, in the Adriatic off the coast of Croatia)"). But it said "Acts 28:1 does not say which island 'Melita' is", while the WEB's 28:1 reads "the island was called Malta"; it now says "The island Acts 28:1 names (the WEB's 'Malta', the KJV's 'Melita') is traditionally identified with Malta". |
+| Citations | I added `scripture:Galatians 1:2` to `paul-1` (its note quotes "the assemblies of Galatia", which matches the WEB) and `scripture:Acts 24:27`, `28:1` and `28:11` to `paul-rome` (its texts cite them). |
+| Unchanged stages | **Pass.** Every stage starts where the one before it ends, the ids run without gaps, and all 103 `textWEB` strings (79 in stages, 24 in stops) match the WEB. |
+| Research note | **Pass after my corrections.** Its §3 tables match the 51 stages row for row. §9 item 2 said the route note cites "many interpreters", which it doesn't; §10 said the routes cite Strabo, which only the note does; and §5 repeated "autumn". I corrected all three. |
+| `isbe-lasea` (new) | **Pass after correction.** The URL opens; the article is unsigned, so "James Orr" follows the convention. It is cited only by the research note. Its `accessed` date was 2026-10-14, a day ahead; I set it to 2026-10-13, when I opened it. |
+
+For the PO: the Research Lead's `docs/BUDGET.md` row is also dated 2026-10-14. I didn't edit another agent's row.
+
+Checks after round 2 (Node 24.21.0): `validate:data` passes with the same 203 warnings; `npm test`: 297 of 297 pass; `npm run test:app`: 159 of 159 pass.
