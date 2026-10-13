@@ -49,8 +49,37 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -58,
+      "toYear": -27,
+      "holderId": "cyprus-province",
+      "entity": "Roman province of Cyprus (ruler: Attached to Cilicia)",
+      "sources": [
+        "bib:isbe-cyprus"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": -22,
+      "holderId": "cyprus-province",
+      "entity": "Roman province of Cyprus (ruler: Kept by the emperor)",
+      "sources": [
+        "bib:isbe-cyprus"
+      ]
+    },
+    {
+      "fromYear": -22,
+      "toYear": 101,
+      "holderId": "cyprus-province",
+      "entity": "Roman province of Cyprus (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-cyprus"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "cyprus"
 }

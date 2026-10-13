@@ -12,6 +12,8 @@ export type ZoomTier = "region" | "city" | "site";
 export type Confidence = "high" | "medium" | "low" | "disputed";
 export type SourceId = string;
 export type PlaceProminence = "major" | "standard";
+export type MapDisplayMode = "ancient" | "modern";
+export type PinLabelSource = "biblical" | "modern";
 
 export type Coordinates = [number, number];
 
@@ -40,6 +42,7 @@ export interface PlaceIndexRecord {
   type: PlaceType;
   zoomTier: ZoomTier;
   parentId: string | null;
+  politicalAreaId?: string;
   prominence: PlaceProminence;
   passageCount: number;
   candidates: PlaceCandidate[];
@@ -75,7 +78,16 @@ export interface OtConnectionEntry {
 export interface PoliticalHistoryEntry {
   fromYear: number;
   toYear: number;
+  holderId?: string;
   entity: string;
+  sources: SourceId[];
+}
+
+export interface PoliticalHistoryOverrideEntry {
+  fromYear: number;
+  toYear: number;
+  holderId: string;
+  ruler?: string;
   sources: SourceId[];
 }
 
@@ -85,6 +97,8 @@ export interface PlaceRecord extends PlaceIndexRecord {
   history: SourcedTextEntry[];
   scripture: ScriptureEntry[];
   otConnections: OtConnectionEntry[];
+  politicalAreaId?: string;
+  politicalHistoryOverrides?: PoliticalHistoryOverrideEntry[];
   politicalHistory: PoliticalHistoryEntry[];
   status: "draft" | "verified";
   verifiedBy?: string;

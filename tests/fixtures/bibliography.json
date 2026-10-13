@@ -10,6 +10,17 @@
       "year": 2024,
       "journal": "Illustrative Journal of Ancient Studies",
       "doi": "10.1234/example-fixture-doi"
+    },
+    {
+      "id": "pleiades-place-resource",
+      "type": "dataset",
+      "title": "Pleiades: A Gazetteer of Past Places",
+      "authors": [
+        "Pleiades contributors"
+      ],
+      "year": 2026,
+      "publisher": "Institute for the Study of the Ancient World, New York University",
+      "url": "https://pleiades.stoa.org/"
     }
   ]
 }

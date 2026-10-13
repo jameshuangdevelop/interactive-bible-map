@@ -72,8 +72,32 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 72,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography",
+        "bib:livius-cilicia"
+      ],
+      "note": "Administered from Syria throughout; Tarsus sits in this plain."
+    },
+    {
+      "fromYear": 72,
+      "toYear": 101,
+      "holderId": "cilicia-province",
+      "entity": "Roman province of Cilicia (ruler: Reunited with Cilicia Tracheia as one province)",
+      "sources": [
+        "bib:livius-cilicia",
+        "bib:josephus-jewish-war"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "cilicia"
 }

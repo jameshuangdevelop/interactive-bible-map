@@ -23,7 +23,7 @@ Show the ancient world's borders, roads and coastline on the ancient map, with a
 1. **Ancient layer,** as spec §2 describes: area fills by kind, borders, area labels (those with a record open it; the others show a tooltip), roads and the ancient coastline. It loads after the map first renders, changes with the stop, and is hidden on the modern map. Area labels rank below the major places (ADR-0035).
 2. **Province labels by year:** a province record's label is hidden in the years its area doesn't exist (spec §2). Region labels stay as they are.
 3. **Timeline,** as spec §2 describes: the track with one tick per stop, the caption, the "Sources" popover with the summary, passages and sources, the "Earlier" and "Later" buttons, the keyboard slider, the URL (`year`, with BC negative; spec §10), the AD 50 opening stop, and its place on phones while the bottom sheet is open.
-4. **Map key,** as spec §2 describes.
+4. **Map key,** as spec §2 describes. *Removed at MC7 (2026-10-09, the human): the layer's lines follow the modern map's conventions instead, and the key's note moves to the timeline's Sources popover (spec §2, ADR-0037).*
 5. **States:** if the layer fails to load, the map stays usable and the timeline offers "Try again" (spec §5).
 6. **Attribution:** the AWMC credit that M4-03's Fact-Checker sets, on the ancient map only.
 7. **Tests:** unit tests for choosing the stop from a year, reading the URL (including BC years), and which labels show in which year; Playwright checks for the timeline by keyboard and pointer, the URL, the map key, and the layer hiding on the modern map; the accessibility check; `npm run bench:map` with the layer on (no main-thread task over 50 ms while dragging and zooming); and changing the stop within the same 50 ms budget.
@@ -36,7 +36,7 @@ A place line in the panel that follows the timeline (backlog), the Routes tab (M
 - [ ] Each stop shows its areas, borders and labels, and the roads and coastline show, all as the spec describes.
 - [ ] The timeline works by mouse, touch and keyboard, the URL keeps the stop, and the map opens at the stop in force in AD 50.
 - [ ] Dragging and zooming stay smooth (ADR-0024), changing the stop stays within 50 ms, and LCP and TBT pass from a desktop (the PO measures them).
-- [ ] The map key and the failure state work as the spec describes.
+- [ ] The failure state works as the spec describes, and the layer needs no map key (MC7).
 - [ ] `npm run lint`, `typecheck`, `test:all`, `build:data`, `export:web` and `verify:web:playwright` pass.
 
 ## Finish

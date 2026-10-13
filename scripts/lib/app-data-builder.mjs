@@ -1,7 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import zlib from "node:zlib";
 
+import { buildAncientAppData } from "./ancient-app-data-builder.mjs";
 import { validateData } from "./validator.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -11,6 +13,7 @@ const DEFAULT_LOCATIONS_DIRECTORY = path.join(repositoryRoot, "data", "locations
 const DEFAULT_MEDIA_DIRECTORY = path.join(repositoryRoot, "data", "media");
 const DEFAULT_BIBLIOGRAPHY_PATH = path.join(repositoryRoot, "data", "bibliography.json");
 const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "generated");
+const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 300_000;
 
 async function listJsonFiles(directoryPath) {
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -23,6 +26,24 @@ async function listJsonFiles(directoryPath) {
 async function readJsonFile(filePath) {
   const content = await fs.readFile(filePath, "utf8");
   return JSON.parse(content);
+}
+
+async function pathExists(targetPath) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function inferDataRootFromDirectory(directoryPath, expectedLeafDirectoryName) {
+  const directoryName = path.basename(directoryPath).toLowerCase();
+  if (directoryName === expectedLeafDirectoryName) {
+    return path.dirname(directoryPath);
+  }
+
+  return directoryPath;
 }
 
 function collectBibSourceIds(locationRecord) {
@@ -95,6 +116,7 @@ function toIndexRecord(locationRecord) {
     names: toAppNames(locationRecord.names),
     type: locationRecord.type,
     zoomTier: locationRecord.zoomTier,
+    politicalAreaId: locationRecord.politicalAreaId,
     prominence: locationRecord.prominence,
     passageCount: Array.isArray(locationRecord.scripture)
       ? locationRecord.scripture.length
@@ -114,17 +136,52 @@ export async function buildAppData(options = {}) {
   );
   const mediaDirectory = path.resolve(options.mediaDirectory ?? DEFAULT_MEDIA_DIRECTORY);
   const bibliographyPath = path.resolve(options.bibliographyPath ?? DEFAULT_BIBLIOGRAPHY_PATH);
+  const dataRoot =
+    options.dataRoot != null
+      ? path.resolve(options.dataRoot)
+      : inferDataRootFromDirectory(locationsDirectory, "locations");
+  const ancientSourceDirectory = options.ancientSourceDirectory
+    ? path.resolve(options.ancientSourceDirectory)
+    : null;
+  const ancientDataRoot = ancientSourceDirectory ?? dataRoot;
+  const ancientAreasPath = path.resolve(
+    options.ancientAreasPath ?? path.join(ancientDataRoot, "geo", "ancient-areas.geojson")
+  );
+  const ancientRoadsPath = path.resolve(
+    options.ancientRoadsPath ?? path.join(ancientDataRoot, "geo", "ancient-roads.geojson")
+  );
+  const ancientCoastlinePath = path.resolve(
+    options.ancientCoastlinePath ??
+      path.join(ancientDataRoot, "geo", "ancient-coastline.geojson")
+  );
+  // Optional: when this file is missing the other ancient files are still built.
+  const ancientEmpireEdgePath = path.resolve(
+    options.ancientEmpireEdgePath ??
+      path.join(ancientDataRoot, "geo", "ancient-empire-edge.geojson")
+  );
+  const resolvedTimelinePath = path.resolve(
+    options.timelinePath ?? path.join(ancientDataRoot, "timeline.json")
+  );
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
+  const maxAncientLayerGzipBytes =
+    options.maxAncientLayerGzipBytes ?? DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES;
 
   const validationResult = await validateData({
     locationsDirectory,
     mediaDirectory,
     bibliographyPath,
+    timelinePath: resolvedTimelinePath,
+    ancientAreasPath,
+    ancientRoadsPath,
+    ancientCoastlinePath,
+    ancientEmpireEdgePath,
     webVplPath: options.webVplPath,
     webSnapshotMetadataPath: options.webSnapshotMetadataPath,
     skipSnapshotChecksumCheck: options.skipSnapshotChecksumCheck,
     requireEmpireRoot: options.requireEmpireRoot,
-    requireModernCountries: options.requireModernCountries
+    requireModernCountries: options.requireModernCountries,
+    requireAncientShapes: options.requireAncientShapes,
+    requireDerivedPoliticalHistory: options.requireDerivedPoliticalHistory
   });
 
   if (validationResult.errors.length > 0) {
@@ -144,6 +201,29 @@ export async function buildAppData(options = {}) {
   const locationRecords = await Promise.all(locationFiles.map((filePath) => readJsonFile(filePath)));
   const mediaRecords = await Promise.all(mediaFiles.map((filePath) => readJsonFile(filePath)));
   locationRecords.sort((a, b) => a.id.localeCompare(b.id));
+  const majorPlacePinCoordinates = locationRecords
+    .filter(
+      (locationRecord) =>
+        (locationRecord.type === "place" ||
+          locationRecord.type === "region" ||
+          locationRecord.type === "province" ||
+          locationRecord.type === "empire") &&
+        Array.isArray(locationRecord.candidates)
+    )
+    .flatMap((locationRecord) =>
+      (locationRecord.candidates ?? [])
+        .filter(
+          (candidate) =>
+            Array.isArray(candidate?.coordinates) &&
+            candidate.coordinates.length >= 2 &&
+            typeof candidate.coordinates[0] === "number" &&
+            typeof candidate.coordinates[1] === "number"
+        )
+        .map((candidate) => ({
+          placeId: locationRecord.id,
+          coordinates: [candidate.coordinates[0], candidate.coordinates[1]]
+        }))
+    );
 
   const mediaByLocationId = new Map(
     mediaRecords
@@ -165,6 +245,13 @@ export async function buildAppData(options = {}) {
   await fs.mkdir(placesDirectory, { recursive: true });
 
   await fs.writeFile(path.join(outputDirectory, "places.index.json"), indexPayload, "utf8");
+  const outputFiles = [
+    {
+      file: "places.index.json",
+      bytes: Buffer.byteLength(indexPayload, "utf8"),
+      gzipBytes: zlib.gzipSync(indexPayload, { level: zlib.constants.Z_BEST_COMPRESSION }).length
+    }
+  ];
 
   for (const locationRecord of locationRecords) {
     const bibliographyIds = collectBibSourceIds(locationRecord);
@@ -185,13 +272,81 @@ export async function buildAppData(options = {}) {
     };
 
     const destinationPath = path.join(placesDirectory, `${locationRecord.id}.json`);
-    await fs.writeFile(destinationPath, JSON.stringify(placePayload), "utf8");
+    const placePayloadText = JSON.stringify(placePayload);
+    await fs.writeFile(destinationPath, placePayloadText, "utf8");
+    outputFiles.push({
+      file: `places/${locationRecord.id}.json`,
+      bytes: Buffer.byteLength(placePayloadText, "utf8"),
+      gzipBytes: zlib.gzipSync(placePayloadText, { level: zlib.constants.Z_BEST_COMPRESSION }).length
+    });
+  }
+
+  const [timelineExists, areasExists, roadsExists, coastlineExists] = await Promise.all([
+    pathExists(resolvedTimelinePath),
+    pathExists(ancientAreasPath),
+    pathExists(ancientRoadsPath),
+    pathExists(ancientCoastlinePath)
+  ]);
+
+  let ancientBuild = {
+    generated: false,
+    skippedReason:
+      "Skipped ancient generated files because timeline or ancient geo source files are missing.",
+    gzipBytes: 0,
+    maxGzipBytes: maxAncientLayerGzipBytes,
+    roadJoinCount: 0,
+    roadJoinTotalLengthKm: 0,
+    roadJoinMaxLengthKm: 0
+  };
+
+  if (timelineExists && areasExists && roadsExists && coastlineExists) {
+    const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData] =
+      await Promise.all([
+        readJsonFile(resolvedTimelinePath),
+        readJsonFile(ancientAreasPath),
+        readJsonFile(ancientRoadsPath),
+        readJsonFile(ancientCoastlinePath)
+      ]);
+    const ancientEmpireEdgeData = (await pathExists(ancientEmpireEdgePath))
+      ? await readJsonFile(ancientEmpireEdgePath)
+      : null;
+    const ancientBuildResult = await buildAncientAppData({
+      timelineData,
+      ancientAreasData,
+      ancientRoadsData,
+      ancientCoastlineData,
+      bibliographyById,
+      ancientEmpireEdgeData,
+      majorPlacePinCoordinates,
+      outputDirectory
+    });
+    const ancientLayerGzipBytes = ancientBuildResult.writtenFiles.reduce(
+      (sum, file) => sum + file.gzipBytes,
+      0
+    );
+    if (ancientLayerGzipBytes > maxAncientLayerGzipBytes) {
+      throw new Error(
+        `Ancient layer generated files exceed ${maxAncientLayerGzipBytes} bytes gzip (${ancientLayerGzipBytes} bytes).`
+      );
+    }
+    outputFiles.push(...ancientBuildResult.writtenFiles);
+    ancientBuild = {
+      generated: true,
+      skippedReason: null,
+      gzipBytes: ancientLayerGzipBytes,
+      maxGzipBytes: maxAncientLayerGzipBytes,
+      roadJoinCount: ancientBuildResult.roadJoinCount ?? 0,
+      roadJoinTotalLengthKm: ancientBuildResult.roadJoinTotalLengthKm ?? 0,
+      roadJoinMaxLengthKm: ancientBuildResult.roadJoinMaxLengthKm ?? 0
+    };
   }
 
   return {
     validationResult,
     outputDirectory,
     locationCount: locationRecords.length,
-    indexBytes: Buffer.byteLength(indexPayload, "utf8")
+    indexBytes: Buffer.byteLength(indexPayload, "utf8"),
+    outputFiles,
+    ancientBuild
   };
 }

@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "coastlineId": "fixture-coast-1",
+        "provenance": {
+          "dataset": "AWMC fixture",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "awmc:fixture-coast-1"
+          ],
+          "changes": [
+            {
+              "kind": "none",
+              "detail": "Fixture coastline segment",
+              "sources": [
+                "bib:pleiades-place-resource"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -0.5,
+            -0.5
+          ],
+          [
+            4.5,
+            -0.5
+          ]
+        ]
+      }
+    }
+  ]
+}

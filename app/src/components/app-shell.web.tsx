@@ -3,17 +3,31 @@ import {
   lazy,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  type CSSProperties
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent
 } from "react";
 
 import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
+import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
-import { applySelectionToSearch, parseSelectionFromSearch } from "../features/map/selection-url";
+import {
+  applyMapModeToSearch,
+  applyTimelineYearToSearch,
+  applySelectionToSearch,
+  parseMapModeFromSearch,
+  parseTimelineYearFromSearch,
+  parseSelectionFromSearch
+} from "../features/map/selection-url";
+import type { AncientTimelinePayload } from "../features/map/ancient-layer.types";
+import { formatTimelineValueText, formatTimelineYear, resolveStopForYear } from "../features/map/timeline";
 import type {
+  MapDisplayMode,
+  PinLabelSource,
   PlaceDetailsPayload,
   PlaceIndexRecord,
   PlaceSelection
@@ -26,6 +40,34 @@ const SEARCH_HEIGHT = 48;
 const PANEL_CONTENT_TOP_PADDING = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + tokens.spacing.md;
 const MAP_PLACEHOLDER_COLOR = "#F1EEE4";
 const SMALL_SCREEN_BREAKPOINT = 768;
+const SMALL_SCREEN_SHEET_EDGE_GAP_PX = 16;
+const SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX = PANEL_CONTENT_TOP_PADDING + 56;
+const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.53;
+const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
+const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
+const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
+const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
+const MAP_MODE_ORDER: readonly MapDisplayMode[] = ["ancient", "modern"];
+const TIMELINE_DEFAULT_YEAR = 50;
+const TIMELINE_TRACK_THICKNESS_PX = 2;
+const TIMELINE_TRACK_THUMB_DIAMETER_PX = 20;
+const TIMELINE_TRACK_THUMB_INSET_PX = TIMELINE_TRACK_THUMB_DIAMETER_PX / 2;
+const TIMELINE_MAX_WIDTH_PX = 800;
+const TIMELINE_MIN_STOP_SPACING_PX = 36;
+const TIMELINE_NAV_BUTTON_WIDTH_PX = 44;
+const TIMELINE_TRACK_AND_BUTTON_GAP_PX = 12;
+const srOnlyStyle: CSSProperties = {
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: 0,
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0
+};
+type SmallScreenSheetMode = "collapsed" | "expanded";
 
 const LazyMapView = lazy(async () => {
   const module = await import("../features/map/map-view");
@@ -98,9 +140,46 @@ async function fetchPlaceDetails(placeId: string) {
   return (await response.json()) as PlaceDetailsPayload;
 }
 
+async function fetchAncientTimeline() {
+  const response = await fetch("/generated/ancient.timeline.json", {
+    cache: "no-store"
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    const error = new Error(`Could not load ancient timeline (${response.status})`) as Error & {
+      status: number;
+    };
+    error.status = response.status;
+    throw error;
+  }
+
+  return (await response.json()) as AncientTimelinePayload;
+}
+
 function visiblePlaceEntrySelectorById(entryId: string) {
   const escaped = entryId.replace(/\\/gu, "\\\\").replace(/"/gu, '\\"');
   return `button[data-place-entry-id="${escaped}"]`;
+}
+
+function timelineStopTickLabel(stops: { year: number }[], index: number) {
+  const stop = stops[index];
+  if (stop.year < 0) {
+    const isFirstBc = !stops.slice(0, index).some((item) => item.year < 0);
+    return isFirstBc ? `${Math.abs(stop.year)} BC` : `${Math.abs(stop.year)}`;
+  }
+
+  const isFirstAd = !stops.slice(0, index).some((item) => item.year >= 0);
+  return isFirstAd ? `AD ${stop.year}` : `${stop.year}`;
+}
+
+function timelineTickPosition(fraction: number) {
+  const clamped = Math.max(0, Math.min(1, fraction));
+  const thumbInsetOffset = (1 - 2 * clamped) * TIMELINE_TRACK_THUMB_INSET_PX;
+  return `calc(${clamped * 100}% + ${thumbInsetOffset}px)`;
 }
 
 function MapLoadingPlaceholder() {
@@ -126,6 +205,9 @@ function MapLoadingPlaceholder() {
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
+  const [mapMode, setMapMode] = useState<MapDisplayMode>(() =>
+    typeof window === "undefined" ? "ancient" : parseMapModeFromSearch(window.location.search)
+  );
   const [loading, setLoading] = useState(true);
   const [urlStateReady, setUrlStateReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -134,21 +216,84 @@ export function AppShell() {
   const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== "undefined" ? window.innerWidth < SMALL_SCREEN_BREAKPOINT : false
   );
-  const [isSmallScreenPanelExpanded, setIsSmallScreenPanelExpanded] = useState(false);
+  const [smallScreenSheetMode, setSmallScreenSheetMode] = useState<SmallScreenSheetMode>("collapsed");
+  const [smallScreenSheetDragHeightPx, setSmallScreenSheetDragHeightPx] = useState<number | null>(
+    null
+  );
+  const [viewportHeightPx, setViewportHeightPx] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 0
+  );
+  const [viewportWidthPx, setViewportWidthPx] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 0
+  );
   const [placeDetailsById, setPlaceDetailsById] = useState<Record<string, PlaceDetailsPayload>>(
     {}
   );
   const [placeDetailsErrorsById, setPlaceDetailsErrorsById] = useState<Record<string, string>>(
     {}
   );
+  const [ancientTimeline, setAncientTimeline] = useState<AncientTimelinePayload | null>(null);
+  const [ancientTimelineLoadState, setAncientTimelineLoadState] = useState<
+    "loading" | "ready" | "absent" | "error"
+  >("loading");
+  const [ancientLayerStatus, setAncientLayerStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [ancientTimelineRetryToken, setAncientTimelineRetryToken] = useState(0);
+  const [ancientLayerRetryToken, setAncientLayerRetryToken] = useState(0);
+  const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
+  const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
+  const [timelineOverlayInsetForAttribution, setTimelineOverlayInsetForAttribution] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const timelineCardRef = useRef<HTMLDivElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
   const unmountedRef = useRef(false);
+  const smallScreenSheetDragStateRef = useRef<{
+    pointerId: number;
+    startY: number;
+    startHeightPx: number;
+    movedPx: number;
+  } | null>(null);
+  const suppressNextHandleClickRef = useRef(false);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
+  const selectedTimelineStop = useMemo(
+    () =>
+      ancientTimeline?.stops.find((stop) => stop.id === selectedTimelineStopId) ??
+      null,
+    [ancientTimeline, selectedTimelineStopId]
+  );
+  const sortedTimelineStops = useMemo(() => {
+    if (!ancientTimeline) {
+      return [];
+    }
+
+    return [...ancientTimeline.stops].sort((left, right) => left.year - right.year);
+  }, [ancientTimeline]);
+  const timelineBibliographyById = useMemo(
+    () => new Map((ancientTimeline?.bibliography ?? []).map((entry) => [entry.id, entry] as const)),
+    [ancientTimeline]
+  );
+  const hasAncientTimeline = sortedTimelineStops.length > 0;
+  const selectedTimelineStopIndex = useMemo(() => {
+    if (!selectedTimelineStop) {
+      return -1;
+    }
+
+    return sortedTimelineStops.findIndex((stop) => stop.id === selectedTimelineStop.id);
+  }, [selectedTimelineStop, sortedTimelineStops]);
+  const smallScreenSheetMaxHeightPx = Math.max(
+    0,
+    viewportHeightPx - SMALL_SCREEN_SHEET_EDGE_GAP_PX - SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX
+  );
+  const smallScreenSheetCollapsedHeightPx = Math.min(
+    smallScreenSheetMaxHeightPx,
+    Math.max(
+      SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX,
+      Math.round(smallScreenSheetMaxHeightPx * SMALL_SCREEN_SHEET_COLLAPSED_RATIO)
+    )
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -156,13 +301,95 @@ export function AppShell() {
     }
 
     const onResize = () => {
-      setIsSmallScreen(window.innerWidth < SMALL_SCREEN_BREAKPOINT);
+      setViewportHeightPx(window.innerHeight);
+      setViewportWidthPx(window.innerWidth);
+      const nextIsSmallScreen = window.innerWidth < SMALL_SCREEN_BREAKPOINT;
+      setIsSmallScreen(nextIsSmallScreen);
+      if (!nextIsSmallScreen) {
+        setSmallScreenSheetDragHeightPx(null);
+      }
     };
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("resize", onResize);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isSmallScreen) {
+      smallScreenSheetDragStateRef.current = null;
+      return undefined;
+    }
+
+    const onPointerMove = (event: PointerEvent) => {
+      const dragState = smallScreenSheetDragStateRef.current;
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const nextHeightPx = Math.min(
+        smallScreenSheetMaxHeightPx,
+        Math.max(
+          smallScreenSheetCollapsedHeightPx,
+          dragState.startHeightPx + (dragState.startY - event.clientY)
+        )
+      );
+      dragState.movedPx = Math.max(dragState.movedPx, Math.abs(event.clientY - dragState.startY));
+      setSmallScreenSheetDragHeightPx(nextHeightPx);
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      const dragState = smallScreenSheetDragStateRef.current;
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      smallScreenSheetDragStateRef.current = null;
+      const movedLessThanTapThreshold =
+        dragState.movedPx <= SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX;
+      const startedExpanded =
+        dragState.startHeightPx >=
+        (smallScreenSheetCollapsedHeightPx +
+          (smallScreenSheetMaxHeightPx - smallScreenSheetCollapsedHeightPx) / 2);
+      if (movedLessThanTapThreshold) {
+        setSmallScreenSheetMode(startedExpanded ? "collapsed" : "expanded");
+        setSmallScreenSheetDragHeightPx(null);
+        suppressNextHandleClickRef.current = true;
+        return;
+      }
+
+      const finalHeightPx = Math.min(
+        smallScreenSheetMaxHeightPx,
+        Math.max(smallScreenSheetCollapsedHeightPx, smallScreenSheetDragHeightPx ?? dragState.startHeightPx)
+      );
+      const dragRangePx = smallScreenSheetMaxHeightPx - smallScreenSheetCollapsedHeightPx;
+      const dragThresholdPx = Math.min(120, Math.max(48, dragRangePx * 0.33));
+      const nextMode = startedExpanded
+        ? finalHeightPx <= smallScreenSheetMaxHeightPx - dragThresholdPx
+          ? "collapsed"
+          : "expanded"
+        : finalHeightPx >= smallScreenSheetCollapsedHeightPx + dragThresholdPx
+          ? "expanded"
+          : "collapsed";
+      setSmallScreenSheetMode(nextMode);
+      setSmallScreenSheetDragHeightPx(null);
+      suppressNextHandleClickRef.current = true;
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+    };
+  }, [
+    isSmallScreen,
+    smallScreenSheetCollapsedHeightPx,
+    smallScreenSheetDragHeightPx,
+    smallScreenSheetMaxHeightPx
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,6 +407,11 @@ export function AppShell() {
           loadedPlaces.map((place) => [place.id, place] as const)
         );
         const parsedSelection = parseSelectionFromSearch(window.location.search);
+        const parsedMapMode = parseMapModeFromSearch(window.location.search);
+        if (parsedMapMode !== "ancient") {
+          setTimelineSourcesOpen(false);
+        }
+        setMapMode(parsedMapMode);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
         if (parsedSelection && !normalized) {
@@ -210,6 +442,59 @@ export function AppShell() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setAncientTimelineLoadState("loading");
+      }
+    });
+
+    fetchAncientTimeline()
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientTimeline(payload);
+        if (!payload || payload.stops.length === 0) {
+          setAncientTimelineLoadState("absent");
+          setSelectedTimelineStopId(null);
+          return;
+        }
+
+        setAncientTimelineLoadState("ready");
+        const requestedYear = parseTimelineYearFromSearch(window.location.search) ?? TIMELINE_DEFAULT_YEAR;
+        const resolvedStop = resolveStopForYear(payload.stops, requestedYear);
+        setSelectedTimelineStopId(resolvedStop?.id ?? payload.defaultStopId ?? payload.stops[0]?.id ?? null);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) {
+          return;
+        }
+
+        const status =
+          error && typeof error === "object" && "status" in error && typeof error.status === "number"
+            ? error.status
+            : null;
+        if (status === 404) {
+          setAncientTimelineLoadState("absent");
+          setAncientTimeline(null);
+          setSelectedTimelineStopId(null);
+          return;
+        }
+
+        console.error("Failed to load ancient timeline.", error);
+        setAncientTimeline(null);
+        setAncientTimelineLoadState("error");
+        setSelectedTimelineStopId(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ancientTimelineRetryToken]);
 
   useEffect(() => {
     return () => {
@@ -284,13 +569,57 @@ export function AppShell() {
   }, [selection, urlStateReady]);
 
   useEffect(() => {
+    if (!urlStateReady) {
+      return;
+    }
+
+    const nextSearch = applyMapModeToSearch(window.location.search, mapMode);
+    const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState({}, "", nextUrl);
+    }
+  }, [mapMode, urlStateReady]);
+
+  useEffect(() => {
+    if (!urlStateReady || !selectedTimelineStop) {
+      return;
+    }
+
+    const nextSearch = applyTimelineYearToSearch(window.location.search, selectedTimelineStop.year);
+    const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (nextUrl !== currentUrl) {
+      window.history.replaceState({}, "", nextUrl);
+    }
+  }, [selectedTimelineStop, urlStateReady]);
+
+  useEffect(() => {
     if (loading || !urlStateReady) {
       return undefined;
     }
 
     const onPopState = () => {
       const parsedSelection = parseSelectionFromSearch(window.location.search);
+      const parsedMapMode = parseMapModeFromSearch(window.location.search);
+      const parsedYear = parseTimelineYearFromSearch(window.location.search);
       const normalized = normalizeSelection(parsedSelection, placesById);
+      if (parsedMapMode !== "ancient") {
+        setTimelineSourcesOpen(false);
+      }
+      setMapMode(parsedMapMode);
+      if (ancientTimeline) {
+        const resolvedStop = resolveStopForYear(
+          ancientTimeline.stops,
+          parsedYear ?? TIMELINE_DEFAULT_YEAR
+        );
+        setSelectedTimelineStopId(
+          resolvedStop?.id ??
+            ancientTimeline.defaultStopId ??
+            ancientTimeline.stops[0]?.id ??
+            null
+        );
+      }
 
       if (!parsedSelection) {
         lastSelectionActivatorEntryIdRef.current = null;
@@ -318,12 +647,13 @@ export function AppShell() {
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [loading, placesById, urlStateReady]);
+  }, [ancientTimeline, loading, placesById, urlStateReady]);
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
 
     if (!restoreFocus) {
       return;
@@ -368,7 +698,8 @@ export function AppShell() {
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
 
     const activeElement = document.activeElement;
     lastSelectionActivatorEntryIdRef.current =
@@ -382,14 +713,16 @@ export function AppShell() {
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
     setSelection(nextSelection);
   }, []);
 
   const handlePanelSelectPlaceFromAbout = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     writeSelectionToUrl(nextSelection, "push");
     setSelection(nextSelection);
@@ -420,7 +753,8 @@ export function AppShell() {
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setIsSmallScreenPanelExpanded(false);
+    setSmallScreenSheetMode("collapsed");
+    setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     setSelection(nextSelection);
   }, []);
@@ -435,6 +769,155 @@ export function AppShell() {
     },
     [placesById]
   );
+  const handleMapModeRadioKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+      if (
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowRight" &&
+        event.key !== "ArrowUp" &&
+        event.key !== "ArrowDown" &&
+        event.key !== "Home" &&
+        event.key !== "End"
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      const currentIndex = MAP_MODE_ORDER.indexOf(mapMode);
+      let nextMode: MapDisplayMode = mapMode;
+
+      if (event.key === "Home") {
+        nextMode = MAP_MODE_ORDER[0];
+      } else if (event.key === "End") {
+        nextMode = MAP_MODE_ORDER[MAP_MODE_ORDER.length - 1];
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        const nextIndex = currentIndex <= 0 ? MAP_MODE_ORDER.length - 1 : currentIndex - 1;
+        nextMode = MAP_MODE_ORDER[nextIndex];
+      } else {
+        const nextIndex = currentIndex >= MAP_MODE_ORDER.length - 1 ? 0 : currentIndex + 1;
+        nextMode = MAP_MODE_ORDER[nextIndex];
+      }
+
+      if (nextMode !== "ancient") {
+        setTimelineSourcesOpen(false);
+      }
+      setMapMode(nextMode);
+      event.currentTarget
+        .closest("[role='radiogroup']")
+        ?.querySelector<HTMLButtonElement>(`button[role='radio'][data-map-mode='${nextMode}']`)
+        ?.focus();
+    },
+    [mapMode]
+  );
+
+  useEffect(() => {
+    if (!timelineSourcesOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setTimelineSourcesOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [timelineSourcesOpen]);
+
+  const panelHeightPx =
+    smallScreenSheetDragHeightPx ??
+    (smallScreenSheetMode === "expanded"
+      ? smallScreenSheetMaxHeightPx
+      : smallScreenSheetCollapsedHeightPx);
+  const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
+  const timelineVisible =
+    mapMode === "ancient" && (hasAncientTimeline || ancientTimelineLoadState === "error");
+  const retryAncientLayer = useCallback(() => {
+    setTimelineSourcesOpen(false);
+    if (ancientTimelineLoadState === "error") {
+      setAncientTimelineRetryToken((value) => value + 1);
+      return;
+    }
+    setAncientLayerRetryToken((value) => value + 1);
+  }, [ancientTimelineLoadState]);
+  const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
+  useLayoutEffect(() => {
+    if (!timelineVisible) {
+      return undefined;
+    }
+
+    const updateTimelineOverlayInset = () => {
+      const card = timelineCardRef.current;
+      if (!card) {
+        setTimelineOverlayInsetForAttribution(0);
+        return;
+      }
+
+      const bounds = card.getBoundingClientRect();
+      const nextInset = Math.max(0, Math.ceil(window.innerHeight - bounds.top + 8));
+      setTimelineOverlayInsetForAttribution((currentInset) =>
+        currentInset === nextInset ? currentInset : nextInset
+      );
+    };
+
+    updateTimelineOverlayInset();
+    window.addEventListener("resize", updateTimelineOverlayInset);
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && timelineCardRef.current) {
+      observer = new ResizeObserver(updateTimelineOverlayInset);
+      observer.observe(timelineCardRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateTimelineOverlayInset);
+      observer?.disconnect();
+    };
+  }, [timelineVisible]);
+  const effectiveTimelineOverlayInsetForAttribution = timelineVisible ? timelineOverlayInsetForAttribution : 0;
+  const timelineWidthLimitPx = Math.max(
+    280,
+    isSmallScreen
+      ? viewportWidthPx - 32
+      : selectedPlace
+        ? viewportWidthPx - PANEL_WIDTH - 32
+        : viewportWidthPx - 32
+  );
+  const timelineWidthPx = Math.min(TIMELINE_MAX_WIDTH_PX, timelineWidthLimitPx);
+  const timelineMapCenterLeft = selectedPlace && !isSmallScreen ? `calc(50% + ${PANEL_WIDTH / 2}px)` : "50%";
+  const timelineHorizontalPaddingPx = tokens.spacing.md;
+  const timelineTrackColumnWidthPx = Math.max(
+    120,
+    timelineWidthPx -
+      timelineHorizontalPaddingPx * 2 -
+      TIMELINE_NAV_BUTTON_WIDTH_PX * 2 -
+      TIMELINE_TRACK_AND_BUTTON_GAP_PX * 2
+  );
+  const timelineStopSpacingPx =
+    sortedTimelineStops.length > 1
+      ? Math.max(0, timelineTrackColumnWidthPx - TIMELINE_TRACK_THUMB_INSET_PX * 2) /
+        (sortedTimelineStops.length - 1)
+      : Number.POSITIVE_INFINITY;
+  const showOnlyEdgeTickLabels =
+    sortedTimelineStops.length > 2 && timelineStopSpacingPx < TIMELINE_MIN_STOP_SPACING_PX;
+  const hideMapModeToggleOnPhoneExpandedSheet =
+    isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded";
+
+  const setTimelineStopByIndex = useCallback(
+    (index: number) => {
+      if (sortedTimelineStops.length === 0) {
+        return;
+      }
+
+      const clampedIndex = Math.max(0, Math.min(sortedTimelineStops.length - 1, index));
+      setSelectedTimelineStopId(sortedTimelineStops[clampedIndex].id);
+    },
+    [sortedTimelineStops]
+  );
 
   const panelStyle: CSSProperties | null = selectedPlace
     ? isSmallScreen
@@ -443,7 +926,7 @@ export function AppShell() {
           left: `${tokens.spacing.md}px`,
           right: `${tokens.spacing.md}px`,
           bottom: `${tokens.spacing.md}px`,
-          height: isSmallScreenPanelExpanded ? "calc(100% - 32px)" : "40%",
+          height: `${Math.round(panelHeightPx)}px`,
           maxHeight: "calc(100% - 32px)",
           boxSizing: "border-box" as const,
           backgroundColor: tokens.color.surface,
@@ -490,19 +973,382 @@ export function AppShell() {
         places={places}
       />
 
+      {!hideMapModeToggleOnPhoneExpandedSheet ? (
+        <div
+          aria-label="Map type"
+          role="radiogroup"
+          style={{
+            position: "absolute",
+            right: `${tokens.spacing.md}px`,
+            top: isSmallScreen ? `${MAP_TOGGLE_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
+            display: "inline-flex",
+            borderRadius: "999px",
+            border: `1px solid ${tokens.color.divider}`,
+            backgroundColor: tokens.color.surface,
+            boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+            padding: "2px",
+            zIndex: 45
+          }}
+        >
+          {([
+            ["ancient", "Ancient"],
+            ["modern", "Modern"]
+          ] as const).map(([value, label]) => {
+            const selected = mapMode === value;
+            return (
+              <button
+                aria-checked={selected}
+                data-map-mode={value}
+                key={value}
+                onClick={() => {
+                  if (value !== "ancient") {
+                    setTimelineSourcesOpen(false);
+                  }
+                  setMapMode(value);
+                }}
+                onKeyDown={handleMapModeRadioKeyDown}
+                role="radio"
+                tabIndex={selected ? 0 : -1}
+                style={{
+                  minWidth: "86px",
+                  height: "36px",
+                  borderRadius: "999px",
+                  border: "none",
+                  backgroundColor: selected ? "#1A73E8" : "transparent",
+                  color: selected ? "#FFFFFF" : tokens.color.textPrimary,
+                  fontFamily: tokens.typography.uiFont,
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+                type="button"
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
       {loading ? (
         <MapLoadingPlaceholder />
       ) : (
         <Suspense fallback={<MapLoadingPlaceholder />}>
           <LazyMapView
+            ancientTimeline={ancientTimeline}
+            ancientLayerRetryToken={ancientLayerRetryToken}
+            bottomPanelInset={Math.max(panelBottomInsetForMap, timelineBottomInsetForMap)}
             highlightedPlaceId={highlightedPlaceId}
+            isSmallScreen={isSmallScreen}
             leftPanelWidth={panelWidthForMap}
+            mapMode={mapMode}
+            onAncientLayerLoadStateChange={setAncientLayerStatus}
             onSelectPlace={handleSelectFromMap}
+            pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
+            selectedTimelineStopId={selectedTimelineStopId}
             selection={selection}
+            timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
           />
         </Suspense>
       )}
+
+      {timelineVisible ? (
+        <div
+          data-timeline-card="true"
+          ref={timelineCardRef}
+          style={{
+            position: "absolute",
+            left: timelineMapCenterLeft,
+            bottom: isSmallScreen
+              ? `${tokens.spacing.md}px`
+              : `${Math.max(tokens.spacing.md, panelBottomInsetForMap + tokens.spacing.md)}px`,
+            transform: "translateX(-50%)",
+            width: `${Math.round(timelineWidthPx)}px`,
+            maxWidth: `${Math.round(timelineWidthPx)}px`,
+            borderRadius: "8px",
+            border: `1px solid ${tokens.color.divider}`,
+            backgroundColor: "#FFFFFF",
+            boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+            boxSizing: "border-box",
+            padding: `${tokens.spacing.sm}px ${tokens.spacing.md}px`,
+            zIndex: isSmallScreen ? 11 : 30
+          }}
+        >
+          {ancientTimelineLoadState === "error" || ancientLayerStatus === "error" || !selectedTimelineStop ? (
+            <div role="status" style={{ color: tokens.color.textPrimary, fontSize: `${tokens.typography.captionSize}px` }}>
+              Ancient layer data failed to load.{" "}
+              <button
+                onClick={retryAncientLayer}
+                style={{
+                  border: "none",
+                  background: "none",
+                  color: "#1A73E8",
+                  cursor: "pointer",
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  padding: 0,
+                  textDecoration: "underline"
+                }}
+                type="button"
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            <>
+              <div
+                style={{
+                  color: tokens.color.textPrimary,
+                  fontSize: `${tokens.typography.captionSize}px`,
+                  lineHeight: `${tokens.typography.captionLineHeight}px`
+                }}
+              >
+                {formatTimelineYear(selectedTimelineStop.year)} · {selectedTimelineStop.title}{" "}
+                <button
+                  aria-expanded={timelineSourcesOpen}
+                  onClick={() => setTimelineSourcesOpen((value) => !value)}
+                  style={{
+                    border: "none",
+                    background: "none",
+                    color: "#1A73E8",
+                    cursor: "pointer",
+                    fontSize: `${tokens.typography.captionSize}px`,
+                    padding: 0
+                  }}
+                  type="button"
+                >
+                  Sources
+                </button>
+              </div>
+              <div
+                aria-live="polite"
+                data-timeline-stop-live-region="true"
+                style={srOnlyStyle}
+              >
+                {formatTimelineValueText(selectedTimelineStop)}
+              </div>
+              {timelineSourcesOpen ? (
+                <div
+                  data-timeline-sources-popover="true"
+                  style={{
+                    marginTop: `${tokens.spacing.xs}px`,
+                    padding: `${tokens.spacing.sm}px`,
+                    borderRadius: "8px",
+                    backgroundColor: tokens.color.subtleSurface,
+                    color: tokens.color.textSecondary,
+                    fontSize: `${tokens.typography.captionSize}px`,
+                    lineHeight: `${tokens.typography.captionLineHeight}px`
+                  }}
+                >
+                  <p style={{ margin: 0 }}>
+                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                  </p>
+                  <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>{selectedTimelineStop.summary}</p>
+                  {selectedTimelineStop.scripture.length > 0 ? (
+                    <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                      <strong>Passages:</strong>
+                      <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                        {selectedTimelineStop.scripture.map((reference) => (
+                          <li key={reference}>{reference.replace(/^scripture:/u, "")}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  {selectedTimelineStop.sources.length > 0 ? (
+                    <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+                      <strong>Sources:</strong>
+                      <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                        {selectedTimelineStop.sources.map((sourceId) => {
+                          const source = formatSourceCitation(sourceId, timelineBibliographyById);
+                          return (
+                            <li key={sourceId}>
+                              {source.url ? (
+                                <a
+                                  href={source.url}
+                                  rel="noopener noreferrer"
+                                  style={{ color: "#1A73E8" }}
+                                  target="_blank"
+                                >
+                                  {source.label}
+                                </a>
+                              ) : (
+                                source.label
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              <div
+                style={{
+                  marginTop: `${tokens.spacing.sm}px`,
+                  display: "grid",
+                  gridTemplateColumns: `${TIMELINE_NAV_BUTTON_WIDTH_PX}px minmax(0, 1fr) ${TIMELINE_NAV_BUTTON_WIDTH_PX}px`,
+                  gridTemplateRows: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px auto`,
+                  alignItems: "center",
+                  columnGap: `${tokens.spacing.sm}px`
+                }}
+              >
+                <button
+                  aria-label="Earlier change"
+                  disabled={selectedTimelineStopIndex <= 0}
+                  onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex - 1)}
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "22px",
+                    border: `1px solid ${tokens.color.divider}`,
+                    backgroundColor: "#FFFFFF",
+                    color: tokens.color.textPrimary,
+                    cursor: "pointer"
+                  }}
+                  type="button"
+                >
+                  ‹
+                </button>
+                <div style={{ minWidth: 0, gridColumn: 2, gridRow: 1 }}>
+                  <div
+                    style={{
+                      position: "relative",
+                      height: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px`
+                    }}
+                  >
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        left: `${TIMELINE_TRACK_THUMB_INSET_PX}px`,
+                        right: `${TIMELINE_TRACK_THUMB_INSET_PX}px`,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        height: `${TIMELINE_TRACK_THICKNESS_PX}px`,
+                        borderRadius: `${TIMELINE_TRACK_THICKNESS_PX / 2}px`,
+                        backgroundColor: "#C9CDD1"
+                      }}
+                    />
+                    <div
+                      aria-hidden="true"
+                      data-timeline-slider-thumb="true"
+                      style={{
+                        position: "absolute",
+                        left: timelineTickPosition(
+                          Math.max(0, selectedTimelineStopIndex) / Math.max(1, sortedTimelineStops.length - 1)
+                        ),
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px`,
+                        height: `${TIMELINE_TRACK_THUMB_DIAMETER_PX}px`,
+                        borderRadius: "50%",
+                        border: "2px solid #1A73E8",
+                        backgroundColor: "#FFFFFF",
+                        boxSizing: "border-box"
+                      }}
+                    />
+                    <input
+                      aria-label="Year"
+                      aria-valuetext={formatTimelineValueText(selectedTimelineStop)}
+                      className="ibm-timeline-slider-input"
+                      data-timeline-slider="true"
+                      max={Math.max(0, sortedTimelineStops.length - 1)}
+                      min={0}
+                      onChange={(event) => {
+                        setTimelineStopByIndex(Number.parseInt(event.currentTarget.value, 10));
+                      }}
+                      step={1}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        margin: 0,
+                        opacity: 0,
+                        cursor: "pointer"
+                      }}
+                      type="range"
+                      value={Math.max(0, selectedTimelineStopIndex)}
+                    />
+                  </div>
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    gridColumn: 2,
+                    gridRow: 2,
+                    position: "relative",
+                    marginTop: `${tokens.spacing.xs}px`,
+                    height: "40px"
+                  }}
+                >
+                  {sortedTimelineStops.map((stop, stopIndex) => {
+                    const denominator = Math.max(1, sortedTimelineStops.length - 1);
+                    const fraction = denominator === 0 ? 0 : stopIndex / denominator;
+                    const showTickLabel =
+                      !showOnlyEdgeTickLabels ||
+                      stopIndex === 0 ||
+                      stopIndex === sortedTimelineStops.length - 1;
+                    return (
+                      <div
+                        data-timeline-tick-stop-id={stop.id}
+                        key={stop.id}
+                        style={{
+                          position: "absolute",
+                          left: timelineTickPosition(fraction),
+                          transform: "translateX(-50%)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          minWidth: "2px"
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: "1px",
+                            height: "8px",
+                            backgroundColor: "#5F6368"
+                          }}
+                        />
+                        {showTickLabel ? (
+                          <span
+                            style={{
+                              marginTop: "4px",
+                              whiteSpace: "nowrap",
+                              fontSize: `${tokens.typography.captionSize}px`,
+                              color: tokens.color.textSecondary
+                            }}
+                          >
+                            {timelineStopTickLabel(sortedTimelineStops, stopIndex)}
+                          </span>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+                <button
+                  aria-label="Later change"
+                  disabled={selectedTimelineStopIndex < 0 || selectedTimelineStopIndex >= sortedTimelineStops.length - 1}
+                  onClick={() => setTimelineStopByIndex(selectedTimelineStopIndex + 1)}
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "22px",
+                    border: `1px solid ${tokens.color.divider}`,
+                    backgroundColor: "#FFFFFF",
+                    color: tokens.color.textPrimary,
+                    cursor: "pointer"
+                  }}
+                  type="button"
+                >
+                  ›
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
+      <div id="ibm-visible-places-portal-root" style={srOnlyStyle} />
 
       {selectedPlace && panelStyle ? (
         <section aria-label="Place details" style={panelStyle}>
@@ -510,16 +1356,43 @@ export function AppShell() {
             key={selectedPlace.id}
             isLoading={selectedPlaceLoading}
             isSmallScreen={isSmallScreen}
-            isSmallScreenExpanded={isSmallScreenPanelExpanded}
+            isSmallScreenExpanded={smallScreenSheetMode === "expanded"}
             loadErrorMessage={selectedPlaceLoadError}
             onClose={() => closePanel(false)}
             onHighlightPlace={handlePanelHighlightPlace}
+            onSmallScreenHandlePointerDown={(event) => {
+              if (!isSmallScreen) {
+                return;
+              }
+
+              const currentHeightPx =
+                smallScreenSheetDragHeightPx ??
+                (smallScreenSheetMode === "expanded"
+                  ? smallScreenSheetMaxHeightPx
+                  : smallScreenSheetCollapsedHeightPx);
+
+              smallScreenSheetDragStateRef.current = {
+                pointerId: event.pointerId,
+                startY: event.clientY,
+                startHeightPx: currentHeightPx,
+                movedPx: 0
+              };
+              suppressNextHandleClickRef.current = false;
+              setSmallScreenSheetDragHeightPx(currentHeightPx);
+            }}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
             onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
-            onToggleSmallScreenExpanded={() =>
-              setIsSmallScreenPanelExpanded((current) => !current)
-            }
+            onToggleSmallScreenExpanded={() => {
+              setSmallScreenSheetDragHeightPx(null);
+              if (suppressNextHandleClickRef.current) {
+                suppressNextHandleClickRef.current = false;
+                return;
+              }
+              setSmallScreenSheetMode((current) =>
+                current === "expanded" ? "collapsed" : "expanded"
+              );
+            }}
             placeDetails={selectedPlaceDetails}
             places={places}
             placesById={placesById}

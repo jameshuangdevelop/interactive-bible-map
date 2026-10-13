@@ -1,6 +1,11 @@
 import { validateData } from "./lib/validator.mjs";
 
-const result = await validateData();
+// Timeline research landed in M4-02 (data/timeline.json plus politicalAreaId
+// links on location records), so the project's own validate:data run enforces
+// the derived/stored politicalHistory match. The library default stays off so
+// callers (including tests) that don't set up matching timeline fixtures are
+// unaffected.
+const result = await validateData({ requireDerivedPoliticalHistory: true });
 
 for (const warning of result.warnings) {
   console.warn(`WARNING ${warning.file} ${warning.path}: ${warning.message}`);

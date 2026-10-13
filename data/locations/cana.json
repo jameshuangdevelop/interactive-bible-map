@@ -30,7 +30,8 @@
         "wikidata:Q17199012",
         "openbible:cana",
         "bib:mccollough-khirbet-qana"
-      ]
+      ],
+      "politicalAreaId": "galilee-perea"
     },
     {
       "label": "Kafr Kanna",
@@ -45,7 +46,8 @@
         "wikidata:Q2633158",
         "dare:43765",
         "openbible:cana"
-      ]
+      ],
+      "politicalAreaId": "galilee-perea"
     },
     {
       "label": "Qana",
@@ -60,7 +62,8 @@
         "wikidata:Q753812",
         "dare:43764",
         "pleiades:678219"
-      ]
+      ],
+      "politicalAreaId": "syria"
     }
   ],
   "summary": {
@@ -150,38 +153,138 @@
     {
       "fromYear": -37,
       "toYear": -4,
-      "entity": "Kingdom of Judea under Herod the Great (Roman client king)",
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:rainey-notley-sacred-bridge"
-      ]
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 0
     },
     {
       "fromYear": -4,
       "toYear": 39,
-      "entity": "Tetrarchy of Galilee and Perea under Herod Antipas",
+      "holderId": "antipas-tetrarchy",
+      "entity": "Tetrarchy of Galilee and Perea (ruler: Herod Antipas)",
       "sources": [
-        "bib:rainey-notley-sacred-bridge"
-      ]
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 0
     },
     {
       "fromYear": 39,
       "toYear": 44,
-      "entity": "Kingdom of Herod Agrippa I (Roman client king; Galilee added in AD 39 after Antipas's exile)",
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
       "sources": [
-        "bib:rainey-notley-sacred-bridge"
-      ]
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 0
     },
     {
       "fromYear": 44,
       "toYear": 70,
-      "entity": "Roman province of Judaea (Galilee under procuratorial rule after Agrippa I's death)",
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators)",
       "sources": [
-        "wikidata:Q1003997",
-        "bib:rainey-notley-sacred-bridge"
-      ]
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:iaa-magdala-excavation"
+      ],
+      "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change.",
+      "candidate": 0
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
+      "candidate": 0
+    },
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": -4,
+      "toYear": 39,
+      "holderId": "antipas-tetrarchy",
+      "entity": "Tetrarchy of Galilee and Perea (ruler: Herod Antipas)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": 39,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "candidate": 1
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:jewish-encyclopedia-agrippa-ii",
+        "bib:iaa-magdala-excavation"
+      ],
+      "note": "The emperor Nero later added the Galilean towns of Tiberias and Taricheae (identified with Magdala), and Julias in Perea with fourteen villages, to Agrippa II's kingdom; the Jewish historian Josephus dates this to AD 54, but the Jewish Encyclopedia (1906) reads Agrippa II's coinage as pointing to AD 61 instead. These are towns, not land of their own, so this area's extent does not change.",
+      "candidate": 1
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change.",
+      "candidate": 1
+    },
+    {
+      "fromYear": -64,
+      "toYear": -27,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:livius-damascus"
+      ],
+      "candidate": 2
+    },
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6).",
+      "candidate": 2
     }
   ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08"
 }

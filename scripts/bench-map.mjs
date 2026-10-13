@@ -49,7 +49,8 @@ function parseArguments(argv) {
     target: "both",
     appQuery: "",
     outJson: null,
-    outMarkdown: null
+    outMarkdown: null,
+    chromiumArgs: []
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -106,6 +107,17 @@ function parseArguments(argv) {
 
     if (argument.startsWith("--app-query=")) {
       options.appQuery = argument.slice("--app-query=".length);
+      continue;
+    }
+
+    if (argument === "--chromium-arg" && argv[index + 1]) {
+      options.chromiumArgs.push(argv[index + 1]);
+      index += 1;
+      continue;
+    }
+
+    if (argument.startsWith("--chromium-arg=")) {
+      options.chromiumArgs.push(argument.slice("--chromium-arg=".length));
       continue;
     }
   }
@@ -378,6 +390,22 @@ function isTileRequestUrl(rawUrl) {
   return true;
 }
 
+function isKnownBasemapRequestUrl(rawUrl) {
+  let url;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+
+  const host = url.hostname.toLowerCase();
+  return (
+    host.includes("openfreemap.org") ||
+    host.includes("versatiles.org") ||
+    host.includes("openmaptiles.org")
+  );
+}
+
 async function waitForMapReady(page, mapHookKey) {
   await page.waitForSelector("canvas.maplibregl-canvas", { timeout: mapReadyTimeoutMs });
   try {
@@ -544,14 +572,18 @@ async function readMainStyleHealth(page, mapHookKey) {
   );
 }
 
-function assertMainStyleHealth(target, scenario, health) {
+function assertMainStyleHealth(target, scenario, health, networkErrors = []) {
   if (target.id !== "app") {
     return;
   }
 
   if (!health.hasMainAttribution) {
+    const networkErrorSummary =
+      networkErrors.length > 0
+        ? ` network_errors=${JSON.stringify(networkErrors)}`
+        : "";
     throw new Error(
-      `${target.name} ${scenario.id}: expected attribution containing '${mainAttributionNeedle}', got '${health.attributionText}'.`
+      `${target.name} ${scenario.id}: expected attribution containing '${mainAttributionNeedle}', got '${health.attributionText}'.${networkErrorSummary}`
     );
   }
 
@@ -954,7 +986,8 @@ function createTileTracker(page) {
     tileRequestCount: 0,
     knownTileBytes: 0,
     unknownTileBytes: 0,
-    pendingResponses: []
+    pendingResponses: [],
+    networkErrors: []
   };
 
   page.on("response", (response) => {
@@ -963,6 +996,14 @@ function createTileTracker(page) {
     }
 
     const responseUrl = response.url();
+    const status = response.status();
+    if (isKnownBasemapRequestUrl(responseUrl) && status >= 400) {
+      scenarioState.networkErrors.push({
+        status,
+        url: responseUrl
+      });
+    }
+
     if (!isTileRequestUrl(responseUrl)) {
       return;
     }
@@ -991,6 +1032,7 @@ function createTileTracker(page) {
       scenarioState.knownTileBytes = 0;
       scenarioState.unknownTileBytes = 0;
       scenarioState.pendingResponses = [];
+      scenarioState.networkErrors = [];
     },
     async stop() {
       scenarioState.active = false;
@@ -998,7 +1040,8 @@ function createTileTracker(page) {
       return {
         tileRequestCount: scenarioState.tileRequestCount,
         knownTileBytes: scenarioState.knownTileBytes,
-        unknownTileBytes: scenarioState.unknownTileBytes
+        unknownTileBytes: scenarioState.unknownTileBytes,
+        networkErrors: scenarioState.networkErrors
       };
     }
   };
@@ -1149,7 +1192,7 @@ async function runScenarioAttempt({
     const tileResult = await tileTracker.stop();
     const firstMapPaintMs = await readFirstMapPaintMs(page);
     const mainStyleHealth = await readMainStyleHealth(page, target.mapHookKey);
-    assertMainStyleHealth(target, scenario, mainStyleHealth);
+    assertMainStyleHealth(target, scenario, mainStyleHealth, tileResult.networkErrors);
 
     return {
       mode,
@@ -1171,6 +1214,7 @@ async function runScenarioAttempt({
       tileRequestCount: tileResult.tileRequestCount,
       tileKnownBytes: tileResult.knownTileBytes,
       tileUnknownByteCount: tileResult.unknownTileBytes,
+      basemapNetworkErrors: tileResult.networkErrors,
       selectedEntryId: flyToSelectionEntryId,
       webglRenderer,
       mainStyleHealth
@@ -1381,7 +1425,8 @@ async function runBenchmarks(options) {
     options: {
       mode: options.mode,
       target: options.target,
-      appQuery: options.appQuery
+      appQuery: options.appQuery,
+      chromiumArgs: options.chromiumArgs
     },
     modes: {}
   };
@@ -1390,7 +1435,8 @@ async function runBenchmarks(options) {
     for (const mode of benchmarkModesToRun(options.mode)) {
       const headless = mode === "headless";
       const browser = await chromium.launch({
-        headless
+        headless,
+        args: options.chromiumArgs
       });
 
       try {

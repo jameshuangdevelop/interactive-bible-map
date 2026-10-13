@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   AttributionControl,
   LngLatBounds,
@@ -17,15 +18,26 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
   CLUSTER_MAX_ZOOM,
+  ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION,
+  ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
+  ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
+  ANCIENT_MAIN_BASEMAP_STYLE_URL,
+  ANCIENT_AWMC_ATTRIBUTION,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
-  FALLBACK_BASEMAP_ATTRIBUTION,
-  FALLBACK_BASEMAP_STYLE_URL,
   MAP_WORKER_URL,
-  MAIN_BASEMAP_ATTRIBUTION,
+  MODERN_FALLBACK_BASEMAP_ATTRIBUTION,
+  MODERN_FALLBACK_BASEMAP_STYLE_URL,
+  MODERN_MAIN_BASEMAP_ATTRIBUTION,
+  MODERN_MAIN_BASEMAP_STYLE_URL,
   MAX_MAP_ZOOM,
-  MAIN_BASEMAP_STYLE_URL
 } from "./constants";
+import {
+  openingAreaBounds,
+  openingAreaFitOptions,
+  openingCameraMode,
+  resolveMapFitPadding
+} from "./map-camera";
 import {
   BasemapFallbackController,
   MainSourceLoadTimeoutController,
@@ -33,6 +45,7 @@ import {
   type BasemapMode
 } from "./basemap-fallback";
 import { getScaleControlLeftOffset } from "./map-layout";
+import { roundScaleDistanceMeters } from "./map-scale";
 import {
   MAX_VISIBLE_PLACE_LIST_ENTRIES,
   buildPlaceRenderData,
@@ -57,8 +70,22 @@ import {
   pickNearestCandidateWithPreferredRank,
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
+import { formatHolderYearRange } from "./holder-year-range";
+import { ANCIENT_LAYER_STYLE } from "./ancient-layer-style";
+import {
+  filterAreaLabelsForAncientMap,
+  linkedTimelineLocationIds
+} from "./ancient-area-label-visibility";
 import type { MapViewProps } from "./map-view.types";
-import type { Coordinates, PlaceIndexRecord, PlaceSelection } from "./types";
+import type {
+  AncientEntityRecord,
+  AncientShapesPayload,
+  AncientStopPayload,
+  FeatureCollection,
+  LineStringGeometry,
+  MultiLineStringGeometry
+} from "./ancient-layer.types";
+import type { Coordinates, MapDisplayMode, PlaceIndexRecord, PlaceSelection } from "./types";
 
 setWorkerUrl(MAP_WORKER_URL);
 const configuredBasemapMode = resolveInitialBasemapMode(process.env.EXPO_PUBLIC_BASEMAP);
@@ -69,6 +96,12 @@ const sourceSitePinsId = "ibm-site-pins";
 const sourceCandidatePinsId = "ibm-candidate-pins";
 const sourceAreaLabelsId = "ibm-area-labels";
 const sourceKeyboardFocusId = "ibm-keyboard-focus";
+const sourceAncientAreasId = "ibm-ancient-areas";
+const sourceAncientBordersId = "ibm-ancient-borders";
+const sourceAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const sourceAncientRoadsId = "ibm-ancient-roads";
+const sourceAncientCoastlineId = "ibm-ancient-coastline";
+const sourceAncientHolderLabelsId = "ibm-ancient-holder-labels";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
@@ -98,8 +131,21 @@ const layerAreaLabelOverviewId = "ibm-area-label-overview";
 const layerAreaLabelId = "ibm-area-label";
 const layerSelectedAreaLabelId = "ibm-selected-area-label";
 const layerKeyboardFocusId = "ibm-keyboard-focus";
+const layerAncientAreaFillId = "ibm-ancient-area-fill";
+const layerAncientUncertainFillId = "ibm-ancient-area-uncertain-fill";
+const layerAncientBorderStateId = "ibm-ancient-border-state";
+const layerAncientBorderDisputedId = "ibm-ancient-border-disputed";
+const layerAncientEmpireEdgeId = "ibm-ancient-empire-edge";
+const layerAncientRoadMajorCasingId = "ibm-ancient-road-major-casing";
+const layerAncientRoadMajorKnownId = "ibm-ancient-road-major-known";
+const layerAncientCoastlineId = "ibm-ancient-coastline";
+const layerAncientCoastlineLabelId = "ibm-ancient-coastline-label";
+const layerAncientHolderLabelId = "ibm-ancient-holder-label";
+const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
+const layerAncientHolderLabelClickTargetId = "ibm-ancient-holder-label-click-target";
 
 const questionBadgeImageId = "ibm-question-badge-image";
+const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
 const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
@@ -155,7 +201,9 @@ const interactiveLayerIds = [
   layerMajorAreaLabelId,
   layerAreaLabelOverviewId,
   layerAreaLabelId,
-  layerSelectedAreaLabelId
+  layerSelectedAreaLabelId,
+  layerAncientHolderLabelClickableId,
+  layerAncientHolderLabelClickTargetId
 ] as const;
 
 const candidateVisibilityFilter = [
@@ -214,6 +262,12 @@ const areaLabelMajorVariableAnchorFilter = [
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const selectedAreaLabelFilter = ["all", areaLabelVisibilityFilter, ["==", ["get", "isSelectedPlace"], true]];
+const areaLabelTextFontExpression = toExpression([
+  "case",
+  ["==", ["get", "areaKind"], "region"],
+  ["literal", ["Noto Sans Italic"]],
+  ["literal", ["Noto Sans Bold"]]
+]);
 const areaLabelPointLayout = {
   "text-anchor": "center" as const,
   "text-justify": "center" as const,
@@ -239,8 +293,54 @@ interface WebGlRendererInfo {
   isSoftwareRenderer: boolean;
 }
 
+function applyMapModeOverlayVisibility(
+  map: MapLibreMap,
+  mapMode: MapDisplayMode,
+  ancientLayerEnabled: boolean
+) {
+  const showAreaLabels = mapMode === "ancient";
+  for (const layerId of [
+    layerAreaLabelOverviewId,
+    layerAreaLabelId,
+    layerMajorAreaLabelOverviewId,
+    layerMajorAreaLabelId,
+    layerSelectedAreaLabelId
+  ]) {
+    setLayerVisibility(map, layerId, showAreaLabels);
+  }
+
+  const showAncientLayer = mapMode === "ancient" && ancientLayerEnabled;
+  for (const layerId of [
+    layerAncientAreaFillId,
+    layerAncientUncertainFillId,
+    layerAncientBorderStateId,
+    layerAncientBorderDisputedId,
+    layerAncientEmpireEdgeId,
+    layerAncientRoadMajorCasingId,
+    layerAncientRoadMajorKnownId,
+    layerAncientCoastlineId,
+    layerAncientCoastlineLabelId,
+    layerAncientHolderLabelId,
+    layerAncientHolderLabelClickableId,
+    layerAncientHolderLabelClickTargetId
+  ]) {
+    setLayerVisibility(map, layerId, showAncientLayer);
+  }
+}
+
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
+
+function isFeatureCollectionData(
+  value: GeoJsonSourceData
+): value is Exclude<GeoJsonSourceData, string> & { features: unknown[] } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "features" in value &&
+    Array.isArray((value as { features: unknown }).features)
+  );
+}
 
 function toLayerFilter(filter: unknown): LayerFilter {
   return filter as LayerFilter;
@@ -381,16 +481,26 @@ function createMajorClusterTopSideFilter(
   return expression;
 }
 
-function getStyleUrl(mode: BasemapMode) {
-  if (mode === "fallback") {
-    return FALLBACK_BASEMAP_STYLE_URL;
+function getStyleUrl(mode: BasemapMode, mapMode: MapDisplayMode) {
+  if (mapMode === "modern") {
+    return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_STYLE_URL : MODERN_MAIN_BASEMAP_STYLE_URL;
   }
 
-  return MAIN_BASEMAP_STYLE_URL;
+  if (mode === "fallback") {
+    return ANCIENT_FALLBACK_BASEMAP_STYLE_URL;
+  }
+
+  return ANCIENT_MAIN_BASEMAP_STYLE_URL;
 }
 
-function getAttributionMarkup(mode: BasemapMode) {
-  return mode === "fallback" ? FALLBACK_BASEMAP_ATTRIBUTION : MAIN_BASEMAP_ATTRIBUTION;
+function getAttributionMarkup(mode: BasemapMode, mapMode: MapDisplayMode) {
+  if (mapMode === "modern") {
+    return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
+  }
+
+  const basemapAttribution =
+    mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
+  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}`;
 }
 
 function prefersReducedMotion() {
@@ -426,6 +536,7 @@ function fitBoundsForPlace(
   coordinates: Coordinates[],
   maxZoom: number,
   leftInset: number,
+  bottomInset: number,
   durationMs: number,
   reducedMotion = prefersReducedMotion()
 ) {
@@ -440,12 +551,13 @@ function fitBoundsForPlace(
   }
 
   map.fitBounds(bounds, {
-    padding: {
+    padding: resolveMapFitPadding({
+      leftInset,
+      bottomInset,
       top: focusPaddingTop,
-      right: 64,
-      bottom: 64,
-      left: leftInset + 64
-    },
+      side: 64,
+      bottom: 64
+    }),
     maxZoom,
     duration: reducedMotion ? 0 : durationMs
   });
@@ -456,6 +568,7 @@ function focusSelection(
   place: PlaceIndexRecord,
   selection: PlaceSelection,
   leftInset: number,
+  bottomInset: number,
   durationMs: number
 ) {
   const focusPlan = planSelectionFocus(place, selection);
@@ -464,7 +577,7 @@ function focusSelection(
   }
 
   if (focusPlan.kind === "fit-bounds") {
-    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, durationMs);
+    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, bottomInset, durationMs);
     return;
   }
 
@@ -473,25 +586,54 @@ function focusSelection(
     {
       center: focusPlan.coordinates,
       zoom: focusPlan.zoom,
-      padding: {
+      padding: resolveMapFitPadding({
+        leftInset,
+        bottomInset,
         top: focusPaddingTop,
-        right: 64,
-        bottom: 64,
-        left: leftInset + 64
-      }
+        side: 64,
+        bottom: 64
+      })
     },
     durationMs,
     prefersReducedMotion()
   );
 }
 
-function getMapLabelPadding(leftInset: number) {
+function getMapLabelPadding(leftInset: number, bottomInset: number) {
   return {
     top: mapLabelPaddingTop,
     right: mapLabelPaddingEdge,
-    bottom: mapLabelPaddingEdge,
+    bottom: bottomInset + mapLabelPaddingEdge,
     left: leftInset + mapLabelPaddingEdge
   };
+}
+
+function openOverviewForCurrentViewport(
+  map: MapLibreMap,
+  insets: { left: number; bottom: number },
+  durationMs: number
+) {
+  const viewportWidth = typeof window === "undefined" ? 1440 : window.innerWidth;
+  const mode = openingCameraMode(viewportWidth);
+  if (mode === "desktop-fixed") {
+    flyOrJump(
+      map,
+      {
+        center: DEFAULT_MAP_CENTER,
+        zoom: DEFAULT_MAP_ZOOM
+      },
+      durationMs
+    );
+    return;
+  }
+
+  map.fitBounds(
+    openingAreaBounds(),
+    openingAreaFitOptions({
+      insets,
+      durationMs: prefersReducedMotion() ? 0 : durationMs
+    })
+  );
 }
 
 function collapseCompactAttribution(container: HTMLElement | null) {
@@ -781,6 +923,26 @@ function createTransparentCollisionImage(sizePx: number) {
   });
 }
 
+function createUncertainHatchImage() {
+  return createCanvasImage(8, (context, size) => {
+    context.clearRect(0, 0, size, size);
+    context.strokeStyle = ANCIENT_LAYER_STYLE.uncertain.hatchColor;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(0, size);
+    context.lineTo(size, 0);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(-2, size);
+    context.lineTo(2, size - 4);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(size - 2, 2);
+    context.lineTo(size + 2, -2);
+    context.stroke();
+  });
+}
+
 function createCircularSdfImage({
   canvasSizePx,
   radiusPx
@@ -911,11 +1073,446 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
   }
 }
 
+function ensureUncertainHatchImage(map: MapLibreMap) {
+  if (map.hasImage(uncertainHatchImageId)) {
+    return;
+  }
+
+  const image = createUncertainHatchImage();
+  if (image) {
+    map.addImage(uncertainHatchImageId, image.image, { pixelRatio: image.pixelRatio });
+  }
+}
+
+type AncientLineGeometry = LineStringGeometry | MultiLineStringGeometry;
+type AncientLineFeatureCollection = FeatureCollection<AncientLineGeometry, Record<string, unknown>>;
+
+function emptyAncientLineFeatureCollection(): AncientLineFeatureCollection {
+  return {
+    type: "FeatureCollection",
+    features: []
+  };
+}
+
+function asLineFeatureCollection(
+  value: AncientLineGeometry | null | undefined
+): AncientLineFeatureCollection {
+  if (!value) {
+    return emptyAncientLineFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: value
+      }
+    ]
+  };
+}
+
+function holderKindLabel(kind: AncientEntityRecord["kind"], holderId?: string) {
+  if (holderId === "italy-direct") {
+    return "Ruled from Rome, not a province";
+  }
+  if (holderId === "archelaus-ethnarchy") {
+    return "Ethnarchy under Rome";
+  }
+  if (holderId === "roman-empire") {
+    return "Roman provinces shown together";
+  }
+
+  if (kind === "roman-province") {
+    return "Roman province";
+  }
+  if (kind === "client-kingdom") {
+    return "Allied kingdom";
+  }
+  if (kind === "client-tetrarchy") {
+    return "Tetrarchy under Rome";
+  }
+  if (kind === "free-city-or-league") {
+    return "Free city or league";
+  }
+  if (kind === "outside-empire") {
+    return "Outside the empire";
+  }
+
+  return "Status unclear in the sources";
+}
+
+function buildAncientAreaFeatures(
+  shapes: AncientShapesPayload | null,
+  stopPayload: AncientStopPayload | null,
+  entitiesById: Map<string, AncientEntityRecord>
+) {
+  const empty = createEmptyFeatureCollection();
+  if (!shapes || !stopPayload) {
+    return empty;
+  }
+
+  const shapeByAreaId = new Map(
+    shapes.areas.features.map((feature) => [feature.properties.areaId, feature.geometry] as const)
+  );
+
+  return {
+    type: "FeatureCollection" as const,
+    features: stopPayload.areas
+      .map((area) => {
+        const geometry = shapeByAreaId.get(area.areaId);
+        if (!geometry) {
+          return null;
+        }
+
+        const holder = entitiesById.get(area.holderId);
+        const tooltipText =
+          area.holderKind === "uncertain"
+            ? area.note
+              ? `Status unclear in the sources: ${area.note}`
+              : "Status unclear in the sources"
+            : `${holder?.name ?? area.holderId} (${holderKindLabel(area.holderKind, area.holderId)})`;
+
+        return {
+          type: "Feature" as const,
+          properties: {
+            areaId: area.areaId,
+            holderId: area.holderId,
+            holderKind: area.holderKind,
+            tooltipText
+          },
+          geometry
+        };
+      })
+      .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
+  };
+}
+
+function buildAncientBorderFeatures(stopPayload: AncientStopPayload | null): AncientLineFeatureCollection {
+  if (!stopPayload) {
+    return emptyAncientLineFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: stopPayload.holderBorders.features.map((feature) => ({
+      type: "Feature",
+      properties: { ...feature.properties },
+      geometry: feature.geometry
+    }))
+  };
+}
+
+function buildAncientHolderLabelFeatures(
+  stopPayload: AncientStopPayload | null,
+  timelineRangeEndYear: number
+) {
+  if (!stopPayload) {
+    return createEmptyFeatureCollection();
+  }
+
+  return {
+    type: "FeatureCollection" as const,
+    features: stopPayload.holderLabels
+      .map((label) => {
+        const holderAssignment = stopPayload.areas.find((area) => area.areaId === label.areaId);
+        const labelText = label.labelText;
+        const yearRangeText = holderAssignment
+          ? formatHolderYearRange({
+              heldFromYear: holderAssignment.heldFromYear,
+              heldToYear: holderAssignment.heldToYear,
+              heldFromKnown: holderAssignment.heldFromKnown,
+              timelineRangeEndYear
+            })
+          : "";
+        const rulerText = holderAssignment?.ruler ? ` · ${holderAssignment.ruler}` : "";
+        const yearRangePart = yearRangeText.length > 0 ? ` · ${yearRangeText}` : "";
+        return {
+          type: "Feature" as const,
+          properties: {
+            holderId: label.holderId,
+            holderLocationId: label.locationId,
+            labelText,
+            minZoom: label.minZoom,
+            clickable: typeof label.locationId === "string" && label.locationId.length > 0,
+            tooltipText: `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
+          },
+          geometry: {
+            type: "Point" as const,
+            coordinates: label.labelPoint
+          }
+        };
+      })
+  };
+}
+
 function ensureMapLayers(
   map: MapLibreMap,
   majorPlaceByRank: Map<number, MajorPlaceReference>
 ) {
   ensureCollisionImages(map);
+  ensureUncertainHatchImage(map);
+
+  if (!map.getLayer(layerAncientAreaFillId)) {
+    map.addLayer({
+      id: layerAncientAreaFillId,
+      source: sourceAncientAreasId,
+      type: "fill",
+      filter: toLayerFilter(["!=", ["get", "holderKind"], "uncertain"]),
+      paint: {
+        "fill-color": [
+          "match",
+          ["get", "holderKind"],
+          "roman-province",
+          ANCIENT_LAYER_STYLE.areaFill.romanProvince.color,
+          "client-kingdom",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
+          "client-tetrarchy",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
+          "free-city-or-league",
+          ANCIENT_LAYER_STYLE.areaFill.client.color,
+          "outside-empire",
+          ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color,
+          ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.color
+        ],
+        "fill-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          3,
+          [
+            "match",
+            ["get", "holderKind"],
+            "roman-province",
+            ANCIENT_LAYER_STYLE.areaFill.romanProvince.opacity,
+            "client-kingdom",
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
+            "client-tetrarchy",
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
+            "free-city-or-league",
+            ANCIENT_LAYER_STYLE.areaFill.client.opacity,
+            "outside-empire",
+            ANCIENT_LAYER_STYLE.areaFill.outsideEmpire.opacity,
+            0
+          ],
+          10,
+          0
+        ]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientUncertainFillId)) {
+    map.addLayer({
+      id: layerAncientUncertainFillId,
+      source: sourceAncientAreasId,
+      type: "fill",
+      filter: toLayerFilter(["==", ["get", "holderKind"], "uncertain"]),
+      paint: {
+        "fill-pattern": uncertainHatchImageId,
+        "fill-opacity": 0.55
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderStateId)) {
+    map.addLayer({
+      id: layerAncientBorderStateId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "borderStyle"], "state"],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]
+      ]),
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.border.stateColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 7, 1, 11, 2],
+        "line-dasharray": [1, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientBorderDisputedId)) {
+    map.addLayer({
+      id: layerAncientBorderDisputedId,
+      source: sourceAncientBordersId,
+      type: "line",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "borderStyle"], "disputed"],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]
+      ]),
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+        "line-dasharray": [1, 2]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientEmpireEdgeId)) {
+    map.addLayer({
+      id: layerAncientEmpireEdgeId,
+      source: sourceAncientEmpireEdgeId,
+      type: "line",
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 4, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMajorCasingId)) {
+    map.addLayer({
+      id: layerAncientRoadMajorCasingId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.casingColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 2.6, 7, 3.6, 9, 5.5, 12, 9]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientRoadMajorKnownId)) {
+    map.addLayer({
+      id: layerAncientRoadMajorKnownId,
+      source: sourceAncientRoadsId,
+      type: "line",
+      minzoom: 5,
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.roads.knownColor,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1.2, 7, 2, 9, 3.5, 12, 6.5]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientCoastlineId)) {
+    map.addLayer({
+      id: layerAncientCoastlineId,
+      source: sourceAncientCoastlineId,
+      type: "line",
+      paint: {
+        "line-color": ANCIENT_LAYER_STYLE.coastline.lineColor,
+        "line-width": 1.5
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientCoastlineLabelId)) {
+    map.addLayer({
+      id: layerAncientCoastlineLabelId,
+      source: sourceAncientCoastlineId,
+      type: "symbol",
+      minzoom: 9,
+      layout: {
+        "symbol-placement": "line",
+        "symbol-spacing": 250,
+        "text-field": "Roman shore",
+        "text-font": ["Noto Sans Italic"],
+        "text-size": 12,
+        "text-letter-spacing": 0.1,
+        "text-max-angle": 60
+      },
+      paint: {
+        "text-color": ANCIENT_LAYER_STYLE.coastline.labelColor,
+        "text-halo-color": ANCIENT_LAYER_STYLE.coastline.labelHaloColor,
+        "text-halo-width": 1.5
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], false],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-max-width": 30,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
+        "symbol-sort-key": 0
+      },
+      paint: {
+        "text-color": "#5F6368",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelClickableId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelClickTargetId,
+      source: sourceAncientHolderLabelsId,
+      type: "circle",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], true],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 12, 7, 14, 10, 18],
+        "circle-color": "rgba(0,0,0,0)",
+        "circle-opacity": 0.001
+      }
+    });
+
+    map.addLayer({
+      id: layerAncientHolderLabelClickableId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "clickable"], true],
+        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+      ]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-max-width": 30,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
+        "symbol-sort-key": 0
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
 
   if (!map.getLayer(layerClusterCircleId)) {
     map.addLayer({
@@ -1304,7 +1901,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1328,7 +1925,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1352,7 +1949,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1376,7 +1973,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -1528,7 +2125,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "placeName"],
         "text-transform": "uppercase",
-        "text-font": ["Noto Sans Bold"],
+        "text-font": areaLabelTextFontExpression,
         "text-size": ["get", "areaFontSize"],
         "text-letter-spacing": 0.18,
         "text-allow-overlap": true,
@@ -1616,6 +2213,9 @@ function ensureMapLayers(
   }
 
   const areaLayersNeedingStandardClusterClearance = [
+    layerAncientHolderLabelId,
+    layerAncientHolderLabelClickableId,
+    layerAncientHolderLabelClickTargetId,
     layerAreaLabelOverviewId,
     layerAreaLabelId,
     layerMajorAreaLabelOverviewId,
@@ -1668,6 +2268,10 @@ function asNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function propertyIsTrue(value: unknown): boolean {
+  return value === true || value === "true" || value === 1;
+}
+
 function asScreenPoint(point: PointLike): HitScreenPoint | null {
   if (Array.isArray(point)) {
     const [x, y] = point;
@@ -1718,6 +2322,31 @@ function toVisibleEntry(
 
   const clusterId = asNumber(properties.cluster_id);
   const pointCount = asNumber(properties.point_count);
+  if (
+    layerId === layerAncientHolderLabelClickableId ||
+    layerId === layerAncientHolderLabelClickTargetId
+  ) {
+    const holderLocationId = asString(properties.holderLocationId);
+    const holderLabelText = asString(properties.labelText);
+    const holderTooltipText = asString(properties.tooltipText);
+    const clickable = propertyIsTrue(properties.clickable);
+    if (clickable && holderLocationId && holderLabelText && holderTooltipText) {
+      return {
+        id: `holder:${String(properties.holderId ?? holderLocationId)}:${holderLabelText}`,
+        kind: "place",
+        coordinates,
+        accessibleName: `${holderLabelText}, area`,
+        tooltipText: holderTooltipText,
+        selection: {
+          placeId: holderLocationId,
+          candidateIndex: null
+        },
+        interactionRank: 1
+      };
+    }
+    return null;
+  }
+
   if (clusterId !== null && pointCount !== null) {
     if (isMajorClusterLayerId(layerId)) {
       const minImportanceRank = asNumber(properties.minImportanceRank);
@@ -1895,14 +2524,6 @@ function distanceMeters(left: Coordinates, right: Coordinates) {
   return earthRadiusMeters * arc;
 }
 
-function roundedDistanceMeters(value: number) {
-  const leading = [1, 2, 3, 5, 10];
-  const power = Math.pow(10, Math.floor(Math.log10(value)));
-  const normalized = value / power;
-  const candidate = leading.find((entry) => entry >= normalized) ?? 10;
-  return candidate * power;
-}
-
 function formatScaleDistance(valueMeters: number) {
   if (valueMeters >= 1000) {
     const kilometers = valueMeters / 1000;
@@ -1922,6 +2543,15 @@ export function MapView({
   selection,
   highlightedPlaceId,
   leftPanelWidth,
+  bottomPanelInset,
+  timelineOverlayInset,
+  isSmallScreen,
+  mapMode,
+  selectedTimelineStopId,
+  ancientTimeline,
+  ancientLayerRetryToken,
+  onAncientLayerLoadStateChange,
+  pinLabelSource,
   onSelectPlace
 }: MapViewProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1936,16 +2566,23 @@ export function MapView({
   const gestureInProgressRef = useRef(false);
   const gestureReleaseTimeoutRef = useRef<number | null>(null);
   const visibleListRefreshFrameRef = useRef<number | null>(null);
+  const scaleBarRefreshFrameRef = useRef<number | null>(null);
   const activeTooltipEntryIdRef = useRef<string | null>(null);
   const mapCanvasHasPointerCursorRef = useRef(false);
   const attributionControlRef = useRef<AttributionControl | null>(null);
-  const attributionModeRef = useRef<BasemapMode | null>(null);
+  const attributionModeRef = useRef<string | null>(null);
   const mainSourceLoadTimeoutRef = useRef<number | null>(null);
   const mainSourceLoadControllerRef = useRef(new MainSourceLoadTimeoutController());
   const mapKeyboardActiveRef = useRef(false);
   const tooltipTrackingEnabledRef = useRef(false);
   const tooltipMouseMoveFrameRef = useRef<number | null>(null);
   const pendingTooltipPointRef = useRef<PointLike | null>(null);
+  const openingOverviewAppliedRef = useRef(false);
+  const panelInsetRef = useRef(0);
+  const bottomInsetRef = useRef(0);
+  const selectionRef = useRef<PlaceSelection | null>(null);
+  const mapModeRef = useRef<MapDisplayMode>(mapMode);
+  const mapModeEffectInitializedRef = useRef(false);
   const majorPlaceByRankRef = useRef<Map<number, MajorPlaceReference>>(new Map());
   const majorClusterTooltipByEntryIdRef = useRef(new Map<string, string>());
   const activateVisibleEntryRef = useRef<(entry: VisibleListEntry) => void>(() => undefined);
@@ -1954,6 +2591,14 @@ export function MapView({
   const scheduleVisibleEntryRefreshRef = useRef<() => void>(() => undefined);
   const syncSourcesAndLayersRef = useRef<() => void>(() => undefined);
   const updateScaleBarRef = useRef<() => void>(() => undefined);
+  const stopPayloadRequestIdsRef = useRef(new Set<string>());
+  const stopPrefetchScheduledRef = useRef(false);
+  const failedStopIdsRef = useRef(new Set<string>());
+  const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
+
+  useEffect(() => {
+    selectedTimelineStopIdRef.current = selectedTimelineStopId;
+  }, [selectedTimelineStopId]);
 
   const runtimeTuning = useMemo(
     () =>
@@ -1971,24 +2616,327 @@ export function MapView({
     []
   );
   const panelInset = Math.max(0, leftPanelWidth);
+  const bottomInset = Math.max(0, bottomPanelInset);
+  const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
-  const renderData = useMemo(
-    () => buildPlaceRenderData(places, selection, highlightedPlaceId),
-    [highlightedPlaceId, places, selection]
+  const renderData = useMemo(() => {
+    return buildPlaceRenderData(places, selection, highlightedPlaceId, {
+      includeAreaLabels: mapMode === "ancient",
+      pinLabelSource
+    });
+  }, [highlightedPlaceId, mapMode, pinLabelSource, places, selection]);
+  const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
+  const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientStopsById, setAncientStopsById] = useState<Record<string, AncientStopPayload>>({});
+  const ancientEntitiesById = useMemo(
+    () => new Map((ancientTimeline?.entities ?? []).map((entity) => [entity.id, entity] as const)),
+    [ancientTimeline]
   );
+  const selectedAncientStopPayload = useMemo(
+    () =>
+      selectedTimelineStopId && ancientStopsById[selectedTimelineStopId]
+        ? ancientStopsById[selectedTimelineStopId]
+        : null,
+    [ancientStopsById, selectedTimelineStopId]
+  );
+  const effectiveRenderData = useMemo(() => {
+    if (mapMode !== "ancient" || !hasAncientTimeline) {
+      return renderData;
+    }
+
+    const linkedLocationIds = linkedTimelineLocationIds(ancientTimeline?.entities);
+
+    return {
+      ...renderData,
+      areaLabels: filterAreaLabelsForAncientMap({
+        areaLabels: renderData.areaLabels,
+        linkedLocationIds
+      })
+    };
+  }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData]);
   const majorPlaceByRank = useMemo(
-    () => buildMajorPlaceReferenceByRank(renderData),
-    [renderData]
+    () => buildMajorPlaceReferenceByRank(effectiveRenderData),
+    [effectiveRenderData]
   );
+  const ancientAreaFeatures = useMemo(
+    () => buildAncientAreaFeatures(ancientShapes, selectedAncientStopPayload, ancientEntitiesById),
+    [ancientEntitiesById, ancientShapes, selectedAncientStopPayload]
+  );
+  const ancientBorderFeatures = useMemo(
+    () => buildAncientBorderFeatures(selectedAncientStopPayload),
+    [selectedAncientStopPayload]
+  );
+  const ancientEmpireEdgeFeatures = useMemo(() => {
+    if (isFeatureCollectionData(ancientEmpireEdge) && ancientEmpireEdge.features.length > 0) {
+      return ancientEmpireEdge;
+    }
+
+    return asLineFeatureCollection(selectedAncientStopPayload?.romanEmpireEdge);
+  }, [ancientEmpireEdge, selectedAncientStopPayload]);
+  const ancientHolderLabelFeatures = useMemo(() => {
+    const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
+    return buildAncientHolderLabelFeatures(
+      selectedAncientStopPayload,
+      timelineRangeEndYear
+    );
+  }, [ancientTimeline, selectedAncientStopPayload]);
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
   const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
+  const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const ancientLayerLoadStateRef = useRef<"idle" | "loading" | "ready" | "error">("idle");
+  const previousAncientLayerRetryTokenRef = useRef(ancientLayerRetryToken);
+  const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
+    setAncientShapes(null);
+    setAncientRoads(createEmptyFeatureCollection());
+    setAncientCoastline(createEmptyFeatureCollection());
+    setAncientEmpireEdge(createEmptyFeatureCollection());
+    setAncientStopsById({});
+    stopPrefetchScheduledRef.current = false;
+    stopPayloadRequestIdsRef.current.clear();
+    failedStopIdsRef.current.clear();
+    setAncientLayerLoadState(nextState);
+  }, []);
+
+  useEffect(() => {
+    onAncientLayerLoadStateChange(ancientLayerLoadState);
+    ancientLayerLoadStateRef.current = ancientLayerLoadState;
+  }, [ancientLayerLoadState, onAncientLayerLoadStateChange]);
 
   useEffect(() => {
     majorPlaceByRankRef.current = majorPlaceByRank;
   }, [majorPlaceByRank]);
+
+  useEffect(() => {
+    panelInsetRef.current = panelInset;
+  }, [panelInset]);
+
+  useEffect(() => {
+    bottomInsetRef.current = bottomInset;
+  }, [bottomInset]);
+
+  useEffect(() => {
+    selectionRef.current = selection;
+  }, [selection]);
+
+  useEffect(() => {
+    mapModeRef.current = mapMode;
+  }, [mapMode]);
+
+  useEffect(() => {
+    if (!hasAncientTimeline) {
+      queueMicrotask(() => {
+        resetAncientLayerData("idle");
+      });
+      return;
+    }
+
+    queueMicrotask(() => {
+      resetAncientLayerData("loading");
+    });
+  }, [hasAncientTimeline, resetAncientLayerData]);
+
+  const loadStopPayload = useCallback(async (stopId: string, options?: { prefetch?: boolean; forceRetry?: boolean }) => {
+    const prefetch = options?.prefetch ?? false;
+    const forceRetry = options?.forceRetry ?? false;
+    const selectedStopId = selectedTimelineStopIdRef.current;
+    const isSelectedStop = selectedStopId === stopId;
+    if (
+      !hasAncientTimeline ||
+      !stopId ||
+      (ancientLayerLoadStateRef.current === "error" && !forceRetry) ||
+      (failedStopIdsRef.current.has(stopId) && !forceRetry && !isSelectedStop) ||
+      stopPayloadRequestIdsRef.current.has(stopId)
+    ) {
+      return;
+    }
+
+    if (forceRetry) {
+      failedStopIdsRef.current.delete(stopId);
+    }
+
+    stopPayloadRequestIdsRef.current.add(stopId);
+    try {
+      const response = await fetch(`/generated/ancient.stop.${encodeURIComponent(stopId)}.json`, {
+        cache: "no-store"
+      });
+      if (!response.ok) {
+        throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
+      }
+
+      const payload = (await response.json()) as AncientStopPayload;
+      setAncientStopsById((previous) => {
+        if (previous[payload.stopId]) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [payload.stopId]: payload
+        };
+      });
+      failedStopIdsRef.current.delete(payload.stopId);
+      if (selectedTimelineStopIdRef.current === payload.stopId) {
+        setAncientLayerLoadState("ready");
+      }
+    } catch (error) {
+      console.error("Failed to load ancient stop payload.", error);
+      failedStopIdsRef.current.add(stopId);
+      if (!prefetch || selectedTimelineStopIdRef.current === stopId) {
+        setAncientLayerLoadState("error");
+      }
+    } finally {
+      stopPayloadRequestIdsRef.current.delete(stopId);
+    }
+  }, [hasAncientTimeline]);
+
+  useEffect(() => {
+    if (ancientLayerRetryToken === previousAncientLayerRetryTokenRef.current) {
+      return;
+    }
+    previousAncientLayerRetryTokenRef.current = ancientLayerRetryToken;
+
+    if (!hasAncientTimeline) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      setAncientLayerLoadState("loading");
+    });
+
+    if (selectedTimelineStopIdRef.current && failedStopIdsRef.current.has(selectedTimelineStopIdRef.current)) {
+      queueMicrotask(() => {
+        const stopId = selectedTimelineStopIdRef.current;
+        if (!stopId) {
+          return;
+        }
+        void loadStopPayload(stopId, { forceRetry: true });
+      });
+    }
+  }, [ancientLayerRetryToken, hasAncientTimeline, loadStopPayload]);
+
+  useEffect(() => {
+    if (mapReadyVersion === 0 || ancientShapes || !hasAncientTimeline || ancientLayerLoadState === "error") {
+      return;
+    }
+
+    let cancelled = false;
+    void Promise.all([
+      fetch("/generated/ancient.shapes.json", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient shapes (${response.status})`);
+        }
+
+        return (await response.json()) as AncientShapesPayload;
+      }),
+      fetch("/generated/ancient.roads.geojson", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient roads (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      }),
+      fetch("/generated/ancient.coastline.geojson", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient coastline (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      }),
+      fetch("/generated/ancient.empire-edge.geojson", { cache: "no-store" }).then(async (response) => {
+        if (response.status === 404) {
+          return createEmptyFeatureCollection() as GeoJsonSourceData;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Could not load ancient empire edge (${response.status})`);
+        }
+
+        return (await response.json()) as GeoJsonSourceData;
+      })
+    ])
+      .then(([shapesPayload, roadsPayload, coastlinePayload, empireEdgePayload]) => {
+        if (cancelled) {
+          return;
+        }
+
+        setAncientShapes(shapesPayload);
+        setAncientRoads(roadsPayload);
+        setAncientCoastline(coastlinePayload);
+        setAncientEmpireEdge(empireEdgePayload);
+      })
+      .catch((error) => {
+        console.error("Failed to load ancient map layer data.", error);
+        setAncientLayerLoadState("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ancientLayerLoadState, ancientShapes, hasAncientTimeline, mapReadyVersion]);
+
+  useEffect(() => {
+    if (
+      !hasAncientTimeline ||
+      ancientLayerLoadState === "error" ||
+      !selectedTimelineStopId ||
+      ancientStopsById[selectedTimelineStopId]
+    ) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      void loadStopPayload(selectedTimelineStopId);
+    });
+  }, [ancientLayerLoadState, ancientStopsById, hasAncientTimeline, loadStopPayload, selectedTimelineStopId]);
+
+  useEffect(() => {
+    if (
+      stopPrefetchScheduledRef.current ||
+      !hasAncientTimeline ||
+      ancientLayerLoadState === "error" ||
+      !ancientTimeline ||
+      !ancientShapes ||
+      !selectedAncientStopPayload ||
+      mapReadyVersion === 0
+    ) {
+      return;
+    }
+
+    stopPrefetchScheduledRef.current = true;
+    const pendingStopIds = ancientTimeline.stops
+      .map((stop) => stop.id)
+      .filter((stopId) => stopId !== selectedAncientStopPayload.stopId);
+    if (pendingStopIds.length === 0) {
+      return;
+    }
+
+    const scheduleIdle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback.bind(window)
+        : (callback: () => void) => window.setTimeout(callback, 50);
+
+    scheduleIdle(() => {
+      for (const stopId of pendingStopIds) {
+        if (!ancientStopsById[stopId]) {
+          void loadStopPayload(stopId, { prefetch: true });
+        }
+      }
+    });
+  }, [
+    ancientShapes,
+    ancientLayerLoadState,
+    ancientStopsById,
+    hasAncientTimeline,
+    ancientTimeline,
+    loadStopPayload,
+    mapReadyVersion,
+    selectedAncientStopPayload
+  ]);
 
   useEffect(() => {
     majorClusterTooltipByEntryIdRef.current.clear();
@@ -2062,25 +3010,41 @@ export function MapView({
 
   const updateScaleBar = useCallback(() => {
     const map = mapRef.current;
+    const mapContainer = mapContainerRef.current;
     const scaleBar = scaleBarRef.current;
     const scaleFill = scaleBarFillRef.current;
     const scaleLabel = scaleBarLabelRef.current;
-    if (!map || !scaleBar || !scaleFill || !scaleLabel) {
+    if (!map || !mapContainer || !scaleBar || !scaleFill || !scaleLabel) {
       return;
     }
 
-    const mapHeight = map.getContainer().clientHeight;
     const maxWidth = 110;
-    const y = Math.max(32, mapHeight - 48);
+    const mapBounds = mapContainer.getBoundingClientRect();
+    const scaleBounds = scaleBar.getBoundingClientRect();
+    const y = Math.max(
+      0,
+      Math.min(mapBounds.height, scaleBounds.top + scaleBounds.height / 2 - mapBounds.top)
+    );
     const left = map.unproject([0, y] as PointLike);
     const right = map.unproject([maxWidth, y] as PointLike);
     const measuredMeters = distanceMeters([left.lng, left.lat], [right.lng, right.lat]);
-    const roundedMeters = roundedDistanceMeters(measuredMeters);
+    const roundedMeters = roundScaleDistanceMeters(measuredMeters);
     const width = Math.max(24, Math.min(maxWidth, Math.round((roundedMeters / measuredMeters) * maxWidth)));
 
     scaleFill.style.width = `${width}px`;
     scaleLabel.textContent = formatScaleDistance(roundedMeters);
   }, []);
+
+  const scheduleScaleBarUpdate = useCallback(() => {
+    if (scaleBarRefreshFrameRef.current !== null) {
+      return;
+    }
+
+    scaleBarRefreshFrameRef.current = window.requestAnimationFrame(() => {
+      scaleBarRefreshFrameRef.current = null;
+      updateScaleBar();
+    });
+  }, [updateScaleBar]);
 
   const refreshVisibleEntryState = useCallback(() => {
     const map = mapRef.current;
@@ -2128,7 +3092,7 @@ export function MapView({
       return;
     }
 
-    ensureGeoJsonSource(map, sourceMajorCityPinsId, renderData.majorCityPins, {
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins, {
       cluster: true,
       clusterMaxZoom: majorClusterMaxZoom,
       clusterRadius: majorClusterRadiusPx,
@@ -2136,20 +3100,35 @@ export function MapView({
         minImportanceRank: ["min", ["get", "importanceRank"]]
       }
     });
-    ensureGeoJsonSource(map, sourceClusteredCityPinsId, renderData.clusteredCityPins, {
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
       clusterRadius: standardClusterRadiusPx
     });
-    ensureGeoJsonSource(map, sourceSitePinsId, renderData.sitePins);
-    ensureGeoJsonSource(map, sourceCandidatePinsId, renderData.candidatePins);
-    ensureGeoJsonSource(map, sourceAreaLabelsId, renderData.areaLabels);
+    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins);
+    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins);
+    ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
+    ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
+    ensureGeoJsonSource(map, sourceAncientBordersId, ancientBorderFeatures);
+    ensureGeoJsonSource(map, sourceAncientEmpireEdgeId, ancientEmpireEdgeFeatures);
+    ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
+    ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
+    ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
 
     ensureQuestionBadgeImage(map);
-    ensureCandidateImages(map, renderData);
+    ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map, majorPlaceByRank);
-  }, [majorPlaceByRank, renderData]);
+  }, [
+    ancientAreaFeatures,
+    ancientBorderFeatures,
+    ancientCoastline,
+    ancientEmpireEdgeFeatures,
+    ancientHolderLabelFeatures,
+    ancientRoads,
+    majorPlaceByRank,
+    effectiveRenderData
+  ]);
 
   const resolveMajorClusterTooltipText = useCallback(
     async (entry: VisibleMajorClusterEntry) => {
@@ -2218,8 +3197,56 @@ export function MapView({
 
       const entry = resolveInteractiveEntryAtPoint(point);
       if (!entry) {
-        setInteractiveCursor(false);
-        hideTooltip();
+        const pointer = asScreenPoint(point);
+        if (!pointer || mapModeRef.current !== "ancient") {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const infoFeature = map
+          .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
+            layers: [
+              layerAncientHolderLabelClickableId,
+              layerAncientHolderLabelId,
+              layerAncientUncertainFillId
+            ]
+          })
+          .find((feature) => {
+            const properties = asObject(feature.properties);
+            const tooltipText = properties ? asString(properties.tooltipText) : null;
+            return Boolean(tooltipText);
+          });
+        const infoProperties = infoFeature ? asObject(infoFeature.properties) : null;
+        const infoText = infoProperties ? asString(infoProperties.tooltipText) : null;
+        const infoClickable =
+          infoProperties !== null &&
+          propertyIsTrue(infoProperties.clickable) &&
+          typeof asString(infoProperties.holderLocationId) === "string";
+
+        if (!infoFeature || !infoText) {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const fallbackLngLat = map.unproject([pointer.x, pointer.y]);
+        const infoCoordinates =
+          asCoordinates(infoFeature) ??
+          ([fallbackLngLat.lng, fallbackLngLat.lat] as Coordinates);
+        if (!infoCoordinates) {
+          setInteractiveCursor(false);
+          hideTooltip();
+          return;
+        }
+
+        const projectedInfo = map.project(infoCoordinates as LngLatLike);
+        tooltip.textContent = infoText;
+        tooltip.style.display = "block";
+        tooltip.style.left = `${projectedInfo.x}px`;
+        tooltip.style.top = `${projectedInfo.y - 22}px`;
+        activeTooltipEntryIdRef.current = `info:${infoText}`;
+        setInteractiveCursor(infoClickable);
         return;
       }
 
@@ -2295,6 +3322,24 @@ export function MapView({
     [onSelectPlace, zoomToCluster]
   );
 
+  const showTooltipForVisibleEntry = useCallback(
+    (entry: VisibleListEntry) => {
+      const map = mapRef.current;
+      const tooltip = tooltipRef.current;
+      if (!map || !tooltip) {
+        return;
+      }
+
+      const projected = map.project(entry.coordinates as LngLatLike);
+      tooltip.textContent = entry.tooltipText;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${projected.x}px`;
+      tooltip.style.top = `${projected.y - 22}px`;
+      activeTooltipEntryIdRef.current = entry.id;
+    },
+    []
+  );
+
   const setVisibleEntryFocus = useCallback(
     (entry: VisibleListEntry) => {
       const map = mapRef.current;
@@ -2310,8 +3355,9 @@ export function MapView({
         panelInset,
         runtimeTuning.controlZoomDurationMs
       );
+      showTooltipForVisibleEntry(entry);
     },
-    [panelInset, runtimeTuning.controlZoomDurationMs]
+    [panelInset, runtimeTuning.controlZoomDurationMs, showTooltipForVisibleEntry]
   );
 
   useEffect(() => {
@@ -2347,8 +3393,9 @@ export function MapView({
     mainSourceLoadTimeoutRef.current = null;
   }, []);
 
-  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode) => {
-    if (attributionModeRef.current === mode && attributionControlRef.current) {
+  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode, nextMapMode: MapDisplayMode) => {
+    const attributionKey = `${mode}:${nextMapMode}`;
+    if (attributionModeRef.current === attributionKey && attributionControlRef.current) {
       return;
     }
 
@@ -2359,11 +3406,11 @@ export function MapView({
 
     const control = new AttributionControl({
       compact: true,
-      customAttribution: getAttributionMarkup(mode)
+      customAttribution: getAttributionMarkup(mode, nextMapMode)
     });
     map.addControl(control, "bottom-right");
     attributionControlRef.current = control;
-    attributionModeRef.current = mode;
+    attributionModeRef.current = attributionKey;
   }, []);
 
   const switchToFallback = useCallback(
@@ -2377,8 +3424,9 @@ export function MapView({
       clearMainSourceLoadTimeout();
       mainSourceLoadControllerRef.current.markLoaded();
       styleReadyRef.current = false;
-      syncAttributionControl(map, "fallback");
-      map.setStyle(getStyleUrl("fallback"));
+      const nextMapMode = mapModeRef.current;
+      syncAttributionControl(map, "fallback", nextMapMode);
+      map.setStyle(getStyleUrl("fallback", nextMapMode));
       return nextState;
     },
     [basemapController, clearMainSourceLoadTimeout, syncAttributionControl]
@@ -2434,7 +3482,7 @@ export function MapView({
     const effectivePixelRatioCap = resolveEffectivePixelRatioCap(effectiveRuntimeTuning, rendererInfo);
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
-      style: getStyleUrl(initialMode),
+      style: getStyleUrl(initialMode, mapModeRef.current),
       center: DEFAULT_MAP_CENTER,
       zoom: DEFAULT_MAP_ZOOM,
       minZoom: 3,
@@ -2468,7 +3516,7 @@ export function MapView({
     )[visibleEntryRefreshHookKey] = () => {
       refreshVisibleEntryStateRef.current();
     };
-    syncAttributionControl(map, initialMode);
+    syncAttributionControl(map, initialMode, mapModeRef.current);
 
     const cancelScheduledTooltipUpdate = () => {
       pendingTooltipPointRef.current = null;
@@ -2665,7 +3713,8 @@ export function MapView({
     const handleStyleReady = () => {
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
-      syncAttributionControl(map, currentMode);
+      const nextMapMode = mapModeRef.current;
+      syncAttributionControl(map, currentMode, nextMapMode);
       configureZoomGestures(map, effectiveRuntimeTuning);
       applyBasemapLayerVariants(map, currentMode, effectiveRuntimeTuning);
       if (currentMode === "main") {
@@ -2675,15 +3724,33 @@ export function MapView({
       }
       map.getCanvas().tabIndex = -1;
       syncSourcesAndLayersRef.current();
+      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
 
-      if (!cleanupAttributionRef.current) {
+      if (!openingOverviewAppliedRef.current && !selectionRef.current) {
+        openOverviewForCurrentViewport(
+          map,
+          { left: panelInsetRef.current, bottom: bottomInsetRef.current },
+          0
+        );
+        openingOverviewAppliedRef.current = true;
+      }
+
+      const shouldExpandAttribution =
+        typeof window !== "undefined" ? openingCameraMode(window.innerWidth) === "desktop-fixed" : true;
+      if (!cleanupAttributionRef.current && shouldExpandAttribution) {
         cleanupAttributionRef.current = expandCompactAttributionOnFirstPaint(
           map,
           mapContainerRef.current
         );
+      } else if (!shouldExpandAttribution) {
+        const compactAttribution =
+          mapContainerRef.current?.querySelector<HTMLDivElement>(
+            ".maplibregl-ctrl-attrib.maplibregl-compact"
+          ) ?? null;
+        collapseCompactAttribution(compactAttribution);
       }
     };
 
@@ -2706,14 +3773,19 @@ export function MapView({
     const handleMoveEnd = () => {
       scheduleVisibleEntryRefreshRef.current();
     };
+    const handleMove = () => {
+      scheduleScaleBarUpdate();
+    };
     const handleResize = () => {
       scheduleVisibleEntryRefreshRef.current();
+      scheduleScaleBarUpdate();
     };
 
     document.addEventListener("pointerdown", handleDocumentPointerDown, true);
     document.addEventListener("keydown", handleMapKeyboardShortcuts, true);
     map.on("load", handleStyleReady);
     map.on("style.load", handleStyleReady);
+    map.on("move", handleMove);
     map.on("moveend", handleMoveEnd);
     map.on("resize", handleResize);
     map.on("dragstart", markGestureStarted);
@@ -2739,6 +3811,9 @@ export function MapView({
       if (visibleListRefreshFrameRef.current !== null) {
         window.cancelAnimationFrame(visibleListRefreshFrameRef.current);
       }
+      if (scaleBarRefreshFrameRef.current !== null) {
+        window.cancelAnimationFrame(scaleBarRefreshFrameRef.current);
+      }
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
       }
@@ -2748,6 +3823,7 @@ export function MapView({
       document.removeEventListener("keydown", handleMapKeyboardShortcuts, true);
       map.off("load", handleStyleReady);
       map.off("style.load", handleStyleReady);
+      map.off("move", handleMove);
       map.off("moveend", handleMoveEnd);
       map.off("resize", handleResize);
       map.off("dragstart", markGestureStarted);
@@ -2795,14 +3871,34 @@ export function MapView({
   }, [
     basemapController,
     clearMainSourceLoadTimeout,
+    hasAncientTimeline,
     hideTooltip,
     resolveInteractiveEntryAtPoint,
+    scheduleScaleBarUpdate,
     scheduleMainSourceLoadTimeout,
     setInteractiveCursor,
     switchToFallback,
     syncAttributionControl,
+    isSmallScreen,
     runtimeTuning
   ]);
+
+  useEffect(() => {
+    if (!mapModeEffectInitializedRef.current) {
+      mapModeEffectInitializedRef.current = true;
+      return;
+    }
+
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    const basemapMode = basemapController.getState().mode;
+    styleReadyRef.current = false;
+    syncAttributionControl(map, basemapMode, mapMode);
+    map.setStyle(getStyleUrl(basemapMode, mapMode));
+  }, [basemapController, mapMode, syncAttributionControl]);
 
   useEffect(() => {
     if (!styleReadyRef.current) {
@@ -2810,8 +3906,12 @@ export function MapView({
     }
 
     syncSourcesAndLayers();
+    const map = mapRef.current;
+    if (map) {
+      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline);
+    }
     refreshVisibleEntryState();
-  }, [refreshVisibleEntryState, syncSourcesAndLayers]);
+  }, [hasAncientTimeline, refreshVisibleEntryState, syncSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBar();
@@ -2823,9 +3923,10 @@ export function MapView({
       return;
     }
 
-    map.setPadding(getMapLabelPadding(panelInset));
-    refreshVisibleEntryState();
-  }, [panelInset, refreshVisibleEntryState]);
+    map.setPadding(getMapLabelPadding(panelInset, bottomInset));
+    scheduleVisibleEntryRefresh();
+    scheduleScaleBarUpdate();
+  }, [bottomInset, panelInset, scheduleScaleBarUpdate, scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2834,7 +3935,7 @@ export function MapView({
       return;
     }
 
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}`;
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}`;
     if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
@@ -2845,8 +3946,16 @@ export function MapView({
     }
 
     previousFocusRequestRef.current = selectionKey;
-    focusSelection(map, place, selection, panelInset, runtimeTuning.flyToDurationMs);
+    focusSelection(
+      map,
+      place,
+      selection,
+      panelInset,
+      bottomInset,
+      runtimeTuning.flyToDurationMs
+    );
   }, [
+    bottomInset,
     mapReadyVersion,
     panelInset,
     placeById,
@@ -2860,17 +3969,12 @@ export function MapView({
       return;
     }
 
-    flyOrJump(map, {
-      center: DEFAULT_MAP_CENTER,
-      zoom: DEFAULT_MAP_ZOOM,
-      padding: {
-        top: focusPaddingTop,
-        right: 64,
-        bottom: 64,
-        left: panelInset + 64
-      }
-    }, runtimeTuning.flyToDurationMs);
-  }, [panelInset, runtimeTuning.flyToDurationMs]);
+    openOverviewForCurrentViewport(
+      map,
+      { left: panelInset, bottom: bottomInset },
+      runtimeTuning.flyToDurationMs
+    );
+  }, [bottomInset, panelInset, runtimeTuning.flyToDurationMs]);
 
   const zoomIn = useCallback(() => {
     const map = mapRef.current;
@@ -2893,6 +3997,63 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
   }, [runtimeTuning.controlZoomDurationMs]);
+  const timelineOverlayBottomInset =
+    isSmallScreen && mapMode === "ancient" && hasAncientTimeline ? 192 : 0;
+  const maxReachableControlInset =
+    isSmallScreen && typeof window !== "undefined"
+      ? Math.max(0, window.innerHeight - 124)
+      : Number.POSITIVE_INFINITY;
+  const controlBottomInset = Math.min(
+    Math.max(bottomInset, timelineOverlayBottomInset),
+    maxReachableControlInset
+  );
+  const resetButtonBottomOffset = isSmallScreen
+    ? Math.max(controlBottomInset + 16, 88)
+    : bottomInset + 16;
+  const scaleBarBottomOffset = isSmallScreen
+    ? Math.max(controlBottomInset + 176, 320)
+    : controlBottomInset + 16;
+  const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
+  const compactAttributionBottomWithTimelineOffset = Math.max(
+    compactAttributionBottomOffset,
+    Math.max(0, timelineOverlayInset)
+  );
+  const compactAttributionRightOffset = 72;
+  const visiblePlacesList = (
+    <div
+      aria-label="Visible places on map"
+      className="ibm-hidden-visible-places"
+      style={{
+        position: "absolute",
+        width: "1px",
+        height: "1px",
+        padding: 0,
+        margin: "-1px",
+        overflow: "hidden",
+        clip: "rect(0, 0, 0, 0)",
+        whiteSpace: "nowrap",
+        border: 0
+      }}
+    >
+      {visibleEntries.map((entry) => (
+        <button
+          key={entry.id}
+          aria-label={entry.accessibleName}
+          data-place-entry-id={entry.id}
+          onClick={() => activateVisibleEntry(entry)}
+          onFocus={() => setVisibleEntryFocus(entry)}
+          type="button"
+        >
+          {entry.accessibleName}
+        </button>
+      ))}
+      {visibleEntryOverflow ? (
+        <p role="note">Zoom in or search to reach more places</p>
+      ) : null}
+    </div>
+  );
+  const visiblePlacesPortalHost =
+    typeof document !== "undefined" ? document.getElementById("ibm-visible-places-portal-root") : null;
 
   return (
     <div
@@ -2914,6 +4075,18 @@ export function MapView({
           clip: rect(0, 0, 0, 0);
           white-space: nowrap;
           border: 0;
+        }
+
+        .ibm-map-root .maplibregl-ctrl-attrib a {
+          color: #1a73e8;
+          text-decoration: underline;
+        }
+
+        .ibm-map-root .maplibregl-ctrl-bottom-right,
+        .ibm-map-root .maplibregl-ctrl-top-right {
+          right: ${compactAttributionRightOffset}px;
+          top: auto;
+          bottom: ${compactAttributionBottomWithTimelineOffset}px;
         }
       `}</style>
       <div
@@ -2947,7 +4120,7 @@ export function MapView({
         style={{
           position: "absolute",
           left: `${getScaleControlLeftOffset(panelInset)}px`,
-          bottom: "16px",
+          bottom: `${scaleBarBottomOffset}px`,
           backgroundColor: "#FFFFFF",
           border: "1px solid rgba(95,99,104,0.35)",
           borderRadius: "4px",
@@ -2977,58 +4150,62 @@ export function MapView({
           0 m
         </span>
       </div>
-      <button
-        aria-label="Zoom in"
-        data-map-control="zoom-in"
-        onClick={zoomIn}
-        style={{
-          position: "absolute",
-          right: "16px",
-          bottom: "248px",
-          width: "44px",
-          height: "44px",
-          borderRadius: "999px",
-          border: "1px solid #DADCE0",
-          backgroundColor: "#FFFFFF",
-          color: "#202124",
-          fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontSize: "22px",
-          lineHeight: 1,
-          boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
-          cursor: "pointer",
-          zIndex: 12
-        }}
-        title="Zoom in"
-        type="button"
-      >
-        +
-      </button>
-      <button
-        aria-label="Zoom out"
-        data-map-control="zoom-out"
-        onClick={zoomOut}
-        style={{
-          position: "absolute",
-          right: "16px",
-          bottom: "200px",
-          width: "44px",
-          height: "44px",
-          borderRadius: "999px",
-          border: "1px solid #DADCE0",
-          backgroundColor: "#FFFFFF",
-          color: "#202124",
-          fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          fontSize: "22px",
-          lineHeight: 1,
-          boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
-          cursor: "pointer",
-          zIndex: 12
-        }}
-        title="Zoom out"
-        type="button"
-      >
-        −
-      </button>
+      {!isSmallScreen ? (
+        <>
+          <button
+            aria-label="Zoom in"
+            data-map-control="zoom-in"
+            onClick={zoomIn}
+            style={{
+              position: "absolute",
+              right: "16px",
+              bottom: "248px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "999px",
+              border: "1px solid #DADCE0",
+              backgroundColor: "#FFFFFF",
+              color: "#202124",
+              fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              fontSize: "22px",
+              lineHeight: 1,
+              boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
+              cursor: "pointer",
+              zIndex: 12
+            }}
+            title="Zoom in"
+            type="button"
+          >
+            +
+          </button>
+          <button
+            aria-label="Zoom out"
+            data-map-control="zoom-out"
+            onClick={zoomOut}
+            style={{
+              position: "absolute",
+              right: "16px",
+              bottom: "200px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "999px",
+              border: "1px solid #DADCE0",
+              backgroundColor: "#FFFFFF",
+              color: "#202124",
+              fontFamily: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              fontSize: "22px",
+              lineHeight: 1,
+              boxShadow: "0 1px 2px rgba(60,64,67,0.3), 0 2px 6px rgba(60,64,67,0.2)",
+              cursor: "pointer",
+              zIndex: 12
+            }}
+            title="Zoom out"
+            type="button"
+          >
+            −
+          </button>
+        </>
+      ) : null}
       <button
         aria-label="Reset view"
         data-map-control="reset-view"
@@ -3036,7 +4213,7 @@ export function MapView({
         style={{
           position: "absolute",
           right: "16px",
-          bottom: "150px",
+          bottom: `${resetButtonBottomOffset}px`,
           width: "44px",
           height: "44px",
           borderRadius: "999px",
@@ -3055,23 +4232,7 @@ export function MapView({
       >
         ⟳
       </button>
-      <div aria-label="Visible places on map" className="ibm-hidden-visible-places">
-        {visibleEntries.map((entry) => (
-          <button
-            key={entry.id}
-            aria-label={entry.accessibleName}
-            data-place-entry-id={entry.id}
-            onClick={() => activateVisibleEntry(entry)}
-            onFocus={() => setVisibleEntryFocus(entry)}
-            type="button"
-          >
-            {entry.accessibleName}
-          </button>
-        ))}
-        {visibleEntryOverflow ? (
-          <p role="note">Zoom in or search to reach more places</p>
-        ) : null}
-      </div>
+      {visiblePlacesPortalHost ? createPortal(visiblePlacesList, visiblePlacesPortalHost) : visiblePlacesList}
       {basemapState.message ? (
         <div
           role="status"

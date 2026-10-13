@@ -65,8 +65,47 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -33,
+      "toYear": 17,
+      "holderId": "cappadocia-kingdom",
+      "entity": "Kingdom of Cappadocia (ruler: Archelaus)",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 17,
+      "toYear": 69,
+      "holderId": "cappadocia-province",
+      "entity": "Roman province of Cappadocia (ruler: Quintus Veranius, sent to organize the province; then equestrian governors)",
+      "sources": [
+        "bib:tacitus-annals",
+        "bib:isbe-cappadocia",
+        "bib:livius-cappadocia",
+        "bib:isbe-galatia",
+        "bib:isbe-pontus",
+        "bib:cassius-dio-roman-history",
+        "bib:josephus-antiquities",
+        "bib:worldhistory-vespasian"
+      ],
+      "note": "The Roman historian Tacitus calls Veranius the province's \"governor,\" though a translator's note calls his appointment \"only a temporary expedient\"; he later appears on the staff of Germanicus, a Roman prince. Equestrian governors (procurators) followed. This area's drawn land also covers three lands that aren't drawn separately: Pontus Galaticus, part of the province of Galatia from 2 BC; Polemon's kingdom of Pontus, a client kingdom until 63 or 64, when it too joined Galatia; and Lesser Armenia, held by Archelaus of Cappadocia from 20 BC, by Cotys from AD 38 and by Aristobulus, son of Herod of Chalcis, from AD 54, and annexed in AD 72. Their changes don't change Cappadocia's own holder; the AD 6, AD 39, AD 67 and AD 72 stops name them."
+    },
+    {
+      "fromYear": 69,
+      "toYear": 101,
+      "holderId": "cappadocia-province",
+      "entity": "Roman province of Cappadocia (ruler: Gnaeus Pompeius Collega, the first governor of senatorial rank (AD 69))",
+      "sources": [
+        "bib:suetonius-twelve-caesars",
+        "bib:livius-cappadocia"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"gave [Cappadocia] a consular governor in place of a Roman knight.\" Cappadocia and Galatia may have shared one governor from about this time on, which one modern history of the province calls likely, but no ancient source states a merger outright, so the map keeps Cappadocia and Galatia as two areas with their own holders."
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08",
+  "politicalAreaId": "cappadocia"
 }

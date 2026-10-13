@@ -63,8 +63,18 @@
     }
   ],
   "otConnections": [],
-  "politicalHistory": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 101,
+      "entity": "The Parthian Empire itself; no internal succession tracked",
+      "sources": [
+        "bib:isbe-parthians",
+        "bib:livius-parthia"
+      ]
+    }
+  ],
   "status": "verified",
   "verifiedBy": "fact-checker",
-  "lastReviewed": "2026-10-05"
+  "lastReviewed": "2026-10-08"
 }

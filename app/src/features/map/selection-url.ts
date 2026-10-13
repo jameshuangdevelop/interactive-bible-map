@@ -1,4 +1,4 @@
-import type { PlaceSelection } from "./types";
+import type { MapDisplayMode, PlaceSelection } from "./types";
 
 export function candidateLetterToIndex(value: string | null) {
   if (!value) {
@@ -50,6 +50,50 @@ export function applySelectionToSearch(search: string, selection: PlaceSelection
         String.fromCharCode("a".charCodeAt(0) + selection.candidateIndex)
       );
     }
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}
+
+export function parseMapModeFromSearch(search: string): MapDisplayMode {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  return parameters.get("map")?.trim().toLowerCase() === "modern" ? "modern" : "ancient";
+}
+
+export function applyMapModeToSearch(search: string, mapMode: MapDisplayMode) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (mapMode === "modern") {
+    parameters.set("map", "modern");
+  } else {
+    parameters.delete("map");
+  }
+
+  const next = parameters.toString();
+  return next.length > 0 ? `?${next}` : "";
+}
+
+export function parseTimelineYearFromSearch(search: string) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const year = parameters.get("year")?.trim();
+  if (!year) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(year, 10);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function applyTimelineYearToSearch(search: string, year: number | null) {
+  const parameters = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  if (year === null || !Number.isFinite(year)) {
+    parameters.delete("year");
+  } else {
+    parameters.set("year", String(Math.trunc(year)));
   }
 
   const next = parameters.toString();

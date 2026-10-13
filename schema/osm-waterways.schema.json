@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-bible-map/schemas/osm-waterways.schema.json",
+  "title": "Pinned OpenStreetMap waterways",
+  "description": "The OpenStreetMap river ways (© OpenStreetMap contributors, ODbL 1.0) that the ancient layer's build cuts areas along, as Overpass's attic data held them at `asOf`. `npm run refresh:osm-waterways` writes this file; `npm run build:ancient-geo` reads only this file and never live OpenStreetMap data.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "asOf",
+    "features"
+  ],
+  "properties": {
+    "type": {
+      "const": "FeatureCollection"
+    },
+    "asOf": {
+      "type": "string",
+      "description": "The UTC attic date the ways were read at.",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/wayFeature"
+      }
+    }
+  },
+  "$defs": {
+    "position": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        }
+      ]
+    },
+    "osmId": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "wayFeature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "properties",
+        "geometry"
+      ],
+      "properties": {
+        "type": {
+          "const": "Feature"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "river",
+            "relationId",
+            "wayId",
+            "version",
+            "endNodeIds",
+            "provenance"
+          ],
+          "properties": {
+            "river": {
+              "type": "string",
+              "description": "The build's key for the river (see OSM_RIVERS in scripts/lib/osm-waterways.mjs).",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            },
+            "relationId": {
+              "$ref": "#/$defs/osmId"
+            },
+            "wayId": {
+              "$ref": "#/$defs/osmId"
+            },
+            "version": {
+              "$ref": "#/$defs/osmId"
+            },
+            "endNodeIds": {
+              "type": "array",
+              "description": "The way's first and last node, where it joins the river's other ways.",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "$ref": "#/$defs/osmId"
+              }
+            },
+            "provenance": {
+              "$ref": "https://interactive-bible-map/schemas/geo-provenance.schema.json"
+            }
+          }
+        },
+        "geometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "coordinates"
+          ],
+          "properties": {
+            "type": {
+              "const": "LineString"
+            },
+            "coordinates": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/position"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

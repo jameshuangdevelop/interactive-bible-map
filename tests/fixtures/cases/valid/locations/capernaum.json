@@ -24,7 +24,23 @@
       "sources": [
         "pleiades:678180",
         "openbible:capernaum"
-      ]
+      ],
+      "politicalAreaId": "galilee"
+    },
+    {
+      "label": "East-bank fixture candidate",
+      "coordinates": [
+        2.5,
+        0.5
+      ],
+      "coordinateSource": "openbible:capernaum",
+      "confidence": "low",
+      "support": "Illustrative alternate fixture candidate in another area.",
+      "sources": [
+        "openbible:capernaum",
+        "pleiades:678180"
+      ],
+      "politicalAreaId": "perea"
     }
   ],
   "summary": {
