@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "id": "paul-fixture",
+      "title": "Paul fixture journey",
+      "fromYear": 46,
+      "toYear": 48,
+      "yearNote": "Illustrative fixture dates only.",
+      "structure": "connected",
+      "note": "Fixture route for M5 schema/build tests.",
+      "sources": [
+        "scripture:Acts 2:1",
+        "bib:existing-bib-source"
+      ],
+      "stages": [
+        {
+          "id": "stage-01",
+          "from": {
+            "kind": "location",
+            "locationId": "capernaum",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "seleucia-fixture"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 2:1",
+              "book": "Acts",
+              "textWEB": "Now when the day of Pentecost had come, they were all with one accord in one place."
+            }
+          ],
+          "travelMode": "land",
+          "lineId": "paul-fixture-stage-01",
+          "sources": [
+            "scripture:Acts 2:1",
+            "bib:existing-bib-source"
+          ]
+        },
+        {
+          "id": "stage-02",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "seleucia-fixture"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "galilee",
+            "candidateIndex": 0
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "cyprus-harbor-fixture"
+            }
+          ],
+          "scripture": [
+            {
+              "ref": "1 Corinthians 1:2",
+              "book": "1 Corinthians",
+              "textWEB": "to the assembly of God which is at Corinth—those who are sanctified in Christ Jesus, called saints, with all who call on the name of our Lord Jesus Christ in every place, both theirs and ours:"
+            }
+          ],
+          "travelMode": "sea",
+          "lineId": "paul-fixture-stage-02",
+          "sources": [
+            "scripture:1 Corinthians 1:2",
+            "bib:existing-bib-source"
+          ]
+        },
+        {
+          "id": "stage-03",
+          "from": {
+            "kind": "location",
+            "locationId": "galilee",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "capernaum",
+            "candidateIndex": 0
+          },
+          "scripture": [
+            {
+              "ref": "Mark 1:21-22",
+              "book": "Mark",
+              "textWEB": "They went into Capernaum, and immediately on the Sabbath day he entered into the synagogue and taught. They were astonished at his teaching, for he taught them as having authority, and not as the scribes."
+            }
+          ],
+          "travelMode": "unknown",
+          "namedRegions": [
+            {
+              "name": "Galilee",
+              "locationId": "galilee",
+              "sources": [
+                "scripture:Mark 1:21-22"
+              ]
+            }
+          ],
+          "lineId": "paul-fixture-stage-03",
+          "sources": [
+            "scripture:Mark 1:21-22",
+            "bib:existing-bib-source"
+          ]
+        },
+        {
+          "id": "stage-04",
+          "from": {
+            "kind": "location",
+            "locationId": "capernaum",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "disputed-stop-fixture",
+            "candidateIndex": 0
+          },
+          "scripture": [
+            {
+              "ref": "Matthew 5:1",
+              "book": "Matthew",
+              "textWEB": "Seeing the multitudes, he went up onto the mountain. When he had sat down, his disciples came to him."
+            }
+          ],
+          "travelMode": "land",
+          "noLineReason": "Fixture stage without line geometry.",
+          "sources": [
+            "scripture:Matthew 5:1",
+            "bib:existing-bib-source"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jesus-fixture",
+      "title": "Jesus fixture segments",
+      "fromYear": 28,
+      "toYear": 30,
+      "yearNote": "Illustrative fixture dates only.",
+      "structure": "standalone-segments",
+      "note": "Fixture standalone segments for attestation checks.",
+      "sources": [
+        "scripture:Matthew 5:1",
+        "bib:existing-bib-source"
+      ],
+      "stages": [
+        {
+          "id": "segment-01",
+          "from": {
+            "kind": "location",
+            "locationId": "capernaum",
+            "candidateIndex": 0
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "galilee",
+            "candidateIndex": 0
+          },
+          "scripture": [
+            {
+              "ref": "Matthew 5:1",
+              "book": "Matthew",
+              "textWEB": "Seeing the multitudes, he went up onto the mountain. When he had sat down, his disciples came to him."
+            }
+          ],
+          "travelMode": "land",
+          "lineId": "jesus-fixture-segment-01",
+          "attestation": {
+            "gospels": [
+              "Matthew"
+            ],
+            "rule": "Names both ends in the Gospel context.",
+            "sources": [
+              "scripture:Matthew 5:1"
+            ]
+          },
+          "sources": [
+            "scripture:Matthew 5:1",
+            "bib:existing-bib-source"
+          ]
+        }
+      ]
+    }
+  ]
+}

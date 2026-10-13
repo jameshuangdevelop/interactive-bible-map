@@ -62,6 +62,20 @@ try {
     );
   }
 
+  if (result.routesBuild.generated) {
+    console.log(
+      `Routes generated size: ${result.routesBuild.gzipBytes} bytes gzip (budget ${result.routesBuild.maxGzipBytes})`
+    );
+  }
+  if (!result.routesBuild.generated && result.routesBuild.skippedReason) {
+    console.log(result.routesBuild.skippedReason);
+  }
+  if (result.routesBuild.fixtureGenerated) {
+    console.log(
+      "Built routes.fixture.* files for M5 development fixtures (excluded from web export)."
+    );
+  }
+
   if (!result.ancientBuild.generated && result.ancientBuild.skippedReason) {
     console.log(result.ancientBuild.skippedReason);
   }

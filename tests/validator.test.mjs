@@ -51,6 +51,10 @@ const ancientEmpireEdgeFixturePath = path.join(
   "geo",
   "ancient-empire-edge.geojson"
 );
+const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
+const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
+const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
+const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
 
 const locationSchemaPath = path.join(
   testDirectory,
@@ -355,6 +359,68 @@ async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
       ancientRoadsPath: roadsPath,
       ancientCoastlinePath: coastlinePath,
       ancientEmpireEdgePath: empireEdgePath,
+      imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
+      aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
+      webVplPath,
+      bibliographyPath: bibliographyFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      ...validationOptions
+    });
+  } finally {
+    fs.rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
+}
+
+async function runWithTemporaryRoutesCase(mutateRoutes, options = {}) {
+  const temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "ibm-validator-routes-"));
+
+  try {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    const routesDirectory = path.join(temporaryDirectory, "routes");
+    const geoDirectory = path.join(temporaryDirectory, "geo");
+    fs.mkdirSync(locationsDirectory, { recursive: true });
+    fs.mkdirSync(mediaDirectory, { recursive: true });
+    fs.mkdirSync(routesDirectory, { recursive: true });
+    fs.mkdirSync(geoDirectory, { recursive: true });
+
+    for (const locationFile of ["capernaum.json", "galilee.json"]) {
+      fs.copyFileSync(
+        path.join(validCaseDirectory, "locations", locationFile),
+        path.join(locationsDirectory, locationFile)
+      );
+    }
+    fs.copyFileSync(
+      path.join(validCaseDirectory, "media", "capernaum.json"),
+      path.join(mediaDirectory, "capernaum.json")
+    );
+
+    const routes = {
+      routes: JSON.parse(fs.readFileSync(routesFixturePath, "utf8")),
+      stops: JSON.parse(fs.readFileSync(routeStopsFixturePath, "utf8")),
+      lines: JSON.parse(fs.readFileSync(routeLinesFixturePath, "utf8"))
+    };
+
+    if (typeof mutateRoutes === "function") {
+      mutateRoutes(routes);
+    }
+
+    const routesPath = path.join(routesDirectory, "routes.json");
+    const stopsPath = path.join(routesDirectory, "stops.json");
+    const linesPath = path.join(geoDirectory, "routes-lines.geojson");
+    fs.writeFileSync(routesPath, `${JSON.stringify(routes.routes, null, 2)}\n`);
+    fs.writeFileSync(stopsPath, `${JSON.stringify(routes.stops, null, 2)}\n`);
+    fs.writeFileSync(linesPath, `${JSON.stringify(routes.lines, null, 2)}\n`);
+
+    const { webVplPath = webFixturePath, ...validationOptions } = options;
+    return await validateData({
+      locationsDirectory,
+      mediaDirectory,
+      routesPath,
+      routeStopsPath: stopsPath,
+      routeLinesPath: linesPath,
       imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
       aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
@@ -2431,6 +2497,107 @@ test("ancient empire edge is optional and validated when present", async () => {
         error.path === "$.features[0].properties.provenance.changes[0].sources[0]" &&
         /was not found in data\/bibliography\.json/u.test(error.message)
     ),
+    true
+  );
+});
+
+test("routes fixture validates with route-line requirement enabled", async () => {
+  const result = await runWithTemporaryRoutesCase(undefined, {
+    requireRouteLines: true
+  });
+  assert.equal(result.errors.length, 0);
+});
+
+test("routes reject stop references that do not exist", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].to = {
+      kind: "route-stop",
+      stopId: "missing-stop"
+    };
+  });
+  assert.equal(
+    hasError(result, (error) => /Unknown route stop id 'missing-stop'/u.test(error.message)),
+    true
+  );
+});
+
+test("route stops cannot duplicate a location id", async () => {
+  const result = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].id = "capernaum";
+  });
+  assert.equal(
+    hasError(result, (error) => /duplicates location id 'capernaum'/u.test(error.message)),
+    true
+  );
+});
+
+test("route scripture text must match WEB text", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].scripture[0].textWEB = "Wrong route verse text";
+  });
+  assert.equal(
+    hasError(result, (error) => /routes\.json$/u.test(error.file) && /textWEB does not match/u.test(error.message)),
+    true
+  );
+});
+
+test("route stop candidates require at least two sources", async () => {
+  const result = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].candidates[0].sources = ["wikidata:Q2207807"];
+  });
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        /stops\.json$/u.test(error.file) &&
+        error.path === "$.stops[0].candidates[0].sources" &&
+        /(fewer than 2 items|at least 2 items)/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("standalone-segment routes require attestation on every stage", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[1].stages[0].attestation;
+  });
+  assert.equal(
+    hasError(result, (error) => /require attestation/u.test(error.message)),
+    true
+  );
+});
+
+test("route line requirement is switchable", async () => {
+  const relaxed = await runWithTemporaryRoutesCase(
+    ({ routes }) => {
+      delete routes.routes[0].stages[0].lineId;
+      delete routes.routes[0].stages[0].noLineReason;
+    },
+    { requireRouteLines: false }
+  );
+  assert.equal(relaxed.errors.length, 0);
+
+  const strict = await runWithTemporaryRoutesCase(
+    ({ routes }) => {
+      delete routes.routes[0].stages[0].lineId;
+      delete routes.routes[0].stages[0].noLineReason;
+    },
+    { requireRouteLines: true }
+  );
+  assert.equal(
+    hasError(strict, (error) => /Each stage must include lineId or noLineReason/u.test(error.message)),
+    true
+  );
+});
+
+test("route stages with lineId must have matching geometry", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features = lines.features.filter(
+      (feature) => feature.properties.lineId !== "paul-fixture-stage-01"
+    );
+  });
+  assert.equal(
+    hasError(result, (error) => /No route-line geometry exists/u.test(error.message)),
     true
   );
 });

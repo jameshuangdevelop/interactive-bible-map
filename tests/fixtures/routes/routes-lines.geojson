@@ -1,0 +1,157 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-fixture-stage-01",
+        "routeId": "paul-fixture",
+        "stageId": "stage-01",
+        "provenance": {
+          "dataset": "Fixture geometry",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "openbible:capernaum"
+          ],
+          "changes": [
+            {
+              "kind": "fixture-segment",
+              "detail": "Illustrative route segment for tests only.",
+              "sources": [
+                "bib:existing-bib-source"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.575,
+            32.88
+          ],
+          [
+            35.968,
+            36.119
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-fixture-stage-02",
+        "routeId": "paul-fixture",
+        "stageId": "stage-02",
+        "provenance": {
+          "dataset": "Fixture geometry",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "openbible:cyprus"
+          ],
+          "changes": [
+            {
+              "kind": "fixture-segment",
+              "detail": "Illustrative route segment for tests only.",
+              "sources": [
+                "bib:existing-bib-source"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.968,
+            36.119
+          ],
+          [
+            33.624,
+            34.917
+          ],
+          [
+            1.5,
+            1.5
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-fixture-stage-03",
+        "routeId": "paul-fixture",
+        "stageId": "stage-03",
+        "provenance": {
+          "dataset": "Fixture geometry",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "openbible:capernaum"
+          ],
+          "changes": [
+            {
+              "kind": "fixture-segment",
+              "detail": "Illustrative route segment for tests only.",
+              "sources": [
+                "bib:existing-bib-source"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            1.5,
+            1.5
+          ],
+          [
+            35.575,
+            32.88
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-fixture-segment-01",
+        "routeId": "jesus-fixture",
+        "stageId": "segment-01",
+        "provenance": {
+          "dataset": "Fixture geometry",
+          "version": "fixture-1",
+          "upstreamFeatureIds": [
+            "openbible:capernaum"
+          ],
+          "changes": [
+            {
+              "kind": "fixture-segment",
+              "detail": "Illustrative route segment for tests only.",
+              "sources": [
+                "bib:existing-bib-source"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.575,
+            32.88
+          ],
+          [
+            1.5,
+            1.5
+          ]
+        ]
+      }
+    }
+  ]
+}

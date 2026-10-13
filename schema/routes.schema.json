@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-bible-map/schemas/routes.schema.json",
+  "title": "Routes",
+  "description": "CC BY-SA route metadata and ordered stages for the Routes tab.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "routes"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/route"
+      }
+    }
+  },
+  "$defs": {
+    "yearNoZero": {
+      "type": "integer",
+      "description": "Year integer with BC as negative and no year 0.",
+      "not": {
+        "const": 0
+      }
+    },
+    "scriptureEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "book",
+        "textWEB"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "Single-chapter reference format, for example Acts 16:6-8.",
+          "pattern": "^(?:[1-3] )?[A-Za-z]+(?: [A-Za-z]+)* [1-9][0-9]*:[1-9][0-9]*(?:-[1-9][0-9]*)?$"
+        },
+        "book": {
+          "type": "string",
+          "minLength": 1
+        },
+        "textWEB": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "stopRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "location",
+            "route-stop"
+          ]
+        },
+        "locationId": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "stopId": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "candidateIndex": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "location"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "locationId"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "route-stop"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "stopId"
+            ]
+          }
+        }
+      ]
+    },
+    "attestation": {
+      "type": "object",
+      "description": "Attestation for Jesus segments: which Gospels report it and which inclusion rule it meets.",
+      "additionalProperties": false,
+      "required": [
+        "gospels",
+        "rule",
+        "sources"
+      ],
+      "properties": {
+        "gospels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Matthew",
+              "Mark",
+              "Luke",
+              "John"
+            ]
+          }
+        },
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+          }
+        }
+      }
+    },
+    "namedRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "sources"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locationId": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+          }
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "from",
+        "to",
+        "scripture",
+        "travelMode",
+        "sources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stage ID unique within the route.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "from": {
+          "$ref": "#/$defs/stopRef"
+        },
+        "to": {
+          "$ref": "#/$defs/stopRef"
+        },
+        "via": {
+          "type": "array",
+          "description": "Stops passed or sailed by in the text's order.",
+          "items": {
+            "$ref": "#/$defs/stopRef"
+          }
+        },
+        "scripture": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/scriptureEntry"
+          }
+        },
+        "travelMode": {
+          "type": "string",
+          "enum": [
+            "land",
+            "sea",
+            "unknown"
+          ]
+        },
+        "namedRegions": {
+          "type": "array",
+          "description": "Regions named by the text where no town is named.",
+          "items": {
+            "$ref": "#/$defs/namedRegion"
+          }
+        },
+        "attestation": {
+          "$ref": "#/$defs/attestation"
+        },
+        "lineId": {
+          "type": "string",
+          "description": "Route-line geometry ID in data/geo/routes-lines.geojson.",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "noLineReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+          }
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "fromYear",
+        "toYear",
+        "structure",
+        "note",
+        "sources",
+        "stages"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fromYear": {
+          "$ref": "#/$defs/yearNoZero"
+        },
+        "toYear": {
+          "$ref": "#/$defs/yearNoZero"
+        },
+        "yearNote": {
+          "type": "string",
+          "description": "Short note where scholarly date ranges differ.",
+          "minLength": 1
+        },
+        "structure": {
+          "type": "string",
+          "description": "Whether stages form one connected sequence or stand alone.",
+          "enum": [
+            "connected",
+            "standalone-segments"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
+          }
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/stage"
+          }
+        }
+      }
+    }
+  }
+}

@@ -32,6 +32,10 @@ const ancientEmpireEdgePath = path.join(
   "geo",
   "ancient-empire-edge.geojson"
 );
+const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
+const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
+const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
+const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
 const repositoryLocationsDirectory = path.join(repositoryRoot, "data", "locations");
 const repositoryTimelinePath = path.join(repositoryRoot, "data", "timeline.json");
 const repositoryAncientAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
@@ -1065,6 +1069,73 @@ test("buildAppData supports ancient-source fixture directory", async () => {
 
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.empire-edge.geojson"));
+  });
+});
+
+test("buildAppData writes routes generated files and fixture files", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    const result = await buildAppData({
+      locationsDirectory: path.join(validCaseDirectory, "locations"),
+      mediaDirectory: path.join(validCaseDirectory, "media"),
+      bibliographyPath: bibliographyFixturePath,
+      routesPath: routesFixturePath,
+      routeStopsPath: routeStopsFixturePath,
+      routeLinesPath: routeLinesFixturePath,
+      routesFixtureDirectory,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    assert.equal(result.routesBuild.generated, true);
+    assert.ok(result.routesBuild.gzipBytes > 0);
+    assert.equal(result.routesBuild.fixtureGenerated, true);
+
+    const requiredFiles = [
+      "routes.routes.json",
+      "routes.stages.json",
+      "routes.stops.json",
+      "routes.lines.geojson",
+      "routes.fixture.routes.json",
+      "routes.fixture.stages.json",
+      "routes.fixture.stops.json",
+      "routes.fixture.lines.geojson"
+    ];
+    for (const fileName of requiredFiles) {
+      await fs.access(path.join(outputDirectory, fileName));
+    }
+
+    const stagesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "routes.stages.json"), "utf8")
+    );
+    assert.equal(stagesPayload.routes.length, 2);
+    assert.match(stagesPayload.routes[0].stages[0].scripture[0].textWEB, /Pentecost/u);
+  });
+});
+
+test("buildAppData fails when routes generated files exceed the gzip budget", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(validCaseDirectory, "locations"),
+          mediaDirectory: path.join(validCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          routesPath: routesFixturePath,
+          routeStopsPath: routeStopsFixturePath,
+          routeLinesPath: routeLinesFixturePath,
+          routesFixtureDirectory,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          requireEmpireRoot: false,
+          requireModernCountries: false,
+          outputDirectory,
+          maxRoutesLayerGzipBytes: 1
+        }),
+      /Routes generated files exceed/u
+    );
   });
 });
 

@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "stops": [
+    {
+      "id": "seleucia-fixture",
+      "name": "Seleucia",
+      "todayName": "Samandağ",
+      "candidates": [
+        {
+          "label": "Seleucia Pieria (illustrative)",
+          "coordinates": [
+            35.968,
+            36.119
+          ],
+          "coordinateSource": "wikidata:Q2207807",
+          "confidence": "high",
+          "support": "Illustrative fixture support text only.",
+          "sources": [
+            "wikidata:Q2207807",
+            "openbible:seleucia"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 2:1",
+          "book": "Acts",
+          "textWEB": "Now when the day of Pentecost had come, they were all with one accord in one place."
+        }
+      ],
+      "sources": [
+        "scripture:Acts 2:1",
+        "bib:existing-bib-source"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "cyprus-harbor-fixture",
+      "name": "Cyprus harbor",
+      "todayName": "Near modern Larnaca",
+      "candidates": [
+        {
+          "label": "Illustrative harbor point",
+          "coordinates": [
+            33.624,
+            34.917
+          ],
+          "coordinateSource": "openbible:cyprus",
+          "confidence": "medium",
+          "support": "Illustrative fixture support text only.",
+          "sources": [
+            "openbible:cyprus",
+            "pleiades:707534"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "1 Corinthians 1:2",
+          "book": "1 Corinthians",
+          "textWEB": "to the assembly of God which is at Corinth—those who are sanctified in Christ Jesus, called saints, with all who call on the name of our Lord Jesus Christ in every place, both theirs and ours:"
+        }
+      ],
+      "sources": [
+        "bib:existing-bib-source"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "disputed-stop-fixture",
+      "name": "Disputed stop",
+      "todayName": "Proposed near the Sea of Galilee",
+      "candidates": [
+        {
+          "label": "Candidate A",
+          "coordinates": [
+            35.56,
+            32.9
+          ],
+          "coordinateSource": "openbible:capernaum",
+          "confidence": "disputed",
+          "support": "Illustrative fixture support text only.",
+          "sources": [
+            "openbible:capernaum",
+            "wikidata:Q5732"
+          ]
+        },
+        {
+          "label": "Candidate B",
+          "coordinates": [
+            35.6,
+            32.88
+          ],
+          "coordinateSource": "pleiades:678180",
+          "confidence": "disputed",
+          "support": "Illustrative fixture support text only.",
+          "sources": [
+            "pleiades:678180",
+            "openbible:capernaum"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Matthew 5:1",
+          "book": "Matthew",
+          "textWEB": "Seeing the multitudes, he went up onto the mountain. When he had sat down, his disciples came to him."
+        }
+      ],
+      "sources": [
+        "bib:existing-bib-source",
+        "scripture:Matthew 5:1"
+      ],
+      "status": "draft"
+    }
+  ]
+}
