@@ -61,7 +61,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M5-00 | Record CP4; plan M5 (ADR-0038); stacked PRs target `main` (ADR-0039); visual spec; cards M5-01 to M5-05 | project-owner | `docs/m5-kickoff` | Merged | #60 |
 | M5-01 | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Merged | #61 |
 | M5-02 | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Merged | #62 |
-| M5-03 | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Research note done (`docs/research/M5-jesus-journeys.md`: 35 segments in 5 phases, 20 existing-record stops, 6 new stop entries including one disputed region); data waits for M5-01's schema | |
+| M5-03 | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Research note and data done (1 route `jesus`, 35 standalone segments, 3 new stop entries including one disputed region with 3 candidates; PO's §9 answers applied, dropping the Jordan/Sidon/Decapolis stop entries); waits for the Fact-Checker's phase | |
 | M5-04 | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | In progress: 51 lines for Paul's routes; next, smoother sea paths and Jesus' lines | |
 | M5-05 | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | In progress: the tab on test data, first-phase fixes; real data and MC9 next | |
 

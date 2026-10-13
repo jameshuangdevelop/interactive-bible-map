@@ -207,6 +207,15 @@ This note tries to flag every point where the Gospels' own accounts differ, rath
 6. **Excluding "the wilderness" (the temptation) and "the borders of Judea and beyond the Jordan" as stops (§4).** Both are named in segments this note keeps, but neither got a stop entry, since no source gives either a specific point the way the Gospels name them. Please confirm this line is drawn in the right place, particularly next to Decapolis, which this note did keep as a stop on the strength of two sources giving it a representative point.
 7. **The segment count.** This note is thorough rather than minimal: it includes several segments with a weaker "from" than a strict reading might want (for example, "his own country" for Nazareth at Matthew 13:54/Mark 6:1, and the context-based readings flagged throughout Phase B). The human sees the full list at MC9 (ADR-0038 item 3); if any of these feel like they stretch the rule too far, trimming them does not affect any other segment.
 
+**PO answers (2026-10-13), applied in phase 2's data:**
+1. **Emmaus:** kept, with the stage noting Jesus joined the two disciples on the road. Its four candidates get `noLineReason` unless the Fact-Checker finds one with the strongest support.
+2. **Tyre and Sidon:** encoded as one region end, not two stops. The stage names "the borders of Tyre and Sidon" (`namedRegions`) and ends at the `tyre` record; no `sidon` stop was added for this route (Paul's own `sidon` stop entry, for Acts 27:3, is not reused or duplicated here, since WEB does not say Jesus reached Sidon itself).
+3. **The Gadarenes:** descriptive title kept, now encoded as the route-stop `country-of-the-gadarenes` with three candidates.
+4. **Bethphage:** kept as proposed; encoded as the route-stop `bethphage`.
+5. **The Jordan:** no separate stop. The baptism stage (segment-01) now ends at the existing `bethany-beyond-the-jordan` record, citing Matthew 3:13, Mark 1:9 and John 1:28-29 together (ADR-0038 item 4 of the 2026-10-13 update); its `the-jordan` stop entry proposed in phase 1 was dropped.
+6. **General places and regions:** confirmed; Decapolis is encoded as a `namedRegions` entry on segment-19 (Mark 7:31), by name only, with no stop entry or coordinate of its own.
+7. **Order and count:** every segment this note found attested is encoded; the route's `note` field states that the order is a way of listing the segments, not a claim about the order of events.
+
 ## 10. Sources
 
 ### New bibliography entries needed in phase 2 (`data/bibliography.json`)
@@ -218,7 +227,7 @@ All International Standard Bible Encyclopedia (1915) entries below were opened d
 - `bib:isbe-gerasa` — "Gerasa; Gerasenes", at `G/gerasa-gerasenes.html`.
 - `bib:isbe-ephraim` — ISBE publishes two "Ephraim" articles; this cites the second, at `E/ephraim-(2).html`, specifically its subsection (2), "The town near the wilderness to which Jesus retired after the raising of Lazarus".
 - `bib:isbe-bethphage` — "Bethphage", at `B/bethphage.html`.
-- `bib:livius-pontius-pilate` — "Pontius Pilate", by the historian Jona Lendering, Livius.org, opened at `livius.org/articles/person/pontius-pilate/`. Livius.org is a cite-only source under the project's existing rule (custom terms, not an open license); this note restates its facts and never quotes it.
+- `bib:livius-pontius-pilate` — "Pontius Pilate", by the historian Jona Lendering, Livius.org, opened at `livius.org/articles/person/pontius-pilate/`. Livius.org is a cite-only source under the project's existing rule (custom terms, not an open license); this note restates its facts and never quotes it. (Phase 2 update: this source supports the note's own discussion of the ministry's years, §7, but the route's encoded `yearNote` only needed `bib:isbe-chronology-nt`, so this entry was not added to `data/bibliography.json`.)
 
 Already-existing entries reused directly (no change needed): `bib:isbe-decapolis`, `bib:custodia-bethphage`, `bib:niv-2011-biblegateway`, `bib:esv-2025-biblegateway`, `bib:nlt-2015-biblegateway`, `bib:kjv-1987-biblegateway`, `bib:nkjv-1982-biblegateway`, `bib:csb-2017-biblegateway`.
 
