@@ -61,6 +61,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | Agent(s) | `<agent>`, or an ordered chain such as `research-lead` → `media-curator` → `fact-checker` |
 | Model | <model> (fallback <model>) |
 | Branch | `<prefix>/<slug>` |
+| PR target | `main`, even when the branch is stacked on another (ADR-0039) |
 | Depends on | <IDs or checkpoint> |
 | Parallel with | <IDs or "none"> |
 | Credit target | ~<n> AI credits (session guard: 10,000) |

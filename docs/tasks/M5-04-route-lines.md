@@ -5,6 +5,7 @@
 | Agents, in order | `gis-engineer` (sources, then lines) → `fact-checker` (verification), each adding its own commits (ADR-0014) |
 | Models | GPT-5.3-Codex (fallback GPT-5.5) → Claude Opus 5.5 |
 | Branch | `data/m5-route-lines`, stacked on M5-01 (ADR-0039). Before the final build, the PO merges M5-02's and M5-03's verified data into it. |
+| PR target | `main` (ADR-0039) |
 | Depends on | M5-01's schema; the stops and stages by sea from M5-02's and M5-03's research notes (the notes are enough to start; the verified data is needed to finish) |
 | Parallel with | M5-02's and M5-03's data steps, and M5-05 |
 | Credit target | ~5,000 sources and lines, ~4,000 verification (session guard: 10,000 each; ADR-0025) |

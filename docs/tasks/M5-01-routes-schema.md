@@ -5,6 +5,7 @@
 | Agent | `gis-engineer` |
 | Model | GPT-5.3-Codex (fallback GPT-5.5) |
 | Branch | `feat/m5-routes-schema`, stacked on the M5 kickoff (`docs/m5-kickoff`) until it merges (ADR-0039) |
+| PR target | `main` (ADR-0039) |
 | Depends on | The M5 kickoff (ADR-0038) |
 | Parallel with | M5-02's and M5-03's research. Their data steps, M5-04 and M5-05 start from this branch's commit. |
 | Credit target | ~2,500 (session guard: 10,000; ADR-0025) |

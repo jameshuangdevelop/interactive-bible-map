@@ -5,6 +5,7 @@
 | Agents, in order | `research-lead` (research note, then data) → `fact-checker` (verification), each adding its own commits (ADR-0014) |
 | Models | Claude Sonnet 5 → Claude Opus 5.5 |
 | Branch | `data/m5-jesus-journeys`, stacked on the M5 kickoff (ADR-0039). Before the data step, the PO merges M5-01's schema commit into it. |
+| PR target | `main` (ADR-0039) |
 | Depends on | The M5 kickoff for the research; M5-01's schema for the data step |
 | Parallel with | M5-01, M5-02 and M5-05. M5-04 takes its stops from this task's research note. |
 | Credit target | ~5,000 research and data, ~5,000 verification (session guard: 10,000 each; ADR-0025) |
