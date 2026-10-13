@@ -60,7 +60,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | — | Land M4 on `main`: merge the top of the stack, which holds #52 to #58 (ADR-0039) | project-owner | `feat/m4-timeline-ui` | Merged | #59 |
 | M5-00 | Record CP4; plan M5 (ADR-0038); stacked PRs target `main` (ADR-0039); visual spec; cards M5-01 to M5-05 | project-owner | `docs/m5-kickoff` | Done | |
 | M5-01 | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Done (review fixes applied) | |
-| M5-02 | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Research note and data done (4 routes, 45 stages, 24 new stop entries); waits for the Fact-Checker's phase | |
+| M5-02 | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Fact-Checker round 1 done (`docs/verification/M5-paul-journeys.md`): the 24 stop entries are verified, after sourced corrections (10 coordinate sources, Apollonia's Wikidata item, two today's names, "Forum of Appius", support wording); the routes go back to the Research Lead for R1–R7: places reached recorded as passed, two provinces used as stops, two regions and two modes, the years (ADR-0038 item 7), and the notes' sourcing and debated points | |
 | M5-03 | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Ready (research); data after M5-01 | |
 | M5-04 | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | After M5-01 and the research notes | |
 | M5-05 | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | After M5-01 | |

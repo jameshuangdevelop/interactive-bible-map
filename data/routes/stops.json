@@ -12,9 +12,9 @@
             35.922,
             36.124
           ],
-          "coordinateSource": "pleiades:658483",
+          "coordinateSource": "wikidata:Q1605894",
           "confidence": "high",
-          "support": "Seleucia Pieria, the port Antioch used, about 16 Roman miles from the city near the mouth of the Orontes. Pleiades, OpenBible.info and Wikidata agree on this coastal site; Wikidata's own record places it within Hatay Province, Türkiye.",
+          "support": "Seleucia Pieria, the seaport of Antioch, about 16 miles from the city and about 5 miles north of the mouth of the Orontes. Pleiades, OpenBible.info and Wikidata agree on this coastal site; Wikidata's own record places it within Hatay Province, Türkiye.",
           "sources": [
             "pleiades:658483",
             "openbible:seleucia",
@@ -36,7 +36,9 @@
         "wikidata:Q1605894",
         "bib:isbe-seleucia"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "attalia",
@@ -49,7 +51,7 @@
             30.703614,
             36.881272
           ],
-          "coordinateSource": "wikidata:Q6487",
+          "coordinateSource": "openbible:attalia",
           "confidence": "high",
           "support": "A city on Pamphylia's coast founded by Attalus II Philadelphus, continuously inhabited today as Antalya, Türkiye. Pleiades, OpenBible.info and Wikidata agree on the site.",
           "sources": [
@@ -73,7 +75,9 @@
         "wikidata:Q6487",
         "bib:isbe-attalia"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "samothrace",
@@ -86,9 +90,9 @@
             25.583333,
             40.45
           ],
-          "coordinateSource": "wikidata:Q203175",
+          "coordinateSource": "openbible:samothrace",
           "confidence": "high",
-          "support": "An island in the north Aegean Sea, south of Thrace, where ancient sources record a town at its northern end where ships could anchor overnight. Pleiades, OpenBible.info and Wikidata agree on the island, known today as Samothraki.",
+          "support": "An island in the north Aegean Sea, south of Thrace, with a town at its northern end where ships could anchor for the night. Pleiades, OpenBible.info and Wikidata agree on the island, known today as Samothraki.",
           "sources": [
             "pleiades:501597",
             "openbible:samothrace",
@@ -110,7 +114,9 @@
         "wikidata:Q203175",
         "bib:isbe-samothrace"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "amphipolis",
@@ -125,7 +131,7 @@
           ],
           "coordinateSource": "openbible:amphipolis",
           "confidence": "high",
-          "support": "A town in Macedonia on the river Strymon, on the Via Egnatia. Pleiades, OpenBible.info and Wikidata agree on the site, near the modern village of Amphipolis.",
+          "support": "A town in Macedonia on the river Strymon, on the Via Egnatia. Pleiades, OpenBible.info and Wikidata agree on the site, which Wikidata places in today's municipality of Amphipolis.",
           "sources": [
             "pleiades:501347",
             "openbible:amphipolis",
@@ -147,12 +153,14 @@
         "wikidata:Q217414",
         "bib:isbe-amphipolis"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "apollonia-macedonia",
       "name": "Apollonia",
-      "todayName": "Near Pollina, Greece",
+      "todayName": "Near Nea Apollonia, Greece",
       "candidates": [
         {
           "label": "Apollonia (Macedonia, on the Via Egnatia)",
@@ -162,11 +170,11 @@
           ],
           "coordinateSource": "openbible:apollonia",
           "confidence": "high",
-          "support": "A town in Mygdonia, Macedonia, on the Via Egnatia between Amphipolis and Thessalonica, about a day's journey from each. The International Standard Bible Encyclopedia reports its name survives in the modern Pollina; Pleiades, OpenBible.info and Wikidata agree on the site's location.",
+          "support": "A town in Mygdonia, Macedonia, on the Via Egnatia between Amphipolis and Thessalonica, about 30 Roman miles from Amphipolis and 38 from Thessalonica. Pleiades, OpenBible.info and Wikidata agree on the site, near the modern village of Nea Apollonia; the International Standard Bible Encyclopedia reports that its name seems to survive in the modern Pollina.",
           "sources": [
             "pleiades:491526",
             "openbible:apollonia",
-            "wikidata:Q1611799",
+            "wikidata:Q2751389",
             "bib:isbe-apollonia"
           ]
         }
@@ -181,10 +189,12 @@
       "sources": [
         "pleiades:491526",
         "openbible:apollonia",
-        "wikidata:Q1611799",
+        "wikidata:Q2751389",
         "bib:isbe-apollonia"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "assos",
@@ -226,7 +236,9 @@
         "wikidata:Q744631",
         "bib:isbe-assos"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "mitylene",
@@ -263,7 +275,9 @@
         "wikidata:Q189059",
         "bib:isbe-mitylene"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "chios",
@@ -276,11 +290,12 @@
             26.1375,
             38.3725
           ],
-          "coordinateSource": "wikidata:Q160483",
+          "coordinateSource": "openbible:chios",
           "confidence": "high",
-          "support": "An Aegean island south of Lesbos, close to the Asia Minor mainland. Pleiades, OpenBible.info and Wikidata agree on the island, which keeps the name Chios today.",
+          "support": "An Aegean island south of Lesbos, close to the Asia Minor mainland. Pleiades, OpenBible.info and Wikidata agree on the island, which keeps the name Chios today. The point is the island's principal town, also called Chios.",
           "sources": [
             "pleiades:550496",
+            "pleiades:550497",
             "openbible:chios",
             "wikidata:Q160483",
             "bib:isbe-chios"
@@ -296,11 +311,14 @@
       ],
       "sources": [
         "pleiades:550496",
+        "pleiades:550497",
         "openbible:chios",
         "wikidata:Q160483",
         "bib:isbe-chios"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "samos",
@@ -337,12 +355,14 @@
         "wikidata:Q156882",
         "bib:isbe-samos"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "trogyllium",
       "name": "Trogyllium",
-      "todayName": "Cape Mycale, Türkiye",
+      "todayName": "Dip Burun, Türkiye",
       "candidates": [
         {
           "label": "Trogyllium (promontory opposite Samos)",
@@ -352,7 +372,7 @@
           ],
           "coordinateSource": "openbible:trogyllium",
           "confidence": "high",
-          "support": "A promontory on the Asia Minor coast opposite Samos, at the end of the Mycale ridge, where ships could anchor for the night. Pleiades, OpenBible.info and Wikidata agree on the site, today's Cape Mycale. Several early manuscripts omit the clause naming it in Acts 20:15; see the route's note.",
+          "support": "A promontory on the Asia Minor coast opposite Samos, extending from the Mycale mountains, with an anchorage. Pleiades, OpenBible.info and Wikidata agree on the site, which Pleiades identifies as today's Dip Burun. Several early manuscripts omit the clause naming it in Acts 20:15; see the route's note.",
           "sources": [
             "pleiades:599991",
             "openbible:trogyllium",
@@ -374,7 +394,9 @@
         "wikidata:Q2937072",
         "bib:isbe-trogyllium"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "cos",
@@ -411,7 +433,9 @@
         "wikidata:Q187027",
         "bib:isbe-cos"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "rhodes",
@@ -424,9 +448,9 @@
             28.2109,
             36.4402
           ],
-          "coordinateSource": "wikidata:Q188731",
+          "coordinateSource": "openbible:rhodes-1",
           "confidence": "high",
-          "support": "The chief city of the island of Rhodes, at the southeastern Aegean. Pleiades, OpenBible.info and Wikidata agree on the city of Rhodes as the site; OpenBible.info separately records a minor, lower-scored reading that places the stop near Lindos instead, on its own authority alone.",
+          "support": "The chief city of the island of Rhodes, in the southeastern Aegean. Pleiades, OpenBible.info and Wikidata agree on the city of Rhodes as the site. OpenBible.info also notes a tradition that Paul arrived near Lindos instead of the city.",
           "sources": [
             "pleiades:590030",
             "openbible:rhodes-1",
@@ -448,7 +472,9 @@
         "wikidata:Q188731",
         "bib:isbe-rhodes"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "patara",
@@ -487,7 +513,9 @@
         "bib:isbe-patara",
         "bib:isbe-lycia"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "myra",
@@ -526,7 +554,9 @@
         "bib:isbe-myra",
         "bib:isbe-lycia"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "cnidus",
@@ -539,9 +569,9 @@
             27.375,
             36.6858
           ],
-          "coordinateSource": "pleiades:599575",
+          "coordinateSource": "wikidata:Q690575",
           "confidence": "high",
-          "support": "A city of Caria at the tip of a long peninsula, with two harbors, described by the first-century geographer Strabo at this same site (quoted in Smith's 1854 Dictionary of Greek and Roman Geography). Pleiades, OpenBible.info and Wikidata agree on the Cape Krio (Tekir) location; Wikidata's own record places it within Datça, Muğla Province, Türkiye. Pleiades separately catalogs an inland 'Cnidus (Burgaz)' entry, read here as an earlier phase of the city rather than a dispute over the Roman-period site Paul's ship passed.",
+          "support": "A city of Caria at the end of a long, narrow peninsula, with two harbors. Pleiades records that in the late fourth century BC the city's political center moved here, to Tekir, from an older site at Burgaz, so the city Paul's ship passed was at Tekir. Pleiades, OpenBible.info and Wikidata agree on the Tekir site; Wikidata's own record places it within Datça, Muğla Province, Türkiye.",
           "sources": [
             "pleiades:599575",
             "openbible:cnidus",
@@ -563,7 +593,9 @@
         "wikidata:Q690575",
         "bib:isbe-cnidus"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "salmone",
@@ -600,7 +632,9 @@
         "wikidata:Q2937111",
         "bib:isbe-phoenix"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "fair-havens",
@@ -639,7 +673,9 @@
         "bib:isbe-fair-havens",
         "bib:isbe-phoenix"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "cauda",
@@ -676,7 +712,9 @@
         "wikidata:Q213895",
         "bib:isbe-phoenix"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "sidon",
@@ -689,7 +727,7 @@
             35.371944,
             33.560985
           ],
-          "coordinateSource": "wikidata:Q163490",
+          "coordinateSource": "openbible:sidon",
           "confidence": "high",
           "support": "An ancient Phoenician port city on the Mediterranean coast. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Sidon, Lebanon.",
           "sources": [
@@ -713,7 +751,9 @@
         "wikidata:Q163490",
         "bib:isbe-sidon"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "syracuse",
@@ -726,9 +766,9 @@
             15.293056,
             37.063889
           ],
-          "coordinateSource": "wikidata:Q13670",
+          "coordinateSource": "openbible:syracuse",
           "confidence": "high",
-          "support": "A Greek colony on Sicily's east coast and capital of the Roman province of Sicily. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Syracuse.",
+          "support": "A Greek colony on Sicily's east coast and capital of the Roman province of Sicily. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Syracuse (Siracusa).",
           "sources": [
             "pleiades:462503",
             "openbible:syracuse",
@@ -750,7 +790,9 @@
         "wikidata:Q13670",
         "bib:isbe-syracuse"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "rhegium",
@@ -763,7 +805,7 @@
             15.64412,
             38.1088
           ],
-          "coordinateSource": "wikidata:Q8471",
+          "coordinateSource": "openbible:rhegium",
           "confidence": "high",
           "support": "A city on the Italian shore of the Sicilian Strait. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Reggio Calabria.",
           "sources": [
@@ -787,7 +829,9 @@
         "wikidata:Q8471",
         "bib:isbe-rhegium"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "three-taverns",
@@ -801,7 +845,7 @@
           ],
           "coordinateSource": "wikidata:Q622536",
           "confidence": "high",
-          "support": "A station on the Appian Way about 33 Roman miles from Rome. Pleiades, OpenBible.info and Wikidata agree on the site; no source opened for this note names a modern town there.",
+          "support": "A station on the Appian Way about 33 Roman miles from Rome. Pleiades, OpenBible.info and Wikidata agree on the site.",
           "sources": [
             "pleiades:423106",
             "openbible:three-taverns",
@@ -823,27 +867,35 @@
         "wikidata:Q622536",
         "bib:isbe-taverns-three"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "forum-of-appius",
-      "name": "The Forum of Appius",
+      "name": "Forum of Appius",
       "todayName": "In the comune of Latina, Italy",
       "candidates": [
         {
-          "label": "The Forum of Appius (Forum Appii, Appian Way)",
+          "label": "Forum of Appius (Forum Appii, Appian Way)",
           "coordinates": [
             12.9975,
             41.46639
           ],
           "coordinateSource": "wikidata:Q3748871",
           "confidence": "high",
-          "support": "A station on the Appian Way about 43 Roman miles from Rome, at the edge of the Pontine Marshes. Pleiades, OpenBible.info and Wikidata agree on the site; Wikidata's own description places it within the comune of Latina, Italy. WEB's own wording, 'The Market of Appius,' is a minority reading among six compared English versions; see the route's note.",
+          "support": "A station on the Appian Way about 43 Roman miles from Rome, where a canal through the Pontine Marshes began. Pleiades, OpenBible.info and Wikidata agree on the site; Wikidata's own record places it within the comune of Latina, Italy. None of six popular English versions compared uses the World English Bible's wording, 'The Market of Appius'; three read 'Forum of Appius'. See the route's note.",
           "sources": [
             "pleiades:422927",
             "openbible:forum-of-appius",
             "wikidata:Q3748871",
-            "bib:isbe-appii-forum"
+            "bib:isbe-appii-forum",
+            "bib:niv-2011-biblegateway",
+            "bib:esv-2025-biblegateway",
+            "bib:nlt-2015-biblegateway",
+            "bib:kjv-1987-biblegateway",
+            "bib:nkjv-1982-biblegateway",
+            "bib:csb-2017-biblegateway"
           ]
         }
       ],
@@ -858,9 +910,17 @@
         "pleiades:422927",
         "openbible:forum-of-appius",
         "wikidata:Q3748871",
-        "bib:isbe-appii-forum"
+        "bib:isbe-appii-forum",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "ptolemais",
@@ -873,9 +933,9 @@
             35.0692,
             32.9214
           ],
-          "coordinateSource": "wikidata:Q126084",
+          "coordinateSource": "openbible:ptolemais",
           "confidence": "high",
-          "support": "A Phoenician coastal city, identified with the Old Testament's Acco. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Acre.",
+          "support": "A Phoenician coastal city, identified with the Old Testament's Acco. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Acre (Akko).",
           "sources": [
             "pleiades:678010",
             "openbible:ptolemais",
@@ -897,7 +957,9 @@
         "wikidata:Q126084",
         "bib:isbe-ptolemais"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     }
   ]
 }

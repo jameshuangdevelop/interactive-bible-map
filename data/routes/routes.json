@@ -12,7 +12,8 @@
       "sources": [
         "scripture:Acts 13:1",
         "scripture:Acts 14:28",
-        "bib:isbe-paul-the-apostle-5"
+        "bib:isbe-paul-the-apostle-5",
+        "bib:isbe-paul-the-apostle-3"
       ],
       "stages": [
         {
@@ -358,7 +359,8 @@
         "scripture:Acts 15:36",
         "scripture:Acts 18:22",
         "bib:isbe-paul-the-apostle-5",
-        "bib:bibleodyssey-erastus-gallio-paul"
+        "bib:bibleodyssey-erastus-gallio-paul",
+        "bib:isbe-paul-the-apostle-3"
       ],
       "stages": [
         {
@@ -706,11 +708,17 @@
               "ref": "Acts 18:21",
               "book": "Acts",
               "textWEB": "but taking his leave of them, he said, “I must by all means keep this coming feast in Jerusalem, but I will return again to you if God wills.” Then he set sail from Ephesus."
+            },
+            {
+              "ref": "Acts 18:22",
+              "book": "Acts",
+              "textWEB": "When he had landed at Caesarea, he went up and greeted the assembly, and went down to Antioch."
             }
           ],
           "travelMode": "sea",
           "sources": [
-            "scripture:Acts 18:21"
+            "scripture:Acts 18:21",
+            "scripture:Acts 18:22"
           ]
         },
         {
@@ -749,7 +757,13 @@
       "sources": [
         "scripture:Acts 18:23",
         "scripture:Acts 21:17",
-        "bib:isbe-paul-the-apostle-5"
+        "bib:isbe-paul-the-apostle-5",
+        "bib:isbe-paul-the-apostle-3",
+        "bib:isbe-trogyllium",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:csb-2017-biblegateway",
+        "openbible:rhodes-1"
       ],
       "stages": [
         {
@@ -1130,7 +1144,17 @@
       "sources": [
         "scripture:Acts 27:1",
         "scripture:Acts 28:16",
-        "bib:isbe-paul-the-apostle-3"
+        "bib:isbe-paul-the-apostle-3",
+        "scripture:Acts 25:4",
+        "bib:isbe-phoenix",
+        "bib:isbe-appii-forum",
+        "bib:isbe-taverns-three",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
       ],
       "stages": [
         {
