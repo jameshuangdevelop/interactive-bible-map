@@ -4,16 +4,18 @@
     {
       "id": "paul-1",
       "title": "Paul's first journey",
-      "fromYear": 47,
-      "toYear": 48,
-      "yearNote": "About AD 47-48, per the International Standard Bible Encyclopedia's (1915) own stated span for Acts 13-14. A ten-scholar survey it reports ranges the journey from 45 to 50-51, anchored loosely by the famine relief visit that precedes it (Acts 11:27-30), commonly dated about AD 45-46.",
+      "fromYear": 44,
+      "toYear": 51,
+      "yearNote": "About AD 47-48, per the International Standard Bible Encyclopedia's (1915) own stated span for Acts 13-14, within a wider ten-scholar range it reports running from before 45 (McGiffert) to 50-51 (Zahn). The famine-relief visit that precedes this journey (Acts 11:27-30) gives some background: the same encyclopedia's account of Paul's life places that visit at “the end of 44 or beginning of 45,” and its separate article on the famine itself dates the famine that “severely affected Palestine” to AD 45, without calling either date a fixed anchor for the journey that follows.",
       "structure": "connected",
-      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Pisidia, Pamphylia and Lycaonia are regions the text names alongside the towns within them; this route does not resolve which part of Galatia Paul's later letter to that name addresses (see the galatia record).",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Pisidia, Pamphylia and Lycaonia are regions the text names alongside the towns within them, not stops of their own. Paul's later letter to the Galatians is addressed to “the assemblies of Galatia,” and which congregations he meant has long been debated: the “South Galatian” view holds he wrote to the congregations this journey reaches, in the province's southern cities (Antioch in Pisidia, Iconium, Lystra and Derbe); the “North Galatian” view holds he wrote instead to ethnically Galatian congregations further north, which this journey does not reach. This route takes neither side.",
       "sources": [
         "scripture:Acts 13:1",
         "scripture:Acts 14:28",
         "bib:isbe-paul-the-apostle-5",
-        "bib:isbe-paul-the-apostle-3"
+        "bib:isbe-paul-the-apostle-3",
+        "bib:isbe-famine",
+        "bib:zondervan-who-were-galatians"
       ],
       "stages": [
         {
@@ -33,10 +35,9 @@
               "textWEB": "So, being sent out by the Holy Spirit, they went down to Seleucia. From there they sailed to Cyprus."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "sources": [
-            "scripture:Acts 13:4",
-            "bib:isbe-seleucia"
+            "scripture:Acts 13:4"
           ]
         },
         {
@@ -62,15 +63,6 @@
             }
           ],
           "travelMode": "sea",
-          "namedRegions": [
-            {
-              "name": "Cyprus",
-              "locationId": "cyprus",
-              "sources": [
-                "scripture:Acts 13:4"
-              ]
-            }
-          ],
           "sources": [
             "scripture:Acts 13:4",
             "scripture:Acts 13:5"
@@ -182,15 +174,6 @@
             }
           ],
           "travelMode": "land",
-          "namedRegions": [
-            {
-              "name": "Lycaonia",
-              "locationId": "lycaonia",
-              "sources": [
-                "scripture:Acts 14:6"
-              ]
-            }
-          ],
           "sources": [
             "scripture:Acts 14:6"
           ]
@@ -233,18 +216,8 @@
           },
           "to": {
             "kind": "location",
-            "locationId": "antioch-pisidia"
+            "locationId": "lystra"
           },
-          "via": [
-            {
-              "kind": "location",
-              "locationId": "lystra"
-            },
-            {
-              "kind": "location",
-              "locationId": "iconium"
-            }
-          ],
           "scripture": [
             {
               "ref": "Acts 14:21",
@@ -259,6 +232,50 @@
         },
         {
           "id": "stage-10",
+          "from": {
+            "kind": "location",
+            "locationId": "lystra"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "iconium"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:21",
+              "book": "Acts",
+              "textWEB": "When they had preached the Good News to that city and had made many disciples, they returned to Lystra, Iconium, and Antioch,"
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 14:21"
+          ]
+        },
+        {
+          "id": "stage-11",
+          "from": {
+            "kind": "location",
+            "locationId": "iconium"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "antioch-pisidia"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 14:21",
+              "book": "Acts",
+              "textWEB": "When they had preached the Good News to that city and had made many disciples, they returned to Lystra, Iconium, and Antioch,"
+            }
+          ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 14:21"
+          ]
+        },
+        {
+          "id": "stage-12",
           "from": {
             "kind": "location",
             "locationId": "antioch-pisidia"
@@ -302,7 +319,7 @@
           ]
         },
         {
-          "id": "stage-11",
+          "id": "stage-13",
           "from": {
             "kind": "location",
             "locationId": "perga"
@@ -318,13 +335,13 @@
               "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "sources": [
             "scripture:Acts 14:25"
           ]
         },
         {
-          "id": "stage-12",
+          "id": "stage-14",
           "from": {
             "kind": "route-stop",
             "stopId": "attalia"
@@ -350,17 +367,18 @@
     {
       "id": "paul-2",
       "title": "Paul's second journey",
-      "fromYear": 49,
-      "toYear": 52,
-      "yearNote": "About AD 49-52, per the International Standard Bible Encyclopedia's (1915) stated span of '49-51 (or 52)' for Acts 15:36-18:22. A Greek inscription from the emperor Claudius to the people of Delphi, usually dated to about AD 52, names Lucius Junius Gallio as proconsul of Achaia, the office Acts 18:12 records him holding when Paul had already spent eighteen months in Corinth (Acts 18:11); this is the firmest anchor in the whole chronology (Bible Odyssey, bib:bibleodyssey-erastus-gallio-paul; ISBE, bib:isbe-paul-the-apostle-3).",
+      "fromYear": 46,
+      "toYear": 53,
+      "yearNote": "About AD 46-53, per the International Standard Bible Encyclopedia's (1915) stated span of “49-51 (or 52)” for Acts 15:36-18:22, within a wider ten-scholar range it reports running from 46 (McGiffert) to 50-53 (Ramsay). A Greek inscription from the emperor Claudius to the people of Delphi, dated to about AD 52, names Lucius Junius Gallio as proconsul of Achaia, the office Acts 18:12 records him holding; Acts 18:11 says Paul had by then spent eighteen months in Corinth, which the encyclopedia reads as “apparently” already true when Gallio arrived. The Society of Biblical Literature's Bible Odyssey project reads the inscription as placing Paul's stay in Corinth at 50-51; working from the same inscription, the encyclopedia instead places Gallio's arrival “either … the summer of 51 or 52 AD,” while cautioning that “we do not get a certain date as to the year.”",
       "structure": "connected",
-      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 16:6-8 names only regions (Phrygia and Galatia, then Mysia) between Lystra and Troas, and records that the party tried to enter Bithynia but was not allowed to; Bithynia is not recorded as a region passed through, since the text says they did not go there. Acts 18:22 says only that Paul 'went up and greeted the assembly' between landing at Caesarea and going down to Antioch; this is very likely Jerusalem, on Luke's standard idiom for travel to and from that city elsewhere in Acts, and the International Standard Bible Encyclopedia reads it the same way ('probably' Jerusalem), but the text does not name it, so this route records that stage as Caesarea to Antioch directly, with unknown travel mode.",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 16:6-8 names only regions (Phrygia and Galatia, then Mysia) between Lystra and Troas, and records that the party tried to enter Bithynia but was not allowed to; Bithynia is not recorded as a region passed through, since the text says they did not go there. As on the first journey, which congregations Paul's letter to the Galatians addresses is debated between those in the southern cities and others further north; this route does not take a side. Acts 18:22 says only that Paul “went up and greeted the assembly” between landing at Caesarea and going down to Antioch, without naming a city; the International Standard Bible Encyclopedia reads this as probably Jerusalem, so this route records that stage as Caesarea to Antioch directly, with unknown travel mode.",
       "sources": [
         "scripture:Acts 15:36",
         "scripture:Acts 18:22",
         "bib:isbe-paul-the-apostle-5",
         "bib:bibleodyssey-erastus-gallio-paul",
-        "bib:isbe-paul-the-apostle-3"
+        "bib:isbe-paul-the-apostle-3",
+        "bib:zondervan-who-were-galatians"
       ],
       "stages": [
         {
@@ -667,14 +685,30 @@
           },
           "to": {
             "kind": "location",
-            "locationId": "ephesus"
+            "locationId": "cenchreae"
           },
-          "via": [
+          "scripture": [
             {
-              "kind": "location",
-              "locationId": "cenchreae"
+              "ref": "Acts 18:18",
+              "book": "Acts",
+              "textWEB": "Paul, having stayed after this many more days, took his leave of the brothers, and sailed from there for Syria, together with Priscilla and Aquila. He shaved his head in Cenchreae, for he had a vow."
             }
           ],
+          "travelMode": "land",
+          "sources": [
+            "scripture:Acts 18:18"
+          ]
+        },
+        {
+          "id": "stage-12",
+          "from": {
+            "kind": "location",
+            "locationId": "cenchreae"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "ephesus"
+          },
           "scripture": [
             {
               "ref": "Acts 18:18",
@@ -694,7 +728,7 @@
           ]
         },
         {
-          "id": "stage-12",
+          "id": "stage-13",
           "from": {
             "kind": "location",
             "locationId": "ephesus"
@@ -722,7 +756,7 @@
           ]
         },
         {
-          "id": "stage-13",
+          "id": "stage-14",
           "from": {
             "kind": "location",
             "locationId": "caesarea-maritima"
@@ -749,11 +783,11 @@
     {
       "id": "paul-3",
       "title": "Paul's third journey",
-      "fromYear": 52,
-      "toYear": 58,
-      "yearNote": "About AD 52-58, per the International Standard Bible Encyclopedia's (1915) stated span of '52 (or 53)-57 (or 58)' for Acts 18:23-21:17 (its own section heading states a narrower Ac 18:23-21:14, picking up again at exactly 21:17; see the note on this route's final stage). A ten-scholar survey it reports ranges the journey from 49 to 59.",
+      "fromYear": 49,
+      "toYear": 59,
+      "yearNote": "About AD 49-59: the International Standard Bible Encyclopedia's (1915) own account gives “52 (or 53)-57 (or 58) AD” for its own section covering Acts 18:23-21:14, three verses short of where this route ends (21:17; the boundary is discussed in the research note). Its wider ten-scholar range runs from 49 (McGiffert) to 53-59 (Clemen) for the journey itself, and from 53 to 59 for the arrest in Jerusalem that follows it, which together set this route's wider span.",
       "structure": "connected",
-      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 18:23 names 'the region of Galatia and Phrygia,' reversing 16:6's order ('Phrygia and Galatia'); this route does not read significance into the reversal. Acts 20:1-2 names Macedonia and Greece (Achaia) as real destinations reached, each already a location record in this project, rather than regions merely passed through; the text does not name a city for the three-month stay in Achaia, though many interpreters associate it with Corinth. Acts 20:13 records that Paul himself went to Assos by land while his companions sailed there; this route records that stage as land, tracing Paul's own path, and the sailing instruction is in the quoted text. Troas to Miletus includes Trogyllium (Acts 20:15); several early manuscripts omit the clause naming it, and some modern versions footnote it instead of printing it, but WEB includes it. OpenBible.info also records a minor, lower-confidence reading that the stop at Rhodes (21:1) was near Lindos instead of the city; this route follows the city of Rhodes. ISBE's own account ends this journey three verses before the arrival at Jerusalem (21:14); this route follows the card's choice and ends at the arrival itself (21:17), which is also where ISBE's next section begins.",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 18:23 names “the region of Galatia and Phrygia,” reversing 16:6's order (“Phrygia and Galatia”); this route does not read significance into the reversal. As on the first journey, which congregations Paul's letter to the Galatians addresses is debated between those in the southern cities and others further north; this route does not take a side. Acts 20:1-6 names only regions between Ephesus and Philippi: Macedonia, then Achaia (which Acts also calls “Greece”), then Macedonia again on the return; no town is named for the three-month stay in Achaia, though the International Standard Bible Encyclopedia places a plot against Paul's life specifically in Corinth around this time. Acts 20:13 records that Paul himself went to Assos by land while his companions sailed there; this route records that stage as land, tracing Paul's own path, and the sailing instruction is in the quoted text. The stop at Trogyllium (Acts 20:15) is textually disputed: several early manuscripts omit the clause naming it, and some modern versions footnote it instead of printing it, but WEB includes it. One tradition has Paul landing near Lindos instead of the city of Rhodes (Acts 21:1); this route follows the city. The International Standard Bible Encyclopedia's own account of this journey ends three verses earlier, at Acts 21:14; this route continues to the arrival itself, Acts 21:17, where Acts' own narrative turns to Paul's arrest.",
       "sources": [
         "scripture:Acts 18:23",
         "scripture:Acts 21:17",
@@ -763,7 +797,8 @@
         "bib:esv-2025-biblegateway",
         "bib:nlt-2015-biblegateway",
         "bib:csb-2017-biblegateway",
-        "openbible:rhodes-1"
+        "openbible:rhodes-1",
+        "bib:zondervan-who-were-galatians"
       ],
       "stages": [
         {
@@ -818,59 +853,19 @@
           },
           "to": {
             "kind": "location",
-            "locationId": "macedonia"
+            "locationId": "philippi"
           },
           "scripture": [
             {
               "ref": "Acts 20:1",
               "book": "Acts",
               "textWEB": "After the uproar had ceased, Paul sent for the disciples, took leave of them, and departed to go into Macedonia."
-            }
-          ],
-          "travelMode": "unknown",
-          "sources": [
-            "scripture:Acts 20:1"
-          ]
-        },
-        {
-          "id": "stage-03",
-          "from": {
-            "kind": "location",
-            "locationId": "macedonia"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "achaia"
-          },
-          "scripture": [
+            },
             {
               "ref": "Acts 20:2",
               "book": "Acts",
               "textWEB": "When he had gone through those parts and had encouraged them with many words, he came into Greece."
-            }
-          ],
-          "travelMode": "land",
-          "sources": [
-            "scripture:Acts 20:2"
-          ]
-        },
-        {
-          "id": "stage-04",
-          "from": {
-            "kind": "location",
-            "locationId": "achaia"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "philippi"
-          },
-          "via": [
-            {
-              "kind": "location",
-              "locationId": "macedonia"
-            }
-          ],
-          "scripture": [
+            },
             {
               "ref": "Acts 20:3",
               "book": "Acts",
@@ -892,14 +887,40 @@
               "textWEB": "We sailed away from Philippi after the days of Unleavened Bread, and came to them at Troas in five days, where we stayed seven days."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
+          "namedRegions": [
+            {
+              "name": "Macedonia",
+              "locationId": "macedonia",
+              "sources": [
+                "scripture:Acts 20:1"
+              ]
+            },
+            {
+              "name": "Greece",
+              "locationId": "achaia",
+              "sources": [
+                "scripture:Acts 20:2"
+              ]
+            },
+            {
+              "name": "Macedonia",
+              "locationId": "macedonia",
+              "sources": [
+                "scripture:Acts 20:3"
+              ]
+            }
+          ],
           "sources": [
+            "scripture:Acts 20:1",
+            "scripture:Acts 20:2",
             "scripture:Acts 20:3",
-            "scripture:Acts 20:6"
+            "scripture:Acts 20:6",
+            "bib:isbe-paul-the-apostle-3"
           ]
         },
         {
-          "id": "stage-05",
+          "id": "stage-03",
           "from": {
             "kind": "location",
             "locationId": "philippi"
@@ -921,7 +942,7 @@
           ]
         },
         {
-          "id": "stage-06",
+          "id": "stage-04",
           "from": {
             "kind": "location",
             "locationId": "troas"
@@ -943,39 +964,44 @@
           ]
         },
         {
-          "id": "stage-07",
+          "id": "stage-05",
           "from": {
             "kind": "route-stop",
             "stopId": "assos"
           },
           "to": {
-            "kind": "location",
-            "locationId": "miletus"
+            "kind": "route-stop",
+            "stopId": "mitylene"
           },
-          "via": [
-            {
-              "kind": "route-stop",
-              "stopId": "mitylene"
-            },
-            {
-              "kind": "route-stop",
-              "stopId": "chios"
-            },
-            {
-              "kind": "route-stop",
-              "stopId": "samos"
-            },
-            {
-              "kind": "route-stop",
-              "stopId": "trogyllium"
-            }
-          ],
           "scripture": [
             {
               "ref": "Acts 20:14",
               "book": "Acts",
               "textWEB": "When he met us at Assos, we took him aboard and came to Mitylene."
-            },
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 20:14"
+          ]
+        },
+        {
+          "id": "stage-06",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "mitylene"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "samos"
+          },
+          "via": [
+            {
+              "kind": "route-stop",
+              "stopId": "chios"
+            }
+          ],
+          "scripture": [
             {
               "ref": "Acts 20:15",
               "book": "Acts",
@@ -984,30 +1010,63 @@
           ],
           "travelMode": "sea",
           "sources": [
-            "scripture:Acts 20:14",
+            "scripture:Acts 20:15"
+          ]
+        },
+        {
+          "id": "stage-07",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "samos"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "trogyllium"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 20:15",
+              "book": "Acts",
+              "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
             "scripture:Acts 20:15"
           ]
         },
         {
           "id": "stage-08",
           "from": {
+            "kind": "route-stop",
+            "stopId": "trogyllium"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "miletus"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 20:15",
+              "book": "Acts",
+              "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 20:15"
+          ]
+        },
+        {
+          "id": "stage-09",
+          "from": {
             "kind": "location",
             "locationId": "miletus"
           },
           "to": {
             "kind": "route-stop",
-            "stopId": "patara"
+            "stopId": "cos"
           },
-          "via": [
-            {
-              "kind": "route-stop",
-              "stopId": "cos"
-            },
-            {
-              "kind": "route-stop",
-              "stopId": "rhodes"
-            }
-          ],
           "scripture": [
             {
               "ref": "Acts 21:1",
@@ -1021,7 +1080,51 @@
           ]
         },
         {
-          "id": "stage-09",
+          "id": "stage-10",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "cos"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "rhodes"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 21:1",
+              "book": "Acts",
+              "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 21:1"
+          ]
+        },
+        {
+          "id": "stage-11",
+          "from": {
+            "kind": "route-stop",
+            "stopId": "rhodes"
+          },
+          "to": {
+            "kind": "route-stop",
+            "stopId": "patara"
+          },
+          "scripture": [
+            {
+              "ref": "Acts 21:1",
+              "book": "Acts",
+              "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+            }
+          ],
+          "travelMode": "sea",
+          "sources": [
+            "scripture:Acts 21:1"
+          ]
+        },
+        {
+          "id": "stage-12",
           "from": {
             "kind": "route-stop",
             "stopId": "patara"
@@ -1055,7 +1158,7 @@
           ]
         },
         {
-          "id": "stage-10",
+          "id": "stage-13",
           "from": {
             "kind": "location",
             "locationId": "tyre"
@@ -1077,7 +1180,7 @@
           ]
         },
         {
-          "id": "stage-11",
+          "id": "stage-14",
           "from": {
             "kind": "route-stop",
             "stopId": "ptolemais"
@@ -1099,7 +1202,7 @@
           ]
         },
         {
-          "id": "stage-12",
+          "id": "stage-15",
           "from": {
             "kind": "location",
             "locationId": "caesarea-maritima"
@@ -1136,11 +1239,11 @@
     {
       "id": "paul-rome",
       "title": "Paul's voyage to Rome",
-      "fromYear": 59,
-      "toYear": 60,
-      "yearNote": "About AD 59-60: the International Standard Bible Encyclopedia reasons from the succession of the governor Festus (Acts 24:27) to place the sailing for Rome 'in the late summer of 59 AD' and the arrival 'in the early spring... of 60 AD'. A ten-scholar survey it reports ranges the arrival in Rome from 56 to 62.",
+      "fromYear": 55,
+      "toYear": 62,
+      "yearNote": "About AD 55-62: the International Standard Bible Encyclopedia reasons from the succession of the governor Festus (Acts 24:27) to place the sailing for Rome “in the late summer of 59 AD” and the arrival “in the early spring … of 60 AD.” Its wider ten-scholar range puts the arrival in Rome from 56 (McGiffert) to 62 (Clemen), with the voyage itself beginning the autumn before each scholar's arrival year (Acts 27:9, 28:11), which together set this route's wider span.",
       "structure": "connected",
-      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 27:1 does not itself name the port of departure; the preceding narrative places Paul in Roman custody at Caesarea (Acts 25:4, 25:13-27; 26:32), so this route treats Caesarea as the starting point on that basis. The ship's intended winter harbor, Phoenix, and the town of Lasea named near Fair Havens are not recorded as stops: the storm kept the ship from ever reaching Phoenix (27:12-15), and Lasea is named only as a landmark near Fair Havens (27:8); both are researched in docs/research/M5-paul-journeys.md section 4.2 for a possible future record. The sandbars called Syrtis (27:17) were feared, not reached, and are not a stop either. WEB reads 'Clauda' at Acts 27:16; of six compared English versions, four (NIV, ESV, NLT, CSB) read 'Cauda' instead, the form reflected in the island's modern Greek name, Gavdos, so this route titles the stop Cauda. WEB reads 'The Market of Appius' at Acts 28:15; of six compared English versions, three (NIV, ESV, CSB) read 'Forum of Appius,' two (KJV, NKJV) read 'Appii Forum,' and one (NLT) reads only 'the Forum,' so this route titles the stop The Forum of Appius. Paul's party reached the Forum of Appius (43 Roman miles from Rome) before Three Taverns (33 Roman miles from Rome) while approaching the city, per their distances in the International Standard Bible Encyclopedia, even though Acts 28:15 names the Three Taverns party second.",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. Acts 27:1 does not itself name the port of departure; the preceding narrative places Paul in Roman custody at Caesarea (Acts 25:4, 25:13-27; 26:32), so this route treats Caesarea as the starting point on that basis. The ship's intended winter harbor, Phoenix, and the town of Lasea named near Fair Havens are not recorded as stops: the storm kept the ship from ever reaching Phoenix (27:12-15), and Lasea is named only as a landmark near Fair Havens (27:8). The sandbars called Syrtis (27:17) were feared, not reached, and are not a stop either. Acts 28:1 does not say which island “Melita” is; the traditional identification is Malta, which this route's line follows, while a minority view holds it was Mljet, off the Croatian coast. WEB reads “Clauda” at Acts 27:16; of six compared English versions, four (NIV, ESV, NLT, CSB) read “Cauda” instead, the form reflected in the island's modern Greek name, Gavdos, so this route titles the stop Cauda. WEB reads “The Market of Appius” at Acts 28:15; of six compared English versions, three (NIV, ESV, CSB) read “Forum of Appius,” two (KJV, NKJV) read “Appii Forum,” and one (NLT) reads only “the Forum,” so this route titles the stop Forum of Appius. Paul's party reached the Forum of Appius (43 Roman miles from Rome) before Three Taverns (33 Roman miles from Rome) while approaching the city, matching the order Acts 28:15 names them in.",
       "sources": [
         "scripture:Acts 27:1",
         "scripture:Acts 28:16",
@@ -1154,7 +1257,8 @@
         "bib:nlt-2015-biblegateway",
         "bib:kjv-1987-biblegateway",
         "bib:nkjv-1982-biblegateway",
-        "bib:csb-2017-biblegateway"
+        "bib:csb-2017-biblegateway",
+        "bib:hmml-contesting-shipwreck"
       ],
       "stages": [
         {
