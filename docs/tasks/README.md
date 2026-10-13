@@ -41,12 +41,17 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M3-22](M3-22-name-intros.md) | Introduce names in the other About texts | research-lead → fact-checker | `data/m3-name-intros` | Merged (#47) |
 | [M3-23](M3-23-important-places-first.md) | Important places first on the opening map | frontend-engineer | `feat/m3-important-places-first` | Merged (#48) |
 | [M3-24](M3-24-lean-ci.md) | Lean CI | frontend-engineer | `chore/m3-lean-ci` | Merged (#49) |
-| [M7-01](M7-01-phone-basics.md) | Phone basics | frontend-engineer | `feat/m7-phone-basics` | Ready |
-| [M4-01](M4-01-ancient-schema.md) | Timeline and ancient layer: schema and build | gis-engineer | `feat/m4-ancient-schema` | Ready |
-| [M4-02](M4-02-timeline.md) | The timeline: who held each area, and when | research-lead → fact-checker | `data/m4-timeline` | Ready (research); data after M4-01 |
-| [M4-03](M4-03-ancient-geometry.md) | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | After M4-01 |
-| [M4-04](M4-04-modern-map.md) | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | `feat/m4-modern-map` | After M7-01 |
-| [M4-05](M4-05-timeline-ui.md) | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | After M4-01 and M4-04 |
+| [M7-01](M7-01-phone-basics.md) | Phone basics | frontend-engineer | `feat/m7-phone-basics` | Merged (#52, via #59) |
+| [M4-01](M4-01-ancient-schema.md) | Timeline and ancient layer: schema and build | gis-engineer | `feat/m4-ancient-schema` | Merged (#53, via #59) |
+| [M4-02](M4-02-timeline.md) | The timeline: who held each area, and when | research-lead → fact-checker | `data/m4-timeline` | Merged (#54, via #59) |
+| [M4-03](M4-03-ancient-geometry.md) | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Merged (#55, via #59) |
+| [M4-04](M4-04-modern-map.md) | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | `feat/m4-modern-map` | Merged (#56, via #59) |
+| [M4-05](M4-05-timeline-ui.md) | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | Merged (#57, via #59) |
+| [M5-01](M5-01-routes-schema.md) | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Ready |
+| [M5-02](M5-02-paul-journeys.md) | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Ready (research); data after M5-01 |
+| [M5-03](M5-03-jesus-journeys.md) | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Ready (research); data after M5-01 |
+| [M5-04](M5-04-route-lines.md) | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | After M5-01 and the research notes |
+| [M5-05](M5-05-routes-tab.md) | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | After M5-01 |
 ## Template
 ```markdown
 # <ID> — <title>

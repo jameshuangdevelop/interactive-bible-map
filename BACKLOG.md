@@ -23,6 +23,8 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Unsupported clauses in candidate support text.** M3-16's Fact-Checker found clauses in the untouched `candidates[].support` text of Bethany beyond the Jordan and Cana that no cited source states (`docs/verification/M3-longer-about.md`). A small sourced data task should fix them.
 - **Older verified text cites books no one on the team could open,** such as Murphy-O'Connor's guide and Rainey and Notley's atlas (found by M3-16's Fact-Checker). Decide whether to re-source those clauses from openable sources (a question for CP3b).
 - **Thin "today" paragraphs.** In some major places, the About paragraph on what a visitor sees today is short, or rests on a 1915 encyclopedia (M3-16's Fact-Checker). Refresh them from current site and museum pages in a later data pass.
+- **Stops on the routes as full places.** M5's routes give each stop without a record a short stop entry, shown only on the Routes tab (ADR-0038 item 2). An M6 batch can make them full places, with photos, starting with the ports where Paul stayed, as listed in M5-02's research note.
+- **Other journeys in Acts,** such as Paul's journey to Damascus (Acts 9), his visits to Jerusalem (Acts 11:30, 15:2), and the travels of Philip (Acts 8) and Peter (Acts 9–10). The Routes tab shows Paul's three journeys and his voyage to Rome, which the brief names (ADR-0038 item 1).
 
 ## Process and tooling
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).

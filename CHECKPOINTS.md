@@ -10,8 +10,8 @@ Each checkpoint is a PR labeled `checkpoint`. Its description gives a summary, t
 | CP3a | M3 MVP App | Low-fidelity visual spec and mockup | Approved 2026-09-28 | #15–#16 |
 | CP3.5 | M3.5 Images | 5–10 images for each of 31 major places and 1–3 for the rest, cited AI reconstructions, link checks, and a larger gallery | Approved 2026-10-02 | #29–#37 |
 | CP3b | M3 MVP App | Working MVP deployed to a preview | Approved 2026-10-07 (live at https://interactive-bible-map.pages.dev) | #38–#50 |
-| CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | **Waiting for your review** (summary below) | #51–#58 |
-| CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | Not started | |
+| CP4 | M4 Ancient Layer & Timeline | Modern↔Ancient toggle, ancient provinces and roads, timeline that snaps to change years | Approved 2026-10-12; on `main` through #59 | #51–#59 |
+| CP5 | M5 Routes Tab | Paul's journeys and well-attested Jesus segments, with citations | In progress (started 2026-10-12) | |
 | CP6+ | M6 Expansion | About 50 verified locations per batch, one checkpoint per batch, up to about 300 | Not started | |
 | CP7 | M7 Mobile-web polish | Responsive layout, touch gestures, performance | Not started | |
 
@@ -29,6 +29,8 @@ Lighter stops between checkpoints: the PO opens the app with the work so far on 
 | MC6 | CP4 | The modern map and the "Ancient \| Modern" toggle (M4-04) | Whether the pins keep their Bible names on the modern map (ADR-0037 item 4) | Opened 2026-10-08 on a local preview; the pin-name question is CP4's decision 1 |
 | MC7 | CP4 | The ancient layer and the timeline (M4-05) with the first verified data (M4-02, M4-03) | The colours and the list of stops (ADR-0037 item 1) | Done 2026-10-09: you asked for lines that need no map key, a name on every area, and roads that read as roads, so the ancient layer now draws its lines the way the modern map does (ADR-0037's updates). The colours and the stops are CP4's decision 2 |
 | MC8 | CP4 | Everything merged and built as it will deploy, with the speed results | The push | Done 2026-10-10: the assembled stack, with the MC7 changes, passed the full browser suite and the desktop speed check (CP4, below); you approved the push |
+| MC9 | CP5 | The Routes tab (M5-05) with the first verified routes, and the list of Jesus' journeys with the rule that chose them (M5-03) | The tab's look (ADR-0038 item 6) and which of Jesus' journeys to show (item 3) | Not started |
+| MC10 | CP5 | Everything merged and built as it will deploy, with the speed results | The merge of the last M5 PRs | Not started |
 
 ---
 
@@ -405,7 +407,7 @@ The mini checkpoints on the way (MC5 to MC8) are in the table at the top.
 
 ## CP4 — Ancient layer and timeline
 
-**Outcome:** waiting for your review.
+**Outcome:** approved on 2026-10-12, with all four recommendations: the pins keep their Bible names on the modern map, the ancient layer keeps its colours and 15 stops, the dragging speed is accepted, and M5 comes next. The stacked PRs merged into the branches below them rather than `main`, so #59 brought all of them to `main` and the live site (ADR-0039).
 
 ### What was delivered
 The ancient map now shows who held each land of the New Testament world, from 4 BC to AD 100, and today's map is one tap away. Phones get a proper layout too. It all goes live when these PRs merge.
@@ -465,5 +467,17 @@ The forecast assumed one session for each agent. In practice, sources that rarel
 - **These figures are measured, not estimated.** Copilot CLI records the tokens and the cost of every model call. The agents' own estimates were off in both directions, by up to 12,000 credits each, and my own rows had left out about 25,500 of coordination. The errors largely cancelled, so the ledger's month total was within about 3% of the measurement. The ledger now has measured rows for my work and the reviews, and a reconciliation row at CP4 and another after MC7. GitHub's billing report is still the authority (ADR-0005).
 - **For M5, plan on about 60,000–100,000 credits.** At that rate the budget still doesn't limit the pace: under 10% of a month.
 
-### Next: M5, the routes (after you approve)
-M5-00 will record this approval and plan M5 the way M4-00 planned M4. The M4 items on the backlog wait for a later milestone, unless you'd like one first.
+### Next: M5, the routes (started 2026-10-12)
+M5-00 recorded this approval and planned M5 (ADR-0038). Two lanes run in parallel: the data (the schema, the research for Paul's and Jesus' journeys, then the lines) and the app (the Routes tab, on test data until the verified data is ready). From M5, every PR targets `main`, even when it's stacked on another (ADR-0039). The M4 items on the backlog wait for a later milestone.
+
+| ID | Task | Agent | Starts after |
+|---|---|---|---|
+| M5-00 | Record CP4, plan M5 (ADR-0038), stacked PRs target `main` (ADR-0039), the visual spec, the cards | project-owner | CP4 |
+| [M5-01](docs/tasks/M5-01-routes-schema.md) | Routes: schema and build | gis-engineer | M5-00 |
+| [M5-02](docs/tasks/M5-02-paul-journeys.md) | Paul's four journeys | research-lead → fact-checker | M5-00 (research); M5-01 (data) |
+| [M5-03](docs/tasks/M5-03-jesus-journeys.md) | Jesus' journeys: the well-attested segments | research-lead → fact-checker | M5-00 (research); M5-01 (data) |
+| [M5-04](docs/tasks/M5-04-route-lines.md) | The routes' lines | gis-engineer → fact-checker | M5-01, and the stops in M5-02's and M5-03's research notes |
+| [M5-05](docs/tasks/M5-05-routes-tab.md) | The Routes tab | frontend-engineer | M5-01; real data from M5-02 to M5-04 |
+| CP5 | The routes | project-owner | M5's tasks merged |
+
+The mini checkpoints on the way (MC9 and MC10) are in the table at the top.
