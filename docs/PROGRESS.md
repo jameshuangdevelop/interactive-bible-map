@@ -60,7 +60,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | — | Land M4 on `main`: merge the top of the stack, which holds #52 to #58 (ADR-0039) | project-owner | `feat/m4-timeline-ui` | Merged | #59 |
 | M5-00 | Record CP4; plan M5 (ADR-0038); stacked PRs target `main` (ADR-0039); visual spec; cards M5-01 to M5-05 | project-owner | `docs/m5-kickoff` | Done | |
 | M5-01 | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Done (review fixes applied) | |
-| M5-02 | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Ready (research); data after M5-01 | |
+| M5-02 | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Research note done (`docs/research/M5-paul-journeys.md`); data step waits for M5-01's schema to merge, then the Fact-Checker's phase | |
 | M5-03 | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Ready (research); data after M5-01 | |
 | M5-04 | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | After M5-01 and the research notes | |
 | M5-05 | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | After M5-01 | |
