@@ -74,8 +74,8 @@
         {
           "label": "Candidate A",
           "coordinates": [
-            35.56,
-            32.9
+            34.2,
+            33.4
           ],
           "coordinateSource": "openbible:capernaum",
           "confidence": "disputed",
@@ -88,8 +88,8 @@
         {
           "label": "Candidate B",
           "coordinates": [
-            35.6,
-            32.88
+            34.26,
+            33.38
           ],
           "coordinateSource": "pleiades:678180",
           "confidence": "disputed",

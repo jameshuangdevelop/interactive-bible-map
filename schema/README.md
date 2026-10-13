@@ -113,7 +113,7 @@ Generated app payloads:
 - `ancient.roads.geojson` keeps only `roadId`, `major`, `known` and `timeperiod` in properties; provenance stays in `data/geo/`.
 - The per-stop `romanEmpireEdge` is the line between drawn Roman-side and drawn non-Roman areas in that stop; it is `null` while no area outside the empire is drawn (ADR-0037 rule 5), and the static `ancient.empire-edge.geojson` shows the empire's edge instead.
 - `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size, and the builder adds straight join segments where one road end sits more than 0.2 km and at most 4 km from another road so sheet-edge digitising breaks draw as continuous roads; `data/geo/ancient-roads.geojson` remains the full-detail source and is not edited.
-- Full shapes and lines keep 4 decimals (about 11 m), well below their simplification tolerances.
+- Full ancient shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
 - Everything the ancient layer loads (the `ancient.*` files) must stay within 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-08).
 - Stop-area assignments carry each period's optional `note`.
 - Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year. They also include `heldFromKnown`, which is `false` when that span starts at the timeline range's `fromYear` and there is no earlier period in that area's data.
@@ -140,7 +140,7 @@ GIS terms used here:
 - Canonical route facts live in:
   - `data/routes/routes.json` (route metadata + stages)
   - `data/routes/stops.json` (shared stop entries for places without full location records yet)
-  - `data/geo/routes-lines.geojson` (ODbL geometry + provenance only; no CC BY-SA facts)
+  - `data/geo/routes-lines.geojson` (geometry + provenance only; licensed per source, as confirmed in `docs/LICENSES.md`, ADR-0038 item 5; no CC BY-SA facts)
 - A route records:
   - `id`, `title`, approximate `fromYear` and `toYear` (`yearNote` where sources differ),
   - `structure`: `connected` (Paul-style sequence) or `standalone-segments` (Jesus segments),

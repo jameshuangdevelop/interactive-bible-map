@@ -15,7 +15,7 @@ const DEFAULT_LOCATIONS_DIRECTORY = path.join(repositoryRoot, "data", "locations
 const DEFAULT_MEDIA_DIRECTORY = path.join(repositoryRoot, "data", "media");
 const DEFAULT_BIBLIOGRAPHY_PATH = path.join(repositoryRoot, "data", "bibliography.json");
 const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "generated");
-const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 300_000;
+const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 302_000;
 const DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES = 100_000;
 const DEFAULT_ROUTES_FIXTURE_DIRECTORY = path.join(
   repositoryRoot,

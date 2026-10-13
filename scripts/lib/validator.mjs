@@ -163,6 +163,9 @@ const COMMONS_SOURCE_PAGE_PATTERN =
 const AI_MEDIA_URL_PATTERN =
   /^media\/ai\/([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})\.webp$/u;
 const IMAGE_PROMPT_SOURCE_ID_PATTERN = /\[([^\]\r\n]+)\]/gu;
+const ROUTE_STOP_DUPLICATE_DISTANCE_KM = 2;
+// Empty for now; entries use "<stopId>|<locationId>" -> "reason".
+const ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST = new Map();
 
 function toPosixPath(value) {
   return value.replace(/\\/gu, "/");
@@ -415,6 +418,86 @@ function coordinateInsideBounds(coordinates) {
     lat >= PROJECT_BOUNDS.minLat &&
     lat <= PROJECT_BOUNDS.maxLat
   );
+}
+
+function toRadians(value) {
+  return (value * Math.PI) / 180;
+}
+
+function haversineDistanceKm(pointA, pointB) {
+  const [lonA, latA] = pointA;
+  const [lonB, latB] = pointB;
+  const latitudeDelta = toRadians(latB - latA);
+  const longitudeDelta = toRadians(lonB - lonA);
+  const latitudeA = toRadians(latA);
+  const latitudeB = toRadians(latB);
+  const sinLatitude = Math.sin(latitudeDelta / 2);
+  const sinLongitude = Math.sin(longitudeDelta / 2);
+  const haversine =
+    sinLatitude * sinLatitude +
+    Math.cos(latitudeA) * Math.cos(latitudeB) * sinLongitude * sinLongitude;
+  const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(Math.max(0, 1 - haversine)));
+  return 6371.0088 * arc;
+}
+
+function validateCandidateCoordinateSource({
+  candidate,
+  file,
+  pathPrefix,
+  errors
+}) {
+  if (!candidate || typeof candidate !== "object") {
+    return;
+  }
+
+  if (
+    typeof candidate.coordinateSource === "string" &&
+    candidate.coordinateSource.startsWith("osm:")
+  ) {
+    recordError(
+      errors,
+      file,
+      `${pathPrefix}.coordinateSource`,
+      "Coordinate source must not use OSM-derived IDs; use a non-OSM coordinate source"
+    );
+  }
+
+  if (
+    typeof candidate.coordinateSource === "string" &&
+    candidate.coordinateSource.startsWith("wikipedia:")
+  ) {
+    recordError(
+      errors,
+      file,
+      `${pathPrefix}.coordinateSource`,
+      "Coordinate source must not use wikipedia: IDs; use a geospatial dataset source"
+    );
+  }
+
+  if (
+    typeof candidate.coordinateSource === "string" &&
+    candidate.coordinateSource.startsWith("scripture:")
+  ) {
+    recordError(
+      errors,
+      file,
+      `${pathPrefix}.coordinateSource`,
+      "Coordinate source must not use scripture: IDs; use a geospatial dataset source"
+    );
+  }
+
+  if (
+    Array.isArray(candidate.sources) &&
+    typeof candidate.coordinateSource === "string" &&
+    !candidate.sources.includes(candidate.coordinateSource)
+  ) {
+    recordError(
+      errors,
+      file,
+      `${pathPrefix}.coordinateSource`,
+      "coordinateSource must also appear in candidates[].sources"
+    );
+  }
 }
 
 async function loadSchemas(
@@ -1807,6 +1890,14 @@ function validateRouteStopRef({
   }
 
   if (stopRef.kind === "location") {
+    if (typeof stopRef.stopId === "string") {
+      recordError(
+        errors,
+        file,
+        `${pathValue}.stopId`,
+        "stopId is not allowed when kind is 'location'"
+      );
+    }
     const locationRecord = locationRecordsById.get(stopRef.locationId);
     if (!locationRecord) {
       recordError(
@@ -1857,6 +1948,14 @@ function validateRouteStopRef({
   }
 
   if (stopRef.kind === "route-stop") {
+    if (typeof stopRef.locationId === "string") {
+      recordError(
+        errors,
+        file,
+        `${pathValue}.locationId`,
+        "locationId is not allowed when kind is 'route-stop'"
+      );
+    }
     const stopEntry = routeStopsById.get(stopRef.stopId);
     if (!stopEntry) {
       recordError(
@@ -2915,6 +3014,42 @@ export async function validateData(options = {}) {
     });
   }
 
+  const locationIdsByNormalizedAncientOrAlternateName = new Map();
+  const locationCandidatesById = new Map();
+  for (const locationRecord of locationRecords) {
+    const locationId = locationRecord.data?.id;
+    if (typeof locationId !== "string") {
+      continue;
+    }
+
+    const nameValues = [];
+    if (Array.isArray(locationRecord.data?.names?.ancient)) {
+      nameValues.push(...locationRecord.data.names.ancient);
+    }
+    if (Array.isArray(locationRecord.data?.names?.alternate)) {
+      nameValues.push(...locationRecord.data.names.alternate);
+    }
+    for (const name of toTrimmedNonEmptyNameList(nameValues)) {
+      const normalizedName = name.normalize("NFC").toLowerCase();
+      const matchingIds = locationIdsByNormalizedAncientOrAlternateName.get(normalizedName) ?? [];
+      matchingIds.push(locationId);
+      locationIdsByNormalizedAncientOrAlternateName.set(normalizedName, matchingIds);
+    }
+
+    const candidateCoordinates = [];
+    for (const candidate of locationRecord.data?.candidates ?? []) {
+      if (
+        Array.isArray(candidate?.coordinates) &&
+        candidate.coordinates.length === 2 &&
+        typeof candidate.coordinates[0] === "number" &&
+        typeof candidate.coordinates[1] === "number"
+      ) {
+        candidateCoordinates.push([candidate.coordinates[0], candidate.coordinates[1]]);
+      }
+    }
+    locationCandidatesById.set(locationId, candidateCoordinates);
+  }
+
   const routeStopsById = new Map();
   if (Array.isArray(routeStopsData?.stops)) {
     routeStopsData.stops.forEach((stop, stopIndex) => {
@@ -2940,8 +3075,37 @@ export async function validateData(options = {}) {
         );
       }
 
+      const stopName = typeof stop?.name === "string" ? stop.name.trim() : "";
+      if (stopName.length > 0) {
+        const normalizedStopName = stopName.normalize("NFC").toLowerCase();
+        const matchingLocationIds = new Set(
+          locationIdsByNormalizedAncientOrAlternateName.get(normalizedStopName) ?? []
+        );
+        for (const locationId of matchingLocationIds) {
+          const allowlistReason = ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST.get(
+            `${stop.id}|${locationId}`
+          );
+          if (allowlistReason) {
+            continue;
+          }
+          recordError(
+            errors,
+            routeStopsRelativePath,
+            `$.stops[${stopIndex}].name`,
+            `Route stop '${stop.id}' duplicates location '${locationId}' by name '${stopName}'`
+          );
+        }
+      }
+
       if (Array.isArray(stop.candidates)) {
         stop.candidates.forEach((candidate, candidateIndex) => {
+          validateCandidateCoordinateSource({
+            candidate,
+            file: routeStopsRelativePath,
+            pathPrefix: `$.stops[${stopIndex}].candidates[${candidateIndex}]`,
+            errors
+          });
+
           validateSourceArray({
             sourceIds: candidate?.sources,
             file: routeStopsRelativePath,
@@ -2960,6 +3124,36 @@ export async function validateData(options = {}) {
                 `$.stops[${stopIndex}].candidates[${candidateIndex}].coordinates`,
                 `Coordinates must be inside project bounds [${PROJECT_BOUNDS.minLon}, ${PROJECT_BOUNDS.minLat}] to [${PROJECT_BOUNDS.maxLon}, ${PROJECT_BOUNDS.maxLat}]`
               );
+            }
+          }
+
+          if (
+            Array.isArray(candidate?.coordinates) &&
+            candidate.coordinates.length === 2 &&
+            typeof candidate.coordinates[0] === "number" &&
+            typeof candidate.coordinates[1] === "number"
+          ) {
+            for (const [locationId, locationCandidateCoordinates] of locationCandidatesById.entries()) {
+              const allowlistReason = ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST.get(
+                `${stop.id}|${locationId}`
+              );
+              if (allowlistReason) {
+                continue;
+              }
+              if (
+                locationCandidateCoordinates.some(
+                  (locationCoordinates) =>
+                    haversineDistanceKm(candidate.coordinates, locationCoordinates) <=
+                    ROUTE_STOP_DUPLICATE_DISTANCE_KM
+                )
+              ) {
+                recordError(
+                  errors,
+                  routeStopsRelativePath,
+                  `$.stops[${stopIndex}].candidates[${candidateIndex}].coordinates`,
+                  `Route stop '${stop.id}' duplicates location '${locationId}' within ${ROUTE_STOP_DUPLICATE_DISTANCE_KM} km`
+                );
+              }
             }
           }
         });
@@ -3187,6 +3381,18 @@ export async function validateData(options = {}) {
         }
 
         if (
+          typeof stage?.lineId === "string" &&
+          typeof stage?.noLineReason === "string"
+        ) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].stages[${stageIndex}]`,
+            "A stage cannot define both lineId and noLineReason"
+          );
+        }
+
+        if (
           requireRouteLines &&
           typeof stage?.lineId !== "string" &&
           typeof stage?.noLineReason !== "string"
@@ -3236,54 +3442,12 @@ export async function validateData(options = {}) {
           return;
         }
 
-        if (
-          typeof candidate.coordinateSource === "string" &&
-          candidate.coordinateSource.startsWith("osm:")
-        ) {
-          recordError(
-            errors,
-            locationRecord.relativePath,
-            `$.candidates[${candidateIndex}].coordinateSource`,
-            "Coordinate source must not use OSM-derived IDs; use a non-OSM coordinate source"
-          );
-        }
-
-        if (
-          typeof candidate.coordinateSource === "string" &&
-          candidate.coordinateSource.startsWith("wikipedia:")
-        ) {
-          recordError(
-            errors,
-            locationRecord.relativePath,
-            `$.candidates[${candidateIndex}].coordinateSource`,
-            "Coordinate source must not use wikipedia: IDs; use a geospatial dataset source"
-          );
-        }
-
-        if (
-          typeof candidate.coordinateSource === "string" &&
-          candidate.coordinateSource.startsWith("scripture:")
-        ) {
-          recordError(
-            errors,
-            locationRecord.relativePath,
-            `$.candidates[${candidateIndex}].coordinateSource`,
-            "Coordinate source must not use scripture: IDs; use a geospatial dataset source"
-          );
-        }
-
-        if (
-          Array.isArray(candidate.sources) &&
-          typeof candidate.coordinateSource === "string" &&
-          !candidate.sources.includes(candidate.coordinateSource)
-        ) {
-          recordError(
-            errors,
-            locationRecord.relativePath,
-            `$.candidates[${candidateIndex}].coordinateSource`,
-            "coordinateSource must also appear in candidates[].sources"
-          );
-        }
+        validateCandidateCoordinateSource({
+          candidate,
+          file: locationRecord.relativePath,
+          pathPrefix: `$.candidates[${candidateIndex}]`,
+          errors
+        });
 
         validateSourceArray({
           sourceIds: candidate.sources,

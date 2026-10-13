@@ -2521,12 +2521,169 @@ test("routes reject stop references that do not exist", async () => {
   );
 });
 
+test("routes reject location stop references that do not exist", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].from = {
+      kind: "location",
+      locationId: "missing-location"
+    };
+  });
+  assert.equal(
+    hasError(result, (error) => /Unknown location id 'missing-location'/u.test(error.message)),
+    true
+  );
+});
+
+test("stopRef enforces candidateIndex for multi-candidate location refs", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[0].stages[0].from.candidateIndex;
+  });
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        /must include candidateIndex/u.test(error.message) &&
+        error.path.endsWith(".candidateIndex")
+    ),
+    true
+  );
+});
+
+test("stopRef enforces location candidateIndex integer and range", async () => {
+  const nonInteger = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].from.candidateIndex = 1.5;
+  });
+  assert.equal(
+    hasError(
+      nonInteger,
+      (error) =>
+        /candidateIndex must be a non-negative integer/u.test(error.message) ||
+        /must be integer/u.test(error.message)
+    ),
+    true
+  );
+
+  const outOfRange = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].from.candidateIndex = 99;
+  });
+  assert.equal(
+    hasError(outOfRange, (error) => /is out of range for location/u.test(error.message)),
+    true
+  );
+});
+
+test("stopRef enforces route-stop candidateIndex cases", async () => {
+  const missing = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[0].stages[3].to.candidateIndex;
+  });
+  assert.equal(
+    hasError(missing, (error) => /must include candidateIndex/u.test(error.message)),
+    true
+  );
+
+  const nonInteger = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[3].to.candidateIndex = -1;
+  });
+  assert.equal(
+    hasError(nonInteger, (error) => /candidateIndex must be a non-negative integer/u.test(error.message)),
+    true
+  );
+
+  const outOfRange = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[3].to.candidateIndex = 22;
+  });
+  assert.equal(
+    hasError(outOfRange, (error) => /is out of range for route-stop/u.test(error.message)),
+    true
+  );
+});
+
+test("stopRef kind-specific fields are mutually exclusive", async () => {
+  const locationWithStopId = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].from.stopId = "seleucia-fixture";
+  });
+  assert.equal(
+    hasError(locationWithStopId, (error) => /stopId is not allowed when kind is 'location'/u.test(error.message)),
+    true
+  );
+
+  const routeStopWithLocationId = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].to.locationId = "capernaum";
+  });
+  assert.equal(
+    hasError(routeStopWithLocationId, (error) => /locationId is not allowed when kind is 'route-stop'/u.test(error.message)),
+    true
+  );
+});
+
 test("route stops cannot duplicate a location id", async () => {
   const result = await runWithTemporaryRoutesCase(({ stops }) => {
     stops.stops[0].id = "capernaum";
   });
   assert.equal(
     hasError(result, (error) => /duplicates location id 'capernaum'/u.test(error.message)),
+    true
+  );
+});
+
+test("route stops cannot duplicate location names or nearby location candidates", async () => {
+  const nameMatch = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].name = "Capernaum";
+  });
+  assert.equal(
+    hasError(nameMatch, (error) => /duplicates location 'capernaum' by name/u.test(error.message)),
+    true
+  );
+
+  const nearbyCandidate = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].candidates[0].coordinates = [35.5751, 32.8801];
+  });
+  assert.equal(
+    hasError(nearbyCandidate, (error) => /duplicates location 'capernaum' within 2 km/u.test(error.message)),
+    true
+  );
+});
+
+test("route-stop candidate coordinateSource follows location-candidate rules", async () => {
+  const osm = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].candidates[0].coordinateSource = "osm:way/123";
+  });
+  assert.equal(
+    hasError(osm, (error) => /must not use OSM-derived IDs/u.test(error.message)),
+    true
+  );
+
+  const wikipedia = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].candidates[0].coordinateSource = "wikipedia:Capernaum";
+  });
+  assert.equal(
+    hasError(wikipedia, (error) => /must not use wikipedia: IDs/u.test(error.message)),
+    true
+  );
+
+  const scripture = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].candidates[0].coordinateSource = "scripture:Mark 1:21";
+  });
+  assert.equal(
+    hasError(scripture, (error) => /must not use scripture: IDs/u.test(error.message)),
+    true
+  );
+
+  const missingFromSources = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[0].candidates[0].coordinateSource = "pleiades:678180";
+  });
+  assert.equal(
+    hasError(missingFromSources, (error) => /coordinateSource must also appear in candidates\[\]\.sources/u.test(error.message)),
+    true
+  );
+});
+
+test("duplicate route stop IDs are rejected", async () => {
+  const result = await runWithTemporaryRoutesCase(({ stops }) => {
+    stops.stops[1].id = stops.stops[0].id;
+  });
+  assert.equal(
+    hasError(result, (error) => /Duplicate route stop id/u.test(error.message)),
     true
   );
 });
@@ -2567,6 +2724,27 @@ test("standalone-segment routes require attestation on every stage", async () =>
   );
 });
 
+test("route fromYear cannot be greater than toYear", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].fromYear = 50;
+    routes.routes[0].toYear = 40;
+  });
+  assert.equal(
+    hasError(result, (error) => /Route years must satisfy fromYear <= toYear/u.test(error.message)),
+    true
+  );
+});
+
+test("namedRegions locationId must reference a known location", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[2].namedRegions[0].locationId = "missing-region";
+  });
+  assert.equal(
+    hasError(result, (error) => /Unknown location id 'missing-region'/u.test(error.message)),
+    true
+  );
+});
+
 test("route line requirement is switchable", async () => {
   const relaxed = await runWithTemporaryRoutesCase(
     ({ routes }) => {
@@ -2598,6 +2776,44 @@ test("route stages with lineId must have matching geometry", async () => {
   });
   assert.equal(
     hasError(result, (error) => /No route-line geometry exists/u.test(error.message)),
+    true
+  );
+});
+
+test("route stages cannot define both lineId and noLineReason", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].noLineReason = "Conflicting fixture value";
+  });
+  assert.equal(
+    hasError(result, (error) => /cannot define both lineId and noLineReason/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject duplicate stage mapping and unknown stage mapping", async () => {
+  const duplicate = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features.push(JSON.parse(JSON.stringify(lines.features[0])));
+  });
+  assert.equal(
+    hasError(duplicate, (error) => /Duplicate route line for route/u.test(error.message)),
+    true
+  );
+
+  const unknownStage = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].properties.stageId = "missing-stage";
+  });
+  assert.equal(
+    hasError(unknownStage, (error) => /references unknown stage 'missing-stage'/u.test(error.message)),
+    true
+  );
+});
+
+test("route lineId must match geometry lineId for the same route/stage", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[0].lineId = "wrong-line-id";
+  });
+  assert.equal(
+    hasError(result, (error) => /does not match route-line geometry id/u.test(error.message)),
     true
   );
 });

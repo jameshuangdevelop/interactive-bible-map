@@ -3,6 +3,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { removeRoutesFixtureFilesFromDist } from "./lib/export-web.mjs";
+
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
 const aiMediaSourceDirectory = path.join(repositoryRoot, "media", "ai");
@@ -34,29 +36,6 @@ function runCommand(command, args) {
       reject(new Error(`Command failed (${command} ${args.join(" ")}) with exit code ${code}.`));
     });
   });
-}
-
-async function removeRoutesFixtureFilesFromDist() {
-  let entries;
-  try {
-    entries = await fs.readdir(generatedDistDirectory, { withFileTypes: true });
-  } catch (error) {
-    if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
-      return [];
-    }
-    throw error;
-  }
-
-  const fixtureFileNames = entries
-    .filter((entry) => entry.isFile() && /^routes\.fixture\./u.test(entry.name))
-    .map((entry) => entry.name)
-    .sort((left, right) => left.localeCompare(right));
-
-  for (const fixtureFileName of fixtureFileNames) {
-    await fs.rm(path.join(generatedDistDirectory, fixtureFileName), { force: true });
-  }
-
-  return fixtureFileNames;
 }
 
 async function copyAiMediaIntoDist() {
@@ -106,7 +85,7 @@ async function run() {
   await runCommand(npmCommand, ["run", "export:web", "--workspace", "interactive-bible-map-app"]);
 
   const copyResult = await copyAiMediaIntoDist();
-  const removedFixtureFiles = await removeRoutesFixtureFilesFromDist();
+  const removedFixtureFiles = await removeRoutesFixtureFilesFromDist(generatedDistDirectory);
   if (removedFixtureFiles.length > 0) {
     console.log(
       `Removed ${removedFixtureFiles.length} routes fixture file(s) from export: ${removedFixtureFiles.join(", ")}`

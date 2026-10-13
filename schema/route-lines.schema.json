@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://interactive-bible-map/schemas/route-lines.schema.json",
   "title": "Route stage lines",
-  "description": "ODbL geometry for route-stage lines; route facts remain in CC BY-SA route files.",
+  "description": "Route-stage geometry licensed per source, as confirmed in docs/LICENSES.md (ADR-0038 item 5); route facts remain in CC BY-SA route files.",
   "type": "object",
   "additionalProperties": false,
   "required": [

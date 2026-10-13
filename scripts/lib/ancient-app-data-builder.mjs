@@ -88,7 +88,7 @@ function roundCoordinates(value, decimals = 5) {
   return value;
 }
 
-function roundGeometry(geometry, decimals = 4) {
+function roundGeometry(geometry, decimals = 5) {
   return {
     ...geometry,
     coordinates: roundCoordinates(geometry.coordinates, decimals)

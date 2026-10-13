@@ -4,6 +4,31 @@ import zlib from "node:zlib";
 
 import { getWebTextForReference } from "./web-text.mjs";
 
+function roundNumber(value, decimals = 5) {
+  if (typeof value !== "number") {
+    return value;
+  }
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+}
+
+function roundCoordinates(value, decimals = 5) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => roundCoordinates(entry, decimals));
+  }
+  if (typeof value === "number") {
+    return roundNumber(value, decimals);
+  }
+  return value;
+}
+
+function roundGeometry(geometry, decimals = 5) {
+  return {
+    ...geometry,
+    coordinates: roundCoordinates(geometry.coordinates, decimals)
+  };
+}
+
 async function writeJsonWithSize(outputDirectory, relativePath, payload) {
   const destinationPath = path.join(outputDirectory, relativePath);
   await fs.mkdir(path.dirname(destinationPath), { recursive: true });
@@ -112,7 +137,7 @@ export async function buildRoutesAppData({
           routeId: feature.properties.routeId,
           stageId: feature.properties.stageId
         },
-        geometry: feature.geometry
+        geometry: roundGeometry(feature.geometry, 5)
       }))
   };
 
