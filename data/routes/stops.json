@@ -1002,7 +1002,7 @@
     },
     {
       "id": "bethphage",
-      "name": "Bethphage",
+      "name": "Bethsphage",
       "todayName": "Et-Tur (Kafr et-Tur), Jerusalem",
       "candidates": [
         {
@@ -1141,6 +1141,46 @@
       "status": "verified",
       "verifiedBy": "fact-checker",
       "lastReviewed": "2026-10-13"
+    },
+    {
+      "id": "gennesaret",
+      "name": "Gennesaret",
+      "todayName": "El Ghuweir, on the northwest shore of the Sea of Galilee, Israel",
+      "candidates": [
+        {
+          "label": "El Ghuweir (the plain between Magdala and Capernaum)",
+          "coordinates": [
+            35.507222,
+            32.860556
+          ],
+          "coordinateSource": "openbible:gennesaret",
+          "confidence": "high",
+          "support": "The International Standard Bible Encyclopedia identifies the land of Gennesaret as the fertile coastal plain the Gospels name at Matthew 14:34 and Mark 6:53, 'now known as el-Ghuweir', running along the shore between Magdala in the south and Khan Minyeh in the north; Wikidata's point for the modern kibbutz of Ginosar, which takes its name from Gennesaret, lies about 1.4 km away within this same plain.",
+          "sources": [
+            "openbible:gennesaret",
+            "wikidata:Q1525069",
+            "bib:isbe-gennesaret"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Matthew 14:34",
+          "book": "Matthew",
+          "textWEB": "When they had crossed over, they came to the land of Gennesaret."
+        },
+        {
+          "ref": "Mark 6:53",
+          "book": "Mark",
+          "textWEB": "When they had crossed over, they came to land at Gennesaret and moored to the shore."
+        }
+      ],
+      "sources": [
+        "openbible:gennesaret",
+        "wikidata:Q1525069",
+        "bib:isbe-gennesaret"
+      ],
+      "status": "draft"
     }
   ]
 }
