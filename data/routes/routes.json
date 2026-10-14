@@ -297,7 +297,7 @@
               "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Pisidia",
@@ -405,7 +405,7 @@
               "textWEB": "He came to Derbe and Lystra; and behold, a certain disciple was there, named Timothy, the son of a Jewess who believed, but his father was a Greek."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Syria",
@@ -477,7 +477,7 @@
               "textWEB": "Passing by Mysia, they came down to Troas."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Phrygia",
@@ -823,7 +823,7 @@
               "textWEB": "While Apollos was at Corinth, Paul, having passed through the upper country, came to Ephesus and found certain disciples."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Galatia",

@@ -1002,7 +1002,7 @@
     },
     {
       "id": "bethphage",
-      "name": "Bethsphage",
+      "name": "Bethphage",
       "todayName": "Et-Tur (Kafr et-Tur), Jerusalem",
       "candidates": [
         {
@@ -1013,7 +1013,7 @@
           ],
           "coordinateSource": "wikidata:Q2193088",
           "confidence": "medium",
-          "support": "All six English versions compared spell the name 'Bethphage'. The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
+          "support": "All six English versions compared spell the name 'Bethphage'; the WEB itself reads 'Bethsphage' at this and the other two passages below, the Majority Text's reading (footnoted in the NKJV). The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
           "sources": [
             "wikidata:Q2193088",
             "openbible:bethphage",
