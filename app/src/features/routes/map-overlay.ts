@@ -14,6 +14,7 @@ export interface RouteMapLineFeatureProperties {
   isInSelectedRoute: boolean;
   isSelectedStage: boolean;
   isHighlightedStage: boolean;
+  isDimmed: boolean;
 }
 
 export interface RouteMapPointFeatureProperties {
@@ -28,6 +29,7 @@ export interface RouteMapPointFeatureProperties {
   isInSelectedRoute: boolean;
   isSelectedStage: boolean;
   isHighlightedStage: boolean;
+  isDimmed: boolean;
   orderLabel?: string;
 }
 

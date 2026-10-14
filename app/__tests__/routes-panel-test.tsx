@@ -143,6 +143,7 @@ const defaultProps = {
   routesData: routesDataFixture,
   hydratedRoutes: routeEntries,
   selectedRoute: null,
+  selectedRouteBorderYear: null,
   selectedStageIndex: null,
   selectedRouteStop: null,
   placesById: new Map([[placeFixture.id, placeFixture]]),

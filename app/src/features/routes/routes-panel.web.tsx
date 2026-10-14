@@ -1,6 +1,6 @@
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
-import { resolveRouteStop, stageHasDisputedStop } from "./routes-data";
+import { resolveRouteStop } from "./routes-data";
 import type { HydratedRoute, LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "./types";
 import { tokens } from "../../theme/tokens";
 
@@ -19,15 +19,17 @@ function formatStageCount(count: number) {
 function SourcesDisclosure({
   sourceIds,
   bibliographyById,
-  idPrefix
+  idPrefix,
+  summaryLabel = "Show sources"
 }: {
   sourceIds: string[];
   bibliographyById: LoadedRoutesData["bibliographyById"];
   idPrefix: string;
+  summaryLabel?: string;
 }) {
   return (
     <details style={{ marginTop: `${tokens.spacing.xs}px` }}>
-      <summary style={{ cursor: "pointer", color: "#1A73E8" }}>Sources</summary>
+      <summary style={{ cursor: "pointer", color: "#1A73E8" }}>{summaryLabel}</summary>
       {sourceIds.length > 0 ? (
         <ul data-route-sources-list="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
           {sourceIds.map((sourceId, index) => {
@@ -54,6 +56,35 @@ function SourcesDisclosure({
   );
 }
 
+function formatBorderYear(year: number) {
+  return year < 0 ? `${Math.abs(year)} BC` : `AD ${year}`;
+}
+
+function formatReadableList(values: string[]) {
+  if (values.length <= 1) {
+    return values[0] ?? "";
+  }
+  if (values.length === 2) {
+    return `${values[0]} and ${values[1]}`;
+  }
+  return `${values.slice(0, -1).join(", ")}, and ${values[values.length - 1]}`;
+}
+
+function stopCandidatesText(
+  resolved: RouteStopResolved,
+  placesById: Map<string, PlaceIndexRecord>
+) {
+  if (resolved.kind === "route-stop") {
+    return (resolved.stop?.candidates ?? []).map((candidate) => candidate.label);
+  }
+
+  const place = placesById.get(resolved.id);
+  if (!place) {
+    return [];
+  }
+  return place.candidates.map((candidate) => candidate.label);
+}
+
 export function RoutesPanel({
   routesLoadState,
   routesData,
@@ -61,6 +92,7 @@ export function RoutesPanel({
   selectedRoute,
   selectedStageIndex,
   selectedRouteStop,
+  selectedRouteBorderYear,
   placesById,
   routeStopsById,
   onRetryLoad,
@@ -79,6 +111,7 @@ export function RoutesPanel({
   selectedRoute: HydratedRoute | null;
   selectedStageIndex: number | null;
   selectedRouteStop: RouteStopRecord | null;
+  selectedRouteBorderYear: number | null;
   placesById: Map<string, PlaceIndexRecord>;
   routeStopsById: Map<string, RouteStopRecord>;
   onRetryLoad: () => void;
@@ -169,7 +202,7 @@ export function RoutesPanel({
         {formatApproximateYears(selectedRoute.route.fromYear, selectedRoute.route.toYear)}
       </p>
       <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
-        Borders as in AD {selectedRoute.route.fromYear}
+        Borders as in {formatBorderYear(selectedRouteBorderYear ?? selectedRoute.route.fromYear)}
       </p>
       <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
         {selectedRoute.route.note} Lines show stop order and land or sea mode, not exact traveled paths.
@@ -185,6 +218,27 @@ export function RoutesPanel({
           </button>
           <strong style={{ display: "block", marginTop: `${tokens.spacing.xs}px` }}>{selectedRouteStop.name}</strong>
           {selectedRouteStop.todayName ? <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>Today: {selectedRouteStop.todayName}</p> : null}
+          {selectedRouteStop.candidates.length > 1 ? (
+            <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+              Candidate sites:
+              <ul data-route-stop-candidates="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+                {selectedRouteStop.candidates.map((candidate) => (
+                  <li key={`${selectedRouteStop.id}:${candidate.label}`}>{candidate.label}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {selectedRouteStop.scripture.length > 0 ? (
+            <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
+              Passages: {selectedRouteStop.scripture.map((entry) => entry.ref).join(", ")}
+            </div>
+          ) : null}
+          <SourcesDisclosure
+            bibliographyById={bibliographyById}
+            idPrefix={`route-stop:${selectedRouteStop.id}`}
+            sourceIds={selectedRouteStop.sources}
+            summaryLabel="Sources"
+          />
           <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>Not yet on the main map.</p>
         </div>
       ) : null}
@@ -193,7 +247,12 @@ export function RoutesPanel({
           const from = resolveRouteStop(stage.from, placesById, routeStopsById);
           const to = resolveRouteStop(stage.to, placesById, routeStopsById);
           const isActive = selectedStageIndex === stageIndex;
-          const disputed = stageHasDisputedStop(stage, routeStopsById);
+          const fromCandidates = stopCandidatesText(from, placesById);
+          const toCandidates = stopCandidatesText(to, placesById);
+          const candidateSiteLines = [
+            ...(fromCandidates.length > 1 ? [`${from.name}: ${fromCandidates.join(", ")}`] : []),
+            ...(toCandidates.length > 1 ? [`${to.name}: ${toCandidates.join(", ")}`] : [])
+          ];
           return (
             <li
               data-route-stage-selected={isActive ? "true" : "false"}
@@ -249,16 +308,16 @@ export function RoutesPanel({
               ) : null}
               {selectedRoute.route.structure === "standalone-segments" && stage.attestation ? (
                 <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                  Told in {stage.attestation.gospels.join(" and ")}
+                  Told in {formatReadableList(stage.attestation.gospels)}
                 </div>
               ) : null}
-              {!stage.lineId || disputed ? (
+              {!stage.lineId ? (
                 <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
                   {stage.noLineReason ?? "Line omitted for this stage."}
-                  {disputed && to.stop ? (
+                  {candidateSiteLines.length > 0 ? (
                     <ul data-route-stop-candidates="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
-                      {to.stop.candidates.map((candidate) => (
-                        <li key={`${to.stop?.id}:${candidate.label}`}>{candidate.label}</li>
+                      {candidateSiteLines.map((line) => (
+                        <li key={`${stage.id}:${line}`}>{line}</li>
                       ))}
                     </ul>
                   ) : null}
@@ -276,6 +335,7 @@ export function RoutesPanel({
                 bibliographyById={bibliographyById}
                 idPrefix={`route-stage:${selectedRoute.route.id}:${stage.id}`}
                 sourceIds={stage.sources}
+                summaryLabel="Sources"
               />
             </li>
           );
@@ -287,6 +347,7 @@ export function RoutesPanel({
           bibliographyById={bibliographyById}
           idPrefix={`route:${selectedRoute.route.id}`}
           sourceIds={selectedRoute.route.sources}
+          summaryLabel="Show sources"
         />
       </div>
     </div>

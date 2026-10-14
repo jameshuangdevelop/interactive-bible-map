@@ -39,7 +39,7 @@ import type {
   PlaceSelection
 } from "../features/map/types";
 import { loadRoutesData, resolveRouteStop, routeLineFeatureByStage } from "../features/routes/routes-data";
-import type { LoadedRoutesData } from "../features/routes/types";
+import type { LoadedRoutesData, RouteStopResolved } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { RoutesPanel } from "../features/routes/routes-panel.web";
 import { tokens } from "../theme/tokens";
@@ -313,6 +313,12 @@ export function AppShell() {
     () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
     [hydratedRoutes, selectedRouteId]
   );
+  const selectedRouteTimelineStop = useMemo(() => {
+    if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
+      return null;
+    }
+    return resolveStopForYear(ancientTimeline.stops, selectedRoute.route.fromYear);
+  }, [ancientTimeline, selectedRoute]);
   useEffect(() => {
     routesLoadStateRef.current = routesLoadState;
   }, [routesLoadState]);
@@ -1001,6 +1007,8 @@ export function AppShell() {
         ? selectedRouteEntry.stages[selectedStageIndex]?.id ?? null
         : null;
     const activeRouteId = selectedRouteEntry?.route.id ?? hoveredRouteId ?? null;
+    const selectedStandaloneSegment =
+      selectedRouteEntry?.route.structure === "standalone-segments" && selectedStageId !== null;
 
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     for (const entry of routesData.routes) {
@@ -1013,10 +1021,7 @@ export function AppShell() {
         if (feature.geometry.type === "LineString") {
           lineFeatures.push({
             type: "Feature",
-            geometry: {
-              type: "LineString",
-              coordinates: feature.geometry.coordinates as number[][]
-            },
+            geometry: feature.geometry as { type: "LineString"; coordinates: number[][] },
             properties: {
               routeId: entry.route.id,
               stageId: stage.id,
@@ -1025,7 +1030,12 @@ export function AppShell() {
               isPathUnknown: stage.travelMode === "unknown",
               isInSelectedRoute: activeRouteId ? entry.route.id === activeRouteId : false,
               isSelectedStage: selectedStageId === stage.id,
-              isHighlightedStage: highlightedStageId === stage.id
+              isHighlightedStage: highlightedStageId === stage.id,
+              isDimmed:
+                entry.route.id === selectedRouteEntry?.route.id &&
+                selectedStandaloneSegment &&
+                selectedStageId !== stage.id &&
+                highlightedStageId !== stage.id
             }
           });
           continue;
@@ -1033,10 +1043,7 @@ export function AppShell() {
 
         lineFeatures.push({
           type: "Feature",
-          geometry: {
-            type: "MultiLineString",
-            coordinates: feature.geometry.coordinates as number[][][]
-          },
+          geometry: feature.geometry as { type: "MultiLineString"; coordinates: number[][][] },
           properties: {
             routeId: entry.route.id,
             stageId: stage.id,
@@ -1045,108 +1052,222 @@ export function AppShell() {
             isPathUnknown: stage.travelMode === "unknown",
             isInSelectedRoute: activeRouteId ? entry.route.id === activeRouteId : false,
             isSelectedStage: selectedStageId === stage.id,
-            isHighlightedStage: highlightedStageId === stage.id
+            isHighlightedStage: highlightedStageId === stage.id,
+            isDimmed:
+              entry.route.id === selectedRouteEntry?.route.id &&
+              selectedStandaloneSegment &&
+              selectedStageId !== stage.id &&
+              highlightedStageId !== stage.id
           }
         });
       }
     }
 
-    const pointFeatures = routesData.routes.flatMap((entry) =>
-      entry.stages.flatMap((stage, index) => {
-        const resolvedFrom = resolveRouteStop(stage.from, placesById, routeStopsById);
-        const resolvedTo = resolveRouteStop(stage.to, placesById, routeStopsById);
-        const viaStops = (stage.via ?? []).map((via) => resolveRouteStop(via, placesById, routeStopsById));
-        const row = [];
-        const stageSelected = selectedStageId === stage.id;
-        const stageHighlighted = highlightedStageId === stage.id;
-        const routeSelected = activeRouteId ? activeRouteId === entry.route.id : false;
-
-        if (resolvedFrom.coordinates) {
-          row.push({
-            type: "Feature" as const,
-            geometry: { type: "Point" as const, coordinates: resolvedFrom.coordinates },
-            properties: {
-              id: `${entry.route.id}:${stage.id}:from:${resolvedFrom.id}`,
-              routeId: entry.route.id,
-              stageId: stage.id,
-              stageIndex: index,
-              kind: "stop" as const,
-              stopKind: resolvedFrom.kind,
-              stopId: resolvedFrom.id,
-              label: resolvedFrom.name,
-              orderLabel: entry.route.structure === "connected" ? `${index + 1}` : undefined,
-              isInSelectedRoute: routeSelected,
-              isSelectedStage: stageSelected,
-              isHighlightedStage: stageHighlighted
-            }
-          });
-        }
-
-        for (const via of viaStops) {
-          if (!via.coordinates) {
-            continue;
+    const pointFeatures = routesData.routes.flatMap((entry) => {
+      const routeSelected = activeRouteId ? activeRouteId === entry.route.id : false;
+      if (entry.route.structure === "connected") {
+        const stopByKey = new Map<
+          string,
+          {
+            resolved: RouteStopResolved;
+            order: Set<number>;
+            firstStageIndex: number;
+            stageIds: Set<string>;
           }
-          row.push({
-            type: "Feature" as const,
-            geometry: { type: "Point" as const, coordinates: via.coordinates },
-            properties: {
-              id: `${entry.route.id}:${stage.id}:via:${via.id}`,
-              routeId: entry.route.id,
-              stageId: stage.id,
-              stageIndex: index,
-              kind: "via" as const,
-              stopKind: via.kind,
-              stopId: via.id,
-              label: via.name,
-              isInSelectedRoute: routeSelected,
-              isSelectedStage: stageSelected,
-              isHighlightedStage: stageHighlighted
-            }
+        >();
+        const ensureConnectedStop = (resolved: RouteStopResolved, order: number, stageIndex: number, stageId: string) => {
+          if (!resolved.coordinates) {
+            return;
+          }
+          const key = `${resolved.kind}:${resolved.id}`;
+          const existing = stopByKey.get(key);
+          if (existing) {
+            existing.order.add(order);
+            existing.stageIds.add(stageId);
+            return;
+          }
+          stopByKey.set(key, {
+            resolved,
+            order: new Set([order]),
+            firstStageIndex: stageIndex,
+            stageIds: new Set([stageId])
           });
+        };
+        const firstStage = entry.stages[0];
+        if (firstStage) {
+          ensureConnectedStop(resolveRouteStop(firstStage.from, placesById, routeStopsById), 1, 0, firstStage.id);
+        }
+        for (const [index, stage] of entry.stages.entries()) {
+          ensureConnectedStop(resolveRouteStop(stage.to, placesById, routeStopsById), index + 2, index, stage.id);
         }
 
-        if (resolvedTo.coordinates) {
-          row.push({
+        const connectedStops = [...stopByKey.values()].map((value) => {
+          const isSelectedStage = selectedStageId ? value.stageIds.has(selectedStageId) : false;
+          const isHighlightedStage = highlightedStageId ? value.stageIds.has(highlightedStageId) : false;
+          const dimmed =
+            entry.route.id === selectedRouteEntry?.route.id &&
+            selectedStandaloneSegment &&
+            !isSelectedStage &&
+            !isHighlightedStage;
+          return {
             type: "Feature" as const,
-            geometry: { type: "Point" as const, coordinates: resolvedTo.coordinates },
+            geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
             properties: {
-              id: `${entry.route.id}:${stage.id}:to:${resolvedTo.id}`,
+              id: `${entry.route.id}:${value.resolved.kind}:${value.resolved.id}`,
               routeId: entry.route.id,
-              stageId: stage.id,
-              stageIndex: index,
+              stageId: [...value.stageIds][0] ?? "",
+              stageIndex: value.firstStageIndex,
               kind: "stop" as const,
-              stopKind: resolvedTo.kind,
-              stopId: resolvedTo.id,
-              label: resolvedTo.name,
-              orderLabel: entry.route.structure === "connected" ? `${index + 2}` : undefined,
+              stopKind: value.resolved.kind,
+              stopId: value.resolved.id,
+              label: value.resolved.name,
+              orderLabel: [...value.order].sort((left, right) => left - right).join(", "),
               isInSelectedRoute: routeSelected,
-              isSelectedStage: stageSelected,
-              isHighlightedStage: stageHighlighted
+              isSelectedStage,
+              isHighlightedStage,
+              isDimmed: dimmed
             }
-          });
+          };
+        });
+
+        const viaByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
+        for (const [index, stage] of entry.stages.entries()) {
+          const stageSelected = selectedStageId === stage.id;
+          const stageHighlighted = highlightedStageId === stage.id;
+          const dimmed =
+            entry.route.id === selectedRouteEntry?.route.id &&
+            selectedStandaloneSegment &&
+            !stageSelected &&
+            !stageHighlighted;
+          for (const viaRef of stage.via ?? []) {
+            const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+            if (!via.coordinates) {
+              continue;
+            }
+            const key = `${entry.route.id}:${via.kind}:${via.id}`;
+            if (viaByKey.has(key)) {
+              continue;
+            }
+            viaByKey.set(key, {
+              type: "Feature" as const,
+              geometry: { type: "Point" as const, coordinates: via.coordinates },
+              properties: {
+                id: `${entry.route.id}:${stage.id}:via:${via.id}`,
+                routeId: entry.route.id,
+                stageId: stage.id,
+                stageIndex: index,
+                kind: "via" as const,
+                stopKind: via.kind,
+                stopId: via.id,
+                label: via.name,
+                isInSelectedRoute: routeSelected,
+                isSelectedStage: stageSelected,
+                isHighlightedStage: stageHighlighted,
+                isDimmed: dimmed
+              }
+            });
+          }
         }
+        return [...connectedStops, ...viaByKey.values()];
+      }
 
-        return row;
-      })
-    );
+      const stopsByKey = new Map<
+        string,
+        {
+          resolved: RouteStopResolved;
+          stageIds: Set<string>;
+          firstStageIndex: number;
+        }
+      >();
+      const addSegmentStop = (resolved: RouteStopResolved, stage: { id: string }, stageIndex: number) => {
+        if (!resolved.coordinates) {
+          return;
+        }
+        const key = `${resolved.kind}:${resolved.id}`;
+        const existing = stopsByKey.get(key);
+        if (existing) {
+          existing.stageIds.add(stage.id);
+          return;
+        }
+        stopsByKey.set(key, {
+          resolved,
+          stageIds: new Set([stage.id]),
+          firstStageIndex: stageIndex
+        });
+      };
+      for (const [index, stage] of entry.stages.entries()) {
+        addSegmentStop(resolveRouteStop(stage.from, placesById, routeStopsById), stage, index);
+        addSegmentStop(resolveRouteStop(stage.to, placesById, routeStopsById), stage, index);
+      }
+      return [...stopsByKey.values()].map((value) => {
+        const isSelectedStage = selectedStageId ? value.stageIds.has(selectedStageId) : false;
+        const isHighlightedStage = highlightedStageId ? value.stageIds.has(highlightedStageId) : false;
+        const dimmed =
+          entry.route.id === selectedRouteEntry?.route.id &&
+          selectedStandaloneSegment &&
+          !isSelectedStage &&
+          !isHighlightedStage;
+        return {
+          type: "Feature" as const,
+          geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
+          properties: {
+            id: `${entry.route.id}:${value.resolved.kind}:${value.resolved.id}`,
+            routeId: entry.route.id,
+            stageId: [...value.stageIds][0] ?? "",
+            stageIndex: value.firstStageIndex,
+            kind: "stop" as const,
+            stopKind: value.resolved.kind,
+            stopId: value.resolved.id,
+            label: value.resolved.name,
+            isInSelectedRoute: routeSelected,
+            isSelectedStage,
+            isHighlightedStage,
+            isDimmed: dimmed
+          }
+        };
+      });
+    });
 
-    const allCoordinates = selectedRouteEntry
-      ? pointFeatures
-          .filter((feature) => feature.properties.routeId === selectedRouteEntry.route.id)
-          .map((feature) => feature.geometry.coordinates as [number, number])
-      : [];
-    const fallbackLineCoordinates = lineFeatures.flatMap((feature) =>
-      feature.geometry.type === "LineString"
-        ? feature.geometry.coordinates
-        : feature.geometry.coordinates.flatMap((segment) => segment)
-    ) as [number, number][];
-    const boundedCoordinates = allCoordinates.length > 0 ? allCoordinates : fallbackLineCoordinates;
-    const bounds = boundedCoordinates.length
-      ? ([
-          [Math.min(...boundedCoordinates.map((coordinate) => coordinate[0])), Math.min(...boundedCoordinates.map((coordinate) => coordinate[1]))],
-          [Math.max(...boundedCoordinates.map((coordinate) => coordinate[0])), Math.max(...boundedCoordinates.map((coordinate) => coordinate[1]))]
-        ] as [[number, number], [number, number]])
-      : null;
+    let minLon = Number.POSITIVE_INFINITY;
+    let minLat = Number.POSITIVE_INFINITY;
+    let maxLon = Number.NEGATIVE_INFINITY;
+    let maxLat = Number.NEGATIVE_INFINITY;
+    const includeCoordinate = (coordinate: [number, number]) => {
+      if (coordinate[0] < minLon) minLon = coordinate[0];
+      if (coordinate[1] < minLat) minLat = coordinate[1];
+      if (coordinate[0] > maxLon) maxLon = coordinate[0];
+      if (coordinate[1] > maxLat) maxLat = coordinate[1];
+    };
+    if (selectedRouteEntry) {
+      for (const feature of pointFeatures) {
+        if (feature.properties.routeId !== selectedRouteEntry.route.id) {
+          continue;
+        }
+        includeCoordinate(feature.geometry.coordinates as [number, number]);
+      }
+    }
+    if (minLon === Number.POSITIVE_INFINITY) {
+      for (const feature of lineFeatures) {
+        if (feature.geometry.type === "LineString") {
+          for (const coordinate of feature.geometry.coordinates) {
+            includeCoordinate(coordinate as [number, number]);
+          }
+          continue;
+        }
+        for (const segment of feature.geometry.coordinates) {
+          for (const coordinate of segment) {
+            includeCoordinate(coordinate as [number, number]);
+          }
+        }
+      }
+    }
+    const bounds =
+      minLon === Number.POSITIVE_INFINITY
+        ? null
+        : ([
+            [minLon, minLat],
+            [maxLon, maxLat]
+          ] as [[number, number], [number, number]]);
 
     return {
       lines: {
@@ -1545,7 +1666,11 @@ export function AppShell() {
             places={places}
             routeKeyboardEntries={routeKeyboardEntries}
             routesOverlay={routeMapOverlay}
-            selectedTimelineStopId={selectedTimelineStopId}
+            selectedTimelineStopId={
+              viewTab === "routes" && selectedRouteTimelineStop
+                ? selectedRouteTimelineStop.id
+                : selectedTimelineStopId
+            }
             selection={selection}
             timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
           />
@@ -1886,6 +2011,7 @@ export function AppShell() {
                 routesData={routesData}
                 routesLoadState={routesLoadState}
                 selectedRoute={selectedRoute}
+                selectedRouteBorderYear={selectedRouteTimelineStop?.year ?? null}
                 selectedRouteStop={selectedRouteStop}
                 selectedStageIndex={selectedStageIndex}
               />

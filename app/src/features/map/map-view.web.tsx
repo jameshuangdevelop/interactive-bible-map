@@ -147,6 +147,7 @@ const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
 const layerAncientHolderLabelClickTargetId = "ibm-ancient-holder-label-click-target";
 const layerRoutesLinesBackgroundId = "ibm-routes-lines-background";
 const layerRoutesLinesForegroundId = "ibm-routes-lines-foreground";
+const layerRoutesLinesArrowsId = "ibm-routes-lines-arrows";
 const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
 const layerRoutesLinesUnknownId = "ibm-routes-lines-unknown";
 const layerRoutesStopsId = "ibm-routes-stops";
@@ -345,6 +346,7 @@ function applyMapModeOverlayVisibility(
   for (const layerId of [
     layerRoutesLinesBackgroundId,
     layerRoutesLinesForegroundId,
+    layerRoutesLinesArrowsId,
     layerRoutesLinesHighlightId,
     layerRoutesLinesUnknownId,
     layerRoutesStopsId,
@@ -1624,7 +1626,36 @@ function ensureMapLayers(
           ["literal", [2, 2]],
           ["literal", [1, 0]]
         ],
-        "line-opacity": ["case", ["==", ["get", "isInSelectedRoute"], true], 1, 0.8]
+        "line-opacity": [
+          "case",
+          ["==", ["get", "isInSelectedRoute"], true],
+          ["case", ["==", ["get", "isDimmed"], true], 0.2, 1],
+          0.8
+        ]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesArrowsId)) {
+    map.addLayer({
+      id: layerRoutesLinesArrowsId,
+      source: sourceRoutesLinesId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "isInSelectedRoute"], true]),
+      layout: {
+        "symbol-placement": "line",
+        "symbol-spacing": 180,
+        "text-field": "▸",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 10,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      paint: {
+        "text-color": "#FFFFFF",
+        "text-halo-color": "#1A73E8",
+        "text-halo-width": 0.8,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.2, 1]
       }
     });
   }
@@ -1648,7 +1679,12 @@ function ensureMapLayers(
         ],
         "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 3, 1.6],
         "line-dasharray": [1, 2],
-        "line-opacity": ["case", ["==", ["get", "isInSelectedRoute"], true], 1, 0.8]
+        "line-opacity": [
+          "case",
+          ["==", ["get", "isInSelectedRoute"], true],
+          ["case", ["==", ["get", "isDimmed"], true], 0.2, 1],
+          0.8
+        ]
       }
     });
   }
@@ -1685,11 +1721,21 @@ function ensureMapLayers(
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       paint: {
-        "circle-radius": 10,
+        "circle-radius": [
+          "case",
+          ["any", ["==", ["get", "isSelectedStage"], true], ["==", ["get", "isHighlightedStage"], true]],
+          11,
+          10
+        ],
         "circle-color": "#FFFFFF",
         "circle-stroke-color": "#1A73E8",
         "circle-stroke-width": 2,
-        "circle-opacity": ["case", ["==", ["get", "isInSelectedRoute"], true], 1, 0.8]
+        "circle-opacity": [
+          "case",
+          ["==", ["get", "isInSelectedRoute"], true],
+          ["case", ["==", ["get", "isDimmed"], true], 0.3, 1],
+          0.8
+        ]
       }
     });
   }
@@ -1708,7 +1754,8 @@ function ensureMapLayers(
         "circle-radius": 4,
         "circle-color": "#1A73E8",
         "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 1.2
+        "circle-stroke-width": 1.2,
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
       }
     });
   }
@@ -1727,7 +1774,7 @@ function ensureMapLayers(
       layout: {
         "text-field": ["get", "orderLabel"],
         "text-font": ["Noto Sans Bold"],
-        "text-size": 11,
+        "text-size": 10,
         "text-anchor": "center",
         "text-allow-overlap": true,
         "text-ignore-placement": true
@@ -1752,16 +1799,26 @@ function ensureMapLayers(
         "text-field": ["get", "label"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 12,
-        "text-offset": [1, 0],
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.75,
         "text-anchor": "left",
         "text-optional": false,
-        "text-allow-overlap": true,
-        "text-ignore-placement": true
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "symbol-sort-key": [
+          "case",
+          ["==", ["get", "isSelectedStage"], true],
+          200,
+          ["==", ["get", "isHighlightedStage"], true],
+          150,
+          50
+        ]
       },
       paint: {
         "text-color": "#202124",
         "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.2
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
       }
     });
   }
@@ -4057,7 +4114,13 @@ export function MapView({
     const handleMapClick = (event: { point: PointLike }) => {
       if (routesModeEnabled) {
         const routeFeatures = map.queryRenderedFeatures(event.point, {
-          layers: [layerRoutesStopsId, layerRoutesViaId, layerRoutesLinesHighlightId, layerRoutesLinesForegroundId]
+          layers: [
+            layerRoutesStopsId,
+            layerRoutesViaId,
+            layerRoutesLinesHighlightId,
+            layerRoutesLinesForegroundId,
+            layerRoutesLinesUnknownId
+          ]
         });
         const routeMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStopsId || feature.layer?.id === layerRoutesViaId);
         if (routeMatch) {
@@ -4087,7 +4150,9 @@ export function MapView({
         }
 
         const lineMatch = routeFeatures.find((feature) =>
-          feature.layer?.id === layerRoutesLinesHighlightId || feature.layer?.id === layerRoutesLinesForegroundId
+          feature.layer?.id === layerRoutesLinesHighlightId ||
+          feature.layer?.id === layerRoutesLinesForegroundId ||
+          feature.layer?.id === layerRoutesLinesUnknownId
         );
         if (lineMatch) {
           const properties = asObject(lineMatch.properties);

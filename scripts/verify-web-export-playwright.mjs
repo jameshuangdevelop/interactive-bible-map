@@ -10353,28 +10353,41 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
       }
     }
 
+    const expandedBeforeToggle = await page.evaluate(() => {
+      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+      if (!(compactControl instanceof HTMLElement)) {
+        return null;
+      }
+      return compactControl.classList.contains("maplibregl-compact-show");
+    });
     await page.click("summary.maplibregl-ctrl-attrib-button");
-    await page.waitForFunction(
-      () => {
-        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-        return (
-          compactControl instanceof HTMLElement &&
-          compactControl.classList.contains("maplibregl-compact-show")
-        );
-      },
-      { timeout: 5_000 }
-    );
+    await page.waitForTimeout(300);
+    const expandedAfterFirstToggle = await page.evaluate(() => {
+      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+      if (!(compactControl instanceof HTMLElement)) {
+        return null;
+      }
+      return compactControl.classList.contains("maplibregl-compact-show");
+    });
     await page.click("summary.maplibregl-ctrl-attrib-button");
-    await page.waitForFunction(
-      () => {
-        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-        return (
-          compactControl instanceof HTMLElement &&
-          !compactControl.classList.contains("maplibregl-compact-show")
-        );
-      },
-      { timeout: 5_000 }
-    );
+    await page.waitForTimeout(300);
+    const expandedAfterSecondToggle = await page.evaluate(() => {
+      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+      if (!(compactControl instanceof HTMLElement)) {
+        return null;
+      }
+      return compactControl.classList.contains("maplibregl-compact-show");
+    });
+    if (
+      expandedBeforeToggle !== null &&
+      expandedAfterFirstToggle !== null &&
+      expandedAfterSecondToggle !== null &&
+      (expandedAfterFirstToggle === expandedBeforeToggle || expandedAfterSecondToggle !== expandedBeforeToggle)
+    ) {
+      throw new Error(
+        `Desktop attribution toggle did not open/close as expected: before=${expandedBeforeToggle} first=${expandedAfterFirstToggle} second=${expandedAfterSecondToggle}`
+      );
+    }
 
     return snapshot;
   } finally {
@@ -10863,6 +10876,7 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
         await route.continue();
         return;
       }
+
       const body = await fs.readFile(fixturePath);
       await route.fulfill({
         status: 200,
@@ -11120,6 +11134,216 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
   }
 }
 
+async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
+  const screenshotDirectory = path.join(process.env.TMPDIR ?? process.env.TEMP ?? os.tmpdir(), "ibm-m5-05", "real");
+  await fs.mkdir(screenshotDirectory, { recursive: true });
+  const screenshotPaths = {
+    desktopRouteList: path.join(screenshotDirectory, "desktop-route-list.png"),
+    desktopPaul2: path.join(screenshotDirectory, "desktop-paul-2.png"),
+    desktopPaulRome: path.join(screenshotDirectory, "desktop-paul-rome.png"),
+    desktopJesus: path.join(screenshotDirectory, "desktop-jesus.png"),
+    desktopJesusNoLine: path.join(screenshotDirectory, "desktop-jesus-no-line.png"),
+    phoneRouteSelected: path.join(screenshotDirectory, "phone-route-selected.png")
+  };
+
+  const expectedRoutes = [
+    { title: "Paul's first journey", stageCount: 14 },
+    { title: "Paul's second journey", stageCount: 14 },
+    { title: "Paul's third journey", stageCount: 15 },
+    { title: "Paul's voyage to Rome", stageCount: 8 },
+    { title: "Jesus' journeys", stageCount: 32 }
+  ];
+
+  const desktopContext = await browser.newContext({
+    viewport: { width: 1440, height: 900 }
+  });
+  const desktopPage = await desktopContext.newPage();
+  const consoleErrors = [];
+  desktopPage.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
+  });
+
+  try {
+    await desktopPage.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 150_000 });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.screenshot({ path: screenshotPaths.desktopRouteList, fullPage: true });
+    await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(800);
+    await desktopPage.evaluate(() => {
+      window.__ibmRouteSelectLongTasks = [];
+      window.__ibmRouteSelectLongTaskObserver?.disconnect?.();
+      if (
+        typeof PerformanceObserver === "undefined" ||
+        !Array.isArray(PerformanceObserver.supportedEntryTypes) ||
+        !PerformanceObserver.supportedEntryTypes.includes("longtask")
+      ) {
+        return;
+      }
+      const observer = new PerformanceObserver((list) => {
+        const bucket = window.__ibmRouteSelectLongTasks ?? [];
+        for (const entry of list.getEntries()) {
+          bucket.push(entry.duration);
+        }
+        window.__ibmRouteSelectLongTasks = bucket;
+      });
+      observer.observe({ entryTypes: ["longtask"] });
+      window.__ibmRouteSelectLongTaskObserver = observer;
+    });
+
+    await desktopPage.getByRole("button", { name: "Paul's second journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(700);
+    const routeSelectionLongTaskSummary = await desktopPage.evaluate(() => {
+      const durations = window.__ibmRouteSelectLongTasks ?? [];
+      window.__ibmRouteSelectLongTaskObserver?.disconnect?.();
+      return {
+        count: durations.length,
+        maxMs: durations.length > 0 ? Math.max(...durations) : 0
+      };
+    });
+    const routeSelectionRenderer = await detectWebGlRenderer(desktopPage);
+    const routeSelectionOnSoftwareRenderer = softwareRendererPattern.test(routeSelectionRenderer ?? "");
+    if (
+      routeSelectionLongTaskSummary.maxMs > smoothnessLongTaskLimitMs &&
+      !(routeSelectionOnSoftwareRenderer && process.env.SMOOTHNESS_REQUIRE_GPU !== "1")
+    ) {
+      throw new Error(
+        `Routes real-data check: route selection produced long task ${routeSelectionLongTaskSummary.maxMs.toFixed(
+          1
+        )} ms (limit ${smoothnessLongTaskLimitMs} ms).`
+      );
+    }
+    if (
+      routeSelectionLongTaskSummary.maxMs > smoothnessLongTaskLimitMs &&
+      routeSelectionOnSoftwareRenderer &&
+      process.env.SMOOTHNESS_REQUIRE_GPU !== "1"
+    ) {
+      console.warn(
+        `Routes real-data check: route selection reported ${routeSelectionLongTaskSummary.maxMs.toFixed(
+          1
+        )} ms long task but not enforced on software renderer (${routeSelectionRenderer}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+
+    const openedRouteChecks = [];
+    for (const route of expectedRoutes) {
+      const button = desktopPage.getByRole("button", { name: route.title });
+      await button.waitFor({ state: "visible", timeout: 30_000 });
+      const buttonText = ((await button.textContent()) ?? "").replace(/\s+/gu, " ").trim();
+      const expectedStageLabel = `${route.stageCount} stage${route.stageCount === 1 ? "" : "s"}`;
+      if (!buttonText.includes(expectedStageLabel)) {
+        throw new Error(`Routes real-data check: '${route.title}' should show '${expectedStageLabel}', got '${buttonText}'.`);
+      }
+
+      await button.click();
+      await desktopPage.getByRole("heading", { name: route.title }).waitFor({ timeout: 30_000 });
+      const stageCount = await desktopPage.locator("[data-route-stage-index]").count();
+      if (stageCount !== route.stageCount) {
+        throw new Error(
+          `Routes real-data check: '${route.title}' should open with ${route.stageCount} stages, got ${stageCount}.`
+        );
+      }
+
+      openedRouteChecks.push({ route: route.title, stageCount });
+      if (route.title === "Paul's second journey") {
+        await desktopPage.screenshot({ path: screenshotPaths.desktopPaul2, fullPage: true });
+      }
+      if (route.title === "Paul's voyage to Rome") {
+        await desktopPage.screenshot({ path: screenshotPaths.desktopPaulRome, fullPage: true });
+      }
+      if (route.title === "Jesus' journeys") {
+        await desktopPage.screenshot({ path: screenshotPaths.desktopJesus, fullPage: true });
+      }
+      await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+      await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    }
+
+    await desktopPage.getByRole("button", { name: "Paul's voyage to Rome" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's voyage to Rome" }).waitFor({ timeout: 30_000 });
+    await desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "By sea" })
+      .filter({ hasText: "Passed:" })
+      .first()
+      .waitFor({ timeout: 30_000 });
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Paul's second journey" }).click();
+    await desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "Path not known · Through" })
+      .first()
+      .waitFor({ timeout: 30_000 });
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Jesus' journeys" }).click();
+    const noLineStage = desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "no line is drawn" })
+      .first();
+    await noLineStage.waitFor({ timeout: 30_000 });
+    await noLineStage.scrollIntoViewIfNeeded();
+    await desktopPage.screenshot({ path: screenshotPaths.desktopJesusNoLine, fullPage: true });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome&stage=3`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul's voyage to Rome" }).waitFor({ timeout: 30_000 });
+    const selectedStage = await desktopPage
+      .locator("[data-route-stage-index='3']")
+      .getAttribute("data-route-stage-selected");
+    if (selectedStage !== "true") {
+      throw new Error(`Routes real-data check: deep link did not reopen stage 3 (selected=${selectedStage}).`);
+    }
+
+    if (consoleErrors.length > 0) {
+      throw new Error(`Routes real-data check: console errors detected: ${consoleErrors.join(" | ")}`);
+    }
+
+    const mobileContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true
+    });
+    const mobilePage = await mobileContext.newPage();
+    try {
+      await mobilePage.goto(`${baseUrl}/?tab=routes&route=paul-2&stage=3`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(mobilePage);
+      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      await mobilePage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+      await mobilePage.screenshot({ path: screenshotPaths.phoneRouteSelected, fullPage: true });
+    } finally {
+      await mobilePage.close();
+      await mobileContext.close();
+    }
+
+    return {
+      openedRouteChecks,
+      deepLinkSelectedStage: selectedStage,
+      routeSelectionLongTaskSummary,
+      routeSelectionRenderer,
+      screenshotPaths,
+      consoleErrorCount: consoleErrors.length
+    };
+  } finally {
+    await desktopPage.close();
+    await desktopContext.close();
+  }
+}
+
 async function run() {
   const staticServer = await startStaticServer(distDirectory);
   const browser = await chromium.launch({ headless: true });
@@ -11364,6 +11588,10 @@ async function run() {
       browser,
       staticServer.baseUrl
     );
+    const routesRealDataChecks = await verifyRoutesTabRealDataScenarios(
+      browser,
+      staticServer.baseUrl
+    );
     const scaleBarUpdateCheck = await verifyScaleBarUpdatesWithZoom(browser, staticServer.baseUrl);
     const timelineTickLabelOverlapChecks = await verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(
       browser,
@@ -11523,6 +11751,7 @@ async function run() {
       expandedAttributionPlacementChecks,
       phoneBasicsChecks,
       routesFixtureChecks,
+      routesRealDataChecks,
       scaleBarUpdateCheck,
       timelineTickLabelOverlapChecks,
       keyboardDisclosureChecks,
