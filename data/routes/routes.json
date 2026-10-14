@@ -1690,6 +1690,90 @@
           "id": "segment-03",
           "from": {
             "kind": "location",
+            "locationId": "nazareth"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "capernaum"
+          },
+          "scripture": [
+            {
+              "ref": "Matthew 4:13",
+              "book": "Matthew",
+              "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
+            },
+            {
+              "ref": "Luke 4:16",
+              "book": "Luke",
+              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
+            },
+            {
+              "ref": "Luke 4:28-31",
+              "book": "Luke",
+              "textWEB": "They were all filled with wrath in the synagogue as they heard these things. They rose up, threw him out of the city, and led him to the brow of the hill that their city was built on, that they might throw him off the cliff. But he, passing through the middle of them, went his way. He came down to Capernaum, a city of Galilee. He was teaching them on the Sabbath day,"
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "Matthew",
+              "Luke"
+            ],
+            "rule": "Matthew states directly that, leaving Nazareth, Jesus came to live in Capernaum; Luke separately narrates Jesus leaving Nazareth after the synagogue's rejection of him and coming down to Capernaum.",
+            "sources": [
+              "scripture:Luke 4:16",
+              "scripture:Luke 4:28-31",
+              "scripture:Matthew 4:13"
+            ]
+          },
+          "sources": [
+            "scripture:Luke 4:16",
+            "scripture:Luke 4:28-31",
+            "scripture:Matthew 4:13"
+          ]
+        },
+        {
+          "from": {
+            "kind": "location",
+            "locationId": "galilee"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "nazareth"
+          },
+          "scripture": [
+            {
+              "ref": "Luke 4:14",
+              "book": "Luke",
+              "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
+            },
+            {
+              "ref": "Luke 4:16",
+              "book": "Luke",
+              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
+            }
+          ],
+          "travelMode": "unknown",
+          "attestation": {
+            "gospels": [
+              "Luke"
+            ],
+            "rule": "Luke states directly that Jesus returned in the power of the Spirit into Galilee, and then came to Nazareth, where he had been brought up.",
+            "sources": [
+              "scripture:Luke 4:14",
+              "scripture:Luke 4:16"
+            ]
+          },
+          "sources": [
+            "scripture:Luke 4:14",
+            "scripture:Luke 4:16"
+          ],
+          "id": "segment-04"
+        },
+        {
+          "id": "segment-05",
+          "from": {
+            "kind": "location",
             "locationId": "bethany-beyond-the-jordan",
             "candidateIndex": 0
           },
@@ -1742,7 +1826,7 @@
           ]
         },
         {
-          "id": "segment-04",
+          "id": "segment-06",
           "from": {
             "kind": "location",
             "locationId": "cana",
@@ -1775,7 +1859,7 @@
           ]
         },
         {
-          "id": "segment-05",
+          "id": "segment-07",
           "from": {
             "kind": "location",
             "locationId": "capernaum"
@@ -1806,7 +1890,7 @@
           ]
         },
         {
-          "id": "segment-06",
+          "id": "segment-08",
           "from": {
             "kind": "location",
             "locationId": "jerusalem"
@@ -1837,7 +1921,7 @@
           ]
         },
         {
-          "id": "segment-07",
+          "id": "segment-09",
           "from": {
             "kind": "location",
             "locationId": "judea"
@@ -1891,7 +1975,7 @@
           ]
         },
         {
-          "id": "segment-08",
+          "id": "segment-10",
           "from": {
             "kind": "location",
             "locationId": "sychar"
@@ -1940,308 +2024,7 @@
           ]
         },
         {
-          "from": {
-            "kind": "location",
-            "locationId": "galilee"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "nazareth"
-          },
-          "scripture": [
-            {
-              "ref": "Luke 4:14",
-              "book": "Luke",
-              "textWEB": "Jesus returned in the power of the Spirit into Galilee, and news about him spread through all the surrounding area."
-            },
-            {
-              "ref": "Luke 4:16",
-              "book": "Luke",
-              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
-            }
-          ],
-          "travelMode": "unknown",
-          "attestation": {
-            "gospels": [
-              "Luke"
-            ],
-            "rule": "Luke states directly that Jesus returned in the power of the Spirit into Galilee, and then came to Nazareth, where he had been brought up.",
-            "sources": [
-              "scripture:Luke 4:14",
-              "scripture:Luke 4:16"
-            ]
-          },
-          "sources": [
-            "scripture:Luke 4:14",
-            "scripture:Luke 4:16"
-          ],
-          "id": "segment-09"
-        },
-        {
-          "id": "segment-10",
-          "from": {
-            "kind": "location",
-            "locationId": "nazareth"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "capernaum"
-          },
-          "scripture": [
-            {
-              "ref": "Matthew 4:13",
-              "book": "Matthew",
-              "textWEB": "Leaving Nazareth, he came and lived in Capernaum, which is by the sea, in the region of Zebulun and Naphtali,"
-            },
-            {
-              "ref": "Luke 4:16",
-              "book": "Luke",
-              "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
-            },
-            {
-              "ref": "Luke 4:28-31",
-              "book": "Luke",
-              "textWEB": "They were all filled with wrath in the synagogue as they heard these things. They rose up, threw him out of the city, and led him to the brow of the hill that their city was built on, that they might throw him off the cliff. But he, passing through the middle of them, went his way. He came down to Capernaum, a city of Galilee. He was teaching them on the Sabbath day,"
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "Matthew",
-              "Luke"
-            ],
-            "rule": "Matthew states directly that, leaving Nazareth, Jesus came to live in Capernaum; Luke separately narrates Jesus leaving Nazareth after the synagogue's rejection of him and coming down to Capernaum.",
-            "sources": [
-              "scripture:Luke 4:16",
-              "scripture:Luke 4:28-31",
-              "scripture:Matthew 4:13"
-            ]
-          },
-          "sources": [
-            "scripture:Luke 4:16",
-            "scripture:Luke 4:28-31",
-            "scripture:Matthew 4:13"
-          ]
-        },
-        {
           "id": "segment-11",
-          "from": {
-            "kind": "location",
-            "locationId": "galilee"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "jerusalem"
-          },
-          "scripture": [
-            {
-              "ref": "John 5:1",
-              "book": "John",
-              "textWEB": "After these things, there was a feast of the Jews, and Jesus went up to Jerusalem."
-            }
-          ],
-          "travelMode": "unknown",
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states directly that Jesus went up to Jerusalem for a feast, picking up from the Galilee setting of the previous chapter.",
-            "sources": [
-              "scripture:John 5:1"
-            ]
-          },
-          "sources": [
-            "scripture:John 5:1"
-          ]
-        },
-        {
-          "from": {
-            "kind": "location",
-            "locationId": "jerusalem"
-          },
-          "to": {
-            "kind": "route-stop",
-            "stopId": "gennesaret"
-          },
-          "scripture": [
-            {
-              "ref": "John 6:1",
-              "book": "John",
-              "textWEB": "After these things, Jesus went away to the other side of the sea of Galilee, which is also called the Sea of Tiberias."
-            },
-            {
-              "ref": "John 6:16-17",
-              "book": "John",
-              "textWEB": "When evening came, his disciples went down to the sea. They entered into the boat, and were going over the sea to Capernaum. It was now dark, and Jesus had not come to them."
-            },
-            {
-              "ref": "John 6:19",
-              "book": "John",
-              "textWEB": "When therefore they had rowed about twenty-five or thirty stadia, they saw Jesus walking on the sea and drawing near to the boat; and they were afraid."
-            },
-            {
-              "ref": "John 6:20",
-              "book": "John",
-              "textWEB": "But he said to them, “It is I. Don’t be afraid.”"
-            },
-            {
-              "ref": "John 6:21",
-              "book": "John",
-              "textWEB": "They were willing therefore to receive him into the boat. Immediately the boat was at the land where they were going."
-            },
-            {
-              "ref": "Matthew 14:13",
-              "book": "Matthew",
-              "textWEB": "Now when Jesus heard this, he withdrew from there in a boat to a deserted place apart. When the multitudes heard it, they followed him on foot from the cities."
-            },
-            {
-              "ref": "Matthew 14:22",
-              "book": "Matthew",
-              "textWEB": "Immediately Jesus made the disciples get into the boat and go ahead of him to the other side, while he sent the multitudes away."
-            },
-            {
-              "ref": "Matthew 14:34",
-              "book": "Matthew",
-              "textWEB": "When they had crossed over, they came to the land of Gennesaret."
-            },
-            {
-              "ref": "Mark 6:32",
-              "book": "Mark",
-              "textWEB": "They went away in the boat to a deserted place by themselves."
-            },
-            {
-              "ref": "Mark 6:45",
-              "book": "Mark",
-              "textWEB": "Immediately he made his disciples get into the boat and go ahead to the other side, to Bethsaida, while he himself sent the multitude away."
-            },
-            {
-              "ref": "Mark 6:53",
-              "book": "Mark",
-              "textWEB": "When they had crossed over, they came to land at Gennesaret and moored to the shore."
-            }
-          ],
-          "travelMode": "sea",
-          "attestation": {
-            "gospels": [
-              "Matthew",
-              "Mark",
-              "John"
-            ],
-            "rule": "John has Jesus go from Jerusalem (5:1) to the other side of the Sea of Galilee (6:1, a general description, not itself a stop), where he feeds a crowd; all three Gospels then have the disciples cross the lake by boat while Jesus walks on the water and joins them. Matthew and Mark both state the boat came to land at Gennesaret; John's boat, bound for Capernaum (6:17), reaches 'the land where they were going' (6:21) on the same shore, which this note treats as the same arrival rather than a conflict. Matthew and Mark do not narrate a Jerusalem visit beforehand, which does not conflict, since they simply place the episode differently in their own narratives. Luke tells of the same feeding at a different place, Bethsaida (9:10), and does not narrate this crossing.",
-            "sources": [
-              "scripture:John 6:1",
-              "scripture:John 6:16-17",
-              "scripture:John 6:19",
-              "scripture:John 6:20",
-              "scripture:John 6:21",
-              "scripture:Matthew 14:13",
-              "scripture:Matthew 14:22",
-              "scripture:Matthew 14:34",
-              "scripture:Mark 6:32",
-              "scripture:Mark 6:45",
-              "scripture:Mark 6:53"
-            ]
-          },
-          "sources": [
-            "scripture:John 6:1",
-            "scripture:John 6:16-17",
-            "scripture:John 6:19",
-            "scripture:John 6:20",
-            "scripture:John 6:21",
-            "scripture:Matthew 14:13",
-            "scripture:Matthew 14:22",
-            "scripture:Matthew 14:34",
-            "scripture:Mark 6:32",
-            "scripture:Mark 6:45",
-            "scripture:Mark 6:53"
-          ],
-          "id": "segment-12"
-        },
-        {
-          "id": "segment-13",
-          "from": {
-            "kind": "location",
-            "locationId": "galilee"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "jerusalem"
-          },
-          "scripture": [
-            {
-              "ref": "John 7:1",
-              "book": "John",
-              "textWEB": "After these things, Jesus was walking in Galilee, for he wouldn’t walk in Judea, because the Jews sought to kill him."
-            },
-            {
-              "ref": "John 7:10",
-              "book": "John",
-              "textWEB": "But when his brothers had gone up to the feast, then he also went up, not publicly, but as it were in secret."
-            },
-            {
-              "ref": "John 7:14",
-              "book": "John",
-              "textWEB": "But when it was now the middle of the feast, Jesus went up into the temple and taught."
-            }
-          ],
-          "travelMode": "unknown",
-          "attestation": {
-            "gospels": [
-              "John"
-            ],
-            "rule": "John states Jesus was walking in Galilee, then also went up to the feast (in secret), and 7:14 confirms he went up into the temple at Jerusalem.",
-            "sources": [
-              "scripture:John 7:1",
-              "scripture:John 7:10",
-              "scripture:John 7:14"
-            ]
-          },
-          "sources": [
-            "scripture:John 7:1",
-            "scripture:John 7:10",
-            "scripture:John 7:14"
-          ]
-        },
-        {
-          "id": "segment-14",
-          "from": {
-            "kind": "location",
-            "locationId": "capernaum"
-          },
-          "to": {
-            "kind": "location",
-            "locationId": "nain"
-          },
-          "scripture": [
-            {
-              "ref": "Luke 7:1",
-              "book": "Luke",
-              "textWEB": "After he had finished speaking in the hearing of the people, he entered into Capernaum."
-            },
-            {
-              "ref": "Luke 7:11",
-              "book": "Luke",
-              "textWEB": "Soon afterwards, he went to a city called Nain. Many of his disciples, along with a great multitude, went with him."
-            }
-          ],
-          "travelMode": "land",
-          "attestation": {
-            "gospels": [
-              "Luke"
-            ],
-            "rule": "Luke states directly that, soon after entering Capernaum, Jesus went to a city called Nain.",
-            "sources": [
-              "scripture:Luke 7:1",
-              "scripture:Luke 7:11"
-            ]
-          },
-          "sources": [
-            "scripture:Luke 7:1",
-            "scripture:Luke 7:11"
-          ]
-        },
-        {
-          "id": "segment-15",
           "from": {
             "kind": "location",
             "locationId": "capernaum"
@@ -2311,7 +2094,7 @@
           ]
         },
         {
-          "id": "segment-16",
+          "id": "segment-12",
           "from": {
             "kind": "route-stop",
             "stopId": "country-of-the-gadarenes",
@@ -2360,7 +2143,7 @@
           ]
         },
         {
-          "id": "segment-17",
+          "id": "segment-13",
           "from": {
             "kind": "location",
             "locationId": "galilee"
@@ -2408,7 +2191,7 @@
           ]
         },
         {
-          "id": "segment-18",
+          "id": "segment-14",
           "from": {
             "kind": "location",
             "locationId": "tyre"
@@ -2461,7 +2244,7 @@
           ]
         },
         {
-          "id": "segment-19",
+          "id": "segment-15",
           "from": {
             "kind": "location",
             "locationId": "sea-of-galilee"
@@ -2500,7 +2283,7 @@
           ]
         },
         {
-          "id": "segment-20",
+          "id": "segment-16",
           "from": {
             "kind": "location",
             "locationId": "magdala"
@@ -2548,7 +2331,7 @@
           ]
         },
         {
-          "id": "segment-21",
+          "id": "segment-17",
           "from": {
             "kind": "location",
             "locationId": "bethsaida",
@@ -2589,7 +2372,7 @@
           ]
         },
         {
-          "id": "segment-22",
+          "id": "segment-18",
           "from": {
             "kind": "location",
             "locationId": "caesarea-philippi"
@@ -2680,7 +2463,121 @@
           ]
         },
         {
-          "id": "segment-23",
+          "id": "segment-19",
+          "from": {
+            "kind": "location",
+            "locationId": "capernaum"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "nain"
+          },
+          "scripture": [
+            {
+              "ref": "Luke 7:1",
+              "book": "Luke",
+              "textWEB": "After he had finished speaking in the hearing of the people, he entered into Capernaum."
+            },
+            {
+              "ref": "Luke 7:11",
+              "book": "Luke",
+              "textWEB": "Soon afterwards, he went to a city called Nain. Many of his disciples, along with a great multitude, went with him."
+            }
+          ],
+          "travelMode": "land",
+          "attestation": {
+            "gospels": [
+              "Luke"
+            ],
+            "rule": "Luke states directly that, soon after entering Capernaum, Jesus went to a city called Nain.",
+            "sources": [
+              "scripture:Luke 7:1",
+              "scripture:Luke 7:11"
+            ]
+          },
+          "sources": [
+            "scripture:Luke 7:1",
+            "scripture:Luke 7:11"
+          ]
+        },
+        {
+          "id": "segment-20",
+          "from": {
+            "kind": "location",
+            "locationId": "galilee"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "jerusalem"
+          },
+          "scripture": [
+            {
+              "ref": "John 5:1",
+              "book": "John",
+              "textWEB": "After these things, there was a feast of the Jews, and Jesus went up to Jerusalem."
+            }
+          ],
+          "travelMode": "unknown",
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states directly that Jesus went up to Jerusalem for a feast, picking up from the Galilee setting of the previous chapter.",
+            "sources": [
+              "scripture:John 5:1"
+            ]
+          },
+          "sources": [
+            "scripture:John 5:1"
+          ]
+        },
+        {
+          "id": "segment-21",
+          "from": {
+            "kind": "location",
+            "locationId": "galilee"
+          },
+          "to": {
+            "kind": "location",
+            "locationId": "jerusalem"
+          },
+          "scripture": [
+            {
+              "ref": "John 7:1",
+              "book": "John",
+              "textWEB": "After these things, Jesus was walking in Galilee, for he wouldn’t walk in Judea, because the Jews sought to kill him."
+            },
+            {
+              "ref": "John 7:10",
+              "book": "John",
+              "textWEB": "But when his brothers had gone up to the feast, then he also went up, not publicly, but as it were in secret."
+            },
+            {
+              "ref": "John 7:14",
+              "book": "John",
+              "textWEB": "But when it was now the middle of the feast, Jesus went up into the temple and taught."
+            }
+          ],
+          "travelMode": "unknown",
+          "attestation": {
+            "gospels": [
+              "John"
+            ],
+            "rule": "John states Jesus was walking in Galilee, then also went up to the feast (in secret), and 7:14 confirms he went up into the temple at Jerusalem.",
+            "sources": [
+              "scripture:John 7:1",
+              "scripture:John 7:10",
+              "scripture:John 7:14"
+            ]
+          },
+          "sources": [
+            "scripture:John 7:1",
+            "scripture:John 7:10",
+            "scripture:John 7:14"
+          ]
+        },
+        {
+          "id": "segment-22",
           "from": {
             "kind": "location",
             "locationId": "galilee"
@@ -2743,7 +2640,7 @@
           ]
         },
         {
-          "id": "segment-24",
+          "id": "segment-23",
           "from": {
             "kind": "location",
             "locationId": "jericho",
@@ -2820,7 +2717,7 @@
           ]
         },
         {
-          "id": "segment-25",
+          "id": "segment-24",
           "from": {
             "kind": "route-stop",
             "stopId": "bethphage",
@@ -2903,7 +2800,7 @@
           ]
         },
         {
-          "id": "segment-26",
+          "id": "segment-25",
           "from": {
             "kind": "location",
             "locationId": "jerusalem"
@@ -2943,7 +2840,7 @@
           ]
         },
         {
-          "id": "segment-27",
+          "id": "segment-26",
           "from": {
             "kind": "location",
             "locationId": "bethany-beyond-the-jordan",
@@ -2992,7 +2889,7 @@
           ]
         },
         {
-          "id": "segment-28",
+          "id": "segment-27",
           "from": {
             "kind": "location",
             "locationId": "bethany"
@@ -3023,7 +2920,7 @@
           ]
         },
         {
-          "id": "segment-29",
+          "id": "segment-28",
           "from": {
             "kind": "route-stop",
             "stopId": "ephraim"
@@ -3054,7 +2951,7 @@
           ]
         },
         {
-          "id": "segment-30",
+          "id": "segment-29",
           "from": {
             "kind": "location",
             "locationId": "jerusalem"
@@ -3122,7 +3019,7 @@
           ]
         },
         {
-          "id": "segment-31",
+          "id": "segment-30",
           "from": {
             "kind": "location",
             "locationId": "jerusalem"
@@ -3191,7 +3088,7 @@
           ]
         },
         {
-          "id": "segment-32",
+          "id": "segment-31",
           "from": {
             "kind": "location",
             "locationId": "jerusalem"
@@ -3245,7 +3142,7 @@
           ]
         },
         {
-          "id": "segment-33",
+          "id": "segment-32",
           "from": {
             "kind": "location",
             "locationId": "jerusalem"

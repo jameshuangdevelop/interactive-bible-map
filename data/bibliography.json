@@ -2485,7 +2485,9 @@
       "id": "isbe-lasea",
       "type": "chapter",
       "title": "Lasea",
-      "authors": ["James Orr"],
+      "authors": [
+        "James Orr"
+      ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
@@ -2697,19 +2699,6 @@
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/C/chronology-of-the-new-testament.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-gennesaret",
-      "type": "chapter",
-      "title": "Gennesaret, Land of",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/G/gennesaret-land-of.html",
       "accessed": "2026-10-13"
     },
     {
