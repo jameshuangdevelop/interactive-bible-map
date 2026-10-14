@@ -38,9 +38,10 @@ import type {
   PlaceIndexRecord,
   PlaceSelection
 } from "../features/map/types";
-import { loadRoutesData, resolveRouteStop, routeLineFeatureByStage, stageHasDisputedStop } from "../features/routes/routes-data";
+import { loadRoutesData, resolveRouteStop, routeLineFeatureByStage } from "../features/routes/routes-data";
 import type { LoadedRoutesData } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
+import { RoutesPanel } from "../features/routes/routes-panel.web";
 import { tokens } from "../theme/tokens";
 
 const PANEL_WIDTH = 408;
@@ -213,12 +214,6 @@ function timelineTickPosition(fraction: number) {
   const clamped = Math.max(0, Math.min(1, fraction));
   const thumbInsetOffset = (1 - 2 * clamped) * TIMELINE_TRACK_THUMB_INSET_PX;
   return `calc(${clamped * 100}% + ${thumbInsetOffset}px)`;
-}
-
-function formatApproximateYears(fromYear: number, toYear: number) {
-  const start = fromYear < 0 ? `${Math.abs(fromYear)} BC` : `AD ${fromYear}`;
-  const end = toYear < 0 ? `${Math.abs(toYear)} BC` : `AD ${toYear}`;
-  return `About ${start} – ${end}`;
 }
 
 function MapLoadingPlaceholder() {
@@ -1135,21 +1130,21 @@ export function AppShell() {
       })
     );
 
-    const allCoordinates = lineFeatures.flatMap((feature) =>
+    const allCoordinates = selectedRouteEntry
+      ? pointFeatures
+          .filter((feature) => feature.properties.routeId === selectedRouteEntry.route.id)
+          .map((feature) => feature.geometry.coordinates as [number, number])
+      : [];
+    const fallbackLineCoordinates = lineFeatures.flatMap((feature) =>
       feature.geometry.type === "LineString"
         ? feature.geometry.coordinates
         : feature.geometry.coordinates.flatMap((segment) => segment)
     ) as [number, number][];
-    const bounds = allCoordinates.length
+    const boundedCoordinates = allCoordinates.length > 0 ? allCoordinates : fallbackLineCoordinates;
+    const bounds = boundedCoordinates.length
       ? ([
-          [
-            Math.min(...allCoordinates.map((coordinate) => coordinate[0])),
-            Math.min(...allCoordinates.map((coordinate) => coordinate[1]))
-          ],
-          [
-            Math.max(...allCoordinates.map((coordinate) => coordinate[0])),
-            Math.max(...allCoordinates.map((coordinate) => coordinate[1]))
-          ]
+          [Math.min(...boundedCoordinates.map((coordinate) => coordinate[0])), Math.min(...boundedCoordinates.map((coordinate) => coordinate[1]))],
+          [Math.max(...boundedCoordinates.map((coordinate) => coordinate[0])), Math.max(...boundedCoordinates.map((coordinate) => coordinate[1]))]
         ] as [[number, number], [number, number]])
       : null;
 
@@ -1858,188 +1853,42 @@ export function AppShell() {
         <section aria-label={viewTab === "routes" ? "Route details" : "Place details"} style={panelStyle}>
           {viewTab === "routes" ? (
             <div data-routes-panel="true">
-              {routesLoadState === "loading" || routesLoadState === "idle" ? (
-                <p aria-live="polite">Loading routes…</p>
-              ) : routesLoadState === "error" ? (
-                <div role="status">
-                  Routes couldn&apos;t load.{" "}
-                  <button
-                    onClick={() => {
-                      setRoutesLoadState("idle");
-                      setRoutesReloadToken((value) => value + 1);
-                    }}
-                    style={{ border: "none", background: "none", color: "#1A73E8", textDecoration: "underline", cursor: "pointer", padding: 0 }}
-                    type="button"
-                  >
-                    Try again
-                  </button>
-                </div>
-              ) : routesData && hydratedRoutes.length === 0 ? (
-                <p>No routes yet.</p>
-              ) : selectedRoute ? (
-                <div>
-                  <button
-                    onClick={() => {
-                      setSelectedRouteId(null);
-                      setSelectedStageIndex(null);
-                      setHighlightedStageIndex(null);
-                      setSelectedRouteStopId(null);
-                    }}
-                    style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer" }}
-                    type="button"
-                  >
-                    ‹ All routes
-                  </button>
-                  <h1 style={{ fontSize: `${tokens.typography.titleSize}px`, lineHeight: `${tokens.typography.titleLineHeight}px`, margin: `${tokens.spacing.sm}px 0 0` }}>
-                    {selectedRoute.route.title}
-                  </h1>
-                  <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
-                    {formatApproximateYears(selectedRoute.route.fromYear, selectedRoute.route.toYear)}
-                  </p>
-                  <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
-                    Borders as in AD {selectedRoute.route.fromYear}
-                  </p>
-                  <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
-                    {selectedRoute.route.note} Lines show stop order and land or sea mode, not exact traveled paths.
-                  </p>
-                  {selectedRouteStop ? (
-                    <div style={{ border: `1px solid ${tokens.color.divider}`, borderRadius: "8px", padding: `${tokens.spacing.sm}px`, marginBottom: `${tokens.spacing.sm}px` }}>
-                      <strong>{selectedRouteStop.name}</strong>
-                      {selectedRouteStop.todayName ? <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>Today: {selectedRouteStop.todayName}</p> : null}
-                      <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>Not yet on the main map.</p>
-                    </div>
-                  ) : null}
-                  <ol style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}>
-                    {selectedRoute.stages.map((stage, stageIndex) => {
-                      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
-                      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
-                      const isActive = selectedStageIndex === stageIndex;
-                      const disputed = stageHasDisputedStop(stage, routeStopsById);
-                      return (
-                        <li
-                          data-route-stage-selected={isActive ? "true" : "false"}
-                          data-route-stage-index={stageIndex + 1}
-                          key={stage.id}
-                          onMouseEnter={() => setHighlightedStageIndex(stageIndex)}
-                          onMouseLeave={() => setHighlightedStageIndex(null)}
-                          style={{
-                            marginBottom: `${tokens.spacing.sm}px`,
-                            borderRadius: "8px",
-                            border: `1px solid ${isActive ? tokens.color.accent : tokens.color.divider}`,
-                            padding: `${tokens.spacing.sm}px`
-                          }}
-                        >
-                          <div style={{ fontWeight: 600 }}>
-                            {selectedRoute.route.structure === "standalone-segments"
-                              ? `Segment ${stageIndex + 1}`
-                              : `Stage ${stageIndex + 1}`}{" "}
-                            ·{" "}
-                            <button
-                              onClick={() => {
-                                setSelectedStageIndex(stageIndex);
-                                setSelectedRouteStopId(null);
-                                if (from.kind === "location") {
-                                  setSelection({ placeId: from.id, candidateIndex: null });
-                                } else {
-                                  setSelectedRouteStopId(from.id);
-                                }
-                              }}
-                              style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
-                              type="button"
-                            >
-                              {from.name}
-                            </button>{" "}
-                            →{" "}
-                            <button
-                              onClick={() => {
-                                setSelectedStageIndex(stageIndex);
-                                if (to.kind === "location") {
-                                  setSelection({ placeId: to.id, candidateIndex: null });
-                                } else {
-                                  setSelectedRouteStopId(to.id);
-                                }
-                              }}
-                              style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
-                              type="button"
-                            >
-                              {to.name}
-                            </button>
-                          </div>
-                          <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
-                            {stage.travelMode === "land"
-                              ? "By land"
-                              : stage.travelMode === "sea"
-                                ? "By sea"
-                                : `Path not known${stage.namedRegions?.length ? ` · Through ${stage.namedRegions.map((region) => region.name).join(", ")}` : ""}`}
-                          </div>
-                          {stage.via?.length ? (
-                            <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                              Passed: {stage.via.map((via) => resolveRouteStop(via, placesById, routeStopsById).name).join(", ")}
-                            </div>
-                          ) : null}
-                          {selectedRoute.route.structure === "standalone-segments" && stage.attestation ? (
-                            <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                              Told in {stage.attestation.gospels.join(" and ")}
-                            </div>
-                          ) : null}
-                          {(!stage.lineId || disputed) ? (
-                            <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                              {stage.noLineReason ?? "Line omitted for this stage."}
-                              {disputed && to.stop ? (
-                                <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
-                                  {to.stop.candidates.map((candidate) => (
-                                    <li key={`${to.stop?.id}:${candidate.label}`}>{candidate.label}</li>
-                                  ))}
-                                </ul>
-                              ) : null}
-                            </div>
-                          ) : null}
-                          <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
-                            {stage.scripture.map((passage) => (
-                              <details key={`${stage.id}:${passage.ref}`}>
-                                <summary style={{ cursor: "pointer", color: "#1A73E8" }}>{passage.ref}</summary>
-                                <p style={{ margin: `${tokens.spacing.xs}px 0 0`, fontFamily: tokens.typography.scriptureFont }}>{passage.textWEB}</p>
-                              </details>
-                            ))}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                </div>
-              ) : (
-                <div>
-                  <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Routes</h2>
-                  <ul style={{ listStyle: "none", padding: 0, margin: `${tokens.spacing.sm}px 0 0` }}>
-                    {hydratedRoutes.map((entry) => (
-                      <li key={entry.route.id}>
-                        <button
-                          onClick={() => handleSelectRoute(entry.route.id)}
-                          onFocus={() => setHoveredRouteId(entry.route.id)}
-                          onMouseEnter={() => setHoveredRouteId(entry.route.id)}
-                          onMouseLeave={() => setHoveredRouteId(null)}
-                          style={{
-                            width: "100%",
-                            textAlign: "left",
-                            borderRadius: "8px",
-                            border: `1px solid ${tokens.color.divider}`,
-                            background: "#FFFFFF",
-                            padding: `${tokens.spacing.sm}px`,
-                            marginBottom: `${tokens.spacing.sm}px`,
-                            cursor: "pointer"
-                          }}
-                          type="button"
-                        >
-                          <div style={{ fontWeight: 600 }}>{entry.route.title}</div>
-                          <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
-                            {formatApproximateYears(entry.route.fromYear, entry.route.toYear)} · {entry.stages.length} stages
-                          </div>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <RoutesPanel
+                hydratedRoutes={hydratedRoutes}
+                onBackToAllRoutes={() => {
+                  setSelectedRouteId(null);
+                  setSelectedStageIndex(null);
+                  setHighlightedStageIndex(null);
+                  setSelectedRouteStopId(null);
+                  setHoveredRouteId(null);
+                }}
+                onClearRouteHover={() => setHoveredRouteId(null)}
+                onHighlightStage={setHighlightedStageIndex}
+                onHoverRoute={setHoveredRouteId}
+                onResolveStopSelection={(resolvedStop, stageIndex) => {
+                  setSelectedStageIndex(stageIndex);
+                  if (resolvedStop.kind === "location") {
+                    setSelectedRouteStopId(null);
+                    setSelection({ placeId: resolvedStop.id, candidateIndex: null });
+                  } else {
+                    setSelectedRouteStopId(resolvedStop.id);
+                  }
+                }}
+                onRetryLoad={() => {
+                  setRoutesLoadState("idle");
+                  setRoutesReloadToken((value) => value + 1);
+                }}
+                onRouteStopCardBack={() => setSelectedRouteStopId(null)}
+                onSelectRoute={handleSelectRoute}
+                onSelectStage={setSelectedStageIndex}
+                placesById={placesById}
+                routeStopsById={routeStopsById}
+                routesData={routesData}
+                routesLoadState={routesLoadState}
+                selectedRoute={selectedRoute}
+                selectedRouteStop={selectedRouteStop}
+                selectedStageIndex={selectedStageIndex}
+              />
             </div>
           ) : selectedPlace ? (
             <PlacePanel

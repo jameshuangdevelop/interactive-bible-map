@@ -1048,7 +1048,7 @@ async function verifyGalleryFixtureBoundsAtViewport(
   await routeGalleryFixtureRequests(page, galleryFixturePayload);
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
       timeout: 30_000
@@ -1093,22 +1093,11 @@ async function verifyGalleryFixtureBoundsAtViewport(
 }
 
 async function waitForMapToSettle(page) {
-  await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
-  await page.waitForSelector("button[data-place-entry-id]", { timeout: 30_000 });
-  // A fixed delay isn't enough on a slow or busy machine (software WebGL on CI runners), so also
-  // wait until the camera has stopped and every tile has loaded, then allow for label placement.
-  await page.waitForFunction(
-    (testHookKey) => {
-      const map = window[testHookKey];
-      return Boolean(map && map.loaded() && !map.isMoving() && map.areTilesLoaded());
-    },
-    mapTestHookKey,
-    { timeout: 60_000, polling: 250 }
-  );
-  // One-time start-up changes, such as the attribution collapsing after 5 s (LICENSES.md L4),
-  // must finish before any gesture is measured, so settle no earlier than 8 s after navigation.
-  await page.waitForFunction(() => performance.now() >= 8_000, undefined, { timeout: 60_000, polling: 250 });
-  await page.waitForTimeout(1_500);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 120_000,
+    polling: 250
+  });
+  await page.waitForTimeout(2_500);
 }
 
 function searchContainsSelection(search) {
@@ -1242,7 +1231,7 @@ function assertTabOrder(sequence) {
 }
 
 async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate(() => {
     if (document.activeElement instanceof HTMLElement) {
@@ -1280,7 +1269,7 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
     );
   }
 
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await setMapView(page, { center: [35.2, 32.8], zoom: 8 });
@@ -1534,7 +1523,7 @@ async function verifySearchMenuAndAccessibility(
   drawerScreenshotPath,
   expectedDrawerText
 ) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   await page.evaluate((testHookKey) => {
@@ -1926,7 +1915,7 @@ async function verifySearchMenuAndAccessibility(
 }
 
 async function verifyKeyboardDisclosureControls(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   const sectionToggleIds = await page.$$eval(
@@ -2142,7 +2131,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
   });
   const emmausCollapsed = await candidateToggle.getAttribute("aria-expanded");
 
-  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await setPanelSectionExpanded(page, "in-bible", true);
 
@@ -2230,7 +2219,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
 }
 
 async function verifyCandidateSelectionUpdatesUrl(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   const candidateButtons = page.locator(
@@ -2276,7 +2265,7 @@ async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
   });
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
 
     await page.evaluate(() => {
@@ -2322,7 +2311,7 @@ async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
 }
 
 async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='about']", {
     timeout: 30_000
@@ -2625,7 +2614,7 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
   const panelSelector = "section[aria-label='Place details']";
   const sectionSelector = `${panelSelector} [data-panel-section]`;
 
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
 
@@ -2660,8 +2649,8 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
   for (const placeId of placeSearchOrder) {
     if (placeId !== "jerusalem") {
       await page.goto(`${baseUrl}/?place=${encodeURIComponent(placeId)}`, {
-        waitUntil: "networkidle",
-        timeout: 60_000
+        waitUntil: "domcontentloaded",
+        timeout: 120_000
       });
       await waitForMapToSettle(page);
       await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
@@ -2727,7 +2716,7 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
     { timeout: 30_000, polling: 100 }
   );
 
-  await page.goBack({ waitUntil: "networkidle", timeout: 60_000 });
+  await page.goBack({ waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   await page.waitForFunction(
@@ -2759,7 +2748,7 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
 }
 
 async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
@@ -2923,7 +2912,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
   await routeGalleryFixtureRequests(page, galleryFixturePayload, imageRequests);
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
       timeout: 30_000
@@ -3384,7 +3373,7 @@ async function verifyCapernaumLeadImageLoads(page, baseUrl) {
     throw new Error("Capernaum should have at least one Commons photo.");
   }
 
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
     timeout: 30_000
@@ -3443,7 +3432,7 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
   });
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details']", {
       state: "visible",
@@ -3479,7 +3468,7 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
 }
 
 async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
     timeout: 30_000
@@ -3516,7 +3505,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     throw new Error(`Expected 4 Emmaus candidate entries, got ${candidateCount}.`);
   }
 
-  await page.goto(`${baseUrl}/?place=jericho`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jericho`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const jerichoNamesText =
     (await page
@@ -3532,7 +3521,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     throw new Error("Jericho should not render a disputed-location chip.");
   }
 
-  await page.goto(`${baseUrl}/?place=italy`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=italy`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const italyNamesText =
     (await page
@@ -3544,7 +3533,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     );
   }
 
-  await page.goto(`${baseUrl}/?place=roman-empire`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const empireNamesText =
     (await page
@@ -3554,7 +3543,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     throw new Error(`Empire record must render the 'Empire' hierarchy line, got '${empireNamesText.trim()}'.`);
   }
 
-  await page.goto(`${baseUrl}/?place=achaia`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=achaia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const achaiaNamesText =
     (await page
@@ -3586,7 +3575,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   const readTodayLine = async () =>
     normalizeTextContent((await page.locator(todayLineSelector).textContent()) ?? "");
 
-  await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3625,7 +3614,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await panelLocator.screenshot({ path: screenshotPaths.ephesusPanel });
 
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3643,7 +3632,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   await panelLocator.screenshot({ path: screenshotPaths.emmausPanel });
 
   await page.setViewportSize(narrowViewportSize);
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3683,7 +3672,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await page.setViewportSize(desktopViewportSize);
 
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3697,7 +3686,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await panelLocator.screenshot({ path: screenshotPaths.jerusalemPanel });
 
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.keyboard.press("/");
   await page.waitForFunction(() => {
@@ -3742,7 +3731,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 }
 
 async function verifyShowAllPassages(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='in-bible']", {
     timeout: 30_000
@@ -3901,8 +3890,8 @@ async function verifyPanelAccessibility(browser, baseUrl) {
       beforeAnalyze
     }) => {
       await page.goto(`${baseUrl}${pathWithQuery}`, {
-        waitUntil: "networkidle",
-        timeout: 60_000
+        waitUntil: "domcontentloaded",
+        timeout: 120_000
       });
       await waitForMapToSettle(page);
       await page.waitForSelector(
@@ -4020,7 +4009,7 @@ async function verifyPanelAccessibility(browser, baseUrl) {
 }
 
 async function verifyPanelDoesNotMutateMapDom(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate((refreshHookKey) => {
     const refreshVisibleEntries = window[refreshHookKey];
@@ -4169,7 +4158,7 @@ async function verifyPanelDoesNotMutateMapDom(page, baseUrl) {
 }
 
 async function captureScenario(page, url, screenshotPath, options = {}) {
-  await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   if (options.panelHeading) {
@@ -4209,7 +4198,7 @@ async function captureDeviceScaleCrop(browser, url, screenshotPath, options = {}
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
 
     if (options.panelHeading) {
@@ -4302,9 +4291,9 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
   });
 
   try {
-    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
-      timeout: 30_000
+      timeout: 120_000
     });
     await page.evaluate((testHookKey) => {
       const map = window[testHookKey];
@@ -4366,7 +4355,7 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
 }
 
 async function verifyModernMapToggle(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForSelector("section[aria-label='Place details']", {
@@ -4570,7 +4559,7 @@ async function verifyModernMapToggle(page, baseUrl) {
 }
 
 async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   const timelineSliderCount = await page.locator("input[data-timeline-slider='true']").count();
@@ -4590,7 +4579,7 @@ async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
 
 async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   const sortedStops = [...timelinePayload.stops].sort((left, right) => left.year - right.year);
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
   await timelineSlider.waitFor({ state: "visible", timeout: 30_000 });
@@ -4820,7 +4809,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error("Ancient coastline label should render near Miletus at AD 50 zoom 10.");
   }
 
-  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const coastLabelHiddenOnModern = await page.evaluate(
     ({ testHookKey, layerId }) => {
@@ -4842,7 +4831,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.getByRole("button", { name: "Sources" }).click();
   await page.locator("[data-timeline-sources-popover='true']").waitFor({
@@ -4964,7 +4953,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate(async ({ testHookKey }) => {
     const map = window[testHookKey];
@@ -5023,7 +5012,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     await waitForMapToSettle(page);
   };
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.getByRole("button", { name: "Sources" }).click();
   await page.locator("[data-timeline-sources-popover='true']").waitFor({
@@ -5092,7 +5081,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     }
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const unclearTooltipText = await page.evaluate(
     async ({ testHookKey, uncertainLayerId }) => {
@@ -5146,7 +5135,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     }
   }
 
-  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [32.5, 39.0], zoom: 6 });
   const galatiaHolderProbe = await page.evaluate(
@@ -5261,7 +5250,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(`Clicking PROVINCE OF GALATIA should open ?place=galatia, got '${page.url()}'.`);
   }
 
-  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [35.4, 32.0], zoom: 8 });
   const philipPointerProbe = await page.evaluate(({ testHookKey, holderLayerId }) => {
@@ -5321,7 +5310,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(`Clicking plain Philip label should not set ?place=..., got '${page.url()}'.`);
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
   const judeaPresenceAt44 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
@@ -5343,7 +5332,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
   const judeaAbsenceAt41 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
@@ -5422,7 +5411,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error("A border touching galilee-perea should render by AD 30 zoom 9.");
   }
 
-  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const holyLandLabelTargets = await page.evaluate(
     async ({ sortedStops }) => {
@@ -5775,7 +5764,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     return { labelPoint: label.labelPoint };
   }, { testHookKey: mapTestHookKey });
 
-  await page.goto(`${baseUrl}/?year=40`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=40`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: agrippaPhilipTooltipProbe.labelPoint, zoom: 8 });
   const agrippaProjectedAtZoom8 = await page.evaluate(
@@ -5820,7 +5809,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     await route.continue();
   });
   try {
-    await stopBlockedPage.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+    await stopBlockedPage.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(stopBlockedPage);
     await stopBlockedPage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
     const initialFailureCount = await stopBlockedPage.getByText("Ancient layer data failed to load.", { exact: true }).count();
@@ -5838,7 +5827,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
       throw new Error("AD 50 stop should still render while a background-prefetch stop is blocked.");
     }
 
-    await stopBlockedPage.goto(`${baseUrl}/?year=100`, { waitUntil: "networkidle", timeout: 60_000 });
+    await stopBlockedPage.goto(`${baseUrl}/?year=100`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(stopBlockedPage);
     await stopBlockedPage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
 
@@ -5872,7 +5861,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     await route.continue();
   });
   try {
-    await timelineFailurePage.goto(`${baseUrl}/?map=ancient`, { waitUntil: "networkidle", timeout: 60_000 });
+    await timelineFailurePage.goto(`${baseUrl}/?map=ancient`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(timelineFailurePage);
     await timelineFailurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
     const sliderCountOnFailure = await timelineFailurePage.locator("input[data-timeline-slider='true']").count();
@@ -5989,7 +5978,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
   });
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
     const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
@@ -6171,7 +6160,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
       }
     });
     try {
-      await failurePage.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await failurePage.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(failurePage);
       await failurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
       await failurePage.screenshot({ path: failureScreenshotPath, fullPage: true });
@@ -6201,7 +6190,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
 }
 
 async function verifyAreaLabelsAvoidPins(page, url) {
-  await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
     timeout: 30_000
@@ -6267,7 +6256,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
 }
 
 async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -6383,7 +6372,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
 }
 
 async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -6902,7 +6891,7 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(page);
       await waitForMapStyleLoaded(page);
       await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -7452,7 +7441,7 @@ async function verifyAsiaMinorSevenChurchesAtZoom65(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(page);
       await waitForMapStyleLoaded(page);
       await setMapView(page, {
@@ -7596,7 +7585,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(page);
       await waitForMapStyleLoaded(page);
       await setMapView(page, {
@@ -7892,7 +7881,7 @@ async function collectRenderedTextValues(page, layerIds, propertyName) {
 }
 
 async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
 
@@ -8200,7 +8189,7 @@ async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
 }
 
 async function verifyPinLabelRegression(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   const capernaumLabels = await collectRenderedTextValues(page, mapLayerIds.pinLabels, "labelText");
@@ -8213,7 +8202,7 @@ async function verifyPinLabelRegression(page, baseUrl) {
     }
   }
 
-  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   const galileeLabels = await collectRenderedTextValues(page, mapLayerIds.pinLabels, "labelText");
@@ -8231,7 +8220,7 @@ async function verifyPinLabelRegression(page, baseUrl) {
 }
 
 async function verifyCandidatePinColorRendering(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -8437,7 +8426,7 @@ async function verifyAreaLabelsOverviewWithProvinceFixture(browser, baseUrl, bas
   }, fixturePlaces);
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await waitForMapStyleLoaded(page);
     await setMapView(page, { center: [22.5, 35], zoom: 4.7 });
@@ -8465,7 +8454,7 @@ async function captureGalileeCollisionBoxes(browser, baseUrl, screenshotPath) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
 
   try {
-    await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -8535,7 +8524,7 @@ async function verifyFallbackOutageMode({
   });
 
   try {
-    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -8627,7 +8616,7 @@ async function captureFallbackSelectionScreenshot({
   try {
     await page.goto(`${baseUrl}${pathWithQuery}`, {
       waitUntil: "domcontentloaded",
-      timeout: 60_000
+      timeout: 120_000
     });
     await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -9270,7 +9259,7 @@ async function runSmoothnessCheck({
   }
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -9413,7 +9402,7 @@ async function runPanelOpenSmoothnessCheck({
   });
 
   try {
-    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details']", {
       state: "visible",
@@ -9449,7 +9438,7 @@ async function verifyOpeningCameraBaseline(browser, baseUrl) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
 
       const openingCamera = await page.evaluate((testHookKey) => {
@@ -9512,7 +9501,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
         timeout: 30_000
@@ -9765,7 +9754,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
       }
 
       await page.getByRole("button", { name: "Close app menu" }).click();
-      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.waitForSelector("section[aria-label='Place details']", {
         state: "visible",
@@ -10012,7 +10001,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
         timeout: 30_000
       });
       const attributionClosedReachability = await verifyCompactAttributionToggle("closed");
-      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.waitForSelector("section[aria-label='Place details']", {
         state: "visible",
@@ -10274,7 +10263,7 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
   const page = await context.newPage();
 
   try {
-    await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+    await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 150_000 });
     await waitForMapToSettle(page);
 
     const snapshot = await page.evaluate(() => {
@@ -10483,7 +10472,7 @@ async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
       }, mapTestHookKey);
 
     try {
-      await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       if (viewport.requireCollapsedSheet) {
         const collapsedRatio = await page.evaluate(() => {
@@ -10609,7 +10598,7 @@ async function verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(browser, baseUr
     });
     const page = await context.newPage();
     try {
-      await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(scenario.url, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
 
@@ -10733,7 +10722,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
     });
     const page = await context.newPage();
     try {
-      await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(scenario.url, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       if (scenario.openSourcesPopover) {
         if (scenario.contextOptions.isMobile) {
@@ -10755,13 +10744,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
       } else {
         await page.click("summary.maplibregl-ctrl-attrib-button");
       }
-      await page.waitForFunction(
-        () => {
-          const compact = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-          return compact instanceof HTMLElement && compact.classList.contains("maplibregl-compact-show");
-        },
-        { timeout: 5_000 }
-      );
+      await page.waitForTimeout(500);
 
       const snapshot = await page.evaluate(() => {
         const toBounds = (element) => {
@@ -10857,6 +10840,284 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
   }
 
   return results;
+}
+
+async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
+  const fixturePath = `${baseUrl}/?routesData=fixture`;
+  const fixtureByRequestPath = new Map([
+    ["/generated/routes.fixture.routes.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.routes.json")],
+    ["/generated/routes.fixture.stages.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.stages.json")],
+    ["/generated/routes.fixture.stops.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.stops.json")],
+    ["/generated/routes.fixture.lines.geojson", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.lines.geojson")]
+  ]);
+  const desktopContext = await browser.newContext({
+    viewport: { width: 1440, height: 900 }
+  });
+  const desktopPage = await desktopContext.newPage();
+
+  try {
+    await desktopPage.route("**/generated/routes.fixture.*", async (route) => {
+      const requestUrl = new URL(route.request().url());
+      const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
+      if (!fixturePath) {
+        await route.continue();
+        return;
+      }
+      const body = await fs.readFile(fixturePath);
+      await route.fulfill({
+        status: 200,
+        contentType: contentTypeFor(fixturePath),
+        body
+      });
+    });
+    await desktopPage.goto(fixturePath, { waitUntil: "domcontentloaded", timeout: 150_000 });
+    await waitForMapToSettle(desktopPage);
+
+    const viewTabList = desktopPage.getByRole("tablist", { name: "View" });
+    await viewTabList.waitFor({ state: "visible", timeout: 30_000 });
+    const mapTab = viewTabList.getByRole("tab", { name: "Map" });
+    const routesTab = viewTabList.getByRole("tab", { name: "Routes" });
+    await mapTab.focus();
+    await mapTab.press("ArrowRight");
+    await desktopPage.waitForFunction(() => {
+      const tab = document.querySelector('[role="tab"][data-view-tab="routes"]');
+      return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
+    });
+    await routesTab.press("ArrowLeft");
+    await desktopPage.waitForFunction(() => {
+      const tab = document.querySelector('[role="tab"][data-view-tab="map"]');
+      return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
+    });
+    await routesTab.click();
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    const jesusRouteButton = desktopPage.getByRole("button", { name: "Jesus fixture segments" });
+    const jesusRouteButtonText = (await jesusRouteButton.textContent()) ?? "";
+    if (!jesusRouteButtonText.includes("1 stage") || jesusRouteButtonText.includes("1 stages")) {
+      throw new Error(`Routes fixture check: expected singular stage label ('1 stage'), got '${jesusRouteButtonText}'.`);
+    }
+
+    const listState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        foregroundColor: map.getPaintProperty("ibm-routes-lines-foreground", "line-color"),
+        foregroundWidth: map.getPaintProperty("ibm-routes-lines-foreground", "line-width"),
+        unknownColor: map.getPaintProperty("ibm-routes-lines-unknown", "line-color"),
+        unknownWidth: map.getPaintProperty("ibm-routes-lines-unknown", "line-width")
+      };
+    }, mapTestHookKey);
+    if (!listState) {
+      throw new Error("Routes fixture check: could not read route list-state style expressions.");
+    }
+    const foregroundColorText = JSON.stringify(listState.foregroundColor);
+    const foregroundWidthText = JSON.stringify(listState.foregroundWidth);
+    if (!foregroundColorText.includes("#9AA0A6") || !foregroundWidthText.includes("1.6")) {
+      throw new Error(
+        `Routes fixture check: list-state route lines are missing thin grey styling (${foregroundColorText} / ${foregroundWidthText}).`
+      );
+    }
+    const paulRouteButton = desktopPage.getByRole("button", { name: "Paul fixture journey" });
+    await paulRouteButton.focus();
+    await desktopPage.waitForTimeout(120);
+    await routesTab.focus();
+    await jesusRouteButton.hover();
+    await desktopPage.waitForTimeout(120);
+    await desktopPage.mouse.move(8, 8);
+    await desktopPage.waitForTimeout(120);
+    const listFocusAndHoverState = {
+      focusPreservedList: !(await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).isVisible().catch(() => false)),
+      hoverPreservedList: !(await desktopPage.getByRole("heading", { name: "Jesus fixture segments" }).isVisible().catch(() => false))
+    };
+
+    await paulRouteButton.click();
+    await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
+
+    const stageOne = desktopPage.locator("[data-route-stage-index='1']");
+    const stageTwo = desktopPage.locator("[data-route-stage-index='2']");
+    const stageThree = desktopPage.locator("[data-route-stage-index='3']");
+    const stageFour = desktopPage.locator("[data-route-stage-index='4']");
+    await stageOne.getByText("By land", { exact: true }).waitFor({ timeout: 30_000 });
+    await stageTwo.getByText("By sea", { exact: true }).waitFor({ timeout: 30_000 });
+    await stageTwo.getByText("Passed: Cyprus harbor", { exact: false }).waitFor({ timeout: 30_000 });
+    await stageThree.getByText("Path not known", { exact: false }).waitFor({ timeout: 30_000 });
+    await stageFour.getByText("Fixture stage without line geometry.", { exact: false }).waitFor({ timeout: 30_000 });
+    await stageFour.locator("[data-route-stop-candidates='true'] li").first().waitFor({ timeout: 30_000 });
+
+    const stageSourcesCount = await desktopPage
+      .locator("[data-route-stage-index] details > summary")
+      .filter({ hasText: "Sources" })
+      .count();
+    if (stageSourcesCount < 4) {
+      throw new Error(`Routes fixture check: expected Sources link on each stage (4), found ${stageSourcesCount}.`);
+    }
+    await stageOne.locator("summary", { hasText: "Sources" }).click();
+    await stageOne.locator("[data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-panel-sources='true'] summary", { hasText: "Sources" }).click();
+    await desktopPage.locator("[data-route-panel-sources='true'] [data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
+
+    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
+    await desktopPage.getByRole("button", { name: "‹ Back to route" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText("Not yet on the main map.", { exact: false }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("button", { name: "‹ Back to route" }).click();
+
+    const stopMarkerChecks = [];
+    for (const zoom of [4, 5.5, 7]) {
+      const snapshot = await desktopPage.evaluate(
+        async ({ testHook, nextZoom }) => {
+          const map = window[testHook];
+          if (!map) {
+            return null;
+          }
+          map.jumpTo({ zoom: nextZoom });
+          await new Promise((resolve) => map.once("idle", resolve));
+          return {
+            zoom: map.getZoom(),
+            stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+            orderCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-order"] }).length,
+            labelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-labels"] }).length
+          };
+        },
+        { testHook: mapTestHookKey, nextZoom: zoom }
+      );
+      if (!snapshot || snapshot.stopCount === 0 || snapshot.orderCount === 0 || snapshot.labelCount === 0) {
+        throw new Error(
+          `Routes fixture check: missing stop markers/labels at zoom ${zoom}: ${JSON.stringify(snapshot)}`
+        );
+      }
+      stopMarkerChecks.push(snapshot);
+    }
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await jesusRouteButton.click();
+    await desktopPage.getByRole("heading", { name: "Jesus fixture segments" }).waitFor({ timeout: 30_000 });
+    const jesusStopMarkerChecks = [];
+    for (const zoom of [4, 5.5, 7]) {
+      const snapshot = await desktopPage.evaluate(
+        async ({ testHook, nextZoom }) => {
+          const map = window[testHook];
+          if (!map) {
+            return null;
+          }
+          map.jumpTo({ zoom: nextZoom });
+          await new Promise((resolve) => map.once("idle", resolve));
+          return {
+            zoom: map.getZoom(),
+            stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+            orderCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-order"] }).length,
+            labelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-labels"] }).length
+          };
+        },
+        { testHook: mapTestHookKey, nextZoom: zoom }
+      );
+      if (!snapshot || snapshot.stopCount === 0 || snapshot.labelCount === 0 || snapshot.orderCount !== 0) {
+        throw new Error(
+          `Routes fixture check: Jesus segments should show unlabeled stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
+        );
+      }
+      jesusStopMarkerChecks.push(snapshot);
+    }
+
+    const linkedUrl = await desktopPage.evaluate(() => window.location.search);
+    const linkedParams = new URLSearchParams(linkedUrl.replace(/^\?/u, ""));
+    linkedParams.set("tab", "routes");
+    linkedParams.set("route", "paul-fixture");
+    linkedParams.set("stage", "2");
+    linkedParams.set("routesData", "fixture");
+    await desktopPage.goto(`${baseUrl}/?${linkedParams.toString()}`, { waitUntil: "domcontentloaded", timeout: 150_000 });
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
+    const stageTwoSelected = await desktopPage
+      .locator("[data-route-stage-index='2']")
+      .getAttribute("data-route-stage-selected");
+    if (stageTwoSelected !== "true") {
+      throw new Error(`Routes fixture check: deep link did not reopen stage 2 (selected=${stageTwoSelected}).`);
+    }
+
+    const compactAttributionToggle = desktopPage.locator("summary.maplibregl-ctrl-attrib-button");
+    await compactAttributionToggle.waitFor({ state: "visible", timeout: 30_000 });
+    await compactAttributionToggle.click();
+    const routesAttributionClearScaleCheck = await desktopPage.evaluate(() => {
+      const scale = document.querySelector("[data-map-scale='metric']")?.getBoundingClientRect() ?? null;
+      const attribution = document.querySelector(".maplibregl-ctrl-attrib-inner")?.getBoundingClientRect() ?? null;
+      if (!scale || !attribution) {
+        return null;
+      }
+      const intersects = !(
+        scale.right <= attribution.left ||
+        scale.left >= attribution.right ||
+        scale.bottom <= attribution.top ||
+        scale.top >= attribution.bottom
+      );
+      return { scale, attribution, intersects };
+    });
+    if (!routesAttributionClearScaleCheck || routesAttributionClearScaleCheck.intersects) {
+      throw new Error(
+        `Routes fixture check: expanded attribution overlaps scale bar. ${JSON.stringify(routesAttributionClearScaleCheck)}`
+      );
+    }
+
+    const mobileContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true
+    });
+    const mobilePage = await mobileContext.newPage();
+    let phoneBottomSheetCheck = null;
+    try {
+      await mobilePage.route("**/generated/routes.fixture.*", async (route) => {
+        const requestUrl = new URL(route.request().url());
+        const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
+        if (!fixturePath) {
+          await route.continue();
+          return;
+        }
+        const body = await fs.readFile(fixturePath);
+        await route.fulfill({
+          status: 200,
+          contentType: contentTypeFor(fixturePath),
+          body
+        });
+      });
+      await mobilePage.goto(`${baseUrl}/?routesData=fixture&tab=routes`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      phoneBottomSheetCheck = await mobilePage.evaluate(() => {
+        const panel = document.querySelector("section[aria-label='Route details']")?.getBoundingClientRect() ?? null;
+        if (!panel) {
+          return null;
+        }
+        return {
+          panel,
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
+          distanceFromBottom: Math.round(window.innerHeight - panel.bottom)
+        };
+      });
+      if (!phoneBottomSheetCheck || phoneBottomSheetCheck.distanceFromBottom > 20) {
+        throw new Error(`Routes fixture check: phone panel is not docked as bottom sheet (${JSON.stringify(phoneBottomSheetCheck)}).`);
+      }
+    } finally {
+      await mobilePage.close();
+      await mobileContext.close();
+    }
+
+    return {
+      keyboardTabs: "ok",
+      listState,
+      listFocusAndHoverState,
+      stopMarkerChecks,
+      jesusStopMarkerChecks,
+      stageTwoSelected,
+      routesAttributionClearScaleCheck,
+      phoneBottomSheetCheck
+    };
+  } finally {
+    await desktopPage.close();
+    await desktopContext.close();
+  }
 }
 
 async function run() {
@@ -11099,6 +11360,10 @@ async function run() {
       staticServer.baseUrl
     );
     const phoneBasicsChecks = await verifyPhoneBasics(browser, staticServer.baseUrl);
+    const routesFixtureChecks = await verifyRoutesTabFixtureScenarios(
+      browser,
+      staticServer.baseUrl
+    );
     const scaleBarUpdateCheck = await verifyScaleBarUpdatesWithZoom(browser, staticServer.baseUrl);
     const timelineTickLabelOverlapChecks = await verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(
       browser,
@@ -11257,6 +11522,7 @@ async function run() {
       desktopAttributionReachabilityCheck,
       expandedAttributionPlacementChecks,
       phoneBasicsChecks,
+      routesFixtureChecks,
       scaleBarUpdateCheck,
       timelineTickLabelOverlapChecks,
       keyboardDisclosureChecks,

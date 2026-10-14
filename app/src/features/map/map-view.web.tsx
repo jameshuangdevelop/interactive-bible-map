@@ -150,6 +150,7 @@ const layerRoutesLinesForegroundId = "ibm-routes-lines-foreground";
 const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
 const layerRoutesLinesUnknownId = "ibm-routes-lines-unknown";
 const layerRoutesStopsId = "ibm-routes-stops";
+const layerRoutesStopOrderId = "ibm-routes-stop-order";
 const layerRoutesStopLabelsId = "ibm-routes-stop-labels";
 const layerRoutesViaId = "ibm-routes-via";
 
@@ -347,6 +348,7 @@ function applyMapModeOverlayVisibility(
     layerRoutesLinesHighlightId,
     layerRoutesLinesUnknownId,
     layerRoutesStopsId,
+    layerRoutesStopOrderId,
     layerRoutesStopLabelsId,
     layerRoutesViaId
   ]) {
@@ -1638,9 +1640,15 @@ function ensureMapLayers(
         "line-join": "round"
       },
       paint: {
-        "line-color": "#1A73E8",
-        "line-width": 3,
-        "line-dasharray": [1, 2]
+        "line-color": [
+          "case",
+          ["==", ["get", "isInSelectedRoute"], true],
+          "#1A73E8",
+          "#9AA0A6"
+        ],
+        "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 3, 1.6],
+        "line-dasharray": [1, 2],
+        "line-opacity": ["case", ["==", ["get", "isInSelectedRoute"], true], 1, 0.8]
       }
     });
   }
@@ -1671,7 +1679,11 @@ function ensureMapLayers(
       id: layerRoutesStopsId,
       source: sourceRoutesPointsId,
       type: "circle",
-      filter: toLayerFilter(["==", ["get", "kind"], "stop"]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
       paint: {
         "circle-radius": 10,
         "circle-color": "#FFFFFF",
@@ -1687,7 +1699,11 @@ function ensureMapLayers(
       id: layerRoutesViaId,
       source: sourceRoutesPointsId,
       type: "circle",
-      filter: toLayerFilter(["==", ["get", "kind"], "via"]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "via"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
       paint: {
         "circle-radius": 4,
         "circle-color": "#1A73E8",
@@ -1697,19 +1713,50 @@ function ensureMapLayers(
     });
   }
 
+  if (!map.getLayer(layerRoutesStopOrderId)) {
+    map.addLayer({
+      id: layerRoutesStopOrderId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["has", "orderLabel"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "orderLabel"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 11,
+        "text-anchor": "center",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      paint: {
+        "text-color": "#1A73E8"
+      }
+    });
+  }
+
   if (!map.getLayer(layerRoutesStopLabelsId)) {
     map.addLayer({
       id: layerRoutesStopLabelsId,
       source: sourceRoutesPointsId,
       type: "symbol",
-      filter: toLayerFilter(["==", ["get", "kind"], "stop"]),
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
       layout: {
         "text-field": ["get", "label"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 12,
         "text-offset": [1, 0],
         "text-anchor": "left",
-        "text-optional": true
+        "text-optional": false,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
       },
       paint: {
         "text-color": "#202124",
@@ -2974,6 +3021,13 @@ export function MapView({
         cache: "no-store"
       });
       if (!response.ok) {
+        if (response.status === 404) {
+          failedStopIdsRef.current.add(stopId);
+          if (selectedTimelineStopIdRef.current === stopId) {
+            setAncientLayerLoadState("ready");
+          }
+          return;
+        }
         throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
       }
 
@@ -4336,9 +4390,11 @@ export function MapView({
     ? Math.max(controlBottomInset + 176, 320)
     : controlBottomInset + 16;
   const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
+  const routeAttributionOverlayInset = routesModeEnabled ? scaleBarBottomOffset + 56 : 0;
   const compactAttributionBottomWithTimelineOffset = Math.max(
     compactAttributionBottomOffset,
-    Math.max(0, timelineOverlayInset)
+    Math.max(0, timelineOverlayInset),
+    routeAttributionOverlayInset
   );
   const compactAttributionRightOffset = 72;
   const visiblePlacesList = (
