@@ -380,3 +380,12 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Context:** ADR-0007 has the PO stack finished branches, and each PR in M4's stack targeted the branch below it. On 2026-10-12 the human merged #51 to #58 in order. #51 merged into `main`, but each of the others merged into the branch below it, because GitHub moves a PR's target to `main` only when the branch below it is deleted, and ADR-0023's clean-up comes after the merges. So only #51 reached `main` and the live site. #59 brought the top of the stack, which holds all seven, into `main`.
 - **Decision:** Every PR in a stack targets `main`. Its description says which PR it's stacked on, that its list of changes includes that PR's until it merges, and gives a link that shows its own changes only. The human merges the stack in order, as before; a PR merged early brings the ones below it along, so nothing is stranded. After a stack merges, the PO checks that `main` holds its top before deleting branches (ADR-0023).
 - **Consequences:** No repository setting changes. Until the PRs below it merge, a PR's "Files changed" tab on GitHub shows their changes too, so reviews use each PR's own link.
+
+## ADR-0040 — The PO pushes and opens PRs, except for what can be play-tested
+- **Date:** 2026-10-13 · **Status:** Accepted · **By:** the human ("I still want you to create and push PRs, I just want you to have my approvals before you do them"; then "You may push any PRs except for the ones that can be play tested. For those, I want to view them locally first and give feedback before pushing"). This amends ADR-0007 and ADR-0019.
+- **Context:** ADR-0007 and ADR-0019 had the PO ask before every push and PR. On 2026-10-12 the human logged the GitHub CLI in on their Mac so the PO could push and open PRs, approved each M5 push while away, and then set this rule.
+- **Decision:**
+  1. The PO pushes branches and opens PRs without asking, when the change can't be play-tested, such as docs, plans, schemas, research and data the app doesn't show yet.
+  2. A change the human can play-test, anything that changes what the app shows or how it behaves, gets a local preview first: a mini checkpoint (ADR-0031) with the work served on localhost and opened in the human's browser. The PO pushes it only after the human's feedback.
+  3. Merges, and checkpoint approvals, stay with the human. Deleting merged branches stays as in ADR-0023.
+- **Consequences:** Data and docs PRs flow without a round trip. App PRs such as M5-05's Routes tab wait at MC9 for the human's play-test.
