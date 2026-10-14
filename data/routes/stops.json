@@ -450,7 +450,7 @@
           ],
           "coordinateSource": "openbible:rhodes-1",
           "confidence": "high",
-          "support": "The chief city of the island of Rhodes, in the southeastern Aegean. Pleiades, OpenBible.info and Wikidata agree on the city of Rhodes as the site. OpenBible.info also notes a tradition that Paul arrived near Lindos instead of the city.",
+          "support": "The chief city of the island of Rhodes, in the southeastern Aegean. Pleiades, OpenBible.info and Wikidata agree on the city of Rhodes as the site.",
           "sources": [
             "pleiades:590030",
             "openbible:rhodes-1",
