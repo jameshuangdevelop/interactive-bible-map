@@ -242,3 +242,11 @@ Already-existing entries reused directly (no change needed): `bib:isbe-decapolis
 ### WEB verses quoted or read
 
 Pulled from `data/reference/engwebp_vpl.txt` by grep, Gospel by Gospel: Matthew 2:1-28:20 (infancy and ministry passages throughout, as cited in §3-§4); Mark 1:1-16:20; Luke 1:1-24:52; John 1:1-21:1, as cited throughout. Six-version spelling comparisons (NIV, ESV, NLT, KJV, NKJV, CSB) were read directly at BibleGateway.com for Matthew 8:28, Mark 5:1, Luke 8:26 (the Gadarenes/Gerasenes/Gergesenes question, §6.3) and Mark 11:1 (Bethphage, §6.2): spellings and wording only, never verse text copied into this note or any record.
+
+## 11. Fact-Checker's corrections (2026-10-13)
+
+The verification report (`docs/verification/M5-jesus-journeys.md`) has the full findings. These factual points in this note were wrong; the data follows the corrected versions.
+- **Bethphage (§6.2, §9 item 4):** "Bethsphage" is a manuscript reading, not a WEB-only transliteration. The NKJV footnotes "M Bethsphage" (the Majority Text) at Matthew 21:1, Mark 11:1 and Luke 19:29; all six versions read "Bethphage" in their text.
+- **ISBE's note on "Gergesenes" (§6.3):** "Gadara" rejects the Textus Receptus reading "of the Gergesenes", which is the reading at Matthew 8:28 (the WEB's there), not "a fourth reading" at Mark 5:1 and Luke 8:26.
+- **Ephraim (§6.2):** ISBE says the town "probably" corresponds to Ephrem and "probably" answers to et-Taiyebeh, so the entry's confidence is `medium`, not `high`. Wikidata's Taybeh item gives the village's point but doesn't identify it with Ephraim.
+- **Bethphage's point (§6.2):** ISBE puts New Testament Bethphage most probably on the summit, where Kefr et-Tur stands, and the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. The entry's point is that Franciscan sanctuary, on the eastern part of the Mount of Olives, not the summit. Wikidata's own "located in" for Bethphage is Jerusalem.

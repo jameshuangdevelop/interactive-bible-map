@@ -168,15 +168,15 @@ const ROUTE_STOP_DUPLICATE_DISTANCE_KM = 2;
 const ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST = new Map([
   // Bethphage traditionally sits on the Mount of Olives ridge, where several
   // genuinely distinct places (not duplicates of each other) fall within 2 km:
-  // the Old City of Jerusalem and its Temple Mount and two pools, Gethsemane,
-  // Golgotha, the Mount of Olives itself, and Bethany on its far slope.
-  ["bethphage|bethany", "Distinct village on the same Mount of Olives ridge, about 1 km away."],
+  // Jerusalem with its Temple Mount and the pools of Bethesda and Siloam,
+  // Gethsemane, Golgotha, the Mount of Olives itself, and Bethany on its far slope.
+  ["bethphage|bethany", "Distinct village on the same Mount of Olives ridge, about 0.8 km away."],
   ["bethphage|gethsemane", "Distinct garden site at the foot of the Mount of Olives."],
-  ["bethphage|golgotha", "Distinct site inside the Old City, across the Kidron Valley."],
+  ["bethphage|golgotha", "Distinct site in Jerusalem, across the Kidron Valley."],
   ["bethphage|jerusalem", "Distinct city; Bethphage sits just outside it, on the ridge."],
   ["bethphage|mount-of-olives", "Bethphage sits on this ridge but is its own named village."],
   ["bethphage|pool-of-bethesda", "Distinct site inside the Old City."],
-  ["bethphage|pool-of-siloam", "Distinct site inside the Old City."],
+  ["bethphage|pool-of-siloam", "Distinct site at the southern end of the City of David."],
   ["bethphage|temple-mount", "Distinct site inside the Old City, across the Kidron Valley."]
 ]);
 

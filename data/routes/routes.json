@@ -1557,9 +1557,9 @@
       "title": "Jesus' journeys",
       "fromYear": 26,
       "toYear": 30,
-      "yearNote": "About AD 26-30, following the International Standard Bible Encyclopedia's (1915) own reasoned dates for the baptism and death; the length of the ministry between them is itself a separate, debated question (2-3 years, depending on how many Passovers John's Gospel implies), which this route's research note describes without resolving.",
+      "yearNote": "About AD 26-30. The International Standard Bible Encyclopedia (1915) dates the baptism to AD 26 and the death to AD 30, with a ministry of probably three years after the first Passover, from the Passovers that John's Gospel names. It also notes that counting Tiberius's fifteenth year (Luke 3:1) from the death of Augustus, a common way of reckoning reigns, would give AD 28-29 for the start, and that an early tradition dates the death to AD 29.",
       "structure": "standalone-segments",
-      "note": "These segments are well-attested but standalone: they are not joined into one itinerary, and no single order across the Gospels is claimed. They are listed in five broad periods every Gospel shares, from the baptism to the resurrection, and within each, by each segment's first passage; this is a way of listing the segments, not a claim about the order of events (ADR-0038 item 6 of the 2026-10-13 update). Lines (added in a later task) show stage order and land or sea mode, not exact traveled paths. The research note (docs/research/M5-jesus-journeys.md) gives the full reasoning for every segment kept and left out.",
+      "note": "Lines show stage order and land or sea mode, not exact traveled paths. These segments are well attested but stand alone: they are not joined into one itinerary, and no single order of events across the Gospels is claimed. They are listed in five broad periods that every Gospel shares, from the baptism to the resurrection, and within each period by each segment's first passage; this is a way of listing them, not a claim about the order of events.",
       "sources": [
         "scripture:Matthew 3:13",
         "scripture:Matthew 28:16",
@@ -1614,7 +1614,7 @@
               "scripture:Matthew 3:13"
             ]
           },
-          "noLineReason": "Bethany beyond the Jordan's site is disputed between two candidates; neither has the Fact-Checker's agreement as the strongest yet (ADR-0038 item 4).",
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
           "sources": [
             "scripture:John 1:28",
             "scripture:John 1:29",
@@ -1667,7 +1667,7 @@
               "Mark",
               "Luke"
             ],
-            "rule": "All three name a 40-day stay in the wilderness (a general place, not a stop) between the Jordan and Galilee; Matthew and Luke name Galilee as the destination, and Mark says 'into Galilee'.",
+            "rule": "All three have Jesus go from the Jordan (named in Luke 4:1) into the wilderness, a general place and not a stop (Mark 1:13: forty days), and then into Galilee; Matthew and Mark place this after John was taken into custody.",
             "sources": [
               "scripture:Luke 4:1",
               "scripture:Luke 4:14",
@@ -1676,7 +1676,7 @@
               "scripture:Matthew 4:11-12"
             ]
           },
-          "noLineReason": "The segment's starting point, Bethany beyond the Jordan, has a disputed site (ADR-0038 item 4); see segment-01.",
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
           "sources": [
             "scripture:Luke 4:1",
             "scripture:Luke 4:14",
@@ -1709,9 +1709,14 @@
               "textWEB": "On the next day, he was determined to go out into Galilee, and he found Philip. Jesus said to him, “Follow me.”"
             },
             {
-              "ref": "John 2:1",
+              "ref": "John 2:1-2",
               "book": "John",
-              "textWEB": "The third day, there was a wedding in Cana of Galilee. Jesus’ mother was there."
+              "textWEB": "The third day, there was a wedding in Cana of Galilee. Jesus’ mother was there. Jesus also was invited, with his disciples, to the wedding."
+            },
+            {
+              "ref": "John 2:11",
+              "book": "John",
+              "textWEB": "This beginning of his signs Jesus did in Cana of Galilee, and revealed his glory; and his disciples believed in him."
             }
           ],
           "travelMode": "land",
@@ -1719,18 +1724,20 @@
             "gospels": [
               "John"
             ],
-            "rule": "John has Jesus determined to go into Galilee after his time at Bethany beyond the Jordan (1:43), arriving specifically at Cana of Galilee (2:1).",
+            "rule": "John has Jesus, after the days at Bethany beyond the Jordan (1:28), decide to go into Galilee (1:43); he is then a guest at a wedding in Cana of Galilee and does his first sign there (2:1-2, 2:11).",
             "sources": [
               "scripture:John 1:28",
               "scripture:John 1:43",
-              "scripture:John 2:1"
+              "scripture:John 2:1-2",
+              "scripture:John 2:11"
             ]
           },
-          "noLineReason": "Both ends are disputed sites with no candidate agreed as strongest (Bethany beyond the Jordan and Cana, ADR-0038 item 4).",
+          "noLineReason": "Both ends have disputed sites: Bethany beyond the Jordan has two proposed sites and this map favors neither, and Cana's site is disputed among three villages, so no line is drawn.",
           "sources": [
             "scripture:John 1:28",
             "scripture:John 1:43",
-            "scripture:John 2:1"
+            "scripture:John 2:1-2",
+            "scripture:John 2:11"
           ]
         },
         {
@@ -1761,7 +1768,7 @@
               "scripture:John 2:12"
             ]
           },
-          "noLineReason": "Cana's site is disputed among three candidates with no clear strongest support (ADR-0038 item 4).",
+          "noLineReason": "Cana's site is disputed among three proposed villages, and this map favors none of them, so no line is drawn.",
           "sources": [
             "scripture:John 2:12"
           ]
@@ -1925,7 +1932,7 @@
               "scripture:John 4:45-46"
             ]
           },
-          "noLineReason": "Cana's site is disputed among three candidates with no clear strongest support (ADR-0038 item 4).",
+          "noLineReason": "Cana's site is disputed among three proposed villages, and this map favors none of them, so no line is drawn.",
           "sources": [
             "scripture:John 4:43",
             "scripture:John 4:45-46"
@@ -2227,7 +2234,7 @@
               "scripture:Matthew 8:28"
             ]
           },
-          "noLineReason": "This region's identity and name are disputed across manuscripts and candidate sites, with no candidate agreed as strongest (ADR-0038 item 4; see the research note §6.3).",
+          "noLineReason": "Sources place the country of the Gadarenes at three different sites, and none has the clearest support, so no line is drawn.",
           "sources": [
             "scripture:Luke 8:22",
             "scripture:Luke 8:26",
@@ -2279,7 +2286,7 @@
               "scripture:Matthew 9:1"
             ]
           },
-          "noLineReason": "This region's identity and name are disputed across manuscripts and candidate sites, with no candidate agreed as strongest (ADR-0038 item 4; see the research note §6.3).",
+          "noLineReason": "Sources place the country of the Gadarenes at three different sites, and none has the clearest support, so no line is drawn.",
           "sources": [
             "scripture:Luke 8:40",
             "scripture:Mark 5:21",
@@ -2362,7 +2369,7 @@
               "Matthew",
               "Mark"
             ],
-            "rule": "Both Gospels have Jesus withdraw into the region/borders of Tyre and Sidon; the text names a region bounded by two cities, so the stage ends at the first-named city's record (ADR-0038 item 3 update).",
+            "rule": "Both Gospels have Jesus go into the region, or the borders, of Tyre and Sidon. The text names a region by two cities, so the stage names the region and ends at the first city named.",
             "sources": [
               "scripture:Mark 7:24",
               "scripture:Matthew 15:21"
@@ -2384,6 +2391,11 @@
             "locationId": "sea-of-galilee"
           },
           "scripture": [
+            {
+              "ref": "Matthew 15:29",
+              "book": "Matthew",
+              "textWEB": "Jesus departed from there and came near to the sea of Galilee; and he went up on the mountain and sat there."
+            },
             {
               "ref": "Mark 7:31",
               "book": "Mark",
@@ -2407,15 +2419,18 @@
           ],
           "attestation": {
             "gospels": [
+              "Matthew",
               "Mark"
             ],
-            "rule": "The card's own example: Mark states Jesus departed from the borders of Tyre and Sidon and came to the Sea of Galilee through the middle of the region of Decapolis, a region passed through and named on the stage, not a stop (ADR-0038 item 3 update).",
+            "rule": "Mark says that Jesus left the borders of Tyre and Sidon and came to the Sea of Galilee through the middle of the region of Decapolis, a region passed through and named on the stage, not a stop. Matthew says that he went 'from there' and came near to the Sea of Galilee, naming no region on the way, which does not conflict.",
             "sources": [
-              "scripture:Mark 7:31"
+              "scripture:Mark 7:31",
+              "scripture:Matthew 15:29"
             ]
           },
           "sources": [
-            "scripture:Mark 7:31"
+            "scripture:Mark 7:31",
+            "scripture:Matthew 15:29"
           ]
         },
         {
@@ -2470,6 +2485,11 @@
           },
           "scripture": [
             {
+              "ref": "Matthew 16:4-5",
+              "book": "Matthew",
+              "textWEB": "An evil and adulterous generation seeks after a sign, and there will be no sign given to it, except the sign of the prophet Jonah.” He left them and departed. The disciples came to the other side and had forgotten to take bread."
+            },
+            {
               "ref": "Mark 8:13",
               "book": "Mark",
               "textWEB": "He left them, and again entering into the boat, departed to the other side."
@@ -2483,18 +2503,21 @@
           "travelMode": "sea",
           "attestation": {
             "gospels": [
+              "Matthew",
               "Mark"
             ],
-            "rule": "Mark states directly that Jesus departed to the other side by boat and came to Bethsaida; Matthew's parallel (16:5) says only 'the other side', naming no town, which does not conflict.",
+            "rule": "Mark says that Jesus left by boat for the other side and came to Bethsaida. Matthew's parallel has him leave and the disciples come to 'the other side', naming no town, which does not conflict.",
             "sources": [
               "scripture:Mark 8:13",
-              "scripture:Mark 8:22"
+              "scripture:Mark 8:22",
+              "scripture:Matthew 16:4-5"
             ]
           },
-          "noLineReason": "Bethsaida's site is disputed between two candidates with no clear strongest support (ADR-0038 item 4).",
+          "noLineReason": "Bethsaida's site is disputed between two excavated sites, so no line is drawn.",
           "sources": [
             "scripture:Mark 8:13",
-            "scripture:Mark 8:22"
+            "scripture:Mark 8:22",
+            "scripture:Matthew 16:4-5"
           ]
         },
         {
@@ -2532,7 +2555,7 @@
               "scripture:Matthew 16:13"
             ]
           },
-          "noLineReason": "The segment's starting point, Bethsaida, has a disputed site (ADR-0038 item 4); see segment-21.",
+          "noLineReason": "Bethsaida's site is disputed between two excavated sites, so no line is drawn.",
           "sources": [
             "scripture:Mark 8:27",
             "scripture:Matthew 16:13"
@@ -2550,6 +2573,16 @@
           },
           "scripture": [
             {
+              "ref": "Mark 8:27",
+              "book": "Mark",
+              "textWEB": "Jesus went out, with his disciples, into the villages of Caesarea Philippi. On the way he asked his disciples, “Who do men say that I am?”"
+            },
+            {
+              "ref": "Mark 9:2",
+              "book": "Mark",
+              "textWEB": "After six days Jesus took with him Peter, James, and John, and brought them up onto a high mountain privately by themselves, and he was changed into another form in front of them."
+            },
+            {
               "ref": "Mark 9:30",
               "book": "Mark",
               "textWEB": "They went out from there and passed through Galilee. He didn’t want anyone to know it,"
@@ -2558,6 +2591,16 @@
               "ref": "Mark 9:33",
               "book": "Mark",
               "textWEB": "He came to Capernaum, and when he was in the house he asked them, “What were you arguing among yourselves on the way?”"
+            },
+            {
+              "ref": "Matthew 16:13",
+              "book": "Matthew",
+              "textWEB": "Now when Jesus came into the parts of Caesarea Philippi, he asked his disciples, saying, “Who do men say that I, the Son of Man, am?”"
+            },
+            {
+              "ref": "Matthew 17:1",
+              "book": "Matthew",
+              "textWEB": "After six days, Jesus took with him Peter, James, and John his brother, and brought them up into a high mountain by themselves."
             },
             {
               "ref": "Matthew 17:22",
@@ -2586,17 +2629,25 @@
               "Mark",
               "Matthew"
             ],
-            "rule": "Mark and Matthew both name Capernaum as the destination and Galilee as the region they were passing through on the way.",
+            "rule": "Both Gospels have Jesus in the area of Caesarea Philippi (Mark 8:27; Matthew 16:13), then on 'a high mountain' that they don't name (Mark 9:2; Matthew 17:1), and then in Galilee and at Capernaum. The segment takes no position on where that mountain was.",
             "sources": [
+              "scripture:Mark 8:27",
+              "scripture:Mark 9:2",
               "scripture:Mark 9:30",
               "scripture:Mark 9:33",
+              "scripture:Matthew 16:13",
+              "scripture:Matthew 17:1",
               "scripture:Matthew 17:22",
               "scripture:Matthew 17:24"
             ]
           },
           "sources": [
+            "scripture:Mark 8:27",
+            "scripture:Mark 9:2",
             "scripture:Mark 9:30",
             "scripture:Mark 9:33",
+            "scripture:Matthew 16:13",
+            "scripture:Matthew 17:1",
             "scripture:Matthew 17:22",
             "scripture:Matthew 17:24"
           ]
@@ -2770,6 +2821,11 @@
               "textWEB": "Jesus entered into the temple in Jerusalem. When he had looked around at everything, it being now evening, he went out to Bethany with the twelve."
             },
             {
+              "ref": "Luke 19:37",
+              "book": "Luke",
+              "textWEB": "As he was now getting near, at the descent of the Mount of Olives, the whole multitude of the disciples began to rejoice and praise God with a loud voice for all the mighty works which they had seen,"
+            },
+            {
               "ref": "Luke 19:41",
               "book": "Luke",
               "textWEB": "When he came near, he saw the city and wept over it,"
@@ -2798,10 +2854,11 @@
               "Luke",
               "John"
             ],
-            "rule": "The triumphal entry: all four Gospels confirm arrival at Jerusalem; John's own account of this day continues directly from Bethany without naming Bethphage or the Mount of Olives, which does not conflict with the Synoptics' added detail.",
+            "rule": "The entry into Jerusalem. Matthew, Mark and Luke have Jesus come from the Mount of Olives (Luke 19:37) into the city or its temple. John has him coming to Jerusalem from Bethany (12:1, 12:12) and doesn't name Bethphage or the Mount of Olives, which does not conflict.",
             "sources": [
               "scripture:John 12:1",
               "scripture:John 12:12",
+              "scripture:Luke 19:37",
               "scripture:Luke 19:41",
               "scripture:Luke 19:45",
               "scripture:Mark 11:11",
@@ -2811,6 +2868,7 @@
           "sources": [
             "scripture:John 12:1",
             "scripture:John 12:12",
+            "scripture:Luke 19:37",
             "scripture:Luke 19:41",
             "scripture:Luke 19:45",
             "scripture:Mark 11:11",
@@ -2851,7 +2909,7 @@
               "scripture:John 10:40"
             ]
           },
-          "noLineReason": "Bethany beyond the Jordan's site is disputed between two candidates; neither has the Fact-Checker's agreement as the strongest yet (ADR-0038 item 4).",
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
           "sources": [
             "scripture:John 10:22-23",
             "scripture:John 10:40"
@@ -2900,7 +2958,7 @@
               "scripture:John 11:7"
             ]
           },
-          "noLineReason": "The segment's starting point, Bethany beyond the Jordan, has a disputed site (ADR-0038 item 4); see segment-01.",
+          "noLineReason": "Bethany beyond the Jordan has two proposed sites, on opposite banks of the river, and this map favors neither, so no line is drawn.",
           "sources": [
             "scripture:John 11:17-18",
             "scripture:John 11:7"
@@ -2928,7 +2986,7 @@
             "gospels": [
               "John"
             ],
-            "rule": "The card's own example: John states directly that Jesus departed from there into the country near the wilderness, to a city called Ephraim.",
+            "rule": "John states directly that Jesus departed from there into the country near the wilderness, to a city called Ephraim.",
             "sources": [
               "scripture:John 11:54"
             ]
@@ -3123,6 +3181,11 @@
               "ref": "Luke 24:28-29",
               "book": "Luke",
               "textWEB": "They came near to the village where they were going, and he acted like he would go further. They urged him, saying, “Stay with us, for it is almost evening, and the day is almost over.” He went in to stay with them."
+            },
+            {
+              "ref": "Luke 24:33",
+              "book": "Luke",
+              "textWEB": "They rose up that very hour, returned to Jerusalem, and found the eleven gathered together, and those who were with them,"
             }
           ],
           "travelMode": "land",
@@ -3130,18 +3193,20 @@
             "gospels": [
               "Luke"
             ],
-            "rule": "Luke frames this as the two disciples' own journey from near Jerusalem, already under way when Jesus himself came near and went with them; Jesus reaches Emmaus with them, so this note counts the arrival as attested even though the departure is framed as theirs.",
+            "rule": "Luke tells this as the journey of two disciples to Emmaus, sixty stadia from Jerusalem, where they later returned (24:13, 24:33). Jesus joined them on the road (24:15) and went with them to Emmaus (24:28-29).",
             "sources": [
               "scripture:Luke 24:13",
               "scripture:Luke 24:15",
-              "scripture:Luke 24:28-29"
+              "scripture:Luke 24:28-29",
+              "scripture:Luke 24:33"
             ]
           },
-          "noLineReason": "Emmaus's site is disputed among four candidates; it gets noLineReason unless the Fact-Checker finds one candidate with the strongest support (ADR-0038 item 4; PO answer to research note §9 item 1).",
+          "noLineReason": "Emmaus's site is disputed among four proposed sites, so no line is drawn.",
           "sources": [
             "scripture:Luke 24:13",
             "scripture:Luke 24:15",
-            "scripture:Luke 24:28-29"
+            "scripture:Luke 24:28-29",
+            "scripture:Luke 24:33"
           ]
         },
         {

@@ -973,8 +973,8 @@
             31.954665
           ],
           "coordinateSource": "pleiades:687896",
-          "confidence": "high",
-          "support": "The International Standard Bible Encyclopedia identifies this as the town Jesus retired to after raising Lazarus, corresponding to Eusebius's Ephrem about 5 Roman miles east of Bethel and answering to the modern village of et-Taiyibeh; Wikidata's and OpenBible.info's own independent identifications of the same village agree closely with Pleiades' coordinate.",
+          "confidence": "medium",
+          "support": "The International Standard Bible Encyclopedia takes the town Jesus retired to after raising Lazarus to be probably Eusebius's Ephrem, 5 Roman miles east of Bethel, and probably the village of et-Taiyibeh. Pleiades places Ephraim here, and OpenBible.info's leading identification and Wikidata's point for the modern village agree with Pleiades' coordinate to within about 0.1 km.",
           "sources": [
             "pleiades:687896",
             "wikidata:Q931667",
@@ -996,12 +996,14 @@
         "openbible:ephraim-2",
         "bib:isbe-ephraim"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "bethphage",
       "name": "Bethphage",
-      "todayName": "Et-Tur (Kafr et-Tur), East Jerusalem",
+      "todayName": "Et-Tur (Kafr et-Tur), Jerusalem",
       "candidates": [
         {
           "label": "Et-Tur (Kafr et-Tur)",
@@ -1011,7 +1013,7 @@
           ],
           "coordinateSource": "wikidata:Q2193088",
           "confidence": "medium",
-          "support": "The International Standard Bible Encyclopedia judges this site, on the summit of the Mount of Olives ridge, 'much more probable' than Abu Dis, since it 'certainly occupies an ancient site and no other name is known' for it; OpenBible.info's own dataset independently scores this identification far above the alternative, and the Franciscan Custody of the Holy Land keeps its sanctuary of Bethphage at this same site.",
+          "support": "The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
           "sources": [
             "wikidata:Q2193088",
             "openbible:bethphage",
@@ -1027,10 +1029,11 @@
           ],
           "coordinateSource": "openbible:bethphage",
           "confidence": "low",
-          "support": "A minority identification that the International Standard Bible Encyclopedia judges markedly less probable than Et-Tur; OpenBible.info's own dataset scores it far below Et-Tur for the same identification.",
+          "support": "A minority identification that the International Standard Bible Encyclopedia judges much less probable than Et-Tur; OpenBible.info scores it far below Et-Tur for the same identification. OpenBible.info and Wikidata give the same point for the village.",
           "sources": [
             "openbible:bethphage",
-            "bib:isbe-bethphage"
+            "bib:isbe-bethphage",
+            "wikidata:Q246590"
           ]
         }
       ],
@@ -1055,7 +1058,8 @@
         "wikidata:Q2193088",
         "openbible:bethphage",
         "bib:isbe-bethphage",
-        "bib:custodia-bethphage"
+        "bib:custodia-bethphage",
+        "wikidata:Q246590"
       ],
       "status": "draft"
     },
@@ -1071,10 +1075,11 @@
           ],
           "coordinateSource": "pleiades:726708218",
           "confidence": "disputed",
-          "support": "The only one of the three candidates directly on the lake shore, where the steep edges of the Bashan plateau drop close to the water, matching the text's description of the herd rushing down a steep bank into the sea; a Byzantine-period monastery here has long marked it as the traditional site. The International Standard Bible Encyclopedia's 'Gerasa' article identifies these ruins, which it calls 'Kurseh', as what 'Gerasa' means in this Gospel context, and its separate 'Gadara' article independently describes Gadara's own territory as extending to 'the lands of the subordinate town, Gerasa' in this same lake-adjacent area.",
+          "support": "The only one of the three candidates on the lake shore. The International Standard Bible Encyclopedia places the event on the eastern shore, where 'the steep edges of the Bashan plateau drop close upon the brink of the lake', which it finds only just south of Wadi Semak, and takes the Gospels' Gerasa to be probably the ruins of Kurseh there; its 'Gadara' article likewise has Gadara's territory cover the country east of the lake, 'including the lands of the subordinate town, Gerasa'. OpenBible.info identifies Gergesa, the WEB's reading at Matthew 8:28, with Kursi.",
           "sources": [
             "pleiades:726708218",
             "wikidata:Q2469418",
+            "openbible:gergesa",
             "bib:isbe-gerasa",
             "bib:isbe-gadara"
           ]
@@ -1087,10 +1092,11 @@
           ],
           "coordinateSource": "pleiades:678142",
           "confidence": "disputed",
-          "support": "A real Decapolis city (modern Umm Qais), about 6 miles from the lake by the International Standard Bible Encyclopedia's own estimate; its ancient coins show a ship, read as evidence its territory reached the lake, making 'country of the Gadarenes' (Mark 5:1; Luke 8:26) a reasonable description even though the city itself is not on the shore.",
+          "support": "A Decapolis city (modern Umm Qais), about 6 miles southeast of the lake by the International Standard Bible Encyclopedia's estimate; the ship on its coins is, for that encyclopedia, proof that its territory reached the lake, so the area could be called the 'land of the Gadarenes', the WEB's reading at Mark 5:1 and Luke 8:26, even though the city is not on the shore. OpenBible.info identifies Gadara, named at Matthew 8:28 in most English versions, with Umm Qais.",
           "sources": [
             "pleiades:678142",
             "wikidata:Q1490815",
+            "openbible:gadara",
             "bib:isbe-gadara"
           ]
         },
@@ -1102,10 +1108,11 @@
           ],
           "coordinateSource": "pleiades:678158",
           "confidence": "low",
-          "support": "The most famous ancient place with this name, but far inland; the International Standard Bible Encyclopedia's own 'Gerasa' article identifies the Gospel story with the nearer Kursi site instead, describing this famous city's own location and history as a separate matter without connecting it to the Gospel story.",
+          "support": "The best-known city of this name, far inland, about 19 miles from the Jordan by the International Standard Bible Encyclopedia's estimate. That encyclopedia takes the Gospels' Gerasa to be the Kursi site instead, but OpenBible.info identifies the Gerasa named at Mark 5:1 and Luke 8:26 in most English versions with Jerash.",
           "sources": [
             "pleiades:678158",
             "wikidata:Q56072866",
+            "openbible:gerasa",
             "bib:isbe-gerasa"
           ]
         }
@@ -1131,7 +1138,9 @@
         "bib:isbe-gadara",
         "bib:isbe-gerasa"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     }
   ]
 }
