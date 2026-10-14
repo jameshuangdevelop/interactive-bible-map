@@ -2053,7 +2053,7 @@
               "textWEB": "So when he came into Galilee, the Galileans received him, having seen all the things that he did in Jerusalem at the feast, for they also went to the feast. Jesus came therefore again to Cana of Galilee, where he made the water into wine. There was a certain nobleman whose son was sick at Capernaum."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Galilee",
@@ -2482,7 +2482,7 @@
               "textWEB": "When they had come to Capernaum, those who collected the didrachma coins came to Peter, and said, “Doesn’t your teacher pay the didrachma?”"
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Galilee",
@@ -2928,7 +2928,7 @@
               "textWEB": "So when Jesus came, he found that he had been in the tomb four days already. Now Bethany was near Jerusalem, about fifteen stadia away."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "namedRegions": [
             {
               "name": "Judea",
