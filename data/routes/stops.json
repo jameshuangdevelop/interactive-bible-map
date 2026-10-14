@@ -960,6 +960,201 @@
       "status": "verified",
       "verifiedBy": "fact-checker",
       "lastReviewed": "2026-10-13"
+    },
+    {
+      "id": "ephraim",
+      "name": "Ephraim",
+      "todayName": "Taybeh, West Bank",
+      "candidates": [
+        {
+          "label": "Taybeh (et-Taiyibeh)",
+          "coordinates": [
+            35.299196,
+            31.954665
+          ],
+          "coordinateSource": "pleiades:687896",
+          "confidence": "medium",
+          "support": "The International Standard Bible Encyclopedia takes the town Jesus retired to after raising Lazarus to be probably Eusebius's Ephrem, 5 Roman miles east of Bethel, and probably the village of et-Taiyibeh. Pleiades places Ephraim here, and OpenBible.info's leading identification and Wikidata's point for the modern village agree with Pleiades' coordinate to within about 0.1 km.",
+          "sources": [
+            "pleiades:687896",
+            "wikidata:Q931667",
+            "openbible:ephraim-2",
+            "bib:isbe-ephraim"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "John 11:54",
+          "book": "John",
+          "textWEB": "Jesus therefore walked no more openly among the Jews, but departed from there into the country near the wilderness, to a city called Ephraim. He stayed there with his disciples."
+        }
+      ],
+      "sources": [
+        "pleiades:687896",
+        "wikidata:Q931667",
+        "openbible:ephraim-2",
+        "bib:isbe-ephraim"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
+    },
+    {
+      "id": "bethphage",
+      "name": "Bethphage",
+      "todayName": "Et-Tur (Kafr et-Tur), Jerusalem",
+      "candidates": [
+        {
+          "label": "Et-Tur (Kafr et-Tur)",
+          "coordinates": [
+            35.250778,
+            31.777222
+          ],
+          "coordinateSource": "wikidata:Q2193088",
+          "confidence": "medium",
+          "support": "All six English versions compared spell the name 'Bethphage'; the WEB itself reads 'Bethsphage' at this and the other two passages below, the Majority Text's reading (footnoted in the NKJV). The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
+          "sources": [
+            "wikidata:Q2193088",
+            "openbible:bethphage",
+            "bib:isbe-bethphage",
+            "bib:custodia-bethphage",
+            "bib:niv-2011-biblegateway",
+            "bib:esv-2025-biblegateway",
+            "bib:nlt-2015-biblegateway",
+            "bib:kjv-1987-biblegateway",
+            "bib:nkjv-1982-biblegateway",
+            "bib:csb-2017-biblegateway"
+          ]
+        },
+        {
+          "label": "Abu Dis",
+          "coordinates": [
+            35.265833,
+            31.7625
+          ],
+          "coordinateSource": "openbible:bethphage",
+          "confidence": "low",
+          "support": "A minority identification that the International Standard Bible Encyclopedia judges much less probable than Et-Tur; OpenBible.info scores it far below Et-Tur for the same identification. OpenBible.info and Wikidata give the same point for the village.",
+          "sources": [
+            "openbible:bethphage",
+            "bib:isbe-bethphage",
+            "wikidata:Q246590"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Matthew 21:1",
+          "book": "Matthew",
+          "textWEB": "When they came near to Jerusalem and came to Bethsphage, to the Mount of Olives, then Jesus sent two disciples,"
+        },
+        {
+          "ref": "Mark 11:1",
+          "book": "Mark",
+          "textWEB": "When they came near to Jerusalem, to Bethsphage and Bethany, at the Mount of Olives, he sent two of his disciples"
+        },
+        {
+          "ref": "Luke 19:29",
+          "book": "Luke",
+          "textWEB": "When he came near to Bethsphage and Bethany, at the mountain that is called Olivet, he sent two of his disciples,"
+        }
+      ],
+      "sources": [
+        "wikidata:Q2193088",
+        "openbible:bethphage",
+        "bib:isbe-bethphage",
+        "bib:custodia-bethphage",
+        "wikidata:Q246590",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
+    },
+    {
+      "id": "country-of-the-gadarenes",
+      "name": "The country of the Gadarenes (Gerasenes/Gergesenes)",
+      "candidates": [
+        {
+          "label": "Kursi (Gergesa)",
+          "coordinates": [
+            35.650415,
+            32.825796
+          ],
+          "coordinateSource": "pleiades:726708218",
+          "confidence": "disputed",
+          "support": "The only one of the three candidates on the lake shore. The International Standard Bible Encyclopedia places the event on the eastern shore, where 'the steep edges of the Bashan plateau drop close upon the brink of the lake', which it finds only just south of Wadi Semak, and takes the Gospels' Gerasa to be probably the ruins of Kurseh there; its 'Gadara' article likewise has Gadara's territory cover the country east of the lake, 'including the lands of the subordinate town, Gerasa'. OpenBible.info identifies Gergesa, the WEB's reading at Matthew 8:28, with Kursi.",
+          "sources": [
+            "pleiades:726708218",
+            "wikidata:Q2469418",
+            "openbible:gergesa",
+            "bib:isbe-gerasa",
+            "bib:isbe-gadara"
+          ]
+        },
+        {
+          "label": "Gadara",
+          "coordinates": [
+            35.677263,
+            32.65608
+          ],
+          "coordinateSource": "pleiades:678142",
+          "confidence": "disputed",
+          "support": "A Decapolis city (modern Umm Qais), about 6 miles southeast of the lake by the International Standard Bible Encyclopedia's estimate; the ship on its coins is, for that encyclopedia, proof that its territory reached the lake, so the area could be called the 'land of the Gadarenes', the WEB's reading at Mark 5:1 and Luke 8:26, even though the city is not on the shore. OpenBible.info identifies Gadara, named at Matthew 8:28 in most English versions, with Umm Qais.",
+          "sources": [
+            "pleiades:678142",
+            "wikidata:Q1490815",
+            "openbible:gadara",
+            "bib:isbe-gadara"
+          ]
+        },
+        {
+          "label": "Gerasa (modern Jerash)",
+          "coordinates": [
+            35.891091,
+            32.280087
+          ],
+          "coordinateSource": "pleiades:678158",
+          "confidence": "low",
+          "support": "The best-known city of this name, far inland, about 19 miles from the Jordan by the International Standard Bible Encyclopedia's estimate. That encyclopedia takes the Gospels' Gerasa to be the Kursi site instead, but OpenBible.info identifies the Gerasa named at Mark 5:1 and Luke 8:26 in most English versions with Jerash.",
+          "sources": [
+            "pleiades:678158",
+            "wikidata:Q56072866",
+            "openbible:gerasa",
+            "bib:isbe-gerasa"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Matthew 8:28",
+          "book": "Matthew",
+          "textWEB": "When he came to the other side, into the country of the Gergesenes, two people possessed by demons met him there, coming out of the tombs, exceedingly fierce, so that nobody could pass that way."
+        },
+        {
+          "ref": "Mark 5:1",
+          "book": "Mark",
+          "textWEB": "They came to the other side of the sea, into the country of the Gadarenes."
+        },
+        {
+          "ref": "Luke 8:26",
+          "book": "Luke",
+          "textWEB": "Then they arrived at the country of the Gadarenes, which is opposite Galilee."
+        }
+      ],
+      "sources": [
+        "bib:isbe-gadara",
+        "bib:isbe-gerasa"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     }
   ]
 }
