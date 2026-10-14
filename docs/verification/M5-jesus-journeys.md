@@ -206,3 +206,54 @@ All eight pairs are needed: each record has a candidate within 2 km of a Bethpha
 - `npm test`: 297 of 297 pass.
 - `npm run test:app`: 159 of 159 pass, after one fix. The app's "Sources & credits" list must match `ATTRIBUTION.md`'s source names exactly, so I added custodia.org there too (`app/src/features/search/sources-credits-content.ts`, as in M4-04).
 - `npm run typecheck` and `npm run lint` are clean.
+
+## 15. Re-check of `a649411` and `49b11d9` (2026-10-13)
+I checked `git diff bacbc11..HEAD`: the Research Lead's R1–R7 fixes, the PO's answers to Q1 and Q2, and the merged cite-only lists. The route now has 33 segments, 12 without a line. All 117 passages match the WEB.
+
+**Result:** 32 of 33 segments pass, 3 after the small fixes below. `Bethsphage` is now `verified`. Two items stay open:
+- **S1:** the merged segment 12, back to the Research Lead.
+- **S2:** the listing order, for the PO.
+
+| Item | Result |
+|---|---|
+| R1, the feeding and the crossing | **Still open, S1** (below) |
+| R2, "his own country" | Pass. Dropped, and the §4 reason states the unnamed start accurately. The new segment 09 (Galilee → Nazareth; Luke 4:14, 4:16) meets the rule, and no Gospel conflicts with it. |
+| R3, Luke 17:11 | Pass. Removed; segment 23 is Matthew and Mark only. |
+| R4, the post-resurrection Galilee segment | Pass. Dropped, and the §4 reason matches the WEB (Matthew 28:16; Mark 16:7; John 21:1; Luke 24:49). |
+| R5, Bethsphage | Pass after fix. Segments 24 and 25 now end and start there. Segment 24's `via` (Bethany, then the Mount of Olives, before Bethsphage) isn't in the text: Mark 11:1 and Luke 19:29 name "Bethsphage and Bethany", Bethsphage first, and Matthew 21:1 has "came to Bethsphage, to the Mount of Olives". Since Et-Tur lies east of the Mount of Olives point, it also made the line double back, so I removed it. Segment 25's `via` (Luke 19:37, "the descent of the Mount of Olives") stands. |
+| R6, Luke 21:37 | Pass after fix. It's cited, but Luke wasn't in segment 30's Gospels, while segments 20 and 25 list Gospels that tell only part of a move. Added Luke. |
+| R7, `toYear` 33 | Pass after fix. World History Encyclopedia (Denova, 2021; CC BY-NC-SA, so cite-only, as the existing row says) states that the Gospels place the ministry and death under Pilate, "26-36 CE", and that the common date for the death is "between 30-33 CE". The `yearNote` restates this without quoting. I changed "this route's toYear widens" to readers' words, and the bibliography URL to the page's own citation URL (`/Jesus_Christ/`; the old one redirects with a 301). |
+| Q1, "path not known" | Pass after fix. Region-end segments are `unknown`, but the new segment 09 (from Galilee) was `land`. Fixed, so all nine are `unknown`: 02, 06, 07, 09, 11, 13, 17, 18 and 23. `namedRegions` names regions passed, or a region named by its cities. A region that is itself the end isn't repeated there, as in M5-02. |
+| Q2, the title "Bethsphage" | Pass, following your ruling under ADR-0026's rule for manuscript differences. With no field for other names, "Bethphage" now appears in the support text, sourced to the six versions. ADR-0026 still says "So far only Magdala is affected", which is now out of date. |
+| Item 3, Bethsphage's line | Segment 24 runs to candidate 0, Et-Tur. The entry names it as the strongest (`medium` against `low`; ISBE "much more probable"; OpenBible.info 336 against 40), and I agree. |
+| `ATTRIBUTION.md` and the app's credits (`49b11d9`) | Pass: both name Bible Odyssey and custodia.org, and `test:app` checks that they match. |
+
+**`gennesaret`: passes on its content after fix, but stays `draft`,** because S1 sends back the only segment that uses it.
+- Title: all six versions and the WEB read "Gennesaret" at Matthew 14:34 and Mark 6:53.
+- Site: OpenBible.info's "El Ghuweir" (500/1000) is the entry's point. Wikidata's kibbutz Ginosar is 2.05 km away. Both lie on the plain that ISBE describes as running "from el-Mejdel in the South, to … Khan Minyeh, in the North", over 3 miles long and about a mile wide. Confidence `high` fits.
+- Fixes:
+  - The label said "between Magdala and Capernaum"; ISBE says Khan Minyeh, and our `capernaum` record is 6.7 km from the point.
+  - The support said "about 1.4 km" and that the kibbutz "takes its name from Gennesaret"; Wikidata states no such thing.
+  - `todayName` was "El Ghuweir, …". That is ISBE's 1915 name ("now known as el-Ghuweir"), and OpenBible's point is 0.81 km from the former village of Ghuwayr Abu Shusha (Mandatory Palestine). It is now "Near Ginosar, Israel", from Wikidata Q1525069 (country: Israel), in ADR-0028's "Near <town>" form.
+
+**S1, segment 12 (Jerusalem → Gennesaret): needs change, back to the Research Lead.**
+- No single Gospel names both ends. John gives Jerusalem (by the context of 5:1) and Matthew and Mark give Gennesaret. Item 3 asks that "a Gospel says that Jesus went from one named place to another".
+- The rule says John's arrival at "the land where they were going" (6:21), on a boat bound for Capernaum (6:17), is one that "this note treats as the same arrival rather than a conflict". That is the harmonizing judgment the brief (§1.6) rules out, written in process words.
+- `travelMode: "sea"` can't start at Jerusalem. OpenBible's Gennesaret point is also about 2 km from the shore, so a line by sea can't reach it either.
+- The rule cites John 5:1 and Luke 9:10 without listing them.
+- What it needs: the note now treats "the other side of the sea" and "a deserted place" as general places (§4). On that reading, John's half ends at a general place and Matthew and Mark's crossing starts at one, so neither half meets item 3 and the episode would be left out. If instead the Sea of Galilee counts as the named place, it becomes two segments: John's Jerusalem → the Sea of Galilee (`unknown`), and Matthew and Mark's crossing to Gennesaret (`sea`), with John's Capernaum-bound crossing (6:16–21) judged as a conflict or not, in neutral words. If the segment is dropped, `gennesaret` goes too.
+
+**S2, the order: for the PO.** I missed this in round 1. The route note (and ADR-0038 update item 6) lists segments "within each period by each segment's first passage", and the note's §5 says that means canonical book order, then chapter and verse. The data doesn't follow that:
+- Phase A runs Matthew 3:13, Matthew 4:1, John 1:28 … John 4:43, Luke 4:14, Matthew 4:13. That puts John 1–4 between the temptation and the start of the Galilean ministry, which is the traditional harmony's order.
+- Phase B puts John 5:1, 6:1 and 7:1 and Luke 7:1 before Matthew 8:18.
+- Either re-sort, which renumbers the segment ids that M5-04 keys its lines to, or describe the order the list actually follows.
+
+**My round-2 corrections:**
+- Data: segment 09's `travelMode`; segment 30's Gospels; segment 24's `via`; the `yearNote` wording; the WHE URL.
+- Stop entries: `gennesaret`'s label, support and `todayName`; `bethphage`'s support and its six version sources.
+- The research note: its §9 line on `via`, and two re-check points in §11.
+
+**Checks (round 2):**
+- `npm run validate:data`: passes with 203 warnings, the same as before.
+- `npm test`: 297 of 297 pass.
+- `npm run test:app`: 159 of 159 pass.

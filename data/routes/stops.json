@@ -1013,12 +1013,18 @@
           ],
           "coordinateSource": "wikidata:Q2193088",
           "confidence": "medium",
-          "support": "The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
+          "support": "All six English versions compared spell the name 'Bethphage'. The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
           "sources": [
             "wikidata:Q2193088",
             "openbible:bethphage",
             "bib:isbe-bethphage",
-            "bib:custodia-bethphage"
+            "bib:custodia-bethphage",
+            "bib:niv-2011-biblegateway",
+            "bib:esv-2025-biblegateway",
+            "bib:nlt-2015-biblegateway",
+            "bib:kjv-1987-biblegateway",
+            "bib:nkjv-1982-biblegateway",
+            "bib:csb-2017-biblegateway"
           ]
         },
         {
@@ -1059,9 +1065,17 @@
         "openbible:bethphage",
         "bib:isbe-bethphage",
         "bib:custodia-bethphage",
-        "wikidata:Q246590"
+        "wikidata:Q246590",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-13"
     },
     {
       "id": "country-of-the-gadarenes",
@@ -1145,17 +1159,17 @@
     {
       "id": "gennesaret",
       "name": "Gennesaret",
-      "todayName": "El Ghuweir, on the northwest shore of the Sea of Galilee, Israel",
+      "todayName": "Near Ginosar, Israel",
       "candidates": [
         {
-          "label": "El Ghuweir (the plain between Magdala and Capernaum)",
+          "label": "El Ghuweir (the plain between Magdala and Khan Minyeh)",
           "coordinates": [
             35.507222,
             32.860556
           ],
           "coordinateSource": "openbible:gennesaret",
           "confidence": "high",
-          "support": "The International Standard Bible Encyclopedia identifies the land of Gennesaret as the fertile coastal plain the Gospels name at Matthew 14:34 and Mark 6:53, 'now known as el-Ghuweir', running along the shore between Magdala in the south and Khan Minyeh in the north; Wikidata's point for the modern kibbutz of Ginosar, which takes its name from Gennesaret, lies about 1.4 km away within this same plain.",
+          "support": "The International Standard Bible Encyclopedia identifies the land of Gennesaret that the Gospels name at Matthew 14:34 and Mark 6:53 as the fertile plain on the northwest shore of the Sea of Galilee, 'now known as el-Ghuweir', curving from el-Mejdel (Magdala) in the south to Khan Minyeh in the north. OpenBible.info's point for El Ghuweir lies on this plain, and Wikidata's point for the modern kibbutz of Ginosar, in Israel, lies about 2 km away on the same plain.",
           "sources": [
             "openbible:gennesaret",
             "wikidata:Q1525069",

@@ -1557,7 +1557,7 @@
       "title": "Jesus' journeys",
       "fromYear": 26,
       "toYear": 33,
-      "yearNote": "About AD 26-33. The International Standard Bible Encyclopedia (1915) dates the baptism to AD 26 and the death to AD 30, with a ministry of probably three years after the first Passover, from the Passovers that John's Gospel names. It also notes that counting Tiberius's fifteenth year (Luke 3:1) from the death of Augustus, a common way of reckoning reigns, would give AD 28-29 for the start, and that an early tradition dates the death to AD 29. World History Encyclopedia's own account states that all the Gospels place Jesus' ministry and death within Pontius Pilate's time as governor (AD 26-36), and that the commonly agreed date for the death falls between AD 30 and AD 33; this route's toYear widens to AD 33 to cover that range.",
+      "yearNote": "About AD 26-33. The International Standard Bible Encyclopedia (1915) dates the baptism to AD 26 and the death to AD 30, with a ministry of probably three years after the first Passover, from the Passovers that John's Gospel names. It also notes that counting Tiberius's fifteenth year (Luke 3:1) from the death of Augustus, a common way of reckoning reigns, would give AD 28-29 for the start, and that an early tradition dates the death to AD 29. World History Encyclopedia's own account states that all the Gospels place Jesus' ministry and death within Pontius Pilate's time as governor (AD 26-36), and that the commonly agreed date for the death falls between AD 30 and AD 33, so the route's years run to AD 33 to cover that range.",
       "structure": "standalone-segments",
       "note": "Lines show stage order and land or sea mode, not exact traveled paths. These segments are well attested but stand alone: they are not joined into one itinerary, and no single order of events across the Gospels is claimed. They are listed in five broad periods that every Gospel shares, from the baptism to the resurrection, and within each period by each segment's first passage; this is a way of listing them, not a claim about the order of events.",
       "sources": [
@@ -1960,7 +1960,7 @@
               "textWEB": "He came to Nazareth, where he had been brought up. He entered, as was his custom, into the synagogue on the Sabbath day, and stood up to read."
             }
           ],
-          "travelMode": "land",
+          "travelMode": "unknown",
           "attestation": {
             "gospels": [
               "Luke"
@@ -2817,16 +2817,6 @@
             "scripture:Mark 11:1",
             "scripture:Matthew 20:29",
             "scripture:Matthew 21:1"
-          ],
-          "via": [
-            {
-              "kind": "location",
-              "locationId": "bethany"
-            },
-            {
-              "kind": "location",
-              "locationId": "mount-of-olives"
-            }
           ]
         },
         {
@@ -3109,7 +3099,8 @@
           "attestation": {
             "gospels": [
               "Mark",
-              "Matthew"
+              "Matthew",
+              "Luke"
             ],
             "rule": "Mark narrates Jesus lodging at Bethany and returning to Jerusalem each day of the final week; Matthew's account of going out of the city to Bethany to camp, then returning to the city, matches. Luke separately states that every night during this period Jesus went out to spend the night on the Mount of Olives (21:37), which Bethany sits on the far slope of, and which does not conflict.",
             "sources": [
