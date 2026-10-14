@@ -388,4 +388,4 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   1. The PO pushes branches and opens PRs without asking, when the change can't be play-tested, such as docs, plans, schemas, research and data the app doesn't show yet.
   2. A change the human can play-test, anything that changes what the app shows or how it behaves, gets a local preview first: a mini checkpoint (ADR-0031) with the work served on localhost and opened in the human's browser. The PO pushes it only after the human's feedback.
   3. Merges, and checkpoint approvals, stay with the human. Deleting merged branches stays as in ADR-0023.
-- **Consequences:** Data and docs PRs flow without a round trip. App PRs such as M5-05's Routes tab wait at MC9 for the human's play-test.
+- **Consequences:** Docs, plans, schemas, research and data the app doesn't show yet flow without a round trip. Anything the human can play-test waits for their feedback on a local preview: app changes such as M5-05's Routes tab, at MC9, and data changes the live app already shows, such as new places, new images or new text in the panel.
