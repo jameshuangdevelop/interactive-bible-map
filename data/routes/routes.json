@@ -1781,7 +1781,8 @@
             "scripture:Luke 4:16",
             "scripture:Luke 4:28-31",
             "scripture:Matthew 4:13"
-          ]
+          ],
+          "lineId": "jesus-segment-03"
         },
         {
           "from": {
@@ -1819,7 +1820,8 @@
             "scripture:Luke 4:14",
             "scripture:Luke 4:16"
           ],
-          "id": "segment-04"
+          "id": "segment-04",
+          "lineId": "jesus-segment-04"
         },
         {
           "id": "segment-05",
@@ -1938,7 +1940,8 @@
           },
           "sources": [
             "scripture:John 2:13"
-          ]
+          ],
+          "lineId": "jesus-segment-07"
         },
         {
           "id": "segment-08",
@@ -1969,7 +1972,8 @@
           },
           "sources": [
             "scripture:John 3:22"
-          ]
+          ],
+          "lineId": "jesus-segment-08"
         },
         {
           "id": "segment-09",
@@ -2023,7 +2027,8 @@
             "scripture:John 4:3",
             "scripture:John 4:4",
             "scripture:John 4:5"
-          ]
+          ],
+          "lineId": "jesus-segment-09"
         },
         {
           "id": "segment-10",
@@ -2239,7 +2244,8 @@
           "sources": [
             "scripture:Mark 7:24",
             "scripture:Matthew 15:21"
-          ]
+          ],
+          "lineId": "jesus-segment-13"
         },
         {
           "id": "segment-14",
@@ -2292,7 +2298,8 @@
           "sources": [
             "scripture:Mark 7:31",
             "scripture:Matthew 15:29"
-          ]
+          ],
+          "lineId": "jesus-segment-14"
         },
         {
           "id": "segment-15",
@@ -2331,7 +2338,8 @@
           "sources": [
             "scripture:Mark 8:10",
             "scripture:Matthew 15:39"
-          ]
+          ],
+          "lineId": "jesus-segment-15"
         },
         {
           "id": "segment-16",
@@ -2511,7 +2519,8 @@
             "scripture:Matthew 17:1",
             "scripture:Matthew 17:22",
             "scripture:Matthew 17:24"
-          ]
+          ],
+          "lineId": "jesus-segment-18"
         },
         {
           "id": "segment-19",
@@ -2549,7 +2558,8 @@
           "sources": [
             "scripture:Luke 7:1",
             "scripture:Luke 7:11"
-          ]
+          ],
+          "lineId": "jesus-segment-19"
         },
         {
           "id": "segment-20",
@@ -2580,7 +2590,8 @@
           },
           "sources": [
             "scripture:John 5:1"
-          ]
+          ],
+          "lineId": "jesus-segment-20"
         },
         {
           "id": "segment-21",
@@ -2625,7 +2636,8 @@
             "scripture:John 7:1",
             "scripture:John 7:10",
             "scripture:John 7:14"
-          ]
+          ],
+          "lineId": "jesus-segment-21"
         },
         {
           "id": "segment-22",
@@ -2688,7 +2700,8 @@
             "scripture:Mark 10:46",
             "scripture:Matthew 19:1",
             "scripture:Matthew 20:29"
-          ]
+          ],
+          "lineId": "jesus-segment-22"
         },
         {
           "id": "segment-23",
@@ -2765,7 +2778,8 @@
             "scripture:Mark 11:1",
             "scripture:Matthew 20:29",
             "scripture:Matthew 21:1"
-          ]
+          ],
+          "lineId": "jesus-segment-23"
         },
         {
           "id": "segment-24",
@@ -2848,7 +2862,8 @@
               "kind": "location",
               "locationId": "mount-of-olives"
             }
-          ]
+          ],
+          "lineId": "jesus-segment-24"
         },
         {
           "id": "segment-25",
@@ -2968,7 +2983,8 @@
           },
           "sources": [
             "scripture:John 11:54"
-          ]
+          ],
+          "lineId": "jesus-segment-27"
         },
         {
           "id": "segment-28",
@@ -2999,7 +3015,8 @@
           },
           "sources": [
             "scripture:John 12:1"
-          ]
+          ],
+          "lineId": "jesus-segment-28"
         },
         {
           "id": "segment-29",
@@ -3067,7 +3084,8 @@
             "scripture:Mark 11:27",
             "scripture:Matthew 21:17-18",
             "scripture:Luke 21:37"
-          ]
+          ],
+          "lineId": "jesus-segment-29"
         },
         {
           "id": "segment-30",
@@ -3136,7 +3154,8 @@
             "scripture:Mark 14:32",
             "scripture:Matthew 26:30",
             "scripture:Matthew 26:36"
-          ]
+          ],
+          "lineId": "jesus-segment-30"
         },
         {
           "id": "segment-31",
@@ -3221,7 +3240,8 @@
           },
           "sources": [
             "scripture:Luke 24:50-51"
-          ]
+          ],
+          "lineId": "jesus-segment-32"
         }
       ]
     }

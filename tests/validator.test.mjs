@@ -55,6 +55,22 @@ const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
 const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
 const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
 const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
+const repositoryRoutesPath = path.join(testDirectory, "..", "data", "routes", "routes.json");
+const repositoryRouteLinesPath = path.join(
+  testDirectory,
+  "..",
+  "data",
+  "geo",
+  "routes-lines.geojson"
+);
+const repositoryRouteStopsPath = path.join(
+  testDirectory,
+  "..",
+  "data",
+  "routes",
+  "stops.json"
+);
+const repositoryLocationsDirectory = path.join(testDirectory, "..", "data", "locations");
 
 const locationSchemaPath = path.join(
   testDirectory,
@@ -441,6 +457,24 @@ function hasError(result, predicate) {
 
 function hasWarning(result, predicate) {
   return result.warnings.some(predicate);
+}
+
+function haversineKm(start, end) {
+  const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const dLat = toRadians(end[1] - start[1]);
+  const dLon = toRadians(end[0] - start[0]);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(start[1])) * Math.cos(toRadians(end[1])) * Math.sin(dLon / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+function polylineLengthKm(coordinates) {
+  let total = 0;
+  for (let index = 1; index < coordinates.length; index += 1) {
+    total += haversineKm(coordinates[index - 1], coordinates[index]);
+  }
+  return total;
 }
 
 test("empty data directories pass validation", async () => {
@@ -2917,6 +2951,93 @@ test("sea route detour over 1.25x is allowed with explicit provenance reason", a
   assert.equal(
     hasError(result, (error) => /shortest over-water path/u.test(error.message)),
     false
+  );
+});
+
+test("Caesarea to Sidon sea fallback avoids staircase detours", async () => {
+  const routes = JSON.parse(fs.readFileSync(repositoryRoutesPath, "utf8"));
+  const lines = JSON.parse(fs.readFileSync(repositoryRouteLinesPath, "utf8"));
+  const stage = routes.routes
+    .find((route) => route.id === "paul-rome")
+    ?.stages.find((routeStage) => routeStage.id === "stage-01");
+  assert.ok(stage?.lineId, "Expected paul-rome stage-01 to have a lineId");
+
+  const lineFeature = lines.features.find(
+    (feature) => feature?.properties?.lineId === stage.lineId
+  );
+  assert.ok(lineFeature, "Expected route-lines feature for paul-rome stage-01");
+
+  const changes = lineFeature.properties?.provenance?.changes ?? [];
+  assert.ok(
+    changes.some((change) => change?.kind === "shortest-water-fallback"),
+    "Expected paul-rome stage-01 to use shortest-over-water fallback"
+  );
+
+  const coordinates = lineFeature.geometry?.coordinates ?? [];
+  assert.ok(
+    coordinates.length >= 2,
+    "Expected paul-rome stage-01 to contain at least two coordinates"
+  );
+  const actualLengthKm = polylineLengthKm(coordinates);
+  const directLengthKm = haversineKm(coordinates[0], coordinates[coordinates.length - 1]);
+  assert.ok(
+    actualLengthKm / directLengthKm <= 1.25,
+    `Expected paul-rome stage-01 to stay within 1.25x direct distance (actual ${actualLengthKm.toFixed(1)} km vs ${directLengthKm.toFixed(1)} km)`
+  );
+});
+
+test("Myra to Fair Havens does not detour south of Crete when passing Cnidus and Salmone", async () => {
+  const routes = JSON.parse(fs.readFileSync(repositoryRoutesPath, "utf8"));
+  const lines = JSON.parse(fs.readFileSync(repositoryRouteLinesPath, "utf8"));
+  const stopRecords = JSON.parse(fs.readFileSync(repositoryRouteStopsPath, "utf8"));
+  const stopById = new Map(stopRecords.stops.map((stop) => [stop.id, stop]));
+
+  const locationById = new Map();
+  for (const fileName of fs.readdirSync(repositoryLocationsDirectory)) {
+    if (!fileName.endsWith(".json")) {
+      continue;
+    }
+    const record = JSON.parse(
+      fs.readFileSync(path.join(repositoryLocationsDirectory, fileName), "utf8")
+    );
+    locationById.set(record.id, record);
+  }
+
+  const resolveStopCoordinate = (stopRef) => {
+    if (stopRef.kind === "location") {
+      const location = locationById.get(stopRef.locationId);
+      const candidateIndex = Number.isInteger(stopRef.candidateIndex) ? stopRef.candidateIndex : 0;
+      return location?.candidates?.[candidateIndex]?.coordinates;
+    }
+    const stop = stopById.get(stopRef.stopId);
+    const candidateIndex = Number.isInteger(stopRef.candidateIndex) ? stopRef.candidateIndex : 0;
+    return stop?.candidates?.[candidateIndex]?.coordinates;
+  };
+
+  const stage = routes.routes
+    .find((route) => route.id === "paul-rome")
+    ?.stages.find((routeStage) => routeStage.id === "stage-03");
+  assert.ok(stage?.lineId, "Expected paul-rome stage-03 to have a lineId");
+
+  const lineFeature = lines.features.find(
+    (feature) => feature?.properties?.lineId === stage.lineId
+  );
+  assert.ok(lineFeature, "Expected route-lines feature for paul-rome stage-03");
+
+  const from = resolveStopCoordinate(stage.from);
+  const cnidus = resolveStopCoordinate(stage.via.find((via) => via.kind === "route-stop" && via.stopId === "cnidus"));
+  const salmone = resolveStopCoordinate(stage.via.find((via) => via.kind === "route-stop" && via.stopId === "salmone"));
+  const to = resolveStopCoordinate(stage.to);
+  assert.ok(from && cnidus && salmone && to, "Expected fixed waypoints for stage-03");
+
+  const shortestNamedPathKm =
+    haversineKm(from, cnidus) +
+    haversineKm(cnidus, salmone) +
+    haversineKm(salmone, to);
+  const actualLengthKm = polylineLengthKm(lineFeature.geometry?.coordinates ?? []);
+  assert.ok(
+    actualLengthKm / shortestNamedPathKm <= 1.25,
+    `Expected paul-rome stage-03 to stay within 1.25x the named-points path (actual ${actualLengthKm.toFixed(1)} km vs ${shortestNamedPathKm.toFixed(1)} km)`
   );
 });
 

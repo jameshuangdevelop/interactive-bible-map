@@ -4,6 +4,857 @@
     {
       "type": "Feature",
       "properties": {
+        "lineId": "jesus-segment-03",
+        "routeId": "jesus",
+        "stageId": "segment-03",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q430776",
+            "dare:22899",
+            "wikidata:Q59174",
+            "dare:33337"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q430776",
+                "wikidata:Q59174"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.29785,
+            32.702103
+          ],
+          [
+            35.575,
+            32.881111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-04",
+        "routeId": "jesus",
+        "stageId": "segment-04",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "openbible:galilee-1",
+            "wikidata:Q430776",
+            "dare:22899"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q430776"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.29785,
+            32.702103
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-07",
+        "routeId": "jesus",
+        "stageId": "segment-07",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q59174",
+            "dare:33337",
+            "wikidata:Q1218",
+            "dare:15896"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q59174",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.575,
+            32.881111
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-08",
+        "routeId": "jesus",
+        "stageId": "segment-08",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q1218",
+            "dare:15896",
+            "wikidata:Q104028",
+            "openbible:judea-1"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q104028"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.306389,
+            31.698889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-09",
+        "routeId": "jesus",
+        "stageId": "segment-09",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q104028",
+            "openbible:judea-1",
+            "wikidata:Q7951237",
+            "wikidata:Q7697383"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q104028",
+                "wikidata:Q7951237"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.306389,
+            31.698889
+          ],
+          [
+            35.281944,
+            32.213611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-13",
+        "routeId": "jesus",
+        "stageId": "segment-13",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "openbible:galilee-1",
+            "dare:21116",
+            "wikidata:Q82070"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q83241",
+                "dare:21116"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.209358,
+            33.268071
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-14",
+        "routeId": "jesus",
+        "stageId": "segment-14",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "dare:21116",
+            "wikidata:Q82070",
+            "wikidata:Q126982",
+            "openbible:sea-of-galilee"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "dare:21116",
+                "wikidata:Q126982"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.209358,
+            33.268071
+          ],
+          [
+            35.590033,
+            32.818906
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-15",
+        "routeId": "jesus",
+        "stageId": "segment-15",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "orbis:node-50014",
+            "naturalearth:1159152091"
+          ],
+          "changes": [
+            {
+              "kind": "coastal-connector",
+              "detail": "Sea of Galilee is 48.6 km inland; added straight connector from nearest coast point.",
+              "sources": [
+                "wikidata:Q126982",
+                "openbible:sea-of-galilee",
+                "naturalearth:1159152091"
+              ]
+            },
+            {
+              "kind": "coastal-connector",
+              "detail": "Magdala is 41.7 km inland; added straight connector to stage end.",
+              "sources": [
+                "dare:33357",
+                "wikidata:Q4880851",
+                "naturalearth:1159152091"
+              ]
+            },
+            {
+              "kind": "shortest-water-fallback",
+              "detail": "Used shortest-over-water fallback for 1 leg(s), constrained to avoid land.",
+              "sources": [
+                "naturalearth:1159152091"
+              ]
+            },
+            {
+              "kind": "sea-lane-length-rule",
+              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 1; legs using fallback because an explicit exception applied: 0).",
+              "sources": [
+                "orbis:mn425tz9757",
+                "naturalearth:1159152091"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.590033,
+            32.818906
+          ],
+          [
+            35.0796,
+            32.905829
+          ],
+          [
+            35.515763,
+            32.825077
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-18",
+        "routeId": "jesus",
+        "stageId": "segment-18",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q2484244",
+            "pleiades:678324",
+            "wikidata:Q59174",
+            "dare:33337"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q2484244",
+                "wikidata:Q59174"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.693333,
+            33.246111
+          ],
+          [
+            35.575,
+            32.881111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-19",
+        "routeId": "jesus",
+        "stageId": "segment-19",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q59174",
+            "dare:33337",
+            "wikidata:Q934904",
+            "openbible:nain"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q59174",
+                "wikidata:Q934904"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.575,
+            32.881111
+          ],
+          [
+            35.35,
+            32.633333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-20",
+        "routeId": "jesus",
+        "stageId": "segment-20",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "openbible:galilee-1",
+            "wikidata:Q1218",
+            "dare:15896"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-21",
+        "routeId": "jesus",
+        "stageId": "segment-21",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "openbible:galilee-1",
+            "wikidata:Q1218",
+            "dare:15896"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-22",
+        "routeId": "jesus",
+        "stageId": "segment-22",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "openbible:galilee-1",
+            "wikidata:Q2460244",
+            "openbible:jericho-2"
+          ],
+          "changes": [
+            {
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q2460244"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.436238,
+            31.851872
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-23",
+        "routeId": "jesus",
+        "stageId": "segment-23",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q2460244",
+            "openbible:jericho-2",
+            "wikidata:Q2193088",
+            "openbible:bethphage"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q2460244",
+                "wikidata:Q2193088"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.436238,
+            31.851872
+          ],
+          [
+            35.250778,
+            31.777222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-24",
+        "routeId": "jesus",
+        "stageId": "segment-24",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q2193088",
+            "openbible:bethphage",
+            "wikidata:Q1218",
+            "dare:15896"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q2193088",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.250778,
+            31.777222
+          ],
+          [
+            35.245686,
+            31.777946
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-27",
+        "routeId": "jesus",
+        "stageId": "segment-27",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q7818622",
+            "wikidata:Q2181579",
+            "pleiades:687896",
+            "wikidata:Q931667"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q7818622",
+                "pleiades:687896"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.255903,
+            31.771661
+          ],
+          [
+            35.299196,
+            31.954665
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-28",
+        "routeId": "jesus",
+        "stageId": "segment-28",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "pleiades:687896",
+            "wikidata:Q931667",
+            "wikidata:Q7818622",
+            "wikidata:Q2181579"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "pleiades:687896",
+                "wikidata:Q7818622"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.299196,
+            31.954665
+          ],
+          [
+            35.255903,
+            31.771661
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-29",
+        "routeId": "jesus",
+        "stageId": "segment-29",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q1218",
+            "dare:15896",
+            "wikidata:Q7818622",
+            "wikidata:Q2181579"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q7818622"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.255903,
+            31.771661
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-30",
+        "routeId": "jesus",
+        "stageId": "segment-30",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q1218",
+            "dare:15896",
+            "wikidata:Q205333",
+            "openbible:gethsemane"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q205333"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.239425,
+            31.779419
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-32",
+        "routeId": "jesus",
+        "stageId": "segment-32",
+        "provenance": {
+          "dataset": "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+          "version": "commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson | ORBIS:druid:mn425tz9757/orbis_nodes_0514.csv,druid:mn425tz9757/orbis_edges_0514.csv | NaturalEarth:geojson/ne_10m_land.geojson,geojson/ne_10m_coastline.geojson",
+          "upstreamFeatureIds": [
+            "wikidata:Q1218",
+            "dare:15896",
+            "wikidata:Q7818622",
+            "wikidata:Q2181579"
+          ],
+          "changes": [
+            {
+              "kind": "straight-land-fallback",
+              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q7818622"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.255903,
+            31.771661
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "lineId": "paul-1-stage-01",
         "routeId": "paul-1",
         "stageId": "stage-01",
@@ -166,7 +1017,7 @@
             },
             {
               "kind": "sea-lane-length-rule",
-              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 1; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 0; legs using fallback because an explicit exception applied: 0).",
+              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 1; legs using fallback because an explicit exception applied: 0).",
               "sources": [
                 "orbis:mn425tz9757",
                 "naturalearth:1159152091"
@@ -497,8 +1348,8 @@
           ],
           "changes": [
             {
-              "kind": "straight-land-fallback",
-              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
               "sources": [
                 "pleiades:609307",
                 "dare:21450"
@@ -610,12 +1461,8 @@
             36.881272
           ],
           [
-            30.601736,
-            36.838121
-          ],
-          [
-            30.503614,
-            36.087836
+            32.601938,
+            35.835559
           ],
           [
             35.948416,
@@ -645,8 +1492,8 @@
           ],
           "changes": [
             {
-              "kind": "straight-land-fallback",
-              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
               "sources": [
                 "wikidata:Q200441",
                 "wikidata:Q20717624"
@@ -727,8 +1574,8 @@
           ],
           "changes": [
             {
-              "kind": "straight-land-fallback",
-              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
               "sources": [
                 "pleiades:648699",
                 "dare:21154"
@@ -808,6 +1655,10 @@
           [
             26.139737,
             39.745492
+          ],
+          [
+            25.712325,
+            40.015492
           ],
           [
             25.562325,
@@ -1784,8 +2635,8 @@
           ],
           "changes": [
             {
-              "kind": "straight-land-fallback",
-              "detail": "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
+              "kind": "unknown-path",
+              "detail": "travelMode is unknown, so the stage uses a straight line between the named stops.",
               "sources": [
                 "wikidata:Q200441",
                 "pleiades:599612"
@@ -2141,14 +2992,6 @@
             37.785386
           ],
           [
-            27.203279,
-            37.785386
-          ],
-          [
-            27.189604,
-            37.706624
-          ],
-          [
             27.003279,
             37.659431
           ]
@@ -2193,7 +3036,7 @@
             },
             {
               "kind": "sea-lane-length-rule",
-              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 1; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 0; legs using fallback because an explicit exception applied: 0).",
+              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 1; legs using fallback because an explicit exception applied: 0).",
               "sources": [
                 "orbis:mn425tz9757",
                 "naturalearth:1159152091"
@@ -2524,14 +3367,6 @@
             33.262562
           ],
           [
-            34.869235,
-            33.262562
-          ],
-          [
-            34.869235,
-            32.921484
-          ],
-          [
             35.069235,
             32.921484
           ],
@@ -2674,12 +3509,8 @@
             32.501924
           ],
           [
-            34.690214,
-            32.501924
-          ],
-          [
-            34.690214,
-            33.563721
+            34.975156,
+            33.180929
           ],
           [
             35.365723,
@@ -2779,15 +3610,15 @@
             "orbis:edge-50606-50775-coastal",
             "orbis:edge-50593-50775-coastal",
             "orbis:edge-50582-50593-coastal",
-            "orbis:edge-50577-50582-coastal",
             "orbis:node-50606",
             "orbis:node-50775",
             "orbis:node-50593",
             "orbis:node-50582",
-            "orbis:node-50577",
+            "orbis:edge-50577-50582-coastal",
             "orbis:edge-50556-50577-coastal",
             "orbis:edge-50554-50556-coastal",
             "orbis:edge-50554-50558-coastal",
+            "orbis:node-50577",
             "orbis:node-50556",
             "orbis:node-50554",
             "orbis:node-50558"
@@ -2803,24 +3634,25 @@
               ]
             },
             {
-              "kind": "via-coast-pass",
-              "detail": "Sea stage passes Crete by nearest coastline point (11.5 km from recorded site).",
+              "kind": "region-via-coast-pass",
+              "detail": "Crete is a passed region, so the line does not route to a central point before Salmone; it follows the coast as required by the concrete passed/end stops.",
               "sources": [
                 "pleiades:589748",
                 "wikidata:Q34374",
-                "naturalearth:1159152091"
+                "pleiades:590037",
+                "openbible:salmone"
               ]
             },
             {
               "kind": "shortest-water-fallback",
-              "detail": "Used shortest-over-water fallback for 4 leg(s), constrained to avoid land.",
+              "detail": "Used shortest-over-water fallback for 3 leg(s), constrained to avoid land.",
               "sources": [
                 "naturalearth:1159152091"
               ]
             },
             {
               "kind": "sea-lane-length-rule",
-              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 1; legs using fallback because ORBIS crossed land: 3; legs using fallback because an explicit exception applied: 0).",
+              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 1; legs using fallback because ORBIS crossed land: 2; legs using fallback because an explicit exception applied: 0).",
               "sources": [
                 "orbis:mn425tz9757",
                 "naturalearth:1159152091"
@@ -2845,20 +3677,12 @@
             36.681904
           ],
           [
-            24.840831,
-            35.403998
-          ],
-          [
             26.3116,
             35.316
           ],
           [
-            26.5116,
-            35.316
-          ],
-          [
-            26.5116,
-            34.929694
+            26.305743,
+            34.875131
           ],
           [
             24.800306,
@@ -3059,21 +3883,20 @@
             "orbis:edge-50322-50762-coastal",
             "orbis:node-50326",
             "orbis:node-50762",
-            "orbis:node-50322"
+            "orbis:node-50322",
+            "naturalearth:1159152091"
           ],
           "changes": [
             {
-              "kind": "orbis-sea-lanes",
-              "detail": "Used ORBIS sea lanes for 1 leg(s) of this stage.",
+              "kind": "shortest-water-fallback",
+              "detail": "Used shortest-over-water fallback for 1 leg(s), constrained to avoid land.",
               "sources": [
-                "orbis:mn425tz9757",
-                "orbis:orbis_nodes_0514",
-                "orbis:orbis_edges_0514"
+                "naturalearth:1159152091"
               ]
             },
             {
               "kind": "sea-lane-length-rule",
-              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 1; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 0; legs using fallback because an explicit exception applied: 0).",
+              "detail": "Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ 25% longer than shortest over-water fallback (legs using ORBIS: 0; legs using fallback because ORBIS exceeded the length limit: 0; legs using fallback because no ORBIS path was available: 0; legs using fallback because ORBIS crossed land: 1; legs using fallback because an explicit exception applied: 0).",
               "sources": [
                 "orbis:mn425tz9757",
                 "naturalearth:1159152091"
@@ -3090,12 +3913,12 @@
             38.1088
           ],
           [
-            15.644,
-            38.109
+            15.315812,
+            39.103077
           ],
           [
-            14.122,
-            40.824
+            14.79783,
+            40.026688
           ],
           [
             14.120642,

@@ -62,7 +62,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M5-01 | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Merged | #61 |
 | M5-02 | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Merged | #62 |
 | M5-03 | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Verified (`docs/verification/M5-jesus-journeys.md`, final check in §16); three small fixes after: the PO reversed the Bethphage title ruling back to "Bethphage" under ADR-0026's main rule (the WEB's "Bethsphage" is now described as the Majority Text's reading in the stop's own support text, not the title); Paul's four region-only stages (`paul-1` stage-12, `paul-2` stage-01 and stage-03, `paul-3` stage-01) are now `travelMode: "unknown"`, matching ADR-0038 item 1; `paul-rome` stage-02 stays `sea`. 32 Jesus segments, 12 without a line. `validate:data` and `test` pass | |
-| M5-04 | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | In progress: 51 lines for Paul's routes; next, smoother sea paths and Jesus' lines | |
+| M5-04 | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | In progress: rebased onto final M5-03 data; 71 lines regenerated (Paul 51 + Jesus 20), sea fallback smoothing shipped, passed-island handling fixed (Crete loop removed), new sea-detour regressions added, full required checks pass | |
 | M5-05 | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | In progress: the tab on test data, first-phase fixes; real data and MC9 next | |
 
 ## Open questions
