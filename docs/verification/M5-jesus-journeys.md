@@ -257,3 +257,19 @@ I checked `git diff bacbc11..HEAD`: the Research Lead's R1–R7 fixes, the PO's 
 - `npm run validate:data`: passes with 203 warnings, the same as before.
 - `npm test`: 297 of 297 pass.
 - `npm run test:app`: 159 of 159 pass.
+
+## 16. Final check of `6ced671` (2026-10-13)
+I checked `git diff d1d7843..6ced671`, the Research Lead's second round after the PO's rulings on S1 and S2. **Everything passes.** The route has 32 segments, 12 of them without a line, and all 101 passages match the WEB.
+
+| Check | Result |
+|---|---|
+| S1, the feeding and the crossing | Pass. The merged segment and both original halves are left out. The §4 reason matches the WEB: Matthew 14:13 and Mark 6:31–32 give only "a deserted place"; John 6:1 ends at "the other side of the sea of Galilee"; and the crossing lands at Gennesaret in Matthew 14:34 and Mark 6:53 but heads for Capernaum in John 6:17, 21 and 24. That is a difference between the accounts, which item 3 rules out. |
+| No references to `gennesaret` | Pass. The stop entry, `bib:isbe-gennesaret` and the segment are gone, and nothing in `data/`, `scripts/`, `schema/`, `app/src` or `tests/` refers to them. The remaining "Gennesaret" matches are unrelated: the Sea of Galilee record's existing name "Lake of Gennesaret", and the note's history. |
+| S2, the order | Pass. Within each period, segments sort by their first passage in canonical book order, then chapter and verse: A is 01–10 (Matthew 3:13 … John 4:43), B is 11–21 (Matthew 8:18 … John 7:1), C is 22–28, D is 29–30 and E is 31–32. Segments 17 and 18 tie on Matthew 16:13, because 18 cites it as the context that names its start. The rule allows either order, and the list keeps the text's own sequence. |
+| Ids and the note's tables | Pass after fix. `segment-01` to `segment-32` are sequential, and the 32 rows of the note's §3 tables match them in order, with the same ends and passages. One cell was out of date: the "Caesarea Philippi → Capernaum" row (segment 18) lacked the four context verses its own Notes cite (Mark 8:27, 9:2; Matthew 16:13, 17:1). I synced it. |
+| Earlier fixes kept | Pass. Segment 04 (Galilee → Nazareth) is `unknown`, segment 29 lists Luke, segment 23 has no `via`, and segment 24 keeps the Mount of Olives as its `via`. The `yearNote`, the WHE URL, `Bethsphage` (`verified`) and the 12 reasons for no line are unchanged. Gospels match the books cited in all 32 segments. |
+| A stray change | The second round re-wrapped M5-02's `isbe-lasea` authors onto several lines again, with no value change. I restored it, so the bibliography's only change is the removed entry. |
+
+The ADR-0026 wording ("So far only Magdala is affected") is still listed in `docs/PROGRESS.md` as the PO's open item. It isn't a data issue.
+
+**Checks:** `npm run validate:data` passes with 203 warnings, the same as before; `npm test` passes 297 of 297.
