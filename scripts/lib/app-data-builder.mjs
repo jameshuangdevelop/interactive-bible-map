@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 import zlib from "node:zlib";
 
 import { buildAncientAppData } from "./ancient-app-data-builder.mjs";
+import { buildRoutesAppData } from "./routes-app-data-builder.mjs";
 import { validateData } from "./validator.mjs";
+import { loadWebVerseIndex } from "./web-text.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
@@ -14,6 +16,13 @@ const DEFAULT_MEDIA_DIRECTORY = path.join(repositoryRoot, "data", "media");
 const DEFAULT_BIBLIOGRAPHY_PATH = path.join(repositoryRoot, "data", "bibliography.json");
 const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "generated");
 const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 300_000;
+const DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES = 100_000;
+const DEFAULT_ROUTES_FIXTURE_DIRECTORY = path.join(
+  repositoryRoot,
+  "tests",
+  "fixtures",
+  "routes"
+);
 
 async function listJsonFiles(directoryPath) {
   const entries = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -144,6 +153,21 @@ export async function buildAppData(options = {}) {
     ? path.resolve(options.ancientSourceDirectory)
     : null;
   const ancientDataRoot = ancientSourceDirectory ?? dataRoot;
+  const routesPath = path.resolve(
+    options.routesPath ?? path.join(dataRoot, "routes", "routes.json")
+  );
+  const routeStopsPath = path.resolve(
+    options.routeStopsPath ?? path.join(dataRoot, "routes", "stops.json")
+  );
+  const routeLinesPath = path.resolve(
+    options.routeLinesPath ?? path.join(dataRoot, "geo", "routes-lines.geojson")
+  );
+  const routesFixtureDirectory = path.resolve(
+    options.routesFixtureDirectory ?? DEFAULT_ROUTES_FIXTURE_DIRECTORY
+  );
+  const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
+  const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
+  const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
   const ancientAreasPath = path.resolve(
     options.ancientAreasPath ?? path.join(ancientDataRoot, "geo", "ancient-areas.geojson")
   );
@@ -165,11 +189,16 @@ export async function buildAppData(options = {}) {
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
   const maxAncientLayerGzipBytes =
     options.maxAncientLayerGzipBytes ?? DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES;
+  const maxRoutesLayerGzipBytes =
+    options.maxRoutesLayerGzipBytes ?? DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES;
 
   const validationResult = await validateData({
     locationsDirectory,
     mediaDirectory,
     bibliographyPath,
+    routesPath,
+    routeStopsPath,
+    routeLinesPath,
     timelinePath: resolvedTimelinePath,
     ancientAreasPath,
     ancientRoadsPath,
@@ -181,7 +210,8 @@ export async function buildAppData(options = {}) {
     requireEmpireRoot: options.requireEmpireRoot,
     requireModernCountries: options.requireModernCountries,
     requireAncientShapes: options.requireAncientShapes,
-    requireDerivedPoliticalHistory: options.requireDerivedPoliticalHistory
+    requireDerivedPoliticalHistory: options.requireDerivedPoliticalHistory,
+    requireRouteLines: options.requireRouteLines
   });
 
   if (validationResult.errors.length > 0) {
@@ -281,6 +311,80 @@ export async function buildAppData(options = {}) {
     });
   }
 
+  const routesFilesExist = await Promise.all([
+    pathExists(routesPath),
+    pathExists(routeStopsPath),
+    pathExists(routeLinesPath)
+  ]);
+  const routesBuild = {
+    generated: false,
+    skippedReason:
+      "Skipped routes generated files because route source files are missing.",
+    gzipBytes: 0,
+    maxGzipBytes: maxRoutesLayerGzipBytes,
+    routeCount: 0,
+    stageCount: 0,
+    stopCount: 0,
+    fixtureGenerated: false
+  };
+
+  if (routesFilesExist.every(Boolean)) {
+    const [routesData, routeStopsData, routeLinesData, webVerseIndex] = await Promise.all([
+      readJsonFile(routesPath),
+      readJsonFile(routeStopsPath),
+      readJsonFile(routeLinesPath),
+      loadWebVerseIndex(options.webVplPath)
+    ]);
+    const routesBuildResult = await buildRoutesAppData({
+      routesData,
+      routeStopsData,
+      routeLinesData,
+      webVerseIndex,
+      outputDirectory,
+      outputPrefix: "routes"
+    });
+    const routesLayerGzipBytes = routesBuildResult.writtenFiles.reduce(
+      (sum, file) => sum + file.gzipBytes,
+      0
+    );
+    if (routesLayerGzipBytes > maxRoutesLayerGzipBytes) {
+      throw new Error(
+        `Routes generated files exceed ${maxRoutesLayerGzipBytes} bytes gzip (${routesLayerGzipBytes} bytes).`
+      );
+    }
+    outputFiles.push(...routesBuildResult.writtenFiles);
+    routesBuild.generated = true;
+    routesBuild.skippedReason = null;
+    routesBuild.gzipBytes = routesLayerGzipBytes;
+    routesBuild.routeCount = routesBuildResult.routeCount;
+    routesBuild.stageCount = routesBuildResult.stageCount;
+    routesBuild.stopCount = routesBuildResult.stopCount;
+  }
+
+  const fixtureFilesExist = await Promise.all([
+    pathExists(routesFixturePath),
+    pathExists(routeStopsFixturePath),
+    pathExists(routeLinesFixturePath)
+  ]);
+  if (fixtureFilesExist.every(Boolean)) {
+    const [routesData, routeStopsData, routeLinesData, webVerseIndex] = await Promise.all([
+      readJsonFile(routesFixturePath),
+      readJsonFile(routeStopsFixturePath),
+      readJsonFile(routeLinesFixturePath),
+      loadWebVerseIndex(options.webVplPath)
+    ]);
+    const fixtureBuildResult = await buildRoutesAppData({
+      routesData,
+      routeStopsData,
+      routeLinesData,
+      webVerseIndex,
+      outputDirectory,
+      outputPrefix: "routes.fixture"
+    });
+    outputFiles.push(...fixtureBuildResult.writtenFiles);
+    routesBuild.fixtureGenerated = true;
+  }
+
   const [timelineExists, areasExists, roadsExists, coastlineExists] = await Promise.all([
     pathExists(resolvedTimelinePath),
     pathExists(ancientAreasPath),
@@ -347,6 +451,7 @@ export async function buildAppData(options = {}) {
     locationCount: locationRecords.length,
     indexBytes: Buffer.byteLength(indexPayload, "utf8"),
     outputFiles,
+    routesBuild,
     ancientBuild
   };
 }

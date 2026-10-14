@@ -3,10 +3,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { removeRoutesFixtureFilesFromDist } from "./lib/export-web.mjs";
+
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
 const aiMediaSourceDirectory = path.join(repositoryRoot, "media", "ai");
 const aiMediaDistDirectory = path.join(repositoryRoot, "app", "dist", "media", "ai");
+const generatedDistDirectory = path.join(repositoryRoot, "app", "dist", "generated");
 
 function runCommand(command, args) {
   return new Promise((resolve, reject) => {
@@ -82,6 +85,12 @@ async function run() {
   await runCommand(npmCommand, ["run", "export:web", "--workspace", "interactive-bible-map-app"]);
 
   const copyResult = await copyAiMediaIntoDist();
+  const removedFixtureFiles = await removeRoutesFixtureFilesFromDist(generatedDistDirectory);
+  if (removedFixtureFiles.length > 0) {
+    console.log(
+      `Removed ${removedFixtureFiles.length} routes fixture file(s) from export: ${removedFixtureFiles.join(", ")}`
+    );
+  }
   if (!copyResult.sourceDirectoryExists) {
     console.log("Skipped AI media copy: media/ai/ does not exist.");
     return;

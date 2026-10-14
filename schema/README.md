@@ -1,6 +1,6 @@
 # Data schema guide (M2-01)
 
-This folder defines the JSON Schema rules and data-validation behavior for `data/locations/`, `data/media/`, and `data/bibliography.json`.
+This folder defines the JSON Schema rules and data-validation behavior for places, media, bibliography, timeline/ancient layers, and routes.
 
 All example values below are **illustrative only** (not verified historical claims).
 
@@ -9,6 +9,10 @@ All example values below are **illustrative only** (not verified historical clai
 - `media.schema.json`: one media record per `data/media/<location-id>.json`
 - `source-id.schema.json`: allowed source-ID prefixes and patterns (including `bib:`)
 - `bibliography.schema.json`: structure for `data/bibliography.json`
+- `timeline.schema.json`: canonical timeline facts for M4 (`data/timeline.json`)
+- `routes.schema.json`: route metadata + ordered stages for M5 (`data/routes/routes.json`)
+- `route-stops.schema.json`: shared route-stop entries for M5 (`data/routes/stops.json`)
+- `route-lines.schema.json`: route-stage geometry + provenance (`data/geo/routes-lines.geojson`)
 - `scripts/fill-scripture-text.mjs`: fills `scripture[].textWEB` from the WEB source text
 - `scripts/fill-image-sizes.mjs`: fills or corrects Commons `width`/`height` fields from the Commons API
 - `scripts/validate-data.mjs`: schema + cross-file + scripture + checksum checks used by CI
@@ -109,7 +113,7 @@ Generated app payloads:
 - `ancient.roads.geojson` keeps only `roadId`, `major`, `known` and `timeperiod` in properties; provenance stays in `data/geo/`.
 - The per-stop `romanEmpireEdge` is the line between drawn Roman-side and drawn non-Roman areas in that stop; it is `null` while no area outside the empire is drawn (ADR-0037 rule 5), and the static `ancient.empire-edge.geojson` shows the empire's edge instead.
 - `ancient.roads.geojson` is simplified and rounded during `build:data` for transfer size, and the builder adds straight join segments where one road end sits more than 0.2 km and at most 4 km from another road so sheet-edge digitising breaks draw as continuous roads; `data/geo/ancient-roads.geojson` remains the full-detail source and is not edited.
-- Full shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
+- Full ancient shapes keep 5 decimals (about 1 m); the zoom<=10 shapes, holder borders, per-stop edge and static edge use 4 (about 11 m), well below their simplification.
 - Everything the ancient layer loads (the `ancient.*` files) must stay within 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037's update of 2026-10-08).
 - Stop-area assignments carry each period's optional `note`.
 - Stop-area assignments include `heldFromYear` and `heldToYear`: the unbroken half-open holder span for that area that contains the stop's year. They also include `heldFromKnown`, which is `false` when that span starts at the timeline range's `fromYear` and there is no earlier period in that area's data.
@@ -131,6 +135,92 @@ GIS terms used here:
 - **Polylabel** finds a point deep inside a polygon for stable labels, even on irregular shapes: <https://github.com/mapbox/polylabel>.
 - **Douglas–Peucker simplification** drops vertices that lie within a set distance of the simplified line, so no border moves further than that distance: <https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm>.
 - A **union** (or dissolve) merges polygons into one shape and removes the borders between them; the empire edge is where the union of all areas meets land beyond the empire: <https://mapshaper.org/docs/reference.html#-dissolve>.
+
+### Routes (M5)
+- Canonical route facts live in:
+  - `data/routes/routes.json` (route metadata + stages)
+  - `data/routes/stops.json` (shared stop entries for places without full location records yet)
+  - `data/geo/routes-lines.geojson` (geometry + provenance only; licensed per source, as confirmed in `docs/LICENSES.md`, ADR-0038 item 5; no CC BY-SA facts)
+- A route records:
+  - `id`, `title`, approximate `fromYear` and `toYear` (`yearNote` where sources differ),
+  - `structure`: `connected` (Paul-style sequence) or `standalone-segments` (Jesus segments),
+  - short `note`, `sources`, and ordered `stages[]`.
+- Stage stop references use either:
+  - `{ "kind": "location", "locationId": "...", "candidateIndex": 0 }`, or
+  - `{ "kind": "route-stop", "stopId": "...", "candidateIndex": 0 }`.
+- Stages include `from`, `to`, optional ordered `via[]` (passed or sailed-by places), `scripture[]` (`ref`, `book`, `textWEB`), `travelMode` (`land`, `sea`, `unknown`), optional `namedRegions[]`, optional Jesus-segment `attestation`, and exactly one of `lineId` or `noLineReason`.
+- Stop entries include an English `name` (ADR-0026), optional `todayName`, `candidates[]` in the same coordinate/citation shape as place candidates (`[lon, lat]`, confidence, coordinate source, sources), naming `scripture[]`, top-level `sources`, and `status` (`draft` or `verified`).
+- Validation adds route checks:
+  - each referenced stop exists (location record or route-stop entry);
+  - route-stop IDs cannot duplicate location IDs;
+  - passage refs must parse in one-chapter format and `textWEB` must match WEB;
+  - every route-stop candidate has at least two sources;
+  - every `standalone-segments` stage has attestation;
+  - every `lineId` points to matching geometry by route/stage key.
+- `REQUIRE_ROUTE_LINES` can enforce that every stage has either `lineId` or `noLineReason`; default is `false` until M5-04 lands real linework.
+- `build:data` writes lazy Routes-tab payloads:
+  - `app/public/generated/routes.routes.json`
+  - `app/public/generated/routes.stages.json`
+  - `app/public/generated/routes.stops.json`
+  - `app/public/generated/routes.lines.geojson`
+  and fails if their combined gzip size is over **100,000 bytes** (ADR-0038 item 5).
+- `build:data` also writes `routes.fixture.*` payloads from `tests/fixtures/routes/` so M5-05 can build before verified route research lands. `export:web` removes those fixture files from `app/dist/generated/`, so they never ship.
+
+Complete example:
+
+```json
+{
+  "version": 1,
+  "routes": [
+    {
+      "id": "paul-1",
+      "title": "Paul's first journey",
+      "fromYear": 46,
+      "toYear": 48,
+      "yearNote": "About AD 46-48 in cited chronologies.",
+      "structure": "connected",
+      "note": "Lines show stage order and land/sea mode, not exact traveled paths.",
+      "sources": ["scripture:Acts 13:4-5", "bib:pleiades-place-resource"],
+      "stages": [
+        {
+          "id": "stage-01",
+          "from": { "kind": "location", "locationId": "antioch-syria", "candidateIndex": 0 },
+          "to": { "kind": "route-stop", "stopId": "seleucia" },
+          "scripture": [{ "ref": "Acts 13:4-5", "book": "Acts", "textWEB": "..." }],
+          "travelMode": "land",
+          "lineId": "paul-1-stage-01",
+          "sources": ["scripture:Acts 13:4-5"]
+        }
+      ]
+    },
+    {
+      "id": "jesus",
+      "title": "Jesus' journeys",
+      "fromYear": 28,
+      "toYear": 30,
+      "structure": "standalone-segments",
+      "note": "Standalone, well-attested segments only.",
+      "sources": ["scripture:Matthew 4:13", "bib:pleiades-place-resource"],
+      "stages": [
+        {
+          "id": "segment-01",
+          "from": { "kind": "location", "locationId": "nazareth", "candidateIndex": 0 },
+          "to": { "kind": "location", "locationId": "capernaum", "candidateIndex": 0 },
+          "scripture": [{ "ref": "Matthew 4:13", "book": "Matthew", "textWEB": "..." }],
+          "travelMode": "land",
+          "lineId": "jesus-segment-01",
+          "attestation": {
+            "gospels": ["Matthew"],
+            "rule": "Named-place movement in the text.",
+            "sources": ["scripture:Matthew 4:13"]
+          },
+          "sources": ["scripture:Matthew 4:13"]
+        }
+      ]
+    }
+  ]
+}
+```
 
 ### Zoom tiers
 - `mediterranean`: broad world context.
