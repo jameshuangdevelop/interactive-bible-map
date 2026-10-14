@@ -8,7 +8,7 @@ export const ABOUT_THIS_MAP_TEXT =
   "Interactive Bible Map shows the places of the New Testament on a map of the ancient world, with their English Bible names, candidate sites where the location is uncertain, and the passages that mention them (World English Bible).";
 
 export const DATA_LICENSE_TEXT =
-  "Data license: all non-reference data and content are CC BY-SA 4.0, except the ancient layer's borders, roads and coastline, which are derived from AWMC Geodata and OpenStreetMap and are ODbL 1.0.";
+  "Data license: all non-reference data and content are CC BY-SA 4.0, except two sets of map geometry, which are ODbL 1.0: the ancient layer's borders, roads and coastline, derived from AWMC Geodata and OpenStreetMap, and the routes' lines, derived from AWMC Geodata's roads.";
 
 export const LICENSE_DETAILS_URL =
   "https://github.com/jameshuangdevelop/interactive-bible-map/blob/main/docs/LICENSES.md";
@@ -54,8 +54,9 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     url: "http://imperium.ahlfeldt.se/"
   },
   {
-    name: "ORBIS (Stanford) — node/edge dataset",
-    url: "https://purl.stanford.edu/mn425tz9757"
+    name: "ORBIS (v2) Network Edge and Node Tables (Stanford)",
+    url: "https://purl.stanford.edu/mn425tz9757",
+    note: "Route data derived from ORBIS (v2) Network Edge and Node Tables (Meeks, Scheidel, Weiland and Arcenas, Stanford Digital Repository, 2014), CC BY 3.0."
   },
   {
     name: "AWMC Geodata",
