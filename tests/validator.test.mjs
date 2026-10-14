@@ -2818,6 +2818,108 @@ test("route lineId must match geometry lineId for the same route/stage", async (
   );
 });
 
+test("route lines must start and end at the stage stop coordinates", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates[0] = [35.5752, 32.881111];
+  });
+  assert.equal(
+    hasError(result, (error) => /lines must end exactly at their stops/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject [0, 0] vertices", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates.splice(1, 0, [0, 0]);
+  });
+  assert.equal(
+    hasError(result, (error) => /forbidden \[0, 0\]/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject vertices outside project bounds", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates.splice(1, 0, [90, 10]);
+  });
+  assert.equal(
+    hasError(result, (error) => /outside project bounds/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject unrealistic jumps between consecutive vertices", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates.splice(1, 0, [-10, -5]);
+  });
+  assert.equal(
+    hasError(result, (error) => /vertex jump/u.test(error.message)),
+    true
+  );
+});
+
+test("sea route lines reject any segment that crosses land", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    // Force a long segment through fixture land-mask polygons near [0..4].
+    lines.features[1].geometry.coordinates = [
+      [0.2, 0.2],
+      [2.8, 0.2],
+      [3.8, 0.2]
+    ];
+  }, { ancientAreasPath: ancientAreasFixturePath });
+  assert.equal(
+    hasError(result, (error) => /Sea route line .*crossing land/u.test(error.message)),
+    true
+  );
+});
+
+test("sea route lines reject detours over 1.25x shortest water path without explicit reason", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[1].geometry.coordinates = [
+      [35.968, 36.119],
+      [28, 36],
+      [20, 36],
+      [12, 33],
+      [20, 30],
+      [28, 30],
+      [35.4, 32.9]
+    ];
+  }, {
+    ancientAreasPath: ancientAreasFixturePath,
+    ancientCoastlinePath: ancientCoastlineFixturePath
+  });
+  assert.equal(
+    hasError(result, (error) => /shortest over-water path/u.test(error.message)),
+    true
+  );
+});
+
+test("sea route detour over 1.25x is allowed with explicit provenance reason", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[1].geometry.coordinates = [
+      [35.968, 36.119],
+      [28, 36],
+      [20, 36],
+      [12, 33],
+      [20, 30],
+      [28, 30],
+      [35.4, 32.9]
+    ];
+    lines.features[1].properties.provenance.changes.push({
+      kind: "explicit-sea-detour-reason",
+      detail: "Fixture explicit reason for a storm-driven drift path.",
+      sources: ["bib:existing-bib-source"]
+    });
+  }, {
+    ancientAreasPath: ancientAreasFixturePath,
+    ancientCoastlinePath: ancientCoastlineFixturePath
+  });
+  assert.equal(
+    hasError(result, (error) => /shortest over-water path/u.test(error.message)),
+    false
+  );
+});
+
 test("derived political-history consistency check is switchable", async () => {
   const relaxed = await runWithTemporaryCase(
     ({ galileeData }) => {

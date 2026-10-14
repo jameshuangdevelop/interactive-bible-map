@@ -39,7 +39,8 @@
           "travelMode": "unknown",
           "sources": [
             "scripture:Acts 13:4"
-          ]
+          ],
+          "lineId": "paul-1-stage-01"
         },
         {
           "id": "stage-02",
@@ -67,7 +68,8 @@
           "sources": [
             "scripture:Acts 13:4",
             "scripture:Acts 13:5"
-          ]
+          ],
+          "lineId": "paul-1-stage-02"
         },
         {
           "id": "stage-03",
@@ -89,7 +91,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 13:6"
-          ]
+          ],
+          "lineId": "paul-1-stage-03"
         },
         {
           "id": "stage-04",
@@ -111,7 +114,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 13:13"
-          ]
+          ],
+          "lineId": "paul-1-stage-04"
         },
         {
           "id": "stage-05",
@@ -133,7 +137,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 13:14"
-          ]
+          ],
+          "lineId": "paul-1-stage-05"
         },
         {
           "id": "stage-06",
@@ -155,7 +160,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 13:51"
-          ]
+          ],
+          "lineId": "paul-1-stage-06"
         },
         {
           "id": "stage-07",
@@ -177,7 +183,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 14:6"
-          ]
+          ],
+          "lineId": "paul-1-stage-07"
         },
         {
           "id": "stage-08",
@@ -206,7 +213,8 @@
           "sources": [
             "scripture:Acts 14:6",
             "scripture:Acts 14:20"
-          ]
+          ],
+          "lineId": "paul-1-stage-08"
         },
         {
           "id": "stage-09",
@@ -229,7 +237,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 14:21"
-          ]
+          ],
+          "lineId": "paul-1-stage-09"
         },
         {
           "id": "stage-10",
@@ -251,7 +260,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 14:21"
-          ]
+          ],
+          "lineId": "paul-1-stage-10"
         },
         {
           "id": "stage-11",
@@ -273,7 +283,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 14:21"
-          ]
+          ],
+          "lineId": "paul-1-stage-11"
         },
         {
           "id": "stage-12",
@@ -317,7 +328,8 @@
           "sources": [
             "scripture:Acts 14:24",
             "scripture:Acts 14:25"
-          ]
+          ],
+          "lineId": "paul-1-stage-12"
         },
         {
           "id": "stage-13",
@@ -339,7 +351,8 @@
           "travelMode": "unknown",
           "sources": [
             "scripture:Acts 14:25"
-          ]
+          ],
+          "lineId": "paul-1-stage-13"
         },
         {
           "id": "stage-14",
@@ -361,7 +374,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 14:26"
-          ]
+          ],
+          "lineId": "paul-1-stage-14"
         }
       ]
     },
@@ -425,7 +439,8 @@
           "sources": [
             "scripture:Acts 15:41",
             "scripture:Acts 16:1"
-          ]
+          ],
+          "lineId": "paul-2-stage-01"
         },
         {
           "id": "stage-02",
@@ -448,7 +463,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 16:1"
-          ]
+          ],
+          "lineId": "paul-2-stage-02"
         },
         {
           "id": "stage-03",
@@ -506,7 +522,8 @@
             "scripture:Acts 16:6",
             "scripture:Acts 16:7",
             "scripture:Acts 16:8"
-          ]
+          ],
+          "lineId": "paul-2-stage-03"
         },
         {
           "id": "stage-04",
@@ -528,7 +545,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 16:11"
-          ]
+          ],
+          "lineId": "paul-2-stage-04"
         },
         {
           "id": "stage-05",
@@ -550,7 +568,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 16:11"
-          ]
+          ],
+          "lineId": "paul-2-stage-05"
         },
         {
           "id": "stage-06",
@@ -572,7 +591,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 16:12"
-          ]
+          ],
+          "lineId": "paul-2-stage-06"
         },
         {
           "id": "stage-07",
@@ -604,7 +624,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 17:1"
-          ]
+          ],
+          "lineId": "paul-2-stage-07"
         },
         {
           "id": "stage-08",
@@ -626,7 +647,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 17:10"
-          ]
+          ],
+          "lineId": "paul-2-stage-08"
         },
         {
           "id": "stage-09",
@@ -654,7 +676,8 @@
           "sources": [
             "scripture:Acts 17:14",
             "scripture:Acts 17:15"
-          ]
+          ],
+          "lineId": "paul-2-stage-09"
         },
         {
           "id": "stage-10",
@@ -676,7 +699,8 @@
           "travelMode": "unknown",
           "sources": [
             "scripture:Acts 18:1"
-          ]
+          ],
+          "lineId": "paul-2-stage-10"
         },
         {
           "id": "stage-11",
@@ -698,7 +722,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 18:18"
-          ]
+          ],
+          "lineId": "paul-2-stage-11"
         },
         {
           "id": "stage-12",
@@ -726,7 +751,8 @@
           "sources": [
             "scripture:Acts 18:18",
             "scripture:Acts 18:19"
-          ]
+          ],
+          "lineId": "paul-2-stage-12"
         },
         {
           "id": "stage-13",
@@ -754,7 +780,8 @@
           "sources": [
             "scripture:Acts 18:21",
             "scripture:Acts 18:22"
-          ]
+          ],
+          "lineId": "paul-2-stage-13"
         },
         {
           "id": "stage-14",
@@ -777,7 +804,8 @@
           "sources": [
             "scripture:Acts 18:22",
             "bib:isbe-paul-the-apostle-5"
-          ]
+          ],
+          "lineId": "paul-2-stage-14"
         }
       ]
     },
@@ -843,7 +871,8 @@
           "sources": [
             "scripture:Acts 18:23",
             "scripture:Acts 19:1"
-          ]
+          ],
+          "lineId": "paul-3-stage-01"
         },
         {
           "id": "stage-02",
@@ -917,7 +946,8 @@
             "scripture:Acts 20:3",
             "scripture:Acts 20:6",
             "bib:isbe-paul-the-apostle-3"
-          ]
+          ],
+          "lineId": "paul-3-stage-02"
         },
         {
           "id": "stage-03",
@@ -939,7 +969,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 20:6"
-          ]
+          ],
+          "lineId": "paul-3-stage-03"
         },
         {
           "id": "stage-04",
@@ -961,7 +992,8 @@
           "travelMode": "land",
           "sources": [
             "scripture:Acts 20:13"
-          ]
+          ],
+          "lineId": "paul-3-stage-04"
         },
         {
           "id": "stage-05",
@@ -983,7 +1015,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 20:14"
-          ]
+          ],
+          "lineId": "paul-3-stage-05"
         },
         {
           "id": "stage-06",
@@ -1011,7 +1044,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 20:15"
-          ]
+          ],
+          "lineId": "paul-3-stage-06"
         },
         {
           "id": "stage-07",
@@ -1033,7 +1067,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 20:15"
-          ]
+          ],
+          "lineId": "paul-3-stage-07"
         },
         {
           "id": "stage-08",
@@ -1055,7 +1090,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 20:15"
-          ]
+          ],
+          "lineId": "paul-3-stage-08"
         },
         {
           "id": "stage-09",
@@ -1077,7 +1113,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 21:1"
-          ]
+          ],
+          "lineId": "paul-3-stage-09"
         },
         {
           "id": "stage-10",
@@ -1099,7 +1136,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 21:1"
-          ]
+          ],
+          "lineId": "paul-3-stage-10"
         },
         {
           "id": "stage-11",
@@ -1121,7 +1159,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 21:1"
-          ]
+          ],
+          "lineId": "paul-3-stage-11"
         },
         {
           "id": "stage-12",
@@ -1155,7 +1194,8 @@
           "sources": [
             "scripture:Acts 21:2",
             "scripture:Acts 21:3"
-          ]
+          ],
+          "lineId": "paul-3-stage-12"
         },
         {
           "id": "stage-13",
@@ -1177,7 +1217,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 21:7"
-          ]
+          ],
+          "lineId": "paul-3-stage-13"
         },
         {
           "id": "stage-14",
@@ -1199,7 +1240,8 @@
           "travelMode": "unknown",
           "sources": [
             "scripture:Acts 21:8"
-          ]
+          ],
+          "lineId": "paul-3-stage-14"
         },
         {
           "id": "stage-15",
@@ -1232,7 +1274,8 @@
           "sources": [
             "scripture:Acts 21:15",
             "scripture:Acts 21:17"
-          ]
+          ],
+          "lineId": "paul-3-stage-15"
         }
       ]
     },
@@ -1291,7 +1334,8 @@
             "scripture:Acts 27:1",
             "scripture:Acts 27:3",
             "scripture:Acts 25:4"
-          ]
+          ],
+          "lineId": "paul-rome-stage-01"
         },
         {
           "id": "stage-02",
@@ -1341,7 +1385,8 @@
           "sources": [
             "scripture:Acts 27:4",
             "scripture:Acts 27:5"
-          ]
+          ],
+          "lineId": "paul-rome-stage-02"
         },
         {
           "id": "stage-03",
@@ -1383,7 +1428,8 @@
           "sources": [
             "scripture:Acts 27:7",
             "scripture:Acts 27:8"
-          ]
+          ],
+          "lineId": "paul-rome-stage-03"
         },
         {
           "id": "stage-04",
@@ -1425,7 +1471,8 @@
             "scripture:Acts 27:16",
             "scripture:Acts 27:27",
             "scripture:Acts 28:1"
-          ]
+          ],
+          "lineId": "paul-rome-stage-04"
         },
         {
           "id": "stage-05",
@@ -1454,7 +1501,8 @@
           "sources": [
             "scripture:Acts 28:11",
             "scripture:Acts 28:12"
-          ]
+          ],
+          "lineId": "paul-rome-stage-05"
         },
         {
           "id": "stage-06",
@@ -1476,7 +1524,8 @@
           "travelMode": "sea",
           "sources": [
             "scripture:Acts 28:13"
-          ]
+          ],
+          "lineId": "paul-rome-stage-06"
         },
         {
           "id": "stage-07",
@@ -1504,7 +1553,8 @@
           "sources": [
             "scripture:Acts 28:13",
             "scripture:Acts 28:14"
-          ]
+          ],
+          "lineId": "paul-rome-stage-07"
         },
         {
           "id": "stage-08",
@@ -1548,7 +1598,8 @@
             "scripture:Acts 28:14",
             "scripture:Acts 28:15",
             "scripture:Acts 28:16"
-          ]
+          ],
+          "lineId": "paul-rome-stage-08"
         }
       ]
     },

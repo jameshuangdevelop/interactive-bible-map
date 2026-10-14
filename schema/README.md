@@ -156,8 +156,12 @@ GIS terms used here:
   - passage refs must parse in one-chapter format and `textWEB` must match WEB;
   - every route-stop candidate has at least two sources;
   - every `standalone-segments` stage has attestation;
-  - every `lineId` points to matching geometry by route/stage key.
-- `REQUIRE_ROUTE_LINES` can enforce that every stage has either `lineId` or `noLineReason`; default is `false` until M5-04 lands real linework.
+  - every `lineId` points to matching geometry by route/stage key;
+  - each line's first and last coordinates must match the stage's `from`/`to` stop coordinates within about 1 m;
+  - route-line vertices must stay in project bounds, may not use `[0, 0]`, and may not contain jumps over 1000 km between consecutive vertices;
+  - sea-stage line segments are checked segment-by-segment against the land mask (with short inland endpoint connectors allowed for inland stops).
+  - sea-stage line length may not exceed 1.25× the shortest over-water path (including ordered `via` points), unless provenance includes an explicit reason (for example, a storm-driven drift stage).
+- `REQUIRE_ROUTE_LINES` enforces that every stage has either `lineId` or `noLineReason`; default is `true` since M5-04's linework.
 - `build:data` writes lazy Routes-tab payloads:
   - `app/public/generated/routes.routes.json`
   - `app/public/generated/routes.stages.json`

@@ -183,6 +183,17 @@ IDs only; no coordinates recorded (coordinates come in M2). "Candidates" counts 
 | `wikipedia:` | Wikipedia article title, cite-only | `wikipedia:Capernaum` |
 | `perseus:` | Perseus Digital Library CTS URN, cite-only, license unverified | `perseus:urn:cts:greekLit:tlg0526` |
 
+## M5-04 route-line geometry inputs (read 2026-10-13)
+
+These are the pinned files the route-line builder (`npm run build:route-lines`) uses.
+
+| Source | Used for | Version pinned in code | License | Notes |
+|---|---|---|---|---|
+| AWMC Geodata (`data/geo/ancient-roads.geojson`) | First-century dated land-road graph (`travelMode: land`) | Commit `7ecf8bccea2efe1e1e9df2daf6001942de73fb87` (already pinned by `build:ancient-geo`) | ODbL 1.0 | Only AWMC roads already filtered to Roman-period major roads and post-AD-100 exclusions (ADR-0037). |
+| ORBIS v2 node/edge tables (`orbis_nodes_0514.csv`, `orbis_edges_0514.csv`) | Sea-lane graph where ORBIS links two ports (`travelMode: sea`) | `druid:mn425tz9757`; URL + SHA-256 pinned in `scripts/lib/route-line-inputs.mjs` | CC BY 3.0 | Used only from the downloadable dataset, not from the web app. |
+| Natural Earth 10m land + coastline | Coastline-aware sea fallback and inland-to-coast connectors | Commit `ca96624a56bd078437bca8184e78163e5039ad19` (already pinned by `build:ancient-geo`) | Public domain | Used when no ORBIS sea-lane path links stage waypoints. |
+| Itiner-e (2025 release) | Evaluated as possible first-century land-road source | Evaluated only in M5-04 | CC BY 4.0 (as reported by project/Zenodo metadata) | Not used in this pass: the current branch can already draw every stage from AWMC roads + straight fallback; Fact-Checker can still adopt Itiner-e later for tighter land paths after stop-site review settles. |
+
 ## Open questions for the Fact-Checker (M1-03)
 
 1. Our candidate sources mix CC BY (OpenBible.info, Pleiades, ORBIS dataset), CC BY-SA/ODbL share-alike (DARE, AWMC, OpenStreetMap), and CC0 (Wikidata) content. Does combining them into our own `data/*.json` require the whole data release to carry a share-alike license (e.g. CC BY-SA 4.0), and should that be recorded as the project's data license in `docs/LICENSES.md`?
