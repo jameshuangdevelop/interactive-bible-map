@@ -52,6 +52,7 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M5-03](M5-03-jesus-journeys.md) | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Ready (research); data after M5-01 |
 | [M5-04](M5-04-route-lines.md) | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | After M5-01 and the research notes |
 | [M5-05](M5-05-routes-tab.md) | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | After M5-01 |
+| [M5-06](M5-06-route-text.md) | Route text, and every place the passages name | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Ready (after MC9, ADR-0041) |
 ## Template
 ```markdown
 # <ID> — <title>
