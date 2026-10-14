@@ -1,6 +1,6 @@
-# Visual spec — the map app (M3 and M4, low fidelity)
+# Visual spec — the map app (M3 to M5, low fidelity)
 
-This spec describes how the map app looks and behaves. It is low fidelity on purpose: it fixes layout, content order, interaction and accessibility, and leaves exact pixels to the build. The wireframes are in [wireframes/](wireframes/); they show the M3 app. The Frontend Engineer builds against this document (M3's tasks, and from M4 the toggle, the ancient layer and the timeline), and the PO updates it when a decision changes.
+This spec describes how the map app looks and behaves. It is low fidelity on purpose: it fixes layout, content order, interaction and accessibility, and leaves exact pixels to the build. The wireframes are in [wireframes/](wireframes/); they show the M3 app. The Frontend Engineer builds against this document (M3's tasks; from M4 the toggle, the ancient layer and the timeline; and from M5 the Routes tab), and the PO updates it when a decision changes.
 
 **Model:** Google Maps on desktop: a full-screen map, a floating search box, and a place panel on the left. The basemap is colourful and familiar, like Google Maps (OpenFreeMap Liberty, chosen at CP3a; ADR-0022). The biblical places stay clearly visible on it, and the tone of the text stays calm and scholarly.
 
@@ -14,11 +14,11 @@ This spec describes how the map app looks and behaves. It is low fidelity on pur
 | Left side, full height | Place panel (about 408 px wide). It opens when a place is selected, and the search box floats on top of it. | M3 |
 | Bottom right | Zoom in, zoom out and reset view, then the map attribution (compact "ⓘ") | M3 |
 | Bottom left | Scale bar (metric) | M3 |
-| Top centre | "Map" and "Routes" tabs | Reserved for M5 |
+| Top centre | "Map" and "Routes" tabs (§2 "Routes tab") | M5 |
 | Top right | The "Ancient" and "Modern" toggle | M4 |
 | Bottom centre | The timeline (4 BC – AD 100, snapping to the years the map changes), on the ancient map only (§2 "Timeline") | M4 |
 
-The Routes tabs are **not built yet**. The wireframes show the reserved areas with dashed outlines.
+The wireframes show the M3 app, with the areas kept for later milestones outlined in dashes.
 
 ### Small screens (under 768 px) — basic only in M3
 - The search box spans the width at the top, with 16 px margins.
@@ -26,6 +26,7 @@ The Routes tabs are **not built yet**. The wireframes show the reserved areas wi
 - The zoom buttons are hidden, since pinch zoom replaces them; reset view stays.
 - **The opening view fits the screen** (M7-01): the same area as on desktop, from Rome to Damascus and down to the Nile delta, is fitted to the screen's width, so a phone sees all of it at a lower zoom instead of only Greece.
 - **Toggle and timeline (M4):** the toggle sits at the top right, just below the search box. The timeline spans the bottom with 16 px margins while no place is open; the bottom sheet covers it while a place is open, and it returns when the sheet closes. While the sheet is fully open, it covers the map's controls too, so the toggle is hidden until the sheet is lowered.
+- **Tabs and the route panel (M5):** the "Map | Routes" tabs sit at the top left, just below the search box, level with the toggle. The route panel is the bottom sheet, opening at about 40% height with the route's title and its first stages.
 - Full responsive polish is M7.
 
 ## 2. The map
@@ -123,6 +124,22 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
 - **The panel** is the same on both maps.
 - **The toggle:** a two-part control, "Ancient | Modern", 40 px tall, on the panel's white surface and shadow; the selected part is filled with the accent colour, with white text. Switching keeps the camera and the selected place. The URL keeps the choice (§10).
 
+### Routes tab (M5)
+The routes have a tab of their own, so the main map stays uncluttered (brief §1.6, ADR-0038). This is the PO's default; the human sees it at MC9.
+- **Tabs:** "Map" and "Routes", a two-part control styled like the "Ancient | Modern" toggle, at the top centre. Switching tabs keeps the camera and the map (ancient or modern). The Map tab is unchanged.
+- **Route panel:** on the Routes tab, a route panel takes the place panel's place. The search box stays on top of it and works as on the Map tab; choosing a result switches to the Map tab with that place selected.
+  - **No route chosen:** the five routes in a list, "Paul's first journey", "Paul's second journey", "Paul's third journey", "Paul's voyage to Rome" and "Jesus' journeys", each with its years (for example "About AD 46 – 48") and its number of stages. The map shows every route's line together, thin and grey, and hovering or focusing a route in the list highlights its line.
+  - **A route chosen:** the map fits the route, leaving room for the panel. The panel shows an "‹ All routes" link, the title and years, and under them the year whose borders the map shows ("Borders as in AD 46"); a short note on the route, ending with a sentence saying that the lines show the order of the stops and whether they went by land or by sea, not the exact paths; the stages in order; and the route's sources.
+  - **A stage** in the list: its number; "From → To", where each stop's name is a link; how it went: "By land", "By sea", or "Path not known" with the regions the text names (for example "Through Phrygia and Galatia"); its passages, as links that open their WEB text in place; and a "Sources" link. A stage without a line (ADR-0038 item 4) says why, for example "Emmaus's site is disputed", and lists the candidate sites. Hovering or focusing a stage highlights its line; selecting a line highlights its stage in the list and scrolls to it.
+  - **Jesus' journeys:** the segments stand alone (ADR-0038 item 3), so the list numbers the segments rather than the stops, and each segment names the Gospels that tell it ("Told in Mark and Luke"). Selecting a segment highlights it and fades the others.
+- **On the map:**
+  - **Lines,** like Google Maps' directions: 5 px of the accent blue `#1A73E8` inside a 2 px white edge, with round ends. Stages by sea are dashed, like ferry lines on everyday maps; "path not known" stages are dotted and thinner. Small white arrowheads inside the line, about every 200 px, show the direction. The lines sit above the ancient layer and its roads, and below the labels.
+  - **Stops:** Paul's routes number their stops in order, each a white circle with a blue edge and its number, about 20 px, labelled with the stop's name in the style of our place labels. A stop reached more than once shows each number, for example "1, 16". A place the text says they only passed or sailed by is a small blue dot, with its name in italic and no number. Jesus' segments stand alone, so their stops have no numbers: each end of a segment is the same white circle with a blue edge, labelled with its name, and a place at the end of several segments is drawn once. Selecting a segment highlights its line and both its ends, and fades the rest. Our other pins are hidden.
+  - **Selecting a stop** that is one of our places opens its place panel, with a "‹ Back to" link to the route at the top. A stop entry (ADR-0038 item 2) opens a short card in the route panel: its name, a "Today" line where the sources give one, its candidate sites if disputed, its passages, its sources, and the words "Not yet on the main map".
+- **The map underneath:** the ancient map at the route's year (ADR-0038 item 7), without the timeline. The "Ancient | Modern" toggle stays; on the modern map the lines and stops are drawn over today's map.
+- **Accessibility:** the tabs are a tab list, and the arrow keys move between them. The stage list is an ordered list and is the text version of the lines; every line style is named in words in the list, so colour and dashes are never the only signal. Stops and stages are reachable by keyboard and show the focus ring. Touch targets are at least 44 × 44 px.
+- **States:** while the routes load, the list shows placeholders; if they fail, it says "Routes couldn't load." with a "Try again" button (§5).
+
 ## 3. Place panel
 The section order follows brief §1.4. Sections without data are left out.
 
@@ -197,11 +214,12 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 7. Accessibility (WCAG 2.2 AA)
 - **Contrast:** text at least 4.5:1; pins, outlines and controls at least 3:1 against the basemap. From M4 this holds over every area fill of the ancient layer too, and its border lines reach 3:1 against the land.
 - **Keyboard:**
-  - Everything is reachable, in this order: search, the toggle, the map controls, the timeline, the places on the map, then the panel.
+  - Everything is reachable, in this order: search, the "Map | Routes" tabs (M5), the toggle, the map controls, the timeline, the places on the map, then the panel. On the Routes tab there's no timeline; the list of places on the map holds the route's stops in stage order, and the route panel comes last.
   - The map draws its pins itself (ADR-0024), so keyboard and screen-reader users get a **list of the places currently on the map**, kept in step with it after each pan or zoom ends. Each entry is a button named like "Capernaum, city", "Jerusalem and 4 nearby places", or "Cluster of 7 places". Tab moves through the list in reading order (top to bottom, then left to right). A focus ring is drawn around the focused pin on the map, the map pans if the pin is hidden under the panel, and Enter selects the place or zooms into the cluster. The list is capped at 200 entries, with "Zoom in or search to reach more places" after them.
   - The focus ring is 2 px `#1A73E8` with a 2 px offset.
   - Esc closes search results and the panel.
   - **Toggle (M4):** a radio group named "Map", with "Ancient" and "Modern"; the arrow keys switch.
+  - **Tabs (M5):** a tab list named "View", with the tabs "Map" and "Routes", following the ARIA tabs pattern; the arrow keys move between them.
   - **Timeline (M4):** a slider named "Year". Its value text is the stop's year and title ("AD 44: Agrippa I dies, and Judea is a Roman province again"). Left and Right move one stop, and Home and End go to the first and last. The end buttons are labelled "Earlier change" and "Later change". Each change of stop is announced politely.
 - **Screen readers:**
   - The panel is a labelled region, with the place name as its level-1 heading.
@@ -227,16 +245,18 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 - A selected place is kept in the URL, as `?place=capernaum`, plus `&candidate=b` for a candidate, so any view can be shared.
 - Opening that URL selects the same place (and candidate, when present).
 - **From M4:** `&map=modern` keeps the modern map (the ancient map needs no parameter), and `&year=44` keeps the timeline's stop, with BC years negative (`year=-4`). A year that isn't a stop opens the stop in force that year.
+- **From M5:** `?tab=routes` opens the Routes tab, `&route=paul-2` a route, and `&stage=4` a highlighted stage. `&map=modern` and `&place=` work as on the Map tab.
 
 ## 11. Performance targets
 - **Load speed:** measured with Lighthouse's **desktop preset on a cold cache** against the preview deploy, the Largest Contentful Paint must be **2.5 s or less**, and the Total Blocking Time **200 ms or less**. These are Lighthouse's "good" thresholds.
 - **Smooth dragging and zooming (ADR-0024):** pins, labels and clusters move with the map in the same frame, never behind it. With **10,000 test points** loaded, no main-thread task may exceed 50 ms while dragging or zooming, and the page's DOM may not change during the gesture.
 - **Data loading:** the map and search data (about 18 KB minified) load with the app. Each place's details load when it is opened; the largest, Jerusalem, is about 36 KB minified.
 - **Ancient layer (M4):** it loads after the map first renders, so the load-speed gates don't move. Everything it loads (the areas for every stop, the roads and the coastline) is at most 300,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0037). Changing the stop causes no main-thread task over 50 ms. Switching between the maps keeps the camera, the pins and the selected place, and the new map is drawn within about 1 second on a desktop.
+- **Routes (M5):** the Routes tab's data loads when the tab first opens, so the load-speed gates don't move. It is at most 100,000 bytes compressed with gzip, as `npm run build:data` reports it (ADR-0038). Choosing a route causes no main-thread task over 50 ms.
 - **Images:** load lazily: only the image shown and the next one. They use Commons thumbnail URLs at Commons' standard widths (330, 500, 960 and 1,280 px), never full-resolution files: the panel uses the width nearest its size, the thumbnail row 330 px, and the viewer 1,280 px only when it opens. AI images are WebP files of at most 1,600 px and 400 KB, served by the site.
 
 ## 12. Not built yet
-The Routes tab (M5), a place line in the panel that follows the timeline (backlog), responsive polish (M7), a native app build, offline use, other languages, and search by verse or person.
+A place line in the panel that follows the timeline (backlog), responsive polish (M7), a native app build, offline use, other languages, and search by verse or person.
 
 ## Wireframes
 | File | Shows |
