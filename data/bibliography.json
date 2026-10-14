@@ -2101,6 +2101,19 @@
       "accessed": "2026-10-07"
     },
     {
+      "id": "smith-dictionary-lindus",
+      "type": "chapter",
+      "title": "Lindus",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=lindus-geo",
+      "accessed": "2026-10-13"
+    },
+    {
       "id": "smith-dictionary-thracia",
       "type": "chapter",
       "title": "Thracia",
@@ -2259,6 +2272,313 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/G/golan-gaulonitis.html",
       "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-seleucia",
+      "type": "chapter",
+      "title": "Seleucia",
+      "authors": ["W. M. Christie"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/seleucia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-attalia",
+      "type": "chapter",
+      "title": "Attalia",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/attalia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-samothrace",
+      "type": "chapter",
+      "title": "Samothrace",
+      "authors": ["Arthur J. Kinsella"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/samothrace.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-amphipolis",
+      "type": "chapter",
+      "title": "Amphipolis",
+      "authors": ["Marcus N. Tod"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/amphipolis.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-apollonia",
+      "type": "chapter",
+      "title": "Apollonia",
+      "authors": ["Marcus N. Tod"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/apollonia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-assos",
+      "type": "chapter",
+      "title": "Assos",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/assos.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-mitylene",
+      "type": "chapter",
+      "title": "Mitylene",
+      "authors": ["J. E. Harry"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/mitylene.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-chios",
+      "type": "chapter",
+      "title": "Chios",
+      "authors": ["J. E. Harry"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/chios.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-samos",
+      "type": "chapter",
+      "title": "Samos",
+      "authors": ["Arthur J. Kinsella"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/samos.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-trogyllium",
+      "type": "chapter",
+      "title": "Trogyllium",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/trogyllium.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-cos",
+      "type": "chapter",
+      "title": "Cos",
+      "authors": ["J. E. Harry"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cos.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-patara",
+      "type": "chapter",
+      "title": "Patara",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/patara.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-myra",
+      "type": "chapter",
+      "title": "Myra",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/myra.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-cnidus",
+      "type": "chapter",
+      "title": "Cnidus",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cnidus.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-phoenix",
+      "type": "chapter",
+      "title": "Phoenix",
+      "authors": ["W. M. Calder"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/phoenix.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-fair-havens",
+      "type": "chapter",
+      "title": "Fair Havens",
+      "authors": ["James Orr"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/F/fair-havens.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-lasea",
+      "type": "chapter",
+      "title": "Lasea",
+      "authors": ["James Orr"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lasea.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-sidon",
+      "type": "chapter",
+      "title": "Sidon (2)",
+      "authors": ["H. Porter"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/sidon-(2).html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-syracuse",
+      "type": "chapter",
+      "title": "Syracuse",
+      "authors": ["George H. Allen"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/syracuse.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-rhegium",
+      "type": "chapter",
+      "title": "Rhegium",
+      "authors": ["George H. Allen"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/R/rhegium.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-ptolemais",
+      "type": "chapter",
+      "title": "Ptolemais",
+      "authors": ["James Orr"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/ptolemais.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-taverns-three",
+      "type": "chapter",
+      "title": "Taverns, Three",
+      "authors": ["George H. Allen"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/taverns-three.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-adria",
+      "type": "chapter",
+      "title": "Adria",
+      "authors": ["George H. Allen"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/adria.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-famine",
+      "type": "chapter",
+      "title": "Famine",
+      "authors": ["W. L. Walker"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/F/famine.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-lycia",
+      "type": "chapter",
+      "title": "Lycia",
+      "authors": ["E. J. Banks"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lycia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-paul-the-apostle-3",
+      "type": "chapter",
+      "title": "Paul, the Apostle, 3 (III. Chronology of Paul's Career)",
+      "authors": ["A. T. Robertson"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/paul-the-apostle-3.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-paul-the-apostle-5",
+      "type": "chapter",
+      "title": "Paul, the Apostle, 5 (V. Work)",
+      "authors": ["A. T. Robertson"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/paul-the-apostle-5.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "bibleodyssey-erastus-gallio-paul",
+      "type": "web",
+      "title": "Erastus, Gallio, and Paul",
+      "authors": ["C. D. Elledge"],
+      "year": 2017,
+      "publisher": "Society of Biblical Literature (Bible Odyssey)",
+      "url": "https://www.bibleodyssey.org/articles/erastus-gallio-and-paul/",
+      "accessed": "2026-10-13"
     }
   ]
 }

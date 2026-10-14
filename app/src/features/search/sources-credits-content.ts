@@ -138,7 +138,7 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     url: "https://esa-worldcover.org/en/data-access"
   },
   {
-    name: "Cite-only references in `data/bibliography.json` (e.g. UNESCO World Heritage Centre listings, World History Encyclopedia, Livius.org, Zondervan Academic, BiblePlaces.com, HMML, the Hellenic Ministry of Culture and Sports' Odysseus portal, the Austrian Academy of Sciences, the Biblical Archaeology Society, and Nikos Kokkinos's article in *Scripta Classica Israelica*)",
+    name: "Cite-only references in `data/bibliography.json` (e.g. UNESCO World Heritage Centre listings, World History Encyclopedia, Livius.org, Zondervan Academic, BiblePlaces.com, HMML, the Hellenic Ministry of Culture and Sports' Odysseus portal, the Austrian Academy of Sciences, the Biblical Archaeology Society, Nikos Kokkinos's article in *Scripta Classica Israelica*, and the Society of Biblical Literature's Bible Odyssey, whose articles are CC BY-NC-ND 3.0)",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
   },
