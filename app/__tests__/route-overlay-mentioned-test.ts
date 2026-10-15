@@ -22,6 +22,46 @@ const placeFixture: PlaceIndexRecord = {
   ]
 };
 
+const secondPlaceFixture: PlaceIndexRecord = {
+  id: "tyre",
+  names: {
+    ancient: ["Tyre"],
+    alternate: []
+  },
+  type: "city",
+  zoomTier: "city",
+  parentId: null,
+  prominence: "standard",
+  passageCount: 0,
+  candidates: [
+    {
+      label: "Tyre",
+      coordinates: [35.19, 33.27],
+      confidence: "high"
+    }
+  ]
+};
+
+const thirdPlaceFixture: PlaceIndexRecord = {
+  id: "byblos",
+  names: {
+    ancient: ["Byblos"],
+    alternate: []
+  },
+  type: "city",
+  zoomTier: "city",
+  parentId: null,
+  prominence: "standard",
+  passageCount: 0,
+  candidates: [
+    {
+      label: "Byblos",
+      coordinates: [35.65, 34.12],
+      confidence: "high"
+    }
+  ]
+};
+
 const routeStopFixture: RouteStopRecord = {
   id: "stop-1",
   name: "Stop 1",
@@ -54,19 +94,19 @@ describe("route mentioned overlay features", () => {
       {
         id: "stage-1",
         from: { kind: "location", locationId: "sidon" },
-        to: { kind: "location", locationId: "sidon" },
+        to: { kind: "location", locationId: "tyre" },
         scripture: [],
         travelMode: "land",
-        mentioned: [{ kind: "location", locationId: "sidon" }],
+        mentioned: [{ kind: "location", locationId: "byblos" }],
         sources: []
       },
       {
         id: "stage-2",
-        from: { kind: "location", locationId: "sidon" },
-        to: { kind: "location", locationId: "sidon" },
+        from: { kind: "location", locationId: "tyre" },
+        to: { kind: "location", locationId: "tyre" },
         scripture: [],
         travelMode: "land",
-        mentioned: [{ kind: "location", locationId: "sidon" }],
+        mentioned: [{ kind: "location", locationId: "byblos" }],
         sources: []
       }
     ];
@@ -77,7 +117,11 @@ describe("route mentioned overlay features", () => {
       selectedStageId: "stage-2",
       highlightedStageId: "stage-1",
       emphasizedStageId: "stage-1",
-      placesById: new Map([[placeFixture.id, placeFixture]]),
+      placesById: new Map([
+        [placeFixture.id, placeFixture],
+        [secondPlaceFixture.id, secondPlaceFixture],
+        [thirdPlaceFixture.id, thirdPlaceFixture]
+      ]),
       routeStopsById: new Map([[routeStopFixture.id, routeStopFixture]])
     });
 
@@ -91,8 +135,8 @@ describe("route mentioned overlay features", () => {
     const stages: RouteStageRecord[] = [
       {
         id: "stage-1",
-        from: { kind: "route-stop", stopId: "stop-1", candidateIndex: 0 },
-        to: { kind: "route-stop", stopId: "stop-1", candidateIndex: 1 },
+        from: { kind: "location", locationId: "sidon" },
+        to: { kind: "location", locationId: "tyre" },
         scripture: [],
         travelMode: "land",
         mentioned: [{ kind: "route-stop", stopId: "stop-1", candidateIndex: 0 }],
@@ -100,8 +144,8 @@ describe("route mentioned overlay features", () => {
       },
       {
         id: "stage-2",
-        from: { kind: "route-stop", stopId: "stop-1", candidateIndex: 1 },
-        to: { kind: "route-stop", stopId: "stop-1", candidateIndex: 0 },
+        from: { kind: "location", locationId: "tyre" },
+        to: { kind: "location", locationId: "sidon" },
         scripture: [],
         travelMode: "land",
         mentioned: [{ kind: "route-stop", stopId: "stop-1", candidateIndex: 1 }],
@@ -115,10 +159,52 @@ describe("route mentioned overlay features", () => {
       selectedStageId: null,
       highlightedStageId: null,
       emphasizedStageId: null,
-      placesById: new Map([[placeFixture.id, placeFixture]]),
+      placesById: new Map([
+        [placeFixture.id, placeFixture],
+        [secondPlaceFixture.id, secondPlaceFixture],
+        [thirdPlaceFixture.id, thirdPlaceFixture]
+      ]),
       routeStopsById: new Map([[routeStopFixture.id, routeStopFixture]])
     });
 
     expect(features).toHaveLength(2);
+  });
+
+  test("does not include mentioned places that are route stops in another stage", () => {
+    const stages: RouteStageRecord[] = [
+      {
+        id: "stage-1",
+        from: { kind: "location", locationId: "sidon" },
+        to: { kind: "location", locationId: "tyre" },
+        scripture: [],
+        travelMode: "land",
+        sources: []
+      },
+      {
+        id: "stage-2",
+        from: { kind: "location", locationId: "tyre" },
+        to: { kind: "location", locationId: "tyre" },
+        scripture: [],
+        travelMode: "land",
+        mentioned: [{ kind: "location", locationId: "sidon" }],
+        sources: []
+      }
+    ];
+
+    const features = buildMentionedPointFeatures({
+      routeId: "jesus",
+      stages,
+      selectedStageId: null,
+      highlightedStageId: null,
+      emphasizedStageId: null,
+      placesById: new Map([
+        [placeFixture.id, placeFixture],
+        [secondPlaceFixture.id, secondPlaceFixture],
+        [thirdPlaceFixture.id, thirdPlaceFixture]
+      ]),
+      routeStopsById: new Map([[routeStopFixture.id, routeStopFixture]])
+    });
+
+    expect(features).toHaveLength(0);
   });
 });

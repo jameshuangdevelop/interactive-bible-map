@@ -3,12 +3,12 @@ import type { RouteMapOverlayData } from "./map-overlay";
 import { resolveRouteStop } from "./routes-data";
 import type { RouteStageRecord, RouteStopRecord, RouteStopRef } from "./types";
 
-function mentionedFeatureKey(routeId: string, mentionedRef: RouteStopRef) {
-  if (mentionedRef.kind === "location") {
-    return `${routeId}:location:${mentionedRef.locationId ?? ""}`;
+function routeFeatureKey(routeId: string, stopRef: RouteStopRef) {
+  if (stopRef.kind === "location") {
+    return `${routeId}:location:${stopRef.locationId ?? ""}`;
   }
 
-  return `${routeId}:route-stop:${mentionedRef.stopId ?? ""}:${mentionedRef.candidateIndex ?? ""}`;
+  return `${routeId}:route-stop:${stopRef.stopId ?? ""}:${stopRef.candidateIndex ?? ""}`;
 }
 
 export function buildMentionedPointFeatures({
@@ -28,6 +28,15 @@ export function buildMentionedPointFeatures({
   placesById: Map<string, PlaceIndexRecord>;
   routeStopsById: Map<string, RouteStopRecord>;
 }) {
+  const routeStopOrViaKeys = new Set<string>();
+  for (const stage of stages) {
+    routeStopOrViaKeys.add(routeFeatureKey(routeId, stage.from));
+    routeStopOrViaKeys.add(routeFeatureKey(routeId, stage.to));
+    for (const viaRef of stage.via ?? []) {
+      routeStopOrViaKeys.add(routeFeatureKey(routeId, viaRef));
+    }
+  }
+
   const mentionedByKey = new Map<
     string,
     {
@@ -46,7 +55,10 @@ export function buildMentionedPointFeatures({
         continue;
       }
 
-      const key = mentionedFeatureKey(routeId, mentionedRef);
+      const key = routeFeatureKey(routeId, mentionedRef);
+      if (routeStopOrViaKeys.has(key)) {
+        continue;
+      }
       const existing = mentionedByKey.get(key);
       if (!existing) {
         mentionedByKey.set(key, {
