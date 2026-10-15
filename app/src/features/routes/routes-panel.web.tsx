@@ -3,7 +3,13 @@ import { useEffect, useRef } from "react";
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
 import { resolveRouteStop, stageLabelNumber } from "./routes-data";
-import type { HydratedRoute, LoadedRoutesData, RouteStageRecord, RouteStopRecord, RouteStopResolved } from "./types";
+import type {
+  HydratedRoute,
+  LoadedRoutesData,
+  RouteStageRecord,
+  RouteStopRecord,
+  RouteStopResolved
+} from "./types";
 import { tokens } from "../../theme/tokens";
 
 type RoutesLoadState = "idle" | "loading" | "ready" | "error";
@@ -106,7 +112,6 @@ export function RoutesPanel({
   hydratedRoutes,
   selectedRoute,
   selectedStageIndex,
-  selectedRouteStop,
   selectedRouteBorderYear,
   placesById,
   routeStopsById,
@@ -114,7 +119,6 @@ export function RoutesPanel({
   onSelectRoute,
   onSelectStage,
   onBackToAllRoutes,
-  onRouteStopCardBack,
   onResolveStopSelection,
   onHighlightStage
 }: {
@@ -123,7 +127,6 @@ export function RoutesPanel({
   hydratedRoutes: HydratedRoute[];
   selectedRoute: HydratedRoute | null;
   selectedStageIndex: number | null;
-  selectedRouteStop: RouteStopRecord | null;
   selectedRouteBorderYear: number | null;
   placesById: Map<string, PlaceIndexRecord>;
   routeStopsById: Map<string, RouteStopRecord>;
@@ -131,7 +134,6 @@ export function RoutesPanel({
   onSelectRoute: (routeId: string) => void;
   onSelectStage: (stageIndex: number) => void;
   onBackToAllRoutes: () => void;
-  onRouteStopCardBack: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
 }) {
@@ -277,49 +279,17 @@ export function RoutesPanel({
           {selectedRoute.route.bibleText}
         </p>
       </div>
-      {selectedRouteStop ? (
-        <div style={{ border: `1px solid ${tokens.color.divider}`, borderRadius: "8px", padding: `${tokens.spacing.sm}px`, marginBottom: `${tokens.spacing.sm}px` }}>
-          <button
-            onClick={onRouteStopCardBack}
-            style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer" }}
-            type="button"
-          >
-            ‹ Back to route
-          </button>
-          <strong style={{ display: "block", marginTop: `${tokens.spacing.xs}px` }}>{selectedRouteStop.name}</strong>
-          {selectedRouteStop.todayName ? <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>Today: {selectedRouteStop.todayName}</p> : null}
-          {selectedRouteStop.candidates.length > 1 ? (
-            <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
-              Candidate sites:
-              <ul data-route-stop-candidates="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
-                {selectedRouteStop.candidates.map((candidate) => (
-                  <li key={`${selectedRouteStop.id}:${candidate.label}`}>{candidate.label}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {selectedRouteStop.scripture.length > 0 ? (
-            <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
-              Passages: {selectedRouteStop.scripture.map((entry) => entry.ref).join(", ")}
-            </div>
-          ) : null}
-          <SourcesDisclosure
-            bibliographyById={bibliographyById}
-            idPrefix={`route-stop:${selectedRouteStop.id}`}
-            sourceIds={selectedRouteStop.sources}
-            summaryLabel="Sources"
-          />
-          <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>Not yet on the main map.</p>
-        </div>
-      ) : null}
       <ol style={{ paddingLeft: "20px", margin: `${tokens.spacing.sm}px 0 0` }}>
         {selectedRoute.stages.map((stage, stageIndex) => {
           const from = resolveRouteStop(stage.from, placesById, routeStopsById);
           const to = resolveRouteStop(stage.to, placesById, routeStopsById);
           const isActive = selectedStageIndex === stageIndex;
-          const mentionedNames = (stage.mentioned ?? [])
-            .map((mentioned) => resolveRouteStop(mentioned, placesById, routeStopsById).name)
-            .filter((name, index, array) => array.indexOf(name) === index);
+          const viaStops = (stage.via ?? []).map((via) => resolveRouteStop(via, placesById, routeStopsById));
+          const mentionedStops = (stage.mentioned ?? [])
+            .map((mentioned) => resolveRouteStop(mentioned, placesById, routeStopsById))
+            .filter((resolved, index, array) =>
+              array.findIndex((candidate) => candidate.kind === resolved.kind && candidate.id === resolved.id) === index
+            );
           const travelModeText = formatRouteTravelModeText(stage);
           const stageTypeLabel =
             selectedRoute.route.structure === "standalone-segments" ? "Segment" : "Stage";
@@ -369,7 +339,8 @@ export function RoutesPanel({
                 {stageTypeLabel} {stageIndex + 1}{" "}
                 ·{" "}
                 <button
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.stopPropagation();
                     onSelectStage(stageIndex);
                     onResolveStopSelection(from, stageIndex);
                   }}
@@ -380,7 +351,8 @@ export function RoutesPanel({
                 </button>{" "}
                 →{" "}
                 <button
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.stopPropagation();
                     onSelectStage(stageIndex);
                     onResolveStopSelection(to, stageIndex);
                   }}
@@ -393,14 +365,46 @@ export function RoutesPanel({
               <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
                 {travelModeText}
               </div>
-              {stage.via?.length ? (
+              {viaStops.length > 0 ? (
                 <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                  Passed: {stage.via.map((via) => resolveRouteStop(via, placesById, routeStopsById).name).join(", ")}
+                  Passed:{" "}
+                  {viaStops.map((viaStop, index) => (
+                    <span key={`${stage.id}:via:${viaStop.kind}:${viaStop.id}`}>
+                      {index > 0 ? ", " : null}
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onSelectStage(stageIndex);
+                          onResolveStopSelection(viaStop, stageIndex);
+                        }}
+                        style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                        type="button"
+                      >
+                        {viaStop.name}
+                      </button>
+                    </span>
+                  ))}
                 </div>
               ) : null}
-              {mentionedNames.length > 0 ? (
+              {mentionedStops.length > 0 ? (
                 <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                  Also named: {mentionedNames.join(", ")}
+                  Also named:{" "}
+                  {mentionedStops.map((mentionedStop, index) => (
+                    <span key={`${stage.id}:mentioned:${mentionedStop.kind}:${mentionedStop.id}`}>
+                      {index > 0 ? ", " : null}
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onSelectStage(stageIndex);
+                          onResolveStopSelection(mentionedStop, stageIndex);
+                        }}
+                        style={{ border: "none", background: "none", color: "#1A73E8", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                        type="button"
+                      >
+                        {mentionedStop.name}
+                      </button>
+                    </span>
+                  ))}
                 </div>
               ) : null}
               {selectedRoute.route.structure === "standalone-segments" && stage.attestation ? (

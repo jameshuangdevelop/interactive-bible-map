@@ -43,7 +43,7 @@ import {
   resolveRouteStop,
   routeLineFeatureByStage
 } from "../features/routes/routes-data";
-import type { LoadedRoutesData, RouteStopResolved } from "../features/routes/types";
+import type { LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { buildMentionedPointFeatures } from "../features/routes/overlay-mentioned";
 import { RoutesPanel } from "../features/routes/routes-panel.web";
@@ -60,6 +60,7 @@ const SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX = PANEL_CONTENT_TOP_PADDING + 56;
 const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.53;
 const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
+const ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX = 1280;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const VIEW_TABS_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
@@ -241,6 +242,112 @@ function MapLoadingPlaceholder() {
   );
 }
 
+function RouteStopDetailsPanel({
+  selectedRouteStop,
+  bibliographyById,
+  showBackToRoute,
+  onBackToRoute,
+  onClose
+}: {
+  selectedRouteStop: RouteStopRecord;
+  bibliographyById: Map<string, LoadedRoutesData["index"]["bibliography"][number]>;
+  showBackToRoute: boolean;
+  onBackToRoute: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div data-route-stop-panel="true">
+      {showBackToRoute ? (
+        <button
+          onClick={onBackToRoute}
+          style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer", marginBottom: `${tokens.spacing.sm}px` }}
+          type="button"
+        >
+          ‹ Back to route
+        </button>
+      ) : null}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: `${tokens.spacing.sm}px` }}>
+        <h1 style={{ margin: 0, fontSize: `${tokens.typography.titleSize}px`, lineHeight: `${tokens.typography.titleLineHeight}px` }}>
+          {selectedRouteStop.name}
+        </h1>
+        <button
+          aria-label="Close"
+          onClick={onClose}
+          style={{
+            border: "none",
+            background: "none",
+            color: tokens.color.textSecondary,
+            cursor: "pointer",
+            fontSize: "20px",
+            lineHeight: 1,
+            padding: 0
+          }}
+          type="button"
+        >
+          ×
+        </button>
+      </div>
+      {selectedRouteStop.todayName ? (
+        <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
+          Today: {selectedRouteStop.todayName}
+        </p>
+      ) : null}
+      {selectedRouteStop.candidates.length > 1 ? (
+        <div style={{ marginTop: `${tokens.spacing.sm}px` }}>
+          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Candidate sites</h2>
+          <ul data-route-stop-candidates="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+            {selectedRouteStop.candidates.map((candidate) => (
+              <li key={`${selectedRouteStop.id}:${candidate.label}`}>
+                <strong>{candidate.label}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {selectedRouteStop.scripture.length > 0 ? (
+        <div style={{ marginTop: `${tokens.spacing.sm}px` }}>
+          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>In the Bible</h2>
+          <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+            {selectedRouteStop.scripture.map((entry) => (
+              <li key={`${selectedRouteStop.id}:${entry.ref}`}>
+                <strong>{entry.ref}</strong>
+                <p style={{ margin: `${tokens.spacing.xs}px 0 0`, fontFamily: tokens.typography.scriptureFont }}>{entry.textWEB}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <div style={{ marginTop: `${tokens.spacing.sm}px` }}>
+        <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>
+          Sources · {selectedRouteStop.sources.length}
+        </h2>
+        {selectedRouteStop.sources.length > 0 ? (
+          <ol style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+            {selectedRouteStop.sources.map((sourceId, index) => {
+              const source = formatSourceCitation(sourceId, bibliographyById);
+              return (
+                <li key={`${selectedRouteStop.id}:${sourceId}:${index}`}>
+                  {source.url ? (
+                    <a href={source.url} rel="noreferrer noopener" target="_blank">
+                      {source.label}
+                    </a>
+                  ) : (
+                    source.label
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
+            No sources listed.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
@@ -312,6 +419,7 @@ export function AppShell() {
     () => new Map((routesData?.stops.stops ?? []).map((stop) => [stop.id, stop] as const)),
     [routesData]
   );
+  const routeBibliographyById = useMemo(() => routesData?.bibliographyById ?? new Map(), [routesData]);
   const hydratedRoutes = useMemo(() => routesData?.routes ?? [], [routesData]);
   const selectedRoute = useMemo(
     () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
@@ -777,6 +885,7 @@ export function AppShell() {
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
+    setSelectedRouteStopId(null);
     setHighlightedPlaceId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
@@ -802,7 +911,7 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
-    if (!selectedPlace) {
+    if (!selectedPlace && !selectedRouteStopId) {
       return undefined;
     }
 
@@ -819,12 +928,12 @@ export function AppShell() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [closePanel, selectedPlace]);
+  }, [closePanel, selectedPlace, selectedRouteStopId]);
 
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setViewTab("map");
+    setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
 
@@ -840,7 +949,7 @@ export function AppShell() {
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setViewTab("map");
+    setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     setSelection(nextSelection);
@@ -849,7 +958,7 @@ export function AppShell() {
   const handlePanelSelectPlaceFromAbout = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setViewTab("map");
+    setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
@@ -877,8 +986,6 @@ export function AppShell() {
     ? !selectedPlaceDetails && !placeDetailsErrorsById[selectedPlace.id]
     : false;
   const selectedPlaceLoadError = selectedPlace ? placeDetailsErrorsById[selectedPlace.id] ?? null : null;
-  const panelWidthForMap =
-    !isSmallScreen && (selectedPlace || viewTab === "routes") ? PANEL_WIDTH : 0;
 
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
@@ -1015,8 +1122,7 @@ export function AppShell() {
         bounds: null,
         routeFocusKey: null,
         selectedStageFocusKey: null,
-        selectedStageCenter: null,
-        selectedStageAnimationKey: null
+        selectedStageCenter: null
       };
     }
 
@@ -1438,11 +1544,7 @@ export function AppShell() {
       routeFocusKey: bounds ? selectedRouteId : null,
       selectedStageFocusKey:
         selectedStageId && selectedStageCenter ? `${selectedRouteId}:${selectedStageId}` : null,
-      selectedStageCenter,
-      selectedStageAnimationKey:
-        selectedStageId && lineFeatureByStageId.has(selectedStageId)
-          ? `${selectedRouteId}:${selectedStageId}`
-          : null
+      selectedStageCenter
     };
   }, [
     highlightedStageIndex,
@@ -1503,6 +1605,53 @@ export function AppShell() {
 
     return entries;
   }, [placesById, routeStopsById, selectedRoute, viewTab]);
+  const routeKeyboardLocationIds = useMemo(
+    () =>
+      new Set(
+        routeKeyboardEntries
+          .filter((entry) => entry.stopKind === "location")
+          .map((entry) => entry.stopId)
+      ),
+    [routeKeyboardEntries]
+  );
+  const routeOverlayHiddenPlaceIds = useMemo(() => {
+    if (viewTab !== "routes" || !routeMapOverlay) {
+      return [];
+    }
+    const hidden = new Set<string>();
+    for (const feature of routeMapOverlay.points.features) {
+      const properties = feature.properties;
+      if (properties.kind === "stage-pill" || properties.stopKind !== "location") {
+        continue;
+      }
+      hidden.add(properties.stopId);
+    }
+    return [...hidden].sort();
+  }, [routeMapOverlay, viewTab]);
+  const routeOverlayHiddenPlaceIdsKey = useMemo(
+    () => routeOverlayHiddenPlaceIds.join("|"),
+    [routeOverlayHiddenPlaceIds]
+  );
+  const selectedRouteStop =
+    selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
+      ? routeStopsById.get(selectedRouteStopId) ?? null
+      : null;
+  const routePlacePanelActive = viewTab === "routes" && Boolean(selectedPlace || selectedRouteStop);
+  const showSideBySideRoutePlacePanels =
+    routePlacePanelActive &&
+    !isSmallScreen &&
+    viewportWidthPx >= ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX;
+  const panelWidthForMap = !isSmallScreen
+    ? viewTab === "routes"
+      ? showSideBySideRoutePlacePanels
+        ? PANEL_WIDTH * 2
+        : routePlacePanelActive || viewTab === "routes"
+          ? PANEL_WIDTH
+          : 0
+      : selectedPlace
+        ? PANEL_WIDTH
+        : 0
+    : 0;
 
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
@@ -1510,7 +1659,7 @@ export function AppShell() {
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
   const panelBottomInsetForMap =
-    ((selectedPlace || viewTab === "routes") && isSmallScreen)
+    ((selectedPlace || selectedRouteStop || viewTab === "routes") && isSmallScreen)
       ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX
       : 0;
   const timelineVisible =
@@ -1601,25 +1750,30 @@ export function AppShell() {
   );
 
   const routePanelOpen = viewTab === "routes";
-  const panelStyle: CSSProperties | null = selectedPlace || routePanelOpen
+  const showRoutesPanel = routePanelOpen && (!routePlacePanelActive || showSideBySideRoutePlacePanels);
+  const showRoutePlacePanel = routePanelOpen && routePlacePanelActive;
+  const showRouteBackLink = showRoutePlacePanel && !showSideBySideRoutePlacePanels;
+  const showMapTabPlacePanel = viewTab === "map" && Boolean(selectedPlace);
+  const commonSmallScreenPanelStyle: CSSProperties = {
+    position: "absolute",
+    left: `${tokens.spacing.md}px`,
+    right: `${tokens.spacing.md}px`,
+    bottom: `${tokens.spacing.md}px`,
+    height: `${Math.round(panelHeightPx)}px`,
+    maxHeight: "calc(100% - 32px)",
+    boxSizing: "border-box" as const,
+    backgroundColor: tokens.color.surface,
+    border: `1px solid ${tokens.color.divider}`,
+    borderRadius: "16px",
+    padding: `${tokens.spacing.md}px`,
+    boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+    overflowX: "hidden",
+    overflowY: "auto",
+    zIndex: 20
+  };
+  const routePanelStyle: CSSProperties | null = showRoutesPanel
     ? isSmallScreen
-      ? {
-          position: "absolute",
-          left: `${tokens.spacing.md}px`,
-          right: `${tokens.spacing.md}px`,
-          bottom: `${tokens.spacing.md}px`,
-          height: `${Math.round(panelHeightPx)}px`,
-          maxHeight: "calc(100% - 32px)",
-          boxSizing: "border-box" as const,
-          backgroundColor: tokens.color.surface,
-          border: `1px solid ${tokens.color.divider}`,
-          borderRadius: "16px",
-          padding: `${tokens.spacing.md}px`,
-          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
-          overflowX: "hidden",
-          overflowY: "auto",
-          zIndex: 20
-        }
+      ? commonSmallScreenPanelStyle
       : {
           position: "absolute",
           top: 0,
@@ -1634,6 +1788,30 @@ export function AppShell() {
           overflowX: "hidden",
           overflowY: "auto",
           zIndex: 20
+        }
+    : null;
+  const placePanelStyle: CSSProperties | null = showMapTabPlacePanel || showRoutePlacePanel
+    ? isSmallScreen
+      ? commonSmallScreenPanelStyle
+      : {
+          position: "absolute",
+          top: 0,
+          left: showRoutePlacePanel && showSideBySideRoutePlacePanels ? `${PANEL_WIDTH}px` : 0,
+          bottom: 0,
+          width: `${PANEL_WIDTH}px`,
+          boxSizing: "border-box" as const,
+          backgroundColor: tokens.color.surface,
+          borderRight: showRoutePlacePanel && !showSideBySideRoutePlacePanels
+            ? `1px solid ${tokens.color.divider}`
+            : undefined,
+          borderLeft: showRoutePlacePanel && showSideBySideRoutePlacePanels
+            ? `1px solid ${tokens.color.divider}`
+            : undefined,
+          padding: `${PANEL_CONTENT_TOP_PADDING}px ${tokens.spacing.lg}px ${tokens.spacing.lg}px`,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          overflowX: "hidden",
+          overflowY: "auto",
+          zIndex: 21
         }
     : null;
 
@@ -1673,11 +1851,6 @@ export function AppShell() {
     },
     []
   );
-
-  const selectedRouteStop =
-    selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
-      ? routeStopsById.get(selectedRouteStopId) ?? null
-      : null;
 
   return (
     <div
@@ -1823,6 +1996,9 @@ export function AppShell() {
             pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
             routeKeyboardEntries={routeKeyboardEntries}
+            routeKeyboardPlaceIds={[...routeKeyboardLocationIds]}
+            routeOverlayHiddenPlaceIds={routeOverlayHiddenPlaceIds}
+            routeOverlayHiddenPlaceIdsKey={routeOverlayHiddenPlaceIdsKey}
             routesOverlay={routeMapOverlay}
             selectedTimelineStopId={
               viewTab === "routes" && selectedRouteTimelineStop
@@ -2132,97 +2308,134 @@ export function AppShell() {
       ) : null}
       <div id="ibm-visible-places-portal-root" style={srOnlyStyle} />
 
-      {panelStyle ? (
-        <section aria-label={viewTab === "routes" ? "Route details" : "Place details"} style={panelStyle}>
-          {viewTab === "routes" ? (
-            <div data-routes-panel="true">
-              <RoutesPanel
-                hydratedRoutes={hydratedRoutes}
-                onBackToAllRoutes={() => {
-                  setSelectedRouteId(null);
-                  setSelectedStageIndex(null);
-                  setHighlightedStageIndex(null);
-                  setSelectedRouteStopId(null);
-                }}
-                onHighlightStage={setHighlightedStageIndex}
-                onResolveStopSelection={(resolvedStop, stageIndex) => {
-                  setSelectedStageIndex(stageIndex);
-                  if (resolvedStop.kind === "location") {
-                    setSelectedRouteStopId(null);
-                    setSelection({ placeId: resolvedStop.id, candidateIndex: null });
-                  } else {
-                    setSelectedRouteStopId(resolvedStop.id);
-                  }
-                }}
-                onRetryLoad={() => {
-                  setRoutesLoadState("idle");
-                  setRoutesReloadToken((value) => value + 1);
-                }}
-                onRouteStopCardBack={() => setSelectedRouteStopId(null)}
-                onSelectRoute={handleSelectRoute}
-                onSelectStage={(stageIndex) => {
-                  setSelectedRouteStopId(null);
-                  setSelectedStageIndex(stageIndex);
-                }}
-                placesById={placesById}
-                routeStopsById={routeStopsById}
-                routesData={routesData}
-                routesLoadState={routesLoadState}
-                selectedRoute={selectedRoute}
-                selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
-                selectedRouteStop={selectedRouteStop}
-                selectedStageIndex={selectedStageIndex}
-              />
-            </div>
-          ) : selectedPlace ? (
-            <PlacePanel
-              key={selectedPlace.id}
-              isLoading={selectedPlaceLoading}
-              isSmallScreen={isSmallScreen}
-              isSmallScreenExpanded={smallScreenSheetMode === "expanded"}
-              loadErrorMessage={selectedPlaceLoadError}
-              onClose={() => closePanel(false)}
-              onHighlightPlace={handlePanelHighlightPlace}
-              onSmallScreenHandlePointerDown={(event) => {
-                if (!isSmallScreen) {
-                  return;
-                }
-
-                const currentHeightPx =
-                  smallScreenSheetDragHeightPx ??
-                  (smallScreenSheetMode === "expanded"
-                    ? smallScreenSheetMaxHeightPx
-                    : smallScreenSheetCollapsedHeightPx);
-
-                smallScreenSheetDragStateRef.current = {
-                  pointerId: event.pointerId,
-                  startY: event.clientY,
-                  startHeightPx: currentHeightPx,
-                  movedPx: 0
-                };
-                suppressNextHandleClickRef.current = false;
-                setSmallScreenSheetDragHeightPx(currentHeightPx);
+      {routePanelStyle ? (
+        <section aria-label="Route details" style={routePanelStyle}>
+          <div data-routes-panel="true">
+            <RoutesPanel
+              hydratedRoutes={hydratedRoutes}
+              onBackToAllRoutes={() => {
+                setSelectedRouteId(null);
+                setSelectedStageIndex(null);
+                setHighlightedStageIndex(null);
+                setSelectedRouteStopId(null);
+                setSelection(null);
               }}
-              onSelectCandidate={handlePanelSelectCandidate}
-              onSelectPlace={handlePanelSelectPlace}
-              onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
-              onToggleSmallScreenExpanded={() => {
-                setSmallScreenSheetDragHeightPx(null);
-                if (suppressNextHandleClickRef.current) {
-                  suppressNextHandleClickRef.current = false;
-                  return;
+              onHighlightStage={setHighlightedStageIndex}
+              onResolveStopSelection={(resolvedStop, stageIndex) => {
+                setSelectedStageIndex(stageIndex);
+                if (resolvedStop.kind === "location") {
+                  setSelectedRouteStopId(null);
+                  setSelection({ placeId: resolvedStop.id, candidateIndex: null });
+                } else {
+                  setSelection(null);
+                  setSelectedRouteStopId(resolvedStop.id);
                 }
-                setSmallScreenSheetMode((current) =>
-                  current === "expanded" ? "collapsed" : "expanded"
-                );
               }}
-              placeDetails={selectedPlaceDetails}
-              places={places}
+              onRetryLoad={() => {
+                setRoutesLoadState("idle");
+                setRoutesReloadToken((value) => value + 1);
+              }}
+              onSelectRoute={handleSelectRoute}
+              onSelectStage={(stageIndex) => {
+                setSelectedRouteStopId(null);
+                setSelection(null);
+                setSelectedStageIndex(stageIndex);
+              }}
               placesById={placesById}
-              selectedPlace={selectedPlace}
-              selection={selection ?? { placeId: selectedPlace.id, candidateIndex: null }}
+              routeStopsById={routeStopsById}
+              routesData={routesData}
+              routesLoadState={routesLoadState}
+              selectedRoute={selectedRoute}
+              selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
+              selectedStageIndex={selectedStageIndex}
             />
+          </div>
+        </section>
+      ) : null}
+      {placePanelStyle && selectedPlace ? (
+        <section aria-label="Place details" data-route-place-panel={viewTab === "routes" ? "true" : "false"} style={placePanelStyle}>
+          {showRouteBackLink ? (
+            <button
+              data-back-to-route="true"
+              onClick={() => {
+                setSelection(null);
+                setSelectedRouteStopId(null);
+                setHighlightedPlaceId(null);
+                setSmallScreenSheetMode("collapsed");
+                setSmallScreenSheetDragHeightPx(null);
+              }}
+              style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer", marginBottom: `${tokens.spacing.sm}px` }}
+              type="button"
+            >
+              ‹ Back to route
+            </button>
           ) : null}
+          <PlacePanel
+            key={selectedPlace.id}
+            isLoading={selectedPlaceLoading}
+            isSmallScreen={isSmallScreen}
+            isSmallScreenExpanded={smallScreenSheetMode === "expanded"}
+            loadErrorMessage={selectedPlaceLoadError}
+            onClose={() => closePanel(false)}
+            onHighlightPlace={handlePanelHighlightPlace}
+            onSmallScreenHandlePointerDown={(event) => {
+              if (!isSmallScreen) {
+                return;
+              }
+
+              const currentHeightPx =
+                smallScreenSheetDragHeightPx ??
+                (smallScreenSheetMode === "expanded"
+                  ? smallScreenSheetMaxHeightPx
+                  : smallScreenSheetCollapsedHeightPx);
+
+              smallScreenSheetDragStateRef.current = {
+                pointerId: event.pointerId,
+                startY: event.clientY,
+                startHeightPx: currentHeightPx,
+                movedPx: 0
+              };
+              suppressNextHandleClickRef.current = false;
+              setSmallScreenSheetDragHeightPx(currentHeightPx);
+            }}
+            onSelectCandidate={handlePanelSelectCandidate}
+            onSelectPlace={handlePanelSelectPlace}
+            onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
+            onToggleSmallScreenExpanded={() => {
+              setSmallScreenSheetDragHeightPx(null);
+              if (suppressNextHandleClickRef.current) {
+                suppressNextHandleClickRef.current = false;
+                return;
+              }
+              setSmallScreenSheetMode((current) =>
+                current === "expanded" ? "collapsed" : "expanded"
+              );
+            }}
+            placeDetails={selectedPlaceDetails}
+            places={places}
+            placesById={placesById}
+            selectedPlace={selectedPlace}
+            selection={selection ?? { placeId: selectedPlace.id, candidateIndex: null }}
+          />
+        </section>
+      ) : null}
+      {placePanelStyle && !selectedPlace && selectedRouteStop ? (
+        <section aria-label="Place details" data-route-place-panel="true" style={placePanelStyle}>
+          <RouteStopDetailsPanel
+            bibliographyById={routeBibliographyById}
+            onBackToRoute={() => {
+              setSelectedRouteStopId(null);
+              setSmallScreenSheetMode("collapsed");
+              setSmallScreenSheetDragHeightPx(null);
+            }}
+            onClose={() => {
+              setSelectedRouteStopId(null);
+              setSmallScreenSheetMode("collapsed");
+              setSmallScreenSheetDragHeightPx(null);
+            }}
+            selectedRouteStop={selectedRouteStop}
+            showBackToRoute={showRouteBackLink}
+          />
         </section>
       ) : null}
 
