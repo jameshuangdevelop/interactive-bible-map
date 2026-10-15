@@ -178,7 +178,7 @@ describe("routes panel", () => {
     expect(markup).toContain("Fixture bibliography");
   });
 
-  test("uses notes section and 'Through' wording for unknown travel", () => {
+  test("uses notes section and unknown travel wording", () => {
     const unknownTravelRoute: HydratedRoute = {
       route: {
         ...routeEntries[0].route,
@@ -191,6 +191,12 @@ describe("routes panel", () => {
           ...routeEntries[0].stages[0],
           travelMode: "unknown",
           namedRegions: [{ name: "Galilee", sources: ["scripture:Acts 2:1"] }]
+        },
+        {
+          ...routeEntries[0].stages[0],
+          id: "single-stage-02",
+          travelMode: "unknown",
+          namedRegions: []
         }
       ]
     };
@@ -198,7 +204,7 @@ describe("routes panel", () => {
       <RoutesPanel {...defaultProps} selectedRoute={unknownTravelRoute} />
     );
     expect(markup).toContain("Through Galilee");
-    expect(markup).not.toContain("Path not known");
+    expect(markup).toContain("Path not known");
     expect(markup).toContain(">Notes<");
     expect(markup).toContain("Fixture note");
   });

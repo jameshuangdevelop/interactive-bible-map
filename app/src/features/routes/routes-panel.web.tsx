@@ -3,6 +3,7 @@ import type { PlaceIndexRecord } from "../map/types";
 import { resolveRouteStop, stageLabelNumber } from "./routes-data";
 import type { HydratedRoute, LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "./types";
 import { tokens } from "../../theme/tokens";
+import type { RouteStageRecord } from "./types";
 
 type RoutesLoadState = "idle" | "loading" | "ready" | "error";
 
@@ -68,6 +69,19 @@ function formatReadableList(values: string[]) {
     return `${values[0]} and ${values[1]}`;
   }
   return `${values.slice(0, -1).join(", ")}, and ${values[values.length - 1]}`;
+}
+
+export function formatRouteTravelModeText(stage: Pick<RouteStageRecord, "travelMode" | "namedRegions">) {
+  if (stage.travelMode === "land") {
+    return "By land";
+  }
+  if (stage.travelMode === "sea") {
+    return "By sea";
+  }
+  if (stage.namedRegions?.length) {
+    return `Through ${stage.namedRegions.map((region) => region.name).join(", ")}`;
+  }
+  return "Path not known";
 }
 
 function stopCandidatesText(
@@ -280,12 +294,7 @@ export function RoutesPanel({
           const mentionedNames = (stage.mentioned ?? [])
             .map((mentioned) => resolveRouteStop(mentioned, placesById, routeStopsById).name)
             .filter((name, index, array) => array.indexOf(name) === index);
-          const travelModeText =
-            stage.travelMode === "land"
-              ? "By land"
-              : stage.travelMode === "sea"
-                ? "By sea"
-                : `Through${stage.namedRegions?.length ? ` ${stage.namedRegions.map((region) => region.name).join(", ")}` : ""}`;
+          const travelModeText = formatRouteTravelModeText(stage);
           return (
             <li
               data-route-stage-selected={isActive ? "true" : "false"}
