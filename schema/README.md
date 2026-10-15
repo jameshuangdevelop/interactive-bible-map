@@ -142,22 +142,36 @@ GIS terms used here:
   - `data/routes/stops.json` (shared stop entries for places without full location records yet)
   - `data/geo/routes-lines.geojson` (geometry + provenance only; licensed per source, as confirmed in `docs/LICENSES.md`, ADR-0038 item 5; no CC BY-SA facts)
 - A route records:
-  - `id`, `title`, approximate `fromYear` and `toYear` (`yearNote` where sources differ),
+  - `id`, `title`, approximate `fromYear` and `toYear`,
   - `structure`: `connected` (Paul-style sequence) or `standalone-segments` (Jesus segments),
-  - short `note`, `sources`, and ordered `stages[]`.
+  - route text (`summary`, `bibleText`, `notes[]`), `sources`, and ordered `stages[]`.
 - Stage stop references use either:
   - `{ "kind": "location", "locationId": "...", "candidateIndex": 0 }`, or
   - `{ "kind": "route-stop", "stopId": "...", "candidateIndex": 0 }`.
-- Stages include `from`, `to`, optional ordered `via[]` (passed or sailed-by places), `scripture[]` (`ref`, `book`, `textWEB`), `travelMode` (`land`, `sea`, `unknown`), optional `namedRegions[]`, optional Jesus-segment `attestation`, and exactly one of `lineId` or `noLineReason`.
+- Stages include `from`, `to`, optional ordered `via[]` (passed or sailed-by places), optional `mentioned[]` (places named but not reached), `scripture[]` (`ref`, `book`, `textWEB`), `travelMode` (`land`, `sea`, `unknown`), optional `namedRegions[]`, optional Jesus-segment `attestation`, and exactly one of `lineId` or `noLineReason`.
 - Stop entries include an English `name` (ADR-0026), optional `todayName`, `candidates[]` in the same coordinate/citation shape as place candidates (`[lon, lat]`, confidence, coordinate source, sources), naming `scripture[]`, top-level `sources`, and `status` (`draft` or `verified`).
 - Validation adds route checks:
   - each referenced stop exists (location record or route-stop entry);
+  - each `mentioned[]` stop must not duplicate the stage's `from`, `to`, or any `via[]` stop;
   - route-stop IDs cannot duplicate location IDs;
   - passage refs must parse in one-chapter format and `textWEB` must match WEB;
   - every route-stop candidate has at least two sources;
   - every `standalone-segments` stage has attestation;
-  - every `lineId` points to matching geometry by route/stage key.
-- `REQUIRE_ROUTE_LINES` can enforce that every stage has either `lineId` or `noLineReason`; default is `false` until M5-04 lands real linework.
+  - every `lineId` points to matching geometry by route/stage key;
+  - each line's first and last coordinates must match the stage's `from`/`to` stop coordinates within about 1 m;
+  - route-line vertices must stay in project bounds, may not use `[0, 0]`, and may not contain jumps over 1000 km between consecutive vertices;
+  - every line passes the routes' lines audit (below).
+- `REQUIRE_ROUTE_LINES` enforces that every stage has either `lineId` or `noLineReason`; default is `true` since M5-04's linework.
+- `REQUIRE_ROUTE_TEXT` enforces that routes have non-empty `summary`, `bibleText`, and `notes[]`; default is `true` since M5-06's text landed.
+- Legacy route-level caveat fields (`note`, `yearNote`) are retired and not accepted by schema validation.
+
+#### The routes' lines (M5-04)
+- `npm run build:route-lines` draws one line per stage (ADR-0038 item 5 and its update of 2026-10-14) and writes `data/geo/routes-lines.geojson` and the stages' `lineId`s; `npm run check:route-lines` rebuilds them from an empty cache, checks the result byte for byte, and prints the audit's per-line table. Its inputs are pinned by commit and SHA-256 (`scripts/lib/route-line-inputs.mjs`; `docs/research/SOURCES.md`, "M5-04"). The build report and the previews (Web Mercator, land and lakes filled) are written to the cache, outside the repository (`$TMPDIR/ibm-route-lines/report/`, or `ROUTE_LINES_CACHE`).
+- **By sea** (`shortest-over-water`): the shortest path over water from stop to stop through each place passed, in order: within 5 km of a town or cape, within 10 km of an island's coast, or across the open water on the side of an island the text gives (`SIDE_PASSES` in `scripts/lib/route-line-rules.mjs`, each with its passage). Found by A* in 8 directions on a raster of Natural Earth 10 m land and lakes (500 m Web Mercator cells), string-pulled and relaxed with exact line-of-sight tests against the vector coast, keeping 1.3 km off it where the water allows (less only in a narrower passage, or within 0.5 km of a stop's connector). A stop that lies on land more than 3 km from the water (inland, or an island's label point) is reached by an **approach** instead of a connector (ADR-0038, update of 2026-10-14, "stops away from the water"): the line goes by sea to the coast nearest the stop, then straight over land to it, up to 30 km.
+- **By land**: along AWMC's dated roads where one lies within 15 km of each stop (`awmc-road`); otherwise straight (`straight-over-land`), or, where the straight line would cross the sea or a lake, the shortest path over land in the same way (`shortest-over-land`). The line passes through each place passed.
+- **Path not known** (`path-not-known`): straight between the stops. Stages with a `noLineReason` get no line.
+- Each line's provenance gives its method as the kind of its first change, the pinned versions, the `coordinateSource` of every stop it joins, and every change: connectors, places passed, sides of islands, road stretches replaced, and the text's reasons.
+- **The audit** (`scripts/lib/route-line-audit.mjs`, run by `check:route-lines`, `validate:data` and so `build:data`, with no line skipped) splits every segment exactly where it crosses Natural Earth's coast or a lake shore, in Web Mercator, where the map draws it straight, and measures each piece. A line by sea fails on any piece over land, and a line by land on any piece over the sea or a lake, except a connector of at most 3 km at each end, recorded in a `start-connector` or `end-connector` change with its length, or, at a stop of a stage by sea more than 3 km from the water, an approach: up to 30 km, ending at the coast nearest the stop (within 0.05 km of the stop's distance to the water), checked again as a line by land (no water crossed), and recorded in a `start-approach` or `end-approach` change with its length. It also fails a line whose ends lie more than 1 m from its stops, a line by sea that misses a place passed or passes it out of order, a line by sea longer than 1.25 times the shortest path over water through its places passed (unless a `detour-reason` change gives the text's reason), a "path not known" line that isn't straight, and any staircase step (a segment under 2 km between turns of more than 20° in opposite directions, not counting AWMC's own road geometry). A single such step is accepted as a turn round land only if the straight line from the vertex before it to the vertex after it would cross land (water, for a line by land) beyond the line's own connector or approach; two or more steps in a row always fail. For information, its table also gives each line's nearest approach to the coast or a lake shore beyond its connectors and the 3 km after them.
 - `build:data` writes lazy Routes-tab payloads:
   - `app/public/generated/routes.routes.json`
   - `app/public/generated/routes.stages.json`
@@ -177,15 +191,19 @@ Complete example:
       "title": "Paul's first journey",
       "fromYear": 46,
       "toYear": 48,
-      "yearNote": "About AD 46-48 in cited chronologies.",
       "structure": "connected",
-      "note": "Lines show stage order and land/sea mode, not exact traveled paths.",
+      "summary": "Paul and Barnabas travel from Antioch through Cyprus and southern Anatolia, then return to report back.",
+      "bibleText": "Acts 13-14 describes their departures, preaching stops, and return to Antioch in Syria.",
+      "notes": [
+        "Lines show stage order and travel mode, not exact traveled paths."
+      ],
       "sources": ["scripture:Acts 13:4-5", "bib:pleiades-place-resource"],
       "stages": [
         {
           "id": "stage-01",
           "from": { "kind": "location", "locationId": "antioch-syria", "candidateIndex": 0 },
           "to": { "kind": "route-stop", "stopId": "seleucia" },
+          "mentioned": [{ "kind": "route-stop", "stopId": "phoenix-crete" }],
           "scripture": [{ "ref": "Acts 13:4-5", "book": "Acts", "textWEB": "..." }],
           "travelMode": "land",
           "lineId": "paul-1-stage-01",
@@ -199,7 +217,9 @@ Complete example:
       "fromYear": 28,
       "toYear": 30,
       "structure": "standalone-segments",
-      "note": "Standalone, well-attested segments only.",
+      "summary": "Well-attested movement segments listed without harmonizing the Gospels into one itinerary.",
+      "bibleText": "The route keeps only segments whose start and end places are clear in the cited passages.",
+      "notes": ["Segments are listed neutrally and do not assert one Gospel timeline."],
       "sources": ["scripture:Matthew 4:13", "bib:pleiades-place-resource"],
       "stages": [
         {

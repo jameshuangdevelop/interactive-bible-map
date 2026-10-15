@@ -729,7 +729,7 @@
           ],
           "coordinateSource": "openbible:sidon",
           "confidence": "high",
-          "support": "An ancient Phoenician port city on the Mediterranean coast. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Sidon, Lebanon.",
+          "support": "An ancient Phoenician port city on the Mediterranean coast, named in the Gospels alongside Tyre as well as in Acts. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Sidon, Lebanon.",
           "sources": [
             "pleiades:678393",
             "openbible:sidon",
@@ -743,6 +743,21 @@
           "ref": "Acts 27:3",
           "book": "Acts",
           "textWEB": "The next day, we touched at Sidon. Julius treated Paul kindly and gave him permission to go to his friends and refresh himself."
+        },
+        {
+          "ref": "Matthew 15:21",
+          "book": "Matthew",
+          "textWEB": "Jesus went out from there and withdrew into the region of Tyre and Sidon."
+        },
+        {
+          "ref": "Mark 7:24",
+          "book": "Mark",
+          "textWEB": "From there he arose and went away into the borders of Tyre and Sidon. He entered into a house and didn’t want anyone to know it, but he couldn’t escape notice."
+        },
+        {
+          "ref": "Mark 7:31",
+          "book": "Mark",
+          "textWEB": "Again he departed from the borders of Tyre and Sidon, and came to the sea of Galilee through the middle of the region of Decapolis."
         }
       ],
       "sources": [
@@ -753,7 +768,7 @@
       ],
       "status": "verified",
       "verifiedBy": "fact-checker",
-      "lastReviewed": "2026-10-13"
+      "lastReviewed": "2026-10-14"
     },
     {
       "id": "syracuse",
@@ -1155,6 +1170,226 @@
       "status": "verified",
       "verifiedBy": "fact-checker",
       "lastReviewed": "2026-10-13"
+    },
+    {
+      "id": "phoenix",
+      "name": "Phoenix",
+      "todayName": "Sfakia Municipality, Crete, Greece",
+      "candidates": [
+        {
+          "label": "Loutro",
+          "coordinates": [
+            24.07828,
+            35.19919
+          ],
+          "coordinateSource": "pleiades:589993",
+          "confidence": "disputed",
+          "support": "A harbor on Crete's south coast, by the village of Loutro, sheltered from every wind. The International Standard Bible Encyclopedia calls this the only safe harbor on this coast large enough for the ship, and states that the ancient authorities agree in placing Phoenix in this neighborhood, judging the identification \"seems certain\"; an inscription found at Loutro shows that Egyptian grain ships wintered there. It calls the harbor's east-facing aspect, against Acts 27:12's \"looking southwest and northwest,\" a serious difficulty, and resolves it either by reading the phrase in sailors' language as looking down those winds, toward the northeast and southeast, which fits Loutro, or by supposing that the writer, who never saw Phoenix, described it wrongly. OpenBible.info rates this site its second identification (35% confidence). Pleiades, OpenBible.info and Wikidata agree on the site.",
+          "sources": [
+            "pleiades:589993",
+            "wikidata:Q1872352",
+            "openbible:phoenix",
+            "bib:isbe-phoenix"
+          ]
+        },
+        {
+          "label": "Finikas",
+          "coordinates": [
+            24.0668,
+            35.1991
+          ],
+          "coordinateSource": "pleiades:589992",
+          "confidence": "disputed",
+          "support": "An open roadstead on the west side of the isthmus Loutro stands on. This reading takes Acts 27:12's \"looking southwest and northwest\" at face value; the International Standard Bible Encyclopedia records the proposal but judges the roadstead \"not a suitable place for wintering in.\" OpenBible.info rates this site, at today's village of Finikas, its likelier identification (55% confidence, against 35% for Loutro), and Wikidata places the village here; Pleiades catalogs it as Phoinikous Limen.",
+          "sources": [
+            "pleiades:589992",
+            "wikidata:Q21773510",
+            "openbible:phoenix",
+            "bib:isbe-phoenix"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:12",
+          "book": "Acts",
+          "textWEB": "Because the haven was not suitable to winter in, the majority advised going to sea from there, if by any means they could reach Phoenix and winter there, which is a port of Crete, looking southwest and northwest."
+        }
+      ],
+      "sources": [
+        "pleiades:589993",
+        "wikidata:Q1872352",
+        "openbible:phoenix",
+        "bib:isbe-phoenix",
+        "pleiades:589992",
+        "wikidata:Q21773510"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
+    },
+    {
+      "id": "lasea",
+      "name": "Lasea",
+      "todayName": "Faistos Municipality, Crete, Greece",
+      "candidates": [
+        {
+          "label": "Lasea ruins",
+          "coordinates": [
+            24.811111,
+            34.940556
+          ],
+          "coordinateSource": "openbible:lasea",
+          "confidence": "high",
+          "support": "A town on Crete's south coast about 5 miles east of Fair Havens and south of Gortyna, a city the International Standard Bible Encyclopedia notes had many Jews; its ruins were examined in 1856. The encyclopedia reasons that having to buy stores from Lasea, had the ship stayed at Fair Havens, helps explain the ship's reluctance to winter there instead of continuing toward Phoenix. Pleiades, OpenBible.info and Wikidata agree on the site.",
+          "sources": [
+            "pleiades:589897",
+            "openbible:lasea",
+            "wikidata:Q6492763",
+            "bib:isbe-lasea",
+            "bib:isbe-phoenix"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:8",
+          "book": "Acts",
+          "textWEB": "With difficulty sailing along it we came to a certain place called Fair Havens, near the city of Lasea."
+        }
+      ],
+      "sources": [
+        "pleiades:589897",
+        "openbible:lasea",
+        "wikidata:Q6492763",
+        "bib:isbe-lasea",
+        "bib:isbe-phoenix"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
+    },
+    {
+      "id": "adramyttium",
+      "name": "Adramyttium",
+      "todayName": "Ören, Balıkesir Province, Türkiye",
+      "candidates": [
+        {
+          "label": "Adramyttium (Karataş peninsula, Ören)",
+          "coordinates": [
+            26.936098,
+            39.49864
+          ],
+          "coordinateSource": "pleiades:550403",
+          "confidence": "high",
+          "support": "A city of Mysia, in the Roman province of Asia, with a good harbor at the head of the Gulf of Adramyttium, facing the island of Lesbos. The International Standard Bible Encyclopedia says the city grew important once Pergamum became the province's capital, serving as the district's own administrative center, and that its ancient harbor has disappeared, while a village carrying a form of its name stands further inland. Pleiades places the ancient site on the modern Karataş peninsula at Ören; Wikidata and OpenBible.info agree, and Wikidata's own record places it within Balıkesir Province, Türkiye.",
+          "sources": [
+            "pleiades:550403",
+            "wikidata:Q3605584",
+            "openbible:adramyttium",
+            "bib:isbe-adramyttium"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:2",
+          "book": "Acts",
+          "textWEB": "Embarking in a ship of Adramyttium, which was about to sail to places on the coast of Asia, we put to sea, Aristarchus, a Macedonian of Thessalonica being with us."
+        }
+      ],
+      "sources": [
+        "pleiades:550403",
+        "wikidata:Q3605584",
+        "openbible:adramyttium",
+        "bib:isbe-adramyttium"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
+    },
+    {
+      "id": "alexandria",
+      "name": "Alexandria",
+      "todayName": "Alexandria, Egypt",
+      "candidates": [
+        {
+          "label": "Alexandria",
+          "coordinates": [
+            29.8925,
+            31.1975
+          ],
+          "coordinateSource": "wikidata:Q87",
+          "confidence": "high",
+          "support": "A port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC by the isle of Pharos, and a major shipbuilding and trade center under Roman rule. Acts names \"a ship of Alexandria\" twice as the vessel Paul's party boarded: first at Myra (Acts 27:6), and again, after the shipwreck, on Malta (Acts 28:11); the International Standard Bible Encyclopedia confirms these as the New Testament's only two direct references to such a ship. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Alexandria, Egypt.",
+          "sources": [
+            "wikidata:Q87",
+            "pleiades:727070",
+            "openbible:alexandria",
+            "bib:isbe-alexandria"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:6",
+          "book": "Acts",
+          "textWEB": "There the centurion found a ship of Alexandria sailing for Italy, and he put us on board."
+        },
+        {
+          "ref": "Acts 28:11",
+          "book": "Acts",
+          "textWEB": "After three months, we set sail in a ship of Alexandria which had wintered in the island, whose figurehead was “The Twin Brothers.”"
+        }
+      ],
+      "sources": [
+        "wikidata:Q87",
+        "pleiades:727070",
+        "openbible:alexandria",
+        "bib:isbe-alexandria"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
+    },
+    {
+      "id": "syrtis",
+      "name": "Syrtis",
+      "todayName": "Gulf of Sidra, Libya",
+      "candidates": [
+        {
+          "label": "Syrtis Maior (Gulf of Sidra)",
+          "coordinates": [
+            17.827475,
+            31.474808
+          ],
+          "coordinateSource": "pleiades:344491",
+          "confidence": "high",
+          "support": "A gulf on the northern coast of Africa, off today's Libya, known in ancient geography as Syrtis Maior, whose sandbanks sailors long feared as a hazard; the International Standard Bible Encyclopedia notes that the Roman poet Virgil refers to the danger in the Aeneid. Acts 27:17 says the storm-driven ship's crew, fearing they would run aground there, lowered the sea anchor instead; the ship never reached it. OpenBible.info identifies the Syrtis of Acts 27:17 with the Gulf of Sidra, which Wikidata and Pleiades equate with ancient Syrtis Maior; their points lie about 17 km apart, close for a gulf this size.",
+          "sources": [
+            "pleiades:344491",
+            "wikidata:Q187274",
+            "openbible:syrtis",
+            "bib:isbe-syrtis"
+          ]
+        }
+      ],
+      "scripture": [
+        {
+          "ref": "Acts 27:17",
+          "book": "Acts",
+          "textWEB": "After they had hoisted it up, they used cables to help reinforce the ship. Fearing that they would run aground on the Syrtis sand bars, they lowered the sea anchor, and so were driven along."
+        }
+      ],
+      "sources": [
+        "pleiades:344491",
+        "wikidata:Q187274",
+        "openbible:syrtis",
+        "bib:isbe-syrtis"
+      ],
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     }
   ]
 }

@@ -6,9 +6,13 @@
       "title": "Paul fixture journey",
       "fromYear": 46,
       "toYear": 48,
-      "yearNote": "Illustrative fixture dates only.",
       "structure": "connected",
-      "note": "Fixture route for M5 schema/build tests.",
+      "summary": "Fixture summary for route-level text validation.",
+      "bibleText": "Fixture bibleText paragraph for route-level text validation.",
+      "notes": [
+        "Fixture disclaimer one.",
+        "Fixture disclaimer two."
+      ],
       "sources": [
         "scripture:Acts 2:1",
         "bib:existing-bib-source"
@@ -65,6 +69,13 @@
           ],
           "travelMode": "sea",
           "lineId": "paul-fixture-stage-02",
+          "mentioned": [
+            {
+              "kind": "route-stop",
+              "stopId": "disputed-stop-fixture",
+              "candidateIndex": 1
+            }
+          ],
           "sources": [
             "scripture:1 Corinthians 1:2",
             "bib:existing-bib-source"
@@ -138,9 +149,12 @@
       "title": "Jesus fixture segments",
       "fromYear": 28,
       "toYear": 30,
-      "yearNote": "Illustrative fixture dates only.",
       "structure": "standalone-segments",
-      "note": "Fixture standalone segments for attestation checks.",
+      "summary": "Fixture summary for standalone segments.",
+      "bibleText": "Fixture bibleText paragraph for standalone segments.",
+      "notes": [
+        "Fixture standalone disclaimer."
+      ],
       "sources": [
         "scripture:Matthew 5:1",
         "bib:existing-bib-source"

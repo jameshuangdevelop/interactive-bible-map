@@ -300,6 +300,13 @@
             "$ref": "#/$defs/stopRef"
           }
         },
+        "mentioned": {
+          "type": "array",
+          "description": "Places named in the passages that travelers did not reach or pass.",
+          "items": {
+            "$ref": "#/$defs/stopRef"
+          }
+        },
         "scripture": {
           "type": "array",
           "minItems": 1,
@@ -353,7 +360,6 @@
         "fromYear",
         "toYear",
         "structure",
-        "note",
         "sources",
         "stages"
       ],
@@ -372,11 +378,6 @@
         "toYear": {
           "$ref": "#/$defs/yearNoZero"
         },
-        "yearNote": {
-          "type": "string",
-          "description": "Short note where scholarly date ranges differ.",
-          "minLength": 1
-        },
         "structure": {
           "type": "string",
           "description": "Whether stages form one connected sequence or stand alone.",
@@ -385,9 +386,20 @@
             "standalone-segments"
           ]
         },
-        "note": {
+        "summary": {
           "type": "string",
           "minLength": 1
+        },
+        "bibleText": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "sources": {
           "type": "array",

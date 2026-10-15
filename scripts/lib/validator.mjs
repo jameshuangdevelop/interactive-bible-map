@@ -1,11 +1,13 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import booleanValid from "@turf/boolean-valid";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { pointInGeometry } from "./ancient-area-checks.mjs";
 
 import { CANONICAL_BOOKS, OLD_TESTAMENT_BOOKS, parseReference } from "./books.mjs";
 import {
@@ -18,6 +20,9 @@ import {
   getWebTextForReference,
   loadWebVerseIndex
 } from "./web-text.mjs";
+import { auditRouteLines, loadPinnedSurfaceModel } from "./route-line-audit-runner.mjs";
+import { REGION_BOUNDS as ROUTE_LINE_REGION_BOUNDS } from "./route-line-rules.mjs";
+import { createSurfaceModel } from "./route-line-surface.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
@@ -138,6 +143,8 @@ export const PROJECT_BOUNDS = Object.freeze({
   minLat: -5,
   maxLat: 50
 });
+export const ROUTE_LINE_MAX_VERTEX_JUMP_KM = 1000;
+export const ROUTE_SEA_MAX_DETOUR_RATIO = 1.25;
 export const REQUIRE_EMPIRE_ROOT = true;
 export const REQUIRE_MODERN_COUNTRIES = true;
 export const REQUIRE_MAJOR_IMAGES = true;
@@ -145,7 +152,8 @@ export const REQUIRE_MAJOR_IMAGES = true;
 // data/geo/ancient-areas.geojson. REQUIRE_ANCIENT_SHAPES=false in the environment relaxes it.
 export const REQUIRE_ANCIENT_SHAPES = true;
 export const REQUIRE_DERIVED_POLITICAL_HISTORY = false;
-export const REQUIRE_ROUTE_LINES = false;
+export const REQUIRE_ROUTE_LINES = true;
+export const REQUIRE_ROUTE_TEXT = true;
 export const MAJOR_PLACE_MIN_IMAGE_COUNT = 4;
 export const MAJOR_PLACE_MAX_IMAGE_COUNT = 7;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
@@ -1957,6 +1965,7 @@ function validateRouteStopRef({
         );
       }
     }
+
     return;
   }
 
@@ -2012,7 +2021,129 @@ function validateRouteStopRef({
         );
       }
     }
+
   }
+}
+
+function routeStopRefKey(stopRef) {
+  if (!stopRef || typeof stopRef !== "object") {
+    return null;
+  }
+  if (stopRef.kind === "location" && typeof stopRef.locationId === "string") {
+    return `location:${stopRef.locationId}`;
+  }
+  if (stopRef.kind === "route-stop" && typeof stopRef.stopId === "string") {
+    return `route-stop:${stopRef.stopId}`;
+  }
+  return null;
+}
+
+function resolveRouteStopRefCoordinate(stopRef, locationRecordsById, routeStopsById) {
+  if (!stopRef || typeof stopRef !== "object") {
+    return null;
+  }
+  if (stopRef.kind === "location") {
+    const locationRecord = locationRecordsById.get(stopRef.locationId);
+    const candidates = locationRecord?.data?.candidates;
+    const candidateIndex = Number.isInteger(stopRef.candidateIndex)
+      ? stopRef.candidateIndex
+      : 0;
+    return candidates?.[candidateIndex]?.coordinates ?? null;
+  }
+  if (stopRef.kind === "route-stop") {
+    const stopEntry = routeStopsById.get(stopRef.stopId);
+    const candidateIndex = Number.isInteger(stopRef.candidateIndex)
+      ? stopRef.candidateIndex
+      : 0;
+    return stopEntry?.candidates?.[candidateIndex]?.coordinates ?? null;
+  }
+  return null;
+}
+
+function geometryEndpoints(geometry) {
+  if (!geometry || typeof geometry !== "object") {
+    return null;
+  }
+  if (geometry.type === "LineString") {
+    const coordinates = geometry.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length < 2) {
+      return null;
+    }
+    return {
+      start: coordinates[0],
+      end: coordinates[coordinates.length - 1]
+    };
+  }
+  if (geometry.type === "MultiLineString") {
+    const coordinates = geometry.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length === 0) {
+      return null;
+    }
+    const first = coordinates[0];
+    const last = coordinates[coordinates.length - 1];
+    if (
+      !Array.isArray(first) ||
+      !Array.isArray(last) ||
+      first.length < 2 ||
+      last.length < 2
+    ) {
+      return null;
+    }
+    return {
+      start: first[0],
+      end: last[last.length - 1]
+    };
+  }
+  return null;
+}
+
+function haversineDistanceMeters(left, right) {
+  const [lon1, lat1] = left;
+  const [lon2, lat2] = right;
+  const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const deltaLat = toRadians(lat2 - lat1);
+  const deltaLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(deltaLon / 2) ** 2;
+  const km = 6371 * 2 * Math.asin(Math.sqrt(a));
+  return km * 1000;
+}
+
+function lineStringsFromGeometry(geometry) {
+  if (!geometry || typeof geometry !== "object") {
+    return [];
+  }
+  if (geometry.type === "LineString") {
+    return Array.isArray(geometry.coordinates) ? [geometry.coordinates] : [];
+  }
+  if (geometry.type === "MultiLineString") {
+    return Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
+  }
+  return [];
+}
+
+function geometryBounds(geometry) {
+  const coordinates = [];
+  if (geometry?.type === "Polygon") {
+    coordinates.push(...geometry.coordinates.flat());
+  } else if (geometry?.type === "MultiPolygon") {
+    for (const polygon of geometry.coordinates) {
+      coordinates.push(...polygon.flat());
+    }
+  }
+  if (coordinates.length === 0) {
+    return null;
+  }
+  return coordinates.reduce(
+    (bounds, [lon, lat]) => ({
+      minLon: Math.min(bounds.minLon, lon),
+      maxLon: Math.max(bounds.maxLon, lon),
+      minLat: Math.min(bounds.minLat, lat),
+      maxLat: Math.max(bounds.maxLat, lat)
+    }),
+    { minLon: Infinity, maxLon: -Infinity, minLat: Infinity, maxLat: -Infinity }
+  );
 }
 
 export async function validateData(options = {}) {
@@ -2152,6 +2283,9 @@ export async function validateData(options = {}) {
   const requireRouteLinesFromEnvironment = parseBooleanEnvironmentFlag(
     process.env.REQUIRE_ROUTE_LINES
   );
+  const requireRouteTextFromEnvironment = parseBooleanEnvironmentFlag(
+    process.env.REQUIRE_ROUTE_TEXT
+  );
   const requireMajorImages =
     typeof options.requireMajorImages === "boolean"
       ? options.requireMajorImages
@@ -2169,6 +2303,10 @@ export async function validateData(options = {}) {
     typeof options.requireRouteLines === "boolean"
       ? options.requireRouteLines
       : requireRouteLinesFromEnvironment ?? REQUIRE_ROUTE_LINES;
+  const requireRouteText =
+    typeof options.requireRouteText === "boolean"
+      ? options.requireRouteText
+      : requireRouteTextFromEnvironment ?? REQUIRE_ROUTE_TEXT;
 
   const errors = [];
   const warnings = [];
@@ -2423,6 +2561,29 @@ export async function validateData(options = {}) {
   const ancientCoastlineRelativePath = relativeFromRepositoryRoot(ancientCoastlinePath);
   const ancientEmpireEdgeRelativePath = relativeFromRepositoryRoot(ancientEmpireEdgePath);
   const osmWaterwaysRelativePath = relativeFromRepositoryRoot(osmWaterwaysPath);
+  // The routes' lines audit measures against Natural Earth 10 m land and lakes (pinned), or against
+  // the land and lakes given by `routeLineLandPath` and `routeLineLakesPath` (test fixtures).
+  let routeLineSurfaceModel = null;
+  if (routeLinesData) {
+    try {
+      if (options.routeLineLandPath) {
+        const [land, lakes] = await Promise.all([
+          readJsonFile(path.resolve(options.routeLineLandPath)),
+          options.routeLineLakesPath ? readJsonFile(path.resolve(options.routeLineLakesPath)) : { type: "FeatureCollection", features: [] }
+        ]);
+        routeLineSurfaceModel = createSurfaceModel({ land, lakes, bounds: ROUTE_LINE_REGION_BOUNDS });
+      } else {
+        routeLineSurfaceModel = await loadPinnedSurfaceModel();
+      }
+    } catch (error) {
+      recordError(
+        errors,
+        routeLinesRelativePath,
+        "$",
+        `Unable to read the land and lakes for the route-line audit: ${error.message}`
+      );
+    }
+  }
 
   if (usingRepositoryDataRoot) {
     if (!ancientAreasExists) {
@@ -3195,6 +3356,7 @@ export async function validateData(options = {}) {
   }
 
   const routeStageKeySet = new Set();
+  const routeStageByKey = new Map();
   if (Array.isArray(routesData?.routes)) {
     routesData.routes.forEach((route, routeIndex) => {
       if (!route || typeof route !== "object") {
@@ -3224,13 +3386,74 @@ export async function validateData(options = {}) {
         errors
       });
 
+      if (requireRouteText) {
+        if (typeof route?.summary !== "string" || route.summary.trim().length === 0) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].summary`,
+            "Routes must include a non-empty summary while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+        if (typeof route?.bibleText !== "string" || route.bibleText.trim().length === 0) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].bibleText`,
+            "Routes must include a non-empty bibleText while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+        if (!Array.isArray(route?.notes) || route.notes.length === 0) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].notes`,
+            "Routes must include at least one notes entry while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        } else {
+          route.notes.forEach((noteEntry, noteIndex) => {
+            if (typeof noteEntry !== "string" || noteEntry.trim().length === 0) {
+              recordError(
+                errors,
+                routesRelativePath,
+                `$.routes[${routeIndex}].notes[${noteIndex}]`,
+                "Route notes entries must be non-empty strings"
+              );
+            }
+          });
+        }
+        if (typeof route?.note === "string") {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].note`,
+            "Legacy route note is not allowed while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+        if (typeof route?.yearNote === "string") {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].yearNote`,
+            "Legacy route yearNote is not allowed while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+      }
+
       (route.stages ?? []).forEach((stage, stageIndex) => {
         if (!stage || typeof stage !== "object") {
           return;
         }
 
         if (typeof route?.id === "string" && typeof stage?.id === "string") {
-          routeStageKeySet.add(`${route.id}::${stage.id}`);
+          const stageKey = `${route.id}::${stage.id}`;
+          routeStageKeySet.add(stageKey);
+          routeStageByKey.set(stageKey, {
+            route,
+            stage,
+            routeIndex,
+            stageIndex
+          });
         }
 
         validateRouteStopRef({
@@ -3259,6 +3482,52 @@ export async function validateData(options = {}) {
               routeStopsById,
               errors
             });
+          });
+        }
+        if (Array.isArray(stage.mentioned)) {
+          stage.mentioned.forEach((stopRef, mentionedIndex) => {
+            validateRouteStopRef({
+              stopRef,
+              file: routesRelativePath,
+              pathValue: `$.routes[${routeIndex}].stages[${stageIndex}].mentioned[${mentionedIndex}]`,
+              locationRecordsById,
+              routeStopsById,
+              errors
+            });
+          });
+        }
+
+        const fromKey = routeStopRefKey(stage.from);
+        const toKey = routeStopRefKey(stage.to);
+        const viaKeySet = new Set(
+          (stage.via ?? [])
+            .map((stopRef) => routeStopRefKey(stopRef))
+            .filter((value) => typeof value === "string")
+        );
+        if (Array.isArray(stage.mentioned)) {
+          const mentionedKeys = new Set();
+          stage.mentioned.forEach((mentionedRef, mentionedIndex) => {
+            const mentionedKey = routeStopRefKey(mentionedRef);
+            if (!mentionedKey) {
+              return;
+            }
+            if (mentionedKey === fromKey || mentionedKey === toKey || viaKeySet.has(mentionedKey)) {
+              recordError(
+                errors,
+                routesRelativePath,
+                `$.routes[${routeIndex}].stages[${stageIndex}].mentioned[${mentionedIndex}]`,
+                "A mentioned stop cannot also be a stage endpoint or via stop"
+              );
+            }
+            if (mentionedKeys.has(mentionedKey)) {
+              recordError(
+                errors,
+                routesRelativePath,
+                `$.routes[${routeIndex}].stages[${stageIndex}].mentioned[${mentionedIndex}]`,
+                "A stage cannot list the same mentioned stop more than once"
+              );
+            }
+            mentionedKeys.add(mentionedKey);
           });
         }
 
@@ -3355,7 +3624,11 @@ export async function validateData(options = {}) {
           `Duplicate route line for route '${routeId}' and stage '${stageId}'`
         );
       } else {
-        routeLineByKey.set(mapKey, { lineId, featureIndex });
+        routeLineByKey.set(mapKey, {
+          lineId,
+          featureIndex,
+          geometry: feature.geometry
+        });
       }
 
       if (!routeStageKeySet.has(mapKey)) {
@@ -3366,7 +3639,90 @@ export async function validateData(options = {}) {
           `Route line '${lineId}' references unknown stage '${stageId}' in route '${routeId}'`
         );
       }
+
+      const lineStrings = lineStringsFromGeometry(feature?.geometry);
+      lineStrings.forEach((lineString, lineStringIndex) => {
+        lineString.forEach((coordinate, coordinateIndex) => {
+          if (!Array.isArray(coordinate) || coordinate.length < 2) {
+            return;
+          }
+          const [lon, lat] = coordinate;
+          if (
+            typeof lon === "number" &&
+            typeof lat === "number" &&
+            lon === 0 &&
+            lat === 0
+          ) {
+            recordError(
+              errors,
+              routeLinesRelativePath,
+              `$.features[${featureIndex}].geometry`,
+              `Route line '${lineId}' contains forbidden [0, 0] coordinates`
+            );
+          }
+          if (
+            typeof lon === "number" &&
+            typeof lat === "number" &&
+            (lon < PROJECT_BOUNDS.minLon ||
+              lon > PROJECT_BOUNDS.maxLon ||
+              lat < PROJECT_BOUNDS.minLat ||
+              lat > PROJECT_BOUNDS.maxLat)
+          ) {
+            recordError(
+              errors,
+              routeLinesRelativePath,
+              `$.features[${featureIndex}].geometry`,
+              `Route line '${lineId}' has a vertex outside project bounds ${JSON.stringify(PROJECT_BOUNDS)}`
+            );
+          }
+
+          if (coordinateIndex > 0) {
+            const previous = lineString[coordinateIndex - 1];
+            if (Array.isArray(previous) && previous.length >= 2) {
+              const jumpKm =
+                haversineDistanceMeters(previous, coordinate) / 1000;
+              if (jumpKm > ROUTE_LINE_MAX_VERTEX_JUMP_KM) {
+                recordError(
+                  errors,
+                  routeLinesRelativePath,
+                  `$.features[${featureIndex}].geometry`,
+                  `Route line '${lineId}' has a ${jumpKm.toFixed(1)} km vertex jump; the maximum allowed is ${ROUTE_LINE_MAX_VERTEX_JUMP_KM} km`
+                );
+              }
+            }
+          }
+        });
+      });
     });
+
+    // The routes' lines audit (scripts/lib/route-line-audit.mjs): every segment of every line,
+    // measured exactly against land (lines by sea) or water (lines by land), with no line skipped.
+    if (routeLineSurfaceModel && routesData) {
+      try {
+        const { rows } = auditRouteLines({
+          model: routeLineSurfaceModel,
+          routesData,
+          linesData: routeLinesData,
+          lookup: {
+            getLocation: (id) => locationRecordsById.get(id)?.data,
+            getStop: (id) => routeStopsById.get(id)
+          },
+          roadsData: ancientRoadsData
+        });
+        for (const row of rows) {
+          for (const failure of row.failures) {
+            recordError(
+              errors,
+              routeLinesRelativePath,
+              `$.features[${row.featureIndex}].geometry`,
+              `Route line '${row.lineId}' fails the route-line audit: ${failure}`
+            );
+          }
+        }
+      } catch (error) {
+        recordError(errors, routeLinesRelativePath, "$", `The route-line audit could not run: ${error.message}`);
+      }
+    }
   }
 
   if (Array.isArray(routesData?.routes)) {
@@ -3390,6 +3746,41 @@ export async function validateData(options = {}) {
               `$.routes[${routeIndex}].stages[${stageIndex}].lineId`,
               `lineId '${stage.lineId}' does not match route-line geometry id '${matchingLine.lineId}' for route '${route.id}' stage '${stage.id}'`
             );
+          } else {
+            const fromCoordinate = resolveRouteStopRefCoordinate(
+              stage.from,
+              locationRecordsById,
+              routeStopsById
+            );
+            const toCoordinate = resolveRouteStopRefCoordinate(
+              stage.to,
+              locationRecordsById,
+              routeStopsById
+            );
+            const endpoints = geometryEndpoints(matchingLine.geometry);
+            if (fromCoordinate && toCoordinate && endpoints) {
+              const startDistance = haversineDistanceMeters(
+                fromCoordinate,
+                endpoints.start
+              );
+              const endDistance = haversineDistanceMeters(toCoordinate, endpoints.end);
+              if (startDistance > 1.5) {
+                recordError(
+                  errors,
+                  routeLinesRelativePath,
+                  `$.features[${matchingLine.featureIndex}].geometry`,
+                  `Route line '${matchingLine.lineId}' start is ${startDistance.toFixed(2)} m from stage start stop; lines must end exactly at their stops`
+                );
+              }
+              if (endDistance > 1.5) {
+                recordError(
+                  errors,
+                  routeLinesRelativePath,
+                  `$.features[${matchingLine.featureIndex}].geometry`,
+                  `Route line '${matchingLine.lineId}' end is ${endDistance.toFixed(2)} m from stage end stop; lines must end exactly at their stops`
+                );
+              }
+            }
           }
         }
 
@@ -4163,7 +4554,7 @@ export async function validateData(options = {}) {
     }
   }
 
-  const validateGeoLayerProvenance = (featureCollection, file) => {
+  const validateGeoLayerProvenance = (featureCollection, file, verseIndex = null) => {
     if (!Array.isArray(featureCollection?.features)) {
       return;
     }
@@ -4173,7 +4564,7 @@ export async function validateData(options = {}) {
         file,
         pathValue: `$.features[${featureIndex}].properties.provenance.upstreamFeatureIds`,
         bibliographyIds,
-        webVerseIndex: null,
+        webVerseIndex: verseIndex,
         enforceNonWikipedia: false,
         validateSourceIdSchema,
         errors
@@ -4184,7 +4575,7 @@ export async function validateData(options = {}) {
           file,
           pathValue: `$.features[${featureIndex}].properties.provenance.changes[${changeIndex}].sources`,
           bibliographyIds,
-          webVerseIndex: null,
+          webVerseIndex: verseIndex,
           enforceNonWikipedia: false,
           validateSourceIdSchema,
           errors
@@ -4198,7 +4589,8 @@ export async function validateData(options = {}) {
   validateGeoLayerProvenance(ancientCoastlineData, ancientCoastlineRelativePath);
   validateGeoLayerProvenance(ancientEmpireEdgeData, ancientEmpireEdgeRelativePath);
   validateGeoLayerProvenance(osmWaterwaysData, osmWaterwaysRelativePath);
-  validateGeoLayerProvenance(routeLinesData, routeLinesRelativePath);
+  // Route lines cite the passages that set their course (ADR-0038, update of 2026-10-14).
+  validateGeoLayerProvenance(routeLinesData, routeLinesRelativePath, webVerseIndex);
 
   return { errors, warnings };
 }

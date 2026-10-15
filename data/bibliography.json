@@ -2710,6 +2710,45 @@
       "publisher": "World History Encyclopedia",
       "url": "https://www.worldhistory.org/Jesus_Christ/",
       "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-adramyttium",
+      "type": "chapter",
+      "title": "Adramyttium",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/adramyttium.html",
+      "accessed": "2026-10-14"
+    },
+    {
+      "id": "isbe-alexandria",
+      "type": "chapter",
+      "title": "Alexandria",
+      "authors": [
+        "Camden M. Cobern"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/alexandria.html",
+      "accessed": "2026-10-14"
+    },
+    {
+      "id": "isbe-syrtis",
+      "type": "chapter",
+      "title": "Syrtis",
+      "authors": [
+        "James Orr"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/syrtis.html",
+      "accessed": "2026-10-14"
     }
   ]
 }

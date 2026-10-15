@@ -55,6 +55,24 @@ const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
 const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
 const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
 const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
+const routeLineLandFixturePath = path.join(routesFixtureDirectory, "route-line-land.geojson");
+const routeLineLakesFixturePath = path.join(routesFixtureDirectory, "route-line-lakes.geojson");
+const repositoryRoutesPath = path.join(testDirectory, "..", "data", "routes", "routes.json");
+const repositoryRouteLinesPath = path.join(
+  testDirectory,
+  "..",
+  "data",
+  "geo",
+  "routes-lines.geojson"
+);
+const repositoryRouteStopsPath = path.join(
+  testDirectory,
+  "..",
+  "data",
+  "routes",
+  "stops.json"
+);
+const repositoryLocationsDirectory = path.join(testDirectory, "..", "data", "locations");
 
 const locationSchemaPath = path.join(
   testDirectory,
@@ -421,6 +439,8 @@ async function runWithTemporaryRoutesCase(mutateRoutes, options = {}) {
       routesPath,
       routeStopsPath: stopsPath,
       routeLinesPath: linesPath,
+      routeLineLandPath: routeLineLandFixturePath,
+      routeLineLakesPath: routeLineLakesFixturePath,
       imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
       aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
@@ -441,6 +461,24 @@ function hasError(result, predicate) {
 
 function hasWarning(result, predicate) {
   return result.warnings.some(predicate);
+}
+
+function haversineKm(start, end) {
+  const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const dLat = toRadians(end[1] - start[1]);
+  const dLon = toRadians(end[0] - start[0]);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(start[1])) * Math.cos(toRadians(end[1])) * Math.sin(dLon / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(a));
+}
+
+function polylineLengthKm(coordinates) {
+  let total = 0;
+  for (let index = 1; index < coordinates.length; index += 1) {
+    total += haversineKm(coordinates[index - 1], coordinates[index]);
+  }
+  return total;
 }
 
 test("empty data directories pass validation", async () => {
@@ -2768,6 +2806,129 @@ test("route line requirement is switchable", async () => {
   );
 });
 
+test("route text requirement is switchable", async () => {
+  const relaxed = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[0].summary;
+    delete routes.routes[0].bibleText;
+    delete routes.routes[0].notes;
+  }, { requireRouteText: false });
+  assert.equal(relaxed.errors.length, 0);
+
+  const strict = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[0].summary;
+    delete routes.routes[0].bibleText;
+    delete routes.routes[0].notes;
+  }, { requireRouteText: true });
+  assert.equal(
+    hasError(strict, (error) => /REQUIRE_ROUTE_TEXT is enabled/u.test(error.message)),
+    true
+  );
+});
+
+test("route text mode disallows legacy note and yearNote when REQUIRE_ROUTE_TEXT is enabled", async () => {
+  const result = await runWithTemporaryRoutesCase(
+    ({ routes }) => {
+      routes.routes[0].note = "Legacy note injected for this test only.";
+      routes.routes[0].yearNote = "Legacy year note injected for this test only.";
+    },
+    {
+      requireRouteText: true
+    }
+  );
+  assert.equal(
+    hasError(result, (error) => /Legacy route note is not allowed/u.test(error.message)),
+    true
+  );
+  assert.equal(
+    hasError(result, (error) => /Legacy route yearNote is not allowed/u.test(error.message)),
+    true
+  );
+});
+
+test("route text mode accepts summary+bibleText+notes without legacy fields", async () => {
+  const result = await runWithTemporaryRoutesCase(undefined, {
+    requireRouteText: true
+  });
+  assert.equal(result.errors.length, 0);
+});
+
+test("route text notes entries must be non-empty strings in strict mode", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].notes = ["Valid note", "   "];
+  }, {
+    requireRouteText: true
+  });
+  assert.equal(
+    hasError(result, (error) => /Route notes entries must be non-empty strings/u.test(error.message)),
+    true
+  );
+});
+
+test("mentioned stops must resolve as stop references", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "route-stop",
+        stopId: "missing-stop"
+      }
+    ];
+  });
+  assert.equal(
+    hasError(result, (error) => /Unknown route stop id 'missing-stop'/u.test(error.message)),
+    true
+  );
+});
+
+test("mentioned stops cannot duplicate stage endpoints or via stops", async () => {
+  const endpointDuplicate = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "location",
+        locationId: "galilee",
+        candidateIndex: 0
+      }
+    ];
+  });
+  assert.equal(
+    hasError(endpointDuplicate, (error) => /cannot also be a stage endpoint or via stop/u.test(error.message)),
+    true
+  );
+
+  const viaDuplicate = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "route-stop",
+        stopId: "cyprus-harbor-fixture"
+      }
+    ];
+  });
+  assert.equal(
+    hasError(viaDuplicate, (error) => /cannot also be a stage endpoint or via stop/u.test(error.message)),
+    true
+  );
+});
+
+test("mentioned stops cannot repeat the same place in one stage", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "route-stop",
+        stopId: "disputed-stop-fixture",
+        candidateIndex: 0
+      },
+      {
+        kind: "route-stop",
+        stopId: "disputed-stop-fixture",
+        candidateIndex: 1
+      }
+    ];
+  });
+  assert.equal(
+    hasError(result, (error) => /same mentioned stop more than once/u.test(error.message)),
+    true
+  );
+});
+
 test("route stages with lineId must have matching geometry", async () => {
   const result = await runWithTemporaryRoutesCase(({ lines }) => {
     lines.features = lines.features.filter(
@@ -2815,6 +2976,219 @@ test("route lineId must match geometry lineId for the same route/stage", async (
   assert.equal(
     hasError(result, (error) => /does not match route-line geometry id/u.test(error.message)),
     true
+  );
+});
+
+test("route lines must start and end at the stage stop coordinates", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates[0] = [35.5752, 32.881111];
+  });
+  assert.equal(
+    hasError(result, (error) => /lines must end exactly at their stops/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject [0, 0] vertices", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates.splice(1, 0, [0, 0]);
+  });
+  assert.equal(
+    hasError(result, (error) => /forbidden \[0, 0\]/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject vertices outside project bounds", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates.splice(1, 0, [90, 10]);
+  });
+  assert.equal(
+    hasError(result, (error) => /outside project bounds/u.test(error.message)),
+    true
+  );
+});
+
+test("route lines reject unrealistic jumps between consecutive vertices", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    lines.features[0].geometry.coordinates.splice(1, 0, [-10, -5]);
+  });
+  assert.equal(
+    hasError(result, (error) => /vertex jump/u.test(error.message)),
+    true
+  );
+});
+
+const isAuditError = (pattern) => (error) =>
+  /routes-lines\.geojson$/u.test(error.file ?? "") && /fails the route-line audit/u.test(error.message) && pattern.test(error.message);
+
+function fixtureLine(lines, lineId) {
+  return lines.features.find((feature) => feature.properties.lineId === lineId);
+}
+
+test("sea route lines reject any piece over land outside the connectors", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    // Crosses the fixture's strip of land and back out to sea before reaching Galilee.
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [33.624, 34.917], [36.2, 34.5], [34.9, 34.0], [35.4, 32.9]];
+  });
+  assert.equal(hasError(result, isAuditError(/km over land \(land\)/u)), true);
+});
+
+test("land route lines reject any piece over open water outside the connectors", async () => {
+  const overSea = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-01").geometry.coordinates = [[35.575, 32.88], [34.9, 34.5], [35.968, 36.119]];
+    fixtureLine(lines, "paul-fixture-stage-01").properties.provenance.changes[0].kind = "shortest-over-land";
+  });
+  assert.equal(hasError(overSea, isAuditError(/km over water \(sea\)/u)), true);
+
+  const overLake = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-01").geometry.coordinates = [[35.575, 32.88], [36.3, 34.1], [35.968, 36.119]];
+    fixtureLine(lines, "paul-fixture-stage-01").properties.provenance.changes[0].kind = "shortest-over-land";
+  });
+  assert.equal(hasError(overLake, isAuditError(/km over water \(lake\)/u)), true);
+});
+
+test("route line connectors must be at most 3 km and recorded", async () => {
+  const tooLong = await runWithTemporaryRoutesCase(({ lines }) => {
+    // Leaves Seleucia south along the land for about 30 km before reaching the sea.
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [35.95, 35.85], [33.624, 34.917], [35.4, 32.9]];
+  });
+  assert.equal(hasError(tooLong, isAuditError(/start connector is .* km over land, more than 3 km/u)), true);
+
+  const unrecorded = await runWithTemporaryRoutesCase(({ lines }) => {
+    const line = fixtureLine(lines, "paul-fixture-stage-02");
+    line.properties.provenance.changes = line.properties.provenance.changes.filter((change) => change.kind !== "end-connector");
+  });
+  assert.equal(hasError(unrecorded, isAuditError(/end connector of 1\.58 km is not recorded/u)), true);
+});
+
+test("sea route lines must pass their places passed", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [34.3, 34.9], [35.4, 32.9]];
+  });
+  assert.equal(hasError(result, isAuditError(/does not pass within 5 km of route-stop:cyprus-harbor-fixture/u)), true);
+});
+
+test("path-not-known route lines must be straight", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-03").geometry.coordinates = [[35.4, 32.9], [35.5, 33.0], [35.575, 32.88]];
+  });
+  assert.equal(hasError(result, isAuditError(/must be straight/u)), true);
+});
+
+test("route lines reject staircases", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [
+      [35.968, 36.119], [34.8, 35.5], [34.8, 35.49], [34.79, 35.49], [34.79, 35.48], [33.624, 34.917], [35.4, 32.9]
+    ];
+  });
+  assert.equal(hasError(result, isAuditError(/staircase/u)), true);
+});
+
+test("sea route lines reject detours over 1.25x shortest water path without explicit reason", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [33.624, 34.917], [30.0, 33.0], [35.4, 32.9]];
+  });
+  assert.equal(hasError(result, isAuditError(/times its shortest path over water/u)), true);
+});
+
+test("sea route detour over 1.25x is allowed with explicit provenance reason", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    const line = fixtureLine(lines, "paul-fixture-stage-02");
+    line.geometry.coordinates = [[35.968, 36.119], [33.624, 34.917], [30.0, 33.0], [35.4, 32.9]];
+    line.properties.provenance.changes.push({
+      kind: "detour-reason",
+      detail: "Fixture explicit reason for a storm-driven drift path.",
+      sources: ["bib:existing-bib-source"]
+    });
+  });
+  assert.equal(hasError(result, isAuditError(/times its shortest path over water/u)), false);
+});
+
+test("Caesarea to Sidon sea fallback avoids staircase detours", async () => {
+  const routes = JSON.parse(fs.readFileSync(repositoryRoutesPath, "utf8"));
+  const lines = JSON.parse(fs.readFileSync(repositoryRouteLinesPath, "utf8"));
+  const stage = routes.routes
+    .find((route) => route.id === "paul-rome")
+    ?.stages.find((routeStage) => routeStage.id === "stage-01");
+  assert.ok(stage?.lineId, "Expected paul-rome stage-01 to have a lineId");
+
+  const lineFeature = lines.features.find(
+    (feature) => feature?.properties?.lineId === stage.lineId
+  );
+  assert.ok(lineFeature, "Expected route-lines feature for paul-rome stage-01");
+
+  const changes = lineFeature.properties?.provenance?.changes ?? [];
+  assert.ok(
+    changes.some((change) => change?.kind === "shortest-over-water" || change?.kind === "water-waypoints"),
+    "Expected paul-rome stage-01 to record the shortest-over-water rule"
+  );
+
+  const coordinates = lineFeature.geometry?.coordinates ?? [];
+  assert.ok(
+    coordinates.length >= 2,
+    "Expected paul-rome stage-01 to contain at least two coordinates"
+  );
+  const actualLengthKm = polylineLengthKm(coordinates);
+  const directLengthKm = haversineKm(coordinates[0], coordinates[coordinates.length - 1]);
+  assert.ok(
+    actualLengthKm / directLengthKm <= 1.25,
+    `Expected paul-rome stage-01 to stay within 1.25x direct distance (actual ${actualLengthKm.toFixed(1)} km vs ${directLengthKm.toFixed(1)} km)`
+  );
+});
+
+test("Myra to Fair Havens does not detour south of Crete when passing Cnidus and Salmone", async () => {
+  const routes = JSON.parse(fs.readFileSync(repositoryRoutesPath, "utf8"));
+  const lines = JSON.parse(fs.readFileSync(repositoryRouteLinesPath, "utf8"));
+  const stopRecords = JSON.parse(fs.readFileSync(repositoryRouteStopsPath, "utf8"));
+  const stopById = new Map(stopRecords.stops.map((stop) => [stop.id, stop]));
+
+  const locationById = new Map();
+  for (const fileName of fs.readdirSync(repositoryLocationsDirectory)) {
+    if (!fileName.endsWith(".json")) {
+      continue;
+    }
+    const record = JSON.parse(
+      fs.readFileSync(path.join(repositoryLocationsDirectory, fileName), "utf8")
+    );
+    locationById.set(record.id, record);
+  }
+
+  const resolveStopCoordinate = (stopRef) => {
+    if (stopRef.kind === "location") {
+      const location = locationById.get(stopRef.locationId);
+      const candidateIndex = Number.isInteger(stopRef.candidateIndex) ? stopRef.candidateIndex : 0;
+      return location?.candidates?.[candidateIndex]?.coordinates;
+    }
+    const stop = stopById.get(stopRef.stopId);
+    const candidateIndex = Number.isInteger(stopRef.candidateIndex) ? stopRef.candidateIndex : 0;
+    return stop?.candidates?.[candidateIndex]?.coordinates;
+  };
+
+  const stage = routes.routes
+    .find((route) => route.id === "paul-rome")
+    ?.stages.find((routeStage) => routeStage.id === "stage-03");
+  assert.ok(stage?.lineId, "Expected paul-rome stage-03 to have a lineId");
+
+  const lineFeature = lines.features.find(
+    (feature) => feature?.properties?.lineId === stage.lineId
+  );
+  assert.ok(lineFeature, "Expected route-lines feature for paul-rome stage-03");
+
+  const from = resolveStopCoordinate(stage.from);
+  const cnidus = resolveStopCoordinate(stage.via.find((via) => via.kind === "route-stop" && via.stopId === "cnidus"));
+  const salmone = resolveStopCoordinate(stage.via.find((via) => via.kind === "route-stop" && via.stopId === "salmone"));
+  const to = resolveStopCoordinate(stage.to);
+  assert.ok(from && cnidus && salmone && to, "Expected fixed waypoints for stage-03");
+
+  const shortestNamedPathKm =
+    haversineKm(from, cnidus) +
+    haversineKm(cnidus, salmone) +
+    haversineKm(salmone, to);
+  const actualLengthKm = polylineLengthKm(lineFeature.geometry?.coordinates ?? []);
+  assert.ok(
+    actualLengthKm / shortestNamedPathKm <= 1.25,
+    `Expected paul-rome stage-03 to stay within 1.25x the named-points path (actual ${actualLengthKm.toFixed(1)} km vs ${shortestNamedPathKm.toFixed(1)} km)`
   );
 });
 

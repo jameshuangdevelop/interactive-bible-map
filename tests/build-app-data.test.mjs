@@ -36,6 +36,11 @@ const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
 const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
 const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
 const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
+// The route-line audit measures the fixture lines against fixture land and lakes.
+const routeLineSurfaceFixtures = {
+  routeLineLandPath: path.join(routesFixtureDirectory, "route-line-land.geojson"),
+  routeLineLakesPath: path.join(routesFixtureDirectory, "route-line-lakes.geojson")
+};
 const repositoryLocationsDirectory = path.join(repositoryRoot, "data", "locations");
 const repositoryTimelinePath = path.join(repositoryRoot, "data", "timeline.json");
 const repositoryAncientAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
@@ -1081,6 +1086,7 @@ test("buildAppData writes routes generated files and fixture files", async () =>
       routesPath: routesFixturePath,
       routeStopsPath: routeStopsFixturePath,
       routeLinesPath: routeLinesFixturePath,
+      ...routeLineSurfaceFixtures,
       routesFixtureDirectory,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
@@ -1110,8 +1116,29 @@ test("buildAppData writes routes generated files and fixture files", async () =>
     const stagesPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "routes.stages.json"), "utf8")
     );
+    const routesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "routes.routes.json"), "utf8")
+    );
     assert.equal(stagesPayload.routes.length, 2);
     assert.match(stagesPayload.routes[0].stages[0].scripture[0].textWEB, /Pentecost/u);
+    assert.equal(routesPayload.routes[0].summary, "Fixture summary for route-level text validation.");
+    assert.equal(
+      routesPayload.routes[0].bibleText,
+      "Fixture bibleText paragraph for route-level text validation."
+    );
+    assert.deepEqual(routesPayload.routes[0].notes, [
+      "Fixture disclaimer one.",
+      "Fixture disclaimer two."
+    ]);
+    assert.equal("note" in routesPayload.routes[0], false);
+    assert.equal("yearNote" in routesPayload.routes[0], false);
+    assert.deepEqual(stagesPayload.routes[0].stages[1].mentioned, [
+      {
+        kind: "route-stop",
+        stopId: "disputed-stop-fixture",
+        candidateIndex: 1
+      }
+    ]);
   });
 });
 
@@ -1126,6 +1153,7 @@ test("buildAppData fails when routes generated files exceed the gzip budget", as
           routesPath: routesFixturePath,
           routeStopsPath: routeStopsFixturePath,
           routeLinesPath: routeLinesFixturePath,
+          ...routeLineSurfaceFixtures,
           routesFixtureDirectory,
           webVplPath: webFixturePath,
           skipSnapshotChecksumCheck: true,
