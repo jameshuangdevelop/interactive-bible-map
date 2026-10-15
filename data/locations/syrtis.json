@@ -1,0 +1,76 @@
+{
+  "id": "syrtis",
+  "names": {
+    "ancient": [
+      "Syrtis"
+    ],
+    "modern": "Gulf of Sidra",
+    "modernCountries": [
+      "Libya"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Syrtis Maior"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "parentId": "roman-empire",
+  "candidates": [
+    {
+      "label": "Syrtis Maior (Gulf of Sidra)",
+      "coordinates": [
+        17.827475,
+        31.474808
+      ],
+      "coordinateSource": "pleiades:344491",
+      "confidence": "high",
+      "support": "A gulf on the northern coast of Africa, off today's Libya, known in ancient geography as Syrtis Maior, whose sandbanks sailors long feared as a hazard; the International Standard Bible Encyclopedia notes that the Roman poet Virgil refers to the danger in the Aeneid. Acts 27:17 says the storm-driven ship's crew, fearing they would run aground there, lowered the sea anchor instead; the ship never reached it. OpenBible.info identifies the Syrtis of Acts 27:17 with the Gulf of Sidra, which Wikidata and Pleiades equate with ancient Syrtis Maior; their points lie about 17 km apart, close for a gulf this size.",
+      "sources": [
+        "pleiades:344491",
+        "wikidata:Q187274",
+        "openbible:syrtis",
+        "bib:isbe-syrtis"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Syrtis, known in ancient geography as Syrtis Maior and today as the Gulf of Sidra, is a wide, shallow bay on the North African coast whose sandbanks and shoals made it one of antiquity's most feared sailing hazards; the International Standard Bible Encyclopedia notes that the Roman poet Virgil describes this danger in the Aeneid. Acts records that when a violent storm drove Paul's ship off course near Crete, the crew, fearing they would run aground on the Syrtis sand bars, lowered the sea anchor and let the ship drive before the wind instead; the ship never actually reached the gulf.",
+    "sources": [
+      "pleiades:344491",
+      "wikidata:Q187274",
+      "openbible:syrtis",
+      "bib:isbe-syrtis",
+      "scripture:Acts 27:17"
+    ]
+  },
+  "history": [
+    {
+      "text": "Ancient geographers grouped Syrtis Maior with a smaller, neighboring gulf, Syrtis Minor, further west, and named the surrounding desert coastline Regio Syrtica after them both; the whole stretch lay between the territories of Carthage, later the Roman province of Africa, to the west, and Cyrenaica, joined with Crete as a single Roman province, to the east. This project has no record for the Roman province of Africa, so the gulf is not assigned to either neighboring province on this map.",
+      "sources": [
+        "bib:smith-dictionary-syrtis-major"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:17",
+      "book": "Acts",
+      "textWEB": "After they had hoisted it up, they used cables to help reinforce the ship. Fearing that they would run aground on the Syrtis sand bars, they lowered the sea anchor, and so were driven along."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 101,
+      "entity": "A sailing hazard on the North African coast, between the Roman province of Africa (not otherwise shown on this map) and the Roman province of Crete and Cyrene; ancient sources describe the surrounding coast as a sparsely settled borderland rather than assign it to one province.",
+      "sources": [
+        "bib:isbe-syrtis",
+        "bib:smith-dictionary-syrtis-major"
+      ]
+    }
+  ],
+  "status": "draft"
+}
