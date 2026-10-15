@@ -156,7 +156,7 @@ The routes have a tab of their own, so the main map stays uncluttered (brief §1
     - Each stop is a white dot with a blue ring, about 12 px, labelled with the stop's name in the style of our place labels, without a number.
     - The route's start is a filled blue dot; where a route ends where it began, one dot serves.
     - A place the text says they passed or sailed by is a small blue dot with its name in italic.
-    - A place the passages name that the travellers didn't reach is a small grey dot with its name in grey.
+    - A town or site the passages name that the travellers didn't reach, or that they name for another person, is a small grey dot with its name in grey, unless it's already on the route. Regions aren't drawn as dots (ADR-0041 item 8).
     - Our other pins are hidden.
   - **Stage numbers:** while a stage is hovered or selected, a small pill with its number, matching the list's, sits at the middle of its line.
   - **Selecting a stop:**
