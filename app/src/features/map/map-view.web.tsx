@@ -3060,19 +3060,8 @@ export function MapView({
   const failedStopIdsRef = useRef(new Set<string>());
   const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
   const routesModeEnabledRef = useRef(false);
-  const previousRoutesModeEnabledRef = useRef(false);
   const previousRouteFocusKeyRef = useRef<string | null>(null);
   const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
-  const previousRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
-  const routesTabCameraSnapshotRef = useRef<{
-    routeFocusKey: string;
-    selectedStageFocusKey: string | null;
-    center: [number, number];
-    zoom: number;
-    bearing: number;
-    pitch: number;
-  } | null>(null);
-  const routesTabCameraRestorePendingRef = useRef(false);
   const routeStageAnimationFrameRef = useRef<number | null>(null);
   const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
   const preservedCameraRef = useRef<{
@@ -3085,28 +3074,6 @@ export function MapView({
   const selectedStageAnimationKey = routesOverlay?.selectedStageAnimationKey ?? null;
   useEffect(() => {
     latestRoutesOverlayRef.current = routesOverlay;
-  }, [routesOverlay]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    const previousOverlay = previousRoutesOverlayRef.current;
-    if (map && previousOverlay?.routeFocusKey && routesOverlay === null) {
-      const center = map.getCenter();
-      routesTabCameraSnapshotRef.current = {
-        routeFocusKey: previousOverlay.routeFocusKey,
-        selectedStageFocusKey: previousOverlay.selectedStageFocusKey ?? null,
-        center: [center.lng, center.lat],
-        zoom: map.getZoom(),
-        bearing: map.getBearing(),
-        pitch: map.getPitch()
-      };
-      routesTabCameraRestorePendingRef.current = true;
-    }
-    if (routesOverlay && !routesOverlay.routeFocusKey) {
-      routesTabCameraSnapshotRef.current = null;
-      routesTabCameraRestorePendingRef.current = false;
-    }
-    previousRoutesOverlayRef.current = routesOverlay;
   }, [routesOverlay]);
   useEffect(() => {
     selectedTimelineStopIdRef.current = selectedTimelineStopId;
@@ -3134,52 +3101,6 @@ export function MapView({
   useEffect(() => {
     routesModeEnabledRef.current = routesModeEnabled;
   }, [routesModeEnabled]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    const wasRoutesModeEnabled = previousRoutesModeEnabledRef.current;
-    if (!map || !styleReadyRef.current) {
-      previousRoutesModeEnabledRef.current = routesModeEnabled;
-      return;
-    }
-
-    if (wasRoutesModeEnabled && !routesModeEnabled) {
-      const overlay = latestRoutesOverlayRef.current;
-      if (overlay?.routeFocusKey) {
-        const center = map.getCenter();
-        routesTabCameraSnapshotRef.current = {
-          routeFocusKey: overlay.routeFocusKey,
-          selectedStageFocusKey: overlay.selectedStageFocusKey ?? null,
-          center: [center.lng, center.lat],
-          zoom: map.getZoom(),
-          bearing: map.getBearing(),
-          pitch: map.getPitch()
-        };
-        routesTabCameraRestorePendingRef.current = true;
-      }
-    }
-
-    if (!wasRoutesModeEnabled && routesModeEnabled && routesTabCameraRestorePendingRef.current) {
-      const snapshot = routesTabCameraSnapshotRef.current;
-      if (
-        snapshot &&
-        snapshot.routeFocusKey === (routesOverlay?.routeFocusKey ?? null) &&
-        snapshot.selectedStageFocusKey === (routesOverlay?.selectedStageFocusKey ?? null)
-      ) {
-        map.jumpTo({
-          center: snapshot.center,
-          zoom: snapshot.zoom,
-          bearing: snapshot.bearing,
-          pitch: snapshot.pitch
-        });
-        previousRouteFocusKeyRef.current = snapshot.routeFocusKey;
-        previousSelectedStageFocusKeyRef.current = snapshot.selectedStageFocusKey;
-      }
-      routesTabCameraRestorePendingRef.current = false;
-    }
-
-    previousRoutesModeEnabledRef.current = routesModeEnabled;
-  }, [routesModeEnabled, routesOverlay]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
@@ -4664,23 +4585,6 @@ export function MapView({
   }, [bottomInset, panelInset, scheduleScaleBarUpdate, scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
-    if (routesOverlay !== null || !routesTabCameraRestorePendingRef.current) {
-      return;
-    }
-    const map = mapRef.current;
-    const snapshot = routesTabCameraSnapshotRef.current;
-    if (!map || !styleReadyRef.current || !snapshot) {
-      return;
-    }
-    map.jumpTo({
-      center: snapshot.center,
-      zoom: snapshot.zoom,
-      bearing: snapshot.bearing,
-      pitch: snapshot.pitch
-    });
-  }, [routesOverlay, panelInset, bottomInset]);
-
-  useEffect(() => {
     const map = mapRef.current;
     if (!selection || !map || !styleReadyRef.current) {
       previousFocusRequestRef.current = selection ? previousFocusRequestRef.current : "";
@@ -4728,25 +4632,6 @@ export function MapView({
     if (!map || !styleReadyRef.current) {
       return;
     }
-    const pendingSnapshot = routesTabCameraSnapshotRef.current;
-    if (
-      routesTabCameraRestorePendingRef.current &&
-      pendingSnapshot &&
-      pendingSnapshot.routeFocusKey === routesOverlay.routeFocusKey &&
-      pendingSnapshot.selectedStageFocusKey === (routesOverlay.selectedStageFocusKey ?? null)
-    ) {
-      map.jumpTo({
-        center: pendingSnapshot.center,
-        zoom: pendingSnapshot.zoom,
-        bearing: pendingSnapshot.bearing,
-        pitch: pendingSnapshot.pitch
-      });
-      previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
-      previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey ?? null;
-      routesTabCameraRestorePendingRef.current = false;
-      return;
-    }
-    routesTabCameraRestorePendingRef.current = false;
     if (previousRouteFocusKeyRef.current === routesOverlay.routeFocusKey) {
       return;
     }

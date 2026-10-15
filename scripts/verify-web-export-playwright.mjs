@@ -11449,6 +11449,118 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         })}).`
       );
     }
+    await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const methods = ["jumpTo", "easeTo", "flyTo", "fitBounds"];
+      const originals = {};
+      const calls = [];
+      const extractCenterFromBounds = (bounds) => {
+        if (bounds && typeof bounds.getCenter === "function") {
+          const center = bounds.getCenter();
+          return center && Number.isFinite(center.lng) && Number.isFinite(center.lat)
+            ? [center.lng, center.lat]
+            : null;
+        }
+        if (
+          Array.isArray(bounds) &&
+          bounds.length === 2 &&
+          Array.isArray(bounds[0]) &&
+          Array.isArray(bounds[1]) &&
+          bounds[0].length >= 2 &&
+          bounds[1].length >= 2
+        ) {
+          return [
+            (Number(bounds[0][0]) + Number(bounds[1][0])) / 2,
+            (Number(bounds[0][1]) + Number(bounds[1][1])) / 2
+          ];
+        }
+        return null;
+      };
+      for (const method of methods) {
+        const original = map[method];
+        if (typeof original !== "function") {
+          continue;
+        }
+        originals[method] = original;
+        map[method] = (...args) => {
+          let center = null;
+          let zoom = null;
+          if (method === "fitBounds") {
+            center = extractCenterFromBounds(args[0]);
+            if (args[1] && typeof args[1] === "object" && Number.isFinite(args[1].zoom)) {
+              zoom = Number(args[1].zoom);
+            }
+          } else if (args[0] && typeof args[0] === "object") {
+            if (Array.isArray(args[0].center) && args[0].center.length >= 2) {
+              center = [Number(args[0].center[0]), Number(args[0].center[1])];
+            }
+            if (Number.isFinite(args[0].zoom)) {
+              zoom = Number(args[0].zoom);
+            }
+          }
+          calls.push({ method, center, zoom });
+          return original.apply(map, args);
+        };
+      }
+      window.__ibmCameraCallProbe = { methods, originals, calls };
+      return true;
+    }, mapTestHookKey);
+    await desktopPage.getByRole("tab", { name: "Map" }).click();
+    await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return;
+      }
+      map.jumpTo({ center: [5, 30], zoom: 6.1 });
+      await new Promise((resolve) => map.once("idle", resolve));
+    }, mapTestHookKey);
+    const searchInput = desktopPage.getByLabel("Search biblical places");
+    await searchInput.fill("Bethlehem");
+    await desktopPage.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+    await desktopPage
+      .locator("[data-testid='search-results-list'] [role='option']")
+      .filter({ hasText: /^Bethlehem\b/u })
+      .first()
+      .click();
+    await desktopPage.getByRole("heading", { level: 1, name: "Bethlehem" }).waitFor({ timeout: 30_000 });
+    const cameraProbeCalls = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      const probe = window.__ibmCameraCallProbe;
+      const calls = Array.isArray(probe?.calls) ? [...probe.calls] : [];
+      if (map && probe && probe.originals) {
+        for (const method of probe.methods ?? []) {
+          if (typeof probe.originals[method] === "function") {
+            map[method] = probe.originals[method];
+          }
+        }
+      }
+      delete window.__ibmCameraCallProbe;
+      return calls;
+    }, mapTestHookKey);
+    const routesCameraYank = cameraProbeCalls.find((call) => {
+      if (!Array.isArray(call.center) || call.center.length < 2) {
+        return false;
+      }
+      return (
+        Math.abs(call.center[0] - cameraAfterTabSwitch.center[0]) < 0.2 &&
+        Math.abs(call.center[1] - cameraAfterTabSwitch.center[1]) < 0.2 &&
+        (call.zoom === null || Math.abs(call.zoom - cameraAfterTabSwitch.zoom) < 0.3)
+      );
+    });
+    if (routesCameraYank) {
+      throw new Error(
+        `Routes real-data regression: opening a place from search returned to prior routes camera (${JSON.stringify({
+          priorRoutesCamera: cameraAfterTabSwitch,
+          matchingCall: routesCameraYank,
+          calls: cameraProbeCalls
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("tab", { name: "Routes" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
     await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
