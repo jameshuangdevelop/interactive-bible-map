@@ -36,18 +36,21 @@
     }
   ],
   "summary": {
-    "text": "Adramyttium was a city of Mysia, in the Roman province of Asia, with a good harbor at the head of a gulf facing the island of Lesbos. Acts records that when Paul and his fellow prisoners first set out from Caesarea bound for Rome, they embarked on a ship of Adramyttium that was sailing for ports along the coast of Asia, before transferring to an Alexandrian grain ship at Myra.",
+    "text": "Adramyttium was a city of Mysia, in the Roman province of Asia, with a good harbor at the head of a gulf facing the island of Lesbos. According to the International Standard Bible Encyclopedia, Paul embarked on a ship of Adramyttium while being taken as a prisoner from Caesarea to Rome; Acts records that this ship was sailing for ports along the coast of Asia, and that Paul and the other prisoners transferred to an Alexandrian grain ship at Myra.",
     "sources": [
       "pleiades:550403",
       "wikidata:Q3605584",
       "openbible:adramyttium",
       "bib:isbe-adramyttium",
-      "scripture:Acts 27:2"
+      "scripture:Acts 27:1",
+      "scripture:Acts 27:2",
+      "scripture:Acts 27:5",
+      "scripture:Acts 27:6"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia reports that Adramyttium grew into an important city and the administrative center of its district once Pergamum became capital of the province of Asia, and that assizes (circuit courts) were held there; coins struck at Adramyttium, bearing the twin gods Castor and Pollux, continued to be minted as late as the third century AD. Its ancient harbor has since disappeared, and a village bearing a form of its name, Edremit, stands farther inland.",
+      "text": "The International Standard Bible Encyclopedia reports that Adramyttium grew into an important city and the administrative center of its district once Pergamum became capital of the province of Asia, and that assizes (circuit courts) were held there; coins struck at Adramyttium, bearing the twin gods Castor and Pollux, continued to be minted as late as the third century AD. Its ancient harbor has since disappeared; writing in 1915, the encyclopedia described a village bearing a form of its name, Edremit, standing farther inland.",
       "sources": [
         "bib:isbe-adramyttium"
       ]

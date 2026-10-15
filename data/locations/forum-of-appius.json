@@ -4,6 +4,7 @@
     "ancient": [
       "Forum of Appius"
     ],
+    "modern": "Near Latina",
     "modernCountries": [
       "Italy"
     ],
@@ -44,12 +45,13 @@
     }
   ],
   "summary": {
-    "text": "Forum of Appius was a station on the Appian Way about forty-three Roman miles from Rome, where travelers could transfer to canal boats for a night journey through the Pontine Marshes. According to Acts, believers from Rome walked out to meet Paul here as he approached the city under guard as a prisoner, and seeing them, Paul thanked God and took courage.",
+    "text": "Forum of Appius was a station on the Appian Way about forty-three Roman miles from Rome, where travelers could transfer to canal boats for a night journey through the Pontine Marshes. According to Acts, as Paul, under guard as a prisoner, approached Rome, believers from the city came to meet him as far as Forum of Appius, and seeing them, Paul thanked God and took courage.",
     "sources": [
       "pleiades:422927",
       "openbible:forum-of-appius",
       "wikidata:Q3748871",
       "bib:isbe-appii-forum",
+      "scripture:Acts 27:1",
       "scripture:Acts 28:15"
     ]
   },

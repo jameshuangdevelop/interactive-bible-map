@@ -11,7 +11,7 @@
     "alternate": [],
     "otherLanguages": []
   },
-  "type": "site",
+  "type": "natural-feature",
   "zoomTier": "city",
   "prominence": "standard",
   "parentId": "crete",
@@ -24,7 +24,7 @@
       ],
       "coordinateSource": "wikidata:Q11818846",
       "confidence": "high",
-      "support": "A roadstead on Crete's south coast about 5 miles east of Cape Matala, sheltered from north and northwest winds but judged unsuitable for wintering. Pleiades, OpenBible.info and Wikidata agree on the site; its Greek name, Kaloi Limenes, is a direct translation of 'Fair Havens.'",
+      "support": "An embayment on Crete's south coast about 5 miles east of Cape Matala, sheltered from north and northwest winds but judged unsuitable for wintering. Pleiades, OpenBible.info and Wikidata agree on the site; its Greek name, Kaloi Limenes, is a direct translation of 'Fair Havens.'",
       "sources": [
         "pleiades:589834",
         "openbible:fair-havens",

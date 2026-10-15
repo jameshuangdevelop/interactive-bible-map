@@ -34,13 +34,15 @@
     }
   ],
   "summary": {
-    "text": "Alexandria was a major port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC beside the isle of Pharos and soon the preeminent city of the Hellenistic world, famed for its library and its lighthouse. Acts names Apollos, a Jewish Christian teacher who later worked alongside Paul, as \"an Alexandrian by race,\" and records that \"Alexandrians\" were among those who disputed with Stephen in a Jerusalem synagogue. Twice more Acts names a ship of Alexandria: the grain ship Paul's centurion found at Myra, and another, wintered on Malta, that carried Paul's party on to Italy.",
+    "text": "Alexandria was a major port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC beside the isle of Pharos and soon the preeminent city of the Hellenistic world, famed for its library and its lighthouse. Acts names Apollos, who taught accurately the things concerning Jesus and later worked alongside Paul (Paul \"planted,\" Apollos \"watered\"), as \"an Alexandrian by race,\" and records that \"Alexandrians\" were among those who disputed with Stephen in a Jerusalem synagogue. Twice more Acts names a ship of Alexandria, a grain ship according to the International Standard Bible Encyclopedia: the one Paul's centurion found at Myra, and another, wintered on Malta, that carried Paul's party on to Italy.",
     "sources": [
       "wikidata:Q87",
       "pleiades:727070",
       "openbible:alexandria",
       "bib:isbe-alexandria",
       "scripture:Acts 18:24",
+      "scripture:Acts 18:25",
+      "scripture:1 Corinthians 3:6",
       "scripture:Acts 6:9",
       "scripture:Acts 27:6",
       "scripture:Acts 28:11"
@@ -48,7 +50,7 @@
   },
   "history": [
     {
-      "text": "Alexander the Great chose the site for its strategic position guarding the richest part of his empire. With its famous library and museum, Alexandria became a leading center of Greek scholarship and science, and the International Standard Bible Encyclopedia credits its library and university with helping to make the city, next to Rome, the greatest of the ancient world.",
+      "text": "Alexander the Great chose the site for its strategic position guarding the richest part of his empire. The International Standard Bible Encyclopedia describes the city that arose there, with its straight, parallel streets, as the most beautiful city of the ancient or modern world except Rome; with its famous library and museum, it also became a leading center of Greek scholarship and science.",
       "sources": [
         "bib:isbe-alexandria"
       ]

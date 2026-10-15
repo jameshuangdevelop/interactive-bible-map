@@ -36,20 +36,23 @@
     }
   ],
   "summary": {
-    "text": "Syrtis, known in ancient geography as Syrtis Maior and today as the Gulf of Sidra, is a wide, shallow bay on the North African coast whose sandbanks and shoals made it one of antiquity's most feared sailing hazards; the International Standard Bible Encyclopedia notes that the Roman poet Virgil describes this danger in the Aeneid. Acts records that when a violent storm drove Paul's ship off course near Crete, the crew, fearing they would run aground on the Syrtis sand bars, lowered the sea anchor and let the ship drive before the wind instead; the ship never actually reached the gulf.",
+    "text": "Syrtis, known in ancient geography as Syrtis Maior and today as the Gulf of Sidra, is a broad gulf on the North African coast. Smith's Dictionary of Greek and Roman Geography describes its waters as dangerous to navigate because of shallows and submerged rocks, and the International Standard Bible Encyclopedia notes that sailors long regarded it as a source of danger, as the Roman poet Virgil describes in the Aeneid. Acts records that when a violent storm drove Paul's ship off course near Crete, the crew, fearing they would run aground on the Syrtis sand bars, lowered the sea anchor and let the ship drive before the wind instead; the ship never actually reached the gulf.",
     "sources": [
       "pleiades:344491",
       "wikidata:Q187274",
       "openbible:syrtis",
       "bib:isbe-syrtis",
+      "bib:smith-dictionary-syrtis-major",
       "scripture:Acts 27:17"
     ]
   },
   "history": [
     {
-      "text": "Ancient geographers grouped Syrtis Maior with a smaller, neighboring gulf, Syrtis Minor, further west, and named the surrounding desert coastline Regio Syrtica after them both; the whole stretch lay between the territories of Carthage, later the Roman province of Africa, to the west, and Cyrenaica, joined with Crete as a single Roman province, to the east. This project has no record for the Roman province of Africa, so the gulf is not assigned to either neighboring province on this map.",
+      "text": "Smith's Dictionary of Greek and Roman Geography describes Syrtis Maior as one of two gulfs on the North African coast, the smaller Syrtis Minor lying further west. It states that the coastal tract between the two, called Syrtica Regio, at first belonged to the Cyrenaeans but was later taken by Carthage, becoming part of the Roman province of Africa once Carthage fell to Rome. Cyrenaica, the district around Cyrene that the International Standard Bible Encyclopedia places within the Roman province of Crete and Cyrene, lay well to the east.",
       "sources": [
-        "bib:smith-dictionary-syrtis-major"
+        "bib:smith-dictionary-syrtis-major",
+        "bib:smith-dictionary-syrtica-regio",
+        "bib:isbe-crete"
       ]
     }
   ],
@@ -65,10 +68,10 @@
     {
       "fromYear": -4,
       "toYear": 101,
-      "entity": "A sailing hazard on the North African coast, between the Roman province of Africa (not otherwise shown on this map) and the Roman province of Crete and Cyrene; ancient sources describe the surrounding coast as a sparsely settled borderland rather than assign it to one province.",
+      "entity": "A sailing hazard off the North African coast, between the Roman province of Africa (to the west, not otherwise shown on this map) and the Roman province of Crete and Cyrene (whose Cyrenaican district lay to the east); this feature has no single political area of its own on this map.",
       "sources": [
-        "bib:isbe-syrtis",
-        "bib:smith-dictionary-syrtis-major"
+        "bib:smith-dictionary-syrtica-regio",
+        "bib:isbe-crete"
       ]
     }
   ],

@@ -12,7 +12,7 @@
     ],
     "otherLanguages": []
   },
-  "type": "site",
+  "type": "town",
   "zoomTier": "city",
   "prominence": "standard",
   "parentId": "crete",
@@ -25,7 +25,7 @@
       ],
       "coordinateSource": "pleiades:589993",
       "confidence": "disputed",
-      "support": "A harbor on Crete's south coast, by the village of Loutro, sheltered from every wind. The International Standard Bible Encyclopedia calls this the only safe harbor on this coast large enough for the ship, and states that the ancient authorities agree in placing Phoenix in this neighborhood, judging the identification \"seems certain\"; an inscription found at Loutro shows that Egyptian grain ships wintered there. It calls the harbor's east-facing aspect, against Acts 27:12's \"looking southwest and northwest,\" a serious difficulty, and resolves it either by reading the phrase in sailors' language as looking down those winds, toward the northeast and southeast, which fits Loutro, or by supposing that the writer, who never saw Phoenix, described it wrongly. OpenBible.info rates this site its second identification (35% confidence). Pleiades, OpenBible.info and Wikidata agree on the site.",
+      "support": "A harbor on Crete's south coast, by the village of Loutro, sheltered from every wind. Pleiades describes ancient Phoinix as a coastal city of western Crete that served as the port of inland Anopolis and later Aradena. The International Standard Bible Encyclopedia calls this the only safe harbor on this coast large enough for the ship, and states that the ancient authorities agree in placing Phoenix in this neighborhood, judging the identification \"seems certain\"; an inscription found at Loutro shows that Egyptian grain ships wintered there. It calls the harbor's east-facing aspect, against Acts 27:12's \"looking southwest and northwest,\" a serious difficulty, and resolves it either by reading the phrase in sailors' language as looking down those winds, toward the northeast and southeast, which fits Loutro, or by supposing that the writer, who never saw Phoenix, described it wrongly. OpenBible.info rates this site its second identification (35% confidence). Pleiades, OpenBible.info and Wikidata agree on the site.",
       "sources": [
         "pleiades:589993",
         "wikidata:Q1872352",

@@ -36,11 +36,13 @@
     }
   ],
   "summary": {
-    "text": "Cauda is a small island south of Crete, known today as Gavdos, whose modern Greek name reflects the \"Cauda\" reading found in some ancient manuscripts rather than \"Clauda.\" Acts records that when a violent northeasterly wind caught Paul's ship off Crete, the crew ran under the lee of Cauda and, with difficulty, were able to secure the ship's boat.",
+    "text": "Cauda is a small island south of Crete, known today as Gavdos. Acts records that when a violent northeasterly wind caught Paul's ship off Crete, the crew ran under the lee of Cauda and, with difficulty, were able to secure the ship's boat. The island's modern Greek name reflects the \"Cauda\" reading found in some ancient manuscripts rather than \"Clauda.\"",
     "sources": [
       "pleiades:589858",
       "openbible:cauda",
       "wikidata:Q213895",
+      "bib:isbe-phoenix",
+      "scripture:Acts 27:14",
       "scripture:Acts 27:16"
     ]
   },
