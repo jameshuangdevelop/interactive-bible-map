@@ -1,0 +1,235 @@
+{
+  "id": "sidon",
+  "names": {
+    "ancient": [
+      "Sidon"
+    ],
+    "modern": "Sidon",
+    "modernCountries": [
+      "Lebanon"
+    ],
+    "alternate": [
+      "Zidon"
+    ],
+    "otherLanguages": [
+      "Saida"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "syria",
+  "candidates": [
+    {
+      "label": "Sidon (ancient Phoenician port)",
+      "coordinates": [
+        35.371944,
+        33.560985
+      ],
+      "coordinateSource": "openbible:sidon",
+      "confidence": "high",
+      "support": "An ancient Phoenician port city on the Mediterranean coast, named in the Gospels alongside Tyre as well as in Acts. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Sidon, Lebanon.",
+      "sources": [
+        "pleiades:678393",
+        "openbible:sidon",
+        "wikidata:Q163490",
+        "bib:isbe-sidon"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Sidon was one of the oldest and most prominent cities of ancient Phoenicia, built on a narrow coastal plain with two harbors a little north of Tyre. Genesis names Sidon as Canaan's firstborn son, and Israel's early historical books call it \"great Sidon,\" a leading city of the region. The Gospels record that Jesus withdrew into the region of Tyre and Sidon, where he healed a Gentile woman's daughter, and that he contrasted the repentance Tyre and Sidon would have shown with the Galilean towns that saw his mighty works and did not repent. According to Acts, on the voyage to Rome as a prisoner, Paul's ship touched at Sidon, where the centurion Julius let him go ashore to see friends.",
+    "sources": [
+      "pleiades:678393",
+      "openbible:sidon",
+      "wikidata:Q163490",
+      "bib:isbe-sidon",
+      "scripture:Genesis 10:15",
+      "scripture:Joshua 11:8",
+      "scripture:Mark 7:24",
+      "scripture:Matthew 11:21",
+      "scripture:Acts 27:3"
+    ]
+  },
+  "history": [
+    {
+      "text": "Sidon's wealth rested on Mediterranean trade and skilled craftsmanship, including fine metalwork and the purple dye later called Tyrian, which the International Standard Bible Encyclopedia says was first produced at Sidon; the encyclopedia also credits Sidon's sailors as the first Phoenicians to navigate open water at night by the stars.",
+      "sources": [
+        "bib:isbe-sidon"
+      ]
+    },
+    {
+      "text": "In 351 BC, besieged after a revolt by the Persian king Artaxerxes III (Ochus), the citizens of Sidon are said to have burned their own ships and houses rather than surrender, with a reported 40,000 deaths. The city recovered, passing after Alexander the Great's conquests first to the Ptolemies and then to the Seleucids before coming under Rome, which granted it a measure of self-government and the right to mint its own bronze coinage.",
+      "sources": [
+        "bib:isbe-sidon"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia notes that Sidon was known for a school of philosophy under the Roman emperors Augustus and Tiberius, and that its law school took in students and teachers from Berytus (modern Beirut) after an earthquake destroyed that city in AD 551. Today Sidon is a city in southern Lebanon and the seat of the South Governorate.",
+      "sources": [
+        "bib:isbe-sidon",
+        "wikidata:Q163490"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 11:21",
+      "book": "Matthew",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago in sackcloth and ashes."
+    },
+    {
+      "ref": "Matthew 11:22",
+      "book": "Matthew",
+      "textWEB": "But I tell you, it will be more tolerable for Tyre and Sidon on the day of judgment than for you."
+    },
+    {
+      "ref": "Matthew 15:21",
+      "book": "Matthew",
+      "textWEB": "Jesus went out from there and withdrew into the region of Tyre and Sidon."
+    },
+    {
+      "ref": "Mark 3:8",
+      "book": "Mark",
+      "textWEB": "from Jerusalem, from Idumaea, beyond the Jordan, and those from around Tyre and Sidon. A great multitude, hearing what great things he did, came to him."
+    },
+    {
+      "ref": "Mark 7:24",
+      "book": "Mark",
+      "textWEB": "From there he arose and went away into the borders of Tyre and Sidon. He entered into a house and didn’t want anyone to know it, but he couldn’t escape notice."
+    },
+    {
+      "ref": "Mark 7:31",
+      "book": "Mark",
+      "textWEB": "Again he departed from the borders of Tyre and Sidon, and came to the sea of Galilee through the middle of the region of Decapolis."
+    },
+    {
+      "ref": "Luke 4:26",
+      "book": "Luke",
+      "textWEB": "Elijah was sent to none of them, except to Zarephath, in the land of Sidon, to a woman who was a widow."
+    },
+    {
+      "ref": "Luke 6:17",
+      "book": "Luke",
+      "textWEB": "He came down with them and stood on a level place, with a crowd of his disciples and a great number of the people from all Judea and Jerusalem and the sea coast of Tyre and Sidon, who came to hear him and to be healed of their diseases,"
+    },
+    {
+      "ref": "Luke 10:13",
+      "book": "Luke",
+      "textWEB": "“Woe to you, Chorazin! Woe to you, Bethsaida! For if the mighty works had been done in Tyre and Sidon which were done in you, they would have repented long ago, sitting in sackcloth and ashes."
+    },
+    {
+      "ref": "Luke 10:14",
+      "book": "Luke",
+      "textWEB": "But it will be more tolerable for Tyre and Sidon in the judgment than for you."
+    },
+    {
+      "ref": "Acts 12:20",
+      "book": "Acts",
+      "textWEB": "Now Herod was very angry with the people of Tyre and Sidon. They came with one accord to him and, having made Blastus, the king’s personal aide, their friend, they asked for peace, because their country depended on the king’s country for food."
+    },
+    {
+      "ref": "Acts 27:3",
+      "book": "Acts",
+      "textWEB": "The next day, we touched at Sidon. Julius treated Paul kindly and gave him permission to go to his friends and refresh himself."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Genesis 10:15-19",
+      "note": "Genesis names Sidon as the firstborn son of Canaan in the genealogy of the nations, and describes the border of the Canaanites as running from Sidon south toward Gaza and the cities of the plain.",
+      "sources": [
+        "scripture:Genesis 10:15-19"
+      ]
+    },
+    {
+      "ref": "Genesis 49:13",
+      "note": "In his final blessing on his sons, Jacob says of Zebulun that \"his border will be on Sidon,\" naming Sidon as a landmark at the edge of Zebulun's future territory.",
+      "sources": [
+        "scripture:Genesis 49:13"
+      ]
+    },
+    {
+      "ref": "Joshua 11:8",
+      "note": "Joshua reports that after Israel defeated a coalition of Canaanite kings, its forces chased the survivors as far as \"great Sidon.\"",
+      "sources": [
+        "scripture:Joshua 11:8"
+      ]
+    },
+    {
+      "ref": "Judges 1:31",
+      "note": "Judges lists the inhabitants of Sidon among the Canaanite towns, with Acco, Ahlab, Achzib, Helbah, Aphik and Rehob, that the tribe of Asher failed to drive out.",
+      "sources": [
+        "scripture:Judges 1:31"
+      ]
+    },
+    {
+      "ref": "Judges 18:27-29",
+      "note": "Judges explains that no help reached the people of Laish because their city was \"far from Sidon\"; the Danites then destroyed Laish, rebuilt it, and renamed it Dan.",
+      "sources": [
+        "scripture:Judges 18:27-29"
+      ]
+    },
+    {
+      "ref": "1 Kings 5:6",
+      "note": "Preparing to build the temple, Solomon asks Hiram, king of Tyre, to supply cedar and workers, \"for you know that there is nobody among us who knows how to cut timber like the Sidonians.\"",
+      "sources": [
+        "scripture:1 Kings 5:6"
+      ]
+    },
+    {
+      "ref": "1 Kings 16:31",
+      "note": "1 Kings reports that King Ahab of Israel married Jezebel, \"the daughter of Ethbaal king of the Sidonians,\" and then served Baal, a marriage the book treats as a turning point toward greater idolatry.",
+      "sources": [
+        "scripture:1 Kings 16:31"
+      ]
+    },
+    {
+      "ref": "1 Kings 17:9",
+      "note": "During a famine, the LORD sends the prophet Elijah to be fed by a widow at Zarephath, a town \"which belongs to Sidon\"; in the Gospel of Luke, Jesus cites this same episode in his sermon at Nazareth.",
+      "sources": [
+        "scripture:1 Kings 17:9",
+        "scripture:Luke 4:26"
+      ]
+    },
+    {
+      "ref": "Isaiah 23:2-4",
+      "note": "In his oracle against Tyre, Isaiah twice addresses Sidon directly, calling its seafaring merchants to be silent and telling Sidon to \"be ashamed\" at the loss of the city's maritime wealth.",
+      "sources": [
+        "scripture:Isaiah 23:2-4"
+      ]
+    },
+    {
+      "ref": "Ezekiel 28:21-22",
+      "note": "The LORD instructs Ezekiel to \"set your face toward Sidon, and prophesy against it,\" announcing judgment on the city so that its people \"will know that I am the LORD.\"",
+      "sources": [
+        "scripture:Ezekiel 28:21-22"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -64,
+      "toYear": -27,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:livius-damascus"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "syria"
+}

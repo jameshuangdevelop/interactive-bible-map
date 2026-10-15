@@ -1,0 +1,83 @@
+{
+  "id": "cnidus",
+  "names": {
+    "ancient": [
+      "Cnidus"
+    ],
+    "modern": "Knidos",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Knidos"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Cnidus (Cape Krio / Tekir site)",
+      "coordinates": [
+        27.375,
+        36.6858
+      ],
+      "coordinateSource": "wikidata:Q690575",
+      "confidence": "high",
+      "support": "A city of Caria at the end of a long, narrow peninsula, with two harbors. Pleiades records that in the late fourth century BC the city's political center moved here, to Tekir, from an older site at Burgaz, so the city Paul's ship passed was at Tekir. Pleiades, OpenBible.info and Wikidata agree on the Tekir site; Wikidata's own record places it within Datça, Muğla Province, Türkiye.",
+      "sources": [
+        "pleiades:599575",
+        "openbible:cnidus",
+        "wikidata:Q690575",
+        "bib:isbe-cnidus"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cnidus was a city of Caria, within the Roman province of Asia, built at the end of a long peninsula projecting from the southwest corner of Asia Minor, where a small island joined to the mainland formed two harbors. Acts records that on the voyage to Rome, Paul's ship came with difficulty opposite Cnidus before the wind forced it to pass under the lee of Crete. Though administratively part of Caria, Cnidus held the privileged status of a free city, and the International Standard Bible Encyclopedia notes that Jews had lived there since at least the second century BC.",
+    "sources": [
+      "pleiades:599575",
+      "openbible:cnidus",
+      "wikidata:Q690575",
+      "bib:isbe-cnidus",
+      "scripture:Acts 27:7"
+    ]
+  },
+  "history": [
+    {
+      "text": "Though Cnidus lay within the Roman province of Asia, the International Standard Bible Encyclopedia notes that it held the privileged standing of a free city, meaning it governed itself under its own laws rather than being directly administered by the province's governor.",
+      "sources": [
+        "bib:isbe-cnidus"
+      ]
+    },
+    {
+      "text": "The city was especially noted in antiquity for its shrine of Venus (Aphrodite) and for the sculptor Praxiteles's statue of the goddess there, one of his most celebrated works.",
+      "sources": [
+        "bib:isbe-cnidus"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:7",
+      "book": "Acts",
+      "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "asia"
+}

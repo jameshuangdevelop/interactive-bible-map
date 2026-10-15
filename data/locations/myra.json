@@ -1,0 +1,108 @@
+{
+  "id": "myra",
+  "names": {
+    "ancient": [
+      "Myra"
+    ],
+    "modern": "Demre",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Mura"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "pamphylia",
+  "candidates": [
+    {
+      "label": "Myra archaeological site",
+      "coordinates": [
+        29.985278,
+        36.259167
+      ],
+      "coordinateSource": "wikidata:Q652024",
+      "confidence": "high",
+      "support": "A Lycian city with a harbor used by grain ships from Alexandria. Pleiades, OpenBible.info and Wikidata agree on the site; Wikidata's own record places it within Demre district, Türkiye.",
+      "sources": [
+        "pleiades:639005",
+        "openbible:myra",
+        "wikidata:Q652024",
+        "bib:isbe-myra",
+        "bib:isbe-lycia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Myra was a city of ancient Lycia, a few kilometers from the coast, with a harbor used by ships sailing between Egypt, Cyprus and the Aegean. Acts records that the centurion guarding Paul as a prisoner transferred him and the other prisoners at Myra onto a grain ship of Alexandria bound for Italy. In later Christian tradition Myra is honored as the home city of the bishop Nicholas, remembered today as a patron saint of sailors.",
+    "sources": [
+      "pleiades:639005",
+      "openbible:myra",
+      "wikidata:Q652024",
+      "bib:isbe-myra",
+      "scripture:Acts 27:5",
+      "scripture:Acts 27:6"
+    ]
+  },
+  "history": [
+    {
+      "text": "Lycia, the country Myra belonged to, had been a free federation of cities under Roman protection; the Roman historian Cassius Dio reports that in AD 43 the emperor Claudius ended this freedom and incorporated the Lycians into the district of Pamphylia, so that by the time of Paul's voyage Lycia's affairs were administered together with its neighboring province.",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia states that Myra was at first less important than the nearby Lycian city of Patara, but later became a leading port for ships from Egypt and Cyprus, and that in the fifth century the Eastern Roman emperor Theodosius II made it the capital of the province. In Christian tradition Myra is honored as the home city of the bishop Nicholas, now remembered as a patron saint of sailors and traditionally said to be buried in a church on the road to the port.",
+      "sources": [
+        "bib:isbe-myra"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:5",
+      "book": "Acts",
+      "textWEB": "When we had sailed across the sea which is off Cilicia and Pamphylia, we came to Myra, a city of Lycia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 43,
+      "holderId": "lycia-league",
+      "entity": "Lycian League",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
+      ]
+    },
+    {
+      "fromYear": 43,
+      "toYear": 74,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "bib:tacitus-histories"
+      ],
+      "note": "The Roman historian Cassius Dio says the emperor Claudius \"incorporated them in the prefecture of Pamphylia,\" not that Lycia became its own province; the Roman biographer Suetonius separately records that the emperor Vespasian made a province of Lycia, implying it had freedom again by his reign, and a translator's note to the Roman historian Tacitus's Histories (2.9) states that \"Galatia, Pamphylia, and Lycia\" formed one province together by AD 69, leaving Lycia's exact status across this span unclear."
+    },
+    {
+      "fromYear": 74,
+      "toYear": 101,
+      "holderId": "lycia-pamphylia-province",
+      "entity": "Roman province of Lycia and Pamphylia",
+      "sources": [
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "lycia"
+}
