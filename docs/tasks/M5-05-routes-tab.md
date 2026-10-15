@@ -44,6 +44,14 @@ The human's play-test at MC9 changed the look. ADR-0041 and VISUAL_SPEC §2 "Rou
 
 Round 3 (after MC9) and round 4 (from the PO's check before MC10) implement this.
 
+## Update after MC10 (2026-10-15, ADR-0042)
+The human's play-test at MC10 made the Routes tab the Map tab with a route on top. Round 6 does items 1, 2, 3 and 5 of ADR-0042, as VISUAL_SPEC §2 "Routes tab" now describes:
+- No animation: selecting a stage highlights it as hovering does.
+- Our places' pins and labels, the area labels and the ancient layer stay on the Routes tab and work as on the Map tab. A place the route draws as one of its dots isn't drawn twice.
+- Selecting any place opens its place panel: to the right of the route panel on screens at least 1,280 px wide, or in its place with "‹ Back to route" on narrower screens and phones. A stop entry opens there too, with what the entry has, until M5-07 makes it a place.
+- The names after "Passed" and "Also named" are links, and the places a stage names are drawn like passed places, with names in the style of our place labels.
+- The timeline stays hidden on the Routes tab (ADR-0042 item 7).
+
 ## Out of scope
 New data or lines (M5-02 to M5-04), the place panel's content, and changes to the Map tab beyond the tabs themselves.
 
