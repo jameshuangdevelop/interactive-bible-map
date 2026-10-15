@@ -55,6 +55,8 @@ const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
 const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
 const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
 const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
+const routeLineLandFixturePath = path.join(routesFixtureDirectory, "route-line-land.geojson");
+const routeLineLakesFixturePath = path.join(routesFixtureDirectory, "route-line-lakes.geojson");
 const repositoryRoutesPath = path.join(testDirectory, "..", "data", "routes", "routes.json");
 const repositoryRouteLinesPath = path.join(
   testDirectory,
@@ -437,6 +439,8 @@ async function runWithTemporaryRoutesCase(mutateRoutes, options = {}) {
       routesPath,
       routeStopsPath: stopsPath,
       routeLinesPath: linesPath,
+      routeLineLandPath: routeLineLandFixturePath,
+      routeLineLakesPath: routeLineLakesFixturePath,
       imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
       aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
@@ -2892,69 +2896,90 @@ test("route lines reject unrealistic jumps between consecutive vertices", async 
   );
 });
 
-test("sea route lines reject any segment that crosses land", async () => {
+const isAuditError = (pattern) => (error) =>
+  /routes-lines\.geojson$/u.test(error.file ?? "") && /fails the route-line audit/u.test(error.message) && pattern.test(error.message);
+
+function fixtureLine(lines, lineId) {
+  return lines.features.find((feature) => feature.properties.lineId === lineId);
+}
+
+test("sea route lines reject any piece over land outside the connectors", async () => {
   const result = await runWithTemporaryRoutesCase(({ lines }) => {
-    const seaLine = lines.features.find(
-      (feature) => feature.properties.routeId === "paul-1" && feature.properties.stageId === "stage-02"
-    ) ?? lines.features[1];
-    // Force a long segment through fixture land-mask polygons near [0..4].
-    seaLine.geometry.coordinates = [
-      [0.2, -0.2],
-      [1.5, -0.2],
-      [2.5, 0.2],
-      [3.8, -0.2]
+    // Crosses the fixture's strip of land and back out to sea before reaching Galilee.
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [33.624, 34.917], [36.2, 34.5], [34.9, 34.0], [35.4, 32.9]];
+  });
+  assert.equal(hasError(result, isAuditError(/km over land \(land\)/u)), true);
+});
+
+test("land route lines reject any piece over open water outside the connectors", async () => {
+  const overSea = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-01").geometry.coordinates = [[35.575, 32.88], [34.9, 34.5], [35.968, 36.119]];
+    fixtureLine(lines, "paul-fixture-stage-01").properties.provenance.changes[0].kind = "shortest-over-land";
+  });
+  assert.equal(hasError(overSea, isAuditError(/km over water \(sea\)/u)), true);
+
+  const overLake = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-01").geometry.coordinates = [[35.575, 32.88], [36.3, 34.1], [35.968, 36.119]];
+    fixtureLine(lines, "paul-fixture-stage-01").properties.provenance.changes[0].kind = "shortest-over-land";
+  });
+  assert.equal(hasError(overLake, isAuditError(/km over water \(lake\)/u)), true);
+});
+
+test("route line connectors must be at most 3 km and recorded", async () => {
+  const tooLong = await runWithTemporaryRoutesCase(({ lines }) => {
+    // Leaves Seleucia south along the land for about 30 km before reaching the sea.
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [35.95, 35.85], [33.624, 34.917], [35.4, 32.9]];
+  });
+  assert.equal(hasError(tooLong, isAuditError(/start connector is .* km over land, more than 3 km/u)), true);
+
+  const unrecorded = await runWithTemporaryRoutesCase(({ lines }) => {
+    const line = fixtureLine(lines, "paul-fixture-stage-02");
+    line.properties.provenance.changes = line.properties.provenance.changes.filter((change) => change.kind !== "end-connector");
+  });
+  assert.equal(hasError(unrecorded, isAuditError(/end connector of 1\.58 km is not recorded/u)), true);
+});
+
+test("sea route lines must pass their places passed", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [34.3, 34.9], [35.4, 32.9]];
+  });
+  assert.equal(hasError(result, isAuditError(/does not pass within 5 km of route-stop:cyprus-harbor-fixture/u)), true);
+});
+
+test("path-not-known route lines must be straight", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-03").geometry.coordinates = [[35.4, 32.9], [35.5, 33.0], [35.575, 32.88]];
+  });
+  assert.equal(hasError(result, isAuditError(/must be straight/u)), true);
+});
+
+test("route lines reject staircases", async () => {
+  const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [
+      [35.968, 36.119], [34.8, 35.5], [34.8, 35.49], [34.79, 35.49], [34.79, 35.48], [33.624, 34.917], [35.4, 32.9]
     ];
-    seaLine.properties.provenance.changes =
-      seaLine.properties.provenance.changes.filter((change) => change.kind !== "water-waypoints");
-  }, { ancientAreasPath: ancientAreasFixturePath });
-  assert.equal(result.errors.length > 0, true);
+  });
+  assert.equal(hasError(result, isAuditError(/staircase/u)), true);
 });
 
 test("sea route lines reject detours over 1.25x shortest water path without explicit reason", async () => {
   const result = await runWithTemporaryRoutesCase(({ lines }) => {
-    lines.features[1].geometry.coordinates = [
-      [35.968, 36.119],
-      [28, 36],
-      [20, 36],
-      [12, 33],
-      [20, 30],
-      [28, 30],
-      [35.4, 32.9]
-    ];
-  }, {
-    ancientAreasPath: ancientAreasFixturePath,
-    ancientCoastlinePath: ancientCoastlineFixturePath
+    fixtureLine(lines, "paul-fixture-stage-02").geometry.coordinates = [[35.968, 36.119], [33.624, 34.917], [30.0, 33.0], [35.4, 32.9]];
   });
-  assert.equal(
-    hasError(result, (error) => /shortest over-water path/u.test(error.message)),
-    true
-  );
+  assert.equal(hasError(result, isAuditError(/times its shortest path over water/u)), true);
 });
 
 test("sea route detour over 1.25x is allowed with explicit provenance reason", async () => {
   const result = await runWithTemporaryRoutesCase(({ lines }) => {
-    lines.features[1].geometry.coordinates = [
-      [35.968, 36.119],
-      [28, 36],
-      [20, 36],
-      [12, 33],
-      [20, 30],
-      [28, 30],
-      [35.4, 32.9]
-    ];
-    lines.features[1].properties.provenance.changes.push({
-      kind: "explicit-sea-detour-reason",
+    const line = fixtureLine(lines, "paul-fixture-stage-02");
+    line.geometry.coordinates = [[35.968, 36.119], [33.624, 34.917], [30.0, 33.0], [35.4, 32.9]];
+    line.properties.provenance.changes.push({
+      kind: "detour-reason",
       detail: "Fixture explicit reason for a storm-driven drift path.",
       sources: ["bib:existing-bib-source"]
     });
-  }, {
-    ancientAreasPath: ancientAreasFixturePath,
-    ancientCoastlinePath: ancientCoastlineFixturePath
   });
-  assert.equal(
-    hasError(result, (error) => /shortest over-water path/u.test(error.message)),
-    false
-  );
+  assert.equal(hasError(result, isAuditError(/times its shortest path over water/u)), false);
 });
 
 test("Caesarea to Sidon sea fallback avoids staircase detours", async () => {

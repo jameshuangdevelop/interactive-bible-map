@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "featurecla": "Lake",
+        "name": "Fixture lake"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              36.2,
+              34
+            ],
+            [
+              36.4,
+              34
+            ],
+            [
+              36.4,
+              34.2
+            ],
+            [
+              36.2,
+              34.2
+            ],
+            [
+              36.2,
+              34
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

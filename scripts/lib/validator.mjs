@@ -20,8 +20,9 @@ import {
   getWebTextForReference,
   loadWebVerseIndex
 } from "./web-text.mjs";
-import { ancientGeoCache, readJsonFile as readPinnedJsonFile } from "./ancient-geo-inputs.mjs";
-import { fetchPinnedRouteLineInputs } from "./route-line-inputs.mjs";
+import { auditRouteLines, loadPinnedSurfaceModel } from "./route-line-audit-runner.mjs";
+import { REGION_BOUNDS as ROUTE_LINE_REGION_BOUNDS } from "./route-line-rules.mjs";
+import { createSurfaceModel } from "./route-line-surface.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
@@ -2131,310 +2132,6 @@ function geometryBounds(geometry) {
   );
 }
 
-function buildPolygonMask(features) {
-  return (features ?? [])
-    .map((feature) => {
-      const bounds = geometryBounds(feature?.geometry);
-      return bounds && boundsOverlap(bounds, PROJECT_BOUNDS) ? { geometry: feature.geometry, bounds } : null;
-    })
-    .filter(Boolean);
-}
-
-function buildBoundarySegments(features) {
-  const segments = [];
-  for (const feature of features) {
-    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
-      for (let index = 1; index < ring.length; index += 1) {
-        const start = ring[index - 1];
-        const end = ring[index];
-        const bounds = expandedSegmentBounds(start, end, 1e-9);
-        if (boundsOverlap(bounds, PROJECT_BOUNDS)) {
-          segments.push({ start, end, bounds });
-        }
-      }
-    }
-  }
-  return segments;
-}
-
-function pointWithinBounds([lon, lat], bounds) {
-  return lon >= bounds.minLon && lon <= bounds.maxLon && lat >= bounds.minLat && lat <= bounds.maxLat;
-}
-
-function pointInMask(coordinate, features) {
-  return features.some((feature) => pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry));
-}
-
-function polygonRingsFromGeometry(geometry) {
-  if (geometry?.type === "Polygon") {
-    return geometry.coordinates ?? [];
-  }
-  if (geometry?.type === "MultiPolygon") {
-    return (geometry.coordinates ?? []).flatMap((polygon) => polygon);
-  }
-  return [];
-}
-
-function cross2d(left, right) {
-  return left[0] * right[1] - left[1] * right[0];
-}
-
-function expandedSegmentBounds(start, end, margin = 0) {
-  return {
-    minLon: Math.min(start[0], end[0]) - margin,
-    maxLon: Math.max(start[0], end[0]) + margin,
-    minLat: Math.min(start[1], end[1]) - margin,
-    maxLat: Math.max(start[1], end[1]) + margin
-  };
-}
-
-function boundsOverlap(left, right) {
-  return !(left.maxLon < right.minLon || left.minLon > right.maxLon || left.maxLat < right.minLat || left.minLat > right.maxLat);
-}
-
-function segmentIntersectionTs(start, end, edgeStart, edgeEnd) {
-  const r = [end[0] - start[0], end[1] - start[1]];
-  const s = [edgeEnd[0] - edgeStart[0], edgeEnd[1] - edgeStart[1]];
-  const qMinusP = [edgeStart[0] - start[0], edgeStart[1] - start[1]];
-  const denominator = cross2d(r, s);
-  const epsilon = 1e-12;
-  if (Math.abs(denominator) < epsilon) {
-    if (Math.abs(cross2d(qMinusP, r)) > epsilon) {
-      return [];
-    }
-    const lengthSquared = r[0] * r[0] + r[1] * r[1];
-    if (lengthSquared === 0) {
-      return [];
-    }
-    return [edgeStart, edgeEnd]
-      .map((point) => ((point[0] - start[0]) * r[0] + (point[1] - start[1]) * r[1]) / lengthSquared)
-      .filter((t) => t >= -1e-10 && t <= 1 + 1e-10);
-  }
-  const t = cross2d(qMinusP, s) / denominator;
-  const u = cross2d(qMinusP, r) / denominator;
-  return t >= -1e-10 && t <= 1 + 1e-10 && u >= -1e-10 && u <= 1 + 1e-10
-    ? [Math.max(0, Math.min(1, t))]
-    : [];
-}
-
-function isLandSurface(coordinate, context) {
-  return pointInMask(coordinate, context.landFeatures) && !pointInMask(coordinate, context.lakeFeatures);
-}
-
-function segmentCrossesLandExact(start, end, context) {
-  const parameters = [0, 1];
-  const segmentBounds = expandedSegmentBounds(start, end, 1e-9);
-  for (const feature of context.surfaceBoundaryFeatures) {
-    if (feature.start) {
-      if (boundsOverlap(segmentBounds, feature.bounds)) {
-        parameters.push(...segmentIntersectionTs(start, end, feature.start, feature.end));
-      }
-      continue;
-    }
-    if (!boundsOverlap(segmentBounds, feature.bounds)) {
-      continue;
-    }
-    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
-      for (let index = 1; index < ring.length; index += 1) {
-        const edgeStart = ring[index - 1];
-        const edgeEnd = ring[index];
-        if (boundsOverlap(segmentBounds, expandedSegmentBounds(edgeStart, edgeEnd, 1e-9))) {
-          parameters.push(...segmentIntersectionTs(start, end, edgeStart, edgeEnd));
-        }
-      }
-    }
-  }
-  const sorted = Array.from(new Set(parameters.map((t) => Number(t.toFixed(10)))))
-    .filter((t) => t >= 0 && t <= 1)
-    .sort((left, right) => left - right);
-  for (let index = 1; index < sorted.length; index += 1) {
-    if (sorted[index] - sorted[index - 1] <= 1e-9) {
-      continue;
-    }
-    const t = (sorted[index] + sorted[index - 1]) / 2;
-    if (isLandSurface([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t], context)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function segmentLandRatio(start, end, context) {
-  return segmentCrossesLandExact(start, end, context) ? 1 : 0;
-}
-
-function lineLengthMeters(coordinates) {
-  let length = 0;
-  for (let index = 1; index < coordinates.length; index += 1) {
-    length += haversineDistanceMeters(coordinates[index - 1], coordinates[index]);
-  }
-  return length;
-}
-
-function nearestPointOnSegment(point, start, end) {
-  const [px, py] = point;
-  const [x1, y1] = start;
-  const [x2, y2] = end;
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  if (dx === 0 && dy === 0) {
-    return [x1, y1];
-  }
-  const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)));
-  return [x1 + t * dx, y1 + t * dy];
-}
-
-function buildCoastSegments(coastlineFeatureCollection) {
-  const segments = [];
-  if (!Array.isArray(coastlineFeatureCollection?.features)) {
-    return segments;
-  }
-  for (const feature of coastlineFeatureCollection.features) {
-    for (const lineString of lineStringsFromGeometry(feature?.geometry)) {
-      for (let index = 1; index < lineString.length; index += 1) {
-        segments.push([lineString[index - 1], lineString[index]]);
-      }
-    }
-  }
-  return segments;
-}
-
-function nearestCoastPoint(coordinate, coastSegments) {
-  let best = null;
-  for (const [start, end] of coastSegments) {
-    const projected = nearestPointOnSegment(coordinate, start, end);
-    const distanceMeters = haversineDistanceMeters(coordinate, projected);
-    if (!best || distanceMeters < best.distanceMeters) {
-      best = { coordinate: projected, distanceMeters };
-    }
-  }
-  return best;
-}
-
-function isOnLand(coordinate, landFeatures) {
-  if (landFeatures?.landFeatures && landFeatures?.lakeFeatures) {
-    return isLandSurface(coordinate, landFeatures);
-  }
-  for (const feature of landFeatures) {
-    if (feature.bounds ? pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry) : pointInGeometry(coordinate, feature.geometry)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function fastSegmentCrossesLand(start, end, landFeatures) {
-  const samples = [0, 0.25, 0.5, 0.75, 1];
-  for (const t of samples) {
-    const sample = [
-      start[0] + (end[0] - start[0]) * t,
-      start[1] + (end[1] - start[1]) * t
-    ];
-    if (isOnLand(sample, landFeatures)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function shortestWaterGridDistanceMeters(start, end, landFeatures) {
-  const minLon = Math.min(start[0], end[0]) - 2;
-  const maxLon = Math.max(start[0], end[0]) + 2;
-  const minLat = Math.min(start[1], end[1]) - 2;
-  const maxLat = Math.max(start[1], end[1]) + 2;
-  const span = Math.max(maxLon - minLon, maxLat - minLat);
-  const step = Math.max(0.25, Math.min(0.6, span / 28));
-
-  const nodeKey = (point) =>
-    `${point[0].toFixed(4)},${point[1].toFixed(4)}`;
-
-  const nodes = new Map();
-  const addNode = (point, force = false) => {
-    const key = nodeKey(point);
-    if (nodes.has(key)) {
-      return key;
-    }
-    const coordinate = [Number(point[0].toFixed(6)), Number(point[1].toFixed(6))];
-    if (!force && isOnLand(coordinate, landFeatures)) {
-      return null;
-    }
-    nodes.set(key, coordinate);
-    return key;
-  };
-
-  for (let lon = minLon; lon <= maxLon + 1e-9; lon += step) {
-    for (let lat = minLat; lat <= maxLat + 1e-9; lat += step) {
-      addNode([lon, lat]);
-    }
-  }
-  const startKey = addNode(start, true);
-  const endKey = addNode(end, true);
-  if (!startKey || !endKey) {
-    return null;
-  }
-
-  const adjacency = new Map();
-  for (const key of nodes.keys()) {
-    adjacency.set(key, []);
-  }
-  const offsets = [
-    [-1, -1], [0, -1], [1, -1],
-    [-1, 0], [1, 0],
-    [-1, 1], [0, 1], [1, 1]
-  ];
-  for (const [key, coordinate] of nodes) {
-    const [lon, lat] = coordinate;
-    for (const [dx, dy] of offsets) {
-      const neighbor = [lon + dx * step, lat + dy * step];
-      const neighborKey = nodeKey(neighbor);
-      const neighborCoordinate = nodes.get(neighborKey);
-      if (!neighborCoordinate) {
-        continue;
-      }
-      if (fastSegmentCrossesLand(coordinate, neighborCoordinate, landFeatures)) {
-        continue;
-      }
-      adjacency.get(key).push({
-        to: neighborKey,
-        weight: haversineDistanceMeters(coordinate, neighborCoordinate)
-      });
-    }
-  }
-
-  const distance = new Map([[startKey, 0]]);
-  const queue = [{ key: startKey, f: haversineDistanceMeters(start, end), g: 0 }];
-  while (queue.length > 0) {
-    queue.sort((left, right) => left.f - right.f);
-    const current = queue.shift();
-    if (!current) {
-      break;
-    }
-    if (current.key === endKey) {
-      return current.g;
-    }
-    for (const edge of adjacency.get(current.key) ?? []) {
-      const candidate = current.g + edge.weight;
-      const known = distance.get(edge.to);
-      if (known == null || candidate < known) {
-        distance.set(edge.to, candidate);
-        const heuristic = haversineDistanceMeters(nodes.get(edge.to), nodes.get(endKey));
-        queue.push({ key: edge.to, g: candidate, f: candidate + heuristic });
-      }
-    }
-  }
-
-  return distance.get(endKey) ?? null;
-}
-
-function shortestWaterDistanceMeters(start, end, landFeatures) {
-  if (segmentLandRatio(start, end, landFeatures) === 0) {
-    return haversineDistanceMeters(start, end);
-  }
-  // Validation's crossing check is exact; the detour check only needs a stable lower-bound
-  // cross-check and must not run an expensive path search over the full Natural Earth mask.
-  return haversineDistanceMeters(start, end) * 1.1;
-}
-
 export async function validateData(options = {}) {
   const locationsDirectory = path.resolve(
     options.locationsDirectory ?? DEFAULT_LOCATION_DIRECTORY
@@ -2843,35 +2540,26 @@ export async function validateData(options = {}) {
   const ancientCoastlineRelativePath = relativeFromRepositoryRoot(ancientCoastlinePath);
   const ancientEmpireEdgeRelativePath = relativeFromRepositoryRoot(ancientEmpireEdgePath);
   const osmWaterwaysRelativePath = relativeFromRepositoryRoot(osmWaterwaysPath);
-  let routeLineSurfaceContext = null;
+  // The routes' lines audit measures against Natural Earth 10 m land and lakes (pinned), or against
+  // the land and lakes given by `routeLineLandPath` and `routeLineLakesPath` (test fixtures).
+  let routeLineSurfaceModel = null;
   if (routeLinesData) {
     try {
-      let landFeatures;
-      let lakeFeatures;
-      if (usingRepositoryDataRoot) {
-        const routeLineCache = ancientGeoCache(process.env.ROUTE_LINES_CACHE || path.join(os.tmpdir(), "ibm-route-lines"));
-        const routeLineInputs = await fetchPinnedRouteLineInputs(routeLineCache.inputs);
-        const [naturalEarthLand, naturalEarthLakes] = await Promise.all([
-          readPinnedJsonFile(routeLineInputs.naturalEarthLand),
-          readPinnedJsonFile(routeLineInputs.naturalEarthLakes)
+      if (options.routeLineLandPath) {
+        const [land, lakes] = await Promise.all([
+          readJsonFile(path.resolve(options.routeLineLandPath)),
+          options.routeLineLakesPath ? readJsonFile(path.resolve(options.routeLineLakesPath)) : { type: "FeatureCollection", features: [] }
         ]);
-        landFeatures = buildPolygonMask(naturalEarthLand.features);
-        lakeFeatures = buildPolygonMask(naturalEarthLakes.features);
+        routeLineSurfaceModel = createSurfaceModel({ land, lakes, bounds: ROUTE_LINE_REGION_BOUNDS });
       } else {
-        landFeatures = buildPolygonMask(ancientAreasData?.features ?? []);
-        lakeFeatures = [];
+        routeLineSurfaceModel = await loadPinnedSurfaceModel();
       }
-      routeLineSurfaceContext = {
-        landFeatures,
-        lakeFeatures,
-        surfaceBoundaryFeatures: buildBoundarySegments([...landFeatures, ...lakeFeatures])
-      };
     } catch (error) {
       recordError(
         errors,
         routeLinesRelativePath,
         "$",
-        `Unable to read pinned Natural Earth route-line masks for land-crossing checks: ${error.message}`
+        `Unable to read the land and lakes for the route-line audit: ${error.message}`
       );
     }
   }
@@ -3793,7 +3481,6 @@ export async function validateData(options = {}) {
   }
 
   const routeLineByKey = new Map();
-  const coastSegments = buildCoastSegments(ancientCoastlineData);
   if (Array.isArray(routeLinesData?.features)) {
     routeLinesData.features.forEach((feature, featureIndex) => {
       const lineId = feature?.properties?.lineId;
@@ -3885,133 +3572,36 @@ export async function validateData(options = {}) {
           }
         });
       });
+    });
 
-      const routeStage = routeStageByKey.get(mapKey)?.stage;
-      if (
-        routeStage?.travelMode === "sea" &&
-        routeLineSurfaceContext
-      ) {
-        const hasWaterWaypoints =
-          Array.isArray(feature?.properties?.provenance?.changes) &&
-          feature.properties.provenance.changes.some((change) => change?.kind === "water-waypoints");
-        const endpoints = geometryEndpoints(feature.geometry);
-        lineStrings.forEach((lineString, lineStringIndex) => {
-          for (let coordinateIndex = 1; coordinateIndex < lineString.length; coordinateIndex += 1) {
-            const start = lineString[coordinateIndex - 1];
-            const end = lineString[coordinateIndex];
-            const segmentLengthKm = haversineDistanceMeters(start, end) / 1000;
-            const isEndpointConnector =
-              endpoints &&
-              segmentLengthKm <= 30 &&
-              ((start[0] === endpoints.start[0] && start[1] === endpoints.start[1]) ||
-                (end[0] === endpoints.end[0] && end[1] === endpoints.end[1]));
-            if (isEndpointConnector) {
-              continue;
-            }
-            if (hasWaterWaypoints) {
-              continue;
-            }
-            const landRatio = segmentLandRatio(start, end, routeLineSurfaceContext);
-            if (landRatio > 0) {
-              recordError(
-                errors,
-                routeLinesRelativePath,
-                `$.features[${featureIndex}].geometry`,
-                `Sea route line '${lineId}' has a segment crossing Natural Earth 10m land-minus-lakes outside the documented endpoint-connector tolerance (line segment ${lineStringIndex + 1}, vertex ${coordinateIndex}, ${segmentLengthKm.toFixed(1)} km)`
-              );
-              break;
-            }
-          }
+    // The routes' lines audit (scripts/lib/route-line-audit.mjs): every segment of every line,
+    // measured exactly against land (lines by sea) or water (lines by land), with no line skipped.
+    if (routeLineSurfaceModel && routesData) {
+      try {
+        const { rows } = auditRouteLines({
+          model: routeLineSurfaceModel,
+          routesData,
+          linesData: routeLinesData,
+          lookup: {
+            getLocation: (id) => locationRecordsById.get(id)?.data,
+            getStop: (id) => routeStopsById.get(id)
+          },
+          roadsData: ancientRoadsData
         });
-
-        const fromCoordinate = resolveRouteStopRefCoordinate(
-          routeStage.from,
-          locationRecordsById,
-          routeStopsById
-        );
-        const toCoordinate = resolveRouteStopRefCoordinate(
-          routeStage.to,
-          locationRecordsById,
-          routeStopsById
-        );
-        if (fromCoordinate && toCoordinate && coastSegments.length > 0) {
-          const snapToWater = (coordinate) => {
-            if (!isOnLand(coordinate, routeLineSurfaceContext)) {
-              return {
-                connectorMeters: 0,
-                waterCoordinate: coordinate
-              };
-            }
-            const nearest = nearestCoastPoint(coordinate, coastSegments);
-            if (!nearest) {
-              return null;
-            }
-            return {
-              connectorMeters: nearest.distanceMeters,
-              waterCoordinate: nearest.coordinate
-            };
-          };
-
-          const fromWater = snapToWater(fromCoordinate);
-          const toWater = snapToWater(toCoordinate);
-          if (fromWater && toWater) {
-            let shortestWaterMeters = 0;
-            let canEstimateDetour = true;
-            const viaCoordinates = (routeStage.via ?? [])
-              .map((stopRef) =>
-                resolveRouteStopRefCoordinate(stopRef, locationRecordsById, routeStopsById)
-              )
-              .filter((coordinate) => Array.isArray(coordinate));
-            const snappedVia = viaCoordinates
-              .map((coordinate) => snapToWater(coordinate))
-              .filter((entry) => entry && Array.isArray(entry.waterCoordinate));
-            const waterLegPoints = [
-              fromWater.waterCoordinate,
-              ...snappedVia.map((entry) => entry.waterCoordinate),
-              toWater.waterCoordinate
-            ];
-            for (let index = 1; index < waterLegPoints.length; index += 1) {
-              const legDistance = shortestWaterDistanceMeters(
-                waterLegPoints[index - 1],
-                waterLegPoints[index],
-                routeLineSurfaceContext
-              );
-              if (!Number.isFinite(legDistance) || legDistance <= 0) {
-                canEstimateDetour = false;
-                break;
-              }
-              shortestWaterMeters += legDistance;
-            }
-            if (canEstimateDetour && shortestWaterMeters > 0) {
-              const actualLengthMeters = lineStrings
-                .reduce((sum, lineString) => sum + lineLengthMeters(lineString), 0);
-              const baselineMeters =
-                shortestWaterMeters +
-                fromWater.connectorMeters +
-                toWater.connectorMeters;
-              const detourRatio = actualLengthMeters / baselineMeters;
-              const hasExplicitReason =
-                Array.isArray(feature?.properties?.provenance?.changes) &&
-                feature.properties.provenance.changes.some(
-                  (change) => change?.kind === "explicit-sea-detour-reason" || change?.kind === "water-waypoints"
-                );
-              if (
-                !hasExplicitReason &&
-                Number.isFinite(detourRatio) &&
-                detourRatio > ROUTE_SEA_MAX_DETOUR_RATIO
-              ) {
-                recordError(
-                  errors,
-                  routeLinesRelativePath,
-                  `$.features[${featureIndex}].geometry`,
-                  `Sea route line '${lineId}' is ${detourRatio.toFixed(2)}x its shortest over-water path; the maximum allowed is ${ROUTE_SEA_MAX_DETOUR_RATIO.toFixed(2)}x unless provenance records an explicit reason`
-                );
-              }
-            }
+        for (const row of rows) {
+          for (const failure of row.failures) {
+            recordError(
+              errors,
+              routeLinesRelativePath,
+              `$.features[${row.featureIndex}].geometry`,
+              `Route line '${row.lineId}' fails the route-line audit: ${failure}`
+            );
           }
         }
+      } catch (error) {
+        recordError(errors, routeLinesRelativePath, "$", `The route-line audit could not run: ${error.message}`);
       }
-    });
+    }
   }
 
   if (Array.isArray(routesData?.routes)) {
@@ -4843,7 +4433,7 @@ export async function validateData(options = {}) {
     }
   }
 
-  const validateGeoLayerProvenance = (featureCollection, file) => {
+  const validateGeoLayerProvenance = (featureCollection, file, verseIndex = null) => {
     if (!Array.isArray(featureCollection?.features)) {
       return;
     }
@@ -4853,7 +4443,7 @@ export async function validateData(options = {}) {
         file,
         pathValue: `$.features[${featureIndex}].properties.provenance.upstreamFeatureIds`,
         bibliographyIds,
-        webVerseIndex: null,
+        webVerseIndex: verseIndex,
         enforceNonWikipedia: false,
         validateSourceIdSchema,
         errors
@@ -4864,7 +4454,7 @@ export async function validateData(options = {}) {
           file,
           pathValue: `$.features[${featureIndex}].properties.provenance.changes[${changeIndex}].sources`,
           bibliographyIds,
-          webVerseIndex: null,
+          webVerseIndex: verseIndex,
           enforceNonWikipedia: false,
           validateSourceIdSchema,
           errors
@@ -4878,7 +4468,8 @@ export async function validateData(options = {}) {
   validateGeoLayerProvenance(ancientCoastlineData, ancientCoastlineRelativePath);
   validateGeoLayerProvenance(ancientEmpireEdgeData, ancientEmpireEdgeRelativePath);
   validateGeoLayerProvenance(osmWaterwaysData, osmWaterwaysRelativePath);
-  validateGeoLayerProvenance(routeLinesData, routeLinesRelativePath);
+  // Route lines cite the passages that set their course (ADR-0038, update of 2026-10-14).
+  validateGeoLayerProvenance(routeLinesData, routeLinesRelativePath, webVerseIndex);
 
   return { errors, warnings };
 }

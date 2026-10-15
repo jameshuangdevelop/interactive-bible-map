@@ -183,16 +183,19 @@ IDs only; no coordinates recorded (coordinates come in M2). "Candidates" counts 
 | `wikipedia:` | Wikipedia article title, cite-only | `wikipedia:Capernaum` |
 | `perseus:` | Perseus Digital Library CTS URN, cite-only, license unverified | `perseus:urn:cts:greekLit:tlg0526` |
 
-## M5-04 route-line geometry inputs (read 2026-10-13)
+## M5-04 route-line geometry inputs (read 2026-10-13, updated 2026-10-14)
 
-These are the pinned files the route-line builder (`npm run build:route-lines`) uses.
+The inputs `npm run build:route-lines` reads, and `npm run check:route-lines` and `npm run validate:data` audit against (ADR-0038, update of 2026-10-14). The Natural Earth files are downloaded from the pinned commit and checked against their SHA-256s (`scripts/lib/route-line-inputs.mjs`, the same pins as `build:ancient-geo`); everything else is committed.
 
-| Source | Used for | Version pinned in code | License | Notes |
+| Source | Used for | Version pinned | License | Notes |
 |---|---|---|---|---|
-| AWMC Geodata (`data/geo/ancient-roads.geojson`) | First-century dated land-road graph (`travelMode: land`) | Commit `7ecf8bccea2efe1e1e9df2daf6001942de73fb87` (already pinned by `build:ancient-geo`) | ODbL 1.0 | Only AWMC roads already filtered to Roman-period major roads and post-AD-100 exclusions (ADR-0037). |
-| ORBIS v2 node/edge tables (`orbis_nodes_0514.csv`, `orbis_edges_0514.csv`) | Sea-lane graph where ORBIS links two ports (`travelMode: sea`) | `druid:mn425tz9757`; URL + SHA-256 pinned in `scripts/lib/route-line-inputs.mjs` | CC BY 3.0 | Used only from the downloadable dataset, not from the web app. |
-| Natural Earth 10m land + coastline | Coastline-aware sea fallback and inland-to-coast connectors | Commit `ca96624a56bd078437bca8184e78163e5039ad19` (already pinned by `build:ancient-geo`) | Public domain | Used when no ORBIS sea-lane path links stage waypoints. |
-| Itiner-e (2025 release) | Evaluated as possible first-century land-road source | Evaluated only in M5-04 | CC BY 4.0 (as reported by project/Zenodo metadata) | Not used in this pass: the current branch can already draw every stage from AWMC roads + straight fallback; Fact-Checker can still adopt Itiner-e later for tighter land paths after stop-site review settles. |
+| Natural Earth 10 m land, `geojson/ne_10m_land.geojson` | Lines by sea keep off it; lines by land keep to it. Rasterised into a grid of 500 m Web Mercator cells for the path search, and used at full resolution, as vectors, for every line-of-sight test and for the audit | Commit `ca96624a56bd078437bca8184e78163e5039ad19`, SHA-256 `1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416` | Public domain | The only coast the lines are drawn and checked against. Its coast is generalised, so paths keep 1.3 km off it where the water allows (`SEA_CLEARANCE`), because the basemap draws OpenStreetMap's more detailed coast. |
+| Natural Earth 10 m lakes, `geojson/ne_10m_lakes.geojson` | Open water for lines by land (the Sea of Galilee); water for the boat crossing of the Sea of Galilee | Commit `ca96624a56bd078437bca8184e78163e5039ad19`, SHA-256 `2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9` | Public domain | "Land" in the audit is land less its lakes. |
+| AWMC Geodata's roads, through `data/geo/ancient-roads.geojson` | Lines by land where a dated road lies within 15 km of each stop (two lines: Neapolis to Philippi, and Philippi to Thessalonica by Amphipolis and Apollonia) | Commit `7ecf8bccea2efe1e1e9df2daf6001942de73fb87`, as built by `build:ancient-geo` | ODbL 1.0 | Only the Roman-period major roads the ancient layer draws, less the roads dated after AD 100 (ADR-0037). Where a road runs over Natural Earth's sea (3.58 km at Asprovalta), that stretch follows the shortest path over land, recorded in the line's provenance. |
+| The stops' sites: `data/routes/stops.json` and `data/locations/*.json` | The first and last vertex of every line, and the places passed | Committed | CC BY-SA 4.0 data, each site cited by its `coordinateSource` | Each line cites its ends' `coordinateSource`s. |
+| ORBIS v2 node and edge tables | Not an input. A cross-check for travel times only (ADR-0038, update of 2026-10-14, item 1) | — | CC BY 3.0 | The builder no longer reads it. |
+| Natural Earth 10 m coastline | Not an input since 2026-10-14: the land polygons' edges are the coast | — | Public domain | Still used by the ancient layer (M4-03). |
+| Itiner-e (2025 release) | Not used | — | CC BY 4.0 (as reported by project/Zenodo metadata) | Evaluated in M5-04 but not read by any script; the Fact-Checker could not confirm the licence (Zenodo refused the request). |
 
 ## Open questions for the Fact-Checker (M1-03)
 
