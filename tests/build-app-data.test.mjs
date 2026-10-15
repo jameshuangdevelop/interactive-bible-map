@@ -10,6 +10,7 @@ import {
   __testOnly as ancientBuilderTestOnly,
   buildAncientAppData
 } from "../scripts/lib/ancient-app-data-builder.mjs";
+import { buildRoutesAppData } from "../scripts/lib/routes-app-data-builder.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
@@ -1174,6 +1175,108 @@ test("buildAppData fails when routes generated files exceed the gzip budget", as
           maxRoutesLayerGzipBytes: 1
         }),
       /Routes generated files exceed/u
+    );
+  });
+});
+
+test("buildRoutesAppData embeds cited bibliography entries sorted by id", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await buildRoutesAppData({
+      routesData: {
+        version: 1,
+        routes: [
+          {
+            id: "fixture-route",
+            title: "Fixture route",
+            fromYear: 46,
+            toYear: 47,
+            structure: "connected",
+            summary: "Summary",
+            bibleText: "Bible text",
+            notes: ["Note"],
+            sources: ["bib:z-source"],
+            stages: [
+              {
+                id: "fixture-stage-1",
+                from: { kind: "location", locationId: "antioch-syria" },
+                to: { kind: "location", locationId: "cyprus" },
+                scripture: [],
+                travelMode: "land",
+                sources: ["bib:a-source"]
+              }
+            ]
+          }
+        ]
+      },
+      routeStopsData: { version: 1, stops: [] },
+      routeLinesData: { type: "FeatureCollection", features: [] },
+      webVerseIndex: new Map(),
+      bibliographyById: new Map([
+        [
+          "a-source",
+          {
+            id: "a-source",
+            type: "book",
+            title: "A source",
+            authors: ["A. Writer"],
+            year: 2026
+          }
+        ],
+        [
+          "z-source",
+          {
+            id: "z-source",
+            type: "book",
+            title: "Z source",
+            authors: ["Z. Writer"],
+            year: 2026
+          }
+        ]
+      ]),
+      outputDirectory,
+      outputPrefix: "routes"
+    });
+
+    const routesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "routes.routes.json"), "utf8")
+    );
+    assert.deepEqual(
+      routesPayload.bibliography.map((entry) => entry.id),
+      ["a-source", "z-source"]
+    );
+  });
+});
+
+test("buildRoutesAppData throws when a cited bibliography entry is missing", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildRoutesAppData({
+          routesData: {
+            version: 1,
+            routes: [
+              {
+                id: "fixture-route",
+                title: "Fixture route",
+                fromYear: 46,
+                toYear: 47,
+                structure: "connected",
+                summary: "Summary",
+                bibleText: "Bible text",
+                notes: ["Note"],
+                sources: ["bib:missing-source"],
+                stages: []
+              }
+            ]
+          },
+          routeStopsData: { version: 1, stops: [] },
+          routeLinesData: { type: "FeatureCollection", features: [] },
+          webVerseIndex: new Map(),
+          bibliographyById: new Map(),
+          outputDirectory,
+          outputPrefix: "routes"
+        }),
+      /Missing bibliography entry 'missing-source' while building routes payload for 'routes'\./u
     );
   });
 });

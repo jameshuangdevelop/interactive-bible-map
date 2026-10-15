@@ -342,6 +342,7 @@ export async function buildAppData(options = {}) {
       routeStopsData,
       routeLinesData,
       webVerseIndex,
+      bibliographyById,
       outputDirectory,
       outputPrefix: "routes"
     });
@@ -369,17 +370,26 @@ export async function buildAppData(options = {}) {
     pathExists(routeLinesFixturePath)
   ]);
   if (fixtureFilesExist.every(Boolean)) {
-    const [routesData, routeStopsData, routeLinesData, webVerseIndex] = await Promise.all([
+    const [routesData, routeStopsData, routeLinesData, webVerseIndex, fixtureBibliography] = await Promise.all([
       readJsonFile(routesFixturePath),
       readJsonFile(routeStopsFixturePath),
       readJsonFile(routeLinesFixturePath),
-      loadWebVerseIndex(options.webVplPath)
+      loadWebVerseIndex(options.webVplPath),
+      readJsonFile(path.join(repositoryRoot, "tests", "fixtures", "bibliography.json"))
     ]);
+    const fixtureBibliographyById = new Map(bibliographyById);
+    for (const entry of fixtureBibliography.entries ?? []) {
+      if (typeof entry?.id !== "string" || fixtureBibliographyById.has(entry.id)) {
+        continue;
+      }
+      fixtureBibliographyById.set(entry.id, entry);
+    }
     const fixtureBuildResult = await buildRoutesAppData({
       routesData,
       routeStopsData,
       routeLinesData,
       webVerseIndex,
+      bibliographyById: fixtureBibliographyById,
       outputDirectory,
       outputPrefix: "routes.fixture"
     });

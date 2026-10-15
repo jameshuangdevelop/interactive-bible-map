@@ -16,51 +16,6 @@ function collectBibSourceIds(sourceIds, bibliographyEntryIds) {
   }
 }
 
-async function readBibliographyEntriesFromPath(filePath) {
-  try {
-    const payload = JSON.parse(await fs.readFile(filePath, "utf8"));
-    if (!Array.isArray(payload?.entries)) {
-      return [];
-    }
-    return payload.entries.filter(
-      (entry) => entry && typeof entry === "object" && typeof entry.id === "string"
-    );
-  } catch {
-    return [];
-  }
-}
-
-async function resolveBibliographyById(routesData, outputPrefix) {
-  const embeddedEntries = Array.isArray(routesData?.bibliography) ? routesData.bibliography : [];
-  if (embeddedEntries.length > 0) {
-    return new Map(
-      embeddedEntries
-        .filter((entry) => entry && typeof entry === "object" && typeof entry.id === "string")
-        .map((entry) => [entry.id, entry])
-    );
-  }
-
-  const registryPaths = outputPrefix.startsWith("routes.fixture")
-    ? [
-        path.resolve(process.cwd(), "tests/fixtures/bibliography.json"),
-        path.resolve(process.cwd(), "data/bibliography.json")
-      ]
-    : [
-        path.resolve(process.cwd(), "data/bibliography.json"),
-        path.resolve(process.cwd(), "tests/fixtures/bibliography.json")
-      ];
-  const bibliographyById = new Map();
-  for (const registryPath of registryPaths) {
-    const entries = await readBibliographyEntriesFromPath(registryPath);
-    for (const entry of entries) {
-      if (!bibliographyById.has(entry.id)) {
-        bibliographyById.set(entry.id, entry);
-      }
-    }
-  }
-  return bibliographyById;
-}
-
 function roundNumber(value, decimals = 5) {
   if (typeof value !== "number") {
     return value;
@@ -116,6 +71,7 @@ export async function buildRoutesAppData({
   routeStopsData,
   routeLinesData,
   webVerseIndex,
+  bibliographyById = new Map(),
   outputDirectory,
   outputPrefix = "routes"
 }) {
@@ -123,7 +79,6 @@ export async function buildRoutesAppData({
   const stops = Array.isArray(routeStopsData?.stops) ? routeStopsData.stops : [];
   const lineFeatures = Array.isArray(routeLinesData?.features) ? routeLinesData.features : [];
   const routeById = new Map(routes.map((route) => [route.id, route]));
-  const bibliographyById = await resolveBibliographyById(routesData, outputPrefix);
   const bibliographyEntryIds = new Set();
   for (const route of routes) {
     collectBibSourceIds(route.sources, bibliographyEntryIds);
@@ -142,8 +97,15 @@ export async function buildRoutesAppData({
     }
   }
   const bibliography = [...bibliographyEntryIds]
-    .map((id) => bibliographyById.get(id))
-    .filter((entry) => entry !== undefined)
+    .map((id) => {
+      const entry = bibliographyById.get(id);
+      if (!entry) {
+        throw new Error(
+          `Missing bibliography entry '${id}' while building routes payload for '${outputPrefix}'.`
+        );
+      }
+      return entry;
+    })
     .sort((left, right) => left.id.localeCompare(right.id));
 
   const routesIndexPayload = {
