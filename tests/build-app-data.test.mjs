@@ -1119,6 +1119,9 @@ test("buildAppData writes routes generated files and fixture files", async () =>
     const routesPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "routes.routes.json"), "utf8")
     );
+    const fixtureRoutesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "routes.fixture.routes.json"), "utf8")
+    );
     assert.equal(stagesPayload.routes.length, 2);
     assert.match(stagesPayload.routes[0].stages[0].scripture[0].textWEB, /Pentecost/u);
     assert.equal(routesPayload.routes[0].summary, "Fixture summary for route-level text validation.");
@@ -1139,6 +1142,14 @@ test("buildAppData writes routes generated files and fixture files", async () =>
         candidateIndex: 1
       }
     ]);
+    assert.deepEqual(
+      routesPayload.bibliography.map((entry) => entry.id),
+      ["existing-bib-source"]
+    );
+    assert.deepEqual(
+      fixtureRoutesPayload.bibliography.map((entry) => entry.id),
+      ["existing-bib-source"]
+    );
   });
 });
 

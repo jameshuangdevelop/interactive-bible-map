@@ -45,7 +45,8 @@ function coerceRoutesIndex(payload: RoutesIndexPayload): RoutesIndexPayload {
   return {
     version: 1,
     routeCount: Array.isArray(payload.routes) ? payload.routes.length : 0,
-    routes: Array.isArray(payload.routes) ? payload.routes : []
+    routes: Array.isArray(payload.routes) ? payload.routes : [],
+    bibliography: Array.isArray(payload.bibliography) ? payload.bibliography : []
   };
 }
 
@@ -97,7 +98,7 @@ export async function loadRoutesData(search: string): Promise<LoadedRoutesData> 
     stops,
     lines,
     routes: hydrateRoutes(index, stages),
-    bibliographyById: new Map()
+    bibliographyById: new Map(index.bibliography.map((entry) => [entry.id, entry] as const))
   };
 }
 

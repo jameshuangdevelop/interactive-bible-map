@@ -1,4 +1,5 @@
 import {
+  loadRoutesData,
   resolveRouteStop,
   routeLineFeatureByStage,
   stageHasDisputedStop
@@ -101,5 +102,79 @@ describe("routes data helpers", () => {
     const match = routeLineFeatureByStage(lines, "paul-1", "stage-01", "line-1");
     expect(match?.properties.lineId).toBe("line-1");
     expect(routeLineFeatureByStage(lines, "paul-1", "stage-02", "line-1")).toBeNull();
+  });
+
+  test("loads routes bibliography into citation map", async () => {
+    const previousWindow = globalThis.window;
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: { location: { hostname: "localhost" } }
+    });
+    const fetchSpy = jest.spyOn(globalThis, "fetch").mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/generated/routes.routes.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            version: 1,
+            routeCount: 1,
+            routes: [
+              {
+                id: "paul-1",
+                title: "Paul route",
+                fromYear: 46,
+                toYear: 48,
+                structure: "connected",
+                summary: "Summary",
+                bibleText: "Bible",
+                notes: [],
+                stageCount: 0,
+                sources: ["bib:fixture-source"]
+              }
+            ],
+            bibliography: [
+              {
+                id: "fixture-source",
+                type: "book",
+                title: "Fixture bibliography",
+                authors: ["A. Writer"],
+                year: 2026,
+                url: "https://example.test/fixture-source"
+              }
+            ]
+          })
+        } as Response);
+      }
+      if (url.includes("/generated/routes.stages.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ version: 1, routes: [{ id: "paul-1", stages: [] }] })
+        } as Response);
+      }
+      if (url.includes("/generated/routes.stops.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ version: 1, stops: [] })
+        } as Response);
+      }
+      if (url.includes("/generated/routes.lines.geojson")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ type: "FeatureCollection", features: [] })
+        } as Response);
+      }
+      throw new Error(`Unexpected fetch url: ${url}`);
+    });
+
+    try {
+      const loaded = await loadRoutesData("");
+      expect(loaded.bibliographyById.get("fixture-source")?.title).toBe("Fixture bibliography");
+    } finally {
+      fetchSpy.mockRestore();
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: previousWindow
+      });
+    }
   });
 });

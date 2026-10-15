@@ -54,6 +54,7 @@ export interface RoutesIndexPayload {
   version: 1;
   routeCount: number;
   routes: RouteIndexEntry[];
+  bibliography: BibliographyEntry[];
 }
 
 export interface RouteStagesPayload {
