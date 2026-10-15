@@ -15,7 +15,7 @@
           ],
           "changes": [
             {
-              "kind": "fixture-segment",
+              "kind": "straight-over-land",
               "detail": "Illustrative route segment for tests only.",
               "sources": [
                 "bib:existing-bib-source"
@@ -52,10 +52,26 @@
           ],
           "changes": [
             {
-              "kind": "fixture-segment",
+              "kind": "shortest-over-water",
               "detail": "Illustrative route segment for tests only.",
               "sources": [
                 "bib:existing-bib-source"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Fixture connector of 1.91 km from the stop's site.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Fixture connector of 1.58 km to the stop's site.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
               ]
             }
           ]
@@ -73,8 +89,8 @@
             34.917
           ],
           [
-            1.5,
-            1.5
+            35.4,
+            32.9
           ]
         ]
       }
@@ -93,7 +109,7 @@
           ],
           "changes": [
             {
-              "kind": "fixture-segment",
+              "kind": "path-not-known",
               "detail": "Illustrative route segment for tests only.",
               "sources": [
                 "bib:existing-bib-source"
@@ -106,8 +122,8 @@
         "type": "LineString",
         "coordinates": [
           [
-            1.5,
-            1.5
+            35.4,
+            32.9
           ],
           [
             35.575,
@@ -130,7 +146,7 @@
           ],
           "changes": [
             {
-              "kind": "fixture-segment",
+              "kind": "straight-over-land",
               "detail": "Illustrative route segment for tests only.",
               "sources": [
                 "bib:existing-bib-source"
@@ -147,8 +163,8 @@
             32.88
           ],
           [
-            1.5,
-            1.5
+            35.4,
+            32.9
           ]
         ]
       }

@@ -31,8 +31,8 @@
     },
     "naturalEarthSourceId": {
       "type": "string",
-      "description": "Natural Earth feature ne_id, for example naturalearth:1159152091.",
-      "pattern": "^naturalearth:[0-9]+$"
+      "description": "Natural Earth feature ne_id where present, or a pinned Natural Earth 10m route-line dataset id such as naturalearth:ne-10m-land, naturalearth:ne-10m-coastline or naturalearth:ne-10m-lakes.",
+      "pattern": "^naturalearth:(?:[0-9]+|ne-10m-(?:land|coastline|lakes))$"
     },
     "commonsSourceId": {
       "type": "string",

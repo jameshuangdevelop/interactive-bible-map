@@ -36,6 +36,11 @@ const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
 const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
 const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
 const routeLinesFixturePath = path.join(routesFixtureDirectory, "routes-lines.geojson");
+// The route-line audit measures the fixture lines against fixture land and lakes.
+const routeLineSurfaceFixtures = {
+  routeLineLandPath: path.join(routesFixtureDirectory, "route-line-land.geojson"),
+  routeLineLakesPath: path.join(routesFixtureDirectory, "route-line-lakes.geojson")
+};
 const repositoryLocationsDirectory = path.join(repositoryRoot, "data", "locations");
 const repositoryTimelinePath = path.join(repositoryRoot, "data", "timeline.json");
 const repositoryAncientAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
@@ -1081,6 +1086,7 @@ test("buildAppData writes routes generated files and fixture files", async () =>
       routesPath: routesFixturePath,
       routeStopsPath: routeStopsFixturePath,
       routeLinesPath: routeLinesFixturePath,
+      ...routeLineSurfaceFixtures,
       routesFixtureDirectory,
       webVplPath: webFixturePath,
       skipSnapshotChecksumCheck: true,
@@ -1126,6 +1132,7 @@ test("buildAppData fails when routes generated files exceed the gzip budget", as
           routesPath: routesFixturePath,
           routeStopsPath: routeStopsFixturePath,
           routeLinesPath: routeLinesFixturePath,
+          ...routeLineSurfaceFixtures,
           routesFixtureDirectory,
           webVplPath: webFixturePath,
           skipSnapshotChecksumCheck: true,
