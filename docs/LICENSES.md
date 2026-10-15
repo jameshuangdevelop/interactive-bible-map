@@ -267,7 +267,7 @@ It reads: Contains information from AWMC Geodata, which is made available here u
 It replaces the M1-03 wording, "Contains information from AWMC Geodata (awmc.unc.edu), made available under the Open Database License (ODbL).", with the ODbL's example notice: the name links to where the database is published, rather than naming the Center's website, and the licence name links to its text.
 
 ## Routes' lines (M5-04)
-Decided on 2026-10-14, and updated the same day after ADR-0038's update ("how the lines are drawn"), which makes ORBIS a cross-check only. The evidence is in [`docs/verification/M5-route-lines.md`](verification/M5-route-lines.md) §2 and §10. The routes' lines are `data/geo/routes-lines.geojson`, built by `npm run build:route-lines` from pinned inputs, and the copy that `npm run build:data` writes for the app (`routes.lines.geojson`, without provenance).
+Decided on 2026-10-14, and updated the same day after ADR-0038's update ("how the lines are drawn"), which makes ORBIS a cross-check only. The evidence is in [`docs/verification/M5-route-lines.md`](verification/M5-route-lines.md) §2, §10 and §11. The routes' lines are `data/geo/routes-lines.geojson`, built by `npm run build:route-lines` from pinned inputs, and the copy that `npm run build:data` writes for the app (`routes.lines.geojson`, without provenance).
 
 ### What each part is licensed under (routes' lines)
 | Part | License, as read at the source | Credit required, and where |
