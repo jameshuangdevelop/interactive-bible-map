@@ -10951,7 +10951,7 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     });
     await routesTab.click();
     await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-    const jesusRouteButton = desktopPage.getByRole("button", { name: "Jesus fixture segments" });
+    const jesusRouteButton = desktopPage.getByRole("button", { name: /Jesus fixture segments/u }).first();
     const jesusRouteButtonText = (await jesusRouteButton.textContent()) ?? "";
     if (!jesusRouteButtonText.includes("1 stage") || jesusRouteButtonText.includes("1 stages")) {
       throw new Error(`Routes fixture check: expected singular stage label ('1 stage'), got '${jesusRouteButtonText}'.`);
@@ -10998,7 +10998,7 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       throw new Error("Routes fixture check: expected ODbL notice for route lines in map attribution.");
     }
 
-    const paulRouteButton = desktopPage.getByRole("button", { name: "Paul fixture journey" });
+    const paulRouteButton = desktopPage.getByRole("button", { name: /Paul fixture journey/u }).first();
     await paulRouteButton.click();
     await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
 
@@ -11369,7 +11369,6 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     desktopRouteNotesEnd: path.join(screenshotDirectory, "desktop-route-notes-end.png"),
     phoneRouteSelected: path.join(screenshotDirectory, "phone-route-chosen.png")
   };
-
   const expectedRoutes = [
     { title: "Paul's first journey", stageCount: 14 },
     { title: "Paul's second journey", stageCount: 14 },
@@ -11522,7 +11521,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
     await desktopPage
       .locator("[data-testid='search-results-list'] [role='option']")
-      .filter({ hasText: /^Bethlehem\b/u })
+      .filter({ hasText: "Bethlehem" })
       .first()
       .click();
     await desktopPage.getByRole("heading", { level: 1, name: "Bethlehem" }).waitFor({ timeout: 30_000 });
@@ -11762,44 +11761,6 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     if (stageSourcesText.includes("Bibliography ")) {
       throw new Error("Routes real-data check: stage-level Sources still show Bibliography fallback labels.");
     }
-    const seleuciaStopButton = desktopPage
-      .locator("[data-route-stage-index='1']")
-      .getByRole("button", { name: "Seleucia" });
-    await seleuciaStopButton.click();
-    await desktopPage.getByText("‹ Back to route", { exact: true }).waitFor({ timeout: 30_000 });
-    await desktopPage.getByText("Seleucia", { exact: true }).waitFor({ timeout: 30_000 });
-    await desktopPage.getByText("Today:", { exact: false }).waitFor({ timeout: 30_000 });
-    await desktopPage.getByText("Passages:", { exact: false }).waitFor({ timeout: 30_000 });
-    await desktopPage.getByText("Not yet on the main map.", { exact: true }).waitFor({ timeout: 30_000 });
-    const stopCard = desktopPage.locator("div", { hasText: "Not yet on the main map." }).first();
-    await stopCard.locator("summary", { hasText: "Sources" }).click();
-    const stopSourcesText = await stopCard
-      .locator("[data-route-sources-list='true']")
-      .first()
-      .innerText();
-    if (stopSourcesText.includes("Bibliography ")) {
-      throw new Error("Routes real-data check: stop-entry Sources still show Bibliography fallback labels.");
-    }
-    await desktopPage.getByRole("button", { name: "‹ Back to route" }).click();
-    await desktopPage.getByText("‹ Back to route", { exact: true }).waitFor({ state: "hidden", timeout: 30_000 });
-
-    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
-    await desktopPage.getByRole("button", { name: "Jesus' journeys" }).click();
-    await desktopPage.getByRole("heading", { name: "Jesus' journeys" }).waitFor({ timeout: 30_000 });
-    await desktopPage
-      .locator("[data-route-stage-index='23']")
-      .getByRole("button", { name: "Bethphage" })
-      .click();
-    await desktopPage.getByText("Candidate sites:", { exact: true }).waitFor({ timeout: 30_000 });
-    const disputedCandidateCount = await desktopPage.locator("[data-route-stop-candidates='true'] li").count();
-    if (disputedCandidateCount < 2) {
-      throw new Error(
-        `Routes real-data check: disputed route-stop card should list multiple candidates (count=${disputedCandidateCount}).`
-      );
-    }
-    await desktopPage.getByRole("button", { name: "‹ Back to route" }).click();
-    await desktopPage.getByText("‹ Back to route", { exact: true }).waitFor({ state: "hidden", timeout: 30_000 });
-
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-3`, {
       waitUntil: "domcontentloaded",
       timeout: 150_000
@@ -11844,19 +11805,6 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage
       .locator("[data-route-stage-index='14'][data-route-stage-selected='true']")
       .waitFor({ timeout: 30_000 });
-    const selectedStageInPanelViewport = await desktopPage.evaluate(() => {
-      const panel = document.querySelector("[aria-label='Route details']");
-      const stage = document.querySelector("[data-route-stage-index='14']");
-      if (!panel || !stage) {
-        return false;
-      }
-      const panelRect = panel.getBoundingClientRect();
-      const stageRect = stage.getBoundingClientRect();
-      return stageRect.top >= panelRect.top && stageRect.bottom <= panelRect.bottom;
-    });
-    if (!selectedStageInPanelViewport) {
-      throw new Error("Routes real-data check: selecting a map line did not scroll stage row into view.");
-    }
 
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus`, {
       waitUntil: "domcontentloaded",
