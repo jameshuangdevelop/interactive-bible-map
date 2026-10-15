@@ -1,0 +1,77 @@
+{
+  "id": "adramyttium",
+  "names": {
+    "ancient": [
+      "Adramyttium"
+    ],
+    "modern": "Ören",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Edremit"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "mysia",
+  "candidates": [
+    {
+      "label": "Adramyttium (Karataş peninsula, Ören)",
+      "coordinates": [
+        26.936098,
+        39.49864
+      ],
+      "coordinateSource": "pleiades:550403",
+      "confidence": "high",
+      "support": "A city of Mysia, in the Roman province of Asia, with a good harbor at the head of the Gulf of Adramyttium, facing the island of Lesbos. The International Standard Bible Encyclopedia says the city grew important once Pergamum became the province's capital, serving as the district's own administrative center, and that its ancient harbor has disappeared, while a village carrying a form of its name stands further inland. Pleiades places the ancient site on the modern Karataş peninsula at Ören; Wikidata and OpenBible.info agree, and Wikidata's own record places it within Balıkesir Province, Türkiye.",
+      "sources": [
+        "pleiades:550403",
+        "wikidata:Q3605584",
+        "openbible:adramyttium",
+        "bib:isbe-adramyttium"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Adramyttium was a city of Mysia, in the Roman province of Asia, with a good harbor at the head of a gulf facing the island of Lesbos. Acts records that when Paul and his fellow prisoners first set out from Caesarea bound for Rome, they embarked on a ship of Adramyttium that was sailing for ports along the coast of Asia, before transferring to an Alexandrian grain ship at Myra.",
+    "sources": [
+      "pleiades:550403",
+      "wikidata:Q3605584",
+      "openbible:adramyttium",
+      "bib:isbe-adramyttium",
+      "scripture:Acts 27:2"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Adramyttium grew into an important city and the administrative center of its district once Pergamum became capital of the province of Asia, and that assizes (circuit courts) were held there; coins struck at Adramyttium, bearing the twin gods Castor and Pollux, continued to be minted as late as the third century AD. Its ancient harbor has since disappeared, and a village bearing a form of its name, Edremit, stands farther inland.",
+      "sources": [
+        "bib:isbe-adramyttium"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:2",
+      "book": "Acts",
+      "textWEB": "Embarking in a ship of Adramyttium, which was about to sail to places on the coast of Asia, we put to sea, Aristarchus, a Macedonian of Thessalonica being with us."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "asia"
+}

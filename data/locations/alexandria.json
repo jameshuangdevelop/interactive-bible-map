@@ -1,0 +1,108 @@
+{
+  "id": "alexandria",
+  "names": {
+    "ancient": [
+      "Alexandria"
+    ],
+    "modern": "Alexandria",
+    "modernCountries": [
+      "Egypt"
+    ],
+    "alternate": [],
+    "otherLanguages": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "egypt",
+  "candidates": [
+    {
+      "label": "Alexandria",
+      "coordinates": [
+        29.8925,
+        31.1975
+      ],
+      "coordinateSource": "wikidata:Q87",
+      "confidence": "high",
+      "support": "A port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC by the isle of Pharos, and a major shipbuilding and trade center under Roman rule. Acts names \"a ship of Alexandria\" twice as the vessel Paul's party boarded: first at Myra (Acts 27:6), and again, after the shipwreck, on Malta (Acts 28:11); the International Standard Bible Encyclopedia confirms these as the New Testament's only two direct references to such a ship. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Alexandria, Egypt.",
+      "sources": [
+        "wikidata:Q87",
+        "pleiades:727070",
+        "openbible:alexandria",
+        "bib:isbe-alexandria"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Alexandria was a major port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC beside the isle of Pharos and soon the preeminent city of the Hellenistic world, famed for its library and its lighthouse. Acts names Apollos, a Jewish Christian teacher who later worked alongside Paul, as \"an Alexandrian by race,\" and records that \"Alexandrians\" were among those who disputed with Stephen in a Jerusalem synagogue. Twice more Acts names a ship of Alexandria: the grain ship Paul's centurion found at Myra, and another, wintered on Malta, that carried Paul's party on to Italy.",
+    "sources": [
+      "wikidata:Q87",
+      "pleiades:727070",
+      "openbible:alexandria",
+      "bib:isbe-alexandria",
+      "scripture:Acts 18:24",
+      "scripture:Acts 6:9",
+      "scripture:Acts 27:6",
+      "scripture:Acts 28:11"
+    ]
+  },
+  "history": [
+    {
+      "text": "Alexander the Great chose the site for its strategic position guarding the richest part of his empire. With its famous library and museum, Alexandria became a leading center of Greek scholarship and science, and the International Standard Bible Encyclopedia credits its library and university with helping to make the city, next to Rome, the greatest of the ancient world.",
+      "sources": [
+        "bib:isbe-alexandria"
+      ]
+    },
+    {
+      "text": "A large Jewish community lived in Alexandria from the city's early years and, according to the International Standard Bible Encyclopedia, occupied a more influential position there than anywhere else in the ancient world. It was in Alexandria, from the third to the second century BC, that Jewish scholars produced the Septuagint, the Greek translation of the Old Testament that New Testament writers frequently quote.",
+      "sources": [
+        "bib:isbe-alexandria"
+      ]
+    },
+    {
+      "text": "The International Standard Bible Encyclopedia states that Alexandria remained a preeminent city through the Roman period and began to decline only from the fifth century AD onward. Today Alexandria remains a major Mediterranean port city in Egypt.",
+      "sources": [
+        "bib:isbe-alexandria",
+        "wikidata:Q87"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 6:9",
+      "book": "Acts",
+      "textWEB": "But some of those who were of the synagogue called “The Libertines”, and of the Cyrenians, of the Alexandrians, and of those of Cilicia and Asia arose, disputing with Stephen."
+    },
+    {
+      "ref": "Acts 18:24",
+      "book": "Acts",
+      "textWEB": "Now a certain Jew named Apollos, an Alexandrian by race, an eloquent man, came to Ephesus. He was mighty in the Scriptures."
+    },
+    {
+      "ref": "Acts 27:6",
+      "book": "Acts",
+      "textWEB": "There the centurion found a ship of Alexandria sailing for Italy, and he put us on board."
+    },
+    {
+      "ref": "Acts 28:11",
+      "book": "Acts",
+      "textWEB": "After three months, we set sail in a ship of Alexandria which had wintered in the island, whose figurehead was “The Twin Brothers.”"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -30,
+      "toYear": 101,
+      "holderId": "egypt-prefecture",
+      "entity": "Roman Egypt (special imperial prefecture) (ruler: Equestrian prefect; senators barred without the emperor's leave)",
+      "sources": [
+        "bib:suetonius-twelve-caesars",
+        "bib:tacitus-annals"
+      ],
+      "note": "The Roman biographer Suetonius: after Cleopatra's death, the emperor Augustus \"reduced Egypt to the form of a province.\""
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "egypt"
+}

@@ -1,0 +1,78 @@
+{
+  "id": "three-taverns",
+  "names": {
+    "ancient": [
+      "Three Taverns"
+    ],
+    "modernCountries": [
+      "Italy"
+    ],
+    "alternate": [
+      "The Three Taverns"
+    ],
+    "otherLanguages": [
+      "Tres Tabernae"
+    ]
+  },
+  "type": "site",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "italy",
+  "candidates": [
+    {
+      "label": "Three Taverns (Tres Tabernae, Appian Way)",
+      "coordinates": [
+        12.873889,
+        41.561944
+      ],
+      "coordinateSource": "wikidata:Q622536",
+      "confidence": "high",
+      "support": "A station on the Appian Way about 33 Roman miles from Rome. Pleiades, OpenBible.info and Wikidata agree on the site.",
+      "sources": [
+        "pleiades:423106",
+        "openbible:three-taverns",
+        "wikidata:Q622536",
+        "bib:isbe-taverns-three"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Three Taverns was a station on the Appian Way about thirty-three Roman miles from Rome, where a road from Antium and Norba crossed the main highway. According to Acts, as Paul approached Rome under guard as a prisoner, one group of believers from the city met him as far as Three Taverns while another went only as far as Forum of Appius, a station further south.",
+    "sources": [
+      "pleiades:423106",
+      "openbible:three-taverns",
+      "wikidata:Q622536",
+      "bib:isbe-taverns-three",
+      "scripture:Acts 28:15"
+    ]
+  },
+  "history": [
+    {
+      "text": "A few kilometers south toward Forum of Appius lay Tripontium, which the International Standard Bible Encyclopedia names as the point where the Appian Way entered the region of the Pontine Marshes.",
+      "sources": [
+        "bib:isbe-taverns-three"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:15",
+      "book": "Acts",
+      "textWEB": "From there the brothers, when they heard of us, came to meet us as far as The Market of Appius and The Three Taverns. When Paul saw them, he thanked God and took courage."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "italy-direct",
+      "entity": "Italy",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "italy"
+}
