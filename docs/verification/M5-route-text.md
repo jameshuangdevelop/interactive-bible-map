@@ -18,6 +18,8 @@
 
 All six stop entries are now `verified`. The route text passes after my corrections, except the two items that need new wording from the Research Lead (R2, R4).
 
+**Re-check (§10):** the PO ruled on Q1 and Q2, and the Research Lead applied R1–R4 in `ca6f82d`. All four pass, R2 after one more correction (C18), and every item in this report is now closed.
+
 ## 2. Route text, clause by clause
 
 Unchanged clauses carried over from the old `note` (verified in `docs/verification/M5-paul-journeys.md` and `M5-jesus-journeys.md`) were re-read against their sources and still hold. The routes' `yearNote` fields are unchanged. The modern glosses ("now central Türkiye", "Asia Minor", "the Aegean Sea", "now in Greece") are stated by the verified records and stop entries the stages link to (`galatia`: "Central Türkiye"; `troas`, `asia`: Asia Minor; `samothrace`: "the north Aegean Sea"; the Greek cities' records), so I accept them.
@@ -118,6 +120,8 @@ Each is sourced in §2 or §5.
 
 ## 8. Back to the Research Lead, and questions for the PO
 
+All closed in `ca6f82d`; see §10.
+
 - **R1** (§4): add Jerusalem to `paul-1` stage 4; Corinth to `paul-3` stage 1; Beroea, Thessalonica and Derbe to `paul-3` stage 2; and Thessalonica and Macedonia to `paul-rome` stage 1. Or, if the PO rules that places named only as someone's home or whereabouts don't count (Q1), give that reason in §12 of the Paul note instead of the one there now.
 - **R2** (§4): Acts 18:21. Add Jerusalem to `paul-2` stage 13's `mentioned`, and reword the note on Acts 18:22 with the textual difference.
 - **R3** (§4): §12 of the Jesus note should list the brook Kidron (John 18:1) as left out for want of a sourced point.
@@ -133,3 +137,21 @@ Run after my corrections, with the official Node 24 build:
 - `npm test`: 313 tests, all pass.
 - `npm run test:app`: 22 suites, 159 tests, all pass.
 - `npm run build:data`: the Routes files come to 31,851 bytes gzip (routes 6,445, stages 14,195, stops 8,706, lines 2,505), well within the 100,000-byte budget, and no tracked file changed.
+
+## 10. Re-check of `ca6f82d` (2026-10-14)
+
+The PO ruled that places named for other people go in `mentioned`, towns and sites only, and that a place already on the route isn't drawn twice (Q1); and that the dates discussion is a caveat, so each `yearNote` moves into `notes` and the field is removed (Q2). I re-checked `git diff 0b18e78..ca6f82d` against the passages and these rulings.
+
+| Item | Result |
+|---|---|
+| R1 | **Pass.** Jerusalem on `paul-1` stage 4 (Acts 13:13); Corinth on `paul-3` stage 1 (19:1); Beroea, Thessalonica and Derbe on `paul-3` stage 2 (20:4), Derbe at candidate 0, Kerti Höyük, as on the first two journeys; Thessalonica on `paul-rome` stage 1 (27:2). Each passage names the town, each record is verified, and none is a stop or `via` on its own route. Macedonia (27:2) and Asia (20:4; 27:2) stay out as regions, and Cyprus (21:16) is already passed on `paul-3` stage 12. Re-reading all 181 stage passages finds no other town or site named for another person. |
+| R2 | **Pass after C18.** Jerusalem is on `paul-2` stage 13, whose passages include Acts 18:21. The note quotes the WEB exactly. On Bible Gateway (read 2026-10-14), the NIV, ESV, NLT and CSB leave the clause out of their main text, and the NLT ("Some manuscripts read") and CSB ("Other mss add") give it in a footnote. The KJV and NKJV include it, and the NKJV's footnote says the NU text omits it. No cited source said "several early manuscripts omit this clause": the phrase is the ISBE's, about Trogyllium. It now reads "manuscripts differ on this clause" (C18). For 18:22 the ISBE reading still holds ("to Jerusalem apparently (Ac 18:21 f)"; "If he went to Jerusalem, it was probably incidental"). Acts 18:21 and the six versions are now among the route's sources. |
+| R3 | **Pass.** §12 of the Jesus note lists the brook Kidron as left out, since it has no record or stop entry. |
+| R4 | **Pass.** No route has a `yearNote`, and no note points to one. Each year note's text, verified in M5-02 and M5-03, is now the route's date note unchanged; the Jesus note keeps my C10 sentence on the ministry's length. Each note's sources are still among its route's sources. The schema still allows an optional `yearNote`, so the GIS Engineer may want to remove it. |
+| Research note | §13 of the Paul note said the CSB omits the 18:21 clause "entirely"; the CSB footnotes it. Corrected (C19). Its new reason for leaving out Acts 16:6's "Asia" (a region) gives the right result, and the party also passes through Asia on that stage, to Troas. |
+
+**More corrections (ADR-0014):** C18, in `paul-2`'s note on Acts 18:21–22: "several early manuscripts omit this clause" became "manuscripts differ on this clause". C19, in `docs/research/M5-paul-journeys.md` §13: the NLT and CSB both footnote the clause.
+
+**For M5-05:** Phoenix keeps `candidateIndex: 0` on `paul-rome` stage 4, because the validator needs an index for an entry with two candidates. That index puts the dot at Loutro, but both candidates are `disputed`, so the dot should carry the "Site disputed" tag and the card should list both sites, as for a stop.
+
+**Checks, after C18 and C19:** `validate:data` passed (203 warnings, none on routes or stops); `npm test`: 313 tests, all pass; `npm run test:app`: 22 suites, 159 tests, all pass.
