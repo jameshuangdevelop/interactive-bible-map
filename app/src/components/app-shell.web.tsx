@@ -38,7 +38,11 @@ import type {
   PlaceIndexRecord,
   PlaceSelection
 } from "../features/map/types";
-import { loadRoutesData, resolveRouteStop, routeLineFeatureByStage } from "../features/routes/routes-data";
+import {
+  loadRoutesData,
+  resolveRouteStop,
+  routeLineFeatureByStage
+} from "../features/routes/routes-data";
 import type { LoadedRoutesData, RouteStopResolved } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
 import { RoutesPanel } from "../features/routes/routes-panel.web";
@@ -284,7 +288,6 @@ export function AppShell() {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
   const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
-  const [hoveredRouteId, setHoveredRouteId] = useState<string | null>(null);
   const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
   const [routesReloadToken, setRoutesReloadToken] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -998,235 +1001,417 @@ export function AppShell() {
     }
 
     const selectedRouteEntry = selectedRoute;
+    if (!selectedRouteEntry) {
+      return {
+        lines: {
+          type: "FeatureCollection",
+          features: []
+        },
+        points: {
+          type: "FeatureCollection",
+          features: []
+        },
+        bounds: null,
+        routeFocusKey: null,
+        selectedStageFocusKey: null,
+        selectedStageCenter: null,
+        selectedStageAnimationKey: null,
+        hideBasePlaces: true
+      };
+    }
+
     const highlightedStageId =
-      selectedRouteEntry && highlightedStageIndex !== null && highlightedStageIndex >= 0
+      highlightedStageIndex !== null && highlightedStageIndex >= 0
         ? selectedRouteEntry.stages[highlightedStageIndex]?.id ?? null
         : null;
     const selectedStageId =
-      selectedRouteEntry && selectedStageIndex !== null && selectedStageIndex >= 0
+      selectedStageIndex !== null && selectedStageIndex >= 0
         ? selectedRouteEntry.stages[selectedStageIndex]?.id ?? null
         : null;
-    const activeRouteId = selectedRouteEntry?.route.id ?? hoveredRouteId ?? null;
-    const selectedStandaloneSegment =
-      selectedRouteEntry?.route.structure === "standalone-segments" && selectedStageId !== null;
+    const emphasizedStageId = highlightedStageId ?? selectedStageId;
+    const selectedRouteId = selectedRouteEntry.route.id;
+
+    const midpointOfCoordinates = (coordinates: [number, number][]) => {
+      if (coordinates.length === 0) {
+        return null;
+      }
+      if (coordinates.length === 1) {
+        return coordinates[0];
+      }
+
+      const lengths: number[] = [];
+      let totalLength = 0;
+      for (let index = 1; index < coordinates.length; index += 1) {
+        const left = coordinates[index - 1];
+        const right = coordinates[index];
+        const dx = right[0] - left[0];
+        const dy = right[1] - left[1];
+        const segmentLength = Math.sqrt(dx ** 2 + dy ** 2);
+        lengths.push(segmentLength);
+        totalLength += segmentLength;
+      }
+      if (totalLength <= Number.EPSILON) {
+        return coordinates[Math.floor(coordinates.length / 2)] ?? coordinates[0];
+      }
+
+      const target = totalLength / 2;
+      let traversed = 0;
+      for (let index = 1; index < coordinates.length; index += 1) {
+        const segmentLength = lengths[index - 1] ?? 0;
+        if (traversed + segmentLength >= target) {
+          const ratio = segmentLength <= Number.EPSILON ? 0 : (target - traversed) / segmentLength;
+          const left = coordinates[index - 1];
+          const right = coordinates[index];
+          return [
+            left[0] + (right[0] - left[0]) * ratio,
+            left[1] + (right[1] - left[1]) * ratio
+          ] as [number, number];
+        }
+        traversed += segmentLength;
+      }
+      return coordinates[coordinates.length - 1] ?? null;
+    };
+
+    const midpointOfGeometry = (
+      geometry:
+        | { type: "LineString"; coordinates: number[][] }
+        | { type: "MultiLineString"; coordinates: number[][][] }
+    ) => {
+      if (geometry.type === "LineString") {
+        return midpointOfCoordinates(geometry.coordinates as [number, number][]);
+      }
+      const merged = geometry.coordinates.flat() as [number, number][];
+      return midpointOfCoordinates(merged);
+    };
 
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
-    for (const entry of routesData.routes) {
-      for (const [index, stage] of entry.stages.entries()) {
-        const feature = routeLineFeatureByStage(routesData.lines, entry.route.id, stage.id, stage.lineId);
-        if (!feature) {
-          continue;
-        }
+    const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
+    let selectedStageCenter: [number, number] | null = null;
+    for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+      const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
+      if (!feature) {
+        continue;
+      }
 
-        if (feature.geometry.type === "LineString") {
-          lineFeatures.push({
-            type: "Feature",
-            geometry: feature.geometry as { type: "LineString"; coordinates: number[][] },
-            properties: {
-              routeId: entry.route.id,
-              stageId: stage.id,
-              stageIndex: index,
-              travelMode: stage.travelMode,
-              isPathUnknown: stage.travelMode === "unknown",
-              isInSelectedRoute: activeRouteId ? entry.route.id === activeRouteId : false,
-              isSelectedStage: selectedStageId === stage.id,
-              isHighlightedStage: highlightedStageId === stage.id,
-              isDimmed:
-                entry.route.id === selectedRouteEntry?.route.id &&
-                selectedStandaloneSegment &&
-                selectedStageId !== stage.id &&
-                highlightedStageId !== stage.id
-            }
-          });
-          continue;
+      const mappedFeature = {
+        type: "Feature" as const,
+        geometry:
+          feature.geometry.type === "LineString"
+            ? (feature.geometry as { type: "LineString"; coordinates: number[][] })
+            : (feature.geometry as { type: "MultiLineString"; coordinates: number[][][] }),
+        properties: {
+          routeId: selectedRouteId,
+          stageId: stage.id,
+          stageIndex: index,
+          stageLabel: `${index + 1}`,
+          travelMode: stage.travelMode,
+          isInSelectedRoute: true as const,
+          isSelectedStage: selectedStageId === stage.id,
+          isHighlightedStage: highlightedStageId === stage.id,
+          isDimmed: Boolean(emphasizedStageId && emphasizedStageId !== stage.id)
         }
-
-        lineFeatures.push({
-          type: "Feature",
-          geometry: feature.geometry as { type: "MultiLineString"; coordinates: number[][][] },
-          properties: {
-            routeId: entry.route.id,
-            stageId: stage.id,
-            stageIndex: index,
-            travelMode: stage.travelMode,
-            isPathUnknown: stage.travelMode === "unknown",
-            isInSelectedRoute: activeRouteId ? entry.route.id === activeRouteId : false,
-            isSelectedStage: selectedStageId === stage.id,
-            isHighlightedStage: highlightedStageId === stage.id,
-            isDimmed:
-              entry.route.id === selectedRouteEntry?.route.id &&
-              selectedStandaloneSegment &&
-              selectedStageId !== stage.id &&
-              highlightedStageId !== stage.id
-          }
-        });
+      };
+      lineFeatures.push(mappedFeature);
+      lineFeatureByStageId.set(stage.id, mappedFeature);
+      if (selectedStageId === stage.id) {
+        selectedStageCenter = midpointOfGeometry(mappedFeature.geometry);
       }
     }
 
-    const pointFeatures = routesData.routes.flatMap((entry) => {
-      const routeSelected = activeRouteId ? activeRouteId === entry.route.id : false;
-      if (entry.route.structure === "connected") {
-        const stopByKey = new Map<
-          string,
-          {
-            resolved: RouteStopResolved;
-            order: Set<number>;
-            firstStageIndex: number;
-            stageIds: Set<string>;
-          }
-        >();
-        const ensureConnectedStop = (resolved: RouteStopResolved, order: number, stageIndex: number, stageId: string) => {
-          if (!resolved.coordinates) {
-            return;
-          }
-          const key = `${resolved.kind}:${resolved.id}`;
-          const existing = stopByKey.get(key);
-          if (existing) {
-            existing.order.add(order);
-            existing.stageIds.add(stageId);
-            return;
-          }
-          stopByKey.set(key, {
-            resolved,
-            order: new Set([order]),
-            firstStageIndex: stageIndex,
-            stageIds: new Set([stageId])
-          });
-        };
-        const firstStage = entry.stages[0];
-        if (firstStage) {
-          ensureConnectedStop(resolveRouteStop(firstStage.from, placesById, routeStopsById), 1, 0, firstStage.id);
-        }
-        for (const [index, stage] of entry.stages.entries()) {
-          ensureConnectedStop(resolveRouteStop(stage.to, placesById, routeStopsById), index + 2, index, stage.id);
-        }
-
-        const connectedStops = [...stopByKey.values()].map((value) => {
-          const isSelectedStage = selectedStageId ? value.stageIds.has(selectedStageId) : false;
-          const isHighlightedStage = highlightedStageId ? value.stageIds.has(highlightedStageId) : false;
-          const dimmed =
-            entry.route.id === selectedRouteEntry?.route.id &&
-            selectedStandaloneSegment &&
-            !isSelectedStage &&
-            !isHighlightedStage;
-          return {
-            type: "Feature" as const,
-            geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
-            properties: {
-              id: `${entry.route.id}:${value.resolved.kind}:${value.resolved.id}`,
-              routeId: entry.route.id,
-              stageId: [...value.stageIds][0] ?? "",
-              stageIndex: value.firstStageIndex,
-              kind: "stop" as const,
-              stopKind: value.resolved.kind,
-              stopId: value.resolved.id,
-              label: value.resolved.name,
-              orderLabel: [...value.order].sort((left, right) => left - right).join(", "),
-              isInSelectedRoute: routeSelected,
-              isSelectedStage,
-              isHighlightedStage,
-              isDimmed: dimmed
-            }
-          };
-        });
-
-        const viaByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
-        for (const [index, stage] of entry.stages.entries()) {
-          const stageSelected = selectedStageId === stage.id;
-          const stageHighlighted = highlightedStageId === stage.id;
-          const dimmed =
-            entry.route.id === selectedRouteEntry?.route.id &&
-            selectedStandaloneSegment &&
-            !stageSelected &&
-            !stageHighlighted;
-          for (const viaRef of stage.via ?? []) {
-            const via = resolveRouteStop(viaRef, placesById, routeStopsById);
-            if (!via.coordinates) {
-              continue;
-            }
-            const key = `${entry.route.id}:${via.kind}:${via.id}`;
-            if (viaByKey.has(key)) {
-              continue;
-            }
-            viaByKey.set(key, {
-              type: "Feature" as const,
-              geometry: { type: "Point" as const, coordinates: via.coordinates },
-              properties: {
-                id: `${entry.route.id}:${stage.id}:via:${via.id}`,
-                routeId: entry.route.id,
-                stageId: stage.id,
-                stageIndex: index,
-                kind: "via" as const,
-                stopKind: via.kind,
-                stopId: via.id,
-                label: via.name,
-                isInSelectedRoute: routeSelected,
-                isSelectedStage: stageSelected,
-                isHighlightedStage: stageHighlighted,
-                isDimmed: dimmed
-              }
-            });
-          }
-        }
-        return [...connectedStops, ...viaByKey.values()];
-      }
-
-      const stopsByKey = new Map<
+    const pointFeatures: RouteMapOverlayData["points"]["features"] = [];
+    if (selectedRouteEntry.route.structure === "connected") {
+      const stopByKey = new Map<
         string,
         {
           resolved: RouteStopResolved;
-          stageIds: Set<string>;
           firstStageIndex: number;
+          stageIds: string[];
+          isRouteStart: boolean;
         }
       >();
-      const addSegmentStop = (resolved: RouteStopResolved, stage: { id: string }, stageIndex: number) => {
+      const ensureConnectedStop = (
+        resolved: RouteStopResolved,
+        stageIndex: number,
+        stageId: string,
+        isRouteStart: boolean
+      ) => {
         if (!resolved.coordinates) {
           return;
         }
         const key = `${resolved.kind}:${resolved.id}`;
-        const existing = stopsByKey.get(key);
+        const existing = stopByKey.get(key);
         if (existing) {
-          existing.stageIds.add(stage.id);
+          if (existing.stageIds.includes(stageId) && (!isRouteStart || existing.isRouteStart)) {
+            return;
+          }
+          stopByKey.set(key, {
+            ...existing,
+            stageIds: existing.stageIds.includes(stageId)
+              ? existing.stageIds
+              : [...existing.stageIds, stageId],
+            isRouteStart: existing.isRouteStart || isRouteStart
+          });
           return;
         }
-        stopsByKey.set(key, {
+        stopByKey.set(key, {
           resolved,
-          stageIds: new Set([stage.id]),
-          firstStageIndex: stageIndex
+          firstStageIndex: stageIndex,
+          stageIds: [stageId],
+          isRouteStart
         });
       };
-      for (const [index, stage] of entry.stages.entries()) {
-        addSegmentStop(resolveRouteStop(stage.from, placesById, routeStopsById), stage, index);
-        addSegmentStop(resolveRouteStop(stage.to, placesById, routeStopsById), stage, index);
+      const firstStage = selectedRouteEntry.stages[0];
+      if (firstStage) {
+        ensureConnectedStop(
+          resolveRouteStop(firstStage.from, placesById, routeStopsById),
+          0,
+          firstStage.id,
+          true
+        );
       }
-      return [...stopsByKey.values()].map((value) => {
-        const isSelectedStage = selectedStageId ? value.stageIds.has(selectedStageId) : false;
-        const isHighlightedStage = highlightedStageId ? value.stageIds.has(highlightedStageId) : false;
-        const dimmed =
-          entry.route.id === selectedRouteEntry?.route.id &&
-          selectedStandaloneSegment &&
-          !isSelectedStage &&
-          !isHighlightedStage;
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        ensureConnectedStop(resolveRouteStop(stage.to, placesById, routeStopsById), index, stage.id, false);
+      }
+
+      const connectedStops = [...stopByKey.values()].map((value, index) => {
+        const isSelectedStage = selectedStageId ? value.stageIds.includes(selectedStageId) : false;
+        const isHighlightedStage = highlightedStageId ? value.stageIds.includes(highlightedStageId) : false;
+        const dimmed = Boolean(emphasizedStageId && !value.stageIds.includes(emphasizedStageId));
         return {
           type: "Feature" as const,
           geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
           properties: {
-            id: `${entry.route.id}:${value.resolved.kind}:${value.resolved.id}`,
-            routeId: entry.route.id,
-            stageId: [...value.stageIds][0] ?? "",
+            id: `${selectedRouteId}:stop:${value.resolved.kind}:${value.resolved.id}:${index}`,
+            routeId: selectedRouteId,
+            stageId: value.stageIds[0] ?? "",
             stageIndex: value.firstStageIndex,
             kind: "stop" as const,
             stopKind: value.resolved.kind,
             stopId: value.resolved.id,
             label: value.resolved.name,
-            isInSelectedRoute: routeSelected,
+            isRouteStart: value.isRouteStart,
+            isInSelectedRoute: true as const,
             isSelectedStage,
             isHighlightedStage,
             isDimmed: dimmed
           }
         };
       });
-    });
+
+      const viaByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
+      const mentionedByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        const stageSelected = selectedStageId === stage.id;
+        const stageHighlighted = highlightedStageId === stage.id;
+        const dimmed = Boolean(emphasizedStageId && emphasizedStageId !== stage.id);
+        for (const viaRef of stage.via ?? []) {
+          const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+          if (!via.coordinates) {
+            continue;
+          }
+          const key = `${selectedRouteId}:${via.kind}:${via.id}`;
+          if (viaByKey.has(key)) {
+            continue;
+          }
+          viaByKey.set(key, {
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: via.coordinates },
+            properties: {
+              id: `${selectedRouteId}:${stage.id}:via:${via.id}`,
+              routeId: selectedRouteId,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "via" as const,
+              stopKind: via.kind,
+              stopId: via.id,
+              label: via.name,
+              isInSelectedRoute: true as const,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted,
+              isDimmed: dimmed
+            }
+          });
+        }
+        for (const mentionedRef of stage.mentioned ?? []) {
+          const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
+          if (!mentioned.coordinates) {
+            continue;
+          }
+          const key = `${selectedRouteId}:${mentioned.kind}:${mentioned.id}`;
+          if (mentionedByKey.has(key)) {
+            continue;
+          }
+          mentionedByKey.set(key, {
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: mentioned.coordinates },
+            properties: {
+              id: `${selectedRouteId}:${stage.id}:mentioned:${mentioned.id}`,
+              routeId: selectedRouteId,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "mentioned" as const,
+              stopKind: mentioned.kind,
+              stopId: mentioned.id,
+              label: mentioned.name,
+              isInSelectedRoute: true as const,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted,
+              isDimmed: dimmed
+            }
+          });
+        }
+      }
+      pointFeatures.push(...connectedStops, ...viaByKey.values(), ...mentionedByKey.values());
+    } else {
+      const stopsByKey = new Map<
+        string,
+        {
+          resolved: RouteStopResolved;
+          stageIds: string[];
+          firstStageIndex: number;
+          isRouteStart: boolean;
+        }
+      >();
+      const addSegmentStop = (
+        resolved: RouteStopResolved,
+        stage: { id: string },
+        stageIndex: number,
+        isRouteStart: boolean
+      ) => {
+        if (!resolved.coordinates) {
+          return;
+        }
+        const key = `${resolved.kind}:${resolved.id}`;
+        const existing = stopsByKey.get(key);
+        if (existing) {
+          if (existing.stageIds.includes(stage.id) && (!isRouteStart || existing.isRouteStart)) {
+            return;
+          }
+          stopsByKey.set(key, {
+            ...existing,
+            stageIds: existing.stageIds.includes(stage.id)
+              ? existing.stageIds
+              : [...existing.stageIds, stage.id],
+            isRouteStart: existing.isRouteStart || isRouteStart
+          });
+          return;
+        }
+        stopsByKey.set(key, {
+          resolved,
+          stageIds: [stage.id],
+          firstStageIndex: stageIndex,
+          isRouteStart
+        });
+      };
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        addSegmentStop(resolveRouteStop(stage.from, placesById, routeStopsById), stage, index, index === 0);
+        addSegmentStop(resolveRouteStop(stage.to, placesById, routeStopsById), stage, index, false);
+      }
+      pointFeatures.push(
+        ...[...stopsByKey.values()].map((value, index) => {
+          const isSelectedStage = selectedStageId ? value.stageIds.includes(selectedStageId) : false;
+          const isHighlightedStage = highlightedStageId ? value.stageIds.includes(highlightedStageId) : false;
+          const dimmed = Boolean(emphasizedStageId && !value.stageIds.includes(emphasizedStageId));
+          return {
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
+            properties: {
+              id: `${selectedRouteId}:stop:${value.resolved.kind}:${value.resolved.id}:${index}`,
+              routeId: selectedRouteId,
+              stageId: value.stageIds[0] ?? "",
+              stageIndex: value.firstStageIndex,
+              kind: "stop" as const,
+              stopKind: value.resolved.kind,
+              stopId: value.resolved.id,
+              label: value.resolved.name,
+              isRouteStart: value.isRouteStart,
+              isInSelectedRoute: true as const,
+              isSelectedStage,
+              isHighlightedStage,
+              isDimmed: dimmed
+            }
+          };
+        })
+      );
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        const stageSelected = selectedStageId === stage.id;
+        const stageHighlighted = highlightedStageId === stage.id;
+        const dimmed = Boolean(emphasizedStageId && emphasizedStageId !== stage.id);
+        for (const viaRef of stage.via ?? []) {
+          const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+          if (!via.coordinates) {
+            continue;
+          }
+          pointFeatures.push({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: via.coordinates },
+            properties: {
+              id: `${selectedRouteId}:${stage.id}:via:${via.id}`,
+              routeId: selectedRouteId,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "via",
+              stopKind: via.kind,
+              stopId: via.id,
+              label: via.name,
+              isInSelectedRoute: true,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted,
+              isDimmed: dimmed
+            }
+          });
+        }
+        for (const mentionedRef of stage.mentioned ?? []) {
+          const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
+          if (!mentioned.coordinates) {
+            continue;
+          }
+          pointFeatures.push({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: mentioned.coordinates },
+            properties: {
+              id: `${selectedRouteId}:${stage.id}:mentioned:${mentioned.id}`,
+              routeId: selectedRouteId,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "mentioned",
+              stopKind: mentioned.kind,
+              stopId: mentioned.id,
+              label: mentioned.name,
+              isInSelectedRoute: true,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted,
+              isDimmed: dimmed
+            }
+          });
+        }
+      }
+    }
+
+    const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
+    const pillFeature = pillStage ? lineFeatureByStageId.get(pillStage.id) ?? null : null;
+    const pillCoordinate = pillFeature ? midpointOfGeometry(pillFeature.geometry) : null;
+    if (pillStage && pillFeature && pillCoordinate) {
+      const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
+      pointFeatures.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: pillCoordinate },
+        properties: {
+          id: `${selectedRouteId}:${pillStage.id}:pill`,
+          routeId: selectedRouteId,
+          stageId: pillStage.id,
+          stageIndex: stageIndex >= 0 ? stageIndex : 0,
+          kind: "stage-pill",
+          stopKind: "location",
+          stopId: pillStage.id,
+          label: `${Math.max(1, stageIndex + 1)}`,
+          isInSelectedRoute: true as const,
+          isSelectedStage: selectedStageId === pillStage.id,
+          isHighlightedStage: highlightedStageId === pillStage.id,
+          isDimmed: false
+        }
+      });
+    }
 
     let minLon = Number.POSITIVE_INFINITY;
     let minLat = Number.POSITIVE_INFINITY;
@@ -1238,13 +1423,11 @@ export function AppShell() {
       if (coordinate[0] > maxLon) maxLon = coordinate[0];
       if (coordinate[1] > maxLat) maxLat = coordinate[1];
     };
-    if (selectedRouteEntry) {
-      for (const feature of pointFeatures) {
-        if (feature.properties.routeId !== selectedRouteEntry.route.id) {
-          continue;
-        }
-        includeCoordinate(feature.geometry.coordinates as [number, number]);
+    for (const feature of pointFeatures) {
+      if (feature.properties.kind === "stage-pill") {
+        continue;
       }
+      includeCoordinate(feature.geometry.coordinates as [number, number]);
     }
     if (minLon === Number.POSITIVE_INFINITY) {
       for (const feature of lineFeatures) {
@@ -1260,6 +1443,9 @@ export function AppShell() {
           }
         }
       }
+    }
+    if (selectedStageCenter) {
+      includeCoordinate(selectedStageCenter);
     }
     const bounds =
       minLon === Number.POSITIVE_INFINITY
@@ -1279,16 +1465,18 @@ export function AppShell() {
         features: pointFeatures
       },
       bounds,
-      focusKey:
-        selectedRouteEntry && bounds
-          ? `${selectedRouteEntry.route.id}:${selectedStageId ?? ""}:${mapMode}`
+      routeFocusKey: bounds ? selectedRouteId : null,
+      selectedStageFocusKey:
+        selectedStageId && selectedStageCenter ? `${selectedRouteId}:${selectedStageId}` : null,
+      selectedStageCenter,
+      selectedStageAnimationKey:
+        selectedStageId && lineFeatureByStageId.has(selectedStageId)
+          ? `${selectedRouteId}:${selectedStageId}`
           : null,
       hideBasePlaces: true
     };
   }, [
     highlightedStageIndex,
-    hoveredRouteId,
-    mapMode,
     placesById,
     routeStopsById,
     routesData,
@@ -1505,6 +1693,7 @@ export function AppShell() {
       setViewTab("routes");
       setSelectedRouteId(entry.routeId);
       setSelectedStageIndex(entry.stageIndex);
+      setSelectedRouteStopId(null);
       if (entry.kind === "stop") {
         if (entry.stopKind === "location") {
           setSelection({ placeId: entry.stopId, candidateIndex: null });
@@ -1764,10 +1953,7 @@ export function AppShell() {
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  <p style={{ margin: 0 }}>
-                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
-                  </p>
-                  <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>{selectedTimelineStop.summary}</p>
+                  <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
                   {selectedTimelineStop.scripture.length > 0 ? (
                     <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
                       <strong>Passages:</strong>
@@ -1804,6 +1990,9 @@ export function AppShell() {
                       </ul>
                     </div>
                   ) : null}
+                  <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
+                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                  </p>
                 </div>
               ) : null}
               <div
@@ -1985,11 +2174,8 @@ export function AppShell() {
                   setSelectedStageIndex(null);
                   setHighlightedStageIndex(null);
                   setSelectedRouteStopId(null);
-                  setHoveredRouteId(null);
                 }}
-                onClearRouteHover={() => setHoveredRouteId(null)}
                 onHighlightStage={setHighlightedStageIndex}
-                onHoverRoute={setHoveredRouteId}
                 onResolveStopSelection={(resolvedStop, stageIndex) => {
                   setSelectedStageIndex(stageIndex);
                   if (resolvedStop.kind === "location") {
@@ -2005,13 +2191,16 @@ export function AppShell() {
                 }}
                 onRouteStopCardBack={() => setSelectedRouteStopId(null)}
                 onSelectRoute={handleSelectRoute}
-                onSelectStage={setSelectedStageIndex}
+                onSelectStage={(stageIndex) => {
+                  setSelectedRouteStopId(null);
+                  setSelectedStageIndex(stageIndex);
+                }}
                 placesById={placesById}
                 routeStopsById={routeStopsById}
                 routesData={routesData}
                 routesLoadState={routesLoadState}
                 selectedRoute={selectedRoute}
-                selectedRouteBorderYear={selectedRouteTimelineStop?.year ?? null}
+                selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
                 selectedRouteStop={selectedRouteStop}
                 selectedStageIndex={selectedStageIndex}
               />

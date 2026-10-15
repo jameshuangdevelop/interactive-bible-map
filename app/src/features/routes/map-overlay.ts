@@ -9,9 +9,9 @@ export interface RouteMapLineFeatureProperties {
   routeId: string;
   stageId: string;
   stageIndex: number;
+  stageLabel: string;
   travelMode: "land" | "sea" | "unknown";
-  isPathUnknown: boolean;
-  isInSelectedRoute: boolean;
+  isInSelectedRoute: true;
   isSelectedStage: boolean;
   isHighlightedStage: boolean;
   isDimmed: boolean;
@@ -22,15 +22,15 @@ export interface RouteMapPointFeatureProperties {
   routeId: string;
   stageId: string;
   stageIndex: number;
-  kind: "stop" | "via";
+  kind: "stop" | "via" | "mentioned" | "stage-pill";
   stopKind: "location" | "route-stop";
   stopId: string;
   label: string;
-  isInSelectedRoute: boolean;
+  isInSelectedRoute: true;
   isSelectedStage: boolean;
   isHighlightedStage: boolean;
   isDimmed: boolean;
-  orderLabel?: string;
+  isRouteStart?: boolean;
 }
 
 export interface RouteMapOverlayData {
@@ -47,6 +47,9 @@ export interface RouteMapOverlayData {
     }[];
   };
   bounds: [Coordinates, Coordinates] | null;
-  focusKey: string | null;
+  routeFocusKey: string | null;
+  selectedStageFocusKey: string | null;
+  selectedStageCenter: Coordinates | null;
+  selectedStageAnimationKey: string | null;
   hideBasePlaces: boolean;
 }

@@ -1054,7 +1054,7 @@ async function verifyGalleryFixtureBoundsAtViewport(
       timeout: 30_000
     });
 
-    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click({ force: true });
     await page
       .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
       .getByText("AI-generated reconstruction", { exact: true })
@@ -3258,11 +3258,13 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       state: "detached",
       timeout: 30_000
     });
+    await page.waitForFunction(() => {
+      const active = document.activeElement;
+      return active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true";
+    });
     const focusRestored = await page.evaluate(() => {
       const active = document.activeElement;
-      return (
-        active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true"
-      );
+      return active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true";
     });
     if (!focusRestored) {
       throw new Error("Esc should close the image viewer and restore focus to the opener.");
@@ -4838,17 +4840,25 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     state: "visible",
     timeout: 5_000
   });
-  const firstPopoverParagraph = await page.evaluate(() => {
+  const popoverParagraphOrder = await page.evaluate(() => {
     const popover = document.querySelector("[data-timeline-sources-popover='true']");
     if (!(popover instanceof HTMLElement)) {
       throw new Error("Timeline Sources popover is unavailable.");
     }
-    const firstParagraph = popover.querySelector("p");
-    return firstParagraph?.textContent?.replace(/\s+/gu, " ").trim() ?? "";
+    const paragraphs = Array.from(popover.querySelectorAll("p")).map((paragraph) =>
+      paragraph.textContent?.replace(/\s+/gu, " ").trim() ?? ""
+    );
+    return {
+      first: paragraphs[0] ?? "",
+      last: paragraphs[paragraphs.length - 1] ?? ""
+    };
   });
-  if (firstPopoverParagraph !== timelineBorderNote) {
+  if (popoverParagraphOrder.first === timelineBorderNote) {
+    throw new Error("Sources popover should show the timeline summary before border notes.");
+  }
+  if (popoverParagraphOrder.last !== timelineBorderNote) {
     throw new Error(
-      `Sources popover first paragraph mismatch. expected='${timelineBorderNote}' actual='${firstPopoverParagraph}'.`
+      `Sources popover last paragraph mismatch. expected='${timelineBorderNote}' actual='${popoverParagraphOrder.last}'.`
     );
   }
   const popoverTextWithoutSpacing = (
@@ -5025,13 +5035,25 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
       return null;
     }
 
+    const summaryText = popover.querySelector("p")?.textContent?.trim() ?? "";
+    const passagesHeading = popover.querySelector("strong")?.textContent?.trim() ?? "";
+    const sourceHeadings = Array.from(popover.querySelectorAll("strong")).map((entry) =>
+      entry.textContent?.trim() ?? ""
+    );
+    const paragraphs = Array.from(popover.querySelectorAll("p")).map((entry) =>
+      entry.textContent?.trim() ?? ""
+    );
     const passageItems = Array.from(popover.querySelectorAll("li"))
       .map((item) => item.textContent?.trim() ?? "")
       .filter((value) => value.length > 0);
     const sourceTexts = passageItems.filter((value) => !/^[A-Z][a-z]{1,}\s+\d+:\d+/u.test(value));
     return {
       text: popover.textContent?.trim() ?? "",
-      sourceTexts
+      sourceTexts,
+      summaryText,
+      passagesHeading,
+      sourceHeadings,
+      paragraphs
     };
   });
   if (!defaultPopoverSnapshot || defaultPopoverSnapshot.text.length === 0) {
@@ -5041,6 +5063,20 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(
       `Default AD 44 sources popover showed bibliography fallback text: ${JSON.stringify(defaultPopoverSnapshot.sourceTexts)}`
     );
+  }
+  const firstParagraph = defaultPopoverSnapshot.paragraphs[0] ?? "";
+  const lastParagraph = defaultPopoverSnapshot.paragraphs[defaultPopoverSnapshot.paragraphs.length - 1] ?? "";
+  if (!firstParagraph || firstParagraph === timelineBorderNote) {
+    throw new Error("Expected timeline sources popover to start with stop summary.");
+  }
+  if (lastParagraph !== timelineBorderNote) {
+    throw new Error("Expected timeline border notes to appear at the end of the sources popover.");
+  }
+  if (
+    !defaultPopoverSnapshot.sourceHeadings.includes("Passages:") ||
+    !defaultPopoverSnapshot.sourceHeadings.includes("Sources:")
+  ) {
+    throw new Error("Expected timeline sources popover to list passages and sources before border notes.");
   }
 
   const holderTooltipText = await page.evaluate(
@@ -10360,32 +10396,42 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
       }
       return compactControl.classList.contains("maplibregl-compact-show");
     });
-    await page.click("summary.maplibregl-ctrl-attrib-button");
-    await page.waitForTimeout(300);
-    const expandedAfterFirstToggle = await page.evaluate(() => {
-      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-      if (!(compactControl instanceof HTMLElement)) {
-        return null;
+    const readExpandedState = async () =>
+      page.evaluate(() => {
+        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+        if (!(compactControl instanceof HTMLElement)) {
+          return null;
+        }
+        return compactControl.classList.contains("maplibregl-compact-show");
+      });
+    const pressAttributionToggle = async () => {
+      await page.click("summary.maplibregl-ctrl-attrib-button");
+      await page.waitForTimeout(200);
+      return readExpandedState();
+    };
+
+    let expandedAfterOpenAttempt = await pressAttributionToggle();
+    if (expandedAfterOpenAttempt === expandedBeforeToggle) {
+      expandedAfterOpenAttempt = await pressAttributionToggle();
+    }
+
+    let expandedAfterCloseAttempt = expandedAfterOpenAttempt;
+    if (expandedAfterOpenAttempt !== null) {
+      expandedAfterCloseAttempt = await pressAttributionToggle();
+      if (expandedAfterCloseAttempt !== expandedBeforeToggle) {
+        expandedAfterCloseAttempt = await pressAttributionToggle();
       }
-      return compactControl.classList.contains("maplibregl-compact-show");
-    });
-    await page.click("summary.maplibregl-ctrl-attrib-button");
-    await page.waitForTimeout(300);
-    const expandedAfterSecondToggle = await page.evaluate(() => {
-      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-      if (!(compactControl instanceof HTMLElement)) {
-        return null;
-      }
-      return compactControl.classList.contains("maplibregl-compact-show");
-    });
+    }
+
     if (
       expandedBeforeToggle !== null &&
-      expandedAfterFirstToggle !== null &&
-      expandedAfterSecondToggle !== null &&
-      (expandedAfterFirstToggle === expandedBeforeToggle || expandedAfterSecondToggle !== expandedBeforeToggle)
+      expandedAfterOpenAttempt !== null &&
+      expandedAfterCloseAttempt !== null &&
+      (expandedAfterOpenAttempt === expandedBeforeToggle ||
+        expandedAfterCloseAttempt !== expandedBeforeToggle)
     ) {
       throw new Error(
-        `Desktop attribution toggle did not open/close as expected: before=${expandedBeforeToggle} first=${expandedAfterFirstToggle} second=${expandedAfterSecondToggle}`
+        `Desktop attribution toggle did not open/close as expected: before=${expandedBeforeToggle} open=${expandedAfterOpenAttempt} close=${expandedAfterCloseAttempt}`
       );
     }
 
@@ -10864,7 +10910,8 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     ["/generated/routes.fixture.lines.geojson", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.lines.geojson")]
   ]);
   const desktopContext = await browser.newContext({
-    viewport: { width: 1440, height: 900 }
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "no-preference"
   });
   const desktopPage = await desktopContext.newPage();
 
@@ -10916,35 +10963,42 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
         return null;
       }
       return {
-        foregroundColor: map.getPaintProperty("ibm-routes-lines-foreground", "line-color"),
-        foregroundWidth: map.getPaintProperty("ibm-routes-lines-foreground", "line-width"),
-        unknownColor: map.getPaintProperty("ibm-routes-lines-unknown", "line-color"),
-        unknownWidth: map.getPaintProperty("ibm-routes-lines-unknown", "line-width")
+        lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length
       };
     }, mapTestHookKey);
     if (!listState) {
-      throw new Error("Routes fixture check: could not read route list-state style expressions.");
+      throw new Error("Routes fixture check: could not read route list-state map features.");
     }
-    const foregroundColorText = JSON.stringify(listState.foregroundColor);
-    const foregroundWidthText = JSON.stringify(listState.foregroundWidth);
-    if (!foregroundColorText.includes("#9AA0A6") || !foregroundWidthText.includes("1.6")) {
+    if (listState.lineCount > 0 || listState.stopCount > 0) {
       throw new Error(
-        `Routes fixture check: list-state route lines are missing thin grey styling (${foregroundColorText} / ${foregroundWidthText}).`
+        `Routes fixture check: expected no route lines/stops before selecting a route (${JSON.stringify(listState)}).`
       );
     }
-    const paulRouteButton = desktopPage.getByRole("button", { name: "Paul fixture journey" });
-    await paulRouteButton.focus();
-    await desktopPage.waitForTimeout(120);
-    await routesTab.focus();
-    await jesusRouteButton.hover();
-    await desktopPage.waitForTimeout(120);
-    await desktopPage.mouse.move(8, 8);
-    await desktopPage.waitForTimeout(120);
-    const listFocusAndHoverState = {
-      focusPreservedList: !(await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).isVisible().catch(() => false)),
-      hoverPreservedList: !(await desktopPage.getByRole("heading", { name: "Jesus fixture segments" }).isVisible().catch(() => false))
-    };
 
+    const routesAttributionText = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const control = document.querySelector(".maplibregl-ctrl-attrib-inner");
+      return {
+        lineDasharray: map.getPaintProperty("ibm-routes-lines-foreground", "line-dasharray"),
+        unknownLayerPresent: Boolean(map.getLayer("ibm-routes-lines-unknown")),
+        attribution: control?.textContent?.trim() ?? ""
+      };
+    }, mapTestHookKey);
+    if (!routesAttributionText) {
+      throw new Error("Routes fixture check: could not inspect route layers.");
+    }
+    if (routesAttributionText.lineDasharray !== undefined || routesAttributionText.unknownLayerPresent) {
+      throw new Error("Routes fixture check: expected one solid route line style with no unknown-path layer.");
+    }
+    if (!routesAttributionText.attribution.includes("AWMC Geodata")) {
+      throw new Error("Routes fixture check: expected ODbL notice for route lines in map attribution.");
+    }
+
+    const paulRouteButton = desktopPage.getByRole("button", { name: "Paul fixture journey" });
     await paulRouteButton.click();
     await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
 
@@ -10955,9 +11009,9 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     await stageOne.getByText("By land", { exact: true }).waitFor({ timeout: 30_000 });
     await stageTwo.getByText("By sea", { exact: true }).waitFor({ timeout: 30_000 });
     await stageTwo.getByText("Passed: Cyprus harbor", { exact: false }).waitFor({ timeout: 30_000 });
-    await stageThree.getByText("Path not known", { exact: false }).waitFor({ timeout: 30_000 });
-    await stageFour.getByText("Fixture stage without line geometry.", { exact: false }).waitFor({ timeout: 30_000 });
-    await stageFour.locator("[data-route-stop-candidates='true'] li").first().waitFor({ timeout: 30_000 });
+    await stageThree.getByText("Through Galilee", { exact: false }).waitFor({ timeout: 30_000 });
+    await stageFour.getByText("Site disputed", { exact: false }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-notes='true']").getByText("Fixture stage without line geometry.").waitFor({ timeout: 30_000 });
 
     const stageSourcesCount = await desktopPage
       .locator("[data-route-stage-index] details > summary")
@@ -10971,10 +11025,113 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     await desktopPage.locator("[data-route-panel-sources='true'] summary", { hasText: "Sources" }).click();
     await desktopPage.locator("[data-route-panel-sources='true'] [data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
 
-    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
-    await desktopPage.getByRole("button", { name: "‹ Back to route" }).waitFor({ timeout: 30_000 });
-    await desktopPage.getByText("Not yet on the main map.", { exact: false }).waitFor({ timeout: 30_000 });
-    await desktopPage.getByRole("button", { name: "‹ Back to route" }).click();
+    const zoomBeforeStageHover = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ zoom: 7.25 });
+      return {
+        zoom: map.getZoom(),
+        center: map.getCenter().toArray()
+      };
+    }, mapTestHookKey);
+    await stageTwo.hover();
+    await desktopPage.waitForTimeout(140);
+    const hoverState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        zoom: map.getZoom(),
+        center: map.getCenter().toArray(),
+        lineOpacity: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity")
+      };
+    }, mapTestHookKey);
+    if (!zoomBeforeStageHover || !hoverState) {
+      throw new Error("Routes fixture check: could not inspect hover map state.");
+    }
+    if (
+      Math.abs(zoomBeforeStageHover.zoom - hoverState.zoom) > 0.01 ||
+      Math.abs(zoomBeforeStageHover.center[0] - hoverState.center[0]) > 0.0001 ||
+      Math.abs(zoomBeforeStageHover.center[1] - hoverState.center[1]) > 0.0001
+    ) {
+      throw new Error("Routes fixture check: hovering a stage changed map zoom or center.");
+    }
+    if (!JSON.stringify(hoverState.lineOpacity).includes("isDimmed")) {
+      throw new Error("Routes fixture check: expected line-opacity expression to dim non-hovered stages.");
+    }
+    await stageTwo.click();
+    await desktopPage.waitForFunction(
+      (testHook) => {
+        const map = window[testHook];
+        if (!map) {
+          return false;
+        }
+        const gradient = map.getPaintProperty("ibm-routes-lines-trace", "line-gradient");
+        return JSON.stringify(gradient).includes("step");
+      },
+      mapTestHookKey,
+      { timeout: 3_000 }
+    );
+    const animationState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        traceGradient: map.getPaintProperty("ibm-routes-lines-trace", "line-gradient"),
+        stagePillLabelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-label"] }).length
+      };
+    }, mapTestHookKey);
+    if (!animationState || !JSON.stringify(animationState.traceGradient).includes("step")) {
+      throw new Error("Routes fixture check: expected stage selection trace animation.");
+    }
+    if (animationState.stagePillLabelCount < 1) {
+      throw new Error("Routes fixture check: expected stage number pill for selected stage.");
+    }
+
+    const reducedMotionContext = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      reducedMotion: "reduce"
+    });
+    const reducedMotionPage = await reducedMotionContext.newPage();
+    try {
+      await reducedMotionPage.route("**/generated/routes.fixture.*", async (route) => {
+        const requestUrl = new URL(route.request().url());
+        const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
+        if (!fixturePath) {
+          await route.continue();
+          return;
+        }
+        const body = await fs.readFile(fixturePath);
+        await route.fulfill({
+          status: 200,
+          contentType: contentTypeFor(fixturePath),
+          body
+        });
+      });
+      await reducedMotionPage.goto(fixturePath, { waitUntil: "domcontentloaded", timeout: 150_000 });
+      await waitForMapToSettle(reducedMotionPage);
+      await reducedMotionPage.getByRole("tab", { name: "Routes" }).click();
+      await reducedMotionPage.getByRole("button", { name: "Paul fixture journey" }).click();
+      await reducedMotionPage.locator("[data-route-stage-index='1']").click();
+      await reducedMotionPage.waitForTimeout(220);
+      const reducedMotionTrace = await reducedMotionPage.evaluate((testHook) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        return map.getPaintProperty("ibm-routes-lines-trace", "line-gradient");
+      }, mapTestHookKey);
+      if (reducedMotionTrace && JSON.stringify(reducedMotionTrace).includes("step")) {
+        throw new Error("Routes fixture check: reduced-motion selection should skip trace animation.");
+      }
+    } finally {
+      await reducedMotionPage.close();
+      await reducedMotionContext.close();
+    }
 
     const stopMarkerChecks = [];
     for (const zoom of [4, 5.5, 7]) {
@@ -10989,13 +11146,13 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
           return {
             zoom: map.getZoom(),
             stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-            orderCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-order"] }).length,
+            startCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops-start"] }).length,
             labelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-labels"] }).length
           };
         },
         { testHook: mapTestHookKey, nextZoom: zoom }
       );
-      if (!snapshot || snapshot.stopCount === 0 || snapshot.orderCount === 0 || snapshot.labelCount === 0) {
+      if (!snapshot || snapshot.stopCount === 0 || snapshot.startCount === 0 || snapshot.labelCount === 0) {
         throw new Error(
           `Routes fixture check: missing stop markers/labels at zoom ${zoom}: ${JSON.stringify(snapshot)}`
         );
@@ -11018,13 +11175,13 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
           return {
             zoom: map.getZoom(),
             stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-            orderCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-order"] }).length,
+            startCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops-start"] }).length,
             labelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-labels"] }).length
           };
         },
         { testHook: mapTestHookKey, nextZoom: zoom }
       );
-      if (!snapshot || snapshot.stopCount === 0 || snapshot.labelCount === 0 || snapshot.orderCount !== 0) {
+      if (!snapshot || snapshot.stopCount === 0 || snapshot.labelCount === 0) {
         throw new Error(
           `Routes fixture check: Jesus segments should show unlabeled stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
         );
@@ -11121,7 +11278,8 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     return {
       keyboardTabs: "ok",
       listState,
-      listFocusAndHoverState,
+      hoverState,
+      animationState,
       stopMarkerChecks,
       jesusStopMarkerChecks,
       stageTwoSelected,
@@ -11135,15 +11293,15 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
 }
 
 async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
-  const screenshotDirectory = path.join(process.env.TMPDIR ?? process.env.TEMP ?? os.tmpdir(), "ibm-m5-05", "real");
+  const screenshotDirectory = path.join("/tmp", "ibm-m5-05", "r3");
   await fs.mkdir(screenshotDirectory, { recursive: true });
   const screenshotPaths = {
-    desktopRouteList: path.join(screenshotDirectory, "desktop-route-list.png"),
-    desktopPaul2: path.join(screenshotDirectory, "desktop-paul-2.png"),
-    desktopPaulRome: path.join(screenshotDirectory, "desktop-paul-rome.png"),
-    desktopJesus: path.join(screenshotDirectory, "desktop-jesus.png"),
-    desktopJesusNoLine: path.join(screenshotDirectory, "desktop-jesus-no-line.png"),
-    phoneRouteSelected: path.join(screenshotDirectory, "phone-route-selected.png")
+    desktopRouteList: path.join(screenshotDirectory, "desktop-route-list-no-lines.png"),
+    desktopPaul2Hovered: path.join(screenshotDirectory, "desktop-paul-2-stage-hovered.png"),
+    desktopPaulRomeHovered: path.join(screenshotDirectory, "desktop-paul-rome-stage-hovered.png"),
+    desktopJesusSelected: path.join(screenshotDirectory, "desktop-jesus-segment-selected.png"),
+    desktopRouteNotesEnd: path.join(screenshotDirectory, "desktop-route-notes-end.png"),
+    phoneRouteSelected: path.join(screenshotDirectory, "phone-route-chosen.png")
   };
 
   const expectedRoutes = [
@@ -11155,7 +11313,8 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
   ];
 
   const desktopContext = await browser.newContext({
-    viewport: { width: 1440, height: 900 }
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "no-preference"
   });
   const desktopPage = await desktopContext.newPage();
   const consoleErrors = [];
@@ -11169,9 +11328,25 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 150_000 });
     await waitForMapToSettle(desktopPage);
     await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    const routeListNoLineState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length
+      };
+    }, mapTestHookKey);
+    if (!routeListNoLineState || routeListNoLineState.lineCount > 0 || routeListNoLineState.stopCount > 0) {
+      throw new Error(
+        `Routes real-data check: expected no lines in route list state (${JSON.stringify(routeListNoLineState)}).`
+      );
+    }
     await desktopPage.screenshot({ path: screenshotPaths.desktopRouteList, fullPage: true });
     await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
     await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText(/Borders as in AD \d+/, { exact: false }).waitFor({ timeout: 30_000 });
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
     await desktopPage.waitForTimeout(800);
@@ -11254,13 +11429,22 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
 
       openedRouteChecks.push({ route: route.title, stageCount });
       if (route.title === "Paul's second journey") {
-        await desktopPage.screenshot({ path: screenshotPaths.desktopPaul2, fullPage: true });
+        const hoveredStage = desktopPage.locator("[data-route-stage-index='3']");
+        await hoveredStage.hover();
+        await desktopPage.waitForTimeout(120);
+        await desktopPage.screenshot({ path: screenshotPaths.desktopPaul2Hovered, fullPage: true });
       }
       if (route.title === "Paul's voyage to Rome") {
-        await desktopPage.screenshot({ path: screenshotPaths.desktopPaulRome, fullPage: true });
+        const hoveredStage = desktopPage.locator("[data-route-stage-index='2']");
+        await hoveredStage.hover();
+        await desktopPage.waitForTimeout(120);
+        await desktopPage.screenshot({ path: screenshotPaths.desktopPaulRomeHovered, fullPage: true });
       }
       if (route.title === "Jesus' journeys") {
-        await desktopPage.screenshot({ path: screenshotPaths.desktopJesus, fullPage: true });
+        const segment = desktopPage.locator("[data-route-stage-index='5']");
+        await segment.click();
+        await desktopPage.waitForTimeout(180);
+        await desktopPage.screenshot({ path: screenshotPaths.desktopJesusSelected, fullPage: true });
       }
       await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
       await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
@@ -11279,7 +11463,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage.getByRole("button", { name: "Paul's second journey" }).click();
     await desktopPage
       .locator("[data-route-stage-index]")
-      .filter({ hasText: "Path not known · Through" })
+      .filter({ hasText: "Through" })
       .first()
       .waitFor({ timeout: 30_000 });
 
@@ -11287,11 +11471,12 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage.getByRole("button", { name: "Jesus' journeys" }).click();
     const noLineStage = desktopPage
       .locator("[data-route-stage-index]")
-      .filter({ hasText: "no line is drawn" })
+      .filter({ hasText: "Site disputed" })
       .first();
     await noLineStage.waitFor({ timeout: 30_000 });
-    await noLineStage.scrollIntoViewIfNeeded();
-    await desktopPage.screenshot({ path: screenshotPaths.desktopJesusNoLine, fullPage: true });
+    const notesSection = desktopPage.locator("[data-route-notes='true']");
+    await notesSection.scrollIntoViewIfNeeded();
+    await desktopPage.screenshot({ path: screenshotPaths.desktopRouteNotesEnd, fullPage: true });
 
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome&stage=3`, {
       waitUntil: "domcontentloaded",

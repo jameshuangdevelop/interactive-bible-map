@@ -1,6 +1,6 @@
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
-import { resolveRouteStop } from "./routes-data";
+import { resolveRouteStop, stageLabelNumber } from "./routes-data";
 import type { HydratedRoute, LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "./types";
 import { tokens } from "../../theme/tokens";
 
@@ -99,8 +99,6 @@ export function RoutesPanel({
   onSelectRoute,
   onSelectStage,
   onBackToAllRoutes,
-  onHoverRoute,
-  onClearRouteHover,
   onRouteStopCardBack,
   onResolveStopSelection,
   onHighlightStage
@@ -118,8 +116,6 @@ export function RoutesPanel({
   onSelectRoute: (routeId: string) => void;
   onSelectStage: (stageIndex: number) => void;
   onBackToAllRoutes: () => void;
-  onHoverRoute: (routeId: string) => void;
-  onClearRouteHover: () => void;
   onRouteStopCardBack: () => void;
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
@@ -157,11 +153,7 @@ export function RoutesPanel({
           {hydratedRoutes.map((entry) => (
             <li key={entry.route.id}>
               <button
-                onBlur={onClearRouteHover}
                 onClick={() => onSelectRoute(entry.route.id)}
-                onFocus={() => onHoverRoute(entry.route.id)}
-                onMouseEnter={() => onHoverRoute(entry.route.id)}
-                onMouseLeave={onClearRouteHover}
                 style={{
                   width: "100%",
                   textAlign: "left",
@@ -186,6 +178,34 @@ export function RoutesPanel({
     );
   }
 
+  const defaultNotes = selectedRoute.route.notes?.filter((note) => note.trim().length > 0) ?? [];
+  const routeNotes =
+    defaultNotes.length > 0
+      ? defaultNotes
+      : selectedRoute.route.note.trim().length > 0
+        ? [selectedRoute.route.note]
+        : [];
+  const stageDisputedNotes = selectedRoute.stages.flatMap((stage, stageIndex) => {
+    if (stage.lineId) {
+      return [];
+    }
+
+    const from = resolveRouteStop(stage.from, placesById, routeStopsById);
+    const to = resolveRouteStop(stage.to, placesById, routeStopsById);
+    const fromCandidates = stopCandidatesText(from, placesById);
+    const toCandidates = stopCandidatesText(to, placesById);
+    const candidateSites = [
+      ...(fromCandidates.length > 1 ? [`${from.name}: ${fromCandidates.join(", ")}`] : []),
+      ...(toCandidates.length > 1 ? [`${to.name}: ${toCandidates.join(", ")}`] : [])
+    ];
+    const routeStageLabel = stageLabelNumber(selectedRoute.route.structure, stageIndex);
+    const stageName = `${from.name} → ${to.name}`;
+    const reason = stage.noLineReason?.trim() || "Site disputed.";
+    const candidatesSuffix = candidateSites.length > 0 ? ` Candidate sites: ${candidateSites.join("; ")}.` : "";
+    return [`${routeStageLabel} (${stageName}): ${reason}${candidatesSuffix}`];
+  });
+  const allNotes = [...routeNotes, ...stageDisputedNotes];
+
   return (
     <div>
       <button
@@ -204,9 +224,19 @@ export function RoutesPanel({
       <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
         Borders as in {formatBorderYear(selectedRouteBorderYear ?? selectedRoute.route.fromYear)}
       </p>
-      <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
-        {selectedRoute.route.note} Lines show stop order and land or sea mode, not exact traveled paths.
-      </p>
+      {selectedRoute.route.summary ? (
+        <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
+          {selectedRoute.route.summary}
+        </p>
+      ) : null}
+      {selectedRoute.route.bibleText ? (
+        <div style={{ margin: `${tokens.spacing.sm}px 0` }}>
+          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>What the Bible says</h2>
+          <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
+            {selectedRoute.route.bibleText}
+          </p>
+        </div>
+      ) : null}
       {selectedRouteStop ? (
         <div style={{ border: `1px solid ${tokens.color.divider}`, borderRadius: "8px", padding: `${tokens.spacing.sm}px`, marginBottom: `${tokens.spacing.sm}px` }}>
           <button
@@ -247,19 +277,37 @@ export function RoutesPanel({
           const from = resolveRouteStop(stage.from, placesById, routeStopsById);
           const to = resolveRouteStop(stage.to, placesById, routeStopsById);
           const isActive = selectedStageIndex === stageIndex;
-          const fromCandidates = stopCandidatesText(from, placesById);
-          const toCandidates = stopCandidatesText(to, placesById);
-          const candidateSiteLines = [
-            ...(fromCandidates.length > 1 ? [`${from.name}: ${fromCandidates.join(", ")}`] : []),
-            ...(toCandidates.length > 1 ? [`${to.name}: ${toCandidates.join(", ")}`] : [])
-          ];
+          const mentionedNames = (stage.mentioned ?? [])
+            .map((mentioned) => resolveRouteStop(mentioned, placesById, routeStopsById).name)
+            .filter((name, index, array) => array.indexOf(name) === index);
+          const travelModeText =
+            stage.travelMode === "land"
+              ? "By land"
+              : stage.travelMode === "sea"
+                ? "By sea"
+                : `Through${stage.namedRegions?.length ? ` ${stage.namedRegions.map((region) => region.name).join(", ")}` : ""}`;
           return (
             <li
               data-route-stage-selected={isActive ? "true" : "false"}
               data-route-stage-index={stageIndex + 1}
               key={stage.id}
+              onClick={() => onSelectStage(stageIndex)}
+              onBlur={(event) => {
+                if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  return;
+                }
+                onHighlightStage(null);
+              }}
+              onFocus={() => onHighlightStage(stageIndex)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelectStage(stageIndex);
+                }
+              }}
               onMouseEnter={() => onHighlightStage(stageIndex)}
               onMouseLeave={() => onHighlightStage(null)}
+              tabIndex={0}
               style={{
                 marginBottom: `${tokens.spacing.sm}px`,
                 borderRadius: "8px",
@@ -295,15 +343,16 @@ export function RoutesPanel({
                 </button>
               </div>
               <div style={{ color: tokens.color.textSecondary, marginTop: `${tokens.spacing.xs}px` }}>
-                {stage.travelMode === "land"
-                  ? "By land"
-                  : stage.travelMode === "sea"
-                    ? "By sea"
-                    : `Path not known${stage.namedRegions?.length ? ` · Through ${stage.namedRegions.map((region) => region.name).join(", ")}` : ""}`}
+                {travelModeText}
               </div>
               {stage.via?.length ? (
                 <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
                   Passed: {stage.via.map((via) => resolveRouteStop(via, placesById, routeStopsById).name).join(", ")}
+                </div>
+              ) : null}
+              {mentionedNames.length > 0 ? (
+                <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
+                  Also named: {mentionedNames.join(", ")}
                 </div>
               ) : null}
               {selectedRoute.route.structure === "standalone-segments" && stage.attestation ? (
@@ -312,15 +361,18 @@ export function RoutesPanel({
                 </div>
               ) : null}
               {!stage.lineId ? (
-                <div style={{ marginTop: `${tokens.spacing.xs}px`, color: tokens.color.textSecondary }}>
-                  {stage.noLineReason ?? "Line omitted for this stage."}
-                  {candidateSiteLines.length > 0 ? (
-                    <ul data-route-stop-candidates="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
-                      {candidateSiteLines.map((line) => (
-                        <li key={`${stage.id}:${line}`}>{line}</li>
-                      ))}
-                    </ul>
-                  ) : null}
+                <div
+                  style={{
+                    marginTop: `${tokens.spacing.xs}px`,
+                    display: "inline-block",
+                    borderRadius: "999px",
+                    border: `1px solid ${tokens.color.divider}`,
+                    padding: "2px 8px",
+                    color: tokens.color.textSecondary,
+                    fontSize: `${tokens.typography.captionSize}px`
+                  }}
+                >
+                  Site disputed
                 </div>
               ) : null}
               <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
@@ -341,6 +393,16 @@ export function RoutesPanel({
           );
         })}
       </ol>
+      {allNotes.length > 0 ? (
+        <div data-route-notes="true" style={{ marginTop: `${tokens.spacing.sm}px` }}>
+          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Notes</h2>
+          <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px", color: tokens.color.textSecondary }}>
+            {allNotes.map((note) => (
+              <li key={`${selectedRoute.route.id}:${note}`}>{note}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <div data-route-panel-sources="true" style={{ marginTop: `${tokens.spacing.sm}px` }}>
         <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Sources</h2>
         <SourcesDisclosure

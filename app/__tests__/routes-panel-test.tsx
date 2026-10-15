@@ -53,6 +53,7 @@ const routeEntries: HydratedRoute[] = [
       yearNote: null,
       structure: "connected",
       note: "Fixture note",
+      notes: ["Fixture note"],
       stageCount: 1,
       sources: ["bib:fixture-source"]
     },
@@ -84,6 +85,7 @@ const routeEntries: HydratedRoute[] = [
       yearNote: null,
       structure: "connected",
       note: "Fixture note",
+      notes: ["Fixture note"],
       stageCount: 2,
       sources: ["bib:fixture-source"]
     },
@@ -174,5 +176,30 @@ describe("routes panel", () => {
     const sourcesHeadingsCount = markup.match(/>Sources</gu)?.length ?? 0;
     expect(sourcesHeadingsCount).toBeGreaterThanOrEqual(2);
     expect(markup).toContain("Fixture bibliography");
+  });
+
+  test("uses notes section and 'Through' wording for unknown travel", () => {
+    const unknownTravelRoute: HydratedRoute = {
+      route: {
+        ...routeEntries[0].route,
+        structure: "standalone-segments",
+        summary: "Route summary",
+        bibleText: "Bible summary"
+      },
+      stages: [
+        {
+          ...routeEntries[0].stages[0],
+          travelMode: "unknown",
+          namedRegions: [{ name: "Galilee", sources: ["scripture:Acts 2:1"] }]
+        }
+      ]
+    };
+    const markup = renderToStaticMarkup(
+      <RoutesPanel {...defaultProps} selectedRoute={unknownTravelRoute} />
+    );
+    expect(markup).toContain("Through Galilee");
+    expect(markup).not.toContain("Path not known");
+    expect(markup).toContain(">Notes<");
+    expect(markup).toContain("Fixture note");
   });
 });

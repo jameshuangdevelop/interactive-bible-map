@@ -27,6 +27,7 @@ export interface RouteStageRecord {
   from: RouteStopRef;
   to: RouteStopRef;
   via?: RouteStopRef[];
+  mentioned?: RouteStopRef[];
   scripture: ScriptureEntry[];
   travelMode: RouteTravelMode;
   namedRegions?: RouteNamedRegion[];
@@ -44,6 +45,9 @@ export interface RouteIndexEntry {
   yearNote: string | null;
   structure: RouteStructure;
   note: string;
+  summary?: string;
+  bibleText?: string;
+  notes?: string[];
   stageCount: number;
   sources: SourceId[];
 }

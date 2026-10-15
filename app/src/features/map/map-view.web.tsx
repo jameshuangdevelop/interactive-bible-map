@@ -149,11 +149,16 @@ const layerRoutesLinesBackgroundId = "ibm-routes-lines-background";
 const layerRoutesLinesForegroundId = "ibm-routes-lines-foreground";
 const layerRoutesLinesArrowsId = "ibm-routes-lines-arrows";
 const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
-const layerRoutesLinesUnknownId = "ibm-routes-lines-unknown";
+const layerRoutesLinesTraceId = "ibm-routes-lines-trace";
 const layerRoutesStopsId = "ibm-routes-stops";
-const layerRoutesStopOrderId = "ibm-routes-stop-order";
+const layerRoutesStopsStartId = "ibm-routes-stops-start";
 const layerRoutesStopLabelsId = "ibm-routes-stop-labels";
 const layerRoutesViaId = "ibm-routes-via";
+const layerRoutesViaLabelsId = "ibm-routes-via-labels";
+const layerRoutesMentionedId = "ibm-routes-mentioned";
+const layerRoutesMentionedLabelsId = "ibm-routes-mentioned-labels";
+const layerRoutesStagePillIconId = "ibm-routes-stage-pill-icon";
+const layerRoutesStagePillLabelId = "ibm-routes-stage-pill-label";
 
 const questionBadgeImageId = "ibm-question-badge-image";
 const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
@@ -161,6 +166,7 @@ const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
 const clusterSymbolImageId = "ibm-cluster-symbol-image";
+const routeStagePillImageId = "ibm-route-stage-pill-image";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
@@ -217,6 +223,7 @@ const interactiveLayerIds = [
   layerAncientHolderLabelClickTargetId,
   layerRoutesStopsId,
   layerRoutesViaId,
+  layerRoutesMentionedId,
   layerRoutesLinesHighlightId
 ] as const;
 
@@ -348,11 +355,16 @@ function applyMapModeOverlayVisibility(
     layerRoutesLinesForegroundId,
     layerRoutesLinesArrowsId,
     layerRoutesLinesHighlightId,
-    layerRoutesLinesUnknownId,
+    layerRoutesLinesTraceId,
     layerRoutesStopsId,
-    layerRoutesStopOrderId,
+    layerRoutesStopsStartId,
     layerRoutesStopLabelsId,
-    layerRoutesViaId
+    layerRoutesViaId,
+    layerRoutesViaLabelsId,
+    layerRoutesMentionedId,
+    layerRoutesMentionedLabelsId,
+    layerRoutesStagePillIconId,
+    layerRoutesStagePillLabelId
   ]) {
     setLayerVisibility(map, layerId, showRouteLayers);
   }
@@ -556,14 +568,21 @@ function getStyleUrl(mode: BasemapMode, mapMode: MapDisplayMode) {
   return ANCIENT_MAIN_BASEMAP_STYLE_URL;
 }
 
-function getAttributionMarkup(mode: BasemapMode, mapMode: MapDisplayMode) {
+function getAttributionMarkup(
+  mode: BasemapMode,
+  mapMode: MapDisplayMode,
+  routesModeEnabled: boolean
+) {
+  const routeLineNotice = routesModeEnabled ? ` · ${ANCIENT_AWMC_ATTRIBUTION}` : "";
   if (mapMode === "modern") {
-    return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
+    const modernBasemapAttribution =
+      mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
+    return `${modernBasemapAttribution}${routeLineNotice}`;
   }
 
   const basemapAttribution =
     mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
-  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}`;
+  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}${routeLineNotice}`;
 }
 
 function prefersReducedMotion() {
@@ -914,6 +933,8 @@ function ensureGeoJsonSource(
     clusterMaxZoom: number;
     clusterRadius: number;
     clusterProperties: Record<string, unknown>;
+    lineMetrics: boolean;
+    attribution: string;
   }> = {}
 ) {
   const existingSource = map.getSource(sourceId);
@@ -1077,6 +1098,46 @@ function ensureQuestionBadgeImage(map: MapLibreMap) {
   }
 
   map.addImage(questionBadgeImageId, image.image, { pixelRatio: image.pixelRatio });
+}
+
+function createRouteStagePillImage() {
+  return createCanvasImage(30, (context, canvasSize) => {
+    const width = canvasSize - 2;
+    const height = 18;
+    const x = 1;
+    const y = (canvasSize - height) / 2;
+    const radius = height / 2;
+
+    context.fillStyle = "#FFFFFF";
+    context.strokeStyle = "#1A73E8";
+    context.lineWidth = 1.5;
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.arcTo(x + width, y, x + width, y + radius, radius);
+    context.lineTo(x + width, y + height - radius);
+    context.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+    context.lineTo(x + radius, y + height);
+    context.arcTo(x, y + height, x, y + height - radius, radius);
+    context.lineTo(x, y + radius);
+    context.arcTo(x, y, x + radius, y, radius);
+    context.closePath();
+    context.fill();
+    context.stroke();
+  });
+}
+
+function ensureRouteStagePillImage(map: MapLibreMap) {
+  if (map.hasImage(routeStagePillImageId)) {
+    return;
+  }
+
+  const image = createRouteStagePillImage();
+  if (!image) {
+    return;
+  }
+
+  map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
 }
 
 function ensureCollisionImages(map: MapLibreMap) {
@@ -1587,13 +1648,9 @@ function ensureMapLayers(
         "line-join": "round"
       },
       paint: {
-        "line-color": [
-          "case",
-          ["==", ["get", "isInSelectedRoute"], true],
-          "#FFFFFF",
-          "rgba(95,99,104,0.3)"
-        ],
-        "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 7, 2.5]
+        "line-color": "#FFFFFF",
+        "line-width": 7,
+        "line-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.28, 1]
       }
     });
   }
@@ -1603,35 +1660,14 @@ function ensureMapLayers(
       id: layerRoutesLinesForegroundId,
       source: sourceRoutesLinesId,
       type: "line",
-      filter: toLayerFilter([
-        "all",
-        ["!=", ["get", "isPathUnknown"], true],
-        ["!=", ["get", "isSelectedStage"], true]
-      ]),
       layout: {
         "line-cap": "round",
         "line-join": "round"
       },
       paint: {
-        "line-color": [
-          "case",
-          ["==", ["get", "isInSelectedRoute"], true],
-          "#1A73E8",
-          "#9AA0A6"
-        ],
-        "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 5, 1.6],
-        "line-dasharray": [
-          "case",
-          ["==", ["get", "travelMode"], "sea"],
-          ["literal", [2, 2]],
-          ["literal", [1, 0]]
-        ],
-        "line-opacity": [
-          "case",
-          ["==", ["get", "isInSelectedRoute"], true],
-          ["case", ["==", ["get", "isDimmed"], true], 0.2, 1],
-          0.8
-        ]
+        "line-color": "#1A73E8",
+        "line-width": 5,
+        "line-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.26, 1]
       }
     });
   }
@@ -1660,35 +1696,6 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerRoutesLinesUnknownId)) {
-    map.addLayer({
-      id: layerRoutesLinesUnknownId,
-      source: sourceRoutesLinesId,
-      type: "line",
-      filter: toLayerFilter(["==", ["get", "isPathUnknown"], true]),
-      layout: {
-        "line-cap": "round",
-        "line-join": "round"
-      },
-      paint: {
-        "line-color": [
-          "case",
-          ["==", ["get", "isInSelectedRoute"], true],
-          "#1A73E8",
-          "#9AA0A6"
-        ],
-        "line-width": ["case", ["==", ["get", "isInSelectedRoute"], true], 3, 1.6],
-        "line-dasharray": [1, 2],
-        "line-opacity": [
-          "case",
-          ["==", ["get", "isInSelectedRoute"], true],
-          ["case", ["==", ["get", "isDimmed"], true], 0.2, 1],
-          0.8
-        ]
-      }
-    });
-  }
-
   if (!map.getLayer(layerRoutesLinesHighlightId)) {
     map.addLayer({
       id: layerRoutesLinesHighlightId,
@@ -1706,6 +1713,31 @@ function ensureMapLayers(
       paint: {
         "line-color": "#1A73E8",
         "line-width": 6
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesTraceId)) {
+    map.addLayer({
+      id: layerRoutesLinesTraceId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      filter: toLayerFilter(["==", ["get", "isSelectedStage"], true]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-width": 6.5,
+        "line-gradient": [
+          "interpolate",
+          ["linear"],
+          ["line-progress"],
+          0,
+          "rgba(255,255,255,0)",
+          1,
+          "rgba(255,255,255,0)"
+        ]
       }
     });
   }
@@ -1730,12 +1762,31 @@ function ensureMapLayers(
         "circle-color": "#FFFFFF",
         "circle-stroke-color": "#1A73E8",
         "circle-stroke-width": 2,
-        "circle-opacity": [
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopsStartId)) {
+    map.addLayer({
+      id: layerRoutesStopsStartId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isRouteStart"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      paint: {
+        "circle-radius": [
           "case",
-          ["==", ["get", "isInSelectedRoute"], true],
-          ["case", ["==", ["get", "isDimmed"], true], 0.3, 1],
-          0.8
-        ]
+          ["any", ["==", ["get", "isSelectedStage"], true], ["==", ["get", "isHighlightedStage"], true]],
+          7,
+          6
+        ],
+        "circle-color": "#1A73E8",
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
       }
     });
   }
@@ -1760,27 +1811,51 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerRoutesStopOrderId)) {
+  if (!map.getLayer(layerRoutesViaLabelsId)) {
     map.addLayer({
-      id: layerRoutesStopOrderId,
+      id: layerRoutesViaLabelsId,
       source: sourceRoutesPointsId,
       type: "symbol",
       filter: toLayerFilter([
         "all",
-        ["==", ["get", "kind"], "stop"],
-        ["has", "orderLabel"],
+        ["==", ["get", "kind"], "via"],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
-        "text-field": ["get", "orderLabel"],
-        "text-font": ["Noto Sans Bold"],
-        "text-size": 10,
-        "text-anchor": "center",
-        "text-allow-overlap": true,
-        "text-ignore-placement": true
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Italic"],
+        "text-size": 11,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false
       },
       paint: {
-        "text-color": "#1A73E8"
+        "text-color": "#1A73E8",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.1,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesMentionedId)) {
+    map.addLayer({
+      id: layerRoutesMentionedId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "mentioned"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      paint: {
+        "circle-radius": 4,
+        "circle-color": "#9AA0A6",
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": 1.2,
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 0.92]
       }
     });
   }
@@ -1819,6 +1894,75 @@ function ensureMapLayers(
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.2,
         "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesMentionedLabelsId)) {
+    map.addLayer({
+      id: layerRoutesMentionedLabelsId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "mentioned"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Italic"],
+        "text-size": 11,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.7,
+        "text-anchor": "left",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false
+      },
+      paint: {
+        "text-color": "#9AA0A6",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.1,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 0.9]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStagePillIconId)) {
+    map.addLayer({
+      id: layerRoutesStagePillIconId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "kind"], "stage-pill"]),
+      layout: {
+        "icon-image": routeStagePillImageId,
+        "icon-anchor": "center",
+        "icon-size": 1,
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.5, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStagePillLabelId)) {
+    map.addLayer({
+      id: layerRoutesStagePillLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "kind"], "stage-pill"]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 10,
+        "text-anchor": "center",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      paint: {
+        "text-color": "#1A73E8",
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.6, 1]
       }
     });
   }
@@ -2907,7 +3051,12 @@ export function MapView({
   const stopPrefetchScheduledRef = useRef(false);
   const failedStopIdsRef = useRef(new Set<string>());
   const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
+  const routesModeEnabledRef = useRef(false);
+  const previousRouteFocusKeyRef = useRef<string | null>(null);
+  const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
+  const routeStageAnimationFrameRef = useRef<number | null>(null);
 
+  const selectedStageAnimationKey = routesOverlay?.selectedStageAnimationKey ?? null;
   useEffect(() => {
     selectedTimelineStopIdRef.current = selectedTimelineStopId;
   }, [selectedTimelineStopId]);
@@ -2931,6 +3080,9 @@ export function MapView({
   const bottomInset = Math.max(0, bottomPanelInset);
   const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
   const routesModeEnabled = Boolean(routesOverlay);
+  useEffect(() => {
+    routesModeEnabledRef.current = routesModeEnabled;
+  }, [routesModeEnabled]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
@@ -3464,7 +3616,10 @@ export function MapView({
     ensureGeoJsonSource(
       map,
       sourceRoutesLinesId,
-      routesOverlay?.lines ?? createEmptyFeatureCollection()
+      routesOverlay?.lines ?? createEmptyFeatureCollection(),
+      {
+        lineMetrics: true
+      }
     );
     ensureGeoJsonSource(
       map,
@@ -3473,6 +3628,7 @@ export function MapView({
     );
 
     ensureQuestionBadgeImage(map);
+    ensureRouteStagePillImage(map);
     ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map, majorPlaceByRank);
   }, [
@@ -3750,8 +3906,13 @@ export function MapView({
     mainSourceLoadTimeoutRef.current = null;
   }, []);
 
-  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode, nextMapMode: MapDisplayMode) => {
-    const attributionKey = `${mode}:${nextMapMode}`;
+  const syncAttributionControl = useCallback((
+    map: MapLibreMap,
+    mode: BasemapMode,
+    nextMapMode: MapDisplayMode,
+    nextRoutesModeEnabled: boolean
+  ) => {
+    const attributionKey = `${mode}:${nextMapMode}:${nextRoutesModeEnabled ? "routes" : "map"}`;
     if (attributionModeRef.current === attributionKey && attributionControlRef.current) {
       return;
     }
@@ -3763,7 +3924,7 @@ export function MapView({
 
     const control = new AttributionControl({
       compact: true,
-      customAttribution: getAttributionMarkup(mode, nextMapMode)
+      customAttribution: getAttributionMarkup(mode, nextMapMode, nextRoutesModeEnabled)
     });
     map.addControl(control, "bottom-right");
     attributionControlRef.current = control;
@@ -3782,11 +3943,11 @@ export function MapView({
       mainSourceLoadControllerRef.current.markLoaded();
       styleReadyRef.current = false;
       const nextMapMode = mapModeRef.current;
-      syncAttributionControl(map, "fallback", nextMapMode);
+      syncAttributionControl(map, "fallback", nextMapMode, routesModeEnabled);
       map.setStyle(getStyleUrl("fallback", nextMapMode));
       return nextState;
     },
-    [basemapController, clearMainSourceLoadTimeout, syncAttributionControl]
+    [basemapController, clearMainSourceLoadTimeout, routesModeEnabled, syncAttributionControl]
   );
 
   const scheduleMainSourceLoadTimeout = useCallback(
@@ -3873,7 +4034,7 @@ export function MapView({
     )[visibleEntryRefreshHookKey] = () => {
       refreshVisibleEntryStateRef.current();
     };
-    syncAttributionControl(map, initialMode, mapModeRef.current);
+    syncAttributionControl(map, initialMode, mapModeRef.current, routesModeEnabled);
 
     const cancelScheduledTooltipUpdate = () => {
       pendingTooltipPointRef.current = null;
@@ -4071,7 +4232,7 @@ export function MapView({
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
       const nextMapMode = mapModeRef.current;
-      syncAttributionControl(map, currentMode, nextMapMode);
+      syncAttributionControl(map, currentMode, nextMapMode, routesModeEnabled);
       configureZoomGestures(map, effectiveRuntimeTuning);
       applyBasemapLayerVariants(map, currentMode, effectiveRuntimeTuning);
       if (currentMode === "main") {
@@ -4117,12 +4278,17 @@ export function MapView({
           layers: [
             layerRoutesStopsId,
             layerRoutesViaId,
+            layerRoutesMentionedId,
             layerRoutesLinesHighlightId,
             layerRoutesLinesForegroundId,
-            layerRoutesLinesUnknownId
+            layerRoutesLinesTraceId
           ]
         });
-        const routeMatch = routeFeatures.find((feature) => feature.layer?.id === layerRoutesStopsId || feature.layer?.id === layerRoutesViaId);
+        const routeMatch = routeFeatures.find((feature) =>
+          feature.layer?.id === layerRoutesStopsId ||
+          feature.layer?.id === layerRoutesViaId ||
+          feature.layer?.id === layerRoutesMentionedId
+        );
         if (routeMatch) {
           const properties = asObject(routeMatch.properties);
           const routeId = asString(properties?.routeId);
@@ -4152,7 +4318,7 @@ export function MapView({
         const lineMatch = routeFeatures.find((feature) =>
           feature.layer?.id === layerRoutesLinesHighlightId ||
           feature.layer?.id === layerRoutesLinesForegroundId ||
-          feature.layer?.id === layerRoutesLinesUnknownId
+          feature.layer?.id === layerRoutesLinesTraceId
         );
         if (lineMatch) {
           const properties = asObject(lineMatch.properties);
@@ -4232,6 +4398,10 @@ export function MapView({
       }
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
+      }
+      if (routeStageAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(routeStageAnimationFrameRef.current);
+        routeStageAnimationFrameRef.current = null;
       }
       cancelScheduledTooltipUpdate();
 
@@ -4314,9 +4484,19 @@ export function MapView({
 
     const basemapMode = basemapController.getState().mode;
     styleReadyRef.current = false;
-    syncAttributionControl(map, basemapMode, mapMode);
+    syncAttributionControl(map, basemapMode, mapMode, routesModeEnabledRef.current);
     map.setStyle(getStyleUrl(basemapMode, mapMode));
   }, [basemapController, mapMode, syncAttributionControl]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    const basemapMode = basemapController.getState().mode;
+    syncAttributionControl(map, basemapMode, mapModeRef.current, routesModeEnabled);
+  }, [basemapController, routesModeEnabled, syncAttributionControl]);
 
   useEffect(() => {
     if (!styleReadyRef.current) {
@@ -4382,9 +4562,15 @@ export function MapView({
   ]);
 
   useEffect(() => {
-    if (!routesOverlay?.focusKey || !routesOverlay.bounds) {
+    if (!routesOverlay?.routeFocusKey || !routesOverlay.bounds) {
+      previousRouteFocusKeyRef.current = null;
       return;
     }
+    if (previousRouteFocusKeyRef.current === routesOverlay.routeFocusKey) {
+      return;
+    }
+    previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
+
     const map = mapRef.current;
     if (!map || !styleReadyRef.current) {
       return;
@@ -4403,6 +4589,101 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
     });
   }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs]);
+
+  useEffect(() => {
+    if (!routesOverlay?.selectedStageFocusKey || !routesOverlay.selectedStageCenter) {
+      previousSelectedStageFocusKeyRef.current = null;
+      return;
+    }
+    if (previousSelectedStageFocusKeyRef.current === routesOverlay.selectedStageFocusKey) {
+      return;
+    }
+    previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
+
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+
+    const projected = map.project(routesOverlay.selectedStageCenter as LngLatLike);
+    const minX = panelInset + 40;
+    const maxX = (typeof window === "undefined" ? 1440 : window.innerWidth) - 40;
+    const minY = 56;
+    const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - bottomInset - 40;
+    const offScreen = projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
+    if (!offScreen) {
+      return;
+    }
+
+    map.easeTo({
+      center: routesOverlay.selectedStageCenter,
+      zoom: map.getZoom(),
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
+    });
+  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+
+    if (routeStageAnimationFrameRef.current !== null) {
+      window.cancelAnimationFrame(routeStageAnimationFrameRef.current);
+      routeStageAnimationFrameRef.current = null;
+    }
+
+    const clearTrace = () => {
+      if (!map.getLayer(layerRoutesLinesTraceId)) {
+        return;
+      }
+      map.setPaintProperty(layerRoutesLinesTraceId, "line-gradient", [
+        "interpolate",
+        ["linear"],
+        ["line-progress"],
+        0,
+        "rgba(255,255,255,0)",
+        1,
+        "rgba(255,255,255,0)"
+      ]);
+    };
+
+    if (!selectedStageAnimationKey || prefersReducedMotion()) {
+      clearTrace();
+      return;
+    }
+
+    const start = performance.now();
+    const durationMs = 1_500;
+    const tick = (now: number) => {
+      if (!map.getLayer(layerRoutesLinesTraceId)) {
+        return;
+      }
+      const progress = Math.max(0, Math.min(1, (now - start) / durationMs));
+      map.setPaintProperty(layerRoutesLinesTraceId, "line-gradient", [
+        "step",
+        ["line-progress"],
+        "#FFFFFF",
+        progress,
+        "rgba(255,255,255,0)"
+      ]);
+      if (progress >= 1) {
+        routeStageAnimationFrameRef.current = null;
+        window.setTimeout(clearTrace, 120);
+        return;
+      }
+      routeStageAnimationFrameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    routeStageAnimationFrameRef.current = window.requestAnimationFrame(tick);
+    return () => {
+      if (routeStageAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(routeStageAnimationFrameRef.current);
+        routeStageAnimationFrameRef.current = null;
+      }
+      clearTrace();
+    };
+  }, [selectedStageAnimationKey]);
 
   const resetView = useCallback(() => {
     const map = mapRef.current;
