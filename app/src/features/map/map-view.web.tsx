@@ -18,17 +18,12 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
   CLUSTER_MAX_ZOOM,
-  ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION,
   ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
-  ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
   ANCIENT_MAIN_BASEMAP_STYLE_URL,
-  ANCIENT_AWMC_ATTRIBUTION,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   MAP_WORKER_URL,
-  MODERN_FALLBACK_BASEMAP_ATTRIBUTION,
   MODERN_FALLBACK_BASEMAP_STYLE_URL,
-  MODERN_MAIN_BASEMAP_ATTRIBUTION,
   MODERN_MAIN_BASEMAP_STYLE_URL,
   MAX_MAP_ZOOM,
 } from "./constants";
@@ -66,6 +61,7 @@ import {
   PRIMARY_VECTOR_SOURCE_ID,
   shouldCountTileErrorForFallback
 } from "./tile-error-filter";
+import { getAttributionMarkup } from "./attribution";
 import {
   pickNearestCandidateWithPreferredRank,
   type ScreenPoint as HitScreenPoint
@@ -567,23 +563,6 @@ function getStyleUrl(mode: BasemapMode, mapMode: MapDisplayMode) {
   }
 
   return ANCIENT_MAIN_BASEMAP_STYLE_URL;
-}
-
-function getAttributionMarkup(
-  mode: BasemapMode,
-  mapMode: MapDisplayMode,
-  routesModeEnabled: boolean
-) {
-  const routeLineNotice = routesModeEnabled ? ` · ${ANCIENT_AWMC_ATTRIBUTION}` : "";
-  if (mapMode === "modern") {
-    const modernBasemapAttribution =
-      mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
-    return `${modernBasemapAttribution}${routeLineNotice}`;
-  }
-
-  const basemapAttribution =
-    mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
-  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}${routeLineNotice}`;
 }
 
 function prefersReducedMotion() {
