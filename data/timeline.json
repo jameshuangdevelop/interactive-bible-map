@@ -1007,6 +1007,7 @@
     },
     {
       "id": "lycia",
+      "locationId": "lycia",
       "focus": true,
       "periods": [
         {

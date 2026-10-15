@@ -16,7 +16,7 @@
   "type": "city",
   "zoomTier": "city",
   "prominence": "standard",
-  "parentId": "pamphylia",
+  "parentId": "lycia",
   "candidates": [
     {
       "label": "Myra archaeological site",
@@ -37,27 +37,33 @@
     }
   ],
   "summary": {
-    "text": "Myra was a city of ancient Lycia, a few kilometers from the coast, with a harbor used by ships sailing between Egypt, Cyprus and the Aegean. Acts records that the centurion guarding Paul as a prisoner transferred him and the other prisoners at Myra onto a grain ship of Alexandria bound for Italy. In later Christian tradition Myra is honored as the home city of the bishop Nicholas, remembered today as a patron saint of sailors.",
+    "text": "Myra was a city of ancient Lycia, a few kilometers from the coast, with a harbor used by ships from Egypt and Cyprus. Acts records that the centurion guarding Paul as a prisoner transferred him and the other prisoners at Myra onto a grain ship of Alexandria bound for Italy.",
     "sources": [
       "pleiades:639005",
       "openbible:myra",
       "wikidata:Q652024",
       "bib:isbe-myra",
+      "scripture:Acts 27:1",
       "scripture:Acts 27:5",
       "scripture:Acts 27:6"
     ]
   },
   "history": [
     {
-      "text": "Lycia, the country Myra belonged to, had been a free federation of cities under Roman protection; the Roman historian Cassius Dio reports that in AD 43 the Roman emperor Claudius ended this freedom and incorporated the Lycians into the district of Pamphylia, so that by the time of Paul's voyage Lycia's affairs were administered together with its neighboring province.",
+      "text": "The Roman historian Cassius Dio records that in AD 43, after the Lycians revolted and killed some Romans, the emperor Claudius reduced them to servitude and incorporated them into the prefecture of Pamphylia. Lycia's exact status for the following decades is unclear, since other sources place it under its own governor again by the reign of the emperor Vespasian, before it was joined with Pamphylia as a single province.",
       "sources": [
-        "bib:cassius-dio-roman-history"
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "bib:tacitus-histories",
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia states that Myra was at first less important than the nearby Lycian city of Patara, but later became a leading port for ships from Egypt and Cyprus, and that in the fifth century the Eastern Roman emperor Theodosius II made it the capital of the province. In Christian tradition Myra is honored as the home city of the bishop Nicholas, now remembered as a patron saint of sailors and traditionally said to be buried in a church on the road to the port.",
+      "text": "The International Standard Bible Encyclopedia states that Myra was at first less important than the nearby Lycian city of Patara, but later became a leading port for ships from Egypt and Cyprus, and that the Eastern Roman emperor Theodosius II made it the capital of the province. In Christian tradition, which the encyclopedia's article on Lycia records, Myra is honored as the home city of the bishop Nicholas, now remembered as a patron saint of sailors and traditionally said to be buried in a church on the road to the port.",
       "sources": [
-        "bib:isbe-myra"
+        "bib:isbe-myra",
+        "bib:isbe-lycia"
       ]
     }
   ],

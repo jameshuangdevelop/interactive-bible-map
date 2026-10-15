@@ -1,0 +1,106 @@
+{
+  "id": "lycia",
+  "names": {
+    "ancient": [
+      "Lycia"
+    ],
+    "modern": "Southwestern Türkiye",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Lukia"
+    ]
+  },
+  "type": "region",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "parentId": "galatia",
+  "candidates": [
+    {
+      "label": "Lycia (label point)",
+      "coordinates": [
+        29.9,
+        36.733333
+      ],
+      "coordinateSource": "wikidata:Q18927",
+      "confidence": "high",
+      "support": "Lycia's identity as the rugged country at the southwestern tip of Asia Minor, where Myra stood, is undisputed. The label point is Wikidata's point for the region.",
+      "sources": [
+        "wikidata:Q18927",
+        "bib:isbe-lycia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Lycia was a rugged country at the southwestern tip of Asia Minor where, according to the International Standard Bible Encyclopedia, lofty mountains rise almost directly from the sea. Acts calls Myra, where Paul transferred to an Alexandrian grain ship on the voyage to Rome, \"a city of Lycia.\" Lycia had been a free league of cities before coming under direct Roman rule: the Roman historian Cassius Dio records that in AD 43, after the Lycians revolted and killed some Romans, the emperor Claudius reduced them to servitude and incorporated them into the prefecture of Pamphylia, and Lycia was later joined with Pamphylia as a single province under the emperor Vespasian.",
+    "sources": [
+      "wikidata:Q18927",
+      "bib:isbe-lycia",
+      "scripture:Acts 27:5",
+      "bib:strabo-geography",
+      "bib:cassius-dio-roman-history",
+      "bib:livius-pamphylia"
+    ]
+  },
+  "history": [
+    {
+      "text": "According to the International Standard Bible Encyclopedia, Lycia passed successively under the Persians, Alexander the Great, the Seleucid kings and the Ptolemies; in 188 BC it fell into the hands of Rome, which gave it to the island of Rhodes, and about twenty years later, for its loyalty to Rome, it became free and independent.",
+      "sources": [
+        "bib:isbe-lycia"
+      ]
+    },
+    {
+      "text": "The encyclopedia names Patara, Myra and Phaselis as Lycia's cities of greatest interest to Bible students. According to Acts, Paul took ship at Patara for Phoenicia on his third missionary journey; Myra, a trading city with a harbor though some distance from the coast, was for a time the Roman province's own capital.",
+      "sources": [
+        "bib:isbe-lycia",
+        "scripture:Acts 21:1"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:5",
+      "book": "Acts",
+      "textWEB": "When we had sailed across the sea which is off Cilicia and Pamphylia, we came to Myra, a city of Lycia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 43,
+      "holderId": "lycia-league",
+      "entity": "Lycian League",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
+      ]
+    },
+    {
+      "fromYear": 43,
+      "toYear": 74,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "bib:tacitus-histories"
+      ],
+      "note": "The Roman historian Cassius Dio says the emperor Claudius \"incorporated them in the prefecture of Pamphylia,\" not that Lycia became its own province; the Roman biographer Suetonius separately records that the emperor Vespasian made a province of Lycia, implying it had freedom again by his reign, and a translator's note to the Roman historian Tacitus's Histories (2.9) states that \"Galatia, Pamphylia, and Lycia\" formed one province together by AD 69, leaving Lycia's exact status across this span unclear."
+    },
+    {
+      "fromYear": 74,
+      "toYear": 101,
+      "holderId": "lycia-pamphylia-province",
+      "entity": "Roman province of Lycia and Pamphylia",
+      "sources": [
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "lycia"
+}
