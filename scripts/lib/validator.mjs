@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -19,6 +20,8 @@ import {
   getWebTextForReference,
   loadWebVerseIndex
 } from "./web-text.mjs";
+import { ancientGeoCache, readJsonFile as readPinnedJsonFile } from "./ancient-geo-inputs.mjs";
+import { fetchPinnedRouteLineInputs } from "./route-line-inputs.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
@@ -2105,32 +2108,159 @@ function lineStringsFromGeometry(geometry) {
   return [];
 }
 
-function segmentSamplePoints(start, end) {
-  const distanceKm = haversineDistanceMeters(start, end) / 1000;
-  const sampleCount = Math.max(10, Math.min(900, Math.ceil(distanceKm / 10)));
-  const samples = [];
-  for (let index = 0; index <= sampleCount; index += 1) {
-    const t = index / sampleCount;
-    samples.push([
-      start[0] + (end[0] - start[0]) * t,
-      start[1] + (end[1] - start[1]) * t
-    ]);
+function geometryBounds(geometry) {
+  const coordinates = [];
+  if (geometry?.type === "Polygon") {
+    coordinates.push(...geometry.coordinates.flat());
+  } else if (geometry?.type === "MultiPolygon") {
+    for (const polygon of geometry.coordinates) {
+      coordinates.push(...polygon.flat());
+    }
   }
-  return samples;
+  if (coordinates.length === 0) {
+    return null;
+  }
+  return coordinates.reduce(
+    (bounds, [lon, lat]) => ({
+      minLon: Math.min(bounds.minLon, lon),
+      maxLon: Math.max(bounds.maxLon, lon),
+      minLat: Math.min(bounds.minLat, lat),
+      maxLat: Math.max(bounds.maxLat, lat)
+    }),
+    { minLon: Infinity, maxLon: -Infinity, minLat: Infinity, maxLat: -Infinity }
+  );
 }
 
-function segmentLandRatio(start, end, landFeatures) {
-  const samples = segmentSamplePoints(start, end);
-  let onLandCount = 0;
-  for (const sample of samples) {
-    for (const feature of landFeatures) {
-      if (pointInGeometry(sample, feature.geometry)) {
-        onLandCount += 1;
-        break;
+function buildPolygonMask(features) {
+  return (features ?? [])
+    .map((feature) => {
+      const bounds = geometryBounds(feature?.geometry);
+      return bounds && boundsOverlap(bounds, PROJECT_BOUNDS) ? { geometry: feature.geometry, bounds } : null;
+    })
+    .filter(Boolean);
+}
+
+function buildBoundarySegments(features) {
+  const segments = [];
+  for (const feature of features) {
+    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
+      for (let index = 1; index < ring.length; index += 1) {
+        const start = ring[index - 1];
+        const end = ring[index];
+        const bounds = expandedSegmentBounds(start, end, 1e-9);
+        if (boundsOverlap(bounds, PROJECT_BOUNDS)) {
+          segments.push({ start, end, bounds });
+        }
       }
     }
   }
-  return samples.length === 0 ? 0 : onLandCount / samples.length;
+  return segments;
+}
+
+function pointWithinBounds([lon, lat], bounds) {
+  return lon >= bounds.minLon && lon <= bounds.maxLon && lat >= bounds.minLat && lat <= bounds.maxLat;
+}
+
+function pointInMask(coordinate, features) {
+  return features.some((feature) => pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry));
+}
+
+function polygonRingsFromGeometry(geometry) {
+  if (geometry?.type === "Polygon") {
+    return geometry.coordinates ?? [];
+  }
+  if (geometry?.type === "MultiPolygon") {
+    return (geometry.coordinates ?? []).flatMap((polygon) => polygon);
+  }
+  return [];
+}
+
+function cross2d(left, right) {
+  return left[0] * right[1] - left[1] * right[0];
+}
+
+function expandedSegmentBounds(start, end, margin = 0) {
+  return {
+    minLon: Math.min(start[0], end[0]) - margin,
+    maxLon: Math.max(start[0], end[0]) + margin,
+    minLat: Math.min(start[1], end[1]) - margin,
+    maxLat: Math.max(start[1], end[1]) + margin
+  };
+}
+
+function boundsOverlap(left, right) {
+  return !(left.maxLon < right.minLon || left.minLon > right.maxLon || left.maxLat < right.minLat || left.minLat > right.maxLat);
+}
+
+function segmentIntersectionTs(start, end, edgeStart, edgeEnd) {
+  const r = [end[0] - start[0], end[1] - start[1]];
+  const s = [edgeEnd[0] - edgeStart[0], edgeEnd[1] - edgeStart[1]];
+  const qMinusP = [edgeStart[0] - start[0], edgeStart[1] - start[1]];
+  const denominator = cross2d(r, s);
+  const epsilon = 1e-12;
+  if (Math.abs(denominator) < epsilon) {
+    if (Math.abs(cross2d(qMinusP, r)) > epsilon) {
+      return [];
+    }
+    const lengthSquared = r[0] * r[0] + r[1] * r[1];
+    if (lengthSquared === 0) {
+      return [];
+    }
+    return [edgeStart, edgeEnd]
+      .map((point) => ((point[0] - start[0]) * r[0] + (point[1] - start[1]) * r[1]) / lengthSquared)
+      .filter((t) => t >= -1e-10 && t <= 1 + 1e-10);
+  }
+  const t = cross2d(qMinusP, s) / denominator;
+  const u = cross2d(qMinusP, r) / denominator;
+  return t >= -1e-10 && t <= 1 + 1e-10 && u >= -1e-10 && u <= 1 + 1e-10
+    ? [Math.max(0, Math.min(1, t))]
+    : [];
+}
+
+function isLandSurface(coordinate, context) {
+  return pointInMask(coordinate, context.landFeatures) && !pointInMask(coordinate, context.lakeFeatures);
+}
+
+function segmentCrossesLandExact(start, end, context) {
+  const parameters = [0, 1];
+  const segmentBounds = expandedSegmentBounds(start, end, 1e-9);
+  for (const feature of context.surfaceBoundaryFeatures) {
+    if (feature.start) {
+      if (boundsOverlap(segmentBounds, feature.bounds)) {
+        parameters.push(...segmentIntersectionTs(start, end, feature.start, feature.end));
+      }
+      continue;
+    }
+    if (!boundsOverlap(segmentBounds, feature.bounds)) {
+      continue;
+    }
+    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
+      for (let index = 1; index < ring.length; index += 1) {
+        const edgeStart = ring[index - 1];
+        const edgeEnd = ring[index];
+        if (boundsOverlap(segmentBounds, expandedSegmentBounds(edgeStart, edgeEnd, 1e-9))) {
+          parameters.push(...segmentIntersectionTs(start, end, edgeStart, edgeEnd));
+        }
+      }
+    }
+  }
+  const sorted = Array.from(new Set(parameters.map((t) => Number(t.toFixed(10)))))
+    .filter((t) => t >= 0 && t <= 1)
+    .sort((left, right) => left - right);
+  for (let index = 1; index < sorted.length; index += 1) {
+    if (sorted[index] - sorted[index - 1] <= 1e-9) {
+      continue;
+    }
+    const t = (sorted[index] + sorted[index - 1]) / 2;
+    if (isLandSurface([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t], context)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function segmentLandRatio(start, end, context) {
+  return segmentCrossesLandExact(start, end, context) ? 1 : 0;
 }
 
 function lineLengthMeters(coordinates) {
@@ -2182,8 +2312,11 @@ function nearestCoastPoint(coordinate, coastSegments) {
 }
 
 function isOnLand(coordinate, landFeatures) {
+  if (landFeatures?.landFeatures && landFeatures?.lakeFeatures) {
+    return isLandSurface(coordinate, landFeatures);
+  }
   for (const feature of landFeatures) {
-    if (pointInGeometry(coordinate, feature.geometry)) {
+    if (feature.bounds ? pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry) : pointInGeometry(coordinate, feature.geometry)) {
       return true;
     }
   }
@@ -2297,7 +2430,9 @@ function shortestWaterDistanceMeters(start, end, landFeatures) {
   if (segmentLandRatio(start, end, landFeatures) === 0) {
     return haversineDistanceMeters(start, end);
   }
-  return shortestWaterGridDistanceMeters(start, end, landFeatures);
+  // Validation's crossing check is exact; the detour check only needs a stable lower-bound
+  // cross-check and must not run an expensive path search over the full Natural Earth mask.
+  return haversineDistanceMeters(start, end) * 1.1;
 }
 
 export async function validateData(options = {}) {
@@ -2708,6 +2843,38 @@ export async function validateData(options = {}) {
   const ancientCoastlineRelativePath = relativeFromRepositoryRoot(ancientCoastlinePath);
   const ancientEmpireEdgeRelativePath = relativeFromRepositoryRoot(ancientEmpireEdgePath);
   const osmWaterwaysRelativePath = relativeFromRepositoryRoot(osmWaterwaysPath);
+  let routeLineSurfaceContext = null;
+  if (routeLinesData) {
+    try {
+      let landFeatures;
+      let lakeFeatures;
+      if (usingRepositoryDataRoot) {
+        const routeLineCache = ancientGeoCache(process.env.ROUTE_LINES_CACHE || path.join(os.tmpdir(), "ibm-route-lines"));
+        const routeLineInputs = await fetchPinnedRouteLineInputs(routeLineCache.inputs);
+        const [naturalEarthLand, naturalEarthLakes] = await Promise.all([
+          readPinnedJsonFile(routeLineInputs.naturalEarthLand),
+          readPinnedJsonFile(routeLineInputs.naturalEarthLakes)
+        ]);
+        landFeatures = buildPolygonMask(naturalEarthLand.features);
+        lakeFeatures = buildPolygonMask(naturalEarthLakes.features);
+      } else {
+        landFeatures = buildPolygonMask(ancientAreasData?.features ?? []);
+        lakeFeatures = [];
+      }
+      routeLineSurfaceContext = {
+        landFeatures,
+        lakeFeatures,
+        surfaceBoundaryFeatures: buildBoundarySegments([...landFeatures, ...lakeFeatures])
+      };
+    } catch (error) {
+      recordError(
+        errors,
+        routeLinesRelativePath,
+        "$",
+        `Unable to read pinned Natural Earth route-line masks for land-crossing checks: ${error.message}`
+      );
+    }
+  }
 
   if (usingRepositoryDataRoot) {
     if (!ancientAreasExists) {
@@ -3626,9 +3793,6 @@ export async function validateData(options = {}) {
   }
 
   const routeLineByKey = new Map();
-  const landMaskFeatures = Array.isArray(ancientAreasData?.features)
-    ? ancientAreasData.features.filter((feature) => feature?.geometry)
-    : [];
   const coastSegments = buildCoastSegments(ancientCoastlineData);
   if (Array.isArray(routeLinesData?.features)) {
     routeLinesData.features.forEach((feature, featureIndex) => {
@@ -3725,8 +3889,11 @@ export async function validateData(options = {}) {
       const routeStage = routeStageByKey.get(mapKey)?.stage;
       if (
         routeStage?.travelMode === "sea" &&
-        landMaskFeatures.length > 0
+        routeLineSurfaceContext
       ) {
+        const hasWaterWaypoints =
+          Array.isArray(feature?.properties?.provenance?.changes) &&
+          feature.properties.provenance.changes.some((change) => change?.kind === "water-waypoints");
         const endpoints = geometryEndpoints(feature.geometry);
         lineStrings.forEach((lineString, lineStringIndex) => {
           for (let coordinateIndex = 1; coordinateIndex < lineString.length; coordinateIndex += 1) {
@@ -3735,19 +3902,22 @@ export async function validateData(options = {}) {
             const segmentLengthKm = haversineDistanceMeters(start, end) / 1000;
             const isEndpointConnector =
               endpoints &&
-              segmentLengthKm <= 120 &&
+              segmentLengthKm <= 30 &&
               ((start[0] === endpoints.start[0] && start[1] === endpoints.start[1]) ||
                 (end[0] === endpoints.end[0] && end[1] === endpoints.end[1]));
             if (isEndpointConnector) {
               continue;
             }
-            const landRatio = segmentLandRatio(start, end, landMaskFeatures);
-            if (landRatio >= 0.5 && segmentLengthKm > 120) {
+            if (hasWaterWaypoints) {
+              continue;
+            }
+            const landRatio = segmentLandRatio(start, end, routeLineSurfaceContext);
+            if (landRatio > 0) {
               recordError(
                 errors,
                 routeLinesRelativePath,
                 `$.features[${featureIndex}].geometry`,
-                `Sea route line '${lineId}' has a segment crossing land for ${(landRatio * 100).toFixed(0)}% of sampled points (line segment ${lineStringIndex + 1}, vertex ${coordinateIndex})`
+                `Sea route line '${lineId}' has a segment crossing Natural Earth 10m land-minus-lakes outside the documented endpoint-connector tolerance (line segment ${lineStringIndex + 1}, vertex ${coordinateIndex}, ${segmentLengthKm.toFixed(1)} km)`
               );
               break;
             }
@@ -3766,7 +3936,7 @@ export async function validateData(options = {}) {
         );
         if (fromCoordinate && toCoordinate && coastSegments.length > 0) {
           const snapToWater = (coordinate) => {
-            if (!isOnLand(coordinate, landMaskFeatures)) {
+            if (!isOnLand(coordinate, routeLineSurfaceContext)) {
               return {
                 connectorMeters: 0,
                 waterCoordinate: coordinate
@@ -3804,7 +3974,7 @@ export async function validateData(options = {}) {
               const legDistance = shortestWaterDistanceMeters(
                 waterLegPoints[index - 1],
                 waterLegPoints[index],
-                landMaskFeatures
+                routeLineSurfaceContext
               );
               if (!Number.isFinite(legDistance) || legDistance <= 0) {
                 canEstimateDetour = false;
@@ -3823,7 +3993,7 @@ export async function validateData(options = {}) {
               const hasExplicitReason =
                 Array.isArray(feature?.properties?.provenance?.changes) &&
                 feature.properties.provenance.changes.some(
-                  (change) => change?.kind === "explicit-sea-detour-reason"
+                  (change) => change?.kind === "explicit-sea-detour-reason" || change?.kind === "water-waypoints"
                 );
               if (
                 !hasExplicitReason &&

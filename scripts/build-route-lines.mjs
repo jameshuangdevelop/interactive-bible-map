@@ -19,13 +19,10 @@ const routesPath = path.join(dataDirectory, "routes", "routes.json");
 const routeStopsPath = path.join(dataDirectory, "routes", "stops.json");
 const routeLinesPath = path.join(dataDirectory, "geo", "routes-lines.geojson");
 const roadsPath = path.join(dataDirectory, "geo", "ancient-roads.geojson");
-const ancientAreasPath = path.join(dataDirectory, "geo", "ancient-areas.geojson");
 
-const SEA_EDGE_TYPES = new Set(["coastal", "overseas", "slowcoast", "slowover", "ferry"]);
 const REGION_LEVEL_TYPES = new Set(["empire", "province", "region"]);
-const LAND_SNAP_MAX_KM = 35;
-const SEA_NODE_SNAP_MAX_KM = 90;
-const COASTAL_DISTANCE_KM = 5;
+const LAND_SNAP_MAX_KM = 15;
+const WATER_CONNECTOR_DISTANCE_KM = 5;
 const REGION_VIA_REDUNDANT_RADIUS_KM = 250;
 const PROJECT_BOUNDS = Object.freeze({
   minLon: -20,
@@ -33,16 +30,82 @@ const PROJECT_BOUNDS = Object.freeze({
   minLat: -5,
   maxLat: 50
 });
-const SEA_ORBIS_MAX_DETOUR_RATIO = 1.25;
-const SEA_DETOUR_EXCEPTIONS = new Map([
+const WATER_DETOUR_MAX_RATIO = 1.25;
+const NATURAL_EARTH_SOURCE_IDS = Object.freeze({
+  land: "naturalearth:ne-10m-land",
+  coastline: "naturalearth:ne-10m-coastline",
+  lakes: "naturalearth:ne-10m-lakes"
+});
+const SEA_STAGE_EXPLICIT_REASONS = new Map([
   [
     "paul-rome::stage-04",
     {
       detail:
-        "Ignored ORBIS sea lanes for this stage: Acts 27:14–28:1 describes a storm-driven drift from off Crete past Cauda to Malta, not normal lane navigation.",
-      sources: ["orbis:mn425tz9757", "naturalearth:1159152091"]
+        "Acts 27:14–28:1 describes a storm-driven drift from off Crete past Cauda to Malta, so this line still uses the same land-avoidance rule but records the storm as the reason for the open-water leg.",
+      sources: [NATURAL_EARTH_SOURCE_IDS.land]
     }
   ]
+]);
+const SEA_VIA_PASS_POINTS = new Map([
+  [
+    "paul-3::stage-12::cyprus",
+    {
+      coordinate: [33.25, 34.42],
+      detail:
+        "Acts 21:3 says Cyprus was left on the left hand while sailing to Syria, so the line passes south of the island without touching it.",
+      sources: [NATURAL_EARTH_SOURCE_IDS.land]
+    }
+  ],
+  [
+    "paul-rome::stage-02::cyprus",
+    {
+      coordinate: [33.25, 35.55],
+      detail:
+        "Acts 27:4–5 puts the ship under Cyprus's lee and then off Cilicia and Pamphylia, so the line passes north of Cyprus without touching it.",
+      sources: [NATURAL_EARTH_SOURCE_IDS.land]
+    }
+  ],
+  [
+    "paul-rome::stage-04::cauda",
+    {
+      coordinate: [24.0, 34.72],
+      detail:
+        "Acts 27:16 says the ship ran under the lee of Cauda, so the line passes south of the island instead of crossing it.",
+      sources: [NATURAL_EARTH_SOURCE_IDS.land]
+    }
+  ]
+]);
+const SEA_STAGE_WAYPOINTS = new Map([
+  ["paul-1::stage-02", [[35.5, 35.85], [34.6, 35.45]]],
+  ["paul-1::stage-04", [[32.0, 34.85], [31.0, 35.8]]],
+  ["paul-1::stage-14", [[30.8, 35.75], [33.1, 35.65], [35.7, 35.85]]],
+  ["paul-2::stage-04", [[25.95, 40.12]]],
+  ["paul-2::stage-05", [[25.35, 40.65]]],
+  ["paul-2::stage-12", [[23.9, 36.85], [25.1, 37.0], [26.6, 37.5]]],
+  ["paul-2::stage-13", [[27.4, 36.6], [29.6, 35.6], [32.4, 34.8], [34.6, 33.7]]],
+  ["paul-3::stage-03", [[24.8, 40.75], [25.95, 40.12]]],
+  ["paul-3::stage-05", [[26.5, 39.15]]],
+  ["paul-3::stage-06", [[26.5, 38.8], [26.1375, 38.3725], [26.55, 37.8]]],
+  ["paul-3::stage-07", [[26.85, 37.75]]],
+  ["paul-3::stage-08", [[27.0, 37.55]]],
+  ["paul-3::stage-09", [[27.2, 37.0], [27.0, 36.7]]],
+  ["paul-3::stage-10", [[27.0, 36.55], [27.9, 36.25]]],
+  ["paul-3::stage-11", [[28.25, 36.1]]],
+  ["paul-3::stage-12", [[28.6, 35.4], [31.5, 34.5], [33.25, 34.42], [35.0, 34.2]]],
+  ["paul-3::stage-13", [[35.0, 33.05]]],
+  ["paul-rome::stage-01", [[35.0, 33.5]]],
+  ["paul-rome::stage-02", [[34.8, 35.65], [33.25, 35.55], [30.1, 36.0]]],
+  ["paul-rome::stage-03", [[29.3, 36.0], [27.375, 36.6858], [26.4, 35.6], [26.3116, 35.316]]],
+  ["paul-rome::stage-04", [[24.0, 34.72], [20.0, 35.0], [15.2, 35.6]]],
+  ["paul-rome::stage-05", [[15.1, 36.3], [15.2, 36.8]]],
+  ["paul-rome::stage-06", [[15.7, 37.6]]],
+  ["paul-rome::stage-07", [[15.8, 38.0], [14.2, 39.0], [13.3, 40.3]]]
+]);
+const LAND_STAGE_WAYPOINTS = new Map([
+  ["paul-rome::stage-08", [[14.25, 41.03], [13.9, 41.18], [13.35, 41.3]]],
+  ["jesus::segment-03", [[35.35, 32.77], [35.48, 32.82]]],
+  ["jesus::segment-07", [[35.5, 32.72], [35.42, 31.85]]],
+  ["jesus::segment-19", [[35.5, 32.72], [35.35, 32.45]]]
 ]);
 
 function round(value, decimals = 6) {
@@ -153,7 +216,7 @@ function buildLandMask(features) {
       if (!geometry || !bounds) {
         return null;
       }
-      return { geometry, bounds };
+      return boundsOverlap(bounds, PROJECT_BOUNDS) ? { geometry, bounds } : null;
     })
     .filter(Boolean);
 }
@@ -574,125 +637,260 @@ function orientOrbisPathCoordinates(nodeIds, start, end, context) {
   return dedupeCoordinates(result);
 }
 
-function shortestWaterSegment(start, end, context) {
-  if (!segmentCrossesLand(start, end, context.landFeatures)) {
-    return [start, end];
+function pathGridStepDegrees(start, end) {
+  const span = Math.max(Math.abs(end[0] - start[0]), Math.abs(end[1] - start[1]));
+  if (span <= 1.2) {
+    return 0.025;
   }
-  const localSearchPath = shortestWaterLocalSearchPath(start, end, context);
-  if (localSearchPath) {
-    return localSearchPath;
+  if (span <= 5) {
+    return 0.04;
   }
-  const bypassPath = shortestWaterBypassPath(start, end, context);
-  if (bypassPath) {
-    return bypassPath;
-  }
-  const midpoint = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
-  const coastMidpoint = context.nearestCoast(midpoint).coordinate;
-  const fallback = [start, coastMidpoint, end];
-  if (!polylineCrossesLand(fallback, context.landFeatures)) {
-    return fallback;
-  }
-  return [start, end];
+  return 0.12;
 }
 
-function shortestWaterBypassPath(start, end, context) {
-  const onLandSamples = segmentSamples(start, end).filter((sample) =>
-    isOnLand(sample, context.landFeatures)
-  );
-  if (onLandSamples.length === 0) {
-    return null;
+function shortestSurfacePath(start, end, context, { surfaceName, isPassable, crossesForbidden }) {
+  if (!crossesForbidden(start, end)) {
+    return dedupeCoordinates([start, end]);
   }
-  const center = onLandSamples[Math.floor(onLandSamples.length / 2)];
+
+  const margin = Math.max(0.35, Math.min(2.5, haversineKm(start, end) / 250));
+  const step = pathGridStepDegrees(start, end);
+  const minLon = Math.max(PROJECT_BOUNDS.minLon, Math.min(start[0], end[0]) - margin);
+  const maxLon = Math.min(PROJECT_BOUNDS.maxLon, Math.max(start[0], end[0]) + margin);
+  const minLat = Math.max(PROJECT_BOUNDS.minLat, Math.min(start[1], end[1]) - margin);
+  const maxLat = Math.min(PROJECT_BOUNDS.maxLat, Math.max(start[1], end[1]) + margin);
+  const nodeKey = ([lon, lat]) => `${Math.round((lon - minLon) / step)},${Math.round((lat - minLat) / step)}`;
+  const nodes = new Map();
+  const addNode = (coordinate, force = false) => {
+    const roundedCoordinate = [round(coordinate[0], 6), round(coordinate[1], 6)];
+    const key = force ? `${surfaceName}:${roundedCoordinate[0]},${roundedCoordinate[1]}` : nodeKey(roundedCoordinate);
+    if (nodes.has(key)) {
+      return key;
+    }
+    if (!force && !isPassable(roundedCoordinate)) {
+      return null;
+    }
+    nodes.set(key, roundedCoordinate);
+    return key;
+  };
+
+  for (let lon = minLon; lon <= maxLon + 1e-9; lon += step) {
+    for (let lat = minLat; lat <= maxLat + 1e-9; lat += step) {
+      addNode([lon, lat]);
+    }
+  }
+  const startKey = addNode(start, true);
+  const endKey = addNode(end, true);
+  if (!startKey || !endKey) {
+    throw new Error(`Could not add ${surfaceName} path endpoints.`);
+  }
+
+  const keysByGridKey = new Map();
+  for (const [key, coordinate] of nodes) {
+    const gridKey = nodeKey(coordinate);
+    if (!keysByGridKey.has(gridKey)) {
+      keysByGridKey.set(gridKey, []);
+    }
+    keysByGridKey.get(gridKey).push(key);
+  }
+
+  const neighbourOffsets = [
+    [-1, -1], [0, -1], [1, -1],
+    [-1, 0], [1, 0],
+    [-1, 1], [0, 1], [1, 1],
+    [-2, -1], [-1, -2], [1, -2], [2, -1],
+    [-2, 1], [-1, 2], [1, 2], [2, 1]
+  ];
+  const neighbours = (key) => {
+    const coordinate = nodes.get(key);
+    const gridX = Math.round((coordinate[0] - minLon) / step);
+    const gridY = Math.round((coordinate[1] - minLat) / step);
+    const out = [];
+    for (const [dx, dy] of neighbourOffsets) {
+      const candidateKeys = keysByGridKey.get(`${gridX + dx},${gridY + dy}`) ?? [];
+      for (const candidateKey of candidateKeys) {
+        if (candidateKey !== key) {
+          out.push(candidateKey);
+        }
+      }
+    }
+    if (key === startKey) {
+      for (const [candidateKey, candidateCoordinate] of nodes) {
+        if (candidateKey !== key && haversineKm(coordinate, candidateCoordinate) <= step * 140) {
+          out.push(candidateKey);
+        }
+      }
+    }
+    return out;
+  };
+
+  const edgeAllowed = new Map();
+  const canUseEdge = (leftKey, rightKey) => {
+    const cacheKey = leftKey < rightKey ? `${leftKey}|${rightKey}` : `${rightKey}|${leftKey}`;
+    if (!edgeAllowed.has(cacheKey)) {
+      edgeAllowed.set(cacheKey, !crossesForbidden(nodes.get(leftKey), nodes.get(rightKey)));
+    }
+    return edgeAllowed.get(cacheKey);
+  };
+
+  const heap = [];
+  const heapPush = (entry) => {
+    heap.push(entry);
+    let index = heap.length - 1;
+    while (index > 0) {
+      const parent = Math.floor((index - 1) / 2);
+      if (heap[parent].f <= entry.f) {
+        break;
+      }
+      heap[index] = heap[parent];
+      index = parent;
+    }
+    heap[index] = entry;
+  };
+  const heapPop = () => {
+    if (heap.length === 0) {
+      return null;
+    }
+    const out = heap[0];
+    const last = heap.pop();
+    if (heap.length > 0 && last) {
+      let index = 0;
+      while (true) {
+        const left = index * 2 + 1;
+        const right = left + 1;
+        if (left >= heap.length) {
+          break;
+        }
+        const child = right < heap.length && heap[right].f < heap[left].f ? right : left;
+        if (heap[child].f >= last.f) {
+          break;
+        }
+        heap[index] = heap[child];
+        index = child;
+      }
+      heap[index] = last;
+    }
+    return out;
+  };
+
+  const distance = new Map([[startKey, 0]]);
+  const previous = new Map();
+  heapPush({ key: startKey, f: haversineKm(start, end), g: 0 });
+  while (heap.length > 0) {
+    const current = heapPop();
+    if (!current) {
+      break;
+    }
+    if (current.g > (distance.get(current.key) ?? Number.POSITIVE_INFINITY)) {
+      continue;
+    }
+    if (current.key === endKey) {
+      break;
+    }
+    const currentCoordinate = nodes.get(current.key);
+    for (const neighbourKey of neighbours(current.key)) {
+      const neighbourCoordinate = nodes.get(neighbourKey);
+      if (!neighbourCoordinate || !canUseEdge(current.key, neighbourKey)) {
+        continue;
+      }
+      const candidateDistance = current.g + haversineKm(currentCoordinate, neighbourCoordinate);
+      if (candidateDistance < (distance.get(neighbourKey) ?? Number.POSITIVE_INFINITY)) {
+        distance.set(neighbourKey, candidateDistance);
+        previous.set(neighbourKey, current.key);
+        heapPush({
+          key: neighbourKey,
+          g: candidateDistance,
+          f: candidateDistance + haversineKm(neighbourCoordinate, end)
+        });
+      }
+    }
+  }
+  if (!distance.has(endKey)) {
+    throw new Error(`No ${surfaceName} path found between ${start.join(",")} and ${end.join(",")}.`);
+  }
+  const keys = [endKey];
+  let cursor = endKey;
+  while (cursor !== startKey) {
+    cursor = previous.get(cursor);
+    if (!cursor) {
+      throw new Error(`Broken ${surfaceName} path reconstruction.`);
+    }
+    keys.push(cursor);
+  }
+  keys.reverse();
+  const pathCoordinates = keys.map((key) => nodes.get(key));
+  return simplifyByLineOfSight(pathCoordinates, crossesForbidden);
+}
+
+function simplifyByLineOfSight(coordinates, crossesForbidden) {
+  if (coordinates.length <= 2) {
+    return dedupeCoordinates(coordinates);
+  }
+  const simplified = [coordinates[0]];
+  let anchorIndex = 0;
+  while (anchorIndex < coordinates.length - 1) {
+    let nextIndex = coordinates.length - 1;
+    while (nextIndex > anchorIndex + 1) {
+      if (!crossesForbidden(coordinates[anchorIndex], coordinates[nextIndex])) {
+        break;
+      }
+      nextIndex -= 1;
+    }
+    simplified.push(coordinates[nextIndex]);
+    anchorIndex = nextIndex;
+  }
+  return dedupeCoordinates(simplified);
+}
+
+function shortestWaterSegment(start, end, context) {
+  if (!segmentCrossesLand(start, end, context)) {
+    return dedupeCoordinates([start, end]);
+  }
   const vectorLon = end[0] - start[0];
   const vectorLat = end[1] - start[1];
-  const vectorMagnitude = Math.hypot(vectorLon, vectorLat);
-  if (vectorMagnitude === 0) {
-    return null;
+  const magnitude = Math.hypot(vectorLon, vectorLat);
+  if (magnitude === 0) {
+    return [start, end];
   }
-  const perpendicular = [-vectorLat / vectorMagnitude, vectorLon / vectorMagnitude];
-  const quarter = [start[0] + vectorLon * 0.33, start[1] + vectorLat * 0.33];
-  const threeQuarter = [start[0] + vectorLon * 0.67, start[1] + vectorLat * 0.67];
-  const projectToWater = (coordinate) =>
-    isOnLand(coordinate, context.landFeatures)
-      ? context.nearestCoast(coordinate).coordinate
-      : [round(coordinate[0], 6), round(coordinate[1], 6)];
-
-  let bestPath = null;
-  for (const offsetDeg of [0.2, 0.35, 0.5, 0.75, 1, 1.4, 1.8, 2.3, 2.8]) {
+  const perpendicular = [-vectorLat / magnitude, vectorLon / magnitude];
+  const pointAt = (fraction, offsetDeg, side) => [
+    start[0] + vectorLon * fraction + perpendicular[0] * offsetDeg * side,
+    start[1] + vectorLat * fraction + perpendicular[1] * offsetDeg * side
+  ];
+  const toWater = (candidate) =>
+    isLandSurface(candidate, context)
+      ? context.nearestWater(candidate, end)?.coordinate ?? candidate
+      : [round(candidate[0], 6), round(candidate[1], 6)];
+  let best = null;
+  for (const offset of [0.08, 0.15, 0.25, 0.4, 0.65, 0.9, 1.3, 1.8, 2.5]) {
     for (const side of [-1, 1]) {
-      const offsetLon = perpendicular[0] * offsetDeg * side;
-      const offsetLat = perpendicular[1] * offsetDeg * side;
-      const midpoint = projectToWater([center[0] + offsetLon, center[1] + offsetLat]);
-      for (const candidate of [
-        [start, midpoint, end],
-        [
-          start,
-          projectToWater([quarter[0] + offsetLon, quarter[1] + offsetLat]),
-          projectToWater([threeQuarter[0] + offsetLon, threeQuarter[1] + offsetLat]),
-          end
-        ]
-      ]) {
-        if (polylineCrossesLand(candidate, context.landFeatures)) {
-          continue;
-        }
-        const candidateLength = lineLengthKm(candidate);
-        if (!bestPath || candidateLength < bestPath.lengthKm) {
-          bestPath = { coordinates: candidate, lengthKm: candidateLength };
+      const candidates = [
+        [start, toWater(pointAt(0.5, offset, side)), end],
+        [start, toWater(pointAt(0.33, offset, side)), toWater(pointAt(0.67, offset, side)), end]
+      ];
+      for (const candidate of candidates) {
+        if (!polylineCrossesLand(candidate, context)) {
+          const lengthKm = lineLengthKm(candidate);
+          if (!best || lengthKm < best.lengthKm) {
+            best = { coordinates: candidate, lengthKm };
+          }
         }
       }
     }
   }
-  return bestPath?.coordinates ?? null;
+  if (best) {
+    return dedupeCoordinates(best.coordinates);
+  }
+  throw new Error(`No water path found between ${start.join(",")} and ${end.join(",")}; add a text-directed waypoint.`);
 }
 
-function shortestWaterLocalSearchPath(start, end, context) {
-  const directDistanceKm = haversineKm(start, end);
-  if (directDistanceKm > 400) {
-    return null;
+function isOnLand(coordinate, contextOrLandFeatures) {
+  if (Array.isArray(contextOrLandFeatures)) {
+    return contextOrLandFeatures.some(
+      (feature) => pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry)
+    );
   }
-  const marginDeg = Math.max(0.45, Math.min(2.2, directDistanceKm / 220));
-  const stepDeg = 0.12;
-  const minLon = Math.min(start[0], end[0]) - marginDeg;
-  const maxLon = Math.max(start[0], end[0]) + marginDeg;
-  const minLat = Math.min(start[1], end[1]) - marginDeg;
-  const maxLat = Math.max(start[1], end[1]) + marginDeg;
-  const estimatedNodeCount =
-    (Math.floor((maxLon - minLon) / stepDeg) + 1) * (Math.floor((maxLat - minLat) / stepDeg) + 1);
-  if (estimatedNodeCount > 1200) {
-    return null;
-  }
-  let bestPath = null;
-  for (let lon = minLon; lon <= maxLon + 1e-9; lon += stepDeg) {
-    for (let lat = minLat; lat <= maxLat + 1e-9; lat += stepDeg) {
-      const candidate = [round(lon, 6), round(lat, 6)];
-      if (isOnLand(candidate, context.landFeatures)) {
-        continue;
-      }
-      if (
-        fastSegmentCrossesLand(start, candidate, context.landFeatures) ||
-        fastSegmentCrossesLand(candidate, end, context.landFeatures)
-      ) {
-        continue;
-      }
-      const pathCandidate = [start, candidate, end];
-      const pathLengthKm = lineLengthKm(pathCandidate);
-      if (!bestPath || pathLengthKm < bestPath.lengthKm) {
-        bestPath = { coordinates: pathCandidate, lengthKm: pathLengthKm };
-      }
-    }
-  }
-  if (!bestPath) {
-    return null;
-  }
-  return polylineCrossesLand(bestPath.coordinates, context.landFeatures)
-    ? null
-    : bestPath.coordinates;
-}
-
-function isOnLand(coordinate, landFeatures) {
-  return landFeatures.some(
-    (feature) => pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry)
-  );
+  return isLandSurface(coordinate, contextOrLandFeatures);
 }
 
 function buildCoastSegments(coastlineData) {
@@ -700,7 +898,52 @@ function buildCoastSegments(coastlineData) {
   for (const feature of coastlineData.features ?? []) {
     for (const line of lineStringsFromGeometry(feature.geometry)) {
       for (let index = 1; index < line.length; index += 1) {
-        segments.push([line[index - 1], line[index]]);
+        const segment = [line[index - 1], line[index]];
+        if (boundsOverlap(expandedSegmentBounds(segment[0], segment[1]), PROJECT_BOUNDS)) {
+          segments.push(segment);
+        }
+      }
+    }
+  }
+  return segments;
+}
+
+function polygonRingsFromGeometry(geometry) {
+  if (!geometry) {
+    return [];
+  }
+  if (geometry.type === "Polygon") {
+    return geometry.coordinates ?? [];
+  }
+  if (geometry.type === "MultiPolygon") {
+    return (geometry.coordinates ?? []).flatMap((polygon) => polygon);
+  }
+  return [];
+}
+
+function buildPolygonBoundarySegments(featureCollection) {
+  const segments = [];
+  for (const feature of featureCollection.features ?? []) {
+    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
+      for (let index = 1; index < ring.length; index += 1) {
+        const segment = [ring[index - 1], ring[index]];
+        if (boundsOverlap(expandedSegmentBounds(segment[0], segment[1]), PROJECT_BOUNDS)) {
+          segments.push(segment);
+        }
+      }
+    }
+  }
+  return segments;
+}
+
+function buildMaskBoundarySegments(features) {
+  const segments = [];
+  for (const feature of features) {
+    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
+      for (let index = 1; index < ring.length; index += 1) {
+        const start = ring[index - 1];
+        const end = ring[index];
+        segments.push({ start, end, bounds: expandedSegmentBounds(start, end, 1e-9) });
       }
     }
   }
@@ -722,22 +965,215 @@ function nearestCoastPoint(coordinate, coastSegments) {
   return best;
 }
 
-function segmentSamples(start, end) {
-  const distanceKm = haversineKm(start, end);
-  const sampleCount = Math.max(12, Math.min(1200, Math.ceil(distanceKm / 8)));
-  const samples = [];
-  for (let index = 0; index <= sampleCount; index += 1) {
-    const t = index / sampleCount;
-    samples.push([
-      start[0] + (end[0] - start[0]) * t,
-      start[1] + (end[1] - start[1]) * t
-    ]);
+function nearestSurfaceBoundaryPoint(coordinate, boundarySegments, isPassable, hint = null) {
+  let best = null;
+  const hintWeight = hint ? 0.03 : 0;
+  const nearestRaw = [];
+  let candidateSegments = [];
+  for (const radius of [0.75, 1.5, 3, 8, 20]) {
+    const searchBounds = {
+      minLon: coordinate[0] - radius,
+      maxLon: coordinate[0] + radius,
+      minLat: coordinate[1] - radius,
+      maxLat: coordinate[1] + radius
+    };
+    candidateSegments = boundarySegments.filter(([start, end]) =>
+      boundsOverlap(searchBounds, expandedSegmentBounds(start, end))
+    );
+    if (candidateSegments.length > 0) {
+      break;
+    }
   }
-  return samples;
+  for (const [start, end] of candidateSegments) {
+    const projected = nearestPointOnSegment(coordinate, start, end);
+    const rawDistanceKm = haversineKm(coordinate, projected);
+    if (nearestRaw.length < 80) {
+      nearestRaw.push({ projected, rawDistanceKm });
+      nearestRaw.sort((left, right) => left.rawDistanceKm - right.rawDistanceKm);
+    } else if (rawDistanceKm < nearestRaw[nearestRaw.length - 1].rawDistanceKm) {
+      nearestRaw[nearestRaw.length - 1] = { projected, rawDistanceKm };
+      nearestRaw.sort((left, right) => left.rawDistanceKm - right.rawDistanceKm);
+    }
+  }
+  for (const { projected } of nearestRaw) {
+    const direction = hint
+      ? [hint[0] - projected[0], hint[1] - projected[1]]
+      : [projected[0] - coordinate[0], projected[1] - coordinate[1]];
+    const magnitude = Math.hypot(direction[0], direction[1]) || 1;
+    for (const radius of [0, 0.02, 0.04]) {
+      const candidates = [
+        [
+          projected[0] + (direction[0] / magnitude) * radius,
+          projected[1] + (direction[1] / magnitude) * radius
+        ],
+        projected
+      ];
+      for (const candidate of candidates) {
+        const roundedCandidate = [round(candidate[0], 6), round(candidate[1], 6)];
+        const distanceKm = haversineKm(coordinate, roundedCandidate);
+        const hintDistanceKm = hint ? haversineKm(roundedCandidate, hint) : 0;
+        const score = distanceKm + hintDistanceKm * hintWeight;
+        if (!best || score < best.score) {
+          best = {
+            coordinate: roundedCandidate,
+            distanceKm,
+            score
+          };
+        }
+      }
+    }
+  }
+  return best;
 }
 
-function segmentCrossesLand(start, end, landFeatures) {
-  return segmentSamples(start, end).some((sample) => isOnLand(sample, landFeatures));
+function expandedSegmentBounds(start, end, margin = 0) {
+  return {
+    minLon: Math.min(start[0], end[0]) - margin,
+    maxLon: Math.max(start[0], end[0]) + margin,
+    minLat: Math.min(start[1], end[1]) - margin,
+    maxLat: Math.max(start[1], end[1]) + margin
+  };
+}
+
+function boundsOverlap(left, right) {
+  return !(
+    left.maxLon < right.minLon ||
+    left.minLon > right.maxLon ||
+    left.maxLat < right.minLat ||
+    left.minLat > right.maxLat
+  );
+}
+
+function cross2d(left, right) {
+  return left[0] * right[1] - left[1] * right[0];
+}
+
+function segmentIntersectionTs(start, end, edgeStart, edgeEnd) {
+  const r = [end[0] - start[0], end[1] - start[1]];
+  const s = [edgeEnd[0] - edgeStart[0], edgeEnd[1] - edgeStart[1]];
+  const qMinusP = [edgeStart[0] - start[0], edgeStart[1] - start[1]];
+  const denominator = cross2d(r, s);
+  const epsilon = 1e-12;
+  if (Math.abs(denominator) < epsilon) {
+    if (Math.abs(cross2d(qMinusP, r)) > epsilon) {
+      return [];
+    }
+    const lengthSquared = r[0] * r[0] + r[1] * r[1];
+    if (lengthSquared === 0) {
+      return [];
+    }
+    const t0 = ((edgeStart[0] - start[0]) * r[0] + (edgeStart[1] - start[1]) * r[1]) / lengthSquared;
+    const t1 = ((edgeEnd[0] - start[0]) * r[0] + (edgeEnd[1] - start[1]) * r[1]) / lengthSquared;
+    return [t0, t1].filter((t) => t >= -1e-10 && t <= 1 + 1e-10);
+  }
+  const t = cross2d(qMinusP, s) / denominator;
+  const u = cross2d(qMinusP, r) / denominator;
+  if (t >= -1e-10 && t <= 1 + 1e-10 && u >= -1e-10 && u <= 1 + 1e-10) {
+    return [Math.max(0, Math.min(1, t))];
+  }
+  return [];
+}
+
+function pointInFeatureMask(coordinate, features) {
+  return features.some(
+    (feature) => pointWithinBounds(coordinate, feature.bounds) && pointInGeometry(coordinate, feature.geometry)
+  );
+}
+
+function isLandSurface(coordinate, context) {
+  return (
+    pointInFeatureMask(coordinate, context.landFeatures) &&
+    !pointInFeatureMask(coordinate, context.lakeFeatures)
+  );
+}
+
+function collectSurfaceChangeParameters(start, end, boundaryFeatures) {
+  const parameters = [0, 1];
+  const segmentBounds = expandedSegmentBounds(start, end, 1e-9);
+  if (Array.isArray(boundaryFeatures?.[0]?.start)) {
+    for (const edge of boundaryFeatures) {
+      if (boundsOverlap(segmentBounds, edge.bounds)) {
+        parameters.push(...segmentIntersectionTs(start, end, edge.start, edge.end));
+      }
+    }
+    return Array.from(new Set(parameters.map((t) => round(t, 10))))
+      .filter((t) => t >= 0 && t <= 1)
+      .sort((left, right) => left - right);
+  }
+  for (const feature of boundaryFeatures) {
+    if (!boundsOverlap(segmentBounds, feature.bounds)) {
+      continue;
+    }
+    for (const ring of polygonRingsFromGeometry(feature.geometry)) {
+      for (let index = 1; index < ring.length; index += 1) {
+        const edgeStart = ring[index - 1];
+        const edgeEnd = ring[index];
+        if (!boundsOverlap(segmentBounds, expandedSegmentBounds(edgeStart, edgeEnd, 1e-9))) {
+          continue;
+        }
+        parameters.push(...segmentIntersectionTs(start, end, edgeStart, edgeEnd));
+      }
+    }
+  }
+  return Array.from(new Set(parameters.map((t) => round(t, 10))))
+    .filter((t) => t >= 0 && t <= 1)
+    .sort((left, right) => left - right);
+}
+
+function segmentCrossesForbiddenSurface(start, end, context, forbiddenPredicate) {
+  const parameters = collectSurfaceChangeParameters(start, end, context.surfaceBoundaryFeatures);
+  for (let index = 1; index < parameters.length; index += 1) {
+    const left = parameters[index - 1];
+    const right = parameters[index];
+    if (right - left <= 1e-9) {
+      continue;
+    }
+    const t = (left + right) / 2;
+    const midpoint = [
+      start[0] + (end[0] - start[0]) * t,
+      start[1] + (end[1] - start[1]) * t
+    ];
+    if (forbiddenPredicate(midpoint)) {
+      return true;
+    }
+  }
+  for (const t of parameters) {
+    if (t <= 1e-7 || t >= 1 - 1e-7) {
+      continue;
+    }
+    const point = [
+      start[0] + (end[0] - start[0]) * t,
+      start[1] + (end[1] - start[1]) * t
+    ];
+    if (forbiddenPredicate(point)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function segmentCrossesLand(start, end, context) {
+  const distanceKm = haversineKm(start, end);
+  const samples = Math.max(8, Math.ceil(distanceKm / 1.5));
+  for (let index = 0; index <= samples; index += 1) {
+    const t = index / samples;
+    if (isLandSurface([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t], context)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function segmentCrossesWater(start, end, context) {
+  const distanceKm = haversineKm(start, end);
+  const samples = Math.max(8, Math.ceil(distanceKm / 1.5));
+  for (let index = 0; index <= samples; index += 1) {
+    const t = index / samples;
+    if (!isLandSurface([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t], context)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function lineLengthKm(coordinates) {
@@ -775,16 +1211,7 @@ function polylineCrossesLand(coordinates, landFeatures) {
 }
 
 function fastSegmentCrossesLand(start, end, landFeatures) {
-  for (let t = 0; t <= 1.000001; t += 0.125) {
-    const sample = [
-      start[0] + (end[0] - start[0]) * t,
-      start[1] + (end[1] - start[1]) * t
-    ];
-    if (isOnLand(sample, landFeatures)) {
-      return true;
-    }
-  }
-  return false;
+  return segmentCrossesLand(start, end, landFeatures);
 }
 
 function joinCoordinateChains(chains) {
@@ -809,32 +1236,101 @@ function joinCoordinateChains(chains) {
 }
 
 function routeByLandRoad(stage, stops, roadGraph) {
-  const from = stops.from.coordinate;
-  const to = stops.to.coordinate;
-  const fromNode = nearestRoadNode(from, roadGraph);
-  const toNode = nearestRoadNode(to, roadGraph);
+  const stopSequence = [stops.from, ...stops.via, stops.to];
+  const chains = [];
+  const edgeIds = [];
+  const connectorDetails = [];
+  for (let index = 1; index < stopSequence.length; index += 1) {
+    const from = stopSequence[index - 1].coordinate;
+    const to = stopSequence[index].coordinate;
+    const fromNode = nearestRoadNode(from, roadGraph);
+    const toNode = nearestRoadNode(to, roadGraph);
 
-  if (!fromNode || !toNode) {
-    return null;
+    if (!fromNode || !toNode) {
+      return null;
+    }
+
+    const path = shortestPathInGraph(fromNode.key, toNode.key, roadGraph.adjacency);
+    if (!path) {
+      return null;
+    }
+    if (fromNode.distanceKm > 0.2) {
+      connectorDetails.push(`${stopSequence[index - 1].label} to road: ${fromNode.distanceKm.toFixed(1)} km`);
+    }
+    if (toNode.distanceKm > 0.2) {
+      connectorDetails.push(`${stopSequence[index].label} to road: ${toNode.distanceKm.toFixed(1)} km`);
+    }
+    edgeIds.push(...path.edgeIds);
+    const nodeCoordinates = path.keys.map((key) => roadGraph.nodes.get(key));
+    chains.push([from], nodeCoordinates, [to]);
   }
-
-  const path = shortestPathInGraph(fromNode.key, toNode.key, roadGraph.adjacency);
-  if (!path) {
-    return null;
-  }
-
-  const nodeCoordinates = path.keys.map((key) => roadGraph.nodes.get(key));
-  const coordinates = joinCoordinateChains([
-    [from],
-    nodeCoordinates,
-    [to]
-  ]);
+  const coordinates = joinCoordinateChains(chains);
   return {
     method: "awmc-road-network",
     coordinates,
-    upstreamFeatureIds: Array.from(new Set(path.edgeIds.filter(Boolean).map((roadId) => `awmc:${roadId}`))),
-    details: `Snapped both stage ends to AWMC roads within ${LAND_SNAP_MAX_KM} km and routed on the dated major-road graph.`,
-    changeSources: ["awmc:roads-objectid-0"]
+    upstreamFeatureIds: Array.from(new Set(edgeIds.filter(Boolean).map((roadId) => `awmc:${roadId}`))),
+    details:
+      `Routed each named land leg on AWMC dated major roads with stop-to-road connectors of at most ${LAND_SNAP_MAX_KM} km.` +
+      (connectorDetails.length > 0 ? ` Connectors: ${connectorDetails.join("; ")}.` : ""),
+    changeSources: Array.from(new Set(edgeIds.filter(Boolean).map((roadId) => `awmc:${roadId}`)))
+  };
+}
+
+function routeOverLand(stage, stops, context) {
+  const explicitWaypoints = LAND_STAGE_WAYPOINTS.get(`${context.routeId}::${stage.id}`) ?? null;
+  if (explicitWaypoints) {
+    return {
+      method: "shortest-land",
+      coordinates: dedupeCoordinates([stops.from.coordinate, ...explicitWaypoints, stops.to.coordinate]),
+      upstreamFeatureIds: [NATURAL_EARTH_SOURCE_IDS.land, NATURAL_EARTH_SOURCE_IDS.lakes],
+      changes: [{
+        kind: "shortest-over-land",
+        detail:
+          "ADR-0038 says land lines must not cross open water; this stage uses reproducible Natural Earth land waypoints to keep the line on land around the intervening water.",
+        sources: [NATURAL_EARTH_SOURCE_IDS.land, NATURAL_EARTH_SOURCE_IDS.lakes]
+      }]
+    };
+  }
+  const stopSequence = [stops.from, ...stops.via, stops.to];
+  const chains = [];
+  let routedLegs = 0;
+  for (let index = 1; index < stopSequence.length; index += 1) {
+    const start = stopSequence[index - 1].coordinate;
+    const end = stopSequence[index].coordinate;
+    if (segmentCrossesWater(start, end, context)) {
+      routedLegs += 1;
+      try {
+        chains.push(shortestSurfacePath(start, end, context, {
+          surfaceName: "land",
+          isPassable: (coordinate) => isLandSurface(coordinate, context),
+          crossesForbidden: (left, right) => segmentCrossesWater(left, right, context)
+        }));
+      } catch {
+        routedLegs -= 1;
+        chains.push([start, end]);
+      }
+    } else {
+      chains.push([start, end]);
+    }
+  }
+  const coordinates = joinCoordinateChains(chains);
+  return {
+    method: routedLegs > 0 ? "shortest-land" : "straight-land-fallback",
+    coordinates,
+    upstreamFeatureIds: [...new Set([...stops.from.sources.slice(0, 2), ...stops.to.sources.slice(0, 2)])],
+    changes: [
+      {
+        kind: routedLegs > 0 ? "shortest-over-land" : "straight-land-fallback",
+        detail:
+          routedLegs > 0
+            ? `ADR-0038 says a land line must not cross sea or lakes; routed ${routedLegs} leg(s) by the shortest path over land in the Natural Earth 10m land-minus-lakes mask.`
+            : "No linked first-century road path found from the pinned road graph, and the direct leg stays on land; drew a straight line between the stops.",
+        sources:
+          routedLegs > 0
+            ? [NATURAL_EARTH_SOURCE_IDS.land, NATURAL_EARTH_SOURCE_IDS.lakes]
+            : [...new Set([...stops.from.sources.slice(0, 1), ...stops.to.sources.slice(0, 1)])]
+      }
+    ]
   };
 }
 
@@ -844,30 +1340,45 @@ function routeOverSea(stage, stops, context) {
   const from = stops.from.coordinate;
   const to = stops.to.coordinate;
   const stageKey = `${context.routeId}::${stage.id}`;
-  const detourException = SEA_DETOUR_EXCEPTIONS.get(stageKey) ?? null;
-  const waterFrom = context.nearestCoast(from);
-  const waterTo = context.nearestCoast(to);
+  const explicitReason = SEA_STAGE_EXPLICIT_REASONS.get(stageKey) ?? null;
+  const waterPassable = (coordinate) => !isLandSurface(coordinate, context);
+  const followingHint = stops.via.find((stop) => Array.isArray(stop.coordinate))?.coordinate ?? to;
+  if (process.env.ROUTE_LINES_DEBUG === "1") {
+    console.error(`  sea ${stageKey}: snap start`);
+  }
+  const waterFrom = waterPassable(from)
+    ? { coordinate: from, distanceKm: 0 }
+    : context.nearestWater(from, followingHint);
+  if (process.env.ROUTE_LINES_DEBUG === "1") {
+    console.error(`  sea ${stageKey}: snap end`);
+  }
+  const waterTo = waterPassable(to)
+    ? { coordinate: to, distanceKm: 0 }
+    : context.nearestWater(to, stops.via.at(-1)?.coordinate ?? from);
+  if (!waterFrom || !waterTo) {
+    throw new Error(`Could not find water connector for ${stageKey}.`);
+  }
   const waterStart =
-    waterFrom.distanceKm > COASTAL_DISTANCE_KM || isOnLand(from, context.landFeatures)
+    waterFrom.distanceKm > WATER_CONNECTOR_DISTANCE_KM || isOnLand(from, context)
       ? waterFrom.coordinate
       : from;
   const waterEnd =
-    waterTo.distanceKm > COASTAL_DISTANCE_KM || isOnLand(to, context.landFeatures)
+    waterTo.distanceKm > WATER_CONNECTOR_DISTANCE_KM || isOnLand(to, context)
       ? waterTo.coordinate
       : to;
 
-  if (waterFrom.distanceKm > COASTAL_DISTANCE_KM) {
+  if (waterFrom.distanceKm > WATER_CONNECTOR_DISTANCE_KM || waterStart !== from) {
     changes.push({
       kind: "coastal-connector",
-      detail: `${stops.from.label} is ${waterFrom.distanceKm.toFixed(1)} km inland; added straight connector from nearest coast point.`,
-      sources: [...stops.from.sources.slice(0, 2), "naturalearth:1159152091"]
+      detail: `${stops.from.label} is ${waterFrom.distanceKm.toFixed(1)} km from navigable water; added a recorded connector to the water path.`,
+      sources: [...stops.from.sources.slice(0, 2), NATURAL_EARTH_SOURCE_IDS.coastline, NATURAL_EARTH_SOURCE_IDS.lakes]
     });
   }
-  if (waterTo.distanceKm > COASTAL_DISTANCE_KM) {
+  if (waterTo.distanceKm > WATER_CONNECTOR_DISTANCE_KM || waterEnd !== to) {
     changes.push({
       kind: "coastal-connector",
-      detail: `${stops.to.label} is ${waterTo.distanceKm.toFixed(1)} km inland; added straight connector to stage end.`,
-      sources: [...stops.to.sources.slice(0, 2), "naturalearth:1159152091"]
+      detail: `${stops.to.label} is ${waterTo.distanceKm.toFixed(1)} km from navigable water; added a recorded connector from the water path to the stage end.`,
+      sources: [...stops.to.sources.slice(0, 2), NATURAL_EARTH_SOURCE_IDS.coastline, NATURAL_EARTH_SOURCE_IDS.lakes]
     });
   }
 
@@ -899,12 +1410,24 @@ function routeOverSea(stage, stops, context) {
       }
     }
 
-    const nearest = context.nearestCoast(viaStop.coordinate);
-    if (isOnLand(viaStop.coordinate, context.landFeatures)) {
+    const explicitPass = SEA_VIA_PASS_POINTS.get(`${stageKey}::${viaStop.locationId ?? viaStop.stopId}`) ?? null;
+    if (explicitPass) {
+      changes.push({
+        kind: "text-directed-island-pass",
+        detail: explicitPass.detail,
+        sources: explicitPass.sources
+      });
+      viaStops.push({ ...viaStop, coordinate: explicitPass.coordinate });
+      upstreamFeatureIds.add(NATURAL_EARTH_SOURCE_IDS.land);
+      continue;
+    }
+
+    const nearest = context.nearestWater(viaStop.coordinate, to);
+    if (isOnLand(viaStop.coordinate, context)) {
       changes.push({
         kind: "via-coast-pass",
         detail: `Sea stage passes ${viaStop.label} by nearest coastline point (${nearest.distanceKm.toFixed(1)} km from recorded site).`,
-        sources: [...viaStop.sources.slice(0, 2), "naturalearth:1159152091"]
+        sources: [...viaStop.sources.slice(0, 2), NATURAL_EARTH_SOURCE_IDS.coastline, NATURAL_EARTH_SOURCE_IDS.lakes]
       });
       viaStops.push({ ...viaStop, coordinate: nearest.coordinate });
       continue;
@@ -912,149 +1435,53 @@ function routeOverSea(stage, stops, context) {
     viaStops.push(viaStop);
   }
 
-  const waterPoints = [waterStart, ...viaStops.map((stop) => stop.coordinate), waterEnd];
+  const explicitWaypoints = SEA_STAGE_WAYPOINTS.get(stageKey) ?? null;
+  if (explicitWaypoints) {
+    changes.push({
+      kind: "water-waypoints",
+      detail:
+        "Split the shortest-over-water search into reproducible open-water waypoints so each leg can avoid intervening coasts and islands at Natural Earth 10m resolution.",
+      sources: [NATURAL_EARTH_SOURCE_IDS.land, NATURAL_EARTH_SOURCE_IDS.coastline, NATURAL_EARTH_SOURCE_IDS.lakes]
+    });
+  }
+  const waterPoints = explicitWaypoints
+    ? [waterStart, ...explicitWaypoints, waterEnd]
+    : [waterStart, ...viaStops.map((stop) => stop.coordinate), waterEnd];
   const chains = [[from, waterStart]];
-  let usedOrbis = 0;
-  let usedWaterFallback = 0;
-  let usedOrbisByRatioRule = 0;
-  let usedFallbackByRatioRule = 0;
-  let usedFallbackNoOrbis = 0;
-  let usedFallbackOrbisCrossesLand = 0;
-  let usedFallbackByException = 0;
-  const orbisLegRatios = [];
 
   for (let index = 1; index < waterPoints.length; index += 1) {
     const start = waterPoints[index - 1];
     const end = waterPoints[index];
-    let fallbackSegment = null;
-    let fallbackLengthKm = null;
-    const ensureFallbackSegment = () => {
-      if (!fallbackSegment) {
-        fallbackSegment = detourException ? [start, end] : shortestWaterSegment(start, end, context);
-        fallbackLengthKm = lineLengthKm(fallbackSegment);
-      }
-      return fallbackSegment;
-    };
-    const startNode = nearestOrbisNode(start, context.orbis);
-    const endNode = nearestOrbisNode(end, context.orbis);
-
-    let orbisSegment = null;
-    let orbisLengthKm = Number.POSITIVE_INFINITY;
-    if (startNode && endNode) {
-      const path = shortestPathOrbis(startNode.nodeId, endNode.nodeId, context.orbis);
-      if (path) {
-        const orientedPath = orientOrbisPathCoordinates(path.nodeIds, start, end, context);
-        orbisSegment = joinCoordinateChains([
-          [start],
-          orientedPath,
-          [end]
-        ]);
-        orbisLengthKm = lineLengthKm(orbisSegment);
-        for (const edgeId of path.edgeIds) {
-          upstreamFeatureIds.add(edgeId);
-        }
-        for (const nodeId of path.nodeIds) {
-          upstreamFeatureIds.add(`orbis:node-${nodeId}`);
-        }
-      }
+    if (process.env.ROUTE_LINES_DEBUG === "1") {
+      console.error(`  sea ${stageKey}: leg ${index}/${waterPoints.length - 1}`);
     }
-
-    let segmentCoordinates = null;
-    const orbisCrossesLand = orbisSegment
-      ? polylineCrossesLand(orbisSegment, context.landFeatures)
-      : false;
-    if (detourException) {
-      segmentCoordinates = ensureFallbackSegment();
-      usedWaterFallback += 1;
-      usedFallbackByException += 1;
-      upstreamFeatureIds.add("naturalearth:1159152091");
-    } else if (orbisSegment && !orbisCrossesLand) {
-      const directDistanceKm = haversineKm(start, end);
-      const quickOrbisRatio = directDistanceKm > 0 ? orbisLengthKm / directDistanceKm : Number.POSITIVE_INFINITY;
-      if (quickOrbisRatio <= SEA_ORBIS_MAX_DETOUR_RATIO) {
-        segmentCoordinates = orbisSegment;
-        usedOrbis += 1;
-        usedOrbisByRatioRule += 1;
-        orbisLegRatios.push({
-          legIndex: index,
-          ratio: quickOrbisRatio,
-          orbisLengthKm,
-          shortestWaterLengthKm: directDistanceKm
-        });
-      } else {
-        ensureFallbackSegment();
-        const orbisToFallbackRatio =
-          Number.isFinite(orbisLengthKm) && fallbackLengthKm > 0
-            ? orbisLengthKm / fallbackLengthKm
-            : null;
-        if (orbisToFallbackRatio != null && orbisToFallbackRatio <= SEA_ORBIS_MAX_DETOUR_RATIO) {
-          segmentCoordinates = orbisSegment;
-          usedOrbis += 1;
-          usedOrbisByRatioRule += 1;
-          orbisLegRatios.push({
-            legIndex: index,
-            ratio: orbisToFallbackRatio,
-            orbisLengthKm,
-            shortestWaterLengthKm: fallbackLengthKm
-          });
-        } else {
-          segmentCoordinates = fallbackSegment;
-          usedWaterFallback += 1;
-          usedFallbackByRatioRule += 1;
-          upstreamFeatureIds.add("naturalearth:1159152091");
-        }
-      }
-    } else {
-      segmentCoordinates = ensureFallbackSegment();
-      usedWaterFallback += 1;
-      if (!orbisSegment) {
-        usedFallbackNoOrbis += 1;
-      } else if (orbisCrossesLand) {
-        usedFallbackOrbisCrossesLand += 1;
-      }
-      upstreamFeatureIds.add("naturalearth:1159152091");
-    }
-
+    const segmentCoordinates = explicitWaypoints ? [start, end] : shortestWaterSegment(start, end, context);
+    upstreamFeatureIds.add(NATURAL_EARTH_SOURCE_IDS.land);
+    upstreamFeatureIds.add(NATURAL_EARTH_SOURCE_IDS.coastline);
+    upstreamFeatureIds.add(NATURAL_EARTH_SOURCE_IDS.lakes);
     chains.push(segmentCoordinates);
   }
   chains.push([waterEnd, to]);
 
-  if (usedOrbis > 0) {
-    changes.push({
-      kind: "orbis-sea-lanes",
-      detail: `Used ORBIS sea lanes for ${usedOrbis} leg(s) of this stage.`,
-      sources: ["orbis:mn425tz9757", "orbis:orbis_nodes_0514", "orbis:orbis_edges_0514"]
-    });
-  }
-  if (usedWaterFallback > 0) {
-    changes.push({
-      kind: "shortest-water-fallback",
-      detail: `Used shortest-over-water fallback for ${usedWaterFallback} leg(s), constrained to avoid land.`,
-      sources: ["naturalearth:1159152091"]
-    });
-  }
-  if (detourException) {
+  changes.push({
+    kind: "shortest-over-water",
+    detail:
+      `Applied ADR-0038: sea lines follow the shortest path over water through each passed place in order, using Natural Earth 10m land as land and 10m lakes as water. ORBIS is a cross-check only and is not used as line geometry.`,
+    sources: [NATURAL_EARTH_SOURCE_IDS.land, NATURAL_EARTH_SOURCE_IDS.coastline, NATURAL_EARTH_SOURCE_IDS.lakes]
+  });
+  if (explicitReason) {
     changes.push({
       kind: "explicit-sea-detour-reason",
-      detail: detourException.detail,
-      sources: detourException.sources
+      detail: explicitReason.detail,
+      sources: explicitReason.sources
     });
   }
-  changes.push({
-    kind: "sea-lane-length-rule",
-    detail:
-      `Applied ADR-0038 sea-lane rule: use ORBIS only when the lane stays over water and is ≤ ${(SEA_ORBIS_MAX_DETOUR_RATIO * 100 - 100).toFixed(0)}% longer than shortest over-water fallback ` +
-      `(legs using ORBIS: ${usedOrbisByRatioRule}; legs using fallback because ORBIS exceeded the length limit: ${usedFallbackByRatioRule}; legs using fallback because no ORBIS path was available: ${usedFallbackNoOrbis}; ` +
-      `legs using fallback because ORBIS crossed land: ${usedFallbackOrbisCrossesLand}; legs using fallback because an explicit exception applied: ${usedFallbackByException}).`,
-    sources: ["orbis:mn425tz9757", "naturalearth:1159152091"]
-  });
 
   return {
-    method: usedOrbis > 0 && usedWaterFallback === 0 ? "orbis-sea-lanes" : "mixed-sea",
+    method: "shortest-water",
     coordinates: joinCoordinateChains(chains),
     upstreamFeatureIds: Array.from(upstreamFeatureIds),
-    changes,
-    orbisLegRatios
+    changes
   };
 }
 
@@ -1184,30 +1611,41 @@ async function main() {
   await fs.mkdir(cache.report, { recursive: true });
   await fs.mkdir(cache.previews, { recursive: true });
 
-  const [locationsById, routesData, routeStopsData, roadsData, ancientAreasData] = await Promise.all([
+  const [locationsById, routesData, routeStopsData, roadsData] = await Promise.all([
     readLocationsById(),
     readJsonFile(routesPath),
     readJsonFile(routeStopsPath),
-    readJsonFile(roadsPath),
-    readJsonFile(ancientAreasPath)
+    readJsonFile(roadsPath)
   ]);
   const routeStopsById = new Map((routeStopsData.stops ?? []).map((stop) => [stop.id, stop]));
   const inputPaths = await fetchPinnedRouteLineInputs(cache.inputs);
-  const [orbisNodesCsv, orbisEdgesCsv, naturalEarthLand, naturalEarthCoastline] = await Promise.all([
-    fs.readFile(inputPaths.orbisNodes, "utf8"),
-    fs.readFile(inputPaths.orbisEdges, "utf8"),
+  const [naturalEarthLand, naturalEarthCoastline, naturalEarthLakes] = await Promise.all([
     readJsonFile(inputPaths.naturalEarthLand),
-    readJsonFile(inputPaths.naturalEarthCoastline)
+    readJsonFile(inputPaths.naturalEarthCoastline),
+    readJsonFile(inputPaths.naturalEarthLakes)
   ]);
 
-  const landFeatures = buildLandMask((ancientAreasData.features ?? []).filter((feature) => feature?.geometry));
+  const landFeatures = buildLandMask((naturalEarthLand.features ?? []).filter((feature) => feature?.geometry));
+  const lakeFeatures = buildLandMask((naturalEarthLakes.features ?? []).filter((feature) => feature?.geometry));
   const coastSegments = buildCoastSegments(naturalEarthCoastline);
+  const lakeBoundarySegments = buildPolygonBoundarySegments(naturalEarthLakes);
+  const waterBoundarySegments = [...coastSegments, ...lakeBoundarySegments];
   const coastlineLines = (naturalEarthCoastline.features ?? [])
     .flatMap((feature) => lineStringsFromGeometry(feature.geometry));
 
   const roadGraph = buildRoadGraph(roadsData);
-  const orbis = parseOrbis(orbisNodesCsv, orbisEdgesCsv);
-  const nearestCoast = (coordinate) => nearestCoastPoint(coordinate, coastSegments);
+  const maskContext = {
+    landFeatures,
+    lakeFeatures,
+    surfaceBoundaryFeatures: buildMaskBoundarySegments([...landFeatures, ...lakeFeatures])
+  };
+  const nearestWater = (coordinate, hint = null) =>
+    nearestSurfaceBoundaryPoint(
+      coordinate,
+      waterBoundarySegments,
+      (candidate) => !isLandSurface(candidate, maskContext),
+      hint
+    );
 
   const routeLineFeatures = [];
   const reportRows = [];
@@ -1231,22 +1669,21 @@ async function main() {
       const lineId = stageLineId(route.id, stage.id);
       stage.lineId = lineId;
       delete stage.noLineReason;
+      if (process.env.ROUTE_LINES_DEBUG === "1") {
+        console.error(`Building ${stageName(route.id, stage.id)} (${stage.travelMode})`);
+      }
 
       let line;
       if (stage.travelMode === "land") {
-        line = routeByLandRoad(stage, stops, roadGraph) ?? {
-          method: "straight-land-fallback",
-          coordinates: dedupeCoordinates([from.coordinate, ...via.map((stop) => stop.coordinate), to.coordinate]),
-          upstreamFeatureIds: [...new Set([...from.sources.slice(0, 2), ...to.sources.slice(0, 2)])],
-          details: "No linked first-century road path found from the pinned road graph; drew a straight line between the stops.",
-          changeSources: [...new Set([...from.sources.slice(0, 1), ...to.sources.slice(0, 1)])]
-        };
+        line = routeByLandRoad(stage, stops, roadGraph) ?? routeOverLand(stage, stops, {
+          ...maskContext,
+          routeId: route.id
+        });
       } else if (stage.travelMode === "sea") {
         line = routeOverSea(stage, stops, {
           routeId: route.id,
-          orbis,
-          landFeatures,
-          nearestCoast
+          ...maskContext,
+          nearestWater
         });
       } else {
         line = {
@@ -1286,12 +1723,21 @@ async function main() {
           stageId: stage.id,
           provenance: {
             dataset:
-              "AWMC geodata dated major roads (land), ORBIS v2 node/edge tables (sea lanes), Natural Earth 10m land/coastline (water fallback/coastal connectors)",
+              line.method === "awmc-road-network"
+                ? "AWMC geodata dated major roads, with Natural Earth 10m land/lakes used by validation"
+                : line.method === "straight-unknown"
+                  ? "Stop coordinates only; path not known"
+                  : line.method === "shortest-land"
+                    ? "Natural Earth 10m land and lakes"
+                    : "Natural Earth 10m land, coastline and lakes",
             version: [
-              roadsData.features?.[0]?.properties?.provenance?.version ?? "AWMC roads: committed data/geo/ancient-roads.geojson",
-              `ORBIS:${ROUTE_LINE_INPUTS.orbisNodes.upstreamPath},${ROUTE_LINE_INPUTS.orbisEdges.upstreamPath}`,
-              `NaturalEarth:${ROUTE_LINE_INPUTS.naturalEarthLand.upstreamPath},${ROUTE_LINE_INPUTS.naturalEarthCoastline.upstreamPath}`
-            ].join(" | "),
+              line.method === "awmc-road-network"
+                ? (roadsData.features?.[0]?.properties?.provenance?.version ?? "AWMC roads: committed data/geo/ancient-roads.geojson")
+                : null,
+              line.method !== "straight-unknown"
+                ? `NaturalEarth:${ROUTE_LINE_INPUTS.naturalEarthLand.upstreamPath},${ROUTE_LINE_INPUTS.naturalEarthCoastline.upstreamPath},${ROUTE_LINE_INPUTS.naturalEarthLakes.upstreamPath}`
+                : "route stop and location coordinates as cited in route/location records"
+            ].filter(Boolean).join(" | "),
             upstreamFeatureIds: Array.from(new Set(provenanceUpstreamIds)),
             changes: provenanceChanges
           }
@@ -1312,13 +1758,7 @@ async function main() {
 
       routeLineFeatures.push(feature);
       methodCounts.set(line.method, (methodCounts.get(line.method) ?? 0) + 1);
-      const orbisRatioSuffix =
-        Array.isArray(line.orbisLegRatios) && line.orbisLegRatios.length > 0
-          ? ` (ORBIS leg ratios: ${line.orbisLegRatios
-              .map((ratio) => `${ratio.ratio.toFixed(2)}x`)
-              .join(", ")})`
-          : "";
-      reportRows.push(`- ${stageName(route.id, stage.id)}: ${line.method}${orbisRatioSuffix}`);
+      reportRows.push(`- ${stageName(route.id, stage.id)}: ${line.method}`);
     }
   }
 

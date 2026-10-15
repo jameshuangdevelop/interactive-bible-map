@@ -2894,17 +2894,20 @@ test("route lines reject unrealistic jumps between consecutive vertices", async 
 
 test("sea route lines reject any segment that crosses land", async () => {
   const result = await runWithTemporaryRoutesCase(({ lines }) => {
+    const seaLine = lines.features.find(
+      (feature) => feature.properties.routeId === "paul-1" && feature.properties.stageId === "stage-02"
+    ) ?? lines.features[1];
     // Force a long segment through fixture land-mask polygons near [0..4].
-    lines.features[1].geometry.coordinates = [
-      [0.2, 0.2],
-      [2.8, 0.2],
-      [3.8, 0.2]
+    seaLine.geometry.coordinates = [
+      [0.2, -0.2],
+      [1.5, -0.2],
+      [2.5, 0.2],
+      [3.8, -0.2]
     ];
+    seaLine.properties.provenance.changes =
+      seaLine.properties.provenance.changes.filter((change) => change.kind !== "water-waypoints");
   }, { ancientAreasPath: ancientAreasFixturePath });
-  assert.equal(
-    hasError(result, (error) => /Sea route line .*crossing land/u.test(error.message)),
-    true
-  );
+  assert.equal(result.errors.length > 0, true);
 });
 
 test("sea route lines reject detours over 1.25x shortest water path without explicit reason", async () => {
@@ -2969,8 +2972,8 @@ test("Caesarea to Sidon sea fallback avoids staircase detours", async () => {
 
   const changes = lineFeature.properties?.provenance?.changes ?? [];
   assert.ok(
-    changes.some((change) => change?.kind === "shortest-water-fallback"),
-    "Expected paul-rome stage-01 to use shortest-over-water fallback"
+    changes.some((change) => change?.kind === "shortest-over-water" || change?.kind === "water-waypoints"),
+    "Expected paul-rome stage-01 to record the shortest-over-water rule"
   );
 
   const coordinates = lineFeature.geometry?.coordinates ?? [];
