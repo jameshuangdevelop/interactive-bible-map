@@ -192,13 +192,7 @@ export function RoutesPanel({
     );
   }
 
-  const defaultNotes = selectedRoute.route.notes?.filter((note) => note.trim().length > 0) ?? [];
-  const routeNotes =
-    defaultNotes.length > 0
-      ? defaultNotes
-      : selectedRoute.route.note.trim().length > 0
-        ? [selectedRoute.route.note]
-        : [];
+  const routeNotes = selectedRoute.route.notes.filter((note) => note.trim().length > 0);
   const stageDisputedNotes = selectedRoute.stages.flatMap((stage, stageIndex) => {
     if (stage.lineId) {
       return [];
@@ -238,19 +232,15 @@ export function RoutesPanel({
       <p style={{ margin: `${tokens.spacing.xs}px 0`, color: tokens.color.textSecondary }}>
         Borders as in {formatBorderYear(selectedRouteBorderYear ?? selectedRoute.route.fromYear)}
       </p>
-      {selectedRoute.route.summary ? (
-        <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
-          {selectedRoute.route.summary}
+      <p style={{ margin: `${tokens.spacing.sm}px 0`, color: tokens.color.textSecondary }}>
+        {selectedRoute.route.summary}
+      </p>
+      <div style={{ margin: `${tokens.spacing.sm}px 0` }}>
+        <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>What the Bible says</h2>
+        <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
+          {selectedRoute.route.bibleText}
         </p>
-      ) : null}
-      {selectedRoute.route.bibleText ? (
-        <div style={{ margin: `${tokens.spacing.sm}px 0` }}>
-          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>What the Bible says</h2>
-          <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
-            {selectedRoute.route.bibleText}
-          </p>
-        </div>
-      ) : null}
+      </div>
       {selectedRouteStop ? (
         <div style={{ border: `1px solid ${tokens.color.divider}`, borderRadius: "8px", padding: `${tokens.spacing.sm}px`, marginBottom: `${tokens.spacing.sm}px` }}>
           <button

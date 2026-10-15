@@ -50,9 +50,9 @@ const routeEntries: HydratedRoute[] = [
       title: "Single stage route",
       fromYear: 46,
       toYear: 47,
-      yearNote: null,
       structure: "connected",
-      note: "Fixture note",
+      summary: "Fixture summary",
+      bibleText: "Fixture bible text",
       notes: ["Fixture note"],
       stageCount: 1,
       sources: ["bib:fixture-source"]
@@ -82,9 +82,9 @@ const routeEntries: HydratedRoute[] = [
       title: "Double stage route",
       fromYear: 48,
       toYear: 49,
-      yearNote: null,
       structure: "connected",
-      note: "Fixture note",
+      summary: "Fixture summary",
+      bibleText: "Fixture bible text",
       notes: ["Fixture note"],
       stageCount: 2,
       sources: ["bib:fixture-source"]

@@ -42,12 +42,10 @@ export interface RouteIndexEntry {
   title: string;
   fromYear: number;
   toYear: number;
-  yearNote: string | null;
   structure: RouteStructure;
-  note: string;
-  summary?: string;
-  bibleText?: string;
-  notes?: string[];
+  summary: string;
+  bibleText: string;
+  notes: string[];
   stageCount: number;
   sources: SourceId[];
 }
