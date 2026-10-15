@@ -325,3 +325,145 @@ Myra's parent changes to the new `lycia` record (ruling; Q3). Fair Havens' and P
 - `npm run check:route-lines`: the lines reproduce byte for byte from an empty cache, and the audit passed (71 lines, 0 failing).
 - `npm test`: 331 tests, all pass.
 - `npm run build:data`: passed. The Routes files total 29,947 bytes gzip, within the 100,000-byte budget. The places index is 38,852 bytes (6,277 gzip). No tracked file changed.
+
+### A7. Re-check of the fix round (`613bde6`, 2026-10-15)
+
+I re-checked `git diff d80d2a8..613bde6` (`dcab26d`, `540451d`, `ca67551`, `2e623d9`, `613bde6`). The checks were:
+- each of F1–F31 against the source it names;
+- the new `lycia` record, Myra's new parent and the timeline link;
+- the PO's three rulings: Q1, Sidon keeps at most five Old Testament connections, those its New Testament passages echo first; Q2, Fair Havens becomes `natural-feature` and Phoenix a `town`; Q3, the timeline's `lycia` area links to the new record;
+- the new bibliography entry.
+
+I re-read the sources where the text changed:
+- the ISBE articles;
+- Smith's "Syrtis Major", "Syrtica Regio" and "Cyrenaica";
+- Cassius Dio 60.17, Suetonius *Vespasian* 8 and the Loeb notes to Tacitus *Histories* 2;
+- Strabo 14.3, and Livius "Pamphylia";
+- Pleiades 638965 (Lycia), 422927 and 423106;
+- Wikidata Q18927 (Lycia) and Q829310 (Berytus);
+- Bible Gateway at Acts 27:5, in six versions, for the name only.
+
+**Result: 9 of the 15 records pass and are now `verified`:** `cnidus`, `salmone`, `fair-havens`, `phoenix`, `cauda`, `syracuse`, `rhegium`, `forum-of-appius` and `three-taverns`. Seven records still need changes: `sidon`, `myra`, `lasea`, `syrtis`, `alexandria`, `adramyttium` and the new `lycia`. They need 11 more fixes, F32–F42 below: six on content, five on citations or wording. Batch A isn't signed off yet. Each remaining fix is a sentence or a citation; no candidate, coordinate, type, tier, parent or route changes, except the `lycia` parent choice in F41.
+
+#### F1–F31
+
+| Fixes | Result |
+|---|---|
+| F1–F6 (`sidon`) | **Closed.**<ul><li>No Old Testament material is left in the summary.</li><li>"A little north of Tyre" is gone.</li><li>Matthew 15:21, Mark 7:26 and Acts 27:1 are cited.</li><li>The trade and dye sentence follows ISBE "Sidon (2)".</li><li>The 351 BC revolt and Ochus's march are in ISBE's order, with "after the death of Alexander", and the Ptolemies and Antiochus III are introduced.</li><li>Berytus's law school moves to Sidon, and Wikidata Q829310 ("Berytus: ancient city of Beirut, Lebanon") supports "(modern Beirut)".</li></ul> |
+| F7, F8 (`sidon`, `otConnections`) | **Closed by the Q1 rewrite.** Isaiah 23 now names Sidon's merchants enriching the coast (23:2) and the two addresses to Sidon (23:4, 23:12). Genesis 10:19 now uses the verse's own places. 1 Kings 16:31 is gone. The new text raises F32 and F33. |
+| F9, F10 (`myra`) | **Closed.** No more "Aegean". Nicholas appears once, cited to ISBE "Lycia". "In the fifth century" is dropped, and Acts 27:1 is cited. |
+| F11 (`myra`) | **Follow-up F34.** Dio's AD 43 report now comes first and the uncertainty last, but the new clause misstates the other sources. |
+| F12–F14 (`cnidus`) | **Closed.** "Though in Caria"; ISBE's own "held the rank of a free city"; "the statue of that goddess there by the sculptor Praxiteles"; modern name "Near Datça" (Wikidata P131 Datça; Pleiades: "the modern Datça peninsula"). |
+| F15, F16 (`lasea`) | **Closed** in the summary and the candidate's support. "About 2 km east of Fair Havens" comes from Pleiades 589834's description ("2 km west of Lasaia"), and ISBE's five miles is now a closing caveat in the support. "The captain's reluctance" and ISBE's own reasoning are restored. The new caveat sentence in `history` raises F35. |
+| F17 (`cauda`) | **Closed.** ISBE "Phoenix" and Acts 27:14 are cited, and the manuscript note now comes after Acts' account. |
+| F18, F19 (`syrtis`) | **Follow-up F37.** The Syrtica Regio and Africa side now matches Smith word for word; the eastern side is still unsourced. |
+| F20 (`syrtis`) | **Closed.** "A broad gulf"; Smith's "shallows and submerged rocks"; ISBE's "a source of danger". |
+| F21, F22 (`rhegium`) | **Closed.** Acts' "circled around" and "after one day" are separated from ISBE's reading (tacking, waiting for the wind). The uncited dates and "with the rest of Italy" are gone. |
+| F23, F24 (`forum-of-appius`) | **Closed.** Modern name "Near Latina" (Wikidata Q3748871: "archaeological site in Latina, Italy"). "Walked" is gone, and Acts 27:1 is cited. |
+| F25–F27 (`three-taverns`) | **Closed.**<ul><li>The parties are the right way round, with ISBE's order: one went as far as the Forum of Appius, the other waited at Three Taverns.</li><li>"A road from Antium to Norba".</li><li>"Three Inns" (NKJV) is in `alternate`.</li><li>"About 10 km", ISBE's 6 miles.</li></ul> |
+| F28 (`alexandria`) | **Closed.** ISBE's actual comparison: "the most beautiful city of the ancient or modern world (with the single exception of Rome)". |
+| F29 (`alexandria`) | **Follow-up F38.** Acts 18:25 ("taught accurately") and 1 Corinthians 3:6 ("I planted. Apollos watered.") close the Apollos clause, but the new "grain ship" citation is wrong. |
+| F30, F31 (`adramyttium`) | **Closed.** "From Caesarea" is now ISBE's, not Acts'. Acts 27:1, 27:5 and 27:6 are cited, and the 1915 village description is in the past. F39 is a gap in the same sentence that I missed in the first round. |
+
+#### The new `lycia` record, Myra's parent, the timeline link
+These pass:
+- **Names (ADR-0026):** "Lycia" in all six versions at Acts 27:5, and in the WEB. `otherLanguages` "Lukia" comes from ISBE.
+- **Modern name:** "Southwestern Türkiye", an area phrase like Pisidia's.
+- **Type, tier, prominence:** `region` at region tier, `standard`, like Pamphylia and Mysia.
+- **Scripture:** Acts 27:5 is the only verse in the WEB that names Lycia, and the quote is exact.
+- **No `otConnections`:** the Old Testament doesn't name Lycia; 1 Maccabees 15:23, which ISBE cites, is outside the canon.
+- **`politicalHistory`:** it matches the timeline's `lycia` area exactly (the validator derives it): the Lycian League to AD 43, "Status uncertain" from 43 to 74 with the timeline's note, then the province of Lycia and Pamphylia.
+- **History:**
+  - `history[0]` gives ISBE "Lycia" word for word: "Successively it was in the possession of the Persians, of Alexander the Great, of the Seleucid kings and of the Ptolemies. In 188 BC it fell into the hands of the Romans, who gave it to the island of Rhodes; 20 years later … it became free and independent".
+  - `history[1]`: Patara for Phoenicia comes from ISBE "Lycia" and Acts 21:1; Myra "for some time … the capital of the Roman province" from ISBE.
+- **The summary's sources:**
+  - "a free league of cities": Strabo 14.3.3, "the Lycian League", "they remained ever free under the Romans";
+  - Dio's AD 43 report: 60.17.3, in Claudius's third consulship;
+  - "joined with Pamphylia as a single province under the emperor Vespasian": Livius, "the emperor Vespasian created a new province called Lycia and Pamphylia (after 70)".
+- **Myra:** its `parentId` is now `lycia` (the PO's ruling).
+- **The timeline:** its `lycia` area now has `locationId: "lycia"` (Q3). The validator resolves the link, and the ancient layer's other linked areas work the same way.
+
+The three Lycia fixes are F40–F42.
+
+#### Sidon's five connections, the two new types, the new bibliography entry
+- **Sidon's five `otConnections`:** Genesis 10:15-19, 1 Kings 17:8-24, Isaiah 23:2-12, Ezekiel 28:20-23 and Joel 3:4-8. That meets Q1's limit of five, and the research note says you named these five. Their quotes match the WEB. Two notes claim more than the passages say (F32), and two paraphrases need small corrections (F33).
+- **Fair Havens, `natural-feature`:** passes. Pleiades 589834 calls it "An embayment", now in the support. It stays at city tier, like Patmos and the Sea of Galilee.
+- **Phoenix, `town`:** passes. The Loutro candidate's support now quotes Pleiades 589993 ("an ancient coastal city of western Crete that served as the port of inland Anopolis and also of later Aradena"). It stays at city tier, and both candidates stay `disputed`.
+- **`smith-dictionary-syrtica-regio`:** passes. It is complete and in the same form as the other Smith's *Geography* entries; its URL answers; and the 1854 text is public domain, already in `docs/LICENSES.md` and `ATTRIBUTION.md`. Its quotes in `syrtis.json` match the entry: "at first belonged to the Cyrenaeans, but was subsequently wrested from them and annexed to Carthage, and … formed a part of the Roman province of Africa".
+
+#### "Faiti" and "near Cisterna": where they come from
+Both are in the places' Pleiades JSON, in the `details` field, which the Research Lead didn't search. It searched `names`, `locations[].references` and `connectsWith`.
+- https://pleiades.stoa.org/places/422927/json has `"details": "<p>The Barrington Atlas Directory notes: Faiti</p>"`.
+- https://pleiades.stoa.org/places/423106/json has `"details": "<p>The Barrington Atlas Directory notes: near Cisterna</p>"`.
+
+Both were read on 2026-10-15; each record was last modified 2025-07-05. The HTML pages now open with a bot check, so the JSON is the reliable place to read them.
+- **Forum of Appius:** "Near Latina" (Wikidata) is sourced and fine as it is.
+- **Three Taverns:** it can now take "Near Cisterna", from the Barrington note, with `pleiades:423106` already cited. This is an improvement, not a fix: the record passes without it.
+
+#### F32–F42: what's still needed
+Fixes marked **content** come first in priority.
+
+`data/locations/sidon.json`
+- **F32 (content), `otConnections` Isaiah 23:2-12 and Ezekiel 28:20-23:**
+  - "Jesus later draws on this same prophetic tradition …" and "this specific judgment on Sidon, together with Isaiah's oracle against Tyre, lies behind Jesus' sayings …" are claims of dependence that no cited source states.
+  - Matthew 11:21-22 and Luke 10:13-14 don't mention Isaiah or Ezekiel, and a `scripture:` source supports only what its passage says (ADR-0017). ISBE "Sidon (2)" and "Tyre" don't make the link either.
+  - The PO's ruling chose these passages; their notes can still say only what the passages say. For example: "Jesus also names Tyre and Sidon together, saying it will be 'more tolerable for Tyre and Sidon on the day of judgment' than for Chorazin and Bethsaida (Matthew 11:21-22; Luke 10:13-14)". Alternatively, cite a scholarly source for the link.
+  - Also, in the Ezekiel note, "it would have been more tolerable" should be the WEB's "it will be more tolerable".
+- **F33 (wording), `otConnections`:**
+  - **Joel 3:4-8:**
+    - The text has the LORD's own treasures, not Judah's: "you have taken my silver and my gold, and have carried my finest treasures into your temples" (3:5).
+    - Judah, not the LORD, sells to Sheba: "I will sell your sons and your daughters into the hands of the children of Judah, and they will sell them to the men of Sheba" (3:8).
+  - **1 Kings 17:8-24:** "During a famine" isn't in the cited range; the famine is Luke 4:25 ("a great famine came over all the land") and 1 Kings 18:2. Cite Luke 4:25 with 4:26, or say "During a drought" (17:14: "until the day that the LORD sends rain").
+
+`data/locations/myra.json`
+- **F34 (content), `history[0]`:** "other sources place it under its own governor again by the reign of the emperor Vespasian" misstates both sources it cites.
+  - Suetonius, *Vespasian* 8.4: "He made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom". So Lycia was free, not governed, before Vespasian.
+  - Tacitus, *Histories* 2.9, translator's note: "Galatia, Pamphylia, and Lycia now formed one province" (AD 69). That puts it under the governor of Galatia and Pamphylia, not its own.
+  - Say what each says, as the record's own `politicalHistory` note does.
+
+`data/locations/lasea.json`
+- **F35 (content), `history[0]`, last sentence:**
+  - "Pleiades' and Wikidata's own coordinates put the two about 2 km apart" names databases in the About text, which ADR-0033 item 1 rules out; VISUAL_SPEC §3 item 6 defines the About as "the summary, then the history notes". It is the only About text in the dataset that does.
+  - It is also imprecise: Pleiades' two points are 1.1 km apart; it is Pleiades' description that gives 2 km. Wikidata's points are 2.1–2.2 km apart.
+  - Reword without naming databases, for example "…about five miles; modern gazetteers place the two about 2 km apart", and keep the sources.
+- **F36 (citations), `summary.sources`:** "south of the city of Gortyna" is stated by ISBE "Phoenix" ("12 miles South of the important city of Gortyna"), which the summary doesn't cite. Add `bib:isbe-phoenix`. I missed this in the first round.
+
+`data/locations/syrtis.json`
+- **F37 (content), `history[0]` and `politicalHistory[0].entity`:**
+  - "Cyrenaica … lay well to the east" and "(whose Cyrenaican district lay to the east)" aren't stated by any cited source. ISBE "Crete" says only "With Cyrene on the North coast of Africa, it was formed into a Roman province".
+  - Smith's "Cyrenaica" (https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=cyrenaica-geo) says: "On the W. the boundary was fixed, after long disputes, at the bottom of the Great Syrtis [Arae Philaenorum]". It also says the country's shore was washed "on the W. by the Greater Syrtis". So Cyrenaica reached the gulf itself, and "well to the east" is wrong.
+  - Add that entry to the bibliography, cite it, and say the boundary between Africa and Cyrenaica lay at the bottom of the gulf.
+  - Also give the entity's "A sailing hazard" a source again: `bib:isbe-syrtis` or `bib:smith-dictionary-syrtis-major`, which the fix round dropped from that entry.
+
+`data/locations/alexandria.json`
+- **F38 (citations), `summary`:** "a grain ship according to the International Standard Bible Encyclopedia".
+  - The cited ISBE "Alexandria" doesn't say it. ISBE "Myra" ("a grain ship from Alexandria") and "Phoenix" ("The Alexandrian corn ship carrying Paul") do, for the Myra ship only, as does Acts 27:38 ("throwing out the wheat into the sea").
+  - No source calls the second ship (Acts 28:11) a grain ship, but the sentence applies the phrase to both.
+  - Attach "grain" to the Myra ship, and cite `bib:isbe-myra` or `scripture:Acts 27:38`.
+
+`data/locations/adramyttium.json`
+- **F39 (citations), `summary`:** "Acts records … an Alexandrian grain ship at Myra", but no cited source says "grain". Cite `scripture:Acts 27:38`, or ISBE "Myra". I missed this in the first round.
+
+`data/locations/lycia.json`
+- **F40 (content), `summary` and the candidate's `support`:**
+  - "At the southwestern tip of Asia Minor" is stated by no cited source. Wikidata Q18927 says "geopolitical region in Anatolia". ISBE "Lycia" says "An ancient country forming the southeast portion of Asia Minor", an error in the source.
+  - The southwest corner of Asia Minor is the Cnidus peninsula (ISBE "Cnidus": "At the Southwest corner of Asia Minor there projects … a long, narrow peninsula").
+  - Pleiades 638965 says "Lycia was a region of southwestern Asia Minor". Cite it and say "in southwestern Asia Minor".
+  - Citing it on the candidate also gives the label point the second source the house style uses for regions. Pleiades' label point is 31.0 km from Wikidata's, close for a region; Mysia's two points are 72 km apart.
+- **F41 (content), `summary` or `history`:**
+  - "Lycia had been a free league of cities before coming under direct Roman rule: … AD 43 …, and Lycia was later joined with Pamphylia as a single province under the emperor Vespasian" reads as unbroken Roman rule from AD 43. The record's own `politicalHistory` calls AD 43–74 uncertain, citing:
+    - Suetonius: Vespasian made Lycia a province, "taking away their freedom";
+    - the Tacitus note: one province with Galatia and Pamphylia by AD 69;
+    - ISBE "Lycia", cited: a province "In 53 AD".
+  - Add that uncertainty last (ADR-0041 item 1, brief §2.6), in the same terms as Myra's history after F34.
+  - The record's `parentId` is `galatia` while its text puts Lycia in Pamphylia's prefecture, and neither the record nor the research note says why. Say why the map places Lycia in Galatia at about AD 50, as `pamphylia.json` does for Pamphylia ("this project treats Pamphylia as part of Galatia at about AD 50"). The other option is `parentId: "pamphylia"`, following Dio.
+- **F42 (wording), `history[1]`:** "Lycia's cities of greatest interest to Bible students" overstates ISBE's "Patara, Myra and Phaselis are of interest to Bible students".
+
+#### Status and checks
+- **Status:** the nine passing records are `status: "verified"`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-10-15"` (`5855588`). The other seven stay `draft` until F32–F42 are re-checked.
+- **Checks** (Node 24.21.0, on `613bde6`):
+  - `npm run validate:data`: passed, 203 warnings, none in these 16 records. It passed again after the status change.
+  - `npm run check:route-lines`: byte for byte, 71 lines, 0 failing.
+  - `npm test`: 331 tests, all pass.
+  - All 30 `textWEB` strings match the WEB exactly.
+  - Every candidate's coordinates are still the stop entries'. Only three support texts changed (Fair Havens, Lasea, Phoenix's Loutro), and one source was added (Lasea's `pleiades:589834`), each a justified improvement.
