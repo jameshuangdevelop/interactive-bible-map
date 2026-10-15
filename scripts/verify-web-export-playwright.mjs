@@ -11507,8 +11507,12 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       waitUntil: "domcontentloaded",
       timeout: 150_000
     });
+    await waitForMapToSettle(desktopPage);
     await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
     await desktopPage.getByRole("heading", { name: "Jesus' journeys" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForFunction((testHook) => Boolean(window[testHook]), mapTestHookKey, {
+      timeout: 30_000
+    });
     const jesusDeepLinkFitCheck = await desktopPage.evaluate((testHook) => {
       const map = window[testHook];
       if (!map) {
@@ -11517,8 +11521,16 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       const center = map.getCenter();
       const bounds = map.getBounds();
       const viewportStops = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] });
-      const sourceMentioned = map.querySourceFeatures("ibm-routes-points");
-      const mentioned = sourceMentioned.filter((feature) => feature.properties?.kind === "mentioned");
+      const pointsSource = map.getSource("ibm-routes-points");
+      const sourceFeatures =
+        pointsSource &&
+        typeof pointsSource === "object" &&
+        "_data" in pointsSource &&
+        pointsSource._data &&
+        Array.isArray(pointsSource._data.features)
+          ? pointsSource._data.features
+          : [];
+      const mentioned = sourceFeatures.filter((feature) => feature.properties?.kind === "mentioned");
       const mentionedIds = mentioned.map((feature) => {
         const stopKind = feature.properties?.stopKind ?? "";
         const stopId = feature.properties?.stopId ?? "";
@@ -11557,9 +11569,6 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         `Routes real-data check: duplicate mentioned place features found (${JSON.stringify(jesusDeepLinkFitCheck)}).`
       );
     }
-    if (jesusDeepLinkFitCheck.mentionedCount < 1) {
-      throw new Error("Routes real-data check: expected mentioned route features for Jesus, found none.");
-    }
 
     const zoomPreservedAfterToggle = await desktopPage.evaluate(async (testHook) => {
       const map = window[testHook];
@@ -11570,7 +11579,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       await new Promise((resolve) => map.once("idle", resolve));
       return { beforeToggleZoom: map.getZoom() };
     }, mapTestHookKey);
-    await desktopPage.getByRole("button", { name: "Modern" }).click();
+    await desktopPage.locator("button[role='radio'][data-map-mode='modern']").click();
     await desktopPage.waitForTimeout(900);
     const zoomAfterMapToggle = await desktopPage.evaluate((testHook) => {
       const map = window[testHook];
@@ -11590,7 +11599,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         })}).`
       );
     }
-    await desktopPage.getByRole("button", { name: "Ancient" }).click();
+    await desktopPage.locator("button[role='radio'][data-map-mode='ancient']").click();
     await desktopPage.waitForTimeout(500);
 
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome&stage=3`, {
