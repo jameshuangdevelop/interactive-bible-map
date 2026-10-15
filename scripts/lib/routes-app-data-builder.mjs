@@ -75,12 +75,10 @@ export async function buildRoutesAppData({
       title: route.title,
       fromYear: route.fromYear,
       toYear: route.toYear,
-      yearNote: route.yearNote ?? null,
       structure: route.structure,
       summary: route.summary ?? null,
       bibleText: route.bibleText ?? null,
       notes: Array.isArray(route.notes) ? route.notes : null,
-      note: route.note ?? null,
       stageCount: Array.isArray(route.stages) ? route.stages.length : 0,
       sources: route.sources ?? []
     }))

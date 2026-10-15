@@ -2825,10 +2825,11 @@ test("route text requirement is switchable", async () => {
   );
 });
 
-test("route text mode disallows legacy note when REQUIRE_ROUTE_TEXT is enabled", async () => {
+test("route text mode disallows legacy note and yearNote when REQUIRE_ROUTE_TEXT is enabled", async () => {
   const result = await runWithTemporaryRoutesCase(
     ({ routes }) => {
       routes.routes[0].note = "Legacy note injected for this test only.";
+      routes.routes[0].yearNote = "Legacy year note injected for this test only.";
     },
     {
       requireRouteText: true
@@ -2838,13 +2839,14 @@ test("route text mode disallows legacy note when REQUIRE_ROUTE_TEXT is enabled",
     hasError(result, (error) => /Legacy route note is not allowed/u.test(error.message)),
     true
   );
+  assert.equal(
+    hasError(result, (error) => /Legacy route yearNote is not allowed/u.test(error.message)),
+    true
+  );
 });
 
-test("route text mode accepts summary+bibleText+notes without legacy note", async () => {
-  const result = await runWithTemporaryRoutesCase(({ routes }) => {
-    delete routes.routes[0].note;
-    delete routes.routes[1].note;
-  }, {
+test("route text mode accepts summary+bibleText+notes without legacy fields", async () => {
+  const result = await runWithTemporaryRoutesCase(undefined, {
     requireRouteText: true
   });
   assert.equal(result.errors.length, 0);
@@ -2853,8 +2855,6 @@ test("route text mode accepts summary+bibleText+notes without legacy note", asyn
 test("route text notes entries must be non-empty strings in strict mode", async () => {
   const result = await runWithTemporaryRoutesCase(({ routes }) => {
     routes.routes[0].notes = ["Valid note", "   "];
-    delete routes.routes[0].note;
-    delete routes.routes[1].note;
   }, {
     requireRouteText: true
   });

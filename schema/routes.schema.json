@@ -378,11 +378,6 @@
         "toYear": {
           "$ref": "#/$defs/yearNoZero"
         },
-        "yearNote": {
-          "type": "string",
-          "description": "Short note where scholarly date ranges differ.",
-          "minLength": 1
-        },
         "structure": {
           "type": "string",
           "description": "Whether stages form one connected sequence or stand alone.",
@@ -405,10 +400,6 @@
             "type": "string",
             "minLength": 1
           }
-        },
-        "note": {
-          "type": "string",
-          "minLength": 1
         },
         "sources": {
           "type": "array",

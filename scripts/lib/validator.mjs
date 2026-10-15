@@ -3430,6 +3430,14 @@ export async function validateData(options = {}) {
             "Legacy route note is not allowed while REQUIRE_ROUTE_TEXT is enabled"
           );
         }
+        if (typeof route?.yearNote === "string") {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].yearNote`,
+            "Legacy route yearNote is not allowed while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
       }
 
       (route.stages ?? []).forEach((stage, stageIndex) => {

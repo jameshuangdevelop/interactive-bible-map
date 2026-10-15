@@ -1130,6 +1130,8 @@ test("buildAppData writes routes generated files and fixture files", async () =>
       "Fixture disclaimer one.",
       "Fixture disclaimer two."
     ]);
+    assert.equal("note" in routesPayload.routes[0], false);
+    assert.equal("yearNote" in routesPayload.routes[0], false);
     assert.deepEqual(stagesPayload.routes[0].stages[1].mentioned, [
       {
         kind: "route-stop",

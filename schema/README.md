@@ -142,9 +142,9 @@ GIS terms used here:
   - `data/routes/stops.json` (shared stop entries for places without full location records yet)
   - `data/geo/routes-lines.geojson` (geometry + provenance only; licensed per source, as confirmed in `docs/LICENSES.md`, ADR-0038 item 5; no CC BY-SA facts)
 - A route records:
-  - `id`, `title`, approximate `fromYear` and `toYear` (`yearNote` where sources differ),
+  - `id`, `title`, approximate `fromYear` and `toYear`,
   - `structure`: `connected` (Paul-style sequence) or `standalone-segments` (Jesus segments),
-  - route text (`summary`, `bibleText`, `notes[]`), legacy `note` (until `REQUIRE_ROUTE_TEXT` is enabled), `sources`, and ordered `stages[]`.
+  - route text (`summary`, `bibleText`, `notes[]`), `sources`, and ordered `stages[]`.
 - Stage stop references use either:
   - `{ "kind": "location", "locationId": "...", "candidateIndex": 0 }`, or
   - `{ "kind": "route-stop", "stopId": "...", "candidateIndex": 0 }`.
@@ -162,7 +162,8 @@ GIS terms used here:
   - route-line vertices must stay in project bounds, may not use `[0, 0]`, and may not contain jumps over 1000 km between consecutive vertices;
   - every line passes the routes' lines audit (below).
 - `REQUIRE_ROUTE_LINES` enforces that every stage has either `lineId` or `noLineReason`; default is `true` since M5-04's linework.
-- `REQUIRE_ROUTE_TEXT` enforces that routes have non-empty `summary`, `bibleText`, and `notes[]`, and disallows legacy `note`; default is `true` since M5-06's text landed.
+- `REQUIRE_ROUTE_TEXT` enforces that routes have non-empty `summary`, `bibleText`, and `notes[]`; default is `true` since M5-06's text landed.
+- Legacy route-level caveat fields (`note`, `yearNote`) are retired and not accepted by schema validation.
 
 #### The routes' lines (M5-04)
 - `npm run build:route-lines` draws one line per stage (ADR-0038 item 5 and its update of 2026-10-14) and writes `data/geo/routes-lines.geojson` and the stages' `lineId`s; `npm run check:route-lines` rebuilds them from an empty cache, checks the result byte for byte, and prints the audit's per-line table. Its inputs are pinned by commit and SHA-256 (`scripts/lib/route-line-inputs.mjs`; `docs/research/SOURCES.md`, "M5-04"). The build report and the previews (Web Mercator, land and lakes filled) are written to the cache, outside the repository (`$TMPDIR/ibm-route-lines/report/`, or `ROUTE_LINES_CACHE`).
@@ -190,7 +191,6 @@ Complete example:
       "title": "Paul's first journey",
       "fromYear": 46,
       "toYear": 48,
-      "yearNote": "About AD 46-48 in cited chronologies.",
       "structure": "connected",
       "summary": "Paul and Barnabas travel from Antioch through Cyprus and southern Anatolia, then return to report back.",
       "bibleText": "Acts 13-14 describes their departures, preaching stops, and return to Antioch in Syria.",
