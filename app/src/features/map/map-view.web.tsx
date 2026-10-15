@@ -3178,6 +3178,7 @@ export function MapView({
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
+  const [styleReadyVersion, setStyleReadyVersion] = useState(0);
   const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
   const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -4260,6 +4261,7 @@ export function MapView({
     const handleStyleReady = () => {
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
+      setStyleReadyVersion((value) => value + 1);
       const nextMapMode = mapModeRef.current;
       syncAttributionControl(map, currentMode, nextMapMode, routesModeEnabled);
       configureZoomGestures(map, effectiveRuntimeTuning);
@@ -4598,7 +4600,6 @@ export function MapView({
     if (previousRouteFocusKeyRef.current === routesOverlay.routeFocusKey) {
       return;
     }
-    previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
 
     const map = mapRef.current;
     if (!map || !styleReadyRef.current) {
@@ -4617,7 +4618,8 @@ export function MapView({
       maxZoom: 8.5,
       duration: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
     });
-  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs]);
+    previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
+  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs, styleReadyVersion]);
 
   useEffect(() => {
     if (!routesOverlay?.selectedStageFocusKey || !routesOverlay.selectedStageCenter) {
@@ -4627,7 +4629,6 @@ export function MapView({
     if (previousSelectedStageFocusKeyRef.current === routesOverlay.selectedStageFocusKey) {
       return;
     }
-    previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
 
     const map = mapRef.current;
     if (!map || !styleReadyRef.current) {
@@ -4641,6 +4642,7 @@ export function MapView({
     const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - bottomInset - 40;
     const offScreen = projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
     if (!offScreen) {
+      previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
       return;
     }
 
@@ -4649,7 +4651,8 @@ export function MapView({
       zoom: map.getZoom(),
       duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
     });
-  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs]);
+    previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
+  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs, styleReadyVersion]);
 
   useEffect(() => {
     const map = mapRef.current;
