@@ -766,7 +766,9 @@
         "wikidata:Q163490",
         "bib:isbe-sidon"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     },
     {
       "id": "syracuse",
@@ -1172,6 +1174,7 @@
     {
       "id": "phoenix",
       "name": "Phoenix",
+      "todayName": "Sfakia Municipality, Crete, Greece",
       "candidates": [
         {
           "label": "Loutro",
@@ -1180,8 +1183,8 @@
             35.19919
           ],
           "coordinateSource": "pleiades:589993",
-          "confidence": "medium",
-          "support": "A harbor on Crete's south coast, by the village of Loutro, sheltered from every wind. The International Standard Bible Encyclopedia calls this the only safe harbor on this coast large enough for the ship, and states that the ancient authorities agree in placing Phoenix in this neighborhood, judging the identification \"seems certain\"; an inscription found at Loutro shows that Egyptian grain ships wintered there. It calls the harbor's east-facing aspect, against Acts 27:12's \"looking toward the southwest and northwest,\" a serious difficulty, resolved by reading the phrase as naming the winds the harbor is sheltered from rather than the direction it faces. Pleiades, OpenBible.info and Wikidata agree on the site.",
+          "confidence": "disputed",
+          "support": "A harbor on Crete's south coast, by the village of Loutro, sheltered from every wind. The International Standard Bible Encyclopedia calls this the only safe harbor on this coast large enough for the ship, and states that the ancient authorities agree in placing Phoenix in this neighborhood, judging the identification \"seems certain\"; an inscription found at Loutro shows that Egyptian grain ships wintered there. It calls the harbor's east-facing aspect, against Acts 27:12's \"looking southwest and northwest,\" a serious difficulty, and resolves it either by reading the phrase in sailors' language as looking down those winds, toward the northeast and southeast, which fits Loutro, or by supposing that the writer, who never saw Phoenix, described it wrongly. OpenBible.info rates this site its second identification (35% confidence). Pleiades, OpenBible.info and Wikidata agree on the site.",
           "sources": [
             "pleiades:589993",
             "wikidata:Q1872352",
@@ -1196,8 +1199,8 @@
             35.1991
           ],
           "coordinateSource": "pleiades:589992",
-          "confidence": "low",
-          "support": "An open roadstead on the west side of the isthmus Loutro stands on. This reading takes Acts 27:12's \"looking toward the southwest and northwest\" at face value; the International Standard Bible Encyclopedia records the proposal but judges the roadstead \"not a suitable place for wintering in.\" OpenBible.info and Wikidata identify today's village of Finikas with this site; Pleiades catalogs it as Phoinikous Limen.",
+          "confidence": "disputed",
+          "support": "An open roadstead on the west side of the isthmus Loutro stands on. This reading takes Acts 27:12's \"looking southwest and northwest\" at face value; the International Standard Bible Encyclopedia records the proposal but judges the roadstead \"not a suitable place for wintering in.\" OpenBible.info rates this site, at today's village of Finikas, its likelier identification (55% confidence, against 35% for Loutro), and Wikidata places the village here; Pleiades catalogs it as Phoinikous Limen.",
           "sources": [
             "pleiades:589992",
             "wikidata:Q21773510",
@@ -1221,7 +1224,9 @@
         "pleiades:589992",
         "wikidata:Q21773510"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     },
     {
       "id": "lasea",
@@ -1260,7 +1265,9 @@
         "bib:isbe-lasea",
         "bib:isbe-phoenix"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     },
     {
       "id": "adramyttium",
@@ -1297,7 +1304,9 @@
         "openbible:adramyttium",
         "bib:isbe-adramyttium"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     },
     {
       "id": "alexandria",
@@ -1312,7 +1321,7 @@
           ],
           "coordinateSource": "wikidata:Q87",
           "confidence": "high",
-          "support": "A port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC by the isle of Pharos, and a major shipbuilding and trade center under Roman rule. Luke's narrative in Acts names \"a ship of Alexandria\" twice as the vessel Paul's party boarded: first at Myra (Acts 27:6), and again, after the shipwreck, on Malta (Acts 28:11); the International Standard Bible Encyclopedia confirms these as the New Testament's only two direct references to such a ship. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Alexandria, Egypt.",
+          "support": "A port city on Egypt's Mediterranean coast, founded by Alexander the Great in 331 BC by the isle of Pharos, and a major shipbuilding and trade center under Roman rule. Acts names \"a ship of Alexandria\" twice as the vessel Paul's party boarded: first at Myra (Acts 27:6), and again, after the shipwreck, on Malta (Acts 28:11); the International Standard Bible Encyclopedia confirms these as the New Testament's only two direct references to such a ship. Pleiades, OpenBible.info and Wikidata agree on the site, continuously inhabited today as Alexandria, Egypt.",
           "sources": [
             "wikidata:Q87",
             "pleiades:727070",
@@ -1339,7 +1348,9 @@
         "openbible:alexandria",
         "bib:isbe-alexandria"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     },
     {
       "id": "syrtis",
@@ -1354,7 +1365,7 @@
           ],
           "coordinateSource": "pleiades:344491",
           "confidence": "high",
-          "support": "A gulf off ancient Libya's coast, known in ancient geography as Syrtis Maior and long feared by sailors as a hazard; the International Standard Bible Encyclopedia notes that the Roman poet Virgil refers to the danger in the Aeneid. Acts 27:17 says the storm-driven ship's crew, fearing they would run aground there, lowered the sea anchor instead; the ship never reached it. OpenBible.info and Wikidata identify the Syrtis of Acts 27:17 with the Gulf of Sidra, agreeing closely with Pleiades' own point for Syrtis Maior.",
+          "support": "A gulf on the northern coast of Africa, off today's Libya, known in ancient geography as Syrtis Maior, whose sandbanks sailors long feared as a hazard; the International Standard Bible Encyclopedia notes that the Roman poet Virgil refers to the danger in the Aeneid. Acts 27:17 says the storm-driven ship's crew, fearing they would run aground there, lowered the sea anchor instead; the ship never reached it. OpenBible.info identifies the Syrtis of Acts 27:17 with the Gulf of Sidra, which Wikidata and Pleiades equate with ancient Syrtis Maior; their points lie about 17 km apart, close for a gulf this size.",
           "sources": [
             "pleiades:344491",
             "wikidata:Q187274",
@@ -1376,7 +1387,9 @@
         "openbible:syrtis",
         "bib:isbe-syrtis"
       ],
-      "status": "draft"
+      "status": "verified",
+      "verifiedBy": "fact-checker",
+      "lastReviewed": "2026-10-14"
     }
   ]
 }
