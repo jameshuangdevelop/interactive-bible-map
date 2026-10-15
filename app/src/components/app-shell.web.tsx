@@ -45,6 +45,7 @@ import {
 } from "../features/routes/routes-data";
 import type { LoadedRoutesData, RouteStopResolved } from "../features/routes/types";
 import type { RouteMapOverlayData } from "../features/routes/map-overlay";
+import { buildMentionedPointFeatures } from "../features/routes/overlay-mentioned";
 import { RoutesPanel } from "../features/routes/routes-panel.web";
 import { tokens } from "../theme/tokens";
 
@@ -1199,7 +1200,6 @@ export function AppShell() {
       });
 
       const viaByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
-      const mentionedByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
       for (const [index, stage] of selectedRouteEntry.stages.entries()) {
         const stageSelected = selectedStageId === stage.id;
         const stageHighlighted = highlightedStageId === stage.id;
@@ -1232,36 +1232,20 @@ export function AppShell() {
             }
           });
         }
-        for (const mentionedRef of stage.mentioned ?? []) {
-          const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
-          if (!mentioned.coordinates) {
-            continue;
-          }
-          const key = `${selectedRouteId}:${mentioned.kind}:${mentioned.id}`;
-          if (mentionedByKey.has(key)) {
-            continue;
-          }
-          mentionedByKey.set(key, {
-            type: "Feature" as const,
-            geometry: { type: "Point" as const, coordinates: mentioned.coordinates },
-            properties: {
-              id: `${selectedRouteId}:${stage.id}:mentioned:${mentioned.id}`,
-              routeId: selectedRouteId,
-              stageId: stage.id,
-              stageIndex: index,
-              kind: "mentioned" as const,
-              stopKind: mentioned.kind,
-              stopId: mentioned.id,
-              label: mentioned.name,
-              isInSelectedRoute: true as const,
-              isSelectedStage: stageSelected,
-              isHighlightedStage: stageHighlighted,
-              isDimmed: dimmed
-            }
-          });
-        }
       }
-      pointFeatures.push(...connectedStops, ...viaByKey.values(), ...mentionedByKey.values());
+      pointFeatures.push(
+        ...connectedStops,
+        ...viaByKey.values(),
+        ...buildMentionedPointFeatures({
+          routeId: selectedRouteId,
+          stages: selectedRouteEntry.stages,
+          selectedStageId,
+          highlightedStageId,
+          emphasizedStageId,
+          placesById,
+          routeStopsById
+        })
+      );
     } else {
       const stopsByKey = new Map<
         string,
@@ -1361,31 +1345,18 @@ export function AppShell() {
             }
           });
         }
-        for (const mentionedRef of stage.mentioned ?? []) {
-          const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
-          if (!mentioned.coordinates) {
-            continue;
-          }
-          pointFeatures.push({
-            type: "Feature",
-            geometry: { type: "Point", coordinates: mentioned.coordinates },
-            properties: {
-              id: `${selectedRouteId}:${stage.id}:mentioned:${mentioned.id}`,
-              routeId: selectedRouteId,
-              stageId: stage.id,
-              stageIndex: index,
-              kind: "mentioned",
-              stopKind: mentioned.kind,
-              stopId: mentioned.id,
-              label: mentioned.name,
-              isInSelectedRoute: true,
-              isSelectedStage: stageSelected,
-              isHighlightedStage: stageHighlighted,
-              isDimmed: dimmed
-            }
-          });
-        }
       }
+      pointFeatures.push(
+        ...buildMentionedPointFeatures({
+          routeId: selectedRouteId,
+          stages: selectedRouteEntry.stages,
+          selectedStageId,
+          highlightedStageId,
+          emphasizedStageId,
+          placesById,
+          routeStopsById
+        })
+      );
     }
 
     const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
