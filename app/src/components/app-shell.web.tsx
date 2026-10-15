@@ -1616,9 +1616,9 @@ export function AppShell() {
       ),
     [routeKeyboardEntries]
   );
-  const routeOverlayHiddenPlaceIds = useMemo(() => {
+  const routeOverlayHiddenPlaceIdsKey = useMemo(() => {
     if (viewTab !== "routes" || !routeMapOverlay) {
-      return [];
+      return "";
     }
     const hidden = new Set<string>();
     for (const feature of routeMapOverlay.points.features) {
@@ -1628,12 +1628,8 @@ export function AppShell() {
       }
       hidden.add(properties.stopId);
     }
-    return [...hidden].sort();
+    return [...hidden].sort().join("|");
   }, [routeMapOverlay, viewTab]);
-  const routeOverlayHiddenPlaceIdsKey = useMemo(
-    () => routeOverlayHiddenPlaceIds.join("|"),
-    [routeOverlayHiddenPlaceIds]
-  );
   const selectedRouteStop =
     selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
       ? routeStopsById.get(selectedRouteStopId) ?? null
@@ -2014,7 +2010,6 @@ export function AppShell() {
             places={places}
             routeKeyboardEntries={routeKeyboardEntries}
             routeKeyboardPlaceIds={[...routeKeyboardLocationIds]}
-            routeOverlayHiddenPlaceIds={routeOverlayHiddenPlaceIds}
             routeOverlayHiddenPlaceIdsKey={routeOverlayHiddenPlaceIdsKey}
             routesOverlay={routeMapOverlay}
             selectedTimelineStopId={

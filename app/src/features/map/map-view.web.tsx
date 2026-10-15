@@ -398,133 +398,6 @@ function applyMapModeOverlayVisibility(
   }
 }
 
-function withRoutePlaceSuppressionFilter(baseFilter: unknown, hiddenPlaceIds: string[]) {
-  if (hiddenPlaceIds.length === 0) {
-    return baseFilter;
-  }
-
-  return ["all", baseFilter, ["!", ["in", ["get", "placeId"], ["literal", hiddenPlaceIds]]]];
-}
-
-function applyRoutePlaceSuppressionFilters(
-  map: MapLibreMap,
-  hiddenPlaceIds: string[]
-) {
-  const updateLayerFilter = (layerId: string, filter: unknown) => {
-    if (!map.getLayer(layerId)) {
-      return;
-    }
-    map.setFilter(layerId, toLayerFilter(withRoutePlaceSuppressionFilter(filter, hiddenPlaceIds)));
-  };
-
-  updateLayerFilter(
-    layerCityPinShadowId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["any", ["==", ["get", "isSelectedPlace"], true], ["==", ["get", "isHighlightedPlace"], true]]
-    ]
-  );
-  updateLayerFilter(layerCityPinId, ["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]);
-  updateLayerFilter(
-    layerMajorPinShadowId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["any", ["==", ["get", "isSelectedPlace"], true], ["==", ["get", "isHighlightedPlace"], true]]
-    ]
-  );
-  updateLayerFilter(layerMajorPinId, ["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]);
-  updateLayerFilter(
-    layerSitePinShadowId,
-    [
-      "all",
-      basePinVisibilityFilter,
-      ["any", ["==", ["get", "isSelectedPlace"], true], ["==", ["get", "isHighlightedPlace"], true]]
-    ]
-  );
-  updateLayerFilter(layerSitePinId, basePinVisibilityFilter);
-  updateLayerFilter(
-    layerQuestionBadgeId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["==", ["get", "hasMultipleCandidates"], true],
-      ["==", ["get", "isDisputed"], true]
-    ]
-  );
-  updateLayerFilter(
-    layerMajorQuestionBadgeId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["==", ["get", "hasMultipleCandidates"], true],
-      ["==", ["get", "isDisputed"], true]
-    ]
-  );
-  updateLayerFilter(layerCandidatePinId, candidateVisibilityFilter);
-  updateLayerFilter(layerMajorPinCollisionMaskId, ["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]);
-  updateLayerFilter(layerSitePinCollisionMaskId, basePinVisibilityFilter);
-  updateLayerFilter(layerCandidatePinCollisionMaskId, candidateVisibilityFilter);
-  updateLayerFilter(
-    layerPinLabelId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      standardPinUnmutedZoomFilter,
-      ["!=", ["get", "labelText"], null],
-      ["!=", ["get", "isSelectedPlace"], true]
-    ]
-  );
-  updateLayerFilter(
-    layerMajorPinLabelId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["!=", ["get", "labelText"], null],
-      ["!=", ["get", "isSelectedPlace"], true],
-      ["!=", ["get", "majorLabelSide"], "left"]
-    ]
-  );
-  updateLayerFilter(
-    layerMajorPinLabelLeftId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["!=", ["get", "labelText"], null],
-      ["!=", ["get", "isSelectedPlace"], true],
-      ["==", ["get", "majorLabelSide"], "left"]
-    ]
-  );
-  updateLayerFilter(
-    layerSelectedMajorPinLabelId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["!=", ["get", "labelText"], null],
-      ["==", ["get", "isSelectedPlace"], true]
-    ]
-  );
-  updateLayerFilter(
-    layerSelectedPinLabelId,
-    [
-      "all",
-      ["!", ["has", "point_count"]],
-      basePinVisibilityFilter,
-      ["!=", ["get", "labelText"], null],
-      ["==", ["get", "isSelectedPlace"], true]
-    ]
-  );
-}
-
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
 type LayerFilter = FilterSpecification;
 
@@ -1076,6 +949,36 @@ function createEmptyFeatureCollection() {
     type: "FeatureCollection" as const,
     features: []
   };
+}
+
+function withRoutePlaceIdsExcluded(
+  data: GeoJsonSourceData,
+  excludedPlaceIds: ReadonlySet<string>
+): GeoJsonSourceData {
+  if (excludedPlaceIds.size === 0 || !isFeatureCollectionData(data)) {
+    return data;
+  }
+
+  const filteredFeatures = data.features.filter((feature) => {
+    if (typeof feature !== "object" || feature === null || !("properties" in feature)) {
+      return true;
+    }
+    const properties = (feature as { properties?: unknown }).properties;
+    if (typeof properties !== "object" || properties === null || !("placeId" in properties)) {
+      return true;
+    }
+    const placeId = (properties as { placeId?: unknown }).placeId;
+    return typeof placeId !== "string" || !excludedPlaceIds.has(placeId);
+  });
+
+  if (filteredFeatures.length === data.features.length) {
+    return data;
+  }
+
+  return {
+    ...(data as unknown as { [key: string]: unknown }),
+    features: filteredFeatures
+  } as GeoJsonSourceData;
 }
 
 function ensureGeoJsonSource(
@@ -3162,7 +3065,6 @@ export function MapView({
   routesOverlay,
   routeKeyboardEntries,
   routeKeyboardPlaceIds,
-  routeOverlayHiddenPlaceIds,
   routeOverlayHiddenPlaceIdsKey,
   onSelectRouteMapEntry,
   onAncientLayerLoadStateChange,
@@ -3215,7 +3117,6 @@ export function MapView({
   const previousRouteFocusKeyRef = useRef<string | null>(null);
   const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
   const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
-  const routeOverlayHiddenPlaceIdsRef = useRef<string[]>(routeOverlayHiddenPlaceIds);
   const preservedCameraRef = useRef<{
     center: [number, number];
     zoom: number;
@@ -3225,9 +3126,6 @@ export function MapView({
   useEffect(() => {
     latestRoutesOverlayRef.current = routesOverlay;
   }, [routesOverlay]);
-  useEffect(() => {
-    routeOverlayHiddenPlaceIdsRef.current = routeOverlayHiddenPlaceIds;
-  }, [routeOverlayHiddenPlaceIds, routeOverlayHiddenPlaceIdsKey]);
   useEffect(() => {
     selectedTimelineStopIdRef.current = selectedTimelineStopId;
   }, [selectedTimelineStopId]);
@@ -3292,6 +3190,30 @@ export function MapView({
       })
     };
   }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData]);
+  const routeSuppressedPlaceIds = useMemo(() => {
+    if (routeOverlayHiddenPlaceIdsKey.length === 0) {
+      return new Set<string>();
+    }
+    return new Set(routeOverlayHiddenPlaceIdsKey.split("|"));
+  }, [routeOverlayHiddenPlaceIdsKey]);
+  const effectivePinRenderData = useMemo(
+    () => ({
+      majorCityPins: withRoutePlaceIdsExcluded(
+        effectiveRenderData.majorCityPins,
+        routeSuppressedPlaceIds
+      ),
+      clusteredCityPins: withRoutePlaceIdsExcluded(
+        effectiveRenderData.clusteredCityPins,
+        routeSuppressedPlaceIds
+      ),
+      sitePins: withRoutePlaceIdsExcluded(effectiveRenderData.sitePins, routeSuppressedPlaceIds),
+      candidatePins: withRoutePlaceIdsExcluded(
+        effectiveRenderData.candidatePins,
+        routeSuppressedPlaceIds
+      )
+    }),
+    [effectiveRenderData, routeSuppressedPlaceIds]
+  );
   const majorPlaceByRank = useMemo(
     () => buildMajorPlaceReferenceByRank(effectiveRenderData),
     [effectiveRenderData]
@@ -3778,7 +3700,7 @@ export function MapView({
       return;
     }
 
-    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins, {
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectivePinRenderData.majorCityPins, {
       cluster: true,
       clusterMaxZoom: majorClusterMaxZoom,
       clusterRadius: majorClusterRadiusPx,
@@ -3786,13 +3708,13 @@ export function MapView({
         minImportanceRank: ["min", ["get", "importanceRank"]]
       }
     });
-    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins, {
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectivePinRenderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
       clusterRadius: standardClusterRadiusPx
     });
-    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins);
-    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins);
+    ensureGeoJsonSource(map, sourceSitePinsId, effectivePinRenderData.sitePins);
+    ensureGeoJsonSource(map, sourceCandidatePinsId, effectivePinRenderData.candidatePins);
     ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
     ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
@@ -3816,6 +3738,7 @@ export function MapView({
     ancientHolderLabelFeatures,
     ancientRoads,
     majorPlaceByRank,
+    effectivePinRenderData,
     effectiveRenderData,
     syncRouteSources
   ]);
@@ -4434,7 +4357,6 @@ export function MapView({
         hasAncientTimeline,
         routesModeEnabledRef.current
       );
-      applyRoutePlaceSuppressionFilters(map, routeOverlayHiddenPlaceIdsRef.current);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -4699,13 +4621,11 @@ export function MapView({
     const map = mapRef.current;
     if (map) {
       applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline, routesModeEnabled);
-      applyRoutePlaceSuppressionFilters(map, routeOverlayHiddenPlaceIdsRef.current);
     }
     refreshVisibleEntryState();
   }, [
     hasAncientTimeline,
     refreshVisibleEntryState,
-    routeOverlayHiddenPlaceIdsKey,
     routesModeEnabled,
     syncBaseSourcesAndLayers
   ]);

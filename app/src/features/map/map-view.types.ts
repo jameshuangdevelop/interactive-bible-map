@@ -26,7 +26,6 @@ export interface MapViewProps {
     stopId: string;
   }[];
   routeKeyboardPlaceIds: string[];
-  routeOverlayHiddenPlaceIds: string[];
   routeOverlayHiddenPlaceIdsKey: string;
   onSelectRouteMapEntry: (
     entry:

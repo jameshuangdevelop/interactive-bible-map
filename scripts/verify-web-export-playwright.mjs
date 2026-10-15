@@ -11460,6 +11460,283 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       await context.close();
     }
   };
+  const verifyNoBaseFeaturesNearRouteDots = async (page, scenarioLabel) => {
+    const result = await page.evaluate(async ({ testHook, thresholdPx }) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+
+      const routeLayers = ["ibm-routes-stops", "ibm-routes-via", "ibm-routes-mentioned"];
+      const clusterLayerIds = new Set([
+        "ibm-major-cluster-circle",
+        "ibm-cluster-circle",
+        "ibm-major-cluster-label",
+        "ibm-major-cluster-label-left"
+      ]);
+      const baseLayers = [
+        "ibm-city-pin",
+        "ibm-major-pin",
+        "ibm-site-pin",
+        ...clusterLayerIds,
+        "ibm-pin-label-standard",
+        "ibm-pin-label",
+        "ibm-pin-label-left",
+        "ibm-selected-major-pin-label",
+        "ibm-selected-pin-label"
+      ];
+      const routePoints = map
+        .queryRenderedFeatures(undefined, { layers: routeLayers })
+        .filter((feature) => feature?.properties?.stopKind === "location")
+        .map((feature) => {
+          const coordinates = feature.geometry?.coordinates;
+          if (!Array.isArray(coordinates) || coordinates.length < 2) {
+            return null;
+          }
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          const canvas = map.getCanvas();
+          if (
+            projected.x < 0 ||
+            projected.y < 0 ||
+            projected.x > canvas.width ||
+            projected.y > canvas.height
+          ) {
+            return null;
+          }
+          return {
+            stopId: String(feature.properties?.stopId ?? ""),
+            x: projected.x,
+            y: projected.y
+          };
+        })
+        .filter((entry) => entry !== null);
+      const routePlaceIds = new Set(routePoints.map((entry) => entry.stopId).filter((id) => id.length > 0));
+      const violations = [];
+      const clusterCandidates = [];
+      for (const layerId of baseLayers) {
+        const features = map.queryRenderedFeatures(undefined, { layers: [layerId] });
+        for (const feature of features) {
+          const coordinates = feature.geometry?.coordinates;
+          if (!Array.isArray(coordinates) || coordinates.length < 2) {
+            continue;
+          }
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          for (const routePoint of routePoints) {
+            const dx = projected.x - routePoint.x;
+            const dy = projected.y - routePoint.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance <= thresholdPx) {
+              if (clusterLayerIds.has(layerId)) {
+                const clusterId = Number(feature.properties?.cluster_id ?? -1);
+                const pointCount = Number(feature.properties?.point_count ?? 0);
+                if (clusterId >= 0 && pointCount > 0) {
+                  clusterCandidates.push({
+                    layerId,
+                    clusterId,
+                    pointCount,
+                    distance
+                  });
+                }
+              } else {
+                const featurePlaceId =
+                  typeof feature.properties?.placeId === "string"
+                    ? feature.properties.placeId
+                    : null;
+                if (featurePlaceId && routePlaceIds.has(featurePlaceId)) {
+                  violations.push({
+                    layerId,
+                    stopId: routePoint.stopId,
+                    distance,
+                    featurePlaceId,
+                    featureCount: feature.properties?.point_count ?? null
+                  });
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+      const sourceByClusterLayerId = {
+        "ibm-major-cluster-circle": "ibm-major-city-pins",
+        "ibm-major-cluster-label": "ibm-major-city-pins",
+        "ibm-major-cluster-label-left": "ibm-major-city-pins",
+        "ibm-cluster-circle": "ibm-clustered-city-pins"
+      };
+      for (const candidate of clusterCandidates) {
+        const sourceId = sourceByClusterLayerId[candidate.layerId];
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.getClusterLeaves !== "function") {
+          continue;
+        }
+        const leaves = await source.getClusterLeaves(
+          candidate.clusterId,
+          Math.max(1, candidate.pointCount + 24),
+          0
+        );
+        const routeLeafIds = leaves
+          .map((leaf) => leaf?.properties?.placeId)
+          .filter((placeId) => typeof placeId === "string" && routePlaceIds.has(placeId));
+        if (routeLeafIds.length > 0) {
+          violations.push({
+            layerId: candidate.layerId,
+            stopId: routeLeafIds[0],
+            distance: candidate.distance,
+            featurePlaceId: routeLeafIds[0],
+            featureCount: candidate.pointCount
+          });
+        }
+      }
+
+      return {
+        routePointCount: routePoints.length,
+        violationCount: violations.length,
+        violationSamples: violations.slice(0, 12)
+      };
+    }, { testHook: mapTestHookKey, thresholdPx: 20 });
+
+    if (!result) {
+      throw new Error(`Routes real-data check: could not inspect base-feature overlap in ${scenarioLabel}.`);
+    }
+    if (result.routePointCount < 1) {
+      throw new Error(`Routes real-data check: no route points rendered in ${scenarioLabel}.`);
+    }
+    if (result.violationCount > 0) {
+      throw new Error(
+        `Routes real-data check: base features rendered within 20px of route dots in ${scenarioLabel} (${JSON.stringify(
+          result
+        )}).`
+      );
+    }
+    return result;
+  };
+  const captureMajorClusterNearEphesus = async (page, scenarioLabel) => {
+    const snapshot = await page.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [27.4, 37.7], zoom: 4.95 });
+      const source = map.getSource("ibm-major-city-pins");
+      if (!source || typeof source.getData !== "function") {
+        return null;
+      }
+      return source.getData().then((sourceData) => {
+        const ephesusFeature = (sourceData?.features ?? []).find(
+          (feature) => feature?.properties?.placeId === "ephesus"
+        );
+        const ephesusCoordinates = ephesusFeature?.geometry?.coordinates;
+        if (!Array.isArray(ephesusCoordinates) || ephesusCoordinates.length < 2) {
+          return null;
+        }
+        const ephesusScreenPoint = map.project([ephesusCoordinates[0], ephesusCoordinates[1]]);
+        const clusters = map.queryRenderedFeatures(undefined, { layers: ["ibm-major-cluster-circle"] });
+        const clusterCandidates = clusters
+          .map((feature) => {
+            const coordinates = feature.geometry?.coordinates;
+            if (!Array.isArray(coordinates) || coordinates.length < 2) {
+              return null;
+            }
+            const projected = map.project([coordinates[0], coordinates[1]]);
+            const dx = projected.x - ephesusScreenPoint.x;
+            const dy = projected.y - ephesusScreenPoint.y;
+            return {
+              pointCount: Number(feature.properties?.point_count ?? 0),
+              clusterId: Number(feature.properties?.cluster_id ?? -1),
+              distanceToEphesusPx: Math.sqrt(dx * dx + dy * dy)
+            };
+          })
+          .filter((entry) => entry && entry.pointCount >= 2 && entry.clusterId >= 0)
+          .sort((left, right) => left.distanceToEphesusPx - right.distanceToEphesusPx);
+        const nearest = clusterCandidates[0] ?? null;
+        return {
+          ephesusCoordinates: [ephesusCoordinates[0], ephesusCoordinates[1]],
+          nearestCluster: nearest
+        };
+      });
+    }, mapTestHookKey);
+    if (!snapshot?.nearestCluster) {
+      throw new Error(`Routes real-data check: no major cluster near Ephesus in ${scenarioLabel}.`);
+    }
+    return snapshot;
+  };
+  const verifyMajorClusterExcludesRoutePlacesNearEphesus = async (page, ephesusCoordinates, baselinePointCount) => {
+    const result = await page.evaluate(
+      async ({ testHook, ephesus, baselineCount }) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        map.jumpTo({ center: [27.4, 37.7], zoom: 4.95 });
+        const ephesusProjected = map.project([ephesus[0], ephesus[1]]);
+        const routePlaceIds = new Set(
+          map
+            .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops", "ibm-routes-via", "ibm-routes-mentioned"] })
+            .filter((feature) => feature?.properties?.stopKind === "location")
+            .map((feature) => String(feature.properties?.stopId ?? ""))
+            .filter((value) => value.length > 0)
+        );
+        const majorClusters = map.queryRenderedFeatures(undefined, { layers: ["ibm-major-cluster-circle"] });
+        const nearestCluster = majorClusters
+          .map((feature) => {
+            const coordinates = feature.geometry?.coordinates;
+            if (!Array.isArray(coordinates) || coordinates.length < 2) {
+              return null;
+            }
+            const projected = map.project([coordinates[0], coordinates[1]]);
+            const dx = projected.x - ephesusProjected.x;
+            const dy = projected.y - ephesusProjected.y;
+            return {
+              clusterId: Number(feature.properties?.cluster_id ?? -1),
+              pointCount: Number(feature.properties?.point_count ?? 0),
+              distanceToEphesusPx: Math.sqrt(dx * dx + dy * dy)
+            };
+          })
+          .filter((entry) => entry && entry.clusterId >= 0 && entry.pointCount >= 1)
+          .sort((left, right) => left.distanceToEphesusPx - right.distanceToEphesusPx)[0];
+        if (!nearestCluster) {
+          return null;
+        }
+        const source = map.getSource("ibm-major-city-pins");
+        if (!source || typeof source.getClusterLeaves !== "function") {
+          return null;
+        }
+        const leaves = await source.getClusterLeaves(
+          nearestCluster.clusterId,
+          Math.max(1, nearestCluster.pointCount + 16),
+          0
+        );
+        const hiddenLeafPlaceIds = leaves
+          .map((feature) => feature?.properties?.placeId)
+          .filter((placeId) => typeof placeId === "string" && routePlaceIds.has(placeId));
+        return {
+          baselineCount,
+          routeClusterPointCount: nearestCluster.pointCount,
+          hiddenLeafPlaceIds,
+          routePlaceIds: Array.from(routePlaceIds)
+        };
+      },
+      {
+        testHook: mapTestHookKey,
+        ephesus: ephesusCoordinates,
+        baselineCount: baselinePointCount
+      }
+    );
+    if (!result) {
+      throw new Error("Routes real-data check: could not inspect Ephesus cluster after route selection.");
+    }
+    if (result.hiddenLeafPlaceIds.length > 0) {
+      throw new Error(
+        `Routes real-data check: Ephesus major cluster still includes route places (${JSON.stringify(result)}).`
+      );
+    }
+    if (result.routeClusterPointCount >= result.baselineCount) {
+      throw new Error(
+        `Routes real-data check: Ephesus major cluster count should drop after route suppression (${JSON.stringify(result)}).`
+      );
+    }
+    return result;
+  };
 
   try {
     await desktopPage.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 150_000 });
@@ -11723,80 +12000,89 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       );
     }
 
-    const routePlaceVisibilityCheck = await desktopPage.evaluate(async (testHook) => {
+    const routeHoverProbeReady = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const sourceIds = Object.keys(map.getStyle()?.sources ?? {});
+      const wrappedSources = [];
+      const counts = {};
+      for (const sourceId of sourceIds) {
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.setData !== "function") {
+          continue;
+        }
+        const original = source.setData.bind(source);
+        source.setData = (...args) => {
+          counts[sourceId] = (counts[sourceId] ?? 0) + 1;
+          return original(...args);
+        };
+        wrappedSources.push({ source, original });
+      }
+      window.__ibmRoutesRealHoverSetDataProbe = {
+        counts,
+        restore: () => {
+          for (const wrapped of wrappedSources) {
+            wrapped.source.setData = wrapped.original;
+          }
+        }
+      };
+      return true;
+    }, mapTestHookKey);
+    if (!routeHoverProbeReady) {
+      throw new Error("Routes real-data check: could not initialize hover setData probe.");
+    }
+    await desktopPage.locator("[data-route-stage-index='3']").hover();
+    await desktopPage.waitForTimeout(120);
+    await desktopPage.locator("[data-route-stage-index='2']").hover();
+    await desktopPage.waitForTimeout(120);
+    const realHoverSetDataCounts = await desktopPage.evaluate(() => {
+      const probe = window.__ibmRoutesRealHoverSetDataProbe;
+      if (!probe) {
+        return null;
+      }
+      const counts = { ...probe.counts };
+      probe.restore();
+      window.__ibmRoutesRealHoverSetDataProbe = null;
+      return counts;
+    });
+    if (!realHoverSetDataCounts) {
+      throw new Error("Routes real-data check: could not read hover setData counts.");
+    }
+    const realHoverUpdatedSources = Object.entries(realHoverSetDataCounts)
+      .filter(([, count]) => Number(count) > 0)
+      .map(([sourceId]) => sourceId);
+    const nonRouteHoverSources = realHoverUpdatedSources.filter(
+      (sourceId) => sourceId !== "ibm-route-lines" && sourceId !== "ibm-route-points"
+    );
+    if (nonRouteHoverSources.length > 0) {
+      throw new Error(
+        `Routes real-data check: hover updated non-route sources (${nonRouteHoverSources.join(", ")}).`
+      );
+    }
+    if (!realHoverUpdatedSources.includes("ibm-route-lines") || !realHoverUpdatedSources.includes("ibm-route-points")) {
+      throw new Error(
+        `Routes real-data check: hover should update only route sources (${JSON.stringify(realHoverSetDataCounts)}).`
+      );
+    }
+
+    const routePlaceVisibilityCheck = await desktopPage.evaluate((testHook) => {
       const map = window[testHook];
       if (!map) {
         return null;
       }
-      const waitForIdle = () => new Promise((resolve) => map.once("idle", resolve));
-
-      const pointsSource = map.getSource("ibm-route-points");
-      const pointsData =
-        pointsSource && typeof pointsSource.getData === "function"
-          ? await pointsSource.getData()
-          : null;
       const basePlaceVisibilityByZoom = [];
       for (const zoom of [6.8, 8.5, 10]) {
         map.jumpTo({ center: [28, 36], zoom });
-        await waitForIdle();
         basePlaceVisibilityByZoom.push({
           zoom,
           pinCount: map.queryRenderedFeatures(undefined, {
             layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"]
-          }).length,
-          labelCount: map.queryRenderedFeatures(undefined, {
-            layers: [
-              "ibm-pin-label-standard",
-              "ibm-major-pin-label",
-              "ibm-major-pin-label-left",
-              "ibm-selected-major-pin-label",
-              "ibm-selected-pin-label"
-            ]
           }).length
         });
       }
-      const corinthRoutePoint = (pointsData?.features ?? []).find((feature) => {
-        const properties = feature?.properties ?? {};
-        const coordinates = feature?.geometry?.coordinates;
-        return (
-          properties.kind !== "stage-pill" &&
-          properties.stopKind === "location" &&
-          properties.stopId === "corinth" &&
-          Array.isArray(coordinates) &&
-          coordinates.length >= 2
-        );
-      });
-      if (!corinthRoutePoint) {
-        return null;
-      }
-      const corinthCoordinates = corinthRoutePoint.geometry.coordinates;
-      map.jumpTo({ center: [corinthCoordinates[0], corinthCoordinates[1]], zoom: 10.8 });
-      await waitForIdle();
-
-      const corinthRouteDotCount = map
-        .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops", "ibm-routes-via", "ibm-routes-mentioned"] })
-        .filter((feature) => feature.properties?.stopId === "corinth").length;
-      const corinthBasePinCount = map
-        .queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] })
-        .filter((feature) => feature.properties?.placeId === "corinth").length;
-      const corinthBaseLabelCount = map
-        .queryRenderedFeatures(undefined, {
-          layers: [
-            "ibm-pin-label-standard",
-            "ibm-major-pin-label",
-            "ibm-major-pin-label-left",
-            "ibm-selected-major-pin-label",
-            "ibm-selected-pin-label"
-          ]
-        })
-        .filter((feature) => feature.properties?.placeId === "corinth").length;
-
-      return {
-        basePlaceVisibilityByZoom,
-        corinthRouteDotCount,
-        corinthBasePinCount,
-        corinthBaseLabelCount
-      };
+      return { basePlaceVisibilityByZoom };
     }, mapTestHookKey);
     if (!routePlaceVisibilityCheck) {
       throw new Error("Routes real-data check: could not verify route/base place visibility.");
@@ -11809,15 +12095,65 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         `Routes real-data check: expected base place pins while a route is selected (${JSON.stringify(routePlaceVisibilityCheck)}).`
       );
     }
-    if (
-      routePlaceVisibilityCheck.corinthRouteDotCount < 1 ||
-      routePlaceVisibilityCheck.corinthBasePinCount !== 0 ||
-      routePlaceVisibilityCheck.corinthBaseLabelCount !== 0
-    ) {
-      throw new Error(
-        `Routes real-data check: Corinth should render only as route dot while route is selected (${JSON.stringify(routePlaceVisibilityCheck)}).`
-      );
+    const routeDotSuppressionChecks = [];
+    const routeDotSuppressionScenarios = [
+      {
+        label: "paul-2 fitted view",
+        url: `${baseUrl}/?tab=routes&route=paul-2`,
+        heading: "Paul's second journey"
+      },
+      {
+        label: "paul-rome fitted view",
+        url: `${baseUrl}/?tab=routes&route=paul-rome`,
+        heading: "Paul's voyage to Rome"
+      },
+      {
+        label: "jesus fitted view",
+        url: `${baseUrl}/?tab=routes&route=jesus`,
+        heading: "Jesus' journeys"
+      },
+      {
+        label: "paul-2 place=corinth",
+        url: `${baseUrl}/?tab=routes&route=paul-2&place=corinth`,
+        heading: "Corinth",
+        headingLevel: 1
+      }
+    ];
+    for (const scenario of routeDotSuppressionScenarios) {
+      await desktopPage.goto(scenario.url, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(desktopPage);
+      await desktopPage
+        .getByRole("heading", {
+          name: scenario.heading,
+          level: scenario.headingLevel
+        })
+        .waitFor({ timeout: 30_000 });
+      routeDotSuppressionChecks.push({
+        scenario: scenario.label,
+        ...(await verifyNoBaseFeaturesNearRouteDots(desktopPage, scenario.label))
+      });
     }
+
+    await desktopPage.goto(`${baseUrl}/?tab=map`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    const ephesusClusterBaseline = await captureMajorClusterNearEphesus(desktopPage, "map overview without route");
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-2`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+    const ephesusClusterSuppressionCheck = await verifyMajorClusterExcludesRoutePlacesNearEphesus(
+      desktopPage,
+      ephesusClusterBaseline.ephesusCoordinates,
+      ephesusClusterBaseline.nearestCluster.pointCount
+    );
 
     const clickRouteStopById = async (page, stopId) => {
       const clicked = await page.evaluate(
@@ -12290,6 +12626,9 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       routeSelectionLongTaskSummary,
       routeSelectionRenderer,
       routePlaceVisibilityCheck,
+      realHoverSetDataCounts,
+      routeDotSuppressionChecks,
+      ephesusClusterSuppressionCheck,
       corinthDeepLinkStageSelected,
       dualPanelTabsLayoutChecks,
       singlePanelTabsPosition,
