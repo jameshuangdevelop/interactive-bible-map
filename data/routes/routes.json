@@ -1413,8 +1413,8 @@
             "locationId": "caesarea-maritima"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "sidon"
+            "kind": "location",
+            "locationId": "sidon"
           },
           "scripture": [
             {
@@ -1436,8 +1436,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "adramyttium"
+              "kind": "location",
+              "locationId": "adramyttium"
             },
             {
               "kind": "location",
@@ -1455,12 +1455,12 @@
         {
           "id": "stage-02",
           "from": {
-            "kind": "route-stop",
-            "stopId": "sidon"
+            "kind": "location",
+            "locationId": "sidon"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "myra"
+            "kind": "location",
+            "locationId": "myra"
           },
           "via": [
             {
@@ -1488,8 +1488,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "alexandria"
+              "kind": "location",
+              "locationId": "alexandria"
             }
           ],
           "namedRegions": [
@@ -1517,25 +1517,25 @@
         {
           "id": "stage-03",
           "from": {
-            "kind": "route-stop",
-            "stopId": "myra"
+            "kind": "location",
+            "locationId": "myra"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "fair-havens"
+            "kind": "location",
+            "locationId": "fair-havens"
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "cnidus"
+              "kind": "location",
+              "locationId": "cnidus"
             },
             {
               "kind": "location",
               "locationId": "crete"
             },
             {
-              "kind": "route-stop",
-              "stopId": "salmone"
+              "kind": "location",
+              "locationId": "salmone"
             }
           ],
           "scripture": [
@@ -1553,8 +1553,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "lasea"
+              "kind": "location",
+              "locationId": "lasea"
             }
           ],
           "sources": [
@@ -1566,8 +1566,8 @@
         {
           "id": "stage-04",
           "from": {
-            "kind": "route-stop",
-            "stopId": "fair-havens"
+            "kind": "location",
+            "locationId": "fair-havens"
           },
           "to": {
             "kind": "location",
@@ -1576,8 +1576,8 @@
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "cauda"
+              "kind": "location",
+              "locationId": "cauda"
             }
           ],
           "scripture": [
@@ -1600,13 +1600,13 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "phoenix",
+              "kind": "location",
+              "locationId": "phoenix",
               "candidateIndex": 0
             },
             {
-              "kind": "route-stop",
-              "stopId": "syrtis"
+              "kind": "location",
+              "locationId": "syrtis"
             }
           ],
           "sources": [
@@ -1626,8 +1626,8 @@
             "candidateIndex": 0
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "syracuse"
+            "kind": "location",
+            "locationId": "syracuse"
           },
           "scripture": [
             {
@@ -1644,8 +1644,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "alexandria"
+              "kind": "location",
+              "locationId": "alexandria"
             }
           ],
           "sources": [
@@ -1657,12 +1657,12 @@
         {
           "id": "stage-06",
           "from": {
-            "kind": "route-stop",
-            "stopId": "syracuse"
+            "kind": "location",
+            "locationId": "syracuse"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "rhegium"
+            "kind": "location",
+            "locationId": "rhegium"
           },
           "scripture": [
             {
@@ -1680,8 +1680,8 @@
         {
           "id": "stage-07",
           "from": {
-            "kind": "route-stop",
-            "stopId": "rhegium"
+            "kind": "location",
+            "locationId": "rhegium"
           },
           "to": {
             "kind": "location",
@@ -1718,12 +1718,12 @@
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "forum-of-appius"
+              "kind": "location",
+              "locationId": "forum-of-appius"
             },
             {
-              "kind": "route-stop",
-              "stopId": "three-taverns"
+              "kind": "location",
+              "locationId": "three-taverns"
             }
           ],
           "scripture": [
@@ -2393,8 +2393,8 @@
           "travelMode": "unknown",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "sidon"
+              "kind": "location",
+              "locationId": "sidon"
             }
           ],
           "namedRegions": [
@@ -2448,8 +2448,8 @@
           "travelMode": "unknown",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "sidon"
+              "kind": "location",
+              "locationId": "sidon"
             }
           ],
           "namedRegions": [

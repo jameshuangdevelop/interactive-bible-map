@@ -3176,8 +3176,8 @@ test("Myra to Fair Havens does not detour south of Crete when passing Cnidus and
   assert.ok(lineFeature, "Expected route-lines feature for paul-rome stage-03");
 
   const from = resolveStopCoordinate(stage.from);
-  const cnidus = resolveStopCoordinate(stage.via.find((via) => via.kind === "route-stop" && via.stopId === "cnidus"));
-  const salmone = resolveStopCoordinate(stage.via.find((via) => via.kind === "route-stop" && via.stopId === "salmone"));
+  const cnidus = resolveStopCoordinate(stage.via.find((via) => via.kind === "location" && via.locationId === "cnidus"));
+  const salmone = resolveStopCoordinate(stage.via.find((via) => via.kind === "location" && via.locationId === "salmone"));
   const to = resolveStopCoordinate(stage.to);
   assert.ok(from && cnidus && salmone && to, "Expected fixed waypoints for stage-03");
 
