@@ -10951,10 +10951,64 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     });
     await routesTab.click();
     await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-    const jesusRouteButton = desktopPage.getByRole("button", { name: /Jesus fixture segments/u }).first();
-    const jesusRouteButtonText = (await jesusRouteButton.textContent()) ?? "";
-    if (!jesusRouteButtonText.includes("1 stage") || jesusRouteButtonText.includes("1 stages")) {
-      throw new Error(`Routes fixture check: expected singular stage label ('1 stage'), got '${jesusRouteButtonText}'.`);
+    let jesusRouteButtonTextValue = "";
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await desktopPage.waitForFunction(() => {
+        const panel = document.querySelector("[data-routes-panel='true']");
+        if (!(panel instanceof HTMLElement)) {
+          return false;
+        }
+        const panelText = panel.textContent ?? "";
+        if (panelText.includes("Jesus fixture")) {
+          return true;
+        }
+        if (panelText.includes("Routes couldn't load.")) {
+          return true;
+        }
+        return false;
+      }, undefined, { timeout: 30_000 });
+      const panelSnapshot = await desktopPage.evaluate(() => {
+        const panel = document.querySelector("[data-routes-panel='true']");
+        if (!(panel instanceof HTMLElement)) {
+          return {
+            hasJesusRoute: false,
+            hasLoadError: false,
+            jesusText: ""
+          };
+        }
+        const panelText = panel.textContent ?? "";
+        const jesusButton = Array.from(panel.querySelectorAll("button")).find((button) =>
+          (button.textContent ?? "").includes("Jesus fixture")
+        );
+        return {
+          hasJesusRoute: Boolean(jesusButton),
+          hasLoadError: panelText.includes("Routes couldn't load."),
+          jesusText: jesusButton
+            ? (jesusButton.textContent ?? "").replace(/\s+/gu, " ").trim()
+            : ""
+        };
+      });
+      if (panelSnapshot.hasJesusRoute) {
+        jesusRouteButtonTextValue = panelSnapshot.jesusText;
+        break;
+      }
+      if (!panelSnapshot.hasLoadError) {
+        continue;
+      }
+      const retryButton = desktopPage.getByRole("button", { name: "Try again" });
+      if (await retryButton.count()) {
+        await retryButton.first().click();
+        continue;
+      }
+    }
+    if (
+      typeof jesusRouteButtonTextValue !== "string" ||
+      !jesusRouteButtonTextValue.includes("1 stage") ||
+      jesusRouteButtonTextValue.includes("1 stages")
+    ) {
+      throw new Error(
+        `Routes fixture check: expected singular stage label ('1 stage'), got '${String(jesusRouteButtonTextValue)}'.`
+      );
     }
 
     const listState = await desktopPage.evaluate((testHook) => {
@@ -11207,6 +11261,8 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       );
     }
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    const jesusRouteButton = desktopPage.getByRole("button", { name: /Jesus fixture/u }).first();
+    await jesusRouteButton.waitFor({ state: "visible", timeout: 30_000 });
     await jesusRouteButton.click();
     await desktopPage.getByRole("heading", { name: "Jesus fixture segments" }).waitFor({ timeout: 30_000 });
     const jesusStopMarkerChecks = [];
@@ -12215,6 +12271,121 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       .getAttribute("data-route-stage-selected");
     if (corinthDeepLinkStageSelected !== "true") {
       throw new Error(`Routes real-data check: route+place deep link should keep stage selection (stage 6=${corinthDeepLinkStageSelected}).`);
+    }
+    const corinthSelectedRouteStyleCheck = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const pointsSource = map.getSource("ibm-route-points");
+      if (!pointsSource || typeof pointsSource.getData !== "function") {
+        return null;
+      }
+      return pointsSource.getData().then((pointsData) => {
+        const selectedCorinthPoints = (pointsData?.features ?? []).filter((feature) => {
+          const properties = feature?.properties ?? {};
+          return (
+            properties.stopKind === "location" &&
+            properties.stopId === "corinth" &&
+            properties.kind !== "stage-pill" &&
+            properties.isSelectedPlace === true
+          );
+        });
+        const corinthLabelCount = map
+          .queryRenderedFeatures(undefined, {
+            layers: ["ibm-routes-stop-labels", "ibm-routes-stop-label-selected"]
+          })
+          .filter((feature) => feature.properties?.stopId === "corinth").length;
+        const selectedLabelCount = map
+          .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-label-selected"] })
+          .filter((feature) => feature.properties?.stopId === "corinth").length;
+        return {
+          selectedCorinthPointCount: selectedCorinthPoints.length,
+          corinthLabelCount,
+          selectedLabelCount,
+          stopPaint: {
+            radius: map.getPaintProperty("ibm-routes-stops", "circle-radius"),
+            color: map.getPaintProperty("ibm-routes-stops", "circle-color"),
+            strokeColor: map.getPaintProperty("ibm-routes-stops", "circle-stroke-color")
+          },
+          selectedLabelLayout: {
+            textAllowOverlap: map.getLayoutProperty("ibm-routes-stop-label-selected", "text-allow-overlap"),
+            textIgnorePlacement: map.getLayoutProperty("ibm-routes-stop-label-selected", "text-ignore-placement"),
+            symbolSortKey: map.getLayoutProperty("ibm-routes-stop-label-selected", "symbol-sort-key")
+          }
+        };
+      });
+    }, mapTestHookKey);
+    if (!corinthSelectedRouteStyleCheck || corinthSelectedRouteStyleCheck.selectedCorinthPointCount < 1) {
+      throw new Error(
+        `Routes real-data check: Corinth route point should be selected when place=corinth (${JSON.stringify(corinthSelectedRouteStyleCheck)}).`
+      );
+    }
+    if (corinthSelectedRouteStyleCheck.corinthLabelCount < 1) {
+      throw new Error("Routes real-data check: selected Corinth route label should render.");
+    }
+    if (corinthSelectedRouteStyleCheck.selectedLabelCount < 1) {
+      throw new Error("Routes real-data check: selected Corinth should render in selected-label layer.");
+    }
+    if (!JSON.stringify(corinthSelectedRouteStyleCheck.stopPaint).includes("isSelectedPlace")) {
+      throw new Error(
+        `Routes real-data check: routes stop paint should key selected style from isSelectedPlace (${JSON.stringify(
+          corinthSelectedRouteStyleCheck.stopPaint
+        )}).`
+      );
+    }
+    if (
+      corinthSelectedRouteStyleCheck.selectedLabelLayout.textAllowOverlap !== true ||
+      corinthSelectedRouteStyleCheck.selectedLabelLayout.textIgnorePlacement !== true
+    ) {
+      throw new Error(
+        `Routes real-data check: selected stop label layer should force visibility (${JSON.stringify(
+          corinthSelectedRouteStyleCheck.selectedLabelLayout
+        )}).`
+      );
+    }
+    await desktopPage
+      .locator("section[aria-label='Place details'][data-route-place-panel='true'] button[aria-label='Close place panel']")
+      .click();
+    await desktopPage
+      .locator("section[aria-label='Place details'][data-route-place-panel='true']")
+      .waitFor({ state: "hidden", timeout: 30_000 });
+    const corinthSelectionClearedCheck = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const pointsSource = map.getSource("ibm-route-points");
+      if (!pointsSource || typeof pointsSource.getData !== "function") {
+        return null;
+      }
+      return pointsSource.getData().then((pointsData) => {
+        const selectedCorinthPoints = (pointsData?.features ?? []).filter((feature) => {
+          const properties = feature?.properties ?? {};
+          return (
+            properties.stopKind === "location" &&
+            properties.stopId === "corinth" &&
+            properties.kind !== "stage-pill" &&
+            properties.isSelectedPlace === true
+          );
+        });
+        return {
+          selectedCorinthPointCount: selectedCorinthPoints.length,
+          search: window.location.search
+        };
+      });
+    }, mapTestHookKey);
+    if (!corinthSelectionClearedCheck || corinthSelectionClearedCheck.selectedCorinthPointCount !== 0) {
+      throw new Error(
+        `Routes real-data check: closing place panel should clear selected route-point style (${JSON.stringify(
+          corinthSelectionClearedCheck
+        )}).`
+      );
+    }
+    if (corinthSelectionClearedCheck.search.includes("place=corinth")) {
+      throw new Error(
+        `Routes real-data check: closing place panel should clear place= from URL (${corinthSelectionClearedCheck.search}).`
+      );
     }
     const dualPanelTabsLayoutChecks = [];
     for (const viewportWidth of [1280, 1440]) {

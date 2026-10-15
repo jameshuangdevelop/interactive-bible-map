@@ -30,6 +30,7 @@ export interface RouteMapPointFeatureProperties {
   isSelectedStage: boolean;
   isHighlightedStage: boolean;
   isDimmed: boolean;
+  isSelectedPlace: boolean;
   isRouteStart?: boolean;
 }
 

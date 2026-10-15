@@ -148,10 +148,13 @@ const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
 const layerRoutesStopsId = "ibm-routes-stops";
 const layerRoutesStopsStartId = "ibm-routes-stops-start";
 const layerRoutesStopLabelsId = "ibm-routes-stop-labels";
+const layerRoutesStopSelectedLabelId = "ibm-routes-stop-label-selected";
 const layerRoutesViaId = "ibm-routes-via";
 const layerRoutesViaLabelsId = "ibm-routes-via-labels";
+const layerRoutesViaSelectedLabelId = "ibm-routes-via-label-selected";
 const layerRoutesMentionedId = "ibm-routes-mentioned";
 const layerRoutesMentionedLabelsId = "ibm-routes-mentioned-labels";
+const layerRoutesMentionedSelectedLabelId = "ibm-routes-mentioned-label-selected";
 const layerRoutesStagePillIconId = "ibm-routes-stage-pill-icon";
 const layerRoutesStagePillLabelId = "ibm-routes-stage-pill-label";
 
@@ -354,10 +357,13 @@ function applyMapModeOverlayVisibility(
     layerRoutesStopsId,
     layerRoutesStopsStartId,
     layerRoutesStopLabelsId,
+    layerRoutesStopSelectedLabelId,
     layerRoutesViaId,
     layerRoutesViaLabelsId,
+    layerRoutesViaSelectedLabelId,
     layerRoutesMentionedId,
     layerRoutesMentionedLabelsId,
+    layerRoutesMentionedSelectedLabelId,
     layerRoutesStagePillIconId,
     layerRoutesStagePillLabelId
   ]) {
@@ -1814,12 +1820,24 @@ function ensureMapLayers(
       paint: {
         "circle-radius": [
           "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          14,
           ["any", ["==", ["get", "isSelectedStage"], true], ["==", ["get", "isHighlightedStage"], true]],
           11,
           10
         ],
-        "circle-color": "#FFFFFF",
-        "circle-stroke-color": "#1A73E8",
+        "circle-color": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          "#1A73E8",
+          "#FFFFFF"
+        ],
+        "circle-stroke-color": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          "#FFFFFF",
+          "#1A73E8"
+        ],
         "circle-stroke-width": 2,
         "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
       }
@@ -1861,10 +1879,10 @@ function ensureMapLayers(
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       paint: {
-        "circle-radius": 4,
+        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 6, 4],
         "circle-color": "#1A73E8",
         "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 1.2,
+        "circle-stroke-width": ["case", ["==", ["get", "isSelectedPlace"], true], 1.6, 1.2],
         "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
       }
     });
@@ -1878,6 +1896,7 @@ function ensureMapLayers(
       filter: toLayerFilter([
         "all",
         ["==", ["get", "kind"], "via"],
+        ["!=", ["get", "isSelectedPlace"], true],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -1899,6 +1918,37 @@ function ensureMapLayers(
     });
   }
 
+  if (!map.getLayer(layerRoutesViaSelectedLabelId)) {
+    map.addLayer({
+      id: layerRoutesViaSelectedLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "via"],
+        ["==", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "symbol-sort-key": 350
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
   if (!map.getLayer(layerRoutesMentionedId)) {
     map.addLayer({
       id: layerRoutesMentionedId,
@@ -1910,10 +1960,10 @@ function ensureMapLayers(
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       paint: {
-        "circle-radius": 4,
+        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 6, 4],
         "circle-color": "#1A73E8",
         "circle-stroke-color": "#FFFFFF",
-        "circle-stroke-width": 1.2,
+        "circle-stroke-width": ["case", ["==", ["get", "isSelectedPlace"], true], 1.6, 1.2],
         "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
       }
     });
@@ -1927,6 +1977,7 @@ function ensureMapLayers(
       filter: toLayerFilter([
         "all",
         ["==", ["get", "kind"], "stop"],
+        ["!=", ["get", "isSelectedPlace"], true],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -1957,6 +2008,38 @@ function ensureMapLayers(
     });
   }
 
+  if (!map.getLayer(layerRoutesStopSelectedLabelId)) {
+    map.addLayer({
+      id: layerRoutesStopSelectedLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.75,
+        "text-anchor": "left",
+        "text-optional": false,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "symbol-sort-key": 350
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
   if (!map.getLayer(layerRoutesMentionedLabelsId)) {
     map.addLayer({
       id: layerRoutesMentionedLabelsId,
@@ -1965,6 +2048,7 @@ function ensureMapLayers(
       filter: toLayerFilter([
         "all",
         ["==", ["get", "kind"], "mentioned"],
+        ["!=", ["get", "isSelectedPlace"], true],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -1976,6 +2060,37 @@ function ensureMapLayers(
         "text-anchor": "left",
         "text-allow-overlap": false,
         "text-ignore-placement": false
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesMentionedSelectedLabelId)) {
+    map.addLayer({
+      id: layerRoutesMentionedSelectedLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "mentioned"],
+        ["==", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "symbol-sort-key": 350
       },
       paint: {
         "text-color": "#202124",

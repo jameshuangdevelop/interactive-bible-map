@@ -165,6 +165,7 @@ The routes have a tab of their own, so the main map stays uncluttered (brief §1
     - on screens at least 1,280 px wide, to the right of the route panel, which stays;
     - on narrower screens and phones, in the route panel's place, with a "‹ Back to route" link at the top;
     - a stop entry that isn't one of our places yet (M5-07) opens with what the entry has: its name, a "Today" line where the sources give one, its candidate sites if disputed, its passages and its sources.
+    - the selected place is shown on the route itself: its dot becomes larger (about 1.4×), filled accent blue with a white ring, and its label uses selected-label priority so it stays visible.
 
     The route stays drawn, and the camera moves only if the place is off the screen, at the reader's zoom.
 - **The map underneath:** the ancient map at the route's first year (ADR-0038 item 7), without the timeline for now (ADR-0042 item 7). The "Ancient | Modern" toggle stays; on the modern map the line and stops are drawn over today's map. On both, the map's credits carry the ODbL notice for the lines (`docs/LICENSES.md`).

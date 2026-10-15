@@ -17,6 +17,7 @@ export function buildMentionedPointFeatures({
   selectedStageId,
   highlightedStageId,
   emphasizedStageId,
+  selectedPlaceId,
   placesById,
   routeStopsById
 }: {
@@ -25,6 +26,7 @@ export function buildMentionedPointFeatures({
   selectedStageId: string | null;
   highlightedStageId: string | null;
   emphasizedStageId: string | null;
+  selectedPlaceId: string | null;
   placesById: Map<string, PlaceIndexRecord>;
   routeStopsById: Map<string, RouteStopRecord>;
 }) {
@@ -95,7 +97,9 @@ export function buildMentionedPointFeatures({
         isInSelectedRoute: true,
         isSelectedStage,
         isHighlightedStage,
-        isDimmed: Boolean(emphasizedStageId && !value.stageIds.includes(emphasizedStageId))
+        isDimmed: Boolean(emphasizedStageId && !value.stageIds.includes(emphasizedStageId)),
+        isSelectedPlace:
+          value.mentioned.kind === "location" && value.mentioned.id === selectedPlaceId
       }
     };
   });

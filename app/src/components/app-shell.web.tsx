@@ -1194,6 +1194,7 @@ export function AppShell() {
 
     const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
     const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
+    const selectedRoutePlaceId = selection?.placeId ?? null;
     let selectedStageCenter: [number, number] | null = null;
     for (const [index, stage] of selectedRouteEntry.stages.entries()) {
       const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
@@ -1301,7 +1302,9 @@ export function AppShell() {
             isInSelectedRoute: true as const,
             isSelectedStage,
             isHighlightedStage,
-            isDimmed: dimmed
+            isDimmed: dimmed,
+            isSelectedPlace:
+              value.resolved.kind === "location" && value.resolved.id === selectedRoutePlaceId
           }
         };
       });
@@ -1335,7 +1338,8 @@ export function AppShell() {
               isInSelectedRoute: true as const,
               isSelectedStage: stageSelected,
               isHighlightedStage: stageHighlighted,
-              isDimmed: dimmed
+              isDimmed: dimmed,
+              isSelectedPlace: via.kind === "location" && via.id === selectedRoutePlaceId
             }
           });
         }
@@ -1349,6 +1353,7 @@ export function AppShell() {
           selectedStageId,
           highlightedStageId,
           emphasizedStageId,
+          selectedPlaceId: selectedRoutePlaceId,
           placesById,
           routeStopsById
         })
@@ -1419,7 +1424,9 @@ export function AppShell() {
               isInSelectedRoute: true as const,
               isSelectedStage,
               isHighlightedStage,
-              isDimmed: dimmed
+              isDimmed: dimmed,
+              isSelectedPlace:
+                value.resolved.kind === "location" && value.resolved.id === selectedRoutePlaceId
             }
           };
         })
@@ -1448,7 +1455,8 @@ export function AppShell() {
               isInSelectedRoute: true,
               isSelectedStage: stageSelected,
               isHighlightedStage: stageHighlighted,
-              isDimmed: dimmed
+              isDimmed: dimmed,
+              isSelectedPlace: via.kind === "location" && via.id === selectedRoutePlaceId
             }
           });
         }
@@ -1460,6 +1468,7 @@ export function AppShell() {
           selectedStageId,
           highlightedStageId,
           emphasizedStageId,
+          selectedPlaceId: selectedRoutePlaceId,
           placesById,
           routeStopsById
         })
@@ -1486,7 +1495,8 @@ export function AppShell() {
           isInSelectedRoute: true as const,
           isSelectedStage: selectedStageId === pillStage.id,
           isHighlightedStage: highlightedStageId === pillStage.id,
-          isDimmed: false
+          isDimmed: false,
+          isSelectedPlace: false
         }
       });
     }
@@ -1553,6 +1563,7 @@ export function AppShell() {
     placesById,
     routeStopsById,
     routesData,
+    selection?.placeId,
     selectedRoute,
     selectedStageIndex,
     viewTab

@@ -117,6 +117,7 @@ describe("route mentioned overlay features", () => {
       selectedStageId: "stage-2",
       highlightedStageId: "stage-1",
       emphasizedStageId: "stage-1",
+      selectedPlaceId: "byblos",
       placesById: new Map([
         [placeFixture.id, placeFixture],
         [secondPlaceFixture.id, secondPlaceFixture],
@@ -129,6 +130,7 @@ describe("route mentioned overlay features", () => {
     expect(features[0].properties.isSelectedStage).toBe(true);
     expect(features[0].properties.isHighlightedStage).toBe(true);
     expect(features[0].properties.isDimmed).toBe(false);
+    expect(features[0].properties.isSelectedPlace).toBe(true);
   });
 
   test("keeps route-stop mentioned candidates separate by candidate index", () => {
@@ -159,6 +161,7 @@ describe("route mentioned overlay features", () => {
       selectedStageId: null,
       highlightedStageId: null,
       emphasizedStageId: null,
+      selectedPlaceId: null,
       placesById: new Map([
         [placeFixture.id, placeFixture],
         [secondPlaceFixture.id, secondPlaceFixture],
@@ -197,6 +200,7 @@ describe("route mentioned overlay features", () => {
       selectedStageId: null,
       highlightedStageId: null,
       emphasizedStageId: null,
+      selectedPlaceId: null,
       placesById: new Map([
         [placeFixture.id, placeFixture],
         [secondPlaceFixture.id, secondPlaceFixture],
