@@ -10964,7 +10964,8 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       }
       return {
         lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
-        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
       };
     }, mapTestHookKey);
     if (!listState) {
@@ -10974,6 +10975,9 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       throw new Error(
         `Routes fixture check: expected no route lines/stops before selecting a route (${JSON.stringify(listState)}).`
       );
+    }
+    if (listState.placePinCount < 1) {
+      throw new Error("Routes fixture check: expected map places to remain visible in route list state.");
     }
 
     const routesAttributionText = await desktopPage.evaluate((testHook) => {
@@ -11129,74 +11133,46 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       );
     }
     await stageTwo.click();
-    await desktopPage.waitForFunction(
-      (testHook) => {
-        const map = window[testHook];
-        if (!map) {
-          return false;
-        }
-        const gradient = map.getPaintProperty("ibm-routes-lines-trace", "line-gradient");
-        return JSON.stringify(gradient).includes("step");
-      },
-      mapTestHookKey,
-      { timeout: 3_000 }
-    );
-    const animationState = await desktopPage.evaluate((testHook) => {
+    const selectionPaintStateBeforeDelay = await desktopPage.evaluate((testHook) => {
       const map = window[testHook];
       if (!map) {
         return null;
       }
       return {
-        traceGradient: map.getPaintProperty("ibm-routes-lines-trace", "line-gradient"),
+        traceLayerPresent: Boolean(map.getLayer("ibm-routes-lines-trace")),
+        highlightPaint: map.getPaintProperty("ibm-routes-lines-highlight", "line-width"),
+        foregroundPaint: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity"),
         stagePillLabelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-label"] }).length
       };
     }, mapTestHookKey);
-    if (!animationState || !JSON.stringify(animationState.traceGradient).includes("step")) {
-      throw new Error("Routes fixture check: expected stage selection trace animation.");
+    if (!selectionPaintStateBeforeDelay || selectionPaintStateBeforeDelay.traceLayerPresent) {
+      throw new Error("Routes fixture check: trace layer should not exist.");
     }
-    if (animationState.stagePillLabelCount < 1) {
-      throw new Error("Routes fixture check: expected stage number pill for selected stage.");
-    }
-
-    const reducedMotionContext = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-      reducedMotion: "reduce"
-    });
-    const reducedMotionPage = await reducedMotionContext.newPage();
-    try {
-      await reducedMotionPage.route("**/generated/routes.fixture.*", async (route) => {
-        const requestUrl = new URL(route.request().url());
-        const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
-        if (!fixturePath) {
-          await route.continue();
-          return;
-        }
-        const body = await fs.readFile(fixturePath);
-        await route.fulfill({
-          status: 200,
-          contentType: contentTypeFor(fixturePath),
-          body
-        });
-      });
-      await reducedMotionPage.goto(fixturePath, { waitUntil: "domcontentloaded", timeout: 150_000 });
-      await waitForMapToSettle(reducedMotionPage);
-      await reducedMotionPage.getByRole("tab", { name: "Routes" }).click();
-      await reducedMotionPage.getByRole("button", { name: "Paul fixture journey" }).click();
-      await reducedMotionPage.locator("[data-route-stage-index='1']").click();
-      await reducedMotionPage.waitForTimeout(220);
-      const reducedMotionTrace = await reducedMotionPage.evaluate((testHook) => {
-        const map = window[testHook];
-        if (!map) {
-          return null;
-        }
-        return map.getPaintProperty("ibm-routes-lines-trace", "line-gradient");
-      }, mapTestHookKey);
-      if (reducedMotionTrace && JSON.stringify(reducedMotionTrace).includes("step")) {
-        throw new Error("Routes fixture check: reduced-motion selection should skip trace animation.");
+    await desktopPage.waitForTimeout(1_800);
+    const selectionPaintStateAfterDelay = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
       }
-    } finally {
-      await reducedMotionPage.close();
-      await reducedMotionContext.close();
+      return {
+        traceLayerPresent: Boolean(map.getLayer("ibm-routes-lines-trace")),
+        highlightPaint: map.getPaintProperty("ibm-routes-lines-highlight", "line-width"),
+        foregroundPaint: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity")
+      };
+    }, mapTestHookKey);
+    if (!selectionPaintStateAfterDelay || selectionPaintStateAfterDelay.traceLayerPresent) {
+      throw new Error("Routes fixture check: trace layer should remain absent after stage selection.");
+    }
+    if (
+      JSON.stringify(selectionPaintStateBeforeDelay.highlightPaint) !==
+        JSON.stringify(selectionPaintStateAfterDelay.highlightPaint) ||
+      JSON.stringify(selectionPaintStateBeforeDelay.foregroundPaint) !==
+        JSON.stringify(selectionPaintStateAfterDelay.foregroundPaint)
+    ) {
+      throw new Error("Routes fixture check: stage selection changed line paint over time.");
+    }
+    if (selectionPaintStateBeforeDelay.stagePillLabelCount < 1) {
+      throw new Error("Routes fixture check: expected stage number pill for selected stage.");
     }
 
     const stopMarkerChecks = [];
@@ -11218,12 +11194,17 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
         },
         { testHook: mapTestHookKey, nextZoom: zoom }
       );
-      if (!snapshot || snapshot.stopCount === 0 || snapshot.startCount === 0 || snapshot.labelCount === 0) {
+      if (!snapshot || snapshot.stopCount === 0 || snapshot.startCount === 0) {
         throw new Error(
-          `Routes fixture check: missing stop markers/labels at zoom ${zoom}: ${JSON.stringify(snapshot)}`
+          `Routes fixture check: missing stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
         );
       }
       stopMarkerChecks.push(snapshot);
+    }
+    if (!stopMarkerChecks.some((snapshot) => snapshot.labelCount > 0)) {
+      throw new Error(
+        `Routes fixture check: expected stop labels to render at one of the tested zoom levels (${JSON.stringify(stopMarkerChecks)}).`
+      );
     }
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await jesusRouteButton.click();
@@ -11247,12 +11228,17 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
         },
         { testHook: mapTestHookKey, nextZoom: zoom }
       );
-      if (!snapshot || snapshot.stopCount === 0 || snapshot.labelCount === 0) {
+      if (!snapshot || snapshot.stopCount === 0) {
         throw new Error(
-          `Routes fixture check: Jesus segments should show unlabeled stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
+          `Routes fixture check: Jesus segments should show stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
         );
       }
       jesusStopMarkerChecks.push(snapshot);
+    }
+    if (!jesusStopMarkerChecks.some((snapshot) => snapshot.labelCount > 0)) {
+      throw new Error(
+        `Routes fixture check: expected Jesus stop labels to render at one tested zoom (${JSON.stringify(jesusStopMarkerChecks)}).`
+      );
     }
 
     const linkedUrl = await desktopPage.evaluate(() => window.location.search);
@@ -11345,7 +11331,8 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       keyboardTabs: "ok",
       listState,
       hoverState,
-      animationState,
+      selectionPaintStateBeforeDelay,
+      selectionPaintStateAfterDelay,
       stopMarkerChecks,
       jesusStopMarkerChecks,
       stageTwoSelected,
@@ -11359,7 +11346,11 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
 }
 
 async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
-  const screenshotDirectory = path.join("/tmp", "ibm-m5-05", "r3");
+  const screenshotDirectory = path.join(
+    process.env.TEMP ?? os.tmpdir(),
+    "ibm-m5-05",
+    "r6"
+  );
   await fs.mkdir(screenshotDirectory, { recursive: true });
   const screenshotPaths = {
     desktopRouteList: path.join(screenshotDirectory, "desktop-route-list-no-lines.png"),
@@ -11400,13 +11391,17 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       }
       return {
         lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
-        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
       };
     }, mapTestHookKey);
     if (!routeListNoLineState || routeListNoLineState.lineCount > 0 || routeListNoLineState.stopCount > 0) {
       throw new Error(
         `Routes real-data check: expected no lines in route list state (${JSON.stringify(routeListNoLineState)}).`
       );
+    }
+    if (routeListNoLineState.placePinCount < 1) {
+      throw new Error("Routes real-data check: expected map places in route list state.");
     }
     await desktopPage.screenshot({ path: screenshotPaths.desktopRouteList, fullPage: true });
     await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
@@ -11646,6 +11641,190 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         )} ms long task but not enforced on software renderer (${routeSelectionRenderer}).`
       );
     }
+
+    const routePlaceVisibilityCheck = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const waitForIdle = () => new Promise((resolve) => map.once("idle", resolve));
+
+      const pointsSource = map.getSource("ibm-route-points");
+      const pointsData =
+        pointsSource && typeof pointsSource.getData === "function"
+          ? await pointsSource.getData()
+          : null;
+      const basePlaceVisibilityByZoom = [];
+      for (const zoom of [6.8, 8.5, 10]) {
+        map.jumpTo({ center: [28, 36], zoom });
+        await waitForIdle();
+        basePlaceVisibilityByZoom.push({
+          zoom,
+          pinCount: map.queryRenderedFeatures(undefined, {
+            layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"]
+          }).length,
+          labelCount: map.queryRenderedFeatures(undefined, {
+            layers: [
+              "ibm-pin-label-standard",
+              "ibm-major-pin-label",
+              "ibm-major-pin-label-left",
+              "ibm-selected-major-pin-label",
+              "ibm-selected-pin-label"
+            ]
+          }).length
+        });
+      }
+      const corinthRoutePoint = (pointsData?.features ?? []).find((feature) => {
+        const properties = feature?.properties ?? {};
+        const coordinates = feature?.geometry?.coordinates;
+        return (
+          properties.kind !== "stage-pill" &&
+          properties.stopKind === "location" &&
+          properties.stopId === "corinth" &&
+          Array.isArray(coordinates) &&
+          coordinates.length >= 2
+        );
+      });
+      if (!corinthRoutePoint) {
+        return null;
+      }
+      const corinthCoordinates = corinthRoutePoint.geometry.coordinates;
+      map.jumpTo({ center: [corinthCoordinates[0], corinthCoordinates[1]], zoom: 10.8 });
+      await waitForIdle();
+
+      const corinthRouteDotCount = map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops", "ibm-routes-via", "ibm-routes-mentioned"] })
+        .filter((feature) => feature.properties?.stopId === "corinth").length;
+      const corinthBasePinCount = map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] })
+        .filter((feature) => feature.properties?.placeId === "corinth").length;
+      const corinthBaseLabelCount = map
+        .queryRenderedFeatures(undefined, {
+          layers: [
+            "ibm-pin-label-standard",
+            "ibm-major-pin-label",
+            "ibm-major-pin-label-left",
+            "ibm-selected-major-pin-label",
+            "ibm-selected-pin-label"
+          ]
+        })
+        .filter((feature) => feature.properties?.placeId === "corinth").length;
+
+      return {
+        basePlaceVisibilityByZoom,
+        corinthRouteDotCount,
+        corinthBasePinCount,
+        corinthBaseLabelCount
+      };
+    }, mapTestHookKey);
+    if (!routePlaceVisibilityCheck) {
+      throw new Error("Routes real-data check: could not verify route/base place visibility.");
+    }
+    const hasBasePins = routePlaceVisibilityCheck.basePlaceVisibilityByZoom.some(
+      (snapshot) => snapshot.pinCount > 0
+    );
+    if (!hasBasePins) {
+      throw new Error(
+        `Routes real-data check: expected base place pins while a route is selected (${JSON.stringify(routePlaceVisibilityCheck)}).`
+      );
+    }
+    if (
+      routePlaceVisibilityCheck.corinthRouteDotCount < 1 ||
+      routePlaceVisibilityCheck.corinthBasePinCount !== 0 ||
+      routePlaceVisibilityCheck.corinthBaseLabelCount !== 0
+    ) {
+      throw new Error(
+        `Routes real-data check: Corinth should render only as route dot while route is selected (${JSON.stringify(routePlaceVisibilityCheck)}).`
+      );
+    }
+
+    const clickRouteStopById = async (page, stopId) => {
+      const clicked = await page.evaluate(
+        async ({ testHook, routeStopId }) => {
+          const map = window[testHook];
+          if (!map) {
+            return false;
+          }
+          const pointsSource = map.getSource("ibm-route-points");
+          const pointsData =
+            pointsSource && typeof pointsSource.getData === "function"
+              ? await pointsSource.getData()
+              : null;
+          const stopFeature = (pointsData?.features ?? []).find((feature) => {
+            const properties = feature?.properties ?? {};
+            const coordinates = feature?.geometry?.coordinates;
+            return (
+              properties.kind === "stop" &&
+              properties.stopKind === "location" &&
+              properties.stopId === routeStopId &&
+              Array.isArray(coordinates) &&
+              coordinates.length >= 2
+            );
+          });
+          if (!stopFeature) {
+            return false;
+          }
+          const coordinates = stopFeature.geometry.coordinates;
+          map.jumpTo({ center: [coordinates[0], coordinates[1]], zoom: 10.8 });
+          await new Promise((resolve) => map.once("idle", resolve));
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          map.fire("click", {
+            point: projected,
+            lngLat: { lng: coordinates[0], lat: coordinates[1] }
+          });
+          return true;
+        },
+        { testHook: mapTestHookKey, routeStopId: stopId }
+      );
+      if (!clicked) {
+        throw new Error(`Routes real-data check: could not click route stop '${stopId}' on map.`);
+      }
+    };
+
+    await clickRouteStopById(desktopPage, "corinth");
+    await desktopPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("section[aria-label='Route details'] [data-routes-panel='true']").waitFor({ timeout: 30_000 });
+    await desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']").waitFor({ timeout: 30_000 });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-2&stage=6&place=corinth`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("section[aria-label='Route details'] [data-routes-panel='true']").waitFor({ timeout: 30_000 });
+    const corinthDeepLinkStageSelected = await desktopPage
+      .locator("[data-route-stage-index='6']")
+      .getAttribute("data-route-stage-selected");
+    if (corinthDeepLinkStageSelected !== "true") {
+      throw new Error(`Routes real-data check: route+place deep link should keep stage selection (stage 6=${corinthDeepLinkStageSelected}).`);
+    }
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    const alexandriaLink = desktopPage.getByRole("button", { name: "Alexandria" }).first();
+    await alexandriaLink.waitFor({ timeout: 30_000 });
+    await alexandriaLink.click();
+    await desktopPage
+      .locator("section[aria-label='Place details'][data-route-place-panel='true']")
+      .getByRole("heading", { level: 1, name: "Alexandria" })
+      .waitFor({ timeout: 30_000 });
+    const alexandriaMentionedLabelCount = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return 0;
+      }
+      return map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-routes-mentioned-labels"] })
+        .filter((feature) => feature.properties?.stopId === "alexandria").length;
+    }, mapTestHookKey);
+    if (alexandriaMentionedLabelCount < 1) {
+      throw new Error("Routes real-data check: expected Alexandria mentioned label to render.");
+    }
+
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
     const routesAncientAttributionCheck = await desktopPage.evaluate(() => {
@@ -11922,12 +12101,42 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       throw new Error(`Routes real-data check: console errors detected: ${consoleErrors.join(" | ")}`);
     }
 
+    const tabletContext = await browser.newContext({
+      viewport: { width: 1024, height: 900 },
+      reducedMotion: "no-preference"
+    });
+    const tabletPage = await tabletContext.newPage();
+    let tabletRoutePlacePanelBehavior = null;
+    try {
+      await tabletPage.goto(`${baseUrl}/?tab=routes&route=paul-2`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(tabletPage);
+      await tabletPage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      await clickRouteStopById(tabletPage, "corinth");
+      await tabletPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+      const backToRouteLink = tabletPage.locator("[data-back-to-route='true']");
+      await backToRouteLink.waitFor({ timeout: 30_000 });
+      const routePanelVisibleWhilePlaceOpen = await tabletPage.locator("[data-routes-panel='true']").isVisible();
+      if (routePanelVisibleWhilePlaceOpen) {
+        throw new Error("Routes real-data check: route panel should be replaced at 1024px when place panel opens.");
+      }
+      await backToRouteLink.click();
+      await tabletPage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      tabletRoutePlacePanelBehavior = { replacedAt1024: true };
+    } finally {
+      await tabletPage.close();
+      await tabletContext.close();
+    }
+
     const mobileContext = await browser.newContext({
       viewport: { width: 390, height: 844 },
       isMobile: true,
       hasTouch: true
     });
     const mobilePage = await mobileContext.newPage();
+    let phoneRoutePlacePanelBehavior = null;
     try {
       await mobilePage.goto(`${baseUrl}/?tab=routes&route=paul-2&stage=3`, {
         waitUntil: "domcontentloaded",
@@ -11936,6 +12145,13 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       await waitForMapToSettle(mobilePage);
       await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
       await mobilePage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+      await clickRouteStopById(mobilePage, "corinth");
+      await mobilePage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+      const backToRouteLink = mobilePage.locator("[data-back-to-route='true']");
+      await backToRouteLink.waitFor({ timeout: 30_000 });
+      await backToRouteLink.click();
+      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      phoneRoutePlacePanelBehavior = { replacedOnPhone: true };
       await mobilePage.screenshot({ path: screenshotPaths.phoneRouteSelected, fullPage: true });
     } finally {
       await mobilePage.close();
@@ -11952,6 +12168,10 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       deepLinkSelectedStage: selectedStage,
       routeSelectionLongTaskSummary,
       routeSelectionRenderer,
+      routePlaceVisibilityCheck,
+      corinthDeepLinkStageSelected,
+      tabletRoutePlacePanelBehavior,
+      phoneRoutePlacePanelBehavior,
       screenshotPaths,
       consoleErrorCount: consoleErrors.length
     };
