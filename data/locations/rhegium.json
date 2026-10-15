@@ -1,0 +1,83 @@
+{
+  "id": "rhegium",
+  "names": {
+    "ancient": [
+      "Rhegium"
+    ],
+    "modern": "Reggio Calabria",
+    "modernCountries": [
+      "Italy"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Rhegion"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "italy",
+  "candidates": [
+    {
+      "label": "Rhegium (Sicilian Strait)",
+      "coordinates": [
+        15.64412,
+        38.1088
+      ],
+      "coordinateSource": "openbible:rhegium",
+      "confidence": "high",
+      "support": "A city on the Italian shore of the Sicilian Strait. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Reggio Calabria.",
+      "sources": [
+        "pleiades:452416",
+        "openbible:rhegium",
+        "wikidata:Q8471",
+        "bib:isbe-rhegium"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Rhegium was a city on the Italian shore of the Sicilian Strait, originally a colony of Greek settlers from Chalcis. Acts records that Paul's ship, sailing from Malta toward Puteoli, reached Rhegium by tacking against unfavorable winds and waited there one day for a south wind before completing the crossing.",
+    "sources": [
+      "pleiades:452416",
+      "openbible:rhegium",
+      "wikidata:Q8471",
+      "bib:isbe-rhegium",
+      "scripture:Acts 28:13"
+    ]
+  },
+  "history": [
+    {
+      "text": "Rhegium was destroyed in 387 BC by Dionysius, tyrant of Syracuse, who sold the surviving inhabitants into slavery. Partially restored under his son, the city allied itself with Rome in 280 BC during the invasion of Italy by Pyrrhus; the International Standard Bible Encyclopedia records that the Campanian troops Rome then sent to garrison the city massacred its men and enslaved its women, a crime Rome did not punish until 270 BC, when it restored the city to its surviving former inhabitants.",
+      "sources": [
+        "bib:isbe-rhegium"
+      ]
+    },
+    {
+      "text": "Rhegium remained loyal to Rome through the Second Punic War and, with the rest of Italy, was incorporated as a Roman municipality at the time of the Social War (91-88 BC).",
+      "sources": [
+        "bib:isbe-rhegium"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:13",
+      "book": "Acts",
+      "textWEB": "From there we circled around and arrived at Rhegium. After one day, a south wind sprang up, and on the second day we came to Puteoli,"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "italy-direct",
+      "entity": "Italy",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "italy"
+}
