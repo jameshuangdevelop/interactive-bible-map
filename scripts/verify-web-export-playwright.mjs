@@ -11062,6 +11062,72 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     if (!JSON.stringify(hoverState.lineOpacity).includes("isDimmed")) {
       throw new Error("Routes fixture check: expected line-opacity expression to dim non-hovered stages.");
     }
+    const hoverProbeReady = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const sourceIds = Object.keys(map.getStyle()?.sources ?? {});
+      const wrappedSources = [];
+      const counts = {};
+      for (const sourceId of sourceIds) {
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.setData !== "function") {
+          continue;
+        }
+        const original = source.setData.bind(source);
+        source.setData = (...args) => {
+          counts[sourceId] = (counts[sourceId] ?? 0) + 1;
+          return original(...args);
+        };
+        wrappedSources.push({ source, original });
+      }
+      window.__ibmRoutesHoverSetDataProbe = {
+        counts,
+        restore: () => {
+          for (const wrapped of wrappedSources) {
+            wrapped.source.setData = wrapped.original;
+          }
+        }
+      };
+      return true;
+    }, mapTestHookKey);
+    if (!hoverProbeReady) {
+      throw new Error("Routes fixture check: could not initialize hover setData probe.");
+    }
+    await stageThree.hover();
+    await desktopPage.waitForTimeout(120);
+    await stageTwo.hover();
+    await desktopPage.waitForTimeout(120);
+    const hoverSetDataCounts = await desktopPage.evaluate(() => {
+      const probe = window.__ibmRoutesHoverSetDataProbe;
+      if (!probe) {
+        return null;
+      }
+      const counts = { ...probe.counts };
+      probe.restore();
+      window.__ibmRoutesHoverSetDataProbe = null;
+      return counts;
+    });
+    if (!hoverSetDataCounts) {
+      throw new Error("Routes fixture check: could not read hover setData counts.");
+    }
+    const updatedSourcesOnHover = Object.entries(hoverSetDataCounts)
+      .filter(([, count]) => Number(count) > 0)
+      .map(([sourceId]) => sourceId);
+    const nonRouteUpdatedSources = updatedSourcesOnHover.filter(
+      (sourceId) => sourceId !== "ibm-route-lines" && sourceId !== "ibm-route-points"
+    );
+    if (nonRouteUpdatedSources.length > 0) {
+      throw new Error(
+        `Routes fixture check: hover updated non-route sources (${nonRouteUpdatedSources.join(", ")}).`
+      );
+    }
+    if (!updatedSourcesOnHover.includes("ibm-route-lines") || !updatedSourcesOnHover.includes("ibm-route-points")) {
+      throw new Error(
+        `Routes fixture check: hover should update route sources only (${JSON.stringify(hoverSetDataCounts)}).`
+      );
+    }
     await stageTwo.click();
     await desktopPage.waitForFunction(
       (testHook) => {
@@ -11347,6 +11413,70 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
     await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
     await desktopPage.getByText(/Borders as in AD \d+/, { exact: false }).waitFor({ timeout: 30_000 });
+    const cameraBeforeTabSwitch = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [17.2, 36.8], zoom: 9.3 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    await desktopPage.getByRole("tab", { name: "Map" }).click();
+    await desktopPage.getByRole("tab", { name: "Routes" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    const cameraAfterTabSwitch = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!cameraBeforeTabSwitch || !cameraAfterTabSwitch) {
+      throw new Error("Routes real-data check: could not verify camera persistence across tab switch.");
+    }
+    if (
+      Math.abs(cameraBeforeTabSwitch.zoom - cameraAfterTabSwitch.zoom) > 0.01 ||
+      Math.abs(cameraBeforeTabSwitch.center[0] - cameraAfterTabSwitch.center[0]) > 0.0001 ||
+      Math.abs(cameraBeforeTabSwitch.center[1] - cameraAfterTabSwitch.center[1]) > 0.0001
+    ) {
+      throw new Error(
+        `Routes real-data check: camera changed after Routes → Map → Routes (${JSON.stringify({
+          before: cameraBeforeTabSwitch,
+          after: cameraAfterTabSwitch
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(500);
+    const cameraAfterReselect = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!cameraAfterReselect) {
+      throw new Error("Routes real-data check: could not inspect camera after reselecting the route.");
+    }
+    if (
+      Math.abs(cameraAfterReselect.zoom - cameraAfterTabSwitch.zoom) < 0.3 &&
+      Math.abs(cameraAfterReselect.center[0] - cameraAfterTabSwitch.center[0]) < 0.2 &&
+      Math.abs(cameraAfterReselect.center[1] - cameraAfterTabSwitch.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes real-data check: reselecting route after ‹ All routes did not fit camera (${JSON.stringify({
+          beforeReselect: cameraAfterTabSwitch,
+          afterReselect: cameraAfterReselect
+        })}).`
+      );
+    }
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
     await desktopPage.waitForTimeout(800);
@@ -11503,6 +11633,119 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await notesSection.scrollIntoViewIfNeeded();
     await desktopPage.screenshot({ path: screenshotPaths.desktopRouteNotesEnd, fullPage: true });
 
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-panel-sources='true'] summary", { hasText: "Sources" }).click();
+    const routeSourcesText = await desktopPage
+      .locator("[data-route-panel-sources='true'] [data-route-sources-list='true']")
+      .innerText();
+    if (routeSourcesText.includes("Bibliography ")) {
+      throw new Error("Routes real-data check: route-level Sources still show Bibliography fallback labels.");
+    }
+    await desktopPage.locator("[data-route-stage-index='1'] summary", { hasText: "Sources" }).click();
+    const stageSourcesText = await desktopPage
+      .locator("[data-route-stage-index='1'] [data-route-sources-list='true']")
+      .innerText();
+    if (stageSourcesText.includes("Bibliography ")) {
+      throw new Error("Routes real-data check: stage-level Sources still show Bibliography fallback labels.");
+    }
+    const seleuciaStopButton = desktopPage
+      .locator("[data-route-stage-index='1']")
+      .getByRole("button", { name: "Seleucia" });
+    await seleuciaStopButton.click();
+    await desktopPage.getByText("‹ Back to route", { exact: true }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText("Seleucia", { exact: true }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText("Today:", { exact: false }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText("Passages:", { exact: false }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText("Not yet on the main map.", { exact: true }).waitFor({ timeout: 30_000 });
+    const stopCard = desktopPage.locator("div", { hasText: "Not yet on the main map." }).first();
+    await stopCard.locator("summary", { hasText: "Sources" }).click();
+    const stopSourcesText = await stopCard
+      .locator("[data-route-sources-list='true']")
+      .first()
+      .innerText();
+    if (stopSourcesText.includes("Bibliography ")) {
+      throw new Error("Routes real-data check: stop-entry Sources still show Bibliography fallback labels.");
+    }
+    await desktopPage.getByRole("button", { name: "‹ Back to route" }).click();
+    await desktopPage.getByText("‹ Back to route", { exact: true }).waitFor({ state: "hidden", timeout: 30_000 });
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Jesus' journeys" }).click();
+    await desktopPage.getByRole("heading", { name: "Jesus' journeys" }).waitFor({ timeout: 30_000 });
+    await desktopPage
+      .locator("[data-route-stage-index='23']")
+      .getByRole("button", { name: "Bethphage" })
+      .click();
+    await desktopPage.getByText("Candidate sites:", { exact: true }).waitFor({ timeout: 30_000 });
+    const disputedCandidateCount = await desktopPage.locator("[data-route-stop-candidates='true'] li").count();
+    if (disputedCandidateCount < 2) {
+      throw new Error(
+        `Routes real-data check: disputed route-stop card should list multiple candidates (count=${disputedCandidateCount}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "‹ Back to route" }).click();
+    await desktopPage.getByText("‹ Back to route", { exact: true }).waitFor({ state: "hidden", timeout: 30_000 });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-3`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { name: "Paul's third journey" }).waitFor({ timeout: 30_000 });
+    const clickedLateStageLine = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const features = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] });
+      const target = features.find((feature) => Number(feature.properties?.stageIndex) === 13);
+      if (!target) {
+        return false;
+      }
+      const geometry = target.geometry;
+      if (!geometry || (geometry.type !== "LineString" && geometry.type !== "MultiLineString")) {
+        return false;
+      }
+      const coordinates =
+        geometry.type === "LineString"
+          ? geometry.coordinates
+          : geometry.coordinates.flat();
+      if (!Array.isArray(coordinates) || coordinates.length === 0) {
+        return false;
+      }
+      const midpoint = coordinates[Math.floor(coordinates.length / 2)];
+      if (!Array.isArray(midpoint) || midpoint.length < 2) {
+        return false;
+      }
+      const point = map.project([midpoint[0], midpoint[1]]);
+      map.fire("click", {
+        point,
+        lngLat: { lng: midpoint[0], lat: midpoint[1] }
+      });
+      return true;
+    }, mapTestHookKey);
+    if (!clickedLateStageLine) {
+      throw new Error("Routes real-data check: could not click late-stage route line on map.");
+    }
+    await desktopPage
+      .locator("[data-route-stage-index='14'][data-route-stage-selected='true']")
+      .waitFor({ timeout: 30_000 });
+    const selectedStageInPanelViewport = await desktopPage.evaluate(() => {
+      const panel = document.querySelector("[aria-label='Route details']");
+      const stage = document.querySelector("[data-route-stage-index='14']");
+      if (!panel || !stage) {
+        return false;
+      }
+      const panelRect = panel.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      return stageRect.top >= panelRect.top && stageRect.bottom <= panelRect.bottom;
+    });
+    if (!selectedStageInPanelViewport) {
+      throw new Error("Routes real-data check: selecting a map line did not scroll stage row into view.");
+    }
+
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus`, {
       waitUntil: "domcontentloaded",
       timeout: 150_000
@@ -11513,7 +11756,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     await desktopPage.waitForFunction((testHook) => Boolean(window[testHook]), mapTestHookKey, {
       timeout: 30_000
     });
-    const jesusDeepLinkFitCheck = await desktopPage.evaluate((testHook) => {
+    const jesusDeepLinkFitCheck = await desktopPage.evaluate(async (testHook) => {
       const map = window[testHook];
       if (!map) {
         return null;
@@ -11521,15 +11764,12 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       const center = map.getCenter();
       const bounds = map.getBounds();
       const viewportStops = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] });
-      const pointsSource = map.getSource("ibm-routes-points");
-      const sourceFeatures =
-        pointsSource &&
-        typeof pointsSource === "object" &&
-        "_data" in pointsSource &&
-        pointsSource._data &&
-        Array.isArray(pointsSource._data.features)
-          ? pointsSource._data.features
-          : [];
+      const pointsSource = map.getSource("ibm-route-points");
+      const pointsData =
+        pointsSource && typeof pointsSource.getData === "function"
+          ? await pointsSource.getData()
+          : null;
+      const sourceFeatures = Array.isArray(pointsData?.features) ? pointsData.features : [];
       const mentioned = sourceFeatures.filter((feature) => feature.properties?.kind === "mentioned");
       const mentionedIds = mentioned.map((feature) => {
         const stopKind = feature.properties?.stopKind ?? "";
@@ -11564,7 +11804,10 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         `Routes real-data check: deep link route fit failed for Jesus (${JSON.stringify(jesusDeepLinkFitCheck)}).`
       );
     }
-    if (jesusDeepLinkFitCheck.mentionedCount !== jesusDeepLinkFitCheck.uniqueMentionedCount) {
+    if (
+      jesusDeepLinkFitCheck.mentionedCount !== 1 ||
+      jesusDeepLinkFitCheck.mentionedCount !== jesusDeepLinkFitCheck.uniqueMentionedCount
+    ) {
       throw new Error(
         `Routes real-data check: duplicate mentioned place features found (${JSON.stringify(jesusDeepLinkFitCheck)}).`
       );
