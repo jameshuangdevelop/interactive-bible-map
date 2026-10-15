@@ -63,6 +63,8 @@ const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
 const ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX = 1280;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const VIEW_TABS_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
+const SEGMENTED_CONTROL_MIN_WIDTH_PX = 178;
+const MAP_TOP_CONTROL_CLEARANCE_PX = 16;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const MAP_MODE_ORDER: readonly MapDisplayMode[] = ["ancient", "modern"];
 const VIEW_TAB_ORDER = ["map", "routes"] as const;
@@ -1754,6 +1756,21 @@ export function AppShell() {
   const showRoutePlacePanel = routePanelOpen && routePlacePanelActive;
   const showRouteBackLink = showRoutePlacePanel && !showSideBySideRoutePlacePanels;
   const showMapTabPlacePanel = viewTab === "map" && Boolean(selectedPlace);
+  const showDualRoutesPanelsOnDesktop = !isSmallScreen && showRoutesPanel && showRoutePlacePanel && showSideBySideRoutePlacePanels;
+  const routePanelsRightEdgePx = showDualRoutesPanelsOnDesktop ? PANEL_WIDTH * 2 : PANEL_WIDTH;
+  const centeredTabsLeftPx =
+    routePanelsRightEdgePx + (viewportWidthPx - routePanelsRightEdgePx - SEGMENTED_CONTROL_MIN_WIDTH_PX) / 2;
+  const mapToggleLeftPx =
+    viewportWidthPx - tokens.spacing.md - SEGMENTED_CONTROL_MIN_WIDTH_PX;
+  const centeredTabsWouldAvoidToggle =
+    centeredTabsLeftPx + SEGMENTED_CONTROL_MIN_WIDTH_PX + MAP_TOP_CONTROL_CLEARANCE_PX <= mapToggleLeftPx;
+  const tabsLeftWithDualPanelsPx = centeredTabsWouldAvoidToggle
+    ? centeredTabsLeftPx
+    : routePanelsRightEdgePx + tokens.spacing.md;
+  const viewTabsDesktopLeft = showDualRoutesPanelsOnDesktop
+    ? `${Math.round(tabsLeftWithDualPanelsPx)}px`
+    : "50%";
+  const viewTabsDesktopTransform = showDualRoutesPanelsOnDesktop ? "none" : "translateX(-50%)";
   const commonSmallScreenPanelStyle: CSSProperties = {
     position: "absolute",
     left: `${tokens.spacing.md}px`,
@@ -1875,8 +1892,8 @@ export function AppShell() {
         role="tablist"
         style={{
           position: "absolute",
-          left: isSmallScreen ? `${tokens.spacing.md}px` : "50%",
-          transform: isSmallScreen ? "none" : "translateX(-50%)",
+          left: isSmallScreen ? `${tokens.spacing.md}px` : viewTabsDesktopLeft,
+          transform: isSmallScreen ? "none" : viewTabsDesktopTransform,
           top: isSmallScreen ? `${VIEW_TABS_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
           display: "inline-flex",
           borderRadius: "999px",

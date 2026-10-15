@@ -11379,6 +11379,87 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       consoleErrors.push(message.text());
     }
   });
+  const intersects = (left, right) =>
+    !(
+      left.right <= right.left ||
+      left.left >= right.right ||
+      left.bottom <= right.top ||
+      left.top >= right.bottom
+    );
+  const verifyRouteTabsAvoidPanelsAndToggle = async (viewportWidth) => {
+    const context = await browser.newContext({
+      viewport: { width: viewportWidth, height: 900 },
+      reducedMotion: "no-preference"
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/?tab=routes&route=paul-2&place=corinth`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(page);
+      await page.locator("section[aria-label='Route details']").waitFor({ timeout: 30_000 });
+      await page.locator("section[aria-label='Place details'][data-route-place-panel='true']").waitFor({ timeout: 30_000 });
+      const layout = await page.evaluate(() => {
+        const tabs = document.querySelector("[role='tablist'][aria-label='View']");
+        const routePanel = document.querySelector("section[aria-label='Route details']");
+        const placePanel = document.querySelector("section[aria-label='Place details'][data-route-place-panel='true']");
+        const mapTypeToggle = document.querySelector("[role='radiogroup'][aria-label='Map type']");
+        const toBox = (element) => {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+          const rect = element.getBoundingClientRect();
+          return {
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+            width: rect.width,
+            height: rect.height
+          };
+        };
+        if (!(tabs instanceof HTMLElement)) {
+          return null;
+        }
+        const tabsRect = toBox(tabs);
+        const routeRect = toBox(routePanel);
+        const placeRect = toBox(placePanel);
+        const mapTypeRect = toBox(mapTypeToggle);
+        return {
+          tabsRect,
+          routeRect,
+          placeRect,
+          mapTypeRect
+        };
+      });
+      if (!layout || !layout.tabsRect || !layout.routeRect || !layout.placeRect || !layout.mapTypeRect) {
+        throw new Error(`Routes real-data check: missing layout boxes for ${viewportWidth}px dual-panel tabs check.`);
+      }
+      if (intersects(layout.tabsRect, layout.routeRect)) {
+        throw new Error(
+          `Routes real-data check: view tabs overlap route panel at ${viewportWidth}px (${JSON.stringify(layout)}).`
+        );
+      }
+      if (intersects(layout.tabsRect, layout.placeRect)) {
+        throw new Error(
+          `Routes real-data check: view tabs overlap place panel at ${viewportWidth}px (${JSON.stringify(layout)}).`
+        );
+      }
+      if (intersects(layout.tabsRect, layout.mapTypeRect)) {
+        throw new Error(
+          `Routes real-data check: view tabs overlap map toggle at ${viewportWidth}px (${JSON.stringify(layout)}).`
+        );
+      }
+      return {
+        viewportWidth,
+        tabsRect: layout.tabsRect
+      };
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  };
 
   try {
     await desktopPage.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 150_000 });
@@ -11799,12 +11880,52 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     if (corinthDeepLinkStageSelected !== "true") {
       throw new Error(`Routes real-data check: route+place deep link should keep stage selection (stage 6=${corinthDeepLinkStageSelected}).`);
     }
-
+    const dualPanelTabsLayoutChecks = [];
+    for (const viewportWidth of [1280, 1440]) {
+      dualPanelTabsLayoutChecks.push(await verifyRouteTabsAvoidPanelsAndToggle(viewportWidth));
+    }
+    await desktopPage.goto(`${baseUrl}/?tab=map&place=corinth`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='false']").waitFor({ timeout: 30_000 });
+    const singlePanelTabsPosition = await desktopPage.evaluate(() => {
+      const tabs = document.querySelector("[role='tablist'][aria-label='View']");
+      if (!(tabs instanceof HTMLElement)) {
+        return null;
+      }
+      const style = tabs.style;
+      const rect = tabs.getBoundingClientRect();
+      return {
+        leftStyle: style.left,
+        transformStyle: style.transform,
+        centerX: rect.left + rect.width / 2,
+        viewportCenterX: window.innerWidth / 2
+      };
+    });
+    if (!singlePanelTabsPosition) {
+      throw new Error("Routes real-data check: missing view tabs for single-panel map-tab position check.");
+    }
+    if (
+      singlePanelTabsPosition.leftStyle !== "50%" ||
+      singlePanelTabsPosition.transformStyle !== "translateX(-50%)"
+    ) {
+      throw new Error(
+        `Routes real-data check: single-panel map-tab view tabs position changed (${JSON.stringify(singlePanelTabsPosition)}).`
+      );
+    }
+    if (Math.abs(singlePanelTabsPosition.centerX - singlePanelTabsPosition.viewportCenterX) > 1.5) {
+      throw new Error(
+        `Routes real-data check: single-panel map-tab view tabs should stay centered (${JSON.stringify(singlePanelTabsPosition)}).`
+      );
+    }
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome`, {
       waitUntil: "domcontentloaded",
       timeout: 150_000
     });
     await waitForMapToSettle(desktopPage);
+
     const alexandriaLink = desktopPage.getByRole("button", { name: "Alexandria" }).first();
     await alexandriaLink.waitFor({ timeout: 30_000 });
     await alexandriaLink.click();
@@ -12170,6 +12291,8 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       routeSelectionRenderer,
       routePlaceVisibilityCheck,
       corinthDeepLinkStageSelected,
+      dualPanelTabsLayoutChecks,
+      singlePanelTabsPosition,
       tabletRoutePlacePanelBehavior,
       phoneRoutePlacePanelBehavior,
       screenshotPaths,
