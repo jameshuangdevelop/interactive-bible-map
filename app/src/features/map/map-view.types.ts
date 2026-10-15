@@ -25,6 +25,9 @@ export interface MapViewProps {
     stopKind: "location" | "route-stop";
     stopId: string;
   }[];
+  routeKeyboardPlaceIds: string[];
+  routeOverlayHiddenPlaceIds: string[];
+  routeOverlayHiddenPlaceIdsKey: string;
   onSelectRouteMapEntry: (
     entry:
       | { kind: "line"; routeId: string; stageId: string; stageIndex: number }

@@ -145,7 +145,6 @@ const layerRoutesLinesBackgroundId = "ibm-routes-lines-background";
 const layerRoutesLinesForegroundId = "ibm-routes-lines-foreground";
 const layerRoutesLinesArrowsId = "ibm-routes-lines-arrows";
 const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
-const layerRoutesLinesTraceId = "ibm-routes-lines-trace";
 const layerRoutesStopsId = "ibm-routes-stops";
 const layerRoutesStopsStartId = "ibm-routes-stops-start";
 const layerRoutesStopLabelsId = "ibm-routes-stop-labels";
@@ -352,7 +351,6 @@ function applyMapModeOverlayVisibility(
     layerRoutesLinesForegroundId,
     layerRoutesLinesArrowsId,
     layerRoutesLinesHighlightId,
-    layerRoutesLinesTraceId,
     layerRoutesStopsId,
     layerRoutesStopsStartId,
     layerRoutesStopLabelsId,
@@ -366,7 +364,7 @@ function applyMapModeOverlayVisibility(
     setLayerVisibility(map, layerId, showRouteLayers);
   }
 
-  const showPlaceLayers = !routesModeEnabled;
+  const showPlaceLayers = true;
   for (const layerId of [
     layerMajorClusterCircleId,
     layerMajorClusterLabelId,
@@ -398,6 +396,133 @@ function applyMapModeOverlayVisibility(
   ]) {
     setLayerVisibility(map, layerId, showPlaceLayers);
   }
+}
+
+function withRoutePlaceSuppressionFilter(baseFilter: unknown, hiddenPlaceIds: string[]) {
+  if (hiddenPlaceIds.length === 0) {
+    return baseFilter;
+  }
+
+  return ["all", baseFilter, ["!", ["in", ["get", "placeId"], ["literal", hiddenPlaceIds]]]];
+}
+
+function applyRoutePlaceSuppressionFilters(
+  map: MapLibreMap,
+  hiddenPlaceIds: string[]
+) {
+  const updateLayerFilter = (layerId: string, filter: unknown) => {
+    if (!map.getLayer(layerId)) {
+      return;
+    }
+    map.setFilter(layerId, toLayerFilter(withRoutePlaceSuppressionFilter(filter, hiddenPlaceIds)));
+  };
+
+  updateLayerFilter(
+    layerCityPinShadowId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["any", ["==", ["get", "isSelectedPlace"], true], ["==", ["get", "isHighlightedPlace"], true]]
+    ]
+  );
+  updateLayerFilter(layerCityPinId, ["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]);
+  updateLayerFilter(
+    layerMajorPinShadowId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["any", ["==", ["get", "isSelectedPlace"], true], ["==", ["get", "isHighlightedPlace"], true]]
+    ]
+  );
+  updateLayerFilter(layerMajorPinId, ["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]);
+  updateLayerFilter(
+    layerSitePinShadowId,
+    [
+      "all",
+      basePinVisibilityFilter,
+      ["any", ["==", ["get", "isSelectedPlace"], true], ["==", ["get", "isHighlightedPlace"], true]]
+    ]
+  );
+  updateLayerFilter(layerSitePinId, basePinVisibilityFilter);
+  updateLayerFilter(
+    layerQuestionBadgeId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["==", ["get", "hasMultipleCandidates"], true],
+      ["==", ["get", "isDisputed"], true]
+    ]
+  );
+  updateLayerFilter(
+    layerMajorQuestionBadgeId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["==", ["get", "hasMultipleCandidates"], true],
+      ["==", ["get", "isDisputed"], true]
+    ]
+  );
+  updateLayerFilter(layerCandidatePinId, candidateVisibilityFilter);
+  updateLayerFilter(layerMajorPinCollisionMaskId, ["all", ["!", ["has", "point_count"]], basePinVisibilityFilter]);
+  updateLayerFilter(layerSitePinCollisionMaskId, basePinVisibilityFilter);
+  updateLayerFilter(layerCandidatePinCollisionMaskId, candidateVisibilityFilter);
+  updateLayerFilter(
+    layerPinLabelId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      standardPinUnmutedZoomFilter,
+      ["!=", ["get", "labelText"], null],
+      ["!=", ["get", "isSelectedPlace"], true]
+    ]
+  );
+  updateLayerFilter(
+    layerMajorPinLabelId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["!=", ["get", "labelText"], null],
+      ["!=", ["get", "isSelectedPlace"], true],
+      ["!=", ["get", "majorLabelSide"], "left"]
+    ]
+  );
+  updateLayerFilter(
+    layerMajorPinLabelLeftId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["!=", ["get", "labelText"], null],
+      ["!=", ["get", "isSelectedPlace"], true],
+      ["==", ["get", "majorLabelSide"], "left"]
+    ]
+  );
+  updateLayerFilter(
+    layerSelectedMajorPinLabelId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["!=", ["get", "labelText"], null],
+      ["==", ["get", "isSelectedPlace"], true]
+    ]
+  );
+  updateLayerFilter(
+    layerSelectedPinLabelId,
+    [
+      "all",
+      ["!", ["has", "point_count"]],
+      basePinVisibilityFilter,
+      ["!=", ["get", "labelText"], null],
+      ["==", ["get", "isSelectedPlace"], true]
+    ]
+  );
 }
 
 type GeoJsonSourceData = Parameters<GeoJSONSource["setData"]>[0];
@@ -659,6 +784,55 @@ function focusSelection(
     durationMs,
     prefersReducedMotion()
   );
+}
+
+function panSelectionIfOffScreen(
+  map: MapLibreMap,
+  place: PlaceIndexRecord,
+  selection: PlaceSelection,
+  leftInset: number,
+  bottomInset: number,
+  durationMs: number
+) {
+  const focusPlan = planSelectionFocus(place, selection);
+  if (!focusPlan) {
+    return;
+  }
+
+  const targetCoordinates =
+    focusPlan.kind === "center"
+      ? focusPlan.coordinates
+      : (() => {
+          const [first, ...rest] = focusPlan.coordinates;
+          if (!first) {
+            return null;
+          }
+          const bounds = new LngLatBounds(first, first);
+          for (const coordinate of rest) {
+            bounds.extend(coordinate);
+          }
+          const center = bounds.getCenter();
+          return [center.lng, center.lat] as Coordinates;
+        })();
+  if (!targetCoordinates) {
+    return;
+  }
+
+  const projected = map.project(targetCoordinates as LngLatLike);
+  const minX = leftInset + 40;
+  const maxX = (typeof window === "undefined" ? 1440 : window.innerWidth) - 40;
+  const minY = 56;
+  const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - bottomInset - 40;
+  const offScreen = projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
+  if (!offScreen) {
+    return;
+  }
+
+  map.easeTo({
+    center: targetCoordinates,
+    zoom: map.getZoom(),
+    duration: prefersReducedMotion() ? 0 : durationMs
+  });
 }
 
 function getMapLabelPadding(leftInset: number, bottomInset: number) {
@@ -1724,31 +1898,6 @@ function ensureMapLayers(
     });
   }
 
-  if (!map.getLayer(layerRoutesLinesTraceId)) {
-    map.addLayer({
-      id: layerRoutesLinesTraceId,
-      source: sourceRoutesLinesId,
-      type: "line",
-      filter: toLayerFilter(["==", ["get", "isSelectedStage"], true]),
-      layout: {
-        "line-cap": "round",
-        "line-join": "round"
-      },
-      paint: {
-        "line-width": 6.5,
-        "line-gradient": [
-          "interpolate",
-          ["linear"],
-          ["line-progress"],
-          0,
-          "rgba(255,255,255,0)",
-          1,
-          "rgba(255,255,255,0)"
-        ]
-      }
-    });
-  }
-
   if (!map.getLayer(layerRoutesStopsId)) {
     map.addLayer({
       id: layerRoutesStopsId,
@@ -1859,10 +2008,10 @@ function ensureMapLayers(
       ]),
       paint: {
         "circle-radius": 4,
-        "circle-color": "#9AA0A6",
+        "circle-color": "#1A73E8",
         "circle-stroke-color": "#FFFFFF",
         "circle-stroke-width": 1.2,
-        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 0.92]
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
       }
     });
   }
@@ -1917,19 +2066,19 @@ function ensureMapLayers(
       ]),
       layout: {
         "text-field": ["get", "label"],
-        "text-font": ["Noto Sans Italic"],
-        "text-size": 11,
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
         "text-variable-anchor": ["right", "left", "top", "bottom"],
-        "text-radial-offset": 0.7,
+        "text-radial-offset": 0.65,
         "text-anchor": "left",
         "text-allow-overlap": false,
         "text-ignore-placement": false
       },
       paint: {
-        "text-color": "#9AA0A6",
+        "text-color": "#202124",
         "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": 1.1,
-        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 0.9]
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
       }
     });
   }
@@ -3012,6 +3161,9 @@ export function MapView({
   ancientLayerRetryToken,
   routesOverlay,
   routeKeyboardEntries,
+  routeKeyboardPlaceIds,
+  routeOverlayHiddenPlaceIds,
+  routeOverlayHiddenPlaceIdsKey,
   onSelectRouteMapEntry,
   onAncientLayerLoadStateChange,
   pinLabelSource,
@@ -3062,19 +3214,20 @@ export function MapView({
   const routesModeEnabledRef = useRef(false);
   const previousRouteFocusKeyRef = useRef<string | null>(null);
   const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
-  const routeStageAnimationFrameRef = useRef<number | null>(null);
   const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
+  const routeOverlayHiddenPlaceIdsRef = useRef<string[]>(routeOverlayHiddenPlaceIds);
   const preservedCameraRef = useRef<{
     center: [number, number];
     zoom: number;
     bearing: number;
     pitch: number;
   } | null>(null);
-
-  const selectedStageAnimationKey = routesOverlay?.selectedStageAnimationKey ?? null;
   useEffect(() => {
     latestRoutesOverlayRef.current = routesOverlay;
   }, [routesOverlay]);
+  useEffect(() => {
+    routeOverlayHiddenPlaceIdsRef.current = routeOverlayHiddenPlaceIds;
+  }, [routeOverlayHiddenPlaceIds, routeOverlayHiddenPlaceIdsKey]);
   useEffect(() => {
     selectedTimelineStopIdRef.current = selectedTimelineStopId;
   }, [selectedTimelineStopId]);
@@ -3543,12 +3696,6 @@ export function MapView({
       return;
     }
 
-    if (routesModeEnabled && routeKeyboardEntries.length > 0) {
-      setVisibleEntryOverflow(false);
-      setVisibleEntries([]);
-      return;
-    }
-
     const rendered = map.queryRenderedFeatures({
       layers: [...interactiveLayerIds]
     });
@@ -3582,7 +3729,7 @@ export function MapView({
     const overflow = deduplicated.length > MAX_VISIBLE_PLACE_LIST_ENTRIES;
     setVisibleEntryOverflow(overflow);
     setVisibleEntries(deduplicated.slice(0, MAX_VISIBLE_PLACE_LIST_ENTRIES));
-  }, [places, routeKeyboardEntries, routesModeEnabled]);
+  }, [places]);
 
   const scheduleVisibleEntryRefresh = useCallback(() => {
     if (gestureInProgressRef.current) {
@@ -4287,6 +4434,7 @@ export function MapView({
         hasAncientTimeline,
         routesModeEnabledRef.current
       );
+      applyRoutePlaceSuppressionFilters(map, routeOverlayHiddenPlaceIdsRef.current);
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -4324,8 +4472,7 @@ export function MapView({
             layerRoutesViaId,
             layerRoutesMentionedId,
             layerRoutesLinesHighlightId,
-            layerRoutesLinesForegroundId,
-            layerRoutesLinesTraceId
+            layerRoutesLinesForegroundId
           ]
         });
         const routeMatch = routeFeatures.find((feature) =>
@@ -4361,8 +4508,7 @@ export function MapView({
 
         const lineMatch = routeFeatures.find((feature) =>
           feature.layer?.id === layerRoutesLinesHighlightId ||
-          feature.layer?.id === layerRoutesLinesForegroundId ||
-          feature.layer?.id === layerRoutesLinesTraceId
+          feature.layer?.id === layerRoutesLinesForegroundId
         );
         if (lineMatch) {
           const properties = asObject(lineMatch.properties);
@@ -4442,10 +4588,6 @@ export function MapView({
       }
       if (gestureReleaseTimeoutRef.current !== null) {
         window.clearTimeout(gestureReleaseTimeoutRef.current);
-      }
-      if (routeStageAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(routeStageAnimationFrameRef.current);
-        routeStageAnimationFrameRef.current = null;
       }
       cancelScheduledTooltipUpdate();
 
@@ -4557,9 +4699,16 @@ export function MapView({
     const map = mapRef.current;
     if (map) {
       applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline, routesModeEnabled);
+      applyRoutePlaceSuppressionFilters(map, routeOverlayHiddenPlaceIdsRef.current);
     }
     refreshVisibleEntryState();
-  }, [hasAncientTimeline, refreshVisibleEntryState, routesModeEnabled, syncBaseSourcesAndLayers]);
+  }, [
+    hasAncientTimeline,
+    refreshVisibleEntryState,
+    routeOverlayHiddenPlaceIdsKey,
+    routesModeEnabled,
+    syncBaseSourcesAndLayers
+  ]);
 
   useEffect(() => {
     if (!styleReadyRef.current) {
@@ -4602,6 +4751,18 @@ export function MapView({
     }
 
     previousFocusRequestRef.current = selectionKey;
+    if (routesModeEnabled) {
+      panSelectionIfOffScreen(
+        map,
+        place,
+        selection,
+        panelInset,
+        bottomInset,
+        runtimeTuning.controlZoomDurationMs
+      );
+      return;
+    }
+
     focusSelection(
       map,
       place,
@@ -4615,6 +4776,8 @@ export function MapView({
     mapReadyVersion,
     panelInset,
     placeById,
+    routesModeEnabled,
+    runtimeTuning.controlZoomDurationMs,
     runtimeTuning.flyToDurationMs,
     selection
   ]);
@@ -4687,69 +4850,6 @@ export function MapView({
     previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
   }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs, styleReadyVersion]);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !styleReadyRef.current) {
-      return;
-    }
-
-    if (routeStageAnimationFrameRef.current !== null) {
-      window.cancelAnimationFrame(routeStageAnimationFrameRef.current);
-      routeStageAnimationFrameRef.current = null;
-    }
-
-    const clearTrace = () => {
-      if (!map.getLayer(layerRoutesLinesTraceId)) {
-        return;
-      }
-      map.setPaintProperty(layerRoutesLinesTraceId, "line-gradient", [
-        "interpolate",
-        ["linear"],
-        ["line-progress"],
-        0,
-        "rgba(255,255,255,0)",
-        1,
-        "rgba(255,255,255,0)"
-      ]);
-    };
-
-    if (!selectedStageAnimationKey || prefersReducedMotion()) {
-      clearTrace();
-      return;
-    }
-
-    const start = performance.now();
-    const durationMs = 1_500;
-    const tick = (now: number) => {
-      if (!map.getLayer(layerRoutesLinesTraceId)) {
-        return;
-      }
-      const progress = Math.max(0, Math.min(1, (now - start) / durationMs));
-      map.setPaintProperty(layerRoutesLinesTraceId, "line-gradient", [
-        "step",
-        ["line-progress"],
-        "#FFFFFF",
-        progress,
-        "rgba(255,255,255,0)"
-      ]);
-      if (progress >= 1) {
-        routeStageAnimationFrameRef.current = null;
-        window.setTimeout(clearTrace, 120);
-        return;
-      }
-      routeStageAnimationFrameRef.current = window.requestAnimationFrame(tick);
-    };
-
-    routeStageAnimationFrameRef.current = window.requestAnimationFrame(tick);
-    return () => {
-      if (routeStageAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(routeStageAnimationFrameRef.current);
-        routeStageAnimationFrameRef.current = null;
-      }
-      clearTrace();
-    };
-  }, [selectedStageAnimationKey]);
-
   const resetView = useCallback(() => {
     const map = mapRef.current;
     if (!map) {
@@ -4808,6 +4908,18 @@ export function MapView({
     routeAttributionOverlayInset
   );
   const compactAttributionRightOffset = 72;
+  const filteredVisibleEntries = useMemo(
+    () =>
+      routesModeEnabled
+        ? visibleEntries.filter((entry) => {
+            if (entry.kind !== "place") {
+              return true;
+            }
+            return !routeKeyboardPlaceIds.includes(entry.selection.placeId);
+          })
+        : visibleEntries,
+    [routeKeyboardPlaceIds, routesModeEnabled, visibleEntries]
+  );
   const visiblePlacesList = (
     <div
       aria-label="Visible places on map"
@@ -4859,7 +4971,7 @@ export function MapView({
               </button>
             ))
           : null}
-        {!routesModeEnabled ? visibleEntries.map((entry) => (
+        {filteredVisibleEntries.map((entry) => (
           <button
             key={entry.id}
           aria-label={entry.accessibleName}
@@ -4870,8 +4982,8 @@ export function MapView({
         >
           {entry.accessibleName}
         </button>
-      )) : null}
-      {!routesModeEnabled && visibleEntryOverflow ? (
+      ))}
+      {visibleEntryOverflow ? (
         <p role="note">Zoom in or search to reach more places</p>
       ) : null}
     </div>

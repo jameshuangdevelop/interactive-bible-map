@@ -50,5 +50,4 @@ export interface RouteMapOverlayData {
   routeFocusKey: string | null;
   selectedStageFocusKey: string | null;
   selectedStageCenter: Coordinates | null;
-  selectedStageAnimationKey: string | null;
 }
