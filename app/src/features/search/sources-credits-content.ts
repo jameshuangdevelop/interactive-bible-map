@@ -56,7 +56,7 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
   {
     name: "ORBIS (v2) Network Edge and Node Tables (Stanford)",
     url: "https://purl.stanford.edu/mn425tz9757",
-    note: "Route data derived from ORBIS (v2) Network Edge and Node Tables (Meeks, Scheidel, Weiland and Arcenas, Stanford Digital Repository, 2014), CC BY 3.0."
+    note: "A cross-check for travel times on the Routes tab; no ORBIS data is used in the map."
   },
   {
     name: "AWMC Geodata",
