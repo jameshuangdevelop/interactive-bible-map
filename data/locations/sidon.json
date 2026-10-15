@@ -36,37 +36,38 @@
     }
   ],
   "summary": {
-    "text": "Sidon was one of the oldest and most prominent cities of ancient Phoenicia, built on a narrow coastal plain with two harbors a little north of Tyre. Genesis names Sidon as Canaan's firstborn son, and Israel's early historical books call it \"great Sidon,\" a leading city of the region. The Gospels record that Jesus withdrew into the region of Tyre and Sidon, where he healed a Gentile woman's daughter, and that he contrasted the repentance Tyre and Sidon would have shown with the Galilean towns that saw his mighty works and did not repent. According to Acts, on the voyage to Rome as a prisoner, Paul's ship touched at Sidon, where the centurion Julius let him go ashore to see friends.",
+    "text": "Sidon was one of the oldest and most prominent cities of ancient Phoenicia, a maritime city with two harbors on the Mediterranean coast. The Gospels record that Jesus withdrew into the region of Tyre and Sidon, where he healed the daughter of a Syrophoenician woman, and that he contrasted the repentance Tyre and Sidon would have shown with the Galilean towns that saw his mighty works and did not repent. According to Acts, Paul, delivered as a prisoner to a centurion named Julius for the voyage to Rome, touched at Sidon, where Julius kindly let him go ashore to see friends.",
     "sources": [
       "pleiades:678393",
       "openbible:sidon",
       "wikidata:Q163490",
       "bib:isbe-sidon",
-      "scripture:Genesis 10:15",
-      "scripture:Joshua 11:8",
-      "scripture:Mark 7:24",
+      "scripture:Matthew 15:21",
+      "scripture:Mark 7:26",
       "scripture:Matthew 11:21",
+      "scripture:Acts 27:1",
       "scripture:Acts 27:3"
     ]
   },
   "history": [
     {
-      "text": "Sidon's wealth rested on Mediterranean trade and skilled craftsmanship, including fine metalwork and the purple dye later called Tyrian, which the International Standard Bible Encyclopedia says was first produced at Sidon; the encyclopedia also credits Sidon's sailors as the first Phoenicians to navigate open water at night by the stars.",
+      "text": "The International Standard Bible Encyclopedia credits Sidon with leading the Phoenician cities in early seafaring, its sailors said to be the first to sail the open sea by night, guided by the stars, and with becoming distinguished for its manufactures and artisans' skill, including fine metalwork and textiles dyed with the purple later called Tyrian, though the encyclopedia says that dye was earlier produced at Sidon.",
       "sources": [
         "bib:isbe-sidon"
       ]
     },
     {
-      "text": "In 351 BC, besieged after a revolt by the Persian king Artaxerxes III (Ochus), the citizens of Sidon are said to have burned their own ships and houses rather than surrender, with a reported 40,000 deaths. The city recovered, passing after Alexander the Great's conquests first to the Ptolemies and then to the Seleucids before coming under Rome, which granted it a measure of self-government and the right to mint its own bronze coinage.",
+      "text": "The International Standard Bible Encyclopedia records that Sidon revolted against Persian rule in 351 BC, and that the Persian king Ochus then marched against the city with a large army; its citizens are said to have burned their own ships and houses rather than surrender, with a reported 40,000 deaths. The city recovered, and after the death of Alexander the Great it passed to the Ptolemies, the Greek dynasty then ruling Egypt, until 198 BC, when the Seleucid king Antiochus III took it from them; it later came under Rome, which granted it a measure of self-government and the right to mint its own bronze coinage.",
       "sources": [
         "bib:isbe-sidon"
       ]
     },
     {
-      "text": "The International Standard Bible Encyclopedia notes that Sidon was known for a school of philosophy under the Roman emperors Augustus and Tiberius, and that its law school took in students and teachers from Berytus (modern Beirut) after an earthquake destroyed that city in AD 551. Today Sidon is a city in southern Lebanon and the seat of the South Governorate.",
+      "text": "The International Standard Bible Encyclopedia notes that Sidon was known for a school of philosophy under the Roman emperors Augustus and Tiberius, and that Berytus's great law school was moved to Sidon after an earthquake destroyed Berytus (modern Beirut) in AD 551. Today Sidon is a city in southern Lebanon and the seat of the South Governorate.",
       "sources": [
         "bib:isbe-sidon",
-        "wikidata:Q163490"
+        "wikidata:Q163490",
+        "wikidata:Q829310"
       ]
     }
   ],
@@ -135,73 +136,42 @@
   "otConnections": [
     {
       "ref": "Genesis 10:15-19",
-      "note": "Genesis names Sidon as the firstborn son of Canaan in the genealogy of the nations, and describes the border of the Canaanites as running from Sidon south toward Gaza and the cities of the plain.",
+      "note": "Genesis names Sidon as the firstborn son of Canaan in the genealogy of the nations, and describes the border of the Canaanites as running from Sidon toward Gerar and Gaza, and toward Sodom, Gomorrah, Admah, Zeboiim and Lasha.",
       "sources": [
         "scripture:Genesis 10:15-19"
       ]
     },
     {
-      "ref": "Genesis 49:13",
-      "note": "In his final blessing on his sons, Jacob says of Zebulun that \"his border will be on Sidon,\" naming Sidon as a landmark at the edge of Zebulun's future territory.",
+      "ref": "1 Kings 17:8-24",
+      "note": "During a famine, the LORD sends the prophet Elijah to Zarephath, a town that \"belongs to Sidon,\" where a widow feeds him from a jar of meal and a jug of oil that do not run out, and where he later restores her dead son to life; in the Gospel of Luke, Jesus recalls that Elijah \"was sent to none of them, except to Zarephath, in the land of Sidon, to a woman who was a widow.\"",
       "sources": [
-        "scripture:Genesis 49:13"
-      ]
-    },
-    {
-      "ref": "Joshua 11:8",
-      "note": "Joshua reports that after Israel defeated a coalition of Canaanite kings, its forces chased the survivors as far as \"great Sidon.\"",
-      "sources": [
-        "scripture:Joshua 11:8"
-      ]
-    },
-    {
-      "ref": "Judges 1:31",
-      "note": "Judges lists the inhabitants of Sidon among the Canaanite towns, with Acco, Ahlab, Achzib, Helbah, Aphik and Rehob, that the tribe of Asher failed to drive out.",
-      "sources": [
-        "scripture:Judges 1:31"
-      ]
-    },
-    {
-      "ref": "Judges 18:27-29",
-      "note": "Judges explains that no help reached the people of Laish because their city was \"far from Sidon\"; the Danites then destroyed Laish, rebuilt it, and renamed it Dan.",
-      "sources": [
-        "scripture:Judges 18:27-29"
-      ]
-    },
-    {
-      "ref": "1 Kings 5:6",
-      "note": "Preparing to build the temple, Solomon asks Hiram, king of Tyre, to supply cedar and workers, \"for you know that there is nobody among us who knows how to cut timber like the Sidonians.\"",
-      "sources": [
-        "scripture:1 Kings 5:6"
-      ]
-    },
-    {
-      "ref": "1 Kings 16:31",
-      "note": "1 Kings reports that King Ahab of Israel married Jezebel, \"the daughter of Ethbaal king of the Sidonians,\" and then served Baal, a marriage the book treats as a turning point toward greater idolatry.",
-      "sources": [
-        "scripture:1 Kings 16:31"
-      ]
-    },
-    {
-      "ref": "1 Kings 17:9",
-      "note": "During a famine, the LORD sends the prophet Elijah to be fed by a widow at Zarephath, a town \"which belongs to Sidon\"; in the Gospel of Luke, Jesus cites this same episode in his sermon at Nazareth.",
-      "sources": [
-        "scripture:1 Kings 17:9",
+        "scripture:1 Kings 17:8-24",
         "scripture:Luke 4:26"
       ]
     },
     {
-      "ref": "Isaiah 23:2-4",
-      "note": "In his oracle against Tyre, Isaiah twice addresses Sidon directly, calling its seafaring merchants to be silent and telling Sidon to \"be ashamed\" at the loss of the city's maritime wealth.",
+      "ref": "Isaiah 23:2-12",
+      "note": "Isaiah's oracle against Tyre names Sidon's merchants as enriching the coast's inhabitants (23:2) and twice addresses Sidon directly, telling the city to \"be ashamed\" (23:4) and calling it the \"oppressed virgin daughter of Sidon\" who will find no rest even in Kittim (23:12); Jesus later draws on this same prophetic tradition of judgment on Tyre and Sidon when he says it will be \"more tolerable for Tyre and Sidon\" on the day of judgment than for the Galilean towns that rejected him.",
       "sources": [
-        "scripture:Isaiah 23:2-4"
+        "scripture:Isaiah 23:2-12",
+        "scripture:Matthew 11:21-22",
+        "scripture:Luke 10:13-14"
       ]
     },
     {
-      "ref": "Ezekiel 28:21-22",
-      "note": "The LORD instructs Ezekiel to \"set your face toward Sidon, and prophesy against it,\" announcing judgment on the city so that its people \"will know that I am the LORD.\"",
+      "ref": "Ezekiel 28:20-23",
+      "note": "The LORD commands Ezekiel to \"set your face toward Sidon, and prophesy against it,\" declaring judgment on the city by pestilence and the sword so that \"they will know that I am the LORD\"; this specific judgment on Sidon, together with Isaiah's oracle against Tyre, lies behind Jesus' sayings that it would have been more tolerable for Tyre and Sidon than for the Galilean towns that rejected him.",
       "sources": [
-        "scripture:Ezekiel 28:21-22"
+        "scripture:Ezekiel 28:20-23",
+        "scripture:Matthew 11:21-22",
+        "scripture:Luke 10:13-14"
+      ]
+    },
+    {
+      "ref": "Joel 3:4-8",
+      "note": "In an oracle against Tyre, Sidon and the regions of Philistia together, the LORD charges them with plundering Judah's treasures and selling its people to the Greeks as slaves, and promises to free the Judeans sold this way and to sell \"your sons and your daughters\" in turn \"to the men of Sheba, to a faraway nation.\"",
+      "sources": [
+        "scripture:Joel 3:4-8"
       ]
     }
   ],
