@@ -2114,6 +2114,19 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "smith-dictionary-cyrenaica",
+      "type": "chapter",
+      "title": "Cyrenaica",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=cyrenaica-geo",
+      "accessed": "2026-10-15"
+    },
+    {
       "id": "smith-dictionary-syrtica-regio",
       "type": "chapter",
       "title": "Syrtica Regio",

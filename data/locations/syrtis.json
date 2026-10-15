@@ -48,10 +48,11 @@
   },
   "history": [
     {
-      "text": "Smith's Dictionary of Greek and Roman Geography describes Syrtis Maior as one of two gulfs on the North African coast, the smaller Syrtis Minor lying further west. It states that the coastal tract between the two, called Syrtica Regio, at first belonged to the Cyrenaeans but was later taken by Carthage, becoming part of the Roman province of Africa once Carthage fell to Rome. Cyrenaica, the district around Cyrene that the International Standard Bible Encyclopedia places within the Roman province of Crete and Cyrene, lay well to the east.",
+      "text": "Smith's Dictionary of Greek and Roman Geography describes Syrtis Maior as one of two gulfs on the North African coast, the smaller Syrtis Minor lying further west. It states that the coastal tract between the two, called Syrtica Regio, at first belonged to the Cyrenaeans but was later taken by Carthage, becoming part of the Roman province of Africa once Carthage fell to Rome. Its separate entry on Cyrenaica, the district around Cyrene that the International Standard Bible Encyclopedia places within the Roman province of Crete and Cyrene, states that after long disputes Cyrenaica's own western boundary was fixed at the bottom of the Great Syrtis, whose waters washed its shore.",
       "sources": [
         "bib:smith-dictionary-syrtis-major",
         "bib:smith-dictionary-syrtica-regio",
+        "bib:smith-dictionary-cyrenaica",
         "bib:isbe-crete"
       ]
     }
@@ -68,9 +69,11 @@
     {
       "fromYear": -4,
       "toYear": 101,
-      "entity": "A sailing hazard off the North African coast, between the Roman province of Africa (to the west, not otherwise shown on this map) and the Roman province of Crete and Cyrene (whose Cyrenaican district lay to the east); this feature has no single political area of its own on this map.",
+      "entity": "A sailing hazard off the North African coast, at the boundary between the Roman province of Africa (to the west, not otherwise shown on this map) and Cyrenaica, within the Roman province of Crete and Cyrene; this feature has no single political area of its own on this map.",
       "sources": [
+        "bib:isbe-syrtis",
         "bib:smith-dictionary-syrtica-regio",
+        "bib:smith-dictionary-cyrenaica",
         "bib:isbe-crete"
       ]
     }
