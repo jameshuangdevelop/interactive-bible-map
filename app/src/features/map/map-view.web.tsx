@@ -167,6 +167,7 @@ const clusterCollisionImageId = "ibm-cluster-collision-image";
 const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
 const clusterSymbolImageId = "ibm-cluster-symbol-image";
 const routeStagePillImageId = "ibm-route-stage-pill-image";
+const routeDirectionArrowImageId = "ibm-route-direction-arrow-image";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
@@ -1127,6 +1128,23 @@ function createRouteStagePillImage() {
   });
 }
 
+function createRouteDirectionArrowImage() {
+  return createCanvasImage(16, (context, canvasSize) => {
+    const center = canvasSize / 2;
+    const halfHeight = 2.5;
+    const tail = 4.5;
+    const tip = canvasSize - 2;
+
+    context.fillStyle = "#FFFFFF";
+    context.beginPath();
+    context.moveTo(tail, center - halfHeight);
+    context.lineTo(tip, center);
+    context.lineTo(tail, center + halfHeight);
+    context.closePath();
+    context.fill();
+  });
+}
+
 function ensureRouteStagePillImage(map: MapLibreMap) {
   if (map.hasImage(routeStagePillImageId)) {
     return;
@@ -1138,6 +1156,19 @@ function ensureRouteStagePillImage(map: MapLibreMap) {
   }
 
   map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
+}
+
+function ensureRouteDirectionArrowImage(map: MapLibreMap) {
+  if (map.hasImage(routeDirectionArrowImageId)) {
+    return;
+  }
+
+  const image = createRouteDirectionArrowImage();
+  if (!image) {
+    return;
+  }
+
+  map.addImage(routeDirectionArrowImageId, image.image, { pixelRatio: image.pixelRatio });
 }
 
 function ensureCollisionImages(map: MapLibreMap) {
@@ -1680,18 +1711,15 @@ function ensureMapLayers(
       filter: toLayerFilter(["==", ["get", "isInSelectedRoute"], true]),
       layout: {
         "symbol-placement": "line",
-        "symbol-spacing": 180,
-        "text-field": "▸",
-        "text-font": ["Noto Sans Bold"],
-        "text-size": 10,
-        "text-allow-overlap": true,
-        "text-ignore-placement": true
+        "symbol-spacing": 200,
+        "icon-image": routeDirectionArrowImageId,
+        "icon-size": 1,
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
       },
       paint: {
-        "text-color": "#FFFFFF",
-        "text-halo-color": "#1A73E8",
-        "text-halo-width": 0.8,
-        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.2, 1]
+        "icon-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
       }
     });
   }
@@ -3629,6 +3657,7 @@ export function MapView({
 
     ensureQuestionBadgeImage(map);
     ensureRouteStagePillImage(map);
+    ensureRouteDirectionArrowImage(map);
     ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map, majorPlaceByRank);
   }, [
