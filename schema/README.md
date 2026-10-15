@@ -144,14 +144,15 @@ GIS terms used here:
 - A route records:
   - `id`, `title`, approximate `fromYear` and `toYear` (`yearNote` where sources differ),
   - `structure`: `connected` (Paul-style sequence) or `standalone-segments` (Jesus segments),
-  - short `note`, `sources`, and ordered `stages[]`.
+  - route text (`summary`, `bibleText`, `notes[]`), legacy `note` (until `REQUIRE_ROUTE_TEXT` is enabled), `sources`, and ordered `stages[]`.
 - Stage stop references use either:
   - `{ "kind": "location", "locationId": "...", "candidateIndex": 0 }`, or
   - `{ "kind": "route-stop", "stopId": "...", "candidateIndex": 0 }`.
-- Stages include `from`, `to`, optional ordered `via[]` (passed or sailed-by places), `scripture[]` (`ref`, `book`, `textWEB`), `travelMode` (`land`, `sea`, `unknown`), optional `namedRegions[]`, optional Jesus-segment `attestation`, and exactly one of `lineId` or `noLineReason`.
+- Stages include `from`, `to`, optional ordered `via[]` (passed or sailed-by places), optional `mentioned[]` (places named but not reached), `scripture[]` (`ref`, `book`, `textWEB`), `travelMode` (`land`, `sea`, `unknown`), optional `namedRegions[]`, optional Jesus-segment `attestation`, and exactly one of `lineId` or `noLineReason`.
 - Stop entries include an English `name` (ADR-0026), optional `todayName`, `candidates[]` in the same coordinate/citation shape as place candidates (`[lon, lat]`, confidence, coordinate source, sources), naming `scripture[]`, top-level `sources`, and `status` (`draft` or `verified`).
 - Validation adds route checks:
   - each referenced stop exists (location record or route-stop entry);
+  - each `mentioned[]` stop must not duplicate the stage's `from`, `to`, or any `via[]` stop;
   - route-stop IDs cannot duplicate location IDs;
   - passage refs must parse in one-chapter format and `textWEB` must match WEB;
   - every route-stop candidate has at least two sources;
@@ -161,6 +162,7 @@ GIS terms used here:
   - route-line vertices must stay in project bounds, may not use `[0, 0]`, and may not contain jumps over 1000 km between consecutive vertices;
   - every line passes the routes' lines audit (below).
 - `REQUIRE_ROUTE_LINES` enforces that every stage has either `lineId` or `noLineReason`; default is `true` since M5-04's linework.
+- `REQUIRE_ROUTE_TEXT` enforces that routes have non-empty `summary`, `bibleText`, and `notes[]`, and disallows legacy `note`; default is `false` until M5-06 text lands.
 
 #### The routes' lines (M5-04)
 - `npm run build:route-lines` draws one line per stage (ADR-0038 item 5 and its update of 2026-10-14) and writes `data/geo/routes-lines.geojson` and the stages' `lineId`s; `npm run check:route-lines` rebuilds them from an empty cache, checks the result byte for byte, and prints the audit's per-line table. Its inputs are pinned by commit and SHA-256 (`scripts/lib/route-line-inputs.mjs`; `docs/research/SOURCES.md`, "M5-04"). The build report and the previews (Web Mercator, land and lakes filled) are written to the cache, outside the repository (`$TMPDIR/ibm-route-lines/report/`, or `ROUTE_LINES_CACHE`).
@@ -190,13 +192,18 @@ Complete example:
       "toYear": 48,
       "yearNote": "About AD 46-48 in cited chronologies.",
       "structure": "connected",
-      "note": "Lines show stage order and land/sea mode, not exact traveled paths.",
+      "summary": "Paul and Barnabas travel from Antioch through Cyprus and southern Anatolia, then return to report back.",
+      "bibleText": "Acts 13-14 describes their departures, preaching stops, and return to Antioch in Syria.",
+      "notes": [
+        "Lines show stage order and travel mode, not exact traveled paths."
+      ],
       "sources": ["scripture:Acts 13:4-5", "bib:pleiades-place-resource"],
       "stages": [
         {
           "id": "stage-01",
           "from": { "kind": "location", "locationId": "antioch-syria", "candidateIndex": 0 },
           "to": { "kind": "route-stop", "stopId": "seleucia" },
+          "mentioned": [{ "kind": "route-stop", "stopId": "phoenix-crete" }],
           "scripture": [{ "ref": "Acts 13:4-5", "book": "Acts", "textWEB": "..." }],
           "travelMode": "land",
           "lineId": "paul-1-stage-01",
@@ -210,7 +217,9 @@ Complete example:
       "fromYear": 28,
       "toYear": 30,
       "structure": "standalone-segments",
-      "note": "Standalone, well-attested segments only.",
+      "summary": "Well-attested movement segments listed without harmonizing the Gospels into one itinerary.",
+      "bibleText": "The route keeps only segments whose start and end places are clear in the cited passages.",
+      "notes": ["Segments are listed neutrally and do not assert one Gospel timeline."],
       "sources": ["scripture:Matthew 4:13", "bib:pleiades-place-resource"],
       "stages": [
         {

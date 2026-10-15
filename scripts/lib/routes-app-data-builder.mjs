@@ -77,7 +77,10 @@ export async function buildRoutesAppData({
       toYear: route.toYear,
       yearNote: route.yearNote ?? null,
       structure: route.structure,
-      note: route.note,
+      summary: route.summary ?? null,
+      bibleText: route.bibleText ?? null,
+      notes: Array.isArray(route.notes) ? route.notes : null,
+      note: route.note ?? null,
       stageCount: Array.isArray(route.stages) ? route.stages.length : 0,
       sources: route.sources ?? []
     }))

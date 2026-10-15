@@ -8,6 +8,12 @@
       "toYear": 48,
       "yearNote": "Illustrative fixture dates only.",
       "structure": "connected",
+      "summary": "Fixture summary for route-level text validation.",
+      "bibleText": "Fixture bibleText paragraph for route-level text validation.",
+      "notes": [
+        "Fixture disclaimer one.",
+        "Fixture disclaimer two."
+      ],
       "note": "Fixture route for M5 schema/build tests.",
       "sources": [
         "scripture:Acts 2:1",
@@ -65,6 +71,13 @@
           ],
           "travelMode": "sea",
           "lineId": "paul-fixture-stage-02",
+          "mentioned": [
+            {
+              "kind": "route-stop",
+              "stopId": "disputed-stop-fixture",
+              "candidateIndex": 1
+            }
+          ],
           "sources": [
             "scripture:1 Corinthians 1:2",
             "bib:existing-bib-source"
@@ -140,6 +153,11 @@
       "toYear": 30,
       "yearNote": "Illustrative fixture dates only.",
       "structure": "standalone-segments",
+      "summary": "Fixture summary for standalone segments.",
+      "bibleText": "Fixture bibleText paragraph for standalone segments.",
+      "notes": [
+        "Fixture standalone disclaimer."
+      ],
       "note": "Fixture standalone segments for attestation checks.",
       "sources": [
         "scripture:Matthew 5:1",

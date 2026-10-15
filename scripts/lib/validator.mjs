@@ -153,6 +153,7 @@ export const REQUIRE_MAJOR_IMAGES = true;
 export const REQUIRE_ANCIENT_SHAPES = true;
 export const REQUIRE_DERIVED_POLITICAL_HISTORY = false;
 export const REQUIRE_ROUTE_LINES = true;
+export const REQUIRE_ROUTE_TEXT = false;
 export const MAJOR_PLACE_MIN_IMAGE_COUNT = 4;
 export const MAJOR_PLACE_MAX_IMAGE_COUNT = 7;
 export const STANDARD_PLACE_MAX_IMAGE_COUNT = 3;
@@ -2024,6 +2025,19 @@ function validateRouteStopRef({
   }
 }
 
+function routeStopRefKey(stopRef) {
+  if (!stopRef || typeof stopRef !== "object") {
+    return null;
+  }
+  if (stopRef.kind === "location" && typeof stopRef.locationId === "string") {
+    return `location:${stopRef.locationId}`;
+  }
+  if (stopRef.kind === "route-stop" && typeof stopRef.stopId === "string") {
+    return `route-stop:${stopRef.stopId}`;
+  }
+  return null;
+}
+
 function resolveRouteStopRefCoordinate(stopRef, locationRecordsById, routeStopsById) {
   if (!stopRef || typeof stopRef !== "object") {
     return null;
@@ -2269,6 +2283,9 @@ export async function validateData(options = {}) {
   const requireRouteLinesFromEnvironment = parseBooleanEnvironmentFlag(
     process.env.REQUIRE_ROUTE_LINES
   );
+  const requireRouteTextFromEnvironment = parseBooleanEnvironmentFlag(
+    process.env.REQUIRE_ROUTE_TEXT
+  );
   const requireMajorImages =
     typeof options.requireMajorImages === "boolean"
       ? options.requireMajorImages
@@ -2286,6 +2303,10 @@ export async function validateData(options = {}) {
     typeof options.requireRouteLines === "boolean"
       ? options.requireRouteLines
       : requireRouteLinesFromEnvironment ?? REQUIRE_ROUTE_LINES;
+  const requireRouteText =
+    typeof options.requireRouteText === "boolean"
+      ? options.requireRouteText
+      : requireRouteTextFromEnvironment ?? REQUIRE_ROUTE_TEXT;
 
   const errors = [];
   const warnings = [];
@@ -3365,6 +3386,52 @@ export async function validateData(options = {}) {
         errors
       });
 
+      if (requireRouteText) {
+        if (typeof route?.summary !== "string" || route.summary.trim().length === 0) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].summary`,
+            "Routes must include a non-empty summary while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+        if (typeof route?.bibleText !== "string" || route.bibleText.trim().length === 0) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].bibleText`,
+            "Routes must include a non-empty bibleText while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+        if (!Array.isArray(route?.notes) || route.notes.length === 0) {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].notes`,
+            "Routes must include at least one notes entry while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        } else {
+          route.notes.forEach((noteEntry, noteIndex) => {
+            if (typeof noteEntry !== "string" || noteEntry.trim().length === 0) {
+              recordError(
+                errors,
+                routesRelativePath,
+                `$.routes[${routeIndex}].notes[${noteIndex}]`,
+                "Route notes entries must be non-empty strings"
+              );
+            }
+          });
+        }
+        if (typeof route?.note === "string") {
+          recordError(
+            errors,
+            routesRelativePath,
+            `$.routes[${routeIndex}].note`,
+            "Legacy route note is not allowed while REQUIRE_ROUTE_TEXT is enabled"
+          );
+        }
+      }
+
       (route.stages ?? []).forEach((stage, stageIndex) => {
         if (!stage || typeof stage !== "object") {
           return;
@@ -3407,6 +3474,52 @@ export async function validateData(options = {}) {
               routeStopsById,
               errors
             });
+          });
+        }
+        if (Array.isArray(stage.mentioned)) {
+          stage.mentioned.forEach((stopRef, mentionedIndex) => {
+            validateRouteStopRef({
+              stopRef,
+              file: routesRelativePath,
+              pathValue: `$.routes[${routeIndex}].stages[${stageIndex}].mentioned[${mentionedIndex}]`,
+              locationRecordsById,
+              routeStopsById,
+              errors
+            });
+          });
+        }
+
+        const fromKey = routeStopRefKey(stage.from);
+        const toKey = routeStopRefKey(stage.to);
+        const viaKeySet = new Set(
+          (stage.via ?? [])
+            .map((stopRef) => routeStopRefKey(stopRef))
+            .filter((value) => typeof value === "string")
+        );
+        if (Array.isArray(stage.mentioned)) {
+          const mentionedKeys = new Set();
+          stage.mentioned.forEach((mentionedRef, mentionedIndex) => {
+            const mentionedKey = routeStopRefKey(mentionedRef);
+            if (!mentionedKey) {
+              return;
+            }
+            if (mentionedKey === fromKey || mentionedKey === toKey || viaKeySet.has(mentionedKey)) {
+              recordError(
+                errors,
+                routesRelativePath,
+                `$.routes[${routeIndex}].stages[${stageIndex}].mentioned[${mentionedIndex}]`,
+                "A mentioned stop cannot also be a stage endpoint or via stop"
+              );
+            }
+            if (mentionedKeys.has(mentionedKey)) {
+              recordError(
+                errors,
+                routesRelativePath,
+                `$.routes[${routeIndex}].stages[${stageIndex}].mentioned[${mentionedIndex}]`,
+                "A stage cannot list the same mentioned stop more than once"
+              );
+            }
+            mentionedKeys.add(mentionedKey);
           });
         }
 
