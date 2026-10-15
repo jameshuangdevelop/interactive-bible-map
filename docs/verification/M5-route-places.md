@@ -25,7 +25,7 @@ One section per batch (card `docs/tasks/M5-07-route-places.md`, Scope item 5).
 
 | Item | Pass | Needs the Research Lead | Question for the PO |
 |---|---|---|---|
-| Records (15) | 4: `salmone`, `fair-havens`, `phoenix`, `syracuse` | 11, with 31 fixes (F1–F31): 16 on content, 15 on citations or wording | Q1, Q2 |
+| Records (15) | 4: `salmone`, `fair-havens`, `phoenix`, `syracuse` | 11, with 31 fixes (F1–F31): 16 on content, 15 on citations or wording | Q1–Q3 |
 | Candidates and coordinates (16 candidates) | 16, identical to the verified stop entries | — | — |
 | WEB quotes (29) and New Testament completeness (15 places) | All | — | — |
 | Sidon's `otConnections` (10) | 7 | 3 notes to reword (F7, F8) | Q1 |
