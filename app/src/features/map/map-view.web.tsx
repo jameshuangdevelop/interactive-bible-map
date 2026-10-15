@@ -3052,18 +3052,62 @@ export function MapView({
   const handleTooltipAtPointRef = useRef<(point: PointLike) => void>(() => undefined);
   const refreshVisibleEntryStateRef = useRef<() => void>(() => undefined);
   const scheduleVisibleEntryRefreshRef = useRef<() => void>(() => undefined);
-  const syncSourcesAndLayersRef = useRef<() => void>(() => undefined);
+  const syncRouteSourcesRef = useRef<() => void>(() => undefined);
+  const syncBaseSourcesAndLayersRef = useRef<() => void>(() => undefined);
   const updateScaleBarRef = useRef<() => void>(() => undefined);
   const stopPayloadRequestIdsRef = useRef(new Set<string>());
   const stopPrefetchScheduledRef = useRef(false);
   const failedStopIdsRef = useRef(new Set<string>());
   const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
   const routesModeEnabledRef = useRef(false);
+  const previousRoutesModeEnabledRef = useRef(false);
   const previousRouteFocusKeyRef = useRef<string | null>(null);
   const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
+  const previousRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
+  const routesTabCameraSnapshotRef = useRef<{
+    routeFocusKey: string;
+    selectedStageFocusKey: string | null;
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
+  } | null>(null);
+  const routesTabCameraRestorePendingRef = useRef(false);
   const routeStageAnimationFrameRef = useRef<number | null>(null);
+  const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
+  const preservedCameraRef = useRef<{
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
+  } | null>(null);
 
   const selectedStageAnimationKey = routesOverlay?.selectedStageAnimationKey ?? null;
+  useEffect(() => {
+    latestRoutesOverlayRef.current = routesOverlay;
+  }, [routesOverlay]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const previousOverlay = previousRoutesOverlayRef.current;
+    if (map && previousOverlay?.routeFocusKey && routesOverlay === null) {
+      const center = map.getCenter();
+      routesTabCameraSnapshotRef.current = {
+        routeFocusKey: previousOverlay.routeFocusKey,
+        selectedStageFocusKey: previousOverlay.selectedStageFocusKey ?? null,
+        center: [center.lng, center.lat],
+        zoom: map.getZoom(),
+        bearing: map.getBearing(),
+        pitch: map.getPitch()
+      };
+      routesTabCameraRestorePendingRef.current = true;
+    }
+    if (routesOverlay && !routesOverlay.routeFocusKey) {
+      routesTabCameraSnapshotRef.current = null;
+      routesTabCameraRestorePendingRef.current = false;
+    }
+    previousRoutesOverlayRef.current = routesOverlay;
+  }, [routesOverlay]);
   useEffect(() => {
     selectedTimelineStopIdRef.current = selectedTimelineStopId;
   }, [selectedTimelineStopId]);
@@ -3090,6 +3134,52 @@ export function MapView({
   useEffect(() => {
     routesModeEnabledRef.current = routesModeEnabled;
   }, [routesModeEnabled]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const wasRoutesModeEnabled = previousRoutesModeEnabledRef.current;
+    if (!map || !styleReadyRef.current) {
+      previousRoutesModeEnabledRef.current = routesModeEnabled;
+      return;
+    }
+
+    if (wasRoutesModeEnabled && !routesModeEnabled) {
+      const overlay = latestRoutesOverlayRef.current;
+      if (overlay?.routeFocusKey) {
+        const center = map.getCenter();
+        routesTabCameraSnapshotRef.current = {
+          routeFocusKey: overlay.routeFocusKey,
+          selectedStageFocusKey: overlay.selectedStageFocusKey ?? null,
+          center: [center.lng, center.lat],
+          zoom: map.getZoom(),
+          bearing: map.getBearing(),
+          pitch: map.getPitch()
+        };
+        routesTabCameraRestorePendingRef.current = true;
+      }
+    }
+
+    if (!wasRoutesModeEnabled && routesModeEnabled && routesTabCameraRestorePendingRef.current) {
+      const snapshot = routesTabCameraSnapshotRef.current;
+      if (
+        snapshot &&
+        snapshot.routeFocusKey === (routesOverlay?.routeFocusKey ?? null) &&
+        snapshot.selectedStageFocusKey === (routesOverlay?.selectedStageFocusKey ?? null)
+      ) {
+        map.jumpTo({
+          center: snapshot.center,
+          zoom: snapshot.zoom,
+          bearing: snapshot.bearing,
+          pitch: snapshot.pitch
+        });
+        previousRouteFocusKeyRef.current = snapshot.routeFocusKey;
+        previousSelectedStageFocusKeyRef.current = snapshot.selectedStageFocusKey;
+      }
+      routesTabCameraRestorePendingRef.current = false;
+    }
+
+    previousRoutesModeEnabledRef.current = routesModeEnabled;
+  }, [routesModeEnabled, routesOverlay]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
@@ -3592,7 +3682,29 @@ export function MapView({
     });
   }, [refreshVisibleEntryState]);
 
-  const syncSourcesAndLayers = useCallback(() => {
+  const syncRouteSources = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    const overlay = latestRoutesOverlayRef.current;
+    ensureGeoJsonSource(
+      map,
+      sourceRoutesLinesId,
+      overlay?.lines ?? createEmptyFeatureCollection(),
+      {
+        lineMetrics: true
+      }
+    );
+    ensureGeoJsonSource(
+      map,
+      sourceRoutesPointsId,
+      overlay?.points ?? createEmptyFeatureCollection()
+    );
+  }, []);
+
+  const syncBaseSourcesAndLayers = useCallback(() => {
     const map = mapRef.current;
     if (!map) {
       return;
@@ -3621,19 +3733,7 @@ export function MapView({
     ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
     ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
     ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
-    ensureGeoJsonSource(
-      map,
-      sourceRoutesLinesId,
-      routesOverlay?.lines ?? createEmptyFeatureCollection(),
-      {
-        lineMetrics: true
-      }
-    );
-    ensureGeoJsonSource(
-      map,
-      sourceRoutesPointsId,
-      routesOverlay?.points ?? createEmptyFeatureCollection()
-    );
+    syncRouteSources();
 
     ensureQuestionBadgeImage(map);
     ensureRouteStagePillImage(map);
@@ -3649,7 +3749,7 @@ export function MapView({
     ancientRoads,
     majorPlaceByRank,
     effectiveRenderData,
-    routesOverlay
+    syncRouteSources
   ]);
 
   const resolveMajorClusterTooltipText = useCallback(
@@ -3899,8 +3999,12 @@ export function MapView({
   }, [scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
-    syncSourcesAndLayersRef.current = syncSourcesAndLayers;
-  }, [syncSourcesAndLayers]);
+    syncRouteSourcesRef.current = syncRouteSources;
+  }, [syncRouteSources]);
+
+  useEffect(() => {
+    syncBaseSourcesAndLayersRef.current = syncBaseSourcesAndLayers;
+  }, [syncBaseSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBarRef.current = updateScaleBar;
@@ -3952,11 +4056,11 @@ export function MapView({
       mainSourceLoadControllerRef.current.markLoaded();
       styleReadyRef.current = false;
       const nextMapMode = mapModeRef.current;
-      syncAttributionControl(map, "fallback", nextMapMode, routesModeEnabled);
+      syncAttributionControl(map, "fallback", nextMapMode, routesModeEnabledRef.current);
       map.setStyle(getStyleUrl("fallback", nextMapMode));
       return nextState;
     },
-    [basemapController, clearMainSourceLoadTimeout, routesModeEnabled, syncAttributionControl]
+    [basemapController, clearMainSourceLoadTimeout, syncAttributionControl]
   );
 
   const scheduleMainSourceLoadTimeout = useCallback(
@@ -4007,11 +4111,14 @@ export function MapView({
       })
     };
     const effectivePixelRatioCap = resolveEffectivePixelRatioCap(effectiveRuntimeTuning, rendererInfo);
+    const preservedCamera = preservedCameraRef.current;
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode, mapModeRef.current),
-      center: DEFAULT_MAP_CENTER,
-      zoom: DEFAULT_MAP_ZOOM,
+      center: preservedCamera?.center ?? DEFAULT_MAP_CENTER,
+      zoom: preservedCamera?.zoom ?? DEFAULT_MAP_ZOOM,
+      bearing: preservedCamera?.bearing ?? 0,
+      pitch: preservedCamera?.pitch ?? 0,
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
@@ -4043,7 +4150,7 @@ export function MapView({
     )[visibleEntryRefreshHookKey] = () => {
       refreshVisibleEntryStateRef.current();
     };
-    syncAttributionControl(map, initialMode, mapModeRef.current, routesModeEnabled);
+    syncAttributionControl(map, initialMode, mapModeRef.current, routesModeEnabledRef.current);
 
     const cancelScheduledTooltipUpdate = () => {
       pendingTooltipPointRef.current = null;
@@ -4242,7 +4349,7 @@ export function MapView({
       styleReadyRef.current = true;
       setStyleReadyVersion((value) => value + 1);
       const nextMapMode = mapModeRef.current;
-      syncAttributionControl(map, currentMode, nextMapMode, routesModeEnabled);
+      syncAttributionControl(map, currentMode, nextMapMode, routesModeEnabledRef.current);
       configureZoomGestures(map, effectiveRuntimeTuning);
       applyBasemapLayerVariants(map, currentMode, effectiveRuntimeTuning);
       if (currentMode === "main") {
@@ -4251,8 +4358,14 @@ export function MapView({
         clearMainSourceLoadTimeout();
       }
       map.getCanvas().tabIndex = -1;
-      syncSourcesAndLayersRef.current();
-      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline, routesModeEnabled);
+      syncRouteSourcesRef.current();
+      syncBaseSourcesAndLayersRef.current();
+      applyMapModeOverlayVisibility(
+        map,
+        nextMapMode,
+        hasAncientTimeline,
+        routesModeEnabledRef.current
+      );
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -4283,7 +4396,7 @@ export function MapView({
     };
 
     const handleMapClick = (event: { point: PointLike }) => {
-      if (routesModeEnabled) {
+      if (routesModeEnabledRef.current) {
         const routeFeatures = map.queryRenderedFeatures(event.point, {
           layers: [
             layerRoutesStopsId,
@@ -4445,6 +4558,13 @@ export function MapView({
         map.removeControl(attributionControlRef.current);
         attributionControlRef.current = null;
       }
+      const center = map.getCenter();
+      preservedCameraRef.current = {
+        center: [center.lng, center.lat],
+        zoom: map.getZoom(),
+        bearing: map.getBearing(),
+        pitch: map.getPitch()
+      };
       attributionModeRef.current = null;
       map.remove();
       mapRef.current = null;
@@ -4477,7 +4597,6 @@ export function MapView({
     syncAttributionControl,
     onSelectRouteMapEntry,
     isSmallScreen,
-    routesModeEnabled,
     runtimeTuning
   ]);
 
@@ -4513,13 +4632,21 @@ export function MapView({
       return;
     }
 
-    syncSourcesAndLayers();
+    syncBaseSourcesAndLayers();
     const map = mapRef.current;
     if (map) {
       applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline, routesModeEnabled);
     }
     refreshVisibleEntryState();
-  }, [hasAncientTimeline, refreshVisibleEntryState, routesModeEnabled, syncSourcesAndLayers]);
+  }, [hasAncientTimeline, refreshVisibleEntryState, routesModeEnabled, syncBaseSourcesAndLayers]);
+
+  useEffect(() => {
+    if (!styleReadyRef.current) {
+      return;
+    }
+
+    syncRouteSources();
+  }, [syncRouteSources, routesOverlay]);
 
   useEffect(() => {
     updateScaleBar();
@@ -4535,6 +4662,23 @@ export function MapView({
     scheduleVisibleEntryRefresh();
     scheduleScaleBarUpdate();
   }, [bottomInset, panelInset, scheduleScaleBarUpdate, scheduleVisibleEntryRefresh]);
+
+  useEffect(() => {
+    if (routesOverlay !== null || !routesTabCameraRestorePendingRef.current) {
+      return;
+    }
+    const map = mapRef.current;
+    const snapshot = routesTabCameraSnapshotRef.current;
+    if (!map || !styleReadyRef.current || !snapshot) {
+      return;
+    }
+    map.jumpTo({
+      center: snapshot.center,
+      zoom: snapshot.zoom,
+      bearing: snapshot.bearing,
+      pitch: snapshot.pitch
+    });
+  }, [routesOverlay, panelInset, bottomInset]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -4572,16 +4716,38 @@ export function MapView({
   ]);
 
   useEffect(() => {
-    if (!routesOverlay?.routeFocusKey || !routesOverlay.bounds) {
-      previousRouteFocusKeyRef.current = null;
+    if (!routesOverlay) {
       return;
     }
-    if (previousRouteFocusKeyRef.current === routesOverlay.routeFocusKey) {
+    if (!routesOverlay.routeFocusKey || !routesOverlay.bounds) {
+      previousRouteFocusKeyRef.current = null;
       return;
     }
 
     const map = mapRef.current;
     if (!map || !styleReadyRef.current) {
+      return;
+    }
+    const pendingSnapshot = routesTabCameraSnapshotRef.current;
+    if (
+      routesTabCameraRestorePendingRef.current &&
+      pendingSnapshot &&
+      pendingSnapshot.routeFocusKey === routesOverlay.routeFocusKey &&
+      pendingSnapshot.selectedStageFocusKey === (routesOverlay.selectedStageFocusKey ?? null)
+    ) {
+      map.jumpTo({
+        center: pendingSnapshot.center,
+        zoom: pendingSnapshot.zoom,
+        bearing: pendingSnapshot.bearing,
+        pitch: pendingSnapshot.pitch
+      });
+      previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
+      previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey ?? null;
+      routesTabCameraRestorePendingRef.current = false;
+      return;
+    }
+    routesTabCameraRestorePendingRef.current = false;
+    if (previousRouteFocusKeyRef.current === routesOverlay.routeFocusKey) {
       return;
     }
     const [southWest, northEast] = routesOverlay.bounds;
@@ -4601,7 +4767,10 @@ export function MapView({
   }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs, styleReadyVersion]);
 
   useEffect(() => {
-    if (!routesOverlay?.selectedStageFocusKey || !routesOverlay.selectedStageCenter) {
+    if (!routesOverlay) {
+      return;
+    }
+    if (!routesOverlay.selectedStageFocusKey || !routesOverlay.selectedStageCenter) {
       previousSelectedStageFocusKeyRef.current = null;
       return;
     }

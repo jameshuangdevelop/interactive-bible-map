@@ -305,6 +305,14 @@ export function AppShell() {
     movedPx: number;
   } | null>(null);
   const suppressNextHandleClickRef = useRef(false);
+  const routesTabCameraSnapshotRef = useRef<{
+    routeId: string;
+    stageIndex: number | null;
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
+  } | null>(null);
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
@@ -977,6 +985,63 @@ export function AppShell() {
     [viewTab]
   );
 
+  const handleSelectViewTab = useCallback(
+    (nextTab: "map" | "routes") => {
+      const map =
+        typeof window !== "undefined"
+          ? (
+              window as Window & {
+                __ibmMapForTests?: {
+                  getCenter: () => { lng: number; lat: number };
+                  getZoom: () => number;
+                  getBearing: () => number;
+                  getPitch: () => number;
+                  jumpTo: (camera: {
+                    center: [number, number];
+                    zoom: number;
+                    bearing: number;
+                    pitch: number;
+                  }) => void;
+                };
+              }
+            ).__ibmMapForTests
+          : undefined;
+
+      if (viewTab === "routes" && nextTab === "map" && map && selectedRouteId) {
+        const center = map.getCenter();
+        routesTabCameraSnapshotRef.current = {
+          routeId: selectedRouteId,
+          stageIndex: selectedStageIndex,
+          center: [center.lng, center.lat],
+          zoom: map.getZoom(),
+          bearing: map.getBearing(),
+          pitch: map.getPitch()
+        };
+      }
+
+      setViewTab(nextTab);
+
+      if (viewTab === "map" && nextTab === "routes" && map && selectedRouteId) {
+        const snapshot = routesTabCameraSnapshotRef.current;
+        if (
+          snapshot &&
+          snapshot.routeId === selectedRouteId &&
+          snapshot.stageIndex === selectedStageIndex
+        ) {
+          window.requestAnimationFrame(() => {
+            map.jumpTo({
+              center: snapshot.center,
+              zoom: snapshot.zoom,
+              bearing: snapshot.bearing,
+              pitch: snapshot.pitch
+            });
+          });
+        }
+      }
+    },
+    [selectedRouteId, selectedStageIndex, viewTab]
+  );
+
   useEffect(() => {
     if (!timelineSourcesOpen) {
       return undefined;
@@ -1016,8 +1081,7 @@ export function AppShell() {
         routeFocusKey: null,
         selectedStageFocusKey: null,
         selectedStageCenter: null,
-        selectedStageAnimationKey: null,
-        hideBasePlaces: true
+        selectedStageAnimationKey: null
       };
     }
 
@@ -1443,8 +1507,7 @@ export function AppShell() {
       selectedStageAnimationKey:
         selectedStageId && lineFeatureByStageId.has(selectedStageId)
           ? `${selectedRouteId}:${selectedStageId}`
-          : null,
-      hideBasePlaces: true
+          : null
     };
   }, [
     highlightedStageIndex,
@@ -1726,7 +1789,7 @@ export function AppShell() {
               aria-selected={selected}
               data-view-tab={value}
               key={value}
-              onClick={() => setViewTab(value)}
+              onClick={() => handleSelectViewTab(value)}
               onKeyDown={handleViewTabKeyDown}
               role="tab"
               tabIndex={selected ? 0 : -1}
