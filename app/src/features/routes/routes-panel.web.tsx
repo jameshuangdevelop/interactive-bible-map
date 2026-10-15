@@ -1,9 +1,8 @@
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
 import { resolveRouteStop, stageLabelNumber } from "./routes-data";
-import type { HydratedRoute, LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "./types";
+import type { HydratedRoute, LoadedRoutesData, RouteStageRecord, RouteStopRecord, RouteStopResolved } from "./types";
 import { tokens } from "../../theme/tokens";
-import type { RouteStageRecord } from "./types";
 
 type RoutesLoadState = "idle" | "loading" | "ready" | "error";
 
