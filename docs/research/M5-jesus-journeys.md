@@ -291,3 +291,10 @@ Per card `docs/tasks/M5-06-route-text.md`, reading ADR-0041 and the 2026-10-14 u
 - Capernaum, named as where the official's sick son was (John 4:46, within segment-10's own quoted text), is not added: Jesus himself does not go there in this episode (§3.1), and Capernaum is already a stop on several other segments of this same route.
 - Decapolis (Mark 7:31, segment-14) stays a `namedRegions` entry only, as the PO's 2026-10-13 ruling already set (§9 item 6): it has no stop entry, and this card does not reopen that call.
 - "The wilderness" (segment-02) and "the borders of Judea and beyond the Jordan" (segment-22) are, as §4 already found, general descriptions with no source giving either a specific point, so neither qualifies as a place a source can give coordinates for.
+- The brook Kidron, which John 18:1 says Jesus and his disciples crossed on the way to Gethsemane ("he went out with his disciples over the brook Kidron, where there was a garden"), is left out: it has no location record or stop entry, and no source this note opened gives it a sourced point of its own, as the card's own acceptance criterion asks this note to say.
+
+## 13. Fixes after the Fact-Checker's verification (2026-10-14)
+
+`docs/verification/M5-route-text.md` found three items for this route. The PO ruled on all three (R2 is a `paul-2` item, not this route's).
+- **R3 (§12 above):** the brook Kidron (John 18:1) added to "left out, and why", for want of a sourced point, as just above.
+- **R4:** `jesus`'s `yearNote` is moved into its own date `notes` bullet (keeping the Fact-Checker's own correction, that the ministry's length "can't be fixed with certainty," alongside the moved text) and the field removed; the "See the year note above" pointer is gone, since VISUAL_SPEC §2 never gave the route panel anywhere to show `yearNote` on its own (the verification report's Q2).
