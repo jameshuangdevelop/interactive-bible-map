@@ -14,7 +14,6 @@
         "Fixture disclaimer one.",
         "Fixture disclaimer two."
       ],
-      "note": "Fixture route for M5 schema/build tests.",
       "sources": [
         "scripture:Acts 2:1",
         "bib:existing-bib-source"
@@ -158,7 +157,6 @@
       "notes": [
         "Fixture standalone disclaimer."
       ],
-      "note": "Fixture standalone segments for attestation checks.",
       "sources": [
         "scripture:Matthew 5:1",
         "bib:existing-bib-source"

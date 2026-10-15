@@ -162,7 +162,7 @@ GIS terms used here:
   - route-line vertices must stay in project bounds, may not use `[0, 0]`, and may not contain jumps over 1000 km between consecutive vertices;
   - every line passes the routes' lines audit (below).
 - `REQUIRE_ROUTE_LINES` enforces that every stage has either `lineId` or `noLineReason`; default is `true` since M5-04's linework.
-- `REQUIRE_ROUTE_TEXT` enforces that routes have non-empty `summary`, `bibleText`, and `notes[]`, and disallows legacy `note`; default is `false` until M5-06 text lands.
+- `REQUIRE_ROUTE_TEXT` enforces that routes have non-empty `summary`, `bibleText`, and `notes[]`, and disallows legacy `note`; default is `true` since M5-06's text landed.
 
 #### The routes' lines (M5-04)
 - `npm run build:route-lines` draws one line per stage (ADR-0038 item 5 and its update of 2026-10-14) and writes `data/geo/routes-lines.geojson` and the stages' `lineId`s; `npm run check:route-lines` rebuilds them from an empty cache, checks the result byte for byte, and prints the audit's per-line table. Its inputs are pinned by commit and SHA-256 (`scripts/lib/route-line-inputs.mjs`; `docs/research/SOURCES.md`, "M5-04"). The build report and the previews (Web Mercator, land and lakes filled) are written to the cache, outside the repository (`$TMPDIR/ibm-route-lines/report/`, or `ROUTE_LINES_CACHE`).

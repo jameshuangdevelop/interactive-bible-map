@@ -2826,9 +2826,14 @@ test("route text requirement is switchable", async () => {
 });
 
 test("route text mode disallows legacy note when REQUIRE_ROUTE_TEXT is enabled", async () => {
-  const result = await runWithTemporaryRoutesCase(undefined, {
-    requireRouteText: true
-  });
+  const result = await runWithTemporaryRoutesCase(
+    ({ routes }) => {
+      routes.routes[0].note = "Legacy note injected for this test only.";
+    },
+    {
+      requireRouteText: true
+    }
+  );
   assert.equal(
     hasError(result, (error) => /Legacy route note is not allowed/u.test(error.message)),
     true
