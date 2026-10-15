@@ -11407,8 +11407,22 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
     }
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    const routesAncientAttributionCheck = await desktopPage.evaluate(() => {
+      const controlText = document.querySelector(".maplibregl-ctrl-attrib-inner")?.textContent ?? "";
+      const awmcMatches = controlText.match(/AWMC Geodata/gu) ?? [];
+      return {
+        attribution: controlText.trim(),
+        awmcCount: awmcMatches.length
+      };
+    });
+    if (routesAncientAttributionCheck.awmcCount !== 1) {
+      throw new Error(
+        `Routes real-data check: expected one AWMC credit on ancient routes map, got ${routesAncientAttributionCheck.awmcCount}. attribution='${routesAncientAttributionCheck.attribution}'`
+      );
+    }
 
     const openedRouteChecks = [];
+    let arrowsRenderedCount = 0;
     for (const route of expectedRoutes) {
       const button = desktopPage.getByRole("button", { name: route.title });
       await button.waitFor({ state: "visible", timeout: 30_000 });
@@ -11432,6 +11446,16 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         const hoveredStage = desktopPage.locator("[data-route-stage-index='3']");
         await hoveredStage.hover();
         await desktopPage.waitForTimeout(120);
+        arrowsRenderedCount = await desktopPage.evaluate((testHook) => {
+          const map = window[testHook];
+          if (!map) {
+            return 0;
+          }
+          return map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-arrows"] }).length;
+        }, mapTestHookKey);
+        if (arrowsRenderedCount < 1) {
+          throw new Error("Routes real-data check: expected at least one rendered route direction arrow.");
+        }
         await desktopPage.screenshot({ path: screenshotPaths.desktopPaul2Hovered, fullPage: true });
       }
       if (route.title === "Paul's voyage to Rome") {
@@ -11474,9 +11498,100 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       .filter({ hasText: "Site disputed" })
       .first();
     await noLineStage.waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-stage-index='4']").getByText("Path not known", { exact: true }).waitFor({ timeout: 30_000 });
     const notesSection = desktopPage.locator("[data-route-notes='true']");
     await notesSection.scrollIntoViewIfNeeded();
     await desktopPage.screenshot({ path: screenshotPaths.desktopRouteNotesEnd, fullPage: true });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Jesus' journeys" }).waitFor({ timeout: 30_000 });
+    const jesusDeepLinkFitCheck = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      const bounds = map.getBounds();
+      const viewportStops = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] });
+      const sourceMentioned = map.querySourceFeatures("ibm-routes-points");
+      const mentioned = sourceMentioned.filter((feature) => feature.properties?.kind === "mentioned");
+      const mentionedIds = mentioned.map((feature) => {
+        const stopKind = feature.properties?.stopKind ?? "";
+        const stopId = feature.properties?.stopId ?? "";
+        return `${stopKind}:${stopId}`;
+      });
+      const uniqueMentionedIds = new Set(mentionedIds);
+      return {
+        zoom: map.getZoom(),
+        center: [center.lng, center.lat],
+        differsFromOverview:
+          Math.abs(map.getZoom() - 4.7) > 0.25 ||
+          Math.abs(center.lng - 22.5) > 0.8 ||
+          Math.abs(center.lat - 35) > 0.8,
+        allStopsInViewport: viewportStops.every((feature) => {
+          const coordinates = feature.geometry?.coordinates;
+          if (!Array.isArray(coordinates) || coordinates.length < 2) {
+            return false;
+          }
+          return bounds.contains([coordinates[0], coordinates[1]]);
+        }),
+        renderedStopCount: viewportStops.length,
+        mentionedCount: mentionedIds.length,
+        uniqueMentionedCount: uniqueMentionedIds.size
+      };
+    }, mapTestHookKey);
+    if (!jesusDeepLinkFitCheck) {
+      throw new Error("Routes real-data check: could not inspect Jesus deep-link fit state.");
+    }
+    if (!jesusDeepLinkFitCheck.differsFromOverview || !jesusDeepLinkFitCheck.allStopsInViewport || jesusDeepLinkFitCheck.renderedStopCount < 1) {
+      throw new Error(
+        `Routes real-data check: deep link route fit failed for Jesus (${JSON.stringify(jesusDeepLinkFitCheck)}).`
+      );
+    }
+    if (jesusDeepLinkFitCheck.mentionedCount !== jesusDeepLinkFitCheck.uniqueMentionedCount) {
+      throw new Error(
+        `Routes real-data check: duplicate mentioned place features found (${JSON.stringify(jesusDeepLinkFitCheck)}).`
+      );
+    }
+    if (jesusDeepLinkFitCheck.mentionedCount < 1) {
+      throw new Error("Routes real-data check: expected mentioned route features for Jesus, found none.");
+    }
+
+    const zoomPreservedAfterToggle = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ zoom: 7.6 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      return { beforeToggleZoom: map.getZoom() };
+    }, mapTestHookKey);
+    await desktopPage.getByRole("button", { name: "Modern" }).click();
+    await desktopPage.waitForTimeout(900);
+    const zoomAfterMapToggle = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return { afterToggleZoom: map.getZoom() };
+    }, mapTestHookKey);
+    if (!zoomPreservedAfterToggle || !zoomAfterMapToggle) {
+      throw new Error("Routes real-data check: could not verify zoom persistence across map-mode toggle.");
+    }
+    if (Math.abs(zoomPreservedAfterToggle.beforeToggleZoom - zoomAfterMapToggle.afterToggleZoom) > 0.05) {
+      throw new Error(
+        `Routes real-data check: zoom changed after Ancient → Modern toggle (${JSON.stringify({
+          before: zoomPreservedAfterToggle.beforeToggleZoom,
+          after: zoomAfterMapToggle.afterToggleZoom
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "Ancient" }).click();
+    await desktopPage.waitForTimeout(500);
 
     await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome&stage=3`, {
       waitUntil: "domcontentloaded",
@@ -11517,6 +11632,11 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
 
     return {
       openedRouteChecks,
+      arrowsRenderedCount,
+      routesAncientAttributionCheck,
+      jesusDeepLinkFitCheck,
+      zoomPreservedAfterToggle,
+      zoomAfterMapToggle,
       deepLinkSelectedStage: selectedStage,
       routeSelectionLongTaskSummary,
       routeSelectionRenderer,
