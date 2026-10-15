@@ -51,5 +51,4 @@ export interface RouteMapOverlayData {
   selectedStageFocusKey: string | null;
   selectedStageCenter: Coordinates | null;
   selectedStageAnimationKey: string | null;
-  hideBasePlaces: boolean;
 }

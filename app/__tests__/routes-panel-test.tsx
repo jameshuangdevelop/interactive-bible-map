@@ -38,9 +38,33 @@ const routeStopFixture: RouteStopRecord = {
       sources: ["wikidata:Q2207807"]
     }
   ],
-  scripture: [],
+  scripture: [{ ref: "Acts 13:4", book: "Acts", textWEB: "So, being sent out by the Holy Spirit..." }],
   sources: ["bib:fixture-source"],
   status: "draft"
+};
+
+const disputedRouteStopFixture: RouteStopRecord = {
+  ...routeStopFixture,
+  id: "disputed-route-stop",
+  name: "Disputed route stop",
+  candidates: [
+    {
+      label: "Candidate A",
+      coordinates: [35.968, 36.119],
+      coordinateSource: "wikidata:Q2207807",
+      confidence: "disputed",
+      support: "Candidate A support",
+      sources: ["wikidata:Q2207807", "openbible:antioch-syria"]
+    },
+    {
+      label: "Candidate B",
+      coordinates: [35.972, 36.121],
+      coordinateSource: "wikidata:Q2207807",
+      confidence: "disputed",
+      support: "Candidate B support",
+      sources: ["wikidata:Q2207807", "openbible:antioch-syria"]
+    }
+  ]
 };
 
 const routeEntries: HydratedRoute[] = [
@@ -114,7 +138,17 @@ const routesDataFixture: LoadedRoutesData = {
   index: {
     version: 1,
     routeCount: routeEntries.length,
-    routes: routeEntries.map((entry) => entry.route)
+    routes: routeEntries.map((entry) => entry.route),
+    bibliography: [
+      {
+        id: "fixture-source",
+        type: "book",
+        title: "Fixture bibliography",
+        authors: ["A. Writer"],
+        year: 2026,
+        url: "https://example.test/fixture-source"
+      }
+    ]
   },
   routes: routeEntries,
   stops: {
@@ -149,13 +183,14 @@ const defaultProps = {
   selectedStageIndex: null,
   selectedRouteStop: null,
   placesById: new Map([[placeFixture.id, placeFixture]]),
-  routeStopsById: new Map([[routeStopFixture.id, routeStopFixture]]),
+  routeStopsById: new Map([
+    [routeStopFixture.id, routeStopFixture],
+    [disputedRouteStopFixture.id, disputedRouteStopFixture]
+  ]),
   onRetryLoad: () => {},
   onSelectRoute: () => {},
   onSelectStage: () => {},
   onBackToAllRoutes: () => {},
-  onHoverRoute: () => {},
-  onClearRouteHover: () => {},
   onRouteStopCardBack: () => {},
   onResolveStopSelection: () => {},
   onHighlightStage: () => {}
@@ -207,5 +242,37 @@ describe("routes panel", () => {
     expect(markup).toContain("Path not known");
     expect(markup).toContain(">Notes<");
     expect(markup).toContain("Fixture note");
+  });
+
+  test("renders route-stop card for a stop entry with one candidate", () => {
+    const markup = renderToStaticMarkup(
+      <RoutesPanel
+        {...defaultProps}
+        selectedRoute={routeEntries[0]}
+        selectedRouteStop={routeStopFixture}
+      />
+    );
+
+    expect(markup).toContain("‹ Back to route");
+    expect(markup).toContain("Fixture stop");
+    expect(markup).toContain("Today: Samandağ");
+    expect(markup).toContain("Passages: Acts 13:4");
+    expect(markup).toContain(">Sources<");
+    expect(markup).toContain("Not yet on the main map.");
+    expect(markup).not.toContain("Candidate sites:");
+  });
+
+  test("renders candidate list for disputed route-stop card", () => {
+    const markup = renderToStaticMarkup(
+      <RoutesPanel
+        {...defaultProps}
+        selectedRoute={routeEntries[0]}
+        selectedRouteStop={disputedRouteStopFixture}
+      />
+    );
+
+    expect(markup).toContain("Candidate sites:");
+    expect(markup).toContain("Candidate A");
+    expect(markup).toContain("Candidate B");
   });
 });

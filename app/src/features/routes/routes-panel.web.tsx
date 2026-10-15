@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { formatSourceCitation } from "../place-panel/source-format";
 import type { PlaceIndexRecord } from "../map/types";
 import { resolveRouteStop, stageLabelNumber } from "./routes-data";
@@ -133,7 +135,42 @@ export function RoutesPanel({
   onResolveStopSelection: (resolved: RouteStopResolved, stageIndex: number) => void;
   onHighlightStage: (stageIndex: number | null) => void;
 }) {
+  const stageItemRefs = useRef(new Map<number, HTMLLIElement | null>());
+  const suppressScrollStageIndexRef = useRef<number | null>(null);
+  const previousSelectedStageIndexRef = useRef<number | null>(null);
   const bibliographyById = routesData?.bibliographyById ?? new Map();
+
+  useEffect(() => {
+    if (!selectedRoute || selectedStageIndex === null || selectedStageIndex < 0) {
+      previousSelectedStageIndexRef.current = selectedStageIndex;
+      return;
+    }
+
+    if (previousSelectedStageIndexRef.current === selectedStageIndex) {
+      return;
+    }
+
+    const suppressScroll = suppressScrollStageIndexRef.current === selectedStageIndex;
+    suppressScrollStageIndexRef.current = null;
+    previousSelectedStageIndexRef.current = selectedStageIndex;
+    if (suppressScroll) {
+      return;
+    }
+
+    const stageItem = stageItemRefs.current.get(selectedStageIndex);
+    if (!stageItem) {
+      return;
+    }
+
+    const reducedMotion =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    stageItem.scrollIntoView({
+      block: "nearest",
+      behavior: reducedMotion ? "auto" : "smooth"
+    });
+  }, [selectedRoute, selectedStageIndex]);
 
   if (routesLoadState === "loading" || routesLoadState === "idle") {
     return <p aria-live="polite">Loading routes…</p>;
@@ -284,12 +321,23 @@ export function RoutesPanel({
             .map((mentioned) => resolveRouteStop(mentioned, placesById, routeStopsById).name)
             .filter((name, index, array) => array.indexOf(name) === index);
           const travelModeText = formatRouteTravelModeText(stage);
+          const stageTypeLabel =
+            selectedRoute.route.structure === "standalone-segments" ? "Segment" : "Stage";
+          const stageAccessibleTravelText =
+            travelModeText.length > 0
+              ? `${travelModeText[0].toLowerCase()}${travelModeText.slice(1)}`
+              : travelModeText;
           return (
             <li
+              aria-current={isActive ? "true" : undefined}
+              aria-label={`${stageTypeLabel} ${stageIndex + 1}: ${from.name} to ${to.name}, ${stageAccessibleTravelText}`}
               data-route-stage-selected={isActive ? "true" : "false"}
               data-route-stage-index={stageIndex + 1}
               key={stage.id}
-              onClick={() => onSelectStage(stageIndex)}
+              onClick={() => {
+                suppressScrollStageIndexRef.current = stageIndex;
+                onSelectStage(stageIndex);
+              }}
               onBlur={(event) => {
                 if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
                   return;
@@ -300,11 +348,15 @@ export function RoutesPanel({
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
+                  suppressScrollStageIndexRef.current = stageIndex;
                   onSelectStage(stageIndex);
                 }
               }}
               onMouseEnter={() => onHighlightStage(stageIndex)}
               onMouseLeave={() => onHighlightStage(null)}
+              ref={(element) => {
+                stageItemRefs.current.set(stageIndex, element);
+              }}
               tabIndex={0}
               style={{
                 marginBottom: `${tokens.spacing.sm}px`,
@@ -314,9 +366,7 @@ export function RoutesPanel({
               }}
             >
               <div style={{ fontWeight: 600 }}>
-                {selectedRoute.route.structure === "standalone-segments"
-                  ? `Segment ${stageIndex + 1}`
-                  : `Stage ${stageIndex + 1}`}{" "}
+                {stageTypeLabel} {stageIndex + 1}{" "}
                 ·{" "}
                 <button
                   onClick={() => {
