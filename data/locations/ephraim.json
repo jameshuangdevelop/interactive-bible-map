@@ -37,7 +37,7 @@
     }
   ],
   "summary": {
-    "text": "Ephraim was a town near the wilderness, on a high hill overlooking the plains of Jericho and the Dead Sea, probably about five Roman miles east of Bethel. John's Gospel records that after the Jewish leaders plotted to kill him, Jesus withdrew with his disciples to a town called Ephraim and stayed there, not walking openly among the Jews, until he returned to Bethany shortly before his final Passover.",
+    "text": "Ephraim was a town near the wilderness, probably about five Roman miles east of Bethel, probably the village of et-Taiyibeh, which stands on a high hill overlooking the plains of Jericho and the Dead Sea. John's Gospel records that after the Jewish leaders plotted to kill him, Jesus withdrew with his disciples to a town called Ephraim and stayed there, not walking openly among the Jews, until he returned to Bethany shortly before his final Passover.",
     "sources": [
       "pleiades:687896",
       "wikidata:Q931667",
@@ -50,7 +50,7 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia judges that this Ephraim probably corresponds to the Ephrem of the fourth-century church historian Eusebius's Onomasticon, placed five Roman miles east of Bethel, and that it probably answers to the village of et-Taiyibeh, whose ancient occupation is attested by cisterns and rock tombs there.",
+      "text": "The International Standard Bible Encyclopedia judges that this Ephraim probably corresponds to the Ephrem of the fourth-century church historian Eusebius's Onomasticon, a list of biblical place names, placed five Roman miles east of Bethel, and that it probably answers to the village of et-Taiyibeh, whose ancient occupation is attested by cisterns and rock tombs there.",
       "sources": [
         "bib:isbe-ephraim"
       ]
@@ -66,26 +66,23 @@
   "otConnections": [
     {
       "ref": "Joshua 18:23",
-      "note": "Joshua's list of the towns allotted to the tribe of Benjamin names Ophrah among them; the International Standard Bible Encyclopedia's article on a related town, Ephron, reports that many scholars think Ophrah is identical with that Ephron and with this Ephraim, all localized at et-Taiyibeh, though it treats the identification as uncertain.",
+      "note": "Joshua's list of the cities of the tribe of Benjamin includes Ophrah; the International Standard Bible Encyclopedia's article on a related place, Ephron, reports that Ophrah and Ephron, also read \"Ephraim\" in some manuscripts (2 Chronicles 13:19), are thought by many to be identical with each other, both localized at the town of et-Taiyibeh, which the encyclopedia's main article on this Ephraim probably identifies with the town John's Gospel names.",
       "sources": [
+        "scripture:Joshua 18:21",
         "scripture:Joshua 18:23",
-        "bib:isbe-ephron-2"
-      ]
-    },
-    {
-      "ref": "2 Samuel 13:23",
-      "note": "This verse places Baal Hazor, where Absalom held a sheep-shearing feast, \"beside Ephraim\"; the International Standard Bible Encyclopedia's article on Ephron reports that many scholars think this Ephraim is identical with Ophrah (Joshua 18:23) and with the Ephron of 2 Chronicles 13:19, all localized at et-Taiyibeh, though it treats the identification as uncertain.",
-      "sources": [
-        "scripture:2 Samuel 13:23",
-        "bib:isbe-ephron-2"
+        "scripture:2 Chronicles 13:19",
+        "bib:isbe-ephron-2",
+        "bib:isbe-ephraim"
       ]
     },
     {
       "ref": "2 Chronicles 13:19",
-      "note": "Chronicles records that King Abijah of Judah \"took cities\" from Jeroboam of Israel, including Ephron with its villages; the International Standard Bible Encyclopedia's article on Ephron reports that many scholars think this Ephron, also read \"Ephraim\" in some manuscripts, is identical with Ophrah (Joshua 18:23) and with the Ephraim of 2 Samuel 13:23, all localized at et-Taiyibeh, though it treats the identification as uncertain.",
+      "note": "Chronicles records that King Abijah of Judah \"took cities\" from Jeroboam of Israel, including Ephron with its villages, also read \"Ephraim\" in some manuscripts; the International Standard Bible Encyclopedia's article on Ephron reports that this place is thought by many to be identical with Ophrah (Joshua 18:23), both localized at the town of et-Taiyibeh, which the encyclopedia's main article on this Ephraim probably identifies with the town John's Gospel names.",
       "sources": [
         "scripture:2 Chronicles 13:19",
-        "bib:isbe-ephron-2"
+        "scripture:Joshua 18:23",
+        "bib:isbe-ephron-2",
+        "bib:isbe-ephraim"
       ]
     }
   ],
