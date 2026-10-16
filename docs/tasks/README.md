@@ -53,8 +53,8 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M5-04](M5-04-route-lines.md) | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | Verified; in PR #65 |
 | [M5-05](M5-05-routes-tab.md) | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | Round 6 after MC10 (ADR-0042); waits for the human's play-test |
 | [M5-06](M5-06-route-text.md) | Route text, and every place the passages name | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Verified; in PR #66 |
-| [M5-07](M5-07-route-places.md) | Every route place becomes a place | research-lead → fact-checker | `data/m5-route-places` | Batch A (the voyage to Rome) in progress (ADR-0042 item 4) |
-| [M5-08](M5-08-names-and-dots.md) | Names that show what can be clicked | frontend-engineer | `feat/m5-names-and-dots` | Waits for the human (ADR-0042 item 6) |
+| [M5-07](M5-07-route-places.md) | Every route place becomes a place | research-lead → fact-checker | `data/m5-route-places` | Batch A verified; batches B and C in progress (ADR-0042 item 4) |
+| [M5-08](M5-08-names-and-dots.md) | Names that show what can be clicked | frontend-engineer | `feat/m5-names-and-dots` | Ready (ADR-0043) |
 ## Template
 ```markdown
 # <ID> — <title>
