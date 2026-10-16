@@ -1,0 +1,112 @@
+{
+  "id": "samothrace",
+  "names": {
+    "ancient": [
+      "Samothrace"
+    ],
+    "modern": "Samothraki",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Samothracia"
+    ],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "macedonia",
+  "candidates": [
+    {
+      "label": "Samothrace (island)",
+      "coordinates": [
+        25.583333,
+        40.45
+      ],
+      "coordinateSource": "openbible:samothrace",
+      "confidence": "high",
+      "support": "An island in the north Aegean Sea, south of Thrace, with a town at its northern end where ships could anchor for the night. Pleiades, OpenBible.info and Wikidata agree on the island, known today as Samothraki.",
+      "sources": [
+        "pleiades:501597",
+        "openbible:samothrace",
+        "wikidata:Q203175",
+        "bib:isbe-samothrace"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Samothrace is a mountainous island in the northern Aegean Sea, south of Thrace, long known for its sanctuary of the Cabeiri, gods whose mystery cult rivaled the famous mysteries of Eleusis; Philip of Macedon and his wife Olympias were said to have been initiated there. Acts records that on the voyage from Troas to Philippi, Paul and his companions made a straight course to Samothrace, anchoring for the night at a town on the island's northern end, and continued the next day to Neapolis.",
+    "sources": [
+      "pleiades:501597",
+      "openbible:samothrace",
+      "wikidata:Q203175",
+      "bib:isbe-samothrace",
+      "scripture:Acts 16:11"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that the island's name reflects its height, towering over the neighboring island of Imbros, and that it is mentioned in Homer's Iliad as the seat from which the god Poseidon watched the Trojan War. The famed sculpture known as the Winged Victory of Samothrace, set up on the island around 300 BC by the Macedonian ruler Demetrius Poliorcetes, was discovered there in 1863 and is now in the Louvre.",
+      "sources": [
+        "bib:isbe-samothrace"
+      ]
+    },
+    {
+      "text": "The encyclopedia notes that the Roman writer Pliny described the island as a difficult place to anchor, though ancient sailors preferred to find anchorage somewhere for the night rather than risk sailing in the dark; it also observes that on Paul's return journey a landing on Samothrace may have been made, though Acts gives no details of that leg of the voyage.",
+      "sources": [
+        "bib:isbe-samothrace"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 16:11",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -148,
+      "toYear": -27,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "macedonia"
+}

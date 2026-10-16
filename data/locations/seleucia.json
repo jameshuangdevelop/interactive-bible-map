@@ -1,0 +1,101 @@
+{
+  "id": "seleucia",
+  "names": {
+    "ancient": [
+      "Seleucia"
+    ],
+    "modern": "Near Kapısuyu",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [
+      "Seleucia Pieria"
+    ],
+    "otherLanguages": []
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "syria",
+  "candidates": [
+    {
+      "label": "Seleucia Pieria archaeological site",
+      "coordinates": [
+        35.922,
+        36.124
+      ],
+      "coordinateSource": "wikidata:Q1605894",
+      "confidence": "high",
+      "support": "Seleucia Pieria, the seaport of Antioch, about 16 miles from the city and about 5 miles north of the mouth of the Orontes. Pleiades, OpenBible.info and Wikidata agree on this coastal site; Wikidata's own record places it within Hatay Province, Türkiye.",
+      "sources": [
+        "pleiades:658483",
+        "openbible:seleucia",
+        "wikidata:Q1605894",
+        "bib:isbe-seleucia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Seleucia was the seaport of Antioch on the Orontes, about sixteen miles from the city and five miles north of the river's mouth, built by the Seleucid king Seleucus Nicator. Acts records that the Holy Spirit sent Barnabas and Saul out from Antioch to Seleucia, from where they sailed to Cyprus at the start of their first missionary journey, and that the two later sailed back to Antioch from Attalia.",
+    "sources": [
+      "pleiades:658483",
+      "openbible:seleucia",
+      "wikidata:Q1605894",
+      "bib:isbe-seleucia",
+      "scripture:Acts 13:4",
+      "scripture:Acts 14:26"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Seleucia was one of four sister cities its founder built, called the Syrian Tetrapolis together with Apamea, Laodicea and Antioch, and that it was considered impregnable, protected by the mountain on one side and strongly fortified on the other sides. The Roman general Pompey made it a free city in 64 BC as a reward for its resistance to the Armenian king Tigranes, after which it flourished under Roman rule.",
+      "sources": [
+        "bib:isbe-seleucia"
+      ]
+    },
+    {
+      "text": "Before Pompey's settlement, the encyclopedia records that the city passed between the two rival Hellenistic dynasties of the region: taken by the Egyptian king Ptolemy Euergetes, it remained under his family's control until 219 BC, when the Seleucid king Antiochus the Great recovered it for his own dynasty; Egyptian forces under Ptolemy Philometor captured it again, briefly, in 146 BC.",
+      "sources": [
+        "bib:isbe-seleucia"
+      ]
+    },
+    {
+      "text": "The encyclopedia describes extensive ruins within a four-mile circuit of old walls, including rock-cut tombs near the upper city, the outline of an amphitheater, and a harbor still full of water; the most remarkable surviving work, it states, is a long water canal cut through solid rock in AD 338 to protect the city from flooding.",
+      "sources": [
+        "bib:isbe-seleucia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 13:4",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -64,
+      "toYear": -27,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:livius-damascus"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
+    }
+  ],
+  "status": "draft"
+}
