@@ -19,6 +19,7 @@
   "type": "natural-feature",
   "zoomTier": "city",
   "prominence": "major",
+  "naturalFeatureKind": "water",
   "parentId": "galilee",
   "candidates": [
     {

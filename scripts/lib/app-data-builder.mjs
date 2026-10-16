@@ -127,6 +127,7 @@ function toIndexRecord(locationRecord) {
     zoomTier: locationRecord.zoomTier,
     politicalAreaId: locationRecord.politicalAreaId,
     prominence: locationRecord.prominence,
+    naturalFeatureKind: locationRecord.naturalFeatureKind,
     passageCount: Array.isArray(locationRecord.scripture)
       ? locationRecord.scripture.length
       : 0,

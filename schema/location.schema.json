@@ -112,6 +112,14 @@
         "standard"
       ]
     },
+    "naturalFeatureKind": {
+      "type": "string",
+      "description": "Optional natural-feature subtype for map styling: water features are blue labels, while absent values default to land.",
+      "enum": [
+        "water",
+        "land"
+      ]
+    },
     "parentId": {
       "type": "string",
       "description": "Optional parent location ID, for example a city inside a region.",

@@ -16,6 +16,7 @@
   "type": "natural-feature",
   "zoomTier": "region",
   "prominence": "standard",
+  "naturalFeatureKind": "water",
   "parentId": "roman-empire",
   "candidates": [
     {

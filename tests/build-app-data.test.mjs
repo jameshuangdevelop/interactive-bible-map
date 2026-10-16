@@ -626,6 +626,55 @@ test("buildAppData keeps empire/province types and parent chain in places.index"
   });
 });
 
+test("buildAppData carries naturalFeatureKind into places.index", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const locationsDirectory = path.join(temporaryDirectory, "locations");
+    const mediaDirectory = path.join(temporaryDirectory, "media");
+    const outputDirectory = path.join(temporaryDirectory, "output");
+    await fs.mkdir(locationsDirectory, { recursive: true });
+    await fs.mkdir(mediaDirectory, { recursive: true });
+
+    const capernaumRecord = JSON.parse(
+      await fs.readFile(path.join(validCaseDirectory, "locations", "capernaum.json"), "utf8")
+    );
+    const galileeRecord = JSON.parse(
+      await fs.readFile(path.join(validCaseDirectory, "locations", "galilee.json"), "utf8")
+    );
+
+    capernaumRecord.type = "natural-feature";
+    capernaumRecord.naturalFeatureKind = "water";
+
+    await fs.writeFile(
+      path.join(locationsDirectory, "capernaum.json"),
+      `${JSON.stringify(capernaumRecord, null, 2)}\n`,
+      "utf8"
+    );
+    await fs.writeFile(
+      path.join(locationsDirectory, "galilee.json"),
+      `${JSON.stringify(galileeRecord, null, 2)}\n`,
+      "utf8"
+    );
+
+    await buildAppData({
+      locationsDirectory,
+      mediaDirectory,
+      bibliographyPath: bibliographyFixturePath,
+      webVplPath: webFixturePath,
+      skipSnapshotChecksumCheck: true,
+      requireEmpireRoot: false,
+      requireModernCountries: false,
+      outputDirectory
+    });
+
+    const indexData = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "places.index.json"), "utf8")
+    );
+    const capernaumIndex = indexData.find((record) => record.id === "capernaum");
+    assert.equal(capernaumIndex?.type, "natural-feature");
+    assert.equal(capernaumIndex?.naturalFeatureKind, "water");
+  });
+});
+
 test("buildAppData writes ancient generated files with holder borders, empire edge, and holder labels", async () => {
   await withTempDirectory(async (outputDirectory) => {
     await buildAppData({

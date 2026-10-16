@@ -14,6 +14,7 @@ export type SourceId = string;
 export type PlaceProminence = "major" | "standard";
 export type MapDisplayMode = "ancient" | "modern";
 export type PinLabelSource = "biblical" | "modern";
+export type NaturalFeatureKind = "water" | "land";
 
 export type Coordinates = [number, number];
 
@@ -44,6 +45,7 @@ export interface PlaceIndexRecord {
   parentId: string | null;
   politicalAreaId?: string;
   prominence: PlaceProminence;
+  naturalFeatureKind?: NaturalFeatureKind;
   passageCount: number;
   candidates: PlaceCandidate[];
 }
