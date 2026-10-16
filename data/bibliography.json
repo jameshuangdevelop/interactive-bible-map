@@ -2469,6 +2469,32 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "isbe-acco",
+      "type": "chapter",
+      "title": "Acco",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/acco.html",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "isbe-maccabees",
+      "type": "chapter",
+      "title": "Maccabaeus; Maccabees",
+      "authors": [
+        "J. Hutchison"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/maccabaeus-maccabees.html",
+      "accessed": "2026-10-16"
+    },
+    {
       "id": "isbe-myra",
       "type": "chapter",
       "title": "Myra",

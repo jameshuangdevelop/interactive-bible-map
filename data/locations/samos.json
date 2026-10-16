@@ -45,9 +45,10 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia reports that Samos reached its height of prosperity under the sixth-century BC tyrant Polycrates, who made himself master of the Aegean Sea and traded with Egypt; the encyclopedia also notes that the Apocrypha's first book of Maccabees names Samos among the places a Roman consul wrote to on behalf of the Jews.",
+      "text": "The International Standard Bible Encyclopedia reports that Samos reached its height of prosperity under the sixth-century BC tyrant Polycrates, who made himself master of the Aegean Sea and traded with Egypt; the encyclopedia also notes that the book of 1 Maccabees names Samos among the places a Roman consul wrote to on behalf of the Jews. The Maccabees were a Jewish family who defended Jewish rights and customs in the second century BC.",
       "sources": [
-        "bib:isbe-samos"
+        "bib:isbe-samos",
+        "bib:isbe-maccabees"
       ]
     },
     {

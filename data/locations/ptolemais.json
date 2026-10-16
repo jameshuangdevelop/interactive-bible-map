@@ -37,21 +37,23 @@
     }
   ],
   "summary": {
-    "text": "Ptolemais was the most prominent city on the Phoenician coast in the time of the Maccabees, built on the site of the Old Testament's Acco. Acts records that Paul's ship, nearing the end of its voyage from Tyre, finished its course at Ptolemais, where Paul and his companions greeted the brothers and stayed with them one day before traveling on to Caesarea.",
+    "text": "Ptolemais was the most prominent city on the Phoenician coast in the time of the Maccabees, a Jewish family who defended Jewish rights and customs in the second century BC, and stood on the site of the Old Testament's Acco. Acts records that Paul's ship, nearing the end of its voyage from Tyre, finished its course at Ptolemais, where Paul and his companions greeted the brothers and stayed with them one day before traveling on to Caesarea.",
     "sources": [
       "pleiades:678010",
       "openbible:ptolemais",
       "wikidata:Q126084",
       "bib:isbe-ptolemais",
+      "bib:isbe-maccabees",
       "scripture:Acts 21:7",
       "scripture:Acts 21:8"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia identifies Ptolemais as the same city as Acco, named in the book of Judges, and notes that the city is mentioned several times in the books of the Maccabees as a leading town of the Phoenician coast.",
+      "text": "The International Standard Bible Encyclopedia identifies Ptolemais as the same city as Acco, named in the book of Judges; its article on Acco records that the Ptolemies, who held the city after the death of Alexander the Great, made it their stronghold on the coast and changed its name to Ptolemais. The encyclopedia's article on Ptolemais notes that the city is mentioned several times in the book of 1 Maccabees as the most prominent town of the Phoenician coast in the time of the Maccabees.",
       "sources": [
-        "bib:isbe-ptolemais"
+        "bib:isbe-ptolemais",
+        "bib:isbe-acco"
       ]
     }
   ],
@@ -65,10 +67,12 @@
   "otConnections": [
     {
       "ref": "Judges 1:31",
-      "note": "Judges records that the tribe of Asher \"didn't drive out the inhabitants of Acco,\" the Canaanite town on this site that was later refounded under the Greek name Ptolemais.",
+      "note": "Judges records that the tribe of Asher \"didn't drive out the inhabitants of Acco,\" the town the encyclopedia identifies with Ptolemais; the next verse reports that the Asherites instead lived among the Canaanites of the land.",
       "sources": [
         "scripture:Judges 1:31",
-        "bib:isbe-ptolemais"
+        "scripture:Judges 1:32",
+        "bib:isbe-ptolemais",
+        "bib:isbe-acco"
       ]
     }
   ],
