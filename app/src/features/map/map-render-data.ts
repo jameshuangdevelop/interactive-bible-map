@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, Point } from "geojson";
 
-import { CANDIDATE_PINS_MIN_ZOOM, MAX_MAP_ZOOM, PIN_COLORS } from "./constants";
+import { MAX_MAP_ZOOM, PIN_COLORS } from "./constants";
 import {
   candidateIndexToLetter,
   getPrimaryPlaceName,
@@ -328,7 +328,6 @@ function toCandidateFeature({
     selection.candidateIndex === candidateIndex;
   const candidateLetter = candidateIndexToLetter(candidateIndex);
   const zoomRange = getPinTierZoomRange(place);
-  const candidateMinZoom = Math.max(CANDIDATE_PINS_MIN_ZOOM, zoomRange.minZoom);
   const pinColor = placePinColor(place);
   const highlightedCandidate = highlighted && !selectedCandidate;
 
@@ -345,7 +344,7 @@ function toCandidateFeature({
       typeLabel: placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${placeTypeLabel(place.type)}, candidate ${candidateLetter}`,
       labelPriority: toLabelPriority(place, selectedCandidate || highlighted, importanceRank),
-      minZoom: candidateMinZoom,
+      minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       importanceRank,
       interactionRank: interactionRankForPlace(place),
@@ -518,7 +517,7 @@ export function buildPlaceRenderData(
       return;
     }
 
-    if (place.candidates.length > 1) {
+    if (place.candidates.length > 1 && selectedPlace) {
       place.candidates.forEach((_candidate, candidateIndex) => {
         candidatePins.features.push(
           toCandidateFeature({
@@ -531,10 +530,6 @@ export function buildPlaceRenderData(
           })
         );
       });
-
-      if (selectedPlace) {
-        return;
-      }
     }
 
     const pinFeature = toPinFeature({

@@ -98,6 +98,7 @@ const mapLayerIds = {
 const allClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.clusterPins];
 const allClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers, mapLayerIds.clusterPins];
 const allCityPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.cityPins];
+const selectedPlaceLabelLayerIds = ["ibm-selected-major-pin-label", "ibm-selected-pin-label"];
 const expectedMajorPinPlaceIds = [
   "jerusalem",
   "nazareth",
@@ -8402,6 +8403,128 @@ async function verifyCandidatePinColorRendering(page, baseUrl) {
   return sample;
 }
 
+async function verifyCandidateDotsSelectionVisibility(page, baseUrl) {
+  const inspectPlace = async () =>
+    page.evaluate(
+      ({ testHookKey, pinLabelLayerIds, selectedLabelLayerIds, candidateLayerId }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+
+        const labels = map.queryRenderedFeatures(undefined, {
+          layers: pinLabelLayerIds
+        });
+        const selectedLabels = map.queryRenderedFeatures(undefined, {
+          layers: selectedLabelLayerIds
+        });
+        const candidates = map.queryRenderedFeatures(undefined, {
+          layers: [candidateLayerId]
+        });
+
+        const countForPlace = (features, placeId) =>
+          features.filter((feature) => String(feature.properties?.placeId ?? "") === placeId).length;
+
+        return {
+          emmausLabelCount: countForPlace(labels, "emmaus"),
+          emmausSelectedLabelCount: countForPlace(selectedLabels, "emmaus"),
+          emmausCandidateCount: countForPlace(candidates, "emmaus"),
+          jerichoCandidateCount: countForPlace(candidates, "jericho")
+        };
+      },
+      {
+        testHookKey: mapTestHookKey,
+        pinLabelLayerIds: mapLayerIds.pinLabels,
+        selectedLabelLayerIds: selectedPlaceLabelLayerIds,
+        candidateLayerId: mapLayerIds.candidatePins
+      }
+    );
+
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 30_000
+  });
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      return;
+    }
+    map.jumpTo({ center: [35.23, 31.78], zoom: 9 });
+  }, mapTestHookKey);
+  await waitForMapToSettle(page);
+
+  const unselected = await inspectPlace();
+  if (unselected.emmausLabelCount < 1) {
+    throw new Error(
+      `Candidate visibility check: expected Emmaus name when unselected at zoom 9, got ${JSON.stringify(unselected)}.`
+    );
+  }
+  if (unselected.emmausCandidateCount > 0 || unselected.jerichoCandidateCount > 0) {
+    throw new Error(
+      `Candidate visibility check: candidate dots must be hidden when unselected, got ${JSON.stringify(unselected)}.`
+    );
+  }
+
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  const selected = await inspectPlace();
+  if (selected.emmausSelectedLabelCount < 1) {
+    throw new Error(
+      `Candidate visibility check: selected Emmaus should render selected name label, got ${JSON.stringify(selected)}.`
+    );
+  }
+  if (selected.emmausCandidateCount < 2) {
+    throw new Error(
+      `Candidate visibility check: selected Emmaus should render candidate dots, got ${JSON.stringify(selected)}.`
+    );
+  }
+
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  const afterSelectingJerusalem = await inspectPlace();
+  if (afterSelectingJerusalem.emmausCandidateCount > 0) {
+    throw new Error(
+      `Candidate visibility check: Emmaus dots should clear after selecting Jerusalem, got ${JSON.stringify(afterSelectingJerusalem)}.`
+    );
+  }
+
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+  const mapCanvas = page.locator("canvas").first();
+  const mapCanvasBox = await mapCanvas.boundingBox();
+  if (!mapCanvasBox) {
+    throw new Error("Candidate visibility check: map canvas bounds unavailable for drag probe.");
+  }
+  await page.mouse.move(mapCanvasBox.x + mapCanvasBox.width * 0.5, mapCanvasBox.y + mapCanvasBox.height * 0.55);
+  await page.mouse.down();
+  await page.mouse.move(
+    mapCanvasBox.x + mapCanvasBox.width * 0.62,
+    mapCanvasBox.y + mapCanvasBox.height * 0.43,
+    { steps: 12 }
+  );
+  await page.mouse.up();
+  await waitForMapToSettle(page);
+
+  const afterDrag = await inspectPlace();
+  if (afterDrag.emmausCandidateCount < 2) {
+    throw new Error(
+      `Candidate visibility check: selected Emmaus dots should remain after drag, got ${JSON.stringify(afterDrag)}.`
+    );
+  }
+
+  return {
+    unselected,
+    selected,
+    afterSelectingJerusalem,
+    afterDrag
+  };
+}
+
 function buildProvinceFixturePlaces(basePlaces) {
   const fixturePlaces = [...basePlaces];
   fixturePlaces.push(
@@ -13407,6 +13530,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const candidateDotsVisibilityCheck = await verifyCandidateDotsSelectionVisibility(
+      page,
+      staticServer.baseUrl
+    );
     const candidateSelectionCheck = await verifyCandidateSelectionUpdatesUrl(
       page,
       staticServer.baseUrl
@@ -13601,6 +13728,7 @@ async function run() {
       jerusalemGalileeZoom6Check,
       asiaMinorSevenChurchesZoom65Check,
       candidatePinColorCheck,
+      candidateDotsVisibilityCheck,
       candidateSelectionCheck,
       overviewAreaLabelFixtureCheck,
       overviewClusterOverlap,

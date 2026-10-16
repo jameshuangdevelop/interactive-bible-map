@@ -196,19 +196,15 @@ const interactiveLayerIds = [
 
 const candidateVisibilityFilter = [
   "all",
+  ["==", ["get", "isSelectedPlace"], true],
   ["<", ["zoom"], ["get", "maxZoom"]],
-  ["any", [">=", ["zoom"], ["get", "minZoom"]], ["==", ["get", "isSelectedPlace"], true]]
+  [">=", ["zoom"], ["get", "minZoom"]]
 ];
 
 const basePlaceLabelVisibilityFilter = [
   "all",
   ["<", ["zoom"], ["get", "maxZoom"]],
-  [">=", ["zoom"], ["get", "minZoom"]],
-  [
-    "any",
-    ["==", ["get", "hasMultipleCandidates"], false],
-    ["all", ["==", ["get", "hasMultipleCandidates"], true], ["<", ["zoom"], 8]]
-  ]
+  [">=", ["zoom"], ["get", "minZoom"]]
 ];
 
 const areaLabelVisibilityFilter = [

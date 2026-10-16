@@ -203,7 +203,7 @@ describe("map render data", () => {
     expect(italyRegionLabel?.properties.minZoom).toBe(5);
   });
 
-  test("moves selected multi-candidate places out of clustered pins into candidate icons", () => {
+  test("keeps selected multi-candidate places in labels and adds candidate icons", () => {
     const renderData = buildPlaceRenderData(fixtures, {
       placeId: "emmaus",
       candidateIndex: 1
@@ -212,7 +212,7 @@ describe("map render data", () => {
     const clusteredPlaceIds = renderData.clusteredCityPins.features.map(
       (feature) => feature.properties.placeId
     );
-    expect(clusteredPlaceIds).not.toContain("emmaus");
+    expect(clusteredPlaceIds).toContain("emmaus");
 
     const emmausCandidates = renderData.candidatePins.features.filter(
       (feature) => feature.properties.placeId === "emmaus"
@@ -223,7 +223,7 @@ describe("map render data", () => {
       candidateLetter: "B",
       isSelectedPlace: true,
       isSelectedCandidate: true,
-      minZoom: 8
+      minZoom: 6
     });
   });
 
@@ -284,23 +284,13 @@ describe("map render data", () => {
     expect(capernaumPin?.properties.labelText).toBe("Kfar Nahum");
   });
 
-  test("uses highlighted candidate icons for hovered multi-candidate places", () => {
+  test("does not render candidate icons for unselected multi-candidate places", () => {
     const renderData = buildPlaceRenderData(fixtures, null, "emmaus");
     const emmausCandidates = renderData.candidatePins.features.filter(
       (feature) => feature.properties.placeId === "emmaus"
     );
 
-    expect(emmausCandidates).toHaveLength(2);
-    expect(emmausCandidates[0].properties).toMatchObject({
-      isSelectedCandidate: false,
-      isHighlightedPlace: true,
-      iconId: "candidate-c5221f-selected-a"
-    });
-    expect(emmausCandidates[1].properties).toMatchObject({
-      isSelectedCandidate: false,
-      isHighlightedPlace: true,
-      iconId: "candidate-c5221f-selected-b"
-    });
+    expect(emmausCandidates).toHaveLength(0);
   });
 
   test("keeps an area label renderable when it shares coordinates with a city pin", () => {
