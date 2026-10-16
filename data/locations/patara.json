@@ -1,0 +1,114 @@
+{
+  "id": "patara",
+  "names": {
+    "ancient": [
+      "Patara"
+    ],
+    "modern": "Gelemiş",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Arsinoe"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "lycia",
+  "candidates": [
+    {
+      "label": "Patara archaeological site",
+      "coordinates": [
+        29.314167,
+        36.260278
+      ],
+      "coordinateSource": "wikidata:Q233121",
+      "confidence": "high",
+      "support": "A coastal city of Lycia with a celebrated oracle of Apollo and a harbor serving trade with the interior. The International Standard Bible Encyclopedia gives Gelemiş as the modern name of the ruin; Pleiades, OpenBible.info and Wikidata agree on the site.",
+      "sources": [
+        "pleiades:639042",
+        "openbible:patara",
+        "wikidata:Q233121",
+        "bib:isbe-patara",
+        "bib:isbe-lycia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Patara was a coastal city of Lycia with an excellent harbor that made it a wealthy port of entry for the towns of the interior, and the home of a celebrated oracle of Apollo said to speak only during the six winter months. Acts records that on his return from his third missionary journey, Paul's ship brought him to Patara, where he found a ship crossing over to Phoenicia and went aboard.",
+    "sources": [
+      "pleiades:639042",
+      "openbible:patara",
+      "wikidata:Q233121",
+      "bib:isbe-patara",
+      "scripture:Acts 21:1",
+      "scripture:Acts 21:2"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Patara struck its own autonomous coins as early as 440 BC, and again from 168 BC, when it joined the Lycian league; the Egyptian king Ptolemy Philadelphus enlarged the city and renamed it Arsinoe after his wife.",
+      "sources": [
+        "bib:isbe-patara"
+      ]
+    },
+    {
+      "text": "The encyclopedia records that Patara took little part in the history of early Christianity, but that it was the home of a bishop and, by tradition, the birthplace of Nicholas, later honored as a patron saint of sailors, though Nicholas himself served as bishop of the neighboring Lycian city of Myra, where he is said to have been buried.",
+      "sources": [
+        "bib:isbe-patara"
+      ]
+    },
+    {
+      "text": "The encyclopedia describes surviving traces of the ancient city's walls, a temple, a castle and a triumphal arch inscribed \"Patara the Metropolis of the Lycian Nation,\" along with many sarcophagi outside the walls; the harbor, it notes, had long since silted up into a swamp.",
+      "sources": [
+        "bib:isbe-patara"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 21:1",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 43,
+      "holderId": "lycia-league",
+      "entity": "Lycian League",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:strabo-geography"
+      ]
+    },
+    {
+      "fromYear": 43,
+      "toYear": 74,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:suetonius-twelve-caesars",
+        "bib:tacitus-histories"
+      ],
+      "note": "The Roman historian Cassius Dio says the emperor Claudius \"incorporated them in the prefecture of Pamphylia,\" not that Lycia became its own province; the Roman biographer Suetonius separately records that the emperor Vespasian made a province of Lycia, implying it had freedom again by his reign, and a translator's note to the Roman historian Tacitus's Histories (2.9) states that \"Galatia, Pamphylia, and Lycia\" formed one province together by AD 69, leaving Lycia's exact status across this span unclear."
+    },
+    {
+      "fromYear": 74,
+      "toYear": 101,
+      "holderId": "lycia-pamphylia-province",
+      "entity": "Roman province of Lycia and Pamphylia",
+      "sources": [
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "lycia"
+}
