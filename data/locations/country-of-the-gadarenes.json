@@ -31,8 +31,7 @@
         "openbible:gergesa",
         "bib:isbe-gerasa",
         "bib:isbe-gadara"
-      ],
-      "politicalAreaId": "philip-tetrarchy-lands"
+      ]
     },
     {
       "label": "Gadara",
@@ -48,8 +47,7 @@
         "wikidata:Q1490815",
         "openbible:gadara",
         "bib:isbe-gadara"
-      ],
-      "politicalAreaId": "syria"
+      ]
     },
     {
       "label": "Gerasa (modern Jerash)",
@@ -65,8 +63,7 @@
         "wikidata:Q56072866",
         "openbible:gerasa",
         "bib:isbe-gerasa"
-      ],
-      "politicalAreaId": "syria"
+      ]
     }
   ],
   "summary": {
@@ -111,22 +108,22 @@
     {
       "ref": "Matthew 8:28",
       "book": "Matthew",
-      "textWEB": "PLACEHOLDER"
+      "textWEB": "When he came to the other side, into the country of the Gergesenes, two people possessed by demons met him there, coming out of the tombs, exceedingly fierce, so that nobody could pass that way."
     },
     {
       "ref": "Mark 5:1",
       "book": "Mark",
-      "textWEB": "PLACEHOLDER"
+      "textWEB": "They came to the other side of the sea, into the country of the Gadarenes."
     },
     {
       "ref": "Luke 8:26",
       "book": "Luke",
-      "textWEB": "PLACEHOLDER"
+      "textWEB": "Then they arrived at the country of the Gadarenes, which is opposite Galilee."
     },
     {
       "ref": "Luke 8:37",
       "book": "Luke",
-      "textWEB": "PLACEHOLDER"
+      "textWEB": "All the people of the surrounding country of the Gadarenes asked him to depart from them, for they were very much afraid. Then he entered into the boat and returned."
     }
   ],
   "otConnections": [],

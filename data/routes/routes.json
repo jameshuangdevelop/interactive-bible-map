@@ -2256,8 +2256,8 @@
             "locationId": "capernaum"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "country-of-the-gadarenes",
+            "kind": "location",
+            "locationId": "country-of-the-gadarenes",
             "candidateIndex": 0
           },
           "scripture": [
@@ -2322,8 +2322,8 @@
         {
           "id": "segment-12",
           "from": {
-            "kind": "route-stop",
-            "stopId": "country-of-the-gadarenes",
+            "kind": "location",
+            "locationId": "country-of-the-gadarenes",
             "candidateIndex": 0
           },
           "to": {
@@ -2893,8 +2893,8 @@
             "candidateIndex": 1
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "bethphage",
+            "kind": "location",
+            "locationId": "bethphage",
             "candidateIndex": 0
           },
           "scripture": [
@@ -2966,8 +2966,8 @@
         {
           "id": "segment-24",
           "from": {
-            "kind": "route-stop",
-            "stopId": "bethphage",
+            "kind": "location",
+            "locationId": "bethphage",
             "candidateIndex": 0
           },
           "to": {
@@ -3143,8 +3143,8 @@
             "locationId": "bethany"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "ephraim"
+            "kind": "location",
+            "locationId": "ephraim"
           },
           "scripture": [
             {
@@ -3171,8 +3171,8 @@
         {
           "id": "segment-28",
           "from": {
-            "kind": "route-stop",
-            "stopId": "ephraim"
+            "kind": "location",
+            "locationId": "ephraim"
           },
           "to": {
             "kind": "location",
