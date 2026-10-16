@@ -1,0 +1,80 @@
+{
+  "id": "cos",
+  "names": {
+    "ancient": [
+      "Cos"
+    ],
+    "modern": "Kos",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Kos",
+      "Coos"
+    ],
+    "otherLanguages": [
+      "Stanchio"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Cos (island)",
+      "coordinates": [
+        27.110278,
+        36.815278
+      ],
+      "coordinateSource": "wikidata:Q187027",
+      "confidence": "high",
+      "support": "An Aegean island off the coast of Caria, one of the six cities of the Dorian Hexapolis. Pleiades, OpenBible.info and Wikidata agree on the island, known today as Kos.",
+      "sources": [
+        "pleiades:599581",
+        "openbible:cos",
+        "wikidata:Q187027",
+        "bib:isbe-cos"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cos is a mountainous Aegean island off the coast of Caria, one of the six cities of the Dorian Hexapolis and in antiquity a flourishing center of commerce noted for its wine and its medical school; it was the birthplace of Hippocrates, the physician later called the father of medicine. Acts records that on his return from his third missionary journey, Paul's ship came with a straight course to Cos, and the next day to Rhodes, and from there to Patara.",
+    "sources": [
+      "pleiades:599581",
+      "openbible:cos",
+      "wikidata:Q187027",
+      "bib:isbe-cos",
+      "scripture:Acts 21:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Cos, like Corinth, became one of the Jewish centers of the Aegean as well as one of the commercial centers of the eastern Mediterranean, and names Herod the Great among the benefactors of its people.",
+      "sources": [
+        "bib:isbe-cos"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 21:1",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "asia"
+}

@@ -1,0 +1,89 @@
+{
+  "id": "assos",
+  "names": {
+    "ancient": [
+      "Assos"
+    ],
+    "modern": "Behramkale",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Machramion"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "mysia",
+  "candidates": [
+    {
+      "label": "Assos archaeological site",
+      "coordinates": [
+        26.336667,
+        39.490556
+      ],
+      "coordinateSource": "wikidata:Q744631",
+      "confidence": "high",
+      "support": "An ancient city of the Troad on a rocky height on the south coast, in the Roman province of Asia. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Behramkale, an alternate name recorded on the Wikidata item itself.",
+      "sources": [
+        "pleiades:550463",
+        "openbible:assos",
+        "wikidata:Q744631",
+        "bib:isbe-assos"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Assos was an ancient city of Mysia, in the Roman province of Asia, built on a steep, cone-shaped rock on the southern coast of the Troad, with an extensive view from its summit. Acts records that Paul traveled to Assos by land while his companions sailed there from Troas, and that he rejoined the ship at Assos for the voyage on to Mitylene.",
+    "sources": [
+      "pleiades:550463",
+      "openbible:assos",
+      "wikidata:Q744631",
+      "bib:isbe-assos",
+      "scripture:Acts 20:13",
+      "scripture:Acts 20:14"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Assos was said to have been founded by Aeolian settlers and struck its own coins from as early as the fifth century BC, continuing its own coinage until AD 235. One of its early rulers, a former slave named Hermeas, gave his niece in marriage to the philosopher Aristotle, who lived in the city for three years, from 348 to 345 BC.",
+      "sources": [
+        "bib:isbe-assos"
+      ]
+    },
+    {
+      "text": "The encyclopedia describes a temple of Athena on the hill's summit, built around 470 BC, and a double city wall still well preserved in places; the harbor from which Paul sailed had been filled in and was covered with gardens by the time the encyclopedia was written, in 1915.",
+      "sources": [
+        "bib:isbe-assos"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 20:13",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    },
+    {
+      "ref": "Acts 20:14",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "draft",
+  "politicalAreaId": "asia"
+}
