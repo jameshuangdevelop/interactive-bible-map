@@ -2352,6 +2352,31 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "smith-dictionary-samothrace",
+      "type": "chapter",
+      "title": "Samothrace",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=samothrace-geo",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "louvre-winged-victory",
+      "type": "web",
+      "title": "Victoire de Samothrace (Winged Victory of Samothrace)",
+      "authors": [
+        "Musee du Louvre"
+      ],
+      "year": 2026,
+      "publisher": "Musee du Louvre, Departement des Antiquites grecques, etrusques et romaines",
+      "url": "https://collections.louvre.fr/en/ark:/53355/cl010252531",
+      "accessed": "2026-10-16"
+    },
+    {
       "id": "isbe-amphipolis",
       "type": "chapter",
       "title": "Amphipolis",

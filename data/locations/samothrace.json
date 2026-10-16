@@ -16,7 +16,7 @@
   "type": "natural-feature",
   "zoomTier": "city",
   "prominence": "standard",
-  "parentId": "macedonia",
+  "parentId": "roman-empire",
   "candidates": [
     {
       "label": "Samothrace (island)",
@@ -36,7 +36,7 @@
     }
   ],
   "summary": {
-    "text": "Samothrace is a mountainous island in the northern Aegean Sea, south of Thrace, long known for its sanctuary of the Cabeiri, gods whose mystery cult rivaled the famous mysteries of Eleusis; Philip of Macedon and his wife Olympias were said to have been initiated there. Acts records that on the voyage from Troas to Philippi, Paul and his companions made a straight course to Samothrace, anchoring for the night at a town on the island's northern end, and continued the next day to Neapolis.",
+    "text": "Samothrace is a mountainous island in the northern Aegean Sea, south of Thrace, long known for its sanctuary of the Cabeiri, gods whose mystery cult rivaled the famous mysteries of Eleusis; King Philip of Macedon and his wife Olympias were said to have been initiated there. Acts records that on the voyage from Troas to Philippi, Paul and his companions made a straight course to Samothrace and continued the next day to Neapolis; the International Standard Bible Encyclopedia notes that at the island's northern end was a town where the ship could anchor for the night.",
     "sources": [
       "pleiades:501597",
       "openbible:samothrace",
@@ -47,9 +47,10 @@
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia reports that the island's name reflects its height, towering over the neighboring island of Imbros, and that it is mentioned in Homer's Iliad as the seat from which the god Poseidon watched the Trojan War. The famed sculpture known as the Winged Victory of Samothrace, set up on the island around 300 BC by the Macedonian ruler Demetrius Poliorcetes, was discovered there in 1863 and is now in the Louvre.",
+      "text": "The International Standard Bible Encyclopedia reports that the island's name reflects its height, towering over the neighboring island of Imbros, and that it is mentioned in Homer's Iliad as the seat of the god Poseidon. The sculpture known as the Winged Victory of Samothrace, discovered at the island's Cabirion sanctuary in 1863 and today in the Louvre museum, is dated by the Louvre to the early second century BC, possibly created at Rhodes; the encyclopedia, reflecting an older, since-revised view, instead dated the statue's erection to around 300 BC, crediting it to the Macedonian ruler Demetrius Poliorcetes.",
       "sources": [
-        "bib:isbe-samothrace"
+        "bib:isbe-samothrace",
+        "bib:louvre-winged-victory"
       ]
     },
     {
@@ -69,44 +70,14 @@
   "otConnections": [],
   "politicalHistory": [
     {
-      "fromYear": -148,
-      "toYear": -27,
-      "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
-      "sources": [
-        "bib:isbe-macedonia",
-        "bib:livius-macedonia"
-      ]
-    },
-    {
-      "fromYear": -27,
-      "toYear": 15,
-      "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
-      "sources": [
-        "bib:isbe-macedonia",
-        "bib:livius-macedonia"
-      ]
-    },
-    {
-      "fromYear": 15,
-      "toYear": 44,
-      "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
-      "sources": [
-        "bib:tacitus-annals"
-      ]
-    },
-    {
-      "fromYear": 44,
+      "fromYear": -4,
       "toYear": 101,
-      "holderId": "macedonia-province",
-      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "entity": "Free state under Roman rule",
       "sources": [
-        "bib:cassius-dio-roman-history"
-      ]
+        "bib:smith-dictionary-samothrace"
+      ],
+      "note": "Smith's Dictionary of Greek and Roman Geography records that \"in Pliny's time Samothrace was a free state,\" referring to the Roman writer Pliny the Elder, who wrote in the mid-to-late first century AD; no cited source dates when this status began or whether it changed across the span this map covers."
     }
   ],
-  "status": "draft",
-  "politicalAreaId": "macedonia"
+  "status": "draft"
 }
