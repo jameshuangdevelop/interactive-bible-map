@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { PlacePanel } from "../src/features/place-panel/place-panel.web";
 import type {
+  MediaRecord,
   PlaceDetailsPayload,
   PlaceIndexRecord,
   PlaceRecord,
@@ -34,10 +35,10 @@ const lystra: PlaceIndexRecord = {
   id: "lystra",
   names: {
     ancient: ["Lystra"],
-    alternate: [],
+    alternate: ["Tel Lystra"],
     modernCountries: ["Türkiye"]
   },
-  type: "city",
+  type: "town",
   zoomTier: "city",
   prominence: "standard",
   passageCount: 2,
@@ -56,7 +57,7 @@ const lystraDetails: PlaceRecord = {
     }
   ],
   summary: {
-    text: "Lystra was a city in Lycaonia visited during Paul's journeys.",
+    text: "Lystra was a town in Lycaonia visited during Paul's journeys.",
     sources: ["wikidata:Q844470"]
   },
   history: [],
@@ -75,11 +76,35 @@ const selection: PlaceSelection = {
 
 const places = [romanEmpire, lycaonia, lystra];
 const placesById = new Map(places.map((place) => [place.id, place]));
+const oneImageMedia: MediaRecord = {
+  locationId: "lystra",
+  images: [
+    {
+      id: "lystra-01",
+      url: "https://upload.wikimedia.org/example/lystra.jpg",
+      width: 1600,
+      height: 900,
+      caption: "Lystra area view",
+      kind: "modern",
+      aiGenerated: false,
+      author: "Example Author",
+      license: "CC BY-SA 4.0",
+      licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+      sourcePage: "https://commons.wikimedia.org/wiki/File:Example.jpg"
+    }
+  ]
+};
 
-function renderPanelMarkup(isSmallScreenExpanded: boolean) {
+function renderPanelMarkup({
+  isSmallScreenExpanded,
+  media
+}: {
+  isSmallScreenExpanded: boolean;
+  media: MediaRecord | null;
+}) {
   const detailsPayload: PlaceDetailsPayload = {
     location: lystraDetails,
-    media: null,
+    media,
     bibliography: []
   };
 
@@ -110,12 +135,54 @@ describe("place panel header on small screens", () => {
     { state: "collapsed", isSmallScreenExpanded: false },
     { state: "expanded", isSmallScreenExpanded: true }
   ])("shows Lystra header when sheet is $state and media is missing", ({ isSmallScreenExpanded }) => {
-    const markup = renderPanelMarkup(isSmallScreenExpanded);
+    const markup = renderPanelMarkup({
+      isSmallScreenExpanded,
+      media: null
+    });
 
     expect(markup).toContain("<h1");
     expect(markup).toContain(">Lystra</h1>");
     expect(markup).toContain("Today: Türkiye");
-    expect(markup).toContain("City");
+    expect(markup).toContain("Town");
     expect(markup).toContain("Lycaonia");
+    if (isSmallScreenExpanded) {
+      expect(markup).toContain("Also known as Tel Lystra");
+      return;
+    }
+
+    expect(markup).not.toContain("Also known as");
+  });
+
+  test.each([
+    { state: "collapsed", isSmallScreenExpanded: false },
+    { state: "expanded", isSmallScreenExpanded: true }
+  ])(
+    "renders exactly one title and one names section with an image when sheet is $state",
+    ({ isSmallScreenExpanded }) => {
+      const markup = renderPanelMarkup({
+        isSmallScreenExpanded,
+        media: oneImageMedia
+      });
+
+      expect((markup.match(/<h1/g) ?? []).length).toBe(1);
+      expect((markup.match(/data-panel-section=\"names\"/g) ?? []).length).toBe(1);
+    }
+  );
+
+  test.each([
+    { state: "collapsed", isSmallScreenExpanded: false },
+    { state: "expanded", isSmallScreenExpanded: true }
+  ])("shows Also known as only when expanded with image media for $state state", ({ isSmallScreenExpanded }) => {
+    const markup = renderPanelMarkup({
+      isSmallScreenExpanded,
+      media: oneImageMedia
+    });
+
+    if (isSmallScreenExpanded) {
+      expect(markup).toContain("Also known as Tel Lystra");
+      return;
+    }
+
+    expect(markup).not.toContain("Also known as");
   });
 });
