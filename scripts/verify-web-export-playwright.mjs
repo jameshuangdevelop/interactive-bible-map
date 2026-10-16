@@ -10248,6 +10248,100 @@ async function verifyPhoneBasics(browser, baseUrl) {
         );
       }
       await assertPhoneExpandedControlVisibility("collapsed-after-touch-drag", false);
+
+      const assertPhonePlaceHeader = async ({
+        placeId,
+        expectedName,
+        expectedTodayLineNeedles,
+        todayLineDescription
+      }) => {
+        await page.goto(`${baseUrl}/?place=${placeId}`, {
+          waitUntil: "networkidle",
+          timeout: 90_000
+        });
+        await waitForMapToSettle(page);
+        await page.waitForSelector("section[aria-label='Place details']", {
+          state: "visible",
+          timeout: 45_000
+        });
+
+        const readHeaderSnapshot = async () =>
+          page.evaluate(() => {
+            const panel = document.querySelector("section[aria-label='Place details']");
+            if (!(panel instanceof HTMLElement)) {
+              throw new Error("Phone panel is not visible.");
+            }
+            const title = panel.querySelector("h1");
+            const todayLine = panel.querySelector("[data-modern-name-line='true']");
+            return {
+              panelHeight: panel.getBoundingClientRect().height,
+              titleText: title?.textContent?.trim() ?? "",
+              todayLineText: todayLine?.textContent?.replace(/\s+/gu, " ").trim() ?? ""
+            };
+          });
+
+        const collapsedSnapshot = await readHeaderSnapshot();
+        if (collapsedSnapshot.titleText !== expectedName) {
+          throw new Error(
+            `Phone ${viewport.width}x${viewport.height} ${placeId} collapsed title mismatch: expected '${expectedName}', got '${collapsedSnapshot.titleText}'.`
+          );
+        }
+        if (
+          !expectedTodayLineNeedles.every((needle) =>
+            collapsedSnapshot.todayLineText.includes(needle)
+          )
+        ) {
+          throw new Error(
+            `Phone ${viewport.width}x${viewport.height} ${placeId} collapsed ${todayLineDescription} mismatch: expected ${JSON.stringify(
+              expectedTodayLineNeedles
+            )}, got '${collapsedSnapshot.todayLineText}'.`
+          );
+        }
+
+        const handle = page
+          .locator("section[aria-label='Place details'] button[aria-label$='place details panel']")
+          .first();
+        await handle.tap();
+        await page.waitForTimeout(350);
+
+        const expandedSnapshot = await readHeaderSnapshot();
+        if (expandedSnapshot.titleText !== expectedName) {
+          throw new Error(
+            `Phone ${viewport.width}x${viewport.height} ${placeId} expanded title mismatch: expected '${expectedName}', got '${expandedSnapshot.titleText}'.`
+          );
+        }
+        if (
+          !expectedTodayLineNeedles.every((needle) =>
+            expandedSnapshot.todayLineText.includes(needle)
+          )
+        ) {
+          throw new Error(
+            `Phone ${viewport.width}x${viewport.height} ${placeId} expanded ${todayLineDescription} mismatch: expected ${JSON.stringify(
+              expectedTodayLineNeedles
+            )}, got '${expandedSnapshot.todayLineText}'.`
+          );
+        }
+        if (expandedSnapshot.panelHeight <= collapsedSnapshot.panelHeight + 40) {
+          throw new Error(
+            `Phone ${viewport.width}x${viewport.height} ${placeId} sheet did not expand while checking header.`
+          );
+        }
+      };
+
+      await assertPhonePlaceHeader({
+        placeId: "lystra",
+        expectedName: "Lystra",
+        expectedTodayLineNeedles: ["Today:", "Türkiye"],
+        todayLineDescription: "Today line"
+      });
+
+      await assertPhonePlaceHeader({
+        placeId: "derbe",
+        expectedName: "Derbe",
+        expectedTodayLineNeedles: ["Today:", "Türkiye"],
+        todayLineDescription: "Today line"
+      });
+
       results.push({
         viewport,
         openingOverviewSnapshot,

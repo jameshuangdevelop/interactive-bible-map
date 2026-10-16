@@ -1652,6 +1652,47 @@ export function PlacePanel({
     );
   })();
 
+  const renderNamesSummary = ({ includeAlsoKnownAs }: { includeAlsoKnownAs: boolean }) => (
+    <>
+      <h1
+        style={{
+          margin: 0,
+          color: tokens.color.textPrimary,
+          fontSize: `${tokens.typography.titleSize}px`,
+          lineHeight: `${tokens.typography.titleLineHeight}px`,
+          fontWeight: 600
+        }}
+      >
+        {titleName}
+      </h1>
+      {modernLocationLabel || locationStatusIndicator ? (
+        <p data-modern-name-line="true" style={todayLineStyle}>
+          {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
+          {locationStatusIndicator}
+        </p>
+      ) : null}
+      {includeAlsoKnownAs && alsoKnownAs.length > 0 ? (
+        <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
+      ) : null}
+      <p style={secondaryTextStyle}>
+        {hierarchyItems.map((item, index) => (
+          <span key={`${item.label}:${item.placeId ?? "none"}`}>
+            {index > 0 ? " · " : null}
+            {item.placeId ? (
+              <LinkLikeButton
+                label={item.label}
+                onSelectPlace={onSelectPlace}
+                placeId={item.placeId}
+              />
+            ) : (
+              item.label
+            )}
+          </span>
+        ))}
+      </p>
+    </>
+  );
+
   if (isLoading && !location) {
     return (
       <div>
@@ -1848,23 +1889,7 @@ export function PlacePanel({
             />
             {showCollapsedSummaryOnly ? (
               <section data-panel-section="names">
-                <h1
-                  style={{
-                    margin: 0,
-                    color: tokens.color.textPrimary,
-                    fontSize: `${tokens.typography.titleSize}px`,
-                    lineHeight: `${tokens.typography.titleLineHeight}px`,
-                    fontWeight: 600
-                  }}
-                >
-                  {titleName}
-                </h1>
-                {modernLocationLabel || locationStatusIndicator ? (
-                  <p data-modern-name-line="true" style={todayLineStyle}>
-                    {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
-                    {locationStatusIndicator}
-                  </p>
-                ) : null}
+                {renderNamesSummary({ includeAlsoKnownAs: false })}
                 <PhotoCaptionAndCredit
                   activeImageOrdinal={normalizedActiveImageIndex + 1}
                   caption={selectedImage.caption}
@@ -1895,44 +1920,9 @@ export function PlacePanel({
           </section>
         ) : null}
 
-        {!showCollapsedSummaryOnly ? (
+        {!showCollapsedSummaryOnly || !selectedImage ? (
           <section data-panel-section="names">
-            <h1
-              style={{
-                margin: 0,
-                color: tokens.color.textPrimary,
-                fontSize: `${tokens.typography.titleSize}px`,
-                lineHeight: `${tokens.typography.titleLineHeight}px`,
-                fontWeight: 600
-              }}
-            >
-              {titleName}
-            </h1>
-            {modernLocationLabel || locationStatusIndicator ? (
-              <p data-modern-name-line="true" style={todayLineStyle}>
-                {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
-                {locationStatusIndicator}
-              </p>
-            ) : null}
-            {alsoKnownAs.length > 0 ? (
-              <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
-            ) : null}
-            <p style={secondaryTextStyle}>
-              {hierarchyItems.map((item, index) => (
-                <span key={`${item.label}:${item.placeId ?? "none"}`}>
-                  {index > 0 ? " · " : null}
-                  {item.placeId ? (
-                    <LinkLikeButton
-                      label={item.label}
-                      onSelectPlace={onSelectPlace}
-                      placeId={item.placeId}
-                    />
-                  ) : (
-                    item.label
-                  )}
-                </span>
-              ))}
-            </p>
+            {renderNamesSummary({ includeAlsoKnownAs: !showCollapsedSummaryOnly })}
           </section>
         ) : null}
 
