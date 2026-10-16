@@ -549,3 +549,450 @@ Earlier sections already showed the rest of the batch passing:
 **Checks** (Node 24.21.0, on `a9ce68a`):
 - `npm run validate:data`: passed, 203 warnings, none in these records. It passed again after the status change.
 - `npm test`: 331 tests, all pass.
+
+## Batch B: Paul's journeys (14 places)
+
+- **Card:** `docs/tasks/M5-07-route-places.md` · **Branch:** `data/m5-route-places`
+- **Checked (batches B and C):** the Research Lead's 13 commits `9496e99`…`51dbb4f` on top of `59201f4`:
+  - the 17 new records in `data/locations/`;
+  - the routes switch (`data/routes/routes.json`, `data/routes/stops.json`, `scripts/lib/route-line-rules.mjs`);
+  - the regenerated OpenBible lookup and its TypeScript copy;
+  - the new bibliography entry `isbe-ephron-2`;
+  - the research note `docs/research/M5-route-places.md` (Batches B and C).
+
+  I checked them against ADR-0042, ADR-0041 item 1, ADR-0035, ADR-0033, ADR-0029, ADR-0028, ADR-0027, ADR-0026, ADR-0017, `schema/README.md`, the verified timeline (`data/timeline.json`) and batch A's standard (§A1–§A9).
+- **Verifier:** fact-checker (Claude Opus 5.5) · **Date:** 2026-10-16
+- **Method (both batches):**
+  1. **Candidates:** a script compared every record's `candidates` with `git show 59201f4:data/routes/stops.json`. I measured each point against Pleiades' place JSON and each cited Wikidata item's P625. A second script tested every point against the ancient layer's areas (`data/geo/ancient-areas.geojson`).
+  2. **Scripture:** the validator compares all 23 `textWEB` strings with `data/reference/engwebp_vpl.txt`. I searched the whole WEB for every name and spelling: Seleucia, Attalia, Samothrac-, Amphipolis, Apollonia, Assos/Assus, Mitylene/Mytilene/Lesbos, Chios/Kios, Samos, Trogyllium, Cos/Coos/Kos, Rhodes/Rhodian(s), Patara, Ptolemais/Acco/Akko/Accho, Gadar-/Geras-/Gerges-, Bethphage/Bethsphage, and Ephraim/Ephrem/Ophrah/Ephron. I read each `otConnections` note against its verses.
+  3. **Sources, all opened 2026-10-16:**
+     - the ISBE (1915) at internationalstandardbible.com: the 14 batch B place articles, plus "Asia", "Macedonia", "Acco", "Gadara", "Gerasa; Gerasenes", "Decapolis", "Bethphage", "Ephraim (2)" and "Ephron (2)";
+     - on LacusCurtius: Cassius Dio 54.7–9 and 60.23–24, Tacitus *Annals* 12.58 and *Histories* 1.1 and 2.79, Suetonius *Vespasian* 6 and 8, and Strabo 16.2.4;
+     - Josephus, *Antiquities* 16.2.2 (Whiston, CCEL);
+     - Smith's *Geography* (1854), "Samothrace", on Perseus;
+     - Livius, "Macedonia (8)";
+     - the Custodia's "Bethphage" page, and the Louvre's catalogue entry for the Victory of Samothrace (Ma 2369);
+     - Pleiades' JSON for all 19 cited places;
+     - Wikidata's API for the 20 cited items (labels, descriptions, aliases, P17, P131, P625, and P2046 for the islands);
+     - all 19 OpenBible.info pages.
+  4. **Routes:** a script converted every `{"kind": "route-stop"}` reference in the base `routes.json` to `{"kind": "location"}` and compared the result with the branch's file.
+  5. **Commands:** with the official Node 24 build (v24.21.0), `validate:data`, `check:route-lines`, `npm test` and `build:data` (§C5).
+
+### B1. Results
+
+| Item | Pass | Needs the Research Lead | Question for the PO |
+|---|---|---|---|
+| Records (14) | 3: `attalia`, `assos`, `cos` | 11, with 19 fixes (F46–F64): 9 on content, 10 on citations or wording | Q2, Q3 |
+| Candidates and coordinates (14) | 14, identical to the verified stop entries; Rhodes's support gains one sourced ISBE sentence | — | — |
+| WEB quotes (15) and New Testament completeness | All | — | — |
+| `otConnections` | 13 records rightly have none; Ptolemais's Judges 1:31 is the right verse | Ptolemais's note (F63) | — |
+| Names | All titles, alternates and countries | — | — |
+| Type, tier, parent, political area | 13 | Samothrace's parent and area (F47) | Island tiers (Q2) |
+| `politicalHistory` | 12 derived from the timeline (the validator compares them) | Samos and Rhodes, hand-written (F55, F56, F59–F61) | — |
+| Sources and licences | Every id resolves; at least two independent sources per candidate; no new upstream source | — | — |
+
+**The main findings:**
+1. **Ruling 1 (Samos, Rhodes).** The fuller histories are kept, but four entries don't match their sources (§B4):
+   - Samos's freedom dates from 20 BC in Dio, not 17 BC;
+   - Rhodes's liberty was restored in AD 53 under Claudius, at the plea of Nero, who was not yet emperor;
+   - "the start of his reign, AD 70" is wrong for both islands: Vespasian's reign began on 1 July 69;
+   - no source names the province after Vespasian.
+2. **Samothrace isn't in Macedonia by any source or by the map.** No cited source puts it there. Smith's *Geography* calls it "a free state" in Pliny's time, and the ancient layer draws the island in `other-roman-lands` (F47).
+3. **Three statements are wrong or unsupported:**
+   - the Victory of Samothrace's date, which the Louvre contradicts (F48);
+   - Rhodes's "three oldest cities", which ISBE contradicts (F58);
+   - Chios's wine, which no cited source mentions (F53).
+4. **Three readings are credited to Acts that Acts doesn't state:**
+   - Samothrace's night anchorage (F49) and Chios's anchorage (F54), both ISBE's;
+   - the "third missionary journey" label for Rhodes and Patara, which no source they cite gives (F61, F62).
+5. **The rest** are citation gaps and small overstatements.
+
+### B2. Per record
+
+| Record | Result | Fixes |
+|---|---|---|
+| `seleucia` | Needs change (citations) | F46 |
+| `attalia` | **Pass** | — |
+| `samothrace` | Needs change | F47–F49 (F47 with Q3) |
+| `amphipolis` | Needs change (citation) | F50 |
+| `apollonia-macedonia` | Needs change (wording) | F51 |
+| `assos` | **Pass** | — (one suggestion) |
+| `mitylene` | Needs change (citation) | F52 |
+| `chios` | Needs change | F53, F54 |
+| `samos` | Needs change | F55, F56 |
+| `trogyllium` | Needs change (wording) | F57 |
+| `cos` | **Pass** | — (Q2 on its tier; one suggestion) |
+| `rhodes` | Needs change | F58–F61 |
+| `patara` | Needs change (citation) | F62 |
+| `ptolemais` | Needs change | F63, F64 |
+
+**Why the three pass:**
+- **`attalia`:** ISBE "Attalia" states each clause:
+  - "founded by Attalus II Philadelphus (159-138 BC)";
+  - "a flat terrace of limestone … near the point where the Catarrhactes River flowed into the sea";
+  - "in 1084 when Perga declined, Attalia became a metropolis";
+  - "the chief port for ships from Syria and Egypt, and the point of entry to the interior until modern times, when the harbor at Mersine was reopened";
+  - the chained harbour, "the inscribed arched gateway of Hadrian and the aqueduct".
+
+  Acts 14:25–26 give the visit, and ISBE has "Paul and Barnabas … on the way to Antioch". Its parent and political area are Pamphylia's, as Perga's are.
+- **`assos`:** ISBE "Assos" states each clause:
+  - "An ancient city of Mysia in the Roman province of Asia", on "a conical-shaped rock on the southern coast of the Troad";
+  - founding "by the Aeolians"; its coinage "As early as the 5th century BC … until 235 AD";
+  - Hermeas, "once a slave", and Aristotle "three years, from 348 to 345 BC";
+  - the double wall; the harbour "filled up and … covered with gardens", framed as of 1915.
+
+  Acts 20:13–14 give the visit, with ISBE's "from Troas to Mitylene". Suggestion: keep ISBE's hedge for the temple, "is said to have been erected about 470 BC".
+- **`cos`:** ISBE "Cos" states each clause:
+  - "An island off the coast of Caria"; "one of the six Dorian colonies";
+  - "famous in antiquity for excellent wine"; "a famous hospital and medical school"; "the birthplace of Hippocrates (the father of medicine)";
+  - "like Corinth, … one of the Jewish centers of the Aegean"; Herod the Great among its benefactors;
+  - "mentioned in connection with Paul's third missionary journey in Ac 21:1".
+
+  ISBE "Asia" names Cos among the province's islands. Suggestion: ISBE has it "mountainous in the southern half", not mountainous throughout.
+
+### B3. Fixes for the Research Lead (F46–F64)
+
+Fixes marked **content** come first in priority.
+
+#### `data/locations/seleucia.json`
+- **F46 (citations):**
+  - `history[0]`: "one of four sister cities its founder built" isn't in the cited ISBE ("one of the Syrian Tetrapolis, the others being Apameia, Laodicea and Antioch"). It is in Strabo 16.2.4: "these cities, all founded by Seleucus Nicator, used to be called sisters". Add `bib:strabo-geography`.
+  - `summary`: "sailed back to Antioch from Attalia". Only Acts 14:25 names Attalia; 14:26 says "From there". Add `scripture:Acts 14:25`.
+
+#### `data/locations/samothrace.json`
+- **F47 (content), `parentId`, `politicalAreaId` and `politicalHistory`:** all three are Macedonia's, and nothing supports that.
+  - No cited source places Samothrace in the province of Macedonia:
+    - ISBE "Samothrace": "An island in the Aegean Sea, South of Thrace opposite the mouth of the Hebrus River";
+    - ISBE "Macedonia" and Livius "Macedonia (8)", the table's own sources, don't name the island;
+    - Smith's *Geography* (1854), "Samothrace" (https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=samothrace-geo): "In Pliny's time Samothrace was a free state".
+  - The research note's reason, "the Roman province's own borders ran along this coast past the older ethnic-geographic boundary of Thrace", has no source. Neapolis isn't a precedent: its point lies just off Macedonia's coast, 1.4 km from the `macedonia` area, with no other area within 14 km.
+  - The ancient layer draws the island in `other-roman-lands`, not `macedonia`, so the panel would contradict the map.
+  - **Fix (your choice, Q3):**
+    - (a) follow the sources and the map: `parentId: "roman-empire"`, like Phrygia, Pontus and the Syrtis. Then either use `politicalAreaId: "other-roman-lands"`, whose derived table shows the Roman Empire for 4 BC–AD 101, or, like Samos and Rhodes, use no area and a sourced entry such as "Free state under Roman rule", citing a new Smith's *Geography* entry. Smith's *Geography* is public domain and already in `docs/LICENSES.md` and `ATTRIBUTION.md`.
+    - (b) keep Macedonia, but only with a source that states it, and a GIS change to the area.
+
+    I recommend (a).
+- **F48 (content), `history[0]`:**
+  - "as the seat from which the god Poseidon watched the Trojan War": ISBE says only "mentioned in the Iliad (xiii.12) as the seat of Poseidon". Say that.
+  - "set up on the island around 300 BC by the Macedonian ruler Demetrius Poliorcetes" states ISBE's 1915 attribution ("set up here by Demetrius Poliorcetes circa 300 BC") as fact. The Louvre, which holds the statue (Ma 2369, https://collections.louvre.fr/en/ark:/53355/cl010252531, read 2026-10-16), dates it "-200 / -175 (1e quart IIe s. av. J.-C.)", with "Place of creation : Rhodes (?)", found at Samothrace in 1863.
+  - Drop the date and the dedicator, keeping "discovered there in 1863 and now in the Louvre". Or give the Louvre's dating with a new bibliography entry. If ISBE's view stays, attribute it to ISBE and put it last (ADR-0041 item 1).
+- **F49 (wording), `summary`:**
+  - "Acts records that … made a straight course to Samothrace, anchoring for the night at a town on the island's northern end": Acts 16:11 has only "made a straight course to Samothrace, and the day following to Neapolis". The anchorage is ISBE's: "At the northern end of Samothrace was a town where the ship could anchor for the night". Attribute it to ISBE, as Rhegium's "tacking" was attributed in batch A (F21).
+  - "Philip of Macedon": introduce him, as `amphipolis.json` does ("the Macedonian kings Perdiccas and Philip") (ADR-0033).
+
+#### `data/locations/amphipolis.json`
+- **F50 (citations), `summary`:** "the great Roman road running from the Adriatic coast toward the Hellespont".
+  - The cited ISBE "Amphipolis" has the road run "from Dyrrhachium on the Adriatic to the Hebrus (Maritza)".
+  - "The Hellespont" is in ISBE "Macedonia" ("continued eastward to the Nestus and the Hellespont"), which the summary doesn't cite.
+  - Add `bib:isbe-macedonia`, or say "to the river Hebrus".
+
+#### `data/locations/apollonia-macedonia.json`
+- **F51 (wording):**
+  - `history[0]`: "dates Apollonia's founding to about 432 BC" drops ISBE's hedge: "The foundation of the town may perhaps be attributed to about 432 BC".
+  - `summary`: "a day's journey between Amphipolis and Thessalonica". ISBE's day's journey is from Amphipolis: "a day's journey (Livy xlv.28) or about 30 Roman miles from the former and 38 from the latter". Say "a day's journey from Amphipolis".
+
+#### `data/locations/mitylene.json`
+- **F52 (citations), `summary`:** "before sailing on toward Chios and Samos". ISBE "Mitylene" names only Chios ("opposite the island of Chios (Ac 20:15)"), and only Acts 20:15 names Samos. Add `scripture:Acts 20:15`.
+
+#### `data/locations/chios.json`
+- **F53 (content), `summary`:** "known in antiquity for its wine". No cited source says so. ISBE "Chios" names its "beautiful blue marble", its "excellent potter's clay" and its people's "skill in telling stories". Drop "wine" or cite a source.
+- **F54 (wording):**
+  - `summary`: "Acts records that … came the following day opposite Chios, apparently anchoring overnight on the Asian coast". The anchorage is ISBE's conjecture, after Hastings: "more probably it simply means that, because of the dark moon, they lay at anchor for the night on the Asian coast opposite the island". Attribute it to ISBE.
+  - `history[0]`: "had proved too costly for the city to restore on its own". Josephus (Whiston, *Antiquities* 16.2.2) says the portico "was very large and fine building, so was it not so easy to rebuild that as it was the rest". Use his terms.
+
+#### `data/locations/samos.json` (ruling 1; see §B4)
+- **F55 (content), `politicalHistory[0]` and `[1]`, `history[1]`:** the freedom of "17 BC".
+  - The date is ISBE's ("in 17 BC it became a civitas libera … (Dio Cass. liv.9; Pliny, NH, v.37)"). The authority ISBE cites puts the grant three years earlier.
+  - Cassius Dio 54.7.4 has Augustus winter on Samos, then move on "in the spring of the year when Marcus Apuleius and Publius Silius were consuls" (20 BC).
+  - 54.9.3 records that year's grants ("To Herod he entrusted the tetrarchy of a certain Zenodorus", which the timeline dates to 20 BC). 54.9.7 continues: Augustus "returned to Samos and once more passed the winter there. In recognition of his stay he gave the islanders their freedom".
+  - Date the change from −20, the year Dio narrates it under (the winter of 20/19 BC), and cite `bib:cassius-dio-roman-history`. Give ISBE's 17 BC last, in a note.
+- **F56 (content), `politicalHistory[2]` (and Rhodes, F60):** "this map uses the start of his reign, AD 70".
+  - **It is wrong.** Tacitus, *Histories* 2.79, in the year of Galba's second consulship (1.1, AD 69): Tiberius Alexander administered the oath "on the first of July. This day has been celebrated in later times as the first of Vespasian's reign". Suetonius, *Vespasian* 6.3, agrees: "the Kalends of July, the day which was afterwards celebrated as that of his accession".
+  - **The record dates a change no source dates.** Suetonius (8.4) gives no year. The verified timeline reads the same sentence for Achaia as a span: "the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again". So use 70–79 `uncertain-roman-side`, with that wording, then 79–101 the province.
+  - **"Roman province of Asia":** Suetonius says only that he "made provinces of … Samos, taking away their freedom". For Samos, add ISBE "Asia", which names "apparently the islands of Lesbos, Samos, Patmos, Cos" among the province's lands.
+- **Suggestion (neutrality, brief §2.6):** "the Apocrypha's first book of Maccabees" uses one tradition's label; "the book of 1 Maccabees" doesn't.
+
+#### `data/locations/trogyllium.json`
+- **F57 (wording):**
+  - `summary`: "Many manuscripts of Acts record that Paul's ship stayed at Trogyllium". No cited source says "many". ISBE "Trogyllium" says the King James Version has the words and "Several of the early manuscripts omit the words". For example: "Acts, in the text the WEB follows, records …; several early manuscripts omit this detail".
+  - The candidate's `support` ends "; see the route's note". On the Map tab the place panel has no route note, and the record's summary now gives the caveat. Drop the pointer. It's a justified support change; the coordinates don't change.
+
+#### `data/locations/rhodes.json` (ruling 1; see §B4)
+- **F58 (content), `history[1]`:**
+  - "the island's three oldest cities, Lindus, Ialysus and Camirus": ISBE says "The most ancient cities of Rhodes were Ialysus, Ochyroma, and Lindus". Lindus, Ialysus and Camirus are the three that joined the Hexapolis and, as "the three chief cities", founded the capital in 408 BC. Say "three chief cities".
+  - "was rewarded with the Carian coast, though by 168 BC Rome had taken back most of that territory": ISBE says "she received Caria. In 168, however, only a small portion of this territory remained under Rhodian sway". It doesn't say the coast only, or that Rome took the land back.
+- **F59 (content), `politicalHistory[2].entity`:** "Free city (liberty restored by the emperor Nero)". Tacitus, *Annals* 12.58, in the consulate of Decimus Junius and Quintus Haterius (AD 53): "Nero, at the age of sixteen, received in marriage the emperor's daughter Octavia … By his advocacy, again, … the Rhodians recovered their liberties". Nero wasn't emperor until AD 54; Claudius was. Say "liberty restored under the emperor Claudius, at the plea of the young Nero".
+- **F60 (content), `history[2]` and `politicalHistory[3]`:** the same as F56. "The start of Vespasian's reign, AD 70" is wrong, so use the timeline's 70–79 uncertain span. Name the province only with a source. ISBE "Rhodes" dates Rhodes's first incorporation into Asia to 44 AD, and no cited source names its province after Vespasian.
+- **F61 (citations and wording):**
+  - `politicalHistory[0]` (4 BC–AD 44, "Free Greek state, allied with Rome") cites Suetonius, whose sentence concerns Vespasian's reign. The note's "still held their freedom before the emperor Vespasian's reign" doesn't speak to these years. The source that does is Dio 60.24.4, "The Rhodians were deprived of their liberty because they had impaled some Romans" (AD 44). Cite Dio with ISBE.
+  - "impaled some Roman citizens" (`history[2]`) and "impaling Roman citizens" (`politicalHistory[1].note`): Dio has "some Romans".
+  - `politicalHistory[1].note`: "the encyclopedia independently dates" isn't shown by any source; say "also dates".
+  - `summary`: "on his return from his third missionary journey" isn't stated by any cited source. ISBE "Rhodes" has "on his voyage southward from the Hellespont to Caesarea". Cite a source that names the journey, such as `bib:isbe-cos` ("Paul's third missionary journey in Ac 21:1"), or use ISBE "Rhodes"'s wording.
+
+#### `data/locations/patara.json`
+- **F62 (citations), `summary`:** "on his return from his third missionary journey". The cited ISBE "Patara" doesn't say it ("from which, according to Ac 21:1, Paul took a ship for Phoenicia"). Fix as in F61.
+
+#### `data/locations/ptolemais.json`
+- **F63 (content), `otConnections[0].note`:** "the Canaanite town on this site that was later refounded under the Greek name Ptolemais".
+  - Neither Judges 1:31 nor ISBE "Ptolemais" ("Same as 'Acco' in Jg 1:31") says this.
+  - ISBE "Acco" (https://www.internationalstandardbible.com/A/acco.html) does: the Ptolemies "changed the name to PTOLEMAIS". Judges 1:32 has "the Asherites lived among the Canaanites".
+  - Add an ISBE "Acco" entry (public domain, already covered) and `scripture:Judges 1:32`. Or say "the town the encyclopedia identifies with Ptolemais".
+- **F64 (wording), `summary`:** "in the time of the Maccabees" names a group most readers don't know from the Protestant Bible. Introduce them, with a source (ADR-0033).
+
+### B4. Ruling 1: Samos and Rhodes
+
+I checked every entry against its source, as you asked: dates, status changes, and who granted or removed freedom.
+
+| Entry | Source says | Result |
+|---|---|---|
+| Samos joined to Asia, 84 BC | ISBE "Samos": "In 84 BC, the island was joined to the province of Asia" | Pass |
+| Samos free, granted by Augustus, from 17 BC | ISBE: 17 BC; its own authority, Dio 54.9.7: the winter of 20/19 BC, "he gave the islanders their freedom" | **F55** (the year) |
+| Samos and Rhodes lose freedom under Vespasian | Suetonius, *Vespasian* 8.4: "He made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom" | Pass for the act; **F56/F60** for "the start of his reign, AD 70" and the province |
+| Rhodes free and allied, 4 BC–AD 44 | Dio 60.24.4 (AD 44) implies it; ISBE: "the faithful ally of Rome after … 189 BC" | Pass in substance; **F61** (cites Suetonius instead of Dio) |
+| Rhodes's freedom removed under Claudius, AD 44; part of Asia | Dio 60.24.4, among Claudius's acts after his British triumph; ISBE: "made a part of the Roman province of Asia (44 AD)" | Pass ("Romans", not "Roman citizens": F61) |
+| Rhodes's liberty restored, AD 53 | Tacitus, *Annals* 12.58 (AD 53), "by his [Nero's] advocacy"; the quotation matches the Loeb text exactly | Pass for the year and the quotation; **F59** ("the emperor Nero") |
+
+With F55, F56 and F59–F61 made, both tables will match their sources.
+
+### B5. What passes
+
+**Candidates and coordinates.** All 14 batch B candidates are identical to the verified stop entries: label, coordinates, `coordinateSource`, confidence, support and sources. The one exception is Rhodes's support, which adds ISBE's "an island (and city)" and "at the northeastern extremity", both exact and a justified improvement. No coordinates are swapped. Every point agrees with two independent sources:
+
+| Record | Stored `[lon, lat]` | Pleiades | Cited Wikidata item |
+|---|---|---|---|
+| `seleucia` | [35.922, 36.124] | 0.67 km (658483) | 0.00 km (Q1605894) |
+| `attalia` | [30.703614, 36.881272] | 1.06 km (638778) | 3.07 km (Q6487, the modern city) |
+| `samothrace` | [25.583333, 40.45] | 0.65 km (501597) | 0.35 km (Q203175) |
+| `amphipolis` | [23.847209, 40.820159] | 0.79 km (501347) | 0.40 km (Q217414) |
+| `apollonia-macedonia` | [23.469685, 40.623703] | 0.00 km (491526) | 0.24 km (Q2751389) |
+| `assos` | [26.336667, 39.490556] | 0.05 km (550463) | 0.00 km (Q744631) |
+| `mitylene` | [26.547048, 39.110475] | 0.00 km (550763) | 0.86 km (Q189059) |
+| `chios` | [26.1375, 38.3725] | 0.40 km (550496, the town) | 10.97 km (Q160483, the island; the support says the point is the town) |
+| `samos` | [26.8333, 37.75] | 2.02 km (599926) | 0.00 km (Q156882) |
+| `trogyllium` | [27.003279, 37.659431] | 0.36 km (599991) | 0.00 km (Q2937072) |
+| `cos` | [27.110278, 36.815278] | 2.56 km (599581) | 0.00 km (Q187027) |
+| `rhodes` | [28.2109, 36.4402] | 1.53 km (590030) | 0.92 km (Q188731) |
+| `patara` | [29.314167, 36.260278] | 0.17 km (639042) | 0.00 km (Q233121) |
+| `ptolemais` | [35.0692, 32.9214] | 0.99 km (678010) | 1.47 km (Q126084) |
+
+The distances in the text agree with the records' own points:
+- Seleucia is 25.0 km from Antioch's point (ISBE's 16 miles);
+- Apollonia is 38.6 km and 43.6 km in a straight line from Amphipolis and Thessalonica (ISBE's 30 and 38 Roman miles by road).
+
+**Scripture.**
+- All 15 `textWEB` strings match the WEB.
+- Each place's New Testament verses are all present. Every name occurs once in the WEB New Testament except Assos (Acts 20:13, 14).
+- Only Ptolemais is named in the Old Testament (Acco, Judges 1:31). That verse is its one connection, quoted exactly. No other batch B place occurs in the WEB Old Testament.
+
+**Names (ADR-0026, ADR-0028).**
+- **Titles:** they are the verified stop names, the six versions' majority forms (M5-02 §3).
+- **`alternate`:** it holds the other versions' spellings: Samothracia (KJV), Kios (NLT), Kos (NIV) and Coos (KJV). It also holds "Seleucia Pieria", a historical name in Wikidata's aliases and Pleiades' names.
+- **Modern names:** they are the stops', except Seleucia's "Near Kapısuyu", from Pleiades 658483's Barrington note ("Kapısuyu/Kaboussié"), which is more precise. Trogyllium's "Dip Burun" is Pleiades' own description ("The modern Dip Burun in Turkey").
+- **Countries:** all are right.
+
+**Type, tier, prominence, parent, political area.** These follow the card and the house chain:
+- the cities are at city tier;
+- Trogyllium, a cape, is `natural-feature` at site tier;
+- the islands are `natural-feature`; Rhodes is at region tier, like Malta (Q2 on the others);
+- every prominence is "standard";
+- Seleucia and Ptolemais are under `syria`, like Tyre and Sidon;
+- Attalia is under `pamphylia`, like Perga;
+- Amphipolis and Apollonia are under `macedonia` (ISBE: "A town in Macedonia"; "a district in Macedonia");
+- Assos is under `mysia` (ISBE: "An ancient city of Mysia in the Roman province of Asia");
+- Mitylene, Chios, Samos, Trogyllium, Cos and Rhodes are under `asia` (ISBE "Asia");
+- Patara is in `lycia` (card).
+
+The exception is Samothrace (F47).
+
+**`politicalHistory`.** The 12 records with a `politicalAreaId` reproduce their areas' tables exactly. The validator derives and compares them, and the holder ids are the timeline's. Samos's and Rhodes's hand-written tables use real holder ids and leave no gaps or overlaps. Their content is §B4.
+
+**Sources.**
+- Every source id resolves.
+- Each candidate has at least two independent sources: Pleiades, Wikidata and OpenBible.info, plus the ISBE.
+- Batch B adds no bibliography entry. Every source it uses is already listed in `docs/LICENSES.md` and `ATTRIBUTION.md`, and the ISBE (1915), Whiston, the Loeb texts and Smith's *Geography* are public domain.
+
+## Batch C: Jesus' journeys (3 places)
+
+Same method, sources and date as batch B.
+
+### C1. Results
+
+| Item | Pass | Needs the Research Lead | Question for the PO |
+|---|---|---|---|
+| Records (3) | — | 3, with 10 fixes (F65–F74): 6 on content, 4 on citations or wording | Q1 |
+| Candidates and coordinates (6) | 6, identical to the verified stop entries | — | — |
+| WEB quotes (8) and New Testament completeness | All, including Luke 8:37, which the stop entry lacked | — | — |
+| `otConnections` | Bethphage's Zechariah 9:9, which Matthew 21:4–5 itself cites | Ephraim's three notes (F73) | — |
+| Ruling 2 (the Gadarenes' parent) | `syria` is supported for every candidate area (§C2) | F65, F66 | — |
+| New bibliography entry `isbe-ephron-2` | Complete, URL answers, Masterman's byline, public domain | What it's cited for (F73) | — |
+
+**The main findings:**
+- **Ruling 2:** a cited source supports Syria for each candidate area, so the parent becomes `syria` (F65). The same source puts Kursi under Gadara, so Kursi's Philip's-tetrarchy table must go (F66).
+- **Bethphage:** the summary gives all three Gospels Matthew's donkey and colt (F70).
+- **Ephraim:** its Old Testament notes misquote ISBE "Ephron (2)". They also conflict with ISBE "Ephraim (2)", the record's main source, which puts 2 Samuel 13:23's Ephraim elsewhere (F73).
+- **The Gadarenes' history:** it misstates ISBE "Gadara" on the readings (F68).
+
+### C2. Ruling 2: the country of the Gadarenes's parent is `syria`
+
+You asked me to accept `syria` only if a cited source supports the attachment for each candidate area. It does, for all three:
+
+| Candidate | What the cited sources state |
+|---|---|
+| Kursi | ISBE "Gadara" (cited on this candidate): "It maybe taken as certain that the jurisdiction of Gadara, as the chief city in these regions, extended over the country East of the Sea, including the lands of the subordinate town, GERASA". ISBE "Gerasa" (cited): "Gerasa itself is probably represented by the ruins of Kurseh". So the Kursi shore was Gadara's land, which "after Herod's death … was joined to the province of Syria, 4 BC" (ISBE "Gadara"). |
+| Gadara | ISBE "Gadara": joined to Syria in 4 BC; "Gadara was a member of the DECAPOLIS". ISBE "Decapolis": "They were independent of the local tetrarchy, and answerable directly to the governor of Syria", and Pliny's list includes "Gadara (Umm Qeis)". |
+| Gerasa (Jerash) | ISBE "Gerasa": "The great and splendid city in the Decapolis"; ISBE "Decapolis": "Gerasa (Jerash)" in the list, answerable to the governor of Syria; Pleiades 678158 (cited): "in 63 B.C. Pompeius Magnus made it part of the Decapolis". |
+
+**Outcome: `parentId: "syria"` (F65).** The chain becomes site → province → empire, as Sidon's and Tyre's do. The Bethsaida precedent doesn't apply, because no cited source places any of these candidates in Philip's tetrarchy.
+
+### C3. Fixes for the Research Lead (F65–F74)
+
+#### `data/locations/country-of-the-gadarenes.json`
+- **F65 (content), `parentId`:** set it to `syria` (§C2).
+- **F66 (content), `politicalHistory`, candidate 0 (Kursi):** its seven entries copy the `philip-tetrarchy-lands` table.
+  - No cited source places Kursi in Philip's tetrarchy. The entries' sources (ISBE "Ituraea": "The country of Zenodorus … including Paneas and Ulatha"; Josephus) describe Philip's lands, not this shore.
+  - The record's own ISBE "Gadara" puts the shore under Gadara (§C2).
+  - The map draws Kursi inside `philip-tetrarchy-lands` only as a drawing simplification. M4's research note (§2.24 #3b) keeps even Hippos there "under rule 4 (its own small territory is not independently drawable…)", and the timeline's 4 BC stop says "Gaza, Gadara and Hippos -- are cut away and added to the province of Syria".
+  - Replace the table with what ISBE "Gadara" supports:
+    - 30–4 BC `herod-the-great` ("given by Augustus to Herod the Great in 30 BC");
+    - 4 BC–AD 101 `roman-province-syria` ("After Herod's death it was joined to the province of Syria, 4 BC"; ISBE "Decapolis");
+    - optionally, Gadara's earlier free-city entry.
+
+    Each note should say that ISBE puts this shore under Gadara's jurisdiction. The last note should say that the map draws the shore with Philip's former lands. If a source is found that puts Kursi in Gaulanitis, give both views instead (brief §2.6).
+- **F67 (content), `politicalHistory`, candidate 2 (Gerasa):** its one entry starts at −65 with `roman-province-syria`.
+  - That is before the province existed: the timeline's `syria` area starts at −64 (Livius, "Damascus").
+  - Pleiades 678158, cited on this candidate, says "in 63 B.C. Pompeius Magnus made it part of the Decapolis".
+  - Start at −63, as Gadara's free-city entry does, and keep ISBE "Decapolis"'s "about the time of Pompey's campaign in Syria, 65 BC" in the note.
+- **F68 (content), `history[0]`:** "The International Standard Bible Encyclopedia treats this as a real difference between ancient manuscripts, not a translator's choice".
+  - ISBE "Gadara" says something else. It reads "country of the Gadarenes" at Matthew 8:28 and "country of the Gerasenes" at Mark 5:1 and Luke 8:26, 37. It says "There is no good reason, however, to question the accuracy of the text in either case", because "The place might therefore be called with propriety, either 'land of the Gerasenes,' with reference to the local center, or 'land of the Gadarenes,' with reference to the superior city". Only the Textus Receptus reading "of the Gergesenes … must be rejected (Westcott-Hort …)".
+  - Say what ISBE says.
+  - Cite `scripture:Matthew 8:28`, `scripture:Mark 5:1` and `scripture:Luke 8:26` for the WEB's readings.
+  - Introduce Westcott-Hort, for example as ISBE "Gerasa" does: "Westcott and Hort, The New Testament in Greek" (ADR-0033).
+- **F69 (citations and wording), `summary` and `history[1]`:**
+  - "on the eastern side of the Sea of Galilee", and the closing "disputed among three candidates, each named differently in the Gospels' own manuscripts": the cited passages don't say this. Luke 8:26 has "opposite Galilee", and Mark 5:1 "the other side of the sea". Add `bib:isbe-gerasa` ("It was on the eastern shore of the Sea of Galilee") and `bib:isbe-gadara`.
+  - "Mark and Luke describe one" and "lived among the tombs": cite Mark 5:2–3 ("He lived in the tombs") and Luke 8:27 ("didn't live in a house, but in the tombs").
+  - "Mark and Luke record that the demons, who called themselves 'Legion, for we are many'": these are Mark's words (5:9). Luke 8:30 has "'Legion,' for many demons had entered into him". Credit the phrase to Mark and cite Luke 8:30.
+  - "a large herd of pigs feeding nearby": Mark 5:11 has "on the mountainside", Luke 8:32 "on the mountain", and Matthew 8:30 "far away from them". Say "on the hillside" and cite Mark 5:11 and Luke 8:32–33.
+  - `history[1]`: introduce "Pompey" ("the Roman general Pompey") (ADR-0033).
+
+#### `data/locations/bethphage.json`
+- **F70 (content), `summary`:** "All three Synoptic Gospels record that … Jesus sent two disciples ahead to bring him a donkey and her colt".
+  - Only Matthew 21:2 has both ("a donkey tied, and a colt with her").
+  - Mark 11:2 has "a young donkey tied, on which no one has sat", and Luke 19:30 "a colt tied". Each has one animal.
+  - Credit the two animals to Matthew, and cite `scripture:Mark 11:2` and `scripture:Luke 19:30`.
+- **F71 (wording), `summary` and `history[0]`:**
+  - "on the road from Jerusalem to Jericho": ISBE has "Near the Mount of Olives and to the road from Jerusalem to Jericho". Say "near the road".
+  - "for the final time": the cited verses don't say it. Drop it or cite it.
+  - "a prophecy that Jerusalem's king would come to her": Matthew 21:5 has "Tell the daughter of Zion, behold, your King comes to you". Use Matthew's words.
+  - `history[0]`: introduce "the Talmud" (ADR-0033).
+- **F72 (wording), `names.modern`:** "Et-Tur (Kafr et-Tur)" dropped the verified stop's ", Jerusalem" ("Et-Tur (Kafr et-Tur), Jerusalem").
+  - The record carries no country because ADR-0028 exempts places inside Jerusalem, whose "modern name already says 'Jerusalem'".
+  - Wikidata Q2193088's P131 is Jerusalem (Q1218).
+  - Restore it.
+
+#### `data/locations/ephraim.json`
+- **F73 (content), `otConnections` (all three notes):** they misstate ISBE "Ephron (2)".
+  - **What ISBE "Ephron (2)" says:** Ephron (2 Chronicles 13:19) "is thought by many to be identical with Ophrah (`ophrah, Jos 18:23) and perhaps with Ephraim (`ephrayim, 2Sa 13:23) which both have been localized at the lofty town of eT Taiyibeh".
+    - It doesn't say that "many scholars think" Ophrah, or 2 Samuel's Ephraim, is identical "with this Ephraim", John's. It never mentions John 11:54.
+    - For 2 Samuel 13:23 it says only "perhaps", not "many scholars think".
+  - **The record's main source places 2 Samuel 13:23's Ephraim elsewhere.** ISBE "Ephraim (2)" makes it a separate place, entry (1): "It may be identical with the Ephraim of Eusebius, Onomasticon, 20 Roman miles North of Jerusalem, and therefore to be sought somewhere in the neighborhood of Sinjil and el-Lubban". John's town is entry (2), "probably" at et-Taiyibeh. The note hides that conflict.
+  - **Joshua 18:23** lists Ophrah but doesn't name Benjamin; 18:21 does ("the cities of the tribe of the children of Benjamin").
+  - **Fix:**
+    - Give Joshua 18:23 and 2 Chronicles 13:19 in ISBE's own words: identified "by many" with each other and "localized" at et-Taiyibeh, where ISBE "Ephraim (2)" "probably" places John's town. Cite `bib:isbe-ephraim` too, and cite Joshua 18:21.
+    - Drop 2 Samuel 13:23, or give both of ISBE's views of it.
+- **F74 (wording), `summary` and `history[0]`:**
+  - "Ephraim was a town … on a high hill overlooking the plains of Jericho and the Dead Sea": ISBE says this of et-Taiyibeh ("It stands on a high hill with a wide outlook including the plains of Jericho and the Dead Sea"), which Ephraim "probably answers to". Keep the hedge, for example "probably the village of et-Taiyibeh, which stands on a high hill …".
+  - `history[0]`: introduce the Onomasticon, for example as Eusebius's list of biblical places (ADR-0033).
+
+### C4. What passes
+
+**Candidates.** All 6 candidates are identical to the verified stop entries. The four route references to the Gadarenes and Bethphage keep `candidateIndex: 0`.
+
+| Record | Candidate | Pleiades | Cited Wikidata item |
+|---|---|---|---|
+| `country-of-the-gadarenes` | Kursi [35.650415, 32.825796] | 0.00 km (726708218) | 0.03 km (Q2469418) |
+| | Gadara [35.677263, 32.65608] | 0.00 km (678142) | 0.20 km (Q1490815) |
+| | Gerasa [35.891091, 32.280087] | 0.00 km (678158) | 0.89 km (Q56072866) |
+| `bethphage` | Et-Tur [35.250778, 31.777222] | — | 0.00 km (Q2193088); OpenBible.info, ISBE, the Custodia |
+| | Abu Dis [35.265833, 31.7625] | — | 0.00 km (Q246590); OpenBible.info |
+| `ephraim` | Taybeh [35.299196, 31.954665] | 0.00 km (687896) | 0.10 km (Q931667) |
+
+**Scripture.**
+- **Quotes:** all 8 `textWEB` strings match the WEB.
+- **The Gadarenes:** the WEB names the place at exactly Matthew 8:28, Mark 5:1, Luke 8:26 and 8:37, and all four are present. Luke 8:37 is a gain over the stop entry.
+- **Bethphage:** it is named at exactly Matthew 21:1, Mark 11:1 and Luke 19:29.
+- **Ephraim:** it is named in the New Testament only at John 11:54.
+- **Bethphage's `otConnections`:** Zechariah 9:9 is the right connection. Matthew 21:4–5 makes it ("that it might be fulfilled which was spoken through the prophet"), and the note quotes Matthew 21:5 exactly.
+
+**Names.**
+- **Titles:** they are the verified stop names; "Bethsphage" (the WEB) is in `alternate`.
+- **Countries:** the Gadarenes' "Golan Heights" and "Jordan" are right. Kursi is "an archaeological site on the Golan Heights" (Wikidata) and lies "in the Golan Heights" (Pleiades), and Umm Qais and Jerash are in Jordan. Ephraim's "West Bank" follows ADR-0028.
+- **Modern name:** the disputed Gadarenes rightly has none.
+
+**Type, tier and parent.**
+- The Gadarenes is a `site` at city tier, like Bethany beyond the Jordan.
+- Bethphage is a village at city tier (Q1 on its parent).
+- Ephraim is a town under `judea`, in Jericho's political area. Its point lies inside `judea-samaria-idumea`, and its table is derived.
+
+**The Gadarenes' other hand-written entries.** Gadara's free city from 63 BC, Herod's from 30 BC and Syria's from 4 BC match ISBE "Gadara" ("Pompey is said to have restored it, 63 BC … He gave it a free constitution"; "given by Augustus to Herod the Great in 30 BC"; "After Herod's death it was joined to the province of Syria, 4 BC").
+
+**Bethphage's history.** The Custodia page says "The sanctuary of Bethphage is located on the eastern part of the Mount of Olives". It tells of the Crusader-painted stone found there in 1870, which matches ISBE's "medieval Bethphage … now enclosed by the Roman Catholics".
+
+### C5. Both batches: the routes switch, the duplicate check, the warnings, the checks
+
+**The routes switch.**
+- **The conversion:** converting all 31 batch B and C `{"kind": "route-stop", "stopId": …}` references in the base `routes.json` to `{"kind": "location", "locationId": …}` reproduces the branch's file exactly. They are 14 `from`, 14 `to` and 3 `via`, with each `candidateIndex` kept, and nothing else in the routes changed.
+- **`stops.json`:** it is `{"version": 1, "stops": []}`.
+- **Leftovers:** no `route-stop` reference to these 17 ids remains in `data/`, `scripts/` or `tests/`.
+- **`route-line-rules.mjs`:** the one key change, `route-stop:chios` → `location:chios` in `ISLAND_VIAS`, is a plain rename. The lines reproduce byte for byte.
+- **The OpenBible lookup:** it gains 19 slugs (73 in all), its TypeScript copy matches, every cited slug is present and none is stale. All 19 pages answer with the right titles.
+
+**Bethphage's neighbours and the duplicate check (card item 3).** The validator's view is that there is nothing to compare.
+- Its only duplicate check by distance compares entries in `stops.json` with locations (`scripts/lib/validator.mjs`, around lines 3240–3330). With `stops.json` empty, nothing is compared.
+- No check compares one location with another. Its name check (around lines 3947–3973) looks only inside one record.
+- So `ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST` no longer has any effect.
+
+My own check of all 122 records found only Bethphage's eight allow-listed neighbours within 2 km (0.49–1.99 km) and no shared English names. So no record is a duplicate. If the card's rule should hold for future places, the GIS Engineer would need to add a check that compares locations with each other (note N3).
+
+**The 4 new warnings are acceptable.** They fire because the Gadarenes' one configured name is the compound title, which no verse contains verbatim. Each verse does name the place ("the country of the Gadarenes", "the country of the Gergesenes"), and the scripture links are right. Search finds the place by each spelling, because `app/src/features/search/place-search.ts` matches any word start (`/[\p{L}\p{N}]+/gu`) in the title.
+
+Optional: adding "Gadarenes", "Gergesenes" and "Gerasenes" to `names.alternate` would follow ADR-0026's "every version's spelling" literally, as Bethphage's "Bethsphage" does, and would clear the warnings.
+
+**Checks** (Node 24.21.0, on `51dbb4f`; no tracked file changed):
+- `npm run validate:data`: passed, 0 errors, 207 warnings. The 4 new warnings are the Gadarenes' (above); there are none in the other 16 records. It passed again after the status change.
+- `npm run check:route-lines`: "Reproduced route lines byte-for-byte from an empty cache"; 71 lines audited, 0 failing.
+- `npm test`: 331 tests, all pass.
+- `npm run build:data`: passed. The places index is 45,445 bytes (7,138 gzip); the Routes files are 24,864 bytes gzip of the 100,000 budget.
+
+**Status:** `attalia`, `assos` and `cos` are now `verified`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-10-16"`. The other 14 stay `draft` until F46–F74 are re-checked.
+
+### C6. Questions for the PO
+
+- **Q1. Bethphage's parent: `jerusalem`, as drafted, or `judea`? Not blocking.**
+  - **For `jerusalem`:** Bethphage sits on the Mount of Olives, which is `jerusalem`'s child. Its modern site, Et-Tur, lies inside Jerusalem (Wikidata P131). ADR-0028's no-country rule follows the parent chain in the validator.
+  - **For `judea`:** Bethany, 0.79 km away, is under `judea`. ISBE puts ancient Bethphage "near but outside Jerusalem". Every other child of `jerusalem` is a site-tier site, while Bethphage is a city-tier village. With `jerusalem`, "Places in Jerusalem" will list it.
+  - I'd keep `jerusalem` and restore "Jerusalem" in its modern name (F72).
+- **Q2. Island tiers. Not blocking.**
+  - The card's rule is "small islands follow Patmos (city tier), large ones Malta (region tier)". Wikidata's areas (P2046):
+    - Chios 842.5 km², Samos 476 km² and Cos 290.3 km²;
+    - Malta 316 km² (Q233, Malta's own cited item);
+    - Samothrace 178 km² and Patmos 34.14 km².
+  - The draft puts only Rhodes at region tier. Its reason, that Acts names the island as where the ship called, doesn't separate Cos from Rhodes: Acts 21:1 names both alike ("to Cos, and the next day to Rhodes").
+  - Should Chios and Samos, and perhaps Cos, be at region tier too? If so, they need a re-check. `cos` is verified as it stands.
+- **Q3. Samothrace's political placement (F47).**
+  - (a) Follow the sources and the map: no Macedonia; `parentId: "roman-empire"`; either `other-roman-lands`, or a sourced "free state" entry, as for Samos and Rhodes.
+  - (b) Keep Macedonia with a source, plus a GIS change.
+
+  I recommend (a). The Research Lead needs your choice before F47.
+
+### C7. Notes for the PO, and for the research note
+
+- **N1. The browser suite's real-data route-stop check will fail.** `scripts/verify-web-export-playwright.mjs` (the "Routes real-data check", around lines 12408–12512) looks for `route-stop` points on the `jesus` and `paul-rome` routes. If it finds none, it throws "could not find route-stop entries to verify details panel coverage". With `stops.json` empty, there are none. `npm test` doesn't run it, but `npm run verify:web:playwright` (ADR-0036) will fail there until the Frontend Engineer moves the check to the fixture stops or to `location` stops (M5-05's code). I didn't run the browser suite.
+- **N2. The map's shading at two Gadarenes pins.** The ancient layer draws Kursi (and Hippos) inside `philip-tetrarchy-lands`, under M4's rule 4, and Jerash inside the Nabataean `arabia` area. After F66 and F67, the panel's Syria history will differ from the shading under those two pins. This isn't a record fix. It's a GIS question, if Decapolis land should one day be drawn with Syria.
+- **N3. The duplicate rule** (card item 3) is no longer enforced by the validator (§C5).
+- **For the research note (docs only):**
+  - "Now all this has happened, that it might be fulfilled …" isn't the WEB's Matthew 21:4, which reads "All this was done that it might be fulfilled which was spoken through the prophet, saying,".
+  - ISBE "Ephraim (2)" doesn't identify John's town "only with the three specific verses above". It puts 2 Samuel 13:23's Ephraim elsewhere (F73).
+  - "Kursi … lies in Gaulanitis" has no source (F66).
+  - Samothrace's border reasoning has no source (F47).
+  - Josephus doesn't say the city "could not afford" the stoa (F54).
+  - "AD 70, the start of his reign" is wrong (F56).
