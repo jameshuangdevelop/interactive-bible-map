@@ -14,7 +14,7 @@
   "type": "site",
   "zoomTier": "city",
   "prominence": "standard",
-  "parentId": "judea-province",
+  "parentId": "syria",
   "candidates": [
     {
       "label": "Kursi (Gergesa)",
@@ -67,31 +67,43 @@
     }
   ],
   "summary": {
-    "text": "The country of the Gadarenes was the region on the eastern side of the Sea of Galilee where, after Jesus and his disciples crossed the lake by boat, he was met by one or two men possessed by demons who lived among the tombs. Mark and Luke record that the demons, who called themselves \"Legion, for we are many,\" begged Jesus to send them into a large herd of pigs feeding nearby; when he did, the herd rushed down the bank into the lake and drowned. Matthew's account names two men possessed by demons at this meeting, while Mark and Luke describe one; all three Gospels record that the people of the area, alarmed at what had happened, asked Jesus to leave, and Mark adds that the healed man went on to proclaim what Jesus had done for him throughout the Decapolis. The exact site is disputed among three candidates, each named differently in the Gospels' own manuscripts.",
+    "text": "The country of the Gadarenes was the region on the eastern side of the Sea of Galilee where, after Jesus and his disciples crossed the lake by boat, he was met by one or two men possessed by demons who lived among the tombs. Mark records that the demons said, \"My name is Legion, for we are many\"; Luke's account instead has them called simply \"Legion,\" for many demons had entered into the man. The demons begged Jesus to send them into a great herd of pigs feeding on the hillside nearby, and when he did, the herd rushed down the bank into the lake and drowned. Matthew's account names two men possessed by demons at this meeting, while Mark and Luke describe one; all three Gospels record that the people of the area, alarmed at what had happened, asked Jesus to leave, and Mark adds that the healed man went on to proclaim what Jesus had done for him throughout the Decapolis. The exact site is disputed among three candidates, each named differently in the Gospels' own manuscripts.",
     "sources": [
+      "bib:isbe-gadara",
+      "bib:isbe-gerasa",
       "scripture:Matthew 8:28",
       "scripture:Matthew 8:32",
       "scripture:Matthew 8:34",
       "scripture:Mark 5:1",
+      "scripture:Mark 5:2",
+      "scripture:Mark 5:3",
       "scripture:Mark 5:9",
+      "scripture:Mark 5:11",
       "scripture:Mark 5:12",
       "scripture:Mark 5:13",
       "scripture:Mark 5:17",
       "scripture:Mark 5:20",
       "scripture:Luke 8:26",
+      "scripture:Luke 8:27",
+      "scripture:Luke 8:30",
+      "scripture:Luke 8:32",
+      "scripture:Luke 8:33",
       "scripture:Luke 8:37"
     ]
   },
   "history": [
     {
-      "text": "The three Synoptic Gospels name this region differently in their manuscripts: the World English Bible reads \"the country of the Gergesenes\" at Matthew 8:28 and \"the country of the Gadarenes\" at Mark 5:1 and Luke 8:26. The International Standard Bible Encyclopedia treats this as a real difference between ancient manuscripts, not a translator's choice, and rejects the reading \"of the Gergesenes\" at Matthew 8:28 on the authority of the Westcott-Hort critical edition.",
+      "text": "The World English Bible reads \"the country of the Gergesenes\" at Matthew 8:28 and \"the country of the Gadarenes\" at Mark 5:1 and Luke 8:26. The International Standard Bible Encyclopedia works from a different underlying Greek text, reading \"country of the Gadarenes\" at Matthew 8:28 and \"country of the Gerasenes\" in the parallel passages at Mark 5:1 and Luke 8:26, 37; it finds no good reason to doubt the accuracy of either reading, since the region could rightly be called either \"land of the Gerasenes,\" after the local town, or \"land of the Gadarenes,\" after the superior city whose jurisdiction covered it. The encyclopedia rejects only the Textus Receptus reading \"of the Gergesenes\" at Matthew 8:28, on the authority of the scholars Westcott and Hort, The New Testament in Greek.",
       "sources": [
         "bib:isbe-gadara",
-        "bib:isbe-gerasa"
+        "bib:isbe-gerasa",
+        "scripture:Matthew 8:28",
+        "scripture:Mark 5:1",
+        "scripture:Luke 8:26"
       ]
     },
     {
-      "text": "The encyclopedia's article on Gadara reports that the city, represented today by the ruins of Umm Qais, was a strong fortress, and that Pompey is said to have restored it and given it a free constitution in 63 BC, after an earlier siege by the Hasmonean ruler Alexander Janneus; it was given to Herod the Great in 30 BC, and after his death in 4 BC it was joined to the Roman province of Syria. The encyclopedia's separate article on the Decapolis describes Gadara and the other cities of that league as independent of the local tetrarchy and answerable directly to the governor of Syria, though they struck their own coinage and enjoyed rights of association and asylum.",
+      "text": "The encyclopedia's article on Gadara reports that the city, represented today by the ruins of Umm Qais, was a strong fortress, and that the Roman general Pompey is said to have restored it and given it a free constitution in 63 BC, after an earlier siege by the Hasmonean ruler Alexander Janneus; it was given to Herod the Great in 30 BC, and after his death in 4 BC it was joined to the Roman province of Syria. The encyclopedia's separate article on the Decapolis describes Gadara and the other cities of that league as independent of the local tetrarchy and answerable directly to the governor of Syria, though they struck their own coinage and enjoyed rights of association and asylum.",
       "sources": [
         "bib:isbe-gadara",
         "bib:isbe-decapolis"
@@ -129,81 +141,36 @@
   "otConnections": [],
   "politicalHistory": [
     {
-      "fromYear": -20,
+      "fromYear": -63,
+      "toYear": -30,
+      "entity": "Free Greek city, within Pompey's settlement of Syria (as part of Gadara's territory)",
+      "sources": [
+        "bib:isbe-gadara"
+      ],
+      "note": "The International Standard Bible Encyclopedia holds that the jurisdiction of Gadara, the chief city of this district, extended over the country east of the Sea of Galilee, including this shore; it records that the Roman general Pompey restored Gadara and gave it a free constitution in 63 BC, dating the city's own era from this year.",
+      "candidate": 0
+    },
+    {
+      "fromYear": -30,
       "toYear": -4,
       "holderId": "herod-the-great",
       "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
       "sources": [
-        "bib:isbe-ituraea"
+        "bib:isbe-gadara"
       ],
-      "note": "The International Standard Bible Encyclopedia (1915): \"The country of Zenodorus, lying between Trachonitis and Galilee, and including Paneas and Ulatha, Augustus bestowed on Herod\" in 20 BC.",
+      "note": "The encyclopedia records that the emperor Augustus gave Gadara, whose jurisdiction it holds extended over this shore, to Herod the Great in 30 BC.",
       "candidate": 0
     },
     {
       "fromYear": -4,
-      "toYear": 34,
-      "holderId": "philip-tetrarchy",
-      "entity": "Tetrarchy of Philip (Iturea and Trachonitis) (ruler: Philip)",
-      "sources": [
-        "bib:josephus-antiquities"
-      ],
-      "candidate": 0
-    },
-    {
-      "fromYear": 34,
-      "toYear": 37,
+      "toYear": 101,
       "holderId": "roman-province-syria",
-      "entity": "Roman province of Syria (ruler: Governor of Syria)",
+      "entity": "Roman province of Syria (a Decapolis city's territory, answerable to the governor of Syria)",
       "sources": [
-        "bib:josephus-antiquities"
+        "bib:isbe-gadara",
+        "bib:isbe-decapolis"
       ],
-      "candidate": 0
-    },
-    {
-      "fromYear": 37,
-      "toYear": 44,
-      "holderId": "agrippa-i-kingdom",
-      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
-      "sources": [
-        "bib:josephus-antiquities"
-      ],
-      "candidate": 0
-    },
-    {
-      "fromYear": 44,
-      "toYear": 53,
-      "holderId": "roman-province-judea",
-      "entity": "Roman province of Judea (ruler: Procurators, during Agrippa II's minority)",
-      "sources": [
-        "bib:josephus-antiquities",
-        "bib:isbe-trachonitis"
-      ],
-      "candidate": 0
-    },
-    {
-      "fromYear": 53,
-      "toYear": 100,
-      "holderId": "agrippa-ii-kingdom",
-      "entity": "Kingdom of Herod Agrippa II (ruler: Herod Agrippa II)",
-      "sources": [
-        "bib:josephus-antiquities",
-        "bib:isbe-trachonitis",
-        "bib:kokkinos-justus-josephus-agrippa-coins"
-      ],
-      "note": "Some historians instead place Agrippa II's death, and so the end of this period, before AD 93, reading the Jewish historian Josephus's own wording in the Antiquities; this is the view of, among others, the standard reference work The History of the Jewish People in the Age of Jesus Christ as revised by Vermes and Millar (1973). This area follows the later, AD 100 dating; see that stop for the sources on both sides.",
-      "candidate": 0
-    },
-    {
-      "fromYear": 100,
-      "toYear": 106,
-      "holderId": "roman-province-syria",
-      "entity": "Roman province of Syria",
-      "sources": [
-        "bib:isbe-abilene",
-        "bib:isbe-trachonitis",
-        "bib:livius-nabataeans"
-      ],
-      "note": "The International Standard Bible Encyclopedia (1915) states that Trachonitis \"was incorporated in the new province of Arabia\" in 106, together with the Nabataean kingdom. No source gives an end point for the other three districts (Gaulanitis, Batanea and Auranitis), so the same year is shown for all four.",
+      "note": "The encyclopedia records that after Herod's death in 4 BC, Gadara, whose jurisdiction it holds extended over this shore, was joined to the province of Syria; its article on the Decapolis describes these cities as independent of the local tetrarchy and answerable directly to the governor of Syria. This map draws this shore within the area of Philip's former tetrarchy as a simplification; no cited source places it there.",
       "candidate": 0
     },
     {
@@ -240,15 +207,16 @@
       "candidate": 1
     },
     {
-      "fromYear": -65,
+      "fromYear": -63,
       "toYear": 101,
       "holderId": "roman-province-syria",
       "entity": "Roman province of Syria (a Decapolis city, answerable to the governor of Syria)",
       "sources": [
         "bib:isbe-gerasa",
-        "bib:isbe-decapolis"
+        "bib:isbe-decapolis",
+        "bib:isbe-gadara"
       ],
-      "note": "The International Standard Bible Encyclopedia's article on the Decapolis dates the league's constitution to about the time of Pompey's campaign in Syria, 65 BC, and describes Gerasa and the league's other cities as independent of the local tetrarchy and answerable directly to the governor of Syria; its own \"Gerasa\" article gives no record of the city ever being held by Herod the Great or his sons.",
+      "note": "The International Standard Bible Encyclopedia's article on the Decapolis dates the league's constitution to about the time of Pompey's campaign in Syria, 65 BC, and describes Gerasa and the league's other cities as independent of the local tetrarchy and answerable directly to the governor of Syria; its own \"Gerasa\" article gives no record of the city ever being held by Herod the Great or his sons. This map starts the entry in 63 BC, the year the encyclopedia's \"Gadara\" article dates the Roman general Pompey's settlement of the free cities of this district, for consistency with the other candidates.",
       "candidate": 2
     }
   ],
