@@ -16,7 +16,7 @@
   "type": "region",
   "zoomTier": "region",
   "prominence": "standard",
-  "parentId": "pamphylia",
+  "parentId": "galatia",
   "candidates": [
     {
       "label": "Lycia (label point)",
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "text": "The Roman historian Cassius Dio records that in AD 43, after the Lycians revolted and killed some Romans, the emperor Claudius reduced them to servitude and incorporated them into the prefecture of Pamphylia; this map accordingly places Lycia under Pamphylia at about AD 50. Lycia's exact status for the following decades is unclear: the Roman biographer Suetonius records that the emperor Vespasian made a province of Lycia, implying it had freedom again by his reign, while a translator's note to the Roman historian Tacitus's Histories states that Galatia, Pamphylia and Lycia already formed one province together by AD 69. Lycia was joined with Pamphylia as a single province by AD 74.",
+      "text": "The Roman historian Cassius Dio records that in AD 43, after the Lycians revolted and killed some Romans, the emperor Claudius reduced them to servitude and incorporated them into the prefecture of Pamphylia, and the International Standard Bible Encyclopedia dates Lycia's later union with Pamphylia, \"the new double province Lycia-Pamphylia,\" to AD 74. Lycia's exact status in the decades between is unclear: the Roman biographer Suetonius records that the emperor Vespasian made a province of Lycia, implying it had freedom again by his reign, while a translator's note to the Roman historian Tacitus's Histories states that Galatia, Pamphylia and Lycia already formed one province together by AD 69. As for Pamphylia, this map places Lycia in the province of Galatia at about AD 50.",
       "sources": [
         "bib:cassius-dio-roman-history",
         "bib:suetonius-twelve-caesars",
