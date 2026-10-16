@@ -531,3 +531,21 @@ The sources do support the history's sentence: Dio (60.17.3) does say the Lycian
   - `npm test`: 331 tests, all pass.
   - All 30 `textWEB` strings match the WEB exactly.
   - No candidate's label, coordinates, source or confidence changed.
+
+### A9. Final re-check (`a9ce68a`, 2026-10-15): batch A signed off
+
+All three remaining fixes pass:
+- **F43 (`alexandria`):** `bib:isbe-myra` is now among the summary's sources. It states the claim: "Here, according to Ac 27:6, Paul found a grain ship from Alexandria". "Grain" describes only the Myra ship, and Acts 27:38 is also cited.
+- **F44 (`lycia`):** `parentId` is back to `galatia`, a region pointing to its province as the house rule requires. The panel will read "Region · Galatia · Roman Empire". The history now says "As for Pamphylia, this map places Lycia in the province of Galatia at about AD 50", which matches `pamphylia.json`.
+- **F45 (`lycia`):** `history[2]` now gives the main content first: Dio's AD 43 report, then the AD 74 union. Its quote, "the new double province Lycia-Pamphylia", is ISBE "Pisidia"'s exact wording, and `bib:isbe-pisidia` is cited. The uncertainty comes next and the map's placement last (ADR-0041 item 1).
+
+**Sign-off:** all 16 batch A records are `verified`, with `verifiedBy: "fact-checker"` and `lastReviewed: "2026-10-15"`: the 15 voyage-to-Rome places and the Lycia region. `alexandria` and `lycia` were set in this round.
+
+Earlier sections already showed the rest of the batch passing:
+- The 23 route references point to the new records, and the 15 stop entries are gone (§A4).
+- The route lines reproduce byte for byte (§A7, §A8).
+- No new upstream source needs a licence or attribution change. The three new Smith's *Geography* entries are public domain and already listed (§A7, §A8).
+
+**Checks** (Node 24.21.0, on `a9ce68a`):
+- `npm run validate:data`: passed, 203 warnings, none in these records. It passed again after the status change.
+- `npm test`: 331 tests, all pass.
