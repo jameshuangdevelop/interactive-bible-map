@@ -5,6 +5,9 @@
       "Bethphage"
     ],
     "modern": "Et-Tur (Kafr et-Tur)",
+    "modernCountries": [
+      "West Bank"
+    ],
     "alternate": [
       "Bethsphage"
     ],
@@ -13,7 +16,7 @@
   "type": "village",
   "zoomTier": "city",
   "prominence": "standard",
-  "parentId": "jerusalem",
+  "parentId": "judea",
   "candidates": [
     {
       "label": "Et-Tur (Kafr et-Tur)",
@@ -54,21 +57,24 @@
     }
   ],
   "summary": {
-    "text": "Bethphage was a village on the Mount of Olives, on the road from Jerusalem to Jericho, whose Aramaic name means \"place of young figs.\" All three Synoptic Gospels record that as Jesus and his disciples approached Jerusalem for the final time, they came to Bethphage, where Jesus sent two disciples ahead to bring him a donkey and her colt for his entry into the city; Matthew's account states that this was done to fulfill a prophecy that Jerusalem's king would come to her \"humble, and riding on a donkey.\"",
+    "text": "Bethphage was a village on the Mount of Olives, near the road from Jerusalem to Jericho, whose Aramaic name means \"place of young figs.\" All three Synoptic Gospels record that as Jesus and his disciples approached Jerusalem, they came to Bethphage, where Jesus sent two disciples ahead into the village to bring him an animal to ride for his entry into the city; Matthew's account has the disciples bring both \"a donkey tied, and a colt with her,\" while Mark and Luke each describe a single young animal. Matthew's account states that this was done to fulfill the prophecy, \"Tell the daughter of Zion, behold, your King comes to you, humble, and riding on a donkey, on a colt, the foal of a donkey.\"",
     "sources": [
       "bib:isbe-bethphage",
       "scripture:Matthew 21:1",
       "scripture:Matthew 21:2",
       "scripture:Mark 11:1",
+      "scripture:Mark 11:2",
       "scripture:Luke 19:29",
+      "scripture:Luke 19:30",
       "scripture:Matthew 21:4-5"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia reports that Bethphage is named in several passages of the Talmud, from which it may be inferred that the village stood near but outside Jerusalem, at the limit of distance a Jew could walk on the Sabbath, and that it was enclosed by some kind of wall.",
+      "text": "The International Standard Bible Encyclopedia reports that Bethphage is named in several passages of the Talmud, the collected body of early rabbinic teaching on Jewish law, from which it may be inferred that the village stood near but outside Jerusalem, at the limit of distance a Jew could walk on the Sabbath, and that it was enclosed by some kind of wall.",
       "sources": [
-        "bib:isbe-bethphage"
+        "bib:isbe-bethphage",
+        "bib:isbe-talmud"
       ]
     },
     {

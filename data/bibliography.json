@@ -2790,6 +2790,19 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "isbe-talmud",
+      "type": "chapter",
+      "title": "Talmud",
+      "authors": [
+        "Hermann L. Strack"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/talmud.html",
+      "accessed": "2026-10-16"
+    },
+    {
       "id": "isbe-chronology-nt",
       "type": "chapter",
       "title": "Chronology of the New Testament",
