@@ -48,9 +48,6 @@ const AREA_LABEL_OVERVIEW_MIN_ZOOM_OVERRIDES: Partial<Record<string, number>> = 
   italy: 5
 };
 
-const CITY_PIN_LABEL_TYPES = new Set<PlaceType>(["city", "town", "village"]);
-const MAJOR_CITY_TIER_LABEL_TYPES = new Set<PlaceType>(["site", "natural-feature"]);
-
 export interface BaseMapFeatureProperties {
   entryId: string;
   placeId: string;
@@ -68,11 +65,12 @@ export interface BaseMapFeatureProperties {
 
 export interface PinFeatureProperties extends BaseMapFeatureProperties {
   pinColor: string;
+  naturalFeatureKind?: "water" | "land";
   hasMultipleCandidates: boolean;
   isDisputed: boolean;
   isSelectedPlace: boolean;
   isHighlightedPlace: boolean;
-  labelText: string | null;
+  labelText: string;
   majorLabelSide: "left" | "right";
 }
 
@@ -153,14 +151,6 @@ function interactionRankForPlace(place: PlaceIndexRecord) {
   return 1;
 }
 
-function shouldShowPinLabel(place: PlaceIndexRecord) {
-  if (CITY_PIN_LABEL_TYPES.has(place.type)) {
-    return true;
-  }
-
-  return place.prominence === "major" && MAJOR_CITY_TIER_LABEL_TYPES.has(place.type);
-}
-
 function getPinTierZoomRange(place: PlaceIndexRecord) {
   if (isSiteTier(place)) {
     return {
@@ -177,7 +167,7 @@ function getPinTierZoomRange(place: PlaceIndexRecord) {
   }
 
   return {
-    minZoom: 4,
+    minZoom: 6,
     maxZoom: mapMaxZoomExclusive
   };
 }
@@ -303,11 +293,13 @@ function toPinFeature({
       importanceRank,
       interactionRank: interactionRankForPlace(place),
       pinColor: placePinColor(place),
+      naturalFeatureKind:
+        place.type === "natural-feature" ? (place.naturalFeatureKind ?? "land") : undefined,
       hasMultipleCandidates,
       isDisputed: hasMultipleCandidates ? isDisputedPlace(place) : false,
       isSelectedPlace: selected,
       isHighlightedPlace: highlighted,
-      labelText: shouldShowPinLabel(place) ? placeName : null,
+      labelText: placeName,
       majorLabelSide: "right"
     }
   };

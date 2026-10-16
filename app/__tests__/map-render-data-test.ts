@@ -111,6 +111,11 @@ describe("map render data", () => {
     expect(standardIds).not.toContain("nazareth");
     expect(standardIds).not.toContain("sea-of-galilee");
     expect(seaOfGalileePin?.properties.labelText).toBe("Sea of Galilee");
+    expect(seaOfGalileePin?.properties.naturalFeatureKind).toBe("land");
+    const troasPin = renderData.clusteredCityPins.features.find(
+      (feature) => feature.properties.placeId === "troas"
+    );
+    expect(troasPin?.properties.minZoom).toBe(6);
   });
 
   test("builds area labels for empire, province, and region ranges", () => {
