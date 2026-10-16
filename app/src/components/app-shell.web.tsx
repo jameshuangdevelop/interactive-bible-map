@@ -244,7 +244,7 @@ function MapLoadingPlaceholder() {
   );
 }
 
-function RouteStopDetailsPanel({
+export function RouteStopDetailsPanel({
   selectedRouteStop,
   bibliographyById,
   showBackToRoute,
@@ -261,6 +261,7 @@ function RouteStopDetailsPanel({
     <div data-route-stop-panel="true">
       {showBackToRoute ? (
         <button
+          data-back-to-route="true"
           onClick={onBackToRoute}
           style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer", marginBottom: `${tokens.spacing.sm}px` }}
           type="button"
@@ -992,12 +993,15 @@ export function AppShell() {
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
-    setViewTab("map");
+    setSelectedRouteStopId(null);
+    if (viewTab !== "routes") {
+      setViewTab("map");
+    }
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     setSelection(nextSelection);
-  }, []);
+  }, [viewTab]);
   const handlePanelHighlightPlace = useCallback(
     (placeId: string | null) => {
       if (!placeId || !placesById.has(placeId)) {
@@ -1573,6 +1577,7 @@ export function AppShell() {
     if (viewTab !== "routes" || !selectedRoute) {
       return [];
     }
+    const mentionedKeyByStop = new Map<string, string>();
     const entries = selectedRoute.stages.flatMap((stage, stageIndex) => {
       const from = resolveRouteStop(stage.from, placesById, routeStopsById);
       const to = resolveRouteStop(stage.to, placesById, routeStopsById);
@@ -1586,47 +1591,65 @@ export function AppShell() {
         stopKind: "location" | "route-stop";
         stopId: string;
       }[] = [];
-      if (from.coordinates) {
+      const pushStopEntry = (
+        resolved: RouteStopResolved,
+        role: "from" | "to" | "passed" | "also-named",
+        accessibleKindLabel = "route stop"
+      ) => {
+        if (!resolved.coordinates) {
+          return;
+        }
         result.push({
-          id: `route-stop:${selectedRoute.route.id}:${stage.id}:from`,
-          label: `${from.name}, route stop`,
-          coordinates: from.coordinates,
+          id: `route-stop:${selectedRoute.route.id}:${stage.id}:${role}:${resolved.kind}:${resolved.id}:${stageIndex}:${result.length}`,
+          label: `${resolved.name}, ${accessibleKindLabel}`,
+          coordinates: resolved.coordinates,
           routeId: selectedRoute.route.id,
           stageId: stage.id,
           stageIndex,
-          stopKind: from.kind,
-          stopId: from.id
+          stopKind: resolved.kind,
+          stopId: resolved.id
         });
+      };
+      pushStopEntry(from, "from");
+      pushStopEntry(to, "to");
+      for (const viaRef of stage.via ?? []) {
+        const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+        if (via.kind !== "location") {
+          continue;
+        }
+        pushStopEntry(via, "passed", "passed place");
       }
-      if (to.coordinates) {
-        result.push({
-          id: `route-stop:${selectedRoute.route.id}:${stage.id}:to`,
-          label: `${to.name}, route stop`,
-          coordinates: to.coordinates,
-          routeId: selectedRoute.route.id,
-          stageId: stage.id,
-          stageIndex,
-          stopKind: to.kind,
-          stopId: to.id
-        });
+      for (const mentionedRef of stage.mentioned ?? []) {
+        if (mentionedRef.kind !== "location") {
+          continue;
+        }
+        const key = `${mentionedRef.locationId ?? ""}:${mentionedRef.candidateIndex ?? ""}`;
+        if (mentionedKeyByStop.has(key)) {
+          continue;
+        }
+        mentionedKeyByStop.set(key, stage.id);
+        const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
+        if (mentioned.kind !== "location") {
+          continue;
+        }
+        const alsoNamedIsRouteStop =
+          stage.from.kind === "location" && stage.from.locationId === mentioned.id
+            ? true
+            : stage.to.kind === "location" && stage.to.locationId === mentioned.id
+              ? true
+              : (stage.via ?? []).some(
+                  (viaRef) => viaRef.kind === "location" && viaRef.locationId === mentioned.id
+                );
+        if (alsoNamedIsRouteStop) {
+          continue;
+        }
+        pushStopEntry(mentioned, "also-named", "also named place");
       }
-      return result.map((entry, index) => ({
-        ...entry,
-        id: `${entry.id}:${stageIndex}:${index}`
-      }));
+      return result;
     });
 
     return entries;
   }, [placesById, routeStopsById, selectedRoute, viewTab]);
-  const routeKeyboardLocationIds = useMemo(
-    () =>
-      new Set(
-        routeKeyboardEntries
-          .filter((entry) => entry.stopKind === "location")
-          .map((entry) => entry.stopId)
-      ),
-    [routeKeyboardEntries]
-  );
   const routeOverlayHiddenPlaceIdsKey = useMemo(() => {
     if (viewTab !== "routes" || !routeMapOverlay) {
       return "";
@@ -1644,6 +1667,11 @@ export function AppShell() {
   const selectedRouteStop =
     selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
       ? routeStopsById.get(selectedRouteStopId) ?? null
+      : null;
+  const selectedRouteStopCoordinates = selectedRouteStop?.candidates[0]?.coordinates ?? null;
+  const selectedRouteStopFocusKey =
+    selectedRouteStopId && selectedRouteStopCoordinates
+      ? `${selectedRouteStopId}:${selectedRouteStopCoordinates[0]}:${selectedRouteStopCoordinates[1]}`
       : null;
   const routePlacePanelActive = viewTab === "routes" && Boolean(selectedPlace || selectedRouteStop);
   const showSideBySideRoutePlacePanels =
@@ -2020,7 +2048,8 @@ export function AppShell() {
             pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
             routeKeyboardEntries={routeKeyboardEntries}
-            routeKeyboardPlaceIds={[...routeKeyboardLocationIds]}
+            selectedRouteStopCoordinates={selectedRouteStopCoordinates}
+            selectedRouteStopFocusKey={selectedRouteStopFocusKey}
             routeOverlayHiddenPlaceIdsKey={routeOverlayHiddenPlaceIdsKey}
             routesOverlay={routeMapOverlay}
             selectedTimelineStopId={

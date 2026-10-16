@@ -10949,67 +10949,12 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
       const tab = document.querySelector('[role="tab"][data-view-tab="map"]');
       return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
     });
-    await routesTab.click();
+    await desktopPage.goto(`${baseUrl}/?routesData=fixture&tab=routes`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
     await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-    let jesusRouteButtonTextValue = "";
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      await desktopPage.waitForFunction(() => {
-        const panel = document.querySelector("[data-routes-panel='true']");
-        if (!(panel instanceof HTMLElement)) {
-          return false;
-        }
-        const panelText = panel.textContent ?? "";
-        if (panelText.includes("Jesus fixture")) {
-          return true;
-        }
-        if (panelText.includes("Routes couldn't load.")) {
-          return true;
-        }
-        return false;
-      }, undefined, { timeout: 30_000 });
-      const panelSnapshot = await desktopPage.evaluate(() => {
-        const panel = document.querySelector("[data-routes-panel='true']");
-        if (!(panel instanceof HTMLElement)) {
-          return {
-            hasJesusRoute: false,
-            hasLoadError: false,
-            jesusText: ""
-          };
-        }
-        const panelText = panel.textContent ?? "";
-        const jesusButton = Array.from(panel.querySelectorAll("button")).find((button) =>
-          (button.textContent ?? "").includes("Jesus fixture")
-        );
-        return {
-          hasJesusRoute: Boolean(jesusButton),
-          hasLoadError: panelText.includes("Routes couldn't load."),
-          jesusText: jesusButton
-            ? (jesusButton.textContent ?? "").replace(/\s+/gu, " ").trim()
-            : ""
-        };
-      });
-      if (panelSnapshot.hasJesusRoute) {
-        jesusRouteButtonTextValue = panelSnapshot.jesusText;
-        break;
-      }
-      if (!panelSnapshot.hasLoadError) {
-        continue;
-      }
-      const retryButton = desktopPage.getByRole("button", { name: "Try again" });
-      if (await retryButton.count()) {
-        await retryButton.first().click();
-        continue;
-      }
-    }
-    if (
-      typeof jesusRouteButtonTextValue !== "string" ||
-      !jesusRouteButtonTextValue.includes("1 stage") ||
-      jesusRouteButtonTextValue.includes("1 stages")
-    ) {
-      throw new Error(
-        `Routes fixture check: expected singular stage label ('1 stage'), got '${String(jesusRouteButtonTextValue)}'.`
-      );
-    }
 
     const listState = await desktopPage.evaluate((testHook) => {
       const map = window[testHook];
@@ -11055,10 +11000,77 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     if (!routesAttributionText.attribution.includes("AWMC Geodata")) {
       throw new Error("Routes fixture check: expected ODbL notice for route lines in map attribution.");
     }
-
-    const paulRouteButton = desktopPage.getByRole("button", { name: /Paul fixture journey/u }).first();
-    await paulRouteButton.click();
+    await desktopPage.goto(`${baseUrl}/?routesData=fixture&tab=routes&route=paul-fixture`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
     await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
+
+    const clickRoutePointByStop = async (page, stopId, stopKind) => {
+      const clicked = await page.evaluate(
+        async ({ testHook, targetStopId, targetStopKind }) => {
+          const map = window[testHook];
+          if (!map) {
+            return false;
+          }
+          const pointsSource = map.getSource("ibm-route-points");
+          const pointsData =
+            pointsSource && typeof pointsSource.getData === "function"
+              ? await pointsSource.getData()
+              : null;
+          const stopFeature = (pointsData?.features ?? []).find((feature) => {
+            const properties = feature?.properties ?? {};
+            const coordinates = feature?.geometry?.coordinates;
+            return (
+              properties.kind === "stop" &&
+              properties.stopKind === targetStopKind &&
+              properties.stopId === targetStopId &&
+              Array.isArray(coordinates) &&
+              coordinates.length >= 2
+            );
+          });
+          if (!stopFeature) {
+            return false;
+          }
+          const coordinates = stopFeature.geometry.coordinates;
+          map.jumpTo({ center: [coordinates[0], coordinates[1]], zoom: 10.6 });
+          await new Promise((resolve) => map.once("idle", resolve));
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          map.fire("click", {
+            point: projected,
+            lngLat: { lng: coordinates[0], lat: coordinates[1] }
+          });
+          return true;
+        },
+        { testHook: mapTestHookKey, targetStopId: stopId, targetStopKind: stopKind }
+      );
+      if (!clicked) {
+        throw new Error(`Routes fixture check: could not click route stop '${stopId}' (${stopKind}).`);
+      }
+    };
+
+    const assertRouteStopPanel = async ({ stopName, expectsCandidates, scriptureRef, sourceNeedle }) => {
+      const placePanel = desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']");
+      await placePanel.waitFor({ state: "visible", timeout: 30_000 });
+      await placePanel.locator("[data-route-stop-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+      await placePanel.getByRole("heading", { level: 1, name: stopName }).waitFor({ timeout: 30_000 });
+      await placePanel.getByRole("heading", { level: 2, name: "In the Bible" }).waitFor({ timeout: 30_000 });
+      await placePanel.locator("strong").filter({ hasText: scriptureRef }).first().waitFor({ timeout: 30_000 });
+      await placePanel.getByRole("heading", { level: 2, name: /Sources/u }).waitFor({ timeout: 30_000 });
+      await placePanel.getByText(sourceNeedle, { exact: false }).waitFor({ timeout: 30_000 });
+      if (expectsCandidates) {
+        await placePanel.getByRole("heading", { level: 2, name: "Candidate sites" }).waitFor({ timeout: 30_000 });
+      } else {
+        const candidatesHeadingCount = await placePanel.getByRole("heading", { level: 2, name: "Candidate sites" }).count();
+        if (candidatesHeadingCount !== 0) {
+          throw new Error(`Routes fixture check: '${stopName}' should not show Candidate sites.`);
+        }
+      }
+      await placePanel.getByRole("button", { name: "Close" }).click();
+      await desktopPage.waitForTimeout(120);
+    };
 
     const stageOne = desktopPage.locator("[data-route-stage-index='1']");
     const stageTwo = desktopPage.locator("[data-route-stage-index='2']");
@@ -11070,6 +11082,79 @@ async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
     await stageThree.getByText("Through Galilee", { exact: false }).waitFor({ timeout: 30_000 });
     await stageFour.getByText("Site disputed", { exact: false }).waitFor({ timeout: 30_000 });
     await desktopPage.locator("[data-route-notes='true']").getByText("Fixture stage without line geometry.").waitFor({ timeout: 30_000 });
+
+    await clickRoutePointByStop(desktopPage, "seleucia-fixture", "route-stop");
+    await assertRouteStopPanel({
+      stopName: "Seleucia",
+      expectsCandidates: false,
+      scriptureRef: "Acts 2:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    await stageOne.getByRole("button", { name: "Seleucia" }).click();
+    await assertRouteStopPanel({
+      stopName: "Seleucia",
+      expectsCandidates: false,
+      scriptureRef: "Acts 2:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
+    await assertRouteStopPanel({
+      stopName: "Disputed stop",
+      expectsCandidates: true,
+      scriptureRef: "Matthew 5:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    await clickRoutePointByStop(desktopPage, "disputed-stop-fixture", "route-stop");
+    await assertRouteStopPanel({
+      stopName: "Disputed stop",
+      expectsCandidates: true,
+      scriptureRef: "Matthew 5:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    const fixtureStopEntryPanCheckBefore = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [35.968, 36.119], zoom: 10.2 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
+    await desktopPage.getByRole("heading", { level: 1, name: "Disputed stop" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(450);
+    const fixtureStopEntryPanCheckAfter = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!fixtureStopEntryPanCheckBefore || !fixtureStopEntryPanCheckAfter) {
+      throw new Error("Routes fixture check: could not inspect camera for stop-entry off-screen pan.");
+    }
+    if (Math.abs(fixtureStopEntryPanCheckAfter.zoom - fixtureStopEntryPanCheckBefore.zoom) > 0.02) {
+      throw new Error(
+        `Routes fixture check: selecting off-screen stop entry changed zoom (${JSON.stringify({
+          before: fixtureStopEntryPanCheckBefore,
+          after: fixtureStopEntryPanCheckAfter
+        })}).`
+      );
+    }
+    if (
+      Math.abs(fixtureStopEntryPanCheckAfter.center[0] - fixtureStopEntryPanCheckBefore.center[0]) < 0.2 &&
+      Math.abs(fixtureStopEntryPanCheckAfter.center[1] - fixtureStopEntryPanCheckBefore.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes fixture check: selecting off-screen stop entry did not pan (${JSON.stringify({
+          before: fixtureStopEntryPanCheckBefore,
+          after: fixtureStopEntryPanCheckAfter
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "Close" }).click();
 
     const stageSourcesCount = await desktopPage
       .locator("[data-route-stage-index] details > summary")
@@ -11916,14 +12001,15 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       window.__ibmCameraCallProbe = { methods, originals, calls };
       return true;
     }, mapTestHookKey);
-    await desktopPage.getByRole("tab", { name: "Map" }).click();
-    await desktopPage.evaluate(async (testHook) => {
+    const routesSearchCameraBefore = await desktopPage.evaluate(async (testHook) => {
       const map = window[testHook];
       if (!map) {
-        return;
+        return null;
       }
       map.jumpTo({ center: [5, 30], zoom: 6.1 });
       await new Promise((resolve) => map.once("idle", resolve));
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
     }, mapTestHookKey);
     const searchInput = desktopPage.getByLabel("Search biblical places");
     await searchInput.fill("Bethlehem");
@@ -11934,6 +12020,21 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       .first()
       .click();
     await desktopPage.getByRole("heading", { level: 1, name: "Bethlehem" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    const routesTabSelectedAfterSearch = await desktopPage
+      .getByRole("tab", { name: "Routes" })
+      .getAttribute("aria-selected");
+    if (routesTabSelectedAfterSearch !== "true") {
+      throw new Error("Routes real-data regression: search on Routes tab should keep Routes selected.");
+    }
+    const routesSearchCameraAfter = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
     const cameraProbeCalls = await desktopPage.evaluate((testHook) => {
       const map = window[testHook];
       const probe = window.__ibmCameraCallProbe;
@@ -11948,26 +12049,54 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       delete window.__ibmCameraCallProbe;
       return calls;
     }, mapTestHookKey);
-    const routesCameraYank = cameraProbeCalls.find((call) => {
-      if (!Array.isArray(call.center) || call.center.length < 2) {
-        return false;
-      }
-      return (
-        Math.abs(call.center[0] - cameraAfterTabSwitch.center[0]) < 0.2 &&
-        Math.abs(call.center[1] - cameraAfterTabSwitch.center[1]) < 0.2 &&
-        (call.zoom === null || Math.abs(call.zoom - cameraAfterTabSwitch.zoom) < 0.3)
-      );
-    });
-    if (routesCameraYank) {
+    if (!routesSearchCameraBefore || !routesSearchCameraAfter) {
+      throw new Error("Routes real-data check: could not inspect camera before/after search selection on Routes tab.");
+    }
+    if (Math.abs(routesSearchCameraAfter.zoom - routesSearchCameraBefore.zoom) > 0.02) {
       throw new Error(
-        `Routes real-data regression: opening a place from search returned to prior routes camera (${JSON.stringify({
-          priorRoutesCamera: cameraAfterTabSwitch,
-          matchingCall: routesCameraYank,
+        `Routes real-data regression: search selection on Routes tab changed zoom (${JSON.stringify({
+          before: routesSearchCameraBefore,
+          after: routesSearchCameraAfter,
           calls: cameraProbeCalls
         })}).`
       );
     }
-    await desktopPage.getByRole("tab", { name: "Routes" }).click();
+    if (
+      Math.abs(routesSearchCameraAfter.center[0] - routesSearchCameraBefore.center[0]) < 0.2 &&
+      Math.abs(routesSearchCameraAfter.center[1] - routesSearchCameraBefore.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes real-data regression: search selection on Routes tab did not pan to an off-screen place (${JSON.stringify({
+          before: routesSearchCameraBefore,
+          after: routesSearchCameraAfter
+        })}).`
+      );
+    }
+    const disruptiveSearchCameraCall = cameraProbeCalls.find((call) => {
+      if (call.method === "fitBounds" || call.method === "flyTo") {
+        return true;
+      }
+      if (call.method !== "jumpTo") {
+        return false;
+      }
+      if (!Array.isArray(call.center) || !routesSearchCameraBefore) {
+        return true;
+      }
+      return (
+        Math.abs(call.center[0] - routesSearchCameraBefore.center[0]) > 0.0001 ||
+        Math.abs(call.center[1] - routesSearchCameraBefore.center[1]) > 0.0001 ||
+        (call.zoom !== null && Math.abs(call.zoom - routesSearchCameraBefore.zoom) > 0.001)
+      );
+    });
+    if (disruptiveSearchCameraCall) {
+      throw new Error(
+        `Routes real-data regression: search selection on Routes tab should not fit/fly camera (${JSON.stringify({
+          disruptiveSearchCameraCall,
+          calls: cameraProbeCalls
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "Close" }).click();
     await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
@@ -12211,9 +12340,9 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       ephesusClusterBaseline.nearestCluster.pointCount
     );
 
-    const clickRouteStopById = async (page, stopId) => {
+    const clickRouteStopById = async (page, stopId, stopKind = "location") => {
       const clicked = await page.evaluate(
-        async ({ testHook, routeStopId }) => {
+        async ({ testHook, routeStopId, routeStopKind }) => {
           const map = window[testHook];
           if (!map) {
             return false;
@@ -12228,7 +12357,7 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
             const coordinates = feature?.geometry?.coordinates;
             return (
               properties.kind === "stop" &&
-              properties.stopKind === "location" &&
+              properties.stopKind === routeStopKind &&
               properties.stopId === routeStopId &&
               Array.isArray(coordinates) &&
               coordinates.length >= 2
@@ -12247,12 +12376,247 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
           });
           return true;
         },
-        { testHook: mapTestHookKey, routeStopId: stopId }
+        { testHook: mapTestHookKey, routeStopId: stopId, routeStopKind: stopKind }
       );
       if (!clicked) {
-        throw new Error(`Routes real-data check: could not click route stop '${stopId}' on map.`);
+        throw new Error(`Routes real-data check: could not click route stop '${stopId}' (${stopKind}) on map.`);
       }
     };
+
+    const assertRouteStopPanelContents = async ({ name, todayName, candidateCount, scriptureRef }) => {
+      const panel = desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']");
+      await panel.waitFor({ state: "visible", timeout: 30_000 });
+      await panel.locator("[data-route-stop-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+      await panel.getByRole("heading", { level: 1, name }).waitFor({ timeout: 30_000 });
+      if (todayName) {
+        await panel.getByText(`Today: ${todayName}`, { exact: false }).waitFor({ timeout: 30_000 });
+      }
+      if (candidateCount > 1) {
+        await panel.getByRole("heading", { level: 2, name: "Candidate sites" }).waitFor({ timeout: 30_000 });
+      }
+      await panel.getByRole("heading", { level: 2, name: "In the Bible" }).waitFor({ timeout: 30_000 });
+      if (scriptureRef) {
+        await panel.locator("strong").filter({ hasText: scriptureRef }).first().waitFor({ timeout: 30_000 });
+      }
+      await panel.getByRole("heading", { level: 2, name: /Sources/u }).waitFor({ timeout: 30_000 });
+      const sourceItemsCount = await panel.locator("ol li").count();
+      if (sourceItemsCount < 1) {
+        throw new Error(`Routes real-data check: stop entry '${name}' should show at least one source.`);
+      }
+    };
+
+    const loadRouteStopTargets = async (routeId, heading) => {
+      await desktopPage.goto(`${baseUrl}/?tab=routes&route=${routeId}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(desktopPage);
+      await desktopPage.getByRole("heading", { name: heading }).waitFor({ timeout: 30_000 });
+      return desktopPage.evaluate(async (testHook) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        const pointsSource = map.getSource("ibm-route-points");
+        const pointsData =
+          pointsSource && typeof pointsSource.getData === "function"
+            ? await pointsSource.getData()
+            : null;
+        const stopPoints = (pointsData?.features ?? []).filter((feature) => {
+          const properties = feature?.properties ?? {};
+          const coordinates = feature?.geometry?.coordinates;
+          return (
+            properties.kind === "stop" &&
+            properties.stopKind === "route-stop" &&
+            Array.isArray(coordinates) &&
+            coordinates.length >= 2
+          );
+        });
+        if (stopPoints.length === 0) {
+          return {
+            routeStopCount: 0
+          };
+        }
+        const routeStopIds = new Set(stopPoints.map((feature) => String(feature.properties?.stopId ?? "")));
+        const routeStopsPayload = await fetch("/generated/routes.stops.json")
+          .then((response) => response.json())
+          .catch(() => null);
+        const byId = new Map((routeStopsPayload?.stops ?? []).map((stop) => [stop.id, stop]));
+        const toTarget = (feature) => {
+          const stopId = String(feature.properties?.stopId ?? "");
+          const stopRecord = byId.get(stopId);
+          const coordinates = feature.geometry.coordinates;
+          return {
+            id: stopId,
+            name: String(feature.properties?.label ?? stopRecord?.name ?? stopId),
+            todayName: stopRecord?.todayName ?? null,
+            candidateCount: Array.isArray(stopRecord?.candidates) ? stopRecord.candidates.length : 0,
+            scriptureRef: stopRecord?.scripture?.[0]?.ref ?? null,
+            coordinates: [Number(coordinates[0]), Number(coordinates[1])],
+            isDisputed:
+              Array.isArray(stopRecord?.candidates) &&
+              stopRecord.candidates.some(
+                (candidate) =>
+                  candidate?.confidence === "disputed" || Number(stopRecord.candidates.length) > 1
+              )
+          };
+        };
+        const regularFeature =
+          stopPoints.find((feature) => {
+            const stopId = String(feature.properties?.stopId ?? "");
+            const stopRecord = byId.get(stopId);
+            if (!stopRecord) {
+              return true;
+            }
+            const isDisputed = stopRecord.candidates.some((candidate) => candidate.confidence === "disputed");
+            return !isDisputed && stopRecord.candidates.length <= 1;
+          }) ?? stopPoints[0];
+        const disputedFeature =
+          stopPoints.find((feature) => {
+            const stopId = String(feature.properties?.stopId ?? "");
+            const stopRecord = byId.get(stopId);
+            if (!stopRecord) {
+              return false;
+            }
+            return (
+              stopRecord.candidates.length > 1 ||
+              stopRecord.candidates.some((candidate) => candidate.confidence === "disputed")
+            );
+          }) ?? null;
+        const offscreenCenterFeature =
+          stopPoints.find(
+            (feature) => String(feature.properties?.stopId ?? "") !== String(regularFeature.properties?.stopId ?? "")
+          ) ?? stopPoints[0];
+        return {
+          routeStopCount: stopPoints.length,
+          regular: toTarget(regularFeature),
+          disputed: disputedFeature ? toTarget(disputedFeature) : null,
+          offscreenCenter: [
+            Number(offscreenCenterFeature.geometry.coordinates[0]),
+            Number(offscreenCenterFeature.geometry.coordinates[1])
+          ],
+          hasCountryOfTheGadarenes: routeStopIds.has("country-of-the-gadarenes")
+        };
+      }, mapTestHookKey);
+    };
+
+    let routeStopTargets = await loadRouteStopTargets("jesus", "Jesus' journeys");
+    if (!routeStopTargets || routeStopTargets.routeStopCount < 1) {
+      routeStopTargets = await loadRouteStopTargets("paul-rome", "Paul's voyage to Rome");
+    }
+    if (!routeStopTargets || routeStopTargets.routeStopCount < 1 || !routeStopTargets.regular) {
+      throw new Error("Routes real-data check: could not find route-stop entries to verify details panel coverage.");
+    }
+
+    const routeStopSelectionTargets = [
+      routeStopTargets.regular,
+      routeStopTargets.disputed ?? routeStopTargets.regular
+    ];
+    for (const target of routeStopSelectionTargets) {
+      await clickRouteStopById(desktopPage, target.id, "route-stop");
+      await assertRouteStopPanelContents(target);
+      await desktopPage.getByRole("button", { name: "Close" }).click();
+      await desktopPage.getByRole("heading", { name: /journey|journeys/u }).first().waitFor({ timeout: 30_000 });
+
+      await desktopPage
+        .locator("section[aria-label='Route details'] [data-route-stage-index] button")
+        .filter({ hasText: target.name })
+        .first()
+        .click();
+      await assertRouteStopPanelContents(target);
+      await desktopPage.getByRole("button", { name: "Close" }).click();
+      await desktopPage.getByRole("heading", { name: /journey|journeys/u }).first().waitFor({ timeout: 30_000 });
+    }
+
+    const offscreenStopTarget = routeStopTargets.disputed ?? routeStopTargets.regular;
+    const offscreenProbeCenterCoordinates = await desktopPage.evaluate(
+      async ({ testHook, targetStopId }) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        const pointsSource = map.getSource("ibm-route-points");
+        const pointsData =
+          pointsSource && typeof pointsSource.getData === "function"
+            ? await pointsSource.getData()
+            : null;
+        const otherStop = (pointsData?.features ?? []).find((feature) => {
+          const properties = feature?.properties ?? {};
+          const coordinates = feature?.geometry?.coordinates;
+          return (
+            properties.kind === "stop" &&
+            properties.stopKind === "route-stop" &&
+            properties.stopId !== targetStopId &&
+            Array.isArray(coordinates) &&
+            coordinates.length >= 2
+          );
+        });
+        if (!otherStop) {
+          return null;
+        }
+        return [Number(otherStop.geometry.coordinates[0]), Number(otherStop.geometry.coordinates[1])];
+      },
+      { testHook: mapTestHookKey, targetStopId: offscreenStopTarget.id }
+    );
+    const stopEntryPanCheckBefore = await desktopPage.evaluate(
+      async ({ testHook, centerCoordinates }) => {
+        const map = window[testHook];
+        if (!map || !Array.isArray(centerCoordinates) || centerCoordinates.length < 2) {
+          return null;
+        }
+        map.jumpTo({ center: centerCoordinates, zoom: 10.9 });
+        await new Promise((resolve) => map.once("idle", resolve));
+        const center = map.getCenter();
+        return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+      },
+      { testHook: mapTestHookKey, centerCoordinates: offscreenProbeCenterCoordinates }
+    );
+    await desktopPage
+      .locator("section[aria-label='Route details'] [data-route-stage-index] button")
+      .filter({ hasText: offscreenStopTarget.name })
+      .first()
+      .click();
+    await desktopPage.getByRole("heading", { level: 1, name: offscreenStopTarget.name }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(450);
+    const stopEntryPanCheckAfter = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!stopEntryPanCheckBefore || !stopEntryPanCheckAfter) {
+      throw new Error("Routes real-data check: could not inspect camera for stop-entry off-screen pan.");
+    }
+    if (Math.abs(stopEntryPanCheckAfter.zoom - stopEntryPanCheckBefore.zoom) > 0.02) {
+      throw new Error(
+        `Routes real-data check: selecting stop entry from stage list changed zoom (${JSON.stringify({
+          before: stopEntryPanCheckBefore,
+          after: stopEntryPanCheckAfter
+        })}).`
+      );
+    }
+    if (
+      Math.abs(stopEntryPanCheckAfter.center[0] - stopEntryPanCheckBefore.center[0]) < 0.2 &&
+      Math.abs(stopEntryPanCheckAfter.center[1] - stopEntryPanCheckBefore.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes real-data check: selecting off-screen stop entry did not pan (${JSON.stringify({
+          before: stopEntryPanCheckBefore,
+          after: stopEntryPanCheckAfter,
+          target: offscreenStopTarget
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "Close" }).click();
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-2`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
 
     await clickRouteStopById(desktopPage, "corinth");
     await desktopPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });

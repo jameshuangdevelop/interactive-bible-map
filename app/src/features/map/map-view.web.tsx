@@ -697,13 +697,12 @@ function panSelectionIfOffScreen(
     return;
   }
 
-  const projected = map.project(targetCoordinates as LngLatLike);
-  const minX = leftInset + 40;
-  const maxX = (typeof window === "undefined" ? 1440 : window.innerWidth) - 40;
-  const minY = 56;
-  const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - bottomInset - 40;
-  const offScreen = projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
-  if (!offScreen) {
+  if (
+    !isPointOffScreen(map, targetCoordinates, {
+      leftInset,
+      bottomInset
+    })
+  ) {
     return;
   }
 
@@ -712,6 +711,19 @@ function panSelectionIfOffScreen(
     zoom: map.getZoom(),
     duration: prefersReducedMotion() ? 0 : durationMs
   });
+}
+
+function isPointOffScreen(
+  map: MapLibreMap,
+  coordinates: Coordinates,
+  insets: { leftInset: number; bottomInset: number }
+) {
+  const projected = map.project(coordinates as LngLatLike);
+  const minX = insets.leftInset + 40;
+  const maxX = (typeof window === "undefined" ? 1440 : window.innerWidth) - 40;
+  const minY = 56;
+  const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - insets.bottomInset - 40;
+  return projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
 }
 
 function getMapLabelPadding(leftInset: number, bottomInset: number) {
@@ -3179,7 +3191,8 @@ export function MapView({
   ancientLayerRetryToken,
   routesOverlay,
   routeKeyboardEntries,
-  routeKeyboardPlaceIds,
+  selectedRouteStopFocusKey,
+  selectedRouteStopCoordinates,
   routeOverlayHiddenPlaceIdsKey,
   onSelectRouteMapEntry,
   onAncientLayerLoadStateChange,
@@ -3231,6 +3244,7 @@ export function MapView({
   const routesModeEnabledRef = useRef(false);
   const previousRouteFocusKeyRef = useRef<string | null>(null);
   const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
+  const previousSelectedRouteStopFocusKeyRef = useRef<string | null>(null);
   const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
   const preservedCameraRef = useRef<{
     center: [number, number];
@@ -4866,13 +4880,12 @@ export function MapView({
       return;
     }
 
-    const projected = map.project(routesOverlay.selectedStageCenter as LngLatLike);
-    const minX = panelInset + 40;
-    const maxX = (typeof window === "undefined" ? 1440 : window.innerWidth) - 40;
-    const minY = 56;
-    const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - bottomInset - 40;
-    const offScreen = projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
-    if (!offScreen) {
+    if (
+      !isPointOffScreen(map, routesOverlay.selectedStageCenter, {
+        leftInset: panelInset,
+        bottomInset
+      })
+    ) {
       previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
       return;
     }
@@ -4884,6 +4897,46 @@ export function MapView({
     });
     previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
   }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs, styleReadyVersion]);
+
+  useEffect(() => {
+    if (!routesModeEnabled || !selectedRouteStopFocusKey || !selectedRouteStopCoordinates) {
+      previousSelectedRouteStopFocusKeyRef.current = null;
+      return;
+    }
+
+    if (previousSelectedRouteStopFocusKeyRef.current === selectedRouteStopFocusKey) {
+      return;
+    }
+
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+
+    previousSelectedRouteStopFocusKeyRef.current = selectedRouteStopFocusKey;
+    if (
+      !isPointOffScreen(map, selectedRouteStopCoordinates, {
+        leftInset: panelInset,
+        bottomInset
+      })
+    ) {
+      return;
+    }
+
+    map.easeTo({
+      center: selectedRouteStopCoordinates,
+      zoom: map.getZoom(),
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
+    });
+  }, [
+    bottomInset,
+    panelInset,
+    routesModeEnabled,
+    runtimeTuning.controlZoomDurationMs,
+    selectedRouteStopCoordinates,
+    selectedRouteStopFocusKey,
+    styleReadyVersion
+  ]);
 
   const resetView = useCallback(() => {
     const map = mapRef.current;
@@ -4943,18 +4996,7 @@ export function MapView({
     routeAttributionOverlayInset
   );
   const compactAttributionRightOffset = 72;
-  const filteredVisibleEntries = useMemo(
-    () =>
-      routesModeEnabled
-        ? visibleEntries.filter((entry) => {
-            if (entry.kind !== "place") {
-              return true;
-            }
-            return !routeKeyboardPlaceIds.includes(entry.selection.placeId);
-          })
-        : visibleEntries,
-    [routeKeyboardPlaceIds, routesModeEnabled, visibleEntries]
-  );
+  const filteredVisibleEntries = visibleEntries;
   const visiblePlacesList = (
     <div
       aria-label="Visible places on map"
