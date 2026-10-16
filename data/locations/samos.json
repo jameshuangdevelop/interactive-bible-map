@@ -1,0 +1,99 @@
+{
+  "id": "samos",
+  "names": {
+    "ancient": [
+      "Samos"
+    ],
+    "modern": "Samos",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Samos (island)",
+      "coordinates": [
+        26.8333,
+        37.75
+      ],
+      "coordinateSource": "wikidata:Q156882",
+      "confidence": "high",
+      "support": "An Aegean island between Ephesus and Miletus, joined to the Roman province of Asia. Pleiades, OpenBible.info and Wikidata agree on the island, which keeps the name Samos today.",
+      "sources": [
+        "pleiades:599926",
+        "openbible:samos",
+        "wikidata:Q156882",
+        "bib:isbe-samos"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Samos is a mountainous Aegean island lying at the mouth of the bay of Ephesus, between Ephesus and Miletus, separated from the Asia Minor mainland by the narrow strait where the Greeks defeated the Persian fleet at the battle of Mycale in 479 BC. Acts records that on his return from his third missionary journey, Paul's ship touched at Samos after passing opposite Chios, and stayed at Trogyllium before arriving at Miletus.",
+    "sources": [
+      "pleiades:599926",
+      "openbible:samos",
+      "wikidata:Q156882",
+      "bib:isbe-samos",
+      "scripture:Acts 20:15"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Samos reached its height of prosperity under the sixth-century BC tyrant Polycrates, who made himself master of the Aegean Sea and traded with Egypt; the encyclopedia also notes that the Apocrypha's first book of Maccabees names Samos among the places a Roman consul wrote to on behalf of the Jews.",
+      "sources": [
+        "bib:isbe-samos"
+      ]
+    },
+    {
+      "text": "The encyclopedia records that Samos was joined to the Roman province of Asia in 84 BC, but in 17 BC the emperor Augustus granted it the privileged status of a free city (civitas libera); both the Roman general Marcus Agrippa and King Herod the Great are recorded as having visited the island and bestowed benefits on it. The Roman biographer Suetonius separately records that the emperor Vespasian later made a province of Samos along with Achaia, Lycia, Rhodes and Byzantium, taking away the freedom each had held.",
+      "sources": [
+        "bib:isbe-samos",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 20:15",
+      "book": "Acts",
+      "textWEB": "PLACEHOLDER"
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -84,
+      "toYear": -17,
+      "holderId": "asia-province",
+      "entity": "Joined to the Roman province of Asia",
+      "sources": [
+        "bib:isbe-samos"
+      ]
+    },
+    {
+      "fromYear": -17,
+      "toYear": 70,
+      "entity": "Free city (civitas libera, granted by the emperor Augustus)",
+      "sources": [
+        "bib:isbe-samos"
+      ]
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia (freedom withdrawn under the emperor Vespasian)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius lists Samos among the places Vespasian made provinces, \"taking away their freedom,\" without giving an exact year; this map uses the start of his reign, AD 70, as an approximate date."
+    }
+  ],
+  "status": "draft"
+}
