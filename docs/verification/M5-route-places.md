@@ -467,3 +467,67 @@ Fixes marked **content** come first in priority.
   - `npm test`: 331 tests, all pass.
   - All 30 `textWEB` strings match the WEB exactly.
   - Every candidate's coordinates are still the stop entries'. Only three support texts changed (Fair Havens, Lasea, Phoenix's Loutro), and one source was added (Lasea's `pleiades:589834`), each a justified improvement.
+
+### A8. Second re-check (`1dbfa82`, 2026-10-15)
+
+I re-checked `git diff 89f4c2a..1dbfa82` (`ae813a7`, `ab4eae8`, `c9265d4`, `4011011`, `1dbfa82`): fixes F32–F42 on the seven records, Three Taverns' new modern name, and the Research Lead's own change to Lycia's `parentId`. Where the text changed, I re-read:
+- the WEB;
+- Smith's "Cyrenaica" (the new entry `smith-dictionary-cyrenaica`);
+- Suetonius, *Vespasian* 8, and the Loeb notes to Tacitus, *Histories* 2;
+- ISBE "Lycia" and "Pisidia";
+- Pleiades 638965 and 423106.
+
+**Result: 5 more records pass and are now `verified`:** `sidon`, `myra`, `lasea`, `syrtis` and `adramyttium`. With the 9 verified in §A7, **14 of batch A's 15 places are verified.** Three Taverns' new modern name also passes; that record stays `verified`. Two records still need small fixes, so batch A isn't signed off yet:
+- `alexandria`: one citation (F43);
+- the new `lycia`: its parent (F44) and the order of one history entry (F45).
+
+#### F32–F42
+
+| Fix | Result |
+|---|---|
+| F32 (`sidon`) | **Closed.** The Isaiah 23 and Ezekiel 28 notes now say only what the passages say. Each ends: "Jesus also names Tyre and Sidon together, saying it will be 'more tolerable for Tyre and Sidon on the day of judgment' than for Chorazin and Bethsaida". The quote matches WEB Matthew 11:22, and the dependence claim is gone. |
+| F33 (`sidon`) | **Closed.**<ul><li>Joel 3:4-8: "his silver, gold and finest treasures" (3:5); "your sons and your daughters into the hands of the children of Judah", who sell them "to the men of Sheba, to a faraway nation" (3:8), both exact.</li><li>1 Kings 17:8-24: "During a drought" (17:14, "until the day that the LORD sends rain").</li></ul> |
+| F34 (`myra`) | **Closed.** The history now gives each source's own claim: Suetonius, that Vespasian made Lycia a province, "implying it had freedom again by his reign"; the Tacitus note, "Galatia, Pamphylia, and Lycia now formed one province" by AD 69. The record ends on that uncertainty. |
+| F35, F36 (`lasea`) | **Closed.** "Modern gazetteers place the two about 2 km apart", with no database named. The summary now cites ISBE "Phoenix" for Gortyna. |
+| F37 (`syrtis`) | **Closed.** Smith's "Cyrenaica" is cited: "On the W. the boundary was fixed, after long disputes, at the bottom of the Great Syrtis", with the shore washed "on the W. by the Greater Syrtis". The history and the political note now put the gulf at the boundary between Africa and Cyrenaica, and ISBE "Syrtis" again supports "a sailing hazard". The new entry is complete, its URL answers, and the 1854 text is public domain, already covered in `docs/LICENSES.md` and `ATTRIBUTION.md`. |
+| F38 (`alexandria`) | **Follow-up F43.** "Grain" now describes only the Myra ship, and Acts 27:38 is cited. |
+| F39 (`adramyttium`) | **Closed.** Acts 27:38 ("throwing out the wheat into the sea") is cited for the grain ship. |
+| F40 (`lycia`) | **Closed.** Pleiades 638965's own words, "a region of southwestern Asia Minor", are cited in the summary and on the candidate. That gives the label point its second source: Pleiades' point is 31.0 km from Wikidata's. |
+| F41 (`lycia`) | **Partly closed.** The AD 43–74 uncertainty is now stated, in the same terms as Myra's history. The parent and the order of the entry are F44 and F45. |
+| F42 (`lycia`) | **Closed.** "Patara, Myra and Phaselis as being of interest to Bible students" (ISBE). |
+| Three Taverns, `names.modern` | **Passes.** "Near Cisterna", from Pleiades 423106's `details` field ("The Barrington Atlas Directory notes: near Cisterna"); the record already cites `pleiades:423106`. |
+
+#### Lycia's parent: `pamphylia` doesn't fit; `galatia` is right
+The sources do support the history's sentence: Dio (60.17.3) does say the Lycians were incorporated "in the prefecture of Pamphylia". But `parentId` follows the house rule, and this choice breaks it:
+- **The house rule.** `schema/README.md` ("Ancient area hierarchy") says: "a place points to the smallest containing area, that area points to its province, and the province points to the empire". The panel shows the chain as "`Type · Province · Empire`".
+- **The house practice.** Every other region record points to a province (9: `crete`, `galilee`, `judea`, `libya`, `lycaonia`, `mysia`, `pamphylia`, `pisidia`, `samaria`) or to an empire (5). `lycia` → `pamphylia` is the dataset's only region-to-region link.
+- **What the `pamphylia` record is.** It is the geographic region: "a narrow, fertile coastal plain in southern Asia Minor", with its own label point. It isn't the AD 43 administrative district that Dio says took in the Lycians.
+- **The timeline.** It draws Lycia and Pamphylia as separate areas throughout. Pamphylia's area is "Status uncertain (Roman-side)" from 4 BC and Lycia's from AD 43, both until AD 74, when they become the joint province.
+- **The panel.** With this parent, Lycia's header would read "Region · Pamphylia · Roman Empire", and Pamphylia's "Places in Pamphylia" would list Lycia beside Perga. Acts 27:5 itself sets the two apart: "the sea which is off Cilicia and Pamphylia … Myra, a city of Lycia".
+- **The right parent is `galatia`, the province:**
+  - `pamphylia.json` already applies the house convention to the same uncertainty: "this project treats Pamphylia as part of Galatia at about AD 50".
+  - Dio puts the Lycians in Pamphylia's district in AD 43.
+  - The Tacitus note has "Galatia, Pamphylia, and Lycia" as "one province" by AD 69.
+
+  So Lycia sits in Galatia at about AD 50 by the same reasoning, as Pisidia and Lycaonia do. Myra stays under `lycia`, and Patara (batch B) will too.
+
+#### Still needed
+- **F43 (citations), `data/locations/alexandria.json`, `summary`:** "the grain ship, according to the International Standard Bible Encyclopedia, that Paul's centurion found at Myra". The only ISBE article the summary cites, "Alexandria", doesn't say it; ISBE "Myra" does ("Paul found a grain ship from Alexandria"). Add `bib:isbe-myra` to `summary.sources`, or drop "according to the International Standard Bible Encyclopedia", since Acts 27:38 now supports the grain.
+- **F44 (content), `data/locations/lycia.json`, `parentId` and `history[2]`:**
+  - Set `parentId` back to `galatia`, for the reasons above.
+  - Replace "this map accordingly places Lycia under Pamphylia at about AD 50" with the map's actual placement and its reason. For example: "As for Pamphylia, this map places Lycia in the province of Galatia at about AD 50."
+- **F45 (wording), `data/locations/lycia.json`, `history[2]`:** the entry ends with a content sentence ("Lycia was joined with Pamphylia as a single province by AD 74"), after the caveat. Give the AD 74 union with the main content (ISBE "Pisidia": "the new double province Lycia-Pamphylia" of 74 AD). Then end with the uncertainty and the map's placement (ADR-0041 item 1).
+
+**For the research note (docs only):**
+- the 1 Kings note says "famine" is in 17:1 and 17:7; it isn't, it's in 18:2 and Luke 4:25;
+- "the waters of the greater Syrtis washed its shore" is in quotation marks but isn't Smith's wording ("on the W. by the Greater Syrtis");
+- Lasea's summary never cited `bib:isbe-crete`.
+
+#### Status and checks
+- **Status:** `sidon`, `myra`, `lasea`, `syrtis` and `adramyttium` are now `verified`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-10-15"` (`2ff0a06`). `alexandria` and `lycia` stay `draft`.
+- **Checks** (Node 24.21.0, on `1dbfa82`):
+  - `npm run validate:data`: passed, 203 warnings, none in these records. It passed again after the status change.
+  - `npm run check:route-lines`: byte for byte, 71 lines, 0 failing.
+  - `npm test`: 331 tests, all pass.
+  - All 30 `textWEB` strings match the WEB exactly.
+  - No candidate's label, coordinates, source or confidence changed.
