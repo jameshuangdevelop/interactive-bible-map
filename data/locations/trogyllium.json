@@ -27,7 +27,7 @@
       ],
       "coordinateSource": "openbible:trogyllium",
       "confidence": "high",
-      "support": "A promontory on the Asia Minor coast opposite Samos, extending from the Mycale mountains, with an anchorage. Pleiades, OpenBible.info and Wikidata agree on the site, which Pleiades identifies as today's Dip Burun. Several early manuscripts omit the clause naming it in Acts 20:15; see the route's note.",
+      "support": "A promontory on the Asia Minor coast opposite Samos, extending from the Mycale mountains, with an anchorage. Pleiades, OpenBible.info and Wikidata agree on the site, which Pleiades identifies as today's Dip Burun.",
       "sources": [
         "pleiades:599991",
         "openbible:trogyllium",
@@ -37,7 +37,7 @@
     }
   ],
   "summary": {
-    "text": "Trogyllium is a promontory on the Asia Minor coast, projecting from the Mycale mountains toward the island of Samos across a strait less than a mile wide, where the battle of Mycale was fought in 479 BC. Many manuscripts of Acts record that Paul's ship stayed at Trogyllium between touching at Samos and arriving at Miletus, though some early manuscripts omit this detail.",
+    "text": "Trogyllium is a promontory on the Asia Minor coast, projecting from the Mycale mountains toward the island of Samos across a strait less than a mile wide, where the battle of Mycale was fought in 479 BC. Acts, in the text the WEB follows, records that Paul's ship stayed at Trogyllium between touching at Samos and arriving at Miletus; the International Standard Bible Encyclopedia notes that several early manuscripts omit this detail.",
     "sources": [
       "pleiades:599991",
       "openbible:trogyllium",

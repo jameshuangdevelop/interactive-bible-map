@@ -14,7 +14,7 @@
     "otherLanguages": []
   },
   "type": "natural-feature",
-  "zoomTier": "city",
+  "zoomTier": "region",
   "prominence": "standard",
   "parentId": "asia",
   "candidates": [
@@ -37,7 +37,7 @@
     }
   ],
   "summary": {
-    "text": "Chios is an Aegean island south of Lesbos and close to the Asia Minor mainland, known in antiquity for its wine, its marble and its skilled storytellers; a site on the island was pointed out as the place where Homer once gathered his pupils. Acts records that on his voyage from Assos toward Jerusalem, Paul's ship came the following day opposite Chios, apparently anchoring overnight on the Asian coast across from the island before sailing on toward Samos.",
+    "text": "Chios is an Aegean island south of Lesbos and close to the Asia Minor mainland, known in antiquity for its blue marble, its fine potter's clay and its skilled storytellers; a site on the island was pointed out as the place where Homer once gathered his pupils. Acts records that on his voyage from Assos toward Jerusalem, Paul's ship came the following day opposite Chios; the International Standard Bible Encyclopedia reads this as more probably meaning that, because of the dark moon, the ship lay at anchor for the night on the Asian coast across from the island, before sailing on toward Samos.",
     "sources": [
       "pleiades:550496",
       "pleiades:550497",
@@ -49,7 +49,7 @@
   },
   "history": [
     {
-      "text": "The first-century Jewish historian Josephus records that King Herod the Great, sailing to join the Roman general Marcus Agrippa on a campaign toward the Bosphorus, was held up for several days at Chios by a north wind; while there, Herod gave the people generous gifts, including enough money to finish rebuilding a large stoa that had been destroyed in the Mithridatic War and had proved too costly for the city to restore on its own. The International Standard Bible Encyclopedia records the same visit.",
+      "text": "The first-century Jewish historian Josephus records that King Herod the Great, sailing to join the Roman general Marcus Agrippa on a campaign toward the Bosphorus, was held up for several days at Chios by a north wind; while there, Herod gave the people generous gifts, including enough money to finish rebuilding a large stoa that had been destroyed in the Mithridatic War and, in his own words, \"was it not so easy to rebuild that as it was the rest.\" The International Standard Bible Encyclopedia records the same visit.",
       "sources": [
         "bib:josephus-antiquities",
         "bib:isbe-chios"

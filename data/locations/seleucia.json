@@ -43,14 +43,16 @@
       "wikidata:Q1605894",
       "bib:isbe-seleucia",
       "scripture:Acts 13:4",
+      "scripture:Acts 14:25",
       "scripture:Acts 14:26"
     ]
   },
   "history": [
     {
-      "text": "The International Standard Bible Encyclopedia reports that Seleucia was one of four sister cities its founder built, called the Syrian Tetrapolis together with Apamea, Laodicea and Antioch, and that it was considered impregnable, protected by the mountain on one side and strongly fortified on the other sides. The Roman general Pompey made it a free city in 64 BC as a reward for its resistance to the Armenian king Tigranes, after which it flourished under Roman rule.",
+      "text": "The International Standard Bible Encyclopedia reports that Seleucia was one of what it calls the Syrian Tetrapolis, with Apamea, Laodicea and Antioch, and that it was considered impregnable, protected by the mountain on one side and strongly fortified on the other sides. The Roman writer Strabo gives the same four cities, all founded by the Seleucid king Seleucus Nicator, and records that they \"used to be called sisters, because of their concord with one another.\" The Roman general Pompey made Seleucia a free city in 64 BC as a reward for its resistance to the Armenian king Tigranes, after which it flourished under Roman rule.",
       "sources": [
-        "bib:isbe-seleucia"
+        "bib:isbe-seleucia",
+        "bib:strabo-geography"
       ]
     },
     {

@@ -12,7 +12,7 @@
     "otherLanguages": []
   },
   "type": "natural-feature",
-  "zoomTier": "city",
+  "zoomTier": "region",
   "prominence": "standard",
   "parentId": "asia",
   "candidates": [
@@ -51,9 +51,10 @@
       ]
     },
     {
-      "text": "The encyclopedia records that Samos was joined to the Roman province of Asia in 84 BC, but in 17 BC the emperor Augustus granted it the privileged status of a free city (civitas libera); both the Roman general Marcus Agrippa and King Herod the Great are recorded as having visited the island and bestowed benefits on it. The Roman biographer Suetonius separately records that the emperor Vespasian later made a province of Samos along with Achaia, Lycia, Rhodes and Byzantium, taking away the freedom each had held.",
+      "text": "The encyclopedia records that Samos was joined to the Roman province of Asia in 84 BC; both the Roman general Marcus Agrippa and King Herod the Great are recorded as having visited the island and bestowed benefits on it. The Roman historian Cassius Dio records that the emperor Augustus, wintering on Samos for a second time, \"gave the islanders their freedom\" in recognition of his stay, an event Dio places in 20 BC; the encyclopedia separately dates this grant of free-city status (civitas libera) to 17 BC. The Roman biographer Suetonius records that the emperor Vespasian later made a province of Samos along with Achaia, Lycia, Rhodes and Byzantium, taking away the freedom each had held.",
       "sources": [
         "bib:isbe-samos",
+        "bib:cassius-dio-roman-history",
         "bib:suetonius-twelve-caesars"
       ]
     }
@@ -69,7 +70,7 @@
   "politicalHistory": [
     {
       "fromYear": -84,
-      "toYear": -17,
+      "toYear": -20,
       "holderId": "asia-province",
       "entity": "Joined to the Roman province of Asia",
       "sources": [
@@ -77,22 +78,35 @@
       ]
     },
     {
-      "fromYear": -17,
+      "fromYear": -20,
       "toYear": 70,
       "entity": "Free city (civitas libera, granted by the emperor Augustus)",
       "sources": [
+        "bib:cassius-dio-roman-history",
         "bib:isbe-samos"
-      ]
+      ],
+      "note": "The Roman historian Cassius Dio records that Augustus, wintering on Samos for a second time, \"gave the islanders their freedom\" in recognition of his stay, an event he places in 20 BC; the International Standard Bible Encyclopedia separately dates this grant to 17 BC."
     },
     {
       "fromYear": 70,
+      "toYear": 79,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor until his death in 79, when it is a province again."
+    },
+    {
+      "fromYear": 79,
       "toYear": 101,
       "holderId": "asia-province",
       "entity": "Roman province of Asia (freedom withdrawn under the emperor Vespasian)",
       "sources": [
-        "bib:suetonius-twelve-caesars"
+        "bib:suetonius-twelve-caesars",
+        "bib:isbe-asia"
       ],
-      "note": "The Roman biographer Suetonius lists Samos among the places Vespasian made provinces, \"taking away their freedom,\" without giving an exact year; this map uses the start of his reign, AD 70, as an approximate date."
+      "note": "The encyclopedia's article on the province of Asia names Samos among the islands \"apparently\" within its bounds."
     }
   ],
   "status": "draft"

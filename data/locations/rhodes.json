@@ -42,6 +42,7 @@
       "openbible:rhodes-1",
       "wikidata:Q188731",
       "bib:isbe-rhodes",
+      "bib:isbe-cos",
       "scripture:Acts 21:1"
     ]
   },
@@ -53,13 +54,13 @@
       ]
     },
     {
-      "text": "The encyclopedia records that the island's three oldest cities, Lindus, Ialysus and Camirus, joined with Cos, Cnidus and Halicarnassus to form the Dorian Hexapolis, and that the three Rhodian cities founded the new capital of Rhodes by uniting in 408 BC. Rhodes became a loyal ally of Rome after Rome's defeat of the Seleucid king Antiochus in 189 BC, and was rewarded with the Carian coast, though by 168 BC Rome had taken back most of that territory.",
+      "text": "The encyclopedia records that Lindus, Ialysus and Camirus, three chief cities of the island, joined with Cos, Cnidus and Halicarnassus to form the Dorian Hexapolis, and that these three Rhodian cities founded the new capital of Rhodes by uniting in 408 BC. Rhodes became a loyal ally of Rome after Rome's defeat of the Seleucid king Antiochus in 189 BC and, as a reward for her loyalty, received Caria; by 168 BC, however, only a small portion of this territory remained under Rhodian sway.",
       "sources": [
         "bib:isbe-rhodes"
       ]
     },
     {
-      "text": "The Roman historian Cassius Dio records that in AD 44 the emperor Claudius deprived the Rhodians of their liberty because they had impaled some Roman citizens, a loss of freedom the International Standard Bible Encyclopedia likewise dates to that year, describing Rhodes as thereafter part of the Roman province of Asia. The Roman historian Tacitus records that in AD 53 the Rhodians recovered their liberty, noting that it had been \"so often forfeited or confirmed as the balance varied between their military services abroad or their seditious offences at home.\" The Roman biographer Suetonius records that the emperor Vespasian later made a province of Rhodes, along with Lycia, Byzantium, Achaia and Samos, taking away the freedom each had held; Suetonius gives no exact year for this, so this map uses the start of Vespasian's reign, AD 70, as an approximate date.",
+      "text": "The Roman historian Cassius Dio records that in AD 44 the emperor Claudius deprived the Rhodians of their liberty because they had impaled some Romans, a loss of freedom the International Standard Bible Encyclopedia likewise dates to that year, describing Rhodes as thereafter part of the Roman province of Asia. The Roman historian Tacitus records that in AD 53 the sixteen-year-old Nero, newly married to the emperor Claudius's daughter Octavia, successfully advocated for several favors including the restoring of the Rhodians' liberty, which Tacitus notes had been \"so often forfeited or confirmed as the balance varied between their military services abroad or their seditious offences at home.\" The Roman biographer Suetonius records that the emperor Vespasian later made a province of Rhodes, along with Lycia, Byzantium, Achaia and Samos, taking away the freedom each had held; Suetonius gives no exact year for this, so this map treats Rhodes's status as uncertain from Vespasian's first full year as emperor, AD 70, onward, since no cited source identifies what province, if any, Rhodes belonged to afterward.",
       "sources": [
         "bib:cassius-dio-roman-history",
         "bib:isbe-rhodes",
@@ -82,10 +83,10 @@
       "toYear": 44,
       "entity": "Free Greek state, allied with Rome",
       "sources": [
-        "bib:suetonius-twelve-caesars",
+        "bib:cassius-dio-roman-history",
         "bib:isbe-rhodes"
       ],
-      "note": "Suetonius lists Rhodes among the places that still held their freedom before the emperor Vespasian's reign, and the International Standard Bible Encyclopedia dates Rhodes becoming part of the province of Asia only to AD 44."
+      "note": "The International Standard Bible Encyclopedia describes Rhodes as the faithful ally of Rome from 189 BC and dates Rhodes's incorporation into the province of Asia to AD 44, when, as the Roman historian Cassius Dio records, the emperor Claudius deprived the Rhodians of their liberty because they had impaled some Romans."
     },
     {
       "fromYear": 44,
@@ -96,26 +97,26 @@
         "bib:cassius-dio-roman-history",
         "bib:isbe-rhodes"
       ],
-      "note": "The Roman historian Cassius Dio (60.24.4) records that Claudius deprived the Rhodians of their liberty for impaling Roman citizens; the encyclopedia independently dates the same change to AD 44."
+      "note": "The Roman historian Cassius Dio (60.24.4) records that Claudius deprived the Rhodians of their liberty for impaling some Romans; the encyclopedia also dates the same change to AD 44."
     },
     {
       "fromYear": 53,
       "toYear": 70,
-      "entity": "Free city (liberty restored by the emperor Nero)",
+      "entity": "Free city (liberty restored under the emperor Claudius, at the plea of the young Nero)",
       "sources": [
         "bib:tacitus-annals"
       ],
-      "note": "The Roman historian Tacitus (Annals 12.58) records that the Rhodians recovered their liberties in AD 53."
+      "note": "The Roman historian Tacitus (Annals 12.58) records that in the consulship of Decimus Junius and Quintus Haterius (AD 53), the sixteen-year-old Nero, son-in-law of the reigning emperor Claudius, successfully advocated for the Rhodians to recover their liberties."
     },
     {
       "fromYear": 70,
       "toYear": 101,
-      "holderId": "asia-province",
-      "entity": "Roman province of Asia (freedom withdrawn under the emperor Vespasian)",
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
       "sources": [
         "bib:suetonius-twelve-caesars"
       ],
-      "note": "Suetonius does not give an exact year for Vespasian's action; this map uses the start of his reign, AD 70, as an approximate date."
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor onward; unlike Samos, no cited source names the province Rhodes belonged to afterward."
     }
   ],
   "status": "draft"
