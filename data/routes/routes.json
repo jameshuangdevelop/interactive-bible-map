@@ -37,8 +37,8 @@
             "locationId": "antioch-syria"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "seleucia"
+            "kind": "location",
+            "locationId": "seleucia"
           },
           "scripture": [
             {
@@ -56,8 +56,8 @@
         {
           "id": "stage-02",
           "from": {
-            "kind": "route-stop",
-            "stopId": "seleucia"
+            "kind": "location",
+            "locationId": "seleucia"
           },
           "to": {
             "kind": "location",
@@ -355,8 +355,8 @@
             "locationId": "perga"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "attalia"
+            "kind": "location",
+            "locationId": "attalia"
           },
           "scripture": [
             {
@@ -374,8 +374,8 @@
         {
           "id": "stage-14",
           "from": {
-            "kind": "route-stop",
-            "stopId": "attalia"
+            "kind": "location",
+            "locationId": "attalia"
           },
           "to": {
             "kind": "location",
@@ -573,8 +573,8 @@
             "locationId": "troas"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "samothrace"
+            "kind": "location",
+            "locationId": "samothrace"
           },
           "scripture": [
             {
@@ -592,8 +592,8 @@
         {
           "id": "stage-05",
           "from": {
-            "kind": "route-stop",
-            "stopId": "samothrace"
+            "kind": "location",
+            "locationId": "samothrace"
           },
           "to": {
             "kind": "location",
@@ -647,12 +647,12 @@
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "amphipolis"
+              "kind": "location",
+              "locationId": "amphipolis"
             },
             {
-              "kind": "route-stop",
-              "stopId": "apollonia-macedonia"
+              "kind": "location",
+              "locationId": "apollonia-macedonia"
             }
           ],
           "scripture": [
@@ -1061,8 +1061,8 @@
             "locationId": "troas"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "assos"
+            "kind": "location",
+            "locationId": "assos"
           },
           "scripture": [
             {
@@ -1080,12 +1080,12 @@
         {
           "id": "stage-05",
           "from": {
-            "kind": "route-stop",
-            "stopId": "assos"
+            "kind": "location",
+            "locationId": "assos"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "mitylene"
+            "kind": "location",
+            "locationId": "mitylene"
           },
           "scripture": [
             {
@@ -1103,17 +1103,17 @@
         {
           "id": "stage-06",
           "from": {
-            "kind": "route-stop",
-            "stopId": "mitylene"
+            "kind": "location",
+            "locationId": "mitylene"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "samos"
+            "kind": "location",
+            "locationId": "samos"
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "chios"
+              "kind": "location",
+              "locationId": "chios"
             }
           ],
           "scripture": [
@@ -1132,12 +1132,12 @@
         {
           "id": "stage-07",
           "from": {
-            "kind": "route-stop",
-            "stopId": "samos"
+            "kind": "location",
+            "locationId": "samos"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "trogyllium"
+            "kind": "location",
+            "locationId": "trogyllium"
           },
           "scripture": [
             {
@@ -1155,8 +1155,8 @@
         {
           "id": "stage-08",
           "from": {
-            "kind": "route-stop",
-            "stopId": "trogyllium"
+            "kind": "location",
+            "locationId": "trogyllium"
           },
           "to": {
             "kind": "location",
@@ -1182,8 +1182,8 @@
             "locationId": "miletus"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "cos"
+            "kind": "location",
+            "locationId": "cos"
           },
           "scripture": [
             {
@@ -1201,12 +1201,12 @@
         {
           "id": "stage-10",
           "from": {
-            "kind": "route-stop",
-            "stopId": "cos"
+            "kind": "location",
+            "locationId": "cos"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "rhodes"
+            "kind": "location",
+            "locationId": "rhodes"
           },
           "scripture": [
             {
@@ -1224,12 +1224,12 @@
         {
           "id": "stage-11",
           "from": {
-            "kind": "route-stop",
-            "stopId": "rhodes"
+            "kind": "location",
+            "locationId": "rhodes"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "patara"
+            "kind": "location",
+            "locationId": "patara"
           },
           "scripture": [
             {
@@ -1247,8 +1247,8 @@
         {
           "id": "stage-12",
           "from": {
-            "kind": "route-stop",
-            "stopId": "patara"
+            "kind": "location",
+            "locationId": "patara"
           },
           "to": {
             "kind": "location",
@@ -1286,8 +1286,8 @@
             "locationId": "tyre"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "ptolemais"
+            "kind": "location",
+            "locationId": "ptolemais"
           },
           "scripture": [
             {
@@ -1305,8 +1305,8 @@
         {
           "id": "stage-14",
           "from": {
-            "kind": "route-stop",
-            "stopId": "ptolemais"
+            "kind": "location",
+            "locationId": "ptolemais"
           },
           "to": {
             "kind": "location",

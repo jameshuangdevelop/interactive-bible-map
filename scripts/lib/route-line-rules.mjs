@@ -51,7 +51,7 @@ export const ISLAND_PASS_KM = 10;
 export const ISLAND_VIAS = new Set([
   "location:cyprus",
   "location:crete",
-  "route-stop:chios",
+  "location:chios",
   "location:cauda"
 ]);
 
