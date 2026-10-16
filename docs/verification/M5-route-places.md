@@ -996,3 +996,145 @@ Optional: adding "Gadarenes", "Gergesenes" and "Gerasenes" to `names.alternate` 
   - Samothrace's border reasoning has no source (F47).
   - Josephus doesn't say the city "could not afford" the stoa (F54).
   - "AD 70, the start of his reign" is wrong (F56).
+
+### C8. Re-check of the fix round (`0954a47`, 2026-10-16)
+
+I re-checked `git diff 4d3cb2f..0954a47`: the Research Lead's commits `897d3fc`, `563e63e`, `42a4174`, `204f449`, `07ba672`, `50366d6` and `0954a47`. The checks were:
+- F46–F74 on the 14 draft records;
+- your rulings: Q1, Bethphage's parent is `judea`; Q2, islands larger than Malta take region tier, by a sourced area figure; Q3, Samothrace follows the sources and the map; ruling 2, the Gadarenes' parent is `syria`;
+- the three items the Research Lead flagged;
+- the five new bibliography entries.
+
+I re-read the sources where the text changed:
+- ISBE "Acco", "Maccabaeus; Maccabees", "Talmud", "Gadara", "Gerasa", "Ephron (2)" and "Ephraim (2)";
+- Smith's *Geography*, "Samothrace";
+- the Louvre's entry for the Victory (Ma 2369) and its Terms of Use;
+- Wikidata's areas (P2046) for Chios, Samos, Kos, Samothrace and both Malta items (Q233, Q193896).
+
+**Result: 9 more records pass and are now `verified`:** `samothrace`, `amphipolis`, `apollonia-macedonia`, `mitylene`, `trogyllium`, `rhodes`, `patara`, `ptolemais` and `ephraim`. With `attalia`, `assos` and `cos` (§B2), **12 of the 17 are verified.**
+
+Five records still need changes: `seleucia`, `chios`, `samos`, `country-of-the-gadarenes` and `bethphage`. Cos also needs its tier changed. That's 8 fixes, F75–F82:
+- F75 needs your ruling (Q4);
+- F76–F81 are one-line wording fixes;
+- F82 is a tier.
+
+So batches B and C aren't signed off yet.
+
+#### F46–F74
+
+| Fix | Result |
+|---|---|
+| F46 (`seleucia`) | **Closed.** Strabo 16.2.4 is cited and quoted exactly ("used to be called sisters, because of their concord with one another"), and Acts 14:25 is cited. The new sentence calls Strabo "The Roman writer" (F80). |
+| F47 (`samothrace`) | **Closed** under your Q3 ruling: `parentId: "roman-empire"`, no political area, and one entry, "Free state under Roman rule" (4 BC–AD 101). It cites Smith's "In Pliny's time Samothrace was a free state", with the dating caveat in its note. It agrees with the map's `other-roman-lands`. |
+| F48 (`samothrace`) | **Closed.**<ul><li>"the seat of the god Poseidon" (ISBE).</li><li>The Louvre's dating comes first: "the early second century BC, possibly created at Rhodes", found at the Cabirion in 1863. The entry has "-200 / -175", "Rhodes (?)" and "1863 (Cabirion)".</li><li>ISBE's 300 BC view comes last, as "an older, since-revised view".</li></ul> |
+| F49 (`samothrace`) | **Closed.** The anchorage is now ISBE's; "King Philip of Macedon". |
+| F50 (`amphipolis`) | **Closed.** `bib:isbe-macedonia` is cited for "the Hellespont". |
+| F51 (`apollonia-macedonia`) | **Closed.** "may perhaps be attributed to about 432 BC"; "a day's journey from Amphipolis". |
+| F52 (`mitylene`) | **Closed.** Acts 20:15 is cited. |
+| F53 (`chios`) | **Closed.** "its blue marble, its fine potter's clay and its skilled storytellers" (ISBE: "beautiful blue marble", "excellent potter's clay", "skill in telling stories"). |
+| F54 (`chios`) | The anchorage is **closed**: it's now ISBE's reading, "because of the dark moon". The Josephus clause needs F79. |
+| F55 (`samos`) | **Closed.**<ul><li>Dio's 20 BC, with "gave the islanders their freedom" (54.9.7), is cited.</li><li>ISBE's 17 BC is in the entry's note.</li><li>The table runs −84 to −20, then −20 to 70.</li></ul>The 17 BC aside in `history[1]` sits mid-entry (F81). |
+| F56 (`samos`) | **Closed.** 70–79 is `uncertain-roman-side` with the timeline's Achaia note word for word. 79–101 is the province of Asia, citing ISBE "Asia" ("apparently"). |
+| F57 (`trogyllium`) | **Closed.** "Acts, in the text the WEB follows, records …; the International Standard Bible Encyclopedia notes that several early manuscripts omit this detail". The support's pointer is gone; the coordinates are unchanged. |
+| F58 (`rhodes`) | **Closed.** "three chief cities"; "received Caria; by 168 BC, however, only a small portion of this territory remained under Rhodian sway", matching ISBE. |
+| F59 (`rhodes`) | **Closed.** "liberty restored under the emperor Claudius, at the plea of the young Nero". The history and the note follow *Annals* 12.58 (AD 53, Nero "at the age of sixteen"). |
+| F60 (`rhodes`) | **Closed.** "Vespasian's first full year as emperor, AD 70", and one uncertain span to 101 (below). |
+| F61 (`rhodes`) | **Closed.**<ul><li>Dio 60.24.4 is cited for 4 BC–AD 44.</li><li>"some Romans"; "also dates".</li><li>`bib:isbe-cos` is cited for the third journey.</li></ul> |
+| F62 (`patara`) | **Closed.** `bib:isbe-cos` is cited. |
+| F63 (`ptolemais`) | **Closed.**<ul><li>The note now reads "the town the encyclopedia identifies with Ptolemais" and cites Judges 1:32 ("the Asherites lived among the Canaanites").</li><li>`history[0]` gives the renaming from ISBE "Acco" ("changed the name to PTOLEMAIS").</li></ul> |
+| F64 (`ptolemais`) | **Closed.** "the Maccabees, a Jewish family who defended Jewish rights and customs in the second century BC". ISBE "Maccabaeus; Maccabees" has "a celebrated family who defended Jewish rights and customs in the 2nd century BC". Samos gets the same introduction and now says "the book of 1 Maccabees" (my suggestion). |
+| F65 (`country-of-the-gadarenes`) | **Closed.** `parentId: "syria"` (ruling 2). |
+| F66 (`country-of-the-gadarenes`) | **Closed.**<ul><li>Kursi's table follows ISBE "Gadara": free city 63–30 BC, Herod 30–4 BC, Syria from 4 BC.</li><li>Each note says the attribution runs through Gadara's jurisdiction, "the country East of the Sea".</li><li>The last note says the map draws this shore with Philip's former lands as a simplification.</li></ul> |
+| F67 (`country-of-the-gadarenes`) | The year is **closed** (−63). The note's reason misstates ISBE "Gadara" (F78). |
+| F68 (`country-of-the-gadarenes`) | **Closed.**<ul><li>ISBE's readings: "country of the Gadarenes" at Matthew 8:28, "country of the Gerasenes" at Mark 5:1 and Luke 8:26, 37.</li><li>"no good reason to doubt the accuracy of either reading"; the two names explained.</li><li>Only the Textus Receptus "of the Gergesenes" is rejected.</li><li>The WEB verses are cited, and Westcott and Hort are introduced as ISBE "Gerasa" does.</li></ul> |
+| F69 (`country-of-the-gadarenes`) | **Mostly closed.**<ul><li>ISBE "Gadara" and "Gerasa" are cited.</li><li>Mark 5:2–3 and 5:11, and Luke 8:27, 8:30 and 8:32–33 are cited.</li><li>"My name is Legion, for we are many" is Mark's, with Luke's "Legion".</li><li>Pompey is introduced.</li></ul>"Nearby" stays (F77). |
+| F70 (`bethphage`) | **Closed.** Matthew's "a donkey tied, and a colt with her"; Mark and Luke "a single young animal" (11:2 "a young donkey"; 19:30 "a colt"). Both verses are cited. |
+| F71 (`bethphage`) | **Closed.**<ul><li>"near the road"; "for the final time" is gone.</li><li>Matthew 21:5 is quoted exactly.</li><li>"the Talmud, the collected body of early rabbinic teaching on Jewish law". ISBE "Talmud" has "now it means the Mishna with the discussions thereupon" and "the source whence the Jewish Law is to be derived".</li></ul>The new "ahead into the village" needs F76. |
+| F72 (`bethphage`) | Overtaken by your Q1 ruling; see item 1 below and F75. |
+| F73 (`ephraim`) | **Closed.**<ul><li>2 Samuel 13:23 is dropped.</li><li>Both notes now give ISBE "Ephron (2)"'s identity of Ophrah and Ephron ("thought by many") and their placing at et-Taiyibeh, with ISBE "Ephraim (2)"'s "probably" for John's town.</li><li>Joshua 18:21 is cited.</li></ul> |
+| F74 (`ephraim`) | **Closed.** "probably the village of et-Taiyibeh, which stands on a high hill …"; the Onomasticon is introduced as "a list of biblical place names". |
+
+#### The three items the Research Lead flagged
+
+1. **Bethphage's country doesn't fit ADR-0028.** With the parent now `judea`, the record says "Et-Tur (Kafr et-Tur)", with `modernCountries: ["West Bank"]`.
+   - **Et-Tur lies inside Jerusalem.** Wikidata Q2193088, the leading candidate's `coordinateSource`, has P131 Jerusalem (Q1218). The Mount of Olives, 0.49 km away, and Gethsemane carry no country.
+   - **ADR-0028's rule, approved by the human at CP3.5:** "Jerusalem and the places inside it … take no country: their modern name already says 'Jerusalem', which every reader can place, and its status is the most disputed of all."
+   - **Bethany isn't a precedent here.** ADR-0028 names Al-Eizariya itself as a West Bank example, because it lies outside Jerusalem; Bethphage's leading candidate doesn't. "West Bank" for an East Jerusalem neighbourhood takes the position the rule avoids.
+   - **The cause** is the validator: it exempts only "records whose parent chain includes jerusalem", so your Q1 ruling forces a country. Your choice, Q4 (F75).
+2. **Rhodes from AD 70 to 101 fits the sources.**
+   - Suetonius gives no year and names no province.
+   - ISBE "Rhodes" places Rhodes in Asia only from AD 44, before the restoration of 53, and ISBE "Asia" doesn't name Rhodes.
+   - Samos ends its uncertain span in 79 only because ISBE "Asia" names it. Rhodes has no such source, so one uncertain span is the honest reading. The text says so last.
+3. **The Louvre entry fits, and is more open than custodia.org.**
+   - **The text is openly licensed.** The Louvre's Terms of Use (https://collections.louvre.fr/en/page/cgu, article 4.1.2) put "the textual content of the entries" under the Etalab Open Licence, reusable "for commercial or other purposes". The Louvre calls that licence compatible with CC BY, so it is compatible with our CC BY-SA 4.0 data.
+   - **Credit:** it's due to "the Musée du Louvre" with "the date of the most recent update" (this entry: "Last updated on 08.04.2026"). The terms say a hypertext link satisfies this, and the `bib:` entry gives the author and the link. The record uses the entry's facts in its own words.
+   - **Photographs** are restricted (article 4.1.1), and none are used.
+   - The Research Lead's "short quotation" reading is article 4.2, which covers screen captures of the site, not the entries.
+   - I added rows to `docs/LICENSES.md` and `ATTRIBUTION.md`, and restored the entry's missing accents as typos ("Musée du Louvre", "Département des Antiquités grecques, étrusques et romaines").
+
+#### Island tiers (Q2)
+
+| Island | Area (Wikidata P2046) | Larger than Malta? | Tier | Result |
+|---|---|---|---|---|
+| Chios | 842.5 km² (Q160483) | Yes | region | **Pass** |
+| Samos | 476 km² (Q156882) | Yes | region | **Pass** |
+| Cos | 290.3 km² (Q187027) | Yes, than the island (246 km²); no, than the country (316 km²) | city | **F82** |
+| Samothrace | 178 km² (Q203175; its 184 km² claim is deprecated) | No | city | **Pass** |
+
+- **Which Malta figure:** the research note measures Malta by Q233, 316 km². My own Q2 gave the same figure, which was my error. Q233 is "country in Southern Europe situated on an archipelago": Malta with Gozo and Comino.
+- **The record is the island.** `malta.json`'s candidate is "Malta (island)", and its summary says "the Mediterranean island south of Sicily".
+- **The island's own figure:** Q193896, "island of Malta", gives 246 km² (P2046, with a reference).
+- Compared island to island, Cos is larger, so it takes region tier like Chios and Samos.
+
+#### New bibliography entries
+All five are complete, in the house format, and their URLs answer:
+- **`smith-dictionary-samothrace`:** like `smith-dictionary-cyrenaica`;
+- **`isbe-acco`:** byline H. Porter;
+- **`isbe-maccabees`:** "Maccabaeus; Maccabees", J. Hutchison;
+- **`isbe-talmud`:** Hermann L. Strack;
+- **`louvre-winged-victory`:** like `custodia-bethphage`.
+
+The four 1854 and 1915 texts are public domain, already covered in `docs/LICENSES.md` and `ATTRIBUTION.md`. The Louvre is covered above.
+
+#### F75–F82: what's still needed
+`data/locations/bethphage.json`
+- **F75 (content; needs your ruling, Q4), `names.modernCountries`:** "West Bank" conflicts with ADR-0028's Jerusalem rule (item 1 above).
+  - **(a) Recommended:** the GIS Engineer lets a record omit `modernCountries` when its modern site is inside Jerusalem, whatever its ancient parent (for example, with a flag). The Research Lead then restores "Et-Tur (Kafr et-Tur), Jerusalem", the verified stop's form.
+  - **(b)** Keep "West Bank" as an exception to a rule the human approved, which needs the human.
+- **F76 (wording), `summary`:** "sent two disciples ahead into the village". The Gospels have "the village that is opposite you" (Matthew 21:2; Mark 11:2) and "the village on the other side" (Luke 19:30). Straight after "they came to Bethphage", "the village" reads as Bethphage itself, which none of the three says. Say "into the village opposite them".
+
+`data/locations/country-of-the-gadarenes.json`
+- **F77 (wording), `summary`:** "a great herd of pigs feeding on the hillside nearby". Matthew 8:30 has "far away from them", so "nearby" takes Mark's and Luke's side. Drop "nearby" (the open part of F69).
+- **F78 (wording), `politicalHistory` (candidate 2), `note`:** "the year the encyclopedia's 'Gadara' article dates the Roman general Pompey's settlement of the free cities of this district". ISBE "Gadara" dates only Gadara's own restoration: "Pompey is said to have restored it, 63 BC … He gave it a free constitution". Say so, for example: "the year the encyclopedia's 'Gadara' article gives for Pompey's restoration of Gadara, so that the three candidates start together".
+
+`data/locations/chios.json`
+- **F79 (wording), `history[0]`:** "and, in his own words, 'was it not so easy to rebuild that as it was the rest.'"
+  - The words are Whiston's 1737 translation, not Josephus's own.
+  - Cut from "so was it not so easy to rebuild that as it was the rest", the clause reads as a question.
+  - Paraphrase it, for example: "…destroyed in the Mithridatic War, which Josephus says was not as easy to rebuild as the rest".
+
+`data/locations/seleucia.json`
+- **F80 (wording), `history[0]`:** "The Roman writer Strabo". Strabo was Greek. Eleven other mentions in the dataset say "the Greek geographer Strabo", and none calls him Roman. Use that.
+
+`data/locations/samos.json`
+- **F81 (wording), `history[1]`:** "the encyclopedia separately dates this grant of free-city status (civitas libera) to 17 BC" comes before the Suetonius sentence. Move it to the end of the entry, as F45 did for Lycia (ADR-0041 item 1).
+
+`data/locations/cos.json`
+- **F82 (tier), `zoomTier`:** set it to `"region"`, by your Q2 rule and the island of Malta's 246 km² (Q193896). Also correct the research note's Malta figure.
+  - `cos` stays `verified`: its content is unchanged and only its tier moves. I'll check the tier with F75–F81.
+  - If you meant the country's 316 km², Cos keeps city tier and F82 is void.
+
+#### Status and checks
+- **Status:** the nine records above are `verified`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-10-16"`. `seleucia`, `chios`, `samos`, `country-of-the-gadarenes` and `bethphage` stay `draft`.
+- **Checks** (Node 24.21.0, on `0954a47` and again after the status changes):
+  - `npm run validate:data`: passed, 0 errors, 207 warnings. The Gadarenes' 4, accepted in §C5, are the only ones in these 17 records.
+  - `npm run check:route-lines`: "Reproduced route lines byte-for-byte from an empty cache"; 71 lines, 0 failing.
+  - `npm test`: 331 tests, all pass.
+- **Unchanged:** no candidate's label, coordinates, source or confidence changed. Nothing in `data/routes/`, `scripts/`, `tests/` or `app/` changed in the fix round.
+
+#### Question for the PO
+- **Q4 (F75), Bethphage's country.**
+  - (a) A validator exemption for modern sites inside Jerusalem, with "Et-Tur (Kafr et-Tur), Jerusalem" and no country, as ADR-0028 intends.
+  - (b) "West Bank" as an exception, which needs the human.
+
+  I recommend (a). It's the GIS Engineer's change, then the Research Lead's.
