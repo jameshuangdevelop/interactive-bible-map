@@ -144,6 +144,10 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     note: "See each entry's `url` in `data/bibliography.json`."
   },
   {
+    name: "Musée du Louvre collections website: the entry for the Victory of Samothrace (Ma 2369)",
+    url: "https://collections.louvre.fr/en/ark:/53355/cl010252531"
+  },
+  {
     name: "Public-domain texts cited in `data/bibliography.json`: Loeb translations of Cassius Dio, Suetonius, Tacitus and Strabo (hosted on LacusCurtius), Josephus in Whiston's translation (hosted by CCEL), the *International Standard Bible Encyclopedia* (1915), Smith's *Dictionary of Greek and Roman Antiquities* (1875, hosted on LacusCurtius), the *Jewish Encyclopedia* (1906), and Smith's *Dictionary of Greek and Roman Geography* (1854, hosted on the Perseus Digital Library)",
     url: null,
     note: "See each entry's `url` in `data/bibliography.json`."
