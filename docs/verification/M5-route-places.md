@@ -1138,3 +1138,32 @@ The four 1854 and 1915 texts are public domain, already covered in `docs/LICENSE
   - (b) "West Bank" as an exception, which needs the human.
 
   I recommend (a). It's the GIS Engineer's change, then the Research Lead's.
+
+### C9. Final re-check (`c28e98c`, 2026-10-16): batches B and C signed off
+
+You ruled Q4 as option (a), with no validator change: you reversed Q1, so Bethphage's parent is `jerusalem` again. I re-checked `git diff 1274e3c..c28e98c` (`6269d8f`, `c28e98c`). All eight fixes pass:
+
+| Fix | Result |
+|---|---|
+| F75 (`bethphage`) | **Closed.**<ul><li>`parentId: "jerusalem"`, like the Mount of Olives and Gethsemane.</li><li>No `modernCountries` (ADR-0028's Jerusalem rule; the validator exempts records whose parent chain includes `jerusalem`).</li><li>`names.modern` is "Et-Tur (Kafr et-Tur), Jerusalem", the verified stop's form, matching Wikidata Q2193088's P131 (Jerusalem).</li></ul> |
+| F76 (`bethphage`) | **Closed.** "into the village opposite them" (Matthew 21:2 and Mark 11:2, "the village that is opposite you"; Luke 19:30, "the village on the other side"). |
+| F77 (`country-of-the-gadarenes`) | **Closed.** "feeding on the hillside" (Mark 5:11; Luke 8:32). "Nearby" is gone, so the summary no longer contradicts Matthew 8:30. |
+| F78 (`country-of-the-gadarenes`) | **Closed.** "the year the encyclopedia's 'Gadara' article gives for Pompey's restoration of Gadara, so that the three candidates start together" (ISBE: "Pompey is said to have restored it, 63 BC"). |
+| F79 (`chios`) | **Closed.** "which Josephus says was not as easy to rebuild as the rest", a faithful paraphrase of Whiston's "not so easy to rebuild that as it was the rest". |
+| F80 (`seleucia`) | **Closed.** "The Greek geographer Strabo". |
+| F81 (`samos`) | **Closed.** ISBE's "17 BC" is now the entry's last clause (ADR-0041 item 1). |
+| F82 (`cos`) | **Closed.** `zoomTier: "region"`: Cos is 290.3 km² (Q187027), larger than the island of Malta (246 km², Q193896). The research note now gives the island's figure. I confirm `cos` as `verified`: only its tier changed, and that follows your Q2 rule. |
+
+No candidate's label, coordinates, source or confidence changed, and nothing in `data/routes/`, `scripts/`, `tests/` or `app/` changed.
+
+**Sign-off:** `seleucia`, `chios`, `samos`, `country-of-the-gadarenes` and `bethphage` are now `verified`, `verifiedBy: "fact-checker"`, `lastReviewed: "2026-10-16"`.
+- With §B2 and §C8, all 17 batch B and C records are verified.
+- With batch A's 16 (§A9), all 33 M5-07 records are verified.
+- `data/routes/stops.json` has no entries left, and every route reference to a former stop points to its place (§C5).
+
+**Checks** (Node 24.21.0, on `c28e98c` and again after the status changes):
+- `npm run validate:data`: passed, 0 errors, 207 warnings. The only ones in these records are the Gadarenes' 4, accepted in §C5.
+- `npm run check:route-lines`: "Reproduced route lines byte-for-byte from an empty cache"; 71 lines, 0 failing.
+- `npm test`: 331 tests, all pass.
+
+**Still open, outside these records:** note N1 (§C7). The browser suite's real-data route-stop check in `verify:web:playwright` expects stop entries, and there are none now. It's M5-05's code.

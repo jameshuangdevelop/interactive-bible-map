@@ -173,6 +173,8 @@
       "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
     }
   ],
-  "status": "draft",
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
   "politicalAreaId": "judea-samaria-idumea"
 }

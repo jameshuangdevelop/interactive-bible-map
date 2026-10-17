@@ -220,5 +220,7 @@
       "candidate": 2
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16"
 }

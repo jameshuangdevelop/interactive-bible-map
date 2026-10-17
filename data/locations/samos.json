@@ -110,5 +110,7 @@
       "note": "The encyclopedia's article on the province of Asia names Samos among the islands \"apparently\" within its bounds."
     }
   ],
-  "status": "draft"
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16"
 }
