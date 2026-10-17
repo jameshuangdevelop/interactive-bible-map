@@ -21,7 +21,7 @@ Draw our places as their names instead of pins, styled by whether they can be cl
 
 ## Scope
 1. **Data:** add `naturalFeatureKind` ("water" or "land", optional, only on `natural-feature` records, absent meaning land) to the schema, the validator and the places index the app reads. Set "water" on the Sea of Galilee, the Syrtis and Fair Havens, and on any other water feature you find; list them in the PR.
-2. **No pins:** replace the place pin layers with name layers centred on each place's point, styled as the spec's table says. That covers major, other and site pins, pin shadows, the muted dots and count bubbles, the "?" badges, and the pin collision masks and images. Major places show at every zoom, grouped below zoom 7 as names such as "Jerusalem +4". Other places appear from zoom 6, and sites from 12. Names hide by priority when they collide.
+2. **No pins:** replace the place pin layers with name layers centred on each place's point, styled as the spec's table says. That covers major, other and site pins, pin shadows, the muted dots and count bubbles, the "?" badges, and the pin collision masks and images. Major places show at every zoom; where their names would overlap, they group as one name such as "Jerusalem +4" (ADR-0043 item 5). Other places appear from zoom 6, and sites from 12. Names hide by priority when they collide.
 3. **Clickability:** every name that opens something is upright and shows the pointer cursor. Names that don't, the ancient layer's names without a record and the "Roman shore" labels, are grey in Noto Sans Italic. Area names with a record are upright. Water is blue and land natural features green, both in Noto Sans Regular; towns and sites are dark Noto Sans Bold.
 4. **The selected place:** its name in bold accent blue, 2 px larger, always shown.
 5. **Candidate sites:** one name at the first-listed candidate, with no "?". Selecting the place shows today's lettered red candidate dots. Selecting another place or closing the panel hides them; dragging and zooming don't. Clicking a candidate opens the place with that candidate highlighted.
@@ -33,7 +33,7 @@ Draw our places as their names instead of pins, styled by whether they can be cl
    - each kind's font, colour and slant;
    - clickable versus not: the cursor, and whether a click opens something;
    - candidates show on selection, hide on another selection or on closing, and stay on a drag;
-   - the major places, grouped, show at zooms 3 to 6;
+   - the major places, alone or grouped, show at every zoom, and no two names overlap;
    - no place names on the modern map, and routes there without names;
    - axe stays clean;
    - `bench:map` with its 10,000 test points stays under 50 ms per task (spec §11).

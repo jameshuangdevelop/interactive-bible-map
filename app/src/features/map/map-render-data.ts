@@ -71,7 +71,6 @@ export interface PinFeatureProperties extends BaseMapFeatureProperties {
   isSelectedPlace: boolean;
   isHighlightedPlace: boolean;
   labelText: string;
-  majorLabelSide: "left" | "right";
 }
 
 export interface CandidateFeatureProperties extends BaseMapFeatureProperties {
@@ -299,8 +298,7 @@ function toPinFeature({
       isDisputed: hasMultipleCandidates ? isDisputedPlace(place) : false,
       isSelectedPlace: selected,
       isHighlightedPlace: highlighted,
-      labelText: placeName,
-      majorLabelSide: "right"
+      labelText: placeName
     }
   };
 }
@@ -407,63 +405,6 @@ function emptyFeatureCollection<TProperties>(): FeatureCollection<Point, TProper
   };
 }
 
-function assignMajorPinLabelSides(features: PinFeature[]) {
-  if (features.length === 0) {
-    return;
-  }
-
-  const points = features.map((feature) => {
-    const [longitude, latitude] = feature.geometry.coordinates;
-    return {
-      feature,
-      longitude,
-      latitude
-    };
-  });
-  const longitudes = points.map((point) => point.longitude);
-  const minimumLongitude = Math.min(...longitudes);
-  const maximumLongitude = Math.max(...longitudes);
-  const longitudeSpan = Math.max(0.0001, maximumLongitude - minimumLongitude);
-  const westEdgeThreshold = minimumLongitude + longitudeSpan * 0.12;
-  const eastEdgeThreshold = maximumLongitude - longitudeSpan * 0.12;
-
-  for (const point of points) {
-    if (point.longitude >= eastEdgeThreshold) {
-      point.feature.properties.majorLabelSide = "left";
-      continue;
-    }
-
-    if (point.longitude <= westEdgeThreshold) {
-      point.feature.properties.majorLabelSide = "right";
-      continue;
-    }
-
-    let nearestNeighbor: (typeof point) | null = null;
-    let nearestDistanceSquared = Number.POSITIVE_INFINITY;
-    for (const candidate of points) {
-      if (candidate === point) {
-        continue;
-      }
-
-      const longitudeDelta = candidate.longitude - point.longitude;
-      const latitudeDelta = candidate.latitude - point.latitude;
-      const distanceSquared = longitudeDelta * longitudeDelta + latitudeDelta * latitudeDelta;
-      if (distanceSquared < nearestDistanceSquared) {
-        nearestDistanceSquared = distanceSquared;
-        nearestNeighbor = candidate;
-      }
-    }
-
-    if (!nearestNeighbor) {
-      point.feature.properties.majorLabelSide = "right";
-      continue;
-    }
-
-    point.feature.properties.majorLabelSide =
-      nearestNeighbor.longitude <= point.longitude ? "right" : "left";
-  }
-}
-
 export function candidateIconId(pinColor: string, candidateLetter: string, selected: boolean) {
   return [
     "candidate",
@@ -553,8 +494,6 @@ export function buildPlaceRenderData(
 
     clusteredCityPins.features.push(pinFeature);
   });
-
-  assignMajorPinLabelSides(majorCityPins.features);
 
   return {
     majorCityPins,
