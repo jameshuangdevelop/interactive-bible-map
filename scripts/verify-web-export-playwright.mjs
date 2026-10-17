@@ -2903,6 +2903,9 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
   const cursorOverPin = await page.$eval("canvas.maplibregl-canvas", (element) =>
     window.getComputedStyle(element).cursor
   );
+  if (!cursorOverPin.includes("pointer")) {
+    throw new Error(`Cursor over Capernaum's name should be pointer, got '${cursorOverPin}'.`);
+  }
 
   await page.mouse.move(probe.emptyPoint.x, probe.emptyPoint.y);
   const cursorOverEmptyMap = await page.$eval("canvas.maplibregl-canvas", (element) =>
@@ -2912,32 +2915,12 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
     throw new Error(`Cursor over empty map should not be pointer, got '${cursorOverEmptyMap}'.`);
   }
 
-  let selectedCapernaum = false;
-  const clickOffsets = [0, 6, -6, 12, -12];
-  for (const offsetY of clickOffsets) {
-    for (const offsetX of clickOffsets) {
-      await page.mouse.click(probe.capernaumPoint.x + offsetX, probe.capernaumPoint.y + offsetY);
-      selectedCapernaum = await page
-        .evaluate(() => {
-          const parameters = new URLSearchParams(window.location.search.slice(1));
-          return parameters.get("place") === "capernaum";
-        })
-        .catch(() => false);
-      if (selectedCapernaum) {
-        break;
-      }
-    }
-    if (selectedCapernaum) {
-      break;
-    }
-  }
-  if (!selectedCapernaum) {
-    await page.goto(`${baseUrl}/?place=capernaum`, {
-      waitUntil: "domcontentloaded",
-      timeout: 120_000
-    });
-    await waitForMapToSettle(page);
-  }
+  // A click near the name, within its box plus the hit padding, selects it.
+  await page.mouse.click(probe.capernaumPoint.x + 6, probe.capernaumPoint.y + 6);
+  await page.waitForFunction(() => {
+    const parameters = new URLSearchParams(window.location.search.slice(1));
+    return parameters.get("place") === "capernaum";
+  }, undefined, { timeout: 30_000, polling: 100 });
   await page.getByRole("heading", { level: 1, name: "Capernaum" }).waitFor({ timeout: 30_000 });
 
   return {
@@ -7479,6 +7462,8 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
         );
       }
 
+      // No orphan-label check: since ADR-0043 a name is its own symbol, so it can't come apart from
+      // it; a group's name and its hit circle are filtered alike from one feature.
       const significantNearestPinMismatches = majorLabelAttachment.nearestPinMismatches.filter(
         (mismatch) => Number(mismatch.secondNearestDeltaPx ?? Number.POSITIVE_INFINITY) > 5
       );
@@ -7520,7 +7505,6 @@ async function verifyAsiaMinorSevenChurchesAtZoom65(browser, baseUrl) {
     { width: 1440, height: 900 },
     { width: 1024, height: 768 }
   ];
-  const sevenChurchPlaceIds = new Set(asiaMinorSevenChurchPlaceIds);
   const results = [];
 
   for (const viewport of targetViewports) {
@@ -7537,92 +7521,70 @@ async function verifyAsiaMinorSevenChurchesAtZoom65(browser, baseUrl) {
       });
       await waitForMapToSettle(page);
 
-      const pinSnapshot = await page.evaluate(
-        ({ testHookKey, majorPinLayerId, majorClusterLayerId }) => {
+      // Each church shows by its own name or as a member of a drawn group name ("Laodicea +1"),
+      // as every major does at every zoom (ADR-0043 item 5). Names are centred on their points,
+      // so the pin-era "label beside its own pin" checks no longer apply; overlaps are checked by
+      // verifyNoOverlappingNamesAcrossViews.
+      const churchCoverage = await page.evaluate(
+        ({ testHookKey, majorNameLayerIds, majorGroupLayerIds, churchIds }) => {
           const map = window[testHookKey];
           if (!map) {
             throw new Error("Map test hook is unavailable.");
           }
 
-          const visibleMajorPinPlaceIds = Array.from(
-            new Set(
-              map
-                .queryRenderedFeatures(undefined, { layers: [majorPinLayerId] })
-                .map((feature) => String(feature.properties?.placeId ?? "").trim())
-                .filter((placeId) => placeId.length > 0)
-            )
-          ).sort();
-
-          const visibleMajorClusterIds = Array.from(
-            new Set(
-              map
-                .queryRenderedFeatures(undefined, { layers: [majorClusterLayerId] })
-                .map((feature) => Number(feature.properties?.cluster_id))
-                .filter((clusterId) => Number.isFinite(clusterId))
-            )
+          const ownNamePlaceIds = new Set(
+            map
+              .queryRenderedFeatures(undefined, { layers: majorNameLayerIds })
+              .map((feature) => String(feature.properties?.placeId ?? "").trim())
           );
-
-          return {
-            visibleMajorPinPlaceIds,
-            majorClusterCount: visibleMajorClusterIds.length,
-            majorClusterIds: visibleMajorClusterIds
-          };
+          const groups = map
+            .queryRenderedFeatures(undefined, { layers: majorGroupLayerIds })
+            .map((feature) => ({
+              labelText: String(feature.properties?.labelText ?? ""),
+              memberPlaceIds: String(feature.properties?.memberPlaceIds ?? "").split(",")
+            }));
+          return churchIds.map((placeId) => ({
+            placeId,
+            shownBy: ownNamePlaceIds.has(placeId)
+              ? "name"
+              : (groups.find((group) => group.memberPlaceIds.includes(placeId))?.labelText ?? null)
+          }));
         },
         {
           testHookKey: mapTestHookKey,
-          majorPinLayerId: mapLayerIds.majorPins,
-          majorClusterLayerId: mapLayerIds.majorClusterPins
+          majorNameLayerIds: mapLayerIds.majorPinLabels,
+          majorGroupLayerIds: mapLayerIds.majorClusterLabelLayers,
+          churchIds: asiaMinorSevenChurchPlaceIds
         }
       );
 
-      const majorLabelAttachment = await collectMajorLabelAttachmentDiagnostics(page, {
-        majorPinLayerIds: allMajorPinLayerIds,
-        majorClusterLayerIds: allMajorClusterPinLayerIds,
-        majorPinLabelLayerIds: mapLayerIds.majorPinLabels,
-        majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers
-      });
-
-      const missingSevenChurchPins = asiaMinorSevenChurchPlaceIds
-        .filter((placeId) => !pinSnapshot.visibleMajorPinPlaceIds.includes(placeId));
-      if (missingSevenChurchPins.length > 4) {
+      const missingChurches = churchCoverage
+        .filter((entry) => entry.shownBy === null)
+        .map((entry) => entry.placeId);
+      if (missingChurches.length > 0) {
         throw new Error(
-          `Asia Minor zoom 6.5 is missing seven-church major pins at ${viewport.width}x${viewport.height}: ${JSON.stringify(
-            missingSevenChurchPins
-          )}. Visible major pins: ${JSON.stringify(pinSnapshot.visibleMajorPinPlaceIds)}`
+          `Asia Minor zoom 6.5 shows neither the name nor a group name for ${JSON.stringify(
+            missingChurches
+          )} at ${viewport.width}x${viewport.height}: ${JSON.stringify(churchCoverage)}`
         );
       }
 
-      const sevenChurchLabelKeys = new Set(
-        majorLabelAttachment.majorLabels
-          .filter((label) => !label.isCluster && sevenChurchPlaceIds.has(label.placeId ?? ""))
-          .map((label) => label.key)
-      );
-      const sevenChurchVisibleLabelPlaceIds = Array.from(
-        new Set(
-          majorLabelAttachment.majorLabels
-            .filter((label) => !label.isCluster && sevenChurchPlaceIds.has(label.placeId ?? ""))
-            .map((label) => label.placeId)
-            .filter((placeId) => typeof placeId === "string" && placeId.length > 0)
-        )
-      ).sort();
-
+      const sevenChurchVisibleLabelPlaceIds = churchCoverage
+        .filter((entry) => entry.shownBy === "name")
+        .map((entry) => entry.placeId)
+        .sort();
       if (sevenChurchVisibleLabelPlaceIds.length === 0) {
         throw new Error(
-          `Asia Minor zoom 6.5 rendered no seven-church labels at ${viewport.width}x${viewport.height}.`
+          `Asia Minor zoom 6.5 rendered no seven-church names at ${viewport.width}x${viewport.height}.`
         );
       }
 
-      const sevenChurchNearestPinMismatches = majorLabelAttachment.nearestPinMismatches.filter(
-        (entry) => sevenChurchLabelKeys.has(entry.key)
-      );
       results.push({
         viewport,
         center: [28.35, 38.4],
         zoom: 6.5,
-        sevenChurchPinCount: asiaMinorSevenChurchPlaceIds.length,
-        sevenChurchVisiblePinPlaceIds: asiaMinorSevenChurchPlaceIds,
-        sevenChurchVisibleLabelPlaceIds,
-        majorLabelAttachment
+        churchCoverage,
+        sevenChurchVisibleLabelPlaceIds
       });
     } finally {
       await page.close();
@@ -8464,6 +8426,213 @@ const nameLayerIds = [
   "ibm-routes-mentioned-label-selected"
 ];
 
+async function settleMapInPage(page) {
+  await page.evaluate(
+    (testHookKey) =>
+      new Promise((resolve) => {
+        const map = window[testHookKey];
+        const done = () => {
+          if (map.loaded() && !map.isMoving() && map.areTilesLoaded()) {
+            resolve();
+            return;
+          }
+          map.once("idle", done);
+        };
+        map.once("idle", done);
+        map.triggerRepaint();
+      }),
+    mapTestHookKey
+  );
+  await page.waitForTimeout(300);
+}
+
+async function waitForSelectedPlace(page, placeId) {
+  await page.waitForFunction(
+    (expectedPlaceId) =>
+      new URLSearchParams(window.location.search.slice(1)).get("place") === expectedPlaceId,
+    placeId,
+    { timeout: 30_000, polling: 100 }
+  );
+}
+
+// The old bug (BACKLOG, MC10): from zoom 6, Tarsus's dot lost the collision to its own name and could
+// no longer be clicked. Names are now the only symbol, so Tarsus's name shows and a click selects it.
+async function verifyTarsusNameShowsAndClicks(page, baseUrl) {
+  const results = [];
+  for (const zoom of [7, 9]) {
+    await page.goto(`${baseUrl}/?tab=map`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await waitForMapToSettle(page);
+    await waitForMapStyleLoaded(page);
+    await page.evaluate(
+      ({ testHookKey, targetZoom }) =>
+        window[testHookKey].jumpTo({ center: [34.896467, 36.914043], zoom: targetZoom }),
+      { testHookKey: mapTestHookKey, targetZoom: zoom }
+    );
+    await settleMapInPage(page);
+
+    const point = await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      const tarsus = map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-city-pin"] })
+        .find((feature) => feature.properties?.placeId === "tarsus");
+      if (!tarsus || tarsus.geometry?.type !== "Point") {
+        return null;
+      }
+      const projected = map.project(tarsus.geometry.coordinates);
+      return { x: projected.x, y: projected.y };
+    }, mapTestHookKey);
+    if (!point) {
+      throw new Error(`Tarsus's name should be drawn at zoom ${zoom}.`);
+    }
+
+    await page.mouse.click(point.x, point.y);
+    await waitForSelectedPlace(page, "tarsus");
+    results.push({ zoom, point });
+  }
+  return results;
+}
+
+// Touch targets are at least 44 px tall (spec §7). A 13 px name's box is about 20 px tall, so on a touch
+// screen a tap 21 px above a name's point, beyond the mouse's 8 px hit padding, still selects it.
+async function verifyTouchTapTargetOnNames(browser, baseUrl) {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true
+  });
+  const page = await context.newPage();
+  try {
+    await page.goto(`${baseUrl}/?tab=map`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await waitForMapToSettle(page);
+    await waitForMapStyleLoaded(page);
+    await page.evaluate(
+      (testHookKey) => window[testHookKey].jumpTo({ center: [35.444564, 31.871719], zoom: 11 }),
+      mapTestHookKey
+    );
+    await settleMapInPage(page);
+
+    const probe = await page.evaluate(
+      ({ testHookKey, layerIds }) => {
+        const map = window[testHookKey];
+        const jericho = map
+          .queryRenderedFeatures(undefined, { layers: ["ibm-major-pin"] })
+          .find((feature) => feature.properties?.placeId === "jericho");
+        if (!jericho || jericho.geometry?.type !== "Point") {
+          return null;
+        }
+        const projected = map.project(jericho.geometry.coordinates);
+        const othersNearTap = map
+          .queryRenderedFeatures(
+            [
+              [projected.x - 40, projected.y - 40],
+              [projected.x + 40, projected.y - 12]
+            ],
+            { layers: layerIds }
+          )
+          .filter((feature) => feature.properties?.placeId !== "jericho").length;
+        return {
+          x: projected.x,
+          y: projected.y,
+          coarsePointer: window.matchMedia("(pointer: coarse)").matches,
+          othersNearTap
+        };
+      },
+      { testHookKey: mapTestHookKey, layerIds: nameLayerIds }
+    );
+    if (!probe) {
+      throw new Error("Touch tap-target check: Jericho's name should be drawn at zoom 11 on a phone.");
+    }
+    if (!probe.coarsePointer) {
+      throw new Error("Touch tap-target check: the phone context should report a coarse pointer.");
+    }
+    if (probe.othersNearTap > 0) {
+      throw new Error("Touch tap-target check: another name is near the tap; the check needs an emptier spot.");
+    }
+
+    await page.touchscreen.tap(probe.x, probe.y - 21);
+    await waitForSelectedPlace(page, "jericho");
+    return { tapPoint: { x: probe.x, y: probe.y - 21 }, namePoint: { x: probe.x, y: probe.y } };
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
+// The selected major's name always shows (spec §2), alone or leading its group ("Bethany +1"), also
+// for a place with several candidates, whose dots always show while it is selected.
+async function verifySelectedMajorNameAlwaysShows(page, baseUrl) {
+  const results = [];
+  for (const placeId of ["bethany", "cana", "bethany-beyond-the-jordan", "jerusalem"]) {
+    await page.goto(`${baseUrl}/?place=${placeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await waitForMapToSettle(page);
+    await waitForMapStyleLoaded(page);
+
+    const result = await page.evaluate(
+      async ({ testHookKey, selectedPlaceId }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        const settle = () =>
+          new Promise((resolve) => {
+            const done = () => {
+              if (map.loaded() && !map.isMoving() && map.areTilesLoaded()) {
+                resolve();
+                return;
+              }
+              map.once("idle", done);
+            };
+            map.once("idle", done);
+            map.triggerRepaint();
+          });
+        await settle();
+
+        const selectedNames = () =>
+          map
+            .queryRenderedFeatures(undefined, { layers: ["ibm-selected-major-pin-label"] })
+            .filter(
+              (feature) =>
+                feature.properties?.isSelectedPlace === true &&
+                (feature.properties?.placeId === selectedPlaceId ||
+                  feature.properties?.topPlaceId === selectedPlaceId)
+            )
+            .map((feature) => String(feature.properties?.labelText ?? ""));
+
+        const byZoom = [{ zoom: Number(map.getZoom().toFixed(2)), names: selectedNames() }];
+        for (const zoom of [5, 7, 9]) {
+          map.jumpTo({ zoom });
+          await settle();
+          byZoom.push({ zoom, names: selectedNames() });
+        }
+        const candidateLetters = Array.from(
+          new Set(
+            map
+              .queryRenderedFeatures(undefined, { layers: ["ibm-candidate-pin"] })
+              .map((feature) => String(feature.properties?.candidateLetter ?? ""))
+          )
+        ).sort();
+        return { byZoom, candidateLetters };
+      },
+      { testHookKey: mapTestHookKey, selectedPlaceId: placeId }
+    );
+
+    const missing = result.byZoom.filter((entry) => entry.names.length !== 1);
+    if (missing.length > 0) {
+      throw new Error(
+        `Selected major '${placeId}' should show exactly one selected name at every zoom: ${JSON.stringify(result.byZoom)}`
+      );
+    }
+    if (placeId === "cana" && result.candidateLetters.length < 2) {
+      throw new Error(
+        `Selected Cana should show its candidate dots: ${JSON.stringify(result.candidateLetters)}`
+      );
+    }
+    results.push({ placeId, ...result });
+  }
+
+  return results;
+}
+
 async function verifyNameLayersDisallowOverlap(page, baseUrl) {
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
@@ -8519,7 +8688,8 @@ async function verifyNameLayersDisallowOverlap(page, baseUrl) {
 
 // Reads MapLibre's placed label boxes (an internal API: fails loudly if it changes) and fails on any two
 // names whose boxes overlap, on the Map tab across zooms and with a route chosen. A name may cross a
-// route's line and its arrows, as on Google Maps.
+// route's line, its arrows and the stage-number pill shown while a stage is hovered or selected, as
+// on Google Maps: names that hid for a passing pill would flicker.
 async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
   const views = [];
   const centers = {
@@ -10212,7 +10382,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
       const coverage = openingOverviewSnapshot.requiredCoverage;
 
       const missingRequiredPlaces = requiredOpeningPlaces.filter((place) => !coverage[place.id]);
-      if (missingRequiredPlaces.length > 1) {
+      if (missingRequiredPlaces.length > 0) {
         throw new Error(
           `Phone opening view ${viewport.width}x${viewport.height} is missing drawn coverage for ${JSON.stringify(
             missingRequiredPlaces.map((place) => place.label)
@@ -10385,13 +10555,11 @@ async function verifyPhoneBasics(browser, baseUrl) {
                   feature.properties?.isSelectedPlace === "true"
               );
             const selectedPoint = selectedFeatures.find((feature) => feature.geometry?.type === "Point");
-            const projected =
-              selectedPoint && selectedPoint.geometry?.type === "Point"
-                ? (() => {
-                    const [longitude, latitude] = selectedPoint.geometry.coordinates;
-                    return map.project([longitude, latitude]);
-                  })()
-                : null;
+            if (!selectedPoint) {
+              throw new Error("Selected place's name is not drawn on the map.");
+            }
+            const [longitude, latitude] = selectedPoint.geometry.coordinates;
+            const projected = map.project([longitude, latitude]);
             const centerBefore = map.getCenter();
 
             return {
@@ -10404,16 +10572,16 @@ async function verifyPhoneBasics(browser, baseUrl) {
               photoKindLabelBounds,
               previousImageButtonBounds,
               nextImageButtonBounds,
-              selectedPointPx: projected ? { x: projected.x, y: projected.y } : null,
+              selectedPointPx: { x: projected.x, y: projected.y },
               mapCenter: [centerBefore.lng, centerBefore.lat]
             };
           },
           {
             testHookKey: mapTestHookKey,
             selectedLayerIds: [
-              mapLayerIds.majorPins,
-              mapLayerIds.cityPins,
-              mapLayerIds.sitePins,
+              ...selectedPlaceLabelLayerIds,
+              "ibm-pin-label-standard",
+              "ibm-selected-area-label",
               mapLayerIds.candidatePins
             ]
           }
@@ -13371,9 +13539,14 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         return 0;
       }
       return map
-        .queryRenderedFeatures(undefined, { layers: ["ibm-routes-mentioned-labels"] })
+        .queryRenderedFeatures(undefined, {
+          layers: ["ibm-routes-mentioned-labels", "ibm-routes-mentioned-label-selected"]
+        })
         .filter((feature) => feature.properties?.stopId === "alexandria").length;
     }, mapTestHookKey);
+    if (alexandriaMentionedLabelCount < 1) {
+      throw new Error("Routes real-data check: expected Alexandria's name to render on the route.");
+    }
 
     await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
     await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
@@ -13924,6 +14097,12 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const selectedMajorNameCheck = await verifySelectedMajorNameAlwaysShows(
+      page,
+      staticServer.baseUrl
+    );
+    const tarsusNameCheck = await verifyTarsusNameShowsAndClicks(page, staticServer.baseUrl);
+    const touchTapTargetCheck = await verifyTouchTapTargetOnNames(browser, staticServer.baseUrl);
     const openingCameraBaselineCheck = await verifyOpeningCameraBaseline(
       browser,
       staticServer.baseUrl
@@ -14140,6 +14319,9 @@ async function run() {
       majorPlacesCoverageAcrossZoomsCheck,
       nameLayerOverlapCheck,
       noOverlappingNamesCheck,
+      selectedMajorNameCheck,
+      tarsusNameCheck,
+      touchTapTargetCheck,
       openingCameraBaselineCheck,
       overviewLabelReadabilityCheck,
       jerusalemGalileeZoom6Check,

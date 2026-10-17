@@ -29,7 +29,7 @@ Draw our places as their names instead of pins, styled by whether they can be cl
 7. **The Routes tab:** our places show as names under the route; places the route draws stay left out of the base data (M5-05). The route's dots and names don't change.
 8. **Hover, keyboard and touch:** the tooltip and the keyboard list of visible places work as before. Clicks check the name's box plus about 8 px; on touch screens the hit area is at least 44 px tall.
 9. **Tests (unit and Playwright):**
-   - every place is drawn and can be clicked at every zoom its tier shows it, with Tarsus at zoom 7 and 9 as the old bug's regression check;
+   - every name drawn can be clicked, with Tarsus shown and clickable at zoom 7 and 9 as the old bug's regression check (other places' names may hide where they collide, ADR-0043 item 5);
    - each kind's font, colour and slant;
    - clickable versus not: the cursor, and whether a click opens something;
    - candidates show on selection, hide on another selection or on closing, and stay on a drag;
@@ -44,7 +44,7 @@ Which places are major, the modern map's own labels, and images.
 
 ## Acceptance criteria
 - [ ] The map matches VISUAL_SPEC §2 on desktop and on a phone, on both maps and both tabs.
-- [ ] No place vanishes or stops being clickable at a zoom where its tier shows it; Tarsus shows and can be clicked at zoom 7 and 9.
+- [ ] Every name drawn can be clicked, and no major place is ever left without its name or its group's; other places' names may hide where they collide (ADR-0043 item 5). Tarsus shows and can be clicked at zoom 7 and 9.
 - [ ] `npm run lint`, `typecheck`, `test:all`, `build:data`, `export:web`, `verify:web:playwright` and `verify:web:axe` pass; the PO measures LCP and TBT, and runs `bench:map` headed.
 
 ## Finish

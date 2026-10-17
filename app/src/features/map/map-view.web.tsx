@@ -159,6 +159,7 @@ const mapLabelPaddingTop = 96;
 const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
+const touchInteractiveHitPaddingPx = 13;
 const majorInteractionPreferencePx = 3;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
@@ -259,7 +260,7 @@ const placeNameColorExpression = toExpression([
   [
     "case",
     ["==", ["get", "naturalFeatureKind"], "water"],
-    "#1A73E8",
+    "#1967D2",
     "#0B6B2E"
   ],
   "#202124"
@@ -294,17 +295,6 @@ function applyMapModeOverlayVisibility(
   ancientLayerEnabled: boolean,
   routesModeEnabled: boolean
 ) {
-  const showAreaLabels = mapMode === "ancient";
-  for (const layerId of [
-    layerAreaLabelOverviewId,
-    layerAreaLabelId,
-    layerMajorAreaLabelOverviewId,
-    layerMajorAreaLabelId,
-    layerSelectedAreaLabelId
-  ]) {
-    setLayerVisibility(map, layerId, showAreaLabels);
-  }
-
   const showAncientLayer = mapMode === "ancient" && ancientLayerEnabled;
   for (const layerId of [
     layerAncientAreaFillId,
@@ -2031,7 +2021,7 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         "text-field": ["get", "labelText"],
         "text-font": placeNameFontExpression,
-        "text-size": 12,
+        "text-size": 13,
         "text-variable-anchor": ["top", "bottom", "left", "right"],
         "text-radial-offset": 0.75,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -2060,7 +2050,7 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         "text-field": ["get", "labelText"],
         "text-font": placeNameFontExpression,
-        "text-size": 12,
+        "text-size": 13,
         "text-variable-anchor": ["top", "bottom", "left", "right"],
         "text-radial-offset": 0.75,
         "symbol-sort-key": ["get", "labelPriority"],
@@ -2104,7 +2094,7 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
-        "text-size": 14,
+        "text-size": 15,
         "text-anchor": toExpression([
           "case",
           ["==", ["get", "hasMultipleCandidates"], true],
@@ -2147,7 +2137,7 @@ function ensureMapLayers(map: MapLibreMap) {
         ...areaLabelPointLayout
       },
       paint: {
-        "text-color": "#5F6368",
+        "text-color": "#3C4043",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
       }
@@ -2173,7 +2163,7 @@ function ensureMapLayers(map: MapLibreMap) {
         ...areaLabelPointLayout
       },
       paint: {
-        "text-color": "#5F6368",
+        "text-color": "#3C4043",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
       }
@@ -2199,7 +2189,7 @@ function ensureMapLayers(map: MapLibreMap) {
         ...areaLabelPointLayout
       },
       paint: {
-        "text-color": "#5F6368",
+        "text-color": "#3C4043",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
       }
@@ -2225,7 +2215,7 @@ function ensureMapLayers(map: MapLibreMap) {
         ...areaLabelPointLayout
       },
       paint: {
-        "text-color": "#5F6368",
+        "text-color": "#3C4043",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
       }
@@ -2347,7 +2337,7 @@ function ensureMapLayers(map: MapLibreMap) {
       layout: {
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
-        "text-size": 14,
+        "text-size": 15,
         "text-anchor": toExpression([
           "case",
           ["==", ["get", "hasMultipleCandidates"], true],
@@ -2493,6 +2483,26 @@ function asScreenPoint(point: PointLike): HitScreenPoint | null {
   }
 
   return { x, y };
+}
+
+/** Taps get a wider hit area than the mouse, so that a name's tap target is at least 44 px tall. */
+function interactiveHitPaddingForEvent(originalEvent: unknown) {
+  const pointerType =
+    typeof originalEvent === "object" && originalEvent !== null && "pointerType" in originalEvent
+      ? String((originalEvent as { pointerType: unknown }).pointerType)
+      : "";
+  if (pointerType === "touch") {
+    return touchInteractiveHitPaddingPx;
+  }
+  if (pointerType === "mouse" || pointerType === "pen") {
+    return interactiveHitPaddingPx;
+  }
+  if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
+    return window.matchMedia("(pointer: coarse)").matches
+      ? touchInteractiveHitPaddingPx
+      : interactiveHitPaddingPx;
+  }
+  return interactiveHitPaddingPx;
 }
 
 function queryBoxAroundPoint(point: HitScreenPoint, paddingPx: number): [PointLike, PointLike] {
@@ -3216,51 +3226,54 @@ export function MapView({
     mapCanvasHasPointerCursorRef.current = isInteractiveTarget;
   }, []);
 
-  const resolveInteractiveEntryAtPoint = useCallback((point: PointLike) => {
-    const map = mapRef.current;
-    if (!map) {
-      return null;
-    }
-
-    const majorPlaceByRankForView = majorPlaceByRankRef.current;
-
-    const pointer = asScreenPoint(point);
-    if (!pointer) {
-      return null;
-    }
-
-    const features = map.queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
-      layers: [...interactiveLayerIds]
-    });
-    const entries = deduplicateVisibleEntries(
-      features
-        .map((feature) => toVisibleEntry(feature, majorPlaceByRankForView))
-        .filter((entry): entry is VisibleListEntry => entry !== null)
-    );
-
-    const candidates = entries.map((entry) => {
-      const projected = map.project(entry.coordinates as LngLatLike);
-      return {
-        value: entry,
-        point: {
-          x: projected.x,
-          y: projected.y
-        },
-        interactionRank: entry.interactionRank
-      };
-    });
-
-    return pickNearestCandidateWithPreferredRank(
-      pointer,
-      candidates,
-      {
-        preferredRank: 0,
-        competingRank: 1,
-        maxPreferredDistanceDeltaPx: majorInteractionPreferencePx,
-        tieBreaker: (left, right) => left.id.localeCompare(right.id)
+  const resolveInteractiveEntryAtPoint = useCallback(
+    (point: PointLike, hitPaddingPx: number = interactiveHitPaddingPx) => {
+      const map = mapRef.current;
+      if (!map) {
+        return null;
       }
-    );
-  }, []);
+
+      const majorPlaceByRankForView = majorPlaceByRankRef.current;
+
+      const pointer = asScreenPoint(point);
+      if (!pointer) {
+        return null;
+      }
+
+      const features = map.queryRenderedFeatures(queryBoxAroundPoint(pointer, hitPaddingPx), {
+        layers: [...interactiveLayerIds]
+      });
+      const entries = deduplicateVisibleEntries(
+        features
+          .map((feature) => toVisibleEntry(feature, majorPlaceByRankForView))
+          .filter((entry): entry is VisibleListEntry => entry !== null)
+      );
+
+      const candidates = entries.map((entry) => {
+        const projected = map.project(entry.coordinates as LngLatLike);
+        return {
+          value: entry,
+          point: {
+            x: projected.x,
+            y: projected.y
+          },
+          interactionRank: entry.interactionRank
+        };
+      });
+
+      return pickNearestCandidateWithPreferredRank(
+        pointer,
+        candidates,
+        {
+          preferredRank: 0,
+          competingRank: 1,
+          maxPreferredDistanceDeltaPx: majorInteractionPreferencePx,
+          tieBreaker: (left, right) => left.id.localeCompare(right.id)
+        }
+      );
+    },
+    []
+  );
 
   const updateScaleBar = useCallback(() => {
     const map = mapRef.current;
@@ -4010,7 +4023,7 @@ export function MapView({
       }
     };
 
-    const handleMapClick = (event: { point: PointLike }) => {
+    const handleMapClick = (event: { point: PointLike; originalEvent?: unknown }) => {
       if (routesModeEnabledRef.current) {
         const routeFeatures = map.queryRenderedFeatures(event.point, {
           layers: [
@@ -4073,7 +4086,10 @@ export function MapView({
         }
       }
 
-      const entry = resolveInteractiveEntryAtPoint(event.point);
+      const entry = resolveInteractiveEntryAtPoint(
+        event.point,
+        interactiveHitPaddingForEvent(event.originalEvent)
+      );
       if (!entry) {
         return;
       }

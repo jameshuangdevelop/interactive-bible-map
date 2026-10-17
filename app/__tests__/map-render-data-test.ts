@@ -79,11 +79,22 @@ describe("map render data", () => {
         id: "sea-of-galilee",
         names: { ancient: ["Sea of Galilee"], alternate: [] },
         type: "natural-feature",
+        naturalFeatureKind: "water",
         zoomTier: "city",
         prominence: "major",
         passageCount: 9,
         parentId: "galilee",
         candidates: [{ label: "Sea of Galilee", coordinates: [35.59, 32.82], confidence: "high" }]
+      },
+      {
+        id: "mount-carmel",
+        names: { ancient: ["Mount Carmel"], alternate: [] },
+        type: "natural-feature",
+        zoomTier: "city",
+        prominence: "standard",
+        passageCount: 3,
+        parentId: "galilee",
+        candidates: [{ label: "Mount Carmel", coordinates: [35.05, 32.73], confidence: "high" }]
       },
       {
         id: "troas",
@@ -111,11 +122,17 @@ describe("map render data", () => {
     expect(standardIds).not.toContain("nazareth");
     expect(standardIds).not.toContain("sea-of-galilee");
     expect(seaOfGalileePin?.properties.labelText).toBe("Sea of Galilee");
-    expect(seaOfGalileePin?.properties.naturalFeatureKind).toBe("land");
+    expect(seaOfGalileePin?.properties.naturalFeatureKind).toBe("water");
     const troasPin = renderData.clusteredCityPins.features.find(
       (feature) => feature.properties.placeId === "troas"
     );
     expect(troasPin?.properties.minZoom).toBe(6);
+    expect(troasPin?.properties.naturalFeatureKind).toBeUndefined();
+    // A natural feature without the field is on land.
+    const carmelPin = renderData.clusteredCityPins.features.find(
+      (feature) => feature.properties.placeId === "mount-carmel"
+    );
+    expect(carmelPin?.properties.naturalFeatureKind).toBe("land");
   });
 
   test("builds area labels for empire, province, and region ranges", () => {

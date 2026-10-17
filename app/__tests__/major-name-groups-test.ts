@@ -6,6 +6,8 @@ import {
   groupMajorNamesAtZoom,
   majorGroupLabelText,
   MAJOR_NAME_MAX_BAND,
+  MAJOR_SELECTED_NAME_FONT_SIZE_PX,
+  MAJOR_SELECTED_NAME_RAISE_EM,
   measureLabelBox,
   measureLabelLineWidths,
   measureMajorNameBox,
@@ -154,7 +156,11 @@ describe("major name groups", () => {
     const raised = measureMajorNameBox({ top: selected, members: [selected] });
     expect(plain.centerOffsetY).toBe(0);
     expect(raised.width).toBeGreaterThan(plain.width);
-    expect(raised.centerOffsetY).toBeCloseTo(-(0.45 * 14 + raised.height / 2), 5);
+    expect(MAJOR_SELECTED_NAME_FONT_SIZE_PX).toBe(15);
+    expect(raised.centerOffsetY).toBeCloseTo(
+      -(MAJOR_SELECTED_NAME_RAISE_EM * MAJOR_SELECTED_NAME_FONT_SIZE_PX + raised.height / 2),
+      5
+    );
   });
 
   test("keeps Nazareth's and Jerusalem's names apart on the opening map's zoom", () => {

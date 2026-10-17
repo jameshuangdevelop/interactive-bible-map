@@ -10,7 +10,7 @@ import type { Coordinates } from "./types";
 // keep their size, so a zoom's groups also fit until the next whole zoom.
 
 export const MAJOR_NAME_FONT_SIZE_PX = 13;
-export const MAJOR_SELECTED_NAME_FONT_SIZE_PX = 14;
+export const MAJOR_SELECTED_NAME_FONT_SIZE_PX = 15;
 // A selected place with several candidates has its name just above its first candidate's dot.
 export const MAJOR_SELECTED_NAME_RAISE_EM = 0.45;
 export const MAJOR_NAME_MAX_WIDTH_EM = 10;
@@ -38,10 +38,10 @@ const LATIN1_LETTER_ADVANCES = [
 // The widest glyph in the font, so a character outside the tables is never under-measured.
 const FALLBACK_ADVANCE = 23;
 
-// MapLibre's line-breaking rules (src/symbol/shaping.ts).
+// MapLibre's line-breaking rules for Latin text (src/symbol/shaping.ts in MapLibre GL JS 6.10).
 const WHITESPACE_CODE_POINTS = new Set([0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x20]);
 const BREAKABLE_CODE_POINTS = new Set([
-  0x0a, 0x20, 0x26, 0x29, 0x2b, 0x2d, 0x2f, 0xad, 0xb7, 0x200b, 0x2010, 0x2013, 0x2027
+  0x0a, 0x0d, 0x20, 0x26, 0x29, 0x2b, 0x2d, 0x2f, 0xad, 0xb7, 0x200b, 0x2010, 0x2013, 0x2027
 ]);
 const BREAKABLE_BEFORE_CODE_POINTS = new Set([0x28]);
 
@@ -121,7 +121,7 @@ export function measureLabelLineWidths(text: string, maxWidthEm: number): number
         (index !== codePoints.length - 2 && BREAKABLE_BEFORE_CODE_POINTS.has(nextCodePoint))
       ) {
         let penalty = 0;
-        if (codePoint === 0x0a) {
+        if (codePoint === 0x0a || codePoint === 0x0d) {
           penalty -= 10_000;
         }
         if (codePoint === 0x28) {
