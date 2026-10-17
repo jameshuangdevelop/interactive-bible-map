@@ -8343,7 +8343,7 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
         .filter((target) => target !== null);
 
       const failures = [];
-      const zooms = Array.from({ length: 9 }, (_value, index) => index + 3);
+      const zooms = Array.from({ length: 17 }, (_value, index) => 3 + index * 0.5);
       const statsByZoom = [];
 
       const hasMajorLabel = (placeId) => {
@@ -8383,15 +8383,6 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
         return false;
       };
 
-      const appearsInLoadedMajorSource = (placeId) => {
-        const sourceFeatures = map.querySourceFeatures(majorSourceId);
-        return sourceFeatures.some(
-          (feature) =>
-            !Number.isFinite(Number(feature.properties?.point_count)) &&
-            String(feature.properties?.placeId ?? "").trim() === placeId
-        );
-      };
-
       for (const zoom of zooms) {
         let coveredCount = 0;
         for (const target of targets) {
@@ -8402,18 +8393,13 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
           const coveredByClusterLeaf = coveredByLabel
             ? false
             : await appearsInRenderedMajorCluster(target.placeId);
-          const coveredByLoadedSourceFeature =
-            coveredByLabel || coveredByClusterLeaf
-              ? false
-              : appearsInLoadedMajorSource(target.placeId);
-          if (!coveredByLabel && !coveredByClusterLeaf && !coveredByLoadedSourceFeature) {
+          if (!coveredByLabel && !coveredByClusterLeaf) {
             failures.push({
               zoom,
               placeId: target.placeId,
               center: target.coordinates,
               coveredByLabel,
-              coveredByClusterLeaf,
-              coveredByLoadedSourceFeature
+              coveredByClusterLeaf
             });
             continue;
           }
@@ -8440,7 +8426,7 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
       majorSourceId: "ibm-major-city-pins",
       majorClusterLayerId: mapLayerIds.majorClusterPins,
       majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers,
-      majorLabelLayerIds: ["ibm-major-pin", "ibm-major-pin-label", "ibm-major-pin-label-left"]
+      majorLabelLayerIds: ["ibm-major-pin", "ibm-pin-label", "ibm-pin-label-left"]
     }
   );
 

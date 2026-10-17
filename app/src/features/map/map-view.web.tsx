@@ -154,8 +154,8 @@ const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
 const majorInteractionPreferencePx = 3;
-const majorClusterMaxZoom = 10;
-const majorClusterRadiusPx = 25.6;
+const majorClusterMaxZoom = 11;
+const majorClusterRadiusPx = 36;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
 const fallbackStyleLandcoverLayerIds = [
@@ -213,6 +213,7 @@ const areaLabelVisibilityFilter = [
   ["<", ["zoom"], ["get", "maxZoom"]]
 ];
 const areaLabelVariableAnchorMinZoom = 6;
+const majorPlaceLabelOverlapAtZoomExpression = toExpression(["step", ["zoom"], false, 8, true]);
 const areaLabelMajorFilter = ["==", ["get", "prominence"], "major"];
 const areaLabelNonMajorFilter = ["!=", ["get", "prominence"], "major"];
 const areaLabelOverviewFilter = [
@@ -2071,8 +2072,8 @@ function ensureMapLayers(
         "text-size": 12,
         ...majorPinLabelLayout,
         "symbol-sort-key": ["get", "labelPriority"],
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
+        "text-allow-overlap": majorPlaceLabelOverlapAtZoomExpression,
+        "text-ignore-placement": majorPlaceLabelOverlapAtZoomExpression,
         "text-optional": true
       },
       paint: {
@@ -2101,8 +2102,8 @@ function ensureMapLayers(
         "text-size": 12,
         ...majorPinLabelLeftLayout,
         "symbol-sort-key": ["get", "labelPriority"],
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
+        "text-allow-overlap": majorPlaceLabelOverlapAtZoomExpression,
+        "text-ignore-placement": majorPlaceLabelOverlapAtZoomExpression,
         "text-optional": true
       },
       paint: {
