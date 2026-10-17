@@ -17,7 +17,7 @@
     ]
   },
   "type": "natural-feature",
-  "zoomTier": "city",
+  "zoomTier": "region",
   "prominence": "standard",
   "parentId": "asia",
   "candidates": [

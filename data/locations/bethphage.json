@@ -4,10 +4,7 @@
     "ancient": [
       "Bethphage"
     ],
-    "modern": "Et-Tur (Kafr et-Tur)",
-    "modernCountries": [
-      "West Bank"
-    ],
+    "modern": "Et-Tur (Kafr et-Tur), Jerusalem",
     "alternate": [
       "Bethsphage"
     ],
@@ -16,7 +13,7 @@
   "type": "village",
   "zoomTier": "city",
   "prominence": "standard",
-  "parentId": "judea",
+  "parentId": "jerusalem",
   "candidates": [
     {
       "label": "Et-Tur (Kafr et-Tur)",
@@ -57,7 +54,7 @@
     }
   ],
   "summary": {
-    "text": "Bethphage was a village on the Mount of Olives, near the road from Jerusalem to Jericho, whose Aramaic name means \"place of young figs.\" All three Synoptic Gospels record that as Jesus and his disciples approached Jerusalem, they came to Bethphage, where Jesus sent two disciples ahead into the village to bring him an animal to ride for his entry into the city; Matthew's account has the disciples bring both \"a donkey tied, and a colt with her,\" while Mark and Luke each describe a single young animal. Matthew's account states that this was done to fulfill the prophecy, \"Tell the daughter of Zion, behold, your King comes to you, humble, and riding on a donkey, on a colt, the foal of a donkey.\"",
+    "text": "Bethphage was a village on the Mount of Olives, near the road from Jerusalem to Jericho, whose Aramaic name means \"place of young figs.\" All three Synoptic Gospels record that as Jesus and his disciples approached Jerusalem, they came to Bethphage, where Jesus sent two disciples ahead into the village opposite them to bring him an animal to ride for his entry into the city; Matthew's account has the disciples bring both \"a donkey tied, and a colt with her,\" while Mark and Luke each describe a single young animal. Matthew's account states that this was done to fulfill the prophecy, \"Tell the daughter of Zion, behold, your King comes to you, humble, and riding on a donkey, on a colt, the foal of a donkey.\"",
     "sources": [
       "bib:isbe-bethphage",
       "scripture:Matthew 21:1",
