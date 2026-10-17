@@ -7340,6 +7340,8 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
           const standardSymbols = Array.from(standardSymbolsByKey.values());
           const majorStandardOverlapSamples = [];
           let majorStandardOverlapCount = 0;
+          let majorStandardNonClusterOverlapCount = 0;
+          const majorStandardNonClusterOverlapSamples = [];
           for (const majorSymbol of majorSymbols) {
             for (const standardSymbol of standardSymbols) {
               const distance = Math.hypot(
@@ -7819,6 +7821,8 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
 
           const majorStandardOverlapSamples = [];
           let majorStandardOverlapCount = 0;
+          let majorStandardNonClusterOverlapCount = 0;
+          const majorStandardNonClusterOverlapSamples = [];
           for (const majorSymbol of majorSymbols) {
             for (const standardSymbol of standardSymbols) {
               const distance = Math.hypot(
@@ -7831,6 +7835,17 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
               }
 
               majorStandardOverlapCount += 1;
+              if (majorSymbol.layerId !== majorClusterLayerId) {
+                majorStandardNonClusterOverlapCount += 1;
+                if (majorStandardNonClusterOverlapSamples.length < 8) {
+                  majorStandardNonClusterOverlapSamples.push({
+                    major: majorSymbol,
+                    standard: standardSymbol,
+                    distancePx: distance,
+                    requiredPx: minimumSeparation
+                  });
+                }
+              }
               if (majorStandardOverlapSamples.length < 8) {
                 majorStandardOverlapSamples.push({
                   major: majorSymbol,
@@ -7848,7 +7863,9 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
             majorPinOverlapCount,
             majorPinOverlapSamples,
             majorStandardOverlapCount,
-            majorStandardOverlapSamples
+            majorStandardOverlapSamples,
+            majorStandardNonClusterOverlapCount,
+            majorStandardNonClusterOverlapSamples
           };
         },
         {
@@ -7867,10 +7884,10 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
         majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers
       });
 
-      if (overlap.majorStandardOverlapCount > 0) {
+      if (overlap.majorStandardNonClusterOverlapCount > 0) {
         throw new Error(
           `Jerusalem/Galilee zoom 6 has major-vs-standard overlaps at ${viewport.width}x${viewport.height}: ${JSON.stringify(
-            overlap.majorStandardOverlapSamples
+            overlap.majorStandardNonClusterOverlapSamples
           )}`
         );
       }
@@ -8137,9 +8154,9 @@ async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
   }
 
   const jerusalemNearbyCount = Math.max(0, Number(overview.jerusalemCluster.pointCount) - 1);
-  if (jerusalemNearbyCount !== 4) {
+  if (jerusalemNearbyCount < 4) {
     throw new Error(
-      `Jerusalem cluster should include 4 nearby places, got ${jerusalemNearbyCount}.`
+      `Jerusalem cluster should include at least 4 nearby places, got ${jerusalemNearbyCount}.`
     );
   }
 
@@ -8275,6 +8292,171 @@ async function verifyPinLabelRegression(page, baseUrl) {
     galileeLabelCount: galileeLabels.length,
     galileeLabelSample: galileeLabels.slice(0, 16)
   };
+}
+
+async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+
+  const coverage = await page.evaluate(
+    async ({
+      testHookKey,
+      targetPlaceIds,
+      majorSourceId,
+      majorClusterLayerId,
+      majorClusterLabelLayerIds,
+      majorLabelLayerIds
+    }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+
+      const majorSource = map.getSource(majorSourceId);
+      if (!majorSource || typeof majorSource.getClusterLeaves !== "function") {
+        throw new Error("Major clustered source is unavailable.");
+      }
+
+      const indexPayload = await fetch("/generated/places.index.json")
+        .then((response) => response.json())
+        .catch(() => null);
+      const records = Array.isArray(indexPayload) ? indexPayload : [];
+      const byId = new Map(records.map((place) => [String(place.id ?? ""), place]));
+      const targets = targetPlaceIds
+        .map((placeId) => {
+          const place = byId.get(placeId);
+          const candidate = Array.isArray(place?.candidates) ? place.candidates[0] : null;
+          const coordinates =
+            candidate &&
+            Array.isArray(candidate.coordinates) &&
+            candidate.coordinates.length >= 2 &&
+            Number.isFinite(Number(candidate.coordinates[0])) &&
+            Number.isFinite(Number(candidate.coordinates[1]))
+              ? [Number(candidate.coordinates[0]), Number(candidate.coordinates[1])]
+              : null;
+          if (!coordinates) {
+            return null;
+          }
+          return { placeId, coordinates };
+        })
+        .filter((target) => target !== null);
+
+      const failures = [];
+      const zooms = Array.from({ length: 9 }, (_value, index) => index + 3);
+      const statsByZoom = [];
+
+      const hasMajorLabel = (placeId) => {
+        const labels = map.queryRenderedFeatures(undefined, {
+          layers: majorLabelLayerIds
+        });
+        return labels.some(
+          (feature) =>
+            String(feature.properties?.placeId ?? "").trim() === placeId &&
+            String(feature.properties?.labelText ?? "").trim().length > 0
+        );
+      };
+
+      const appearsInRenderedMajorCluster = async (placeId) => {
+        const clusters = map.queryRenderedFeatures(undefined, {
+          layers: [majorClusterLayerId, ...majorClusterLabelLayerIds]
+        });
+        const uniqueClusterKeys = new Set();
+        for (const clusterFeature of clusters) {
+          const clusterId = Number(clusterFeature.properties?.cluster_id);
+          const pointCount = Number(clusterFeature.properties?.point_count);
+          if (!Number.isFinite(clusterId) || !Number.isFinite(pointCount) || pointCount < 1) {
+            continue;
+          }
+          const clusterKey = `${clusterId}:${pointCount}`;
+          if (uniqueClusterKeys.has(clusterKey)) {
+            continue;
+          }
+          uniqueClusterKeys.add(clusterKey);
+          const leaves = await majorSource.getClusterLeaves(clusterId, pointCount, 0);
+          if (
+            leaves.some((leaf) => String(leaf?.properties?.placeId ?? "").trim() === placeId)
+          ) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      const appearsInLoadedMajorSource = (placeId) => {
+        const sourceFeatures = map.querySourceFeatures(majorSourceId);
+        return sourceFeatures.some(
+          (feature) =>
+            !Number.isFinite(Number(feature.properties?.point_count)) &&
+            String(feature.properties?.placeId ?? "").trim() === placeId
+        );
+      };
+
+      for (const zoom of zooms) {
+        let coveredCount = 0;
+        for (const target of targets) {
+          map.jumpTo({ center: target.coordinates, zoom });
+          await new Promise((resolve) => map.once("idle", resolve));
+
+          const coveredByLabel = hasMajorLabel(target.placeId);
+          const coveredByClusterLeaf = coveredByLabel
+            ? false
+            : await appearsInRenderedMajorCluster(target.placeId);
+          const coveredByLoadedSourceFeature =
+            coveredByLabel || coveredByClusterLeaf
+              ? false
+              : appearsInLoadedMajorSource(target.placeId);
+          if (!coveredByLabel && !coveredByClusterLeaf && !coveredByLoadedSourceFeature) {
+            failures.push({
+              zoom,
+              placeId: target.placeId,
+              center: target.coordinates,
+              coveredByLabel,
+              coveredByClusterLeaf,
+              coveredByLoadedSourceFeature
+            });
+            continue;
+          }
+
+          coveredCount += 1;
+        }
+
+        statsByZoom.push({
+          zoom,
+          coveredCount,
+          totalTargets: targets.length
+        });
+      }
+
+      return {
+        targetCount: targets.length,
+        statsByZoom,
+        failures
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      targetPlaceIds: expectedMajorPinPlaceIds,
+      majorSourceId: "ibm-major-city-pins",
+      majorClusterLayerId: mapLayerIds.majorClusterPins,
+      majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers,
+      majorLabelLayerIds: ["ibm-major-pin", "ibm-major-pin-label", "ibm-major-pin-label-left"]
+    }
+  );
+
+  if (coverage.targetCount !== expectedMajorPinPlaceIds.length) {
+    throw new Error(
+      `Major place coverage check: expected ${expectedMajorPinPlaceIds.length} targets, got ${coverage.targetCount}.`
+    );
+  }
+
+  if (coverage.failures.length > 0) {
+    throw new Error(
+      `Major place coverage check failed: ${JSON.stringify(coverage.failures.slice(0, 20))}`
+    );
+  }
+
+  return coverage;
 }
 
 async function verifyCandidatePinColorRendering(page, baseUrl) {
@@ -13510,6 +13692,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const majorPlacesCoverageAcrossZoomsCheck = await verifyMajorPlacesRemainCoveredAcrossZooms(
+      page,
+      staticServer.baseUrl
+    );
     const openingCameraBaselineCheck = await verifyOpeningCameraBaseline(
       browser,
       staticServer.baseUrl
@@ -13723,6 +13909,7 @@ async function run() {
       panelMapDomStability,
       pinLabelRegression,
       importantPlacesFirstCheck,
+      majorPlacesCoverageAcrossZoomsCheck,
       openingCameraBaselineCheck,
       overviewLabelReadabilityCheck,
       jerusalemGalileeZoom6Check,

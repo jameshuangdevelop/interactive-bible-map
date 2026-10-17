@@ -154,7 +154,7 @@ const mapLabelPaddingEdge = 16;
 const focusPaddingTop = 96;
 const interactiveHitPaddingPx = 8;
 const majorInteractionPreferencePx = 3;
-const majorClusterMaxZoom = 5;
+const majorClusterMaxZoom = 10;
 const majorClusterRadiusPx = 25.6;
 const mainStyleReliefLayerId = "natural_earth";
 const mainStyleLandcoverLayerId = "landcover";
@@ -2200,9 +2200,20 @@ function ensureMapLayers(
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 14,
+        "text-anchor": toExpression([
+          "case",
+          ["==", ["get", "hasMultipleCandidates"], true],
+          "bottom",
+          "center"
+        ]),
+        "text-offset": toExpression([
+          "case",
+          ["==", ["get", "hasMultipleCandidates"], true],
+          ["literal", [0, -0.45]],
+          ["literal", [0, 0]]
+        ]),
         "text-allow-overlap": true,
-        "text-ignore-placement": true,
-        "text-anchor": "center"
+        "text-ignore-placement": true
       },
       paint: {
         "text-color": "#1A73E8",
@@ -2476,8 +2487,18 @@ function ensureMapLayers(
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 14,
-        "text-offset": [1.2, 0],
-        "text-anchor": "left",
+        "text-offset": toExpression([
+          "case",
+          ["==", ["get", "hasMultipleCandidates"], true],
+          ["literal", [0, -0.45]],
+          ["literal", [1.2, 0]]
+        ]),
+        "text-anchor": toExpression([
+          "case",
+          ["==", ["get", "hasMultipleCandidates"], true],
+          "bottom",
+          "left"
+        ]),
         "text-allow-overlap": true,
         "text-ignore-placement": true
       },
@@ -2505,7 +2526,18 @@ function ensureMapLayers(
         "text-field": ["get", "labelText"],
         "text-font": ["Noto Sans Bold"],
         "text-size": 14,
-        "text-anchor": "center",
+        "text-anchor": toExpression([
+          "case",
+          ["==", ["get", "hasMultipleCandidates"], true],
+          "bottom",
+          "center"
+        ]),
+        "text-offset": toExpression([
+          "case",
+          ["==", ["get", "hasMultipleCandidates"], true],
+          ["literal", [0, -0.45]],
+          ["literal", [0, 0]]
+        ]),
         "text-allow-overlap": true,
         "text-ignore-placement": true
       },
