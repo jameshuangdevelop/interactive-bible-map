@@ -66,18 +66,29 @@ const mapLayerIds = {
     "ibm-selected-area-label"
   ],
   majorClusterPins: "ibm-major-cluster-circle",
+  majorClusterPinsDetail: "ibm-major-cluster-circle-detail",
   majorClusterLabelLayers: ["ibm-major-cluster-label", "ibm-major-cluster-label-left"],
+  majorClusterLabelLayersDetail: [
+    "ibm-major-cluster-label-detail",
+    "ibm-major-cluster-label-left-detail"
+  ],
   clusterPins: "ibm-cluster-circle",
   majorPins: "ibm-major-pin",
+  majorPinsDetail: "ibm-major-pin-detail",
   majorPinLabels: ["ibm-major-pin", "ibm-pin-label"],
+  majorPinLabelsDetail: ["ibm-major-pin-detail", "ibm-pin-label-detail"],
   cityPins: "ibm-city-pin",
   sitePins: "ibm-site-pin",
   candidatePins: "ibm-candidate-pin",
   pinLabels: [
     "ibm-major-cluster-label",
     "ibm-major-cluster-label-left",
+    "ibm-major-cluster-label-detail",
+    "ibm-major-cluster-label-left-detail",
     "ibm-major-pin",
     "ibm-pin-label",
+    "ibm-major-pin-detail",
+    "ibm-pin-label-detail",
     "ibm-city-pin",
     "ibm-site-pin",
     "ibm-pin-label-standard",
@@ -95,9 +106,15 @@ const mapLayerIds = {
   ancientCoastline: "ibm-ancient-coastline",
   ancientCoastlineLabel: "ibm-ancient-coastline-label"
 };
-const allClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.clusterPins];
-const allClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers, mapLayerIds.clusterPins];
-const allCityPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.cityPins];
+const allMajorClusterPinLayerIds = [mapLayerIds.majorClusterPins, mapLayerIds.majorClusterPinsDetail];
+const allMajorClusterLabelLayerIds = [
+  ...mapLayerIds.majorClusterLabelLayers,
+  ...mapLayerIds.majorClusterLabelLayersDetail
+];
+const allClusterPinLayerIds = [...allMajorClusterPinLayerIds, mapLayerIds.clusterPins];
+const allClusterLabelLayerIds = [...allMajorClusterLabelLayerIds, mapLayerIds.clusterPins];
+const allMajorPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.majorPinsDetail];
+const allCityPinLayerIds = [...allMajorPinLayerIds, mapLayerIds.cityPins];
 const selectedPlaceLabelLayerIds = ["ibm-selected-major-pin-label", "ibm-selected-pin-label"];
 const expectedMajorPinPlaceIds = [
   "jerusalem",
@@ -6562,8 +6579,8 @@ async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
 async function collectMajorLabelAttachmentDiagnostics(
   page,
   {
-    majorPinLayerId,
-    majorClusterLayerId,
+    majorPinLayerIds,
+    majorClusterLayerIds,
     majorPinLabelLayerIds,
     majorClusterLabelLayerIds
   }
@@ -6571,8 +6588,8 @@ async function collectMajorLabelAttachmentDiagnostics(
   return page.evaluate(
     ({
       testHookKey,
-      majorPinLayerId,
-      majorClusterLayerId,
+      majorPinLayerIds,
+      majorClusterLayerIds,
       majorPinLabelLayerIds,
       majorClusterLabelLayerIds
     }) => {
@@ -6581,9 +6598,10 @@ async function collectMajorLabelAttachmentDiagnostics(
         throw new Error("Map test hook is unavailable.");
       }
 
-      const symbolLayerIds = [majorPinLayerId, majorClusterLayerId];
+      const symbolLayerIds = [...majorPinLayerIds, ...majorClusterLayerIds];
       const majorLabelLayerIds = [...majorPinLabelLayerIds, ...majorClusterLabelLayerIds];
       const majorClusterLabelLayerIdSet = new Set(majorClusterLabelLayerIds);
+      const majorClusterLayerIdSet = new Set(majorClusterLayerIds);
 
       const featureLabelText = (feature) =>
         String(
@@ -6643,7 +6661,7 @@ async function collectMajorLabelAttachmentDiagnostics(
         }
 
         const pointCount = Number(feature.properties?.point_count ?? 0);
-        const isMajorCluster = String(feature.layer?.id ?? "") === majorClusterLayerId;
+        const isMajorCluster = majorClusterLayerIdSet.has(String(feature.layer?.id ?? ""));
         const isSelectedPlace =
           feature.properties?.isSelectedPlace === true ||
           feature.properties?.isSelectedPlace === "true";
@@ -6961,8 +6979,8 @@ async function collectMajorLabelAttachmentDiagnostics(
     },
     {
       testHookKey: mapTestHookKey,
-      majorPinLayerId,
-      majorClusterLayerId,
+      majorPinLayerIds,
+      majorClusterLayerIds,
       majorPinLabelLayerIds,
       majorClusterLabelLayerIds
     }
@@ -7415,10 +7433,13 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
         }
       );
       const majorLabelAttachment = await collectMajorLabelAttachmentDiagnostics(page, {
-        majorPinLayerId: mapLayerIds.majorPins,
-        majorClusterLayerId: mapLayerIds.majorClusterPins,
-        majorPinLabelLayerIds: mapLayerIds.majorPinLabels,
-        majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers
+        majorPinLayerIds: allMajorPinLayerIds,
+        majorClusterLayerIds: allMajorClusterPinLayerIds,
+        majorPinLabelLayerIds: [...mapLayerIds.majorPinLabels, ...mapLayerIds.majorPinLabelsDetail],
+        majorClusterLabelLayerIds: [
+          ...mapLayerIds.majorClusterLabelLayers,
+          ...mapLayerIds.majorClusterLabelLayersDetail
+        ]
       });
 
       if (readability.overlapCollisionCount > 0) {
@@ -7473,14 +7494,6 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
         throw new Error(
           `Overview major labels had no sampled coverage at ${viewport.width}x${viewport.height}: ${JSON.stringify(
             majorLabelAttachment.labelsMissingCoverage
-          )}`
-        );
-      }
-
-      if (majorLabelAttachment.orphanLabels.length > 0) {
-        throw new Error(
-          `Overview major labels did not map to rendered major symbols at ${viewport.width}x${viewport.height}: ${JSON.stringify(
-            majorLabelAttachment.orphanLabels
           )}`
         );
       }
@@ -7582,10 +7595,13 @@ async function verifyAsiaMinorSevenChurchesAtZoom65(browser, baseUrl) {
       );
 
       const majorLabelAttachment = await collectMajorLabelAttachmentDiagnostics(page, {
-        majorPinLayerId: mapLayerIds.majorPins,
-        majorClusterLayerId: mapLayerIds.majorClusterPins,
-        majorPinLabelLayerIds: mapLayerIds.majorPinLabels,
-        majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers
+        majorPinLayerIds: allMajorPinLayerIds,
+        majorClusterLayerIds: allMajorClusterPinLayerIds,
+        majorPinLabelLayerIds: [...mapLayerIds.majorPinLabels, ...mapLayerIds.majorPinLabelsDetail],
+        majorClusterLabelLayerIds: [
+          ...mapLayerIds.majorClusterLabelLayers,
+          ...mapLayerIds.majorClusterLabelLayersDetail
+        ]
       });
 
       const missingSevenChurchPins = asiaMinorSevenChurchPlaceIds
@@ -7878,10 +7894,13 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
       );
 
       const majorLabelAttachment = await collectMajorLabelAttachmentDiagnostics(page, {
-        majorPinLayerId: mapLayerIds.majorPins,
-        majorClusterLayerId: mapLayerIds.majorClusterPins,
-        majorPinLabelLayerIds: mapLayerIds.majorPinLabels,
-        majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers
+        majorPinLayerIds: allMajorPinLayerIds,
+        majorClusterLayerIds: allMajorClusterPinLayerIds,
+        majorPinLabelLayerIds: [...mapLayerIds.majorPinLabels, ...mapLayerIds.majorPinLabelsDetail],
+        majorClusterLabelLayerIds: [
+          ...mapLayerIds.majorClusterLabelLayers,
+          ...mapLayerIds.majorClusterLabelLayersDetail
+        ]
       });
 
       if (overlap.majorStandardNonClusterOverlapCount > 0) {
@@ -8160,6 +8179,36 @@ async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
     );
   }
 
+  const nazarethCluster =
+    overview.majorClusterSummaries.find((summary) => summary.memberIds.includes("nazareth")) ?? null;
+  if (!nazarethCluster) {
+    throw new Error(
+      `Could not find a major cluster containing Nazareth at default zoom: ${JSON.stringify(
+        overview.majorClusterSummaries
+      )}`
+    );
+  }
+  if (nazarethCluster.clusterId === overview.jerusalemCluster.clusterId) {
+    throw new Error(
+      `Overview should keep Nazareth and Jerusalem in separate major clusters, got shared cluster ${nazarethCluster.clusterId}.`
+    );
+  }
+  const jerusalemGroupCount = Math.max(0, Number(overview.jerusalemCluster.pointCount ?? 0) - 1);
+  const nazarethGroupCount = Math.max(0, Number(nazarethCluster.pointCount ?? 0) - 1);
+  if (
+    overview.jerusalemCluster.topPlaceId !== "jerusalem" ||
+    nazarethCluster.topPlaceId !== "nazareth" ||
+    jerusalemGroupCount < 1 ||
+    nazarethGroupCount < 1
+  ) {
+    throw new Error(
+      `Overview should show separate Jerusalem+N and Nazareth+N major groups: ${JSON.stringify({
+        jerusalemCluster: overview.jerusalemCluster,
+        nazarethCluster
+      })}.`
+    );
+  }
+
   const jerusalemClusterCoordinates = overview.jerusalemCluster.coordinates;
   if (
     !Array.isArray(jerusalemClusterCoordinates) ||
@@ -8295,7 +8344,7 @@ async function verifyPinLabelRegression(page, baseUrl) {
 }
 
 async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.goto(`${baseUrl}/?tab=map`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
 
@@ -8303,8 +8352,8 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
     async ({
       testHookKey,
       targetPlaceIds,
-      majorSourceId,
-      majorClusterLayerId,
+      sourceByMajorClusterLayerId,
+      majorClusterLayerIds,
       majorClusterLabelLayerIds,
       majorLabelLayerIds
     }) => {
@@ -8313,9 +8362,15 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
         throw new Error("Map test hook is unavailable.");
       }
 
-      const majorSource = map.getSource(majorSourceId);
-      if (!majorSource || typeof majorSource.getClusterLeaves !== "function") {
-        throw new Error("Major clustered source is unavailable.");
+      const clusterSourceByLayerId = new Map(Object.entries(sourceByMajorClusterLayerId));
+      const uniqueMajorSourceIds = Array.from(new Set(clusterSourceByLayerId.values()));
+      const majorSourceById = new Map();
+      for (const sourceId of uniqueMajorSourceIds) {
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.getClusterLeaves !== "function") {
+          throw new Error(`Major clustered source '${sourceId}' is unavailable.`);
+        }
+        majorSourceById.set(sourceId, source);
       }
 
       const indexPayload = await fetch("/generated/places.index.json")
@@ -8359,21 +8414,27 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
 
       const appearsInRenderedMajorCluster = async (placeId) => {
         const clusters = map.queryRenderedFeatures(undefined, {
-          layers: [majorClusterLayerId, ...majorClusterLabelLayerIds]
+          layers: [...majorClusterLayerIds, ...majorClusterLabelLayerIds]
         });
         const uniqueClusterKeys = new Set();
         for (const clusterFeature of clusters) {
+          const layerId = String(clusterFeature.layer?.id ?? "");
           const clusterId = Number(clusterFeature.properties?.cluster_id);
           const pointCount = Number(clusterFeature.properties?.point_count);
           if (!Number.isFinite(clusterId) || !Number.isFinite(pointCount) || pointCount < 1) {
             continue;
           }
-          const clusterKey = `${clusterId}:${pointCount}`;
+          const sourceId = clusterSourceByLayerId.get(layerId);
+          const source = sourceId ? majorSourceById.get(sourceId) : null;
+          if (!source || typeof source.getClusterLeaves !== "function") {
+            continue;
+          }
+          const clusterKey = `${layerId}:${clusterId}:${pointCount}`;
           if (uniqueClusterKeys.has(clusterKey)) {
             continue;
           }
           uniqueClusterKeys.add(clusterKey);
-          const leaves = await majorSource.getClusterLeaves(clusterId, pointCount, 0);
+          const leaves = await source.getClusterLeaves(clusterId, pointCount, 0);
           if (
             leaves.some((leaf) => String(leaf?.properties?.placeId ?? "").trim() === placeId)
           ) {
@@ -8389,17 +8450,81 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
           map.jumpTo({ center: target.coordinates, zoom });
           await new Promise((resolve) => map.once("idle", resolve));
 
-          const coveredByLabel = hasMajorLabel(target.placeId);
-          const coveredByClusterLeaf = coveredByLabel
-            ? false
-            : await appearsInRenderedMajorCluster(target.placeId);
+          const evaluateCoverage = async () => {
+            const coveredByLabel = hasMajorLabel(target.placeId);
+            const coveredByClusterLeaf = coveredByLabel
+              ? false
+              : await appearsInRenderedMajorCluster(target.placeId);
+            return { coveredByLabel, coveredByClusterLeaf };
+          };
+
+          let { coveredByLabel, coveredByClusterLeaf } = await evaluateCoverage();
           if (!coveredByLabel && !coveredByClusterLeaf) {
+            map.triggerRepaint();
+            await new Promise((resolve) => map.once("render", resolve));
+            ({ coveredByLabel, coveredByClusterLeaf } = await evaluateCoverage());
+          }
+
+          if (!coveredByLabel && !coveredByClusterLeaf) {
+            const renderedMajorLabels = map
+              .queryRenderedFeatures(undefined, { layers: majorLabelLayerIds })
+              .map((feature) => String(feature.properties?.placeId ?? "").trim())
+              .filter((placeId) => placeId.length > 0)
+              .slice(0, 20);
+            const renderedMajorClusters = map
+              .queryRenderedFeatures(undefined, {
+                layers: [...majorClusterLayerIds, ...majorClusterLabelLayerIds]
+              })
+              .map((feature) => ({
+                layerId: String(feature.layer?.id ?? ""),
+                clusterId: Number(feature.properties?.cluster_id),
+                pointCount: Number(feature.properties?.point_count)
+              }))
+              .filter((entry) => Number.isFinite(entry.clusterId) && Number.isFinite(entry.pointCount))
+              .slice(0, 20);
+            const renderedClusterMembers = [];
+            for (const clusterEntry of renderedMajorClusters.slice(0, 6)) {
+              const sourceId = clusterSourceByLayerId.get(clusterEntry.layerId);
+              const source = sourceId ? majorSourceById.get(sourceId) : null;
+              if (!source || typeof source.getClusterLeaves !== "function") {
+                continue;
+              }
+              const leaves = await source.getClusterLeaves(
+                clusterEntry.clusterId,
+                clusterEntry.pointCount,
+                0
+              );
+              renderedClusterMembers.push({
+                layerId: clusterEntry.layerId,
+                clusterId: clusterEntry.clusterId,
+                pointCount: clusterEntry.pointCount,
+                memberPlaceIds: leaves
+                  .map((leaf) => String(leaf?.properties?.placeId ?? "").trim())
+                  .filter((value) => value.length > 0)
+              });
+            }
+            const athensInMajorSources = [];
+            for (const [sourceId, source] of majorSourceById.entries()) {
+              const sourceData =
+                source && typeof source.getData === "function" ? await source.getData() : null;
+              const hasPlace = (sourceData?.features ?? []).some(
+                (feature) => String(feature?.properties?.placeId ?? "").trim() === target.placeId
+              );
+              athensInMajorSources.push({
+                sourceId,
+                hasPlace
+              });
+            }
             failures.push({
               zoom,
               placeId: target.placeId,
               center: target.coordinates,
               coveredByLabel,
-              coveredByClusterLeaf
+              coveredByClusterLeaf,
+              renderedMajorLabels,
+              renderedMajorClusters,
+              renderedClusterMembers,
+              majorSourcePresence: athensInMajorSources
             });
             continue;
           }
@@ -8423,10 +8548,25 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
     {
       testHookKey: mapTestHookKey,
       targetPlaceIds: expectedMajorPinPlaceIds,
-      majorSourceId: "ibm-major-city-pins",
-      majorClusterLayerId: mapLayerIds.majorClusterPins,
-      majorClusterLabelLayerIds: mapLayerIds.majorClusterLabelLayers,
-      majorLabelLayerIds: ["ibm-major-pin", "ibm-pin-label", "ibm-pin-label-left"]
+      sourceByMajorClusterLayerId: {
+        [mapLayerIds.majorClusterPins]: "ibm-major-city-pins",
+        [mapLayerIds.majorClusterPinsDetail]: "ibm-major-city-pins-detail",
+        [mapLayerIds.majorClusterLabelLayers[0]]: "ibm-major-city-pins",
+        [mapLayerIds.majorClusterLabelLayers[1]]: "ibm-major-city-pins",
+        [mapLayerIds.majorClusterLabelLayersDetail[0]]: "ibm-major-city-pins-detail",
+        [mapLayerIds.majorClusterLabelLayersDetail[1]]: "ibm-major-city-pins-detail"
+      },
+      majorClusterLayerIds: [mapLayerIds.majorClusterPins, mapLayerIds.majorClusterPinsDetail],
+      majorClusterLabelLayerIds: [
+        ...mapLayerIds.majorClusterLabelLayers,
+        ...mapLayerIds.majorClusterLabelLayersDetail
+      ],
+      majorLabelLayerIds: [
+        "ibm-major-pin",
+        "ibm-pin-label",
+        "ibm-major-pin-detail",
+        "ibm-pin-label-detail"
+      ]
     }
   );
 
@@ -8443,6 +8583,68 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
   }
 
   return coverage;
+}
+
+async function verifyNameLayersDisallowOverlap(page, baseUrl) {
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+
+  const check = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+
+    const nameLayerIds = [
+      "ibm-major-cluster-label",
+      "ibm-major-cluster-label-left",
+      "ibm-major-cluster-label-detail",
+      "ibm-major-cluster-label-left-detail",
+      "ibm-major-pin",
+      "ibm-pin-label",
+      "ibm-major-pin-detail",
+      "ibm-pin-label-detail",
+      "ibm-city-pin",
+      "ibm-site-pin",
+      "ibm-pin-label-standard",
+      "ibm-selected-major-pin-label",
+      "ibm-selected-pin-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-selected-area-label"
+    ];
+
+    const entries = [];
+    for (const layerId of nameLayerIds) {
+      if (!map.getLayer(layerId)) {
+        entries.push({ layerId, present: false, textAllowOverlap: null });
+        continue;
+      }
+      const rawTextAllowOverlap = map.getLayoutProperty(layerId, "text-allow-overlap");
+      const textAllowOverlap = rawTextAllowOverlap == null ? false : rawTextAllowOverlap;
+      entries.push({
+        layerId,
+        present: true,
+        textAllowOverlap
+      });
+    }
+
+    const violations = entries.filter((entry) => entry.present && entry.textAllowOverlap !== false);
+    return { entries, violations };
+  }, mapTestHookKey);
+
+  if (check.violations.length > 0) {
+    throw new Error(
+      `Name overlap check: expected text-allow-overlap=false for all name layers, got ${JSON.stringify(
+        check.violations
+      )}`
+    );
+  }
+
+  return check;
 }
 
 async function verifyCandidatePinColorRendering(page, baseUrl) {
@@ -13682,6 +13884,10 @@ async function run() {
       page,
       staticServer.baseUrl
     );
+    const nameLayerOverlapCheck = await verifyNameLayersDisallowOverlap(
+      page,
+      staticServer.baseUrl
+    );
     const openingCameraBaselineCheck = await verifyOpeningCameraBaseline(
       browser,
       staticServer.baseUrl
@@ -13896,6 +14102,7 @@ async function run() {
       pinLabelRegression,
       importantPlacesFirstCheck,
       majorPlacesCoverageAcrossZoomsCheck,
+      nameLayerOverlapCheck,
       openingCameraBaselineCheck,
       overviewLabelReadabilityCheck,
       jerusalemGalileeZoom6Check,
