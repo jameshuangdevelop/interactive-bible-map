@@ -9,6 +9,7 @@ import type {
 
 type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
 type RingCoordinates = number[][];
+type PolygonCoordinates = PolygonGeometry["coordinates"];
 
 const WORLD_RING: [number, number][] = [
   [-180, -85],
@@ -40,6 +41,20 @@ function collectOuterRings(geometry: RegionGeometry): RingCoordinates[] {
   return geometry.coordinates
     .map((polygon) => polygon[0])
     .filter((ring): ring is RingCoordinates => Array.isArray(ring) && ring.length > 0);
+}
+
+function collectInteriorRings(geometry: RegionGeometry): RingCoordinates[] {
+  if (geometry.type === "Polygon") {
+    return geometry.coordinates.slice(1);
+  }
+
+  return geometry.coordinates
+    .flatMap((polygon) => polygon.slice(1))
+    .filter((ring): ring is RingCoordinates => Array.isArray(ring) && ring.length > 0);
+}
+
+function toPolygonCoordinates(rings: RingCoordinates[]): PolygonCoordinates {
+  return rings as unknown as PolygonCoordinates;
 }
 
 export function findSelectedRegionGeometry({
@@ -85,6 +100,7 @@ export function buildSelectedRegionVeilFeatureCollection(
   if (outerRings.length === 0) {
     return toEmptyPolygonFeatureCollection();
   }
+  const interiorRings = collectInteriorRings(regionGeometry);
 
   return {
     type: "FeatureCollection",
@@ -92,13 +108,24 @@ export function buildSelectedRegionVeilFeatureCollection(
       {
         type: "Feature",
         properties: {
-          kind: "selected-region-veil"
+          kind: "selected-region-veil" as const
         },
         geometry: {
           type: "Polygon",
-          coordinates: [WORLD_RING, ...outerRings]
+          coordinates: toPolygonCoordinates([WORLD_RING, ...outerRings])
         }
-      }
+      },
+      ...interiorRings.map((ring, index) => ({
+        type: "Feature" as const,
+        id: `selected-region-veil-hole:${index}`,
+        properties: {
+          kind: "selected-region-veil" as const
+        },
+        geometry: {
+          type: "Polygon" as const,
+          coordinates: toPolygonCoordinates([ring])
+        }
+      }))
     ]
   };
 }
@@ -111,13 +138,15 @@ export function buildSelectedRegionOutlineFeatureCollection(
   }
 
   const outerRings = collectOuterRings(regionGeometry);
-  if (outerRings.length === 0) {
+  const interiorRings = collectInteriorRings(regionGeometry);
+  const allRings = [...outerRings, ...interiorRings];
+  if (allRings.length === 0) {
     return toEmptyLineFeatureCollection();
   }
 
   return {
     type: "FeatureCollection",
-    features: outerRings.map((ring, index) => ({
+    features: allRings.map((ring, index) => ({
       type: "Feature",
       properties: {
         kind: "selected-region-outline"

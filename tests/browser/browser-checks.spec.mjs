@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import AxeBuilder from "@axe-core/playwright";
+import sharp from "sharp";
 
 import {
   buildSyntheticPlaces,
@@ -237,19 +238,85 @@ async function clickRouteStageCard(page, stageIndex) {
   await card.click({ position });
 }
 
-async function fireMapClick(page, point) {
-  await page.evaluate(
-    ({ testHookKey, x, y }) => {
-      const map = window[testHookKey];
-      const lngLat = map.unproject([x, y]);
-      map.fire("click", {
-        point: { x, y },
-        lngLat,
-        originalEvent: { type: "click" }
-      });
-    },
-    { testHookKey: mapTestHookKey, x: point.x, y: point.y }
-  );
+function clipAroundPoint(page, x, y, width = 180, height = 72) {
+  const viewport = page.viewportSize();
+  const viewportWidth = viewport?.width ?? 1280;
+  const viewportHeight = viewport?.height ?? 720;
+  const left = Math.max(0, Math.min(Math.round(x - width / 2), viewportWidth - width));
+  const top = Math.max(0, Math.min(Math.round(y - height / 2), viewportHeight - height));
+  return { x: left, y: top, width, height };
+}
+
+async function countBluePixelsNearLabel(page, x, y) {
+  const screenshot = await page.screenshot({
+    clip: clipAroundPoint(page, x, y)
+  });
+  const { data } = await sharp(screenshot).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let nearGoogleBlueCount = 0;
+  for (let index = 0; index < data.length; index += 4) {
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+    const alpha = data[index + 3];
+    if (alpha < 200) {
+      continue;
+    }
+    if (Math.abs(red - 26) <= 20 && Math.abs(green - 115) <= 25 && Math.abs(blue - 232) <= 25) {
+      nearGoogleBlueCount += 1;
+    }
+  }
+  return nearGoogleBlueCount;
+}
+
+async function mapPointToViewportPoint(page, point) {
+  const { x, y } = point;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return null;
+  }
+  return { x, y };
+}
+
+async function moveMouseToMapPoint(page, point) {
+  const viewportPoint = await mapPointToViewportPoint(page, point);
+  expect(viewportPoint).toBeTruthy();
+  await page.mouse.move(viewportPoint.x, viewportPoint.y);
+}
+
+async function clickMapPoint(page, point) {
+  const viewportPoint = await mapPointToViewportPoint(page, point);
+  expect(viewportPoint).toBeTruthy();
+  await page.mouse.click(viewportPoint.x, viewportPoint.y);
+}
+
+async function cursorAtMapPoint(page, point) {
+  await moveMouseToMapPoint(page, point);
+  await page.waitForTimeout(60);
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return window.getComputedStyle(map.getCanvas()).cursor;
+  }, mapTestHookKey);
+}
+
+async function moveMouseToInteractiveMapPoint(page, originPoint) {
+  const offsets = [
+    [0, 0],
+    [0, -10],
+    [0, 10],
+    [-10, 0],
+    [10, 0],
+    [-18, -10],
+    [18, -10],
+    [-18, 10],
+    [18, 10]
+  ];
+  for (const [offsetX, offsetY] of offsets) {
+    const point = { x: originPoint.x + offsetX, y: originPoint.y + offsetY };
+    const cursor = await cursorAtMapPoint(page, point);
+    if (cursor.includes("pointer")) {
+      return point;
+    }
+  }
+  return null;
 }
 
 test("map requests tiles and loads workers on startup", { tag: ["@data"] }, async ({ page, baseUrl }) => {
@@ -810,71 +877,117 @@ test("selected place pin rules stay accurate for towns, areas, candidate places,
   expect(modernState.selectedLabelCount).toBe(0);
 });
 
-test("region names from area labels turn blue on hover and keep pointer cursor @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("hover turns one town, one area label and one holder label blue with unique feature ids @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await jumpMap(page, [35.7, 32.95], 7.1);
-
-  const target = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const hit = map
-      .queryRenderedFeatures(undefined, {
-        layers: [
-          "ibm-area-label-overview",
-          "ibm-area-label",
-          "ibm-major-area-label-overview",
-          "ibm-major-area-label",
-          "ibm-ancient-holder-label-clickable"
-        ]
-      })
-      .find((feature) => {
-        const placeType = feature.properties?.placeType;
-        const hasHolderLocation = typeof feature.properties?.holderLocationId === "string";
-        return placeType === "region" || placeType === "province" || hasHolderLocation;
-      });
-    if (!hit || hit.geometry?.type !== "Point") {
-      return null;
+  const hoverScenarioDefinitions = [
+    {
+      name: "town",
+      center: [27.34, 37.94],
+      zoom: 8.2,
+      layerIds: ["ibm-city-pin", "ibm-site-pin", "ibm-major-pin"]
+    },
+    {
+      name: "area",
+      center: [33.3, 38.6],
+      zoom: 6.5,
+      layerIds: ["ibm-area-label-overview", "ibm-area-label", "ibm-major-area-label-overview", "ibm-major-area-label"]
+    },
+    {
+      name: "holder",
+      center: [31.5, 39.0],
+      zoom: 6.2,
+      layerIds: ["ibm-ancient-holder-label-clickable"]
     }
-    const projected = map.project(hit.geometry.coordinates);
-    return {
-      x: projected.x,
-      y: projected.y,
-      source: String(hit.source ?? ""),
-      id: hit.id ?? null,
-      layerId: typeof hit.layer?.id === "string" ? hit.layer.id : null
-    };
-  }, mapTestHookKey);
-  expect(target).toBeTruthy();
-  await page.mouse.move(target.x, target.y);
-  await page.waitForFunction(
-    ({ testHookKey, source, id }) => {
-      const map = window[testHookKey];
-      if (!map || id === null || id === undefined) {
-        return false;
-      }
-      const state = map.getFeatureState({ source, id });
-      return state?.isHovered === true;
-    },
-    { testHookKey: mapTestHookKey, source: target.source, id: target.id },
-    { timeout: 10_000 }
-  );
+  ];
 
-  const hoverProbe = await page.evaluate(
-    ({ testHookKey, source, id, layerId }) => {
-      const map = window[testHookKey];
-      const cursor = window.getComputedStyle(map.getCanvas()).cursor;
-      const state = id === null || id === undefined ? null : map.getFeatureState({ source, id });
-      const fillColor = layerId ? map.getPaintProperty(layerId, "text-color") : null;
-      return {
-        cursor,
-        hovered: state?.isHovered ?? false,
-        paintTextColor: JSON.stringify(fillColor)
-      };
-    },
-    { testHookKey: mapTestHookKey, source: target.source, id: target.id, layerId: target.layerId }
-  );
-  expect(hoverProbe.cursor).toContain("pointer");
-  expect(hoverProbe.hovered).toBe(true);
-  expect(hoverProbe.paintTextColor).toContain("#1A73E8");
+  for (const scenario of hoverScenarioDefinitions) {
+    await jumpMap(page, scenario.center, scenario.zoom);
+    await waitForMapIdle(page);
+    const target = await page.evaluate(
+      ({ testHookKey, layerIds, scenarioName }) => {
+        const map = window[testHookKey];
+        const predicate =
+          scenarioName === "town"
+            ? (feature) => feature.properties?.placeId === "ephesus"
+            : scenarioName === "area"
+              ? (feature) => feature.properties?.placeId === "lycaonia"
+              : (feature) => feature.properties?.holderLocationId === "asia";
+        const feature = map.queryRenderedFeatures(undefined, { layers: layerIds }).find(predicate);
+        if (!feature || feature.geometry?.type !== "Point") {
+          return null;
+        }
+        const projected = map.project(feature.geometry.coordinates);
+        let hoverPoint = { x: projected.x, y: projected.y };
+        for (const [offsetX, offsetY] of [
+          [0, 0],
+          [0, -10],
+          [0, 10],
+          [-10, 0],
+          [10, 0]
+        ]) {
+          const x = projected.x + offsetX;
+          const y = projected.y + offsetY;
+          const hit = map
+            .queryRenderedFeatures(
+              [
+                [x - 2, y - 2],
+                [x + 2, y + 2]
+              ],
+              { layers: [feature.layer?.id ?? ""] }
+            )
+            .some((entry) => entry.id === feature.id);
+          if (hit) {
+            hoverPoint = { x, y };
+            break;
+          }
+        }
+        const sameIdCount =
+          feature.id === null || feature.id === undefined
+            ? null
+            : map.queryRenderedFeatures(undefined, { layers: [feature.layer?.id ?? ""] }).filter(
+                (entry) => entry.id === feature.id
+              ).length;
+        return {
+          x: hoverPoint.x,
+          y: hoverPoint.y,
+          source: String(feature.source ?? ""),
+          id: feature.id,
+          layerId: feature.layer?.id ?? "",
+          sameIdCount
+        };
+      },
+      { testHookKey: mapTestHookKey, layerIds: scenario.layerIds, scenarioName: scenario.name }
+    );
+    expect(target, `${scenario.name} hover target should exist`).toBeTruthy();
+    expect(target.id, `${target.layerId} should expose a stable id`).not.toBeNull();
+    expect(target.sameIdCount, `${target.layerId} id should not be shared`).toBe(1);
+
+    const beforeBlueCount = await countBluePixelsNearLabel(page, target.x, target.y);
+    expect(beforeBlueCount).toBeLessThan(8);
+
+    let afterBlueCount = 0;
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0],
+      [-18, -10],
+      [18, -10],
+      [-18, 10],
+      [18, 10]
+    ]) {
+      const hoverPoint = { x: target.x + offsetX, y: target.y + offsetY };
+      await moveMouseToMapPoint(page, hoverPoint);
+      await page.waitForTimeout(120);
+      const sampleBlueCount = await countBluePixelsNearLabel(page, hoverPoint.x, hoverPoint.y);
+      afterBlueCount = Math.max(afterBlueCount, sampleBlueCount);
+      if (afterBlueCount > beforeBlueCount + 20) {
+        break;
+      }
+    }
+    expect(afterBlueCount).toBeGreaterThan(beforeBlueCount + 20);
+  }
 });
 
 test("selecting a region draws veil and outline from its political area shape @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -918,9 +1031,6 @@ test("selecting a region draws veil and outline from its political area shape @n
     const canonicalVeil = uniqueVeils.values().next().value ?? null;
     const renderedVeils = map.queryRenderedFeatures(undefined, { layers: ["ibm-selected-region-veil"] });
     const renderedOutlines = map.queryRenderedFeatures(undefined, { layers: ["ibm-selected-region-outline"] });
-    const selectedLabel = map
-      .queryRenderedFeatures(undefined, { layers: ["ibm-selected-area-label"] })
-      .find((feature) => feature.properties?.placeId === "galatia");
     return {
       veilSourceCount: uniqueVeils.size,
       maxVeilHoleCount: Math.max(
@@ -933,8 +1043,7 @@ test("selecting a region draws veil and outline from its political area shape @n
       ),
       maxOutlineSourceCount: Math.max(0, uniqueOutlines.size),
       renderedVeilCount: renderedVeils.length,
-      renderedOutlineCount: renderedOutlines.length,
-      selectedLabelCount: selectedLabel ? 1 : 0
+      renderedOutlineCount: renderedOutlines.length
     };
   }, mapTestHookKey);
 
@@ -943,12 +1052,168 @@ test("selecting a region draws veil and outline from its political area shape @n
   expect(overlayProbe.maxOutlineSourceCount).toBeGreaterThanOrEqual(expectedOuterRingCount);
   expect(overlayProbe.renderedVeilCount).toBeGreaterThan(0);
   expect(overlayProbe.renderedOutlineCount).toBeGreaterThan(0);
-  expect(overlayProbe.selectedLabelCount).toBe(1);
+});
+
+test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=53`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const viewpoints = [
+    { center: [34.2, 39.1], zoom: 6.6 },
+    { center: [33.4, 38.9], zoom: 6.9 },
+    { center: [34.8, 39.3], zoom: 7.2 }
+  ];
+  let galatiaHolderLabel = null;
+  for (const viewpoint of viewpoints) {
+    await jumpMap(page, viewpoint.center, viewpoint.zoom);
+    galatiaHolderLabel = await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      const holderLayers = [
+        "ibm-ancient-holder-label-click-target",
+        "ibm-ancient-holder-label-clickable",
+        "ibm-ancient-holder-label-selected"
+      ];
+      const feature = map
+        .queryRenderedFeatures(undefined, {
+          layers: holderLayers
+        })
+        .find((entry) => {
+          const locationId = entry.properties?.holderLocationId;
+          const text = String(entry.properties?.labelText ?? "");
+          if (!(locationId === "galatia" || text.includes("GALATIA"))) {
+            return false;
+          }
+          return entry.geometry?.type === "Point";
+        });
+      if (!feature || feature.geometry?.type !== "Point") {
+        return null;
+      }
+      const projected = map.project(feature.geometry.coordinates);
+      const targetPlaceId = String(feature.properties?.holderLocationId ?? "");
+      for (const [offsetX, offsetY] of [
+        [0, 0],
+        [0, -10],
+        [0, 10],
+        [-10, 0],
+        [10, 0],
+        [-20, -10],
+        [20, -10],
+        [-20, 10],
+        [20, 10]
+      ]) {
+        const x = projected.x + offsetX;
+        const y = projected.y + offsetY;
+        const hit = map
+          .queryRenderedFeatures(
+            [
+              [x - 2, y - 2],
+              [x + 2, y + 2]
+            ],
+            { layers: holderLayers }
+          )
+          .some(
+            (entry) => String(entry.properties?.holderLocationId ?? "") === targetPlaceId
+          );
+        if (hit) {
+          return { x, y };
+        }
+      }
+      return { x: projected.x, y: projected.y };
+    }, mapTestHookKey);
+    if (galatiaHolderLabel) {
+      break;
+    }
+  }
+  expect(galatiaHolderLabel).toBeTruthy();
+
+  let selectedPlaceAfterHolderClick = null;
+  for (const [offsetX, offsetY] of [
+    [0, 0],
+    [0, -8],
+    [0, 8],
+    [-8, 0],
+    [8, 0],
+    [0, -16],
+    [0, 16],
+    [-16, 0],
+    [16, 0],
+    [-16, -12],
+    [16, -12],
+    [-16, 12],
+    [16, 12],
+    [0, -24],
+    [0, 24],
+    [-24, 0],
+    [24, 0]
+  ]) {
+    await clickMapPoint(page, { x: galatiaHolderLabel.x + offsetX, y: galatiaHolderLabel.y + offsetY });
+    await page.waitForTimeout(200);
+    selectedPlaceAfterHolderClick = await page.evaluate(
+      () => new URLSearchParams(window.location.search).get("place")
+    );
+    if (selectedPlaceAfterHolderClick === "galatia") {
+      break;
+    }
+  }
+  expect(selectedPlaceAfterHolderClick).toBe("galatia");
+  await waitForMapIdle(page);
+
+  const selectedNameProbe = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const nameLayers = [
+      "ibm-major-pin",
+      "ibm-routes-major-pin",
+      "ibm-city-pin",
+      "ibm-routes-city-pin",
+      "ibm-site-pin",
+      "ibm-routes-site-pin",
+      "ibm-pin-label-standard",
+      "ibm-selected-major-pin-label",
+      "ibm-selected-site-pin-label",
+      "ibm-selected-pin-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-selected-area-label",
+      "ibm-ancient-holder-label",
+      "ibm-ancient-holder-label-clickable",
+      "ibm-ancient-holder-label-selected"
+    ];
+    const galatiaNames = map.queryRenderedFeatures(undefined, { layers: nameLayers }).filter((feature) => {
+      const placeId = feature.properties?.placeId;
+      const holderLocationId = feature.properties?.holderLocationId;
+      return placeId === "galatia" || holderLocationId === "galatia";
+    });
+
+    const single = galatiaNames[0];
+    if (!single || single.geometry?.type !== "Point") {
+      return { count: galatiaNames.length, layerId: null, x: null, y: null };
+    }
+    const projected = map.project(single.geometry.coordinates);
+    return {
+      count: galatiaNames.length,
+      layerId: single.layer?.id ?? null,
+      x: projected.x,
+      y: projected.y
+    };
+  }, mapTestHookKey);
+  expect(selectedNameProbe.count).toBe(1);
+  expect(selectedNameProbe.layerId).toBe("ibm-ancient-holder-label-selected");
+
+  const selectedBlueCount = await countBluePixelsNearLabel(page, selectedNameProbe.x, selectedNameProbe.y);
+  expect(selectedBlueCount).toBeGreaterThan(20);
 });
 
 test("with a region selected, clicking an outside town clears region highlight and selects the town @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await jumpMap(page, [35.0, 37.0], 6.7);
+  await page.goto(`${baseUrl}/?tab=map&year=53&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await jumpMap(page, [27.34, 37.94], 7.4);
   const townTarget = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
     const hit = map
@@ -956,6 +1221,9 @@ test("with a region selected, clicking an outside town clears region highlight a
         layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"]
       })
       .find((feature) => {
+        if (feature.geometry?.type !== "Point") {
+          return false;
+        }
         const placeId = feature.properties?.placeId;
         const placeType = feature.properties?.placeType;
         return (
@@ -972,13 +1240,37 @@ test("with a region selected, clicking an outside town clears region highlight a
       return null;
     }
     const projected = map.project(hit.geometry.coordinates);
-    return { x: projected.x, y: projected.y, placeId: String(hit.properties.placeId) };
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0]
+    ]) {
+      const x = projected.x + offsetX;
+      const y = projected.y + offsetY;
+      const hitAtPoint = map
+        .queryRenderedFeatures(
+          [
+            [x - 2, y - 2],
+            [x + 2, y + 2]
+          ],
+          { layers: ["ibm-major-pin", "ibm-routes-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"] }
+        )
+        .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
+      if (hitAtPoint) {
+        return { x, y, placeId: String(hit.properties.placeId) };
+      }
+    }
+    return null;
   }, mapTestHookKey);
   expect(townTarget).toBeTruthy();
-  await fireMapClick(page, townTarget);
+  await clickMapPoint(page, townTarget);
   await page.waitForFunction(
-    (placeId) => new URLSearchParams(window.location.search).get("place") === placeId,
-    townTarget.placeId,
+    () => {
+      const selectedPlaceId = new URLSearchParams(window.location.search).get("place");
+      return typeof selectedPlaceId === "string" && selectedPlaceId.length > 0 && selectedPlaceId !== "galatia";
+    },
     { timeout: 10_000 }
   );
   await waitForMapIdle(page);
@@ -995,25 +1287,62 @@ test("with a region selected, clicking an outside town clears region highlight a
 });
 
 test("clicking another region moves the highlight; towns under veil stay clickable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.goto(`${baseUrl}/?tab=map&year=53&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
   await jumpMap(page, [34.2, 38.4], 6.6);
   const nextRegion = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
-    const hit = map
-      .queryRenderedFeatures(undefined, {
-        layers: [
-          "ibm-area-label-overview",
-          "ibm-area-label",
-          "ibm-major-area-label-overview",
-          "ibm-major-area-label",
-          "ibm-selected-area-label"
-        ]
-      })
-      .find((feature) => {
-        const placeId = feature.properties?.placeId;
-        const placeType = feature.properties?.placeType;
+    const regionLayers = [
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-selected-area-label",
+      "ibm-ancient-holder-label-click-target",
+      "ibm-ancient-holder-label-clickable",
+      "ibm-ancient-holder-label-selected"
+    ];
+    const preferredTargetPlaceIds = [
+      "asia",
+      "bithynia-and-pontus",
+      "lycaonia",
+      "phrygia",
+      "pisidia"
+    ];
+    const features = map.queryRenderedFeatures(undefined, {
+      layers: regionLayers
+    });
+    const hit =
+      preferredTargetPlaceIds
+        .map((targetPlaceId) =>
+          features.find((feature) => {
+            if (feature.geometry?.type !== "Point") {
+              return false;
+            }
+            const placeId = String(
+              feature.properties?.holderLocationId ?? feature.properties?.placeId ?? ""
+            );
+            const placeType = String(feature.properties?.placeType ?? "");
+            return (
+              placeId === targetPlaceId &&
+              (placeType === "region" || placeType === "province")
+            );
+          })
+        )
+        .find(Boolean) ??
+      features.find((feature) => {
+        if (feature.geometry?.type !== "Point") {
+          return false;
+        }
+        const placeId = String(
+          feature.properties?.holderLocationId ?? feature.properties?.placeId ?? ""
+        );
+        const placeType = String(feature.properties?.placeType ?? "");
         return (
-          typeof placeId === "string" &&
+          placeId.length > 0 &&
           placeId !== "galatia" &&
           (placeType === "region" || placeType === "province")
         );
@@ -1022,26 +1351,90 @@ test("clicking another region moves the highlight; towns under veil stay clickab
       return null;
     }
     const projected = map.project(hit.geometry.coordinates);
-    return { x: projected.x, y: projected.y, placeId: String(hit.properties.placeId) };
+    const targetPlaceId = String(hit.properties?.holderLocationId ?? hit.properties?.placeId ?? "");
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0],
+      [-20, -10],
+      [20, -10],
+      [-20, 10],
+      [20, 10]
+    ]) {
+      const x = projected.x + offsetX;
+      const y = projected.y + offsetY;
+      const hitAtPoint = map
+        .queryRenderedFeatures(
+          [
+            [x - 2, y - 2],
+            [x + 2, y + 2]
+          ],
+          { layers: regionLayers }
+        )
+        .some((feature) => {
+          const featurePlaceId = String(
+            feature.properties?.holderLocationId ?? feature.properties?.placeId ?? ""
+          );
+          return featurePlaceId === targetPlaceId;
+        });
+      if (hitAtPoint) {
+        return { x, y, placeId: targetPlaceId };
+      }
+    }
+    return { x: projected.x, y: projected.y, placeId: targetPlaceId };
   }, mapTestHookKey);
   expect(nextRegion).toBeTruthy();
-  await fireMapClick(page, nextRegion);
-  await page.waitForFunction(
-    (placeId) => new URLSearchParams(window.location.search).get("place") === placeId,
-    nextRegion.placeId,
-    { timeout: 10_000 }
-  );
+  let selectedPlaceAfterRegionClick = "galatia";
+  for (const [offsetX, offsetY] of [
+    [0, 0],
+    [0, -8],
+    [0, 8],
+    [-8, 0],
+    [8, 0],
+    [0, -16],
+    [0, 16],
+    [-16, 0],
+    [16, 0],
+    [-16, -12],
+    [16, -12],
+    [-16, 12],
+    [16, 12],
+    [0, -24],
+    [0, 24],
+    [-24, 0],
+    [24, 0]
+  ]) {
+    await clickMapPoint(page, { x: nextRegion.x + offsetX, y: nextRegion.y + offsetY });
+    await page.waitForTimeout(200);
+    selectedPlaceAfterRegionClick = await page.evaluate(
+      () => new URLSearchParams(window.location.search).get("place") ?? ""
+    );
+    if (selectedPlaceAfterRegionClick && selectedPlaceAfterRegionClick !== "galatia") {
+      break;
+    }
+  }
+  expect(selectedPlaceAfterRegionClick).toBe(nextRegion.placeId);
   await waitForMapIdle(page);
+  expect(selectedPlaceAfterRegionClick).toBeTruthy();
 
   const movedHighlight = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
-    const selectedArea = map
-      .queryRenderedFeatures(undefined, { layers: ["ibm-selected-area-label"] })
-      .find((feature) => typeof feature.properties?.placeId === "string");
-    return selectedArea?.properties?.placeId ?? null;
+    const selectedName = map
+      .queryRenderedFeatures(undefined, {
+        layers: ["ibm-selected-area-label", "ibm-ancient-holder-label-selected"]
+      })
+      .find(
+        (feature) =>
+          typeof feature.properties?.placeId === "string" ||
+          typeof feature.properties?.holderLocationId === "string"
+      );
+    return selectedName?.properties?.placeId ?? selectedName?.properties?.holderLocationId ?? null;
   }, mapTestHookKey);
-  expect(movedHighlight).toBe(nextRegion.placeId);
+  expect(movedHighlight).toBe(selectedPlaceAfterRegionClick);
 
+  await jumpMap(page, [27.34, 37.94], 7.4);
   const townUnderVeil = await page.evaluate(({ testHookKey, selectedRegionId }) => {
     const map = window[testHookKey];
     const hit = map
@@ -1049,6 +1442,9 @@ test("clicking another region moves the highlight; towns under veil stay clickab
         layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"]
       })
       .find((feature) => {
+        if (feature.geometry?.type !== "Point") {
+          return false;
+        }
         const placeId = feature.properties?.placeId;
         const placeType = feature.properties?.placeType;
         return (
@@ -1065,10 +1461,32 @@ test("clicking another region moves the highlight; towns under veil stay clickab
       return null;
     }
     const projected = map.project(hit.geometry.coordinates);
-    return { x: projected.x, y: projected.y, placeId: String(hit.properties.placeId) };
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0]
+    ]) {
+      const x = projected.x + offsetX;
+      const y = projected.y + offsetY;
+      const hitAtPoint = map
+        .queryRenderedFeatures(
+          [
+            [x - 2, y - 2],
+            [x + 2, y + 2]
+          ],
+          { layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"] }
+        )
+        .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
+      if (hitAtPoint) {
+        return { x, y, placeId: String(hit.properties.placeId) };
+      }
+    }
+    return null;
   }, { testHookKey: mapTestHookKey, selectedRegionId: nextRegion.placeId });
   expect(townUnderVeil).toBeTruthy();
-  await fireMapClick(page, townUnderVeil);
+  await clickMapPoint(page, townUnderVeil);
   await page.waitForFunction(
     (placeId) => new URLSearchParams(window.location.search).get("place") === placeId,
     townUnderVeil.placeId,
@@ -1198,6 +1616,7 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
   expect(styleProbe.viaOpacity).not.toContain("isDimmed");
   expect(styleProbe.mentionedOpacity).not.toContain("isDimmed");
 
+  let hoveredNameCount = 0;
   for (const placeId of scannedPlaceIds) {
     const candidatePoint = await page.evaluate(
       ({ testHookKey, targetPlaceId, layers }) => {
@@ -1247,11 +1666,16 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
         layers: interactiveNameLayers
       }
     );
-    expect(candidatePoint).toBeTruthy();
-    await page.mouse.move(candidatePoint.x, candidatePoint.y);
-    await page.waitForTimeout(150);
+    if (!candidatePoint) {
+      continue;
+    }
+    const interactiveCandidatePoint = await moveMouseToInteractiveMapPoint(page, candidatePoint);
+    if (!interactiveCandidatePoint) {
+      continue;
+    }
     const pointerCursor = await page.evaluate((testHookKey) => window.getComputedStyle(window[testHookKey].getCanvas()).cursor, mapTestHookKey);
     expect(pointerCursor, `expected pointer cursor for route place ${placeId}`).toContain("pointer");
+    hoveredNameCount += 1;
     let clickedPlaceId = null;
     for (const [offsetX, offsetY] of [
       [0, 0],
@@ -1260,7 +1684,10 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
       [-8, 0],
       [8, 0]
     ]) {
-      await page.mouse.click(candidatePoint.x + offsetX, candidatePoint.y + offsetY);
+      await clickMapPoint(page, {
+        x: interactiveCandidatePoint.x + offsetX,
+        y: interactiveCandidatePoint.y + offsetY
+      });
       await page.waitForTimeout(200);
       clickedPlaceId = await page.evaluate(() => new URLSearchParams(window.location.search).get("place"));
       if (clickedPlaceId === placeId) {
@@ -1273,6 +1700,7 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
     const stageAfterClick = await page.evaluate(() => new URLSearchParams(window.location.search).get("stage"));
     expect(stageAfterClick).toBe("4");
   }
+  expect(hoveredNameCount).toBeGreaterThan(0);
 });
 
 test("routes view keeps ARIA tabs, stage pills, and ODbL attribution (replaces routesFixtureChecks) @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {

@@ -31,11 +31,13 @@ describe("selected region highlight geometry", () => {
     };
 
     const veil = buildSelectedRegionVeilFeatureCollection(geometry);
-    expect(veil.features).toHaveLength(1);
+    expect(veil.features).toHaveLength(2);
     expect(veil.features[0].geometry.type).toBe("Polygon");
     expect(veil.features[0].geometry.coordinates).toHaveLength(2);
     expect(veil.features[0].geometry.coordinates[0][0]).toEqual([-180, -85]);
     expect(veil.features[0].geometry.coordinates[1]).toEqual(geometry.coordinates[0]);
+    expect(veil.features[1].geometry.type).toBe("Polygon");
+    expect(veil.features[1].geometry.coordinates).toEqual([geometry.coordinates[1]]);
   });
 
   test("supports multipolygon regions by adding one hole per outer ring", () => {
@@ -71,6 +73,33 @@ describe("selected region highlight geometry", () => {
     expect(outline.features).toHaveLength(2);
     expect(outline.features[0].geometry.type).toBe("LineString");
     expect(outline.features[1].geometry.type).toBe("LineString");
+  });
+
+  test("includes interior rings in the selected region outline", () => {
+    const geometry = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [10, 10],
+          [20, 10],
+          [20, 20],
+          [10, 20],
+          [10, 10]
+        ],
+        [
+          [12, 12],
+          [14, 12],
+          [14, 14],
+          [12, 14],
+          [12, 12]
+        ]
+      ]
+    };
+
+    const outline = buildSelectedRegionOutlineFeatureCollection(geometry);
+    expect(outline.features).toHaveLength(2);
+    expect(outline.features[0].geometry.coordinates).toEqual(geometry.coordinates[0]);
+    expect(outline.features[1].geometry.coordinates).toEqual(geometry.coordinates[1]);
   });
 
   test("returns empty veil/outline when geometry is missing", () => {

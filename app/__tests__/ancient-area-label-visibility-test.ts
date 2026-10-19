@@ -68,7 +68,7 @@ describe("ancient area label visibility", () => {
     }
   });
 
-  test("keeps the selected area label visible even when linked from timeline entities", () => {
+  test("can keep one linked area label visible only when explicitly requested", () => {
     const timeline = readRepositoryJson("data/timeline.json") as AncientTimelinePayload;
     const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
 
@@ -76,8 +76,14 @@ describe("ancient area label visibility", () => {
     expect(
       shouldShowAreaLabelOnAncientMap({
         placeId: "galatia",
+        linkedLocationIds
+      })
+    ).toBe(false);
+    expect(
+      shouldShowAreaLabelOnAncientMap({
+        placeId: "galatia",
         linkedLocationIds,
-        selectedPlaceId: "galatia"
+        visibleLinkedLocationIds: new Set(["galatia"])
       })
     ).toBe(true);
   });

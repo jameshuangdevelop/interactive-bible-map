@@ -141,6 +141,7 @@ const layerAncientCoastlineId = "ibm-ancient-coastline";
 const layerAncientCoastlineLabelId = "ibm-ancient-coastline-label";
 const layerAncientHolderLabelId = "ibm-ancient-holder-label";
 const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
+const layerAncientHolderLabelSelectedId = "ibm-ancient-holder-label-selected";
 const layerAncientHolderLabelClickTargetId = "ibm-ancient-holder-label-click-target";
 const layerSelectedRegionVeilId = "ibm-selected-region-veil";
 const layerSelectedRegionOutlineId = "ibm-selected-region-outline";
@@ -198,6 +199,7 @@ const interactiveLayerIds = [
   layerAreaLabelId,
   layerSelectedAreaLabelId,
   layerAncientHolderLabelClickableId,
+  layerAncientHolderLabelSelectedId,
   layerAncientHolderLabelClickTargetId,
   layerRoutesStopsId,
   layerRoutesViaId,
@@ -231,27 +233,36 @@ const areaLabelOverviewFilter = [
   "all",
   areaLabelNonMajorFilter,
   areaLabelVisibilityFilter,
+  ["!=", ["get", "isSelectedPlace"], true],
   ["<", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const areaLabelVariableAnchorFilter = [
   "all",
   areaLabelNonMajorFilter,
   areaLabelVisibilityFilter,
+  ["!=", ["get", "isSelectedPlace"], true],
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const areaLabelMajorOverviewFilter = [
   "all",
   areaLabelMajorFilter,
   areaLabelVisibilityFilter,
+  ["!=", ["get", "isSelectedPlace"], true],
   ["<", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const areaLabelMajorVariableAnchorFilter = [
   "all",
   areaLabelMajorFilter,
   areaLabelVisibilityFilter,
+  ["!=", ["get", "isSelectedPlace"], true],
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
 const selectedAreaLabelFilter = ["all", areaLabelVisibilityFilter, ["==", ["get", "isSelectedPlace"], true]];
+const holderLabelBaseFilter = [
+  "all",
+  ["==", ["get", "clickable"], true],
+  [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
+];
 const areaLabelTextFontExpression = toExpression([
   "literal",
   ["Noto Sans Bold"]
@@ -332,6 +343,7 @@ function applyMapModeOverlayVisibility(
     layerAncientCoastlineLabelId,
     layerAncientHolderLabelId,
     layerAncientHolderLabelClickableId,
+    layerAncientHolderLabelSelectedId,
     layerAncientHolderLabelClickTargetId,
     layerSelectedRegionVeilId,
     layerSelectedRegionOutlineId
@@ -848,6 +860,7 @@ function ensureGeoJsonSource(
     clusterProperties: Record<string, unknown>;
     lineMetrics: boolean;
     attribution: string;
+    promoteId: string;
   }> = {}
 ) {
   const existingSource = map.getSource(sourceId);
@@ -1208,9 +1221,10 @@ function buildAncientHolderLabelFeatures(
   return {
     type: "FeatureCollection" as const,
     features: stopPayload.holderLabels
-      .map((label) => {
+      .map((label, labelIndex) => {
         const holderAssignment = stopPayload.areas.find((area) => area.areaId === label.areaId);
         const labelText = label.labelText;
+        const entryId = `holder-label:${label.holderId}:${label.areaId}:${label.labelText}:${labelIndex}`;
         const yearRangeText = holderAssignment
           ? formatHolderYearRange({
               heldFromYear: holderAssignment.heldFromYear,
@@ -1223,8 +1237,9 @@ function buildAncientHolderLabelFeatures(
         const yearRangePart = yearRangeText.length > 0 ? ` · ${yearRangeText}` : "";
         return {
           type: "Feature" as const,
-          id: `holder-label:${label.holderId}:${label.areaId}`,
+          id: entryId,
           properties: {
+            entryId,
             holderId: label.holderId,
             holderLocationId: label.locationId,
             labelText,
@@ -1242,6 +1257,25 @@ function buildAncientHolderLabelFeatures(
         };
       })
   };
+}
+
+function selectedHolderLabelEntryIdForPlace(
+  stopPayload: AncientStopPayload | null,
+  selectedPlaceId: string | null | undefined
+) {
+  if (!stopPayload || !selectedPlaceId) {
+    return null;
+  }
+
+  const selectedLabelIndex = stopPayload.holderLabels.findIndex(
+    (label) => label.locationId === selectedPlaceId
+  );
+  if (selectedLabelIndex < 0) {
+    return null;
+  }
+  const selectedLabel = stopPayload.holderLabels[selectedLabelIndex];
+
+  return `holder-label:${selectedLabel.holderId}:${selectedLabel.areaId}:${selectedLabel.labelText}:${selectedLabelIndex}`;
 }
 
 function ensureMapLayers(map: MapLibreMap) {
@@ -1463,11 +1497,7 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "circle",
       minzoom: 4,
       maxzoom: 10,
-      filter: toLayerFilter([
-        "all",
-        ["==", ["get", "clickable"], true],
-        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
-      ]),
+      filter: toLayerFilter(holderLabelBaseFilter),
       paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 12, 7, 14, 10, 18],
         "circle-color": "rgba(0,0,0,0)",
@@ -1481,11 +1511,7 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "symbol",
       minzoom: 4,
       maxzoom: 10,
-      filter: toLayerFilter([
-        "all",
-        ["==", ["get", "clickable"], true],
-        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
-      ]),
+      filter: toLayerFilter(holderLabelBaseFilter),
       layout: {
         "text-field": ["get", "labelText"],
         "text-transform": "uppercase",
@@ -1504,6 +1530,35 @@ function ensureMapLayers(map: MapLibreMap) {
           "#1A73E8",
           "#202124"
         ]),
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerAncientHolderLabelSelectedId)) {
+    map.addLayer({
+      id: layerAncientHolderLabelSelectedId,
+      source: sourceAncientHolderLabelsId,
+      type: "symbol",
+      minzoom: 4,
+      maxzoom: 10,
+      filter: toLayerFilter(["==", ["get", "entryId"], "__none__"]),
+      layout: {
+        "text-field": ["get", "labelText"],
+        "text-transform": "uppercase",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+        "text-letter-spacing": 0.18,
+        "text-max-width": 30,
+        "text-anchor": "center",
+        "text-offset": [0, 0],
+        "symbol-sort-key": 0,
+        "text-allow-overlap": false,
+        "text-ignore-placement": false
+      },
+      paint: {
+        "text-color": "#1A73E8",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
       }
@@ -1838,7 +1893,6 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         basePlaceLabelVisibilityFilter,
-        ["!=", ["get", "isSelectedPlace"], true],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -1868,7 +1922,6 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         basePlaceLabelVisibilityFilter,
-        ["!=", ["get", "isSelectedPlace"], true],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -1898,7 +1951,6 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         basePlaceLabelVisibilityFilter,
-        ["!=", ["get", "isSelectedPlace"], true],
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -2092,8 +2144,8 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-font": ["Noto Sans Bold"],
         "text-size": ["+", ["get", "areaFontSize"], 2],
         "text-letter-spacing": 0.18,
-        "text-allow-overlap": true,
-        "text-ignore-placement": true,
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
         ...areaLabelPointLayout
       },
       paint: {
@@ -2113,7 +2165,8 @@ function ensureMapLayers(map: MapLibreMap) {
         "all",
         basePlaceLabelVisibilityFilter,
         ["!=", ["get", "labelText"], null],
-        ["==", ["get", "isSelectedPlace"], true]
+        ["==", ["get", "isSelectedPlace"], true],
+        ["!=", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -2157,7 +2210,8 @@ function ensureMapLayers(map: MapLibreMap) {
         ["!", ["has", "point_count"]],
         basePlaceLabelVisibilityFilter,
         ["!=", ["get", "labelText"], null],
-        ["==", ["get", "isSelectedPlace"], true]
+        ["==", ["get", "isSelectedPlace"], true],
+        ["!=", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -2199,7 +2253,8 @@ function ensureMapLayers(map: MapLibreMap) {
         "all",
         basePlaceLabelVisibilityFilter,
         ["!=", ["get", "labelText"], null],
-        ["==", ["get", "isSelectedPlace"], true]
+        ["==", ["get", "isSelectedPlace"], true],
+        ["!=", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
         "text-field": ["get", "labelText"],
@@ -2273,20 +2328,11 @@ function ensureMapLayers(map: MapLibreMap) {
     layerRoutePriorityCityPinId,
     layerRoutePrioritySitePinId,
     layerRoutePriorityMajorPinId,
-    layerSelectedRegionVeilId,
-    layerSelectedRegionOutlineId,
-    layerRoutesLinesBackgroundId,
-    layerRoutesLinesForegroundId,
-    layerRoutesLinesArrowsId,
-    layerRoutesLinesHighlightId,
-    layerRoutesStopsId,
-    layerRoutesStopsStartId,
-    layerRoutesViaId,
-    layerRoutesMentionedId,
     layerCandidatePinId,
     layerSelectedPlacePinId,
-    layerSelectedAreaLabelId,
     layerPinLabelId,
+    layerSelectedAreaLabelId,
+    layerAncientHolderLabelSelectedId,
     layerSelectedMajorPinLabelId,
     layerSelectedSitePinLabelId,
     layerSelectedPinLabelId,
@@ -2396,6 +2442,7 @@ function toVisibleEntry(feature: MapGeoJSONFeature): VisibleListEntry | null {
   const pointCount = asNumber(properties.point_count);
   if (
     layerId === layerAncientHolderLabelClickableId ||
+    layerId === layerAncientHolderLabelSelectedId ||
     layerId === layerAncientHolderLabelClickTargetId
   ) {
     const holderLocationId = asString(properties.holderLocationId);
@@ -2729,22 +2776,30 @@ export function MapView({
         : null,
     [ancientStopsById, selectedTimelineStopId]
   );
+  const selectedPlaceId = selection?.placeId ?? null;
+  const selectedHolderLabelEntryId = useMemo(
+    () => selectedHolderLabelEntryIdForPlace(selectedAncientStopPayload, selectedPlaceId),
+    [selectedAncientStopPayload, selectedPlaceId]
+  );
+  const selectedHolderLabelPlaceId = selectedHolderLabelEntryId ? selectedPlaceId : null;
   const effectiveRenderData = useMemo(() => {
     if (mapMode !== "ancient" || !hasAncientTimeline) {
       return renderData;
     }
 
     const linkedLocationIds = linkedTimelineLocationIds(ancientTimeline?.entities);
+    const visibleLinkedLocationIds =
+      selectedPlaceId && !selectedHolderLabelEntryId ? new Set([selectedPlaceId]) : undefined;
 
     return {
       ...renderData,
       areaLabels: filterAreaLabelsForAncientMap({
         areaLabels: renderData.areaLabels,
         linkedLocationIds,
-        selectedPlaceId: selection?.placeId ?? null
+        visibleLinkedLocationIds
       })
     };
-  }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData, selection?.placeId]);
+  }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData, selectedHolderLabelEntryId, selectedPlaceId]);
   const selectedPlacePinFeatures = useMemo(() => {
     if (!selection) {
       return createEmptyFeatureCollection();
@@ -2787,10 +2842,7 @@ export function MapView({
   }, [ancientEmpireEdge, selectedAncientStopPayload]);
   const ancientHolderLabelFeatures = useMemo(() => {
     const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
-    return buildAncientHolderLabelFeatures(
-      selectedAncientStopPayload,
-      timelineRangeEndYear
-    );
+    return buildAncientHolderLabelFeatures(selectedAncientStopPayload, timelineRangeEndYear);
   }, [ancientTimeline, selectedAncientStopPayload]);
   const selectedRegionGeometry = useMemo(() => {
     if (!selection || mapMode !== "ancient") {
@@ -3304,6 +3356,30 @@ export function MapView({
     );
   }, []);
 
+  const applySelectedHolderLabelFilters = useCallback(
+    (map: MapLibreMap) => {
+      const baseFilter: FilterSpecification = selectedHolderLabelEntryId
+        ? toLayerFilter([
+            "all",
+            holderLabelBaseFilter,
+            ["!=", ["get", "holderLocationId"], selectedHolderLabelPlaceId]
+          ])
+        : toLayerFilter(holderLabelBaseFilter);
+      const selectedFilter: FilterSpecification = selectedHolderLabelEntryId
+        ? toLayerFilter([
+            "all",
+            holderLabelBaseFilter,
+            ["==", ["get", "entryId"], selectedHolderLabelEntryId]
+          ])
+        : toLayerFilter(["==", ["get", "entryId"], "__none__"]);
+
+      map.setFilter(layerAncientHolderLabelClickableId, baseFilter);
+      map.setFilter(layerAncientHolderLabelClickTargetId, baseFilter);
+      map.setFilter(layerAncientHolderLabelSelectedId, selectedFilter);
+    },
+    [selectedHolderLabelEntryId, selectedHolderLabelPlaceId]
+  );
+
   const syncBaseSourcesAndLayers = useCallback(() => {
     const map = mapRef.current;
     if (!map) {
@@ -3311,11 +3387,21 @@ export function MapView({
     }
     clearHoveredFeatureState();
 
-    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins);
-    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins);
-    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins);
-    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins);
-    ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels);
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins, {
+      promoteId: "entryId"
+    });
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins, {
+      promoteId: "entryId"
+    });
+    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins, {
+      promoteId: "entryId"
+    });
+    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins, {
+      promoteId: "entryId"
+    });
+    ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels, {
+      promoteId: "entryId"
+    });
     ensureGeoJsonSource(map, sourceSelectedPlacePinId, selectedPlacePinFeatures);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
     ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
@@ -3323,7 +3409,9 @@ export function MapView({
     ensureGeoJsonSource(map, sourceAncientEmpireEdgeId, ancientEmpireEdgeFeatures);
     ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
     ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
-    ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
+    ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures, {
+      promoteId: "entryId"
+    });
     ensureGeoJsonSource(map, sourceSelectedRegionVeilId, selectedRegionVeilFeatures);
     ensureGeoJsonSource(map, sourceSelectedRegionOutlineId, selectedRegionOutlineFeatures);
     syncRouteSources();
@@ -3333,7 +3421,9 @@ export function MapView({
     ensureSelectedPlacePinImage(map);
     ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map);
+    applySelectedHolderLabelFilters(map);
   }, [
+    applySelectedHolderLabelFilters,
     clearHoveredFeatureState,
     ancientAreaFeatures,
     ancientBorderFeatures,
@@ -3456,6 +3546,7 @@ export function MapView({
           .queryRenderedFeatures(queryBoxAroundPoint(pointer, interactiveHitPaddingPx), {
             layers: [
               layerAncientHolderLabelClickableId,
+              layerAncientHolderLabelSelectedId,
               layerAncientHolderLabelId,
               layerAncientUncertainFillId
             ]
@@ -4322,7 +4413,10 @@ export function MapView({
       origin === "map-candidate" ||
       origin === "map-dot" ||
       origin === "keyboard-visible-place";
-    if (routesModeEnabled || isMapInitiatedSelection) {
+    if (isMapInitiatedSelection) {
+      return;
+    }
+    if (routesModeEnabled) {
       panSelectionIfOffScreen(
         map,
         place,
