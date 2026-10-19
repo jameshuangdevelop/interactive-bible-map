@@ -2806,6 +2806,129 @@ test("route line requirement is switchable", async () => {
   );
 });
 
+test("route text requirement is switchable", async () => {
+  const relaxed = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[0].summary;
+    delete routes.routes[0].bibleText;
+    delete routes.routes[0].notes;
+  }, { requireRouteText: false });
+  assert.equal(relaxed.errors.length, 0);
+
+  const strict = await runWithTemporaryRoutesCase(({ routes }) => {
+    delete routes.routes[0].summary;
+    delete routes.routes[0].bibleText;
+    delete routes.routes[0].notes;
+  }, { requireRouteText: true });
+  assert.equal(
+    hasError(strict, (error) => /REQUIRE_ROUTE_TEXT is enabled/u.test(error.message)),
+    true
+  );
+});
+
+test("route text mode disallows legacy note and yearNote when REQUIRE_ROUTE_TEXT is enabled", async () => {
+  const result = await runWithTemporaryRoutesCase(
+    ({ routes }) => {
+      routes.routes[0].note = "Legacy note injected for this test only.";
+      routes.routes[0].yearNote = "Legacy year note injected for this test only.";
+    },
+    {
+      requireRouteText: true
+    }
+  );
+  assert.equal(
+    hasError(result, (error) => /Legacy route note is not allowed/u.test(error.message)),
+    true
+  );
+  assert.equal(
+    hasError(result, (error) => /Legacy route yearNote is not allowed/u.test(error.message)),
+    true
+  );
+});
+
+test("route text mode accepts summary+bibleText+notes without legacy fields", async () => {
+  const result = await runWithTemporaryRoutesCase(undefined, {
+    requireRouteText: true
+  });
+  assert.equal(result.errors.length, 0);
+});
+
+test("route text notes entries must be non-empty strings in strict mode", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].notes = ["Valid note", "   "];
+  }, {
+    requireRouteText: true
+  });
+  assert.equal(
+    hasError(result, (error) => /Route notes entries must be non-empty strings/u.test(error.message)),
+    true
+  );
+});
+
+test("mentioned stops must resolve as stop references", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "route-stop",
+        stopId: "missing-stop"
+      }
+    ];
+  });
+  assert.equal(
+    hasError(result, (error) => /Unknown route stop id 'missing-stop'/u.test(error.message)),
+    true
+  );
+});
+
+test("mentioned stops cannot duplicate stage endpoints or via stops", async () => {
+  const endpointDuplicate = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "location",
+        locationId: "galilee",
+        candidateIndex: 0
+      }
+    ];
+  });
+  assert.equal(
+    hasError(endpointDuplicate, (error) => /cannot also be a stage endpoint or via stop/u.test(error.message)),
+    true
+  );
+
+  const viaDuplicate = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "route-stop",
+        stopId: "cyprus-harbor-fixture"
+      }
+    ];
+  });
+  assert.equal(
+    hasError(viaDuplicate, (error) => /cannot also be a stage endpoint or via stop/u.test(error.message)),
+    true
+  );
+});
+
+test("mentioned stops cannot repeat the same place in one stage", async () => {
+  const result = await runWithTemporaryRoutesCase(({ routes }) => {
+    routes.routes[0].stages[1].mentioned = [
+      {
+        kind: "route-stop",
+        stopId: "disputed-stop-fixture",
+        candidateIndex: 0
+      },
+      {
+        kind: "route-stop",
+        stopId: "disputed-stop-fixture",
+        candidateIndex: 1
+      }
+    ];
+  });
+  assert.equal(
+    hasError(result, (error) => /same mentioned stop more than once/u.test(error.message)),
+    true
+  );
+});
+
 test("route stages with lineId must have matching geometry", async () => {
   const result = await runWithTemporaryRoutesCase(({ lines }) => {
     lines.features = lines.features.filter(
