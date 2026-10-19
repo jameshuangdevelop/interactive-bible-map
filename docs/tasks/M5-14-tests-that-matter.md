@@ -26,7 +26,15 @@ Protect the human's newest requests and the journeys the audit found unguarded (
    - the red pin shows for a town (Tarsus, Ephesus) and not for an area (Galatia) or a place with candidates (Cana); on the modern map it shows without the name;
    - hovering a name sets its hover state and shows the pointer; away from names, and while dragging, the cursor is the arrow;
    - on the Routes tab with Paul's voyage to Rome and stage 4 selected: the route's place names show the pointer, open their places when clicked, and keep the stage; their names and dots aren't dimmed, while the other stages' lines are.
-2. **Bring back the checks M5-09 switched off,** rewritten for names without groups: the phone basics, and the Routes tab's fixture scenarios (ARIA tabs, stage hover without camera moves, the number pill, the ODbL notice, the phone sheet). List each check and its replacement in the PR. Delete the `test.fixme`s.
+2. **Bring back every check M5-09 switched off** (#75's body), rewritten for names without groups, with a passing test for each. List each check and its replacement in the PR, and delete the `test.fixme`s.
+   - `normalLoadMainBasemapChecks`: one short check that a normal load stays on the main basemap (M5-12 merges the four).
+   - `overviewClusterOverlap`, `importantPlacesFirstCheck` and `overviewLabelReadabilityCheck`: on the opening map, the most important places' names show and stay readable, and no two names overlap.
+   - `majorPlacesCoverageAcrossZoomsCheck`: becomes "Jerusalem shows at every zoom whenever it's on screen and nothing is selected", plus "the top 10 major places by importance show at their own zoom". ADR-0044 item 1 no longer forces every major to show.
+   - `phoneBasicsChecks`: the bottom sheet's tap and drag, the controls hidden while it's open, the search box's margins and results, the toggle under the search box, and the drawer fitting the screen.
+   - `routesFixtureChecks`: the ARIA tabs, stage hover greying the other lines without moving the camera, the number pill, the ODbL notice, and the phone sheet.
+   - `routesRealDataChecks`: each real route's lines, stops and panel, with names that the route's places keep.
+   - The smoothness checks (`smoothnessReal`, `smoothnessSynthetic`, `panelOpenSmoothness`): functional in CI (`@perf`), and enforced with `npm run test:browser:gpu`, with the synthetic 10,000 points drawn as names.
+   - The cursor and touch sub-checks that became skippable: make their probes deterministic (pick targets from rendered features), so they never skip.
 3. **Accessibility:** axe scans of the Routes tab with a route open, of the timeline with its Sources popover, and of the phone layouts (`@a11y`).
 4. **Error states:** "Place not found" for an unknown `?place=`, and "Routes couldn't load." with "Try again" (`@panel` and `@routes`).
 5. **Dead Jest tests:** delete `map-layer-layouts-test.ts`, whose module the app no longer uses, and the grouping tests in `major-name-groups-test.ts` (ADR-0044 item 1). Keep tests of anything still imported.
