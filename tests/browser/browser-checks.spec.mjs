@@ -62,6 +62,7 @@ import {
 import { expect, test } from "./fixtures.mjs";
 
 const evidenceEnabled = process.env.EVIDENCE === "1";
+const generatedDirectory = path.resolve(process.cwd(), "app", "dist", "generated");
 
 test("map requests tiles and loads workers on startup", { tag: ["@data"] }, async ({ page, baseUrl }) => {
   const requestUrls = [];
@@ -216,13 +217,13 @@ test("modern disputed boundaries render by dispute status", { tag: ["@modern"] }
 });
 
 test("timeline UI behaves with default generated timeline data (quarantined: tooltip target is flaky on software rendering)", { tag: ["@timeline", "@quarantine"] }, async ({ page, baseUrl }) => {
-  const timelinePath = path.resolve(process.cwd(), "app/public/generated/ancient.timeline.json");
+  const timelinePath = path.join(generatedDirectory, "ancient.timeline.json");
   const payload = JSON.parse(await fs.readFile(timelinePath, "utf8"));
   await verifyTimelineUiWithDefaultData(page, baseUrl, payload);
 });
 
 test("timeline UI hides itself when generated timeline is absent", { tag: ["@timeline"] }, async ({ page, baseUrl }) => {
-  test.skip(await fs.access(path.resolve(process.cwd(), "app/public/generated/ancient.timeline.json")).then(() => true).catch(() => false), "Default timeline exists in this build.");
+  test.skip(await fs.access(path.join(generatedDirectory, "ancient.timeline.json")).then(() => true).catch(() => false), "Default timeline exists in this build.");
   await verifyNoTimelineUiOnDefaultBuild(page, baseUrl);
 });
 
@@ -296,7 +297,7 @@ test("fallback outage mode works in pbf-only and all-request scenarios", { tag: 
 });
 
 test("overview area labels remain stable with province fixture", { tag: ["@timeline"] }, async ({ browser, baseUrl }) => {
-  const placesPath = path.resolve(process.cwd(), "app/public/generated/places.index.json");
+  const placesPath = path.join(generatedDirectory, "places.index.json");
   const basePlaces = JSON.parse(await fs.readFile(placesPath, "utf8"));
   await verifyAreaLabelsOverviewWithProvinceFixture(browser, baseUrl, basePlaces);
 });
