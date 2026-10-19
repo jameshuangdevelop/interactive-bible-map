@@ -28,7 +28,7 @@ export function isZoomTierVisible(zoomTier: ZoomTier, zoom: number) {
     return zoom >= 12;
   }
 
-  return zoom >= 4;
+  return zoom >= 6;
 }
 
 export function candidateIndexToLetter(candidateIndex: number) {

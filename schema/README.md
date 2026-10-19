@@ -265,6 +265,14 @@ Complete example:
   - standard places must have at most 3 images;
   - major places must have at least 4 images while `REQUIRE_MAJOR_IMAGES` is on (the default); setting it to `false` reduces this to a warning. More than 7 is always an error.
 
+### Natural-feature kind
+- `naturalFeatureKind` is optional and applies only to records with `type: "natural-feature"`.
+- Allowed values:
+  - `"water"` for seas, lakes, gulfs, bays and similar water features;
+  - `"land"` for landforms such as mountains, islands and capes.
+- If `naturalFeatureKind` is omitted, the app treats the feature as land.
+- The validator rejects `naturalFeatureKind` on non-`natural-feature` records.
+
 ### Ancient area hierarchy (AD 50 convention until M4 timeline)
 - `type: "empire"` is an empire-level area record (for M3, the Roman Empire).
 - `type: "province"` is a province-level area record: a Roman province, a client kingdom in the same hierarchy, or an equivalent top-level division that wasn't formally a province (Italy, which was governed directly from Rome).

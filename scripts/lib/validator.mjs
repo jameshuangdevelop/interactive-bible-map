@@ -1700,6 +1700,18 @@ function validateLocationHierarchy({
       );
     }
 
+    if (
+      typeof data?.naturalFeatureKind === "string" &&
+      locationType !== "natural-feature"
+    ) {
+      recordError(
+        errors,
+        relativePath,
+        "$.naturalFeatureKind",
+        "Only records of type 'natural-feature' may define naturalFeatureKind"
+      );
+    }
+
     if (locationType === "empire" && parentId) {
       recordError(
         errors,

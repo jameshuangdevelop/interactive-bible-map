@@ -1824,6 +1824,22 @@ test("jerusalem exemption applies at grandchild depth", async () => {
   );
 });
 
+test("naturalFeatureKind is rejected on non-natural-feature records", async () => {
+  const result = await runWithTemporaryCase(({ capernaumData }) => {
+    capernaumData.naturalFeatureKind = "water";
+  });
+
+  assert.ok(
+    hasError(
+      result,
+      (error) =>
+        error.file.endsWith("capernaum.json") &&
+        error.path === "$.naturalFeatureKind" &&
+        error.message.includes("Only records of type 'natural-feature' may define naturalFeatureKind")
+    )
+  );
+});
+
 test("area records without names.modern emit a warning when modern-countries requirement is off", async () => {
   const result = await runWithTemporaryHierarchyCase(
     ({ cityData, provinceData }) => {

@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, Point } from "geojson";
 
-import { CANDIDATE_PINS_MIN_ZOOM, MAX_MAP_ZOOM, PIN_COLORS } from "./constants";
+import { MAX_MAP_ZOOM, PIN_COLORS } from "./constants";
 import {
   candidateIndexToLetter,
   getPrimaryPlaceName,
@@ -48,9 +48,6 @@ const AREA_LABEL_OVERVIEW_MIN_ZOOM_OVERRIDES: Partial<Record<string, number>> = 
   italy: 5
 };
 
-const CITY_PIN_LABEL_TYPES = new Set<PlaceType>(["city", "town", "village"]);
-const MAJOR_CITY_TIER_LABEL_TYPES = new Set<PlaceType>(["site", "natural-feature"]);
-
 export interface BaseMapFeatureProperties {
   entryId: string;
   placeId: string;
@@ -68,12 +65,12 @@ export interface BaseMapFeatureProperties {
 
 export interface PinFeatureProperties extends BaseMapFeatureProperties {
   pinColor: string;
+  naturalFeatureKind?: "water" | "land";
   hasMultipleCandidates: boolean;
   isDisputed: boolean;
   isSelectedPlace: boolean;
   isHighlightedPlace: boolean;
-  labelText: string | null;
-  majorLabelSide: "left" | "right";
+  labelText: string;
 }
 
 export interface CandidateFeatureProperties extends BaseMapFeatureProperties {
@@ -153,14 +150,6 @@ function interactionRankForPlace(place: PlaceIndexRecord) {
   return 1;
 }
 
-function shouldShowPinLabel(place: PlaceIndexRecord) {
-  if (CITY_PIN_LABEL_TYPES.has(place.type)) {
-    return true;
-  }
-
-  return place.prominence === "major" && MAJOR_CITY_TIER_LABEL_TYPES.has(place.type);
-}
-
 function getPinTierZoomRange(place: PlaceIndexRecord) {
   if (isSiteTier(place)) {
     return {
@@ -177,7 +166,7 @@ function getPinTierZoomRange(place: PlaceIndexRecord) {
   }
 
   return {
-    minZoom: 4,
+    minZoom: 6,
     maxZoom: mapMaxZoomExclusive
   };
 }
@@ -303,12 +292,13 @@ function toPinFeature({
       importanceRank,
       interactionRank: interactionRankForPlace(place),
       pinColor: placePinColor(place),
+      naturalFeatureKind:
+        place.type === "natural-feature" ? (place.naturalFeatureKind ?? "land") : undefined,
       hasMultipleCandidates,
       isDisputed: hasMultipleCandidates ? isDisputedPlace(place) : false,
       isSelectedPlace: selected,
       isHighlightedPlace: highlighted,
-      labelText: shouldShowPinLabel(place) ? placeName : null,
-      majorLabelSide: "right"
+      labelText: placeName
     }
   };
 }
@@ -336,7 +326,6 @@ function toCandidateFeature({
     selection.candidateIndex === candidateIndex;
   const candidateLetter = candidateIndexToLetter(candidateIndex);
   const zoomRange = getPinTierZoomRange(place);
-  const candidateMinZoom = Math.max(CANDIDATE_PINS_MIN_ZOOM, zoomRange.minZoom);
   const pinColor = placePinColor(place);
   const highlightedCandidate = highlighted && !selectedCandidate;
 
@@ -353,7 +342,7 @@ function toCandidateFeature({
       typeLabel: placeTypeLabel(place.type),
       accessibleName: `${placeName}, ${placeTypeLabel(place.type)}, candidate ${candidateLetter}`,
       labelPriority: toLabelPriority(place, selectedCandidate || highlighted, importanceRank),
-      minZoom: candidateMinZoom,
+      minZoom: zoomRange.minZoom,
       maxZoom: zoomRange.maxZoom,
       importanceRank,
       interactionRank: interactionRankForPlace(place),
@@ -416,63 +405,6 @@ function emptyFeatureCollection<TProperties>(): FeatureCollection<Point, TProper
   };
 }
 
-function assignMajorPinLabelSides(features: PinFeature[]) {
-  if (features.length === 0) {
-    return;
-  }
-
-  const points = features.map((feature) => {
-    const [longitude, latitude] = feature.geometry.coordinates;
-    return {
-      feature,
-      longitude,
-      latitude
-    };
-  });
-  const longitudes = points.map((point) => point.longitude);
-  const minimumLongitude = Math.min(...longitudes);
-  const maximumLongitude = Math.max(...longitudes);
-  const longitudeSpan = Math.max(0.0001, maximumLongitude - minimumLongitude);
-  const westEdgeThreshold = minimumLongitude + longitudeSpan * 0.12;
-  const eastEdgeThreshold = maximumLongitude - longitudeSpan * 0.12;
-
-  for (const point of points) {
-    if (point.longitude >= eastEdgeThreshold) {
-      point.feature.properties.majorLabelSide = "left";
-      continue;
-    }
-
-    if (point.longitude <= westEdgeThreshold) {
-      point.feature.properties.majorLabelSide = "right";
-      continue;
-    }
-
-    let nearestNeighbor: (typeof point) | null = null;
-    let nearestDistanceSquared = Number.POSITIVE_INFINITY;
-    for (const candidate of points) {
-      if (candidate === point) {
-        continue;
-      }
-
-      const longitudeDelta = candidate.longitude - point.longitude;
-      const latitudeDelta = candidate.latitude - point.latitude;
-      const distanceSquared = longitudeDelta * longitudeDelta + latitudeDelta * latitudeDelta;
-      if (distanceSquared < nearestDistanceSquared) {
-        nearestDistanceSquared = distanceSquared;
-        nearestNeighbor = candidate;
-      }
-    }
-
-    if (!nearestNeighbor) {
-      point.feature.properties.majorLabelSide = "right";
-      continue;
-    }
-
-    point.feature.properties.majorLabelSide =
-      nearestNeighbor.longitude <= point.longitude ? "right" : "left";
-  }
-}
-
 export function candidateIconId(pinColor: string, candidateLetter: string, selected: boolean) {
   return [
     "candidate",
@@ -526,7 +458,7 @@ export function buildPlaceRenderData(
       return;
     }
 
-    if (place.candidates.length > 1) {
+    if (place.candidates.length > 1 && selectedPlace) {
       place.candidates.forEach((_candidate, candidateIndex) => {
         candidatePins.features.push(
           toCandidateFeature({
@@ -539,10 +471,6 @@ export function buildPlaceRenderData(
           })
         );
       });
-
-      if (selectedPlace) {
-        return;
-      }
     }
 
     const pinFeature = toPinFeature({
@@ -566,8 +494,6 @@ export function buildPlaceRenderData(
 
     clusteredCityPins.features.push(pinFeature);
   });
-
-  assignMajorPinLabelSides(majorCityPins.features);
 
   return {
     majorCityPins,

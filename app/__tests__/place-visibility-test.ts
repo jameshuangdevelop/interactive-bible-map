@@ -12,8 +12,8 @@ describe("place visibility helpers", () => {
     expect(isZoomTierVisible("region", 4)).toBe(true);
     expect(isZoomTierVisible("region", 9)).toBe(true);
     expect(isZoomTierVisible("region", 9.1)).toBe(false);
-    expect(isZoomTierVisible("city", 3.9)).toBe(false);
-    expect(isZoomTierVisible("city", 4)).toBe(true);
+    expect(isZoomTierVisible("city", 5.9)).toBe(false);
+    expect(isZoomTierVisible("city", 6)).toBe(true);
     expect(isZoomTierVisible("site", 11.9)).toBe(false);
     expect(isZoomTierVisible("site", 12)).toBe(true);
   });
