@@ -26,7 +26,8 @@ Make the browser suite fast and scalable (ADR-0045 items 2–4). Each of today's
    - Add `playwright.config.mjs`:
      - `testDir: "tests/browser"`, `fullyParallel: true`;
      - `timeout: 60_000` and `expect.timeout: 10_000`;
-     - in CI: `globalTimeout` 15 minutes, `retries: 2`, `maxFailures: 5` and `workers: 2`; locally: 0, 0 and 1 worker;
+     - in CI: `globalTimeout` 10 minutes (inside the job's 12-minute limit, so that Playwright reports before GitHub kills the job), `retries: 2`, `maxFailures: 5` and `workers: 2`; locally: 0, 0 and 1 worker;
+     - **PR runs exclude Large and quarantined tests:** `grepInvert: /@network|@gpu|@quarantine/`, unless `FULL_SUITE=1`, which the weekly `full-suite.yml` sets;
      - reporter `[["blob"], ["github"], ["list"]]` in CI and `list` locally;
      - `trace: "on-first-retry"`.
    - Use the same Chromium launch arguments as today's script.
@@ -54,8 +55,9 @@ Make the browser suite fast and scalable (ADR-0045 items 2–4). Each of today's
      - `build` needs all three, and runs `build:data`, then `npm run --if-present test:generated` (added by M5-13), then `export:web`, and uploads `web-export`.
    - Add `browser`:
      - `needs: build`, a matrix of `shardIndex` 1–6 with `shardTotal: 6`, `fail-fast: false`, `timeout-minutes: 12`;
-     - it downloads `web-export`, installs Chromium (`npx playwright install --with-deps chromium`), runs `npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}`, and uploads `blob-report-${{ matrix.shardIndex }}`.
-   - Add `browser-report`: `needs: browser`, `if: always()`; it merges the blob reports (`npx playwright merge-reports --reporter html,github`), uploads the HTML report, and fails if any shard failed.
+     - jobs are isolated, so each shard runs `actions/checkout`, `actions/setup-node` (Node 24, npm cache) and `npm ci`, downloads `web-export` into `app/dist`, and installs Chromium (`npx playwright install --with-deps chromium`);
+     - it then runs `npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}`, and uploads `blob-report-${{ matrix.shardIndex }}`.
+   - Add `browser-report`: `needs: browser`, `if: always()`. It runs checkout, setup-node and `npm ci`; downloads every `blob-report-*` with `actions/download-artifact` (`pattern: blob-report-*`, `merge-multiple: true`); merges them (`npx playwright merge-reports --reporter html,github <dir>`); uploads the HTML report; and fails if any shard failed.
    - Every job gets `timeout-minutes`.
    - Add workflow-level concurrency: `group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}`, `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`, so a push to `main` is never cancelled.
    - The deploy jobs keep their conditions. `deploy_preview` needs `build`, not `browser`, so the human's preview link comes early.
@@ -79,6 +81,9 @@ Make the browser suite fast and scalable (ADR-0045 items 2–4). Each of today's
   - the fallback checks B51–B56, about 65 s;
   - the smoothness checks B58–B60, about 48 s.
 - **Checks switched off by M5-09:** `verifyPhoneBasics`, the Routes tab's fixture scenarios and others. Keep them switched off here, as `test.fixme` with the reason. M5-14 rewrites them.
+
+## Shared files
+M5-13 runs in parallel and also edits `package.json`: M5-12 owns `devDependencies` and the `verify:web:*` and `test:browser*` scripts, while M5-13 owns `test` and `test:generated`. Touch only your own keys; the PO resolves the merge.
 
 ## Out of scope
 - New tests (M5-14).

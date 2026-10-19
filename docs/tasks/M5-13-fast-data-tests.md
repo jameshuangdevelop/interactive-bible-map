@@ -47,6 +47,9 @@ Cut `npm test` from 3–6 minutes in CI to under 30 seconds, without losing any 
    - Give each rule a test: a passing fixture and a failing one.
 5. **Remove the low-value stress test,** or make it cheap; say which, and why it's safe.
 
+## Shared files
+M5-12 runs in parallel and also edits `package.json`: M5-13 owns the `test` and `test:generated` scripts, and M5-12 owns `devDependencies` and the browser scripts. Touch only your own keys; the PO resolves the merge.
+
 ## Out of scope
 - The browser suite and the CI workflow files (M5-12). M5-12's build job runs `npm run --if-present test:generated` after `build:data`, so don't edit `.github/workflows/`.
 - Jest tests' content (M5-14).

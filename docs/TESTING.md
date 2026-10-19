@@ -18,7 +18,7 @@ Write each test at the lowest level that can catch the problem. A rule in the da
 | **Medium** | Files on disk and localhost: the built data, the exported site served locally, a headless browser | `test:generated` (checks on the data that ships), the browser tests in `tests/browser/` | 60 s per browser test (up to 180 s for a few, each with a reason in the test); about 4 min per shard | Every PR, in parallel shards |
 | **Large** | The real network or a real GPU | live basemap fallback against VersaTiles, Lighthouse, `bench:map`, the GPU smoothness gate | Per tool | Weekly on `main` and on demand; GPU checks on a desktop |
 
-Browser tests still load the real OpenFreeMap tiles until the tile requests are replayed from a recording (BACKLOG). Until then CI retries a failed test twice and reports it as flaky (§4).
+PR runs skip Large and quarantined tests (`@network`, `@gpu`, `@quarantine`); the weekly run includes them. Browser tests still load the real OpenFreeMap tiles until the tile requests are replayed from a recording (BACKLOG). Until then CI retries a failed test twice and reports it as flaky (§4).
 
 ## 2. What runs where
 
