@@ -261,3 +261,42 @@ Several documents still say that Natural Earth is drawn and credited only below 
 - **P9:** decide on Halaib's north line: add it at every zoom, as the UN draws Halaib's administrative line (Map 4458 Rev. 2), or leave Halaib inside Egypt's outline, as the tiles draw it.
 - **P7** isn't in `BACKLOG.md` on this branch yet.
 - **At MC13:** besides the lines marked "Can't tell", the human should also check the lines that rest on PO defaults (rows 4, 10 and 14) in Google Maps.
+
+## Re-check (phase 3), 2026-10-19
+**Commit:** `1165c51` (the branch is rebased onto M5-09). Method as in phase 2:
+- I ran the same tile build through the committed filters.
+- I rebuilt `modern-neutral-boundaries.geojson` myself from the three pinned Natural Earth files: 1:50m land lines, 1:10m disputed areas, and the newly pinned 1:10m land lines `74d9c162…0f4a`. All three SHA-256s match. My copy is byte-identical to the committed file: 397 features.
+- I looked at the six `fix3-*` shots.
+
+The style filters match the rule table, and neither style uses `within`.
+
+**Result: needs change.** Two problems remain:
+- **Doubled lines (C5).** Cyprus's Green Line and Crimea's border are each drawn twice, at every zoom.
+- **Leftover stubs (C1, low).** Short unnamed pieces of the Moroccan berm are still dashed.
+
+| Fix | Verdict | Evidence |
+|---|---|---|
+| C1 | Needs change (low) | The named berm is hidden: 0 km from zoom 5 in the tiles, and gone from the zoom 4 and 6 shots. The dashed filter now excludes hidden rules. But the rule for unnamed stubs requires MAR or ESH on one side, and these features carry no country codes at all. So about 35 km stay dashed: a 27 km spur at 8.8°W (visible in the zoom 6 shot) and about 8 km at Guerguerat |
+| C2 | Pass | South Ossetia's line (`1746705385`) is dashed below zoom 5 and on the backup (zoom 4 shot). From zoom 5 the tiles draw it, as before (zoom 6 shot), and no second copy is drawn |
+| C3 | Pass | `1746709045` is split at 33.17°E: the west part is solid (including the Wadi Halfa bump), the east part dashed. Bir Tawil's south line (`1746705805`) is dashed below zoom 5 and on the backup. Halaib's north line (`1746705785`) is dashed at every zoom (P9). The zoom 4 and 6 shots match the tiles |
+| C4 | Pass | `docs/LICENSES.md` (rows on lines 13, 125 and 301, L1, the note under string 1, string 4), `ATTRIBUTION.md` and `LICENSE.txt` part (a) are updated; part (a) equals the style's metadata. The notice is identical in all 8 copies |
+| C5 | **Needs change (new problem)** | The 1:10m Cyprus and Crimea lines were added, but the 1:50m features with the same ids are still in the file, now simplified to 7 and 6 vertices. Both copies are dashed and both match the overlays' id filters, so **two dashed lines are drawn at every zoom**. They lie up to 9.9 km apart in Cyprus (mean 2.4 km) and 10.8 km apart in Crimea (mean 2.9 km). The coarse Cyprus copy alone covers 33.68–34.00°E. The three unused helpers and the override for `1746705379` also remain |
+
+**No other regressions:**
+- **Kosovo:** unchanged in the tiles at zoom 8 (Kosovo–Serbia and the Pančić's Peak pocket dashed; Kosovo's other borders solid), and dashed in Natural Earth.
+- **Levant:** every tile line at zoom 8 is unchanged from phase 2, and so are the Natural Earth lines.
+- **Cyprus:** the tiles are unchanged (only the solid base outlines), but Natural Earth's Green Line is doubled (C5).
+- **Elsewhere:** the zoom 5 scan of the reach matches phase 2, less the berm.
+
+**The 16 lines now:**
+- **Pass (9):**
+  - on published evidence: rows 1–3 and 15;
+  - on the PO's rulings or defaults: rows 4, 9, 10, 13 and 14.
+- **Need change (3):**
+  - rows 5 and 8, the doubled lines (C5);
+  - row 7, the berm stubs (C1, low).
+- **Can't tell until MC13 (4):** rows 6, 11, 12 and 16.
+
+### Fixes for the engineer (phase 3)
+- **D1 (C5):** add `1746708491` and `1746708787` to `naturalEarthBoundaryIdOverrides` as `hidden`. Those overrides apply only to the 1:50m pass, so the 1:10m copies stay. Also add the 1:10m Green Line's east piece, `1746708483` (33.91–34.01°E), to the Cyprus rule, so the line still reaches the coast south of Famagusta.
+- **D2 (C1, low):** drop the MAR/ESH condition from the unnamed-stub rule. That would also hide the 5.5 km unnamed piece on the Armenia–Azerbaijan border (P8's caveat), and the 9 km unnamed piece of the 27°40′N line at the Algerian border. To fill that last gap, add the 1:10m land line `1746708721` (8.82–8.68°W) to the Western Sahara rule. Alternatively, the PO accepts the stubs.
