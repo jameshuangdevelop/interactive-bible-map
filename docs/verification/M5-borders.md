@@ -316,3 +316,6 @@ The style filters match the rule table, and neither style uses `within`.
 **Fix:** make `1746708721` part of the Western Sahara rule (`sourceFeatureIds: [1746705527, 1746708721]`) so that it's dashed at every zoom. Then remove the `western-sahara-berm-stub-natural-earth` rule, and change the test that requires `1746708721` to be hidden.
 
 **Sign-off:** once that fix lands, the Fact-Checker signs off on M5-10's modern borders. Nothing else is outstanding. The lines marked "Can't tell" and the PO's defaults stay for the human to compare with Google Maps at MC13.
+
+## Final sign-off, 2026-10-19
+**Signed off on `d287cd0`:** `1746708721` is in the shared file once, dashed, with Western Sahara and Morocco on its two sides. It is drawn below zoom 5 and on the backup, and as an overlay from zoom 5, so the 27°40′N line now reaches the Algerian border at every zoom. My own rebuild matches the committed file byte for byte (397 features), and the tile rules, including the hidden berm stubs, are unchanged. The Fact-Checker signs off on M5-10's modern borders. The lines marked "Can't tell" and the PO's defaults stay for the human to compare with Google Maps at MC13.
