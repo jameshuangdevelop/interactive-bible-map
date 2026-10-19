@@ -173,19 +173,14 @@ const modernBoundaryRenderRules = [
     id: "moroccan-berm-unnamed-stubs",
     render: "hidden",
     reason:
-      "Hides the Moroccan berm, which is not a border (P2/P8), including unnamed disputed stubs in the same MAR–ESH corridor.",
+      "Hides the Moroccan berm, which is not a border (P2/P8), including unnamed disputed stubs.",
     expression: [
       "all",
       nonMaritimeBoundaryCondition,
       ["==", ["coalesce", ["get", "disputed"], 0], 1],
       ["==", ["coalesce", ["get", "admin_level"], 0], 2],
       ["==", ["coalesce", ["get", "disputed_name"], ""], ""],
-      ["==", ["coalesce", ["get", "claimed_by"], ""], ""],
-      [
-        "any",
-        ["in", ["get", "adm0_l"], ["literal", ["MAR", "ESH"]]],
-        ["in", ["get", "adm0_r"], ["literal", ["MAR", "ESH"]]]
-      ]
+      ["==", ["coalesce", ["get", "claimed_by"], ""], ""]
     ]
   },
   {
@@ -282,7 +277,7 @@ const modernNaturalEarthSupplementalDisputedRules = [
     id: "cyprus-buffer-line",
     render: "dashed",
     source: "ne-10m-land",
-    sourceFeatureIds: [1746708491],
+    sourceFeatureIds: [1746708491, 1746708483],
     minzoom: 5,
     reason:
       "Cyprus's Green Line is dashed at every zoom from Natural Earth's unsimplified 1:10m line-of-control geometry."
@@ -351,6 +346,15 @@ const modernNaturalEarthSupplementalDisputedRules = [
     minzoom: 5,
     reason:
       "Halaib's north 1902 administrative line is dashed at every zoom from Natural Earth's 1:10m Sudanese-claim geometry (P9)."
+  },
+  {
+    id: "western-sahara-berm-stub-natural-earth",
+    render: "hidden",
+    source: "ne-10m-land",
+    sourceFeatureIds: [1746708721],
+    minzoom: 0,
+    overlayFromMinzoom: false,
+    reason: "Hides the Moroccan berm, which is not a border (P2/P8)."
   }
 ];
 const naturalEarthBoundaryClassRules = [
@@ -366,6 +370,8 @@ const naturalEarthBoundaryIdOverrides = new Map([
   [1746706755, { render: "dashed", reason: "Kosovo–Serbia is dashed below zoom 5 and on backup maps." }],
   [1746707901, { render: "dashed", reason: "Golan–Jordan is dashed to match the modern disputed-line policy." }],
   [1746708045, { render: "solid", reason: "Algeria–Morocco stays solid at both zoom ranges." }],
+  [1746708491, { render: "hidden", reason: "Hide 1:50m Cyprus Green Line copy so only the 1:10m supplement draws." }],
+  [1746708787, { render: "hidden", reason: "Hide 1:50m Crimea isthmus copy so only the 1:10m supplement draws." }],
   [1746708837, { render: "hidden", reason: "Kerch Strait sea line is hidden because modern borders draw no maritime lines." }],
   [1746705351, { render: "hidden", reason: "Moroccan berm is hidden: it is a military wall, not a border line." }],
   [1746705379, { render: "hidden", reason: "Transnistria is hidden by policy pending human check." }]

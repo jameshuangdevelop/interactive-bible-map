@@ -957,7 +957,7 @@ test("Modern shared Natural Earth boundaries keep lineStyle for solid and dashed
   const styleCounts = new Map();
   for (const feature of neutralBoundaryGeoJson.features ?? []) {
     const lineStyle = feature?.properties?.lineStyle;
-    if (lineStyle !== "solid" && lineStyle !== "dashed") {
+    if (lineStyle !== "solid" && lineStyle !== "dashed" && lineStyle !== "hidden") {
       throw new Error(`Unexpected lineStyle on Natural Earth boundary feature: ${String(lineStyle)}`);
     }
     styleCounts.set(lineStyle, (styleCounts.get(lineStyle) ?? 0) + 1);
@@ -1002,5 +1002,35 @@ test("Modern shared Natural Earth boundaries keep lineStyle for solid and dashed
     egyptSudanEastSegment?.properties?.lineStyle,
     "dashed",
     "East Egypt–Sudan split segment must be dashed"
+  );
+
+  const singleCopySupplementalFeatureIds = [1746708491, 1746708483, 1746708787];
+  for (const featureId of singleCopySupplementalFeatureIds) {
+    const matches = (neutralBoundaryGeoJson.features ?? []).filter(
+      (feature) => Number(feature?.properties?.id) === featureId
+    );
+    assert.equal(
+      matches.length,
+      1,
+      `Natural Earth boundary feature ${featureId} must be present exactly once (no duplicate 1:50m + 1:10m copies)`
+    );
+    assert.equal(
+      matches[0]?.properties?.lineStyle,
+      "dashed",
+      `Natural Earth boundary feature ${featureId} must render as dashed`
+    );
+  }
+
+  const westernSaharaBermStubFeature = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => Number(feature?.properties?.id) === 1746708721
+  );
+  assert.ok(
+    westernSaharaBermStubFeature,
+    "Natural Earth boundary features must include Western Sahara berm-stub feature 1746708721"
+  );
+  assert.equal(
+    westernSaharaBermStubFeature?.properties?.lineStyle,
+    "hidden",
+    "Western Sahara berm-stub feature 1746708721 must be hidden"
   );
 });
