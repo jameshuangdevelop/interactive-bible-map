@@ -35,6 +35,7 @@ import { ANCIENT_GEO_INPUTS, AWMC_COMMIT, NATURAL_EARTH_COMMIT } from "./ancient
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
+export const ARMENIA_MINOR_LABEL_POINT = Object.freeze([38.3301, 39.5639]);
 // The folders and files of one run, set by composeAncientAreas: `workDirectory` for this module's
 // intermediates, `partitionWorkDirectory` for the AD 69 and AD 14 partitions, and the input files.
 let reportDirectory;
@@ -84,6 +85,12 @@ const COARSE_SIMPLIFY_METRES = 600;
 // shares with another area are simplified once, at the finer of the two tolerances, so neighbours keep
 // identical edges.
 const OTHER_ROMAN_LANDS_SIMPLIFY_METRES = 3500;
+const MAURETANIA_SIMPLIFY_METRES = OTHER_ROMAN_LANDS_SIMPLIFY_METRES;
+const MAURETANIA_SIMPLIFY_AREAS = new Set([
+  "mauretania-tingitana",
+  "mauretania-caesariensis",
+  "mauretania-caesariensis-east"
+]);
 const NEAR_PLACES_KM = 150;
 const NEAR_ISLAND_MAX_KM2 = 10000;
 // Coordinates are written to 5 decimals (about 1 m), the precision the app's build uses.
@@ -98,6 +105,7 @@ const AREA_ORDER = [
   "cilicia",
   "cilicia-tracheia",
   "commagene",
+  "pontus",
   "cappadocia",
   "galatia",
   "pamphylia",
@@ -113,6 +121,9 @@ const AREA_ORDER = [
   "sicily",
   "illyricum",
   "thrace",
+  "mauretania-tingitana",
+  "mauretania-caesariensis",
+  "mauretania-caesariensis-east",
   "other-roman-lands"
 ];
 
@@ -127,6 +138,7 @@ const SOURCE_BY_AREA = {
   cilicia: ["bib:livius-cilicia", "bib:strabo-geography"],
   "cilicia-tracheia": ["bib:livius-cilicia", "bib:strabo-geography"],
   commagene: ["bib:tacitus-annals", "bib:josephus-jewish-war"],
+  pontus: ["bib:strabo-geography", "bib:isbe-pontus"],
   cappadocia: ["bib:tacitus-annals", "bib:isbe-galatia"],
   galatia: ["bib:isbe-galatia"],
   pamphylia: ["bib:livius-pamphylia"],
@@ -142,6 +154,9 @@ const SOURCE_BY_AREA = {
   sicily: ["awmc:roman-empire-ad-69-provinces"],
   illyricum: ["awmc:roman-empire-ad-69-provinces"],
   thrace: ["awmc:roman-empire-ad-69-provinces"],
+  "mauretania-tingitana": ["awmc:roman-empire-ad-69-provinces", "bib:smith-dictionary-mauretania", "bib:smith-dictionary-mulucha", "bib:strabo-geography", "pleiades:289941"],
+  "mauretania-caesariensis": ["awmc:roman-empire-ad-69-provinces", "bib:pliny-natural-history", "bib:smith-dictionary-mauretania", "bib:smith-dictionary-mulucha", "bib:smith-dictionary-ampsaga", "bib:strabo-geography", "pleiades:289941", "pleiades:305126"],
+  "mauretania-caesariensis-east": ["awmc:roman-empire-ad-14-extent", "awmc:roman-empire-ad-69-provinces", "bib:strabo-geography", "bib:tacitus-annals", "bib:pliny-natural-history"],
   "judea-samaria-idumea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378"],
   "galilee-perea": ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678378", "pleiades:678326", "pleiades:697728"],
   "philip-tetrarchy-lands": ["bib:josephus-jewish-war"],
@@ -182,6 +197,35 @@ const POINTS = {
   // Strabo 12.2.7: Mazaca, the metropolis of the Cappadocians. The label point is the one on the
   // `cappadocia` location record.
   caesareaMazaca: [35.48, 38.72],
+  amaseia: [35.8279, 40.6668],
+  babanomon: [35.2967, 40.6311],
+  zela: [35.8902, 40.3039],
+  comanaPontica: [36.6387, 40.3576],
+  cabeira: [37.0201, 40.5892],
+  camisa: [37.4012, 39.8458],
+  nicopolisArmeniaMinor: [38.1435, 40.1486],
+  venasa: [34.766, 38.7231],
+  chammanene: [34.0576, 39.2844],
+  laviansene: [37.2405, 39.3602],
+  sargarausene: [36.621, 38.6875],
+  meliteneDistrict: [37.6847, 38.4417],
+  tavium: [34.5183, 39.8583],
+  armeniaMinorLabel: ARMENIA_MINOR_LABEL_POINT,
+  sebasteia: [37.0166, 39.749],
+  polemonion: [37.5002, 41.0309],
+  pharnakeia: [38.3979, 40.9191],
+  trapezus: [39.7233, 41.0043],
+  satala: [39.5979, 40.0279],
+  tingi: [-5.8102, 35.7875],
+  volubilis: [-5.5549, 34.0729],
+  rusaddir: [-2.9388, 35.2922],
+  siga: [-1.4517, 35.2529],
+  cartenna: [1.311, 36.51],
+  saldae: [5.058, 36.7409],
+  igilgili: [5.7662, 36.8213],
+  sitifis: [5.4042, 36.1921],
+  cirta: [6.6133, 36.3681],
+  meliteneCity: [38.3612, 38.3822],
   raphia: [34.25, 31.29],
   cappadociaLabel: [34.8392, 38.6706]
 };
@@ -237,6 +281,27 @@ const GALATIA_CAPPADOCIA_ANCHORS = {
     { name: "Iconium", point: [32.4923, 37.8725], source: "pleiades:648647" },
     { name: "Lystra", point: [32.3445, 37.5883], source: "pleiades:648699" },
     { name: "Derbe", point: [33.3615, 37.3486], source: "pleiades:648620" }
+  ]
+};
+
+const PONTUS_CAPPADOCIA_ANCHORS = {
+  pontus: [
+    { name: "Amaseia", point: POINTS.amaseia, source: "pleiades:857018" },
+    { name: "Babanomon", point: POINTS.babanomon, source: "pleiades:857053" },
+    { name: "Zela", point: POINTS.zela, source: "pleiades:857382" },
+    { name: "Comana Pontica", point: POINTS.comanaPontica, source: "pleiades:857095" },
+    { name: "Cabeira (Sebaste)", point: POINTS.cabeira, source: "pleiades:857177" },
+    { name: "Camisa", point: POINTS.camisa, source: "pleiades:628997" },
+    { name: "Nicopolis (Armenia Minor)", point: POINTS.nicopolisArmeniaMinor, source: "pleiades:857248" }
+  ],
+  cappadocia: [
+    { name: "Mazaca", point: POINTS.caesareaMazaca, source: "pleiades:629035" },
+    { name: "Venasa (Ouenasa)", point: POINTS.venasa, source: "pleiades:619230" },
+    { name: "Chammanene", point: POINTS.chammanene, source: "pleiades:619137" },
+    { name: "Laviansene", point: POINTS.laviansene, source: "pleiades:629025" },
+    { name: "Sargarausene", point: POINTS.sargarausene, source: "pleiades:629068" },
+    { name: "Melitene", point: POINTS.meliteneDistrict, source: "pleiades:629039" },
+    { name: "Tavium", point: POINTS.tavium, source: "pleiades:619267" }
   ]
 };
 
@@ -296,7 +361,7 @@ const OUTSIDE_LIST_PROBES = [
   ["Noricum", [[14.37, 46.7], [15.26, 46.23], [13.04, 47.8]]],
   ["Raetia", [[9.74, 47.5], [9.53, 46.85], [10.31, 47.73], [11.4, 47.27], [10.89, 48.37]]],
   ["Africa Proconsularis", [[10.32, 36.85], [10.64, 35.83], [10.71, 35.3], [14.29, 32.64], [12.48, 32.8], [13.18, 32.89], [10.1, 33.88], [9.5, 35.5], [11.0, 31.0], [10.91, 33.8], [8.12, 35.4]]],
-  ["Mauretania and Numidia", [[2.19, 36.6], [-5.8, 35.77], [-1.0, 35.2], [6.6, 36.37], [5.4, 35.55]]],
+  ["Numidia", [[6.6, 36.37]]],
   ["Sardinia et Corsica", [[9.11, 39.22], [9.5, 40.92], [9.51, 42.11]]],
   ["Gallia and the Alps", [[4.83, 45.76], [3.0, 43.18], [-0.58, 44.84], [2.35, 48.86], [6.9, 45.6], [7.03, 45.14], [9.1, 46.2], [9.6, 46.4]]],
   ["Germania", [[6.96, 50.94], [8.27, 50.0], [7.6, 47.56], [5.7, 51.8]]],
@@ -533,11 +598,11 @@ function polygonFeature(lineCoordinates, framePoints) {
 // coastline; up to COASTAL_ANCHOR_KM outside is accepted and noted.
 const COASTAL_ANCHOR_KM = 2;
 
-function assertInside(feature, points, areaLabel, notes = null) {
+function assertInside(feature, points, areaLabel, notes = null, toleranceKm = COASTAL_ANCHOR_KM) {
   for (const [name, point] of Object.entries(points)) {
     if (pointInGeometry(point, feature.geometry)) continue;
     const distance = distanceToGeometryKm(point, feature.geometry);
-    if (notes && distance <= COASTAL_ANCHOR_KM) {
+    if (notes && distance <= toleranceKm) {
       notes.push(`${areaLabel}: anchor ${name} lies ${rounded(distance, 2)} km beyond the coastline of its area.`);
       continue;
     }
@@ -1030,6 +1095,108 @@ async function drawGalatiaCappadociaLine(built, lakeTatta, notes) {
   return ensureFeatureCollection(await readJson(borderOutput)).features.flatMap((feature) => roadLines(feature.geometry));
 }
 
+async function drawPontusCappadociaLine(built, notes) {
+  const cappadociaIndex = built.findIndex((feature) => feature.properties.areaId === "cappadocia");
+  const cappadocia = built[cappadociaIndex];
+  const scale = Math.cos((39.5 * Math.PI) / 180);
+  const project = ([lon, lat]) => [lon * scale, lat];
+  const unproject = ([x, y]) => [x / scale, y];
+  const clipHalfPlane = (ring, middle, normal) => {
+    const side = (point) => (point[0] - middle[0]) * normal[0] + (point[1] - middle[1]) * normal[1];
+    const kept = [];
+    for (let index = 0; index < ring.length - 1; index += 1) {
+      const [start, end] = [ring[index], ring[index + 1]];
+      const [startSide, endSide] = [side(start), side(end)];
+      if (startSide <= 0) kept.push(start);
+      if ((startSide < 0 && endSide > 0) || (startSide > 0 && endSide < 0)) {
+        const t = startSide / (startSide - endSide);
+        kept.push([start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1])]);
+      }
+    }
+    return kept.length > 0 ? [...kept, kept[0]] : kept;
+  };
+
+  const frame = [[33, 37.8], [40.8, 37.8], [40.8, 42], [33, 42], [33, 37.8]].map(project);
+  const cells = PONTUS_CAPPADOCIA_ANCHORS.pontus.map((anchor) => {
+    const own = project(anchor.point);
+    let ring = frame;
+    for (const site of PONTUS_CAPPADOCIA_ANCHORS.cappadocia) {
+      const theirs = project(site.point);
+      ring = clipHalfPlane(ring, [(own[0] + theirs[0]) / 2, (own[1] + theirs[1]) / 2], [theirs[0] - own[0], theirs[1] - own[1]]);
+    }
+    return geometryFeature({ type: "Polygon", coordinates: [ring.map(unproject)] });
+  });
+  const ponticSide = await unionFeatures("pontus-cappadocia-side", cells);
+  const pieces = await explodeFeatures("pontus-cappadocia-moved", await booleanOp("pontus-cappadocia-moved", "clip", [cappadocia], [ponticSide]));
+  const moved = pieces.filter((piece) => PONTUS_CAPPADOCIA_ANCHORS.pontus.some((anchor) => pointInGeometry(anchor.point, piece.geometry)));
+  if (moved.length === 0) throw new Error("Pontus–Cappadocia: no part of Cappadocia holds a Pontic anchor");
+  const cappadociaRest = await booleanOp("pontus-cappadocia-rest", "erase", [cappadocia], moved);
+  const movedKm2 = moved.reduce((sum, piece) => sum + geometryAreaKm2(piece.geometry), 0);
+  const names = (side) => side.map((anchor) => anchor.name).join(", ");
+  const detail = `Pontus–Cappadocia (rule 2; Strabo 12.2.10): Strabo places the boundary on a mountain tract parallel to the Taurus from the western end of Chammanene to the eastern end of Laviansene; the Barrington Atlas's two places for Dasmenda lie inside Cappadocia, so they cannot anchor that line. The line runs equidistant between the nearest anchors of the two sides, ${names(PONTUS_CAPPADOCIA_ANCHORS.pontus)} (Strabo 12.3.28-39) and ${names(PONTUS_CAPPADOCIA_ANCHORS.cappadocia)} (Strabo 12.1.2-4, 12.2.6-10, 12.5.2). The land north of that line, ${rounded(movedKm2)} km², moves from the AD 14 Cappadocia face into the area of Pontus. Approximate.`;
+  const sources = ["bib:strabo-geography", ...[...PONTUS_CAPPADOCIA_ANCHORS.pontus, ...PONTUS_CAPPADOCIA_ANCHORS.cappadocia].map((anchor) => anchor.source).filter(Boolean)];
+  const change = { kind: "described-line", detail, sources };
+
+  built.push(await finishArea("pontus", moved, "Land north of Strabo's Pontus-Cappadocia line, cut from AWMC's AD 14 face (Armenia Minor / Cappadocia / Pontus Galaticus / Pontus Polemoniacus). Its west edge follows the Halys, Paphlagonia's eastern boundary (Strabo 12.3.9; ISBE 'Pontus').", cappadocia.properties.provenance.upstreamFeatureIds, notes, [change, { kind: "mapshaper-compose", detail: "The area's east edge follows AWMC's AD 69 extent along the Karasu (western Euphrates) and then north to the coast; Strabo 12.3.28 names the Euphrates as Lesser Armenia's frontier and Strabo 12.3.29 has Pythodoris's land continue toward Colchis beyond this edge.", sources: ["awmc:roman-empire-ad-69-extent", "bib:strabo-geography"] }]));
+  built[cappadociaIndex] = await finishArea(
+    "cappadocia",
+    cappadociaRest,
+    `${cappadocia.properties.provenance.changes[0].detail} Less the land north of Strabo's Pontus-Cappadocia line (see \`pontus\`).`,
+    cappadocia.properties.provenance.upstreamFeatureIds,
+    notes,
+    [...cappadocia.properties.provenance.changes.slice(1), change]
+  );
+
+  assertInside(
+    built.find((feature) => feature.properties.areaId === "pontus"),
+    Object.fromEntries(
+      [
+        ...PONTUS_CAPPADOCIA_ANCHORS.pontus.map((anchor) => [anchor.name, anchor.point]),
+        ["Sebasteia", POINTS.sebasteia],
+        ["Polemonion", POINTS.polemonion],
+        ["Pharnakeia", POINTS.pharnakeia],
+        ["Trapezus", POINTS.trapezus],
+        ["Pontus label", [37.83, 40.68]],
+        ["Armenia Minor label", POINTS.armeniaMinorLabel]
+      ]
+    ),
+    "pontus",
+    notes
+  );
+  assertInside(
+    built[cappadociaIndex],
+    Object.fromEntries(
+      [
+        ...PONTUS_CAPPADOCIA_ANCHORS.cappadocia.map((anchor) => [anchor.name, anchor.point]),
+        ["Melitene city", POINTS.meliteneCity],
+        ["Tyana", GALATIA_CAPPADOCIA_ANCHORS.cappadocia[0].point],
+        ["Garsaura", GALATIA_CAPPADOCIA_ANCHORS.cappadocia[1].point],
+        ["Cappadocia label", POINTS.cappadociaLabel]
+      ]
+    ),
+    "cappadocia"
+  );
+  notes.push(`Pontus: ${rounded(movedKm2)} km² north of the anchor line move from Cappadocia to the new \`pontus\` area.`);
+
+  const borderInput = path.join(workDirectory, "pontus-cappadocia-border-input.geojson");
+  const borderOutput = path.join(workDirectory, "pontus-cappadocia-border.geojson");
+  await writeJson(
+    borderInput,
+    featureCollection([
+      geometryFeature((await unionFeatures("pontus-moved-union", moved)).geometry, { side: "pontus" }),
+      ...cappadociaRest.map((piece) => geometryFeature(piece.geometry, { side: "cappadocia" }))
+    ])
+  );
+  await removeIfExists(borderOutput);
+  await mapshaper.runCommands(
+    `-i ${quote(borderInput)} snap -innerlines where="A.side != B.side" -o format=geojson ${quote(borderOutput)}`
+  );
+  const borderLines = ensureFeatureCollection(await readJson(borderOutput)).features.flatMap((feature) =>
+    roadLines(feature.geometry)
+  );
+  return borderLines;
+}
+
 // A piece is coastal when part of its outline is today's coastline (Natural Earth's land outlines).
 function isCoastalPiece(piece, landParts) {
   return sharedBoundaryShares(piece, landParts, 0.1).some((share) => share.share >= 0.05);
@@ -1082,6 +1249,158 @@ async function buildOtherRomanLands(built, ad69Raw, extentFeature, landParts, is
     ["awmc:roman-empire-ad-69-extent", "awmc:roman-empire-ad-69-provinces"],
     notes,
     [{ kind: "left-out", detail: `Great Britain and its islands (${rounded(britainKm2)} km²) are left out: Rome conquered Britain from AD 43, after the timeline begins (ADR-0037).`, sources: ["awmc:roman-empire-ad-69-extent"] }]
+  );
+}
+
+async function carveMauretaniaAreas(built, ad69Raw, ad14Extent, landParts, notes) {
+  const otherIndex = built.findIndex((feature) => feature.properties.areaId === "other-roman-lands");
+  const other = built[otherIndex];
+  const tingitanaFace = featureAtPoint(ad69Raw, POINTS.tingi, "Mauretania Tingitana");
+  const caesariensisFace = featureAtPoint(ad69Raw, POINTS.cartenna, "Mauretania Caesariensis");
+
+  const tingitana = await booleanOp("mauretania-tingitana", "clip", [other], [tingitanaFace]);
+  const caesariensisWhole = await booleanOp("mauretania-caesariensis-whole", "clip", [other], [caesariensisFace]);
+  const caesariensisEast = await booleanOp("mauretania-caesariensis-east", "clip", caesariensisWhole, [ad14Extent]);
+  const caesariensis = await booleanOp("mauretania-caesariensis", "erase", caesariensisWhole, caesariensisEast);
+  const remainder = await booleanOp("other-minus-mauretania", "erase", [other], [...tingitana, ...caesariensisWhole]);
+  const remainderParts = await explodeFeatures("other-minus-mauretania-parts", remainder);
+  const mauretaniaTargets = [
+    { areaId: "mauretania-tingitana", pieces: tingitana },
+    { areaId: "mauretania-caesariensis", pieces: caesariensis },
+    { areaId: "mauretania-caesariensis-east", pieces: caesariensisEast }
+  ];
+  const movedRemainderByArea = new Map();
+  const keptRemainder = [];
+  for (const part of remainderParts) {
+    const areaKm2 = geometryAreaKm2(part.geometry);
+    const centre = labelPoint(part.geometry);
+    const borderWithTargets = mauretaniaTargets
+      .map((target) => ({
+        areaId: target.areaId,
+        borderKm: sharedBoundaryShares(part, target.pieces, 0.05).reduce(
+          (sum, row) => sum + row.sharedKm,
+          0
+        )
+      }))
+      .filter((row) => row.borderKm > 0)
+      .sort((left, right) => right.borderKm - left.borderKm);
+    if (areaKm2 > 500 || !isCoastalPiece(part, landParts)) {
+      keptRemainder.push(part);
+      continue;
+    }
+    const target =
+      borderWithTargets[0] ??
+      (centre
+        ? mauretaniaTargets
+            .map((candidate) => ({
+              areaId: candidate.areaId,
+              borderKm: 0,
+              distanceKm: Math.min(
+                ...candidate.pieces.map((piece) => distanceToGeometryKm(centre, piece.geometry))
+              )
+            }))
+            .sort((left, right) => left.distanceKm - right.distanceKm)
+            .find((candidate) => candidate.distanceKm <= 10)
+        : null);
+    if (!target) {
+      keptRemainder.push(part);
+      continue;
+    }
+    if (!movedRemainderByArea.has(target.areaId)) movedRemainderByArea.set(target.areaId, []);
+    movedRemainderByArea.get(target.areaId).push(part);
+    notes.push(
+      `Mauretania coast fix: moved ${rounded(areaKm2, 1)} km² from \`other-roman-lands\` to \`${target.areaId}\`${target.borderKm > 0 ? ` (${rounded(target.borderKm, 1)} km shared edge)` : ` (nearest edge ${rounded(target.distanceKm ?? 0, 1)} km)`}.`
+    );
+  }
+  const assignedRemainderCount = [...movedRemainderByArea.values()].reduce(
+    (sum, parts) => sum + parts.length,
+    0
+  );
+
+  built.push(
+    await finishArea(
+      "mauretania-tingitana",
+      [...tingitana, ...(movedRemainderByArea.get("mauretania-tingitana") ?? [])],
+      "AD 69 land faces west of AWMC's AD 69 province line 610, inside the AD 69 extent.",
+      ["awmc:roman-empire-ad-69-provinces"],
+      notes,
+      [{
+        kind: "mapshaper-compose",
+        detail: "AWMC AD 69 province line between Tingitana and Caesariensis, along the lower Moulouya: the Mulucha (Smith, 'Mauretania', 'Mulucha'), Strabo's Molochath (17.3.6).",
+        sources: ["awmc:roman-empire-ad-69-provinces", "bib:smith-dictionary-mauretania", "bib:smith-dictionary-mulucha", "bib:strabo-geography", "pleiades:289941"]
+      }]
+    ),
+    await finishArea(
+      "mauretania-caesariensis",
+      [...caesariensis, ...(movedRemainderByArea.get("mauretania-caesariensis") ?? [])],
+      "AD 69 land faces between AWMC's AD 69 province lines 610 and 609, outside AWMC's AD 14 extent.",
+      ["awmc:roman-empire-ad-69-provinces", "awmc:roman-empire-ad-14-extent"],
+      notes,
+      []
+    ),
+    await finishArea(
+      "mauretania-caesariensis-east",
+      [...caesariensisEast, ...(movedRemainderByArea.get("mauretania-caesariensis-east") ?? [])],
+      "The AD 69 Caesariensis faces inside AWMC's AD 14 extent.",
+      ["awmc:roman-empire-ad-14-extent", "awmc:roman-empire-ad-69-provinces"],
+      notes,
+      [
+        {
+          kind: "mapshaper-compose",
+          detail: "AWMC's AD 14 edge, where it ends the kingdom; Strabo names Saldae, about 110 km farther east, as the frontier under Juba (17.3.12), and no source gives its course inland.",
+          sources: ["awmc:roman-empire-ad-14-extent", "bib:strabo-geography"]
+        },
+        {
+          kind: "mapshaper-compose",
+          detail: "The Ampsaga's mouth (Pliny 5.1, Tucca; Smith, 'Ampsaga'); inland, AWMC's line.",
+          sources: ["awmc:roman-empire-ad-69-provinces", "bib:pliny-natural-history", "bib:smith-dictionary-ampsaga", "pleiades:305126"]
+        }
+      ]
+    )
+  );
+
+  built[otherIndex] = await finishArea(
+    "other-roman-lands",
+    keptRemainder,
+    other.properties.provenance.changes[0].detail,
+    other.properties.provenance.upstreamFeatureIds,
+    notes,
+    [
+      ...other.properties.provenance.changes.slice(1),
+      {
+        kind: "left-out",
+        detail: `Land now shown in Mauretania Tingitana, Mauretania Caesariensis and the uncertain eastern strip (\`mauretania-caesariensis-east\`) is removed from this grouped area, including ${assignedRemainderCount} coastal piece(s) where AWMC's coastline and Natural Earth's differ.`,
+        sources: ["awmc:roman-empire-ad-69-provinces", "awmc:roman-empire-ad-14-extent"]
+      }
+    ]
+  );
+  notes.push(
+    `Mauretania coast fix: reassigned ${assignedRemainderCount} coastal piece(s) from \`other-roman-lands\` to the Mauretania areas before simplification.`
+  );
+
+  assertInside(
+    built.find((feature) => feature.properties.areaId === "mauretania-tingitana"),
+    { Tingi: POINTS.tingi, Volubilis: POINTS.volubilis, Rusaddir: POINTS.rusaddir },
+    "mauretania-tingitana"
+  );
+  assertInside(
+    built.find((feature) => feature.properties.areaId === "mauretania-caesariensis"),
+    { Siga: POINTS.siga, Cartenna: POINTS.cartenna },
+    "mauretania-caesariensis"
+  );
+  assertInside(
+    built.find((feature) => feature.properties.areaId === "mauretania-caesariensis-east"),
+    { Saldae: POINTS.saldae, Igilgili: POINTS.igilgili, Sitifis: POINTS.sitifis },
+    "mauretania-caesariensis-east"
+  );
+  assertInside(
+    built.find((feature) => feature.properties.areaId === "other-roman-lands"),
+    { Cirta: POINTS.cirta },
+    "other-roman-lands"
+  );
+
+  notes.push(
+    `Mauretania split: Tingitana ${rounded(tingitana.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0))} km², Caesariensis ${rounded(caesariensis.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0))} km², and eastern strip ${rounded(caesariensisEast.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0))} km².`
   );
 }
 
@@ -1365,7 +1684,9 @@ const PLACE_EXPLANATIONS = {
   pisidia: "Label point for the region. The research note keeps AWMC's whole AD 14 'Pamphylia' face with `pamphylia`, so southern Pisidia's hills are drawn there; the point is in that face, not in Galatia's.",
   "malta candidate 1": "The alternative identification of Melita, Mljet in the Adriatic, lies outside AWMC's AD 69 extent, which leaves out several Dalmatian islands, so no area holds it. The record links the place, not each candidate, to `sicily`.",
   nicopolis: "Coastal city on the Preveza isthmus: AWMC's coastline at the Ambracian Gulf leaves it in the sea (a boundary-precision issue, per the research note's Nicopolis ruling).",
-  "sea-of-galilee": "Label point for the lake, 0.9 km east of the median line that divides the lake between Galilee and Philip's lands."
+  "sea-of-galilee": "Label point for the lake, 0.9 km east of the median line that divides the lake between Galilee and Philip's lands.",
+  cauda: "The route stop's candidate point is on Gavdos, south of Crete. AWMC's AD 69 provincial faces include Crete but not Gavdos, so no area holds this point.",
+  trogyllium: "The route stop's candidate point is on the coast opposite Samos. AWMC's Asia face and coastline leave this promontory just outside the land face at this scale."
 };
 
 function placeExplanation(row) {
@@ -1475,6 +1796,7 @@ export async function composeAncientAreas(options) {
   // AWMC's extents are several polygons, some of which overlap (the AD 69 extent over Raetia). A plain
   // `-dissolve` leaves land covered twice as a hole; `-clean -dissolve2` keeps it.
   const ad69Extent = (await extractShapefileFeature(path.join(culturalRoot, "political_shading", "roman_empire_ad_69_extent", "roman_empire_ad_69_extent.shp"), "ad69-extent.geojson", "-clean -dissolve2"))[0];
+  const ad14Extent = (await extractShapefileFeature(path.join(culturalRoot, "political_shading", "roman_empire_ad_14_extent", "roman_empire_ad_14_extent.shp"), "ad14-extent.geojson", "-clean -dissolve2"))[0];
   const ad200Extent = (await extractShapefileFeature(path.join(culturalRoot, "political_shading", "roman_empire_ad_200_extent", "roman_empire_ad_200_extent.shp"), "ad200-extent.geojson", "-clean -dissolve2"))[0];
   const herodRecord12 = (await extractShapefileFeature(path.join(culturalRoot, "political_shading", "herod", "herod.shp"), "herod-record-12.geojson", `-each "_idx=this.id" -filter "_idx==12"`))[0];
   const herodLand = await clippedHerodOutline(herodRecord12, landMaskPath);
@@ -1501,6 +1823,7 @@ export async function composeAncientAreas(options) {
   built.push(await finishArea("bithynia", [bithyniaAd14, ...pontusCoast], `AD14 face ${bithyniaAd14.properties.faceId} (Bithynia et Pontus / Thracia), plus the AD69 face ${bithyniaAd69.properties.faceId}'s Pontic coast east of it (${rounded(pontusCoast.reduce((sum, feature) => sum + geometryAreaKm2(feature.geometry), 0))} km²), per the research note's ruling that coastal, western Pontus lies in Bithynia.`, [`awmc:ad14-face-${bithyniaAd14.properties.faceId}`, `awmc:ad69-face-${bithyniaAd69.properties.faceId}`], notes));
   const lakeTatta = await loadLakeTatta();
   const galatiaCappadociaLine = await drawGalatiaCappadociaLine(built, lakeTatta, notes);
+  const pontusCappadociaLine = await drawPontusCappadociaLine(built, notes);
   await addDirect("macedonia", ad69Named, "Macedonia", "ad69");
   await addDirect("cyprus", ad69Named, "Cyprus", "ad69");
   await addDirect("egypt", ad69Named, "Aegyptus", "ad69");
@@ -1675,6 +1998,7 @@ export async function composeAncientAreas(options) {
   // The rest of the Roman world.
   const isBritain = await britainTest(landParts);
   built.push(await buildOtherRomanLands(built, ad69Raw, ad69Extent, landParts, isBritain, awmcShore, notes));
+  await carveMauretaniaAreas(built, ad69Raw, ad14Extent, landParts, notes);
   await assignSourcedIslands(built, notes);
   await fillRomanWorldGaps(built, coverageDomain, isBritain, notes);
   await attachExtentSlivers(built, inlandExtentGaps, notes);
@@ -1694,7 +2018,12 @@ export async function composeAncientAreas(options) {
   const simplifyInput = ordered.flatMap((feature) => {
     const { areaId } = feature.properties;
     if (areaId !== "other-roman-lands") {
-      return [geometryFeature(feature.geometry, { ...feature.properties, side: "roman", simplifyMetres: FINE_SIMPLIFY_AREAS.includes(areaId) ? FINE_SIMPLIFY_METRES : COARSE_SIMPLIFY_METRES })];
+      const simplifyMetres = FINE_SIMPLIFY_AREAS.includes(areaId)
+        ? FINE_SIMPLIFY_METRES
+        : MAURETANIA_SIMPLIFY_AREAS.has(areaId)
+          ? MAURETANIA_SIMPLIFY_METRES
+          : COARSE_SIMPLIFY_METRES;
+      return [geometryFeature(feature.geometry, { ...feature.properties, side: "roman", simplifyMetres })];
     }
     const near = [];
     const far = [];
@@ -1729,6 +2058,34 @@ export async function composeAncientAreas(options) {
     return cleaned;
   });
   const collection = featureCollection(finalFeatures);
+  const otherFinal = collection.features.find((feature) => feature.properties.areaId === "other-roman-lands");
+  const mauretaniaFinal = collection.features.filter((feature) =>
+    ["mauretania-tingitana", "mauretania-caesariensis", "mauretania-caesariensis-east"].includes(
+      feature.properties.areaId
+    )
+  );
+  if (otherFinal && mauretaniaFinal.length > 0) {
+    const smallCoastalAlongMauretania = polygonsOf(otherFinal.geometry)
+      .map((polygon) => geometryFeature({ type: "Polygon", coordinates: polygon }))
+      .filter((part) => {
+        const areaKm2 = geometryAreaKm2(part.geometry);
+        if (areaKm2 >= 50) return false;
+        if (!isCoastalPiece(part, landParts)) return false;
+        return sharedBoundaryShares(part, mauretaniaFinal, 0.05).length > 0;
+      });
+    if (smallCoastalAlongMauretania.length > 0) {
+      const details = smallCoastalAlongMauretania
+        .slice(0, 10)
+        .map((part) => `${rounded(geometryAreaKm2(part.geometry), 1)} km² at ${labelPoint(part.geometry).map((value) => value.toFixed(3)).join(", ")}`)
+        .join("; ");
+      throw new Error(
+        `Mauretania coast still has ${smallCoastalAlongMauretania.length} other-roman-lands part(s) under 50 km² after simplification (${details})`
+      );
+    }
+    notes.push(
+      "Mauretania coast check: no `other-roman-lands` coastal part under 50 km² remains adjacent to the three Mauretania areas in the written file."
+    );
+  }
   // G10: the old sea that the Fact-Checker names must stay in no area.
   const areaIdsAt = (point) => collection.features.filter((feature) => pointInGeometry(point, feature.geometry)).map((feature) => feature.properties.areaId);
   const oldSeaChecks = OLD_SEA_POINTS.map(([name, point]) => ({ name, point, areaIds: areaIdsAt(point) }));
@@ -1866,6 +2223,13 @@ export async function composeAncientAreas(options) {
       lines: galatiaCappadociaLine.map((coordinates) => ({ coordinates, color: "#a00", dash: "6,4" })),
       points: [...GALATIA_CAPPADOCIA_ANCHORS.cappadocia, ...GALATIA_CAPPADOCIA_ANCHORS.galatia].map((anchor) => ({ name: anchor.name, coordinates: anchor.point })).concat([{ name: "Caesarea Mazaca", coordinates: POINTS.caesareaMazaca }, { name: "cappadocia label", coordinates: POINTS.cappadociaLabel }, { name: "Ancyra", coordinates: [32.85, 39.93] }])
     }),
+    await writePreviewPng(path.join(previewDirectory, "areas-pontus-cappadocia.png"), {
+      title: "Pontus and Cappadocia: the line between Strabo's Pontic and Cappadocian anchors (dashed)",
+      bounds: [33.7, 38.0, 39.8, 41.4],
+      areas: collection,
+      lines: pontusCappadociaLine.map((coordinates) => ({ coordinates, color: "#a00", dash: "6,4" })),
+      points: [...PONTUS_CAPPADOCIA_ANCHORS.pontus, ...PONTUS_CAPPADOCIA_ANCHORS.cappadocia].map((anchor) => ({ name: anchor.name, coordinates: anchor.point })).concat([{ name: "Pontus label", coordinates: [37.83, 40.68] }, { name: "Armenia Minor label", coordinates: POINTS.armeniaMinorLabel }])
+    }),
     await writePreviewPng(path.join(previewDirectory, "areas-sinai-arabia.png"), {
       title: "Southern Levant, Sinai and Arabia; the coast from Gaza past Raphia to Rhinocolura is Judea's (G11)",
       bounds: [31.5, 27.4, 38.5, 34.0],
@@ -1931,7 +2295,7 @@ export async function composeAncientAreas(options) {
     roadClip,
     previewPaths,
     osmSummary,
-    simplifyNote: `Written after topology-aware Douglas–Peucker simplification (${FINE_SIMPLIFY_METRES} m for ${FINE_SIMPLIFY_AREAS.map((areaId) => `\`${areaId}\``).join(", ")}, whose borders follow the Jordan; ${OTHER_ROMAN_LANDS_SIMPLIFY_METRES} m for \`other-roman-lands\` except its islands within ${NEAR_PLACES_KM} km of our places and its frontier with land beyond the empire; ${COARSE_SIMPLIFY_METRES} m elsewhere; a shared edge takes the finer tolerance) with coordinates rounded to ${OUTPUT_PRECISION}°; areas are cleaned before and after.`
+    simplifyNote: `Written after topology-aware Douglas–Peucker simplification (${FINE_SIMPLIFY_METRES} m for ${FINE_SIMPLIFY_AREAS.map((areaId) => `\`${areaId}\``).join(", ")}, whose borders follow the Jordan; ${OTHER_ROMAN_LANDS_SIMPLIFY_METRES} m for \`other-roman-lands\` except its islands within ${NEAR_PLACES_KM} km of our places and its frontier with land beyond the empire; ${MAURETANIA_SIMPLIFY_METRES} m for the three Mauretania areas (far from our places); ${COARSE_SIMPLIFY_METRES} m elsewhere; a shared edge takes the finer tolerance) with coordinates rounded to ${OUTPUT_PRECISION}°; areas are cleaned before and after.`
   });
   const reportPath = path.join(reportDirectory, "composition-report.md");
   if (acceptance.length > 0) {

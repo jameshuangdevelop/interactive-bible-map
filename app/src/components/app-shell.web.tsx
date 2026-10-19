@@ -15,6 +15,7 @@ import { SearchMenu } from "./search-menu";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
+import { computeTimelineSourcesPopoverMaxHeight } from "../features/map/overlay-layout";
 import {
   applyRouteIdToSearch,
   applyRouteStageToSearch,
@@ -65,7 +66,14 @@ const ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX = 1280;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const VIEW_TABS_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
 const SEGMENTED_CONTROL_MIN_WIDTH_PX = 178;
+const SEGMENTED_CONTROL_HEIGHT_PX = 40;
 const MAP_TOP_CONTROL_CLEARANCE_PX = 16;
+const SMALL_SCREEN_TOP_CONTROLS_SAFE_BOTTOM_PX =
+  MAP_TOGGLE_TOP_OFFSET_PX + SEGMENTED_CONTROL_HEIGHT_PX + MAP_TOP_CONTROL_CLEARANCE_PX;
+const SMALL_SCREEN_ATTRIBUTION_RESERVED_HEIGHT_PX = 180;
+const TIMELINE_CARD_BOTTOM_OFFSET_PX = tokens.spacing.md;
+const TIMELINE_SOURCES_POPOVER_MIN_HEIGHT_PX = 120;
+const TIMELINE_SOURCES_VERTICAL_GAP_PX = 8;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const MAP_MODE_ORDER: readonly MapDisplayMode[] = ["ancient", "modern"];
 const VIEW_TAB_ORDER = ["map", "routes"] as const;
@@ -395,6 +403,9 @@ export function AppShell() {
   const [ancientLayerRetryToken, setAncientLayerRetryToken] = useState(0);
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
+  const [timelineSourcesPopoverMaxHeightPx, setTimelineSourcesPopoverMaxHeightPx] = useState<
+    number | null
+  >(null);
   const [timelineOverlayInsetForAttribution, setTimelineOverlayInsetForAttribution] = useState(0);
   const [routesLoadState, setRoutesLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [routesData, setRoutesData] = useState<LoadedRoutesData | null>(null);
@@ -405,6 +416,7 @@ export function AppShell() {
   const [routesReloadToken, setRoutesReloadToken] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const timelineCardRef = useRef<HTMLDivElement | null>(null);
+  const timelineSourcesPopoverRef = useRef<HTMLDivElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
@@ -1720,6 +1732,52 @@ export function AppShell() {
       observer?.disconnect();
     };
   }, [timelineVisible]);
+  useLayoutEffect(() => {
+    if (!timelineVisible || !timelineSourcesOpen || !isSmallScreen) {
+      return undefined;
+    }
+
+    const updateTimelineSourcesPopoverHeight = () => {
+      const card = timelineCardRef.current;
+      const popover = timelineSourcesPopoverRef.current;
+      if (!card || !popover) {
+        setTimelineSourcesPopoverMaxHeightPx(null);
+        return;
+      }
+
+      const nextHeight = computeTimelineSourcesPopoverMaxHeight({
+        viewportHeight: window.innerHeight,
+        timelineCardHeight: card.getBoundingClientRect().height,
+        sourcesPopoverHeight: popover.getBoundingClientRect().height,
+        topControlsSafeBottomInset: SMALL_SCREEN_TOP_CONTROLS_SAFE_BOTTOM_PX,
+        attributionReservedHeight: SMALL_SCREEN_ATTRIBUTION_RESERVED_HEIGHT_PX,
+        timelineCardBottomOffset: TIMELINE_CARD_BOTTOM_OFFSET_PX,
+        minPopoverHeight: TIMELINE_SOURCES_POPOVER_MIN_HEIGHT_PX,
+        verticalGap: TIMELINE_SOURCES_VERTICAL_GAP_PX
+      });
+      setTimelineSourcesPopoverMaxHeightPx((currentValue) =>
+        currentValue === nextHeight ? currentValue : nextHeight
+      );
+    };
+
+    updateTimelineSourcesPopoverHeight();
+    window.addEventListener("resize", updateTimelineSourcesPopoverHeight);
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(updateTimelineSourcesPopoverHeight);
+      if (timelineCardRef.current) {
+        observer.observe(timelineCardRef.current);
+      }
+      if (timelineSourcesPopoverRef.current) {
+        observer.observe(timelineSourcesPopoverRef.current);
+      }
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateTimelineSourcesPopoverHeight);
+      observer?.disconnect();
+    };
+  }, [isSmallScreen, timelineSourcesOpen, timelineVisible]);
   const effectiveTimelineOverlayInsetForAttribution = timelineVisible ? timelineOverlayInsetForAttribution : 0;
   const timelineWidthLimitPx = Math.max(
     280,
@@ -2037,7 +2095,9 @@ export function AppShell() {
                 : selectedTimelineStopId
             }
             selection={selection}
+            attributionReservedHeight={SMALL_SCREEN_ATTRIBUTION_RESERVED_HEIGHT_PX}
             timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
+            topControlsSafeBottomInset={SMALL_SCREEN_TOP_CONTROLS_SAFE_BOTTOM_PX}
           />
         </Suspense>
       )}
@@ -2119,6 +2179,7 @@ export function AppShell() {
               {timelineSourcesOpen ? (
                 <div
                   data-timeline-sources-popover="true"
+                  ref={timelineSourcesPopoverRef}
                   style={{
                     marginTop: `${tokens.spacing.xs}px`,
                     padding: `${tokens.spacing.sm}px`,
@@ -2126,7 +2187,13 @@ export function AppShell() {
                     backgroundColor: tokens.color.subtleSurface,
                     color: tokens.color.textSecondary,
                     fontSize: `${tokens.typography.captionSize}px`,
-                    lineHeight: `${tokens.typography.captionLineHeight}px`
+                    lineHeight: `${tokens.typography.captionLineHeight}px`,
+                    maxHeight:
+                      isSmallScreen && timelineSourcesPopoverMaxHeightPx
+                        ? `${timelineSourcesPopoverMaxHeightPx}px`
+                        : undefined,
+                    overflowY: isSmallScreen ? "auto" : undefined,
+                    overscrollBehavior: isSmallScreen ? "contain" : undefined
                   }}
                 >
                   <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
@@ -2167,7 +2234,7 @@ export function AppShell() {
                     </div>
                   ) : null}
                   <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
-                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene, Chalcis or Emesa, aren&apos;t drawn. Polemon&apos;s kingdom of Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.
                   </p>
                 </div>
               ) : null}

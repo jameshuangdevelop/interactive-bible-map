@@ -34,23 +34,23 @@ const LOCATION_REFERENCE_IDS = Object.freeze({
 const PLEIADES_REFERENCE_POINTS = Object.freeze({
   Syracuse: { coordinates: [15.287, 37.067], source: "pleiades:462503" },
   Byzantium: { coordinates: [28.9769, 41.0122], source: "pleiades:520998" },
-  Salona: { coordinates: [16.49, 43.54], source: "pleiades:197470" },
+  Salona: { coordinates: [16.49, 43.54], source: "pleiades:197488" },
   Nicomedia: { coordinates: [29.92, 40.77], source: "pleiades:511337" },
   Ancyra: { coordinates: [32.854, 39.932], source: "pleiades:619103" },
-  "Caesarea Mazaca": { coordinates: [35.49, 38.73], source: "pleiades:628879" },
+  "Caesarea Mazaca": { coordinates: [35.49, 38.73], source: "pleiades:629035" },
   Antioch: { coordinates: [36.181667, 36.204722], source: "pleiades:658381" },
   Alexandria: { coordinates: [29.9, 31.2], source: "pleiades:727070" },
   Cyrene: { coordinates: [21.86, 32.83], source: "pleiades:373778" },
   Gortyna: { coordinates: [24.947, 35.061], source: "pleiades:589796" },
-  Patara: { coordinates: [29.318, 36.264], source: "pleiades:639053" },
+  Patara: { coordinates: [29.318, 36.264], source: "pleiades:639042" },
   Petra: { coordinates: [35.444, 30.328], source: "pleiades:697725" },
-  Samosata: { coordinates: [38.606, 37.58], source: "pleiades:658603" },
-  Emesa: { coordinates: [36.72, 34.73], source: "pleiades:668263" },
-  Amaseia: { coordinates: [35.833, 40.653], source: "pleiades:857036" },
-  Neocaesarea: { coordinates: [36.558, 40.326], source: "pleiades:857229" },
-  "Nicopolis (Armenia Minor)": { coordinates: [38.18, 39.88], source: "pleiades:857238" },
-  Artaxata: { coordinates: [44.57, 39.96], source: "pleiades:874318" },
-  Ctesiphon: { coordinates: [44.58, 33.1], source: "pleiades:893989" }
+  Samosata: { coordinates: [38.606, 37.58], source: "pleiades:658587" },
+  Emesa: { coordinates: [36.72, 34.73], source: "pleiades:668261" },
+  Amaseia: { coordinates: [35.833, 40.653], source: "pleiades:857018" },
+  Neocaesarea: { coordinates: [37.0201, 40.5892], source: "pleiades:857177" },
+  "Nicopolis (Armenia Minor)": { coordinates: [38.1435, 40.1486], source: "pleiades:857248" },
+  Artaxata: { coordinates: [44.57, 39.96], source: "pleiades:874361" },
+  Ctesiphon: { coordinates: [44.58, 33.1], source: "pleiades:893976" }
 });
 
 const REFERENCE_TOWNS = Object.freeze([

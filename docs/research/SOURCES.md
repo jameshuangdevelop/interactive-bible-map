@@ -197,6 +197,15 @@ The inputs `npm run build:route-lines` reads, and `npm run check:route-lines` an
 | Natural Earth 10 m coastline | Not an input since 2026-10-14: the land polygons' edges are the coast | — | Public domain | Still used by the ancient layer (M4-03). |
 | Itiner-e (2025 release) | Not used | — | CC BY 4.0 (as reported by project/Zenodo metadata) | Evaluated in M5-04 but not read by any script; the Fact-Checker could not confirm the licence (Zenodo refused the request). |
 
+## M5-11 ancient-land geometry provenance update (2026-10-18)
+
+- No new upstream dataset was added.
+- `scripts/lib/ancient-compose.mjs` now uses **AWMC AD 69 province lines 609 and 610** (from `political_shading/roman_empire_ad_69_provinces`) and the **AWMC AD 14 extent** (`political_shading/roman_empire_ad_14_extent`) to bound named areas:
+  - `mauretania-tingitana`,
+  - `mauretania-caesariensis`,
+  - `mauretania-caesariensis-east`.
+- The same update adds a new `pontus` area cut from the AD 14 Cappadocia face by a sourced, approximate Strabo-based line (rule 2), with provenance recorded on `pontus` and `cappadocia`.
+
 ## Open questions for the Fact-Checker (M1-03)
 
 1. Our candidate sources mix CC BY (OpenBible.info, Pleiades, ORBIS dataset), CC BY-SA/ODbL share-alike (DARE, AWMC, OpenStreetMap), and CC0 (Wikidata) content. Does combining them into our own `data/*.json` require the whole data release to carry a share-alike license (e.g. CC BY-SA 4.0), and should that be recorded as the project's data license in `docs/LICENSES.md`?

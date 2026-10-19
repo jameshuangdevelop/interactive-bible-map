@@ -55,6 +55,7 @@ import {
   resolveEffectiveMapVariantOptions,
   resolveMapRuntimeTuning
 } from "./map-runtime-options";
+import { computeCompactAttributionBottomOffsetLimit } from "./overlay-layout";
 import { planSelectionFocus } from "./selection-focus";
 import {
   PRIMARY_VECTOR_SOURCE_ID,
@@ -1207,7 +1208,10 @@ function buildAncientHolderLabelFeatures(
             labelText,
             minZoom: label.minZoom,
             clickable: typeof label.locationId === "string" && label.locationId.length > 0,
-            tooltipText: `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
+            tooltipText:
+              typeof label.tooltipText === "string" && label.tooltipText.length > 0
+                ? label.tooltipText
+                : `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
           },
           geometry: {
             type: "Point" as const,
@@ -2549,6 +2553,8 @@ export function MapView({
   leftPanelWidth,
   bottomPanelInset,
   timelineOverlayInset,
+  topControlsSafeBottomInset,
+  attributionReservedHeight,
   isSmallScreen,
   mapMode,
   selectedTimelineStopId,
@@ -4442,10 +4448,17 @@ export function MapView({
     : controlBottomInset + 16;
   const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
   const routeAttributionOverlayInset = routesModeEnabled ? scaleBarBottomOffset + 56 : 0;
-  const compactAttributionBottomWithTimelineOffset = Math.max(
-    compactAttributionBottomOffset,
-    Math.max(0, timelineOverlayInset),
-    routeAttributionOverlayInset
+  const maxCompactAttributionBottomOffset =
+    isSmallScreen && typeof window !== "undefined"
+      ? computeCompactAttributionBottomOffsetLimit({
+          viewportHeight: window.innerHeight,
+          topControlsSafeBottomInset,
+          expandedControlReserveHeight: attributionReservedHeight
+        })
+      : Number.POSITIVE_INFINITY;
+  const compactAttributionBottomWithTimelineOffset = Math.min(
+    Math.max(compactAttributionBottomOffset, Math.max(0, timelineOverlayInset), routeAttributionOverlayInset),
+    maxCompactAttributionBottomOffset
   );
   const compactAttributionRightOffset = 72;
   const filteredVisibleEntries = visibleEntries;
@@ -4556,6 +4569,11 @@ export function MapView({
         .ibm-map-root .maplibregl-ctrl-attrib a {
           color: #1a73e8;
           text-decoration: underline;
+        }
+
+        .ibm-map-root .maplibregl-ctrl-attrib.maplibregl-compact {
+          max-height: ${isSmallScreen ? `calc(100vh - ${topControlsSafeBottomInset}px)` : "none"};
+          overflow-y: auto;
         }
 
         .ibm-map-root .maplibregl-canvas-container.maplibregl-interactive,
