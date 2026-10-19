@@ -15,6 +15,8 @@ export interface MapViewProps {
   leftPanelWidth: number;
   bottomPanelInset: number;
   timelineOverlayInset: number;
+  topControlsSafeBottomInset: number;
+  attributionReservedHeight: number;
   isSmallScreen: boolean;
   mapMode: MapDisplayMode;
   selectedTimelineStopId: string | null;
