@@ -188,3 +188,76 @@ The attribution on the map is unchanged and correct for the committed build. Fou
 - **P5, ADR-0044 item 7 and spec §2.** Change "follows the data's own flags" to "follows the data's flags, plus the per-case rules listed in the build script's rule table, each checked by the Fact-Checker". Add "indeterminate frontier" to spec §2's Natural Earth classes.
 - **P6, re-check.** After B1–B5 I'll re-run the tile and Natural Earth checks. For that, please have the engineer save fix shots of central Anatolia at zooms 5–7, Western Sahara at zooms 4 and 6, Crimea at zooms 6 and 9, Cyprus at zoom 8, and Kosovo and the Levant at zoom 4.
 - **P7 (outside this card, from M4-04).** The backup draws Natural Earth 1:50m lines, simplified to 0.25°, at every zoom up to 14, so its lines can be several kilometres off at high zoom.
+
+## Re-check (phase 2), 2026-10-18
+**Commit:** `5251b96`, with the PO's rulings P1–P5 (P4 defaults: Abkhazia and South Ossetia dashed; no line for Transnistria or the Kerch Strait; Halaib and Bir Tawil dashed at both zoom ranges; Algeria–Morocco solid at both; the Sovereign Base Areas and row 16 unchanged). Method as in §6:
+- I ran the same tile build (`20261011_080001_pt`) through the committed filters, with a zoom 5 scan of the reach and zooms 5–8 for each place.
+- I rebuilt `modern-neutral-boundaries.geojson` myself from the two pinned Natural Earth files (both SHA-256s match). My copy is byte-identical to the committed file: 391 features.
+- I compared the 1:50m overlay lines with Natural Earth's 1:10m lines.
+- I looked at the 10 modern `fix2-*` shots. The 3 ancient ones are outside this check.
+
+I ran no build, tests or browser.
+
+**Result: needs change.** 9 of the 16 lines pass, 3 need change and 4 still wait for a look at Google:
+- the Moroccan berm is still dashed from zoom 5;
+- South Ossetia has no line below zoom 5 or on the backup;
+- below zoom 5 and on the backup, the whole Egypt–Sudan border is dashed.
+
+Several documents still say that Natural Earth is drawn and credited only below zoom 5. The notice (P1) is identical in all 8 copies.
+
+| Item | Verdict | Evidence |
+|---|---|---|
+| B1 | Pass | The admin-level-3 rule is gone. The zoom 5 scan finds no admin-level-3 line except South Ossetia's disputed one, and the Anatolia shots at zooms 5–7 are clean. Cyprus's line now comes from NE `1746708491`, unsimplified. A unit test and a Playwright check were added. One low note (C5) |
+| B2 | Needs change | The 27°40′N line comes from the pinned 1:10m file (`69f19da7…c30b`, which matches) and is dashed at every zoom on both maps (zoom 4 and 6 shots). The berm is still dashed from zoom 5 (C1) |
+| B3 | Needs change (documents) | (a) unsimplified 1:50m line with 15 vertices; (b) the country border's width; (d) the Kerch line hidden: all pass. (c) The control now shows "Natural Earth" at every zoom (the shots at zooms 6, 8 and 9), but the documents haven't caught up (C4) |
+| B4 | Pass | NE `1746706755` is dashed (zoom 4 shot). The missing-side rule dashes the Pančić's Peak pocket (14.5 km at zoom 8) and, as expected, about 10 km beside the Croatia–Serbia pockets |
+| B5 | Needs change | Israel–Lebanon is solid (zoom 4 shot), Golan–Jordan dashed and Algeria–Morocco solid, at both zoom ranges. Halaib and Bir Tawil are wrong below zoom 5 (C3) |
+| B6 | Pass | Kokkina's sea lines are gone (tiles at zoom 8; zoom 8 shot) |
+| B7 | Pass | The backup no longer has `boundary-country-disputed:outline` |
+| B8 | Pass | The Shortbread filter, the mask code and the stale comment are gone. Three unused helpers and one dead override remain (C5) |
+| B9 | Pass | Natural Earth's solid lines are `hsl(248, 1%, 41%)` |
+| B10 | Needs change (documents) | The M4-04 ruling is rewritten, the fallback A drawer is fixed, `ATTRIBUTION.md` lists the indeterminate-frontier class, and P5 is in ADR-0044 and spec §2. The "below zoom 5" passages remain (C4) |
+
+| # | Line | Now: below zoom 5 and backup / from zoom 5 | Verdict |
+|---|---|---|---|
+| 1 | Kosovo–Serbia | Dashed at every zoom, including the pocket at Pančić's Peak | Pass |
+| 2 | Israel–West Bank | Unchanged: dashed at every zoom | Pass |
+| 3 | Israel–Gaza | Unchanged: dashed at every zoom | Pass |
+| 4 | Golan Heights | The 1974 line, Golan–Jordan and the new west line (NE 1:10m "Syrian claim") are dashed at every zoom. Lebanon–Golan is dashed below zoom 5 and solid from zoom 5, as the PO ruled (P3) | Pass on the PO's ruling; Google not yet confirmed |
+| 5 | Northern Cyprus | The Green Line is dashed at every zoom, and Kokkina's sea lines are gone | Pass (C5) |
+| 6 | Sovereign Base Areas | Unchanged | Can't tell |
+| 7 | Western Sahara–Morocco | 27°40′N dashed at every zoom. The berm is hidden below zoom 5 and on the backup but **still dashed from zoom 5**: 1,276–1,313 km at zooms 5–7, plainly visible in the zoom 6 shot | Needs change (C1) |
+| 8 | Crimea | The isthmus is dashed at every zoom (zoom 6 shot). No Kerch Strait line | Pass (C5) |
+| 9 | Abkhazia and South Ossetia | Abkhazia is dashed at every zoom. South Ossetia is dashed from zoom 5 only, **with no line below zoom 5 or on the backup** | Needs change (C2) |
+| 10 | Transnistria | No line at any zoom | Pass on the PO's default |
+| 11 | Nagorno-Karabakh, Armenia–Azerbaijan | Unchanged | Can't tell |
+| 12 | Russia–Georgia | Unchanged: solid | Can't tell |
+| 13 | Halaib Triangle and Bir Tawil | Below zoom 5 and on the backup, **the whole 22°N line is dashed** (NE `1746709045`, from Libya to the Red Sea), including 893 km west of Bir Tawil that the tiles draw solid from zoom 5. Bir Tawil's south line isn't drawn there. From zoom 5: unchanged | Needs change (C3, P9) |
+| 14 | Algeria–Morocco | Solid at both zoom ranges | Pass on the PO's default |
+| 15 | Admin-level-3 lines | None drawn | Pass |
+| 16 | Other flagged lines | Unchanged | Can't tell |
+
+### Fixes for the engineer (phase 2)
+- **C1 (P2): hide the berm from zoom 5.**
+  - Add a `hidden` rule: `["==", ["get", "disputed_name"], "Murdesécuritémarocainالجدارالأمنيالمغربي"]`. OpenMapTiles stores `disputed_name` without spaces.
+  - Also make the `dashed` branch of `appendModernTileRenderFilter` exclude the hidden rules, as the `solid` branch already does. As it stands, a hidden rule can't remove a line that the disputed flag dashes.
+  - Test it on the decoded berm feature.
+  - After the fix, about 35 km of unnamed disputed pieces would stay dashed: a 27 km spur at 8.8°W, from 27.67°N to 27.42°N, and about 8 km at Guerguerat (P8).
+- **C2 (P4): South Ossetia below zoom 5 and on the backup.** Add NE 1:10m `1746705385` ("Georgian claim", class "Breakaway") to the shared file as a dashed line. Don't add it as an overlay from zoom 5, because the tiles already draw it there.
+- **C3 (P4): Egypt–Sudan.**
+  - In the build, split `1746709045` at 33.17°E: solid to the west (893 km), dashed to the east (372 km).
+  - Add NE 1:10m `1746705805` ("Bir Tawil", class "Elusive frontier") so that Bir Tawil's south line also shows below zoom 5 and on the backup.
+  - Halaib's north line (NE 1:10m `1746705785`, "Sudanese claim") isn't drawn at any zoom (P9).
+- **C4 (documents): Natural Earth is now drawn, and credited, at every zoom on the main modern map,** because five overlays start at zoom 5. Update:
+  - `docs/LICENSES.md`: L1 ("only while that source's layer is drawn (below zoom 5)"), the note under string 1 ("From zoom 5 … reads as on the ancient map"), and the table rows on lines 13, 125 and 301;
+  - the Natural Earth row in `ATTRIBUTION.md`: "below zoom 5 on the main map", and "then simplifies the result", although the Cyprus, Crimea and 1:10m lines aren't simplified;
+  - string 4 and `LICENSE.txt` part (a): "below zoom 5 Natural Earth's boundary lines" and "Country borders below zoom 5: Natural Earth".
+- **C5 (low).**
+  - **Geometry:** the Cyprus and Crimea overlays use 1:50m lines. Natural Earth's own 1:10m lines lie up to 4.9 km from them (mean 1.5 km) for Cyprus and up to 2.5 km (mean 0.7 km) for Crimea, which shows from about zoom 8–9. Near Perekop at high zoom, the tiles' exact Crimea fragments also draw beside the overlay. The 1:10m features ("Line of control"; "Disputed (please verify)" for Crimea) would fit better; the 1:10m land file would need its own pin.
+  - **Dead code:** remove `appendDisputedFilterExclusion`, `normalizeDisputedAreaName` and `asPolygonCoordinates`, and the override for `1746705379`, which no rule loads.
+
+### Items for the PO (phase 2)
+- **P8:** after C1, decide whether to keep or hide the unnamed disputed pieces in Western Sahara. A rule on their properties (disputed, with no name and no claimant) would also hide a 5.5 km piece on the Armenia–Azerbaijan border near 46.2°E 39.6°N.
+- **P9:** decide on Halaib's north line: add it at every zoom, as the UN draws Halaib's administrative line (Map 4458 Rev. 2), or leave Halaib inside Egypt's outline, as the tiles draw it.
+- **P7** isn't in `BACKLOG.md` on this branch yet.
+- **At MC13:** besides the lines marked "Can't tell", the human should also check the lines that rest on PO defaults (rows 4, 10 and 14) in Google Maps.
