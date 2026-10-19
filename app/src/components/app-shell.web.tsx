@@ -76,7 +76,8 @@ const SEGMENTED_CONTROL_HEIGHT_PX = 40;
 const MAP_TOP_CONTROL_CLEARANCE_PX = 16;
 const SMALL_SCREEN_TOP_CONTROLS_SAFE_BOTTOM_PX =
   MAP_TOGGLE_TOP_OFFSET_PX + SEGMENTED_CONTROL_HEIGHT_PX + MAP_TOP_CONTROL_CLEARANCE_PX;
-const SMALL_SCREEN_ATTRIBUTION_RESERVED_HEIGHT_PX = 180;
+const SMALL_SCREEN_TIMELINE_SOURCES_ATTRIBUTION_RESERVED_HEIGHT_PX = 180;
+const SMALL_SCREEN_COMPACT_ATTRIBUTION_EXPANDED_RESERVE_HEIGHT_PX = 180;
 const TIMELINE_CARD_BOTTOM_OFFSET_PX = tokens.spacing.md;
 const TIMELINE_SOURCES_POPOVER_MIN_HEIGHT_PX = 120;
 const TIMELINE_SOURCES_VERTICAL_GAP_PX = 8;
@@ -437,6 +438,7 @@ export function AppShell() {
     canClose: boolean;
     requiresDownwardMotion: boolean;
     allowTapToggle: boolean;
+    hasEngagedDrag: boolean;
     lastY: number;
     lastTimestampMs: number;
     velocityYPxPerMs: number;
@@ -552,6 +554,7 @@ export function AppShell() {
           return;
         }
         dragState.requiresDownwardMotion = false;
+        dragState.hasEngagedDrag = true;
       }
 
       const elapsedMs = Math.max(1, event.timeStamp - dragState.lastTimestampMs);
@@ -580,6 +583,16 @@ export function AppShell() {
       }
 
       smallScreenSheetDragStateRef.current = null;
+      if (!dragState.allowTapToggle) {
+        if (dragState.requiresDownwardMotion) {
+          setSmallScreenSheetDragHeightPx(null);
+          return;
+        }
+        if (!dragState.hasEngagedDrag || dragState.movedPx <= SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX) {
+          setSmallScreenSheetDragHeightPx(null);
+          return;
+        }
+      }
       const finalHeightPx = Math.min(
         smallScreenSheetMaxHeightPx,
         Math.max(
@@ -587,14 +600,11 @@ export function AppShell() {
           smallScreenSheetDragHeightPx ?? dragState.startHeightPx
         )
       );
-      const movedPx = dragState.allowTapToggle
-        ? dragState.movedPx
-        : Math.max(dragState.movedPx, SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX + 1);
       const nextPosition = settleSmallScreenSheetPosition({
         canClose: dragState.canClose,
         currentHeightPx: finalHeightPx,
         dragDeltaYPx: event.clientY - dragState.startY,
-        movedPx,
+        movedPx: dragState.movedPx,
         startPosition: dragState.startPosition,
         tapThresholdPx: SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX,
         velocityYPxPerMs: dragState.velocityYPxPerMs,
@@ -1004,7 +1014,7 @@ export function AppShell() {
         return;
       }
       if (smallScreenSheetDragStateRef.current) {
-        return;
+        smallScreenSheetDragStateRef.current = null;
       }
       const currentHeightPx =
         smallScreenSheetDragHeightPx ??
@@ -1021,6 +1031,7 @@ export function AppShell() {
         canClose: options.canClose,
         requiresDownwardMotion: options.requiresDownwardMotion,
         allowTapToggle: options.allowTapToggle,
+        hasEngagedDrag: !options.requiresDownwardMotion,
         lastY: event.clientY,
         lastTimestampMs: event.timeStamp,
         velocityYPxPerMs: 0,
@@ -1897,7 +1908,8 @@ export function AppShell() {
         timelineCardHeight: card.getBoundingClientRect().height,
         sourcesPopoverHeight: popover.getBoundingClientRect().height,
         topControlsSafeBottomInset: SMALL_SCREEN_TOP_CONTROLS_SAFE_BOTTOM_PX,
-        attributionReservedHeight: SMALL_SCREEN_ATTRIBUTION_RESERVED_HEIGHT_PX,
+        attributionReservedHeight:
+          SMALL_SCREEN_TIMELINE_SOURCES_ATTRIBUTION_RESERVED_HEIGHT_PX,
         timelineCardBottomOffset: TIMELINE_CARD_BOTTOM_OFFSET_PX,
         minPopoverHeight: TIMELINE_SOURCES_POPOVER_MIN_HEIGHT_PX,
         verticalGap: TIMELINE_SOURCES_VERTICAL_GAP_PX
@@ -2252,7 +2264,9 @@ export function AppShell() {
                 : selectedTimelineStopId
             }
             selection={selection}
-            attributionReservedHeight={SMALL_SCREEN_ATTRIBUTION_RESERVED_HEIGHT_PX}
+            compactAttributionExpandedReserveHeight={
+              SMALL_SCREEN_COMPACT_ATTRIBUTION_EXPANDED_RESERVE_HEIGHT_PX
+            }
             timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
             topControlsSafeBottomInset={SMALL_SCREEN_TOP_CONTROLS_SAFE_BOTTOM_PX}
           />
@@ -2335,8 +2349,10 @@ export function AppShell() {
               </div>
               {timelineSourcesOpen ? (
                 <div
+                  aria-label="Timeline sources and notes"
                   data-timeline-sources-popover="true"
                   ref={timelineSourcesPopoverRef}
+                  tabIndex={0}
                   style={{
                     marginTop: `${tokens.spacing.xs}px`,
                     padding: `${tokens.spacing.sm}px`,

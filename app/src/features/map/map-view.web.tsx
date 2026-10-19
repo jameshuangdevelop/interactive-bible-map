@@ -2555,7 +2555,7 @@ export function MapView({
   suspendSelectionCameraUpdates,
   timelineOverlayInset,
   topControlsSafeBottomInset,
-  attributionReservedHeight,
+  compactAttributionExpandedReserveHeight,
   isSmallScreen,
   mapMode,
   selectedTimelineStopId,
@@ -4458,7 +4458,7 @@ export function MapView({
       ? computeCompactAttributionBottomOffsetLimit({
           viewportHeight: window.innerHeight,
           topControlsSafeBottomInset,
-          expandedControlReserveHeight: attributionReservedHeight
+          expandedControlReserveHeight: compactAttributionExpandedReserveHeight
         })
       : Number.POSITIVE_INFINITY;
   const compactAttributionBottomWithTimelineOffset = Math.min(
@@ -4577,7 +4577,7 @@ export function MapView({
         }
 
         .ibm-map-root .maplibregl-ctrl-attrib.maplibregl-compact {
-          max-height: ${isSmallScreen ? `calc(100vh - ${topControlsSafeBottomInset}px)` : "none"};
+          max-height: ${isSmallScreen ? `calc(100dvh - ${topControlsSafeBottomInset}px)` : "none"};
           overflow-y: auto;
         }
 

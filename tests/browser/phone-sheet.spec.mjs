@@ -54,6 +54,54 @@ async function readMapCamera(page) {
   });
 }
 
+async function dragHandleAndSampleCameraDuringGesture(page, selector, deltaY, options = {}) {
+  const { steps = 14 } = options;
+  const handle = page.locator(selector);
+  await expect(handle).toBeVisible();
+  const box = await handle.boundingBox();
+  if (!box) {
+    throw new Error(`No bounding box for ${selector}`);
+  }
+  const baseline = await readMapCamera(page);
+  if (!baseline) {
+    throw new Error("Map test hook unavailable.");
+  }
+  const startX = box.x + box.width / 2;
+  const startY = box.y + box.height / 2;
+  let cameraMovedDuringDrag = false;
+  await page.mouse.move(startX, startY);
+  await page.mouse.down();
+  for (let index = 1; index <= steps; index += 1) {
+    const nextY = startY + (deltaY * index) / steps;
+    await page.mouse.move(startX, nextY, { steps: 1 });
+    await page.waitForTimeout(40);
+    const sample = await page.evaluate(() => {
+      const map = window.__ibmMapForTests;
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return {
+        moving: map.isMoving(),
+        lng: center.lng,
+        lat: center.lat,
+        zoom: map.getZoom()
+      };
+    });
+    if (sample) {
+      const changed =
+        Math.abs(sample.lng - baseline.lng) > 0.00001 ||
+        Math.abs(sample.lat - baseline.lat) > 0.00001 ||
+        Math.abs(sample.zoom - baseline.zoom) > 0.00001;
+      if (sample.moving || changed) {
+        cameraMovedDuringDrag = true;
+      }
+    }
+  }
+  await page.mouse.up();
+  return cameraMovedDuringDrag;
+}
+
 test("map sheet drags between half, full, half, and closed @phone", async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded" });
   const sheet = page.locator("section[aria-label='Place details']").first();
@@ -100,7 +148,7 @@ test("tapping the map sheet handle toggles half and full @phone", async ({ page,
 });
 
 test("dragging the handle does not move map camera for an open place @phone", async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded" });
   await expect
     .poll(async () => {
       const map = await readMapCamera(page);
@@ -114,14 +162,32 @@ test("dragging the handle does not move map camera for an open place @phone", as
       return Boolean(camera && camera.zoom >= 10.5 && !moving);
     })
     .toBe(true);
+  await page.evaluate(() => {
+    window.__ibmMapForTests?.panBy([0, 420], { animate: false });
+  });
+  await expect
+    .poll(async () => page.evaluate(() => window.__ibmMapForTests?.isMoving() ?? true))
+    .toBe(false);
 
   const before = await readMapCamera(page);
   if (!before) {
     throw new Error("Map test hook unavailable.");
   }
 
-  await dragHandle(page, "[data-sheet-handle='place']", -320);
-  await dragHandle(page, "[data-sheet-handle='place']", 320);
+  const movedWhileDraggingUp = await dragHandleAndSampleCameraDuringGesture(
+    page,
+    "[data-sheet-handle='place']",
+    -320,
+    { steps: 16 }
+  );
+  const movedWhileDraggingDown = await dragHandleAndSampleCameraDuringGesture(
+    page,
+    "[data-sheet-handle='place']",
+    320,
+    { steps: 16 }
+  );
+  expect(movedWhileDraggingUp).toBe(false);
+  expect(movedWhileDraggingDown).toBe(false);
   await expect
     .poll(async () => page.evaluate(() => window.__ibmMapForTests?.isMoving() ?? true))
     .toBe(false);
@@ -133,6 +199,21 @@ test("dragging the handle does not move map camera for an open place @phone", as
   expect(Math.abs(after.lng - before.lng)).toBeLessThan(0.00001);
   expect(Math.abs(after.lat - before.lat)).toBeLessThan(0.00001);
   expect(Math.abs(after.zoom - before.zoom)).toBeLessThan(0.00001);
+});
+
+test("tapping body text at full keeps the sheet full @phone", async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  const sheet = page.locator("section[aria-label='Place details']").first();
+  const handle = page.locator("[data-sheet-handle='place']");
+  await handle.click();
+  await expect(handle).toHaveAttribute("aria-expanded", "true");
+  const topBefore = (await sheet.boundingBox())?.y ?? 999;
+  await expect(topBefore).toBeLessThanOrEqual(8);
+
+  await page.getByText("Today: Jerusalem").first().click({ position: { x: 10, y: 10 } });
+  await expect(handle).toHaveAttribute("aria-expanded", "true");
+  const topAfter = (await sheet.boundingBox())?.y ?? 999;
+  expect(Math.abs(topAfter - topBefore)).toBeLessThanOrEqual(4);
 });
 
 test("downward drags in scrolled content do not move the full sheet @phone", async ({ page, baseUrl }) => {
@@ -175,6 +256,37 @@ test("dragging down from top-of-content moves and closes the map sheet @phone", 
   await expect
     .poll(async () => (await page.url()).includes("place="), { timeout: 15_000 })
     .toBe(false);
+});
+
+test("attribution sources popover fits at closed and half sheet heights on phone @phone", async ({ page, baseUrl }) => {
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  const attributionButton = page.locator(".maplibregl-ctrl-attrib-button");
+  await expect(attributionButton).toBeVisible();
+  await attributionButton.click();
+  const attributionExpanded = page.locator("details.maplibregl-ctrl-attrib.maplibregl-compact[open]");
+  await expect(attributionExpanded).toBeVisible();
+  const closedBox = await attributionExpanded.boundingBox();
+  if (!closedBox) {
+    throw new Error("Missing attribution popover bounding box.");
+  }
+  expect(closedBox.y).toBeGreaterThanOrEqual(0);
+  expect(closedBox.y + closedBox.height).toBeLessThanOrEqual(PHONE_VIEWPORT.height);
+
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded" });
+  await expect(page.locator("section[aria-label='Place details']")).toBeVisible();
+  const halfAttributionButton = page.locator(".maplibregl-ctrl-attrib-button");
+  await expect(halfAttributionButton).toBeVisible();
+  await halfAttributionButton.click();
+  const halfExpanded = page.locator("details.maplibregl-ctrl-attrib.maplibregl-compact[open]");
+  await expect(halfExpanded).toBeVisible();
+  const halfBox = await halfExpanded.boundingBox();
+  const sheetBox = await page.locator("section[aria-label='Place details']").first().boundingBox();
+  if (!halfBox || !sheetBox) {
+    throw new Error("Missing sheet or attribution popover bounding box.");
+  }
+  expect(halfBox.y).toBeGreaterThanOrEqual(0);
+  expect(halfBox.y + halfBox.height).toBeLessThanOrEqual(PHONE_VIEWPORT.height);
+  expect(halfBox.y + halfBox.height).toBeLessThanOrEqual(sheetBox.y + 8);
 });
 
 test("route sheets support half/full and close route-place details by dragging down @phone", async ({ page, baseUrl }) => {

@@ -17,7 +17,7 @@ export interface MapViewProps {
   suspendSelectionCameraUpdates: boolean;
   timelineOverlayInset: number;
   topControlsSafeBottomInset: number;
-  attributionReservedHeight: number;
+  compactAttributionExpandedReserveHeight: number;
   isSmallScreen: boolean;
   mapMode: MapDisplayMode;
   selectedTimelineStopId: string | null;
