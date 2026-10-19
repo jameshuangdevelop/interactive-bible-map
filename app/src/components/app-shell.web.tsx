@@ -1111,7 +1111,7 @@ export function AppShell() {
       beginSmallScreenSheetDrag(event, {
         canClose: options.canClose,
         requiresDownwardMotion: false,
-        allowTapToggle: true
+        allowTapToggle: false
       });
     },
     [beginSmallScreenSheetDrag, isSmallScreen]
@@ -2638,12 +2638,9 @@ export function AppShell() {
                 touchAction: "none"
               }}
             >
-              <button
+              <div
                 aria-hidden="true"
                 data-sheet-drag-strip="route-list"
-                onPointerDown={(event) => {
-                  handleSmallScreenSheetTopStripPointerDown(event, { canClose: false });
-                }}
                 style={{
                   position: "absolute",
                   inset: 0,
@@ -2654,8 +2651,6 @@ export function AppShell() {
                   touchAction: "none",
                   cursor: "grab"
                 }}
-                tabIndex={-1}
-                type="button"
               />
               <button
                 aria-expanded={smallScreenSheetPosition === "full"}
@@ -2810,9 +2805,6 @@ export function AppShell() {
                 allowTapToggle: true
               });
             }}
-            onSmallScreenTopStripPointerDown={(event) => {
-              handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
-            }}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
             onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
@@ -2860,12 +2852,9 @@ export function AppShell() {
                 touchAction: "none"
               }}
             >
-              <button
+              <div
                 aria-hidden="true"
                 data-sheet-drag-strip="route-stop"
-                onPointerDown={(event) => {
-                  handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
-                }}
                 style={{
                   position: "absolute",
                   inset: 0,
@@ -2876,8 +2865,6 @@ export function AppShell() {
                   touchAction: "none",
                   cursor: "grab"
                 }}
-                tabIndex={-1}
-                type="button"
               />
               <button
                 aria-expanded={smallScreenSheetPosition === "full"}

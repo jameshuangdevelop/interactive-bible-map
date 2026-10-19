@@ -41,6 +41,40 @@ async function dragInsideElement(page, element, options) {
   await page.mouse.up();
 }
 
+async function stripDragStartRatioX(page, stripLocator, options = {}) {
+  const { minimumDistancePx = 40, closeButtonLocator = null } = options;
+  const stripBox = await stripLocator.boundingBox();
+  if (!stripBox) {
+    throw new Error("Missing strip bounding box.");
+  }
+  const handleBox = await page.locator("[data-sheet-handle='place']").boundingBox();
+  if (!handleBox) {
+    throw new Error("Missing place-sheet handle bounding box.");
+  }
+  const handleCenterX = handleBox.x + handleBox.width / 2;
+  const closeBox = closeButtonLocator ? await closeButtonLocator.boundingBox() : null;
+  const closeCenterX = closeBox ? closeBox.x + closeBox.width / 2 : null;
+  const candidateXs = [
+    stripBox.x + 44,
+    stripBox.x + stripBox.width * 0.2,
+    stripBox.x + stripBox.width * 0.8,
+    stripBox.x + stripBox.width - 44
+  ];
+  const safeX = candidateXs.find((candidateX) => {
+    if (Math.abs(candidateX - handleCenterX) < minimumDistancePx) {
+      return false;
+    }
+    if (typeof closeCenterX === "number" && Math.abs(candidateX - closeCenterX) < minimumDistancePx) {
+      return false;
+    }
+    return true;
+  });
+  if (typeof safeX !== "number") {
+    throw new Error("No safe strip drag start point found.");
+  }
+  return (safeX - stripBox.x) / stripBox.width;
+}
+
 async function waitForSheetSettledAtFull(page, sheetSelector) {
   await expect
     .poll(
@@ -308,6 +342,68 @@ test("photo arrows stay on-screen even with an unbreakable About token @phone", 
   expect(metrics.nextCenterInViewport).toBe(true);
   expect(metrics.nextCenterOwnedByButton).toBe(true);
   expect(metrics.widestDescendantPx).toBeLessThanOrEqual(metrics.panelBodyWidthPx + 0.5);
+});
+
+test("dragging from the place and route top strips moves sheets while strip taps do nothing @phone", async ({
+  page,
+  baseUrl
+}) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  const placeSheet = page.locator("section[aria-label='Place details']").first();
+  const placeHandle = page.locator("[data-sheet-handle='place']");
+  const placeStrip = page.locator("[data-sheet-drag-strip='place']");
+  const closeButton = page.getByRole("button", { name: "Close place panel" });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
+  await expect(placeStrip).toBeVisible();
+
+  const placeStripStartRatioX = await stripDragStartRatioX(page, placeStrip, {
+    minimumDistancePx: 40,
+    closeButtonLocator: closeButton
+  });
+  const placeStripBox = await placeStrip.boundingBox();
+  if (!placeStripBox) {
+    throw new Error("Missing place strip bounding box.");
+  }
+  const stripTapX = Math.round(placeStripStartRatioX * placeStripBox.width);
+  const halfTopBeforeTap = (await placeSheet.boundingBox())?.y ?? 999;
+  await placeStrip.click({ position: { x: stripTapX, y: 22 } });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
+  const halfTopAfterTap = (await placeSheet.boundingBox())?.y ?? 999;
+  expect(Math.abs(halfTopAfterTap - halfTopBeforeTap)).toBeLessThanOrEqual(4);
+
+  await dragInsideElement(page, placeStrip, {
+    startRatioX: placeStripStartRatioX,
+    startRatioY: 0.5,
+    deltaY: -320
+  });
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
+
+  const fullTopBeforeTap = (await placeSheet.boundingBox())?.y ?? 999;
+  await placeStrip.click({ position: { x: stripTapX, y: 22 } });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
+  const fullTopAfterTap = (await placeSheet.boundingBox())?.y ?? 999;
+  expect(Math.abs(fullTopAfterTap - fullTopBeforeTap)).toBeLessThanOrEqual(4);
+
+  await dragInsideElement(page, placeStrip, {
+    startRatioX: placeStripStartRatioX,
+    startRatioY: 0.5,
+    deltaY: 320
+  });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
+
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-1&stage=1`, { waitUntil: "domcontentloaded" });
+  const routeListHandle = page.locator("[data-sheet-handle='route-list']");
+  const routeListStrip = page.locator("[data-sheet-drag-strip='route-list']");
+  await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
+  await expect(routeListStrip).toBeVisible();
+  await dragInsideElement(page, routeListStrip, {
+    startRatioX: 0.15,
+    startRatioY: 0.5,
+    deltaY: -320
+  });
+  await waitForSheetSettledAtFull(page, "section[aria-label='Route details']");
+  await expect(routeListHandle).toHaveAttribute("aria-expanded", "true");
 });
 
 test("downward drags in scrolled content do not move the full sheet @phone", async ({ page, baseUrl }) => {

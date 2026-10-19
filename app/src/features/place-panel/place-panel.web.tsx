@@ -176,7 +176,6 @@ interface PlacePanelProps {
   isSmallScreenExpanded: boolean;
   onToggleSmallScreenExpanded: () => void;
   onSmallScreenHandlePointerDown: (event: ReactPointerEvent<HTMLButtonElement>) => void;
-  onSmallScreenTopStripPointerDown: (event: ReactPointerEvent<HTMLElement>) => void;
   onClose: () => void;
   onSelectPlace: (selection: PlaceSelection) => void;
   onSelectPlaceFromAbout: (selection: PlaceSelection) => void;
@@ -1058,7 +1057,6 @@ export function PlacePanel({
   isSmallScreenExpanded,
   onToggleSmallScreenExpanded,
   onSmallScreenHandlePointerDown,
-  onSmallScreenTopStripPointerDown,
   onClose,
   onSelectPlace,
   onSelectPlaceFromAbout,
@@ -1735,13 +1733,10 @@ export function PlacePanel({
           }}
         >
           {isSmallScreen ? (
-            <button
+            <div
               aria-hidden="true"
               data-sheet-drag-strip="place"
-              onPointerDown={onSmallScreenTopStripPointerDown}
               style={smallScreenStripDragTargetStyle}
-              tabIndex={-1}
-              type="button"
             />
           ) : null}
           {isSmallScreen ? (
@@ -1811,13 +1806,10 @@ export function PlacePanel({
         }}
       >
         {isSmallScreen ? (
-          <button
+          <div
             aria-hidden="true"
             data-sheet-drag-strip="place"
-            onPointerDown={onSmallScreenTopStripPointerDown}
             style={smallScreenStripDragTargetStyle}
-            tabIndex={-1}
-            type="button"
           />
         ) : null}
       {isSmallScreen ? (
