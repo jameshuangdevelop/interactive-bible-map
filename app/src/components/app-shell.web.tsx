@@ -16,10 +16,16 @@ import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
 import {
+  applyRouteIdToSearch,
+  applyRouteStageToSearch,
+  applyViewTabToSearch,
   applyMapModeToSearch,
   applyTimelineYearToSearch,
   applySelectionToSearch,
+  parseRouteIdFromSearch,
+  parseRouteStageFromSearch,
   parseMapModeFromSearch,
+  parseViewTabFromSearch,
   parseTimelineYearFromSearch,
   parseSelectionFromSearch
 } from "../features/map/selection-url";
@@ -32,6 +38,15 @@ import type {
   PlaceIndexRecord,
   PlaceSelection
 } from "../features/map/types";
+import {
+  loadRoutesData,
+  resolveRouteStop,
+  routeLineFeatureByStage
+} from "../features/routes/routes-data";
+import type { LoadedRoutesData, RouteStopRecord, RouteStopResolved } from "../features/routes/types";
+import type { RouteMapOverlayData } from "../features/routes/map-overlay";
+import { buildMentionedPointFeatures } from "../features/routes/overlay-mentioned";
+import { RoutesPanel } from "../features/routes/routes-panel.web";
 import { tokens } from "../theme/tokens";
 
 const PANEL_WIDTH = 408;
@@ -45,9 +60,14 @@ const SMALL_SCREEN_SHEET_TOP_CLEARANCE_PX = PANEL_CONTENT_TOP_PADDING + 56;
 const SMALL_SCREEN_SHEET_COLLAPSED_RATIO = 0.53;
 const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_DRAG_TOGGLE_THRESHOLD_PX = 6;
+const ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX = 1280;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
+const VIEW_TABS_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
+const SEGMENTED_CONTROL_MIN_WIDTH_PX = 178;
+const MAP_TOP_CONTROL_CLEARANCE_PX = 16;
 const PIN_LABEL_SOURCE: PinLabelSource = "biblical";
 const MAP_MODE_ORDER: readonly MapDisplayMode[] = ["ancient", "modern"];
+const VIEW_TAB_ORDER = ["map", "routes"] as const;
 const TIMELINE_DEFAULT_YEAR = 50;
 const TIMELINE_TRACK_THICKNESS_PX = 2;
 const TIMELINE_TRACK_THUMB_DIAMETER_PX = 20;
@@ -110,7 +130,29 @@ function writeSelectionToUrl(selection: PlaceSelection | null, mode: "replace" |
       window.history.pushState({}, "", nextUrl);
       return;
     }
+    window.history.replaceState({}, "", nextUrl);
+  }
+}
 
+function writeViewTabToUrl(tab: "map" | "routes", mode: "replace" | "push" = "replace") {
+  const nextSearch = applyViewTabToSearch(window.location.search, tab);
+  const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (nextUrl !== currentUrl) {
+    if (mode === "push") {
+      window.history.pushState({}, "", nextUrl);
+      return;
+    }
+    window.history.replaceState({}, "", nextUrl);
+  }
+}
+
+function writeRouteSelectionToUrl(routeId: string | null, stage: number | null) {
+  let nextSearch = applyRouteIdToSearch(window.location.search, routeId);
+  nextSearch = applyRouteStageToSearch(nextSearch, stage);
+  const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (nextUrl !== currentUrl) {
     window.history.replaceState({}, "", nextUrl);
   }
 }
@@ -202,9 +244,119 @@ function MapLoadingPlaceholder() {
   );
 }
 
+export function RouteStopDetailsPanel({
+  selectedRouteStop,
+  bibliographyById,
+  showBackToRoute,
+  onBackToRoute,
+  onClose
+}: {
+  selectedRouteStop: RouteStopRecord;
+  bibliographyById: Map<string, LoadedRoutesData["index"]["bibliography"][number]>;
+  showBackToRoute: boolean;
+  onBackToRoute: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div data-route-stop-panel="true">
+      {showBackToRoute ? (
+        <button
+          data-back-to-route="true"
+          onClick={onBackToRoute}
+          style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer", marginBottom: `${tokens.spacing.sm}px` }}
+          type="button"
+        >
+          ‹ Back to route
+        </button>
+      ) : null}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: `${tokens.spacing.sm}px` }}>
+        <h1 style={{ margin: 0, fontSize: `${tokens.typography.titleSize}px`, lineHeight: `${tokens.typography.titleLineHeight}px` }}>
+          {selectedRouteStop.name}
+        </h1>
+        <button
+          aria-label="Close"
+          onClick={onClose}
+          style={{
+            border: "none",
+            background: "none",
+            color: tokens.color.textSecondary,
+            cursor: "pointer",
+            fontSize: "20px",
+            lineHeight: 1,
+            padding: 0
+          }}
+          type="button"
+        >
+          ×
+        </button>
+      </div>
+      {selectedRouteStop.todayName ? (
+        <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
+          Today: {selectedRouteStop.todayName}
+        </p>
+      ) : null}
+      {selectedRouteStop.candidates.length > 1 ? (
+        <div style={{ marginTop: `${tokens.spacing.sm}px` }}>
+          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>Candidate sites</h2>
+          <ul data-route-stop-candidates="true" style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+            {selectedRouteStop.candidates.map((candidate) => (
+              <li key={`${selectedRouteStop.id}:${candidate.label}`}>
+                <strong>{candidate.label}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {selectedRouteStop.scripture.length > 0 ? (
+        <div style={{ marginTop: `${tokens.spacing.sm}px` }}>
+          <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>In the Bible</h2>
+          <ul style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+            {selectedRouteStop.scripture.map((entry) => (
+              <li key={`${selectedRouteStop.id}:${entry.ref}`}>
+                <strong>{entry.ref}</strong>
+                <p style={{ margin: `${tokens.spacing.xs}px 0 0`, fontFamily: tokens.typography.scriptureFont }}>{entry.textWEB}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <div style={{ marginTop: `${tokens.spacing.sm}px` }}>
+        <h2 style={{ margin: 0, fontSize: `${tokens.typography.sectionHeadingSize}px` }}>
+          Sources · {selectedRouteStop.sources.length}
+        </h2>
+        {selectedRouteStop.sources.length > 0 ? (
+          <ol style={{ margin: `${tokens.spacing.xs}px 0 0`, paddingLeft: "18px" }}>
+            {selectedRouteStop.sources.map((sourceId, index) => {
+              const source = formatSourceCitation(sourceId, bibliographyById);
+              return (
+                <li key={`${selectedRouteStop.id}:${sourceId}:${index}`}>
+                  {source.url ? (
+                    <a href={source.url} rel="noreferrer noopener" target="_blank">
+                      {source.label}
+                    </a>
+                  ) : (
+                    source.label
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p style={{ margin: `${tokens.spacing.xs}px 0 0`, color: tokens.color.textSecondary }}>
+            No sources listed.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
+  const [viewTab, setViewTab] = useState<"map" | "routes">(() =>
+    typeof window === "undefined" ? "map" : parseViewTabFromSearch(window.location.search)
+  );
   const [mapMode, setMapMode] = useState<MapDisplayMode>(() =>
     typeof window === "undefined" ? "ancient" : parseMapModeFromSearch(window.location.search)
   );
@@ -242,12 +394,20 @@ export function AppShell() {
   const [selectedTimelineStopId, setSelectedTimelineStopId] = useState<string | null>(null);
   const [timelineSourcesOpen, setTimelineSourcesOpen] = useState(false);
   const [timelineOverlayInsetForAttribution, setTimelineOverlayInsetForAttribution] = useState(0);
+  const [routesLoadState, setRoutesLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [routesData, setRoutesData] = useState<LoadedRoutesData | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [highlightedStageIndex, setHighlightedStageIndex] = useState<number | null>(null);
+  const [selectedStageIndex, setSelectedStageIndex] = useState<number | null>(null);
+  const [selectedRouteStopId, setSelectedRouteStopId] = useState<string | null>(null);
+  const [routesReloadToken, setRoutesReloadToken] = useState(0);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const timelineCardRef = useRef<HTMLDivElement | null>(null);
   const lastSelectionActivatorEntryIdRef = useRef<string | null>(null);
   const loadingPlaceDetailsIdsRef = useRef(new Set<string>());
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
   const unmountedRef = useRef(false);
+  const routesLoadStateRef = useRef(routesLoadState);
   const smallScreenSheetDragStateRef = useRef<{
     pointerId: number;
     startY: number;
@@ -258,6 +418,25 @@ export function AppShell() {
 
   const placesById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const selectedPlace = selection ? placesById.get(selection.placeId) ?? null : null;
+  const routeStopsById = useMemo(
+    () => new Map((routesData?.stops.stops ?? []).map((stop) => [stop.id, stop] as const)),
+    [routesData]
+  );
+  const routeBibliographyById = useMemo(() => routesData?.bibliographyById ?? new Map(), [routesData]);
+  const hydratedRoutes = useMemo(() => routesData?.routes ?? [], [routesData]);
+  const selectedRoute = useMemo(
+    () => hydratedRoutes.find((entry) => entry.route.id === selectedRouteId) ?? null,
+    [hydratedRoutes, selectedRouteId]
+  );
+  const selectedRouteTimelineStop = useMemo(() => {
+    if (!selectedRoute || !ancientTimeline || ancientTimeline.stops.length === 0) {
+      return null;
+    }
+    return resolveStopForYear(ancientTimeline.stops, selectedRoute.route.fromYear);
+  }, [ancientTimeline, selectedRoute]);
+  useEffect(() => {
+    routesLoadStateRef.current = routesLoadState;
+  }, [routesLoadState]);
   const selectedTimelineStop = useMemo(
     () =>
       ancientTimeline?.stops.find((stop) => stop.id === selectedTimelineStopId) ??
@@ -408,10 +587,16 @@ export function AppShell() {
         );
         const parsedSelection = parseSelectionFromSearch(window.location.search);
         const parsedMapMode = parseMapModeFromSearch(window.location.search);
+        const parsedViewTab = parseViewTabFromSearch(window.location.search);
+        const parsedRouteId = parseRouteIdFromSearch(window.location.search);
+        const parsedStage = parseRouteStageFromSearch(window.location.search);
         if (parsedMapMode !== "ancient") {
           setTimelineSourcesOpen(false);
         }
         setMapMode(parsedMapMode);
+        setViewTab(parsedViewTab);
+        setSelectedRouteId(parsedRouteId);
+        setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
         const normalized = normalizeSelection(parsedSelection, loadedPlacesById);
 
         if (parsedSelection && !normalized) {
@@ -442,6 +627,35 @@ export function AppShell() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (viewTab !== "routes" || routesLoadStateRef.current !== "idle") {
+      return;
+    }
+
+    let cancelled = false;
+    setRoutesLoadState("loading");
+    void loadRoutesData(window.location.search)
+      .then((payload) => {
+        if (cancelled) {
+          return;
+        }
+        setRoutesData(payload);
+        setRoutesLoadState("ready");
+      })
+      .catch((error) => {
+        console.error("Failed to load routes.", error);
+        if (cancelled) {
+          return;
+        }
+        setRoutesData(null);
+        setRoutesLoadState("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routesReloadToken, viewTab]);
 
   useEffect(() => {
     let cancelled = false;
@@ -572,6 +786,23 @@ export function AppShell() {
     if (!urlStateReady) {
       return;
     }
+    writeViewTabToUrl(viewTab);
+  }, [urlStateReady, viewTab]);
+
+  useEffect(() => {
+    if (!urlStateReady || viewTab !== "routes") {
+      return;
+    }
+    writeRouteSelectionToUrl(
+      selectedRouteId,
+      selectedStageIndex !== null ? selectedStageIndex + 1 : null
+    );
+  }, [selectedRouteId, selectedStageIndex, urlStateReady, viewTab]);
+
+  useEffect(() => {
+    if (!urlStateReady) {
+      return;
+    }
 
     const nextSearch = applyMapModeToSearch(window.location.search, mapMode);
     const nextUrl = `${window.location.pathname}${nextSearch}${window.location.hash}`;
@@ -603,11 +834,17 @@ export function AppShell() {
       const parsedSelection = parseSelectionFromSearch(window.location.search);
       const parsedMapMode = parseMapModeFromSearch(window.location.search);
       const parsedYear = parseTimelineYearFromSearch(window.location.search);
+      const parsedViewTab = parseViewTabFromSearch(window.location.search);
+      const parsedRouteId = parseRouteIdFromSearch(window.location.search);
+      const parsedStage = parseRouteStageFromSearch(window.location.search);
       const normalized = normalizeSelection(parsedSelection, placesById);
       if (parsedMapMode !== "ancient") {
         setTimelineSourcesOpen(false);
       }
       setMapMode(parsedMapMode);
+      setViewTab(parsedViewTab);
+      setSelectedRouteId(parsedRouteId);
+      setSelectedStageIndex(parsedStage ? parsedStage - 1 : null);
       if (ancientTimeline) {
         const resolvedStop = resolveStopForYear(
           ancientTimeline.stops,
@@ -651,6 +888,7 @@ export function AppShell() {
 
   const closePanel = useCallback((restoreFocus: boolean) => {
     setSelection(null);
+    setSelectedRouteStopId(null);
     setHighlightedPlaceId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
@@ -676,7 +914,7 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
-    if (!selectedPlace) {
+    if (!selectedPlace && !selectedRouteStopId) {
       return undefined;
     }
 
@@ -693,11 +931,12 @@ export function AppShell() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [closePanel, selectedPlace]);
+  }, [closePanel, selectedPlace, selectedRouteStopId]);
 
   const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
 
@@ -713,6 +952,7 @@ export function AppShell() {
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     setSelection(nextSelection);
@@ -721,6 +961,7 @@ export function AppShell() {
   const handlePanelSelectPlaceFromAbout = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
@@ -748,16 +989,19 @@ export function AppShell() {
     ? !selectedPlaceDetails && !placeDetailsErrorsById[selectedPlace.id]
     : false;
   const selectedPlaceLoadError = selectedPlace ? placeDetailsErrorsById[selectedPlace.id] ?? null : null;
-  const panelWidthForMap = selectedPlace && !isSmallScreen ? PANEL_WIDTH : 0;
 
   const handleSearchSelection = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
     setHighlightedPlaceId(null);
+    setSelectedRouteStopId(null);
+    if (viewTab !== "routes") {
+      setViewTab("map");
+    }
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     setSelection(nextSelection);
-  }, []);
+  }, [viewTab]);
   const handlePanelHighlightPlace = useCallback(
     (placeId: string | null) => {
       if (!placeId || !placesById.has(placeId)) {
@@ -809,6 +1053,42 @@ export function AppShell() {
     },
     [mapMode]
   );
+  const handleViewTabKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+      if (
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowRight" &&
+        event.key !== "ArrowUp" &&
+        event.key !== "ArrowDown" &&
+        event.key !== "Home" &&
+        event.key !== "End"
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      const currentIndex = VIEW_TAB_ORDER.indexOf(viewTab);
+      let nextTab: "map" | "routes" = viewTab;
+      if (event.key === "Home") {
+        nextTab = VIEW_TAB_ORDER[0];
+      } else if (event.key === "End") {
+        nextTab = VIEW_TAB_ORDER[VIEW_TAB_ORDER.length - 1];
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        const nextIndex = currentIndex <= 0 ? VIEW_TAB_ORDER.length - 1 : currentIndex - 1;
+        nextTab = VIEW_TAB_ORDER[nextIndex];
+      } else {
+        const nextIndex = currentIndex >= VIEW_TAB_ORDER.length - 1 ? 0 : currentIndex + 1;
+        nextTab = VIEW_TAB_ORDER[nextIndex];
+      }
+
+      setViewTab(nextTab);
+      event.currentTarget
+        .closest("[role='tablist']")
+        ?.querySelector<HTMLButtonElement>(`[data-view-tab='${nextTab}']`)
+        ?.focus();
+    },
+    [viewTab]
+  );
 
   useEffect(() => {
     if (!timelineSourcesOpen) {
@@ -829,14 +1109,600 @@ export function AppShell() {
     };
   }, [timelineSourcesOpen]);
 
+  const routeMapOverlay = useMemo<RouteMapOverlayData | null>(() => {
+    if (viewTab !== "routes" || !routesData) {
+      return null;
+    }
+
+    const selectedRouteEntry = selectedRoute;
+    if (!selectedRouteEntry) {
+      return {
+        lines: {
+          type: "FeatureCollection",
+          features: []
+        },
+        points: {
+          type: "FeatureCollection",
+          features: []
+        },
+        bounds: null,
+        routeFocusKey: null,
+        selectedStageFocusKey: null,
+        selectedStageCenter: null
+      };
+    }
+
+    const highlightedStageId =
+      highlightedStageIndex !== null && highlightedStageIndex >= 0
+        ? selectedRouteEntry.stages[highlightedStageIndex]?.id ?? null
+        : null;
+    const selectedStageId =
+      selectedStageIndex !== null && selectedStageIndex >= 0
+        ? selectedRouteEntry.stages[selectedStageIndex]?.id ?? null
+        : null;
+    const emphasizedStageId = highlightedStageId ?? selectedStageId;
+    const selectedRouteId = selectedRouteEntry.route.id;
+
+    const midpointOfCoordinates = (coordinates: [number, number][]) => {
+      if (coordinates.length === 0) {
+        return null;
+      }
+      if (coordinates.length === 1) {
+        return coordinates[0];
+      }
+
+      const lengths: number[] = [];
+      let totalLength = 0;
+      for (let index = 1; index < coordinates.length; index += 1) {
+        const left = coordinates[index - 1];
+        const right = coordinates[index];
+        const dx = right[0] - left[0];
+        const dy = right[1] - left[1];
+        const segmentLength = Math.sqrt(dx ** 2 + dy ** 2);
+        lengths.push(segmentLength);
+        totalLength += segmentLength;
+      }
+      if (totalLength <= Number.EPSILON) {
+        return coordinates[Math.floor(coordinates.length / 2)] ?? coordinates[0];
+      }
+
+      const target = totalLength / 2;
+      let traversed = 0;
+      for (let index = 1; index < coordinates.length; index += 1) {
+        const segmentLength = lengths[index - 1] ?? 0;
+        if (traversed + segmentLength >= target) {
+          const ratio = segmentLength <= Number.EPSILON ? 0 : (target - traversed) / segmentLength;
+          const left = coordinates[index - 1];
+          const right = coordinates[index];
+          return [
+            left[0] + (right[0] - left[0]) * ratio,
+            left[1] + (right[1] - left[1]) * ratio
+          ] as [number, number];
+        }
+        traversed += segmentLength;
+      }
+      return coordinates[coordinates.length - 1] ?? null;
+    };
+
+    const midpointOfGeometry = (
+      geometry:
+        | { type: "LineString"; coordinates: number[][] }
+        | { type: "MultiLineString"; coordinates: number[][][] }
+    ) => {
+      if (geometry.type === "LineString") {
+        return midpointOfCoordinates(geometry.coordinates as [number, number][]);
+      }
+      const merged = geometry.coordinates.flat() as [number, number][];
+      return midpointOfCoordinates(merged);
+    };
+
+    const lineFeatures: RouteMapOverlayData["lines"]["features"] = [];
+    const lineFeatureByStageId = new Map<string, (typeof lineFeatures)[number]>();
+    const selectedRoutePlaceId = selection?.placeId ?? null;
+    let selectedStageCenter: [number, number] | null = null;
+    for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+      const feature = routeLineFeatureByStage(routesData.lines, selectedRouteId, stage.id, stage.lineId);
+      if (!feature) {
+        continue;
+      }
+
+      const mappedFeature = {
+        type: "Feature" as const,
+        geometry:
+          feature.geometry.type === "LineString"
+            ? (feature.geometry as { type: "LineString"; coordinates: number[][] })
+            : (feature.geometry as { type: "MultiLineString"; coordinates: number[][][] }),
+        properties: {
+          routeId: selectedRouteId,
+          stageId: stage.id,
+          stageIndex: index,
+          stageLabel: `${index + 1}`,
+          travelMode: stage.travelMode,
+          isInSelectedRoute: true as const,
+          isSelectedStage: selectedStageId === stage.id,
+          isHighlightedStage: highlightedStageId === stage.id,
+          isDimmed: Boolean(emphasizedStageId && emphasizedStageId !== stage.id)
+        }
+      };
+      lineFeatures.push(mappedFeature);
+      lineFeatureByStageId.set(stage.id, mappedFeature);
+      if (selectedStageId === stage.id) {
+        selectedStageCenter = midpointOfGeometry(mappedFeature.geometry);
+      }
+    }
+
+    const pointFeatures: RouteMapOverlayData["points"]["features"] = [];
+    if (selectedRouteEntry.route.structure === "connected") {
+      const stopByKey = new Map<
+        string,
+        {
+          resolved: RouteStopResolved;
+          firstStageIndex: number;
+          stageIds: string[];
+          isRouteStart: boolean;
+        }
+      >();
+      const ensureConnectedStop = (
+        resolved: RouteStopResolved,
+        stageIndex: number,
+        stageId: string,
+        isRouteStart: boolean
+      ) => {
+        if (!resolved.coordinates) {
+          return;
+        }
+        const key = `${resolved.kind}:${resolved.id}`;
+        const existing = stopByKey.get(key);
+        if (existing) {
+          if (existing.stageIds.includes(stageId) && (!isRouteStart || existing.isRouteStart)) {
+            return;
+          }
+          stopByKey.set(key, {
+            ...existing,
+            stageIds: existing.stageIds.includes(stageId)
+              ? existing.stageIds
+              : [...existing.stageIds, stageId],
+            isRouteStart: existing.isRouteStart || isRouteStart
+          });
+          return;
+        }
+        stopByKey.set(key, {
+          resolved,
+          firstStageIndex: stageIndex,
+          stageIds: [stageId],
+          isRouteStart
+        });
+      };
+      const firstStage = selectedRouteEntry.stages[0];
+      if (firstStage) {
+        ensureConnectedStop(
+          resolveRouteStop(firstStage.from, placesById, routeStopsById),
+          0,
+          firstStage.id,
+          true
+        );
+      }
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        ensureConnectedStop(resolveRouteStop(stage.to, placesById, routeStopsById), index, stage.id, false);
+      }
+
+      const connectedStops = [...stopByKey.values()].map((value, index) => {
+        const isSelectedStage = selectedStageId ? value.stageIds.includes(selectedStageId) : false;
+        const isHighlightedStage = highlightedStageId ? value.stageIds.includes(highlightedStageId) : false;
+        const dimmed = Boolean(emphasizedStageId && !value.stageIds.includes(emphasizedStageId));
+        return {
+          type: "Feature" as const,
+          geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
+          properties: {
+            id: `${selectedRouteId}:stop:${value.resolved.kind}:${value.resolved.id}:${index}`,
+            routeId: selectedRouteId,
+            stageId: value.stageIds[0] ?? "",
+            stageIndex: value.firstStageIndex,
+            kind: "stop" as const,
+            stopKind: value.resolved.kind,
+            stopId: value.resolved.id,
+            label: value.resolved.name,
+            isRouteStart: value.isRouteStart,
+            isInSelectedRoute: true as const,
+            isSelectedStage,
+            isHighlightedStage,
+            isDimmed: dimmed,
+            isSelectedPlace:
+              value.resolved.kind === "location" && value.resolved.id === selectedRoutePlaceId
+          }
+        };
+      });
+
+      const viaByKey = new Map<string, RouteMapOverlayData["points"]["features"][number]>();
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        const stageSelected = selectedStageId === stage.id;
+        const stageHighlighted = highlightedStageId === stage.id;
+        const dimmed = Boolean(emphasizedStageId && emphasizedStageId !== stage.id);
+        for (const viaRef of stage.via ?? []) {
+          const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+          if (!via.coordinates) {
+            continue;
+          }
+          const key = `${selectedRouteId}:${via.kind}:${via.id}`;
+          if (viaByKey.has(key)) {
+            continue;
+          }
+          viaByKey.set(key, {
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: via.coordinates },
+            properties: {
+              id: `${selectedRouteId}:${stage.id}:via:${via.id}`,
+              routeId: selectedRouteId,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "via" as const,
+              stopKind: via.kind,
+              stopId: via.id,
+              label: via.name,
+              isInSelectedRoute: true as const,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted,
+              isDimmed: dimmed,
+              isSelectedPlace: via.kind === "location" && via.id === selectedRoutePlaceId
+            }
+          });
+        }
+      }
+      pointFeatures.push(
+        ...connectedStops,
+        ...viaByKey.values(),
+        ...buildMentionedPointFeatures({
+          routeId: selectedRouteId,
+          stages: selectedRouteEntry.stages,
+          selectedStageId,
+          highlightedStageId,
+          emphasizedStageId,
+          selectedPlaceId: selectedRoutePlaceId,
+          placesById,
+          routeStopsById
+        })
+      );
+    } else {
+      const stopsByKey = new Map<
+        string,
+        {
+          resolved: RouteStopResolved;
+          stageIds: string[];
+          firstStageIndex: number;
+          isRouteStart: boolean;
+        }
+      >();
+      const addSegmentStop = (
+        resolved: RouteStopResolved,
+        stage: { id: string },
+        stageIndex: number,
+        isRouteStart: boolean
+      ) => {
+        if (!resolved.coordinates) {
+          return;
+        }
+        const key = `${resolved.kind}:${resolved.id}`;
+        const existing = stopsByKey.get(key);
+        if (existing) {
+          if (existing.stageIds.includes(stage.id) && (!isRouteStart || existing.isRouteStart)) {
+            return;
+          }
+          stopsByKey.set(key, {
+            ...existing,
+            stageIds: existing.stageIds.includes(stage.id)
+              ? existing.stageIds
+              : [...existing.stageIds, stage.id],
+            isRouteStart: existing.isRouteStart || isRouteStart
+          });
+          return;
+        }
+        stopsByKey.set(key, {
+          resolved,
+          stageIds: [stage.id],
+          firstStageIndex: stageIndex,
+          isRouteStart
+        });
+      };
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        addSegmentStop(resolveRouteStop(stage.from, placesById, routeStopsById), stage, index, index === 0);
+        addSegmentStop(resolveRouteStop(stage.to, placesById, routeStopsById), stage, index, false);
+      }
+      pointFeatures.push(
+        ...[...stopsByKey.values()].map((value, index) => {
+          const isSelectedStage = selectedStageId ? value.stageIds.includes(selectedStageId) : false;
+          const isHighlightedStage = highlightedStageId ? value.stageIds.includes(highlightedStageId) : false;
+          const dimmed = Boolean(emphasizedStageId && !value.stageIds.includes(emphasizedStageId));
+          return {
+            type: "Feature" as const,
+            geometry: { type: "Point" as const, coordinates: value.resolved.coordinates as [number, number] },
+            properties: {
+              id: `${selectedRouteId}:stop:${value.resolved.kind}:${value.resolved.id}:${index}`,
+              routeId: selectedRouteId,
+              stageId: value.stageIds[0] ?? "",
+              stageIndex: value.firstStageIndex,
+              kind: "stop" as const,
+              stopKind: value.resolved.kind,
+              stopId: value.resolved.id,
+              label: value.resolved.name,
+              isRouteStart: value.isRouteStart,
+              isInSelectedRoute: true as const,
+              isSelectedStage,
+              isHighlightedStage,
+              isDimmed: dimmed,
+              isSelectedPlace:
+                value.resolved.kind === "location" && value.resolved.id === selectedRoutePlaceId
+            }
+          };
+        })
+      );
+      for (const [index, stage] of selectedRouteEntry.stages.entries()) {
+        const stageSelected = selectedStageId === stage.id;
+        const stageHighlighted = highlightedStageId === stage.id;
+        const dimmed = Boolean(emphasizedStageId && emphasizedStageId !== stage.id);
+        for (const viaRef of stage.via ?? []) {
+          const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+          if (!via.coordinates) {
+            continue;
+          }
+          pointFeatures.push({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: via.coordinates },
+            properties: {
+              id: `${selectedRouteId}:${stage.id}:via:${via.id}`,
+              routeId: selectedRouteId,
+              stageId: stage.id,
+              stageIndex: index,
+              kind: "via",
+              stopKind: via.kind,
+              stopId: via.id,
+              label: via.name,
+              isInSelectedRoute: true,
+              isSelectedStage: stageSelected,
+              isHighlightedStage: stageHighlighted,
+              isDimmed: dimmed,
+              isSelectedPlace: via.kind === "location" && via.id === selectedRoutePlaceId
+            }
+          });
+        }
+      }
+      pointFeatures.push(
+        ...buildMentionedPointFeatures({
+          routeId: selectedRouteId,
+          stages: selectedRouteEntry.stages,
+          selectedStageId,
+          highlightedStageId,
+          emphasizedStageId,
+          selectedPlaceId: selectedRoutePlaceId,
+          placesById,
+          routeStopsById
+        })
+      );
+    }
+
+    const pillStage = selectedRouteEntry.stages.find((stage) => stage.id === emphasizedStageId) ?? null;
+    const pillFeature = pillStage ? lineFeatureByStageId.get(pillStage.id) ?? null : null;
+    const pillCoordinate = pillFeature ? midpointOfGeometry(pillFeature.geometry) : null;
+    if (pillStage && pillFeature && pillCoordinate) {
+      const stageIndex = selectedRouteEntry.stages.findIndex((stage) => stage.id === pillStage.id);
+      pointFeatures.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: pillCoordinate },
+        properties: {
+          id: `${selectedRouteId}:${pillStage.id}:pill`,
+          routeId: selectedRouteId,
+          stageId: pillStage.id,
+          stageIndex: stageIndex >= 0 ? stageIndex : 0,
+          kind: "stage-pill",
+          stopKind: "location",
+          stopId: pillStage.id,
+          label: `${Math.max(1, stageIndex + 1)}`,
+          isInSelectedRoute: true as const,
+          isSelectedStage: selectedStageId === pillStage.id,
+          isHighlightedStage: highlightedStageId === pillStage.id,
+          isDimmed: false,
+          isSelectedPlace: false
+        }
+      });
+    }
+
+    let minLon = Number.POSITIVE_INFINITY;
+    let minLat = Number.POSITIVE_INFINITY;
+    let maxLon = Number.NEGATIVE_INFINITY;
+    let maxLat = Number.NEGATIVE_INFINITY;
+    const includeCoordinate = (coordinate: [number, number]) => {
+      if (coordinate[0] < minLon) minLon = coordinate[0];
+      if (coordinate[1] < minLat) minLat = coordinate[1];
+      if (coordinate[0] > maxLon) maxLon = coordinate[0];
+      if (coordinate[1] > maxLat) maxLat = coordinate[1];
+    };
+    for (const feature of pointFeatures) {
+      if (feature.properties.kind === "stage-pill") {
+        continue;
+      }
+      includeCoordinate(feature.geometry.coordinates as [number, number]);
+    }
+    if (minLon === Number.POSITIVE_INFINITY) {
+      for (const feature of lineFeatures) {
+        if (feature.geometry.type === "LineString") {
+          for (const coordinate of feature.geometry.coordinates) {
+            includeCoordinate(coordinate as [number, number]);
+          }
+          continue;
+        }
+        for (const segment of feature.geometry.coordinates) {
+          for (const coordinate of segment) {
+            includeCoordinate(coordinate as [number, number]);
+          }
+        }
+      }
+    }
+    if (selectedStageCenter) {
+      includeCoordinate(selectedStageCenter);
+    }
+    const bounds =
+      minLon === Number.POSITIVE_INFINITY
+        ? null
+        : ([
+            [minLon, minLat],
+            [maxLon, maxLat]
+          ] as [[number, number], [number, number]]);
+
+    return {
+      lines: {
+        type: "FeatureCollection",
+        features: lineFeatures
+      },
+      points: {
+        type: "FeatureCollection",
+        features: pointFeatures
+      },
+      bounds,
+      routeFocusKey: bounds ? selectedRouteId : null,
+      selectedStageFocusKey:
+        selectedStageId && selectedStageCenter ? `${selectedRouteId}:${selectedStageId}` : null,
+      selectedStageCenter
+    };
+  }, [
+    highlightedStageIndex,
+    placesById,
+    routeStopsById,
+    routesData,
+    selection?.placeId,
+    selectedRoute,
+    selectedStageIndex,
+    viewTab
+  ]);
+
+  const routeKeyboardEntries = useMemo(() => {
+    if (viewTab !== "routes" || !selectedRoute) {
+      return [];
+    }
+    const mentionedKeyByStop = new Map<string, string>();
+    const entries = selectedRoute.stages.flatMap((stage, stageIndex) => {
+      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
+      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
+      const result: {
+        id: string;
+        label: string;
+        coordinates: [number, number];
+        routeId: string;
+        stageId: string;
+        stageIndex: number;
+        stopKind: "location" | "route-stop";
+        stopId: string;
+      }[] = [];
+      const pushStopEntry = (
+        resolved: RouteStopResolved,
+        role: "from" | "to" | "passed" | "also-named",
+        accessibleKindLabel = "route stop"
+      ) => {
+        if (!resolved.coordinates) {
+          return;
+        }
+        result.push({
+          id: `route-stop:${selectedRoute.route.id}:${stage.id}:${role}:${resolved.kind}:${resolved.id}:${stageIndex}:${result.length}`,
+          label: `${resolved.name}, ${accessibleKindLabel}`,
+          coordinates: resolved.coordinates,
+          routeId: selectedRoute.route.id,
+          stageId: stage.id,
+          stageIndex,
+          stopKind: resolved.kind,
+          stopId: resolved.id
+        });
+      };
+      pushStopEntry(from, "from");
+      pushStopEntry(to, "to");
+      for (const viaRef of stage.via ?? []) {
+        const via = resolveRouteStop(viaRef, placesById, routeStopsById);
+        if (via.kind !== "location") {
+          continue;
+        }
+        pushStopEntry(via, "passed", "passed place");
+      }
+      for (const mentionedRef of stage.mentioned ?? []) {
+        if (mentionedRef.kind !== "location") {
+          continue;
+        }
+        const key = `${mentionedRef.locationId ?? ""}:${mentionedRef.candidateIndex ?? ""}`;
+        if (mentionedKeyByStop.has(key)) {
+          continue;
+        }
+        mentionedKeyByStop.set(key, stage.id);
+        const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
+        if (mentioned.kind !== "location") {
+          continue;
+        }
+        const alsoNamedIsRouteStop =
+          stage.from.kind === "location" && stage.from.locationId === mentioned.id
+            ? true
+            : stage.to.kind === "location" && stage.to.locationId === mentioned.id
+              ? true
+              : (stage.via ?? []).some(
+                  (viaRef) => viaRef.kind === "location" && viaRef.locationId === mentioned.id
+                );
+        if (alsoNamedIsRouteStop) {
+          continue;
+        }
+        pushStopEntry(mentioned, "also-named", "also named place");
+      }
+      return result;
+    });
+
+    return entries;
+  }, [placesById, routeStopsById, selectedRoute, viewTab]);
+  const routeOverlayHiddenPlaceIdsKey = useMemo(() => {
+    if (viewTab !== "routes" || !routeMapOverlay) {
+      return "";
+    }
+    const hidden = new Set<string>();
+    for (const feature of routeMapOverlay.points.features) {
+      const properties = feature.properties;
+      if (properties.kind === "stage-pill" || properties.stopKind !== "location") {
+        continue;
+      }
+      hidden.add(properties.stopId);
+    }
+    return [...hidden].sort().join("|");
+  }, [routeMapOverlay, viewTab]);
+  const selectedRouteStop =
+    selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
+      ? routeStopsById.get(selectedRouteStopId) ?? null
+      : null;
+  const selectedRouteStopCoordinates = selectedRouteStop?.candidates[0]?.coordinates ?? null;
+  const selectedRouteStopFocusKey =
+    selectedRouteStopId && selectedRouteStopCoordinates
+      ? `${selectedRouteStopId}:${selectedRouteStopCoordinates[0]}:${selectedRouteStopCoordinates[1]}`
+      : null;
+  const routePlacePanelActive = viewTab === "routes" && Boolean(selectedPlace || selectedRouteStop);
+  const showSideBySideRoutePlacePanels =
+    routePlacePanelActive &&
+    !isSmallScreen &&
+    viewportWidthPx >= ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX;
+  const panelWidthForMap = !isSmallScreen
+    ? viewTab === "routes"
+      ? showSideBySideRoutePlacePanels
+        ? PANEL_WIDTH * 2
+        : routePlacePanelActive || viewTab === "routes"
+          ? PANEL_WIDTH
+          : 0
+      : selectedPlace
+        ? PANEL_WIDTH
+        : 0
+    : 0;
+
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
     (smallScreenSheetMode === "expanded"
       ? smallScreenSheetMaxHeightPx
       : smallScreenSheetCollapsedHeightPx);
-  const panelBottomInsetForMap = selectedPlace && isSmallScreen ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX : 0;
+  const panelBottomInsetForMap =
+    ((selectedPlace || selectedRouteStop || viewTab === "routes") && isSmallScreen)
+      ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX
+      : 0;
   const timelineVisible =
-    mapMode === "ancient" && (hasAncientTimeline || ancientTimelineLoadState === "error");
+    viewTab === "map" &&
+    mapMode === "ancient" &&
+    (hasAncientTimeline || ancientTimelineLoadState === "error");
   const retryAncientLayer = useCallback(() => {
     setTimelineSourcesOpen(false);
     if (ancientTimelineLoadState === "error") {
@@ -845,7 +1711,8 @@ export function AppShell() {
     }
     setAncientLayerRetryToken((value) => value + 1);
   }, [ancientTimelineLoadState]);
-  const timelineBottomInsetForMap = timelineVisible && isSmallScreen && !selectedPlace ? 192 : 0;
+  const timelineBottomInsetForMap =
+    timelineVisible && isSmallScreen && !selectedPlace && viewTab === "map" ? 192 : 0;
   useLayoutEffect(() => {
     if (!timelineVisible) {
       return undefined;
@@ -905,7 +1772,7 @@ export function AppShell() {
   const showOnlyEdgeTickLabels =
     sortedTimelineStops.length > 2 && timelineStopSpacingPx < TIMELINE_MIN_STOP_SPACING_PX;
   const hideMapModeToggleOnPhoneExpandedSheet =
-    isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded";
+    isSmallScreen && Boolean(selectedPlace) && smallScreenSheetMode === "expanded" && viewTab === "map";
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -919,25 +1786,46 @@ export function AppShell() {
     [sortedTimelineStops]
   );
 
-  const panelStyle: CSSProperties | null = selectedPlace
+  const routePanelOpen = viewTab === "routes";
+  const showRoutesPanel = routePanelOpen && (!routePlacePanelActive || showSideBySideRoutePlacePanels);
+  const showRoutePlacePanel = routePanelOpen && routePlacePanelActive;
+  const showRouteBackLink = showRoutePlacePanel && !showSideBySideRoutePlacePanels;
+  const showMapTabPlacePanel = viewTab === "map" && Boolean(selectedPlace);
+  const showDualRoutesPanelsOnDesktop = !isSmallScreen && showRoutesPanel && showRoutePlacePanel && showSideBySideRoutePlacePanels;
+  const routePanelsRightEdgePx = showDualRoutesPanelsOnDesktop ? PANEL_WIDTH * 2 : PANEL_WIDTH;
+  const centeredTabsLeftPx =
+    routePanelsRightEdgePx + (viewportWidthPx - routePanelsRightEdgePx - SEGMENTED_CONTROL_MIN_WIDTH_PX) / 2;
+  const mapToggleLeftPx =
+    viewportWidthPx - tokens.spacing.md - SEGMENTED_CONTROL_MIN_WIDTH_PX;
+  const centeredTabsWouldAvoidToggle =
+    centeredTabsLeftPx + SEGMENTED_CONTROL_MIN_WIDTH_PX + MAP_TOP_CONTROL_CLEARANCE_PX <= mapToggleLeftPx;
+  const tabsLeftWithDualPanelsPx = centeredTabsWouldAvoidToggle
+    ? centeredTabsLeftPx
+    : routePanelsRightEdgePx + tokens.spacing.md;
+  const viewTabsDesktopLeft = showDualRoutesPanelsOnDesktop
+    ? `${Math.round(tabsLeftWithDualPanelsPx)}px`
+    : "50%";
+  const viewTabsDesktopTransform = showDualRoutesPanelsOnDesktop ? "none" : "translateX(-50%)";
+  const commonSmallScreenPanelStyle: CSSProperties = {
+    position: "absolute",
+    left: `${tokens.spacing.md}px`,
+    right: `${tokens.spacing.md}px`,
+    bottom: `${tokens.spacing.md}px`,
+    height: `${Math.round(panelHeightPx)}px`,
+    maxHeight: "calc(100% - 32px)",
+    boxSizing: "border-box" as const,
+    backgroundColor: tokens.color.surface,
+    border: `1px solid ${tokens.color.divider}`,
+    borderRadius: "16px",
+    padding: `${tokens.spacing.md}px`,
+    boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+    overflowX: "hidden",
+    overflowY: "auto",
+    zIndex: 20
+  };
+  const routePanelStyle: CSSProperties | null = showRoutesPanel
     ? isSmallScreen
-      ? {
-          position: "absolute",
-          left: `${tokens.spacing.md}px`,
-          right: `${tokens.spacing.md}px`,
-          bottom: `${tokens.spacing.md}px`,
-          height: `${Math.round(panelHeightPx)}px`,
-          maxHeight: "calc(100% - 32px)",
-          boxSizing: "border-box" as const,
-          backgroundColor: tokens.color.surface,
-          border: `1px solid ${tokens.color.divider}`,
-          borderRadius: "16px",
-          padding: `${tokens.spacing.md}px`,
-          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
-          overflowX: "hidden",
-          overflowY: "auto",
-          zIndex: 20
-        }
+      ? commonSmallScreenPanelStyle
       : {
           position: "absolute",
           top: 0,
@@ -954,6 +1842,67 @@ export function AppShell() {
           zIndex: 20
         }
     : null;
+  const placePanelStyle: CSSProperties | null = showMapTabPlacePanel || showRoutePlacePanel
+    ? isSmallScreen
+      ? commonSmallScreenPanelStyle
+      : {
+          position: "absolute",
+          top: 0,
+          left: showRoutePlacePanel && showSideBySideRoutePlacePanels ? `${PANEL_WIDTH}px` : 0,
+          bottom: 0,
+          width: `${PANEL_WIDTH}px`,
+          boxSizing: "border-box" as const,
+          backgroundColor: tokens.color.surface,
+          borderRight: showRoutePlacePanel && !showSideBySideRoutePlacePanels
+            ? `1px solid ${tokens.color.divider}`
+            : undefined,
+          borderLeft: showRoutePlacePanel && showSideBySideRoutePlacePanels
+            ? `1px solid ${tokens.color.divider}`
+            : undefined,
+          padding: `${PANEL_CONTENT_TOP_PADDING}px ${tokens.spacing.lg}px ${tokens.spacing.lg}px`,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          overflowX: "hidden",
+          overflowY: "auto",
+          zIndex: 21
+        }
+    : null;
+
+  const handleSelectRoute = useCallback((routeId: string) => {
+    setSelectedRouteId(routeId);
+    setSelectedStageIndex(null);
+    setHighlightedStageIndex(null);
+    setSelectedRouteStopId(null);
+    setSelection(null);
+    setStatusMessage(null);
+  }, []);
+
+  const handleSelectRouteMapEntry = useCallback(
+    (
+      entry:
+        | { kind: "line"; routeId: string; stageId: string; stageIndex: number }
+        | {
+            kind: "stop";
+            routeId: string;
+            stageId: string;
+            stageIndex: number;
+            stopKind: "location" | "route-stop";
+            stopId: string;
+          }
+    ) => {
+      setViewTab("routes");
+      setSelectedRouteId(entry.routeId);
+      setSelectedStageIndex(entry.stageIndex);
+      setSelectedRouteStopId(null);
+      if (entry.kind === "stop") {
+        if (entry.stopKind === "location") {
+          setSelection({ placeId: entry.stopId, candidateIndex: null });
+        } else {
+          setSelectedRouteStopId(entry.stopId);
+        }
+      }
+    },
+    []
+  );
 
   return (
     <div
@@ -972,6 +1921,57 @@ export function AppShell() {
         onSelectPlace={handleSearchSelection}
         places={places}
       />
+
+      <div
+        aria-label="View"
+        role="tablist"
+        style={{
+          position: "absolute",
+          left: isSmallScreen ? `${tokens.spacing.md}px` : viewTabsDesktopLeft,
+          transform: isSmallScreen ? "none" : viewTabsDesktopTransform,
+          top: isSmallScreen ? `${VIEW_TABS_TOP_OFFSET_PX}px` : `${tokens.spacing.md}px`,
+          display: "inline-flex",
+          borderRadius: "999px",
+          border: `1px solid ${tokens.color.divider}`,
+          backgroundColor: tokens.color.surface,
+          boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
+          padding: "2px",
+          zIndex: 46
+        }}
+      >
+        {([
+          ["map", "Map"],
+          ["routes", "Routes"]
+        ] as const).map(([value, label]) => {
+          const selected = viewTab === value;
+          return (
+            <button
+              aria-selected={selected}
+              data-view-tab={value}
+              key={value}
+              onClick={() => setViewTab(value)}
+              onKeyDown={handleViewTabKeyDown}
+              role="tab"
+              tabIndex={selected ? 0 : -1}
+              style={{
+                minWidth: "86px",
+                height: "36px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: selected ? "#1A73E8" : "transparent",
+                color: selected ? "#FFFFFF" : tokens.color.textPrimary,
+                fontFamily: tokens.typography.uiFont,
+                fontSize: `${tokens.typography.captionSize}px`,
+                fontWeight: 600,
+                cursor: "pointer"
+              }}
+              type="button"
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
 
       {!hideMapModeToggleOnPhoneExpandedSheet ? (
         <div
@@ -1043,10 +2043,20 @@ export function AppShell() {
             leftPanelWidth={panelWidthForMap}
             mapMode={mapMode}
             onAncientLayerLoadStateChange={setAncientLayerStatus}
+            onSelectRouteMapEntry={handleSelectRouteMapEntry}
             onSelectPlace={handleSelectFromMap}
             pinLabelSource={PIN_LABEL_SOURCE}
             places={places}
-            selectedTimelineStopId={selectedTimelineStopId}
+            routeKeyboardEntries={routeKeyboardEntries}
+            selectedRouteStopCoordinates={selectedRouteStopCoordinates}
+            selectedRouteStopFocusKey={selectedRouteStopFocusKey}
+            routeOverlayHiddenPlaceIdsKey={routeOverlayHiddenPlaceIdsKey}
+            routesOverlay={routeMapOverlay}
+            selectedTimelineStopId={
+              viewTab === "routes" && selectedRouteTimelineStop
+                ? selectedRouteTimelineStop.id
+                : selectedTimelineStopId
+            }
             selection={selection}
             timelineOverlayInset={effectiveTimelineOverlayInsetForAttribution}
           />
@@ -1140,10 +2150,7 @@ export function AppShell() {
                     lineHeight: `${tokens.typography.captionLineHeight}px`
                   }}
                 >
-                  <p style={{ margin: 0 }}>
-                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
-                  </p>
-                  <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>{selectedTimelineStop.summary}</p>
+                  <p style={{ margin: 0 }}>{selectedTimelineStop.summary}</p>
                   {selectedTimelineStop.scripture.length > 0 ? (
                     <div style={{ marginTop: `${tokens.spacing.xs}px` }}>
                       <strong>Passages:</strong>
@@ -1180,6 +2187,9 @@ export function AppShell() {
                       </ul>
                     </div>
                   ) : null}
+                  <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
+                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                  </p>
                 </div>
               ) : null}
               <div
@@ -1350,8 +2360,68 @@ export function AppShell() {
       ) : null}
       <div id="ibm-visible-places-portal-root" style={srOnlyStyle} />
 
-      {selectedPlace && panelStyle ? (
-        <section aria-label="Place details" style={panelStyle}>
+      {routePanelStyle ? (
+        <section aria-label="Route details" style={routePanelStyle}>
+          <div data-routes-panel="true">
+            <RoutesPanel
+              hydratedRoutes={hydratedRoutes}
+              onBackToAllRoutes={() => {
+                setSelectedRouteId(null);
+                setSelectedStageIndex(null);
+                setHighlightedStageIndex(null);
+                setSelectedRouteStopId(null);
+                setSelection(null);
+              }}
+              onHighlightStage={setHighlightedStageIndex}
+              onResolveStopSelection={(resolvedStop, stageIndex) => {
+                setSelectedStageIndex(stageIndex);
+                if (resolvedStop.kind === "location") {
+                  setSelectedRouteStopId(null);
+                  setSelection({ placeId: resolvedStop.id, candidateIndex: null });
+                } else {
+                  setSelection(null);
+                  setSelectedRouteStopId(resolvedStop.id);
+                }
+              }}
+              onRetryLoad={() => {
+                setRoutesLoadState("idle");
+                setRoutesReloadToken((value) => value + 1);
+              }}
+              onSelectRoute={handleSelectRoute}
+              onSelectStage={(stageIndex) => {
+                setSelectedRouteStopId(null);
+                setSelection(null);
+                setSelectedStageIndex(stageIndex);
+              }}
+              placesById={placesById}
+              routeStopsById={routeStopsById}
+              routesData={routesData}
+              routesLoadState={routesLoadState}
+              selectedRoute={selectedRoute}
+              selectedRouteBorderYear={selectedRoute?.route.fromYear ?? null}
+              selectedStageIndex={selectedStageIndex}
+            />
+          </div>
+        </section>
+      ) : null}
+      {placePanelStyle && selectedPlace ? (
+        <section aria-label="Place details" data-route-place-panel={viewTab === "routes" ? "true" : "false"} style={placePanelStyle}>
+          {showRouteBackLink ? (
+            <button
+              data-back-to-route="true"
+              onClick={() => {
+                setSelection(null);
+                setSelectedRouteStopId(null);
+                setHighlightedPlaceId(null);
+                setSmallScreenSheetMode("collapsed");
+                setSmallScreenSheetDragHeightPx(null);
+              }}
+              style={{ border: "none", background: "none", color: "#1A73E8", padding: 0, cursor: "pointer", marginBottom: `${tokens.spacing.sm}px` }}
+              type="button"
+            >
+              ‹ Back to route
+            </button>
+          ) : null}
           <PlacePanel
             key={selectedPlace.id}
             isLoading={selectedPlaceLoading}
@@ -1398,6 +2468,25 @@ export function AppShell() {
             placesById={placesById}
             selectedPlace={selectedPlace}
             selection={selection ?? { placeId: selectedPlace.id, candidateIndex: null }}
+          />
+        </section>
+      ) : null}
+      {placePanelStyle && !selectedPlace && selectedRouteStop ? (
+        <section aria-label="Place details" data-route-place-panel="true" style={placePanelStyle}>
+          <RouteStopDetailsPanel
+            bibliographyById={routeBibliographyById}
+            onBackToRoute={() => {
+              setSelectedRouteStopId(null);
+              setSmallScreenSheetMode("collapsed");
+              setSmallScreenSheetDragHeightPx(null);
+            }}
+            onClose={() => {
+              setSelectedRouteStopId(null);
+              setSmallScreenSheetMode("collapsed");
+              setSmallScreenSheetDragHeightPx(null);
+            }}
+            selectedRouteStop={selectedRouteStop}
+            showBackToRoute={showRouteBackLink}
           />
         </section>
       ) : null}

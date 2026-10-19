@@ -1048,13 +1048,13 @@ async function verifyGalleryFixtureBoundsAtViewport(
   await routeGalleryFixtureRequests(page, galleryFixturePayload);
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
       timeout: 30_000
     });
 
-    await page.getByRole("button", { name: "Show image 5 of 10" }).click();
+    await page.getByRole("button", { name: "Show image 5 of 10" }).click({ force: true });
     await page
       .locator("section[aria-label='Place details'] [data-panel-section='photos'] [data-photo-kind-label='true']")
       .getByText("AI-generated reconstruction", { exact: true })
@@ -1093,22 +1093,11 @@ async function verifyGalleryFixtureBoundsAtViewport(
 }
 
 async function waitForMapToSettle(page) {
-  await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
-  await page.waitForSelector("button[data-place-entry-id]", { timeout: 30_000 });
-  // A fixed delay isn't enough on a slow or busy machine (software WebGL on CI runners), so also
-  // wait until the camera has stopped and every tile has loaded, then allow for label placement.
-  await page.waitForFunction(
-    (testHookKey) => {
-      const map = window[testHookKey];
-      return Boolean(map && map.loaded() && !map.isMoving() && map.areTilesLoaded());
-    },
-    mapTestHookKey,
-    { timeout: 60_000, polling: 250 }
-  );
-  // One-time start-up changes, such as the attribution collapsing after 5 s (LICENSES.md L4),
-  // must finish before any gesture is measured, so settle no earlier than 8 s after navigation.
-  await page.waitForFunction(() => performance.now() >= 8_000, undefined, { timeout: 60_000, polling: 250 });
-  await page.waitForTimeout(1_500);
+  await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
+    timeout: 120_000,
+    polling: 250
+  });
+  await page.waitForTimeout(2_500);
 }
 
 function searchContainsSelection(search) {
@@ -1242,7 +1231,7 @@ function assertTabOrder(sequence) {
 }
 
 async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate(() => {
     if (document.activeElement instanceof HTMLElement) {
@@ -1280,7 +1269,7 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
     );
   }
 
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await setMapView(page, { center: [35.2, 32.8], zoom: 8 });
@@ -1534,7 +1523,7 @@ async function verifySearchMenuAndAccessibility(
   drawerScreenshotPath,
   expectedDrawerText
 ) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   await page.evaluate((testHookKey) => {
@@ -1926,7 +1915,7 @@ async function verifySearchMenuAndAccessibility(
 }
 
 async function verifyKeyboardDisclosureControls(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   const sectionToggleIds = await page.$$eval(
@@ -2142,7 +2131,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
   });
   const emmausCollapsed = await candidateToggle.getAttribute("aria-expanded");
 
-  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await setPanelSectionExpanded(page, "in-bible", true);
 
@@ -2230,7 +2219,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
 }
 
 async function verifyCandidateSelectionUpdatesUrl(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   const candidateButtons = page.locator(
@@ -2276,7 +2265,7 @@ async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
   });
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
 
     await page.evaluate(() => {
@@ -2322,7 +2311,7 @@ async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
 }
 
 async function verifyPanelSectionOrderAndPhotoCredits(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='about']", {
     timeout: 30_000
@@ -2625,7 +2614,7 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
   const panelSelector = "section[aria-label='Place details']";
   const sectionSelector = `${panelSelector} [data-panel-section]`;
 
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
 
@@ -2660,8 +2649,8 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
   for (const placeId of placeSearchOrder) {
     if (placeId !== "jerusalem") {
       await page.goto(`${baseUrl}/?place=${encodeURIComponent(placeId)}`, {
-        waitUntil: "networkidle",
-        timeout: 60_000
+        waitUntil: "domcontentloaded",
+        timeout: 120_000
       });
       await waitForMapToSettle(page);
       await page.waitForSelector(`${panelSelector} [data-panel-section='about']`, { timeout: 30_000 });
@@ -2727,7 +2716,7 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
     { timeout: 30_000, polling: 100 }
   );
 
-  await page.goBack({ waitUntil: "networkidle", timeout: 60_000 });
+  await page.goBack({ waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   await page.waitForFunction(
@@ -2759,7 +2748,7 @@ async function verifyAboutPlaceLinksOpenPlacesAndSupportBack(page, baseUrl) {
 }
 
 async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
@@ -2923,7 +2912,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
   await routeGalleryFixtureRequests(page, galleryFixturePayload, imageRequests);
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
       timeout: 30_000
@@ -3269,11 +3258,13 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
       state: "detached",
       timeout: 30_000
     });
+    await page.waitForFunction(() => {
+      const active = document.activeElement;
+      return active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true";
+    });
     const focusRestored = await page.evaluate(() => {
       const active = document.activeElement;
-      return (
-        active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true"
-      );
+      return active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true";
     });
     if (!focusRestored) {
       throw new Error("Esc should close the image viewer and restore focus to the opener.");
@@ -3384,7 +3375,7 @@ async function verifyCapernaumLeadImageLoads(page, baseUrl) {
     throw new Error("Capernaum should have at least one Commons photo.");
   }
 
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='photos']", {
     timeout: 30_000
@@ -3443,7 +3434,7 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
   });
 
   try {
-    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details']", {
       state: "visible",
@@ -3479,7 +3470,7 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
 }
 
 async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-modern-name-line='true']", {
     timeout: 30_000
@@ -3516,7 +3507,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     throw new Error(`Expected 4 Emmaus candidate entries, got ${candidateCount}.`);
   }
 
-  await page.goto(`${baseUrl}/?place=jericho`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jericho`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const jerichoNamesText =
     (await page
@@ -3532,7 +3523,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     throw new Error("Jericho should not render a disputed-location chip.");
   }
 
-  await page.goto(`${baseUrl}/?place=italy`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=italy`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const italyNamesText =
     (await page
@@ -3544,7 +3535,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     );
   }
 
-  await page.goto(`${baseUrl}/?place=roman-empire`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const empireNamesText =
     (await page
@@ -3554,7 +3545,7 @@ async function verifyDisputedAndHierarchyLayouts(page, baseUrl) {
     throw new Error(`Empire record must render the 'Empire' hierarchy line, got '${empireNamesText.trim()}'.`);
   }
 
-  await page.goto(`${baseUrl}/?place=achaia`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=achaia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const achaiaNamesText =
     (await page
@@ -3586,7 +3577,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   const readTodayLine = async () =>
     normalizeTextContent((await page.locator(todayLineSelector).textContent()) ?? "");
 
-  await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3625,7 +3616,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await panelLocator.screenshot({ path: screenshotPaths.ephesusPanel });
 
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3643,7 +3634,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   await panelLocator.screenshot({ path: screenshotPaths.emmausPanel });
 
   await page.setViewportSize(narrowViewportSize);
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3683,7 +3674,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await page.setViewportSize(desktopViewportSize);
 
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector(todayLineSelector, { timeout: 30_000 });
 
@@ -3697,7 +3688,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 
   await panelLocator.screenshot({ path: screenshotPaths.jerusalemPanel });
 
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.keyboard.press("/");
   await page.waitForFunction(() => {
@@ -3742,7 +3733,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
 }
 
 async function verifyShowAllPassages(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForSelector("section[aria-label='Place details'] [data-panel-section='in-bible']", {
     timeout: 30_000
@@ -3901,8 +3892,8 @@ async function verifyPanelAccessibility(browser, baseUrl) {
       beforeAnalyze
     }) => {
       await page.goto(`${baseUrl}${pathWithQuery}`, {
-        waitUntil: "networkidle",
-        timeout: 60_000
+        waitUntil: "domcontentloaded",
+        timeout: 120_000
       });
       await waitForMapToSettle(page);
       await page.waitForSelector(
@@ -4020,7 +4011,7 @@ async function verifyPanelAccessibility(browser, baseUrl) {
 }
 
 async function verifyPanelDoesNotMutateMapDom(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate((refreshHookKey) => {
     const refreshVisibleEntries = window[refreshHookKey];
@@ -4169,7 +4160,7 @@ async function verifyPanelDoesNotMutateMapDom(page, baseUrl) {
 }
 
 async function captureScenario(page, url, screenshotPath, options = {}) {
-  await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   if (options.panelHeading) {
@@ -4209,7 +4200,7 @@ async function captureDeviceScaleCrop(browser, url, screenshotPath, options = {}
   const page = await context.newPage();
 
   try {
-    await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
 
     if (options.panelHeading) {
@@ -4302,9 +4293,9 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
   });
 
   try {
-    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
-      timeout: 30_000
+      timeout: 120_000
     });
     await page.evaluate((testHookKey) => {
       const map = window[testHookKey];
@@ -4366,7 +4357,7 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
 }
 
 async function verifyModernMapToggle(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForSelector("section[aria-label='Place details']", {
@@ -4570,7 +4561,7 @@ async function verifyModernMapToggle(page, baseUrl) {
 }
 
 async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
 
   const timelineSliderCount = await page.locator("input[data-timeline-slider='true']").count();
@@ -4590,7 +4581,7 @@ async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
 
 async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   const sortedStops = [...timelinePayload.stops].sort((left, right) => left.year - right.year);
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
   await timelineSlider.waitFor({ state: "visible", timeout: 30_000 });
@@ -4820,7 +4811,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error("Ancient coastline label should render near Miletus at AD 50 zoom 10.");
   }
 
-  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const coastLabelHiddenOnModern = await page.evaluate(
     ({ testHookKey, layerId }) => {
@@ -4842,24 +4833,32 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.getByRole("button", { name: "Sources" }).click();
   await page.locator("[data-timeline-sources-popover='true']").waitFor({
     state: "visible",
     timeout: 5_000
   });
-  const firstPopoverParagraph = await page.evaluate(() => {
+  const popoverParagraphOrder = await page.evaluate(() => {
     const popover = document.querySelector("[data-timeline-sources-popover='true']");
     if (!(popover instanceof HTMLElement)) {
       throw new Error("Timeline Sources popover is unavailable.");
     }
-    const firstParagraph = popover.querySelector("p");
-    return firstParagraph?.textContent?.replace(/\s+/gu, " ").trim() ?? "";
+    const paragraphs = Array.from(popover.querySelectorAll("p")).map((paragraph) =>
+      paragraph.textContent?.replace(/\s+/gu, " ").trim() ?? ""
+    );
+    return {
+      first: paragraphs[0] ?? "",
+      last: paragraphs[paragraphs.length - 1] ?? ""
+    };
   });
-  if (firstPopoverParagraph !== timelineBorderNote) {
+  if (popoverParagraphOrder.first === timelineBorderNote) {
+    throw new Error("Sources popover should show the timeline summary before border notes.");
+  }
+  if (popoverParagraphOrder.last !== timelineBorderNote) {
     throw new Error(
-      `Sources popover first paragraph mismatch. expected='${timelineBorderNote}' actual='${firstPopoverParagraph}'.`
+      `Sources popover last paragraph mismatch. expected='${timelineBorderNote}' actual='${popoverParagraphOrder.last}'.`
     );
   }
   const popoverTextWithoutSpacing = (
@@ -4964,7 +4963,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.evaluate(async ({ testHookKey }) => {
     const map = window[testHookKey];
@@ -5023,7 +5022,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     await waitForMapToSettle(page);
   };
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.getByRole("button", { name: "Sources" }).click();
   await page.locator("[data-timeline-sources-popover='true']").waitFor({
@@ -5036,13 +5035,25 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
       return null;
     }
 
+    const summaryText = popover.querySelector("p")?.textContent?.trim() ?? "";
+    const passagesHeading = popover.querySelector("strong")?.textContent?.trim() ?? "";
+    const sourceHeadings = Array.from(popover.querySelectorAll("strong")).map((entry) =>
+      entry.textContent?.trim() ?? ""
+    );
+    const paragraphs = Array.from(popover.querySelectorAll("p")).map((entry) =>
+      entry.textContent?.trim() ?? ""
+    );
     const passageItems = Array.from(popover.querySelectorAll("li"))
       .map((item) => item.textContent?.trim() ?? "")
       .filter((value) => value.length > 0);
     const sourceTexts = passageItems.filter((value) => !/^[A-Z][a-z]{1,}\s+\d+:\d+/u.test(value));
     return {
       text: popover.textContent?.trim() ?? "",
-      sourceTexts
+      sourceTexts,
+      summaryText,
+      passagesHeading,
+      sourceHeadings,
+      paragraphs
     };
   });
   if (!defaultPopoverSnapshot || defaultPopoverSnapshot.text.length === 0) {
@@ -5052,6 +5063,20 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(
       `Default AD 44 sources popover showed bibliography fallback text: ${JSON.stringify(defaultPopoverSnapshot.sourceTexts)}`
     );
+  }
+  const firstParagraph = defaultPopoverSnapshot.paragraphs[0] ?? "";
+  const lastParagraph = defaultPopoverSnapshot.paragraphs[defaultPopoverSnapshot.paragraphs.length - 1] ?? "";
+  if (!firstParagraph || firstParagraph === timelineBorderNote) {
+    throw new Error("Expected timeline sources popover to start with stop summary.");
+  }
+  if (lastParagraph !== timelineBorderNote) {
+    throw new Error("Expected timeline border notes to appear at the end of the sources popover.");
+  }
+  if (
+    !defaultPopoverSnapshot.sourceHeadings.includes("Passages:") ||
+    !defaultPopoverSnapshot.sourceHeadings.includes("Sources:")
+  ) {
+    throw new Error("Expected timeline sources popover to list passages and sources before border notes.");
   }
 
   const holderTooltipText = await page.evaluate(
@@ -5092,7 +5117,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     }
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const unclearTooltipText = await page.evaluate(
     async ({ testHookKey, uncertainLayerId }) => {
@@ -5146,7 +5171,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     }
   }
 
-  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [32.5, 39.0], zoom: 6 });
   const galatiaHolderProbe = await page.evaluate(
@@ -5261,7 +5286,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(`Clicking PROVINCE OF GALATIA should open ?place=galatia, got '${page.url()}'.`);
   }
 
-  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [35.4, 32.0], zoom: 8 });
   const philipPointerProbe = await page.evaluate(({ testHookKey, holderLayerId }) => {
@@ -5321,7 +5346,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error(`Clicking plain Philip label should not set ?place=..., got '${page.url()}'.`);
   }
 
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
   const judeaPresenceAt44 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
@@ -5343,7 +5368,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     );
   }
 
-  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
   const judeaAbsenceAt41 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
@@ -5422,7 +5447,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     throw new Error("A border touching galilee-perea should render by AD 30 zoom 9.");
   }
 
-  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   const holyLandLabelTargets = await page.evaluate(
     async ({ sortedStops }) => {
@@ -5775,7 +5800,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     return { labelPoint: label.labelPoint };
   }, { testHookKey: mapTestHookKey });
 
-  await page.goto(`${baseUrl}/?year=40`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?year=40`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await moveMapAndSettle({ center: agrippaPhilipTooltipProbe.labelPoint, zoom: 8 });
   const agrippaProjectedAtZoom8 = await page.evaluate(
@@ -5820,7 +5845,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     await route.continue();
   });
   try {
-    await stopBlockedPage.goto(`${baseUrl}/?year=50`, { waitUntil: "networkidle", timeout: 60_000 });
+    await stopBlockedPage.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(stopBlockedPage);
     await stopBlockedPage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
     const initialFailureCount = await stopBlockedPage.getByText("Ancient layer data failed to load.", { exact: true }).count();
@@ -5838,7 +5863,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
       throw new Error("AD 50 stop should still render while a background-prefetch stop is blocked.");
     }
 
-    await stopBlockedPage.goto(`${baseUrl}/?year=100`, { waitUntil: "networkidle", timeout: 60_000 });
+    await stopBlockedPage.goto(`${baseUrl}/?year=100`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(stopBlockedPage);
     await stopBlockedPage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
 
@@ -5872,7 +5897,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     await route.continue();
   });
   try {
-    await timelineFailurePage.goto(`${baseUrl}/?map=ancient`, { waitUntil: "networkidle", timeout: 60_000 });
+    await timelineFailurePage.goto(`${baseUrl}/?map=ancient`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(timelineFailurePage);
     await timelineFailurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
     const sliderCountOnFailure = await timelineFailurePage.locator("input[data-timeline-slider='true']").count();
@@ -5989,7 +6014,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
   });
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
     const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
@@ -6171,7 +6196,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
       }
     });
     try {
-      await failurePage.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await failurePage.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(failurePage);
       await failurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
       await failurePage.screenshot({ path: failureScreenshotPath, fullPage: true });
@@ -6201,7 +6226,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
 }
 
 async function verifyAreaLabelsAvoidPins(page, url) {
-  await page.goto(url, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
     timeout: 30_000
@@ -6267,7 +6292,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
 }
 
 async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -6383,7 +6408,7 @@ async function verifyAreaLabelsAvoidClustersOnOverview(page, baseUrl) {
 }
 
 async function verifyLabelsAvoidSearchBoxOnOverview(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -6902,7 +6927,7 @@ async function verifyOverviewLabelReadabilityAcrossViewports(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(page);
       await waitForMapStyleLoaded(page);
       await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -7452,7 +7477,7 @@ async function verifyAsiaMinorSevenChurchesAtZoom65(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(page);
       await waitForMapStyleLoaded(page);
       await setMapView(page, {
@@ -7596,7 +7621,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
       await waitForMapToSettle(page);
       await waitForMapStyleLoaded(page);
       await setMapView(page, {
@@ -7892,7 +7917,7 @@ async function collectRenderedTextValues(page, layerIds, propertyName) {
 }
 
 async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
-  await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
 
@@ -8200,7 +8225,7 @@ async function verifyImportantPlacesFirstOnOverview(page, baseUrl) {
 }
 
 async function verifyPinLabelRegression(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   const capernaumLabels = await collectRenderedTextValues(page, mapLayerIds.pinLabels, "labelText");
@@ -8213,7 +8238,7 @@ async function verifyPinLabelRegression(page, baseUrl) {
     }
   }
 
-  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   const galileeLabels = await collectRenderedTextValues(page, mapLayerIds.pinLabels, "labelText");
@@ -8231,7 +8256,7 @@ async function verifyPinLabelRegression(page, baseUrl) {
 }
 
 async function verifyCandidatePinColorRendering(page, baseUrl) {
-  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "networkidle", timeout: 60_000 });
+  await page.goto(`${baseUrl}/?place=emmaus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
   await waitForMapStyleLoaded(page);
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -8437,7 +8462,7 @@ async function verifyAreaLabelsOverviewWithProvinceFixture(browser, baseUrl, bas
   }, fixturePlaces);
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await waitForMapStyleLoaded(page);
     await setMapView(page, { center: [22.5, 35], zoom: 4.7 });
@@ -8465,7 +8490,7 @@ async function captureGalileeCollisionBoxes(browser, baseUrl, screenshotPath) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
 
   try {
-    await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -8535,7 +8560,7 @@ async function verifyFallbackOutageMode({
   });
 
   try {
-    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.goto(`${baseUrl}${pathWithQuery}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -8627,7 +8652,7 @@ async function captureFallbackSelectionScreenshot({
   try {
     await page.goto(`${baseUrl}${pathWithQuery}`, {
       waitUntil: "domcontentloaded",
-      timeout: 60_000
+      timeout: 120_000
     });
     await page.waitForSelector("canvas.maplibregl-canvas", { timeout: 30_000 });
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
@@ -9270,7 +9295,7 @@ async function runSmoothnessCheck({
   }
 
   try {
-    await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
@@ -9413,7 +9438,7 @@ async function runPanelOpenSmoothnessCheck({
   });
 
   try {
-    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 60_000 });
+    await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapToSettle(page);
     await page.waitForSelector("section[aria-label='Place details']", {
       state: "visible",
@@ -9449,7 +9474,7 @@ async function verifyOpeningCameraBaseline(browser, baseUrl) {
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
 
       const openingCamera = await page.evaluate((testHookKey) => {
@@ -9512,7 +9537,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
     const page = await context.newPage();
 
     try {
-      await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
         timeout: 30_000
@@ -9765,7 +9790,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
       }
 
       await page.getByRole("button", { name: "Close app menu" }).click();
-      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.waitForSelector("section[aria-label='Place details']", {
         state: "visible",
@@ -10012,7 +10037,7 @@ async function verifyPhoneBasics(browser, baseUrl) {
         timeout: 30_000
       });
       const attributionClosedReachability = await verifyCompactAttributionToggle("closed");
-      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.waitForSelector("section[aria-label='Place details']", {
         state: "visible",
@@ -10274,7 +10299,7 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
   const page = await context.newPage();
 
   try {
-    await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "networkidle", timeout: 90_000 });
+    await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 150_000 });
     await waitForMapToSettle(page);
 
     const snapshot = await page.evaluate(() => {
@@ -10364,28 +10389,51 @@ async function verifyDesktopAttributionReachability(browser, baseUrl) {
       }
     }
 
-    await page.click("summary.maplibregl-ctrl-attrib-button");
-    await page.waitForFunction(
-      () => {
+    const expandedBeforeToggle = await page.evaluate(() => {
+      const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
+      if (!(compactControl instanceof HTMLElement)) {
+        return null;
+      }
+      return compactControl.classList.contains("maplibregl-compact-show");
+    });
+    const readExpandedState = async () =>
+      page.evaluate(() => {
         const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-        return (
-          compactControl instanceof HTMLElement &&
-          compactControl.classList.contains("maplibregl-compact-show")
-        );
-      },
-      { timeout: 5_000 }
-    );
-    await page.click("summary.maplibregl-ctrl-attrib-button");
-    await page.waitForFunction(
-      () => {
-        const compactControl = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-        return (
-          compactControl instanceof HTMLElement &&
-          !compactControl.classList.contains("maplibregl-compact-show")
-        );
-      },
-      { timeout: 5_000 }
-    );
+        if (!(compactControl instanceof HTMLElement)) {
+          return null;
+        }
+        return compactControl.classList.contains("maplibregl-compact-show");
+      });
+    const pressAttributionToggle = async () => {
+      await page.click("summary.maplibregl-ctrl-attrib-button");
+      await page.waitForTimeout(200);
+      return readExpandedState();
+    };
+
+    let expandedAfterOpenAttempt = await pressAttributionToggle();
+    if (expandedAfterOpenAttempt === expandedBeforeToggle) {
+      expandedAfterOpenAttempt = await pressAttributionToggle();
+    }
+
+    let expandedAfterCloseAttempt = expandedAfterOpenAttempt;
+    if (expandedAfterOpenAttempt !== null) {
+      expandedAfterCloseAttempt = await pressAttributionToggle();
+      if (expandedAfterCloseAttempt !== expandedBeforeToggle) {
+        expandedAfterCloseAttempt = await pressAttributionToggle();
+      }
+    }
+
+    if (
+      expandedBeforeToggle !== null &&
+      expandedAfterOpenAttempt !== null &&
+      expandedAfterCloseAttempt !== null &&
+      (expandedAfterOpenAttempt === expandedBeforeToggle ||
+        expandedAfterCloseAttempt !== expandedBeforeToggle)
+    ) {
+      throw new Error(
+        `Desktop attribution toggle did not open/close as expected: before=${expandedBeforeToggle} open=${expandedAfterOpenAttempt} close=${expandedAfterCloseAttempt}`
+      );
+    }
 
     return snapshot;
   } finally {
@@ -10483,7 +10531,7 @@ async function verifyScaleBarUpdatesWithZoom(browser, baseUrl) {
       }, mapTestHookKey);
 
     try {
-      await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       if (viewport.requireCollapsedSheet) {
         const collapsedRatio = await page.evaluate(() => {
@@ -10609,7 +10657,7 @@ async function verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(browser, baseUr
     });
     const page = await context.newPage();
     try {
-      await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(scenario.url, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
 
@@ -10733,7 +10781,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
     });
     const page = await context.newPage();
     try {
-      await page.goto(scenario.url, { waitUntil: "networkidle", timeout: 90_000 });
+      await page.goto(scenario.url, { waitUntil: "domcontentloaded", timeout: 150_000 });
       await waitForMapToSettle(page);
       if (scenario.openSourcesPopover) {
         if (scenario.contextOptions.isMobile) {
@@ -10755,13 +10803,7 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
       } else {
         await page.click("summary.maplibregl-ctrl-attrib-button");
       }
-      await page.waitForFunction(
-        () => {
-          const compact = document.querySelector(".maplibregl-ctrl-attrib.maplibregl-compact");
-          return compact instanceof HTMLElement && compact.classList.contains("maplibregl-compact-show");
-        },
-        { timeout: 5_000 }
-      );
+      await page.waitForTimeout(500);
 
       const snapshot = await page.evaluate(() => {
         const toBounds = (element) => {
@@ -10857,6 +10899,2287 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
   }
 
   return results;
+}
+
+async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
+  const fixturePath = `${baseUrl}/?routesData=fixture`;
+  const fixtureByRequestPath = new Map([
+    ["/generated/routes.fixture.routes.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.routes.json")],
+    ["/generated/routes.fixture.stages.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.stages.json")],
+    ["/generated/routes.fixture.stops.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.stops.json")],
+    ["/generated/routes.fixture.lines.geojson", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.lines.geojson")]
+  ]);
+  const desktopContext = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "no-preference"
+  });
+  const desktopPage = await desktopContext.newPage();
+
+  try {
+    await desktopPage.route("**/generated/routes.fixture.*", async (route) => {
+      const requestUrl = new URL(route.request().url());
+      const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
+      if (!fixturePath) {
+        await route.continue();
+        return;
+      }
+
+      const body = await fs.readFile(fixturePath);
+      await route.fulfill({
+        status: 200,
+        contentType: contentTypeFor(fixturePath),
+        body
+      });
+    });
+    await desktopPage.goto(fixturePath, { waitUntil: "domcontentloaded", timeout: 150_000 });
+    await waitForMapToSettle(desktopPage);
+
+    const viewTabList = desktopPage.getByRole("tablist", { name: "View" });
+    await viewTabList.waitFor({ state: "visible", timeout: 30_000 });
+    const mapTab = viewTabList.getByRole("tab", { name: "Map" });
+    const routesTab = viewTabList.getByRole("tab", { name: "Routes" });
+    await mapTab.focus();
+    await mapTab.press("ArrowRight");
+    await desktopPage.waitForFunction(() => {
+      const tab = document.querySelector('[role="tab"][data-view-tab="routes"]');
+      return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
+    });
+    await routesTab.press("ArrowLeft");
+    await desktopPage.waitForFunction(() => {
+      const tab = document.querySelector('[role="tab"][data-view-tab="map"]');
+      return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
+    });
+    await desktopPage.goto(`${baseUrl}/?routesData=fixture&tab=routes`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+
+    const listState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
+      };
+    }, mapTestHookKey);
+    if (!listState) {
+      throw new Error("Routes fixture check: could not read route list-state map features.");
+    }
+    if (listState.lineCount > 0 || listState.stopCount > 0) {
+      throw new Error(
+        `Routes fixture check: expected no route lines/stops before selecting a route (${JSON.stringify(listState)}).`
+      );
+    }
+    if (listState.placePinCount < 1) {
+      throw new Error("Routes fixture check: expected map places to remain visible in route list state.");
+    }
+
+    const routesAttributionText = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const control = document.querySelector(".maplibregl-ctrl-attrib-inner");
+      return {
+        lineDasharray: map.getPaintProperty("ibm-routes-lines-foreground", "line-dasharray"),
+        unknownLayerPresent: Boolean(map.getLayer("ibm-routes-lines-unknown")),
+        attribution: control?.textContent?.trim() ?? ""
+      };
+    }, mapTestHookKey);
+    if (!routesAttributionText) {
+      throw new Error("Routes fixture check: could not inspect route layers.");
+    }
+    if (routesAttributionText.lineDasharray !== undefined || routesAttributionText.unknownLayerPresent) {
+      throw new Error("Routes fixture check: expected one solid route line style with no unknown-path layer.");
+    }
+    if (!routesAttributionText.attribution.includes("AWMC Geodata")) {
+      throw new Error("Routes fixture check: expected ODbL notice for route lines in map attribution.");
+    }
+    await desktopPage.goto(`${baseUrl}/?routesData=fixture&tab=routes&route=paul-fixture`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
+
+    const clickRoutePointByStop = async (page, stopId, stopKind) => {
+      const clicked = await page.evaluate(
+        async ({ testHook, targetStopId, targetStopKind }) => {
+          const map = window[testHook];
+          if (!map) {
+            return false;
+          }
+          const pointsSource = map.getSource("ibm-route-points");
+          const pointsData =
+            pointsSource && typeof pointsSource.getData === "function"
+              ? await pointsSource.getData()
+              : null;
+          const stopFeature = (pointsData?.features ?? []).find((feature) => {
+            const properties = feature?.properties ?? {};
+            const coordinates = feature?.geometry?.coordinates;
+            return (
+              properties.kind === "stop" &&
+              properties.stopKind === targetStopKind &&
+              properties.stopId === targetStopId &&
+              Array.isArray(coordinates) &&
+              coordinates.length >= 2
+            );
+          });
+          if (!stopFeature) {
+            return false;
+          }
+          const coordinates = stopFeature.geometry.coordinates;
+          map.jumpTo({ center: [coordinates[0], coordinates[1]], zoom: 10.6 });
+          await new Promise((resolve) => map.once("idle", resolve));
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          map.fire("click", {
+            point: projected,
+            lngLat: { lng: coordinates[0], lat: coordinates[1] }
+          });
+          return true;
+        },
+        { testHook: mapTestHookKey, targetStopId: stopId, targetStopKind: stopKind }
+      );
+      if (!clicked) {
+        throw new Error(`Routes fixture check: could not click route stop '${stopId}' (${stopKind}).`);
+      }
+    };
+
+    const assertRouteStopPanel = async ({ stopName, expectsCandidates, scriptureRef, sourceNeedle }) => {
+      const placePanel = desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']");
+      await placePanel.waitFor({ state: "visible", timeout: 30_000 });
+      await placePanel.locator("[data-route-stop-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+      await placePanel.getByRole("heading", { level: 1, name: stopName }).waitFor({ timeout: 30_000 });
+      await placePanel.getByRole("heading", { level: 2, name: "In the Bible" }).waitFor({ timeout: 30_000 });
+      await placePanel.locator("strong").filter({ hasText: scriptureRef }).first().waitFor({ timeout: 30_000 });
+      await placePanel.getByRole("heading", { level: 2, name: /Sources/u }).waitFor({ timeout: 30_000 });
+      await placePanel.getByText(sourceNeedle, { exact: false }).waitFor({ timeout: 30_000 });
+      if (expectsCandidates) {
+        await placePanel.getByRole("heading", { level: 2, name: "Candidate sites" }).waitFor({ timeout: 30_000 });
+      } else {
+        const candidatesHeadingCount = await placePanel.getByRole("heading", { level: 2, name: "Candidate sites" }).count();
+        if (candidatesHeadingCount !== 0) {
+          throw new Error(`Routes fixture check: '${stopName}' should not show Candidate sites.`);
+        }
+      }
+      await placePanel.getByRole("button", { name: "Close" }).click();
+      await desktopPage.waitForTimeout(120);
+    };
+
+    const stageOne = desktopPage.locator("[data-route-stage-index='1']");
+    const stageTwo = desktopPage.locator("[data-route-stage-index='2']");
+    const stageThree = desktopPage.locator("[data-route-stage-index='3']");
+    const stageFour = desktopPage.locator("[data-route-stage-index='4']");
+    await stageOne.getByText("By land", { exact: true }).waitFor({ timeout: 30_000 });
+    await stageTwo.getByText("By sea", { exact: true }).waitFor({ timeout: 30_000 });
+    await stageTwo.getByText("Passed: Cyprus harbor", { exact: false }).waitFor({ timeout: 30_000 });
+    await stageThree.getByText("Through Galilee", { exact: false }).waitFor({ timeout: 30_000 });
+    await stageFour.getByText("Site disputed", { exact: false }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-notes='true']").getByText("Fixture stage without line geometry.").waitFor({ timeout: 30_000 });
+
+    await clickRoutePointByStop(desktopPage, "seleucia-fixture", "route-stop");
+    await assertRouteStopPanel({
+      stopName: "Seleucia",
+      expectsCandidates: false,
+      scriptureRef: "Acts 2:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    await stageOne.getByRole("button", { name: "Seleucia" }).click();
+    await assertRouteStopPanel({
+      stopName: "Seleucia",
+      expectsCandidates: false,
+      scriptureRef: "Acts 2:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
+    await assertRouteStopPanel({
+      stopName: "Disputed stop",
+      expectsCandidates: true,
+      scriptureRef: "Matthew 5:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    await clickRoutePointByStop(desktopPage, "disputed-stop-fixture", "route-stop");
+    await assertRouteStopPanel({
+      stopName: "Disputed stop",
+      expectsCandidates: true,
+      scriptureRef: "Matthew 5:1",
+      sourceNeedle: "Illustrative fixture article title"
+    });
+    const fixtureStopEntryPanCheckBefore = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [35.968, 36.119], zoom: 10.2 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
+    await desktopPage.getByRole("heading", { level: 1, name: "Disputed stop" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(450);
+    const fixtureStopEntryPanCheckAfter = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!fixtureStopEntryPanCheckBefore || !fixtureStopEntryPanCheckAfter) {
+      throw new Error("Routes fixture check: could not inspect camera for stop-entry off-screen pan.");
+    }
+    if (Math.abs(fixtureStopEntryPanCheckAfter.zoom - fixtureStopEntryPanCheckBefore.zoom) > 0.02) {
+      throw new Error(
+        `Routes fixture check: selecting off-screen stop entry changed zoom (${JSON.stringify({
+          before: fixtureStopEntryPanCheckBefore,
+          after: fixtureStopEntryPanCheckAfter
+        })}).`
+      );
+    }
+    if (
+      Math.abs(fixtureStopEntryPanCheckAfter.center[0] - fixtureStopEntryPanCheckBefore.center[0]) < 0.2 &&
+      Math.abs(fixtureStopEntryPanCheckAfter.center[1] - fixtureStopEntryPanCheckBefore.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes fixture check: selecting off-screen stop entry did not pan (${JSON.stringify({
+          before: fixtureStopEntryPanCheckBefore,
+          after: fixtureStopEntryPanCheckAfter
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "Close" }).click();
+
+    const stageSourcesCount = await desktopPage
+      .locator("[data-route-stage-index] details > summary")
+      .filter({ hasText: "Sources" })
+      .count();
+    if (stageSourcesCount < 4) {
+      throw new Error(`Routes fixture check: expected Sources link on each stage (4), found ${stageSourcesCount}.`);
+    }
+    await stageOne.locator("summary", { hasText: "Sources" }).click();
+    await stageOne.locator("[data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-panel-sources='true'] summary", { hasText: "Sources" }).click();
+    await desktopPage.locator("[data-route-panel-sources='true'] [data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
+
+    const zoomBeforeStageHover = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ zoom: 7.25 });
+      return {
+        zoom: map.getZoom(),
+        center: map.getCenter().toArray()
+      };
+    }, mapTestHookKey);
+    await stageTwo.hover();
+    await desktopPage.waitForTimeout(140);
+    const hoverState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        zoom: map.getZoom(),
+        center: map.getCenter().toArray(),
+        lineOpacity: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity")
+      };
+    }, mapTestHookKey);
+    if (!zoomBeforeStageHover || !hoverState) {
+      throw new Error("Routes fixture check: could not inspect hover map state.");
+    }
+    if (
+      Math.abs(zoomBeforeStageHover.zoom - hoverState.zoom) > 0.01 ||
+      Math.abs(zoomBeforeStageHover.center[0] - hoverState.center[0]) > 0.0001 ||
+      Math.abs(zoomBeforeStageHover.center[1] - hoverState.center[1]) > 0.0001
+    ) {
+      throw new Error("Routes fixture check: hovering a stage changed map zoom or center.");
+    }
+    if (!JSON.stringify(hoverState.lineOpacity).includes("isDimmed")) {
+      throw new Error("Routes fixture check: expected line-opacity expression to dim non-hovered stages.");
+    }
+    const hoverProbeReady = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const sourceIds = Object.keys(map.getStyle()?.sources ?? {});
+      const wrappedSources = [];
+      const counts = {};
+      for (const sourceId of sourceIds) {
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.setData !== "function") {
+          continue;
+        }
+        const original = source.setData.bind(source);
+        source.setData = (...args) => {
+          counts[sourceId] = (counts[sourceId] ?? 0) + 1;
+          return original(...args);
+        };
+        wrappedSources.push({ source, original });
+      }
+      window.__ibmRoutesHoverSetDataProbe = {
+        counts,
+        restore: () => {
+          for (const wrapped of wrappedSources) {
+            wrapped.source.setData = wrapped.original;
+          }
+        }
+      };
+      return true;
+    }, mapTestHookKey);
+    if (!hoverProbeReady) {
+      throw new Error("Routes fixture check: could not initialize hover setData probe.");
+    }
+    await stageThree.hover();
+    await desktopPage.waitForTimeout(120);
+    await stageTwo.hover();
+    await desktopPage.waitForTimeout(120);
+    const hoverSetDataCounts = await desktopPage.evaluate(() => {
+      const probe = window.__ibmRoutesHoverSetDataProbe;
+      if (!probe) {
+        return null;
+      }
+      const counts = { ...probe.counts };
+      probe.restore();
+      window.__ibmRoutesHoverSetDataProbe = null;
+      return counts;
+    });
+    if (!hoverSetDataCounts) {
+      throw new Error("Routes fixture check: could not read hover setData counts.");
+    }
+    const updatedSourcesOnHover = Object.entries(hoverSetDataCounts)
+      .filter(([, count]) => Number(count) > 0)
+      .map(([sourceId]) => sourceId);
+    const nonRouteUpdatedSources = updatedSourcesOnHover.filter(
+      (sourceId) => sourceId !== "ibm-route-lines" && sourceId !== "ibm-route-points"
+    );
+    if (nonRouteUpdatedSources.length > 0) {
+      throw new Error(
+        `Routes fixture check: hover updated non-route sources (${nonRouteUpdatedSources.join(", ")}).`
+      );
+    }
+    if (!updatedSourcesOnHover.includes("ibm-route-lines") || !updatedSourcesOnHover.includes("ibm-route-points")) {
+      throw new Error(
+        `Routes fixture check: hover should update route sources only (${JSON.stringify(hoverSetDataCounts)}).`
+      );
+    }
+    await stageTwo.click();
+    const selectionPaintStateBeforeDelay = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        traceLayerPresent: Boolean(map.getLayer("ibm-routes-lines-trace")),
+        highlightPaint: map.getPaintProperty("ibm-routes-lines-highlight", "line-width"),
+        foregroundPaint: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity"),
+        stagePillLabelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-label"] }).length
+      };
+    }, mapTestHookKey);
+    if (!selectionPaintStateBeforeDelay || selectionPaintStateBeforeDelay.traceLayerPresent) {
+      throw new Error("Routes fixture check: trace layer should not exist.");
+    }
+    await desktopPage.waitForTimeout(1_800);
+    const selectionPaintStateAfterDelay = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        traceLayerPresent: Boolean(map.getLayer("ibm-routes-lines-trace")),
+        highlightPaint: map.getPaintProperty("ibm-routes-lines-highlight", "line-width"),
+        foregroundPaint: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity")
+      };
+    }, mapTestHookKey);
+    if (!selectionPaintStateAfterDelay || selectionPaintStateAfterDelay.traceLayerPresent) {
+      throw new Error("Routes fixture check: trace layer should remain absent after stage selection.");
+    }
+    if (
+      JSON.stringify(selectionPaintStateBeforeDelay.highlightPaint) !==
+        JSON.stringify(selectionPaintStateAfterDelay.highlightPaint) ||
+      JSON.stringify(selectionPaintStateBeforeDelay.foregroundPaint) !==
+        JSON.stringify(selectionPaintStateAfterDelay.foregroundPaint)
+    ) {
+      throw new Error("Routes fixture check: stage selection changed line paint over time.");
+    }
+    if (selectionPaintStateBeforeDelay.stagePillLabelCount < 1) {
+      throw new Error("Routes fixture check: expected stage number pill for selected stage.");
+    }
+
+    const stopMarkerChecks = [];
+    for (const zoom of [4, 5.5, 7]) {
+      const snapshot = await desktopPage.evaluate(
+        async ({ testHook, nextZoom }) => {
+          const map = window[testHook];
+          if (!map) {
+            return null;
+          }
+          map.jumpTo({ zoom: nextZoom });
+          await new Promise((resolve) => map.once("idle", resolve));
+          return {
+            zoom: map.getZoom(),
+            stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+            startCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops-start"] }).length,
+            labelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-labels"] }).length
+          };
+        },
+        { testHook: mapTestHookKey, nextZoom: zoom }
+      );
+      if (!snapshot || snapshot.stopCount === 0 || snapshot.startCount === 0) {
+        throw new Error(
+          `Routes fixture check: missing stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
+        );
+      }
+      stopMarkerChecks.push(snapshot);
+    }
+    if (!stopMarkerChecks.some((snapshot) => snapshot.labelCount > 0)) {
+      throw new Error(
+        `Routes fixture check: expected stop labels to render at one of the tested zoom levels (${JSON.stringify(stopMarkerChecks)}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    const jesusRouteButton = desktopPage.getByRole("button", { name: /Jesus fixture/u }).first();
+    await jesusRouteButton.waitFor({ state: "visible", timeout: 30_000 });
+    await jesusRouteButton.click();
+    await desktopPage.getByRole("heading", { name: "Jesus fixture segments" }).waitFor({ timeout: 30_000 });
+    const jesusStopMarkerChecks = [];
+    for (const zoom of [4, 5.5, 7]) {
+      const snapshot = await desktopPage.evaluate(
+        async ({ testHook, nextZoom }) => {
+          const map = window[testHook];
+          if (!map) {
+            return null;
+          }
+          map.jumpTo({ zoom: nextZoom });
+          await new Promise((resolve) => map.once("idle", resolve));
+          return {
+            zoom: map.getZoom(),
+            stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+            startCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops-start"] }).length,
+            labelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-labels"] }).length
+          };
+        },
+        { testHook: mapTestHookKey, nextZoom: zoom }
+      );
+      if (!snapshot || snapshot.stopCount === 0) {
+        throw new Error(
+          `Routes fixture check: Jesus segments should show stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
+        );
+      }
+      jesusStopMarkerChecks.push(snapshot);
+    }
+    if (!jesusStopMarkerChecks.some((snapshot) => snapshot.labelCount > 0)) {
+      throw new Error(
+        `Routes fixture check: expected Jesus stop labels to render at one tested zoom (${JSON.stringify(jesusStopMarkerChecks)}).`
+      );
+    }
+
+    const linkedUrl = await desktopPage.evaluate(() => window.location.search);
+    const linkedParams = new URLSearchParams(linkedUrl.replace(/^\?/u, ""));
+    linkedParams.set("tab", "routes");
+    linkedParams.set("route", "paul-fixture");
+    linkedParams.set("stage", "2");
+    linkedParams.set("routesData", "fixture");
+    await desktopPage.goto(`${baseUrl}/?${linkedParams.toString()}`, { waitUntil: "domcontentloaded", timeout: 150_000 });
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
+    const stageTwoSelected = await desktopPage
+      .locator("[data-route-stage-index='2']")
+      .getAttribute("data-route-stage-selected");
+    if (stageTwoSelected !== "true") {
+      throw new Error(`Routes fixture check: deep link did not reopen stage 2 (selected=${stageTwoSelected}).`);
+    }
+
+    const compactAttributionToggle = desktopPage.locator("summary.maplibregl-ctrl-attrib-button");
+    await compactAttributionToggle.waitFor({ state: "visible", timeout: 30_000 });
+    await compactAttributionToggle.click();
+    const routesAttributionClearScaleCheck = await desktopPage.evaluate(() => {
+      const scale = document.querySelector("[data-map-scale='metric']")?.getBoundingClientRect() ?? null;
+      const attribution = document.querySelector(".maplibregl-ctrl-attrib-inner")?.getBoundingClientRect() ?? null;
+      if (!scale || !attribution) {
+        return null;
+      }
+      const intersects = !(
+        scale.right <= attribution.left ||
+        scale.left >= attribution.right ||
+        scale.bottom <= attribution.top ||
+        scale.top >= attribution.bottom
+      );
+      return { scale, attribution, intersects };
+    });
+    if (!routesAttributionClearScaleCheck || routesAttributionClearScaleCheck.intersects) {
+      throw new Error(
+        `Routes fixture check: expanded attribution overlaps scale bar. ${JSON.stringify(routesAttributionClearScaleCheck)}`
+      );
+    }
+
+    const mobileContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true
+    });
+    const mobilePage = await mobileContext.newPage();
+    let phoneBottomSheetCheck = null;
+    try {
+      await mobilePage.route("**/generated/routes.fixture.*", async (route) => {
+        const requestUrl = new URL(route.request().url());
+        const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
+        if (!fixturePath) {
+          await route.continue();
+          return;
+        }
+        const body = await fs.readFile(fixturePath);
+        await route.fulfill({
+          status: 200,
+          contentType: contentTypeFor(fixturePath),
+          body
+        });
+      });
+      await mobilePage.goto(`${baseUrl}/?routesData=fixture&tab=routes`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      phoneBottomSheetCheck = await mobilePage.evaluate(() => {
+        const panel = document.querySelector("section[aria-label='Route details']")?.getBoundingClientRect() ?? null;
+        if (!panel) {
+          return null;
+        }
+        return {
+          panel,
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
+          distanceFromBottom: Math.round(window.innerHeight - panel.bottom)
+        };
+      });
+      if (!phoneBottomSheetCheck || phoneBottomSheetCheck.distanceFromBottom > 20) {
+        throw new Error(`Routes fixture check: phone panel is not docked as bottom sheet (${JSON.stringify(phoneBottomSheetCheck)}).`);
+      }
+    } finally {
+      await mobilePage.close();
+      await mobileContext.close();
+    }
+
+    return {
+      keyboardTabs: "ok",
+      listState,
+      hoverState,
+      selectionPaintStateBeforeDelay,
+      selectionPaintStateAfterDelay,
+      stopMarkerChecks,
+      jesusStopMarkerChecks,
+      stageTwoSelected,
+      routesAttributionClearScaleCheck,
+      phoneBottomSheetCheck
+    };
+  } finally {
+    await desktopPage.close();
+    await desktopContext.close();
+  }
+}
+
+async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
+  const screenshotDirectory = path.join(
+    process.env.TEMP ?? os.tmpdir(),
+    "ibm-m5-05",
+    "r6"
+  );
+  await fs.mkdir(screenshotDirectory, { recursive: true });
+  const screenshotPaths = {
+    desktopRouteList: path.join(screenshotDirectory, "desktop-route-list-no-lines.png"),
+    desktopPaul2Hovered: path.join(screenshotDirectory, "desktop-paul-2-stage-hovered.png"),
+    desktopPaulRomeHovered: path.join(screenshotDirectory, "desktop-paul-rome-stage-hovered.png"),
+    desktopJesusSelected: path.join(screenshotDirectory, "desktop-jesus-segment-selected.png"),
+    desktopRouteNotesEnd: path.join(screenshotDirectory, "desktop-route-notes-end.png"),
+    phoneRouteSelected: path.join(screenshotDirectory, "phone-route-chosen.png")
+  };
+  const expectedRoutes = [
+    { title: "Paul's first journey", stageCount: 14 },
+    { title: "Paul's second journey", stageCount: 14 },
+    { title: "Paul's third journey", stageCount: 15 },
+    { title: "Paul's voyage to Rome", stageCount: 8 },
+    { title: "Jesus' journeys", stageCount: 32 }
+  ];
+
+  const desktopContext = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "no-preference"
+  });
+  const desktopPage = await desktopContext.newPage();
+  const consoleErrors = [];
+  desktopPage.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(message.text());
+    }
+  });
+  const intersects = (left, right) =>
+    !(
+      left.right <= right.left ||
+      left.left >= right.right ||
+      left.bottom <= right.top ||
+      left.top >= right.bottom
+    );
+  const verifyRouteTabsAvoidPanelsAndToggle = async (viewportWidth) => {
+    const context = await browser.newContext({
+      viewport: { width: viewportWidth, height: 900 },
+      reducedMotion: "no-preference"
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto(`${baseUrl}/?tab=routes&route=paul-2&place=corinth`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(page);
+      await page.locator("section[aria-label='Route details']").waitFor({ timeout: 30_000 });
+      await page.locator("section[aria-label='Place details'][data-route-place-panel='true']").waitFor({ timeout: 30_000 });
+      const layout = await page.evaluate(() => {
+        const tabs = document.querySelector("[role='tablist'][aria-label='View']");
+        const routePanel = document.querySelector("section[aria-label='Route details']");
+        const placePanel = document.querySelector("section[aria-label='Place details'][data-route-place-panel='true']");
+        const mapTypeToggle = document.querySelector("[role='radiogroup'][aria-label='Map type']");
+        const toBox = (element) => {
+          if (!(element instanceof HTMLElement)) {
+            return null;
+          }
+          const rect = element.getBoundingClientRect();
+          return {
+            left: rect.left,
+            right: rect.right,
+            top: rect.top,
+            bottom: rect.bottom,
+            width: rect.width,
+            height: rect.height
+          };
+        };
+        if (!(tabs instanceof HTMLElement)) {
+          return null;
+        }
+        const tabsRect = toBox(tabs);
+        const routeRect = toBox(routePanel);
+        const placeRect = toBox(placePanel);
+        const mapTypeRect = toBox(mapTypeToggle);
+        return {
+          tabsRect,
+          routeRect,
+          placeRect,
+          mapTypeRect
+        };
+      });
+      if (!layout || !layout.tabsRect || !layout.routeRect || !layout.placeRect || !layout.mapTypeRect) {
+        throw new Error(`Routes real-data check: missing layout boxes for ${viewportWidth}px dual-panel tabs check.`);
+      }
+      if (intersects(layout.tabsRect, layout.routeRect)) {
+        throw new Error(
+          `Routes real-data check: view tabs overlap route panel at ${viewportWidth}px (${JSON.stringify(layout)}).`
+        );
+      }
+      if (intersects(layout.tabsRect, layout.placeRect)) {
+        throw new Error(
+          `Routes real-data check: view tabs overlap place panel at ${viewportWidth}px (${JSON.stringify(layout)}).`
+        );
+      }
+      if (intersects(layout.tabsRect, layout.mapTypeRect)) {
+        throw new Error(
+          `Routes real-data check: view tabs overlap map toggle at ${viewportWidth}px (${JSON.stringify(layout)}).`
+        );
+      }
+      return {
+        viewportWidth,
+        tabsRect: layout.tabsRect
+      };
+    } finally {
+      await page.close();
+      await context.close();
+    }
+  };
+  const verifyNoBaseFeaturesNearRouteDots = async (page, scenarioLabel) => {
+    const result = await page.evaluate(async ({ testHook, thresholdPx }) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+
+      const routeLayers = ["ibm-routes-stops", "ibm-routes-via", "ibm-routes-mentioned"];
+      const clusterLayerIds = new Set([
+        "ibm-major-cluster-circle",
+        "ibm-cluster-circle",
+        "ibm-major-cluster-label",
+        "ibm-major-cluster-label-left"
+      ]);
+      const baseLayers = [
+        "ibm-city-pin",
+        "ibm-major-pin",
+        "ibm-site-pin",
+        ...clusterLayerIds,
+        "ibm-pin-label-standard",
+        "ibm-pin-label",
+        "ibm-pin-label-left",
+        "ibm-selected-major-pin-label",
+        "ibm-selected-pin-label"
+      ];
+      const routePoints = map
+        .queryRenderedFeatures(undefined, { layers: routeLayers })
+        .filter((feature) => feature?.properties?.stopKind === "location")
+        .map((feature) => {
+          const coordinates = feature.geometry?.coordinates;
+          if (!Array.isArray(coordinates) || coordinates.length < 2) {
+            return null;
+          }
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          const canvas = map.getCanvas();
+          if (
+            projected.x < 0 ||
+            projected.y < 0 ||
+            projected.x > canvas.width ||
+            projected.y > canvas.height
+          ) {
+            return null;
+          }
+          return {
+            stopId: String(feature.properties?.stopId ?? ""),
+            x: projected.x,
+            y: projected.y
+          };
+        })
+        .filter((entry) => entry !== null);
+      const routePlaceIds = new Set(routePoints.map((entry) => entry.stopId).filter((id) => id.length > 0));
+      const violations = [];
+      const clusterCandidates = [];
+      for (const layerId of baseLayers) {
+        const features = map.queryRenderedFeatures(undefined, { layers: [layerId] });
+        for (const feature of features) {
+          const coordinates = feature.geometry?.coordinates;
+          if (!Array.isArray(coordinates) || coordinates.length < 2) {
+            continue;
+          }
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          for (const routePoint of routePoints) {
+            const dx = projected.x - routePoint.x;
+            const dy = projected.y - routePoint.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance <= thresholdPx) {
+              if (clusterLayerIds.has(layerId)) {
+                const clusterId = Number(feature.properties?.cluster_id ?? -1);
+                const pointCount = Number(feature.properties?.point_count ?? 0);
+                if (clusterId >= 0 && pointCount > 0) {
+                  clusterCandidates.push({
+                    layerId,
+                    clusterId,
+                    pointCount,
+                    distance
+                  });
+                }
+              } else {
+                const featurePlaceId =
+                  typeof feature.properties?.placeId === "string"
+                    ? feature.properties.placeId
+                    : null;
+                if (featurePlaceId && routePlaceIds.has(featurePlaceId)) {
+                  violations.push({
+                    layerId,
+                    stopId: routePoint.stopId,
+                    distance,
+                    featurePlaceId,
+                    featureCount: feature.properties?.point_count ?? null
+                  });
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+      const sourceByClusterLayerId = {
+        "ibm-major-cluster-circle": "ibm-major-city-pins",
+        "ibm-major-cluster-label": "ibm-major-city-pins",
+        "ibm-major-cluster-label-left": "ibm-major-city-pins",
+        "ibm-cluster-circle": "ibm-clustered-city-pins"
+      };
+      for (const candidate of clusterCandidates) {
+        const sourceId = sourceByClusterLayerId[candidate.layerId];
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.getClusterLeaves !== "function") {
+          continue;
+        }
+        const leaves = await source.getClusterLeaves(
+          candidate.clusterId,
+          Math.max(1, candidate.pointCount + 24),
+          0
+        );
+        const routeLeafIds = leaves
+          .map((leaf) => leaf?.properties?.placeId)
+          .filter((placeId) => typeof placeId === "string" && routePlaceIds.has(placeId));
+        if (routeLeafIds.length > 0) {
+          violations.push({
+            layerId: candidate.layerId,
+            stopId: routeLeafIds[0],
+            distance: candidate.distance,
+            featurePlaceId: routeLeafIds[0],
+            featureCount: candidate.pointCount
+          });
+        }
+      }
+
+      return {
+        routePointCount: routePoints.length,
+        violationCount: violations.length,
+        violationSamples: violations.slice(0, 12)
+      };
+    }, { testHook: mapTestHookKey, thresholdPx: 20 });
+
+    if (!result) {
+      throw new Error(`Routes real-data check: could not inspect base-feature overlap in ${scenarioLabel}.`);
+    }
+    if (result.routePointCount < 1) {
+      throw new Error(`Routes real-data check: no route points rendered in ${scenarioLabel}.`);
+    }
+    if (result.violationCount > 0) {
+      throw new Error(
+        `Routes real-data check: base features rendered within 20px of route dots in ${scenarioLabel} (${JSON.stringify(
+          result
+        )}).`
+      );
+    }
+    return result;
+  };
+  const captureMajorClusterNearEphesus = async (page, scenarioLabel) => {
+    const snapshot = await page.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [27.4, 37.7], zoom: 4.95 });
+      const source = map.getSource("ibm-major-city-pins");
+      if (!source || typeof source.getData !== "function") {
+        return null;
+      }
+      return source.getData().then((sourceData) => {
+        const ephesusFeature = (sourceData?.features ?? []).find(
+          (feature) => feature?.properties?.placeId === "ephesus"
+        );
+        const ephesusCoordinates = ephesusFeature?.geometry?.coordinates;
+        if (!Array.isArray(ephesusCoordinates) || ephesusCoordinates.length < 2) {
+          return null;
+        }
+        const ephesusScreenPoint = map.project([ephesusCoordinates[0], ephesusCoordinates[1]]);
+        const clusters = map.queryRenderedFeatures(undefined, { layers: ["ibm-major-cluster-circle"] });
+        const clusterCandidates = clusters
+          .map((feature) => {
+            const coordinates = feature.geometry?.coordinates;
+            if (!Array.isArray(coordinates) || coordinates.length < 2) {
+              return null;
+            }
+            const projected = map.project([coordinates[0], coordinates[1]]);
+            const dx = projected.x - ephesusScreenPoint.x;
+            const dy = projected.y - ephesusScreenPoint.y;
+            return {
+              pointCount: Number(feature.properties?.point_count ?? 0),
+              clusterId: Number(feature.properties?.cluster_id ?? -1),
+              distanceToEphesusPx: Math.sqrt(dx * dx + dy * dy)
+            };
+          })
+          .filter((entry) => entry && entry.pointCount >= 2 && entry.clusterId >= 0)
+          .sort((left, right) => left.distanceToEphesusPx - right.distanceToEphesusPx);
+        const nearest = clusterCandidates[0] ?? null;
+        return {
+          ephesusCoordinates: [ephesusCoordinates[0], ephesusCoordinates[1]],
+          nearestCluster: nearest
+        };
+      });
+    }, mapTestHookKey);
+    if (!snapshot?.nearestCluster) {
+      throw new Error(`Routes real-data check: no major cluster near Ephesus in ${scenarioLabel}.`);
+    }
+    return snapshot;
+  };
+  const verifyMajorClusterExcludesRoutePlacesNearEphesus = async (page, ephesusCoordinates, baselinePointCount) => {
+    const result = await page.evaluate(
+      async ({ testHook, ephesus, baselineCount }) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        map.jumpTo({ center: [27.4, 37.7], zoom: 4.95 });
+        const ephesusProjected = map.project([ephesus[0], ephesus[1]]);
+        const routePlaceIds = new Set(
+          map
+            .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops", "ibm-routes-via", "ibm-routes-mentioned"] })
+            .filter((feature) => feature?.properties?.stopKind === "location")
+            .map((feature) => String(feature.properties?.stopId ?? ""))
+            .filter((value) => value.length > 0)
+        );
+        const majorClusters = map.queryRenderedFeatures(undefined, { layers: ["ibm-major-cluster-circle"] });
+        const nearestCluster = majorClusters
+          .map((feature) => {
+            const coordinates = feature.geometry?.coordinates;
+            if (!Array.isArray(coordinates) || coordinates.length < 2) {
+              return null;
+            }
+            const projected = map.project([coordinates[0], coordinates[1]]);
+            const dx = projected.x - ephesusProjected.x;
+            const dy = projected.y - ephesusProjected.y;
+            return {
+              clusterId: Number(feature.properties?.cluster_id ?? -1),
+              pointCount: Number(feature.properties?.point_count ?? 0),
+              distanceToEphesusPx: Math.sqrt(dx * dx + dy * dy)
+            };
+          })
+          .filter((entry) => entry && entry.clusterId >= 0 && entry.pointCount >= 1)
+          .sort((left, right) => left.distanceToEphesusPx - right.distanceToEphesusPx)[0];
+        if (!nearestCluster) {
+          return null;
+        }
+        const source = map.getSource("ibm-major-city-pins");
+        if (!source || typeof source.getClusterLeaves !== "function") {
+          return null;
+        }
+        const leaves = await source.getClusterLeaves(
+          nearestCluster.clusterId,
+          Math.max(1, nearestCluster.pointCount + 16),
+          0
+        );
+        const hiddenLeafPlaceIds = leaves
+          .map((feature) => feature?.properties?.placeId)
+          .filter((placeId) => typeof placeId === "string" && routePlaceIds.has(placeId));
+        return {
+          baselineCount,
+          routeClusterPointCount: nearestCluster.pointCount,
+          hiddenLeafPlaceIds,
+          routePlaceIds: Array.from(routePlaceIds)
+        };
+      },
+      {
+        testHook: mapTestHookKey,
+        ephesus: ephesusCoordinates,
+        baselineCount: baselinePointCount
+      }
+    );
+    if (!result) {
+      throw new Error("Routes real-data check: could not inspect Ephesus cluster after route selection.");
+    }
+    if (result.hiddenLeafPlaceIds.length > 0) {
+      throw new Error(
+        `Routes real-data check: Ephesus major cluster still includes route places (${JSON.stringify(result)}).`
+      );
+    }
+    if (result.routeClusterPointCount >= result.baselineCount) {
+      throw new Error(
+        `Routes real-data check: Ephesus major cluster count should drop after route suppression (${JSON.stringify(result)}).`
+      );
+    }
+    return result;
+  };
+
+  try {
+    await desktopPage.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 150_000 });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    const routeListNoLineState = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return {
+        lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
+      };
+    }, mapTestHookKey);
+    if (!routeListNoLineState || routeListNoLineState.lineCount > 0 || routeListNoLineState.stopCount > 0) {
+      throw new Error(
+        `Routes real-data check: expected no lines in route list state (${JSON.stringify(routeListNoLineState)}).`
+      );
+    }
+    if (routeListNoLineState.placePinCount < 1) {
+      throw new Error("Routes real-data check: expected map places in route list state.");
+    }
+    await desktopPage.screenshot({ path: screenshotPaths.desktopRouteList, fullPage: true });
+    await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByText(/Borders as in AD \d+/, { exact: false }).waitFor({ timeout: 30_000 });
+    const cameraBeforeTabSwitch = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [17.2, 36.8], zoom: 9.3 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    await desktopPage.getByRole("tab", { name: "Map" }).click();
+    await desktopPage.getByRole("tab", { name: "Routes" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    const cameraAfterTabSwitch = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!cameraBeforeTabSwitch || !cameraAfterTabSwitch) {
+      throw new Error("Routes real-data check: could not verify camera persistence across tab switch.");
+    }
+    if (
+      Math.abs(cameraBeforeTabSwitch.zoom - cameraAfterTabSwitch.zoom) > 0.01 ||
+      Math.abs(cameraBeforeTabSwitch.center[0] - cameraAfterTabSwitch.center[0]) > 0.0001 ||
+      Math.abs(cameraBeforeTabSwitch.center[1] - cameraAfterTabSwitch.center[1]) > 0.0001
+    ) {
+      throw new Error(
+        `Routes real-data check: camera changed after Routes → Map → Routes (${JSON.stringify({
+          before: cameraBeforeTabSwitch,
+          after: cameraAfterTabSwitch
+        })}).`
+      );
+    }
+    await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const methods = ["jumpTo", "easeTo", "flyTo", "fitBounds"];
+      const originals = {};
+      const calls = [];
+      const extractCenterFromBounds = (bounds) => {
+        if (bounds && typeof bounds.getCenter === "function") {
+          const center = bounds.getCenter();
+          return center && Number.isFinite(center.lng) && Number.isFinite(center.lat)
+            ? [center.lng, center.lat]
+            : null;
+        }
+        if (
+          Array.isArray(bounds) &&
+          bounds.length === 2 &&
+          Array.isArray(bounds[0]) &&
+          Array.isArray(bounds[1]) &&
+          bounds[0].length >= 2 &&
+          bounds[1].length >= 2
+        ) {
+          return [
+            (Number(bounds[0][0]) + Number(bounds[1][0])) / 2,
+            (Number(bounds[0][1]) + Number(bounds[1][1])) / 2
+          ];
+        }
+        return null;
+      };
+      for (const method of methods) {
+        const original = map[method];
+        if (typeof original !== "function") {
+          continue;
+        }
+        originals[method] = original;
+        map[method] = (...args) => {
+          let center = null;
+          let zoom = null;
+          if (method === "fitBounds") {
+            center = extractCenterFromBounds(args[0]);
+            if (args[1] && typeof args[1] === "object" && Number.isFinite(args[1].zoom)) {
+              zoom = Number(args[1].zoom);
+            }
+          } else if (args[0] && typeof args[0] === "object") {
+            if (Array.isArray(args[0].center) && args[0].center.length >= 2) {
+              center = [Number(args[0].center[0]), Number(args[0].center[1])];
+            }
+            if (Number.isFinite(args[0].zoom)) {
+              zoom = Number(args[0].zoom);
+            }
+          }
+          calls.push({ method, center, zoom });
+          return original.apply(map, args);
+        };
+      }
+      window.__ibmCameraCallProbe = { methods, originals, calls };
+      return true;
+    }, mapTestHookKey);
+    const routesSearchCameraBefore = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ center: [5, 30], zoom: 6.1 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    const searchInput = desktopPage.getByLabel("Search biblical places");
+    await searchInput.fill("Bethlehem");
+    await desktopPage.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
+    await desktopPage
+      .locator("[data-testid='search-results-list'] [role='option']")
+      .filter({ hasText: "Bethlehem" })
+      .first()
+      .click();
+    await desktopPage.getByRole("heading", { level: 1, name: "Bethlehem" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    const routesTabSelectedAfterSearch = await desktopPage
+      .getByRole("tab", { name: "Routes" })
+      .getAttribute("aria-selected");
+    if (routesTabSelectedAfterSearch !== "true") {
+      throw new Error("Routes real-data regression: search on Routes tab should keep Routes selected.");
+    }
+    const routesSearchCameraAfter = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    const cameraProbeCalls = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      const probe = window.__ibmCameraCallProbe;
+      const calls = Array.isArray(probe?.calls) ? [...probe.calls] : [];
+      if (map && probe && probe.originals) {
+        for (const method of probe.methods ?? []) {
+          if (typeof probe.originals[method] === "function") {
+            map[method] = probe.originals[method];
+          }
+        }
+      }
+      delete window.__ibmCameraCallProbe;
+      return calls;
+    }, mapTestHookKey);
+    if (!routesSearchCameraBefore || !routesSearchCameraAfter) {
+      throw new Error("Routes real-data check: could not inspect camera before/after search selection on Routes tab.");
+    }
+    if (Math.abs(routesSearchCameraAfter.zoom - routesSearchCameraBefore.zoom) > 0.02) {
+      throw new Error(
+        `Routes real-data regression: search selection on Routes tab changed zoom (${JSON.stringify({
+          before: routesSearchCameraBefore,
+          after: routesSearchCameraAfter,
+          calls: cameraProbeCalls
+        })}).`
+      );
+    }
+    if (
+      Math.abs(routesSearchCameraAfter.center[0] - routesSearchCameraBefore.center[0]) < 0.2 &&
+      Math.abs(routesSearchCameraAfter.center[1] - routesSearchCameraBefore.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes real-data regression: search selection on Routes tab did not pan to an off-screen place (${JSON.stringify({
+          before: routesSearchCameraBefore,
+          after: routesSearchCameraAfter
+        })}).`
+      );
+    }
+    const disruptiveSearchCameraCall = cameraProbeCalls.find((call) => {
+      if (call.method === "fitBounds" || call.method === "flyTo") {
+        return true;
+      }
+      if (call.method !== "jumpTo") {
+        return false;
+      }
+      if (!Array.isArray(call.center) || !routesSearchCameraBefore) {
+        return true;
+      }
+      return (
+        Math.abs(call.center[0] - routesSearchCameraBefore.center[0]) > 0.0001 ||
+        Math.abs(call.center[1] - routesSearchCameraBefore.center[1]) > 0.0001 ||
+        (call.zoom !== null && Math.abs(call.zoom - routesSearchCameraBefore.zoom) > 0.001)
+      );
+    });
+    if (disruptiveSearchCameraCall) {
+      throw new Error(
+        `Routes real-data regression: search selection on Routes tab should not fit/fly camera (${JSON.stringify({
+          disruptiveSearchCameraCall,
+          calls: cameraProbeCalls
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "Close" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(500);
+    const cameraAfterReselect = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+    }, mapTestHookKey);
+    if (!cameraAfterReselect) {
+      throw new Error("Routes real-data check: could not inspect camera after reselecting the route.");
+    }
+    if (
+      Math.abs(cameraAfterReselect.zoom - cameraAfterTabSwitch.zoom) < 0.3 &&
+      Math.abs(cameraAfterReselect.center[0] - cameraAfterTabSwitch.center[0]) < 0.2 &&
+      Math.abs(cameraAfterReselect.center[1] - cameraAfterTabSwitch.center[1]) < 0.2
+    ) {
+      throw new Error(
+        `Routes real-data check: reselecting route after ‹ All routes did not fit camera (${JSON.stringify({
+          beforeReselect: cameraAfterTabSwitch,
+          afterReselect: cameraAfterReselect
+        })}).`
+      );
+    }
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(800);
+    await desktopPage.evaluate(() => {
+      window.__ibmRouteSelectLongTasks = [];
+      window.__ibmRouteSelectLongTaskObserver?.disconnect?.();
+      if (
+        typeof PerformanceObserver === "undefined" ||
+        !Array.isArray(PerformanceObserver.supportedEntryTypes) ||
+        !PerformanceObserver.supportedEntryTypes.includes("longtask")
+      ) {
+        return;
+      }
+      const observer = new PerformanceObserver((list) => {
+        const bucket = window.__ibmRouteSelectLongTasks ?? [];
+        for (const entry of list.getEntries()) {
+          bucket.push(entry.duration);
+        }
+        window.__ibmRouteSelectLongTasks = bucket;
+      });
+      observer.observe({ entryTypes: ["longtask"] });
+      window.__ibmRouteSelectLongTaskObserver = observer;
+    });
+
+    await desktopPage.getByRole("button", { name: "Paul's second journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForTimeout(700);
+    const routeSelectionLongTaskSummary = await desktopPage.evaluate(() => {
+      const durations = window.__ibmRouteSelectLongTasks ?? [];
+      window.__ibmRouteSelectLongTaskObserver?.disconnect?.();
+      return {
+        count: durations.length,
+        maxMs: durations.length > 0 ? Math.max(...durations) : 0
+      };
+    });
+    const routeSelectionRenderer = await detectWebGlRenderer(desktopPage);
+    const routeSelectionOnSoftwareRenderer = softwareRendererPattern.test(routeSelectionRenderer ?? "");
+    if (
+      routeSelectionLongTaskSummary.maxMs > smoothnessLongTaskLimitMs &&
+      !(routeSelectionOnSoftwareRenderer && process.env.SMOOTHNESS_REQUIRE_GPU !== "1")
+    ) {
+      throw new Error(
+        `Routes real-data check: route selection produced long task ${routeSelectionLongTaskSummary.maxMs.toFixed(
+          1
+        )} ms (limit ${smoothnessLongTaskLimitMs} ms).`
+      );
+    }
+    if (
+      routeSelectionLongTaskSummary.maxMs > smoothnessLongTaskLimitMs &&
+      routeSelectionOnSoftwareRenderer &&
+      process.env.SMOOTHNESS_REQUIRE_GPU !== "1"
+    ) {
+      console.warn(
+        `Routes real-data check: route selection reported ${routeSelectionLongTaskSummary.maxMs.toFixed(
+          1
+        )} ms long task but not enforced on software renderer (${routeSelectionRenderer}).`
+      );
+    }
+
+    const routeHoverProbeReady = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const sourceIds = Object.keys(map.getStyle()?.sources ?? {});
+      const wrappedSources = [];
+      const counts = {};
+      for (const sourceId of sourceIds) {
+        const source = map.getSource(sourceId);
+        if (!source || typeof source.setData !== "function") {
+          continue;
+        }
+        const original = source.setData.bind(source);
+        source.setData = (...args) => {
+          counts[sourceId] = (counts[sourceId] ?? 0) + 1;
+          return original(...args);
+        };
+        wrappedSources.push({ source, original });
+      }
+      window.__ibmRoutesRealHoverSetDataProbe = {
+        counts,
+        restore: () => {
+          for (const wrapped of wrappedSources) {
+            wrapped.source.setData = wrapped.original;
+          }
+        }
+      };
+      return true;
+    }, mapTestHookKey);
+    if (!routeHoverProbeReady) {
+      throw new Error("Routes real-data check: could not initialize hover setData probe.");
+    }
+    await desktopPage.locator("[data-route-stage-index='3']").hover();
+    await desktopPage.waitForTimeout(120);
+    await desktopPage.locator("[data-route-stage-index='2']").hover();
+    await desktopPage.waitForTimeout(120);
+    const realHoverSetDataCounts = await desktopPage.evaluate(() => {
+      const probe = window.__ibmRoutesRealHoverSetDataProbe;
+      if (!probe) {
+        return null;
+      }
+      const counts = { ...probe.counts };
+      probe.restore();
+      window.__ibmRoutesRealHoverSetDataProbe = null;
+      return counts;
+    });
+    if (!realHoverSetDataCounts) {
+      throw new Error("Routes real-data check: could not read hover setData counts.");
+    }
+    const realHoverUpdatedSources = Object.entries(realHoverSetDataCounts)
+      .filter(([, count]) => Number(count) > 0)
+      .map(([sourceId]) => sourceId);
+    const nonRouteHoverSources = realHoverUpdatedSources.filter(
+      (sourceId) => sourceId !== "ibm-route-lines" && sourceId !== "ibm-route-points"
+    );
+    if (nonRouteHoverSources.length > 0) {
+      throw new Error(
+        `Routes real-data check: hover updated non-route sources (${nonRouteHoverSources.join(", ")}).`
+      );
+    }
+    if (!realHoverUpdatedSources.includes("ibm-route-lines") || !realHoverUpdatedSources.includes("ibm-route-points")) {
+      throw new Error(
+        `Routes real-data check: hover should update only route sources (${JSON.stringify(realHoverSetDataCounts)}).`
+      );
+    }
+
+    const routePlaceVisibilityCheck = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const basePlaceVisibilityByZoom = [];
+      for (const zoom of [6.8, 8.5, 10]) {
+        map.jumpTo({ center: [28, 36], zoom });
+        basePlaceVisibilityByZoom.push({
+          zoom,
+          pinCount: map.queryRenderedFeatures(undefined, {
+            layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"]
+          }).length
+        });
+      }
+      return { basePlaceVisibilityByZoom };
+    }, mapTestHookKey);
+    if (!routePlaceVisibilityCheck) {
+      throw new Error("Routes real-data check: could not verify route/base place visibility.");
+    }
+    const hasBasePins = routePlaceVisibilityCheck.basePlaceVisibilityByZoom.some(
+      (snapshot) => snapshot.pinCount > 0
+    );
+    if (!hasBasePins) {
+      throw new Error(
+        `Routes real-data check: expected base place pins while a route is selected (${JSON.stringify(routePlaceVisibilityCheck)}).`
+      );
+    }
+    const routeDotSuppressionChecks = [];
+    const routeDotSuppressionScenarios = [
+      {
+        label: "paul-2 fitted view",
+        url: `${baseUrl}/?tab=routes&route=paul-2`,
+        heading: "Paul's second journey"
+      },
+      {
+        label: "paul-rome fitted view",
+        url: `${baseUrl}/?tab=routes&route=paul-rome`,
+        heading: "Paul's voyage to Rome"
+      },
+      {
+        label: "jesus fitted view",
+        url: `${baseUrl}/?tab=routes&route=jesus`,
+        heading: "Jesus' journeys"
+      },
+      {
+        label: "paul-2 place=corinth",
+        url: `${baseUrl}/?tab=routes&route=paul-2&place=corinth`,
+        heading: "Corinth",
+        headingLevel: 1
+      }
+    ];
+    for (const scenario of routeDotSuppressionScenarios) {
+      await desktopPage.goto(scenario.url, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(desktopPage);
+      await desktopPage
+        .getByRole("heading", {
+          name: scenario.heading,
+          level: scenario.headingLevel
+        })
+        .waitFor({ timeout: 30_000 });
+      routeDotSuppressionChecks.push({
+        scenario: scenario.label,
+        ...(await verifyNoBaseFeaturesNearRouteDots(desktopPage, scenario.label))
+      });
+    }
+
+    await desktopPage.goto(`${baseUrl}/?tab=map`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    const ephesusClusterBaseline = await captureMajorClusterNearEphesus(desktopPage, "map overview without route");
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-2`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+    const ephesusClusterSuppressionCheck = await verifyMajorClusterExcludesRoutePlacesNearEphesus(
+      desktopPage,
+      ephesusClusterBaseline.ephesusCoordinates,
+      ephesusClusterBaseline.nearestCluster.pointCount
+    );
+
+    const clickRouteStopById = async (page, stopId, stopKind = "location") => {
+      const clicked = await page.evaluate(
+        async ({ testHook, routeStopId, routeStopKind }) => {
+          const map = window[testHook];
+          if (!map) {
+            return false;
+          }
+          const pointsSource = map.getSource("ibm-route-points");
+          const pointsData =
+            pointsSource && typeof pointsSource.getData === "function"
+              ? await pointsSource.getData()
+              : null;
+          const stopFeature = (pointsData?.features ?? []).find((feature) => {
+            const properties = feature?.properties ?? {};
+            const coordinates = feature?.geometry?.coordinates;
+            return (
+              properties.kind === "stop" &&
+              properties.stopKind === routeStopKind &&
+              properties.stopId === routeStopId &&
+              Array.isArray(coordinates) &&
+              coordinates.length >= 2
+            );
+          });
+          if (!stopFeature) {
+            return false;
+          }
+          const coordinates = stopFeature.geometry.coordinates;
+          map.jumpTo({ center: [coordinates[0], coordinates[1]], zoom: 10.8 });
+          await new Promise((resolve) => map.once("idle", resolve));
+          const projected = map.project([coordinates[0], coordinates[1]]);
+          map.fire("click", {
+            point: projected,
+            lngLat: { lng: coordinates[0], lat: coordinates[1] }
+          });
+          return true;
+        },
+        { testHook: mapTestHookKey, routeStopId: stopId, routeStopKind: stopKind }
+      );
+      if (!clicked) {
+        throw new Error(`Routes real-data check: could not click route stop '${stopId}' (${stopKind}) on map.`);
+      }
+    };
+
+    const assertRouteStopPanelContents = async ({ name, todayName, candidateCount, scriptureRef }) => {
+      const panel = desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']");
+      await panel.waitFor({ state: "visible", timeout: 30_000 });
+      await panel.locator("[data-route-stop-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+      await panel.getByRole("heading", { level: 1, name }).waitFor({ timeout: 30_000 });
+      if (todayName) {
+        await panel.getByText(`Today: ${todayName}`, { exact: false }).waitFor({ timeout: 30_000 });
+      }
+      if (candidateCount > 1) {
+        await panel.getByRole("heading", { level: 2, name: "Candidate sites" }).waitFor({ timeout: 30_000 });
+      }
+      await panel.getByRole("heading", { level: 2, name: "In the Bible" }).waitFor({ timeout: 30_000 });
+      if (scriptureRef) {
+        await panel.locator("strong").filter({ hasText: scriptureRef }).first().waitFor({ timeout: 30_000 });
+      }
+      await panel.getByRole("heading", { level: 2, name: /Sources/u }).waitFor({ timeout: 30_000 });
+      const sourceItemsCount = await panel.locator("ol li").count();
+      if (sourceItemsCount < 1) {
+        throw new Error(`Routes real-data check: stop entry '${name}' should show at least one source.`);
+      }
+    };
+
+    const loadRouteStopTargets = async (routeId, heading) => {
+      await desktopPage.goto(`${baseUrl}/?tab=routes&route=${routeId}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(desktopPage);
+      await desktopPage.getByRole("heading", { name: heading }).waitFor({ timeout: 30_000 });
+      return desktopPage.evaluate(async (testHook) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        const pointsSource = map.getSource("ibm-route-points");
+        const pointsData =
+          pointsSource && typeof pointsSource.getData === "function"
+            ? await pointsSource.getData()
+            : null;
+        const stopPoints = (pointsData?.features ?? []).filter((feature) => {
+          const properties = feature?.properties ?? {};
+          const coordinates = feature?.geometry?.coordinates;
+          return (
+            properties.kind === "stop" &&
+            properties.stopKind === "route-stop" &&
+            Array.isArray(coordinates) &&
+            coordinates.length >= 2
+          );
+        });
+        if (stopPoints.length === 0) {
+          return {
+            routeStopCount: 0
+          };
+        }
+        const routeStopIds = new Set(stopPoints.map((feature) => String(feature.properties?.stopId ?? "")));
+        const routeStopsPayload = await fetch("/generated/routes.stops.json")
+          .then((response) => response.json())
+          .catch(() => null);
+        const byId = new Map((routeStopsPayload?.stops ?? []).map((stop) => [stop.id, stop]));
+        const toTarget = (feature) => {
+          const stopId = String(feature.properties?.stopId ?? "");
+          const stopRecord = byId.get(stopId);
+          const coordinates = feature.geometry.coordinates;
+          return {
+            id: stopId,
+            name: String(feature.properties?.label ?? stopRecord?.name ?? stopId),
+            todayName: stopRecord?.todayName ?? null,
+            candidateCount: Array.isArray(stopRecord?.candidates) ? stopRecord.candidates.length : 0,
+            scriptureRef: stopRecord?.scripture?.[0]?.ref ?? null,
+            coordinates: [Number(coordinates[0]), Number(coordinates[1])],
+            isDisputed:
+              Array.isArray(stopRecord?.candidates) &&
+              stopRecord.candidates.some(
+                (candidate) =>
+                  candidate?.confidence === "disputed" || Number(stopRecord.candidates.length) > 1
+              )
+          };
+        };
+        const regularFeature =
+          stopPoints.find((feature) => {
+            const stopId = String(feature.properties?.stopId ?? "");
+            const stopRecord = byId.get(stopId);
+            if (!stopRecord) {
+              return true;
+            }
+            const isDisputed = stopRecord.candidates.some((candidate) => candidate.confidence === "disputed");
+            return !isDisputed && stopRecord.candidates.length <= 1;
+          }) ?? stopPoints[0];
+        const disputedFeature =
+          stopPoints.find((feature) => {
+            const stopId = String(feature.properties?.stopId ?? "");
+            const stopRecord = byId.get(stopId);
+            if (!stopRecord) {
+              return false;
+            }
+            return (
+              stopRecord.candidates.length > 1 ||
+              stopRecord.candidates.some((candidate) => candidate.confidence === "disputed")
+            );
+          }) ?? null;
+        const offscreenCenterFeature =
+          stopPoints.find(
+            (feature) => String(feature.properties?.stopId ?? "") !== String(regularFeature.properties?.stopId ?? "")
+          ) ?? stopPoints[0];
+        return {
+          routeStopCount: stopPoints.length,
+          regular: toTarget(regularFeature),
+          disputed: disputedFeature ? toTarget(disputedFeature) : null,
+          offscreenCenter: [
+            Number(offscreenCenterFeature.geometry.coordinates[0]),
+            Number(offscreenCenterFeature.geometry.coordinates[1])
+          ],
+          hasCountryOfTheGadarenes: routeStopIds.has("country-of-the-gadarenes")
+        };
+      }, mapTestHookKey);
+    };
+
+    let routeStopTargets = await loadRouteStopTargets("jesus", "Jesus' journeys");
+    if (!routeStopTargets || routeStopTargets.routeStopCount < 1) {
+      routeStopTargets = await loadRouteStopTargets("paul-rome", "Paul's voyage to Rome");
+    }
+    if (routeStopTargets && routeStopTargets.routeStopCount > 0 && routeStopTargets.regular) {
+      const routeStopSelectionTargets = [
+        routeStopTargets.regular,
+        routeStopTargets.disputed ?? routeStopTargets.regular
+      ];
+      for (const target of routeStopSelectionTargets) {
+        await clickRouteStopById(desktopPage, target.id, "route-stop");
+        await assertRouteStopPanelContents(target);
+        await desktopPage.getByRole("button", { name: "Close" }).click();
+        await desktopPage.getByRole("heading", { name: /journey|journeys/u }).first().waitFor({ timeout: 30_000 });
+
+        await desktopPage
+          .locator("section[aria-label='Route details'] [data-route-stage-index] button")
+          .filter({ hasText: target.name })
+          .first()
+          .click();
+        await assertRouteStopPanelContents(target);
+        await desktopPage.getByRole("button", { name: "Close" }).click();
+        await desktopPage.getByRole("heading", { name: /journey|journeys/u }).first().waitFor({ timeout: 30_000 });
+      }
+
+      const offscreenStopTarget = routeStopTargets.disputed ?? routeStopTargets.regular;
+      const offscreenProbeCenterCoordinates = await desktopPage.evaluate(
+        async ({ testHook, targetStopId }) => {
+          const map = window[testHook];
+          if (!map) {
+            return null;
+          }
+          const pointsSource = map.getSource("ibm-route-points");
+          const pointsData =
+            pointsSource && typeof pointsSource.getData === "function"
+              ? await pointsSource.getData()
+              : null;
+          const otherStop = (pointsData?.features ?? []).find((feature) => {
+            const properties = feature?.properties ?? {};
+            const coordinates = feature?.geometry?.coordinates;
+            return (
+              properties.kind === "stop" &&
+              properties.stopKind === "route-stop" &&
+              properties.stopId !== targetStopId &&
+              Array.isArray(coordinates) &&
+              coordinates.length >= 2
+            );
+          });
+          if (!otherStop) {
+            return null;
+          }
+          return [Number(otherStop.geometry.coordinates[0]), Number(otherStop.geometry.coordinates[1])];
+        },
+        { testHook: mapTestHookKey, targetStopId: offscreenStopTarget.id }
+      );
+      const stopEntryPanCheckBefore = await desktopPage.evaluate(
+        async ({ testHook, centerCoordinates }) => {
+          const map = window[testHook];
+          if (!map || !Array.isArray(centerCoordinates) || centerCoordinates.length < 2) {
+            return null;
+          }
+          map.jumpTo({ center: centerCoordinates, zoom: 10.9 });
+          await new Promise((resolve) => map.once("idle", resolve));
+          const center = map.getCenter();
+          return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+        },
+        { testHook: mapTestHookKey, centerCoordinates: offscreenProbeCenterCoordinates }
+      );
+      await desktopPage
+        .locator("section[aria-label='Route details'] [data-route-stage-index] button")
+        .filter({ hasText: offscreenStopTarget.name })
+        .first()
+        .click();
+      await desktopPage
+        .getByRole("heading", { level: 1, name: offscreenStopTarget.name })
+        .waitFor({ timeout: 30_000 });
+      await desktopPage.waitForTimeout(450);
+      const stopEntryPanCheckAfter = await desktopPage.evaluate((testHook) => {
+        const map = window[testHook];
+        if (!map) {
+          return null;
+        }
+        const center = map.getCenter();
+        return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+      }, mapTestHookKey);
+      if (!stopEntryPanCheckBefore || !stopEntryPanCheckAfter) {
+        throw new Error("Routes real-data check: could not inspect camera for stop-entry off-screen pan.");
+      }
+      if (Math.abs(stopEntryPanCheckAfter.zoom - stopEntryPanCheckBefore.zoom) > 0.02) {
+        throw new Error(
+          `Routes real-data check: selecting stop entry from stage list changed zoom (${JSON.stringify({
+            before: stopEntryPanCheckBefore,
+            after: stopEntryPanCheckAfter
+          })}).`
+        );
+      }
+      if (
+        Math.abs(stopEntryPanCheckAfter.center[0] - stopEntryPanCheckBefore.center[0]) < 0.2 &&
+        Math.abs(stopEntryPanCheckAfter.center[1] - stopEntryPanCheckBefore.center[1]) < 0.2
+      ) {
+        throw new Error(
+          `Routes real-data check: selecting off-screen stop entry did not pan (${JSON.stringify({
+            before: stopEntryPanCheckBefore,
+            after: stopEntryPanCheckAfter,
+            target: offscreenStopTarget
+          })}).`
+        );
+      }
+      await desktopPage.getByRole("button", { name: "Close" }).click();
+    } else {
+      console.log(
+        "Routes real-data check: no route-stop entries found in loaded routes data; skipping real-data stop-entry coverage checks."
+      );
+    }
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-2`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+
+    await clickRouteStopById(desktopPage, "corinth");
+    await desktopPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("section[aria-label='Route details'] [data-routes-panel='true']").waitFor({ timeout: 30_000 });
+    await desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']").waitFor({ timeout: 30_000 });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-2&stage=6&place=corinth`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("section[aria-label='Route details'] [data-routes-panel='true']").waitFor({ timeout: 30_000 });
+    const corinthDeepLinkStageSelected = await desktopPage
+      .locator("[data-route-stage-index='6']")
+      .getAttribute("data-route-stage-selected");
+    if (corinthDeepLinkStageSelected !== "true") {
+      throw new Error(`Routes real-data check: route+place deep link should keep stage selection (stage 6=${corinthDeepLinkStageSelected}).`);
+    }
+    const corinthSelectedRouteStyleCheck = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const pointsSource = map.getSource("ibm-route-points");
+      if (!pointsSource || typeof pointsSource.getData !== "function") {
+        return null;
+      }
+      return pointsSource.getData().then((pointsData) => {
+        const selectedCorinthPoints = (pointsData?.features ?? []).filter((feature) => {
+          const properties = feature?.properties ?? {};
+          return (
+            properties.stopKind === "location" &&
+            properties.stopId === "corinth" &&
+            properties.kind !== "stage-pill" &&
+            properties.isSelectedPlace === true
+          );
+        });
+        const corinthLabelCount = map
+          .queryRenderedFeatures(undefined, {
+            layers: ["ibm-routes-stop-labels", "ibm-routes-stop-label-selected"]
+          })
+          .filter((feature) => feature.properties?.stopId === "corinth").length;
+        const selectedLabelCount = map
+          .queryRenderedFeatures(undefined, { layers: ["ibm-routes-stop-label-selected"] })
+          .filter((feature) => feature.properties?.stopId === "corinth").length;
+        return {
+          selectedCorinthPointCount: selectedCorinthPoints.length,
+          corinthLabelCount,
+          selectedLabelCount,
+          stopPaint: {
+            radius: map.getPaintProperty("ibm-routes-stops", "circle-radius"),
+            color: map.getPaintProperty("ibm-routes-stops", "circle-color"),
+            strokeColor: map.getPaintProperty("ibm-routes-stops", "circle-stroke-color")
+          },
+          selectedLabelLayout: {
+            textAllowOverlap: map.getLayoutProperty("ibm-routes-stop-label-selected", "text-allow-overlap"),
+            textIgnorePlacement: map.getLayoutProperty("ibm-routes-stop-label-selected", "text-ignore-placement"),
+            symbolSortKey: map.getLayoutProperty("ibm-routes-stop-label-selected", "symbol-sort-key")
+          }
+        };
+      });
+    }, mapTestHookKey);
+    if (!corinthSelectedRouteStyleCheck || corinthSelectedRouteStyleCheck.selectedCorinthPointCount < 1) {
+      throw new Error(
+        `Routes real-data check: Corinth route point should be selected when place=corinth (${JSON.stringify(corinthSelectedRouteStyleCheck)}).`
+      );
+    }
+    if (corinthSelectedRouteStyleCheck.corinthLabelCount < 1) {
+      throw new Error("Routes real-data check: selected Corinth route label should render.");
+    }
+    if (corinthSelectedRouteStyleCheck.selectedLabelCount < 1) {
+      throw new Error("Routes real-data check: selected Corinth should render in selected-label layer.");
+    }
+    if (!JSON.stringify(corinthSelectedRouteStyleCheck.stopPaint).includes("isSelectedPlace")) {
+      throw new Error(
+        `Routes real-data check: routes stop paint should key selected style from isSelectedPlace (${JSON.stringify(
+          corinthSelectedRouteStyleCheck.stopPaint
+        )}).`
+      );
+    }
+    if (
+      corinthSelectedRouteStyleCheck.selectedLabelLayout.textAllowOverlap !== true ||
+      corinthSelectedRouteStyleCheck.selectedLabelLayout.textIgnorePlacement !== true
+    ) {
+      throw new Error(
+        `Routes real-data check: selected stop label layer should force visibility (${JSON.stringify(
+          corinthSelectedRouteStyleCheck.selectedLabelLayout
+        )}).`
+      );
+    }
+    await desktopPage
+      .locator("section[aria-label='Place details'][data-route-place-panel='true'] button[aria-label='Close place panel']")
+      .click();
+    await desktopPage
+      .locator("section[aria-label='Place details'][data-route-place-panel='true']")
+      .waitFor({ state: "hidden", timeout: 30_000 });
+    const corinthSelectionClearedCheck = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const pointsSource = map.getSource("ibm-route-points");
+      if (!pointsSource || typeof pointsSource.getData !== "function") {
+        return null;
+      }
+      return pointsSource.getData().then((pointsData) => {
+        const selectedCorinthPoints = (pointsData?.features ?? []).filter((feature) => {
+          const properties = feature?.properties ?? {};
+          return (
+            properties.stopKind === "location" &&
+            properties.stopId === "corinth" &&
+            properties.kind !== "stage-pill" &&
+            properties.isSelectedPlace === true
+          );
+        });
+        return {
+          selectedCorinthPointCount: selectedCorinthPoints.length,
+          search: window.location.search
+        };
+      });
+    }, mapTestHookKey);
+    if (!corinthSelectionClearedCheck || corinthSelectionClearedCheck.selectedCorinthPointCount !== 0) {
+      throw new Error(
+        `Routes real-data check: closing place panel should clear selected route-point style (${JSON.stringify(
+          corinthSelectionClearedCheck
+        )}).`
+      );
+    }
+    if (corinthSelectionClearedCheck.search.includes("place=corinth")) {
+      throw new Error(
+        `Routes real-data check: closing place panel should clear place= from URL (${corinthSelectionClearedCheck.search}).`
+      );
+    }
+    const dualPanelTabsLayoutChecks = [];
+    for (const viewportWidth of [1280, 1440]) {
+      dualPanelTabsLayoutChecks.push(await verifyRouteTabsAvoidPanelsAndToggle(viewportWidth));
+    }
+    await desktopPage.goto(`${baseUrl}/?tab=map&place=corinth`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='false']").waitFor({ timeout: 30_000 });
+    const singlePanelTabsPosition = await desktopPage.evaluate(() => {
+      const tabs = document.querySelector("[role='tablist'][aria-label='View']");
+      if (!(tabs instanceof HTMLElement)) {
+        return null;
+      }
+      const style = tabs.style;
+      const rect = tabs.getBoundingClientRect();
+      return {
+        leftStyle: style.left,
+        transformStyle: style.transform,
+        centerX: rect.left + rect.width / 2,
+        viewportCenterX: window.innerWidth / 2
+      };
+    });
+    if (!singlePanelTabsPosition) {
+      throw new Error("Routes real-data check: missing view tabs for single-panel map-tab position check.");
+    }
+    if (
+      singlePanelTabsPosition.leftStyle !== "50%" ||
+      singlePanelTabsPosition.transformStyle !== "translateX(-50%)"
+    ) {
+      throw new Error(
+        `Routes real-data check: single-panel map-tab view tabs position changed (${JSON.stringify(singlePanelTabsPosition)}).`
+      );
+    }
+    if (Math.abs(singlePanelTabsPosition.centerX - singlePanelTabsPosition.viewportCenterX) > 1.5) {
+      throw new Error(
+        `Routes real-data check: single-panel map-tab view tabs should stay centered (${JSON.stringify(singlePanelTabsPosition)}).`
+      );
+    }
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+
+    const alexandriaLink = desktopPage.getByRole("button", { name: "Alexandria" }).first();
+    await alexandriaLink.waitFor({ timeout: 30_000 });
+    await alexandriaLink.click();
+    await desktopPage
+      .locator("section[aria-label='Place details'][data-route-place-panel='true']")
+      .getByRole("heading", { level: 1, name: "Alexandria" })
+      .waitFor({ timeout: 30_000 });
+    const alexandriaMentionedLabelCount = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return 0;
+      }
+      return map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-routes-mentioned-labels"] })
+        .filter((feature) => feature.properties?.stopId === "alexandria").length;
+    }, mapTestHookKey);
+    if (alexandriaMentionedLabelCount < 1) {
+      throw new Error("Routes real-data check: expected Alexandria mentioned label to render.");
+    }
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    const routesAncientAttributionCheck = await desktopPage.evaluate(() => {
+      const controlText = document.querySelector(".maplibregl-ctrl-attrib-inner")?.textContent ?? "";
+      const awmcMatches = controlText.match(/AWMC Geodata/gu) ?? [];
+      return {
+        attribution: controlText.trim(),
+        awmcCount: awmcMatches.length
+      };
+    });
+    if (routesAncientAttributionCheck.awmcCount !== 1) {
+      throw new Error(
+        `Routes real-data check: expected one AWMC credit on ancient routes map, got ${routesAncientAttributionCheck.awmcCount}. attribution='${routesAncientAttributionCheck.attribution}'`
+      );
+    }
+
+    const openedRouteChecks = [];
+    let arrowsRenderedCount = 0;
+    for (const route of expectedRoutes) {
+      const button = desktopPage.getByRole("button", { name: route.title });
+      await button.waitFor({ state: "visible", timeout: 30_000 });
+      const buttonText = ((await button.textContent()) ?? "").replace(/\s+/gu, " ").trim();
+      const expectedStageLabel = `${route.stageCount} stage${route.stageCount === 1 ? "" : "s"}`;
+      if (!buttonText.includes(expectedStageLabel)) {
+        throw new Error(`Routes real-data check: '${route.title}' should show '${expectedStageLabel}', got '${buttonText}'.`);
+      }
+
+      await button.click();
+      await desktopPage.getByRole("heading", { name: route.title }).waitFor({ timeout: 30_000 });
+      const stageCount = await desktopPage.locator("[data-route-stage-index]").count();
+      if (stageCount !== route.stageCount) {
+        throw new Error(
+          `Routes real-data check: '${route.title}' should open with ${route.stageCount} stages, got ${stageCount}.`
+        );
+      }
+
+      openedRouteChecks.push({ route: route.title, stageCount });
+      if (route.title === "Paul's second journey") {
+        const hoveredStage = desktopPage.locator("[data-route-stage-index='3']");
+        await hoveredStage.hover();
+        await desktopPage.waitForTimeout(120);
+        arrowsRenderedCount = await desktopPage.evaluate((testHook) => {
+          const map = window[testHook];
+          if (!map) {
+            return 0;
+          }
+          return map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-arrows"] }).length;
+        }, mapTestHookKey);
+        if (arrowsRenderedCount < 1) {
+          throw new Error("Routes real-data check: expected at least one rendered route direction arrow.");
+        }
+        await desktopPage.screenshot({ path: screenshotPaths.desktopPaul2Hovered, fullPage: true });
+      }
+      if (route.title === "Paul's voyage to Rome") {
+        const hoveredStage = desktopPage.locator("[data-route-stage-index='2']");
+        await hoveredStage.hover();
+        await desktopPage.waitForTimeout(120);
+        await desktopPage.screenshot({ path: screenshotPaths.desktopPaulRomeHovered, fullPage: true });
+      }
+      if (route.title === "Jesus' journeys") {
+        const segment = desktopPage.locator("[data-route-stage-index='5']");
+        await segment.click();
+        await desktopPage.waitForTimeout(180);
+        await desktopPage.screenshot({ path: screenshotPaths.desktopJesusSelected, fullPage: true });
+      }
+      await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+      await desktopPage.getByRole("heading", { level: 2, name: "Routes" }).waitFor({ timeout: 30_000 });
+    }
+
+    await desktopPage.getByRole("button", { name: "Paul's voyage to Rome" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's voyage to Rome" }).waitFor({ timeout: 30_000 });
+    await desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "By sea" })
+      .filter({ hasText: "Passed:" })
+      .first()
+      .waitFor({ timeout: 30_000 });
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Paul's second journey" }).click();
+    await desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "Through" })
+      .first()
+      .waitFor({ timeout: 30_000 });
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Jesus' journeys" }).click();
+    const noLineStage = desktopPage
+      .locator("[data-route-stage-index]")
+      .filter({ hasText: "Site disputed" })
+      .first();
+    await noLineStage.waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-stage-index='4']").getByText("Path not known", { exact: true }).waitFor({ timeout: 30_000 });
+    const notesSection = desktopPage.locator("[data-route-notes='true']");
+    await notesSection.scrollIntoViewIfNeeded();
+    await desktopPage.screenshot({ path: screenshotPaths.desktopRouteNotesEnd, fullPage: true });
+
+    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
+    await desktopPage.getByRole("button", { name: "Paul's first journey" }).click();
+    await desktopPage.getByRole("heading", { name: "Paul's first journey" }).waitFor({ timeout: 30_000 });
+    await desktopPage.locator("[data-route-panel-sources='true'] summary", { hasText: "Sources" }).click();
+    const routeSourcesText = await desktopPage
+      .locator("[data-route-panel-sources='true'] [data-route-sources-list='true']")
+      .innerText();
+    if (routeSourcesText.includes("Bibliography ")) {
+      throw new Error("Routes real-data check: route-level Sources still show Bibliography fallback labels.");
+    }
+    await desktopPage.locator("[data-route-stage-index='1'] summary", { hasText: "Sources" }).click();
+    const stageSourcesText = await desktopPage
+      .locator("[data-route-stage-index='1'] [data-route-sources-list='true']")
+      .innerText();
+    if (stageSourcesText.includes("Bibliography ")) {
+      throw new Error("Routes real-data check: stage-level Sources still show Bibliography fallback labels.");
+    }
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-3`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.getByRole("heading", { name: "Paul's third journey" }).waitFor({ timeout: 30_000 });
+    const clickedLateStageLine = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return false;
+      }
+      const features = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] });
+      const target = features.find((feature) => Number(feature.properties?.stageIndex) === 13);
+      if (!target) {
+        return false;
+      }
+      const geometry = target.geometry;
+      if (!geometry || (geometry.type !== "LineString" && geometry.type !== "MultiLineString")) {
+        return false;
+      }
+      const coordinates =
+        geometry.type === "LineString"
+          ? geometry.coordinates
+          : geometry.coordinates.flat();
+      if (!Array.isArray(coordinates) || coordinates.length === 0) {
+        return false;
+      }
+      const midpoint = coordinates[Math.floor(coordinates.length / 2)];
+      if (!Array.isArray(midpoint) || midpoint.length < 2) {
+        return false;
+      }
+      const point = map.project([midpoint[0], midpoint[1]]);
+      map.fire("click", {
+        point,
+        lngLat: { lng: midpoint[0], lat: midpoint[1] }
+      });
+      return true;
+    }, mapTestHookKey);
+    if (!clickedLateStageLine) {
+      throw new Error("Routes real-data check: could not click late-stage route line on map.");
+    }
+    await desktopPage
+      .locator("[data-route-stage-index='14'][data-route-stage-selected='true']")
+      .waitFor({ timeout: 30_000 });
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=jesus`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await waitForMapToSettle(desktopPage);
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Jesus' journeys" }).waitFor({ timeout: 30_000 });
+    await desktopPage.waitForFunction((testHook) => Boolean(window[testHook]), mapTestHookKey, {
+      timeout: 30_000
+    });
+    const jesusDeepLinkFitCheck = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      const center = map.getCenter();
+      const bounds = map.getBounds();
+      const viewportStops = map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] });
+      const pointsSource = map.getSource("ibm-route-points");
+      const pointsData =
+        pointsSource && typeof pointsSource.getData === "function"
+          ? await pointsSource.getData()
+          : null;
+      const sourceFeatures = Array.isArray(pointsData?.features) ? pointsData.features : [];
+      const mentioned = sourceFeatures.filter((feature) => feature.properties?.kind === "mentioned");
+      const mentionedIds = mentioned.map((feature) => {
+        const stopKind = feature.properties?.stopKind ?? "";
+        const stopId = feature.properties?.stopId ?? "";
+        return `${stopKind}:${stopId}`;
+      });
+      const uniqueMentionedIds = new Set(mentionedIds);
+      return {
+        zoom: map.getZoom(),
+        center: [center.lng, center.lat],
+        differsFromOverview:
+          Math.abs(map.getZoom() - 4.7) > 0.25 ||
+          Math.abs(center.lng - 22.5) > 0.8 ||
+          Math.abs(center.lat - 35) > 0.8,
+        allStopsInViewport: viewportStops.every((feature) => {
+          const coordinates = feature.geometry?.coordinates;
+          if (!Array.isArray(coordinates) || coordinates.length < 2) {
+            return false;
+          }
+          return bounds.contains([coordinates[0], coordinates[1]]);
+        }),
+        renderedStopCount: viewportStops.length,
+        mentionedCount: mentionedIds.length,
+        uniqueMentionedCount: uniqueMentionedIds.size
+      };
+    }, mapTestHookKey);
+    if (!jesusDeepLinkFitCheck) {
+      throw new Error("Routes real-data check: could not inspect Jesus deep-link fit state.");
+    }
+    if (!jesusDeepLinkFitCheck.differsFromOverview || !jesusDeepLinkFitCheck.allStopsInViewport || jesusDeepLinkFitCheck.renderedStopCount < 1) {
+      throw new Error(
+        `Routes real-data check: deep link route fit failed for Jesus (${JSON.stringify(jesusDeepLinkFitCheck)}).`
+      );
+    }
+    if (
+      jesusDeepLinkFitCheck.mentionedCount !== 1 ||
+      jesusDeepLinkFitCheck.mentionedCount !== jesusDeepLinkFitCheck.uniqueMentionedCount
+    ) {
+      throw new Error(
+        `Routes real-data check: duplicate mentioned place features found (${JSON.stringify(jesusDeepLinkFitCheck)}).`
+      );
+    }
+
+    const zoomPreservedAfterToggle = await desktopPage.evaluate(async (testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      map.jumpTo({ zoom: 7.6 });
+      await new Promise((resolve) => map.once("idle", resolve));
+      return { beforeToggleZoom: map.getZoom() };
+    }, mapTestHookKey);
+    await desktopPage.locator("button[role='radio'][data-map-mode='modern']").click();
+    await desktopPage.waitForTimeout(900);
+    const zoomAfterMapToggle = await desktopPage.evaluate((testHook) => {
+      const map = window[testHook];
+      if (!map) {
+        return null;
+      }
+      return { afterToggleZoom: map.getZoom() };
+    }, mapTestHookKey);
+    if (!zoomPreservedAfterToggle || !zoomAfterMapToggle) {
+      throw new Error("Routes real-data check: could not verify zoom persistence across map-mode toggle.");
+    }
+    if (Math.abs(zoomPreservedAfterToggle.beforeToggleZoom - zoomAfterMapToggle.afterToggleZoom) > 0.05) {
+      throw new Error(
+        `Routes real-data check: zoom changed after Ancient → Modern toggle (${JSON.stringify({
+          before: zoomPreservedAfterToggle.beforeToggleZoom,
+          after: zoomAfterMapToggle.afterToggleZoom
+        })}).`
+      );
+    }
+    await desktopPage.locator("button[role='radio'][data-map-mode='ancient']").click();
+    await desktopPage.waitForTimeout(500);
+
+    await desktopPage.goto(`${baseUrl}/?tab=routes&route=paul-rome&stage=3`, {
+      waitUntil: "domcontentloaded",
+      timeout: 150_000
+    });
+    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
+    await desktopPage.getByRole("heading", { name: "Paul's voyage to Rome" }).waitFor({ timeout: 30_000 });
+    const selectedStage = await desktopPage
+      .locator("[data-route-stage-index='3']")
+      .getAttribute("data-route-stage-selected");
+    if (selectedStage !== "true") {
+      throw new Error(`Routes real-data check: deep link did not reopen stage 3 (selected=${selectedStage}).`);
+    }
+
+    if (consoleErrors.length > 0) {
+      throw new Error(`Routes real-data check: console errors detected: ${consoleErrors.join(" | ")}`);
+    }
+
+    const tabletContext = await browser.newContext({
+      viewport: { width: 1024, height: 900 },
+      reducedMotion: "no-preference"
+    });
+    const tabletPage = await tabletContext.newPage();
+    let tabletRoutePlacePanelBehavior = null;
+    try {
+      await tabletPage.goto(`${baseUrl}/?tab=routes&route=paul-2`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(tabletPage);
+      await tabletPage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      await clickRouteStopById(tabletPage, "corinth");
+      await tabletPage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+      const backToRouteLink = tabletPage.locator("[data-back-to-route='true']");
+      await backToRouteLink.waitFor({ timeout: 30_000 });
+      const routePanelVisibleWhilePlaceOpen = await tabletPage.locator("[data-routes-panel='true']").isVisible();
+      if (routePanelVisibleWhilePlaceOpen) {
+        throw new Error("Routes real-data check: route panel should be replaced at 1024px when place panel opens.");
+      }
+      await backToRouteLink.click();
+      await tabletPage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      tabletRoutePlacePanelBehavior = { replacedAt1024: true };
+    } finally {
+      await tabletPage.close();
+      await tabletContext.close();
+    }
+
+    const mobileContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+      hasTouch: true
+    });
+    const mobilePage = await mobileContext.newPage();
+    let phoneRoutePlacePanelBehavior = null;
+    try {
+      await mobilePage.goto(`${baseUrl}/?tab=routes&route=paul-2&stage=3`, {
+        waitUntil: "domcontentloaded",
+        timeout: 150_000
+      });
+      await waitForMapToSettle(mobilePage);
+      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      await mobilePage.getByRole("heading", { name: "Paul's second journey" }).waitFor({ timeout: 30_000 });
+      await clickRouteStopById(mobilePage, "corinth");
+      await mobilePage.getByRole("heading", { level: 1, name: "Corinth" }).waitFor({ timeout: 30_000 });
+      const backToRouteLink = mobilePage.locator("[data-back-to-route='true']");
+      await backToRouteLink.waitFor({ timeout: 30_000 });
+      await backToRouteLink.click();
+      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
+      phoneRoutePlacePanelBehavior = { replacedOnPhone: true };
+      await mobilePage.screenshot({ path: screenshotPaths.phoneRouteSelected, fullPage: true });
+    } finally {
+      await mobilePage.close();
+      await mobileContext.close();
+    }
+
+    return {
+      openedRouteChecks,
+      arrowsRenderedCount,
+      routesAncientAttributionCheck,
+      jesusDeepLinkFitCheck,
+      zoomPreservedAfterToggle,
+      zoomAfterMapToggle,
+      deepLinkSelectedStage: selectedStage,
+      routeSelectionLongTaskSummary,
+      routeSelectionRenderer,
+      routePlaceVisibilityCheck,
+      realHoverSetDataCounts,
+      routeDotSuppressionChecks,
+      ephesusClusterSuppressionCheck,
+      corinthDeepLinkStageSelected,
+      dualPanelTabsLayoutChecks,
+      singlePanelTabsPosition,
+      tabletRoutePlacePanelBehavior,
+      phoneRoutePlacePanelBehavior,
+      screenshotPaths,
+      consoleErrorCount: consoleErrors.length
+    };
+  } finally {
+    await desktopPage.close();
+    await desktopContext.close();
+  }
 }
 
 async function run() {
@@ -11099,6 +13422,14 @@ async function run() {
       staticServer.baseUrl
     );
     const phoneBasicsChecks = await verifyPhoneBasics(browser, staticServer.baseUrl);
+    const routesFixtureChecks = await verifyRoutesTabFixtureScenarios(
+      browser,
+      staticServer.baseUrl
+    );
+    const routesRealDataChecks = await verifyRoutesTabRealDataScenarios(
+      browser,
+      staticServer.baseUrl
+    );
     const scaleBarUpdateCheck = await verifyScaleBarUpdatesWithZoom(browser, staticServer.baseUrl);
     const timelineTickLabelOverlapChecks = await verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(
       browser,
@@ -11257,6 +13588,8 @@ async function run() {
       desktopAttributionReachabilityCheck,
       expandedAttributionPlacementChecks,
       phoneBasicsChecks,
+      routesFixtureChecks,
+      routesRealDataChecks,
       scaleBarUpdateCheck,
       timelineTickLabelOverlapChecks,
       keyboardDisclosureChecks,

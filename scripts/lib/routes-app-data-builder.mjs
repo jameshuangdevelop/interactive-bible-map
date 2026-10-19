@@ -4,6 +4,18 @@ import zlib from "node:zlib";
 
 import { getWebTextForReference } from "./web-text.mjs";
 
+function collectBibSourceIds(sourceIds, bibliographyEntryIds) {
+  if (!Array.isArray(sourceIds)) {
+    return;
+  }
+  for (const sourceId of sourceIds) {
+    if (typeof sourceId !== "string" || !sourceId.startsWith("bib:")) {
+      continue;
+    }
+    bibliographyEntryIds.add(sourceId.slice("bib:".length));
+  }
+}
+
 function roundNumber(value, decimals = 5) {
   if (typeof value !== "number") {
     return value;
@@ -59,6 +71,7 @@ export async function buildRoutesAppData({
   routeStopsData,
   routeLinesData,
   webVerseIndex,
+  bibliographyById = new Map(),
   outputDirectory,
   outputPrefix = "routes"
 }) {
@@ -66,10 +79,39 @@ export async function buildRoutesAppData({
   const stops = Array.isArray(routeStopsData?.stops) ? routeStopsData.stops : [];
   const lineFeatures = Array.isArray(routeLinesData?.features) ? routeLinesData.features : [];
   const routeById = new Map(routes.map((route) => [route.id, route]));
+  const bibliographyEntryIds = new Set();
+  for (const route of routes) {
+    collectBibSourceIds(route.sources, bibliographyEntryIds);
+    for (const stage of route.stages ?? []) {
+      collectBibSourceIds(stage.sources, bibliographyEntryIds);
+      collectBibSourceIds(stage.attestation?.sources, bibliographyEntryIds);
+      for (const namedRegion of stage.namedRegions ?? []) {
+        collectBibSourceIds(namedRegion.sources, bibliographyEntryIds);
+      }
+    }
+  }
+  for (const stop of stops) {
+    collectBibSourceIds(stop.sources, bibliographyEntryIds);
+    for (const candidate of stop.candidates ?? []) {
+      collectBibSourceIds(candidate.sources, bibliographyEntryIds);
+    }
+  }
+  const bibliography = [...bibliographyEntryIds]
+    .map((id) => {
+      const entry = bibliographyById.get(id);
+      if (!entry) {
+        throw new Error(
+          `Missing bibliography entry '${id}' while building routes payload for '${outputPrefix}'.`
+        );
+      }
+      return entry;
+    })
+    .sort((left, right) => left.id.localeCompare(right.id));
 
   const routesIndexPayload = {
     version: 1,
     routeCount: routes.length,
+    bibliography,
     routes: routes.map((route) => ({
       id: route.id,
       title: route.title,

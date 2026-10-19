@@ -47,12 +47,14 @@ One card = one task = one branch = one PR. The PO writes the cards. A card names
 | [M4-03](M4-03-ancient-geometry.md) | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Merged (#55, via #59) |
 | [M4-04](M4-04-modern-map.md) | The modern map and the "Ancient \| Modern" toggle | frontend-engineer → fact-checker | `feat/m4-modern-map` | Merged (#56, via #59) |
 | [M4-05](M4-05-timeline-ui.md) | The ancient layer and the timeline in the app | frontend-engineer | `feat/m4-timeline-ui` | Merged (#57, via #59) |
-| [M5-01](M5-01-routes-schema.md) | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Ready |
-| [M5-02](M5-02-paul-journeys.md) | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Ready (research); data after M5-01 |
-| [M5-03](M5-03-jesus-journeys.md) | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Ready (research); data after M5-01 |
-| [M5-04](M5-04-route-lines.md) | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | After M5-01 and the research notes |
-| [M5-05](M5-05-routes-tab.md) | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | After M5-01 |
-| [M5-06](M5-06-route-text.md) | Route text, and every place the passages name | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Ready (after MC9, ADR-0041) |
+| [M5-01](M5-01-routes-schema.md) | Routes: schema and build | gis-engineer | `feat/m5-routes-schema` | Merged (#61) |
+| [M5-02](M5-02-paul-journeys.md) | Paul's four journeys | research-lead → fact-checker | `data/m5-paul-journeys` | Merged (#62) |
+| [M5-03](M5-03-jesus-journeys.md) | Jesus' journeys: the well-attested segments | research-lead → fact-checker | `data/m5-jesus-journeys` | Merged (#64) |
+| [M5-04](M5-04-route-lines.md) | The routes' lines | gis-engineer → fact-checker | `data/m5-route-lines` | Verified; in PR #65 |
+| [M5-05](M5-05-routes-tab.md) | The Routes tab | frontend-engineer | `feat/m5-routes-tab` | Round 6 after MC10 (ADR-0042); waits for the human's play-test |
+| [M5-06](M5-06-route-text.md) | Route text, and every place the passages name | gis-engineer → research-lead → fact-checker | `data/m5-route-text` | Verified; in PR #66 |
+| [M5-07](M5-07-route-places.md) | Every route place becomes a place | research-lead → fact-checker | `data/m5-route-places` | Batch A (the voyage to Rome) in progress (ADR-0042 item 4) |
+| [M5-08](M5-08-names-and-dots.md) | Names that show what can be clicked | frontend-engineer | `feat/m5-names-and-dots` | Waits for the human (ADR-0042 item 6) |
 ## Template
 ```markdown
 # <ID> — <title>

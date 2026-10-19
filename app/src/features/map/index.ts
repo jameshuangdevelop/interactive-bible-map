@@ -15,9 +15,15 @@ export {
 } from "./place-visibility";
 export {
   applyMapModeToSearch,
+  applyRouteIdToSearch,
+  applyRouteStageToSearch,
+  applyViewTabToSearch,
   applyTimelineYearToSearch,
   applySelectionToSearch,
+  parseRouteIdFromSearch,
+  parseRouteStageFromSearch,
   parseMapModeFromSearch,
+  parseViewTabFromSearch,
   parseTimelineYearFromSearch,
   parseSelectionFromSearch
 } from "./selection-url";

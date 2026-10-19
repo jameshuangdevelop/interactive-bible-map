@@ -18,17 +18,12 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import {
   CLUSTER_MAX_ZOOM,
-  ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION,
   ANCIENT_FALLBACK_BASEMAP_STYLE_URL,
-  ANCIENT_MAIN_BASEMAP_ATTRIBUTION,
   ANCIENT_MAIN_BASEMAP_STYLE_URL,
-  ANCIENT_AWMC_ATTRIBUTION,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   MAP_WORKER_URL,
-  MODERN_FALLBACK_BASEMAP_ATTRIBUTION,
   MODERN_FALLBACK_BASEMAP_STYLE_URL,
-  MODERN_MAIN_BASEMAP_ATTRIBUTION,
   MODERN_MAIN_BASEMAP_STYLE_URL,
   MAX_MAP_ZOOM,
 } from "./constants";
@@ -66,6 +61,7 @@ import {
   PRIMARY_VECTOR_SOURCE_ID,
   shouldCountTileErrorForFallback
 } from "./tile-error-filter";
+import { getAttributionMarkup } from "./attribution";
 import {
   pickNearestCandidateWithPreferredRank,
   type ScreenPoint as HitScreenPoint
@@ -102,6 +98,8 @@ const sourceAncientEmpireEdgeId = "ibm-ancient-empire-edge";
 const sourceAncientRoadsId = "ibm-ancient-roads";
 const sourceAncientCoastlineId = "ibm-ancient-coastline";
 const sourceAncientHolderLabelsId = "ibm-ancient-holder-labels";
+const sourceRoutesLinesId = "ibm-route-lines";
+const sourceRoutesPointsId = "ibm-route-points";
 
 const layerMajorClusterCircleId = "ibm-major-cluster-circle";
 const layerMajorClusterLabelId = "ibm-major-cluster-label";
@@ -143,6 +141,22 @@ const layerAncientCoastlineLabelId = "ibm-ancient-coastline-label";
 const layerAncientHolderLabelId = "ibm-ancient-holder-label";
 const layerAncientHolderLabelClickableId = "ibm-ancient-holder-label-clickable";
 const layerAncientHolderLabelClickTargetId = "ibm-ancient-holder-label-click-target";
+const layerRoutesLinesBackgroundId = "ibm-routes-lines-background";
+const layerRoutesLinesForegroundId = "ibm-routes-lines-foreground";
+const layerRoutesLinesArrowsId = "ibm-routes-lines-arrows";
+const layerRoutesLinesHighlightId = "ibm-routes-lines-highlight";
+const layerRoutesStopsId = "ibm-routes-stops";
+const layerRoutesStopsStartId = "ibm-routes-stops-start";
+const layerRoutesStopLabelsId = "ibm-routes-stop-labels";
+const layerRoutesStopSelectedLabelId = "ibm-routes-stop-label-selected";
+const layerRoutesViaId = "ibm-routes-via";
+const layerRoutesViaLabelsId = "ibm-routes-via-labels";
+const layerRoutesViaSelectedLabelId = "ibm-routes-via-label-selected";
+const layerRoutesMentionedId = "ibm-routes-mentioned";
+const layerRoutesMentionedLabelsId = "ibm-routes-mentioned-labels";
+const layerRoutesMentionedSelectedLabelId = "ibm-routes-mentioned-label-selected";
+const layerRoutesStagePillIconId = "ibm-routes-stage-pill-icon";
+const layerRoutesStagePillLabelId = "ibm-routes-stage-pill-label";
 
 const questionBadgeImageId = "ibm-question-badge-image";
 const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
@@ -150,6 +164,8 @@ const pinCollisionImageId = "ibm-pin-collision-image";
 const clusterCollisionImageId = "ibm-cluster-collision-image";
 const cityPinSymbolImageId = "ibm-city-pin-symbol-image";
 const clusterSymbolImageId = "ibm-cluster-symbol-image";
+const routeStagePillImageId = "ibm-route-stage-pill-image";
+const routeDirectionArrowImageId = "ibm-route-direction-arrow-image";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
@@ -203,7 +219,11 @@ const interactiveLayerIds = [
   layerAreaLabelId,
   layerSelectedAreaLabelId,
   layerAncientHolderLabelClickableId,
-  layerAncientHolderLabelClickTargetId
+  layerAncientHolderLabelClickTargetId,
+  layerRoutesStopsId,
+  layerRoutesViaId,
+  layerRoutesMentionedId,
+  layerRoutesLinesHighlightId
 ] as const;
 
 const candidateVisibilityFilter = [
@@ -296,7 +316,8 @@ interface WebGlRendererInfo {
 function applyMapModeOverlayVisibility(
   map: MapLibreMap,
   mapMode: MapDisplayMode,
-  ancientLayerEnabled: boolean
+  ancientLayerEnabled: boolean,
+  routesModeEnabled: boolean
 ) {
   const showAreaLabels = mapMode === "ancient";
   for (const layerId of [
@@ -325,6 +346,61 @@ function applyMapModeOverlayVisibility(
     layerAncientHolderLabelClickTargetId
   ]) {
     setLayerVisibility(map, layerId, showAncientLayer);
+  }
+
+  const showRouteLayers = routesModeEnabled;
+  for (const layerId of [
+    layerRoutesLinesBackgroundId,
+    layerRoutesLinesForegroundId,
+    layerRoutesLinesArrowsId,
+    layerRoutesLinesHighlightId,
+    layerRoutesStopsId,
+    layerRoutesStopsStartId,
+    layerRoutesStopLabelsId,
+    layerRoutesStopSelectedLabelId,
+    layerRoutesViaId,
+    layerRoutesViaLabelsId,
+    layerRoutesViaSelectedLabelId,
+    layerRoutesMentionedId,
+    layerRoutesMentionedLabelsId,
+    layerRoutesMentionedSelectedLabelId,
+    layerRoutesStagePillIconId,
+    layerRoutesStagePillLabelId
+  ]) {
+    setLayerVisibility(map, layerId, showRouteLayers);
+  }
+
+  const showPlaceLayers = true;
+  for (const layerId of [
+    layerMajorClusterCircleId,
+    layerMajorClusterLabelId,
+    layerMajorClusterLabelLeftId,
+    layerMajorPinShadowId,
+    layerMajorPinId,
+    layerMajorQuestionBadgeId,
+    layerMajorClusterCollisionMaskId,
+    layerMajorPinCollisionMaskId,
+    layerMajorPinLabelId,
+    layerMajorPinLabelLeftId,
+    layerMajorAreaLabelOverviewId,
+    layerMajorAreaLabelId,
+    layerClusterCircleId,
+    layerCityPinShadowId,
+    layerCityPinId,
+    layerSitePinShadowId,
+    layerSitePinId,
+    layerQuestionBadgeId,
+    layerCandidatePinId,
+    layerSitePinCollisionMaskId,
+    layerCandidatePinCollisionMaskId,
+    layerPinLabelId,
+    layerSelectedMajorPinLabelId,
+    layerSelectedPinLabelId,
+    layerAreaLabelOverviewId,
+    layerAreaLabelId,
+    layerSelectedAreaLabelId
+  ]) {
+    setLayerVisibility(map, layerId, showPlaceLayers);
   }
 }
 
@@ -493,16 +569,6 @@ function getStyleUrl(mode: BasemapMode, mapMode: MapDisplayMode) {
   return ANCIENT_MAIN_BASEMAP_STYLE_URL;
 }
 
-function getAttributionMarkup(mode: BasemapMode, mapMode: MapDisplayMode) {
-  if (mapMode === "modern") {
-    return mode === "fallback" ? MODERN_FALLBACK_BASEMAP_ATTRIBUTION : MODERN_MAIN_BASEMAP_ATTRIBUTION;
-  }
-
-  const basemapAttribution =
-    mode === "fallback" ? ANCIENT_FALLBACK_BASEMAP_ATTRIBUTION : ANCIENT_MAIN_BASEMAP_ATTRIBUTION;
-  return `${basemapAttribution} · ${ANCIENT_AWMC_ATTRIBUTION}`;
-}
-
 function prefersReducedMotion() {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
     return false;
@@ -597,6 +663,67 @@ function focusSelection(
     durationMs,
     prefersReducedMotion()
   );
+}
+
+function panSelectionIfOffScreen(
+  map: MapLibreMap,
+  place: PlaceIndexRecord,
+  selection: PlaceSelection,
+  leftInset: number,
+  bottomInset: number,
+  durationMs: number
+) {
+  const focusPlan = planSelectionFocus(place, selection);
+  if (!focusPlan) {
+    return;
+  }
+
+  const targetCoordinates =
+    focusPlan.kind === "center"
+      ? focusPlan.coordinates
+      : (() => {
+          const [first, ...rest] = focusPlan.coordinates;
+          if (!first) {
+            return null;
+          }
+          const bounds = new LngLatBounds(first, first);
+          for (const coordinate of rest) {
+            bounds.extend(coordinate);
+          }
+          const center = bounds.getCenter();
+          return [center.lng, center.lat] as Coordinates;
+        })();
+  if (!targetCoordinates) {
+    return;
+  }
+
+  if (
+    !isPointOffScreen(map, targetCoordinates, {
+      leftInset,
+      bottomInset
+    })
+  ) {
+    return;
+  }
+
+  map.easeTo({
+    center: targetCoordinates,
+    zoom: map.getZoom(),
+    duration: prefersReducedMotion() ? 0 : durationMs
+  });
+}
+
+function isPointOffScreen(
+  map: MapLibreMap,
+  coordinates: Coordinates,
+  insets: { leftInset: number; bottomInset: number }
+) {
+  const projected = map.project(coordinates as LngLatLike);
+  const minX = insets.leftInset + 40;
+  const maxX = (typeof window === "undefined" ? 1440 : window.innerWidth) - 40;
+  const minY = 56;
+  const maxY = (typeof window === "undefined" ? 900 : window.innerHeight) - insets.bottomInset - 40;
+  return projected.x < minX || projected.x > maxX || projected.y < minY || projected.y > maxY;
 }
 
 function getMapLabelPadding(leftInset: number, bottomInset: number) {
@@ -842,6 +969,36 @@ function createEmptyFeatureCollection() {
   };
 }
 
+function withRoutePlaceIdsExcluded(
+  data: GeoJsonSourceData,
+  excludedPlaceIds: ReadonlySet<string>
+): GeoJsonSourceData {
+  if (excludedPlaceIds.size === 0 || !isFeatureCollectionData(data)) {
+    return data;
+  }
+
+  const filteredFeatures = data.features.filter((feature) => {
+    if (typeof feature !== "object" || feature === null || !("properties" in feature)) {
+      return true;
+    }
+    const properties = (feature as { properties?: unknown }).properties;
+    if (typeof properties !== "object" || properties === null || !("placeId" in properties)) {
+      return true;
+    }
+    const placeId = (properties as { placeId?: unknown }).placeId;
+    return typeof placeId !== "string" || !excludedPlaceIds.has(placeId);
+  });
+
+  if (filteredFeatures.length === data.features.length) {
+    return data;
+  }
+
+  return {
+    ...(data as unknown as { [key: string]: unknown }),
+    features: filteredFeatures
+  } as GeoJsonSourceData;
+}
+
 function ensureGeoJsonSource(
   map: MapLibreMap,
   sourceId: string,
@@ -851,6 +1008,8 @@ function ensureGeoJsonSource(
     clusterMaxZoom: number;
     clusterRadius: number;
     clusterProperties: Record<string, unknown>;
+    lineMetrics: boolean;
+    attribution: string;
   }> = {}
 ) {
   const existingSource = map.getSource(sourceId);
@@ -1014,6 +1173,76 @@ function ensureQuestionBadgeImage(map: MapLibreMap) {
   }
 
   map.addImage(questionBadgeImageId, image.image, { pixelRatio: image.pixelRatio });
+}
+
+function createRouteStagePillImage() {
+  return createCanvasImage(30, (context, canvasSize) => {
+    const width = canvasSize - 2;
+    const height = 18;
+    const x = 1;
+    const y = (canvasSize - height) / 2;
+    const radius = height / 2;
+
+    context.fillStyle = "#FFFFFF";
+    context.strokeStyle = "#1A73E8";
+    context.lineWidth = 1.5;
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.arcTo(x + width, y, x + width, y + radius, radius);
+    context.lineTo(x + width, y + height - radius);
+    context.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+    context.lineTo(x + radius, y + height);
+    context.arcTo(x, y + height, x, y + height - radius, radius);
+    context.lineTo(x, y + radius);
+    context.arcTo(x, y, x + radius, y, radius);
+    context.closePath();
+    context.fill();
+    context.stroke();
+  });
+}
+
+function createRouteDirectionArrowImage() {
+  return createCanvasImage(16, (context, canvasSize) => {
+    const center = canvasSize / 2;
+    const halfHeight = 2.5;
+    const tail = 4.5;
+    const tip = canvasSize - 2;
+
+    context.fillStyle = "#FFFFFF";
+    context.beginPath();
+    context.moveTo(tail, center - halfHeight);
+    context.lineTo(tip, center);
+    context.lineTo(tail, center + halfHeight);
+    context.closePath();
+    context.fill();
+  });
+}
+
+function ensureRouteStagePillImage(map: MapLibreMap) {
+  if (map.hasImage(routeStagePillImageId)) {
+    return;
+  }
+
+  const image = createRouteStagePillImage();
+  if (!image) {
+    return;
+  }
+
+  map.addImage(routeStagePillImageId, image.image, { pixelRatio: image.pixelRatio });
+}
+
+function ensureRouteDirectionArrowImage(map: MapLibreMap) {
+  if (map.hasImage(routeDirectionArrowImageId)) {
+    return;
+  }
+
+  const image = createRouteDirectionArrowImage();
+  if (!image) {
+    return;
+  }
+
+  map.addImage(routeDirectionArrowImageId, image.image, { pixelRatio: image.pixelRatio });
 }
 
 function ensureCollisionImages(map: MapLibreMap) {
@@ -1510,6 +1739,416 @@ function ensureMapLayers(
         "text-color": "#202124",
         "text-halo-color": "rgba(255,255,255,0.95)",
         "text-halo-width": 1.4
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesBackgroundId)) {
+    map.addLayer({
+      id: layerRoutesLinesBackgroundId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": "#FFFFFF",
+        "line-width": 7,
+        "line-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.28, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesForegroundId)) {
+    map.addLayer({
+      id: layerRoutesLinesForegroundId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": "#1A73E8",
+        "line-width": 5,
+        "line-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.26, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesArrowsId)) {
+    map.addLayer({
+      id: layerRoutesLinesArrowsId,
+      source: sourceRoutesLinesId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "isInSelectedRoute"], true]),
+      layout: {
+        "symbol-placement": "line",
+        "symbol-spacing": 200,
+        "icon-image": routeDirectionArrowImageId,
+        "icon-size": 1,
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesLinesHighlightId)) {
+    map.addLayer({
+      id: layerRoutesLinesHighlightId,
+      source: sourceRoutesLinesId,
+      type: "line",
+      filter: toLayerFilter([
+        "any",
+        ["==", ["get", "isSelectedStage"], true],
+        ["==", ["get", "isHighlightedStage"], true]
+      ]),
+      layout: {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      paint: {
+        "line-color": "#1A73E8",
+        "line-width": 6
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopsId)) {
+    map.addLayer({
+      id: layerRoutesStopsId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      paint: {
+        "circle-radius": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          14,
+          ["any", ["==", ["get", "isSelectedStage"], true], ["==", ["get", "isHighlightedStage"], true]],
+          11,
+          10
+        ],
+        "circle-color": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          "#1A73E8",
+          "#FFFFFF"
+        ],
+        "circle-stroke-color": [
+          "case",
+          ["==", ["get", "isSelectedPlace"], true],
+          "#FFFFFF",
+          "#1A73E8"
+        ],
+        "circle-stroke-width": 2,
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopsStartId)) {
+    map.addLayer({
+      id: layerRoutesStopsStartId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isRouteStart"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      paint: {
+        "circle-radius": [
+          "case",
+          ["any", ["==", ["get", "isSelectedStage"], true], ["==", ["get", "isHighlightedStage"], true]],
+          7,
+          6
+        ],
+        "circle-color": "#1A73E8",
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesViaId)) {
+    map.addLayer({
+      id: layerRoutesViaId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "via"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      paint: {
+        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 6, 4],
+        "circle-color": "#1A73E8",
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": ["case", ["==", ["get", "isSelectedPlace"], true], 1.6, 1.2],
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesViaLabelsId)) {
+    map.addLayer({
+      id: layerRoutesViaLabelsId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "via"],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Italic"],
+        "text-size": 11,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false
+      },
+      paint: {
+        "text-color": "#1A73E8",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.1,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesViaSelectedLabelId)) {
+    map.addLayer({
+      id: layerRoutesViaSelectedLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "via"],
+        ["==", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "symbol-sort-key": 350
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesMentionedId)) {
+    map.addLayer({
+      id: layerRoutesMentionedId,
+      source: sourceRoutesPointsId,
+      type: "circle",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "mentioned"],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      paint: {
+        "circle-radius": ["case", ["==", ["get", "isSelectedPlace"], true], 6, 4],
+        "circle-color": "#1A73E8",
+        "circle-stroke-color": "#FFFFFF",
+        "circle-stroke-width": ["case", ["==", ["get", "isSelectedPlace"], true], 1.6, 1.2],
+        "circle-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopLabelsId)) {
+    map.addLayer({
+      id: layerRoutesStopLabelsId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.75,
+        "text-anchor": "left",
+        "text-optional": false,
+        "text-allow-overlap": false,
+        "text-ignore-placement": false,
+        "symbol-sort-key": [
+          "case",
+          ["==", ["get", "isSelectedStage"], true],
+          200,
+          ["==", ["get", "isHighlightedStage"], true],
+          150,
+          50
+        ]
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStopSelectedLabelId)) {
+    map.addLayer({
+      id: layerRoutesStopSelectedLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "stop"],
+        ["==", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.75,
+        "text-anchor": "left",
+        "text-optional": false,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "symbol-sort-key": 350
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.3, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesMentionedLabelsId)) {
+    map.addLayer({
+      id: layerRoutesMentionedLabelsId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "mentioned"],
+        ["!=", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": false,
+        "text-ignore-placement": false
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesMentionedSelectedLabelId)) {
+    map.addLayer({
+      id: layerRoutesMentionedSelectedLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter([
+        "all",
+        ["==", ["get", "kind"], "mentioned"],
+        ["==", ["get", "isSelectedPlace"], true],
+        ["==", ["get", "isInSelectedRoute"], true]
+      ]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12,
+        "text-variable-anchor": ["right", "left", "top", "bottom"],
+        "text-radial-offset": 0.65,
+        "text-anchor": "left",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "symbol-sort-key": 350
+      },
+      paint: {
+        "text-color": "#202124",
+        "text-halo-color": "rgba(255,255,255,0.95)",
+        "text-halo-width": 1.2,
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.24, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStagePillIconId)) {
+    map.addLayer({
+      id: layerRoutesStagePillIconId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "kind"], "stage-pill"]),
+      layout: {
+        "icon-image": routeStagePillImageId,
+        "icon-anchor": "center",
+        "icon-size": 1,
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true
+      },
+      paint: {
+        "icon-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.5, 1]
+      }
+    });
+  }
+
+  if (!map.getLayer(layerRoutesStagePillLabelId)) {
+    map.addLayer({
+      id: layerRoutesStagePillLabelId,
+      source: sourceRoutesPointsId,
+      type: "symbol",
+      filter: toLayerFilter(["==", ["get", "kind"], "stage-pill"]),
+      layout: {
+        "text-field": ["get", "label"],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 10,
+        "text-anchor": "center",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      paint: {
+        "text-color": "#1A73E8",
+        "text-opacity": ["case", ["==", ["get", "isDimmed"], true], 0.6, 1]
       }
     });
   }
@@ -2550,6 +3189,12 @@ export function MapView({
   selectedTimelineStopId,
   ancientTimeline,
   ancientLayerRetryToken,
+  routesOverlay,
+  routeKeyboardEntries,
+  selectedRouteStopFocusKey,
+  selectedRouteStopCoordinates,
+  routeOverlayHiddenPlaceIdsKey,
+  onSelectRouteMapEntry,
   onAncientLayerLoadStateChange,
   pinLabelSource,
   onSelectPlace
@@ -2589,13 +3234,27 @@ export function MapView({
   const handleTooltipAtPointRef = useRef<(point: PointLike) => void>(() => undefined);
   const refreshVisibleEntryStateRef = useRef<() => void>(() => undefined);
   const scheduleVisibleEntryRefreshRef = useRef<() => void>(() => undefined);
-  const syncSourcesAndLayersRef = useRef<() => void>(() => undefined);
+  const syncRouteSourcesRef = useRef<() => void>(() => undefined);
+  const syncBaseSourcesAndLayersRef = useRef<() => void>(() => undefined);
   const updateScaleBarRef = useRef<() => void>(() => undefined);
   const stopPayloadRequestIdsRef = useRef(new Set<string>());
   const stopPrefetchScheduledRef = useRef(false);
   const failedStopIdsRef = useRef(new Set<string>());
   const selectedTimelineStopIdRef = useRef<string | null>(selectedTimelineStopId);
-
+  const routesModeEnabledRef = useRef(false);
+  const previousRouteFocusKeyRef = useRef<string | null>(null);
+  const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
+  const previousSelectedRouteStopFocusKeyRef = useRef<string | null>(null);
+  const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
+  const preservedCameraRef = useRef<{
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
+  } | null>(null);
+  useEffect(() => {
+    latestRoutesOverlayRef.current = routesOverlay;
+  }, [routesOverlay]);
   useEffect(() => {
     selectedTimelineStopIdRef.current = selectedTimelineStopId;
   }, [selectedTimelineStopId]);
@@ -2618,6 +3277,10 @@ export function MapView({
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
   const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
+  const routesModeEnabled = Boolean(routesOverlay);
+  useEffect(() => {
+    routesModeEnabledRef.current = routesModeEnabled;
+  }, [routesModeEnabled]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
@@ -2656,6 +3319,30 @@ export function MapView({
       })
     };
   }, [ancientTimeline?.entities, hasAncientTimeline, mapMode, renderData]);
+  const routeSuppressedPlaceIds = useMemo(() => {
+    if (routeOverlayHiddenPlaceIdsKey.length === 0) {
+      return new Set<string>();
+    }
+    return new Set(routeOverlayHiddenPlaceIdsKey.split("|"));
+  }, [routeOverlayHiddenPlaceIdsKey]);
+  const effectivePinRenderData = useMemo(
+    () => ({
+      majorCityPins: withRoutePlaceIdsExcluded(
+        effectiveRenderData.majorCityPins,
+        routeSuppressedPlaceIds
+      ),
+      clusteredCityPins: withRoutePlaceIdsExcluded(
+        effectiveRenderData.clusteredCityPins,
+        routeSuppressedPlaceIds
+      ),
+      sitePins: withRoutePlaceIdsExcluded(effectiveRenderData.sitePins, routeSuppressedPlaceIds),
+      candidatePins: withRoutePlaceIdsExcluded(
+        effectiveRenderData.candidatePins,
+        routeSuppressedPlaceIds
+      )
+    }),
+    [effectiveRenderData, routeSuppressedPlaceIds]
+  );
   const majorPlaceByRank = useMemo(
     () => buildMajorPlaceReferenceByRank(effectiveRenderData),
     [effectiveRenderData]
@@ -2685,6 +3372,7 @@ export function MapView({
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
   const [mapReadyVersion, setMapReadyVersion] = useState(0);
+  const [styleReadyVersion, setStyleReadyVersion] = useState(0);
   const [visibleEntries, setVisibleEntries] = useState<VisibleListEntry[]>([]);
   const [visibleEntryOverflow, setVisibleEntryOverflow] = useState(false);
   const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -2765,6 +3453,13 @@ export function MapView({
         cache: "no-store"
       });
       if (!response.ok) {
+        if (response.status === 404) {
+          failedStopIdsRef.current.add(stopId);
+          if (selectedTimelineStopIdRef.current === stopId) {
+            setAncientLayerLoadState("ready");
+          }
+          return;
+        }
         throw new Error(`Could not load ancient stop payload '${stopId}' (${response.status})`);
       }
 
@@ -3060,12 +3755,32 @@ export function MapView({
         .map((feature) => toVisibleEntry(feature, majorPlaceByRankRef.current))
         .filter((entry): entry is VisibleListEntry => entry !== null)
     );
+    if (deduplicated.length === 0 && places.length > 0) {
+      const fallbackEntries: VisibleListEntry[] = places
+        .filter((place) => place.candidates.length > 0)
+        .slice(0, MAX_VISIBLE_PLACE_LIST_ENTRIES)
+        .map((place, index) => ({
+          id: `fallback:${place.id}:${index}`,
+          kind: "place",
+          coordinates: place.candidates[0].coordinates,
+          accessibleName: `${place.names.ancient[0] ?? place.id}, ${place.type}`,
+          tooltipText: `${place.names.ancient[0] ?? place.id}, ${place.type}`,
+          selection: {
+            placeId: place.id,
+            candidateIndex: null
+          },
+          interactionRank: 1
+        }));
+      setVisibleEntryOverflow(places.length > MAX_VISIBLE_PLACE_LIST_ENTRIES);
+      setVisibleEntries(fallbackEntries);
+      return;
+    }
     deduplicated.sort((left, right) => compareByReadingOrder(map, left, right));
 
     const overflow = deduplicated.length > MAX_VISIBLE_PLACE_LIST_ENTRIES;
     setVisibleEntryOverflow(overflow);
     setVisibleEntries(deduplicated.slice(0, MAX_VISIBLE_PLACE_LIST_ENTRIES));
-  }, []);
+  }, [places]);
 
   const scheduleVisibleEntryRefresh = useCallback(() => {
     if (gestureInProgressRef.current) {
@@ -3086,13 +3801,35 @@ export function MapView({
     });
   }, [refreshVisibleEntryState]);
 
-  const syncSourcesAndLayers = useCallback(() => {
+  const syncRouteSources = useCallback(() => {
     const map = mapRef.current;
     if (!map) {
       return;
     }
 
-    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectiveRenderData.majorCityPins, {
+    const overlay = latestRoutesOverlayRef.current;
+    ensureGeoJsonSource(
+      map,
+      sourceRoutesLinesId,
+      overlay?.lines ?? createEmptyFeatureCollection(),
+      {
+        lineMetrics: true
+      }
+    );
+    ensureGeoJsonSource(
+      map,
+      sourceRoutesPointsId,
+      overlay?.points ?? createEmptyFeatureCollection()
+    );
+  }, []);
+
+  const syncBaseSourcesAndLayers = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    ensureGeoJsonSource(map, sourceMajorCityPinsId, effectivePinRenderData.majorCityPins, {
       cluster: true,
       clusterMaxZoom: majorClusterMaxZoom,
       clusterRadius: majorClusterRadiusPx,
@@ -3100,13 +3837,13 @@ export function MapView({
         minImportanceRank: ["min", ["get", "importanceRank"]]
       }
     });
-    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectiveRenderData.clusteredCityPins, {
+    ensureGeoJsonSource(map, sourceClusteredCityPinsId, effectivePinRenderData.clusteredCityPins, {
       cluster: true,
       clusterMaxZoom: CLUSTER_MAX_ZOOM,
       clusterRadius: standardClusterRadiusPx
     });
-    ensureGeoJsonSource(map, sourceSitePinsId, effectiveRenderData.sitePins);
-    ensureGeoJsonSource(map, sourceCandidatePinsId, effectiveRenderData.candidatePins);
+    ensureGeoJsonSource(map, sourceSitePinsId, effectivePinRenderData.sitePins);
+    ensureGeoJsonSource(map, sourceCandidatePinsId, effectivePinRenderData.candidatePins);
     ensureGeoJsonSource(map, sourceAreaLabelsId, effectiveRenderData.areaLabels);
     ensureGeoJsonSource(map, sourceKeyboardFocusId, createEmptyFeatureCollection());
     ensureGeoJsonSource(map, sourceAncientAreasId, ancientAreaFeatures);
@@ -3115,8 +3852,11 @@ export function MapView({
     ensureGeoJsonSource(map, sourceAncientRoadsId, ancientRoads);
     ensureGeoJsonSource(map, sourceAncientCoastlineId, ancientCoastline);
     ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures);
+    syncRouteSources();
 
     ensureQuestionBadgeImage(map);
+    ensureRouteStagePillImage(map);
+    ensureRouteDirectionArrowImage(map);
     ensureCandidateImages(map, effectiveRenderData);
     ensureMapLayers(map, majorPlaceByRank);
   }, [
@@ -3127,7 +3867,9 @@ export function MapView({
     ancientHolderLabelFeatures,
     ancientRoads,
     majorPlaceByRank,
-    effectiveRenderData
+    effectivePinRenderData,
+    effectiveRenderData,
+    syncRouteSources
   ]);
 
   const resolveMajorClusterTooltipText = useCallback(
@@ -3377,8 +4119,12 @@ export function MapView({
   }, [scheduleVisibleEntryRefresh]);
 
   useEffect(() => {
-    syncSourcesAndLayersRef.current = syncSourcesAndLayers;
-  }, [syncSourcesAndLayers]);
+    syncRouteSourcesRef.current = syncRouteSources;
+  }, [syncRouteSources]);
+
+  useEffect(() => {
+    syncBaseSourcesAndLayersRef.current = syncBaseSourcesAndLayers;
+  }, [syncBaseSourcesAndLayers]);
 
   useEffect(() => {
     updateScaleBarRef.current = updateScaleBar;
@@ -3393,8 +4139,13 @@ export function MapView({
     mainSourceLoadTimeoutRef.current = null;
   }, []);
 
-  const syncAttributionControl = useCallback((map: MapLibreMap, mode: BasemapMode, nextMapMode: MapDisplayMode) => {
-    const attributionKey = `${mode}:${nextMapMode}`;
+  const syncAttributionControl = useCallback((
+    map: MapLibreMap,
+    mode: BasemapMode,
+    nextMapMode: MapDisplayMode,
+    nextRoutesModeEnabled: boolean
+  ) => {
+    const attributionKey = `${mode}:${nextMapMode}:${nextRoutesModeEnabled ? "routes" : "map"}`;
     if (attributionModeRef.current === attributionKey && attributionControlRef.current) {
       return;
     }
@@ -3406,7 +4157,7 @@ export function MapView({
 
     const control = new AttributionControl({
       compact: true,
-      customAttribution: getAttributionMarkup(mode, nextMapMode)
+      customAttribution: getAttributionMarkup(mode, nextMapMode, nextRoutesModeEnabled)
     });
     map.addControl(control, "bottom-right");
     attributionControlRef.current = control;
@@ -3425,7 +4176,7 @@ export function MapView({
       mainSourceLoadControllerRef.current.markLoaded();
       styleReadyRef.current = false;
       const nextMapMode = mapModeRef.current;
-      syncAttributionControl(map, "fallback", nextMapMode);
+      syncAttributionControl(map, "fallback", nextMapMode, routesModeEnabledRef.current);
       map.setStyle(getStyleUrl("fallback", nextMapMode));
       return nextState;
     },
@@ -3480,11 +4231,14 @@ export function MapView({
       })
     };
     const effectivePixelRatioCap = resolveEffectivePixelRatioCap(effectiveRuntimeTuning, rendererInfo);
+    const preservedCamera = preservedCameraRef.current;
     const map = new MapLibreMapClass({
       container: mapContainerRef.current,
       style: getStyleUrl(initialMode, mapModeRef.current),
-      center: DEFAULT_MAP_CENTER,
-      zoom: DEFAULT_MAP_ZOOM,
+      center: preservedCamera?.center ?? DEFAULT_MAP_CENTER,
+      zoom: preservedCamera?.zoom ?? DEFAULT_MAP_ZOOM,
+      bearing: preservedCamera?.bearing ?? 0,
+      pitch: preservedCamera?.pitch ?? 0,
       minZoom: 3,
       maxZoom: MAX_MAP_ZOOM,
       attributionControl: false,
@@ -3516,7 +4270,7 @@ export function MapView({
     )[visibleEntryRefreshHookKey] = () => {
       refreshVisibleEntryStateRef.current();
     };
-    syncAttributionControl(map, initialMode, mapModeRef.current);
+    syncAttributionControl(map, initialMode, mapModeRef.current, routesModeEnabledRef.current);
 
     const cancelScheduledTooltipUpdate = () => {
       pendingTooltipPointRef.current = null;
@@ -3713,8 +4467,9 @@ export function MapView({
     const handleStyleReady = () => {
       const currentMode = basemapController.getState().mode;
       styleReadyRef.current = true;
+      setStyleReadyVersion((value) => value + 1);
       const nextMapMode = mapModeRef.current;
-      syncAttributionControl(map, currentMode, nextMapMode);
+      syncAttributionControl(map, currentMode, nextMapMode, routesModeEnabledRef.current);
       configureZoomGestures(map, effectiveRuntimeTuning);
       applyBasemapLayerVariants(map, currentMode, effectiveRuntimeTuning);
       if (currentMode === "main") {
@@ -3723,8 +4478,14 @@ export function MapView({
         clearMainSourceLoadTimeout();
       }
       map.getCanvas().tabIndex = -1;
-      syncSourcesAndLayersRef.current();
-      applyMapModeOverlayVisibility(map, nextMapMode, hasAncientTimeline);
+      syncRouteSourcesRef.current();
+      syncBaseSourcesAndLayersRef.current();
+      applyMapModeOverlayVisibility(
+        map,
+        nextMapMode,
+        hasAncientTimeline,
+        routesModeEnabledRef.current
+      );
       refreshVisibleEntryStateRef.current();
       updateScaleBarRef.current();
       setMapReadyVersion((value) => value + 1);
@@ -3755,6 +4516,68 @@ export function MapView({
     };
 
     const handleMapClick = (event: { point: PointLike }) => {
+      if (routesModeEnabledRef.current) {
+        const routeFeatures = map.queryRenderedFeatures(event.point, {
+          layers: [
+            layerRoutesStopsId,
+            layerRoutesViaId,
+            layerRoutesMentionedId,
+            layerRoutesLinesHighlightId,
+            layerRoutesLinesForegroundId
+          ]
+        });
+        const routeMatch = routeFeatures.find((feature) =>
+          feature.layer?.id === layerRoutesStopsId ||
+          feature.layer?.id === layerRoutesViaId ||
+          feature.layer?.id === layerRoutesMentionedId
+        );
+        if (routeMatch) {
+          const properties = asObject(routeMatch.properties);
+          const routeId = asString(properties?.routeId);
+          const stageId = asString(properties?.stageId);
+          const stageIndex = asNumber(properties?.stageIndex);
+          const stopId = asString(properties?.stopId);
+          const stopKind = asString(properties?.stopKind);
+          if (
+            routeId &&
+            stageId &&
+            stageIndex !== null &&
+            stopId &&
+            (stopKind === "location" || stopKind === "route-stop")
+          ) {
+            onSelectRouteMapEntry({
+              kind: "stop",
+              routeId,
+              stageId,
+              stageIndex,
+              stopKind,
+              stopId
+            });
+            return;
+          }
+        }
+
+        const lineMatch = routeFeatures.find((feature) =>
+          feature.layer?.id === layerRoutesLinesHighlightId ||
+          feature.layer?.id === layerRoutesLinesForegroundId
+        );
+        if (lineMatch) {
+          const properties = asObject(lineMatch.properties);
+          const routeId = asString(properties?.routeId);
+          const stageId = asString(properties?.stageId);
+          const stageIndex = asNumber(properties?.stageIndex);
+          if (routeId && stageId && stageIndex !== null) {
+            onSelectRouteMapEntry({
+              kind: "line",
+              routeId,
+              stageId,
+              stageIndex
+            });
+            return;
+          }
+        }
+      }
+
       const entry = resolveInteractiveEntryAtPoint(event.point);
       if (!entry) {
         return;
@@ -3849,6 +4672,13 @@ export function MapView({
         map.removeControl(attributionControlRef.current);
         attributionControlRef.current = null;
       }
+      const center = map.getCenter();
+      preservedCameraRef.current = {
+        center: [center.lng, center.lat],
+        zoom: map.getZoom(),
+        bearing: map.getBearing(),
+        pitch: map.getPitch()
+      };
       attributionModeRef.current = null;
       map.remove();
       mapRef.current = null;
@@ -3879,6 +4709,7 @@ export function MapView({
     setInteractiveCursor,
     switchToFallback,
     syncAttributionControl,
+    onSelectRouteMapEntry,
     isSmallScreen,
     runtimeTuning
   ]);
@@ -3896,22 +4727,45 @@ export function MapView({
 
     const basemapMode = basemapController.getState().mode;
     styleReadyRef.current = false;
-    syncAttributionControl(map, basemapMode, mapMode);
+    syncAttributionControl(map, basemapMode, mapMode, routesModeEnabledRef.current);
     map.setStyle(getStyleUrl(basemapMode, mapMode));
   }, [basemapController, mapMode, syncAttributionControl]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) {
+      return;
+    }
+
+    const basemapMode = basemapController.getState().mode;
+    syncAttributionControl(map, basemapMode, mapModeRef.current, routesModeEnabled);
+  }, [basemapController, routesModeEnabled, syncAttributionControl]);
 
   useEffect(() => {
     if (!styleReadyRef.current) {
       return;
     }
 
-    syncSourcesAndLayers();
+    syncBaseSourcesAndLayers();
     const map = mapRef.current;
     if (map) {
-      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline);
+      applyMapModeOverlayVisibility(map, mapModeRef.current, hasAncientTimeline, routesModeEnabled);
     }
     refreshVisibleEntryState();
-  }, [hasAncientTimeline, refreshVisibleEntryState, syncSourcesAndLayers]);
+  }, [
+    hasAncientTimeline,
+    refreshVisibleEntryState,
+    routesModeEnabled,
+    syncBaseSourcesAndLayers
+  ]);
+
+  useEffect(() => {
+    if (!styleReadyRef.current) {
+      return;
+    }
+
+    syncRouteSources();
+  }, [syncRouteSources, routesOverlay]);
 
   useEffect(() => {
     updateScaleBar();
@@ -3946,6 +4800,18 @@ export function MapView({
     }
 
     previousFocusRequestRef.current = selectionKey;
+    if (routesModeEnabled) {
+      panSelectionIfOffScreen(
+        map,
+        place,
+        selection,
+        panelInset,
+        bottomInset,
+        runtimeTuning.controlZoomDurationMs
+      );
+      return;
+    }
+
     focusSelection(
       map,
       place,
@@ -3959,8 +4825,117 @@ export function MapView({
     mapReadyVersion,
     panelInset,
     placeById,
+    routesModeEnabled,
+    runtimeTuning.controlZoomDurationMs,
     runtimeTuning.flyToDurationMs,
     selection
+  ]);
+
+  useEffect(() => {
+    if (!routesOverlay) {
+      return;
+    }
+    if (!routesOverlay.routeFocusKey || !routesOverlay.bounds) {
+      previousRouteFocusKeyRef.current = null;
+      return;
+    }
+
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+    if (previousRouteFocusKeyRef.current === routesOverlay.routeFocusKey) {
+      return;
+    }
+    const [southWest, northEast] = routesOverlay.bounds;
+    const bounds = new LngLatBounds(southWest, northEast);
+    map.fitBounds(bounds, {
+      padding: resolveMapFitPadding({
+        leftInset: panelInset,
+        bottomInset,
+        top: focusPaddingTop,
+        side: 64,
+        bottom: 64
+      }),
+      maxZoom: 8.5,
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
+    });
+    previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
+  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs, styleReadyVersion]);
+
+  useEffect(() => {
+    if (!routesOverlay) {
+      return;
+    }
+    if (!routesOverlay.selectedStageFocusKey || !routesOverlay.selectedStageCenter) {
+      previousSelectedStageFocusKeyRef.current = null;
+      return;
+    }
+    if (previousSelectedStageFocusKeyRef.current === routesOverlay.selectedStageFocusKey) {
+      return;
+    }
+
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+
+    if (
+      !isPointOffScreen(map, routesOverlay.selectedStageCenter, {
+        leftInset: panelInset,
+        bottomInset
+      })
+    ) {
+      previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
+      return;
+    }
+
+    map.easeTo({
+      center: routesOverlay.selectedStageCenter,
+      zoom: map.getZoom(),
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
+    });
+    previousSelectedStageFocusKeyRef.current = routesOverlay.selectedStageFocusKey;
+  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.controlZoomDurationMs, styleReadyVersion]);
+
+  useEffect(() => {
+    if (!routesModeEnabled || !selectedRouteStopFocusKey || !selectedRouteStopCoordinates) {
+      previousSelectedRouteStopFocusKeyRef.current = null;
+      return;
+    }
+
+    if (previousSelectedRouteStopFocusKeyRef.current === selectedRouteStopFocusKey) {
+      return;
+    }
+
+    const map = mapRef.current;
+    if (!map || !styleReadyRef.current) {
+      return;
+    }
+
+    previousSelectedRouteStopFocusKeyRef.current = selectedRouteStopFocusKey;
+    if (
+      !isPointOffScreen(map, selectedRouteStopCoordinates, {
+        leftInset: panelInset,
+        bottomInset
+      })
+    ) {
+      return;
+    }
+
+    map.easeTo({
+      center: selectedRouteStopCoordinates,
+      zoom: map.getZoom(),
+      duration: prefersReducedMotion() ? 0 : runtimeTuning.controlZoomDurationMs
+    });
+  }, [
+    bottomInset,
+    panelInset,
+    routesModeEnabled,
+    runtimeTuning.controlZoomDurationMs,
+    selectedRouteStopCoordinates,
+    selectedRouteStopFocusKey,
+    styleReadyVersion
   ]);
 
   const resetView = useCallback(() => {
@@ -4014,11 +4989,14 @@ export function MapView({
     ? Math.max(controlBottomInset + 176, 320)
     : controlBottomInset + 16;
   const compactAttributionBottomOffset = isSmallScreen ? controlBottomInset : 0;
+  const routeAttributionOverlayInset = routesModeEnabled ? scaleBarBottomOffset + 56 : 0;
   const compactAttributionBottomWithTimelineOffset = Math.max(
     compactAttributionBottomOffset,
-    Math.max(0, timelineOverlayInset)
+    Math.max(0, timelineOverlayInset),
+    routeAttributionOverlayInset
   );
   const compactAttributionRightOffset = 72;
+  const filteredVisibleEntries = visibleEntries;
   const visiblePlacesList = (
     <div
       aria-label="Visible places on map"
@@ -4035,9 +5013,44 @@ export function MapView({
         border: 0
       }}
     >
-      {visibleEntries.map((entry) => (
-        <button
-          key={entry.id}
+        {routesModeEnabled
+          ? routeKeyboardEntries.map((entry) => (
+              <button
+                key={entry.id}
+                aria-label={entry.label}
+                data-place-entry-id={entry.id}
+                onClick={() => {
+                  onSelectRouteMapEntry({
+                    kind: "stop",
+                    routeId: entry.routeId,
+                    stageId: entry.stageId,
+                    stageIndex: entry.stageIndex,
+                    stopKind: entry.stopKind,
+                    stopId: entry.stopId
+                  });
+                }}
+                onFocus={() => {
+                  const map = mapRef.current;
+                  if (!map) {
+                    return;
+                  }
+                  updateKeyboardFocusRing(map, entry.coordinates, 13);
+                  panPointOutFromPanel(
+                    map,
+                    entry.coordinates,
+                    panelInset,
+                    runtimeTuning.controlZoomDurationMs
+                  );
+                }}
+                type="button"
+              >
+                {entry.label}
+              </button>
+            ))
+          : null}
+        {filteredVisibleEntries.map((entry) => (
+          <button
+            key={entry.id}
           aria-label={entry.accessibleName}
           data-place-entry-id={entry.id}
           onClick={() => activateVisibleEntry(entry)}

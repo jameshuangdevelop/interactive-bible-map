@@ -177,6 +177,7 @@ GIS terms used here:
   - `app/public/generated/routes.stages.json`
   - `app/public/generated/routes.stops.json`
   - `app/public/generated/routes.lines.geojson`
+  - `routes.routes.json` now also includes `bibliography[]`: every cited `bib:` entry used by routes, stages, or stop entries, sorted by `id`, in the same shape as `data/bibliography.json`.
   and fails if their combined gzip size is over **100,000 bytes** (ADR-0038 item 5).
 - `build:data` also writes `routes.fixture.*` payloads from `tests/fixtures/routes/` so M5-05 can build before verified route research lands. `export:web` removes those fixture files from `app/dist/generated/`, so they never ship.
 
@@ -185,6 +186,15 @@ Complete example:
 ```json
 {
   "version": 1,
+  "bibliography": [
+    {
+      "id": "pleiades-place-resource",
+      "type": "dataset",
+      "title": "Pleiades place resource",
+      "authors": ["Pleiades Project"],
+      "year": 2024
+    }
+  ],
   "routes": [
     {
       "id": "paul-1",

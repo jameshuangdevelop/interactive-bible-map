@@ -125,10 +125,10 @@ On the ancient map only, drawn under the pins and labels, for the year the timel
 - **The toggle:** a two-part control, "Ancient | Modern", 40 px tall, on the panel's white surface and shadow; the selected part is filled with the accent colour, with white text. Switching keeps the camera and the selected place. The URL keeps the choice (§10).
 
 ### Routes tab (M5)
-The routes have a tab of their own, so the main map stays uncluttered (brief §1.6, ADR-0038). After the human's play-test at MC9, the routes are drawn simply, and every disclaimer comes last (ADR-0041).
+The routes have a tab of their own, so the main map stays uncluttered (brief §1.6, ADR-0038). After the human's play-test at MC9, the routes are drawn simply, and every disclaimer comes last (ADR-0041). After MC10, the Routes tab is the Map tab with a route drawn on top (ADR-0042).
 - **Tabs:** "Map" and "Routes", a two-part control styled like the "Ancient | Modern" toggle, at the top centre. Switching tabs keeps the camera and the map (ancient or modern). The Map tab is unchanged.
 - **The camera** moves only when a route is chosen, to fit the route and leave room for the panel, and when a selected stage is off the screen, to pan to it at the reader's zoom. Hovering never moves it, and the reader's zoom is kept (the human at MC9).
-- **Route panel:** on the Routes tab, a route panel takes the place panel's place. The search box stays on top of it and works as on the Map tab; choosing a result switches to the Map tab with that place selected.
+- **Route panel:** on the Routes tab, a route panel sits where the place panel does on the Map tab, and a place's panel opens to its right ("Selecting a place", below). The search box stays on top of it and works as on the Map tab; choosing a result opens that place on the Routes tab like any other place selection there.
   - **No route chosen:** the five routes in a list, "Paul's first journey", "Paul's second journey", "Paul's third journey", "Paul's voyage to Rome" and "Jesus' journeys", each with its years (for example "About AD 46 – 48") and its number of stages. The map draws no route until one is chosen.
   - **A route chosen,** from top to bottom:
     1. an "‹ All routes" link;
@@ -142,33 +142,38 @@ The routes have a tab of their own, so the main map stays uncluttered (brief §1
   - **A stage** in the list shows:
     - its number;
     - "From → To", where each stop's name is a link;
-    - how it went: "By land", "By sea", or, where the text names only regions, "Through" and the regions;
-    - the places it passed;
+    - how it went: "By land", "By sea", or, where the text names only regions, "Through" and the regions; where it names neither, "Path not known";
+    - the places it passed, as "Passed: Cnidus, Salmone";
     - the places its passages name that the travellers didn't reach, as "Also named: Phoenix, Lasea";
+
+    each place's name, there and in "From → To", is a link that opens its place panel;
     - its passages, as links that open their WEB text in place;
     - a "Sources" link.
 
-    A stage without a line shows only a short "Site disputed" tag; its reason is in the notes. Hovering or focusing a stage highlights its line and greys out the route's other lines. Selecting it, by click or keyboard, also plays a short animation along its line from start to end (about 1.5 s); readers who ask for reduced motion get the highlight only. Selecting a line on the map selects its stage in the list and scrolls to it.
+    A stage without a line shows only a short "Site disputed" tag; its reason is in the notes. Hovering or focusing a stage highlights its line and greys out the route's other lines. Selecting it, by click or keyboard, does the same and keeps it so; nothing is animated (the human at MC10, ADR-0042 item 1). Selecting a line on the map selects its stage in the list and scrolls to it.
   - **Jesus' journeys:** the segments stand alone (ADR-0038 item 3), so the list numbers the segments, and each segment names the Gospels that tell it ("Told in Mark and Luke"). Hovering and selecting work as for a stage.
-- **On the map,** only the chosen route is drawn:
+- **On the map,** the chosen route is drawn on top of our places, which stay as on the Map tab, with their pins and labels (ADR-0042 item 2). Only the chosen route is drawn:
   - **Lines,** like Google Maps' directions: one solid style for every stage, whether by land, by sea or through regions: 5 px of the accent blue `#1A73E8` inside a 2 px white edge, with round ends. There are no dashed or dotted lines (the human at MC9). Small white arrowheads inside the line, about every 200 px, show the direction.
   - **Stops:**
     - Each stop is a white dot with a blue ring, about 12 px, labelled with the stop's name in the style of our place labels, without a number.
     - The route's start is a filled blue dot; where a route ends where it began, one dot serves.
     - A place the text says they passed or sailed by is a small blue dot with its name in italic.
-    - A town or site the passages name that the travellers didn't reach, or that they name for another person, is a small grey dot with its name in grey, unless it's already on the route. Regions aren't drawn as dots (ADR-0041 item 8).
-    - Our other pins are hidden.
+    - A town or site the passages name that the travellers didn't reach, or that they name for another person, is a small dot like a passed place's, with its name in the style of our place labels, so it's easy to find (ADR-0042 item 5), unless it's already on the route. A place named in several stages is one dot. Regions aren't drawn as dots (ADR-0041 item 8).
+    - A place the route draws as one of its dots isn't drawn a second time with its own pin and label.
   - **Stage numbers:** while a stage is hovered or selected, a small pill with its number, matching the list's, sits at the middle of its line.
-  - **Selecting a stop:**
-    - A stop that is one of our places opens its place panel, with a "‹ Back to" link to the route at the top.
-    - A stop entry (ADR-0038 item 2) opens a short card in the route panel: its name, a "Today" line where the sources give one, its candidate sites if disputed, its passages, its sources, and the words "Not yet on the main map".
-- **The map underneath:** the ancient map at the route's first year (ADR-0038 item 7), without the timeline. The "Ancient | Modern" toggle stays; on the modern map the line and stops are drawn over today's map. On both, the map's credits carry the ODbL notice for the lines (`docs/LICENSES.md`).
+  - **Selecting a place** (a stop, a passed or named place, or any of our places), on the map or by its name in the route panel, opens its place panel (ADR-0042 item 3):
+    - on screens at least 1,280 px wide, to the right of the route panel, which stays;
+    - on narrower screens and phones, in the route panel's place, with a "‹ Back to route" link at the top;
+    - a stop entry that isn't one of our places yet (M5-07) opens with what the entry has: its name, a "Today" line where the sources give one, its candidate sites if disputed, its passages and its sources.
+    - the selected place is shown on the route itself: its dot becomes larger (about 1.4×), filled accent blue with a white ring, and its label uses selected-label priority so it stays visible.
+
+    The route stays drawn, and the camera moves only if the place is off the screen, at the reader's zoom.
+- **The map underneath:** the ancient map at the route's first year (ADR-0038 item 7), without the timeline for now (ADR-0042 item 7). The "Ancient | Modern" toggle stays; on the modern map the line and stops are drawn over today's map. On both, the map's credits carry the ODbL notice for the lines (`docs/LICENSES.md`).
 - **Accessibility:**
   - The tabs are a tab list, and the arrow keys move between them.
   - The stage list is an ordered list and is the text version of the lines; how each stage went is said in words.
   - Stops and stages are reachable by keyboard and show the focus ring.
   - Touch targets are at least 44 × 44 px.
-  - The stage animation honours the reader's reduced-motion setting.
 - **States:** while the routes load, the list shows placeholders; if they fail, it says "Routes couldn't load." with a "Try again" button (§5).
 
 ## 3. Place panel
@@ -245,7 +250,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 ## 7. Accessibility (WCAG 2.2 AA)
 - **Contrast:** text at least 4.5:1; pins, outlines and controls at least 3:1 against the basemap. From M4 this holds over every area fill of the ancient layer too, and its border lines reach 3:1 against the land.
 - **Keyboard:**
-  - Everything is reachable, in this order: search, the "Map | Routes" tabs (M5), the toggle, the map controls, the timeline, the places on the map, then the panel. On the Routes tab there's no timeline; the list of places on the map holds the route's stops in stage order, and the route panel comes last.
+  - Everything is reachable, in this order: search, the "Map | Routes" tabs (M5), the toggle, the map controls, the timeline, the places on the map, then the panel. On the Routes tab there's no timeline; the list of places on the map holds the route's stops in stage order, then our other places as on the Map tab, and the route panel comes last, followed by a place's panel when one is open.
   - The map draws its pins itself (ADR-0024), so keyboard and screen-reader users get a **list of the places currently on the map**, kept in step with it after each pan or zoom ends. Each entry is a button named like "Capernaum, city", "Jerusalem and 4 nearby places", or "Cluster of 7 places". Tab moves through the list in reading order (top to bottom, then left to right). A focus ring is drawn around the focused pin on the map, the map pans if the pin is hidden under the panel, and Enter selects the place or zooms into the cluster. The list is capped at 200 entries, with "Zoom in or search to reach more places" after them.
   - The focus ring is 2 px `#1A73E8` with a 2 px offset.
   - Esc closes search results and the panel.

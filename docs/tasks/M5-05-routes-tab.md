@@ -31,6 +31,27 @@ Build the Routes tab that VISUAL_SPEC §2 "Routes tab" describes: the five route
 8. **Accessibility** as the spec describes: the tab list, the ordered stage list as the text version of the lines, line styles named in words, keyboard focus, and 44 × 44 px touch targets. The axe check stays clean.
 9. **Tests:** unit tests for the panel and URL state, and Playwright checks for each case on M5-01's test data and then on the real data: a stage by land, by sea with a place passed, "path not known", a stop entry, a disputed stop, a stage without a line, the tabs by keyboard, the links, and the phone layout.
 
+## Update after MC9 (2026-10-14, ADR-0041)
+The human's play-test at MC9 changed the look. ADR-0041 and VISUAL_SPEC §2 "Routes tab" take precedence over items 2 to 4 above:
+- The list of routes draws no lines; only the chosen route is drawn.
+- One solid style for every stage, with no dashed or dotted lines; small white arrowheads show the direction.
+- Stops are white dots with a blue ring and their names, without numbers, and the start is a filled dot. A stage's number shows as a pill on its line only while the stage is hovered or selected.
+- Hovering a stage greys out the route's other lines. Selecting it plays a 1.5 s animation along its line, or only highlights it with reduced motion.
+- The header shows the borders of the route's first year.
+- The camera moves only to fit a chosen route, or to pan to a selected stage that is off the screen, at the reader's zoom.
+- The towns and sites a stage's passages name are small grey dots, listed as "Also named" (M5-06).
+- A route reads: summary, what the Bible says, the stages, the notes (every disclaimer), the sources. A stage without a line shows a "Site disputed" tag, with its reason in the notes; a stage whose text names neither how it went nor any region reads "Path not known".
+
+Round 3 (after MC9) and round 4 (from the PO's check before MC10) implement this.
+
+## Update after MC10 (2026-10-15, ADR-0042)
+The human's play-test at MC10 made the Routes tab the Map tab with a route on top. Round 6 does items 1, 2, 3 and 5 of ADR-0042, as VISUAL_SPEC §2 "Routes tab" now describes:
+- No animation: selecting a stage highlights it as hovering does.
+- Our places' pins and labels, the area labels and the ancient layer stay on the Routes tab and work as on the Map tab. A place the route draws as one of its dots isn't drawn twice.
+- Selecting any place opens its place panel: to the right of the route panel on screens at least 1,280 px wide, or in its place with "‹ Back to route" on narrower screens and phones. A stop entry opens there too, with what the entry has, until M5-07 makes it a place.
+- The names after "Passed" and "Also named" are links, and the places a stage names are drawn like passed places, with names in the style of our place labels.
+- The timeline stays hidden on the Routes tab (ADR-0042 item 7).
+
 ## Out of scope
 New data or lines (M5-02 to M5-04), the place panel's content, and changes to the Map tab beyond the tabs themselves.
 
