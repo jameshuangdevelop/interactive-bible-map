@@ -300,3 +300,19 @@ The style filters match the rule table, and neither style uses `within`.
 ### Fixes for the engineer (phase 3)
 - **D1 (C5):** add `1746708491` and `1746708787` to `naturalEarthBoundaryIdOverrides` as `hidden`. Those overrides apply only to the 1:50m pass, so the 1:10m copies stay. Also add the 1:10m Green Line's east piece, `1746708483` (33.91–34.01°E), to the Cyprus rule, so the line still reaches the coast south of Famagusta.
 - **D2 (C1, low):** drop the MAR/ESH condition from the unnamed-stub rule. That would also hide the 5.5 km unnamed piece on the Armenia–Azerbaijan border (P8's caveat), and the 9 km unnamed piece of the 27°40′N line at the Algerian border. To fill that last gap, add the 1:10m land line `1746708721` (8.82–8.68°W) to the Western Sahara rule. Alternatively, the PO accepts the stubs.
+
+## Round 4, 2026-10-19
+**Commit:** `06a7207` (draft PR #76). Method as in phase 3: the same tile build at zooms 5, 7 and 8, and my own rebuild of the shared Natural Earth file from the three pinned files, which matches the committed file byte for byte (397 features). I didn't use a browser.
+
+| Check | Result |
+|---|---|
+| Cyprus and Crimea drawn once | **Pass.** Each of `1746708491`, `1746708483` and `1746708787` is in the file once, as 1:10m geometry, and dashed. The 1:50m copies are hidden. The Cyprus overlay covers both ids, so the line runs from 32.71°E to the coast at 34.01°E. The new test checks the single copies |
+| Berm stubs | **Pass.** From zoom 5 the named berm, the 27 km spur and the Guerguerat stubs aren't drawn. As expected, the 5.5 km unnamed piece on the Armenia–Azerbaijan border is hidden too (P8) |
+| 27°40′N line | **Needs change.** `1746708721` isn't the berm. It is the east end of the Morocco–Western Sahara line along 27.661°N, from 8.82°W to the Algerian border, and Natural Earth's ISO, US, UK and German views class it "Disputed". It was added as `hidden`, so the dashed line stops about 13 km short of Algeria below zoom 5 and on the backup. From zoom 5 it stops about 9 km short, because the tiles' unnamed piece of the line is now hidden as well |
+| Mauritania borders | **Pass.** Solid at every zoom: Western Sahara–Mauritania (tiles, 1,480–1,510 km; NE `1746708049`), including the Lagouira stretch that the tiles code as Morocco–Mauritania (109 km), and Algeria–Mauritania (NE `1746708011`) |
+| Algeria–Western Sahara | **Pass.** Solid at every zoom (tiles, 40 km; NE `1746708217`). Algeria–Morocco is solid as well |
+| Regressions | **None.** The zoom 5 scan still finds the same lines for Kosovo, the Levant and the Golan, South Ossetia, and Halaib and Bir Tawil |
+
+**Fix:** make `1746708721` part of the Western Sahara rule (`sourceFeatureIds: [1746705527, 1746708721]`) so that it's dashed at every zoom. Then remove the `western-sahara-berm-stub-natural-earth` rule, and change the test that requires `1746708721` to be hidden.
+
+**Sign-off:** once that fix lands, the Fact-Checker signs off on M5-10's modern borders. Nothing else is outstanding. The lines marked "Can't tell" and the PO's defaults stay for the human to compare with Google Maps at MC13.
