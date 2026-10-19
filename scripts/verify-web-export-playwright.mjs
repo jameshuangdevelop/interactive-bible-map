@@ -68,14 +68,18 @@ const mapLayerIds = {
   majorClusterLabelLayers: [],
   clusterPins: "ibm-cluster-circle",
   majorPins: "ibm-major-pin",
-  majorPinLabels: ["ibm-major-pin"],
+  majorPinsNoDot: "ibm-major-pin-no-dot",
+  majorPinLabels: ["ibm-major-pin", "ibm-major-pin-no-dot"],
   cityPins: "ibm-city-pin",
+  cityPinsNoDot: "ibm-city-pin-no-dot",
   sitePins: "ibm-site-pin",
   candidatePins: "ibm-candidate-pin",
   pinLabels: [
     "ibm-major-pin",
+    "ibm-major-pin-no-dot",
     "ibm-routes-major-pin",
     "ibm-city-pin",
+    "ibm-city-pin-no-dot",
     "ibm-routes-city-pin",
     "ibm-site-pin",
     "ibm-routes-site-pin",
@@ -105,8 +109,8 @@ const allMajorClusterPinLayerIds = mapLayerIds.majorClusterPins ? [mapLayerIds.m
 const allMajorClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers];
 const allClusterPinLayerIds = [...allMajorClusterPinLayerIds, mapLayerIds.clusterPins];
 const allClusterLabelLayerIds = [...allMajorClusterLabelLayerIds, mapLayerIds.clusterPins];
-const allMajorPinLayerIds = [mapLayerIds.majorPins];
-const allCityPinLayerIds = [...allMajorPinLayerIds, mapLayerIds.cityPins];
+const allMajorPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.majorPinsNoDot];
+const allCityPinLayerIds = [...allMajorPinLayerIds, mapLayerIds.cityPins, mapLayerIds.cityPinsNoDot];
 const selectedPlaceLabelLayerIds = ["ibm-selected-major-pin-label", "ibm-selected-pin-label"];
 const expectedMajorPinPlaceIds = [
   "jerusalem",
@@ -7334,8 +7338,10 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
 // Every layer that draws our places' or a route's names.
 const nameLayerIds = [
   "ibm-major-pin",
+  "ibm-major-pin-no-dot",
   "ibm-routes-major-pin",
   "ibm-city-pin",
+  "ibm-city-pin-no-dot",
   "ibm-routes-city-pin",
   "ibm-site-pin",
   "ibm-routes-site-pin",
