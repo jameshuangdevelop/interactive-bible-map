@@ -198,6 +198,31 @@ async function readRouteStageUpdateProbe(page) {
   });
 }
 
+// Click a stage card on its "Stage N ·" label, never its centre: the centre can land on an
+// inline place button (fonts wrap differently on Linux CI), which selects that place instead.
+async function clickRouteStageCard(page, stageIndex) {
+  const card = page.locator(`li[data-route-stage-index="${stageIndex}"]`);
+  await card.scrollIntoViewIfNeeded();
+  const box = await card.boundingBox();
+  expect(box, `stage card ${stageIndex} should be laid out`).toBeTruthy();
+  const position = { x: 12, y: 12 };
+  const hit = await page.evaluate(
+    ({ x, y, index }) => {
+      const element = document.elementFromPoint(x, y);
+      return {
+        inCard: Boolean(element?.closest(`li[data-route-stage-index="${index}"]`)),
+        onButton: Boolean(element?.closest("button"))
+      };
+    },
+    { x: box.x + position.x, y: box.y + position.y, index: stageIndex }
+  );
+  expect(hit, `stage card ${stageIndex} click point should be on the card, not a place button`).toEqual({
+    inCard: true,
+    onButton: false
+  });
+  await card.click({ position });
+}
+
 test("map requests tiles and loads workers on startup", { tag: ["@data"] }, async ({ page, baseUrl }) => {
   const requestUrls = [];
   const workerUrls = [];
@@ -624,9 +649,12 @@ test("route stage selection only updates route sources and never touches layout 
     await page.waitForTimeout(200);
     await installRouteStageUpdateProbe(page);
     await resetRouteStageUpdateProbe(page);
-    await page.locator(`li[data-route-stage-index="${stageIndex}"]`).click();
+    await clickRouteStageCard(page, stageIndex);
     await waitForMapIdle(page);
     await page.waitForTimeout(200);
+    const urlParams = await page.evaluate(() => Object.fromEntries(new URLSearchParams(window.location.search)));
+    expect(urlParams.stage).toBe(String(stageIndex));
+    expect(urlParams.place).toBeUndefined();
 
     const probeResult = await readRouteStageUpdateProbe(page);
     const updatedSourceIds = [...new Set(probeResult.sourceUpdateCalls.map((entry) => entry.sourceId))];
@@ -892,6 +920,8 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
         break;
       }
     }
+    // Selecting a route place can open the side-by-side panel and pan the map; settle before the next candidate.
+    await waitForMapIdle(page);
     expect(clickedPlaceId, `expected click to select route place ${placeId}`).toBe(placeId);
     const stageAfterClick = await page.evaluate(() => new URLSearchParams(window.location.search).get("stage"));
     expect(stageAfterClick).toBe("4");
