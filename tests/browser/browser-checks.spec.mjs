@@ -1322,6 +1322,31 @@ test("regions only highlight when they own a shaped area in the selected year @n
       { timeout: 10_000 }
     )
     .toBe("1:ibm-selected-area-label");
+
+  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea-province`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  const judeaProvinceOverlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(judeaProvinceOverlay.veilFeatures).toBeGreaterThan(0);
+  expect(judeaProvinceOverlay.outlineFeatures).toBeGreaterThan(0);
+
+  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  const judeaRegionOverlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(judeaRegionOverlay.veilFeatures).toBe(0);
+  expect(judeaRegionOverlay.outlineFeatures).toBe(0);
+
   await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
   const galatiaOverlay = await page.evaluate((testHookKey) => {
