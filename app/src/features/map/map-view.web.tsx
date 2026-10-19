@@ -1004,8 +1004,8 @@ function createSelectedPlacePinImage() {
     context.lineWidth = 1.5;
     context.beginPath();
     context.arc(centerX, headCenterY, headRadius, Math.PI * 0.04, Math.PI * 0.96, true);
-    context.quadraticCurveTo(rightX + 1.5, controlY, centerX, tipY);
-    context.quadraticCurveTo(leftX - 1.5, controlY, leftX, headCenterY);
+    context.quadraticCurveTo(leftX - 1.5, controlY, centerX, tipY);
+    context.quadraticCurveTo(rightX + 1.5, controlY, rightX, headCenterY);
     context.closePath();
     context.fill();
     context.stroke();
