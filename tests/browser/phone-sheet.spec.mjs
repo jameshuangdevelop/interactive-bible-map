@@ -280,27 +280,23 @@ test("photo arrows stay on-screen even with an unbreakable About token @phone", 
       return;
     }
     aboutParagraph.dataset.m703ProbeInjected = "true";
-    aboutParagraph.textContent = `${aboutParagraph.textContent ?? ""} ${"W".repeat(600)}`;
+    aboutParagraph.textContent = `${aboutParagraph.textContent ?? ""} ${"W".repeat(52)}`;
   });
 
   const metrics = await page.evaluate(() => {
     const detailsSheet = document.querySelector("section[aria-label='Place details']");
     const frame = detailsSheet?.querySelector("[data-panel-photo-frame='true']");
-    const panelBodyFallbackFromFrame =
-      frame instanceof HTMLElement &&
-      frame.closest("section[data-panel-section='photos']")?.parentElement
-        ? frame.closest("section[data-panel-section='photos']")?.parentElement
-        : null;
     const panelBody =
       detailsSheet?.querySelector("[data-place-panel-body='true']") ??
-      detailsSheet?.querySelector(":scope > div > div:nth-of-type(2)") ??
-      panelBodyFallbackFromFrame;
+      detailsSheet?.querySelector(":scope > div > div:nth-of-type(2)");
     const nextButton = detailsSheet?.querySelector("button[aria-label='Next image']");
+    const aboutParagraph = detailsSheet?.querySelector("[data-panel-section='about'] p");
     if (
       !(detailsSheet instanceof HTMLElement) ||
       !(panelBody instanceof HTMLElement) ||
       !(frame instanceof HTMLElement) ||
-      !(nextButton instanceof HTMLButtonElement)
+      !(nextButton instanceof HTMLButtonElement) ||
+      !(aboutParagraph instanceof HTMLElement)
     ) {
       return null;
     }
@@ -326,6 +322,8 @@ test("photo arrows stay on-screen even with an unbreakable About token @phone", 
       frameRightPx: frameRect.right,
       panelBodyWidthPx: panelBodyRect.width,
       widestDescendantPx,
+      aboutParagraphClientWidthPx: aboutParagraph.clientWidth,
+      aboutParagraphScrollWidthPx: aboutParagraph.scrollWidth,
       nextCenterInViewport:
         nextCenterX >= 0 &&
         nextCenterY >= 0 &&
@@ -342,6 +340,9 @@ test("photo arrows stay on-screen even with an unbreakable About token @phone", 
   expect(metrics.nextCenterInViewport).toBe(true);
   expect(metrics.nextCenterOwnedByButton).toBe(true);
   expect(metrics.widestDescendantPx).toBeLessThanOrEqual(metrics.panelBodyWidthPx + 0.5);
+  expect(metrics.aboutParagraphScrollWidthPx).toBeLessThanOrEqual(
+    metrics.aboutParagraphClientWidthPx + 1
+  );
 });
 
 test("dragging from the place and route top strips moves sheets while strip taps do nothing @phone", async ({

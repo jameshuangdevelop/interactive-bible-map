@@ -1947,7 +1947,13 @@ export function PlacePanel({
             <h2 style={sectionHeadingStyle}>
               {isDisputed ? "Proposed sites" : "Sites"}
             </h2>
-            <div style={{ display: "grid", gap: `${tokens.spacing.sm}px` }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 1fr)",
+                gap: `${tokens.spacing.sm}px`
+              }}
+            >
               {location.candidates.map((candidate, candidateIndex) => {
                 const selected = selection.candidateIndex === candidateIndex;
                 const chip = typeChipStyle(candidate.confidence);
@@ -1990,7 +1996,13 @@ export function PlacePanel({
                           gap: `${tokens.spacing.sm}px`
                         }}
                       >
-                        <strong style={{ color: tokens.color.textPrimary }}>
+                        <strong
+                          style={{
+                            color: tokens.color.textPrimary,
+                            minWidth: 0,
+                            overflowWrap: "anywhere"
+                          }}
+                        >
                           {letter}. {candidate.label}
                         </strong>
                         <span
@@ -2016,6 +2028,7 @@ export function PlacePanel({
                         color: tokens.color.textSecondary,
                         fontSize: `${tokens.typography.bodySize}px`,
                         lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                        overflowWrap: "anywhere",
                         ...(expanded
                           ? {}
                           : {

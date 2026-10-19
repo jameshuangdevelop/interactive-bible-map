@@ -284,7 +284,15 @@ export function RouteStopDetailsPanel({
         </button>
       ) : null}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: `${tokens.spacing.sm}px` }}>
-        <h1 style={{ margin: 0, fontSize: `${tokens.typography.titleSize}px`, lineHeight: `${tokens.typography.titleLineHeight}px` }}>
+        <h1
+          style={{
+            margin: 0,
+            minWidth: 0,
+            overflowWrap: "anywhere",
+            fontSize: `${tokens.typography.titleSize}px`,
+            lineHeight: `${tokens.typography.titleLineHeight}px`
+          }}
+        >
           {selectedRouteStop.name}
         </h1>
         <button
@@ -1060,12 +1068,8 @@ export function AppShell() {
         return;
       }
       const target = event.target;
-      const isDragStripTarget =
-        target instanceof HTMLElement &&
-        Boolean(target.closest("[data-sheet-drag-strip]"));
       if (
         target instanceof HTMLElement &&
-        !isDragStripTarget &&
         target.closest(
           "button, a, input, select, textarea, [role='button'], [role='link'], [contenteditable='true']"
         )
