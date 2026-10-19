@@ -48,6 +48,7 @@ const fullLicenseDetailsUrl =
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const minimumControlHitAreaPx = 44;
+const UI_STATE_TIMEOUT_MS = 15_000;
 const timelineBorderNote =
   "Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene, Chalcis or Emesa, aren't drawn. Polemon's kingdom of Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.";
 const smoothnessLayerIds = {
@@ -466,7 +467,7 @@ async function jumpToCurrentImageCredit(page) {
       activeElement instanceof HTMLElement &&
       activeElement.getAttribute("data-photo-credits-entry") === "true"
     );
-  });
+  }, { timeout: UI_STATE_TIMEOUT_MS });
 
   const focusedEntry = await page.evaluate(() => {
     const activeElement = document.activeElement;
@@ -1297,7 +1298,7 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
       (element.matches("button[aria-label='Open app menu']") ||
         element.matches("input[aria-label='Search biblical places']"))
     );
-  });
+  }, { timeout: UI_STATE_TIMEOUT_MS });
 
   const postEscapeFocus = await getActiveElementSnapshot(page);
   if (postEscapeFocus.category !== "search") {
@@ -1359,7 +1360,7 @@ async function verifyKeyboardOrderAndEscapeBehavior(page, baseUrl) {
       active.matches("button[aria-label='Open app menu']") ||
       active.matches("input[aria-label='Search biblical places']")
     );
-  }, openerEntryId);
+  }, openerEntryId, { timeout: UI_STATE_TIMEOUT_MS });
 
   const postEscapeSnapshot = await getActiveElementSnapshot(page);
   if (
@@ -1576,7 +1577,7 @@ async function verifySearchMenuAndAccessibility(
   await page.waitForFunction(() => {
     const active = document.activeElement;
     return Boolean(active && active.matches("input[aria-label='Search biblical places']"));
-  });
+  }, { timeout: UI_STATE_TIMEOUT_MS });
 
   await page.keyboard.type("Antioch");
   await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
@@ -2155,7 +2156,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
       "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
     );
     return button instanceof HTMLButtonElement && button.getAttribute("aria-expanded") === "true";
-  });
+  }, { timeout: UI_STATE_TIMEOUT_MS });
   const emmausExpanded = await candidateToggle.getAttribute("aria-expanded");
   const candidateSupportControlId = await candidateToggle.getAttribute("aria-controls");
 
@@ -2165,7 +2166,7 @@ async function verifyKeyboardDisclosureControls(page, baseUrl) {
       "section[aria-label='Place details'] button[data-candidate-support-toggle='true']"
     );
     return button instanceof HTMLButtonElement && button.getAttribute("aria-expanded") === "false";
-  });
+  }, { timeout: UI_STATE_TIMEOUT_MS });
   const emmausCollapsed = await candidateToggle.getAttribute("aria-expanded");
 
   await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
@@ -3358,7 +3359,7 @@ async function verifyGalleryFixtureWithViewer(browser, baseUrl) {
     await page.waitForFunction(() => {
       const active = document.activeElement;
       return active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true";
-    });
+    }, { timeout: UI_STATE_TIMEOUT_MS });
     const focusRestored = await page.evaluate(() => {
       const active = document.activeElement;
       return active instanceof HTMLElement && active.getAttribute("data-image-viewer-open") === "true";
@@ -3791,7 +3792,7 @@ async function verifySimplePanelHeaderWithCountries(page, baseUrl, screenshotPat
   await page.waitForFunction(() => {
     const active = document.activeElement;
     return Boolean(active && active.matches("input[aria-label='Search biblical places']"));
-  });
+  }, { timeout: UI_STATE_TIMEOUT_MS });
   await page.keyboard.type("Ephesus");
   await page.waitForSelector("[data-testid='search-results-list']", { timeout: 30_000 });
 
@@ -4049,7 +4050,7 @@ async function verifyPanelAccessibility(browser, baseUrl) {
               button instanceof HTMLButtonElement &&
               button.getAttribute("aria-expanded") === "true"
             );
-          });
+          }, { timeout: UI_STATE_TIMEOUT_MS });
         }
       })
     );

@@ -71,6 +71,8 @@ const routeStage4PlaceIds = new Set([
   "myra",
   "crete"
 ]);
+const MAP_LOAD_TIMEOUT_MS = 60_000;
+const MAP_CANVAS_TIMEOUT_MS = 30_000;
 
 async function waitForMapIdle(page) {
   await page.waitForFunction(
@@ -79,7 +81,8 @@ async function waitForMapIdle(page) {
       return Boolean(map && map.loaded() && !map.isMoving() && map.areTilesLoaded());
     },
     mapTestHookKey,
-    { timeout: 60_000 }
+    // The first map idle can wait on worker startup + initial tile loads on CI.
+    { timeout: MAP_LOAD_TIMEOUT_MS }
   );
 }
 
@@ -205,22 +208,25 @@ async function clickRouteStageCard(page, stageIndex) {
   await card.scrollIntoViewIfNeeded();
   const box = await card.boundingBox();
   expect(box, `stage card ${stageIndex} should be laid out`).toBeTruthy();
-  const position = { x: 12, y: 12 };
-  const hit = await page.evaluate(
-    ({ x, y, index }) => {
-      const element = document.elementFromPoint(x, y);
+  const clickOffset = { x: 12, y: 12 };
+  const hit = await card.evaluate(
+    (element, { offset, index }) => {
+      const rect = element.getBoundingClientRect();
+      const x = rect.left + element.clientLeft + offset.x;
+      const y = rect.top + element.clientTop + offset.y;
+      const hitElement = document.elementFromPoint(x, y);
       return {
-        inCard: Boolean(element?.closest(`li[data-route-stage-index="${index}"]`)),
-        onButton: Boolean(element?.closest("button"))
+        inCard: Boolean(hitElement?.closest(`li[data-route-stage-index="${index}"]`)),
+        onButton: Boolean(hitElement?.closest("button"))
       };
     },
-    { x: box.x + position.x, y: box.y + position.y, index: stageIndex }
+    { offset: clickOffset, index: stageIndex }
   );
   expect(hit, `stage card ${stageIndex} click point should be on the card, not a place button`).toEqual({
     inCard: true,
     onButton: false
   });
-  await card.click({ position });
+  await card.click({ position: clickOffset });
 }
 
 test("map requests tiles and loads workers on startup", { tag: ["@data"] }, async ({ page, baseUrl }) => {
@@ -234,7 +240,8 @@ test("map requests tiles and loads workers on startup", { tag: ["@data"] }, asyn
   });
 
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("canvas.maplibregl-canvas");
+  // Canvas mount can exceed 15s when Chromium starts the map worker on CI.
+  await page.waitForSelector("canvas.maplibregl-canvas", { timeout: MAP_CANVAS_TIMEOUT_MS });
   await page.waitForTimeout(500);
 
   const tileRequestCount = requestUrls.filter(
