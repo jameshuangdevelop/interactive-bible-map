@@ -172,6 +172,7 @@ const AI_MEDIA_URL_PATTERN =
   /^media\/ai\/([a-z0-9]+(?:-[a-z0-9]+)*-ai-[0-9]{2})\.webp$/u;
 const IMAGE_PROMPT_SOURCE_ID_PATTERN = /\[([^\]\r\n]+)\]/gu;
 const ROUTE_STOP_DUPLICATE_DISTANCE_KM = 2;
+const WATER_NAME_PATTERN = /\b(?:Sea|Lake|River|Gulf|Bay|Strait|Sound)\b/iu;
 // Entries use "<stopId>|<locationId>" -> "reason".
 const ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST = new Map([
   // Bethphage traditionally sits on the Mount of Olives ridge, where several
@@ -187,6 +188,48 @@ const ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST = new Map([
   ["bethphage|pool-of-siloam", "Distinct site at the southern end of the City of David."],
   ["bethphage|temple-mount", "Distinct site inside the Old City, across the Kidron Valley."]
 ]);
+const ADR_0029_MAJOR_PLACE_IDS = Object.freeze([
+  "antioch-syria",
+  "athens",
+  "bethany-beyond-the-jordan",
+  "bethany",
+  "bethlehem",
+  "caesarea-maritima",
+  "cana",
+  "capernaum",
+  "colossae",
+  "corinth",
+  "crete",
+  "damascus",
+  "ephesus",
+  "galatia",
+  "gethsemane",
+  "golgotha",
+  "jericho",
+  "jerusalem",
+  "laodicea",
+  "mount-of-olives",
+  "nazareth",
+  "pergamum",
+  "philadelphia-lydia",
+  "philippi",
+  "rome",
+  "sardis",
+  "sea-of-galilee",
+  "smyrna",
+  "temple-mount",
+  "thessalonica",
+  "thyatira"
+]);
+const ADR_0029_MAJOR_PLACE_ID_SET = new Set(ADR_0029_MAJOR_PLACE_IDS);
+const WATER_NAME_KIND_EXCEPTIONS = Object.freeze([
+  // Keep exceptions explicit. Add entries only with a source-backed reason:
+  // { id: "<location-id>", reason: "<why this named feature is not water>" }
+]);
+const WATER_NAME_KIND_EXCEPTION_BY_ID = new Map(
+  WATER_NAME_KIND_EXCEPTIONS.map((entry) => [entry.id, entry.reason])
+);
+const ROUTE_LINE_SURFACE_MODEL_CACHE = new Map();
 
 function toPosixPath(value) {
   return value.replace(/\\/gu, "/");
@@ -237,6 +280,92 @@ function inferValidationContentRoot(locationsDirectory, mediaDirectory) {
   const locationRoot = inferDataRootFromDirectory(locationsDirectory, "locations");
   const mediaRoot = inferDataRootFromDirectory(mediaDirectory, "media");
   return commonAncestorDirectory(locationRoot, mediaRoot) ?? repositoryRoot;
+}
+
+function collectEnglishNamesForWaterKindRule(locationData) {
+  const names = [
+    ...(Array.isArray(locationData?.names?.ancient) ? locationData.names.ancient : []),
+    ...splitModernNameVariants(locationData?.names?.modern),
+    ...(Array.isArray(locationData?.names?.alternate) ? locationData.names.alternate : [])
+  ];
+  if (Array.isArray(locationData?.names?.otherLanguages)) {
+    for (const entry of locationData.names.otherLanguages) {
+      if (typeof entry?.name !== "string") {
+        continue;
+      }
+      const language = typeof entry?.language === "string" ? entry.language.toLowerCase() : "";
+      if (language === "english" || language === "en") {
+        names.push(entry.name);
+      }
+    }
+  }
+
+  return toTrimmedNonEmptyNameList(names);
+}
+
+function validateAdr0029MajorPlaces({
+  locationRecords,
+  majorPlacesValidationFile,
+  shouldValidateMajorPlaces,
+  errors
+}) {
+  if (!shouldValidateMajorPlaces) {
+    return;
+  }
+
+  const majorIds = new Set(
+    locationRecords
+      .filter((record) => record.data?.prominence === "major" && typeof record.data?.id === "string")
+      .map((record) => record.data.id)
+  );
+
+  for (const locationRecord of locationRecords) {
+    if (locationRecord.data?.prominence !== "major") {
+      continue;
+    }
+    const locationId = locationRecord.data?.id;
+    if (typeof locationId !== "string" || ADR_0029_MAJOR_PLACE_ID_SET.has(locationId)) {
+      continue;
+    }
+    recordError(
+      errors,
+      locationRecord.relativePath,
+      "$.prominence",
+      `prominence 'major' is reserved for ADR-0029's fixed 31 places; '${locationId}' is not on that list`
+    );
+  }
+
+  const missingMajorIds = ADR_0029_MAJOR_PLACE_IDS.filter((id) => !majorIds.has(id));
+  if (missingMajorIds.length > 0) {
+    recordError(
+      errors,
+      majorPlacesValidationFile,
+      "$",
+      `ADR-0029 major places are incomplete: missing ${missingMajorIds.join(", ")}`
+    );
+  }
+}
+
+async function loadRouteLineSurfaceModelFromPaths(routeLineLandPath, routeLineLakesPath) {
+  const resolvedLandPath = path.resolve(routeLineLandPath);
+  const resolvedLakesPath = routeLineLakesPath
+    ? path.resolve(routeLineLakesPath)
+    : "__empty-lakes__";
+  const cacheKey = `${resolvedLandPath}|${resolvedLakesPath}`;
+  const cachedModel = ROUTE_LINE_SURFACE_MODEL_CACHE.get(cacheKey);
+  if (cachedModel) {
+    return cachedModel;
+  }
+
+  const [land, lakes] = await Promise.all([
+    readJsonFile(resolvedLandPath),
+    routeLineLakesPath
+      ? readJsonFile(path.resolve(routeLineLakesPath))
+      : { type: "FeatureCollection", features: [] }
+  ]);
+  const surfaceModel = createSurfaceModel({ land, lakes, bounds: ROUTE_LINE_REGION_BOUNDS });
+  ROUTE_LINE_SURFACE_MODEL_CACHE.set(cacheKey, surfaceModel);
+  return surfaceModel;
 }
 
 function pointerToJsonPath(pointer, missingProperty) {
@@ -2319,6 +2448,11 @@ export async function validateData(options = {}) {
     typeof options.requireRouteText === "boolean"
       ? options.requireRouteText
       : requireRouteTextFromEnvironment ?? REQUIRE_ROUTE_TEXT;
+  const skipRouteLineAudit = options.skipRouteLineAudit === true;
+  const requireCanonicalMajorPlaces =
+    typeof options.requireCanonicalMajorPlaces === "boolean"
+      ? options.requireCanonicalMajorPlaces
+      : usingRepositoryDataRoot;
 
   const errors = [];
   const warnings = [];
@@ -2576,14 +2710,15 @@ export async function validateData(options = {}) {
   // The routes' lines audit measures against Natural Earth 10 m land and lakes (pinned), or against
   // the land and lakes given by `routeLineLandPath` and `routeLineLakesPath` (test fixtures).
   let routeLineSurfaceModel = null;
-  if (routeLinesData) {
+  if (routeLinesData && !skipRouteLineAudit) {
     try {
-      if (options.routeLineLandPath) {
-        const [land, lakes] = await Promise.all([
-          readJsonFile(path.resolve(options.routeLineLandPath)),
-          options.routeLineLakesPath ? readJsonFile(path.resolve(options.routeLineLakesPath)) : { type: "FeatureCollection", features: [] }
-        ]);
-        routeLineSurfaceModel = createSurfaceModel({ land, lakes, bounds: ROUTE_LINE_REGION_BOUNDS });
+      if (options.routeLineSurfaceModel) {
+        routeLineSurfaceModel = options.routeLineSurfaceModel;
+      } else if (options.routeLineLandPath) {
+        routeLineSurfaceModel = await loadRouteLineSurfaceModelFromPaths(
+          options.routeLineLandPath,
+          options.routeLineLakesPath
+        );
       } else {
         routeLineSurfaceModel = await loadPinnedSurfaceModel();
       }
@@ -2756,6 +2891,13 @@ export async function validateData(options = {}) {
       data: mediaRecord
     });
   }
+
+  validateAdr0029MajorPlaces({
+    locationRecords,
+    majorPlacesValidationFile: relativeFromRepositoryRoot(locationsDirectory),
+    shouldValidateMajorPlaces: requireCanonicalMajorPlaces,
+    errors
+  });
 
   const locationIdToFiles = new Map();
   const imageIdToFiles = new Map();
@@ -3841,6 +3983,23 @@ export async function validateData(options = {}) {
         "$.parentId",
         `parentId '${data.parentId}' does not match any location id`
       );
+    }
+
+    if (data.type === "natural-feature") {
+      const englishNames = collectEnglishNamesForWaterKindRule(data);
+      const matchedWaterName = englishNames.find((name) => WATER_NAME_PATTERN.test(name));
+      if (matchedWaterName) {
+        const locationId = typeof data.id === "string" ? data.id : "";
+        const exceptionReason = WATER_NAME_KIND_EXCEPTION_BY_ID.get(locationId);
+        if (!exceptionReason && data.naturalFeatureKind !== "water") {
+          recordError(
+            errors,
+            locationRecord.relativePath,
+            "$.naturalFeatureKind",
+            `Natural features named like water (Sea/Lake/River/Gulf/Bay/Strait/Sound) must set naturalFeatureKind to 'water'; matched '${matchedWaterName}'.`
+          );
+        }
+      }
     }
 
     if (Array.isArray(data.candidates)) {

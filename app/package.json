@@ -32,12 +32,14 @@
     "prepare:maplibre-worker": "node ../scripts/copy-maplibre-worker.mjs",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest --runInBand",
+    "test": "jest",
     "preexport:web": "npm run prepare:maplibre-worker",
     "export:web": "expo export --platform web"
   },
   "private": true,
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "testTimeout": 10000,
+    "slowTestThreshold": 2
   }
 }
