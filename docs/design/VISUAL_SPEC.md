@@ -22,11 +22,11 @@ The wireframes show the M3 app, with the areas kept for later milestones outline
 
 ### Small screens (under 768 px) — basic only in M3
 - The search box spans the width at the top, with 16 px margins.
-- The place panel becomes a **bottom sheet**: it opens at about 40% height (photo and title), and is dragged or tapped to open fully. A close button sits at the top right.
+- The place panel becomes a **bottom sheet** with three positions: **closed**, **half** and **full**. Opening a place starts at half (about 40–53% height, showing the photo and title). Dragging the top edge up opens to full, and dragging down lowers it to half or closes it. Tapping the handle toggles half/full. A close button sits at the top right.
 - The zoom buttons are hidden, since pinch zoom replaces them; reset view stays.
 - **The opening view fits the screen** (M7-01): the same area as on desktop, from Rome to Damascus and down to the Nile delta, is fitted to the screen's width, so a phone sees all of it at a lower zoom instead of only Greece.
 - **Toggle and timeline (M4):** the toggle sits at the top right, just below the search box. The timeline spans the bottom with 16 px margins while no place is open; the bottom sheet covers it while a place is open, and it returns when the sheet closes. While the sheet is fully open, it covers the map's controls too, so the toggle is hidden until the sheet is lowered.
-- **Tabs and the route panel (M5):** the "Map | Routes" tabs sit at the top left, just below the search box, level with the toggle. The route panel is the bottom sheet, opening at about 40% height with the route's title and its first stages.
+- **Tabs and the route panel (M5):** the "Map | Routes" tabs sit at the top left, just below the search box, level with the toggle. The route panel uses the same bottom-sheet behaviour: half/full positions and drag/tap on the handle; dragging down from half on a route-place sheet closes it back to the route list.
 - Full responsive polish is M7.
 
 ## 2. The map
@@ -220,6 +220,13 @@ The section order follows brief §1.4. Sections without data are left out.
 13. **Footer:** "Checked by the project's Fact-Checker · last reviewed 24 Sep 2026", and **Report an issue**, which opens a GitHub issue with the place id filled in.
 
 The panel closes with its × button or with Esc. While the panel is open, the map keeps its position.
+
+On phones, the panel is a draggable bottom sheet:
+- **Positions:** closed, half and full. At full, it fills the screen below the safe-area inset and covers the search box, tabs and toggle.
+- **Drag:** the top strip (handle + header, at least 44 px high) is draggable. Releasing settles to the nearest position; a quick flick moves one position further in the flick's direction. Small movements are taps.
+- **Scroll vs drag:** content scrolls inside the sheet. A downward drag inside content moves the sheet only when that content is already at scroll top; otherwise it scrolls the content.
+- **Handle button:** labelled "Expand details" / "Collapse details", with `aria-expanded`, and keyboard activation on Enter/Space.
+- **Reduced motion:** sheet transitions jump instead of animating.
 
 ## 4. Search
 - **Placeholder:** "Search biblical places". The box searches **English place names only** (brief §1.7; ADR-0026): each record's `ancient` and `alternate` names, which include the spellings of the NIV, ESV, NLT, KJV, NKJV, CSB and WEB. So a reader can look up any place by the name their Bible uses; for example "Melita" (KJV) finds Malta. Modern names, candidate labels and names in other languages are not searched.

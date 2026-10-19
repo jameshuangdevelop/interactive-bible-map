@@ -1707,9 +1707,9 @@ export function PlacePanel({
         >
           {isSmallScreen ? (
             <button
-              aria-label={
-                isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
-              }
+              aria-expanded={isSmallScreenExpanded}
+              aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
+              data-sheet-handle="place"
               onPointerDown={onSmallScreenHandlePointerDown}
               onClick={onToggleSmallScreenExpanded}
               style={{
@@ -1782,9 +1782,9 @@ export function PlacePanel({
       >
       {isSmallScreen ? (
         <button
-            aria-label={
-              isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
-            }
+            aria-expanded={isSmallScreenExpanded}
+            aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
+            data-sheet-handle="place"
             onPointerDown={onSmallScreenHandlePointerDown}
             onClick={onToggleSmallScreenExpanded}
             style={{
