@@ -404,6 +404,8 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   3. Merges, and checkpoint approvals, stay with the human. Deleting merged branches stays as in ADR-0023.
 - **Consequences:** Docs, plans, schemas, research and data the app doesn't show yet flow without a round trip. Anything the human can play-test waits for their feedback on a local preview: app changes such as M5-05's Routes tab, at MC9, and data changes the live app already shows, such as new places, new images or new text in the panel.
 
+- **Update (2026-10-18):** superseded by ADR-0046. The PO now opens PRs for every change, and the human reviews on each PR's preview.
+
 ## ADR-0041 — Routes drawn simply, and disclaimers last
 - **Date:** 2026-10-14 · **Status:** Accepted · **By:** the human at mini checkpoint MC9 ("I won't lie the routes are extremely confusing to look at"; "As a principle, put all disclaimers at the very end"; "No dotted lines please. Just add disclaimers at the end"; "if zoomed, keep the zoom please"; "Display all places on the map if they're in the Bible please"), and the PO, for the map design the human asked for help with ("Help me come up with a good way to make it less confusing please") and for one line style for land and sea, both chosen while the human was away. This amends ADR-0038 items 1 and 6.
 - **Context:** At MC9 the Routes tab drew every route in grey under the chosen one, numbered every stop, dashed the stages by sea and dotted those whose path isn't known, and opened each route's note with its caveats.
@@ -488,3 +490,52 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   - VISUAL_SPEC §2 follows.
   - The human play-tests all three at MC13 before any of them is pushed (ADR-0040).
   - The PO's other defaults at MC12 stand, since the play-test raised nothing about them: a disputed place's name sits at its first candidate; islands and capes are green; the timeline stays hidden on the Routes tab.
+- **Update (2026-10-18, ADR-0046):** M5-09 and M5-10 go up as draft PRs instead of waiting for a local MC13, and the human tries them on the PRs' previews.
+
+## ADR-0045 — Tests that matter, run in parallel, with time limits, failing fast
+- **Date:** 2026-10-18 · **Status:** Accepted
+- **By:** the human, who asked to "put a time limit on each test and run them in parallel on github" ("yeah your fix sounds good"), and then: "optimize to only keep tests that matter (tests that actually make sure our data are accurate and the user experience is optimized) instead of only going for code coverage … we cannot have tests running this long. Test time limit and failing fast should be a thing that's on your mind". The PO wrote the details, from a research report and an audit of every test.
+- **Context:**
+  - **The browser suite** (`verify:web:playwright`) is one 14,000-line script that uses the Playwright library and runs 60 checks in series, with no way to run one check or several at once. It takes about 18 minutes in CI and 20–25 minutes on the 8 GB laptop where the agents work.
+  - **Time spent waiting:** a fixed 2.5 s sleep after every page load adds up to about 6 minutes. Four checks wait 30 s each to see that nothing happens. Ten screenshot captures assert nothing.
+  - **The Node tests** take 3–6 minutes in CI. About 95% of that is one file that builds the real ancient layer twice, which `build:data` then builds again.
+  - **Nothing has a time limit:** no test, and not the CI build job.
+  - **Flakiness:** ADR-0036 took the suite out of PR CI after 9 of 24 runs failed, mostly for outside reasons, and nothing retries.
+  - **Gaps:** the audit found tests that guard nothing users see, while some of the human's newest requests (MC12) have no test at all.
+  - **Runners:** the repo is public, so GitHub's standard runners are free: 4 CPUs and 16 GB each, up to 20 jobs at once.
+- **Decision:**
+  1. **Tests protect data accuracy and the user experience; coverage is not a goal.** Every test names the fact or journey it protects. Change detectors are deleted. Tests are written at the lowest level that can catch the problem. The policy is `docs/TESTING.md`.
+  2. **Sizes and time limits** (Google's test sizes):
+     - **Small:** Node tests 30 s each, Jest tests 10 s.
+     - **Medium:** browser tests against the local export, 60 s each by default, at most 180 s with a reason.
+     - **Large:** live-network and GPU checks; weekly or on a desktop.
+     
+     Every CI job has `timeout-minutes`.
+  3. **The browser suite moves to `@playwright/test`.** Each check becomes a test, tagged by area. CI runs about 6 shards in parallel from one shared export. A shard stops after 5 failures, failed tests retry twice, and a test that passes on a retry is reported as flaky. The shards' reports are merged into one.
+  4. **Failing fast:**
+     - lint, type-check, unit tests and data validation run first, in parallel, and gate the data build and export;
+     - the export gates the browser shards;
+     - a newer push cancels the PR's older run.
+     
+     **Target: a PR's CI under 10 minutes of wall time.**
+  5. **Data checks test what ships:** the real-data checks run against `build:data`'s output (`test:generated`) instead of rebuilding it inside unit tests.
+  6. **Flaky tests are retried, reported and quarantined** (`@quarantine`, a one-week fix deadline), never silently skipped. "Delete, don't skip."
+  7. **Lighthouse, `bench:map` and the GPU smoothness gate stay on a desktop with a real GPU.** CI has none, and the research found timings on shared runners too noisy to gate on. In CI the smoothness checks still run, as functional checks.
+- **Supersedes:**
+  - ADR-0036 item 2 for the browser suite: it now runs on every PR. Lighthouse stays on a desktop.
+  - Step 3 of the frontend engineer's session protocol, which runs the full suite locally. Engineers now run the tests for the area they change, e.g. `--grep @routes`, and CI runs the rest.
+- **Consequences:**
+  - Cards: **M5-12**, the browser suite on `@playwright/test` with shards and the new CI job graph; **M5-13**, fast data tests that check what ships; **M5-14**, tests for what users see: MC12, the phone, the Routes tab's keyboard, accessibility on the new screens.
+  - #67 was the first step: the full suite on every PR, plus a time limit on the build job.
+  - **Later (BACKLOG):** replaying tile requests from a recording, so browser tests stop depending on the network; mutation testing of the validator and data builders; Lighthouse as a weekly, advisory CI run; path filters.
+
+## ADR-0046 — The PO opens PRs for every change; the human reviews on the PR and its preview
+- **Date:** 2026-10-18 · **Status:** Accepted
+- **By:** the human: "yeah you can push unfinished branches without opening PRs just so Github can test them", and minutes later: "you have permissions to open and push to PRs. We can just push new commits if I don't like anything anyways. You have permission to change that rule".
+- **Decision:**
+  1. The PO may push any branch, and open and update PRs, for every change, including play-testable ones, without a local preview first.
+  2. Unfinished work goes up as **draft PRs,** so that CI tests it and the preview deploy gives the human a link to try.
+  3. The human reviews on the PR and its preview link, and asks for changes as new commits.
+  4. **Merging stays with the human.**
+  5. Mini checkpoints (ADR-0031) use the PR preview links instead of a local server.
+- **Supersedes:** ADR-0040's rule that play-testable work waits for a local preview before it's pushed.
