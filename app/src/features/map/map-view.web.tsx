@@ -292,8 +292,6 @@ const areaLabelPointLayout = {
 };
 const areaLabelColorExpression = toExpression([
   "case",
-  ["==", ["get", "isSelectedPlace"], true],
-  "#1A73E8",
   ["==", ["feature-state", "isHovered"], true],
   "#1A73E8",
   "#3C4043"
@@ -2847,6 +2845,8 @@ export function MapView({
   const previousRouteFocusKeyRef = useRef<string | null>(null);
   const previousSelectedStageFocusKeyRef = useRef<string | null>(null);
   const previousSelectedRouteStopFocusKeyRef = useRef<string | null>(null);
+  const selectedRegionSourceSyncKeyRef = useRef<string | null>(null);
+  const selectedHolderLabelFilterSyncKeyRef = useRef<string | null>(null);
   const latestRoutesOverlayRef = useRef<MapViewProps["routesOverlay"]>(routesOverlay);
   const preservedCameraRef = useRef<{
     center: [number, number];
@@ -2993,12 +2993,21 @@ export function MapView({
     if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
       return null;
     }
+    if (!selectedPlace.politicalAreaId || selectedPlace.politicalAreaId !== selectedPlace.id) {
+      return null;
+    }
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
       stopPayload: selectedAncientStopPayload,
-      politicalAreaId: selectedPlace.politicalAreaId ?? null
+      politicalAreaId: selectedPlace.id
     });
   }, [ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+  const selectedRegionSourceSyncKey = useMemo(() => {
+    if (!selectedRegionGeometry) {
+      return "none";
+    }
+    return JSON.stringify(selectedRegionGeometry);
+  }, [selectedRegionGeometry]);
   const selectedRegionVeilFeatures = useMemo(
     () => buildSelectedRegionVeilFeatureCollection(selectedRegionGeometry),
     [selectedRegionGeometry]
@@ -3499,6 +3508,11 @@ export function MapView({
 
   const applySelectedHolderLabelFilters = useCallback(
     (map: MapLibreMap) => {
+      const holderFilterSyncKey = `${selectedHolderLabelEntryId ?? "__none__"}:${selectedHolderLabelPlaceId ?? "__none__"}:${styleReadyVersion}`;
+      if (selectedHolderLabelFilterSyncKeyRef.current === holderFilterSyncKey) {
+        return;
+      }
+
       const baseFilter: FilterSpecification = selectedHolderLabelEntryId
         ? toLayerFilter([
             "all",
@@ -3517,8 +3531,9 @@ export function MapView({
       map.setFilter(layerAncientHolderLabelClickableId, baseFilter);
       map.setFilter(layerAncientHolderLabelClickTargetId, baseFilter);
       map.setFilter(layerAncientHolderLabelSelectedId, selectedFilter);
+      selectedHolderLabelFilterSyncKeyRef.current = holderFilterSyncKey;
     },
-    [selectedHolderLabelEntryId, selectedHolderLabelPlaceId]
+    [selectedHolderLabelEntryId, selectedHolderLabelPlaceId, styleReadyVersion]
   );
 
   const syncBaseSourcesAndLayers = useCallback(() => {
@@ -3553,8 +3568,15 @@ export function MapView({
     ensureGeoJsonSource(map, sourceAncientHolderLabelsId, ancientHolderLabelFeatures, {
       promoteId: "entryId"
     });
-    ensureGeoJsonSource(map, sourceSelectedRegionVeilId, selectedRegionVeilFeatures);
-    ensureGeoJsonSource(map, sourceSelectedRegionOutlineId, selectedRegionOutlineFeatures);
+    const shouldSyncSelectedRegionSources =
+      selectedRegionSourceSyncKeyRef.current !== selectedRegionSourceSyncKey ||
+      !map.getSource(sourceSelectedRegionVeilId) ||
+      !map.getSource(sourceSelectedRegionOutlineId);
+    if (shouldSyncSelectedRegionSources) {
+      ensureGeoJsonSource(map, sourceSelectedRegionVeilId, selectedRegionVeilFeatures);
+      ensureGeoJsonSource(map, sourceSelectedRegionOutlineId, selectedRegionOutlineFeatures);
+      selectedRegionSourceSyncKeyRef.current = selectedRegionSourceSyncKey;
+    }
     syncRouteSources();
 
     ensureRouteStagePillImage(map);
@@ -3573,6 +3595,7 @@ export function MapView({
     ancientHolderLabelFeatures,
     ancientRoads,
     effectiveRenderData,
+    selectedRegionSourceSyncKey,
     selectedRegionOutlineFeatures,
     selectedRegionVeilFeatures,
     selectedPlacePinFeatures,
@@ -4554,10 +4577,11 @@ export function MapView({
       origin === "map-candidate" ||
       origin === "map-dot" ||
       origin === "keyboard-visible-place";
-    if (isMapInitiatedSelection) {
+    const isAreaSelection = isAreaLabelType(place.type);
+    if (isMapInitiatedSelection && isAreaSelection) {
       return;
     }
-    if (routesModeEnabled) {
+    if (routesModeEnabled || isMapInitiatedSelection) {
       panSelectionIfOffScreen(
         map,
         place,

@@ -35,7 +35,7 @@ describe("selected region highlight geometry", () => {
     expect(veil.features[0].geometry.type).toBe("Polygon");
     expect(veil.features[0].geometry.coordinates).toHaveLength(2);
     expect(veil.features[0].geometry.coordinates[0][0]).toEqual([-180, -85]);
-    expect(veil.features[0].geometry.coordinates[1]).toEqual(geometry.coordinates[0]);
+    expect(veil.features[0].geometry.coordinates[1]).toEqual([...geometry.coordinates[0]].reverse());
     expect(veil.features[1].geometry.type).toBe("Polygon");
     expect(veil.features[1].geometry.coordinates).toEqual([geometry.coordinates[1]]);
   });
