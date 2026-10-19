@@ -151,11 +151,6 @@ jobs:
           name: web-export
           path: app/dist
 
-      - name: Restore generated data files for browser fixtures
-        run: |
-          mkdir -p app/public/generated
-          cp -R app/dist/generated/. app/public/generated/
-
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
