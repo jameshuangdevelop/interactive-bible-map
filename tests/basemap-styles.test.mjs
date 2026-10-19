@@ -807,6 +807,39 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     false,
     "Liberty modern disputed-layer filter must not match generic admin-level-3 lines"
   );
+  const moroccanBermNamedMatch = evaluateStyleExpression(
+    libertyDisputedBoundaryLayer.filter,
+    {
+      admin_level: 2,
+      maritime: 0,
+      disputed: 1,
+      disputed_name: "Murdesécuritémarocainالجدارالأمنيالمغربي",
+      adm0_l: "MAR",
+      adm0_r: "ESH"
+    }
+  );
+  assert.equal(
+    moroccanBermNamedMatch,
+    false,
+    "Liberty modern disputed-layer filter must hide the Moroccan berm tile feature"
+  );
+  const moroccanBermUnnamedStubMatch = evaluateStyleExpression(
+    libertyDisputedBoundaryLayer.filter,
+    {
+      admin_level: 2,
+      maritime: 0,
+      disputed: 1,
+      disputed_name: "",
+      claimed_by: "",
+      adm0_l: "MAR",
+      adm0_r: "ESH"
+    }
+  );
+  assert.equal(
+    moroccanBermUnnamedStubMatch,
+    false,
+    "Liberty modern disputed-layer filter must hide unnamed Moroccan berm stubs"
+  );
   const neutralBoundaryLayer = style.layers.find(
     (layer) => layer.id === "ibm-modern-neutral-boundary-solid"
   );
@@ -932,4 +965,42 @@ test("Modern shared Natural Earth boundaries keep lineStyle for solid and dashed
 
   assert.equal((styleCounts.get("solid") ?? 0) > 0, true, "Must include solid Natural Earth lines");
   assert.equal((styleCounts.get("dashed") ?? 0) > 0, true, "Must include dashed Natural Earth lines");
+
+  const southOssetiaFeature = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => Number(feature?.properties?.id) === 1746705385
+  );
+  assert.ok(
+    southOssetiaFeature,
+    "Shared Natural Earth boundaries must include South Ossetia supplemental line (1746705385)"
+  );
+  assert.equal(
+    southOssetiaFeature?.properties?.lineStyle,
+    "dashed",
+    "South Ossetia supplemental line must be dashed"
+  );
+
+  const egyptSudanWestSegment = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => feature?.properties?.id === "1746709045-west"
+  );
+  const egyptSudanEastSegment = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => feature?.properties?.id === "1746709045-east"
+  );
+  assert.ok(
+    egyptSudanWestSegment,
+    "Shared Natural Earth boundaries must include the solid west Egypt–Sudan split segment"
+  );
+  assert.ok(
+    egyptSudanEastSegment,
+    "Shared Natural Earth boundaries must include the dashed east Egypt–Sudan split segment"
+  );
+  assert.equal(
+    egyptSudanWestSegment?.properties?.lineStyle,
+    "solid",
+    "West Egypt–Sudan split segment must be solid"
+  );
+  assert.equal(
+    egyptSudanEastSegment?.properties?.lineStyle,
+    "dashed",
+    "East Egypt–Sudan split segment must be dashed"
+  );
 });

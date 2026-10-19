@@ -4204,6 +4204,129 @@
                 ]
               ]
             ]
+          ],
+          [
+            "!",
+            [
+              "any",
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "get",
+                    "disputed_name"
+                  ],
+                  "Murdesécuritémarocainالجدارالأمنيالمغربي"
+                ]
+              ],
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "disputed"
+                    ],
+                    0
+                  ],
+                  1
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  2
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "disputed_name"
+                    ],
+                    ""
+                  ],
+                  ""
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "claimed_by"
+                    ],
+                    ""
+                  ],
+                  ""
+                ],
+                [
+                  "any",
+                  [
+                    "in",
+                    [
+                      "get",
+                      "adm0_l"
+                    ],
+                    [
+                      "literal",
+                      [
+                        "MAR",
+                        "ESH"
+                      ]
+                    ]
+                  ],
+                  [
+                    "in",
+                    [
+                      "get",
+                      "adm0_r"
+                    ],
+                    [
+                      "literal",
+                      [
+                        "MAR",
+                        "ESH"
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
           ]
         ]
       ],
@@ -4277,99 +4400,7 @@
           ]
         ],
         [
-          "any",
-          [
-            "all",
-            [
-              "==",
-              [
-                "coalesce",
-                [
-                  "get",
-                  "maritime"
-                ],
-                0
-              ],
-              0
-            ],
-            [
-              "==",
-              [
-                "coalesce",
-                [
-                  "get",
-                  "disputed"
-                ],
-                0
-              ],
-              1
-            ]
-          ],
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "coalesce",
-                  [
-                    "get",
-                    "maritime"
-                  ],
-                  0
-                ],
-                0
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "XKK"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "SRB"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "coalesce",
-                  [
-                    "get",
-                    "maritime"
-                  ],
-                  0
-                ],
-                0
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "SRB"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "XKK"
-              ]
-            ]
-          ],
+          "all",
           [
             "any",
             [
@@ -4392,31 +4423,273 @@
                   "coalesce",
                   [
                     "get",
-                    "admin_level"
+                    "disputed"
                   ],
                   0
                 ],
-                2
-              ],
+                1
+              ]
+            ],
+            [
+              "any",
               [
-                "in",
+                "all",
                 [
-                  "get",
-                  "adm0_l"
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
                 ],
                 [
-                  "literal",
+                  "==",
                   [
-                    "XKK",
-                    "SRB"
+                    "get",
+                    "adm0_l"
+                  ],
+                  "XKK"
+                ],
+                [
+                  "==",
+                  [
+                    "get",
+                    "adm0_r"
+                  ],
+                  "SRB"
+                ]
+              ],
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "get",
+                    "adm0_l"
+                  ],
+                  "SRB"
+                ],
+                [
+                  "==",
+                  [
+                    "get",
+                    "adm0_r"
+                  ],
+                  "XKK"
+                ]
+              ]
+            ],
+            [
+              "any",
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  2
+                ],
+                [
+                  "in",
+                  [
+                    "get",
+                    "adm0_l"
+                  ],
+                  [
+                    "literal",
+                    [
+                      "XKK",
+                      "SRB"
+                    ]
+                  ]
+                ],
+                [
+                  "!",
+                  [
+                    "has",
+                    "adm0_r"
                   ]
                 ]
               ],
               [
-                "!",
+                "all",
                 [
-                  "has",
-                  "adm0_r"
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  2
+                ],
+                [
+                  "in",
+                  [
+                    "get",
+                    "adm0_r"
+                  ],
+                  [
+                    "literal",
+                    [
+                      "XKK",
+                      "SRB"
+                    ]
+                  ]
+                ],
+                [
+                  "!",
+                  [
+                    "has",
+                    "adm0_l"
+                  ]
+                ]
+              ]
+            ],
+            [
+              "any",
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  2
+                ],
+                [
+                  "in",
+                  [
+                    "get",
+                    "adm0_l"
+                  ],
+                  [
+                    "literal",
+                    [
+                      "ISR",
+                      "PSE"
+                    ]
+                  ]
+                ],
+                [
+                  "!",
+                  [
+                    "has",
+                    "adm0_r"
+                  ]
+                ]
+              ],
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  2
+                ],
+                [
+                  "in",
+                  [
+                    "get",
+                    "adm0_r"
+                  ],
+                  [
+                    "literal",
+                    [
+                      "ISR",
+                      "PSE"
+                    ]
+                  ]
+                ],
+                [
+                  "!",
+                  [
+                    "has",
+                    "adm0_l"
+                  ]
                 ]
               ]
             ],
@@ -4435,164 +4708,140 @@
                 0
               ],
               [
-                "==",
-                [
-                  "coalesce",
-                  [
-                    "get",
-                    "admin_level"
-                  ],
-                  0
-                ],
-                2
-              ],
-              [
                 "in",
                 [
                   "get",
-                  "adm0_r"
+                  "claimed_by"
                 ],
                 [
                   "literal",
                   [
-                    "XKK",
-                    "SRB"
+                    "IL",
+                    "SY"
                   ]
-                ]
-              ],
-              [
-                "!",
-                [
-                  "has",
-                  "adm0_l"
                 ]
               ]
             ]
           ],
           [
-            "any",
+            "!",
             [
-              "all",
+              "any",
               [
-                "==",
+                "all",
                 [
-                  "coalesce",
+                  "==",
                   [
-                    "get",
-                    "maritime"
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
                   ],
                   0
                 ],
-                0
-              ],
-              [
-                "==",
                 [
-                  "coalesce",
+                  "==",
                   [
                     "get",
-                    "admin_level"
+                    "disputed_name"
+                  ],
+                  "Murdesécuritémarocainالجدارالأمنيالمغربي"
+                ]
+              ],
+              [
+                "all",
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
                   ],
                   0
                 ],
-                2
-              ],
-              [
-                "in",
                 [
-                  "get",
-                  "adm0_l"
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "disputed"
+                    ],
+                    0
+                  ],
+                  1
                 ],
                 [
-                  "literal",
+                  "==",
                   [
-                    "ISR",
-                    "PSE"
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  2
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "disputed_name"
+                    ],
+                    ""
+                  ],
+                  ""
+                ],
+                [
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "claimed_by"
+                    ],
+                    ""
+                  ],
+                  ""
+                ],
+                [
+                  "any",
+                  [
+                    "in",
+                    [
+                      "get",
+                      "adm0_l"
+                    ],
+                    [
+                      "literal",
+                      [
+                        "MAR",
+                        "ESH"
+                      ]
+                    ]
+                  ],
+                  [
+                    "in",
+                    [
+                      "get",
+                      "adm0_r"
+                    ],
+                    [
+                      "literal",
+                      [
+                        "MAR",
+                        "ESH"
+                      ]
+                    ]
                   ]
-                ]
-              ],
-              [
-                "!",
-                [
-                  "has",
-                  "adm0_r"
-                ]
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "coalesce",
-                  [
-                    "get",
-                    "maritime"
-                  ],
-                  0
-                ],
-                0
-              ],
-              [
-                "==",
-                [
-                  "coalesce",
-                  [
-                    "get",
-                    "admin_level"
-                  ],
-                  0
-                ],
-                2
-              ],
-              [
-                "in",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                [
-                  "literal",
-                  [
-                    "ISR",
-                    "PSE"
-                  ]
-                ]
-              ],
-              [
-                "!",
-                [
-                  "has",
-                  "adm0_l"
-                ]
-              ]
-            ]
-          ],
-          [
-            "all",
-            [
-              "==",
-              [
-                "coalesce",
-                [
-                  "get",
-                  "maritime"
-                ],
-                0
-              ],
-              0
-            ],
-            [
-              "in",
-              [
-                "get",
-                "claimed_by"
-              ],
-              [
-                "literal",
-                [
-                  "IL",
-                  "SY"
                 ]
               ]
             ]
@@ -4896,6 +5145,63 @@
             "literal",
             [
               "1746705383"
+            ]
+          ]
+        ]
+      ],
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(248, 1%, 41%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          1,
+          5,
+          1.2,
+          12,
+          3
+        ],
+        "line-dasharray": [
+          4,
+          2
+        ],
+        "line-opacity": 1
+      }
+    },
+    {
+      "id": "ibm-modern-boundary-disputed-halaib-north-line",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "minzoom": 5,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "lineStyle"
+          ],
+          "dashed"
+        ],
+        [
+          "in",
+          [
+            "to-string",
+            [
+              "get",
+              "id"
+            ]
+          ],
+          [
+            "literal",
+            [
+              "1746705785"
             ]
           ]
         ]
@@ -5932,7 +6238,7 @@
   ],
   "name": "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)",
   "metadata": {
-    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, plus a small set of Natural Earth supplement lines for disputed and cease-fire cases; below zoom 5 Natural Earth's boundary lines are drawn and simplified. Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Natural Earth country borders and supplements: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   },
   "zoom": 14,
   "maxzoom": 14
