@@ -4481,6 +4481,7 @@ export function MapView({
     <div
       aria-label="Visible places on map"
       className="ibm-hidden-visible-places"
+      role="group"
       style={{
         position: "absolute",
         width: "1px",
