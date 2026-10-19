@@ -2,6 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "./fixtures.mjs";
 
 const PHONE_VIEWPORT = { width: 390, height: 844 };
+const SHEET_FULL_TOP_MAX_PX = 8;
+const SHEET_SETTLE_TIMEOUT_MS = 15_000;
 
 test.use({
   viewport: PHONE_VIEWPORT,
@@ -39,6 +41,88 @@ async function dragInsideElement(page, element, options) {
   await page.mouse.up();
 }
 
+async function waitForSheetSettledAtFull(page, sheetSelector) {
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(async ({ selector, fullTopMaxPx }) => {
+          const sheet = document.querySelector(selector);
+          if (!(sheet instanceof HTMLElement)) {
+            return false;
+          }
+
+          const topAtStart = sheet.getBoundingClientRect().top;
+          if (topAtStart > fullTopMaxPx) {
+            return false;
+          }
+
+          const stableAcrossFrames = await new Promise((resolve) => {
+            requestAnimationFrame(() => {
+              const top1 = sheet.getBoundingClientRect().top;
+              requestAnimationFrame(() => {
+                const top2 = sheet.getBoundingClientRect().top;
+                resolve(Math.abs(top2 - top1) <= 0.5);
+              });
+            });
+          });
+          if (stableAcrossFrames) {
+            return sheet.getBoundingClientRect().top <= fullTopMaxPx;
+          }
+
+          const transitionSettled = await new Promise((resolve) => {
+            const styles = window.getComputedStyle(sheet);
+            const parseMsList = (value) =>
+              value
+                .split(",")
+                .map((entry) => Number.parseFloat(entry.trim()) * 1_000)
+                .filter((entry) => Number.isFinite(entry) && entry > 0);
+            const durations = parseMsList(styles.transitionDuration);
+            const delays = parseMsList(styles.transitionDelay);
+            const maxTransitionMs = Math.max(
+              0,
+              ...durations.map((duration, index) => duration + (delays[index] ?? delays[0] ?? 0))
+            );
+            const hasTransition =
+              styles.transitionProperty !== "none" &&
+              Number.isFinite(maxTransitionMs) &&
+              maxTransitionMs > 0;
+            if (!hasTransition) {
+              resolve(false);
+              return;
+            }
+
+            let settled = false;
+            const finish = (value) => {
+              if (settled) {
+                return;
+              }
+              settled = true;
+              sheet.removeEventListener("transitionend", onTransitionEnd);
+              sheet.removeEventListener("transitioncancel", onTransitionEnd);
+              window.clearTimeout(timer);
+              resolve(value);
+            };
+            const onTransitionEnd = (event) => {
+              if (event.target === sheet) {
+                finish(true);
+              }
+            };
+            const timer = window.setTimeout(
+              () => finish(false),
+              Math.min(800, Math.max(220, maxTransitionMs + 80))
+            );
+            sheet.addEventListener("transitionend", onTransitionEnd);
+            sheet.addEventListener("transitioncancel", onTransitionEnd);
+          });
+
+          const topAtEnd = sheet.getBoundingClientRect().top;
+          return topAtEnd <= fullTopMaxPx && transitionSettled;
+        }, { selector: sheetSelector, fullTopMaxPx: SHEET_FULL_TOP_MAX_PX }),
+      { timeout: SHEET_SETTLE_TIMEOUT_MS }
+    )
+    .toBe(true);
+}
+
 
 test("map sheet drags between half, full, half, and closed @phone", async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded" });
@@ -49,12 +133,7 @@ test("map sheet drags between half, full, half, and closed @phone", async ({ pag
     .toBe(true);
 
   await dragHandle(page, "[data-sheet-handle='place']", -320);
-  await expect
-    .poll(async () => {
-      const box = await sheet.boundingBox();
-      return box?.y ?? 999;
-    })
-    .toBeLessThanOrEqual(8);
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
 
   await dragHandle(page, "[data-sheet-handle='place']", 360);
   await expect(page.locator("[data-sheet-handle='place']")).toHaveAttribute("aria-expanded", "false");
@@ -70,17 +149,11 @@ test("map sheet drags between half, full, half, and closed @phone", async ({ pag
 
 test("tapping the map sheet handle toggles half and full @phone", async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded" });
-  const sheet = page.locator("section[aria-label='Place details']").first();
   const handle = page.locator("[data-sheet-handle='place']");
   await expect(handle).toHaveAttribute("aria-expanded", "false");
   await handle.click();
   await expect(handle).toHaveAttribute("aria-expanded", "true");
-  await expect
-    .poll(async () => {
-      const box = await sheet.boundingBox();
-      return box?.y ?? 999;
-    })
-    .toBeLessThanOrEqual(8);
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
   await handle.click();
   await expect(handle).toHaveAttribute("aria-expanded", "false");
 });
@@ -97,6 +170,7 @@ test("full sheet intentionally covers map, center, and attribution trigger @phon
   expect(halfTop).toBeGreaterThan(40);
   await handle.click();
   await expect(handle).toHaveAttribute("aria-expanded", "true");
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
 
   const coverage = await page.evaluate(() => {
     const sheet = document.querySelector("section[aria-label='Place details']");
@@ -148,6 +222,7 @@ test("tapping body text at full keeps the sheet full @phone", async ({ page, bas
   const handle = page.locator("[data-sheet-handle='place']");
   await handle.click();
   await expect(handle).toHaveAttribute("aria-expanded", "true");
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
   const topBefore = (await sheet.boundingBox())?.y ?? 999;
   await expect(topBefore).toBeLessThanOrEqual(8);
 
@@ -163,6 +238,7 @@ test("downward drags in scrolled content do not move the full sheet @phone", asy
   const handle = page.locator("[data-sheet-handle='place']");
   await handle.click();
   await expect(handle).toHaveAttribute("aria-expanded", "true");
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
   const fullTop = (await sheet.boundingBox())?.y ?? 999;
   await expect(fullTop).toBeLessThanOrEqual(8);
 
@@ -238,12 +314,7 @@ test("route sheets support half/full and close route-place details by dragging d
   await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
   await routeListHandle.click();
   await expect(routeListHandle).toHaveAttribute("aria-expanded", "true");
-  await expect
-    .poll(async () => {
-      const box = await routeListSheet.boundingBox();
-      return box?.y ?? 999;
-    })
-    .toBeLessThanOrEqual(8);
+  await waitForSheetSettledAtFull(page, "section[aria-label='Route details']");
   await routeListHandle.click();
   await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
 
@@ -258,6 +329,7 @@ test("axe scan passes when the full place sheet is open @phone @a11y", async ({ 
   const handle = page.locator("[data-sheet-handle='place']");
   await handle.click();
   await expect(handle).toHaveAttribute("aria-expanded", "true");
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
 
   const scan = await new AxeBuilder({ page }).disableRules(["region"]).analyze();
   expect(scan.violations).toEqual([]);

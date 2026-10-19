@@ -44,6 +44,10 @@ The target for a PR's wall time is **under 10 minutes.** A newer push to the sam
 - Every test has a time limit: Node 30 s, Jest 10 s, browser 60 s by default.
 - Every CI job has `timeout-minutes`. A hang fails the job; it never runs to GitHub's default of six hours.
 - A browser shard stops after 5 failures. The shard matrix doesn't cancel sibling shards, so one run shows every failing area at once.
+- Browser actions and waits without their own timeout fail fast at 15 s (`use.actionTimeout`).
+- Browser navigations and page-load waits without their own timeout fail at 30 s (`use.navigationTimeout`).
+- A visual-state test (hover colour, selected colour, highlight) must assert rendered output: pixels in a small clip around the target, or rendered features.
+- A paint-expression string or a feature-state value alone is not enough: those can pass while nothing changes on screen. In #81 such a hover test passed while no name turned blue, because MapLibre had turned every string feature id into 0 (live since #75).
 - No fixed sleeps longer than 0.5 s. Wait for a condition instead: the map's `idle`, a URL change, a visible element.
 
 ## 4. Flaky tests
@@ -64,6 +68,7 @@ The target for a PR's wall time is **under 10 minutes.** A newer push to the sam
 
 ## 6. Keeping it fast as we grow
 - Each PR's CI run prints its slowest tests.
+- Each PR's `browser-report` job appends flaky/failed tests and the 10 slowest tests to the run summary page.
 - When a shard passes 4 minutes, the shard count goes up.
 - When a test passes its time limit, it's fixed, split or justified.
 - The PO reviews flaky and slow tests at each checkpoint.
