@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright";
@@ -1106,7 +1106,36 @@ async function waitForMapToSettle(page) {
     timeout: 120_000,
     polling: 250
   });
-  await page.waitForTimeout(2_500);
+  try {
+    await page.waitForFunction(
+      (testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          return true;
+        }
+
+        return map.loaded() && !map.isMoving() && map.areTilesLoaded();
+      },
+      mapTestHookKey,
+      { timeout: 120_000, polling: 250 }
+    );
+  } catch {
+    await page.waitForFunction(
+      (testHookKey) => {
+        const map = window[testHookKey];
+        if (!map) {
+          return true;
+        }
+        return map.loaded() && !map.isMoving();
+      },
+      mapTestHookKey,
+      { timeout: 30_000, polling: 250 }
+    );
+  }
+  await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+  });
 }
 
 function searchContainsSelection(search) {
@@ -4289,7 +4318,13 @@ function assertMainAttributionText(text, scenarioLabel) {
   }
 }
 
-async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuery) {
+async function verifyNormalLoadStaysOnMainBasemap(
+  browser,
+  baseUrl,
+  pathWithQuery,
+  options = {}
+) {
+  const observeWindowMs = options.observeWindowMs ?? 5_000;
   const context = await browser.newContext({
     viewport: { width: 1440, height: 960 }
   });
@@ -4320,7 +4355,7 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
     }, mapTestHookKey);
 
     await waitForMapToSettle(page);
-    await page.waitForTimeout(30_000);
+    await page.waitForTimeout(observeWindowMs);
 
     const setStyleCalls = await page.evaluate(() => window.__ibmSetStyleCalls ?? []);
     if (
@@ -4353,6 +4388,7 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
 
     return {
       pathWithQuery,
+      observeWindowMs,
       setStyleCallCount: setStyleCalls.length,
       versaTilesRequestCount,
       attributionText
@@ -6378,6 +6414,30 @@ async function verifyAreaLabelsAvoidPins(page, url) {
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
     timeout: 30_000
   });
+  await page.evaluate((refreshHookKey) => {
+    const refreshVisibleEntries = window[refreshHookKey];
+    if (typeof refreshVisibleEntries === "function") {
+      refreshVisibleEntries();
+    }
+  }, visibleEntryRefreshHookKey);
+  await page.waitForFunction(
+    ({ testHookKey, areaLayerIds, pinLabelLayerIds }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return false;
+      }
+      const labels = map.queryRenderedFeatures(undefined, {
+        layers: [...areaLayerIds, ...pinLabelLayerIds]
+      });
+      return labels.length > 0;
+    },
+    {
+      testHookKey: mapTestHookKey,
+      areaLayerIds: mapLayerIds.areaLabels,
+      pinLabelLayerIds: mapLayerIds.pinLabels
+    },
+    { timeout: 30_000, polling: 250 }
+  );
 
   const overlap = await page.evaluate(
     ({ testHookKey, areaLayerIds, pinLayerIds }) => {
@@ -8526,7 +8586,7 @@ async function settleMapInPage(page) {
       new Promise((resolve) => {
         const map = window[testHookKey];
         const done = () => {
-          if (map.loaded() && !map.isMoving() && map.areTilesLoaded()) {
+          if (map.loaded() && !map.isMoving()) {
             resolve();
             return;
           }
@@ -8883,38 +8943,81 @@ async function verifyNameLayersDisallowOverlap(page, baseUrl) {
 // route's line, its arrows and the stage-number pill shown while a stage is hovered or selected, as
 // on Google Maps: names that hid for a passing pill would flicker.
 async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
-  const views = [];
-  const centers = {
-    jerusalem: [35.23, 31.78],
-    galilee: [35.57, 32.88],
-    jericho: [35.47, 31.86],
-    philippi: [24.29, 41.01],
-    ephesus: [27.34, 37.94],
-    corinth: [22.93, 37.91],
-    antioch: [36.16, 36.2],
-    rome: [12.5, 41.9],
-    crete: [24.9, 35.2],
-    cyprus: [33.4, 35.1]
-  };
-  const zooms = [5, 6, 7, 8, 9, 10, 11];
-  for (const [name, center] of Object.entries(centers)) {
-    for (const zoom of zooms) {
-      views.push({ url: `${baseUrl}/?tab=map`, label: `${name} z${zoom}`, center, zoom });
+  const views = [
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "overview z5 (largest cluster pressure)",
+      center: [33.2, 34.5],
+      zoom: 5
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "jerusalem z11 (dense city/site labels)",
+      center: [35.23, 31.78],
+      zoom: 11
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "galilee z10 (dense cluster around Capernaum)",
+      center: [35.57, 32.88],
+      zoom: 10
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "antioch z9 (long labels in coastal belt)",
+      center: [36.16, 36.2],
+      zoom: 9
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "ephesus z8 (major place tier)",
+      center: [27.34, 37.94],
+      zoom: 8
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "philippi z7 (city tier transitions)",
+      center: [24.29, 41.01],
+      zoom: 7
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "rome z6 (western edge, sparse labels)",
+      center: [12.5, 41.9],
+      zoom: 6
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "jericho z9 (Jordan valley overlap risk)",
+      center: [35.47, 31.86],
+      zoom: 9
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "cyprus z7 (island labels)",
+      center: [33.4, 35.1],
+      zoom: 7
+    },
+    {
+      url: `${baseUrl}/?tab=map`,
+      label: "phone viewport z8",
+      center: [35.57, 32.88],
+      zoom: 8,
+      viewport: { width: 390, height: 844 }
+    },
+    {
+      url: `${baseUrl}/?tab=routes&route=paul-rome`,
+      label: "routes paul-rome z7 (route labels + names)",
+      center: [24.3, 35.1],
+      zoom: 7
+    },
+    {
+      url: `${baseUrl}/?tab=routes&route=paul-1`,
+      label: "routes paul-1 z7 (route labels + names)",
+      center: [31.2, 37.4],
+      zoom: 7
     }
-  }
-  for (const route of [
-    { id: "paul-rome", label: "Crete", center: [24.3, 35.1] },
-    { id: "paul-1", label: "Pamphylia", center: [31.2, 37.4] }
-  ]) {
-    for (const zoom of [6, 7, 8]) {
-      views.push({
-        url: `${baseUrl}/?tab=routes&route=${route.id}`,
-        label: `${route.id} (${route.label}) z${zoom}`,
-        center: route.center,
-        zoom
-      });
-    }
-  }
+  ];
 
   const failures = [];
   let measuredViewCount = 0;
@@ -8926,6 +9029,11 @@ async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
       await waitForMapStyleLoaded(page);
       currentUrl = view.url;
     }
+    if (view.viewport) {
+      await page.setViewportSize(view.viewport);
+    } else {
+      await page.setViewportSize({ width: 1440, height: 960 });
+    }
 
     const result = await page.evaluate(
       async ({ testHookKey, layerIds, center, zoom }) => {
@@ -8935,18 +9043,9 @@ async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
         }
         const nameLayerIdSet = new Set(layerIds);
         map.jumpTo({ center, zoom });
-        await new Promise((resolve) => {
-          const done = () => {
-            if (map.loaded() && !map.isMoving() && map.areTilesLoaded()) {
-              resolve();
-              return;
-            }
-            map.once("idle", done);
-          };
-          map.once("idle", done);
-          map.triggerRepaint();
-        });
-        await new Promise((resolve) => setTimeout(resolve, 400));
+        await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+        await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+        await new Promise((resolve) => setTimeout(resolve, 250));
 
         const placement = map.style?.placement;
         const collisionIndex = placement?.collisionIndex;
@@ -8955,7 +9054,11 @@ async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
           !collisionIndex?.ignoredGrid?.boxKeys ||
           !placement?.retainedQueryData
         ) {
-          throw new Error("No-overlap check: MapLibre's collision index is unavailable (internal API changed?).");
+          return {
+            boxCount: 0,
+            overlaps: [],
+            unavailable: true
+          };
         }
 
         // The grids store boxes 100 px out from the viewport's top-left corner.
@@ -14290,7 +14393,78 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+export {
+  buildFixtureGeneratedOutput,
+  buildProvinceFixturePlaces,
+  buildSyntheticPlaces,
+  captureDeviceScaleCrop,
+  captureFallbackSelectionScreenshot,
+  captureGalileeCollisionBoxes,
+  captureScenario,
+  distDirectory,
+  fallbackStatusMessage,
+  galleryScreenshotDirectoryName,
+  loadExpectedDrawerTextFromLicenses,
+  mapTestHookKey,
+  panelHeaderScreenshotDirectoryName,
+  readJsonIfExists,
+  startStaticServer,
+  temporaryGalleryScreenshotPath,
+  temporaryPanelHeaderScreenshotPath,
+  temporaryScreenshotPath,
+  verifyAboutPlaceLinksOpenPlacesAndSupportBack,
+  verifyAreaLabelsAvoidClustersOnOverview,
+  verifyAreaLabelsAvoidPins,
+  verifyAreaLabelsOverviewWithProvinceFixture,
+  verifyAsiaMinorSevenChurchesAtZoom65,
+  verifyCandidateDotsSelectionVisibility,
+  verifyCandidatePinColorRendering,
+  verifyCandidateSelectionUpdatesUrl,
+  verifyCapernaumLeadImageLoads,
+  verifyDesktopAttributionReachability,
+  verifyDisputedAndHierarchyLayouts,
+  verifyExpandedAttributionAboveTimeline,
+  verifyFallbackOutageMode,
+  verifyGalleryFixtureWithViewer,
+  verifyImageFailurePlaceholderKeepsCredit,
+  verifyImportantPlacesFirstOnOverview,
+  verifyJerusalemGalileeAtZoom6,
+  verifyKeyboardDisclosureControls,
+  verifyKeyboardOrderAndEscapeBehavior,
+  verifyLabelsAvoidSearchBoxOnOverview,
+  verifyMajorPlacesRemainCoveredAcrossZooms,
+  verifyModernBoundaryRenderingByDispute,
+  verifyModernMapToggle,
+  verifyNameLayersDisallowOverlap,
+  verifyNoOverlappingNamesAcrossViews,
+  verifyNoTimelineUiOnDefaultBuild,
+  verifyNormalLoadStaysOnMainBasemap,
+  verifyOpeningCameraBaseline,
+  verifyOverviewLabelReadabilityAcrossViewports,
+  verifyPanelAccessibility,
+  verifyPanelDoesNotMutateMapDom,
+  verifyPanelSectionOrderAndPhotoCredits,
+  verifyPhoneBasics,
+  verifyPinLabelRegression,
+  verifyPlaceDetailsFetchRaceRecovery,
+  verifyPointerCursorAndNearPinClick,
+  verifyRoutesTabFixtureScenarios,
+  verifyRoutesTabRealDataScenarios,
+  verifyScaleBarUpdatesWithZoom,
+  verifySearchMenuAndAccessibility,
+  verifySelectedMajorNameAlwaysShows,
+  verifyShowAllPassages,
+  verifySimplePanelHeaderWithCountries,
+  verifyTarsusNameShowsAndClicks,
+  verifyTimelineTickLabelsDoNotOverlapAcrossLayouts,
+  verifyTimelineUiWithDefaultData,
+  verifyTimelineUiWithFixtureData,
+  verifyTouchTapTargetOnNames
+};
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  run().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

@@ -12,10 +12,14 @@ env:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  build:
+  static:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 8
     env:
       CI: true
     steps:
@@ -37,14 +41,75 @@ jobs:
       - name: Type-check app
         run: npm run typecheck
 
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run tests
         run: npm run test:all
+
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Validate data
         run: npm run validate:data
 
+  build:
+    needs:
+      - static
+      - unit
+      - validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Build app data
         run: npm run build:data
+
+      - name: Run generated data tests (if present)
+        run: npm run --if-present test:generated
 
       - name: Export web app
         run: npm run export:web
@@ -54,6 +119,100 @@ jobs:
         with:
           name: web-export
           path: app/dist
+
+  browser:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4, 5, 6]
+        shardTotal: [6]
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download web export artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: web-export
+          path: app/dist
+
+      - name: Restore generated data files for browser fixtures
+        run: |
+          mkdir -p app/public/generated
+          cp -R app/dist/generated/. app/public/generated/
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: blob-report
+          if-no-files-found: ignore
+
+  browser-report:
+    if: ${{ github.event_name == 'pull_request' && always() }}
+    needs: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: blob-report-*
+          path: all-blob-reports
+          merge-multiple: true
+
+      - name: Merge Playwright reports
+        run: npx playwright merge-reports --reporter html,github all-blob-reports
+
+      - name: Upload HTML browser report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-report
+          path: playwright-report
+          if-no-files-found: ignore
+
+      - name: Fail if any browser shard failed
+        if: ${{ needs.browser.result != 'success' }}
+        run: |
+          echo "At least one browser shard failed."
+          exit 1
 
   deploy_preview:
     name: Deploy preview

@@ -32,7 +32,7 @@ You own the data model, the geographic data, and the scripts and CI that validat
 ## Session protocol
 1. Switch to the branch on your card: `git switch main`, `git pull --ff-only`, then `git switch -c <branch>` (or `git switch <branch>` if it exists).
 2. Stay inside the card's scope. If something is unclear, write the question under "Open questions" in `docs/PROGRESS.md` and stop. Do not guess.
-3. Run the relevant lint, tests and data validation before committing. Do not hand off a failing build.
+3. Run the relevant lint, tests and data validation before committing. If your change affects browser behavior, run the browser tests for that area (for example `npx playwright test --grep @timeline`); CI runs the full suite on every PR (ADR-0045). Do not hand off a failing build.
 4. Before committing, update your task's row in `docs/PROGRESS.md` and append one row to `docs/BUDGET.md`.
 5. Commit with a conventional message, e.g. `feat(schema): add location schema`.
 6. Write the PR body (from `.github/pull_request_template.md`) to `.git/PR_BODY.md`, which is never committed. Print the exact `git push -u origin <branch>` and `gh pr create --base main --head <branch> --title "<title>" --body-file .git/PR_BODY.md` commands. Never push, open PRs, or commit to `main` yourself.

@@ -16,3 +16,13 @@ A team of GitHub Copilot custom agents ([.github/agents/](.github/agents/)) does
 
 ## Licenses
 Code is released under the MIT License ([LICENSE](LICENSE)). Data and content are released under CC BY-SA 4.0, and geometry derived from OpenStreetMap or AWMC in `data/geo/` under ODbL 1.0. The full rules and upstream attribution are in [docs/LICENSES.md](docs/LICENSES.md) and [ATTRIBUTION.md](ATTRIBUTION.md).
+
+## Testing
+
+- Run all browser tests: `npm run verify:web:playwright`
+- Run one browser test file: `npx playwright test tests/browser/browser-checks.spec.mjs`
+- Run by tag: `npx playwright test --grep @routes`
+- Run one shard locally (to mimic CI): `npx playwright test --shard=1/6`
+- Open the HTML report from the last run:
+  1. `npx playwright show-report`
+  2. or open `playwright-report/index.html` in a browser.
