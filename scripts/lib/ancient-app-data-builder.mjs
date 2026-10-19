@@ -1283,8 +1283,8 @@ export async function buildAncientAppData({
   ancientEmpireEdgeData = null,
   majorPlacePinCoordinates = [],
   outputDirectory,
-  simplifyThreshold = 0.00009,
-  roadSimplifyTolerance = 0.0035
+  simplifyThreshold = 0.00002,
+  roadSimplifyTolerance = 0.0015
 }) {
   const entitiesById = toMapById(timelineData.entities ?? []);
   const areasById = toMapById(timelineData.areas ?? []);

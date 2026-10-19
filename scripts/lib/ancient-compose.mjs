@@ -84,7 +84,7 @@ const COARSE_SIMPLIFY_METRES = 600;
 // shares with another area are simplified once, at the finer of the two tolerances, so neighbours keep
 // identical edges.
 const OTHER_ROMAN_LANDS_SIMPLIFY_METRES = 3500;
-const MAURETANIA_SIMPLIFY_METRES = 12000;
+const MAURETANIA_SIMPLIFY_METRES = OTHER_ROMAN_LANDS_SIMPLIFY_METRES;
 const MAURETANIA_SIMPLIFY_AREAS = new Set([
   "mauretania-tingitana",
   "mauretania-caesariensis",

@@ -1,276 +1,15 @@
 {
   "entries": [
     {
-      "id": "abc-gethsemane-olive-trees-2012",
-      "type": "web",
-      "title": "Jerusalem olive trees among oldest in world",
+      "id": "pleiades-place-resource",
+      "type": "dataset",
+      "title": "Pleiades: A Gazetteer of Past Places",
       "authors": [
-        "Reuters"
-      ],
-      "year": 2012,
-      "publisher": "ABC News (Australian Broadcasting Corporation), archived by the Internet Archive",
-      "url": "https://web.archive.org/web/20161031024714/http://www.abc.net.au/news/2012-10-20/jerusalem-olive-trees-among-oldest-in-world/4324342",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "arav-bethsaida-et-tell",
-      "type": "article",
-      "title": "Searching for Bethsaida: The Case for Et-Tell",
-      "authors": [
-        "Rami Arav"
-      ],
-      "year": 2020,
-      "journal": "Biblical Archaeology Review"
-    },
-    {
-      "id": "bas-colossae-yener",
-      "type": "web",
-      "title": "Colossae: A Biblical City of the Classical World (interview with excavation director Barış Yener)",
-      "authors": [
-        "Lauren K. McCormick"
+        "Pleiades contributors"
       ],
       "year": 2026,
-      "publisher": "Biblical Archaeology Society, Bible History Daily",
-      "url": "https://www.biblicalarchaeology.org/daily/archaeology-today/colossae-a-biblical-city-of-classical-world/",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "bas-siloam-pool",
-      "type": "web",
-      "title": "The Siloam Pool: Where Jesus Healed the Blind Man",
-      "authors": [
-        "Biblical Archaeology Society Staff"
-      ],
-      "year": 2009,
-      "publisher": "Biblical Archaeology Society (Bible History Daily)",
-      "url": "https://www.biblicalarchaeology.org/daily/biblical-sites-places/biblical-archaeology-sites/the-siloam-pool-where-jesus-healed-the-blind-man/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "bdag-greek-lexicon",
-      "type": "book",
-      "title": "A Greek-English Lexicon of the New Testament and Other Early Christian Literature",
-      "authors": [
-        "Frederick William Danker",
-        "Walter Bauer"
-      ],
-      "year": 2000,
-      "publisher": "University of Chicago Press"
-    },
-    {
-      "id": "bernabei-gethsemane-olive-trees",
-      "type": "article",
-      "title": "The age of the olive trees in the Garden of Gethsemane",
-      "authors": [
-        "M. Bernabei"
-      ],
-      "year": 2015,
-      "journal": "Journal of Archaeological Science",
-      "doi": "10.1016/j.jas.2014.10.011",
-      "url": "https://www.sciencedirect.com/science/article/pii/S0305440314003811",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "bibleodyssey-erastus-gallio-paul",
-      "type": "web",
-      "title": "Erastus, Gallio, and Paul",
-      "authors": [
-        "C. D. Elledge"
-      ],
-      "year": 2017,
-      "publisher": "Society of Biblical Literature (Bible Odyssey)",
-      "url": "https://www.bibleodyssey.org/articles/erastus-gallio-and-paul/",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "bibleplaces-puteoli",
-      "type": "web",
-      "title": "Puteoli",
-      "authors": [
-        "BiblePlaces.com"
-      ],
-      "year": 2026,
-      "publisher": "BiblePlaces.com",
-      "url": "https://www.bibleplaces.com/puteoli/",
-      "accessed": "2026-09-24"
-    },
-    {
-      "id": "britannica-origen",
-      "type": "web",
-      "title": "Origen",
-      "authors": [
-        "Henry Chadwick"
-      ],
-      "year": 1998,
-      "publisher": "Encyclopaedia Britannica",
-      "url": "https://www.britannica.com/biography/Origen",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "cassius-dio-roman-history",
-      "type": "book",
-      "title": "Roman History (Loeb Classical Library translation by Earnest Cary, hosted on LacusCurtius)",
-      "authors": [
-        "Cassius Dio"
-      ],
-      "year": 1917,
-      "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/home.html",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "codexsinaiticus-about",
-      "type": "web",
-      "title": "About Codex Sinaiticus",
-      "authors": [
-        "Codex Sinaiticus Project"
-      ],
-      "year": 2026,
-      "publisher": "Codex Sinaiticus Project",
-      "url": "https://codexsinaiticus.org/en/codex/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "csb-2017-biblegateway",
-      "type": "web",
-      "title": "Christian Standard Bible (CSB), 2017",
-      "authors": [
-        "Holman Bible Publishers"
-      ],
-      "year": 2017,
-      "publisher": "Holman Bible Publishers",
-      "url": "https://www.biblegateway.com/versions/Christian-Standard-Bible-CSB/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "custodia-bethany",
-      "type": "web",
-      "title": "Bethany",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/bethany",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "custodia-bethphage",
-      "type": "web",
-      "title": "Bethphage",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/bethphage",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "custodia-cana",
-      "type": "web",
-      "title": "Cana",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/cana/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "custodia-capernaum",
-      "type": "web",
-      "title": "Capernaum",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/capernaum",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "custodia-dominus-flevit",
-      "type": "web",
-      "title": "Dominus Flevit",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/dominus-flevit",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "custodia-gethsemane",
-      "type": "web",
-      "title": "Gethsemane",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/gethsemane",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "custodia-holy-sepulchre",
-      "type": "web",
-      "title": "Basilica of the Holy Sepulchre",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/basilica-of-the-holy-sepulchre/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "custodia-jericho",
-      "type": "web",
-      "title": "Jericho – Church of the Good Shepherd",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/jericho-church-good-shepherd/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "custodia-jordan-baptism-site",
-      "type": "web",
-      "title": "River Jordan – Site of the Baptism of Jesus",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/river-jordan-site-baptism-jesus/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "custodia-nazareth",
-      "type": "web",
-      "title": "Nazareth",
-      "authors": [
-        "Custodia Terrae Sanctae"
-      ],
-      "year": 2026,
-      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
-      "url": "https://www.custodia.org/en/sanctuaries/nazareth",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "dark-nazareth-archaeology",
-      "type": "book",
-      "title": "The Sisters of Nazareth Convent: A Roman-period, Byzantine, and Crusader Site in Central Nazareth",
-      "authors": [
-        "Ken Dark"
-      ],
-      "year": 2020,
-      "publisher": "Routledge"
+      "publisher": "Institute for the Study of the Ancient World, New York University",
+      "url": "https://pleiades.stoa.org/"
     },
     {
       "id": "ebible-engwebp-details",
@@ -285,16 +24,45 @@
       "accessed": "2026-09-23"
     },
     {
-      "id": "esv-2025-biblegateway",
-      "type": "web",
-      "title": "English Standard Version (ESV), 2025 text edition",
+      "id": "murphy-oconnor-holy-land-guide",
+      "type": "book",
+      "title": "The Holy Land: An Oxford Archaeological Guide from Earliest Times to 1700",
       "authors": [
-        "Crossway"
+        "Jerome Murphy-O'Connor"
       ],
-      "year": 2025,
-      "publisher": "Crossway",
-      "url": "https://www.biblegateway.com/versions/English-Standard-Version-ESV-Bible/",
-      "accessed": "2026-09-28"
+      "year": 2008,
+      "publisher": "Oxford University Press"
+    },
+    {
+      "id": "dark-nazareth-archaeology",
+      "type": "book",
+      "title": "The Sisters of Nazareth Convent: A Roman-period, Byzantine, and Crusader Site in Central Nazareth",
+      "authors": [
+        "Ken Dark"
+      ],
+      "year": 2020,
+      "publisher": "Routledge"
+    },
+    {
+      "id": "metzger-textual-commentary",
+      "type": "book",
+      "title": "A Textual Commentary on the Greek New Testament",
+      "authors": [
+        "Bruce M. Metzger"
+      ],
+      "year": 1994,
+      "publisher": "United Bible Societies"
+    },
+    {
+      "id": "bdag-greek-lexicon",
+      "type": "book",
+      "title": "A Greek-English Lexicon of the New Testament and Other Early Christian Literature",
+      "authors": [
+        "Frederick William Danker",
+        "Walter Bauer"
+      ],
+      "year": 2000,
+      "publisher": "University of Chicago Press"
     },
     {
       "id": "freedman-anchor-bible-dictionary",
@@ -305,40 +73,6 @@
       ],
       "year": 1992,
       "publisher": "Doubleday"
-    },
-    {
-      "id": "garden-tomb-about",
-      "type": "web",
-      "title": "About Us",
-      "authors": [
-        "The Garden Tomb (Jerusalem) Association"
-      ],
-      "year": 2026,
-      "publisher": "The Garden Tomb (Jerusalem) Association",
-      "url": "https://gardentomb.com/about-us/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "hmml-contesting-shipwreck",
-      "type": "web",
-      "title": "Contesting Saint Paul's Shipwreck",
-      "authors": [
-        "Daniel K. Gullo"
-      ],
-      "year": 2026,
-      "publisher": "Hill Museum & Manuscript Library, Saint John's University",
-      "url": "https://hmml.org/stories/series-weather-contesting-saint-paul-s-shipwreck/",
-      "accessed": "2026-09-24"
-    },
-    {
-      "id": "hutton-bethany-beyond-jordan",
-      "type": "article",
-      "title": "'Bethany Beyond the Jordan' in Text, Tradition, and Historical Geography",
-      "authors": [
-        "Jeremy M. Hutton"
-      ],
-      "year": 2008,
-      "journal": "Biblica"
     },
     {
       "id": "iaa-magdala-excavation",
@@ -354,6 +88,105 @@
       "accessed": "2026-09-23"
     },
     {
+      "id": "unesco-church-of-nativity",
+      "type": "web",
+      "title": "Birthplace of Jesus: Church of the Nativity and the Pilgrimage Route, Bethlehem",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1433",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "rainey-notley-sacred-bridge",
+      "type": "book",
+      "title": "The Sacred Bridge: Carta's Atlas of the Biblical World",
+      "authors": [
+        "Anson F. Rainey",
+        "R. Steven Notley"
+      ],
+      "year": 2006,
+      "publisher": "Carta Jerusalem"
+    },
+    {
+      "id": "arav-bethsaida-et-tell",
+      "type": "article",
+      "title": "Searching for Bethsaida: The Case for Et-Tell",
+      "authors": [
+        "Rami Arav"
+      ],
+      "year": 2020,
+      "journal": "Biblical Archaeology Review"
+    },
+    {
+      "id": "notley-aviam-bethsaida-el-araj",
+      "type": "article",
+      "title": "Searching for Bethsaida: The Case for El-Araj",
+      "authors": [
+        "R. Steven Notley",
+        "Mordechai Aviam"
+      ],
+      "year": 2020,
+      "journal": "Biblical Archaeology Review"
+    },
+    {
+      "id": "taylor-golgotha-reconsideration",
+      "type": "article",
+      "title": "Golgotha: A Reconsideration of the Evidence for the Sites of Jesus' Crucifixion and Burial",
+      "authors": [
+        "Joan E. Taylor"
+      ],
+      "year": 1998,
+      "journal": "New Testament Studies",
+      "doi": "10.1017/S0028688500016465"
+    },
+    {
+      "id": "hutton-bethany-beyond-jordan",
+      "type": "article",
+      "title": "'Bethany Beyond the Jordan' in Text, Tradition, and Historical Geography",
+      "authors": [
+        "Jeremy M. Hutton"
+      ],
+      "year": 2008,
+      "journal": "Biblica"
+    },
+    {
+      "id": "mccollough-khirbet-qana",
+      "type": "chapter",
+      "title": "Khirbet Qana",
+      "authors": [
+        "C. Thomas McCollough"
+      ],
+      "year": 2015,
+      "containerTitle": "Galilee in the Late Second Temple and Mishnaic Periods, Volume 2: The Archaeological Record from Cities, Towns, and Villages",
+      "publisher": "Fortress Press"
+    },
+    {
+      "id": "reich-shukron-siloam-pool",
+      "type": "article",
+      "title": "The Second Temple Period Pool of Siloam in Jerusalem",
+      "authors": [
+        "Ronny Reich",
+        "Eli Shukron"
+      ],
+      "year": 2005,
+      "journal": "Israel Exploration Journal"
+    },
+    {
+      "id": "unesco-baptism-site-al-maghtas",
+      "type": "web",
+      "title": "Baptism Site \"Bethany Beyond the Jordan\" (Al-Maghtas)",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1446",
+      "accessed": "2026-09-23"
+    },
+    {
       "id": "inpa-korazim-national-park",
       "type": "web",
       "title": "Korazim National Park",
@@ -366,30 +199,387 @@
       "accessed": "2026-09-23"
     },
     {
-      "id": "isbe-abilene",
-      "type": "chapter",
-      "title": "Abilene",
+      "id": "ritmeyer-temple-mount-quest",
+      "type": "book",
+      "title": "The Quest: Revealing the Temple Mount in Jerusalem",
       "authors": [
-        "C. H. Thomson"
+        "Leen Ritmeyer"
       ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/abilene.html",
-      "accessed": "2026-10-07"
+      "year": 2006,
+      "publisher": "Carta Jerusalem"
     },
     {
-      "id": "isbe-acco",
-      "type": "chapter",
-      "title": "Acco",
+      "id": "wagner-wilson-why-derbe",
+      "type": "article",
+      "title": "Why Derbe? An Unlikely Lycaonian City for Paul's Ministry",
       "authors": [
-        "H. Porter"
+        "Bob Wagner",
+        "Mark Wilson"
       ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/acco.html",
-      "accessed": "2026-10-16"
+      "year": 2019,
+      "journal": "Tyndale Bulletin",
+      "url": "https://www.sevenchurches.org/wp-content/uploads/2020/03/Why-Derbe-Wagner-Wilson-Tyndale-Bulletin.pdf",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "worldhistory-corinth",
+      "type": "web",
+      "title": "Corinth",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/corinth/",
+      "accessed": "2026-09-23"
+    },
+    {
+      "id": "zondervan-who-were-galatians",
+      "type": "web",
+      "title": "Who Were the Galatians?",
+      "authors": [
+        "Thomas R. Schreiner"
+      ],
+      "year": 2017,
+      "publisher": "Zondervan Academic",
+      "url": "https://zondervanacademic.com/blog/who-were-the-galatians",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-hierapolis-pamukkale",
+      "type": "web",
+      "title": "Hierapolis-Pamukkale",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/485",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "livius-actium",
+      "type": "web",
+      "title": "Naval Battle of Actium (31 BCE)",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/battle/actium-31-bce/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "livius-miletus",
+      "type": "web",
+      "title": "Miletus",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/miletus/?lang=en",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-pergamon",
+      "type": "web",
+      "title": "Pergamon and its Multi-Layered Cultural Landscape",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1457",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "worldhistory-sardis",
+      "type": "web",
+      "title": "Sardis",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/sardis/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-patmos",
+      "type": "web",
+      "title": "The Historic Centre (Chorá) with the Monastery of Saint-John the Theologian and the Cave of the Apocalypse on the Island of Pátmos",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/942",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "bibleplaces-puteoli",
+      "type": "web",
+      "title": "Puteoli",
+      "authors": [
+        "BiblePlaces.com"
+      ],
+      "year": 2026,
+      "publisher": "BiblePlaces.com",
+      "url": "https://www.bibleplaces.com/puteoli/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "unesco-tyre",
+      "type": "web",
+      "title": "Tyre",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/299",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "hmml-contesting-shipwreck",
+      "type": "web",
+      "title": "Contesting Saint Paul's Shipwreck",
+      "authors": [
+        "Daniel K. Gullo"
+      ],
+      "year": 2026,
+      "publisher": "Hill Museum & Manuscript Library, Saint John's University",
+      "url": "https://hmml.org/stories/series-weather-contesting-saint-paul-s-shipwreck/",
+      "accessed": "2026-09-24"
+    },
+    {
+      "id": "niv-2011-biblegateway",
+      "type": "web",
+      "title": "New International Version (NIV), 2011 text edition",
+      "authors": [
+        "Biblica"
+      ],
+      "year": 2011,
+      "publisher": "Biblica",
+      "url": "https://www.biblegateway.com/versions/New-International-Version-NIV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "esv-2025-biblegateway",
+      "type": "web",
+      "title": "English Standard Version (ESV), 2025 text edition",
+      "authors": [
+        "Crossway"
+      ],
+      "year": 2025,
+      "publisher": "Crossway",
+      "url": "https://www.biblegateway.com/versions/English-Standard-Version-ESV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "nlt-2015-biblegateway",
+      "type": "web",
+      "title": "New Living Translation (NLT), 2015 text edition",
+      "authors": [
+        "Tyndale House Foundation"
+      ],
+      "year": 2015,
+      "publisher": "Tyndale House Publishers",
+      "url": "https://www.biblegateway.com/versions/New-Living-Translation-NLT-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "kjv-1987-biblegateway",
+      "type": "web",
+      "title": "King James Version (KJV), 1987 printing",
+      "authors": [
+        "Church of England"
+      ],
+      "year": 1987,
+      "publisher": "Public domain in the United States",
+      "url": "https://www.biblegateway.com/versions/King-James-Version-KJV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "nkjv-1982-biblegateway",
+      "type": "web",
+      "title": "New King James Version (NKJV), 1982",
+      "authors": [
+        "Thomas Nelson"
+      ],
+      "year": 1982,
+      "publisher": "Thomas Nelson",
+      "url": "https://www.biblegateway.com/versions/New-King-James-Version-NKJV-Bible/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "csb-2017-biblegateway",
+      "type": "web",
+      "title": "Christian Standard Bible (CSB), 2017",
+      "authors": [
+        "Holman Bible Publishers"
+      ],
+      "year": 2017,
+      "publisher": "Holman Bible Publishers",
+      "url": "https://www.biblegateway.com/versions/Christian-Standard-Bible-CSB/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "cassius-dio-roman-history",
+      "type": "book",
+      "title": "Roman History (Loeb Classical Library translation by Earnest Cary, hosted on LacusCurtius)",
+      "authors": [
+        "Cassius Dio"
+      ],
+      "year": 1917,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Cassius_Dio/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "suetonius-twelve-caesars",
+      "type": "book",
+      "title": "The Lives of the Twelve Caesars (Loeb Classical Library translation by J. C. Rolfe, hosted on LacusCurtius)",
+      "authors": [
+        "Suetonius"
+      ],
+      "year": 1914,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Suetonius/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "josephus-antiquities",
+      "type": "book",
+      "title": "Antiquities of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
+      "authors": [
+        "Flavius Josephus"
+      ],
+      "year": 1737,
+      "publisher": "Christian Classics Ethereal Library",
+      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "tacitus-annals",
+      "type": "book",
+      "title": "The Annals (Loeb Classical Library translation by John Jackson, hosted on LacusCurtius)",
+      "authors": [
+        "Tacitus"
+      ],
+      "year": 1931,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "tacitus-histories",
+      "type": "book",
+      "title": "The Histories (Loeb Classical Library translation by Clifford H. Moore, hosted on LacusCurtius)",
+      "authors": [
+        "Tacitus"
+      ],
+      "year": 1925,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "strabo-geography",
+      "type": "book",
+      "title": "Geography (Loeb Classical Library translation by Horace Leonard Jones, hosted on LacusCurtius)",
+      "authors": [
+        "Strabo"
+      ],
+      "year": 1932,
+      "publisher": "Harvard University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/home.html",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "josephus-jewish-war",
+      "type": "book",
+      "title": "The Wars of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
+      "authors": [
+        "Flavius Josephus"
+      ],
+      "year": 1737,
+      "publisher": "Christian Classics Ethereal Library",
+      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-cilicia",
+      "type": "web",
+      "title": "Cilicia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/cilicia/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-damascus",
+      "type": "web",
+      "title": "Damascus",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/damascus/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-judaea",
+      "type": "web",
+      "title": "Judaea",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/judaea/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-macedonia",
+      "type": "web",
+      "title": "Macedonia (8): The Roman age",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/macedonia/macedonia-8/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-nabataeans",
+      "type": "web",
+      "title": "Nabataeans",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/people/nabataeans/",
+      "accessed": "2026-09-28"
+    },
+    {
+      "id": "livius-pamphylia",
+      "type": "web",
+      "title": "Pamphylia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/pamphylia/",
+      "accessed": "2026-09-28"
     },
     {
       "id": "isbe-achaia",
@@ -403,136 +593,6 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/A/achaia.html",
       "accessed": "2026-09-28"
-    },
-    {
-      "id": "isbe-adramyttium",
-      "type": "chapter",
-      "title": "Adramyttium",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/adramyttium.html",
-      "accessed": "2026-10-14"
-    },
-    {
-      "id": "isbe-adria",
-      "type": "chapter",
-      "title": "Adria",
-      "authors": [
-        "George H. Allen"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/adria.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-agriculture",
-      "type": "chapter",
-      "title": "Agriculture",
-      "authors": [
-        "James Orr"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/agriculture.html",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "isbe-alexandria",
-      "type": "chapter",
-      "title": "Alexandria",
-      "authors": [
-        "Camden M. Cobern"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/alexandria.html",
-      "accessed": "2026-10-14"
-    },
-    {
-      "id": "isbe-amphipolis",
-      "type": "chapter",
-      "title": "Amphipolis",
-      "authors": [
-        "Marcus N. Tod"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/amphipolis.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-antioch-pisidia",
-      "type": "chapter",
-      "title": "Antioch of Pisidia",
-      "authors": [
-        "W. M. Calder"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/antioch-of-pisidia.html",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "isbe-antioch-syria",
-      "type": "chapter",
-      "title": "Antioch, in Syria",
-      "authors": [
-        "C. H. Thomson"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/antioch-in-syria.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-apollonia",
-      "type": "chapter",
-      "title": "Apollonia",
-      "authors": [
-        "Marcus N. Tod"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/apollonia.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-appii-forum",
-      "type": "chapter",
-      "title": "Appii Forum",
-      "authors": [
-        "George H. Allen"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/appii-forum.html",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "isbe-arabia",
-      "type": "chapter",
-      "title": "Arabia",
-      "authors": [
-        "James Orr"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/arabia.html",
-      "accessed": "2026-09-30"
     },
     {
       "id": "isbe-aretas",
@@ -561,199 +621,17 @@
       "accessed": "2026-09-28"
     },
     {
-      "id": "isbe-assos",
+      "id": "isbe-rhodes",
       "type": "chapter",
-      "title": "Assos",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/assos.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-athens",
-      "type": "chapter",
-      "title": "Athens",
+      "title": "Rhodes",
       "authors": [
         "J. E. Harry"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/athens.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-attalia",
-      "type": "chapter",
-      "title": "Attalia",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/A/attalia.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-bethphage",
-      "type": "chapter",
-      "title": "Bethphage",
-      "authors": [
-        "E. W. G. Masterman"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/B/bethphage.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-bethsaida",
-      "type": "chapter",
-      "title": "Bethsaida",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/B/bethsaida.html",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "isbe-bithynia",
-      "type": "chapter",
-      "title": "Bithynia",
-      "authors": [
-        "G. E. White"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/B/bithynia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-caesarea",
-      "type": "chapter",
-      "title": "Caesarea",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/caesarea.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-cappadocia",
-      "type": "chapter",
-      "title": "Cappadocia",
-      "authors": [
-        "G. E. White"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/cappadocia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-chios",
-      "type": "chapter",
-      "title": "Chios",
-      "authors": [
-        "J. E. Harry"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/chios.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-chronology-nt",
-      "type": "chapter",
-      "title": "Chronology of the New Testament",
-      "authors": [
-        "W. P. Armstrong"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/chronology-of-the-new-testament.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-cilicia",
-      "type": "chapter",
-      "title": "Cilicia",
-      "authors": [
-        "G. E. White"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/cilicia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-cnidus",
-      "type": "chapter",
-      "title": "Cnidus",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/cnidus.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-colossae",
-      "type": "chapter",
-      "title": "Colossae",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/colossae.html",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "isbe-corinth",
-      "type": "chapter",
-      "title": "Corinth",
-      "authors": [
-        "J. E. Harry"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/corinth.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-cos",
-      "type": "chapter",
-      "title": "Cos",
-      "authors": [
-        "J. E. Harry"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/cos.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/R/rhodes.html",
+      "accessed": "2026-10-08"
     },
     {
       "id": "isbe-crete",
@@ -782,318 +660,6 @@
       "accessed": "2026-09-28"
     },
     {
-      "id": "isbe-cyrene",
-      "type": "chapter",
-      "title": "Cyrene",
-      "authors": [
-        "M. G. Kyle"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/C/cyrene.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-dalmatia",
-      "type": "chapter",
-      "title": "Dalmatia",
-      "authors": [
-        "Marcus N. Tod"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/D/dalmatia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-damascus",
-      "type": "chapter",
-      "title": "Damascus",
-      "authors": [
-        "C. H. Thomson"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/D/damascus.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-decapolis",
-      "type": "chapter",
-      "title": "Decapolis",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/D/decapolis.html",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "isbe-derbe",
-      "type": "chapter",
-      "title": "Derbe",
-      "authors": [
-        "W. M. Calder"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/D/derbe.html",
-      "accessed": "2026-10-08"
-    },
-    {
-      "id": "isbe-en-gannim",
-      "type": "chapter",
-      "title": "En-gannim",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/E/en-gannim.html",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "isbe-ephesus",
-      "type": "chapter",
-      "title": "Ephesus",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/E/ephesus.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-ephraim",
-      "type": "chapter",
-      "title": "Ephraim (2)",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/E/ephraim-(2).html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-ephron-2",
-      "type": "chapter",
-      "title": "Ephron (2)",
-      "authors": [
-        "E. W. G. Masterman"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/E/ephron-(2).html",
-      "accessed": "2026-10-16"
-    },
-    {
-      "id": "isbe-fair-havens",
-      "type": "chapter",
-      "title": "Fair Havens",
-      "authors": [
-        "James Orr"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/F/fair-havens.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-famine",
-      "type": "chapter",
-      "title": "Famine",
-      "authors": [
-        "W. L. Walker"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/F/famine.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-gadara",
-      "type": "chapter",
-      "title": "Gadara",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/G/gadara.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-galatia",
-      "type": "chapter",
-      "title": "Galatia",
-      "authors": [
-        "W. M. Ramsay"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/G/galatia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-gerasa",
-      "type": "chapter",
-      "title": "Gerasa; Gerasenes",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/G/gerasa-gerasenes.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-golan",
-      "type": "chapter",
-      "title": "Golan; Gaulonitis",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/G/golan-gaulonitis.html",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "isbe-house",
-      "type": "chapter",
-      "title": "House",
-      "authors": [
-        "James Orr"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/H/house.html",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "isbe-iconium",
-      "type": "chapter",
-      "title": "Iconium",
-      "authors": [
-        "W. M. Calder"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/I/iconium.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-illyricum",
-      "type": "chapter",
-      "title": "Illyricum",
-      "authors": [
-        "M. N. Tod"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/I/illyricum.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-ituraea",
-      "type": "chapter",
-      "title": "Ituraea",
-      "authors": [
-        "W. Ewing"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/I/ituraea.html",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "isbe-lasea",
-      "type": "chapter",
-      "title": "Lasea",
-      "authors": [
-        "James Orr"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/L/lasea.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-libya",
-      "type": "chapter",
-      "title": "Libya; Libyans",
-      "authors": [
-        "International Standard Bible Encyclopedia"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/L/libya-libyans.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-lycaonia",
-      "type": "chapter",
-      "title": "Lycaonia",
-      "authors": [
-        "W. M. Calder"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/L/lycaonia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-lycia",
-      "type": "chapter",
-      "title": "Lycia",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/L/lycia.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-maccabees",
-      "type": "chapter",
-      "title": "Maccabaeus; Maccabees",
-      "authors": [
-        "J. Hutchison"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/M/maccabaeus-maccabees.html",
-      "accessed": "2026-10-16"
-    },
-    {
       "id": "isbe-macedonia",
       "type": "chapter",
       "title": "Macedonia",
@@ -1105,19 +671,6 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/M/macedonia.html",
       "accessed": "2026-09-28"
-    },
-    {
-      "id": "isbe-media",
-      "type": "chapter",
-      "title": "Media",
-      "authors": [
-        "W. St. Clair Tisdall"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/M/media.html",
-      "accessed": "2026-09-30"
     },
     {
       "id": "isbe-melita",
@@ -1133,185 +686,55 @@
       "accessed": "2026-09-28"
     },
     {
-      "id": "isbe-mitylene",
+      "id": "smith-dictionary-provincia",
       "type": "chapter",
-      "title": "Mitylene",
+      "title": "Provincia",
       "authors": [
-        "J. E. Harry"
+        "George Long"
       ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/M/mitylene.html",
-      "accessed": "2026-10-13"
+      "year": 1875,
+      "publisher": "John Murray",
+      "containerTitle": "A Dictionary of Greek and Roman Antiquities (William Smith, ed.), hosted on LacusCurtius",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Provincia.html",
+      "accessed": "2026-09-28"
     },
     {
-      "id": "isbe-myra",
+      "id": "isbe-bethsaida",
       "type": "chapter",
-      "title": "Myra",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/M/myra.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-mysia",
-      "type": "chapter",
-      "title": "Mysia",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/M/mysia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-pamphylia",
-      "type": "chapter",
-      "title": "Pamphylia",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/pamphylia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-parthians",
-      "type": "chapter",
-      "title": "Parthians",
-      "authors": [
-        "H. Porter"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/parthians.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-patara",
-      "type": "chapter",
-      "title": "Patara",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/patara.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-paul-the-apostle-3",
-      "type": "chapter",
-      "title": "Paul, the Apostle, 3 (III. Chronology of Paul's Career)",
-      "authors": [
-        "A. T. Robertson"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/paul-the-apostle-3.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-paul-the-apostle-5",
-      "type": "chapter",
-      "title": "Paul, the Apostle, 5 (V. Work)",
-      "authors": [
-        "A. T. Robertson"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/paul-the-apostle-5.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-peraea",
-      "type": "chapter",
-      "title": "Peraea",
+      "title": "Bethsaida",
       "authors": [
         "W. Ewing"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/peraea.html",
-      "accessed": "2026-10-07"
+      "url": "https://www.internationalstandardbible.com/B/bethsaida.html",
+      "accessed": "2026-09-28"
     },
     {
-      "id": "isbe-philadelphia-lydia",
+      "id": "isbe-arabia",
       "type": "chapter",
-      "title": "Philadelphia",
+      "title": "Arabia",
       "authors": [
-        "E. J. Banks"
+        "James Orr"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/philadelphia.html",
-      "accessed": "2026-10-08"
-    },
-    {
-      "id": "isbe-philippi",
-      "type": "chapter",
-      "title": "Philippi",
-      "authors": [
-        "M. N. Tod"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/philippi.html",
+      "url": "https://www.internationalstandardbible.com/A/arabia.html",
       "accessed": "2026-09-30"
     },
     {
-      "id": "isbe-phoenix",
+      "id": "isbe-cappadocia",
       "type": "chapter",
-      "title": "Phoenix",
+      "title": "Cappadocia",
       "authors": [
-        "W. M. Calder"
+        "G. E. White"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/phoenix.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-phrygia",
-      "type": "chapter",
-      "title": "Phrygia",
-      "authors": [
-        "E. J. Banks"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/phrygia.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "isbe-pisidia",
-      "type": "chapter",
-      "title": "Pisidia",
-      "authors": [
-        "W. M. Calder"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/pisidia.html",
+      "url": "https://www.internationalstandardbible.com/C/cappadocia.html",
       "accessed": "2026-09-30"
     },
     {
@@ -1328,43 +751,406 @@
       "accessed": "2026-09-30"
     },
     {
-      "id": "isbe-ptolemais",
+      "id": "isbe-bithynia",
       "type": "chapter",
-      "title": "Ptolemais",
+      "title": "Bithynia",
+      "authors": [
+        "G. E. White"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/B/bithynia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-cilicia",
+      "type": "chapter",
+      "title": "Cilicia",
+      "authors": [
+        "G. E. White"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cilicia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-pamphylia",
+      "type": "chapter",
+      "title": "Pamphylia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/pamphylia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-phrygia",
+      "type": "chapter",
+      "title": "Phrygia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/phrygia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-lycaonia",
+      "type": "chapter",
+      "title": "Lycaonia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lycaonia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-pisidia",
+      "type": "chapter",
+      "title": "Pisidia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/pisidia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-iconium",
+      "type": "chapter",
+      "title": "Iconium",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/I/iconium.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-derbe",
+      "type": "chapter",
+      "title": "Derbe",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/derbe.html",
+      "accessed": "2026-10-08"
+    },
+    {
+      "id": "isbe-philadelphia-lydia",
+      "type": "chapter",
+      "title": "Philadelphia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/philadelphia.html",
+      "accessed": "2026-10-08"
+    },
+    {
+      "id": "isbe-mysia",
+      "type": "chapter",
+      "title": "Mysia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/mysia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-illyricum",
+      "type": "chapter",
+      "title": "Illyricum",
+      "authors": [
+        "M. N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/I/illyricum.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-dalmatia",
+      "type": "chapter",
+      "title": "Dalmatia",
+      "authors": [
+        "Marcus N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/dalmatia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-libya",
+      "type": "chapter",
+      "title": "Libya; Libyans",
+      "authors": [
+        "International Standard Bible Encyclopedia"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/libya-libyans.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-cyrene",
+      "type": "chapter",
+      "title": "Cyrene",
+      "authors": [
+        "M. G. Kyle"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cyrene.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-parthians",
+      "type": "chapter",
+      "title": "Parthians",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/parthians.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-media",
+      "type": "chapter",
+      "title": "Media",
+      "authors": [
+        "W. St. Clair Tisdall"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/media.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "livius-parthia",
+      "type": "web",
+      "title": "Parthia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/parthia/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "livius-mesopotamia",
+      "type": "web",
+      "title": "Mesopotamia",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/mesopotamia/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "bernabei-gethsemane-olive-trees",
+      "type": "article",
+      "title": "The age of the olive trees in the Garden of Gethsemane",
+      "authors": [
+        "M. Bernabei"
+      ],
+      "year": 2015,
+      "journal": "Journal of Archaeological Science",
+      "doi": "10.1016/j.jas.2014.10.011",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0305440314003811",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "origen-commentary-john",
+      "type": "book",
+      "title": "Commentary on the Gospel of John, Book VI (Ante-Nicene Fathers translation, hosted by New Advent)",
+      "authors": [
+        "Origen"
+      ],
+      "year": 1896,
+      "publisher": "Christian Literature Publishing Co.",
+      "url": "https://www.newadvent.org/fathers/101506.htm",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-capernaum",
+      "type": "web",
+      "title": "Capernaum",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/capernaum",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-nazareth",
+      "type": "web",
+      "title": "Nazareth",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/nazareth",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-bethany",
+      "type": "web",
+      "title": "Bethany",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/bethany",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "custodia-gethsemane",
+      "type": "web",
+      "title": "Gethsemane",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/gethsemane",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-agriculture",
+      "type": "chapter",
+      "title": "Agriculture",
       "authors": [
         "James Orr"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/P/ptolemais.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/A/agriculture.html",
+      "accessed": "2026-10-01"
     },
     {
-      "id": "isbe-rhegium",
+      "id": "isbe-house",
       "type": "chapter",
-      "title": "Rhegium",
+      "title": "House",
       "authors": [
-        "George H. Allen"
+        "James Orr"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/R/rhegium.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/H/house.html",
+      "accessed": "2026-10-01"
     },
     {
-      "id": "isbe-rhodes",
-      "type": "chapter",
-      "title": "Rhodes",
+      "id": "ramsay-seven-churches",
+      "type": "book",
+      "title": "The Letters to the Seven Churches of Asia and Their Place in the Plan of the Apocalypse",
       "authors": [
-        "J. E. Harry"
+        "W. M. Ramsay"
       ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/R/rhodes.html",
-      "accessed": "2026-10-08"
+      "year": 1904,
+      "publisher": "Hodder and Stoughton",
+      "url": "https://archive.org/details/letterstosevench00rams"
+    },
+    {
+      "id": "worldhistory-pergamon",
+      "type": "web",
+      "title": "Pergamon",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pergamon/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-about",
+      "type": "web",
+      "title": "About Sardis",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-sardis",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-bath-gymnasium",
+      "type": "web",
+      "title": "The Bath-Gymnasium Complex",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-bath-gym",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "sardis-expedition-artemis-temple",
+      "type": "web",
+      "title": "The Temple of Artemis",
+      "authors": [
+        "Archaeological Exploration of Sardis"
+      ],
+      "year": 2026,
+      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
+      "url": "https://sardisexpedition.org/en/essays/about-artemis-temple",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "pau-laodikeia-kazisi",
+      "type": "web",
+      "title": "Laodikeia Kazısı (Laodicea Excavation)",
+      "authors": [
+        "Pamukkale University Laodicea Excavation"
+      ],
+      "year": 2026,
+      "publisher": "Pamukkale University",
+      "url": "https://laodikeia.pau.edu.tr/",
+      "accessed": "2026-09-30"
     },
     {
       "id": "isbe-rome",
@@ -1380,95 +1166,56 @@
       "accessed": "2026-09-30"
     },
     {
-      "id": "isbe-samos",
+      "id": "isbe-corinth",
       "type": "chapter",
-      "title": "Samos",
+      "title": "Corinth",
       "authors": [
-        "Arthur J. Kinsella"
+        "J. E. Harry"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/samos.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/C/corinth.html",
+      "accessed": "2026-09-30"
     },
     {
-      "id": "isbe-samothrace",
+      "id": "isbe-antioch-syria",
       "type": "chapter",
-      "title": "Samothrace",
+      "title": "Antioch, in Syria",
       "authors": [
-        "Arthur J. Kinsella"
+        "C. H. Thomson"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/samothrace.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/A/antioch-in-syria.html",
+      "accessed": "2026-09-30"
     },
     {
-      "id": "isbe-seleucia",
+      "id": "isbe-ephesus",
       "type": "chapter",
-      "title": "Seleucia",
+      "title": "Ephesus",
       "authors": [
-        "W. M. Christie"
+        "E. J. Banks"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/seleucia.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/E/ephesus.html",
+      "accessed": "2026-09-30"
     },
     {
-      "id": "isbe-sidon",
+      "id": "isbe-philippi",
       "type": "chapter",
-      "title": "Sidon (2)",
+      "title": "Philippi",
       "authors": [
-        "H. Porter"
+        "M. N. Tod"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/sidon-(2).html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-syracuse",
-      "type": "chapter",
-      "title": "Syracuse",
-      "authors": [
-        "George H. Allen"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/syracuse.html",
-      "accessed": "2026-10-13"
-    },
-    {
-      "id": "isbe-syrtis",
-      "type": "chapter",
-      "title": "Syrtis",
-      "authors": [
-        "James Orr"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/S/syrtis.html",
-      "accessed": "2026-10-14"
-    },
-    {
-      "id": "isbe-talmud",
-      "type": "chapter",
-      "title": "Talmud",
-      "authors": [
-        "Hermann L. Strack"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/T/talmud.html",
-      "accessed": "2026-10-16"
+      "url": "https://www.internationalstandardbible.com/P/philippi.html",
+      "accessed": "2026-09-30"
     },
     {
       "id": "isbe-tarsus",
@@ -1484,19 +1231,6 @@
       "accessed": "2026-10-08"
     },
     {
-      "id": "isbe-taverns-three",
-      "type": "chapter",
-      "title": "Taverns, Three",
-      "authors": [
-        "George H. Allen"
-      ],
-      "year": 1915,
-      "publisher": "Howard-Severance Company",
-      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/T/taverns-three.html",
-      "accessed": "2026-10-13"
-    },
-    {
       "id": "isbe-thessalonica",
       "type": "chapter",
       "title": "Thessalonica",
@@ -1508,6 +1242,810 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/T/thessalonica.html",
       "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-athens",
+      "type": "chapter",
+      "title": "Athens",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/athens.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-caesarea",
+      "type": "chapter",
+      "title": "Caesarea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/caesarea.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-damascus",
+      "type": "chapter",
+      "title": "Damascus",
+      "authors": [
+        "C. H. Thomson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/damascus.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-galatia",
+      "type": "chapter",
+      "title": "Galatia",
+      "authors": [
+        "W. M. Ramsay"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/galatia.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "platner-ashby-topographical-dictionary",
+      "type": "book",
+      "title": "A Topographical Dictionary of Ancient Rome (hosted on LacusCurtius)",
+      "authors": [
+        "Samuel Ball Platner",
+        "Thomas Ashby"
+      ],
+      "year": 1929,
+      "publisher": "Oxford University Press",
+      "url": "https://penelope.uchicago.edu/Thayer/E/Gazetteer/Places/Europe/Italy/Lazio/Roma/Rome/_Texts/PLATOP*/home.html",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "unesco-ephesus",
+      "type": "web",
+      "title": "Ephesus",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1018/",
+      "accessed": "2026-09-30"
+    },
+    {
+      "id": "isbe-appii-forum",
+      "type": "chapter",
+      "title": "Appii Forum",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/appii-forum.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-antioch-pisidia",
+      "type": "chapter",
+      "title": "Antioch of Pisidia",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/antioch-of-pisidia.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "oeaw-celsus-library",
+      "type": "web",
+      "title": "Austrian researchers start conservation of the Celsus Library in Ephesos",
+      "authors": [
+        "Austrian Academy of Sciences (ÖAW)"
+      ],
+      "year": 2024,
+      "publisher": "Austrian Academy of Sciences",
+      "url": "https://www.oeaw.ac.at/en/news/preserving-world-cultural-heritage-austrian-researchers-start-conservation-of-the-celsus-library-in-ephesos-1",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-philippi",
+      "type": "web",
+      "title": "Philippoi: Description",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=2387",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-thessaloniki-forum",
+      "type": "web",
+      "title": "Ancient Agora of Thessaloniki: History",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2457",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "odysseus-galerius-palace",
+      "type": "web",
+      "title": "Palatial complex of Galerius: Description",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=423",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "unesco-damascus",
+      "type": "web",
+      "title": "Ancient City of Damascus",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/20/",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "isbe-colossae",
+      "type": "chapter",
+      "title": "Colossae",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/colossae.html",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "bas-colossae-yener",
+      "type": "web",
+      "title": "Colossae: A Biblical City of the Classical World (interview with excavation director Barış Yener)",
+      "authors": [
+        "Lauren K. McCormick"
+      ],
+      "year": 2026,
+      "publisher": "Biblical Archaeology Society, Bible History Daily",
+      "url": "https://www.biblicalarchaeology.org/daily/archaeology-today/colossae-a-biblical-city-of-classical-world/",
+      "accessed": "2026-10-01"
+    },
+    {
+      "id": "worldhistory-cicero",
+      "type": "web",
+      "title": "Cicero",
+      "authors": [
+        "James Lloyd"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/cicero/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-pliny-the-elder",
+      "type": "web",
+      "title": "Pliny the Elder",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2014,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pliny-the-elder/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-xenophon",
+      "type": "web",
+      "title": "Xenophon",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/xenophon/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-arrian",
+      "type": "web",
+      "title": "Arrian",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/arrian/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "livius-ptolemy-i-soter",
+      "type": "web",
+      "title": "Ptolemy I Soter",
+      "authors": [
+        "Jona Lendering"
+      ],
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/ptolemy-i-soter/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-josephus",
+      "type": "web",
+      "title": "Flavius Josephus",
+      "authors": [
+        "Rebecca Denova"
+      ],
+      "year": 2021,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Flavius_Josephus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-cassius-dio",
+      "type": "web",
+      "title": "Cassius Dio",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Cassius_Dio/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-strabo",
+      "type": "web",
+      "title": "Strabo of Amasia",
+      "authors": [
+        "Rosie Sykes"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Strabo_of_Amasia/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-tacitus",
+      "type": "web",
+      "title": "Tacitus",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2020,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/tacitus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-suetonius",
+      "type": "web",
+      "title": "Suetonius",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2016,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Suetonius/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-caligula",
+      "type": "web",
+      "title": "Caligula",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Caligula/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-nero",
+      "type": "web",
+      "title": "Nero",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Nero/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-trajan",
+      "type": "web",
+      "title": "Trajan",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/trajan/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-galba",
+      "type": "web",
+      "title": "Galba",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2012,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Galba/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-pompey",
+      "type": "web",
+      "title": "Pompey",
+      "authors": [
+        "James Lloyd"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/pompey/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-germanicus",
+      "type": "web",
+      "title": "Germanicus",
+      "authors": [
+        "Marianne R. H. Fisher"
+      ],
+      "year": 2016,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Germanicus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-crassus",
+      "type": "web",
+      "title": "Marcus Licinius Crassus",
+      "authors": [
+        "Mark Cartwright"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Marcus_Licinius_Crassus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "bas-siloam-pool",
+      "type": "web",
+      "title": "The Siloam Pool: Where Jesus Healed the Blind Man",
+      "authors": [
+        "Biblical Archaeology Society Staff"
+      ],
+      "year": 2009,
+      "publisher": "Biblical Archaeology Society (Bible History Daily)",
+      "url": "https://www.biblicalarchaeology.org/daily/biblical-sites-places/biblical-archaeology-sites/the-siloam-pool-where-jesus-healed-the-blind-man/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "codexsinaiticus-about",
+      "type": "web",
+      "title": "About Codex Sinaiticus",
+      "authors": [
+        "Codex Sinaiticus Project"
+      ],
+      "year": 2026,
+      "publisher": "Codex Sinaiticus Project",
+      "url": "https://codexsinaiticus.org/en/codex/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-dominus-flevit",
+      "type": "web",
+      "title": "Dominus Flevit",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/dominus-flevit",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-bethphage",
+      "type": "web",
+      "title": "Bethphage",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/bethphage",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-holy-sepulchre",
+      "type": "web",
+      "title": "Basilica of the Holy Sepulchre",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/basilica-of-the-holy-sepulchre/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-cana",
+      "type": "web",
+      "title": "Cana",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/cana/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-jericho",
+      "type": "web",
+      "title": "Jericho – Church of the Good Shepherd",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/jericho-church-good-shepherd/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "custodia-jordan-baptism-site",
+      "type": "web",
+      "title": "River Jordan – Site of the Baptism of Jesus",
+      "authors": [
+        "Custodia Terrae Sanctae"
+      ],
+      "year": 2026,
+      "publisher": "Custodia Terrae Sanctae (Franciscan Custody of the Holy Land)",
+      "url": "https://www.custodia.org/en/sanctuaries/river-jordan-site-baptism-jesus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "garden-tomb-about",
+      "type": "web",
+      "title": "About Us",
+      "authors": [
+        "The Garden Tomb (Jerusalem) Association"
+      ],
+      "year": 2026,
+      "publisher": "The Garden Tomb (Jerusalem) Association",
+      "url": "https://gardentomb.com/about-us/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "abc-gethsemane-olive-trees-2012",
+      "type": "web",
+      "title": "Jerusalem olive trees among oldest in world",
+      "authors": [
+        "Reuters"
+      ],
+      "year": 2012,
+      "publisher": "ABC News (Australian Broadcasting Corporation), archived by the Internet Archive",
+      "url": "https://web.archive.org/web/20161031024714/http://www.abc.net.au/news/2012-10-20/jerusalem-olive-trees-among-oldest-in-world/4324342",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "piccirillo-ainon-sapsaphas",
+      "type": "chapter",
+      "title": "Ainon Sapsaphas and Bethabara",
+      "authors": [
+        "Michele Piccirillo"
+      ],
+      "year": 1999,
+      "publisher": "Studium Biblicum Franciscanum",
+      "containerTitle": "The Madaba Map Centenary 1897-1997 (web edition on the Studium Biblicum Franciscanum's Madaba Mosaic Map site, archived by the Internet Archive)",
+      "url": "https://web.archive.org/web/20121011045828/http://www.christusrex.org/www1/ofm/mad/articles/PiccirilloSapsaphas.html",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "unesco-old-city-jerusalem",
+      "type": "web",
+      "title": "Old City of Jerusalem and its Walls",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/148",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "unesco-ancient-jericho",
+      "type": "web",
+      "title": "Ancient Jericho/Tell es-Sultan",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/1687",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "western-wall-heritage-foundation",
+      "type": "web",
+      "title": "The Western Wall",
+      "authors": [
+        "The Western Wall Heritage Foundation"
+      ],
+      "year": 2026,
+      "publisher": "The Western Wall Heritage Foundation",
+      "url": "https://thekotel.org/en/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "pef-khirbat-al-mafjar",
+      "type": "web",
+      "title": "Khirbat al-Mafjar Archaeological Project, Jericho, Palestine",
+      "authors": [
+        "Mahmoud Hawari"
+      ],
+      "year": 2022,
+      "publisher": "Palestine Exploration Fund",
+      "url": "https://www.pef.org.uk/khirbat-al-mafjar-archaeological-project-jericho-palestine/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "unesco-historic-centre-rome",
+      "type": "web",
+      "title": "Historic Centre of Rome, the Properties of the Holy See in that City Enjoying Extraterritorial Rights and San Paolo Fuori le Mura",
+      "authors": [
+        "UNESCO World Heritage Centre"
+      ],
+      "year": 2026,
+      "publisher": "UNESCO",
+      "url": "https://whc.unesco.org/en/list/91/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "odysseus-philippi-history",
+      "type": "web",
+      "title": "Philippoi: History",
+      "authors": [
+        "Hellenic Ministry of Culture and Sports"
+      ],
+      "year": 2026,
+      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
+      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2387",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-herodotus",
+      "type": "web",
+      "title": "Herodotus",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2022,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/herodotus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-augustus",
+      "type": "web",
+      "title": "Augustus",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/augustus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-tiberius",
+      "type": "web",
+      "title": "Tiberius: The Reclusive Roman Emperor",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Tiberius/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-claudius",
+      "type": "web",
+      "title": "Claudius: The Unlikely Roman Emperor",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/claudius/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-vespasian",
+      "type": "web",
+      "title": "Vespasian: The Commoner Who Became Roman Emperor",
+      "authors": [
+        "Harrison W. Mark"
+      ],
+      "year": 2026,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Vespasian/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-titus",
+      "type": "web",
+      "title": "Titus (Roman Emperor)",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Titus_(Roman_Emperor)/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-hadrian",
+      "type": "web",
+      "title": "Hadrian",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2021,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/hadrian/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-constantine",
+      "type": "web",
+      "title": "Constantine I",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2013,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Constantine_I/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-justinian",
+      "type": "web",
+      "title": "Justinian I",
+      "authors": [
+        "Will Wyeth"
+      ],
+      "year": 2012,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Justinian_I/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-julius-caesar",
+      "type": "web",
+      "title": "Julius Caesar",
+      "authors": [
+        "Joshua J. Mark"
+      ],
+      "year": 2011,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Julius_Caesar/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-antigonus",
+      "type": "web",
+      "title": "Antigonus I",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2012,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Antigonus_I/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-lysimachus",
+      "type": "web",
+      "title": "Lysimachus",
+      "authors": [
+        "Donald L. Wasson"
+      ],
+      "year": 2016,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Lysimachus/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "worldhistory-nikephoros-phokas",
+      "type": "web",
+      "title": "Nikephoros II Phokas",
+      "authors": [
+        "Michael Goodyear"
+      ],
+      "year": 2018,
+      "publisher": "World History Encyclopedia",
+      "url": "https://www.worldhistory.org/Nikephoros_II_Phokas/",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "britannica-origen",
+      "type": "web",
+      "title": "Origen",
+      "authors": [
+        "Henry Chadwick"
+      ],
+      "year": 1998,
+      "publisher": "Encyclopaedia Britannica",
+      "url": "https://www.britannica.com/biography/Origen",
+      "accessed": "2026-10-05"
+    },
+    {
+      "id": "isbe-decapolis",
+      "type": "chapter",
+      "title": "Decapolis",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/D/decapolis.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-ituraea",
+      "type": "chapter",
+      "title": "Ituraea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/I/ituraea.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-peraea",
+      "type": "chapter",
+      "title": "Peraea",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/peraea.html",
+      "accessed": "2026-10-07"
     },
     {
       "id": "isbe-trachonitis",
@@ -1523,17 +2061,17 @@
       "accessed": "2026-10-07"
     },
     {
-      "id": "isbe-trogyllium",
+      "id": "isbe-abilene",
       "type": "chapter",
-      "title": "Trogyllium",
+      "title": "Abilene",
       "authors": [
-        "E. J. Banks"
+        "C. H. Thomson"
       ],
       "year": 1915,
       "publisher": "Howard-Severance Company",
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
-      "url": "https://www.internationalstandardbible.com/T/trogyllium.html",
-      "accessed": "2026-10-13"
+      "url": "https://www.internationalstandardbible.com/A/abilene.html",
+      "accessed": "2026-10-07"
     },
     {
       "id": "jewish-encyclopedia-agrippa-ii",
@@ -1563,635 +2101,6 @@
       "accessed": "2026-10-07"
     },
     {
-      "id": "josephus-antiquities",
-      "type": "book",
-      "title": "Antiquities of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
-      "authors": [
-        "Flavius Josephus"
-      ],
-      "year": 1737,
-      "publisher": "Christian Classics Ethereal Library",
-      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "josephus-jewish-war",
-      "type": "book",
-      "title": "The Wars of the Jews (Whiston translation, hosted by the Christian Classics Ethereal Library)",
-      "authors": [
-        "Flavius Josephus"
-      ],
-      "year": 1737,
-      "publisher": "Christian Classics Ethereal Library",
-      "url": "https://www.ccel.org/j/josephus/works/JOSEPHUS.HTM",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "kjv-1987-biblegateway",
-      "type": "web",
-      "title": "King James Version (KJV), 1987 printing",
-      "authors": [
-        "Church of England"
-      ],
-      "year": 1987,
-      "publisher": "Public domain in the United States",
-      "url": "https://www.biblegateway.com/versions/King-James-Version-KJV-Bible/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "kokkinos-justus-josephus-agrippa-coins",
-      "type": "article",
-      "title": "Justus, Josephus, Agrippa II and his Coins",
-      "authors": [
-        "Nikos Kokkinos"
-      ],
-      "year": 2003,
-      "journal": "Scripta Classica Israelica",
-      "url": "https://scriptaclassica.org/index.php/sci/article/view/3711",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-actium",
-      "type": "web",
-      "title": "Naval Battle of Actium (31 BCE)",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/battle/actium-31-bce/",
-      "accessed": "2026-09-24"
-    },
-    {
-      "id": "livius-cappadocia",
-      "type": "web",
-      "title": "Cappadocia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/cappadocia/cappadocia-3/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-cilicia",
-      "type": "web",
-      "title": "Cilicia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/cilicia/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "livius-claudius",
-      "type": "web",
-      "title": "Claudius",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/claudius/",
-      "accessed": "2026-10-08"
-    },
-    {
-      "id": "livius-damascus",
-      "type": "web",
-      "title": "Damascus",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/damascus/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "livius-domitian",
-      "type": "web",
-      "title": "Domitian",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/domitian/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-herod-agrippa-ii",
-      "type": "web",
-      "title": "Herod Agrippa II",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/herod-agrippa-ii/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-judaea",
-      "type": "web",
-      "title": "Judaea",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/judaea/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "livius-lycia",
-      "type": "web",
-      "title": "Lycia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/lycia/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-macedonia",
-      "type": "web",
-      "title": "Macedonia (8): The Roman age",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/macedonia/macedonia-8/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "livius-mesopotamia",
-      "type": "web",
-      "title": "Mesopotamia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/mesopotamia/",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "livius-miletus",
-      "type": "web",
-      "title": "Miletus",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/miletus/?lang=en",
-      "accessed": "2026-09-24"
-    },
-    {
-      "id": "livius-nabataeans",
-      "type": "web",
-      "title": "Nabataeans",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/people/nabataeans/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "livius-nerva",
-      "type": "web",
-      "title": "Nerva",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/nerva/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-pamphylia",
-      "type": "web",
-      "title": "Pamphylia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/pamphylia/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "livius-parthia",
-      "type": "web",
-      "title": "Parthia",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/place/parthia/",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "livius-ptolemy-i-soter",
-      "type": "web",
-      "title": "Ptolemy I Soter",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/ptolemy-i-soter/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "livius-titus",
-      "type": "web",
-      "title": "Titus",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/titus/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "livius-trajan",
-      "type": "web",
-      "title": "Trajan",
-      "authors": [
-        "Jona Lendering"
-      ],
-      "year": 2026,
-      "publisher": "Livius.org",
-      "url": "https://www.livius.org/articles/person/trajan/",
-      "accessed": "2026-10-07"
-    },
-    {
-      "id": "louvre-winged-victory",
-      "type": "web",
-      "title": "Victoire de Samothrace (Winged Victory of Samothrace)",
-      "authors": [
-        "Musée du Louvre"
-      ],
-      "year": 2026,
-      "publisher": "Musée du Louvre, Département des Antiquités grecques, étrusques et romaines",
-      "url": "https://collections.louvre.fr/en/ark:/53355/cl010252531",
-      "accessed": "2026-10-16"
-    },
-    {
-      "id": "mccollough-khirbet-qana",
-      "type": "chapter",
-      "title": "Khirbet Qana",
-      "authors": [
-        "C. Thomas McCollough"
-      ],
-      "year": 2015,
-      "containerTitle": "Galilee in the Late Second Temple and Mishnaic Periods, Volume 2: The Archaeological Record from Cities, Towns, and Villages",
-      "publisher": "Fortress Press"
-    },
-    {
-      "id": "metzger-textual-commentary",
-      "type": "book",
-      "title": "A Textual Commentary on the Greek New Testament",
-      "authors": [
-        "Bruce M. Metzger"
-      ],
-      "year": 1994,
-      "publisher": "United Bible Societies"
-    },
-    {
-      "id": "murphy-oconnor-holy-land-guide",
-      "type": "book",
-      "title": "The Holy Land: An Oxford Archaeological Guide from Earliest Times to 1700",
-      "authors": [
-        "Jerome Murphy-O'Connor"
-      ],
-      "year": 2008,
-      "publisher": "Oxford University Press"
-    },
-    {
-      "id": "niv-2011-biblegateway",
-      "type": "web",
-      "title": "New International Version (NIV), 2011 text edition",
-      "authors": [
-        "Biblica"
-      ],
-      "year": 2011,
-      "publisher": "Biblica",
-      "url": "https://www.biblegateway.com/versions/New-International-Version-NIV-Bible/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "nkjv-1982-biblegateway",
-      "type": "web",
-      "title": "New King James Version (NKJV), 1982",
-      "authors": [
-        "Thomas Nelson"
-      ],
-      "year": 1982,
-      "publisher": "Thomas Nelson",
-      "url": "https://www.biblegateway.com/versions/New-King-James-Version-NKJV-Bible/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "nlt-2015-biblegateway",
-      "type": "web",
-      "title": "New Living Translation (NLT), 2015 text edition",
-      "authors": [
-        "Tyndale House Foundation"
-      ],
-      "year": 2015,
-      "publisher": "Tyndale House Publishers",
-      "url": "https://www.biblegateway.com/versions/New-Living-Translation-NLT-Bible/",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "notley-aviam-bethsaida-el-araj",
-      "type": "article",
-      "title": "Searching for Bethsaida: The Case for El-Araj",
-      "authors": [
-        "R. Steven Notley",
-        "Mordechai Aviam"
-      ],
-      "year": 2020,
-      "journal": "Biblical Archaeology Review"
-    },
-    {
-      "id": "odysseus-galerius-palace",
-      "type": "web",
-      "title": "Palatial complex of Galerius: Description",
-      "authors": [
-        "Hellenic Ministry of Culture and Sports"
-      ],
-      "year": 2026,
-      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
-      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=423",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "odysseus-philippi",
-      "type": "web",
-      "title": "Philippoi: Description",
-      "authors": [
-        "Hellenic Ministry of Culture and Sports"
-      ],
-      "year": 2026,
-      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
-      "url": "http://odysseus.culture.gr/h/3/eh352.jsp?obj_id=2387",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "odysseus-philippi-history",
-      "type": "web",
-      "title": "Philippoi: History",
-      "authors": [
-        "Hellenic Ministry of Culture and Sports"
-      ],
-      "year": 2026,
-      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
-      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2387",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "odysseus-thessaloniki-forum",
-      "type": "web",
-      "title": "Ancient Agora of Thessaloniki: History",
-      "authors": [
-        "Hellenic Ministry of Culture and Sports"
-      ],
-      "year": 2026,
-      "publisher": "Odysseus, Hellenic Ministry of Culture and Sports",
-      "url": "http://odysseus.culture.gr/h/3/eh351.jsp?obj_id=2457",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "oeaw-celsus-library",
-      "type": "web",
-      "title": "Austrian researchers start conservation of the Celsus Library in Ephesos",
-      "authors": [
-        "Austrian Academy of Sciences (ÖAW)"
-      ],
-      "year": 2024,
-      "publisher": "Austrian Academy of Sciences",
-      "url": "https://www.oeaw.ac.at/en/news/preserving-world-cultural-heritage-austrian-researchers-start-conservation-of-the-celsus-library-in-ephesos-1",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "origen-commentary-john",
-      "type": "book",
-      "title": "Commentary on the Gospel of John, Book VI (Ante-Nicene Fathers translation, hosted by New Advent)",
-      "authors": [
-        "Origen"
-      ],
-      "year": 1896,
-      "publisher": "Christian Literature Publishing Co.",
-      "url": "https://www.newadvent.org/fathers/101506.htm",
-      "accessed": "2026-10-01"
-    },
-    {
-      "id": "pau-laodikeia-kazisi",
-      "type": "web",
-      "title": "Laodikeia Kazısı (Laodicea Excavation)",
-      "authors": [
-        "Pamukkale University Laodicea Excavation"
-      ],
-      "year": 2026,
-      "publisher": "Pamukkale University",
-      "url": "https://laodikeia.pau.edu.tr/",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "pef-khirbat-al-mafjar",
-      "type": "web",
-      "title": "Khirbat al-Mafjar Archaeological Project, Jericho, Palestine",
-      "authors": [
-        "Mahmoud Hawari"
-      ],
-      "year": 2022,
-      "publisher": "Palestine Exploration Fund",
-      "url": "https://www.pef.org.uk/khirbat-al-mafjar-archaeological-project-jericho-palestine/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "piccirillo-ainon-sapsaphas",
-      "type": "chapter",
-      "title": "Ainon Sapsaphas and Bethabara",
-      "authors": [
-        "Michele Piccirillo"
-      ],
-      "year": 1999,
-      "publisher": "Studium Biblicum Franciscanum",
-      "containerTitle": "The Madaba Map Centenary 1897-1997 (web edition on the Studium Biblicum Franciscanum's Madaba Mosaic Map site, archived by the Internet Archive)",
-      "url": "https://web.archive.org/web/20121011045828/http://www.christusrex.org/www1/ofm/mad/articles/PiccirilloSapsaphas.html",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "platner-ashby-topographical-dictionary",
-      "type": "book",
-      "title": "A Topographical Dictionary of Ancient Rome (hosted on LacusCurtius)",
-      "authors": [
-        "Samuel Ball Platner",
-        "Thomas Ashby"
-      ],
-      "year": 1929,
-      "publisher": "Oxford University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Gazetteer/Places/Europe/Italy/Lazio/Roma/Rome/_Texts/PLATOP*/home.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "pleiades-place-resource",
-      "type": "dataset",
-      "title": "Pleiades: A Gazetteer of Past Places",
-      "authors": [
-        "Pleiades contributors"
-      ],
-      "year": 2026,
-      "publisher": "Institute for the Study of the Ancient World, New York University",
-      "url": "https://pleiades.stoa.org/"
-    },
-    {
-      "id": "pliny-natural-history",
-      "type": "book",
-      "title": "The Natural History (translation by John Bostock and H. T. Riley, hosted on the Perseus Digital Library)",
-      "authors": [
-        "Pliny the Elder"
-      ],
-      "year": 1855,
-      "publisher": "Taylor and Francis",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.02.0137",
-      "accessed": "2026-10-18"
-    },
-    {
-      "id": "rainey-notley-sacred-bridge",
-      "type": "book",
-      "title": "The Sacred Bridge: Carta's Atlas of the Biblical World",
-      "authors": [
-        "Anson F. Rainey",
-        "R. Steven Notley"
-      ],
-      "year": 2006,
-      "publisher": "Carta Jerusalem"
-    },
-    {
-      "id": "ramsay-seven-churches",
-      "type": "book",
-      "title": "The Letters to the Seven Churches of Asia and Their Place in the Plan of the Apocalypse",
-      "authors": [
-        "W. M. Ramsay"
-      ],
-      "year": 1904,
-      "publisher": "Hodder and Stoughton",
-      "url": "https://archive.org/details/letterstosevench00rams"
-    },
-    {
-      "id": "reich-shukron-siloam-pool",
-      "type": "article",
-      "title": "The Second Temple Period Pool of Siloam in Jerusalem",
-      "authors": [
-        "Ronny Reich",
-        "Eli Shukron"
-      ],
-      "year": 2005,
-      "journal": "Israel Exploration Journal"
-    },
-    {
-      "id": "ritmeyer-temple-mount-quest",
-      "type": "book",
-      "title": "The Quest: Revealing the Temple Mount in Jerusalem",
-      "authors": [
-        "Leen Ritmeyer"
-      ],
-      "year": 2006,
-      "publisher": "Carta Jerusalem"
-    },
-    {
-      "id": "sardis-expedition-about",
-      "type": "web",
-      "title": "About Sardis",
-      "authors": [
-        "Archaeological Exploration of Sardis"
-      ],
-      "year": 2026,
-      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
-      "url": "https://sardisexpedition.org/en/essays/about-sardis",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "sardis-expedition-artemis-temple",
-      "type": "web",
-      "title": "The Temple of Artemis",
-      "authors": [
-        "Archaeological Exploration of Sardis"
-      ],
-      "year": 2026,
-      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
-      "url": "https://sardisexpedition.org/en/essays/about-artemis-temple",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "sardis-expedition-bath-gymnasium",
-      "type": "web",
-      "title": "The Bath-Gymnasium Complex",
-      "authors": [
-        "Archaeological Exploration of Sardis"
-      ],
-      "year": 2026,
-      "publisher": "Archaeological Exploration of Sardis, Harvard University and Cornell University",
-      "url": "https://sardisexpedition.org/en/essays/about-bath-gym",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "smith-dictionary-ampsaga",
-      "type": "chapter",
-      "title": "Ampsaga",
-      "authors": [
-        "William Smith"
-      ],
-      "year": 1854,
-      "publisher": "Walton and Maberly",
-      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=ampsaga-geo",
-      "accessed": "2026-10-18"
-    },
-    {
-      "id": "smith-dictionary-cyrenaica",
-      "type": "chapter",
-      "title": "Cyrenaica",
-      "authors": [
-        "William Smith"
-      ],
-      "year": 1854,
-      "publisher": "Walton and Maberly",
-      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=cyrenaica-geo",
-      "accessed": "2026-10-15"
-    },
-    {
-      "id": "smith-dictionary-epeirus",
-      "type": "chapter",
-      "title": "Epeirus",
-      "authors": [
-        "William Smith"
-      ],
-      "year": 1854,
-      "publisher": "Walton and Maberly",
-      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=epeirus-geo",
-      "accessed": "2026-10-08"
-    },
-    {
       "id": "smith-dictionary-lindus",
       "type": "chapter",
       "title": "Lindus",
@@ -2205,56 +2114,17 @@
       "accessed": "2026-10-13"
     },
     {
-      "id": "smith-dictionary-mauretania",
+      "id": "smith-dictionary-cyrenaica",
       "type": "chapter",
-      "title": "Mauretania",
+      "title": "Cyrenaica",
       "authors": [
         "William Smith"
       ],
       "year": 1854,
       "publisher": "Walton and Maberly",
       "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=mauretania-geo",
-      "accessed": "2026-10-18"
-    },
-    {
-      "id": "smith-dictionary-mulucha",
-      "type": "chapter",
-      "title": "Mulucha",
-      "authors": [
-        "William Smith"
-      ],
-      "year": 1854,
-      "publisher": "Walton and Maberly",
-      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=mulucha-geo",
-      "accessed": "2026-10-18"
-    },
-    {
-      "id": "smith-dictionary-provincia",
-      "type": "chapter",
-      "title": "Provincia",
-      "authors": [
-        "George Long"
-      ],
-      "year": 1875,
-      "publisher": "John Murray",
-      "containerTitle": "A Dictionary of Greek and Roman Antiquities (William Smith, ed.), hosted on LacusCurtius",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/secondary/SMIGRA*/Provincia.html",
-      "accessed": "2026-09-28"
-    },
-    {
-      "id": "smith-dictionary-samothrace",
-      "type": "chapter",
-      "title": "Samothrace",
-      "authors": [
-        "William Smith"
-      ],
-      "year": 1854,
-      "publisher": "Walton and Maberly",
-      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
-      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=samothrace-geo",
-      "accessed": "2026-10-16"
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=cyrenaica-geo",
+      "accessed": "2026-10-15"
     },
     {
       "id": "smith-dictionary-syrtica-regio",
@@ -2296,388 +2166,654 @@
       "accessed": "2026-10-07"
     },
     {
-      "id": "strabo-geography",
-      "type": "book",
-      "title": "Geography (Loeb Classical Library translation by Horace Leonard Jones, hosted on LacusCurtius)",
+      "id": "smith-dictionary-epeirus",
+      "type": "chapter",
+      "title": "Epeirus",
       "authors": [
-        "Strabo"
+        "William Smith"
       ],
-      "year": 1932,
-      "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Strabo/home.html",
-      "accessed": "2026-09-28"
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=epeirus-geo",
+      "accessed": "2026-10-08"
     },
     {
-      "id": "suetonius-twelve-caesars",
-      "type": "book",
-      "title": "The Lives of the Twelve Caesars (Loeb Classical Library translation by J. C. Rolfe, hosted on LacusCurtius)",
+      "id": "livius-herod-agrippa-ii",
+      "type": "web",
+      "title": "Herod Agrippa II",
       "authors": [
-        "Suetonius"
+        "Jona Lendering"
       ],
-      "year": 1914,
-      "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Suetonius/home.html",
-      "accessed": "2026-09-28"
+      "year": 2026,
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/herod-agrippa-ii/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "tacitus-annals",
-      "type": "book",
-      "title": "The Annals (Loeb Classical Library translation by John Jackson, hosted on LacusCurtius)",
-      "authors": [
-        "Tacitus"
-      ],
-      "year": 1931,
-      "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "tacitus-histories",
-      "type": "book",
-      "title": "The Histories (Loeb Classical Library translation by Clifford H. Moore, hosted on LacusCurtius)",
-      "authors": [
-        "Tacitus"
-      ],
-      "year": 1925,
-      "publisher": "Harvard University Press",
-      "url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Tacitus/home.html",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "taylor-golgotha-reconsideration",
+      "id": "kokkinos-justus-josephus-agrippa-coins",
       "type": "article",
-      "title": "Golgotha: A Reconsideration of the Evidence for the Sites of Jesus' Crucifixion and Burial",
+      "title": "Justus, Josephus, Agrippa II and his Coins",
       "authors": [
-        "Joan E. Taylor"
+        "Nikos Kokkinos"
       ],
-      "year": 1998,
-      "journal": "New Testament Studies",
-      "doi": "10.1017/S0028688500016465"
+      "year": 2003,
+      "journal": "Scripta Classica Israelica",
+      "url": "https://scriptaclassica.org/index.php/sci/article/view/3711",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-ancient-jericho",
+      "id": "livius-titus",
       "type": "web",
-      "title": "Ancient Jericho/Tell es-Sultan",
+      "title": "Titus",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/1687",
-      "accessed": "2026-10-05"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/titus/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-baptism-site-al-maghtas",
+      "id": "livius-domitian",
       "type": "web",
-      "title": "Baptism Site \"Bethany Beyond the Jordan\" (Al-Maghtas)",
+      "title": "Domitian",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/1446",
-      "accessed": "2026-09-23"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/domitian/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-church-of-nativity",
+      "id": "livius-nerva",
       "type": "web",
-      "title": "Birthplace of Jesus: Church of the Nativity and the Pilgrimage Route, Bethlehem",
+      "title": "Nerva",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/1433",
-      "accessed": "2026-09-23"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/nerva/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-damascus",
+      "id": "livius-trajan",
       "type": "web",
-      "title": "Ancient City of Damascus",
+      "title": "Trajan",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/20/",
-      "accessed": "2026-10-01"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/trajan/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-ephesus",
+      "id": "livius-claudius",
       "type": "web",
-      "title": "Ephesus",
+      "title": "Claudius",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/1018/",
-      "accessed": "2026-09-30"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/person/claudius/",
+      "accessed": "2026-10-08"
     },
     {
-      "id": "unesco-hierapolis-pamukkale",
+      "id": "livius-cappadocia",
       "type": "web",
-      "title": "Hierapolis-Pamukkale",
+      "title": "Cappadocia",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/485",
-      "accessed": "2026-09-24"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/cappadocia/cappadocia-3/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-historic-centre-rome",
+      "id": "livius-lycia",
       "type": "web",
-      "title": "Historic Centre of Rome, the Properties of the Holy See in that City Enjoying Extraterritorial Rights and San Paolo Fuori le Mura",
+      "title": "Lycia",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "Jona Lendering"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/91/",
-      "accessed": "2026-10-05"
+      "publisher": "Livius.org",
+      "url": "https://www.livius.org/articles/place/lycia/",
+      "accessed": "2026-10-07"
     },
     {
-      "id": "unesco-old-city-jerusalem",
-      "type": "web",
-      "title": "Old City of Jerusalem and its Walls",
+      "id": "isbe-en-gannim",
+      "type": "chapter",
+      "title": "En-gannim",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/E/en-gannim.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-golan",
+      "type": "chapter",
+      "title": "Golan; Gaulonitis",
+      "authors": [
+        "W. Ewing"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/golan-gaulonitis.html",
+      "accessed": "2026-10-07"
+    },
+    {
+      "id": "isbe-seleucia",
+      "type": "chapter",
+      "title": "Seleucia",
+      "authors": [
+        "W. M. Christie"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/seleucia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-attalia",
+      "type": "chapter",
+      "title": "Attalia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/attalia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-samothrace",
+      "type": "chapter",
+      "title": "Samothrace",
+      "authors": [
+        "Arthur J. Kinsella"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/samothrace.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "smith-dictionary-samothrace",
+      "type": "chapter",
+      "title": "Samothrace",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=samothrace-geo",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "louvre-winged-victory",
+      "type": "web",
+      "title": "Victoire de Samothrace (Winged Victory of Samothrace)",
+      "authors": [
+        "Musée du Louvre"
       ],
       "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/148",
-      "accessed": "2026-10-05"
+      "publisher": "Musée du Louvre, Département des Antiquités grecques, étrusques et romaines",
+      "url": "https://collections.louvre.fr/en/ark:/53355/cl010252531",
+      "accessed": "2026-10-16"
     },
     {
-      "id": "unesco-patmos",
+      "id": "isbe-amphipolis",
+      "type": "chapter",
+      "title": "Amphipolis",
+      "authors": [
+        "Marcus N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/amphipolis.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-apollonia",
+      "type": "chapter",
+      "title": "Apollonia",
+      "authors": [
+        "Marcus N. Tod"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/apollonia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-assos",
+      "type": "chapter",
+      "title": "Assos",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/assos.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-mitylene",
+      "type": "chapter",
+      "title": "Mitylene",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/mitylene.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-chios",
+      "type": "chapter",
+      "title": "Chios",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/chios.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-samos",
+      "type": "chapter",
+      "title": "Samos",
+      "authors": [
+        "Arthur J. Kinsella"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/samos.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-trogyllium",
+      "type": "chapter",
+      "title": "Trogyllium",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/trogyllium.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-cos",
+      "type": "chapter",
+      "title": "Cos",
+      "authors": [
+        "J. E. Harry"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cos.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-patara",
+      "type": "chapter",
+      "title": "Patara",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/patara.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-acco",
+      "type": "chapter",
+      "title": "Acco",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/acco.html",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "isbe-maccabees",
+      "type": "chapter",
+      "title": "Maccabaeus; Maccabees",
+      "authors": [
+        "J. Hutchison"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/maccabaeus-maccabees.html",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "isbe-myra",
+      "type": "chapter",
+      "title": "Myra",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/myra.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-cnidus",
+      "type": "chapter",
+      "title": "Cnidus",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/cnidus.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-phoenix",
+      "type": "chapter",
+      "title": "Phoenix",
+      "authors": [
+        "W. M. Calder"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/phoenix.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-fair-havens",
+      "type": "chapter",
+      "title": "Fair Havens",
+      "authors": [
+        "James Orr"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/F/fair-havens.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-lasea",
+      "type": "chapter",
+      "title": "Lasea",
+      "authors": ["James Orr"],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lasea.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-sidon",
+      "type": "chapter",
+      "title": "Sidon (2)",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/sidon-(2).html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-syracuse",
+      "type": "chapter",
+      "title": "Syracuse",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/syracuse.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-rhegium",
+      "type": "chapter",
+      "title": "Rhegium",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/R/rhegium.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-ptolemais",
+      "type": "chapter",
+      "title": "Ptolemais",
+      "authors": [
+        "James Orr"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/ptolemais.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-taverns-three",
+      "type": "chapter",
+      "title": "Taverns, Three",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/taverns-three.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-adria",
+      "type": "chapter",
+      "title": "Adria",
+      "authors": [
+        "George H. Allen"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/adria.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-famine",
+      "type": "chapter",
+      "title": "Famine",
+      "authors": [
+        "W. L. Walker"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/F/famine.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-lycia",
+      "type": "chapter",
+      "title": "Lycia",
+      "authors": [
+        "E. J. Banks"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/L/lycia.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-paul-the-apostle-3",
+      "type": "chapter",
+      "title": "Paul, the Apostle, 3 (III. Chronology of Paul's Career)",
+      "authors": [
+        "A. T. Robertson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/paul-the-apostle-3.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-paul-the-apostle-5",
+      "type": "chapter",
+      "title": "Paul, the Apostle, 5 (V. Work)",
+      "authors": [
+        "A. T. Robertson"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/P/paul-the-apostle-5.html",
+      "accessed": "2026-10-13"
+    },
+    {
+      "id": "bibleodyssey-erastus-gallio-paul",
       "type": "web",
-      "title": "The Historic Centre (Chorá) with the Monastery of Saint-John the Theologian and the Cave of the Apocalypse on the Island of Pátmos",
+      "title": "Erastus, Gallio, and Paul",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "C. D. Elledge"
       ],
-      "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/942",
-      "accessed": "2026-09-24"
+      "year": 2017,
+      "publisher": "Society of Biblical Literature (Bible Odyssey)",
+      "url": "https://www.bibleodyssey.org/articles/erastus-gallio-and-paul/",
+      "accessed": "2026-10-13"
     },
     {
-      "id": "unesco-pergamon",
-      "type": "web",
-      "title": "Pergamon and its Multi-Layered Cultural Landscape",
+      "id": "isbe-gadara",
+      "type": "chapter",
+      "title": "Gadara",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "W. Ewing"
       ],
-      "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/1457",
-      "accessed": "2026-09-24"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gadara.html",
+      "accessed": "2026-10-13"
     },
     {
-      "id": "unesco-tyre",
-      "type": "web",
-      "title": "Tyre",
+      "id": "isbe-gerasa",
+      "type": "chapter",
+      "title": "Gerasa; Gerasenes",
       "authors": [
-        "UNESCO World Heritage Centre"
+        "W. Ewing"
       ],
-      "year": 2026,
-      "publisher": "UNESCO",
-      "url": "https://whc.unesco.org/en/list/299",
-      "accessed": "2026-09-24"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/G/gerasa-gerasenes.html",
+      "accessed": "2026-10-13"
     },
     {
-      "id": "wagner-wilson-why-derbe",
-      "type": "article",
-      "title": "Why Derbe? An Unlikely Lycaonian City for Paul's Ministry",
+      "id": "isbe-ephraim",
+      "type": "chapter",
+      "title": "Ephraim (2)",
       "authors": [
-        "Bob Wagner",
-        "Mark Wilson"
+        "W. Ewing"
       ],
-      "year": 2019,
-      "journal": "Tyndale Bulletin",
-      "url": "https://www.sevenchurches.org/wp-content/uploads/2020/03/Why-Derbe-Wagner-Wilson-Tyndale-Bulletin.pdf",
-      "accessed": "2026-09-23"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/E/ephraim-(2).html",
+      "accessed": "2026-10-13"
     },
     {
-      "id": "western-wall-heritage-foundation",
-      "type": "web",
-      "title": "The Western Wall",
+      "id": "isbe-ephron-2",
+      "type": "chapter",
+      "title": "Ephron (2)",
       "authors": [
-        "The Western Wall Heritage Foundation"
+        "E. W. G. Masterman"
       ],
-      "year": 2026,
-      "publisher": "The Western Wall Heritage Foundation",
-      "url": "https://thekotel.org/en/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/E/ephron-(2).html",
+      "accessed": "2026-10-16"
     },
     {
-      "id": "worldhistory-antigonus",
-      "type": "web",
-      "title": "Antigonus I",
+      "id": "isbe-bethphage",
+      "type": "chapter",
+      "title": "Bethphage",
       "authors": [
-        "Donald L. Wasson"
+        "E. W. G. Masterman"
       ],
-      "year": 2012,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Antigonus_I/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/B/bethphage.html",
+      "accessed": "2026-10-13"
     },
     {
-      "id": "worldhistory-arrian",
-      "type": "web",
-      "title": "Arrian",
+      "id": "isbe-talmud",
+      "type": "chapter",
+      "title": "Talmud",
       "authors": [
-        "Donald L. Wasson"
+        "Hermann L. Strack"
       ],
-      "year": 2020,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/arrian/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/talmud.html",
+      "accessed": "2026-10-16"
     },
     {
-      "id": "worldhistory-augustus",
-      "type": "web",
-      "title": "Augustus",
+      "id": "isbe-chronology-nt",
+      "type": "chapter",
+      "title": "Chronology of the New Testament",
       "authors": [
-        "Joshua J. Mark"
+        "W. P. Armstrong"
       ],
-      "year": 2018,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/augustus/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-caligula",
-      "type": "web",
-      "title": "Caligula",
-      "authors": [
-        "Harrison W. Mark"
-      ],
-      "year": 2026,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Caligula/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-cassius-dio",
-      "type": "web",
-      "title": "Cassius Dio",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2020,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Cassius_Dio/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-cicero",
-      "type": "web",
-      "title": "Cicero",
-      "authors": [
-        "James Lloyd"
-      ],
-      "year": 2013,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/cicero/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-claudius",
-      "type": "web",
-      "title": "Claudius: The Unlikely Roman Emperor",
-      "authors": [
-        "Harrison W. Mark"
-      ],
-      "year": 2026,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/claudius/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-constantine",
-      "type": "web",
-      "title": "Constantine I",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2013,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Constantine_I/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-corinth",
-      "type": "web",
-      "title": "Corinth",
-      "authors": [
-        "Mark Cartwright"
-      ],
-      "year": 2018,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/corinth/",
-      "accessed": "2026-09-23"
-    },
-    {
-      "id": "worldhistory-crassus",
-      "type": "web",
-      "title": "Marcus Licinius Crassus",
-      "authors": [
-        "Mark Cartwright"
-      ],
-      "year": 2013,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Marcus_Licinius_Crassus/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-galba",
-      "type": "web",
-      "title": "Galba",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2012,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Galba/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-germanicus",
-      "type": "web",
-      "title": "Germanicus",
-      "authors": [
-        "Marianne R. H. Fisher"
-      ],
-      "year": 2016,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Germanicus/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-hadrian",
-      "type": "web",
-      "title": "Hadrian",
-      "authors": [
-        "Joshua J. Mark"
-      ],
-      "year": 2021,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/hadrian/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-herodotus",
-      "type": "web",
-      "title": "Herodotus",
-      "authors": [
-        "Joshua J. Mark"
-      ],
-      "year": 2022,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/herodotus/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/C/chronology-of-the-new-testament.html",
+      "accessed": "2026-10-13"
     },
     {
       "id": "worldhistory-jesus-christ",
@@ -2692,232 +2828,94 @@
       "accessed": "2026-10-13"
     },
     {
-      "id": "worldhistory-josephus",
-      "type": "web",
-      "title": "Flavius Josephus",
+      "id": "isbe-adramyttium",
+      "type": "chapter",
+      "title": "Adramyttium",
       "authors": [
-        "Rebecca Denova"
+        "E. J. Banks"
       ],
-      "year": 2021,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Flavius_Josephus/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/adramyttium.html",
+      "accessed": "2026-10-14"
     },
     {
-      "id": "worldhistory-julius-caesar",
-      "type": "web",
-      "title": "Julius Caesar",
+      "id": "isbe-alexandria",
+      "type": "chapter",
+      "title": "Alexandria",
       "authors": [
-        "Joshua J. Mark"
+        "Camden M. Cobern"
       ],
-      "year": 2011,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Julius_Caesar/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/alexandria.html",
+      "accessed": "2026-10-14"
     },
     {
-      "id": "worldhistory-justinian",
-      "type": "web",
-      "title": "Justinian I",
+      "id": "isbe-syrtis",
+      "type": "chapter",
+      "title": "Syrtis",
       "authors": [
-        "Will Wyeth"
+        "James Orr"
       ],
-      "year": 2012,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Justinian_I/",
-      "accessed": "2026-10-05"
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/S/syrtis.html",
+      "accessed": "2026-10-14"
     },
     {
-      "id": "worldhistory-lysimachus",
-      "type": "web",
-      "title": "Lysimachus",
+      "id": "pliny-natural-history",
+      "type": "book",
+      "title": "The Natural History (translation by John Bostock and H. T. Riley, hosted on the Perseus Digital Library)",
       "authors": [
-        "Donald L. Wasson"
+        "Pliny the Elder"
       ],
-      "year": 2016,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Lysimachus/",
-      "accessed": "2026-10-05"
+      "year": 1855,
+      "publisher": "Taylor and Francis",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.02.0137",
+      "accessed": "2026-10-18"
     },
     {
-      "id": "worldhistory-nero",
-      "type": "web",
-      "title": "Nero",
+      "id": "smith-dictionary-mauretania",
+      "type": "chapter",
+      "title": "Mauretania",
       "authors": [
-        "Harrison W. Mark"
+        "William Smith"
       ],
-      "year": 2026,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Nero/",
-      "accessed": "2026-10-05"
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=mauretania-geo",
+      "accessed": "2026-10-18"
     },
     {
-      "id": "worldhistory-nikephoros-phokas",
-      "type": "web",
-      "title": "Nikephoros II Phokas",
+      "id": "smith-dictionary-mulucha",
+      "type": "chapter",
+      "title": "Mulucha",
       "authors": [
-        "Michael Goodyear"
+        "William Smith"
       ],
-      "year": 2018,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Nikephoros_II_Phokas/",
-      "accessed": "2026-10-05"
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=mulucha-geo",
+      "accessed": "2026-10-18"
     },
     {
-      "id": "worldhistory-pergamon",
-      "type": "web",
-      "title": "Pergamon",
+      "id": "smith-dictionary-ampsaga",
+      "type": "chapter",
+      "title": "Ampsaga",
       "authors": [
-        "Joshua J. Mark"
+        "William Smith"
       ],
-      "year": 2022,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/pergamon/",
-      "accessed": "2026-09-30"
-    },
-    {
-      "id": "worldhistory-pliny-the-elder",
-      "type": "web",
-      "title": "Pliny the Elder",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2014,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/pliny-the-elder/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-pompey",
-      "type": "web",
-      "title": "Pompey",
-      "authors": [
-        "James Lloyd"
-      ],
-      "year": 2013,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/pompey/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-sardis",
-      "type": "web",
-      "title": "Sardis",
-      "authors": [
-        "Joshua J. Mark"
-      ],
-      "year": 2022,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/sardis/",
-      "accessed": "2026-09-24"
-    },
-    {
-      "id": "worldhistory-strabo",
-      "type": "web",
-      "title": "Strabo of Amasia",
-      "authors": [
-        "Rosie Sykes"
-      ],
-      "year": 2026,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Strabo_of_Amasia/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-suetonius",
-      "type": "web",
-      "title": "Suetonius",
-      "authors": [
-        "Mark Cartwright"
-      ],
-      "year": 2016,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Suetonius/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-tacitus",
-      "type": "web",
-      "title": "Tacitus",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2020,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/tacitus/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-tiberius",
-      "type": "web",
-      "title": "Tiberius: The Reclusive Roman Emperor",
-      "authors": [
-        "Harrison W. Mark"
-      ],
-      "year": 2026,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Tiberius/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-titus",
-      "type": "web",
-      "title": "Titus (Roman Emperor)",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2013,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Titus_(Roman_Emperor)/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-trajan",
-      "type": "web",
-      "title": "Trajan",
-      "authors": [
-        "Donald L. Wasson"
-      ],
-      "year": 2013,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/trajan/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-vespasian",
-      "type": "web",
-      "title": "Vespasian: The Commoner Who Became Roman Emperor",
-      "authors": [
-        "Harrison W. Mark"
-      ],
-      "year": 2026,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/Vespasian/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "worldhistory-xenophon",
-      "type": "web",
-      "title": "Xenophon",
-      "authors": [
-        "Joshua J. Mark"
-      ],
-      "year": 2022,
-      "publisher": "World History Encyclopedia",
-      "url": "https://www.worldhistory.org/xenophon/",
-      "accessed": "2026-10-05"
-    },
-    {
-      "id": "zondervan-who-were-galatians",
-      "type": "web",
-      "title": "Who Were the Galatians?",
-      "authors": [
-        "Thomas R. Schreiner"
-      ],
-      "year": 2017,
-      "publisher": "Zondervan Academic",
-      "url": "https://zondervanacademic.com/blog/who-were-the-galatians",
-      "accessed": "2026-09-24"
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=ampsaga-geo",
+      "accessed": "2026-10-18"
     }
   ]
 }
