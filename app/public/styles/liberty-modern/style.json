@@ -3785,9 +3785,17 @@
       }
     },
     {
-      "id": "ibm-modern-neutral-boundary",
+      "id": "ibm-modern-neutral-boundary-solid",
       "type": "line",
       "source": "ibm-modern-neutral-boundaries",
+      "filter": [
+        "==",
+        [
+          "get",
+          "lineStyle"
+        ],
+        "solid"
+      ],
       "layout": {},
       "paint": {
         "line-color": "hsl(0, 0%, 50%)",
@@ -3803,6 +3811,42 @@
           0.5,
           4,
           1
+        ],
+        "line-opacity": 1
+      },
+      "maxzoom": 5
+    },
+    {
+      "id": "ibm-modern-neutral-boundary-disputed",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "filter": [
+        "==",
+        [
+          "get",
+          "lineStyle"
+        ],
+        "dashed"
+      ],
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(248, 1%, 41%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.5,
+          4,
+          1
+        ],
+        "line-dasharray": [
+          4,
+          2
         ],
         "line-opacity": 1
       },
@@ -3832,461 +3876,214 @@
               "maritime"
             ],
             1
-          ],
-          [
-            "!=",
-            [
-              "get",
-              "disputed"
-            ],
-            1
-          ],
+          ]
+        ],
+        [
+          "all",
           [
             "!",
             [
-              "has",
-              "claimed_by"
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
+              "any",
+              [
+                "==",
+                [
+                  "get",
+                  "disputed"
+                ],
+                1
+              ],
+              [
+                "any",
+                [
+                  "all",
                   [
+                    "==",
                     [
-                      34.05,
-                      29.35
+                      "get",
+                      "adm0_l"
                     ],
+                    "XKK"
+                  ],
+                  [
+                    "==",
                     [
-                      36.3,
-                      29.35
+                      "get",
+                      "adm0_r"
                     ],
+                    "SRB"
+                  ]
+                ],
+                [
+                  "all",
+                  [
+                    "==",
                     [
-                      36.3,
-                      33.65
+                      "get",
+                      "adm0_l"
                     ],
+                    "SRB"
+                  ],
+                  [
+                    "==",
                     [
-                      34.05,
-                      33.65
+                      "get",
+                      "adm0_r"
                     ],
-                    [
-                      34.05,
-                      29.35
-                    ]
+                    "XKK"
                   ]
                 ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
+              ],
+              [
+                "any",
+                [
+                  "all",
                   [
+                    "==",
                     [
-                      32.53,
-                      34.93
+                      "coalesce",
+                      [
+                        "get",
+                        "admin_level"
+                      ],
+                      0
+                    ],
+                    2
+                  ],
+                  [
+                    "==",
+                    [
+                      "coalesce",
+                      [
+                        "get",
+                        "maritime"
+                      ],
+                      0
+                    ],
+                    0
+                  ],
+                  [
+                    "in",
+                    [
+                      "get",
+                      "adm0_l"
                     ],
                     [
-                      34.65,
-                      34.93
-                    ],
+                      "literal",
+                      [
+                        "ISR",
+                        "PSE"
+                      ]
+                    ]
+                  ],
+                  [
+                    "!",
                     [
-                      34.65,
-                      35.75
-                    ],
-                    [
-                      32.53,
-                      35.75
-                    ],
-                    [
-                      32.53,
-                      34.93
+                      "has",
+                      "adm0_r"
                     ]
                   ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
+                ],
+                [
+                  "all",
                   [
+                    "==",
                     [
-                      19.97,
-                      41.79
+                      "coalesce",
+                      [
+                        "get",
+                        "admin_level"
+                      ],
+                      0
+                    ],
+                    2
+                  ],
+                  [
+                    "==",
+                    [
+                      "coalesce",
+                      [
+                        "get",
+                        "maritime"
+                      ],
+                      0
+                    ],
+                    0
+                  ],
+                  [
+                    "in",
+                    [
+                      "get",
+                      "adm0_r"
                     ],
                     [
-                      21.83,
-                      41.79
-                    ],
+                      "literal",
+                      [
+                        "ISR",
+                        "PSE"
+                      ]
+                    ]
+                  ],
+                  [
+                    "!",
                     [
-                      21.83,
-                      43.32
-                    ],
-                    [
-                      19.97,
-                      43.32
-                    ],
-                    [
-                      19.97,
-                      41.79
+                      "has",
+                      "adm0_l"
                     ]
                   ]
-                ]
-              }
-            ],
-            [
-              "within",
-              {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      -17.16,
-                      20.71
-                    ],
-                    [
-                      -8.63,
-                      20.71
-                    ],
-                    [
-                      -8.63,
-                      27.72
-                    ],
-                    [
-                      -17.16,
-                      27.72
-                    ],
-                    [
-                      -17.16,
-                      20.71
-                    ]
-                  ]
-                ]
-              }
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "ISR"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "PSE"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "PSE"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "ISR"
-              ]
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "XKK"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "SRB"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "SRB"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "XKK"
-              ]
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "MAR"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "ESH"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "ESH"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "MAR"
-              ]
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "RUS"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "GEO"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "GEO"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "RUS"
-              ]
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "ARM"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "AZE"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "AZE"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "ARM"
-              ]
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "CYP"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "XNC"
-              ]
-            ],
-            [
-              "all",
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_l"
-                ],
-                "XNC"
-              ],
-              [
-                "==",
-                [
-                  "get",
-                  "adm0_r"
-                ],
-                "CYP"
-              ]
-            ]
-          ]
-        ],
-        [
-          "!",
-          [
-            "any",
-            [
-              "all",
-              [
-                "!",
-                [
-                  "has",
-                  "adm0_l"
                 ]
               ],
               [
                 "in",
                 [
                   "get",
-                  "adm0_r"
+                  "claimed_by"
                 ],
                 [
                   "literal",
                   [
-                    "ARM",
-                    "AZE"
+                    "IL",
+                    "SY"
                   ]
-                ]
-              ]
-            ],
-            [
-              "all",
-              [
-                "!",
-                [
-                  "has",
-                  "adm0_r"
                 ]
               ],
               [
-                "in",
+                "all",
                 [
-                  "get",
-                  "adm0_l"
+                  "==",
+                  [
+                    "coalesce",
+                    [
+                      "get",
+                      "admin_level"
+                    ],
+                    0
+                  ],
+                  3
                 ],
                 [
-                  "literal",
+                  "==",
                   [
-                    "ARM",
-                    "AZE"
+                    "coalesce",
+                    [
+                      "get",
+                      "maritime"
+                    ],
+                    0
+                  ],
+                  0
+                ],
+                [
+                  "!",
+                  [
+                    "has",
+                    "adm0_l"
+                  ]
+                ],
+                [
+                  "!",
+                  [
+                    "has",
+                    "adm0_r"
                   ]
                 ]
               ]
@@ -4327,6 +4124,286 @@
           1.2,
           12,
           3
+        ]
+      },
+      "minzoom": 5
+    },
+    {
+      "id": "ibm-modern-boundary-disputed",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "filter": [
+        "all",
+        [
+          "all",
+          [
+            "in",
+            [
+              "get",
+              "admin_level"
+            ],
+            [
+              "literal",
+              [
+                2,
+                3
+              ]
+            ]
+          ],
+          [
+            "!=",
+            [
+              "get",
+              "maritime"
+            ],
+            1
+          ]
+        ],
+        [
+          "any",
+          [
+            "==",
+            [
+              "get",
+              "disputed"
+            ],
+            1
+          ],
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "XKK"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "SRB"
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                "SRB"
+              ],
+              [
+                "==",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                "XKK"
+              ]
+            ]
+          ],
+          [
+            "any",
+            [
+              "all",
+              [
+                "==",
+                [
+                  "coalesce",
+                  [
+                    "get",
+                    "admin_level"
+                  ],
+                  0
+                ],
+                2
+              ],
+              [
+                "==",
+                [
+                  "coalesce",
+                  [
+                    "get",
+                    "maritime"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "in",
+                [
+                  "get",
+                  "adm0_l"
+                ],
+                [
+                  "literal",
+                  [
+                    "ISR",
+                    "PSE"
+                  ]
+                ]
+              ],
+              [
+                "!",
+                [
+                  "has",
+                  "adm0_r"
+                ]
+              ]
+            ],
+            [
+              "all",
+              [
+                "==",
+                [
+                  "coalesce",
+                  [
+                    "get",
+                    "admin_level"
+                  ],
+                  0
+                ],
+                2
+              ],
+              [
+                "==",
+                [
+                  "coalesce",
+                  [
+                    "get",
+                    "maritime"
+                  ],
+                  0
+                ],
+                0
+              ],
+              [
+                "in",
+                [
+                  "get",
+                  "adm0_r"
+                ],
+                [
+                  "literal",
+                  [
+                    "ISR",
+                    "PSE"
+                  ]
+                ]
+              ],
+              [
+                "!",
+                [
+                  "has",
+                  "adm0_l"
+                ]
+              ]
+            ]
+          ],
+          [
+            "in",
+            [
+              "get",
+              "claimed_by"
+            ],
+            [
+              "literal",
+              [
+                "IL",
+                "SY"
+              ]
+            ]
+          ],
+          [
+            "all",
+            [
+              "==",
+              [
+                "coalesce",
+                [
+                  "get",
+                  "admin_level"
+                ],
+                0
+              ],
+              3
+            ],
+            [
+              "==",
+              [
+                "coalesce",
+                [
+                  "get",
+                  "maritime"
+                ],
+                0
+              ],
+              0
+            ],
+            [
+              "!",
+              [
+                "has",
+                "adm0_l"
+              ]
+            ],
+            [
+              "!",
+              [
+                "has",
+                "adm0_r"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "hsl(248, 1%, 41%)",
+        "line-opacity": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          0,
+          0.4,
+          4,
+          1
+        ],
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          1,
+          5,
+          1.2,
+          12,
+          3
+        ],
+        "line-dasharray": [
+          4,
+          2
         ]
       },
       "minzoom": 5
@@ -5338,7 +5415,7 @@
   ],
   "name": "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)",
   "metadata": {
-    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    "interactive-bible-map:license": "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Disputed borders are drawn as dashed lines, as Google Maps' default view draws them. A dashed line marks a border that is disputed; it is not a claim about where a border runs or who governs a place. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
   },
   "zoom": 14,
   "maxzoom": 14

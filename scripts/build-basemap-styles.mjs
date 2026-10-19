@@ -14,14 +14,7 @@ const versaTilesColorfulStyleUrl =
   "https://tiles.versatiles.org/assets/styles/colorful/style.json";
 const naturalEarthBoundaryLinesUrl =
   "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_admin_0_boundary_lines_land.geojson";
-const naturalEarthCountriesUrl =
-  "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_50m_admin_0_countries.geojson";
-const naturalEarthDisputedAreasUrl =
-  "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_disputed_areas.geojson";
 const naturalEarthBoundaryLinesSha256 = "2faac4f6b34386f3d21b6e018cf151f241f00e5c936d44dd17d7d9bfb147fa48";
-const naturalEarthCountriesSha256 = "3e458fc036ad0a66411f2c1e6cac49c5d7bfb81cb1123bc513b22511a2b7fdeb";
-const naturalEarthDisputedAreasSha256 =
-  "9cafef8b7dfb6b164dc58f218f981f4ace9f716f6c03795d4c62d1ac9f3d50f5";
 
 const libertyAttribution =
   '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
@@ -50,10 +43,10 @@ const naturalEarthAttribution =
 // The places where the modern styles draw no border line (ADR-0037, "borders on the modern map",
 // item 6). docs/LICENSES.md and the "Sources & credits" text repeat this wording.
 const modernNoBorderLineStatement =
-  "No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places.";
+  "Disputed borders are drawn as dashed lines, as Google Maps' default view draws them. A dashed line marks a border that is disputed; it is not a claim about where a border runs or who governs a place.";
 
 const libertyModernName = "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)";
-const libertyModernMetadataLicense = `Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. ${modernNoBorderLineStatement} Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.`;
+const libertyModernMetadataLicense = `Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. ${modernNoBorderLineStatement} Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file.`;
 
 const versaTilesModernName =
   "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)";
@@ -147,52 +140,86 @@ const libertyDisputedBoundaryLayerId = "boundary_disputed";
 const libertySubNationalBoundaryLayerId = "boundary_3";
 const versaTilesDisputedBoundaryLayerId = "boundary-country-disputed";
 const libertyPoiLayerIdPattern = /^poi_/u;
+const libertyModernDisputedBoundaryLayerId = "ibm-modern-boundary-disputed";
 const modernNeutralBoundarySourceId = "ibm-modern-neutral-boundaries";
-const libertyModernNeutralBoundaryLayerId = "ibm-modern-neutral-boundary";
-const versaTilesModernNeutralBoundaryLayerId = "ibm-modern-neutral-boundary-fallback";
+const libertyModernNeutralBoundarySolidLayerId = "ibm-modern-neutral-boundary-solid";
+const libertyModernNeutralBoundaryDisputedLayerId = "ibm-modern-neutral-boundary-disputed";
+const versaTilesModernNeutralBoundarySolidLayerId = "ibm-modern-neutral-boundary-fallback-solid";
+const versaTilesModernNeutralBoundaryDisputedLayerId = "ibm-modern-neutral-boundary-fallback-disputed";
 const modernNeutralBoundaryGeoJsonRelativeUrl = "/styles/shared/modern-neutral-boundaries.geojson";
 const simplifiedBoundaryToleranceDegrees = 0.25;
-const lineClipBufferDegrees = 0.05;
-const libertyContestedMaskRectangles = [
-  [34.05, 29.35, 36.30, 33.65], // Israel, West Bank, Gaza, Golan
-  [32.53, 34.93, 34.65, 35.75], // Northern Cyprus and UN buffer area
-  [19.97, 41.79, 21.83, 43.32], // Kosovo
-  [-17.16, 20.71, -8.63, 27.72] // Western Sahara
-].map(([minLng, minLat, maxLng, maxLat]) => ({
-  type: "Polygon",
-  coordinates: [[
-    [minLng, minLat],
-    [maxLng, minLat],
-    [maxLng, maxLat],
-    [minLng, maxLat],
-    [minLng, minLat]
-  ]]
-}));
-const neutralMaskRegionDefinitions = [
+const modernDisputedBorderDashArray = [4, 2];
+const libertyContestedMaskRectangles = [];
+const hiddenBoundaryAdm0Pairs = [];
+const hiddenBoundaryNeIdsByPair = new Map();
+const modernBoundaryRenderRules = [
   {
-    id: "israel-palestine-golan",
-    countries: ["Israel", "Palestine"],
-    disputedAreas: ["Golan Heights"]
+    id: "disputed-flag",
+    render: "dashed",
+    reason: "OpenMapTiles marks the line as disputed (`disputed = 1`).",
+    expression: ["==", ["get", "disputed"], 1]
   },
   {
-    id: "northern-cyprus",
-    disputedAreas: ["Turkish Republic of Northern Cyprus", "United Nations Buffer Zone in Cyprus"]
+    id: "kosovo-serbia",
+    render: "dashed",
+    reason: "Google-style rendering: Kosovo–Serbia is dashed, even though nearby tiles mark it `disputed = 0`.",
+    expression: [
+      "any",
+      ["all", ["==", ["get", "adm0_l"], "XKK"], ["==", ["get", "adm0_r"], "SRB"]],
+      ["all", ["==", ["get", "adm0_l"], "SRB"], ["==", ["get", "adm0_r"], "XKK"]]
+    ]
   },
-  { id: "kosovo", disputedAreas: ["Kosovo"] },
-  { id: "western-sahara", disputedAreas: ["Western Sahara"] }
+  {
+    id: "west-bank-and-gaza-lines",
+    render: "dashed",
+    reason:
+      "Google-style rendering: the West Bank and Gaza lines are dashed; nearby tiles encode them as `adm0` features with one side missing and `disputed = 0`.",
+    expression: [
+      "any",
+      [
+        "all",
+        ["==", ["coalesce", ["get", "admin_level"], 0], 2],
+        ["==", ["coalesce", ["get", "maritime"], 0], 0],
+        ["in", ["get", "adm0_l"], ["literal", ["ISR", "PSE"]]],
+        ["!", ["has", "adm0_r"]]
+      ],
+      [
+        "all",
+        ["==", ["coalesce", ["get", "admin_level"], 0], 2],
+        ["==", ["coalesce", ["get", "maritime"], 0], 0],
+        ["in", ["get", "adm0_r"], ["literal", ["ISR", "PSE"]]],
+        ["!", ["has", "adm0_l"]]
+      ]
+    ]
+  },
+  {
+    id: "golan-claimed-by",
+    render: "dashed",
+    reason:
+      "Google-style rendering: the Golan line is dashed; nearby tiles mark it with `disputed = 1` and `claimed_by` (`IL`/`SY`) but without `adm0_l`/`adm0_r`.",
+    expression: ["in", ["get", "claimed_by"], ["literal", ["IL", "SY"]]]
+  },
+  {
+    id: "cyprus-buffer-line",
+    render: "dashed",
+    reason:
+      "Google-style rendering: Cyprus's internal divide is dashed; nearby tiles encode it as `admin_level = 3`, non-maritime, without `adm0_l`/`adm0_r`.",
+    expression: [
+      "all",
+      ["==", ["coalesce", ["get", "admin_level"], 0], 3],
+      ["==", ["coalesce", ["get", "maritime"], 0], 0],
+      ["!", ["has", "adm0_l"]],
+      ["!", ["has", "adm0_r"]]
+    ]
+  }
 ];
-const hiddenBoundaryAdm0Pairs = [
-  ["ISR", "PSE"], // Israel and the Palestinian territories
-  ["XKK", "SRB"], // Kosovo
-  ["MAR", "ESH"], // Western Sahara
-  ["RUS", "GEO"], // Whole Russia-Georgia border
-  ["ARM", "AZE"], // Nagorno-Karabakh area
-  ["CYP", "XNC"] // Northern Cyprus
+const naturalEarthBoundaryClassRules = [
+  { featurecla: "International boundary (verify)", render: "solid" },
+  { featurecla: "Disputed (please verify)", render: "dashed" },
+  { featurecla: "Indefinite (please verify)", render: "dashed" },
+  { featurecla: "Indeterminant frontier", render: "dashed" },
+  { featurecla: "Line of control (please verify)", render: "dashed" }
 ];
-const hiddenBoundaryNeIdsByPair = new Map([
-  ["ARM|AZE", new Set([1746705689, 1746705697, 1746706155, 1746706169])],
-  ["GEO|RUS", new Set([1746705547])]
-]);
 const libertyModernPerformanceExcludedLayerIds = new Set([
   "building-3d",
   "park_outline",
@@ -306,6 +333,43 @@ function expressionContainsGetField(expression, fieldNames) {
   }
 
   return expression.some((entry) => expressionContainsGetField(entry, fieldNames));
+}
+
+function buildModernTileRenderCondition(targetRender) {
+  const expressions = modernBoundaryRenderRules
+    .filter((rule) => rule.render === targetRender)
+    .map((rule) => rule.expression);
+  if (expressions.length === 0) {
+    return null;
+  }
+  return ["any", ...expressions];
+}
+
+function appendModernTileRenderFilter(existingFilter, targetRender) {
+  const dashedCondition = buildModernTileRenderCondition("dashed");
+  const hiddenCondition = buildModernTileRenderCondition("hidden");
+  let renderCondition = null;
+
+  if (targetRender === "dashed") {
+    renderCondition = dashedCondition;
+  } else if (targetRender === "solid") {
+    const exclusions = [dashedCondition, hiddenCondition].filter((condition) => condition != null);
+    renderCondition =
+      exclusions.length === 0 ? null : ["all", ...exclusions.map((condition) => ["!", condition])];
+  } else if (targetRender === "hidden") {
+    renderCondition = hiddenCondition;
+  }
+
+  if (!existingFilter && !renderCondition) {
+    return null;
+  }
+  if (!existingFilter) {
+    return renderCondition;
+  }
+  if (!renderCondition) {
+    return existingFilter;
+  }
+  return ["all", existingFilter, renderCondition];
 }
 
 function appendDisputedFilterExclusion(existingFilter) {
@@ -780,25 +844,18 @@ function simplifyFeature(feature, toleranceDegrees) {
 function createNeutralBoundaryGeoJson(
   boundaryGeoJson,
   countryPolygonIndex,
-  maskPolygons,
   simplifyToleranceDegrees
 ) {
   const relevantFeatures = (boundaryGeoJson.features ?? []).filter(
     (feature) => {
-      const inferredPairCodes = inferBoundaryPairCodesFromGeometry(
-        feature?.geometry,
-        countryPolygonIndex
-      );
-      return (
-        (feature?.properties?.FEATURECLA ?? feature?.properties?.featurecla) ===
-        "International boundary (verify)" &&
-        !featureMatchesHiddenAdm0Pair(feature?.properties, hiddenBoundaryAdm0Pairs, inferredPairCodes) &&
-        !featureMatchesHiddenNeIdForPair(
-          feature?.properties,
-          hiddenBoundaryAdm0Pairs,
-          hiddenBoundaryNeIdsByPair
-        )
-      );
+      const featurecla =
+        feature?.properties?.FEATURECLA ??
+        feature?.properties?.featurecla ??
+        "International boundary (verify)";
+      const render = naturalEarthBoundaryClassRules.find(
+        (rule) => rule.featurecla === featurecla
+      )?.render;
+      return render === "solid" || render === "dashed";
     }
   );
 
@@ -821,12 +878,17 @@ function createNeutralBoundaryGeoJson(
           feature.properties?.adm0_a3_r ??
           feature.properties?.adm0_r ??
           inferredPairCodes?.[1];
-        return {
-        id: feature.properties?.NE_ID ?? feature.properties?.ne_id ?? `boundary-${index + 1}`,
-        featurecla:
+        const featurecla =
           feature.properties?.FEATURECLA ??
           feature.properties?.featurecla ??
-          "International boundary (verify)",
+          "International boundary (verify)";
+        const lineStyle =
+          naturalEarthBoundaryClassRules.find((rule) => rule.featurecla === featurecla)?.render ??
+          "solid";
+        return {
+          id: feature.properties?.NE_ID ?? feature.properties?.ne_id ?? `boundary-${index + 1}`,
+          featurecla,
+          lineStyle,
           adm0_a3_l: leftCode,
           adm0_a3_r: rightCode
         };
@@ -835,39 +897,13 @@ function createNeutralBoundaryGeoJson(
     }))
   };
 
-  const clippedFeatures = clipFeatureCollectionOutsideMasks(boundaryFeatureCollection, maskPolygons)
-    .features
+  const simplifiedFeatures = boundaryFeatureCollection.features
     .map((feature) => simplifyFeature(feature, simplifyToleranceDegrees))
     .filter((feature) => feature != null);
 
   return {
     type: "FeatureCollection",
-    features: clippedFeatures
-  };
-}
-
-function ensureNoNeutralBoundaryVerticesInsideMasks(neutralBoundaryGeoJson, maskPolygons) {
-  for (const feature of neutralBoundaryGeoJson.features ?? []) {
-    if (feature?.geometry?.type !== "LineString") {
-      continue;
-    }
-    for (const point of feature.geometry.coordinates) {
-      if (isPointStrictlyInsideAnyPolygon(point, maskPolygons)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-function createMaskFeatureCollection(maskPolygons) {
-  return {
-    type: "FeatureCollection",
-    features: maskPolygons.map((coordinates, index) => ({
-      type: "Feature",
-      properties: { id: `neutral-mask-${index + 1}` },
-      geometry: { type: "Polygon", coordinates }
-    }))
+    features: simplifiedFeatures
   };
 }
 
@@ -879,15 +915,17 @@ function createNeutralBoundarySourceDefinition() {
   };
 }
 
-function createNeutralBoundaryLineLayer(layerId) {
+function createNeutralBoundaryLineLayer(layerId, lineStyle) {
   return {
     id: layerId,
     type: "line",
     source: modernNeutralBoundarySourceId,
+    filter: ["==", ["get", "lineStyle"], lineStyle],
     layout: {},
     paint: {
-      "line-color": "hsl(0, 0%, 50%)",
+      "line-color": lineStyle === "dashed" ? "hsl(248, 1%, 41%)" : "hsl(0, 0%, 50%)",
       "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.5, 4, 1],
+      ...(lineStyle === "dashed" ? { "line-dasharray": modernDisputedBorderDashArray } : {}),
       "line-opacity": 1
     }
   };
@@ -896,33 +934,40 @@ function createNeutralBoundaryLineLayer(layerId) {
 function applyNaturalEarthBoundaryLayerAtAllZooms({
   style,
   beforeLayerId,
-  layerId
+  solidLayerId,
+  dashedLayerId
 }) {
   style.sources = style.sources ?? {};
   style.sources[modernNeutralBoundarySourceId] = createNeutralBoundarySourceDefinition();
-  const existingLayerIndex = style.layers.findIndex((layer) => layer.id === layerId);
-  if (existingLayerIndex >= 0) {
-    style.layers.splice(existingLayerIndex, 1);
+  for (const layerId of [solidLayerId, dashedLayerId]) {
+    const existingLayerIndex = style.layers.findIndex((layer) => layer.id === layerId);
+    if (existingLayerIndex >= 0) {
+      style.layers.splice(existingLayerIndex, 1);
+    }
   }
   const targetIndex = style.layers.findIndex((layer) => layer.id === beforeLayerId);
-  const neutralLayer = createNeutralBoundaryLineLayer(layerId);
+  const solidLayer = createNeutralBoundaryLineLayer(solidLayerId, "solid");
+  const dashedLayer = createNeutralBoundaryLineLayer(dashedLayerId, "dashed");
   if (targetIndex < 0) {
-    style.layers.push(neutralLayer);
+    style.layers.push(solidLayer, dashedLayer);
     return;
   }
-  style.layers.splice(targetIndex, 0, neutralLayer);
+  style.layers.splice(targetIndex, 0, solidLayer, dashedLayer);
 }
 
 function applyNaturalEarthBoundaryLayerForLowZoom({
   style,
   beforeLayerId,
-  layerId,
+  solidLayerId,
+  dashedLayerId,
   maxzoom
 }) {
-  applyNaturalEarthBoundaryLayerAtAllZooms({ style, beforeLayerId, layerId });
-  const neutralLayer = style.layers.find((layer) => layer.id === layerId);
-  if (neutralLayer != null) {
-    neutralLayer.maxzoom = maxzoom;
+  applyNaturalEarthBoundaryLayerAtAllZooms({ style, beforeLayerId, solidLayerId, dashedLayerId });
+  for (const layerId of [solidLayerId, dashedLayerId]) {
+    const neutralLayer = style.layers.find((layer) => layer.id === layerId);
+    if (neutralLayer != null) {
+      neutralLayer.maxzoom = maxzoom;
+    }
   }
 }
 
@@ -1036,7 +1081,7 @@ function updateVersaTilesModernBoundaryFilters(style) {
       continue;
     }
 
-    layer.filter = appendDisputedFilterExclusion(layer.filter);
+    layer.filter = appendModernTileRenderFilter(layer.filter, "solid");
   }
 }
 
@@ -1241,18 +1286,38 @@ function buildModernLibertyStyle(upstreamStyle) {
   removeLibertyModernExcludedLayers(style);
   const countryBoundaryLayer = style.layers.find((layer) => layer.id === "boundary_2");
   if (countryBoundaryLayer) {
+    const baseSolidBoundaryFilter = [
+      "all",
+      ["==", ["get", "admin_level"], 2],
+      ["!=", ["get", "maritime"], 1]
+    ];
+    const baseDisputedBoundaryFilter = [
+      "all",
+      ["in", ["get", "admin_level"], ["literal", [2, 3]]],
+      ["!=", ["get", "maritime"], 1]
+    ];
     countryBoundaryLayer.minzoom = 5;
-    countryBoundaryLayer.filter = appendArmeniaAzerbaijanMissingSideCodeExclusion(
-      appendAdm0PairExclusions(
-        appendContestedMaskExclusion(countryBoundaryLayer.filter),
-        hiddenBoundaryAdm0Pairs
-      )
-    );
+    countryBoundaryLayer.filter = appendModernTileRenderFilter(baseSolidBoundaryFilter, "solid");
+    const disputedBoundaryLayer = structuredClone(countryBoundaryLayer);
+    disputedBoundaryLayer.id = libertyModernDisputedBoundaryLayerId;
+    disputedBoundaryLayer.filter = appendModernTileRenderFilter(baseDisputedBoundaryFilter, "dashed");
+    disputedBoundaryLayer.paint = {
+      ...(disputedBoundaryLayer.paint ?? {}),
+      "line-color": "hsl(248, 1%, 41%)",
+      "line-dasharray": modernDisputedBorderDashArray
+    };
+    const countryBoundaryLayerIndex = style.layers.findIndex((layer) => layer.id === "boundary_2");
+    if (countryBoundaryLayerIndex >= 0) {
+      style.layers.splice(countryBoundaryLayerIndex + 1, 0, disputedBoundaryLayer);
+    } else {
+      style.layers.push(disputedBoundaryLayer);
+    }
   }
   applyNaturalEarthBoundaryLayerForLowZoom({
     style,
     beforeLayerId: "boundary_2",
-    layerId: libertyModernNeutralBoundaryLayerId,
+    solidLayerId: libertyModernNeutralBoundarySolidLayerId,
+    dashedLayerId: libertyModernNeutralBoundaryDisputedLayerId,
     maxzoom: 5
   });
   updateLibertyModernLabelFields(style);
@@ -1283,7 +1348,8 @@ function buildModernVersaTilesStyle(upstreamStyle) {
   applyNaturalEarthBoundaryLayerAtAllZooms({
     style,
     beforeLayerId: "label-country-4",
-    layerId: versaTilesModernNeutralBoundaryLayerId
+    solidLayerId: versaTilesModernNeutralBoundarySolidLayerId,
+    dashedLayerId: versaTilesModernNeutralBoundaryDisputedLayerId
   });
   updateVersaTilesModernLabelFields(style);
   tuneVersaTilesModernPerformance(style);
@@ -1323,18 +1389,10 @@ async function writeStyleDirectory(outputDirectory, styleJson, noticeFileName, n
 }
 
 async function buildStyles() {
-  const [
-    libertyUpstream,
-    versaTilesUpstream,
-    naturalEarthBoundaryLinesText,
-    naturalEarthCountriesText,
-    naturalEarthDisputedAreasText
-  ] = await Promise.all([
+  const [libertyUpstream, versaTilesUpstream, naturalEarthBoundaryLinesText] = await Promise.all([
     fetchJson(libertyStyleUrl),
     fetchJson(versaTilesColorfulStyleUrl),
-    fetchText(naturalEarthBoundaryLinesUrl),
-    fetchText(naturalEarthCountriesUrl),
-    fetchText(naturalEarthDisputedAreasUrl)
+    fetchText(naturalEarthBoundaryLinesUrl)
   ]);
 
   const naturalEarthBoundaryLinesHash = createHash("sha256")
@@ -1346,48 +1404,13 @@ async function buildStyles() {
     );
   }
 
-  const naturalEarthCountriesHash = createHash("sha256")
-    .update(naturalEarthCountriesText, "utf8")
-    .digest("hex");
-  if (naturalEarthCountriesHash !== naturalEarthCountriesSha256) {
-    throw new Error(
-      `Natural Earth countries SHA mismatch: expected ${naturalEarthCountriesSha256}, got ${naturalEarthCountriesHash}`
-    );
-  }
-
-  const naturalEarthDisputedAreasHash = createHash("sha256")
-    .update(naturalEarthDisputedAreasText, "utf8")
-    .digest("hex");
-  if (naturalEarthDisputedAreasHash !== naturalEarthDisputedAreasSha256) {
-    throw new Error(
-      `Natural Earth disputed SHA mismatch: expected ${naturalEarthDisputedAreasSha256}, got ${naturalEarthDisputedAreasHash}`
-    );
-  }
-
   const naturalEarthBoundaryGeoJson = JSON.parse(naturalEarthBoundaryLinesText);
-  const naturalEarthCountriesGeoJson = JSON.parse(naturalEarthCountriesText);
-  const naturalEarthDisputedGeoJson = JSON.parse(naturalEarthDisputedAreasText);
-
-  const neutralMaskPolygonCoordinates = collectNeutralMaskPolygonCoordinates({
-    countryGeoJson: naturalEarthCountriesGeoJson,
-    disputedAreasGeoJson: naturalEarthDisputedGeoJson,
-    regionDefinitions: neutralMaskRegionDefinitions
-  });
-  const bufferedMaskPolygonCoordinates = createBufferedMaskPolygonCoordinates(
-    neutralMaskPolygonCoordinates,
-    lineClipBufferDegrees
-  );
-  const allNeutralMaskPolygonCoordinates = bufferedMaskPolygonCoordinates;
-  const countryPolygonIndex = buildCountryPolygonIndex(naturalEarthCountriesGeoJson);
+  const countryPolygonIndex = [];
   const neutralBoundaryGeoJson = createNeutralBoundaryGeoJson(
     naturalEarthBoundaryGeoJson,
     countryPolygonIndex,
-    allNeutralMaskPolygonCoordinates,
     simplifiedBoundaryToleranceDegrees
   );
-  if (!ensureNoNeutralBoundaryVerticesInsideMasks(neutralBoundaryGeoJson, allNeutralMaskPolygonCoordinates)) {
-    throw new Error("Neutral boundary output still contains vertices inside a contested-area mask.");
-  }
 
   const libertyStyle = buildLibertyStyle(libertyUpstream);
   const versaTilesStyle = buildVersaTilesStyle(versaTilesUpstream);
@@ -1433,12 +1456,6 @@ async function buildStyles() {
   );
 
   await fs.mkdir(sharedStylesOutputDirectory, { recursive: true });
-  const neutralMaskGeoJson = createMaskFeatureCollection(allNeutralMaskPolygonCoordinates);
-  await fs.writeFile(
-    path.join(sharedStylesOutputDirectory, "modern-neutral-boundary-masks.geojson"),
-    `${JSON.stringify(neutralMaskGeoJson)}\n`,
-    "utf8"
-  );
   const neutralBoundaryGeoJsonSerialized = `${JSON.stringify(neutralBoundaryGeoJson)}\n`;
   await fs.writeFile(
     path.join(sharedStylesOutputDirectory, "modern-neutral-boundaries.geojson"),
@@ -1459,7 +1476,6 @@ async function buildStyles() {
   console.log(" - app/public/styles/liberty-modern/LICENSE.txt");
   console.log(" - app/public/styles/versatiles-colorful-modern/style.json");
   console.log(" - app/public/styles/versatiles-colorful-modern/NOTICE.txt");
-  console.log(" - app/public/styles/shared/modern-neutral-boundary-masks.geojson");
   console.log(" - app/public/styles/shared/modern-neutral-boundaries.geojson");
 }
 
