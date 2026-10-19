@@ -32,6 +32,8 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Lighthouse in CI as a weekly, advisory run** (median of 5). The desktop gate stays the one that counts (ADR-0034, ADR-0045).
 - **Path filters,** so that a PR changing only data or only styles runs only the affected checks.
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
+- **A time limit for CI's build job.** `.github/workflows/app.yml`'s `build` job has no `timeout-minutes`, so a stuck run waits for GitHub's 6-hour default. On 2026-10-07, three runs on `main` hung at the Playwright install, a step lean CI (ADR-0036) has since removed from the build. Add a 20-minute limit the next time the workflow changes.
+- **Share border geometry across the ancient layer's stops.** Each stop file repeats the borders it draws, about 145 KB of the layer's 318 KB gzip. A shared file of border segments that each stop lists by id would win most of that back, and the budget could return to 300,000 bytes (ADR-0037, update of 2026-10-19).
 
 ## Map
 - **Sophene, the first land drawn outside the empire (M5-11's research §4.7).** Three of its four sides are sourced (Strabo 11.14.2 and 12.2.1; Smith's *Dictionary*). The Fact-Checker found that the note swaps Mount Masius and the Antitaurus (verification U2). This fits the later item on civilisations around the world.
