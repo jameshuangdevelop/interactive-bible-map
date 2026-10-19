@@ -43,6 +43,12 @@ Protect the human's newest requests and the journeys the audit found unguarded (
    - every ancient border shown from zoom 5;
    - lands whose status is unclear dashed and not hatched (`@modern` and `@data`).
 
+7. **Findings deferred here from the reviews of #75 (M5-09) and #76 (M5-10),** which touch the browser suite M5-12 moved:
+   - Restore the assertion that a clickable name shows `cursor: pointer`. M5-09 deleted it from `verifyPointerCursorAndNearPinClick`. Wait for the hover to settle before reading the cursor; item 1's hover test can carry it.
+   - `verifyJerusalemGalileeAtZoom6` reads clusters through the constant `majorClusterPins`, which M5-09 aliased to the major-name layer, so every major counts as a cluster. Tell a cluster by its `properties.cluster === true` instead, so that the selected and highlighted sizes count again.
+   - Delete the grouping code that M5-09 left unused in `app/src/features/map/major-name-groups.ts` (`buildMajorNameFeatures`, `majorNameBandFilter`, `groupMajorNamesAtZoom`, `majorGroupLabelText`, `measureMajorNameBox` and their types), with its tests. Keep only what the app still imports.
+   - The border tests (item 6) assert each contested line by name (West Bank, Gaza, Golan, Kosovo–Serbia, the Green Line), not "any dashed feature".
+
 ## Out of scope
 The runner, the CI and the data tests (M5-12 and M5-13). New features.
 
