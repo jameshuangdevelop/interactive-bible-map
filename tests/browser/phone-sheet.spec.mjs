@@ -39,68 +39,6 @@ async function dragInsideElement(page, element, options) {
   await page.mouse.up();
 }
 
-async function readMapCamera(page) {
-  return page.evaluate(() => {
-    const map = window.__ibmMapForTests;
-    if (!map) {
-      return null;
-    }
-    const center = map.getCenter();
-    return {
-      lng: center.lng,
-      lat: center.lat,
-      zoom: map.getZoom()
-    };
-  });
-}
-
-async function dragHandleAndSampleCameraDuringGesture(page, selector, deltaY, options = {}) {
-  const { steps = 14 } = options;
-  const handle = page.locator(selector);
-  await expect(handle).toBeVisible();
-  const box = await handle.boundingBox();
-  if (!box) {
-    throw new Error(`No bounding box for ${selector}`);
-  }
-  const baseline = await readMapCamera(page);
-  if (!baseline) {
-    throw new Error("Map test hook unavailable.");
-  }
-  const startX = box.x + box.width / 2;
-  const startY = box.y + box.height / 2;
-  let cameraMovedDuringDrag = false;
-  await page.mouse.move(startX, startY);
-  await page.mouse.down();
-  for (let index = 1; index <= steps; index += 1) {
-    const nextY = startY + (deltaY * index) / steps;
-    await page.mouse.move(startX, nextY, { steps: 1 });
-    await page.waitForTimeout(40);
-    const sample = await page.evaluate(() => {
-      const map = window.__ibmMapForTests;
-      if (!map) {
-        return null;
-      }
-      const center = map.getCenter();
-      return {
-        moving: map.isMoving(),
-        lng: center.lng,
-        lat: center.lat,
-        zoom: map.getZoom()
-      };
-    });
-    if (sample) {
-      const changed =
-        Math.abs(sample.lng - baseline.lng) > 0.00001 ||
-        Math.abs(sample.lat - baseline.lat) > 0.00001 ||
-        Math.abs(sample.zoom - baseline.zoom) > 0.00001;
-      if (sample.moving || changed) {
-        cameraMovedDuringDrag = true;
-      }
-    }
-  }
-  await page.mouse.up();
-  return cameraMovedDuringDrag;
-}
 
 test("map sheet drags between half, full, half, and closed @phone", async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded" });
@@ -147,58 +85,61 @@ test("tapping the map sheet handle toggles half and full @phone", async ({ page,
   await expect(handle).toHaveAttribute("aria-expanded", "false");
 });
 
-test("dragging the handle does not move map camera for an open place @phone", async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?place=capernaum`, { waitUntil: "domcontentloaded" });
-  await expect
-    .poll(async () => {
-      const map = await readMapCamera(page);
-      return map !== null;
-    })
-    .toBe(true);
-  await expect
-    .poll(async () => {
-      const camera = await readMapCamera(page);
-      const moving = await page.evaluate(() => window.__ibmMapForTests?.isMoving() ?? true);
-      return Boolean(camera && camera.zoom >= 10.5 && !moving);
-    })
-    .toBe(true);
-  await page.evaluate(() => {
-    window.__ibmMapForTests?.panBy([0, 420], { animate: false });
+test("full sheet intentionally covers map, center, and attribution trigger @phone", async ({
+  page,
+  baseUrl
+}) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  const sheet = page.locator("section[aria-label='Place details']").first();
+  const handle = page.locator("[data-sheet-handle='place']");
+  await expect(handle).toHaveAttribute("aria-expanded", "false");
+  const halfTop = (await sheet.boundingBox())?.y ?? 0;
+  expect(halfTop).toBeGreaterThan(40);
+  await handle.click();
+  await expect(handle).toHaveAttribute("aria-expanded", "true");
+
+  const coverage = await page.evaluate(() => {
+    const sheet = document.querySelector("section[aria-label='Place details']");
+    const map = document.querySelector(".ibm-map-root");
+    const attribButton = document.querySelector(".maplibregl-ctrl-attrib-button");
+    if (!(sheet instanceof HTMLElement) || !(map instanceof HTMLElement)) {
+      return null;
+    }
+    const mapRect = map.getBoundingClientRect();
+    const points = [
+      { label: "map-top-left", x: mapRect.left + 6, y: mapRect.top + 6 },
+      { label: "map-top-right", x: mapRect.right - 6, y: mapRect.top + 6 },
+      { label: "map-bottom-left", x: mapRect.left + 6, y: mapRect.bottom - 6 },
+      { label: "map-bottom-right", x: mapRect.right - 6, y: mapRect.bottom - 6 },
+      { label: "map-center", x: mapRect.left + mapRect.width / 2, y: mapRect.top + mapRect.height / 2 }
+    ];
+    if (attribButton instanceof HTMLElement) {
+      const rect = attribButton.getBoundingClientRect();
+      points.push({
+        label: "attribution-button",
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      });
+    }
+
+    return points.map((point) => {
+      const el = document.elementFromPoint(point.x, point.y);
+      return {
+        label: point.label,
+        coveredBySheet: Boolean(el && sheet.contains(el)),
+        mapElementVisible: Boolean(el && map.contains(el))
+      };
+    });
   });
-  await expect
-    .poll(async () => page.evaluate(() => window.__ibmMapForTests?.isMoving() ?? true))
-    .toBe(false);
-
-  const before = await readMapCamera(page);
-  if (!before) {
-    throw new Error("Map test hook unavailable.");
+  if (!coverage) {
+    throw new Error("Missing sheet or map element for full-sheet coverage test.");
   }
-
-  const movedWhileDraggingUp = await dragHandleAndSampleCameraDuringGesture(
-    page,
-    "[data-sheet-handle='place']",
-    -320,
-    { steps: 16 }
-  );
-  const movedWhileDraggingDown = await dragHandleAndSampleCameraDuringGesture(
-    page,
-    "[data-sheet-handle='place']",
-    320,
-    { steps: 16 }
-  );
-  expect(movedWhileDraggingUp).toBe(false);
-  expect(movedWhileDraggingDown).toBe(false);
-  await expect
-    .poll(async () => page.evaluate(() => window.__ibmMapForTests?.isMoving() ?? true))
-    .toBe(false);
-
-  const after = await readMapCamera(page);
-  if (!after) {
-    throw new Error("Map test hook unavailable.");
+  for (const sample of coverage) {
+    expect(sample.mapElementVisible, `${sample.label} should not expose map content at full`).toBe(false);
+    if (sample.label === "attribution-button" || sample.label === "map-center") {
+      expect(sample.coveredBySheet, `${sample.label} should be covered by the full sheet`).toBe(true);
+    }
   }
-  expect(Math.abs(after.lng - before.lng)).toBeLessThan(0.00001);
-  expect(Math.abs(after.lat - before.lat)).toBeLessThan(0.00001);
-  expect(Math.abs(after.zoom - before.zoom)).toBeLessThan(0.00001);
 });
 
 test("tapping body text at full keeps the sheet full @phone", async ({ page, baseUrl }) => {

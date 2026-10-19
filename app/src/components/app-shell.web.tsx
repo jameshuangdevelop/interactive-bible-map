@@ -492,7 +492,7 @@ export function AppShell() {
 
     return sortedTimelineStops.findIndex((stop) => stop.id === selectedTimelineStop.id);
   }, [selectedTimelineStop, sortedTimelineStops]);
-  const smallScreenSheetMaxHeightPx = Math.max(0, viewportHeightPx - SMALL_SCREEN_SHEET_EDGE_GAP_PX);
+  const smallScreenSheetMaxHeightPx = Math.max(0, viewportHeightPx);
   const smallScreenSheetCollapsedHeightPx = Math.min(
     smallScreenSheetMaxHeightPx,
     Math.max(
@@ -2005,15 +2005,15 @@ export function AppShell() {
   const viewTabsDesktopTransform = showDualRoutesPanelsOnDesktop ? "none" : "translateX(-50%)";
   const commonSmallScreenPanelStyle: CSSProperties = {
     position: "absolute",
-    left: `${tokens.spacing.md}px`,
-    right: `${tokens.spacing.md}px`,
-    bottom: `${tokens.spacing.md}px`,
+    left: smallScreenSheetIsFull ? "0" : `${tokens.spacing.md}px`,
+    right: smallScreenSheetIsFull ? "0" : `${tokens.spacing.md}px`,
+    bottom: smallScreenSheetIsFull ? "0" : `${tokens.spacing.md}px`,
     height: `${Math.round(panelHeightPx)}px`,
-    maxHeight: "calc(100% - 16px)",
+    maxHeight: smallScreenSheetIsFull ? "100%" : "calc(100% - 16px)",
     boxSizing: "border-box" as const,
     backgroundColor: tokens.color.surface,
     border: `1px solid ${tokens.color.divider}`,
-    borderRadius: "16px",
+    borderRadius: smallScreenSheetIsFull ? "0" : "16px",
     padding: `${tokens.spacing.md}px`,
     boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
     overflowX: "hidden",
