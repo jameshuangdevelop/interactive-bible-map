@@ -13,18 +13,6 @@ export const test = base.extend({
     },
     { scope: "worker" }
   ],
-  timelineServer: [
-    async ({ server }, use) => {
-      await use(server);
-    },
-    { scope: "worker" }
-  ],
-  routesServer: [
-    async ({ server }, use) => {
-      await use(server);
-    },
-    { scope: "worker" }
-  ],
   baseUrl: async ({ server }, use) => {
     await use(server.baseUrl);
   },

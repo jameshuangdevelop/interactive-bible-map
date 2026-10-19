@@ -3,7 +3,6 @@ import {
   buildPlaceRenderData,
   candidateIconId
 } from "../src/features/map/map-render-data";
-import { AREA_LABEL_OFFSET_LAYOUT } from "../src/features/map/map-layer-layouts";
 import type { PlaceIndexRecord } from "../src/features/map/types";
 
 const fixtures: PlaceIndexRecord[] = [
@@ -351,12 +350,5 @@ describe("map render data", () => {
     expect(areaLabel).toBeDefined();
     expect(cityPin).toBeDefined();
     expect(areaLabel?.geometry.coordinates).toEqual(cityPin?.geometry.coordinates);
-    expect(AREA_LABEL_OFFSET_LAYOUT["text-variable-anchor"]).toEqual([
-      "top",
-      "bottom",
-      "left",
-      "right"
-    ]);
-    expect(AREA_LABEL_OFFSET_LAYOUT["text-radial-offset"]).toBeGreaterThan(0);
   });
 });

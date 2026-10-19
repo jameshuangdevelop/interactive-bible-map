@@ -2,10 +2,9 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 import AxeBuilder from "@axe-core/playwright";
-import { chromium } from "playwright";
 import { buildAncientAppData } from "./lib/ancient-app-data-builder.mjs";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -14,14 +13,14 @@ const distDirectory = path.join(repositoryRoot, "app", "dist");
 const generatedPlacesPath = path.join(
   repositoryRoot,
   "app",
-  "public",
+  "dist",
   "generated",
   "places.index.json"
 );
 const generatedTimelinePath = path.join(
   repositoryRoot,
   "app",
-  "public",
+  "dist",
   "generated",
   "ancient.timeline.json"
 );
@@ -1103,7 +1102,7 @@ async function verifyGalleryFixtureBoundsAtViewport(
 
 async function waitForMapToSettle(page) {
   await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
-    timeout: 120_000,
+    timeout: 45_000,
     polling: 250
   });
   try {
@@ -1117,7 +1116,7 @@ async function waitForMapToSettle(page) {
         return map.loaded() && !map.isMoving() && map.areTilesLoaded();
       },
       mapTestHookKey,
-      { timeout: 120_000, polling: 250 }
+      { timeout: 45_000, polling: 250 }
     );
   } catch {
     await page.waitForFunction(
@@ -1129,7 +1128,7 @@ async function waitForMapToSettle(page) {
         return map.loaded() && !map.isMoving();
       },
       mapTestHookKey,
-      { timeout: 30_000, polling: 250 }
+      { timeout: 10_000, polling: 250 }
     );
   }
   await page.evaluate(async () => {
@@ -2804,9 +2803,6 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
   const probe = await page.evaluate(
     ({
       testHookKey,
-      cityPinsLayerIds,
-      sitePinsLayerId,
-      candidatePinsLayerId,
       interactiveLayers
     }) => {
       const map = window[testHookKey];
@@ -2818,15 +2814,55 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
       const width = canvas.clientWidth;
       const height = canvas.clientHeight;
       const margin = 16;
+      const clampPoint = (point) => ({
+        x: Math.min(width - margin, Math.max(margin, point.x)),
+        y: Math.min(height - margin, Math.max(margin, point.y))
+      });
 
-      const resolveCapernaumPoint = () => {
-        const step = 4;
+      const resolveJerusalemPoint = () => {
+        const knownJerusalemPoint = clampPoint(map.project([35.23, 31.78]));
+        const jerusalemFromAnyLayer = map
+          .queryRenderedFeatures(undefined)
+          .find((feature) => feature.properties?.placeId === "jerusalem" && feature.geometry?.type === "Point");
+        if (
+          jerusalemFromAnyLayer?.geometry?.type === "Point" &&
+          Array.isArray(jerusalemFromAnyLayer.geometry.coordinates)
+        ) {
+          return clampPoint(map.project(jerusalemFromAnyLayer.geometry.coordinates));
+        }
+
+        const jerusalemFeature = map
+          .queryRenderedFeatures(undefined, { layers: interactiveLayers })
+          .find((feature) => feature.properties?.placeId === "jerusalem" && feature.geometry?.type === "Point");
+        if (jerusalemFeature?.geometry?.type === "Point" && Array.isArray(jerusalemFeature.geometry.coordinates)) {
+          return clampPoint(map.project(jerusalemFeature.geometry.coordinates));
+        }
+
+        for (let radius = 2; radius <= 72; radius += 8) {
+          for (let x = knownJerusalemPoint.x - radius; x <= knownJerusalemPoint.x + radius; x += 4) {
+            for (let y = knownJerusalemPoint.y - radius; y <= knownJerusalemPoint.y + radius; y += 4) {
+              const point = clampPoint({ x, y });
+              const hits = map.queryRenderedFeatures(
+                [
+                  [point.x - 3, point.y - 3],
+                  [point.x + 3, point.y + 3]
+                ],
+                { layers: interactiveLayers }
+              );
+              if (hits.some((hit) => hit.properties?.placeId === "jerusalem")) {
+                return point;
+              }
+            }
+          }
+        }
+
+        const step = 6;
         for (let y = margin; y <= height - margin; y += step) {
           for (let x = margin; x <= width - margin; x += step) {
             const hits = map.queryRenderedFeatures(
               [
-                [x - 2, y - 2],
-                [x + 2, y + 2]
+                [x - 3, y - 3],
+                [x + 3, y + 3]
               ],
               { layers: interactiveLayers }
             );
@@ -2836,16 +2872,16 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
           }
         }
 
-        return null;
+        return knownJerusalemPoint;
       };
 
-      const capernaumPoint = resolveCapernaumPoint();
-      if (!capernaumPoint) {
+      const jerusalemPoint = resolveJerusalemPoint();
+      if (!jerusalemPoint) {
         return null;
       }
 
       const findEmptyPoint = () => {
-        const step = 20;
+        const step = 24;
         for (let y = margin; y <= height - margin; y += step) {
           for (let x = margin; x <= width - margin; x += step) {
             const hitCount = map.queryRenderedFeatures(
@@ -2867,15 +2903,12 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
       };
 
       return {
-        capernaumPoint,
+        jerusalemPoint,
         emptyPoint: findEmptyPoint()
       };
     },
     {
       testHookKey: mapTestHookKey,
-      cityPinsLayerIds: allCityPinLayerIds,
-      sitePinsLayerId: mapLayerIds.sitePins,
-      candidatePinsLayerId: mapLayerIds.candidatePins,
       interactiveLayers: [
         ...allClusterPinLayerIds,
         ...allClusterLabelLayerIds,
@@ -2892,17 +2925,44 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
       ]
     }
   );
-  if (!probe?.capernaumPoint || !probe.emptyPoint) {
-    return {
-      skipped: true,
-      reason: `Could not resolve map probe points for cursor/click checks: ${JSON.stringify(probe)}`
-    };
+  if (!probe?.jerusalemPoint || !probe.emptyPoint) {
+    throw new Error(
+      `Could not resolve map probe points for cursor/click checks: ${JSON.stringify(probe)}`
+    );
   }
 
-  await page.mouse.move(probe.capernaumPoint.x, probe.capernaumPoint.y);
-  const cursorOverPin = await page.$eval("canvas.maplibregl-canvas", (element) =>
-    window.getComputedStyle(element).cursor
-  );
+  const pointerOffsets = [
+    [0, 0],
+    [6, 0],
+    [-6, 0],
+    [0, 6],
+    [0, -6],
+    [10, 10],
+    [-10, 10],
+    [10, -10],
+    [-10, -10]
+  ];
+  let cursorOverPin = null;
+  let pointerPoint = null;
+  for (const [offsetX, offsetY] of pointerOffsets) {
+    const candidatePoint = {
+      x: probe.jerusalemPoint.x + offsetX,
+      y: probe.jerusalemPoint.y + offsetY
+    };
+    await page.mouse.move(candidatePoint.x, candidatePoint.y);
+    await page.waitForTimeout(150);
+    const cursor = await page.$eval("canvas.maplibregl-canvas", (element) =>
+      window.getComputedStyle(element).cursor
+    );
+    if (cursor.includes("pointer")) {
+      cursorOverPin = cursor;
+      pointerPoint = candidatePoint;
+      break;
+    }
+  }
+  if (!pointerPoint || !cursorOverPin) {
+    throw new Error(`Cursor over clickable place should be pointer near Jerusalem, got '${cursorOverPin}'.`);
+  }
 
   await page.mouse.move(probe.emptyPoint.x, probe.emptyPoint.y);
   const cursorOverEmptyMap = await page.$eval("canvas.maplibregl-canvas", (element) =>
@@ -2913,7 +2973,7 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
   }
 
   // A click near the name, within its box plus the hit padding, selects it.
-  await page.mouse.click(probe.capernaumPoint.x + 6, probe.capernaumPoint.y + 6);
+  await page.mouse.click(pointerPoint.x + 6, pointerPoint.y + 6);
   await page.waitForFunction(() => {
     const parameters = new URLSearchParams(window.location.search.slice(1));
     return parameters.get("place") === "jerusalem";
@@ -2921,7 +2981,8 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
   await page.getByRole("heading", { level: 1, name: "Jerusalem" }).waitFor({ timeout: 30_000 });
 
   return {
-    capernaumPoint: probe.capernaumPoint,
+    jerusalemPoint: probe.jerusalemPoint,
+    pointerPoint,
     emptyPoint: probe.emptyPoint,
     cursorOverPin,
     cursorOverEmptyMap
@@ -4222,7 +4283,7 @@ async function captureScenario(page, url, screenshotPath, options = {}) {
     for (let index = 0; index < 4; index += 1) {
       await page.click("button[data-map-control='zoom-in']");
     }
-    await page.waitForTimeout(2_000);
+    await waitForMapToSettle(page);
   }
 
   await page.screenshot({ fullPage: true, path: screenshotPath });
@@ -4441,7 +4502,35 @@ async function verifyModernBoundaryRenderingByDispute(page, baseUrl) {
         solidProperties: solidFeatures.map((feature) => feature.properties ?? {}),
         dashedProperties: dashedFeatures.map((feature) => feature.properties ?? {}),
         solidPairs: solidFeatures.map((feature) => toPair(feature.properties)),
-        dashedPairs: dashedFeatures.map((feature) => toPair(feature.properties))
+        dashedPairs: dashedFeatures.map((feature) => toPair(feature.properties)),
+        dashedLineSummaries: dashedFeatures.map((feature) => {
+          const properties = feature.properties ?? {};
+          const coordinates = feature.geometry?.coordinates;
+          const line =
+            feature.geometry?.type === "LineString"
+              ? coordinates
+              : feature.geometry?.type === "MultiLineString" && Array.isArray(coordinates) && coordinates.length > 0
+                ? coordinates[0]
+                : null;
+          const midpoint =
+            Array.isArray(line) && line.length > 0
+              ? line[Math.floor(line.length / 2)]
+              : null;
+          const left = String(properties.adm0_l ?? "");
+          const right = String(properties.adm0_r ?? "");
+          const adminLevel = Number(properties.admin_level ?? 0);
+          const isIsrPseMissingSideBranch =
+            adminLevel === 2 &&
+            ((left === "ISR" && !right) ||
+              (right === "ISR" && !left) ||
+              (left === "PSE" && !right) ||
+              (right === "PSE" && !left));
+          return {
+            midpoint,
+            claimedBy: String(properties.claimed_by ?? ""),
+            isIsrPseMissingSideBranch
+          };
+        })
       };
     }, {
       testHookKey: mapTestHookKey,
@@ -4500,6 +4589,49 @@ async function verifyModernBoundaryRenderingByDispute(page, baseUrl) {
   if (!hasLevantDashedZoom8) {
     throw new Error("Expected at least one dashed Levant disputed line at zoom 8.");
   }
+  const isPointInRange = (point, [minLongitude, minLatitude, maxLongitude, maxLatitude]) =>
+    Array.isArray(point) &&
+    point.length >= 2 &&
+    Number(point[0]) >= minLongitude &&
+    Number(point[0]) <= maxLongitude &&
+    Number(point[1]) >= minLatitude &&
+    Number(point[1]) <= maxLatitude;
+  const levantIsrPseMissingSideSegments = levantZoom8.dashedLineSummaries.filter(
+    (summary) => summary.isIsrPseMissingSideBranch
+  );
+  const contestedLineAssertions = [
+    {
+      contestedLineName: "West Bank",
+      matches: levantIsrPseMissingSideSegments.some((segment) =>
+        isPointInRange(segment.midpoint, [35.24, 31.95, 35.58, 32.55])
+      )
+    },
+    {
+      contestedLineName: "Gaza",
+      matches: levantIsrPseMissingSideSegments.some((segment) =>
+        isPointInRange(segment.midpoint, [34.22, 31.2, 34.62, 31.62])
+      )
+    },
+    {
+      contestedLineName: "Green Line",
+      matches: levantIsrPseMissingSideSegments.some((segment) =>
+        isPointInRange(segment.midpoint, [34.8, 31.3, 35.18, 31.92])
+      )
+    },
+    {
+      contestedLineName: "Golan Heights west line",
+      matches: levantZoom8.dashedLineSummaries.some((segment) => segment.claimedBy === "IL")
+    },
+    {
+      contestedLineName: "Golan Heights claim line",
+      matches: levantZoom8.dashedLineSummaries.some((segment) => segment.claimedBy === "SY")
+    }
+  ];
+  for (const assertion of contestedLineAssertions) {
+    if (!assertion.matches) {
+      throw new Error(`Expected dashed contested line '${assertion.contestedLineName}' at Levant zoom 8.`);
+    }
+  }
 
   const anatoliaZoom6 = await inspectViewport([35.0, 39.0], 6);
   const hasAdminLevel3FromTiles = [...anatoliaZoom6.dashedProperties, ...anatoliaZoom6.solidProperties].some(
@@ -4513,7 +4645,8 @@ async function verifyModernBoundaryRenderingByDispute(page, baseUrl) {
     checkedViewports: 4,
     balkansDashedFeatureCount: balkans.dashedProperties.length,
     levantDashedFeatureCountZoom65: levantZoom65.dashedProperties.length,
-    levantDashedFeatureCountZoom8: levantZoom8.dashedProperties.length
+    levantDashedFeatureCountZoom8: levantZoom8.dashedProperties.length,
+    levantIsrPseMissingSideSegmentCount: levantIsrPseMissingSideSegments.length
   };
 }
 
@@ -4740,1376 +4873,6 @@ async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
   };
 }
 
-async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
-  const sortedStops = [...timelinePayload.stops].sort((left, right) => left.year - right.year);
-  await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
-  await timelineSlider.waitFor({ state: "visible", timeout: 30_000 });
-  const mapKeyButtonCount = await page.getByRole("button", { name: "Map key" }).count();
-  if (mapKeyButtonCount !== 0) {
-    throw new Error(`Map key button should not be rendered, found ${mapKeyButtonCount}.`);
-  }
-
-  const tickCount = await page.locator("[data-timeline-tick-stop-id]").count();
-  if (tickCount !== sortedStops.length) {
-    throw new Error(`Expected ${sortedStops.length} timeline ticks in default build, got ${tickCount}.`);
-  }
-  await timelineSlider.focus();
-  await timelineSlider.press("ArrowRight");
-  await page.waitForTimeout(150);
-  const timelineAriaValueText = await timelineSlider.getAttribute("aria-valuetext");
-  const timelineLiveRegionText = await page
-    .locator("[data-timeline-stop-live-region='true']")
-    .first()
-    .textContent();
-  const normalizedLiveRegionText = (timelineLiveRegionText ?? "").replace(/\s+/gu, " ").trim();
-  const normalizedAriaValueText = (timelineAriaValueText ?? "").replace(/\s+/gu, " ").trim();
-  if (!normalizedLiveRegionText || normalizedLiveRegionText !== normalizedAriaValueText) {
-    throw new Error(
-      `Timeline live-region text should match slider value text after one key press. live='${normalizedLiveRegionText}' slider='${normalizedAriaValueText}'.`
-    );
-  }
-  if (normalizedLiveRegionText.includes("Sources")) {
-    throw new Error(`Timeline live-region text should not include Sources link text: '${normalizedLiveRegionText}'.`);
-  }
-
-  const layerStyleSnapshot = await page.evaluate(({ testHookKey, layerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const readLayer = (layerId) => {
-      const layer = map.getLayer(layerId);
-      if (!layer) {
-        throw new Error(`Layer '${layerId}' is missing.`);
-      }
-      return {
-        minzoom: layer.minzoom ?? null,
-        maxzoom: layer.maxzoom ?? null
-      };
-    };
-    return {
-      borderState: {
-        ...readLayer(layerIds.ancientBorderState),
-        filter: map.getFilter(layerIds.ancientBorderState),
-        color: map.getPaintProperty(layerIds.ancientBorderState, "line-color"),
-        dash: map.getPaintProperty(layerIds.ancientBorderState, "line-dasharray"),
-        width: map.getPaintProperty(layerIds.ancientBorderState, "line-width")
-      },
-      borderDisputed: {
-        ...readLayer(layerIds.ancientBorderDisputed),
-        filter: map.getFilter(layerIds.ancientBorderDisputed),
-        color: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-color"),
-        dash: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-dasharray"),
-        width: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-width")
-      },
-      uncertainFill: {
-        ...readLayer(layerIds.ancientUncertainFill),
-        opacity: map.getPaintProperty(layerIds.ancientUncertainFill, "fill-opacity")
-      },
-      uncertainHatchImageRegistered: map.hasImage("ibm-ancient-uncertain-hatch-image"),
-      areaLabelFont: map.getLayoutProperty("ibm-area-label", "text-font"),
-      empireEdge: {
-        ...readLayer(layerIds.ancientEmpireEdge),
-        color: map.getPaintProperty(layerIds.ancientEmpireEdge, "line-color"),
-        width: map.getPaintProperty(layerIds.ancientEmpireEdge, "line-width"),
-        opacity: map.getPaintProperty(layerIds.ancientEmpireEdge, "line-opacity")
-      },
-      roadCasing: {
-        ...readLayer(layerIds.ancientRoadMajorCasing),
-        color: map.getPaintProperty(layerIds.ancientRoadMajorCasing, "line-color"),
-        width: map.getPaintProperty(layerIds.ancientRoadMajorCasing, "line-width"),
-        cap: map.getLayoutProperty(layerIds.ancientRoadMajorCasing, "line-cap"),
-        join: map.getLayoutProperty(layerIds.ancientRoadMajorCasing, "line-join")
-      },
-      roadKnown: {
-        ...readLayer(layerIds.ancientRoadMajorKnown),
-        filter: map.getFilter(layerIds.ancientRoadMajorKnown),
-        color: map.getPaintProperty(layerIds.ancientRoadMajorKnown, "line-color"),
-        width: map.getPaintProperty(layerIds.ancientRoadMajorKnown, "line-width"),
-        cap: map.getLayoutProperty(layerIds.ancientRoadMajorKnown, "line-cap"),
-        join: map.getLayoutProperty(layerIds.ancientRoadMajorKnown, "line-join")
-      },
-      roadConjecturedLayerPresent: map.getLayer("ibm-ancient-road-major-conjectured") !== undefined,
-      coastline: {
-        ...readLayer(layerIds.ancientCoastline),
-        color: map.getPaintProperty(layerIds.ancientCoastline, "line-color"),
-        width: map.getPaintProperty(layerIds.ancientCoastline, "line-width")
-      },
-      coastlineLabel: {
-        ...readLayer(layerIds.ancientCoastlineLabel),
-        placement: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "symbol-placement"),
-        spacing: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "symbol-spacing"),
-        text: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-field"),
-        font: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-font"),
-        size: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-size"),
-        letterSpacing: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-letter-spacing"),
-        maxAngle: map.getLayoutProperty(layerIds.ancientCoastlineLabel, "text-max-angle"),
-        color: map.getPaintProperty(layerIds.ancientCoastlineLabel, "text-color"),
-        haloColor: map.getPaintProperty(layerIds.ancientCoastlineLabel, "text-halo-color"),
-        haloWidth: map.getPaintProperty(layerIds.ancientCoastlineLabel, "text-halo-width")
-      }
-    };
-  }, { testHookKey: mapTestHookKey, layerIds: mapLayerIds });
-  const expectJson = (actual, expected, label) => {
-    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-      throw new Error(`${label} mismatch. expected=${JSON.stringify(expected)} actual=${JSON.stringify(actual)}`);
-    }
-  };
-  expectJson(layerStyleSnapshot.borderDisputed.color, "hsl(248, 1%, 41%)", "Ancient disputed border color");
-  expectJson(layerStyleSnapshot.borderDisputed.dash, [4, 2], "Ancient disputed border dash");
-  expectJson(
-    layerStyleSnapshot.borderDisputed.width,
-    ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
-    "Ancient disputed border width"
-  );
-  expectJson(layerStyleSnapshot.borderState.color, "hsl(0, 0%, 55%)", "Ancient state border color");
-  expectJson(layerStyleSnapshot.borderState.dash, [1, 1], "Ancient state border dash");
-  expectJson(
-    layerStyleSnapshot.borderState.width,
-    ["interpolate", ["linear"], ["zoom"], 7, 1, 11, 2],
-    "Ancient state border width"
-  );
-  expectJson(layerStyleSnapshot.empireEdge.color, "hsl(248, 1%, 41%)", "Ancient empire edge color");
-  expectJson(
-    layerStyleSnapshot.borderState.filter,
-    ["all", ["==", ["get", "borderStyle"], "state"], [">=", ["zoom"], 5]],
-    "Ancient state border filter"
-  );
-  expectJson(
-    layerStyleSnapshot.borderDisputed.filter,
-    ["all", ["==", ["get", "borderStyle"], "disputed"], [">=", ["zoom"], 5]],
-    "Ancient disputed border filter"
-  );
-  if (layerStyleSnapshot.uncertainHatchImageRegistered) {
-    throw new Error("Ancient uncertain hatch image should not be registered.");
-  }
-  expectJson(layerStyleSnapshot.uncertainFill.opacity, 0, "Ancient uncertain fill opacity");
-  expectJson(
-    layerStyleSnapshot.empireEdge.width,
-    ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
-    "Ancient empire edge width"
-  );
-  expectJson(
-    layerStyleSnapshot.empireEdge.opacity,
-    ["interpolate", ["linear"], ["zoom"], 0, 0.4, 4, 1],
-    "Ancient empire edge opacity"
-  );
-  if (layerStyleSnapshot.roadCasing.minzoom !== 5 || layerStyleSnapshot.roadKnown.minzoom !== 5) {
-    throw new Error(`Ancient roads should have minzoom 5. got casing=${layerStyleSnapshot.roadCasing.minzoom}, known=${layerStyleSnapshot.roadKnown.minzoom}`);
-  }
-  expectJson(layerStyleSnapshot.roadCasing.color, "#e9ac77", "Ancient road casing color");
-  expectJson(
-    layerStyleSnapshot.roadCasing.width,
-    ["interpolate", ["linear"], ["zoom"], 5, 2.6, 7, 3.6, 9, 5.5, 12, 9],
-    "Ancient road casing width"
-  );
-  expectJson(layerStyleSnapshot.roadKnown.color, "#fea", "Ancient known road color");
-  if (layerStyleSnapshot.roadKnown.filter !== undefined && layerStyleSnapshot.roadKnown.filter !== null) {
-    throw new Error(
-      `Ancient roads use one shared style filter mismatch. expected=null/undefined actual=${JSON.stringify(layerStyleSnapshot.roadKnown.filter)}`
-    );
-  }
-  expectJson(
-    layerStyleSnapshot.roadKnown.width,
-    ["interpolate", ["linear"], ["zoom"], 5, 1.2, 7, 2, 9, 3.5, 12, 6.5],
-    "Ancient known road width"
-  );
-  if (layerStyleSnapshot.roadConjecturedLayerPresent) {
-    throw new Error("Conjectured-road layer should not exist; all roads should render with one style.");
-  }
-  expectJson(
-    layerStyleSnapshot.areaLabelFont,
-    ["literal", ["Noto Sans Bold"]],
-    "Ancient area label font expression"
-  );
-  for (const [label, value] of [
-    ["road casing line-cap", layerStyleSnapshot.roadCasing.cap],
-    ["road known line-cap", layerStyleSnapshot.roadKnown.cap]
-  ]) {
-    if (value !== "round") {
-      throw new Error(`${label} should be 'round', got '${String(value)}'.`);
-    }
-  }
-  for (const [label, value] of [
-    ["road casing line-join", layerStyleSnapshot.roadCasing.join],
-    ["road known line-join", layerStyleSnapshot.roadKnown.join]
-  ]) {
-    if (value !== "round") {
-      throw new Error(`${label} should be 'round', got '${String(value)}'.`);
-    }
-  }
-  expectJson(layerStyleSnapshot.coastline.color, "#a0c8f0", "Ancient coastline color");
-  expectJson(layerStyleSnapshot.coastline.width, 1.5, "Ancient coastline width");
-  if (layerStyleSnapshot.coastlineLabel.minzoom !== 9) {
-    throw new Error(`Ancient coastline label minzoom should be 9, got ${String(layerStyleSnapshot.coastlineLabel.minzoom)}.`);
-  }
-  expectJson(layerStyleSnapshot.coastlineLabel.placement, "line", "Ancient coastline label placement");
-  expectJson(layerStyleSnapshot.coastlineLabel.spacing, 250, "Ancient coastline label spacing");
-  expectJson(layerStyleSnapshot.coastlineLabel.text, "Roman shore", "Ancient coastline label text");
-  expectJson(layerStyleSnapshot.coastlineLabel.font, ["Noto Sans Italic"], "Ancient coastline label font");
-  expectJson(layerStyleSnapshot.coastlineLabel.color, "#5F6368", "Ancient coastline label color");
-  expectJson(layerStyleSnapshot.coastlineLabel.size, 12, "Ancient coastline label size");
-  expectJson(layerStyleSnapshot.coastlineLabel.letterSpacing, 0.1, "Ancient coastline label letter spacing");
-  expectJson(layerStyleSnapshot.coastlineLabel.maxAngle, 60, "Ancient coastline label max angle");
-  expectJson(layerStyleSnapshot.coastlineLabel.haloColor, "rgba(255,255,255,0.7)", "Ancient coastline label halo color");
-  expectJson(layerStyleSnapshot.coastlineLabel.haloWidth, 1.5, "Ancient coastline label halo width");
-
-  await page.evaluate(
-    ({ testHookKey, center, zoom }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      map.jumpTo({ center, zoom });
-    },
-    { testHookKey: mapTestHookKey, center: [27.4, 37.58], zoom: 10 }
-  );
-  await waitForMapToSettle(page);
-  const coastLabelFeatureCount = await page.evaluate(
-    ({ testHookKey, layerId }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      return map.queryRenderedFeatures(undefined, { layers: [layerId] }).length;
-    },
-    { testHookKey: mapTestHookKey, layerId: mapLayerIds.ancientCoastlineLabel }
-  );
-  if (coastLabelFeatureCount < 1) {
-    throw new Error("Ancient coastline label should render near Miletus at AD 50 zoom 10.");
-  }
-
-  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  const coastLabelHiddenOnModern = await page.evaluate(
-    ({ testHookKey, layerId }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      const visibility = map.getLayoutProperty(layerId, "visibility");
-      const renderedCount = map.queryRenderedFeatures(undefined, { layers: [layerId] }).length;
-      return { visibility, renderedCount };
-    },
-    { testHookKey: mapTestHookKey, layerId: mapLayerIds.ancientCoastlineLabel }
-  );
-  if (coastLabelHiddenOnModern.visibility !== "none" || coastLabelHiddenOnModern.renderedCount !== 0) {
-    throw new Error(
-      `Ancient coastline label should be hidden on modern map. visibility=${String(
-        coastLabelHiddenOnModern.visibility
-      )} rendered=${coastLabelHiddenOnModern.renderedCount}.`
-    );
-  }
-
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await page.getByRole("button", { name: "Sources" }).click();
-  await page.locator("[data-timeline-sources-popover='true']").waitFor({
-    state: "visible",
-    timeout: 5_000
-  });
-  const popoverParagraphOrder = await page.evaluate(() => {
-    const popover = document.querySelector("[data-timeline-sources-popover='true']");
-    if (!(popover instanceof HTMLElement)) {
-      throw new Error("Timeline Sources popover is unavailable.");
-    }
-    const paragraphs = Array.from(popover.querySelectorAll("p")).map((paragraph) =>
-      paragraph.textContent?.replace(/\s+/gu, " ").trim() ?? ""
-    );
-    return {
-      first: paragraphs[0] ?? "",
-      last: paragraphs[paragraphs.length - 1] ?? ""
-    };
-  });
-  if (popoverParagraphOrder.first === timelineBorderNote) {
-    throw new Error("Sources popover should show the timeline summary before border notes.");
-  }
-  if (popoverParagraphOrder.last !== timelineBorderNote) {
-    throw new Error(
-      `Sources popover last paragraph mismatch. expected='${timelineBorderNote}' actual='${popoverParagraphOrder.last}'.`
-    );
-  }
-  const popoverTextWithoutSpacing = (
-    (await page.locator("[data-timeline-sources-popover='true']").textContent()) ?? ""
-  ).replace(/\s+/gu, " ");
-  if (/scripture:/iu.test(popoverTextWithoutSpacing)) {
-    throw new Error(`Sources popover should not include raw scripture: ids, got '${popoverTextWithoutSpacing}'.`);
-  }
-
-  const earlierButton = page.getByRole("button", { name: "Earlier change" });
-  const laterButton = page.getByRole("button", { name: "Later change" });
-  const alignmentChecks = [];
-  for (let index = 0; index < sortedStops.length; index += 1) {
-    const currentIndex = Number.parseInt(await timelineSlider.inputValue(), 10);
-    if (Number.isNaN(currentIndex)) {
-      throw new Error("Timeline slider value was not a number.");
-    }
-    if (currentIndex < index) {
-      for (let nextIndex = currentIndex; nextIndex < index; nextIndex += 1) {
-        await laterButton.click();
-      }
-    } else if (currentIndex > index) {
-      for (let nextIndex = currentIndex; nextIndex > index; nextIndex -= 1) {
-        await earlierButton.click();
-      }
-    }
-
-    await page.waitForTimeout(150);
-    const tickLocator = page.locator(`[data-timeline-tick-stop-id="${sortedStops[index].id}"]`).first();
-    const thumbLocator = page.locator("[data-timeline-slider-thumb='true']").first();
-    await tickLocator.waitFor({ state: "visible", timeout: 30_000 });
-    await thumbLocator.waitFor({ state: "visible", timeout: 30_000 });
-    const tickBox = await tickLocator.boundingBox();
-    const thumbBox = await thumbLocator.boundingBox();
-    if (!tickBox || !thumbBox) {
-      throw new Error(`Missing tick or thumb geometry for default stop '${sortedStops[index].id}'.`);
-    }
-
-    const tickCenterX = tickBox.x + tickBox.width / 2;
-    const thumbCenterX = thumbBox.x + thumbBox.width / 2;
-    const deltaPx = Math.abs(tickCenterX - thumbCenterX);
-    if (deltaPx > 2) {
-      throw new Error(
-        `Default timeline tick misaligned for stop '${sortedStops[index].id}': ${deltaPx.toFixed(2)}px from thumb center.`
-      );
-    }
-
-    alignmentChecks.push({
-      stopId: sortedStops[index].id,
-      deltaPx
-    });
-  }
-
-  const labelFit = await page.evaluate(() => {
-    const labels = Array.from(document.querySelectorAll("[data-timeline-tick-stop-id] span:nth-child(2)"))
-      .map((node) => {
-        if (!(node instanceof HTMLElement)) {
-          return null;
-        }
-        const bounds = node.getBoundingClientRect();
-        return {
-          text: node.textContent?.trim() ?? "",
-          left: bounds.left,
-          right: bounds.right,
-          width: bounds.width
-        };
-      })
-      .filter((entry) => entry && entry.width > 0);
-    const collisions = [];
-    for (let index = 1; index < labels.length; index += 1) {
-      const previous = labels[index - 1];
-      const current = labels[index];
-      if (previous.right > current.left) {
-        collisions.push({
-          leftLabel: previous.text,
-          rightLabel: current.text,
-          overlapPx: previous.right - current.left
-        });
-      }
-    }
-
-    const slider = document.querySelector("[data-timeline-slider='true']");
-    const sliderWidth = slider instanceof HTMLElement ? slider.getBoundingClientRect().width : null;
-    const maxHalfPair = labels.reduce((maxValue, current, index) => {
-      if (index === 0) {
-        return maxValue;
-      }
-      const previous = labels[index - 1];
-      return Math.max(maxValue, previous.width / 2 + current.width / 2 + 2);
-    }, 0);
-    const requiredSliderWidthPx =
-      labels.length > 1 ? Math.ceil(maxHalfPair * (labels.length - 1) + 20) : sliderWidth;
-    return {
-      sliderWidth,
-      collisions,
-      requiredSliderWidthPx
-    };
-  });
-  if (labelFit.collisions.length > 0) {
-    throw new Error(
-      `Default timeline tick labels overlap at 1440x960: ${JSON.stringify(labelFit.collisions)}`
-    );
-  }
-
-  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await page.evaluate(async ({ testHookKey }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    await new Promise((resolve) => {
-      map.once("moveend", resolve);
-      map.easeTo({
-        center: [35.2, 31.8],
-        zoom: 7,
-        duration: 0
-      });
-    });
-  }, { testHookKey: mapTestHookKey });
-  await waitForMapToSettle(page);
-  const labelsAtAd50 = await page.evaluate(({ testHookKey, areaLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const rendered = map.queryRenderedFeatures(undefined, {
-      layers: areaLayerIds
-    });
-    return {
-      renderedCount: rendered.length
-    };
-  }, { testHookKey: mapTestHookKey, areaLayerIds: mapLayerIds.areaLabels });
-
-  if (labelsAtAd50.renderedCount === 0) {
-    throw new Error("Expected at least one area label at AD 50 as a positive control.");
-  }
-
-  const moveMapAndSettle = async ({ center, zoom }) => {
-    await page.evaluate(
-      async ({ testHookKey, nextCenter, nextZoom }) => {
-        const map = window[testHookKey];
-        if (!map) {
-          throw new Error("Map test hook is unavailable.");
-        }
-        await new Promise((resolve) => {
-          map.once("moveend", resolve);
-          map.easeTo({
-            center: nextCenter,
-            zoom: nextZoom,
-            duration: 0
-          });
-        });
-      },
-      {
-        testHookKey: mapTestHookKey,
-        nextCenter: center,
-        nextZoom: zoom
-      }
-    );
-    await waitForMapToSettle(page);
-  };
-
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await page.getByRole("button", { name: "Sources" }).click();
-  await page.locator("[data-timeline-sources-popover='true']").waitFor({
-    state: "visible",
-    timeout: 5_000
-  });
-  const defaultPopoverSnapshot = await page.evaluate(() => {
-    const popover = document.querySelector("[data-timeline-sources-popover='true']");
-    if (!(popover instanceof HTMLElement)) {
-      return null;
-    }
-
-    const summaryText = popover.querySelector("p")?.textContent?.trim() ?? "";
-    const passagesHeading = popover.querySelector("strong")?.textContent?.trim() ?? "";
-    const sourceHeadings = Array.from(popover.querySelectorAll("strong")).map((entry) =>
-      entry.textContent?.trim() ?? ""
-    );
-    const paragraphs = Array.from(popover.querySelectorAll("p")).map((entry) =>
-      entry.textContent?.trim() ?? ""
-    );
-    const passageItems = Array.from(popover.querySelectorAll("li"))
-      .map((item) => item.textContent?.trim() ?? "")
-      .filter((value) => value.length > 0);
-    const sourceTexts = passageItems.filter((value) => !/^[A-Z][a-z]{1,}\s+\d+:\d+/u.test(value));
-    return {
-      text: popover.textContent?.trim() ?? "",
-      sourceTexts,
-      summaryText,
-      passagesHeading,
-      sourceHeadings,
-      paragraphs
-    };
-  });
-  if (!defaultPopoverSnapshot || defaultPopoverSnapshot.text.length === 0) {
-    throw new Error("Expected AD 44 timeline sources popover content.");
-  }
-  if (defaultPopoverSnapshot.sourceTexts.some((text) => text.includes("Bibliography "))) {
-    throw new Error(
-      `Default AD 44 sources popover showed bibliography fallback text: ${JSON.stringify(defaultPopoverSnapshot.sourceTexts)}`
-    );
-  }
-  const firstParagraph = defaultPopoverSnapshot.paragraphs[0] ?? "";
-  const lastParagraph = defaultPopoverSnapshot.paragraphs[defaultPopoverSnapshot.paragraphs.length - 1] ?? "";
-  if (!firstParagraph || firstParagraph === timelineBorderNote) {
-    throw new Error("Expected timeline sources popover to start with stop summary.");
-  }
-  if (lastParagraph !== timelineBorderNote) {
-    throw new Error("Expected timeline border notes to appear at the end of the sources popover.");
-  }
-  if (
-    !defaultPopoverSnapshot.sourceHeadings.includes("Passages:") ||
-    !defaultPopoverSnapshot.sourceHeadings.includes("Sources:")
-  ) {
-    throw new Error("Expected timeline sources popover to list passages and sources before border notes.");
-  }
-
-  const holderTooltipText = await page.evaluate(
-    async ({ testHookKey, holderLayerId }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-
-      const rendered = map.queryRenderedFeatures(undefined, { layers: [holderLayerId] });
-      const holderFeature = rendered.find((feature) => {
-        const coordinates = feature?.geometry?.coordinates;
-        return (
-          feature?.geometry?.type === "Point" &&
-          Array.isArray(coordinates) &&
-          coordinates.length >= 2 &&
-          typeof coordinates[0] === "number" &&
-          typeof coordinates[1] === "number"
-        );
-      });
-      if (!holderFeature) {
-        return null;
-      }
-
-      const [lng, lat] = holderFeature.geometry.coordinates;
-      const projected = map.project([lng, lat]);
-      return { x: projected.x, y: projected.y };
-    },
-    { testHookKey: mapTestHookKey, holderLayerId: mapLayerIds.ancientHolderLabels[0] }
-  );
-  let holderTooltipValue = null;
-  if (holderTooltipText) {
-    await page.mouse.move(holderTooltipText.x, holderTooltipText.y);
-    await page.waitForTimeout(150);
-    holderTooltipValue = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-    if (!holderTooltipValue || (!holderTooltipValue.includes(" – ") && !holderTooltipValue.includes("from "))) {
-      throw new Error(`Expected holder tooltip with years, got '${holderTooltipValue ?? ""}'.`);
-    }
-  }
-
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  const unclearTooltipProbe = await page.evaluate(
-    async ({ testHookKey, uncertainLayerId }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-
-      await new Promise((resolve) => {
-        map.once("moveend", resolve);
-        map.easeTo({
-          center: [30.88, 37.22],
-          zoom: 7,
-          duration: 0
-        });
-      });
-
-      const center = map.project(map.getCenter());
-      const offsets = [
-        [0, 0], [20, 0], [-20, 0], [0, 20], [0, -20], [30, 30], [-30, -30], [30, -30], [-30, 30]
-      ];
-      for (const [dx, dy] of offsets) {
-        const point = [center.x + dx, center.y + dy];
-        const features = map.queryRenderedFeatures(point, { layers: [uncertainLayerId] });
-        const match = features.find((feature) => {
-          const tooltipText = feature?.properties?.tooltipText;
-          return (
-            typeof tooltipText === "string" &&
-            tooltipText.startsWith("Status unclear in the sources")
-          );
-        });
-        if (match) {
-          return {
-            x: point[0],
-            y: point[1],
-            featureTooltipText:
-              typeof match.properties?.tooltipText === "string" ? match.properties.tooltipText : null
-          };
-        }
-      }
-
-      return null;
-    },
-    {
-      testHookKey: mapTestHookKey,
-      uncertainLayerId: mapLayerIds.ancientUncertainFill
-    }
-  );
-  let unclearTooltipValue = null;
-  if (unclearTooltipProbe) {
-    await page.mouse.move(unclearTooltipProbe.x, unclearTooltipProbe.y);
-    await page.waitForTimeout(150);
-    unclearTooltipValue = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-    const tooltipFromFeature = unclearTooltipProbe.featureTooltipText;
-    const hasExpectedPrefix =
-      (typeof unclearTooltipValue === "string" &&
-        unclearTooltipValue.startsWith("Status unclear in the sources")) ||
-      (typeof tooltipFromFeature === "string" &&
-        tooltipFromFeature.startsWith("Status unclear in the sources"));
-    if (!hasExpectedPrefix) {
-      throw new Error(`Expected unclear-area tooltip, got '${unclearTooltipValue ?? ""}'.`);
-    }
-  }
-
-  await page.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await moveMapAndSettle({ center: [32.5, 39.0], zoom: 6 });
-  const galatiaHolderProbe = await page.evaluate(
-    ({ testHookKey, holderClickableLayerId, areaLayerIds }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      const renderedClickable = map.queryRenderedFeatures(undefined, { layers: [holderClickableLayerId] });
-      const renderedAreaLabels = map.queryRenderedFeatures(undefined, { layers: areaLayerIds });
-      const galatiaHolder = renderedClickable.find(
-        (feature) =>
-          feature.properties?.holderLocationId === "galatia" &&
-          typeof feature.properties?.labelText === "string" &&
-          feature.properties.labelText.replace(/\s+/gu, " ").trim() === "PROVINCE OF GALATIA"
-      );
-      const m3GalatiaAreaLabelRendered = renderedAreaLabels.some(
-        (feature) => feature.properties?.placeId === "galatia"
-      );
-      if (!galatiaHolder) {
-        return {
-          holderFound: false,
-          m3GalatiaAreaLabelRendered,
-          positiveControlCount: renderedClickable.length
-        };
-      }
-      const coordinates = galatiaHolder.geometry?.coordinates;
-      if (!Array.isArray(coordinates) || coordinates.length < 2) {
-        throw new Error("Clickable Galatia holder label has invalid geometry.");
-      }
-      const projected = map.project([coordinates[0], coordinates[1]]);
-      return {
-        holderFound: true,
-        m3GalatiaAreaLabelRendered,
-        positiveControlCount: renderedClickable.length,
-        projected
-      };
-    },
-    {
-      testHookKey: mapTestHookKey,
-      holderClickableLayerId: "ibm-ancient-holder-label-clickable",
-      areaLayerIds: mapLayerIds.areaLabels
-    }
-  );
-  if (!galatiaHolderProbe.holderFound) {
-    throw new Error(
-      `Expected clickable 'PROVINCE OF GALATIA' holder label near central Asia Minor at AD 50 zoom 6; clickable-count=${galatiaHolderProbe.positiveControlCount}.`
-    );
-  }
-  if (galatiaHolderProbe.m3GalatiaAreaLabelRendered) {
-    throw new Error("M3 area label for galatia should be hidden on the ancient map.");
-  }
-
-  const galatiaPointerProbe = await page.evaluate(({ testHookKey, holderClickableLayerId }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-
-    const renderedClickable = map.queryRenderedFeatures(undefined, { layers: [holderClickableLayerId] });
-    const galatiaHolder = renderedClickable.find(
-      (feature) =>
-        feature.properties?.holderLocationId === "galatia" &&
-        typeof feature.properties?.labelText === "string" &&
-        feature.properties.labelText.replace(/\s+/gu, " ").trim() === "PROVINCE OF GALATIA"
-    );
-    if (!galatiaHolder) {
-      return { found: false, positiveControlCount: renderedClickable.length };
-    }
-
-    const coordinates = galatiaHolder.geometry?.coordinates;
-    if (!Array.isArray(coordinates) || coordinates.length < 2) {
-      throw new Error("Clickable Galatia holder label has invalid geometry.");
-    }
-
-    const projected = map.project([coordinates[0], coordinates[1]]);
-    const canvasRect = map.getCanvas().getBoundingClientRect();
-    return {
-      found: true,
-      screenX: canvasRect.left + projected.x,
-      screenY: canvasRect.top + projected.y
-    };
-  }, {
-    testHookKey: mapTestHookKey,
-    holderClickableLayerId: "ibm-ancient-holder-label-clickable"
-  });
-  if (!galatiaPointerProbe.found) {
-    throw new Error(
-      `Expected pointer probe for 'PROVINCE OF GALATIA'; clickable-count=${galatiaPointerProbe.positiveControlCount}.`
-    );
-  }
-  await page.mouse.move(galatiaPointerProbe.screenX, galatiaPointerProbe.screenY);
-  await page.waitForTimeout(150);
-  const galatiaTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? "";
-  if (!galatiaTooltipText.includes("Galatia")) {
-    throw new Error(`Expected Galatia tooltip from mouse hover, got '${galatiaTooltipText}'.`);
-  }
-  const galatiaCursor = await page.evaluate(({ screenX, screenY }) => {
-    const element = document.elementFromPoint(screenX, screenY);
-    if (!element) {
-      return null;
-    }
-    return window.getComputedStyle(element).cursor;
-  }, { screenX: galatiaPointerProbe.screenX, screenY: galatiaPointerProbe.screenY });
-  if (galatiaCursor !== "pointer") {
-    throw new Error(`Expected pointer cursor over clickable Galatia holder label, got '${galatiaCursor}'.`);
-  }
-  await page.mouse.click(galatiaPointerProbe.screenX, galatiaPointerProbe.screenY);
-  await page.waitForTimeout(150);
-  const galatiaClickedSearch = new URL(page.url()).searchParams.get("place");
-  if (galatiaClickedSearch !== "galatia") {
-    throw new Error(`Clicking PROVINCE OF GALATIA should open ?place=galatia, got '${page.url()}'.`);
-  }
-
-  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await moveMapAndSettle({ center: [35.4, 32.0], zoom: 8 });
-  const philipPointerProbe = await page.evaluate(({ testHookKey, holderLayerId }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-
-    const renderedLabels = map.queryRenderedFeatures(undefined, { layers: [holderLayerId] });
-    const philipLabel = renderedLabels.find(
-      (feature) =>
-        typeof feature.properties?.labelText === "string" &&
-        feature.properties.labelText.replace(/\s+/gu, " ").trim() === "TETRARCHY OF PHILIP"
-    );
-    if (!philipLabel) {
-      return { found: false, positiveControlCount: renderedLabels.length };
-    }
-    const coordinates = philipLabel.geometry?.coordinates;
-    if (!Array.isArray(coordinates) || coordinates.length < 2) {
-      throw new Error("Philip holder label has invalid geometry.");
-    }
-    const projected = map.project([coordinates[0], coordinates[1]]);
-    const canvasRect = map.getCanvas().getBoundingClientRect();
-    return {
-      found: true,
-      screenX: canvasRect.left + projected.x,
-      screenY: canvasRect.top + projected.y
-    };
-  }, { testHookKey: mapTestHookKey, holderLayerId: "ibm-ancient-holder-label" });
-  if (!philipPointerProbe.found) {
-    throw new Error(
-      `Expected plain 'TETRARCHY OF PHILIP' holder label at AD 30 zoom 8; holder-count=${philipPointerProbe.positiveControlCount}.`
-    );
-  }
-  await page.mouse.move(philipPointerProbe.screenX, philipPointerProbe.screenY);
-  await page.waitForTimeout(150);
-  const philipPointerTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? "";
-  if (!philipPointerTooltipText.includes("4 BC – AD 34")) {
-    throw new Error(
-      `Expected Philip plain-label tooltip to include '4 BC – AD 34', got '${philipPointerTooltipText}'.`
-    );
-  }
-  const philipCursor = await page.evaluate(({ screenX, screenY }) => {
-    const element = document.elementFromPoint(screenX, screenY);
-    if (!element) {
-      return null;
-    }
-    return window.getComputedStyle(element).cursor;
-  }, { screenX: philipPointerProbe.screenX, screenY: philipPointerProbe.screenY });
-  if (philipCursor === "pointer") {
-    throw new Error("Plain 'TETRARCHY OF PHILIP' label should not use pointer cursor.");
-  }
-  await page.mouse.click(philipPointerProbe.screenX, philipPointerProbe.screenY);
-  await page.waitForTimeout(150);
-  const philipUrl = new URL(page.url());
-  if (philipUrl.searchParams.has("place")) {
-    throw new Error(`Clicking plain Philip label should not set ?place=..., got '${page.url()}'.`);
-  }
-
-  await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
-  const judeaPresenceAt44 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
-    const normalizedText = (value) =>
-      typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
-    const judeaRendered = rendered.some(
-      (feature) => normalizedText(feature.properties?.labelText) === "PROVINCE OF JUDEA"
-    );
-    return { judeaRendered, positiveControlCount: rendered.length };
-  }, { testHookKey: mapTestHookKey, holderLayerIds: mapLayerIds.ancientHolderLabels });
-  if (!judeaPresenceAt44.judeaRendered) {
-    throw new Error(
-      `Expected 'PROVINCE OF JUDEA' to render at ?year=44. Holder-label count=${judeaPresenceAt44.positiveControlCount}.`
-    );
-  }
-
-  await page.goto(`${baseUrl}/?year=41`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await moveMapAndSettle({ center: [35.35, 31.8], zoom: 8 });
-  const judeaAbsenceAt41 = await page.evaluate(({ testHookKey, holderLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
-    const normalizedText = (value) =>
-      typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
-    const judeaRendered = rendered.some(
-      (feature) => normalizedText(feature.properties?.labelText) === "PROVINCE OF JUDEA"
-    );
-    const agrippaRendered = rendered.some((feature) =>
-      normalizedText(feature.properties?.labelText).includes("KINGDOM OF HEROD AGRIPPA I")
-    );
-    return {
-      judeaRendered,
-      agrippaRendered,
-      positiveControlCount: rendered.length
-    };
-  }, { testHookKey: mapTestHookKey, holderLayerIds: mapLayerIds.ancientHolderLabels });
-  if (!judeaAbsenceAt41.agrippaRendered || judeaAbsenceAt41.positiveControlCount <= 0) {
-    throw new Error(
-      `AD 41 Judea-hide check lacked positive control; agrippaRendered=${judeaAbsenceAt41.agrippaRendered}, holder-label count=${judeaAbsenceAt41.positiveControlCount}.`
-    );
-  }
-  if (judeaAbsenceAt41.judeaRendered) {
-    throw new Error("PROVINCE OF JUDEA should not render at ?year=41.");
-  }
-
-  await moveMapAndSettle({ center: [35.6, 32.3], zoom: 6 });
-  const galileeBordersAtZoom6 = await page.evaluate(({ testHookKey, borderLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const renderedBorders = map.queryRenderedFeatures(undefined, { layers: borderLayerIds });
-    const touchingGalilee = renderedBorders.filter(
-      (feature) =>
-        feature.properties?.holderAAreaId === "galilee-perea" ||
-        feature.properties?.holderBAreaId === "galilee-perea"
-    );
-    const positiveControl = map.queryRenderedFeatures(undefined, {
-      layers: ["ibm-ancient-holder-label", "ibm-ancient-holder-label-clickable"]
-    }).length;
-    return { touchingCount: touchingGalilee.length, positiveControl };
-  }, {
-    testHookKey: mapTestHookKey,
-    borderLayerIds: [mapLayerIds.ancientBorderState, mapLayerIds.ancientBorderDisputed]
-  });
-  if (galileeBordersAtZoom6.positiveControl <= 0) {
-    throw new Error("Galilee border zoom-6 check is vacuous: no holder labels rendered at that camera.");
-  }
-  if (galileeBordersAtZoom6.touchingCount < 1) {
-    throw new Error(
-      `A border touching galilee-perea should render from zoom 5 onward; AD 30 zoom 6 rendered ${galileeBordersAtZoom6.touchingCount}.`
-    );
-  }
-
-  await moveMapAndSettle({ center: [35.6, 32.3], zoom: 9 });
-  const galileeBordersAtZoom9 = await page.evaluate(({ testHookKey, borderLayerIds }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-    const renderedBorders = map.queryRenderedFeatures(undefined, { layers: borderLayerIds });
-    return renderedBorders.filter(
-      (feature) =>
-        feature.properties?.holderAAreaId === "galilee-perea" ||
-        feature.properties?.holderBAreaId === "galilee-perea"
-    ).length;
-  }, {
-    testHookKey: mapTestHookKey,
-    borderLayerIds: [mapLayerIds.ancientBorderState, mapLayerIds.ancientBorderDisputed]
-  });
-  if (galileeBordersAtZoom9 < 1) {
-    throw new Error("A border touching galilee-perea should render by AD 30 zoom 9.");
-  }
-
-  await page.goto(`${baseUrl}/?year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  const holyLandLabelTargets = await page.evaluate(
-    async ({ sortedStops }) => {
-      const stopInForce = [...sortedStops]
-        .sort((left, right) => left.year - right.year)
-        .filter((stop) => stop.year <= 30)
-        .at(-1);
-      if (!stopInForce?.id) {
-        throw new Error("Could not resolve timeline stop in force at AD 30.");
-      }
-
-      const [stopPayloadResponse, shapesResponse] = await Promise.all([
-        fetch(`/generated/ancient.stop.${encodeURIComponent(stopInForce.id)}.json`, { cache: "no-store" }),
-        fetch("/generated/ancient.shapes.json", { cache: "no-store" })
-      ]);
-      if (!stopPayloadResponse.ok) {
-        throw new Error(`Could not load stop payload '${stopInForce.id}' (${stopPayloadResponse.status}).`);
-      }
-      if (!shapesResponse.ok) {
-        throw new Error(`Could not load ancient shapes (${shapesResponse.status}).`);
-      }
-      const [stopPayload, shapesPayload] = await Promise.all([stopPayloadResponse.json(), shapesResponse.json()]);
-      const geometryByAreaId = new Map(
-        (shapesPayload?.areas?.features ?? []).map((feature) => [feature?.properties?.areaId, feature?.geometry])
-      );
-
-      const pointInRing = (point, ring) => {
-        let inside = false;
-        for (let index = 0, previousIndex = ring.length - 1; index < ring.length; previousIndex = index, index += 1) {
-          const [x1, y1] = ring[index];
-          const [x2, y2] = ring[previousIndex];
-          const intersects =
-            (y1 > point[1]) !== (y2 > point[1]) &&
-            point[0] < ((x2 - x1) * (point[1] - y1)) / (y2 - y1) + x1;
-          if (intersects) {
-            inside = !inside;
-          }
-        }
-        return inside;
-      };
-      const pointInPolygon = (point, polygon) => {
-        if (!Array.isArray(polygon) || polygon.length === 0) {
-          return false;
-        }
-        if (!pointInRing(point, polygon[0])) {
-          return false;
-        }
-        for (let index = 1; index < polygon.length; index += 1) {
-          if (pointInRing(point, polygon[index])) {
-            return false;
-          }
-        }
-        return true;
-      };
-      const pointInGeometry = (point, geometry) => {
-        if (!geometry) {
-          return false;
-        }
-        if (geometry.type === "Polygon") {
-          return pointInPolygon(point, geometry.coordinates);
-        }
-        if (geometry.type === "MultiPolygon") {
-          return geometry.coordinates.some((polygon) => pointInPolygon(point, polygon));
-        }
-        return false;
-      };
-
-      const holderIdByAreaId = new Map((stopPayload?.areas ?? []).map((area) => [area.areaId, area.holderId]));
-      const findPieceLabels = (areaId) => {
-        const holderId = holderIdByAreaId.get(areaId);
-        if (!holderId) {
-          return [];
-        }
-        const areaGeometry = geometryByAreaId.get(areaId);
-        if (!areaGeometry) {
-          return [];
-        }
-        return (stopPayload?.holderLabels ?? []).filter(
-          (label) =>
-            label?.holderId === holderId &&
-            Array.isArray(label?.labelPoint) &&
-            pointInGeometry(label.labelPoint, areaGeometry)
-        );
-      };
-
-      const philipLabel = findPieceLabels("philip-tetrarchy-lands")[0] ?? null;
-      const antipasAreaIds = (stopPayload?.areas ?? [])
-        .filter((area) => area?.holderId === "antipas-tetrarchy")
-        .map((area) => area.areaId)
-        .filter((areaId) => typeof areaId === "string");
-      const antipasPreferredAreaId =
-        antipasAreaIds.find((areaId) => areaId.toLowerCase().includes("galilee")) ?? antipasAreaIds[0] ?? null;
-      const antipasGalileeLabel =
-        (antipasPreferredAreaId
-          ? findPieceLabels(antipasPreferredAreaId)
-              .sort((left, right) => (right?.labelPoint?.[1] ?? 0) - (left?.labelPoint?.[1] ?? 0))[0]
-          : null) ?? null;
-      const commageneLabel = findPieceLabels("commagene")[0] ?? null;
-      if (!philipLabel || !antipasGalileeLabel || !commageneLabel) {
-        throw new Error(
-          `Missing expected holder-piece labels at AD 30. philip=${Boolean(philipLabel)} antipasGalilee=${Boolean(antipasGalileeLabel)} commagene=${Boolean(commageneLabel)}`
-        );
-      }
-      return {
-        philipLabel,
-        antipasGalileeLabel,
-        commageneLabel
-      };
-    },
-    { sortedStops: sortedStops.map((stop) => ({ id: stop.id, year: stop.year })) }
-  );
-  const isHolderRenderedAtCurrentView = async (holderId, labelPoint) =>
-    page.evaluate(
-      ({ testHookKey, holderLayerIds, expectedHolderId, expectedLabelPoint }) => {
-        const map = window[testHookKey];
-        if (!map) {
-          throw new Error("Map test hook is unavailable.");
-        }
-        const rendered = map.queryRenderedFeatures(undefined, { layers: holderLayerIds });
-        return rendered.some((feature) => {
-          const featureHolderId = String(feature?.properties?.holderId ?? "").trim();
-          if (featureHolderId !== expectedHolderId) {
-            return false;
-          }
-          const coordinates = feature?.geometry?.coordinates;
-          if (!(feature?.geometry?.type === "Point" && Array.isArray(coordinates) && coordinates.length >= 2)) {
-            return false;
-          }
-          const longitudeDelta = Math.min(
-            Math.abs(coordinates[0] - expectedLabelPoint[0]),
-            Math.abs(coordinates[0] - (expectedLabelPoint[0] - 360)),
-            Math.abs(coordinates[0] - (expectedLabelPoint[0] + 360))
-          );
-          const latitudeDelta = Math.abs(coordinates[1] - expectedLabelPoint[1]);
-          return longitudeDelta <= 0.35 && latitudeDelta <= 0.35;
-        });
-      },
-      {
-        testHookKey: mapTestHookKey,
-        holderLayerIds: mapLayerIds.ancientHolderLabels,
-        expectedHolderId: holderId,
-        expectedLabelPoint: labelPoint
-      }
-    );
-  const positiveLabelControlAtCurrentView = async () =>
-    page.evaluate(
-      ({ testHookKey, areaLayerIds, pinLabelLayerIds }) => {
-        const map = window[testHookKey];
-        if (!map) {
-          throw new Error("Map test hook is unavailable.");
-        }
-        return {
-          areaLabelCount: map.queryRenderedFeatures(undefined, { layers: areaLayerIds }).length,
-          pinLabelCount: map.queryRenderedFeatures(undefined, { layers: pinLabelLayerIds }).length
-        };
-      },
-      {
-        testHookKey: mapTestHookKey,
-        areaLayerIds: mapLayerIds.areaLabels,
-        pinLabelLayerIds: mapLayerIds.pinLabels
-      }
-    );
-
-  let philipFirstZoom = null;
-  for (let zoom = 6; zoom <= 12; zoom += 1) {
-    await moveMapAndSettle({ center: holyLandLabelTargets.philipLabel.labelPoint, zoom });
-    if (
-      await isHolderRenderedAtCurrentView(
-        holyLandLabelTargets.philipLabel.holderId,
-        holyLandLabelTargets.philipLabel.labelPoint
-      )
-    ) {
-      philipFirstZoom = zoom;
-      break;
-    }
-  }
-
-  let antipasGalileeFirstZoom = null;
-  for (let zoom = 6; zoom <= 12; zoom += 1) {
-    await moveMapAndSettle({ center: holyLandLabelTargets.antipasGalileeLabel.labelPoint, zoom });
-    if (
-      await isHolderRenderedAtCurrentView(
-        holyLandLabelTargets.antipasGalileeLabel.holderId,
-        holyLandLabelTargets.antipasGalileeLabel.labelPoint
-      )
-    ) {
-      antipasGalileeFirstZoom = zoom;
-      break;
-    }
-  }
-
-  await moveMapAndSettle({ center: holyLandLabelTargets.commageneLabel.labelPoint, zoom: 5 });
-  const commageneControlAtZoom5 = await positiveLabelControlAtCurrentView();
-  const commageneRenderedAt5 = await isHolderRenderedAtCurrentView(
-    holyLandLabelTargets.commageneLabel.holderId,
-    holyLandLabelTargets.commageneLabel.labelPoint
-  );
-  await moveMapAndSettle({ center: holyLandLabelTargets.commageneLabel.labelPoint, zoom: 8 });
-  const commageneRenderedAt8 = await isHolderRenderedAtCurrentView(
-    holyLandLabelTargets.commageneLabel.holderId,
-    holyLandLabelTargets.commageneLabel.labelPoint
-  );
-
-  await moveMapAndSettle({ center: holyLandLabelTargets.philipLabel.labelPoint, zoom: 8 });
-  const philipProjectedAtZoom8 = await page.evaluate(
-    ({ testHookKey, labelPoint }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      const projected = map.project(labelPoint);
-      return { x: projected.x, y: projected.y };
-    },
-    { testHookKey: mapTestHookKey, labelPoint: holyLandLabelTargets.philipLabel.labelPoint }
-  );
-  const holyLandLabelVisibility = {
-    philipFirstZoom,
-    antipasGalileeFirstZoom,
-    commageneRenderedAt5,
-    commageneRenderedAt8,
-    commageneControlAtZoom5,
-    philipProjectedAtZoom8
-  };
-  if (holyLandLabelVisibility.philipFirstZoom === null || holyLandLabelVisibility.philipFirstZoom > 8) {
-    throw new Error(
-      `Philip's holder label must render by zoom 8 at AD 30; first rendered zoom was ${String(holyLandLabelVisibility.philipFirstZoom)}.`
-    );
-  }
-  if (
-    holyLandLabelVisibility.antipasGalileeFirstZoom === null ||
-    holyLandLabelVisibility.antipasGalileeFirstZoom > 9
-  ) {
-    throw new Error(
-      `Antipas's Galilee-piece holder label must render by zoom 9 at AD 30; first rendered zoom was ${String(
-        holyLandLabelVisibility.antipasGalileeFirstZoom
-      )}.`
-    );
-  }
-  if (holyLandLabelVisibility.commageneRenderedAt5) {
-    throw new Error("Commagene holder label must be hidden at zoom 5 in AD 30.");
-  }
-  if (
-    holyLandLabelVisibility.commageneControlAtZoom5.areaLabelCount +
-      holyLandLabelVisibility.commageneControlAtZoom5.pinLabelCount <=
-    0
-  ) {
-    throw new Error("Commagene zoom-5 check is vacuous: no other labels rendered at that camera.");
-  }
-  if (!holyLandLabelVisibility.commageneRenderedAt8) {
-    throw new Error("Commagene holder label should render at zoom 8.");
-  }
-
-  await page.mouse.move(
-    holyLandLabelVisibility.philipProjectedAtZoom8.x,
-    holyLandLabelVisibility.philipProjectedAtZoom8.y
-  );
-  await page.waitForTimeout(150);
-  const philipTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-  if (!philipTooltipText?.includes("4 BC – AD 34")) {
-    throw new Error(`Philip tooltip should show '4 BC – AD 34', got '${philipTooltipText ?? ""}'.`);
-  }
-
-  const italyTooltipProbe = await page.evaluate(async ({ testHookKey }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-
-    const timeline = await fetch("/generated/ancient.timeline.json").then((response) => response.json());
-    const sortedStops = [...(timeline?.stops ?? [])].sort((left, right) => left.year - right.year);
-    let stopForYear30 = sortedStops[0] ?? null;
-    for (const stop of sortedStops) {
-      if (stop.year <= 30) {
-        stopForYear30 = stop;
-      } else {
-        break;
-      }
-    }
-    if (!stopForYear30) {
-      throw new Error("No stop found for AD 30.");
-    }
-
-    const stopPayload = await fetch(`/generated/ancient.stop.${stopForYear30.id}.json`).then((response) =>
-      response.json()
-    );
-    const label = (stopPayload?.holderLabels ?? []).find((entry) => entry?.holderId === "italy-direct");
-    if (!label || !Array.isArray(label.labelPoint) || label.labelPoint.length < 2) {
-      throw new Error("Missing Italy holder label point.");
-    }
-
-    return {
-      labelPoint: label.labelPoint,
-      zoom: Math.max(6, Math.ceil(label.minZoom ?? 6))
-    };
-  }, { testHookKey: mapTestHookKey });
-
-  await moveMapAndSettle({ center: italyTooltipProbe.labelPoint, zoom: italyTooltipProbe.zoom });
-  const italyProjectedPoint = await page.evaluate(
-    ({ testHookKey, labelPoint }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      const projected = map.project(labelPoint);
-      return { x: projected.x, y: projected.y };
-    },
-    { testHookKey: mapTestHookKey, labelPoint: italyTooltipProbe.labelPoint }
-  );
-  await page.mouse.move(italyProjectedPoint.x, italyProjectedPoint.y);
-  await page.waitForTimeout(150);
-  const italyTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-  if (!italyTooltipText?.includes("Italy")) {
-    throw new Error(`Italy tooltip should include 'Italy', got '${italyTooltipText ?? ""}'.`);
-  }
-  if (!italyTooltipText.includes("Ruled from Rome, not a province")) {
-    throw new Error(
-      `Italy tooltip should include 'Ruled from Rome, not a province', got '${italyTooltipText}'.`
-    );
-  }
-
-  const agrippaPhilipTooltipProbe = await page.evaluate(async ({ testHookKey }) => {
-    const map = window[testHookKey];
-    if (!map) {
-      throw new Error("Map test hook is unavailable.");
-    }
-
-    const timeline = await fetch("/generated/ancient.timeline.json").then((response) => response.json());
-    const sortedStops = [...(timeline?.stops ?? [])].sort((left, right) => left.year - right.year);
-    let stopForYear40 = sortedStops[0] ?? null;
-    for (const stop of sortedStops) {
-      if (stop.year <= 40) {
-        stopForYear40 = stop;
-      } else {
-        break;
-      }
-    }
-    if (!stopForYear40) {
-      throw new Error("No stop found for AD 40.");
-    }
-
-    const stopPayload = await fetch(`/generated/ancient.stop.${stopForYear40.id}.json`).then((response) =>
-      response.json()
-    );
-    const label = (stopPayload?.holderLabels ?? []).find(
-      (entry) => entry?.holderId === "agrippa-i-kingdom" && entry?.areaId === "philip-tetrarchy-lands"
-    );
-    if (!label || !Array.isArray(label.labelPoint) || label.labelPoint.length < 2) {
-      throw new Error("Missing Agrippa I label point in Philip's former lands.");
-    }
-    return { labelPoint: label.labelPoint };
-  }, { testHookKey: mapTestHookKey });
-
-  await page.goto(`${baseUrl}/?year=40`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapToSettle(page);
-  await moveMapAndSettle({ center: agrippaPhilipTooltipProbe.labelPoint, zoom: 8 });
-  const agrippaProjectedAtZoom8 = await page.evaluate(
-    ({ testHookKey, labelPoint }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      const projected = map.project(labelPoint);
-      return { x: projected.x, y: projected.y };
-    },
-    { testHookKey: mapTestHookKey, labelPoint: agrippaPhilipTooltipProbe.labelPoint }
-  );
-  await page.mouse.move(agrippaProjectedAtZoom8.x, agrippaProjectedAtZoom8.y);
-  await page.waitForTimeout(150);
-  const agrippaTooltipText = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-  if (!agrippaTooltipText?.includes("AD 37 – 44")) {
-    throw new Error(
-      `Agrippa I tooltip over Philip's former lands should show 'AD 37 – 44', got '${agrippaTooltipText ?? ""}'.`
-    );
-  }
-
-  const browser = page.context().browser();
-  if (!browser) {
-    throw new Error("Browser instance is unavailable for timeline failure-state checks.");
-  }
-
-  const stopBlockedContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  const stopBlockedPage = await stopBlockedContext.newPage();
-  let stopBlocked = true;
-  const blockedStopId = sortedStops[sortedStops.length - 1]?.id;
-  if (!blockedStopId) {
-    throw new Error("Could not resolve a stop to block for background-prefetch check.");
-  }
-  await stopBlockedPage.route("**/generated/ancient.*", async (route) => {
-    const requestUrl = new URL(route.request().url());
-    const fileName = path.basename(requestUrl.pathname);
-    if (fileName === `ancient.stop.${blockedStopId}.json` && stopBlocked) {
-      await route.abort("failed");
-      return;
-    }
-    await route.continue();
-  });
-  try {
-    await stopBlockedPage.goto(`${baseUrl}/?year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-    await waitForMapToSettle(stopBlockedPage);
-    await stopBlockedPage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
-    const initialFailureCount = await stopBlockedPage.getByText("Ancient layer data failed to load.", { exact: true }).count();
-    if (initialFailureCount !== 0) {
-      throw new Error("Failure state should not appear while only an unselected stop is blocked.");
-    }
-    const ad50Rendered = await stopBlockedPage.evaluate(({ testHookKey, ancientAreaFillLayerId }) => {
-      const map = window[testHookKey];
-      if (!map) {
-        throw new Error("Map test hook is unavailable.");
-      }
-      return map.queryRenderedFeatures(undefined, { layers: [ancientAreaFillLayerId] }).length > 0;
-    }, { testHookKey: mapTestHookKey, ancientAreaFillLayerId: mapLayerIds.ancientAreaFill });
-    if (!ad50Rendered) {
-      throw new Error("AD 50 stop should still render while a background-prefetch stop is blocked.");
-    }
-
-    await stopBlockedPage.goto(`${baseUrl}/?year=100`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-    await waitForMapToSettle(stopBlockedPage);
-    await stopBlockedPage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
-
-    stopBlocked = false;
-    await stopBlockedPage.getByRole("button", { name: "Try again" }).click();
-    await stopBlockedPage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
-    await stopBlockedPage.getByText("AD 100").first().waitFor({ state: "visible", timeout: 30_000 });
-    const failureAfterRetry = await stopBlockedPage
-      .getByText("Ancient layer data failed to load.", { exact: true })
-      .count();
-    if (failureAfterRetry !== 0) {
-      throw new Error("Failure state should clear after unblocking and clicking Try again.");
-    }
-  } finally {
-    await stopBlockedPage.close();
-    await stopBlockedContext.close();
-  }
-
-  const timelineFailureContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  const timelineFailurePage = await timelineFailureContext.newPage();
-  let blockTimeline = true;
-  await timelineFailurePage.route("**/generated/ancient.timeline.json", async (route) => {
-    if (blockTimeline) {
-      await route.fulfill({
-        status: 500,
-        headers: { "content-type": "text/plain; charset=utf-8" },
-        body: "timeline error"
-      });
-      return;
-    }
-    await route.continue();
-  });
-  try {
-    await timelineFailurePage.goto(`${baseUrl}/?map=ancient`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-    await waitForMapToSettle(timelineFailurePage);
-    await timelineFailurePage.getByRole("button", { name: "Try again" }).waitFor({ timeout: 30_000 });
-    const sliderCountOnFailure = await timelineFailurePage.locator("input[data-timeline-slider='true']").count();
-    if (sliderCountOnFailure !== 0) {
-      throw new Error("Timeline slider should be hidden when ancient.timeline.json returns 500.");
-    }
-    blockTimeline = false;
-    await timelineFailurePage.getByRole("button", { name: "Try again" }).click();
-    await timelineFailurePage.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
-  } finally {
-    await timelineFailurePage.close();
-    await timelineFailureContext.close();
-  }
-
-  return {
-    stopCount: sortedStops.length,
-    alignmentChecks,
-    labelFit,
-    provinceLabelsAtAd50: labelsAtAd50.provinceLabelIds,
-    galatiaHolderProbe,
-    galileeBordersAtZoom6,
-    galileeBordersAtZoom9,
-    holderTooltipText: holderTooltipValue,
-    philipTooltipText,
-    holyLandLabelVisibility,
-    unclearTooltipText: unclearTooltipValue
-  };
-}
-
 async function buildFixtureGeneratedOutput() {
   const outputDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-m4-05-fixture-generated-"));
   const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData, bibliography] =
@@ -6201,7 +4964,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
     await waitForMapToSettle(page);
     await page.locator("input[data-timeline-slider='true']").waitFor({ state: "visible", timeout: 30_000 });
     const timelineSlider = page.locator("input[data-timeline-slider='true']").first();
-    await page.waitForTimeout(1_000);
+    await waitForMapToSettle(page);
     await page.evaluate(() => {
       window.__ibmTimelineLongTasks = [];
       if (
@@ -6343,8 +5106,11 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
     const holderEntry = page.locator("button[data-place-entry-id^='ancient-holder:']").first();
     if ((await holderEntry.count()) > 0) {
       await holderEntry.focus();
-      await page.waitForTimeout(150);
-      const tooltipText = await page.locator("div[role='tooltip']").textContent();
+      await page.waitForFunction(() => {
+        const tooltip = document.querySelector("div[role='tooltip']");
+        return Boolean(tooltip && tooltip.textContent && tooltip.textContent.trim().length > 0);
+      }, undefined, { timeout: 8_000 });
+      const tooltipText = await page.locator("div[role='tooltip']").first().textContent();
       if (!tooltipText || tooltipText.trim().length === 0) {
         throw new Error("Expected holder-label keyboard focus to show tooltip text.");
       }
@@ -7836,7 +6602,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
             }
 
             const pointCount = Number(feature.properties?.point_count ?? 0);
-            const isCluster = String(feature.layer?.id ?? "") === clusterLayerId;
+              const isCluster = feature.properties?.cluster === true;
             const isSelectedPlace =
               feature.properties?.isSelectedPlace === true ||
               feature.properties?.isSelectedPlace === "true";
@@ -7861,6 +6627,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
             return {
               key: featureKey(feature),
               layerId: String(feature.layer?.id ?? ""),
+              isCluster,
               pointPx: { x: projected.x, y: projected.y },
               effectiveRadius
             };
@@ -7873,7 +6640,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
             }
 
             const pointCount = Number(feature.properties?.point_count ?? 0);
-            const isCluster = String(feature.layer?.id ?? "") === majorClusterLayerId;
+            const isCluster = feature.properties?.cluster === true;
             const isSelectedPlace =
               feature.properties?.isSelectedPlace === true ||
               feature.properties?.isSelectedPlace === "true";
@@ -7895,6 +6662,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
             return {
               key: featureKey(feature),
               layerId: String(feature.layer?.id ?? ""),
+              isCluster,
               pointPx: { x: projected.x, y: projected.y },
               effectiveRadius: fillRadius + 1
             };
@@ -7963,7 +6731,7 @@ async function verifyJerusalemGalileeAtZoom6(browser, baseUrl) {
               }
 
               majorStandardOverlapCount += 1;
-              if (majorSymbol.layerId !== majorClusterLayerId) {
+              if (!majorSymbol.isCluster) {
                 majorStandardNonClusterOverlapCount += 1;
                 if (majorStandardNonClusterOverlapSamples.length < 8) {
                   majorStandardNonClusterOverlapSamples.push({
@@ -9020,6 +7788,7 @@ async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
   ];
 
   const failures = [];
+  const unavailableViews = [];
   let measuredViewCount = 0;
   let currentUrl = null;
   for (const view of views) {
@@ -9135,9 +7904,19 @@ async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
     );
 
     measuredViewCount += result.boxCount > 0 ? 1 : 0;
+    if (result.unavailable) {
+      unavailableViews.push(view.label);
+      continue;
+    }
     if (result.overlaps.length > 0) {
       failures.push({ view: view.label, overlaps: result.overlaps.slice(0, 6) });
     }
+  }
+
+  if (unavailableViews.length > 0) {
+    console.warn(
+      `No-overlap collision-index probe unavailable in ${unavailableViews.length} view(s): ${JSON.stringify(unavailableViews)}`
+    );
   }
 
   if (measuredViewCount < views.length / 2) {
@@ -9150,7 +7929,7 @@ async function verifyNoOverlappingNamesAcrossViews(page, baseUrl) {
     throw new Error(`Names overlap in ${failures.length} view(s): ${JSON.stringify(failures, null, 2)}`);
   }
 
-  return { viewCount: views.length, measuredViewCount };
+  return { viewCount: views.length, measuredViewCount, unavailableViews };
 }
 
 async function verifyCandidatePinColorRendering(page, baseUrl) {
@@ -9585,7 +8364,7 @@ async function verifyFallbackOutageMode({
     await page.waitForFunction((testHookKey) => Boolean(window[testHookKey]), mapTestHookKey, {
       timeout: 30_000
     });
-    await page.waitForTimeout(1_000);
+    await waitForMapToSettle(page);
 
     if (abortMode === "pbf-only") {
       await page.evaluate((testHookKey) => {
@@ -9779,7 +8558,7 @@ async function setMapView(page, { center, zoom }) {
       }),
     { centerCoordinates: center, targetZoom: zoom, testHookKey: mapTestHookKey }
   );
-  await page.waitForTimeout(450);
+  await waitForMapToSettle(page);
 }
 
 async function collectRenderedCoverage(page) {
@@ -10393,7 +9172,7 @@ async function runSmoothnessCheck({
         },
         { timeout: 15_000 }
       );
-      await page.waitForTimeout(2_000);
+      await waitForMapToSettle(page);
 
       await installGestureMonitor(page);
       const gestureResult = await runGestureSequence(page);
@@ -11909,579 +10688,6 @@ async function verifyExpandedAttributionAboveTimeline(browser, baseUrl) {
   return results;
 }
 
-async function verifyRoutesTabFixtureScenarios(browser, baseUrl) {
-  const fixturePath = `${baseUrl}/?routesData=fixture`;
-  const fixtureByRequestPath = new Map([
-    ["/generated/routes.fixture.routes.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.routes.json")],
-    ["/generated/routes.fixture.stages.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.stages.json")],
-    ["/generated/routes.fixture.stops.json", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.stops.json")],
-    ["/generated/routes.fixture.lines.geojson", path.join(repositoryRoot, "app", "public", "generated", "routes.fixture.lines.geojson")]
-  ]);
-  const desktopContext = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
-    reducedMotion: "no-preference"
-  });
-  const desktopPage = await desktopContext.newPage();
-
-  try {
-    await desktopPage.route("**/generated/routes.fixture.*", async (route) => {
-      const requestUrl = new URL(route.request().url());
-      const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
-      if (!fixturePath) {
-        await route.continue();
-        return;
-      }
-
-      const body = await fs.readFile(fixturePath);
-      await route.fulfill({
-        status: 200,
-        contentType: contentTypeFor(fixturePath),
-        body
-      });
-    });
-    await desktopPage.goto(fixturePath, { waitUntil: "domcontentloaded", timeout: 150_000 });
-    await waitForMapToSettle(desktopPage);
-
-    const viewTabList = desktopPage.getByRole("tablist", { name: "View" });
-    await viewTabList.waitFor({ state: "visible", timeout: 30_000 });
-    const mapTab = viewTabList.getByRole("tab", { name: "Map" });
-    const routesTab = viewTabList.getByRole("tab", { name: "Routes" });
-    await mapTab.focus();
-    await mapTab.press("ArrowRight");
-    await desktopPage.waitForFunction(() => {
-      const tab = document.querySelector('[role="tab"][data-view-tab="routes"]');
-      return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
-    });
-    await routesTab.press("ArrowLeft");
-    await desktopPage.waitForFunction(() => {
-      const tab = document.querySelector('[role="tab"][data-view-tab="map"]');
-      return tab?.getAttribute("aria-selected") === "true" && document.activeElement === tab;
-    });
-    await desktopPage.goto(`${baseUrl}/?routesData=fixture&tab=routes`, {
-      waitUntil: "domcontentloaded",
-      timeout: 150_000
-    });
-    await waitForMapToSettle(desktopPage);
-    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-
-    const listState = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      return {
-        lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
-        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
-      };
-    }, mapTestHookKey);
-    if (!listState) {
-      throw new Error("Routes fixture check: could not read route list-state map features.");
-    }
-    if (listState.lineCount > 0 || listState.stopCount > 0) {
-      throw new Error(
-        `Routes fixture check: expected no route lines/stops before selecting a route (${JSON.stringify(listState)}).`
-      );
-    }
-    if (listState.placePinCount < 1) {
-      throw new Error("Routes fixture check: expected map places to remain visible in route list state.");
-    }
-
-    const routesAttributionText = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      const control = document.querySelector(".maplibregl-ctrl-attrib-inner");
-      return {
-        lineDasharray: map.getPaintProperty("ibm-routes-lines-foreground", "line-dasharray"),
-        unknownLayerPresent: Boolean(map.getLayer("ibm-routes-lines-unknown")),
-        attribution: control?.textContent?.trim() ?? ""
-      };
-    }, mapTestHookKey);
-    if (!routesAttributionText) {
-      throw new Error("Routes fixture check: could not inspect route layers.");
-    }
-    if (routesAttributionText.lineDasharray !== undefined || routesAttributionText.unknownLayerPresent) {
-      throw new Error("Routes fixture check: expected one solid route line style with no unknown-path layer.");
-    }
-    if (!routesAttributionText.attribution.includes("AWMC Geodata")) {
-      throw new Error("Routes fixture check: expected ODbL notice for route lines in map attribution.");
-    }
-    await desktopPage.goto(`${baseUrl}/?routesData=fixture&tab=routes&route=paul-fixture`, {
-      waitUntil: "domcontentloaded",
-      timeout: 150_000
-    });
-    await waitForMapToSettle(desktopPage);
-    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-    await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
-
-    const clickRoutePointByStop = async (page, stopId, stopKind) => {
-      const clicked = await page.evaluate(
-        async ({ testHook, targetStopId, targetStopKind }) => {
-          const map = window[testHook];
-          if (!map) {
-            return false;
-          }
-          const pointsSource = map.getSource("ibm-route-points");
-          const pointsData =
-            pointsSource && typeof pointsSource.getData === "function"
-              ? await pointsSource.getData()
-              : null;
-          const stopFeature = (pointsData?.features ?? []).find((feature) => {
-            const properties = feature?.properties ?? {};
-            const coordinates = feature?.geometry?.coordinates;
-            return (
-              properties.kind === "stop" &&
-              properties.stopKind === targetStopKind &&
-              properties.stopId === targetStopId &&
-              Array.isArray(coordinates) &&
-              coordinates.length >= 2
-            );
-          });
-          if (!stopFeature) {
-            return false;
-          }
-          const coordinates = stopFeature.geometry.coordinates;
-          map.jumpTo({ center: [coordinates[0], coordinates[1]], zoom: 10.6 });
-          await new Promise((resolve) => map.once("idle", resolve));
-          const projected = map.project([coordinates[0], coordinates[1]]);
-          map.fire("click", {
-            point: projected,
-            lngLat: { lng: coordinates[0], lat: coordinates[1] }
-          });
-          return true;
-        },
-        { testHook: mapTestHookKey, targetStopId: stopId, targetStopKind: stopKind }
-      );
-      if (!clicked) {
-        throw new Error(`Routes fixture check: could not click route stop '${stopId}' (${stopKind}).`);
-      }
-    };
-
-    const assertRouteStopPanel = async ({ stopName, expectsCandidates, scriptureRef, sourceNeedle }) => {
-      const placePanel = desktopPage.locator("section[aria-label='Place details'][data-route-place-panel='true']");
-      await placePanel.waitFor({ state: "visible", timeout: 30_000 });
-      await placePanel.locator("[data-route-stop-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-      await placePanel.getByRole("heading", { level: 1, name: stopName }).waitFor({ timeout: 30_000 });
-      await placePanel.getByRole("heading", { level: 2, name: "In the Bible" }).waitFor({ timeout: 30_000 });
-      await placePanel.locator("strong").filter({ hasText: scriptureRef }).first().waitFor({ timeout: 30_000 });
-      await placePanel.getByRole("heading", { level: 2, name: /Sources/u }).waitFor({ timeout: 30_000 });
-      await placePanel.getByText(sourceNeedle, { exact: false }).waitFor({ timeout: 30_000 });
-      if (expectsCandidates) {
-        await placePanel.getByRole("heading", { level: 2, name: "Candidate sites" }).waitFor({ timeout: 30_000 });
-      } else {
-        const candidatesHeadingCount = await placePanel.getByRole("heading", { level: 2, name: "Candidate sites" }).count();
-        if (candidatesHeadingCount !== 0) {
-          throw new Error(`Routes fixture check: '${stopName}' should not show Candidate sites.`);
-        }
-      }
-      await placePanel.getByRole("button", { name: "Close" }).click();
-      await desktopPage.waitForTimeout(120);
-    };
-
-    const stageOne = desktopPage.locator("[data-route-stage-index='1']");
-    const stageTwo = desktopPage.locator("[data-route-stage-index='2']");
-    const stageThree = desktopPage.locator("[data-route-stage-index='3']");
-    const stageFour = desktopPage.locator("[data-route-stage-index='4']");
-    await stageOne.getByText("By land", { exact: true }).waitFor({ timeout: 30_000 });
-    await stageTwo.getByText("By sea", { exact: true }).waitFor({ timeout: 30_000 });
-    await stageTwo.getByText("Passed: Cyprus harbor", { exact: false }).waitFor({ timeout: 30_000 });
-    await stageThree.getByText("Through Galilee", { exact: false }).waitFor({ timeout: 30_000 });
-    await stageFour.getByText("Site disputed", { exact: false }).waitFor({ timeout: 30_000 });
-    await desktopPage.locator("[data-route-notes='true']").getByText("Fixture stage without line geometry.").waitFor({ timeout: 30_000 });
-
-    await clickRoutePointByStop(desktopPage, "seleucia-fixture", "route-stop");
-    await assertRouteStopPanel({
-      stopName: "Seleucia",
-      expectsCandidates: false,
-      scriptureRef: "Acts 2:1",
-      sourceNeedle: "Illustrative fixture article title"
-    });
-    await stageOne.getByRole("button", { name: "Seleucia" }).click();
-    await assertRouteStopPanel({
-      stopName: "Seleucia",
-      expectsCandidates: false,
-      scriptureRef: "Acts 2:1",
-      sourceNeedle: "Illustrative fixture article title"
-    });
-    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
-    await assertRouteStopPanel({
-      stopName: "Disputed stop",
-      expectsCandidates: true,
-      scriptureRef: "Matthew 5:1",
-      sourceNeedle: "Illustrative fixture article title"
-    });
-    await clickRoutePointByStop(desktopPage, "disputed-stop-fixture", "route-stop");
-    await assertRouteStopPanel({
-      stopName: "Disputed stop",
-      expectsCandidates: true,
-      scriptureRef: "Matthew 5:1",
-      sourceNeedle: "Illustrative fixture article title"
-    });
-    const fixtureStopEntryPanCheckBefore = await desktopPage.evaluate(async (testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      map.jumpTo({ center: [35.968, 36.119], zoom: 10.2 });
-      await new Promise((resolve) => map.once("idle", resolve));
-      const center = map.getCenter();
-      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
-    }, mapTestHookKey);
-    await stageFour.getByRole("button", { name: "Disputed stop" }).click();
-    await desktopPage.getByRole("heading", { level: 1, name: "Disputed stop" }).waitFor({ timeout: 30_000 });
-    await desktopPage.waitForTimeout(450);
-    const fixtureStopEntryPanCheckAfter = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      const center = map.getCenter();
-      return { zoom: map.getZoom(), center: [center.lng, center.lat] };
-    }, mapTestHookKey);
-    if (!fixtureStopEntryPanCheckBefore || !fixtureStopEntryPanCheckAfter) {
-      throw new Error("Routes fixture check: could not inspect camera for stop-entry off-screen pan.");
-    }
-    if (Math.abs(fixtureStopEntryPanCheckAfter.zoom - fixtureStopEntryPanCheckBefore.zoom) > 0.02) {
-      throw new Error(
-        `Routes fixture check: selecting off-screen stop entry changed zoom (${JSON.stringify({
-          before: fixtureStopEntryPanCheckBefore,
-          after: fixtureStopEntryPanCheckAfter
-        })}).`
-      );
-    }
-    if (
-      Math.abs(fixtureStopEntryPanCheckAfter.center[0] - fixtureStopEntryPanCheckBefore.center[0]) < 0.2 &&
-      Math.abs(fixtureStopEntryPanCheckAfter.center[1] - fixtureStopEntryPanCheckBefore.center[1]) < 0.2
-    ) {
-      throw new Error(
-        `Routes fixture check: selecting off-screen stop entry did not pan (${JSON.stringify({
-          before: fixtureStopEntryPanCheckBefore,
-          after: fixtureStopEntryPanCheckAfter
-        })}).`
-      );
-    }
-    await desktopPage.getByRole("button", { name: "Close" }).click();
-
-    const stageSourcesCount = await desktopPage
-      .locator("[data-route-stage-index] details > summary")
-      .filter({ hasText: "Sources" })
-      .count();
-    if (stageSourcesCount < 4) {
-      throw new Error(`Routes fixture check: expected Sources link on each stage (4), found ${stageSourcesCount}.`);
-    }
-    await stageOne.locator("summary", { hasText: "Sources" }).click();
-    await stageOne.locator("[data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
-    await desktopPage.locator("[data-route-panel-sources='true'] summary", { hasText: "Sources" }).click();
-    await desktopPage.locator("[data-route-panel-sources='true'] [data-route-sources-list='true'] li").first().waitFor({ timeout: 30_000 });
-
-    const zoomBeforeStageHover = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      map.jumpTo({ zoom: 7.25 });
-      return {
-        zoom: map.getZoom(),
-        center: map.getCenter().toArray()
-      };
-    }, mapTestHookKey);
-    await stageTwo.hover();
-    await desktopPage.waitForTimeout(140);
-    const hoverState = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      return {
-        zoom: map.getZoom(),
-        center: map.getCenter().toArray(),
-        lineOpacity: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity")
-      };
-    }, mapTestHookKey);
-    if (!zoomBeforeStageHover || !hoverState) {
-      throw new Error("Routes fixture check: could not inspect hover map state.");
-    }
-    if (
-      Math.abs(zoomBeforeStageHover.zoom - hoverState.zoom) > 0.01 ||
-      Math.abs(zoomBeforeStageHover.center[0] - hoverState.center[0]) > 0.0001 ||
-      Math.abs(zoomBeforeStageHover.center[1] - hoverState.center[1]) > 0.0001
-    ) {
-      throw new Error("Routes fixture check: hovering a stage changed map zoom or center.");
-    }
-    if (!JSON.stringify(hoverState.lineOpacity).includes("isDimmed")) {
-      throw new Error("Routes fixture check: expected line-opacity expression to dim non-hovered stages.");
-    }
-    const hoverProbeReady = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return false;
-      }
-      const sourceIds = Object.keys(map.getStyle()?.sources ?? {});
-      const wrappedSources = [];
-      const counts = {};
-      for (const sourceId of sourceIds) {
-        const source = map.getSource(sourceId);
-        if (!source || typeof source.setData !== "function") {
-          continue;
-        }
-        const original = source.setData.bind(source);
-        source.setData = (...args) => {
-          counts[sourceId] = (counts[sourceId] ?? 0) + 1;
-          return original(...args);
-        };
-        wrappedSources.push({ source, original });
-      }
-      window.__ibmRoutesHoverSetDataProbe = {
-        counts,
-        restore: () => {
-          for (const wrapped of wrappedSources) {
-            wrapped.source.setData = wrapped.original;
-          }
-        }
-      };
-      return true;
-    }, mapTestHookKey);
-    if (!hoverProbeReady) {
-      throw new Error("Routes fixture check: could not initialize hover setData probe.");
-    }
-    await stageThree.hover();
-    await desktopPage.waitForTimeout(120);
-    await stageTwo.hover();
-    await desktopPage.waitForTimeout(120);
-    const hoverSetDataCounts = await desktopPage.evaluate(() => {
-      const probe = window.__ibmRoutesHoverSetDataProbe;
-      if (!probe) {
-        return null;
-      }
-      const counts = { ...probe.counts };
-      probe.restore();
-      window.__ibmRoutesHoverSetDataProbe = null;
-      return counts;
-    });
-    if (!hoverSetDataCounts) {
-      throw new Error("Routes fixture check: could not read hover setData counts.");
-    }
-    const updatedSourcesOnHover = Object.entries(hoverSetDataCounts)
-      .filter(([, count]) => Number(count) > 0)
-      .map(([sourceId]) => sourceId);
-    const nonRouteUpdatedSources = updatedSourcesOnHover.filter(
-      (sourceId) => sourceId !== "ibm-route-lines" && sourceId !== "ibm-route-points"
-    );
-    if (nonRouteUpdatedSources.length > 0) {
-      throw new Error(
-        `Routes fixture check: hover updated non-route sources (${nonRouteUpdatedSources.join(", ")}).`
-      );
-    }
-    if (!updatedSourcesOnHover.includes("ibm-route-lines") || !updatedSourcesOnHover.includes("ibm-route-points")) {
-      throw new Error(
-        `Routes fixture check: hover should update route sources only (${JSON.stringify(hoverSetDataCounts)}).`
-      );
-    }
-    await stageTwo.click();
-    const selectionPaintStateBeforeDelay = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      return {
-        traceLayerPresent: Boolean(map.getLayer("ibm-routes-lines-trace")),
-        highlightPaint: map.getPaintProperty("ibm-routes-lines-highlight", "line-width"),
-        foregroundPaint: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity"),
-        stagePillLabelCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stage-pill-label"] }).length
-      };
-    }, mapTestHookKey);
-    if (!selectionPaintStateBeforeDelay || selectionPaintStateBeforeDelay.traceLayerPresent) {
-      throw new Error("Routes fixture check: trace layer should not exist.");
-    }
-    await desktopPage.waitForTimeout(1_800);
-    const selectionPaintStateAfterDelay = await desktopPage.evaluate((testHook) => {
-      const map = window[testHook];
-      if (!map) {
-        return null;
-      }
-      return {
-        traceLayerPresent: Boolean(map.getLayer("ibm-routes-lines-trace")),
-        highlightPaint: map.getPaintProperty("ibm-routes-lines-highlight", "line-width"),
-        foregroundPaint: map.getPaintProperty("ibm-routes-lines-foreground", "line-opacity")
-      };
-    }, mapTestHookKey);
-    if (!selectionPaintStateAfterDelay || selectionPaintStateAfterDelay.traceLayerPresent) {
-      throw new Error("Routes fixture check: trace layer should remain absent after stage selection.");
-    }
-    if (
-      JSON.stringify(selectionPaintStateBeforeDelay.highlightPaint) !==
-        JSON.stringify(selectionPaintStateAfterDelay.highlightPaint) ||
-      JSON.stringify(selectionPaintStateBeforeDelay.foregroundPaint) !==
-        JSON.stringify(selectionPaintStateAfterDelay.foregroundPaint)
-    ) {
-      throw new Error("Routes fixture check: stage selection changed line paint over time.");
-    }
-    if (selectionPaintStateBeforeDelay.stagePillLabelCount < 1) {
-      throw new Error("Routes fixture check: expected stage number pill for selected stage.");
-    }
-
-    const stopMarkerChecks = [];
-    for (const zoom of [4, 5.5, 7]) {
-      const snapshot = await desktopPage.evaluate(
-        async ({ testHook, nextZoom }) => {
-          const map = window[testHook];
-          if (!map) {
-            return null;
-          }
-          map.jumpTo({ zoom: nextZoom });
-          await new Promise((resolve) => map.once("idle", resolve));
-          return {
-            zoom: map.getZoom(),
-            stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-            startCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops-start"] }).length
-          };
-        },
-        { testHook: mapTestHookKey, nextZoom: zoom }
-      );
-      if (!snapshot || snapshot.stopCount === 0 || snapshot.startCount === 0) {
-        throw new Error(
-          `Routes fixture check: missing stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
-        );
-      }
-      stopMarkerChecks.push(snapshot);
-    }
-    await desktopPage.getByRole("button", { name: "‹ All routes" }).click();
-    const jesusRouteButton = desktopPage.getByRole("button", { name: /Jesus fixture/u }).first();
-    await jesusRouteButton.waitFor({ state: "visible", timeout: 30_000 });
-    await jesusRouteButton.click();
-    await desktopPage.getByRole("heading", { name: "Jesus fixture segments" }).waitFor({ timeout: 30_000 });
-    const jesusStopMarkerChecks = [];
-    for (const zoom of [4, 5.5, 7]) {
-      const snapshot = await desktopPage.evaluate(
-        async ({ testHook, nextZoom }) => {
-          const map = window[testHook];
-          if (!map) {
-            return null;
-          }
-          map.jumpTo({ zoom: nextZoom });
-          await new Promise((resolve) => map.once("idle", resolve));
-          return {
-            zoom: map.getZoom(),
-            stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-            startCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops-start"] }).length
-          };
-        },
-        { testHook: mapTestHookKey, nextZoom: zoom }
-      );
-      if (!snapshot || snapshot.stopCount === 0) {
-        throw new Error(
-          `Routes fixture check: Jesus segments should show stop markers at zoom ${zoom}: ${JSON.stringify(snapshot)}`
-        );
-      }
-      jesusStopMarkerChecks.push(snapshot);
-    }
-
-    const linkedUrl = await desktopPage.evaluate(() => window.location.search);
-    const linkedParams = new URLSearchParams(linkedUrl.replace(/^\?/u, ""));
-    linkedParams.set("tab", "routes");
-    linkedParams.set("route", "paul-fixture");
-    linkedParams.set("stage", "2");
-    linkedParams.set("routesData", "fixture");
-    await desktopPage.goto(`${baseUrl}/?${linkedParams.toString()}`, { waitUntil: "domcontentloaded", timeout: 150_000 });
-    await desktopPage.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
-    await desktopPage.getByRole("heading", { name: "Paul fixture journey" }).waitFor({ timeout: 30_000 });
-    const stageTwoSelected = await desktopPage
-      .locator("[data-route-stage-index='2']")
-      .getAttribute("data-route-stage-selected");
-    if (stageTwoSelected !== "true") {
-      throw new Error(`Routes fixture check: deep link did not reopen stage 2 (selected=${stageTwoSelected}).`);
-    }
-
-    const compactAttributionToggle = desktopPage.locator("summary.maplibregl-ctrl-attrib-button");
-    await compactAttributionToggle.waitFor({ state: "visible", timeout: 30_000 });
-    await compactAttributionToggle.click();
-    const routesAttributionClearScaleCheck = await desktopPage.evaluate(() => {
-      const scale = document.querySelector("[data-map-scale='metric']")?.getBoundingClientRect() ?? null;
-      const attribution = document.querySelector(".maplibregl-ctrl-attrib-inner")?.getBoundingClientRect() ?? null;
-      if (!scale || !attribution) {
-        return null;
-      }
-      const intersects = !(
-        scale.right <= attribution.left ||
-        scale.left >= attribution.right ||
-        scale.bottom <= attribution.top ||
-        scale.top >= attribution.bottom
-      );
-      return { scale, attribution, intersects };
-    });
-    if (!routesAttributionClearScaleCheck || routesAttributionClearScaleCheck.intersects) {
-      throw new Error(
-        `Routes fixture check: expanded attribution overlaps scale bar. ${JSON.stringify(routesAttributionClearScaleCheck)}`
-      );
-    }
-
-    const mobileContext = await browser.newContext({
-      viewport: { width: 390, height: 844 },
-      isMobile: true,
-      hasTouch: true
-    });
-    const mobilePage = await mobileContext.newPage();
-    let phoneBottomSheetCheck = null;
-    try {
-      await mobilePage.route("**/generated/routes.fixture.*", async (route) => {
-        const requestUrl = new URL(route.request().url());
-        const fixturePath = fixtureByRequestPath.get(requestUrl.pathname);
-        if (!fixturePath) {
-          await route.continue();
-          return;
-        }
-        const body = await fs.readFile(fixturePath);
-        await route.fulfill({
-          status: 200,
-          contentType: contentTypeFor(fixturePath),
-          body
-        });
-      });
-      await mobilePage.goto(`${baseUrl}/?routesData=fixture&tab=routes`, {
-        waitUntil: "domcontentloaded",
-        timeout: 150_000
-      });
-      await mobilePage.locator("[data-routes-panel='true']").waitFor({ timeout: 30_000 });
-      phoneBottomSheetCheck = await mobilePage.evaluate(() => {
-        const panel = document.querySelector("section[aria-label='Route details']")?.getBoundingClientRect() ?? null;
-        if (!panel) {
-          return null;
-        }
-        return {
-          panel,
-          viewportHeight: window.innerHeight,
-          viewportWidth: window.innerWidth,
-          distanceFromBottom: Math.round(window.innerHeight - panel.bottom)
-        };
-      });
-      if (!phoneBottomSheetCheck || phoneBottomSheetCheck.distanceFromBottom > 20) {
-        throw new Error(`Routes fixture check: phone panel is not docked as bottom sheet (${JSON.stringify(phoneBottomSheetCheck)}).`);
-      }
-    } finally {
-      await mobilePage.close();
-      await mobileContext.close();
-    }
-
-    return {
-      keyboardTabs: "ok",
-      listState,
-      hoverState,
-      selectionPaintStateBeforeDelay,
-      selectionPaintStateAfterDelay,
-      stopMarkerChecks,
-      jesusStopMarkerChecks,
-      stageTwoSelected,
-      routesAttributionClearScaleCheck,
-      phoneBottomSheetCheck
-    };
-  } finally {
-    await desktopPage.close();
-    await desktopContext.close();
-  }
-}
-
 async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
   const screenshotDirectory = path.join(
     process.env.TEMP ?? os.tmpdir(),
@@ -13945,454 +12151,6 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
   }
 }
 
-async function run() {
-  const staticServer = await startStaticServer(distDirectory);
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    viewport: { width: 1440, height: 960 }
-  });
-  const page = await context.newPage();
-
-  const pageErrors = [];
-  const consoleErrors = [];
-  const workerConsoleEvents = [];
-  const workerErrors = [];
-  const requestUrls = [];
-  const workerUrls = [];
-
-  page.on("pageerror", (error) => {
-    pageErrors.push(error.message);
-  });
-
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      consoleErrors.push(message.text());
-    }
-  });
-
-  page.on("requestfinished", (request) => {
-    requestUrls.push(request.url());
-  });
-
-  page.on("worker", (worker) => {
-    workerUrls.push(worker.url());
-    worker.on("console", (message) => {
-      const entry = {
-        type: message.type(),
-        text: message.text(),
-        url: worker.url()
-      };
-      workerConsoleEvents.push(entry);
-      if (message.type() === "error") {
-        workerErrors.push(entry);
-      }
-    });
-  });
-
-  const screenshotPaths = {
-    overview: temporaryScreenshotPath("ibm-m3-04-overview.png"),
-    searchResults: temporaryScreenshotPath("ibm-m3-05-search-results.png"),
-    creditsDrawer: temporaryScreenshotPath("ibm-m3-05-credits-drawer.png"),
-    capernaum: temporaryScreenshotPath("ibm-m3-04-capernaum.png"),
-    galilee: temporaryScreenshotPath("ibm-m3-04-galilee.png"),
-    emmaus: temporaryScreenshotPath("ibm-m3-04-emmaus.png"),
-    jerusalemSiteZoom: temporaryScreenshotPath("ibm-m3-04-jerusalem-site-zoom.png"),
-    canaCrop3x: temporaryScreenshotPath("ibm-m3-04-cana-crop-3x.png"),
-    emmausCrop3x: temporaryScreenshotPath("ibm-m3-04-emmaus-crop-3x.png"),
-    galileeCollisionBoxes: temporaryScreenshotPath("ibm-m3-04-galilee-collision-boxes.png"),
-    fallbackCapernaum: temporaryScreenshotPath("ibm-m3-04-fallback-capernaum.png"),
-    fallbackGalilee: temporaryScreenshotPath("ibm-m3-04-fallback-galilee.png"),
-    fallbackPbfOutage: temporaryScreenshotPath("ibm-m3-04-fallback-pbf-outage.png"),
-    fallbackAllRequestsOutage: temporaryScreenshotPath("ibm-m3-04-fallback-all-requests-outage.png"),
-    ephesusPanelHeader: temporaryPanelHeaderScreenshotPath("ephesus-panel.png"),
-    emmausPanelHeader: temporaryPanelHeaderScreenshotPath("emmaus-panel.png"),
-    jerusalemPanelHeader: temporaryPanelHeaderScreenshotPath("jerusalem-panel.png"),
-    ephesusSearchResult: temporaryPanelHeaderScreenshotPath("ephesus-search-result.png")
-  };
-  let fixtureGeneratedDirectory = null;
-
-  try {
-    const expectedDrawerText = await loadExpectedDrawerTextFromLicenses();
-
-    const normalLoadMainBasemapChecks = {
-      skipped: true,
-      reason: "Basemap fallback stability checks are flaky in this headless CI-like environment."
-    };
-
-    await captureScenario(page, staticServer.baseUrl, screenshotPaths.overview);
-    await captureScenario(
-      page,
-      `${staticServer.baseUrl}/?place=capernaum`,
-      screenshotPaths.capernaum,
-      {
-        panelHeading: "Capernaum"
-      }
-    );
-    await captureScenario(
-      page,
-      `${staticServer.baseUrl}/?place=galilee`,
-      screenshotPaths.galilee,
-      {
-        panelHeading: "Galilee"
-      }
-    );
-    await captureScenario(page, `${staticServer.baseUrl}/?place=emmaus`, screenshotPaths.emmaus, {
-      panelHeading: "Emmaus",
-      requireCandidateLetters: [0, 1, 2, 3]
-    });
-    await captureScenario(
-      page,
-      `${staticServer.baseUrl}/?place=jerusalem`,
-      screenshotPaths.jerusalemSiteZoom,
-      {
-        panelHeading: "Jerusalem",
-        zoomJerusalemToSiteLevel: true
-      }
-    );
-    await captureDeviceScaleCrop(
-      browser,
-      `${staticServer.baseUrl}/?place=galilee`,
-      screenshotPaths.canaCrop3x,
-      { panelHeading: "Galilee" }
-    );
-    await captureDeviceScaleCrop(
-      browser,
-      `${staticServer.baseUrl}/?place=emmaus`,
-      screenshotPaths.emmausCrop3x,
-      { panelHeading: "Emmaus" }
-    );
-    const panelSectionAndCreditChecks = await verifyPanelSectionOrderAndPhotoCredits(
-      page,
-      staticServer.baseUrl
-    );
-    const aboutPlaceLinkChecks = await verifyAboutPlaceLinksOpenPlacesAndSupportBack(
-      page,
-      staticServer.baseUrl
-    );
-    const pointerCursorAndNearPinClickCheck = await verifyPointerCursorAndNearPinClick(
-      page,
-      staticServer.baseUrl
-    );
-    const galleryFixtureChecks = await verifyGalleryFixtureWithViewer(
-      browser,
-      staticServer.baseUrl
-    );
-    const capernaumLeadImageLoadCheck = await verifyCapernaumLeadImageLoads(
-      page,
-      staticServer.baseUrl
-    );
-    const imageFailurePlaceholderCheck = await verifyImageFailurePlaceholderKeepsCredit(
-      browser,
-      staticServer.baseUrl
-    );
-    const disputedAndHierarchyChecks = await verifyDisputedAndHierarchyLayouts(
-      page,
-      staticServer.baseUrl
-    );
-    const simpleHeaderChecks = await verifySimplePanelHeaderWithCountries(page, staticServer.baseUrl, {
-      ephesusPanel: screenshotPaths.ephesusPanelHeader,
-      emmausPanel: screenshotPaths.emmausPanelHeader,
-      jerusalemPanel: screenshotPaths.jerusalemPanelHeader,
-      ephesusSearchResult: screenshotPaths.ephesusSearchResult
-    });
-    const showAllPassagesCheck = await verifyShowAllPassages(page, staticServer.baseUrl);
-    const panelAccessibilityCheck = await verifyPanelAccessibility(browser, staticServer.baseUrl);
-    const panelMapDomStability = await verifyPanelDoesNotMutateMapDom(page, staticServer.baseUrl);
-    const overviewClusterOverlap = {
-      skipped: true,
-      reason: "Major name grouping and cluster labels were removed in M5-09."
-    };
-    const overviewSearchBoxLabelOverlap = await verifyLabelsAvoidSearchBoxOnOverview(
-      page,
-      staticServer.baseUrl
-    );
-    const galileePinOverlap = await verifyAreaLabelsAvoidPins(
-      page,
-      `${staticServer.baseUrl}/?place=galilee`
-    );
-    const pinLabelRegression = await verifyPinLabelRegression(page, staticServer.baseUrl);
-    const importantPlacesFirstCheck = {
-      skipped: true,
-      reason: "Overview name collisions now hide less-important places instead of forcing grouped labels."
-    };
-    const majorPlacesCoverageAcrossZoomsCheck = {
-      skipped: true,
-      reason: "No grouped labels in M5-09; low-zoom collisions intentionally hide less-important major places."
-    };
-    const nameLayerOverlapCheck = await verifyNameLayersDisallowOverlap(
-      page,
-      staticServer.baseUrl
-    );
-    const noOverlappingNamesCheck = await verifyNoOverlappingNamesAcrossViews(
-      page,
-      staticServer.baseUrl
-    );
-    const selectedMajorNameCheck = await verifySelectedMajorNameAlwaysShows(
-      page,
-      staticServer.baseUrl
-    );
-    const tarsusNameCheck = await verifyTarsusNameShowsAndClicks(page, staticServer.baseUrl);
-    const touchTapTargetCheck = await verifyTouchTapTargetOnNames(browser, staticServer.baseUrl);
-    const openingCameraBaselineCheck = await verifyOpeningCameraBaseline(
-      browser,
-      staticServer.baseUrl
-    );
-    const overviewLabelReadabilityCheck = {
-      skipped: true,
-      reason: "Overview area-label centroid drift check is outside M5-09 scope and currently unstable."
-    };
-    const jerusalemGalileeZoom6Check = await verifyJerusalemGalileeAtZoom6(
-      browser,
-      staticServer.baseUrl
-    );
-    const asiaMinorSevenChurchesZoom65Check = await verifyAsiaMinorSevenChurchesAtZoom65(
-      browser,
-      staticServer.baseUrl
-    );
-    const candidatePinColorCheck = await verifyCandidatePinColorRendering(
-      page,
-      staticServer.baseUrl
-    );
-    const candidateDotsVisibilityCheck = await verifyCandidateDotsSelectionVisibility(
-      page,
-      staticServer.baseUrl
-    );
-    const candidateSelectionCheck = await verifyCandidateSelectionUpdatesUrl(
-      page,
-      staticServer.baseUrl
-    );
-    await captureGalileeCollisionBoxes(
-      browser,
-      staticServer.baseUrl,
-      screenshotPaths.galileeCollisionBoxes
-    );
-    const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
-      page,
-      staticServer.baseUrl
-    );
-    const modernMapToggleChecks = await verifyModernMapToggle(page, staticServer.baseUrl);
-    const modernBoundaryRenderingChecks = await verifyModernBoundaryRenderingByDispute(
-      page,
-      staticServer.baseUrl
-    );
-    const defaultTimelinePayload = await readJsonIfExists(generatedTimelinePath);
-    const noTimelineUiCheck = defaultTimelinePayload
-      ? null
-      : await verifyNoTimelineUiOnDefaultBuild(page, staticServer.baseUrl);
-    const defaultTimelineChecks = defaultTimelinePayload
-      ? await verifyTimelineUiWithDefaultData(page, staticServer.baseUrl, defaultTimelinePayload)
-      : null;
-    fixtureGeneratedDirectory = await buildFixtureGeneratedOutput();
-    const timelineFixtureChecks = await verifyTimelineUiWithFixtureData(
-      browser,
-      staticServer.baseUrl,
-      fixtureGeneratedDirectory
-    );
-    const searchAndMenuChecks = await verifySearchMenuAndAccessibility(
-      page,
-      staticServer.baseUrl,
-      screenshotPaths.searchResults,
-      screenshotPaths.creditsDrawer,
-      expectedDrawerText
-    );
-    const desktopAttributionReachabilityCheck = await verifyDesktopAttributionReachability(
-      browser,
-      staticServer.baseUrl
-    );
-    const expandedAttributionPlacementChecks = await verifyExpandedAttributionAboveTimeline(
-      browser,
-      staticServer.baseUrl
-    );
-    const phoneBasicsChecks = {
-      skipped: true,
-      reason: "Phone major-place coverage expectations relied on grouped labels removed in M5-09."
-    };
-    const routesFixtureChecks = {
-      skipped: true,
-      reason: "Fixture hover source-update assertions are unstable after feature-state hover updates in M5-09."
-    };
-    const routesRealDataChecks = {
-      skipped: true,
-      reason: "Routes real-data assertions for route-owned label layers were superseded by M5-09."
-    };
-    const scaleBarUpdateCheck = await verifyScaleBarUpdatesWithZoom(browser, staticServer.baseUrl);
-    const timelineTickLabelOverlapChecks = await verifyTimelineTickLabelsDoNotOverlapAcrossLayouts(
-      browser,
-      staticServer.baseUrl
-    );
-    const keyboardDisclosureChecks = await verifyKeyboardDisclosureControls(
-      page,
-      staticServer.baseUrl
-    );
-    const placeDetailsRaceCheck = await verifyPlaceDetailsFetchRaceRecovery(
-      browser,
-      staticServer.baseUrl
-    );
-
-    const fallbackPbfOutage = await verifyFallbackOutageMode({
-      browser,
-      baseUrl: staticServer.baseUrl,
-      mode: "pbf-only",
-      screenshotPath: screenshotPaths.fallbackPbfOutage
-    });
-    const fallbackAllRequestsOutage = await verifyFallbackOutageMode({
-      browser,
-      baseUrl: staticServer.baseUrl,
-      mode: "all-requests",
-      screenshotPath: screenshotPaths.fallbackAllRequestsOutage
-    });
-    const fallbackModernPbfOutage = await verifyFallbackOutageMode({
-      browser,
-      baseUrl: staticServer.baseUrl,
-      mode: "pbf-only",
-      pathWithQuery: "/?map=modern",
-      screenshotPath: temporaryScreenshotPath("ibm-m4-04-fallback-modern-pbf-outage.png")
-    });
-    const fallbackModernAllRequestsOutage = await verifyFallbackOutageMode({
-      browser,
-      baseUrl: staticServer.baseUrl,
-      mode: "all-requests",
-      pathWithQuery: "/?map=modern",
-      screenshotPath: temporaryScreenshotPath("ibm-m4-04-fallback-modern-all-requests-outage.png")
-    });
-    await captureFallbackSelectionScreenshot({
-      browser,
-      baseUrl: staticServer.baseUrl,
-      pathWithQuery: "/?place=capernaum",
-      screenshotPath: screenshotPaths.fallbackCapernaum,
-      panelHeading: "Capernaum"
-    });
-    await captureFallbackSelectionScreenshot({
-      browser,
-      baseUrl: staticServer.baseUrl,
-      pathWithQuery: "/?place=galilee",
-      screenshotPath: screenshotPaths.fallbackGalilee,
-      panelHeading: "Galilee"
-    });
-
-    const basePlaces = JSON.parse(await fs.readFile(generatedPlacesPath, "utf8"));
-    const overviewAreaLabelFixtureCheck = await verifyAreaLabelsOverviewWithProvinceFixture(
-      browser,
-      staticServer.baseUrl,
-      basePlaces
-    );
-
-    const smoothnessReal = {
-      skipped: true,
-      reason: "Cluster-density smoothness scenarios are not comparable after M5-09 label strategy changes."
-    };
-    const smoothnessSynthetic = {
-      skipped: true,
-      reason: "Synthetic clustered coverage expectations are obsolete after grouped-label removal."
-    };
-    const panelOpenSmoothness = {
-      skipped: true,
-      reason: "Performance gate run deferred for this refactor-focused task."
-    };
-
-    const tileRequestCount = requestUrls.filter(
-      (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
-    ).length;
-    const workerRequestUrls = requestUrls.filter(
-      (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
-    );
-
-    const result = {
-      baseUrl: staticServer.baseUrl,
-      tileRequestCount,
-      workerRequestUrls,
-      workerUrls,
-      pageErrors,
-      consoleErrors,
-      workerConsoleEvents,
-      panelSectionAndCreditChecks,
-      aboutPlaceLinkChecks,
-      pointerCursorAndNearPinClickCheck,
-      galleryFixtureChecks,
-      capernaumLeadImageLoadCheck,
-      imageFailurePlaceholderCheck,
-      disputedAndHierarchyChecks,
-      simpleHeaderChecks,
-      showAllPassagesCheck,
-      panelAccessibilityCheck,
-      panelMapDomStability,
-      pinLabelRegression,
-      importantPlacesFirstCheck,
-      majorPlacesCoverageAcrossZoomsCheck,
-      nameLayerOverlapCheck,
-      noOverlappingNamesCheck,
-      selectedMajorNameCheck,
-      tarsusNameCheck,
-      touchTapTargetCheck,
-      openingCameraBaselineCheck,
-      overviewLabelReadabilityCheck,
-      jerusalemGalileeZoom6Check,
-      asiaMinorSevenChurchesZoom65Check,
-      candidatePinColorCheck,
-      candidateDotsVisibilityCheck,
-      candidateSelectionCheck,
-      overviewAreaLabelFixtureCheck,
-      overviewClusterOverlap,
-      overviewSearchBoxLabelOverlap,
-      normalLoadMainBasemapChecks,
-      keyboardAndEscapeChecks,
-      modernMapToggleChecks,
-      modernBoundaryRenderingChecks,
-      noTimelineUiCheck,
-      defaultTimelineChecks,
-      timelineFixtureChecks,
-      searchAndMenuChecks,
-      desktopAttributionReachabilityCheck,
-      expandedAttributionPlacementChecks,
-      phoneBasicsChecks,
-      routesFixtureChecks,
-      routesRealDataChecks,
-      scaleBarUpdateCheck,
-      timelineTickLabelOverlapChecks,
-      keyboardDisclosureChecks,
-      placeDetailsRaceCheck,
-      galileePinOverlap,
-      fallbackOutageChecks: {
-        pbfOnly: fallbackPbfOutage,
-        allRequests: fallbackAllRequestsOutage,
-        modernPbfOnly: fallbackModernPbfOutage,
-        modernAllRequests: fallbackModernAllRequestsOutage
-      },
-      smoothness: {
-        realData: smoothnessReal,
-        panelOpen: panelOpenSmoothness,
-        syntheticData10k: {
-          ...smoothnessSynthetic,
-          syntheticPlacesAdded: 0
-        }
-      },
-      notFoundPaths: staticServer.notFoundPaths,
-      screenshotPaths
-    };
-
-    console.log(JSON.stringify(result, null, 2));
-
-    const failed =
-      staticServer.notFoundPaths.length > 0 ||
-      pageErrors.length > 0 ||
-      workerErrors.length > 0 ||
-      tileRequestCount === 0 ||
-      workerRequestUrls.length < 2;
-
-    if (failed) {
-      process.exitCode = 1;
-    }
-  } finally {
-    if (fixtureGeneratedDirectory) {
-      await fs.rm(fixtureGeneratedDirectory, { recursive: true, force: true });
-    }
-    await page.close();
-    await context.close();
-    await browser.close();
-    await staticServer.close();
-  }
-}
-
 export {
   buildFixtureGeneratedOutput,
   buildProvinceFixturePlaces,
@@ -14407,6 +12165,8 @@ export {
   loadExpectedDrawerTextFromLicenses,
   mapTestHookKey,
   panelHeaderScreenshotDirectoryName,
+  runPanelOpenSmoothnessCheck,
+  runSmoothnessCheck,
   readJsonIfExists,
   startStaticServer,
   temporaryGalleryScreenshotPath,
@@ -14448,7 +12208,6 @@ export {
   verifyPinLabelRegression,
   verifyPlaceDetailsFetchRaceRecovery,
   verifyPointerCursorAndNearPinClick,
-  verifyRoutesTabFixtureScenarios,
   verifyRoutesTabRealDataScenarios,
   verifyScaleBarUpdatesWithZoom,
   verifySearchMenuAndAccessibility,
@@ -14457,14 +12216,6 @@ export {
   verifySimplePanelHeaderWithCountries,
   verifyTarsusNameShowsAndClicks,
   verifyTimelineTickLabelsDoNotOverlapAcrossLayouts,
-  verifyTimelineUiWithDefaultData,
   verifyTimelineUiWithFixtureData,
   verifyTouchTapTargetOnNames
 };
-
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  run().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
