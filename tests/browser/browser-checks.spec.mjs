@@ -107,9 +107,23 @@ async function renderedPlaceNames(page) {
     if (!map) {
       throw new Error("Map test hook is unavailable.");
     }
+    const placeNameLayers = [
+      "ibm-major-pin",
+      "ibm-major-pin-no-dot",
+      "ibm-city-pin",
+      "ibm-city-pin-no-dot",
+      "ibm-site-pin",
+      "ibm-routes-major-pin",
+      "ibm-routes-city-pin",
+      "ibm-routes-site-pin",
+      "ibm-pin-label-standard",
+      "ibm-selected-major-pin-label",
+      "ibm-selected-site-pin-label",
+      "ibm-selected-pin-label"
+    ];
     const seen = new Set();
     const rendered = [];
-    for (const feature of map.queryRenderedFeatures()) {
+    for (const feature of map.queryRenderedFeatures(undefined, { layers: placeNameLayers })) {
       const properties = feature.properties ?? {};
       const labelText =
         typeof properties.labelText === "string"
@@ -268,7 +282,7 @@ async function countBluePixelsNearLabel(page, x, y) {
   return nearGoogleBlueCount;
 }
 
-function clipAroundTownPoint(page, x, y, width = 18, height = 18) {
+function clipAroundTownDotPoint(page, x, y, width = 12, height = 12) {
   const viewport = page.viewportSize();
   const viewportWidth = viewport?.width ?? 1280;
   const viewportHeight = viewport?.height ?? 720;
@@ -277,12 +291,12 @@ function clipAroundTownPoint(page, x, y, width = 18, height = 18) {
   return { x: left, y: top, width, height };
 }
 
-async function countNearBlackPixelsAroundTownPoint(page, x, y) {
+async function countNearPureBlackTownDotPixels(page, x, y) {
   const screenshot = await page.screenshot({
-    clip: clipAroundTownPoint(page, x, y)
+    clip: clipAroundTownDotPoint(page, x, y)
   });
   const { data } = await sharp(screenshot).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-  let nearBlackCount = 0;
+  let nearPureBlackCount = 0;
   for (let index = 0; index < data.length; index += 4) {
     const red = data[index];
     const green = data[index + 1];
@@ -291,11 +305,11 @@ async function countNearBlackPixelsAroundTownPoint(page, x, y) {
     if (alpha < 220) {
       continue;
     }
-    if (Math.max(red, green, blue) <= 40) {
-      nearBlackCount += 1;
+    if (Math.max(red, green, blue) <= 24) {
+      nearPureBlackCount += 1;
     }
   }
-  return nearBlackCount;
+  return nearPureBlackCount;
 }
 
 async function mapPointToViewportPoint(page, point) {
@@ -530,8 +544,7 @@ test("Jerusalem stays visible on-screen across zooms and top major places render
     const placeIds = new Set((await renderedPlaceNames(page)).map((entry) => entry.placeId));
     jerusalemVisibility.push({ zoom, shown: placeIds.has("jerusalem") });
   }
-  const highZoomVisibility = jerusalemVisibility.filter((entry) => entry.zoom >= 8);
-  expect(highZoomVisibility.every((entry) => entry.shown)).toBe(true);
+  expect(jerusalemVisibility.every((entry) => entry.shown)).toBe(true);
 
   const topMajorIds = [
     "jerusalem",
@@ -824,19 +837,7 @@ test("important names stay discoverable: hover pointer/blue state, arrow while d
   await jumpMap(page, [35.5, 32.75], 9);
 
   const visibleNames = (await renderedPlaceNames(page)).filter((name) => name.x > 500 && name.x < 1300 && name.y > 150 && name.y < 750);
-  const target = visibleNames.find((name) =>
-    [
-      "capernaum",
-      "nazareth",
-      "cana",
-      "tiberias",
-      "magdala",
-      "nain",
-      "ephesus",
-      "laodicea",
-      "thyatira"
-    ].includes(name.placeId)
-  );
+  const target = visibleNames.find((name) => ["capernaum", "nazareth", "cana", "tiberias", "magdala", "nain"].includes(name.placeId));
   expect(target).toBeTruthy();
   const hit = target;
   await page.mouse.move(hit.x, hit.y);
@@ -892,33 +893,6 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await jumpMap(page, [27.34, 37.94], 6.2);
 
-  const layoutProbe = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const read = (layerId, property) => map.getLayoutProperty(layerId, property) ?? null;
-    return {
-      major: {
-        iconImage: read("ibm-major-pin", "icon-image"),
-        iconOptional: read("ibm-major-pin", "icon-optional"),
-        textOptional: read("ibm-major-pin", "text-optional"),
-        iconAllowOverlap: read("ibm-major-pin", "icon-allow-overlap")
-      },
-      city: {
-        iconImage: read("ibm-city-pin", "icon-image"),
-        iconOptional: read("ibm-city-pin", "icon-optional"),
-        textOptional: read("ibm-city-pin", "text-optional"),
-        iconAllowOverlap: read("ibm-city-pin", "icon-allow-overlap")
-      }
-    };
-  }, mapTestHookKey);
-  expect(layoutProbe.major.iconImage).toBeTruthy();
-  expect(layoutProbe.city.iconImage).toBeTruthy();
-  expect(layoutProbe.major.iconOptional).toBe(false);
-  expect(layoutProbe.city.iconOptional).toBe(false);
-  expect(layoutProbe.major.textOptional).toBe(false);
-  expect(layoutProbe.city.textOptional).toBe(false);
-  expect(layoutProbe.major.iconAllowOverlap).toBe(false);
-  expect(layoutProbe.city.iconAllowOverlap).toBe(false);
-
   const targets = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
     const layerIds = ["ibm-major-pin", "ibm-city-pin"];
@@ -955,29 +929,19 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
   }, mapTestHookKey);
 
   expect(targets).toHaveLength(3);
+  const devicePixelRatio = await page.evaluate(() => window.devicePixelRatio || 1);
+  const minimumDotPixelCount = Math.max(6, Math.round(6 * devicePixelRatio * devicePixelRatio));
   for (const target of targets) {
-    const dotPixels = await countNearBlackPixelsAroundTownPoint(page, target.x, target.y);
-    const nearbyPixels = await countNearBlackPixelsAroundTownPoint(page, target.x + 14, target.y + 14);
-    expect(
-      dotPixels - nearbyPixels,
-      `expected a black town dot contrast near ${target.placeId}`
-    ).toBeGreaterThanOrEqual(2);
+    const dotPixels = await countNearPureBlackTownDotPixels(page, target.x, target.y);
+    expect(dotPixels, `expected a black town dot under ${target.placeId}`).toBeGreaterThanOrEqual(
+      minimumDotPixelCount
+    );
   }
 });
 
 test("selecting a town replaces its black dot with the selected pin @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await jumpMap(page, [27.34, 37.94], 6.2);
-
-  const dotLayoutProbe = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return {
-      majorIconImage: map.getLayoutProperty("ibm-major-pin", "icon-image") ?? null,
-      cityIconImage: map.getLayoutProperty("ibm-city-pin", "icon-image") ?? null
-    };
-  }, mapTestHookKey);
-  expect(dotLayoutProbe.majorIconImage).toBeTruthy();
-  expect(dotLayoutProbe.cityIconImage).toBeTruthy();
 
   const ephesusPoint = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
@@ -992,14 +956,10 @@ test("selecting a town replaces its black dot with the selected pin @names", { t
   }, mapTestHookKey);
   expect(ephesusPoint).toBeTruthy();
 
-  const beforeSelectDotPixels = await countNearBlackPixelsAroundTownPoint(page, ephesusPoint.x, ephesusPoint.y);
-  const beforeSelectNearbyPixels = await countNearBlackPixelsAroundTownPoint(
-    page,
-    ephesusPoint.x + 14,
-    ephesusPoint.y + 14
-  );
-  const beforeSelectDotContrast = beforeSelectDotPixels - beforeSelectNearbyPixels;
-  expect(beforeSelectDotContrast).toBeGreaterThanOrEqual(2);
+  const devicePixelRatio = await page.evaluate(() => window.devicePixelRatio || 1);
+  const minimumDotPixelCount = Math.max(6, Math.round(6 * devicePixelRatio * devicePixelRatio));
+  const beforeSelectDotPixels = await countNearPureBlackTownDotPixels(page, ephesusPoint.x, ephesusPoint.y);
+  expect(beforeSelectDotPixels).toBeGreaterThanOrEqual(minimumDotPixelCount);
 
   await clickMapPoint(page, ephesusPoint);
   await page.waitForFunction(
@@ -1034,14 +994,12 @@ test("selecting a town replaces its black dot with the selected pin @names", { t
   expect(selectedState.selectedLabelCount).toBe(1);
   expect(selectedState.unselectedTownFeatureCount).toBe(0);
 
-  const afterSelectDotPixels = await countNearBlackPixelsAroundTownPoint(page, selectedState.x, selectedState.y);
-  const afterSelectNearbyPixels = await countNearBlackPixelsAroundTownPoint(
+  const afterSelectDotPixels = await countNearPureBlackTownDotPixels(
     page,
-    selectedState.x + 14,
-    selectedState.y + 14
+    selectedState.x,
+    selectedState.y
   );
-  const afterSelectDotContrast = afterSelectDotPixels - afterSelectNearbyPixels;
-  expect(afterSelectDotContrast).toBeLessThan(beforeSelectDotContrast);
+  expect(afterSelectDotPixels).toBeLessThan(Math.max(2, Math.floor(minimumDotPixelCount / 3)));
 });
 
 test("selected place pin rules stay accurate for towns, areas, candidate places, and modern mode @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {

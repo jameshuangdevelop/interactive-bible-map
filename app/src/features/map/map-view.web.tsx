@@ -163,7 +163,6 @@ const routeDirectionArrowImageId = "ibm-route-direction-arrow-image";
 const selectedPlacePinImageId = "ibm-selected-place-pin-icon";
 const townDotMajorImageId = "ibm-town-dot-major";
 const townDotStandardImageId = "ibm-town-dot-standard";
-const townDotSpriteImageId = "circle_11_black";
 const mapTestHookKey = "__ibmMapForTests";
 const visibleEntryRefreshHookKey = "__ibmRefreshVisibleEntriesForTests";
 const mainSourceLoadTimeoutMs = 8_000;
@@ -1057,7 +1056,7 @@ function createTownDotImage(diameter: number) {
   const canvasSize = diameter + 2;
   return createCanvasImage(canvasSize, canvasSize, (context, width, height) => {
     context.clearRect(0, 0, width, height);
-    context.fillStyle = "#202124";
+    context.fillStyle = "#000000";
     context.beginPath();
     context.arc(width / 2, height / 2, diameter / 2, 0, Math.PI * 2);
     context.fill();
@@ -1065,17 +1064,8 @@ function createTownDotImage(diameter: number) {
 }
 
 function ensureTownDotImages(map: MapLibreMap) {
-  if (map.hasImage(townDotSpriteImageId)) {
-    return {
-      majorIconImageId: townDotSpriteImageId,
-      cityIconImageId: townDotSpriteImageId,
-      majorIconSize: 6 / 11,
-      cityIconSize: 4 / 11
-    };
-  }
-
   if (!map.hasImage(townDotMajorImageId)) {
-    const majorDot = createTownDotImage(6);
+    const majorDot = createTownDotImage(5.5);
     if (majorDot) {
       map.addImage(townDotMajorImageId, majorDot.image, { pixelRatio: majorDot.pixelRatio });
     }
@@ -1878,6 +1868,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "icon-anchor": "center",
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
+        "icon-padding": 0,
         "icon-optional": false,
         "text-field": ["get", "labelText"],
         "text-font": placeNameFontExpression,
@@ -1885,7 +1876,8 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-max-width": MAJOR_NAME_MAX_WIDTH_EM,
         "text-anchor": "bottom",
         "text-justify": "center",
-        "text-offset": [0, -0.2],
+        "text-offset": [0, -0.1],
+        "text-padding": 0,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-allow-overlap": false,
         "text-ignore-placement": false,
@@ -1948,12 +1940,14 @@ function ensureMapLayers(map: MapLibreMap) {
         "icon-anchor": "center",
         "icon-allow-overlap": false,
         "icon-ignore-placement": false,
+        "icon-padding": 0,
         "icon-optional": false,
         "text-field": ["get", "labelText"],
         "text-font": placeNameFontExpression,
         "text-size": 13,
         "text-anchor": "bottom",
         "text-offset": [0, -0.1],
+        "text-padding": 0,
         "symbol-sort-key": ["get", "labelPriority"],
         "text-allow-overlap": false,
         "text-ignore-placement": false,
@@ -2461,8 +2455,8 @@ function ensureMapLayers(map: MapLibreMap) {
   // (ADR-0035 item 4): other places; then empires, provinces and regions, our records above the
   // ancient layer's own names; then majors; then chosen-route places; then the selected place.
   const placementPriorityOrder = [
-    layerCityPinId,
     layerCityPinNoDotId,
+    layerCityPinId,
     layerSitePinId,
     layerAncientHolderLabelId,
     layerAncientHolderLabelClickableId,
@@ -2470,8 +2464,8 @@ function ensureMapLayers(map: MapLibreMap) {
     layerAreaLabelId,
     layerMajorAreaLabelOverviewId,
     layerMajorAreaLabelId,
-    layerMajorPinId,
     layerMajorPinNoDotId,
+    layerMajorPinId,
     layerRoutePriorityCityPinId,
     layerRoutePrioritySitePinId,
     layerRoutePriorityMajorPinId,
