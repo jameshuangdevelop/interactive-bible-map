@@ -941,43 +941,54 @@ async function runCtrlWheelPinchGesture(page, mapBounds) {
 
 async function runFlyToSelectionScenario(page, mapHookKey) {
   await setMapView(page, mapHookKey, { center: [35.2, 32.8], zoom: 8 });
-  await refreshVisibleEntries(page);
-  await page.waitForFunction(() => {
-    const selector =
-      "button[data-place-entry-id^='place:'],button[data-place-entry-id^='area:'],button[data-place-entry-id^='cluster:']";
-    return document.querySelectorAll(selector).length > 0;
-  }, { timeout: 20_000 });
-  await page.waitForTimeout(1_100);
-  await refreshVisibleEntries(page);
-
-  const selectedEntryId = await page.evaluate(() => {
-    const target =
-      document.querySelector("button[data-place-entry-id='place:capernaum']") ??
-      document.querySelector("button[data-place-entry-id='area:galilee']") ??
-      document.querySelector("button[data-place-entry-id^='place:']") ??
-      document.querySelector("button[data-place-entry-id^='area:']");
-    if (!(target instanceof HTMLButtonElement)) {
+  const cameraBeforeSelection = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
       return null;
     }
-
-    const entryId = target.getAttribute("data-place-entry-id");
-    target.click();
-    return entryId;
-  });
-
-  if (!selectedEntryId) {
-    throw new Error("Could not find a selectable place entry for fly-to benchmark.");
+    const center = map.getCenter();
+    return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+  }, mapHookKey);
+  if (!cameraBeforeSelection) {
+    throw new Error("Fly-to benchmark: map hook is unavailable before search selection.");
   }
+
+  const searchInput = page.getByRole("combobox", { name: "Search biblical places" });
+  await searchInput.fill("Capernaum");
+  const capernaumResult = page.getByRole("option", { name: /Capernaum/i }).first();
+  await capernaumResult.waitFor({ state: "visible", timeout: 30_000 });
+  await capernaumResult.click();
 
   await page.waitForFunction(
     () => {
       const parameters = new URLSearchParams(window.location.search.slice(1));
-      return parameters.has("place");
+      return parameters.get("place") === "capernaum";
     },
     { timeout: 30_000 }
   );
+  await page.waitForTimeout(1_000);
 
-  return selectedEntryId;
+  const cameraAfterSelection = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      return null;
+    }
+    const center = map.getCenter();
+    return { zoom: map.getZoom(), center: [center.lng, center.lat] };
+  }, mapHookKey);
+  if (!cameraAfterSelection) {
+    throw new Error("Fly-to benchmark: map hook is unavailable after search selection.");
+  }
+  if (Math.abs(cameraAfterSelection.zoom - cameraBeforeSelection.zoom) < 0.02) {
+    throw new Error(
+      `Fly-to benchmark: selecting from search should change zoom (${JSON.stringify({
+        before: cameraBeforeSelection,
+        after: cameraAfterSelection
+      })}).`
+    );
+  }
+
+  return "place:capernaum";
 }
 
 function createTileTracker(page) {

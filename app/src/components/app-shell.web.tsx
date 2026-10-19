@@ -36,7 +36,8 @@ import type {
   PinLabelSource,
   PlaceDetailsPayload,
   PlaceIndexRecord,
-  PlaceSelection
+  PlaceSelection,
+  SelectionOrigin
 } from "../features/map/types";
 import {
   loadRoutesData,
@@ -354,6 +355,7 @@ export function RouteStopDetailsPanel({
 export function AppShell() {
   const [places, setPlaces] = useState<PlaceIndexRecord[]>([]);
   const [selection, setSelection] = useState<PlaceSelection | null>(null);
+  const [selectionOrigin, setSelectionOrigin] = useState<SelectionOrigin>("url");
   const [viewTab, setViewTab] = useState<"map" | "routes">(() =>
     typeof window === "undefined" ? "map" : parseViewTabFromSearch(window.location.search)
   );
@@ -607,6 +609,7 @@ export function AppShell() {
         } else if (normalized) {
           lastSelectionActivatorEntryIdRef.current = null;
           setHighlightedPlaceId(null);
+          setSelectionOrigin("url");
           setSelection(normalized);
         }
 
@@ -861,6 +864,7 @@ export function AppShell() {
       if (!parsedSelection) {
         lastSelectionActivatorEntryIdRef.current = null;
         setHighlightedPlaceId(null);
+        setSelectionOrigin("url");
         setSelection(null);
         setStatusMessage(null);
         return;
@@ -869,6 +873,7 @@ export function AppShell() {
       if (!normalized) {
         lastSelectionActivatorEntryIdRef.current = null;
         setHighlightedPlaceId(null);
+        setSelectionOrigin("url");
         setSelection(null);
         setStatusMessage("Place not found");
         return;
@@ -877,6 +882,7 @@ export function AppShell() {
       lastSelectionActivatorEntryIdRef.current = null;
       setHighlightedPlaceId(null);
       setStatusMessage(null);
+      setSelectionOrigin("url");
       setSelection(normalized);
     };
 
@@ -887,6 +893,7 @@ export function AppShell() {
   }, [ancientTimeline, loading, placesById, urlStateReady]);
 
   const closePanel = useCallback((restoreFocus: boolean) => {
+    setSelectionOrigin("url");
     setSelection(null);
     setSelectedRouteStopId(null);
     setHighlightedPlaceId(null);
@@ -933,21 +940,28 @@ export function AppShell() {
     };
   }, [closePanel, selectedPlace, selectedRouteStopId]);
 
-  const handleSelectFromMap = useCallback((nextSelection: PlaceSelection) => {
-    setStatusMessage(null);
-    setHighlightedPlaceId(null);
-    setSelectedRouteStopId(null);
-    setSmallScreenSheetMode("collapsed");
-    setSmallScreenSheetDragHeightPx(null);
+  const handleSelectFromMap = useCallback(
+    (
+      nextSelection: PlaceSelection,
+      origin: "map-name" | "map-candidate" | "keyboard-visible-place"
+    ) => {
+      setStatusMessage(null);
+      setHighlightedPlaceId(null);
+      setSelectedRouteStopId(null);
+      setSmallScreenSheetMode("collapsed");
+      setSmallScreenSheetDragHeightPx(null);
 
-    const activeElement = document.activeElement;
-    lastSelectionActivatorEntryIdRef.current =
-      activeElement instanceof HTMLElement
-        ? activeElement.getAttribute("data-place-entry-id")
-        : null;
+      const activeElement = document.activeElement;
+      lastSelectionActivatorEntryIdRef.current =
+        activeElement instanceof HTMLElement
+          ? activeElement.getAttribute("data-place-entry-id")
+          : null;
 
-    setSelection(nextSelection);
-  }, []);
+      setSelectionOrigin(origin);
+      setSelection(nextSelection);
+    },
+    []
+  );
 
   const handlePanelSelectPlace = useCallback((nextSelection: PlaceSelection) => {
     setStatusMessage(null);
@@ -955,6 +969,7 @@ export function AppShell() {
     setSelectedRouteStopId(null);
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
+    setSelectionOrigin("panel");
     setSelection(nextSelection);
   }, []);
 
@@ -966,6 +981,7 @@ export function AppShell() {
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
     writeSelectionToUrl(nextSelection, "push");
+    setSelectionOrigin("panel-link");
     setSelection(nextSelection);
   }, []);
 
@@ -976,6 +992,7 @@ export function AppShell() {
       }
 
       setHighlightedPlaceId(null);
+      setSelectionOrigin("panel");
       setSelection({
         placeId: selection.placeId,
         candidateIndex
@@ -1000,6 +1017,7 @@ export function AppShell() {
     setSmallScreenSheetMode("collapsed");
     setSmallScreenSheetDragHeightPx(null);
     lastSelectionActivatorEntryIdRef.current = null;
+    setSelectionOrigin("search");
     setSelection(nextSelection);
   }, [viewTab]);
   const handlePanelHighlightPlace = useCallback(
@@ -1577,93 +1595,50 @@ export function AppShell() {
     if (viewTab !== "routes" || !selectedRoute) {
       return [];
     }
-    const mentionedKeyByStop = new Map<string, string>();
-    const entries = selectedRoute.stages.flatMap((stage, stageIndex) => {
-      const from = resolveRouteStop(stage.from, placesById, routeStopsById);
-      const to = resolveRouteStop(stage.to, placesById, routeStopsById);
-      const result: {
-        id: string;
-        label: string;
-        coordinates: [number, number];
-        routeId: string;
-        stageId: string;
-        stageIndex: number;
-        stopKind: "location" | "route-stop";
-        stopId: string;
-      }[] = [];
-      const pushStopEntry = (
-        resolved: RouteStopResolved,
-        role: "from" | "to" | "passed" | "also-named",
-        accessibleKindLabel = "route stop"
-      ) => {
-        if (!resolved.coordinates) {
-          return;
-        }
-        result.push({
-          id: `route-stop:${selectedRoute.route.id}:${stage.id}:${role}:${resolved.kind}:${resolved.id}:${stageIndex}:${result.length}`,
-          label: `${resolved.name}, ${accessibleKindLabel}`,
-          coordinates: resolved.coordinates,
-          routeId: selectedRoute.route.id,
-          stageId: stage.id,
-          stageIndex,
-          stopKind: resolved.kind,
-          stopId: resolved.id
-        });
-      };
-      pushStopEntry(from, "from");
-      pushStopEntry(to, "to");
-      for (const viaRef of stage.via ?? []) {
-        const via = resolveRouteStop(viaRef, placesById, routeStopsById);
-        if (via.kind !== "location") {
-          continue;
-        }
-        pushStopEntry(via, "passed", "passed place");
+    const entries: {
+      id: string;
+      label: string;
+      coordinates: [number, number];
+      routeId: string;
+      stageId: string;
+      stageIndex: number;
+      stopKind: "location" | "route-stop";
+      stopId: string;
+    }[] = [];
+    const seenStops = new Set<string>();
+    const pushStopEntry = (
+      resolved: RouteStopResolved,
+      stageId: string,
+      stageIndex: number,
+      role: "from" | "to"
+    ) => {
+      if (!resolved.coordinates) {
+        return;
       }
-      for (const mentionedRef of stage.mentioned ?? []) {
-        if (mentionedRef.kind !== "location") {
-          continue;
-        }
-        const key = `${mentionedRef.locationId ?? ""}:${mentionedRef.candidateIndex ?? ""}`;
-        if (mentionedKeyByStop.has(key)) {
-          continue;
-        }
-        mentionedKeyByStop.set(key, stage.id);
-        const mentioned = resolveRouteStop(mentionedRef, placesById, routeStopsById);
-        if (mentioned.kind !== "location") {
-          continue;
-        }
-        const alsoNamedIsRouteStop =
-          stage.from.kind === "location" && stage.from.locationId === mentioned.id
-            ? true
-            : stage.to.kind === "location" && stage.to.locationId === mentioned.id
-              ? true
-              : (stage.via ?? []).some(
-                  (viaRef) => viaRef.kind === "location" && viaRef.locationId === mentioned.id
-                );
-        if (alsoNamedIsRouteStop) {
-          continue;
-        }
-        pushStopEntry(mentioned, "also-named", "also named place");
+      const key = `${resolved.kind}:${resolved.id}`;
+      if (seenStops.has(key)) {
+        return;
       }
-      return result;
-    });
+      seenStops.add(key);
+      entries.push({
+        id: `route-stop:${selectedRoute.route.id}:${stageId}:${role}:${resolved.kind}:${resolved.id}:${stageIndex}`,
+        label: `${resolved.name}, ${resolved.kind === "location" ? "place" : "route stop"}`,
+        coordinates: resolved.coordinates,
+        routeId: selectedRoute.route.id,
+        stageId,
+        stageIndex,
+        stopKind: resolved.kind,
+        stopId: resolved.id
+      });
+    };
+
+    for (const [stageIndex, stage] of selectedRoute.stages.entries()) {
+      pushStopEntry(resolveRouteStop(stage.from, placesById, routeStopsById), stage.id, stageIndex, "from");
+      pushStopEntry(resolveRouteStop(stage.to, placesById, routeStopsById), stage.id, stageIndex, "to");
+    }
 
     return entries;
   }, [placesById, routeStopsById, selectedRoute, viewTab]);
-  const routeOverlayHiddenPlaceIdsKey = useMemo(() => {
-    if (viewTab !== "routes" || !routeMapOverlay) {
-      return "";
-    }
-    const hidden = new Set<string>();
-    for (const feature of routeMapOverlay.points.features) {
-      const properties = feature.properties;
-      if (properties.kind === "stage-pill" || properties.stopKind !== "location") {
-        continue;
-      }
-      hidden.add(properties.stopId);
-    }
-    return [...hidden].sort().join("|");
-  }, [routeMapOverlay, viewTab]);
   const selectedRouteStop =
     selectedRouteStopId && routeStopsById.has(selectedRouteStopId)
       ? routeStopsById.get(selectedRouteStopId) ?? null
@@ -1872,6 +1847,7 @@ export function AppShell() {
     setSelectedStageIndex(null);
     setHighlightedStageIndex(null);
     setSelectedRouteStopId(null);
+    setSelectionOrigin("url");
     setSelection(null);
     setStatusMessage(null);
   }, []);
@@ -1879,7 +1855,7 @@ export function AppShell() {
   const handleSelectRouteMapEntry = useCallback(
     (
       entry:
-        | { kind: "line"; routeId: string; stageId: string; stageIndex: number }
+        | { kind: "line"; routeId: string; stageId: string; stageIndex: number; origin: "map-line" }
         | {
             kind: "stop";
             routeId: string;
@@ -1887,6 +1863,7 @@ export function AppShell() {
             stageIndex: number;
             stopKind: "location" | "route-stop";
             stopId: string;
+            origin: "map-dot" | "keyboard-visible-place";
           }
     ) => {
       setViewTab("routes");
@@ -1895,8 +1872,10 @@ export function AppShell() {
       setSelectedRouteStopId(null);
       if (entry.kind === "stop") {
         if (entry.stopKind === "location") {
+          setSelectionOrigin(entry.origin);
           setSelection({ placeId: entry.stopId, candidateIndex: null });
         } else {
+          setSelectionOrigin("url");
           setSelectedRouteStopId(entry.stopId);
         }
       }
@@ -2050,8 +2029,8 @@ export function AppShell() {
             routeKeyboardEntries={routeKeyboardEntries}
             selectedRouteStopCoordinates={selectedRouteStopCoordinates}
             selectedRouteStopFocusKey={selectedRouteStopFocusKey}
-            routeOverlayHiddenPlaceIdsKey={routeOverlayHiddenPlaceIdsKey}
             routesOverlay={routeMapOverlay}
+            selectionOrigin={selectionOrigin}
             selectedTimelineStopId={
               viewTab === "routes" && selectedRouteTimelineStop
                 ? selectedRouteTimelineStop.id
@@ -2370,6 +2349,7 @@ export function AppShell() {
                 setSelectedStageIndex(null);
                 setHighlightedStageIndex(null);
                 setSelectedRouteStopId(null);
+                setSelectionOrigin("url");
                 setSelection(null);
               }}
               onHighlightStage={setHighlightedStageIndex}
@@ -2377,8 +2357,10 @@ export function AppShell() {
                 setSelectedStageIndex(stageIndex);
                 if (resolvedStop.kind === "location") {
                   setSelectedRouteStopId(null);
+                  setSelectionOrigin("route-panel-stop");
                   setSelection({ placeId: resolvedStop.id, candidateIndex: null });
                 } else {
+                  setSelectionOrigin("url");
                   setSelection(null);
                   setSelectedRouteStopId(resolvedStop.id);
                 }
@@ -2390,6 +2372,7 @@ export function AppShell() {
               onSelectRoute={handleSelectRoute}
               onSelectStage={(stageIndex) => {
                 setSelectedRouteStopId(null);
+                setSelectionOrigin("url");
                 setSelection(null);
                 setSelectedStageIndex(stageIndex);
               }}
@@ -2410,6 +2393,7 @@ export function AppShell() {
             <button
               data-back-to-route="true"
               onClick={() => {
+                setSelectionOrigin("url");
                 setSelection(null);
                 setSelectedRouteStopId(null);
                 setHighlightedPlaceId(null);

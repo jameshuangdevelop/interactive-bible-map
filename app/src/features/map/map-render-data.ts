@@ -70,6 +70,8 @@ export interface PinFeatureProperties extends BaseMapFeatureProperties {
   isDisputed: boolean;
   isSelectedPlace: boolean;
   isHighlightedPlace: boolean;
+  isInSelectedRoute: boolean;
+  showSelectionPin: boolean;
   labelText: string;
 }
 
@@ -104,6 +106,7 @@ export interface PlaceRenderData {
 interface BuildPlaceRenderDataOptions {
   includeAreaLabels?: boolean;
   pinLabelSource?: PinLabelSource;
+  routePriorityPlaceIds?: ReadonlySet<string>;
 }
 
 export interface AreaLabelSpec {
@@ -150,7 +153,14 @@ function interactionRankForPlace(place: PlaceIndexRecord) {
   return 1;
 }
 
-function getPinTierZoomRange(place: PlaceIndexRecord) {
+function getPinTierZoomRange(place: PlaceIndexRecord, showAtAnyZoom: boolean) {
+  if (showAtAnyZoom) {
+    return {
+      minZoom: 3,
+      maxZoom: mapMaxZoomExclusive
+    };
+  }
+
   if (isSiteTier(place)) {
     return {
       minZoom: 12,
@@ -262,7 +272,8 @@ function toPinFeature({
   importanceRank,
   selected,
   highlighted,
-  coordinates
+  coordinates,
+  inSelectedRoute
 }: {
   place: PlaceIndexRecord;
   placeName: string;
@@ -270,9 +281,11 @@ function toPinFeature({
   selected: boolean;
   highlighted: boolean;
   coordinates: Coordinates;
+  inSelectedRoute: boolean;
 }): PinFeature {
-  const zoomRange = getPinTierZoomRange(place);
+  const zoomRange = getPinTierZoomRange(place, inSelectedRoute);
   const hasMultipleCandidates = place.candidates.length > 1;
+  const showSelectionPin = selected && !hasMultipleCandidates && !isAreaLabelPlace(place);
 
   return {
     type: "Feature",
@@ -298,6 +311,8 @@ function toPinFeature({
       isDisputed: hasMultipleCandidates ? isDisputedPlace(place) : false,
       isSelectedPlace: selected,
       isHighlightedPlace: highlighted,
+      isInSelectedRoute: inSelectedRoute,
+      showSelectionPin,
       labelText: placeName
     }
   };
@@ -325,7 +340,7 @@ function toCandidateFeature({
     typeof selection?.candidateIndex === "number" &&
     selection.candidateIndex === candidateIndex;
   const candidateLetter = candidateIndexToLetter(candidateIndex);
-  const zoomRange = getPinTierZoomRange(place);
+  const zoomRange = getPinTierZoomRange(place, false);
   const pinColor = placePinColor(place);
   const highlightedCandidate = highlighted && !selectedCandidate;
 
@@ -431,6 +446,7 @@ export function buildPlaceRenderData(
 
   const includeAreaLabels = options.includeAreaLabels ?? true;
   const pinLabelSource = options.pinLabelSource ?? "biblical";
+  const routePriorityPlaceIds = options.routePriorityPlaceIds ?? new Set<string>();
 
   sortedPlaces.forEach((place, importanceRank) => {
     if (place.candidates.length === 0) {
@@ -440,6 +456,7 @@ export function buildPlaceRenderData(
     const placeName = getPrimaryPlaceName(place, pinLabelSource);
     const selectedPlace = selection?.placeId === place.id;
     const highlightedPlace = highlightedPlaceId === place.id;
+    const inSelectedRoute = routePriorityPlaceIds.has(place.id);
 
     if (includeAreaLabels && isAreaLabelPlace(place)) {
       areaLabels.features.push(
@@ -479,7 +496,8 @@ export function buildPlaceRenderData(
       importanceRank,
       selected: selectedPlace,
       highlighted: highlightedPlace,
-      coordinates: toCoordinates(place, 0)
+      coordinates: toCoordinates(place, 0),
+      inSelectedRoute
     });
 
     if (isSiteTier(place)) {
