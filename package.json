@@ -34,7 +34,8 @@
     "test:app": "npm run test --workspace interactive-bible-map-app",
     "test:all": "npm test && npm run test:app",
     "export:web": "node scripts/export-web.mjs",
-    "verify:web:playwright": "node scripts/verify-web-export-playwright.mjs",
+    "verify:web:playwright": "playwright test",
+    "test:browser:gpu": "playwright test --grep @perf --headed --workers=1 --retries=0 --max-failures=1",
     "verify:web:smoke": "node scripts/verify-web-smoke-playwright.mjs",
     "verify:web:axe": "node scripts/verify-web-axe-playwright.mjs",
     "verify:web:lighthouse": "node scripts/verify-web-lighthouse.mjs",
@@ -50,6 +51,7 @@
     "topojson-simplify": "3.0.3"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@axe-core/playwright": "4.11.0",
     "fflate": "0.8.2",
     "lighthouse": "^12.8.2",

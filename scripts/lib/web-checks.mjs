@@ -243,7 +243,6 @@ export async function withResolvedBaseUrl(task, options = {}) {
 
 export async function waitForMapToSettle(page, options = {}) {
   const timeout = options.timeoutMs ?? 60_000;
-  const settleDelayMs = options.settleDelayMs ?? 1_000;
   const mapTestHookKey = options.mapTestHookKey ?? "__ibmMapForTests";
 
   await page.waitForSelector("canvas.maplibregl-canvas", { timeout });
@@ -260,5 +259,8 @@ export async function waitForMapToSettle(page, options = {}) {
     mapTestHookKey,
     { timeout, polling: 250 }
   );
-  await page.waitForTimeout(settleDelayMs);
+  await page.evaluate(async () => {
+    await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+  });
 }
