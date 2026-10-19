@@ -263,6 +263,7 @@ const holderLabelBaseFilter = [
   ["==", ["get", "clickable"], true],
   [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
 ];
+const politicalUnitAreaTypes = new Set(["province", "kingdom", "tetrarchy"]);
 const areaLabelTextFontExpression = toExpression([
   "literal",
   ["Noto Sans Bold"]
@@ -2852,13 +2853,20 @@ export function MapView({
     if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
       return null;
     }
-    if (!selectedPlace.politicalAreaId || selectedPlace.politicalAreaId !== selectedPlace.id) {
+    const politicalAreaId = selectedPlace.politicalAreaId;
+    if (!politicalAreaId) {
+      return null;
+    }
+    const placeType = selectedPlace.type as string;
+    const shouldHighlightPoliticalArea =
+      politicalUnitAreaTypes.has(placeType) || politicalAreaId === selectedPlace.id;
+    if (!shouldHighlightPoliticalArea) {
       return null;
     }
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
       stopPayload: selectedAncientStopPayload,
-      politicalAreaId: selectedPlace.id
+      politicalAreaId
     });
   }, [ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
   const selectedRegionSourceSyncKey = useMemo(() => {
