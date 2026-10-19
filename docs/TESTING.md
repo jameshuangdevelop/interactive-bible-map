@@ -46,6 +46,8 @@ The target for a PR's wall time is **under 10 minutes.** A newer push to the sam
 - A browser shard stops after 5 failures. The shard matrix doesn't cancel sibling shards, so one run shows every failing area at once.
 - Browser actions and waits without their own timeout fail fast at 15 s (`use.actionTimeout`).
 - Browser navigations and page-load waits without their own timeout fail at 30 s (`use.navigationTimeout`).
+- A visual-state test (hover colour, selected colour, highlight) must assert rendered output: pixels in a small clip around the target, or rendered features.
+- A paint-expression string or a feature-state value alone is not enough: those can pass while nothing changes on screen (as in #81's string-id-to-0 regression).
 - No fixed sleeps longer than 0.5 s. Wait for a condition instead: the map's `idle`, a URL change, a visible element.
 
 ## 4. Flaky tests
