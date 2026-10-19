@@ -472,8 +472,8 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
      This amends ADR-0042 item 2, under which a place drawn as one of the route's dots wasn't drawn again with its own name.
   7. **Modern borders are drawn the way Google Maps' default (international) view draws them.** Every country border is drawn: solid grey where it isn't disputed, and dashed grey where it is. No mask hides lines.
      - This applies everywhere on the modern map, including Kosovo–Serbia, Northern Cyprus, Western Sahara, Crimea, Abkhazia and South Ossetia, and Israel, the West Bank, Gaza and the Golan Heights. That reach is the PO's reading of "do what google maps does"; the human confirms it at the play-test.
-     - Whether a line counts as disputed follows the data's own flags: OpenMapTiles' `disputed` and Natural Earth's line classes. The Fact-Checker checks them against Google Maps' international view and the UN's maps.
-     - The modern map's notice says that a dashed line marks a disputed border, and that it isn't a claim about where a border runs or who governs a place.
+     - Whether a line counts as disputed follows the data's flags, plus the per-case rules listed in the build script's rule table, each checked by the Fact-Checker against Google Maps' international view and the UN's maps.
+     - The modern map's notice says: "Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place."
 
      This supersedes the parts of ADR-0009, ADR-0022 and ADR-0037 item 4 that hide disputed borders, and M4-04's masks.
   8. **Ancient borders are drawn the same way.**

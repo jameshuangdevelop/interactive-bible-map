@@ -970,7 +970,13 @@ function buildTopologyFeatureCollection(areaFeatureCollection, simplifyThreshold
   };
 }
 
-function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, majorPlacePinCoordinates }) {
+function buildHolderLabelPoints({
+  assignments,
+  areaFeatureById,
+  entitiesById,
+  areasById,
+  majorPlacePinCoordinates
+}) {
   const holderPieces = new Map();
 
   for (const assignment of assignments) {
@@ -1021,9 +1027,43 @@ function buildHolderLabelPoints({ assignments, areaFeatureById, entitiesById, ma
       0
     );
     const minimumPieceArea = largestPieceArea / 3;
+    const inferredNamesakeAreaId = (() => {
+      if (holderId.startsWith("roman-province-")) {
+        return holderId.slice("roman-province-".length);
+      }
+      if (holderId.endsWith("-kingdom")) {
+        return holderId.slice(0, -"-kingdom".length);
+      }
+      if (holderId.endsWith("-tetrarchy")) {
+        return holderId.slice(0, -"-tetrarchy".length);
+      }
+      if (holderId.endsWith("-ethnarchy")) {
+        return holderId.slice(0, -"-ethnarchy".length);
+      }
+      return null;
+    })();
+    const namesakeAreaIds = new Set();
+    if (typeof holder.locationId === "string" && holder.locationId.length > 0) {
+      namesakeAreaIds.add(holder.locationId);
+      for (const piece of pieces) {
+        if (areasById?.get(piece.areaId)?.locationId === holder.locationId) {
+          namesakeAreaIds.add(piece.areaId);
+        }
+      }
+    }
+    if (typeof inferredNamesakeAreaId === "string" && inferredNamesakeAreaId.length > 0) {
+      namesakeAreaIds.add(inferredNamesakeAreaId);
+    }
+    const namesakePiece = pieces
+      .filter((piece) => namesakeAreaIds.has(piece.areaId))
+      .sort((left, right) => right.area - left.area)[0];
 
     for (const piece of pieces) {
-      if (!piece?.polygon || piece.area < minimumPieceArea) {
+      if (!piece?.polygon) {
+        continue;
+      }
+      const keepSmallNamesakePiece = namesakePiece === piece;
+      if (piece.area < minimumPieceArea && !keepSmallNamesakePiece) {
         continue;
       }
 
@@ -1426,6 +1466,7 @@ export async function buildAncientAppData({
       assignments,
       areaFeatureById,
       entitiesById,
+      areasById,
       majorPlacePinCoordinates
     });
     const areaLabelMinZoomByAreaId = buildAreaLabelMinZoomByAreaId(assignments, holderLabels);

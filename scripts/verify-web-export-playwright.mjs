@@ -4465,8 +4465,16 @@ async function verifyModernBoundaryRenderingByDispute(page, baseUrl) {
     throw new Error("Expected at least one dashed Levant disputed line at zoom 8.");
   }
 
+  const anatoliaZoom6 = await inspectViewport([35.0, 39.0], 6);
+  const hasAdminLevel3FromTiles = [...anatoliaZoom6.dashedProperties, ...anatoliaZoom6.solidProperties].some(
+    (properties) => Number(properties.admin_level ?? 0) === 3
+  );
+  if (hasAdminLevel3FromTiles) {
+    throw new Error("Unexpected admin-level-3 tile boundary rendered in central Anatolia at zoom 6.");
+  }
+
   return {
-    checkedViewports: 3,
+    checkedViewports: 4,
     balkansDashedFeatureCount: balkans.dashedProperties.length,
     levantDashedFeatureCountZoom65: levantZoom65.dashedProperties.length,
     levantDashedFeatureCountZoom8: levantZoom8.dashedProperties.length

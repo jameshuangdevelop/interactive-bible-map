@@ -128,10 +128,10 @@ On the ancient map only, drawn under our places' names, for the year the timelin
   - every country border is drawn, solid grey (Liberty's country border, `hsl(248, 1%, 41%)`) where it isn't disputed;
   - dashed grey (the same colour and width, dashed `[4, 2]`) where it is, for example Kosovo–Serbia, the West Bank's and Gaza's lines, the Golan Heights, Northern Cyprus, Western Sahara and Crimea;
   - no mask hides lines;
-  - whether a line counts as disputed follows the data's own flags, checked by the Fact-Checker;
-  - the modern map's notice says that a dashed line marks a disputed border and isn't a claim about where a border runs or who governs a place.
+  - whether a line counts as disputed follows the data's flags, plus the per-case rules listed in the build script's rule table, each checked by the Fact-Checker;
+  - the modern map's notice says: "Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place."
 
-  Below zoom 5, and in the fallback, the country borders come from Natural Earth, with its disputed, indefinite and line-of-control classes dashed. Its zoom range is the same as the ancient map's. The fallback is VersaTiles Colorful, given the same treatment.
+  Below zoom 5, and in the fallback, the country borders come from Natural Earth, with its disputed, indefinite, indeterminate-frontier and line-of-control classes dashed. Its zoom range is the same as the ancient map's. The fallback is VersaTiles Colorful, given the same treatment.
 - **Our places aren't drawn on the modern map:** no names, no dots and no candidate sites (ADR-0043 item 7, which supersedes ADR-0037 item 4). The area names, the ancient layer and the timeline are hidden too. A selected place keeps its pin, without its name, so the reader can see where it lies today (ADR-0044 item 3). To compare ancient and modern, the reader switches maps, and the camera stays put.
 - **The panel** is the same on both maps.
 - **The toggle:** a two-part control, "Ancient | Modern", 40 px tall, on the panel's white surface and shadow; the selected part is filled with the accent colour, with white text. Switching keeps the camera and the selected place. The URL keeps the choice (§10).

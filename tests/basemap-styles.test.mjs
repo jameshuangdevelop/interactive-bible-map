@@ -166,6 +166,56 @@ function classOpacityByName(matchExpression, description) {
   return opacities;
 }
 
+function evaluateStyleExpression(expression, properties) {
+  if (!Array.isArray(expression)) {
+    return expression;
+  }
+
+  const [operator, ...argumentsList] = expression;
+  switch (operator) {
+    case "all":
+      return argumentsList.every((entry) => Boolean(evaluateStyleExpression(entry, properties)));
+    case "any":
+      return argumentsList.some((entry) => Boolean(evaluateStyleExpression(entry, properties)));
+    case "!":
+      return !Boolean(evaluateStyleExpression(argumentsList[0], properties));
+    case "==":
+      return (
+        evaluateStyleExpression(argumentsList[0], properties) ===
+        evaluateStyleExpression(argumentsList[1], properties)
+      );
+    case "!=":
+      return (
+        evaluateStyleExpression(argumentsList[0], properties) !==
+        evaluateStyleExpression(argumentsList[1], properties)
+      );
+    case "in": {
+      const needle = evaluateStyleExpression(argumentsList[0], properties);
+      const haystack = evaluateStyleExpression(argumentsList[1], properties);
+      return Array.isArray(haystack) ? haystack.includes(needle) : false;
+    }
+    case "get":
+      return properties[argumentsList[0]];
+    case "has":
+      return Object.prototype.hasOwnProperty.call(properties, argumentsList[0]);
+    case "coalesce": {
+      for (const entry of argumentsList) {
+        const value = evaluateStyleExpression(entry, properties);
+        if (value !== null && value !== undefined) {
+          return value;
+        }
+      }
+      return null;
+    }
+    case "literal":
+      return argumentsList[0];
+    case "to-string":
+      return String(evaluateStyleExpression(argumentsList[0], properties));
+    default:
+      throw new Error(`Unsupported expression operator in test evaluator: ${String(operator)}`);
+  }
+}
+
 function assertLibertyMergedLandcover(style) {
   const layer = style.layers.find((candidate) => candidate.id === "landcover");
   assert.ok(layer, "Liberty style must include merged landcover layer");
@@ -679,7 +729,7 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   );
   assert.equal(
     style.metadata["interactive-bible-map:license"].includes(
-      "Disputed borders are drawn as dashed lines, as Google Maps' default view draws them."
+      "Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view."
     ),
     true
   );
@@ -712,6 +762,50 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     libertyDisputedBoundaryLayer.paint?.["line-color"],
     "hsl(248, 1%, 41%)",
     "Liberty modern disputed boundaries must use the shared disputed color"
+  );
+  const libertyCrimeaSupplementLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-boundary-disputed-crimea-isthmus-natural-earth-overlay"
+  );
+  assert.ok(
+    libertyCrimeaSupplementLayer,
+    "Liberty modern must include the supplemental Crimea isthmus disputed layer"
+  );
+  assert.deepEqual(
+    libertyCrimeaSupplementLayer.paint?.["line-dasharray"],
+    [4, 2],
+    "Liberty modern Crimea supplemental disputed layer must use [4,2] dash"
+  );
+  assert.equal(
+    libertyCrimeaSupplementLayer.paint?.["line-color"],
+    "hsl(248, 1%, 41%)",
+    "Liberty modern Crimea supplemental disputed layer must use the shared disputed color"
+  );
+  const maritimeDisputedFilterMatch = evaluateStyleExpression(
+    libertyDisputedBoundaryLayer.filter,
+    {
+      admin_level: 2,
+      disputed: 1,
+      maritime: 1,
+      claimed_by: "UA"
+    }
+  );
+  assert.equal(
+    maritimeDisputedFilterMatch,
+    false,
+    "Liberty modern disputed-layer filter must reject maritime boundaries"
+  );
+  const anatoliaAdminLevel3Match = evaluateStyleExpression(
+    libertyDisputedBoundaryLayer.filter,
+    {
+      admin_level: 3,
+      disputed: 0,
+      maritime: 0
+    }
+  );
+  assert.equal(
+    anatoliaAdminLevel3Match,
+    false,
+    "Liberty modern disputed-layer filter must not match generic admin-level-3 lines"
   );
   const neutralBoundaryLayer = style.layers.find(
     (layer) => layer.id === "ibm-modern-neutral-boundary-solid"
@@ -751,7 +845,7 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   );
   assert.equal(
     style.metadata["interactive-bible-map:notice"].includes(
-      "Disputed borders are drawn as dashed lines, as Google Maps' default view draws them."
+      "Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view."
     ),
     true
   );

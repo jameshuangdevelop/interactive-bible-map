@@ -912,11 +912,14 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
         );
         assert.ok(italyLabelAt30, "expected Italy holder label at AD 30");
         assert.equal(italyLabelAt30.labelText, "ITALY");
+        const commageneHolderIdAt30 = stopAt30.areas.find((area) => area.areaId === "commagene")?.holderId;
         const commageneLabelAt30 = stopAt30.holderLabels.find(
-          (label) =>
-            label.holderId === stopAt30.areas.find((area) => area.areaId === "commagene")?.holderId
+          (label) => label.holderId === commageneHolderIdAt30 && label.areaId === "commagene"
         );
-        assert.ok(commageneLabelAt30);
+        assert.ok(
+          commageneLabelAt30,
+          "Expected Commagene holder label to be kept on the Commagene namesake area."
+        );
         assert.ok(commageneLabelAt30.minZoom > 5, "Commagene label should be hidden at zoom 5.");
         const galileeTouchingBordersAt30 = stopAt30.holderBorders.features.filter(
           (feature) =>

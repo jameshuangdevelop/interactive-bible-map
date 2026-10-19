@@ -11,7 +11,7 @@ Modifications in this copy:
 - Remove detail layers for smooth dragging: 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels
 - Remove the tiles' boundary lines, including maritime boundaries
 - Draw the country borders at every zoom from Natural Earth's boundary lines (public domain), simplified
-- Disputed borders are drawn as dashed lines, as Google Maps' default view draws them. A dashed line marks a border that is disputed; it is not a claim about where a border runs or who governs a place.
+- Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place.
 - Max zoom set to 14
 
 Attribution string used in the vector source:
