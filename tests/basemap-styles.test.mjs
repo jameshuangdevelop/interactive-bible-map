@@ -52,32 +52,7 @@ const sharedModernNeutralBoundaryGeoJsonPath = path.join(
   "shared",
   "modern-neutral-boundaries.geojson"
 );
-const sharedModernNeutralBoundaryMasksGeoJsonPath = path.join(
-  repositoryRoot,
-  "app",
-  "public",
-  "styles",
-  "shared",
-  "modern-neutral-boundary-masks.geojson"
-);
-const modernBoundaryFilterFixturePath = path.join(
-  repositoryRoot,
-  "tests",
-  "fixtures",
-  "modern-boundary-filter-fixture.json"
-);
-const expectedHiddenBoundaryPairs = [
-  "ARM|AZE",
-  "CYP|XNC",
-  "ESH|MAR",
-  "GEO|RUS",
-  "ISR|PSE",
-  "SRB|XKK"
-];
-const expectedHiddenNeIdsForSharedPairs = new Map([
-  ["ARM|AZE", new Set([1746705689, 1746705697, 1746706155, 1746706169])],
-  ["GEO|RUS", new Set([1746705547])]
-]);
+const buildBasemapStylesScriptPath = path.join(repositoryRoot, "scripts", "build-basemap-styles.mjs");
 
 const libertyAllowedLayerIds = new Set([
   "background",
@@ -140,6 +115,47 @@ const removedSourceLayers = new Set([
 
 async function readStyle(stylePath) {
   return JSON.parse(await fs.readFile(stylePath, "utf8"));
+}
+
+async function loadBuildBasemapStylesTestOnly() {
+  const module = await import(pathToFileURL(buildBasemapStylesScriptPath).href);
+  return module.__testOnly;
+}
+
+let maplibreFeatureFilterPromise;
+async function getMapLibreFeatureFilter() {
+  if (!maplibreFeatureFilterPromise) {
+    const maplibreStyleSpecPath = path.join(
+      repositoryRoot,
+      "node_modules",
+      "@maplibre",
+      "maplibre-gl-style-spec",
+      "dist",
+      "index.mjs"
+    );
+    maplibreFeatureFilterPromise = import(pathToFileURL(maplibreStyleSpecPath).href).then(
+      (module) => module.featureFilter
+    );
+  }
+  return maplibreFeatureFilterPromise;
+}
+
+async function compileMapLibreFilter(filterExpression, contextLabel) {
+  const featureFilter = await getMapLibreFeatureFilter();
+  return featureFilter(filterExpression, contextLabel, {});
+}
+
+function evaluateCompiledMapLibreFilter(compiledFilter, properties, zoom = 6) {
+  return compiledFilter.filter(
+    { zoom },
+    {
+      type: 1,
+      properties,
+      geometry: [[{ x: 0, y: 0 }]],
+      id: 1
+    },
+    { z: zoom, x: 0, y: 0 }
+  );
 }
 
 function assertNoSymbolLayers(style, styleName) {
@@ -430,15 +446,7 @@ function assertLibertyModernLabels(style) {
 }
 
 async function assertNoStateOrProvinceLabelsAcrossZooms(style, styleName) {
-  const maplibreStyleSpecPath = path.join(
-    repositoryRoot,
-    "node_modules",
-    "@maplibre",
-    "maplibre-gl-style-spec",
-    "dist",
-    "index.mjs"
-  );
-  const { featureFilter } = await import(pathToFileURL(maplibreStyleSpecPath).href);
+  const featureFilter = await getMapLibreFeatureFilter();
   for (const [layerIndex, layer] of style.layers.entries()) {
     if (layer.type !== "symbol") {
       continue;
@@ -575,26 +583,6 @@ function assertNoForbiddenModernNameFallbacks(style, styleName, allowedNameField
   }
 }
 
-function assertNoDisputedBoundaryFilters(style, styleName) {
-  for (const layer of style.layers) {
-    if (layer["source-layer"] !== "boundaries" && layer["source-layer"] !== "boundary_labels") {
-      continue;
-    }
-
-    const filterText = JSON.stringify(layer.filter ?? []);
-    assert.equal(
-      filterText.includes("\"disputed\""),
-      true,
-      `${styleName} boundary layer '${layer.id}' must include a disputed filter guard`
-    );
-    assert.equal(
-      filterText.includes('"==",["get","disputed"],true'),
-      false,
-      `${styleName} boundary layer '${layer.id}' must not include disputed=true branch`
-    );
-  }
-}
-
 function expressionContainsOperator(expression, operator) {
   if (!Array.isArray(expression)) {
     return false;
@@ -605,89 +593,6 @@ function expressionContainsOperator(expression, operator) {
   }
 
   return expression.some((entry) => expressionContainsOperator(entry, operator));
-}
-
-function expressionContainsString(expression, target) {
-  if (typeof expression === "string") {
-    return expression === target;
-  }
-  if (!Array.isArray(expression)) {
-    return false;
-  }
-  return expression.some((entry) => expressionContainsString(entry, target));
-}
-
-function canonicalPair(leftCode, rightCode) {
-  return [leftCode, rightCode].sort().join("|");
-}
-
-function collectAdm0PairExclusionsFromFilter(filterExpression, pairs = []) {
-  if (!Array.isArray(filterExpression)) {
-    return pairs;
-  }
-  if (
-    filterExpression.length === 2 &&
-    filterExpression[0] === "!" &&
-    Array.isArray(filterExpression[1]) &&
-    filterExpression[1][0] === "any"
-  ) {
-    const [first, second] = filterExpression[1].slice(1);
-    if (
-      Array.isArray(first) &&
-      first[0] === "all" &&
-      Array.isArray(second) &&
-      second[0] === "all"
-    ) {
-      const firstLeft = first?.[1]?.[2];
-      const firstRight = first?.[2]?.[2];
-      const secondLeft = second?.[1]?.[2];
-      const secondRight = second?.[2]?.[2];
-      if (
-        typeof firstLeft === "string" &&
-        typeof firstRight === "string" &&
-        typeof secondLeft === "string" &&
-        typeof secondRight === "string" &&
-        firstLeft === secondRight &&
-        firstRight === secondLeft
-      ) {
-        pairs.push(canonicalPair(firstLeft, firstRight));
-      }
-    }
-  }
-  for (const entry of filterExpression) {
-    collectAdm0PairExclusionsFromFilter(entry, pairs);
-  }
-  return pairs;
-}
-
-function pointInRing(point, ring) {
-  let intersects = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {
-    const [xi, yi] = ring[i];
-    const [xj, yj] = ring[j];
-    const intersectsHorizontal = yi > point[1] !== yj > point[1];
-    if (!intersectsHorizontal) {
-      continue;
-    }
-    const x = ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi;
-    if (point[0] < x) {
-      intersects = !intersects;
-    }
-  }
-  return intersects;
-}
-
-function isPointStrictlyInsidePolygon(point, polygonCoordinates) {
-  const [outerRing, ...holes] = polygonCoordinates;
-  if (!outerRing || !pointInRing(point, outerRing)) {
-    return false;
-  }
-  for (const hole of holes) {
-    if (pointInRing(point, hole)) {
-      return false;
-    }
-  }
-  return true;
 }
 
 function collectAdminLevelChecks(filter, levels = []) {
@@ -741,8 +646,11 @@ function assertOnlyCountryBoundaryLayers(style, styleName) {
     }
 
     for (const value of adminLevels) {
+      // Disputed layer may include admin_level=3 for explicit policy exceptions (for example Cyprus).
+      const isDisputedAdminLevel3Exception =
+        layer.id === "ibm-modern-boundary-disputed" && (value === 3 || value === "3");
       assert.equal(
-        value === 2 || value === "2",
+        value === 2 || value === "2" || isDisputedAdminLevel3Exception,
         true,
         `${styleName} boundary layer '${layer.id}' must only target admin level 2, got '${value}'`
       );
@@ -805,8 +713,10 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     "Interactive Bible Map modern basemap (modified from OpenFreeMap Liberty)"
   );
   assert.equal(
-    style.metadata["interactive-bible-map:license"],
-    "Modified by Interactive Bible Map from OpenFreeMap Liberty (https://github.com/hyperknot/openfreemap-styles/tree/main/styles/liberty), a fork of OSM Liberty (https://github.com/maputnik/osm-liberty), derived from OSM Bright (OpenMapTiles) and Mapbox Open Styles. Changes: modern-map treatment. Labels are in English only (the English name, or else the name in Latin script). Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, and runway/taxiway layers are removed. Only country borders are drawn: from zoom 5 the tiles' own lines, and below zoom 5 Natural Earth's boundary lines, simplified. Lines the data marks as disputed are not drawn. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14. Style code: BSD 3-Clause (Copyright (c) 2014, Mapbox) and MIT (Copyright (c) 2023 Zsolt Ero). Style design: CC BY 3.0 (Mapbox Open Styles) and CC BY 4.0 (OpenMapTiles). Map data: OpenStreetMap contributors, ODbL 1.0. Country borders below zoom 5: Natural Earth (https://www.naturalearthdata.com/), public domain. Full notices and disclaimers: LICENSE.txt in the same folder as this file."
+    style.metadata["interactive-bible-map:license"].includes(
+      "Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view."
+    ),
+    true
   );
   assert.equal(style.sources.openmaptiles.attribution, libertyAttribution);
   assertLayerMissing(style, "boundary_disputed", "Liberty modern");
@@ -821,23 +731,154 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
   assert.equal(libertyBoundary2Layer.minzoom, 5, "Liberty modern boundary_2 must start at zoom 5");
   assert.equal(
     expressionContainsOperator(libertyBoundary2Layer.filter ?? [], "within"),
-    true,
-    "Liberty modern boundary_2 filter must include a contested-area mask with within"
+    false,
+    "Liberty modern boundary_2 filter must not include contested-area within masks"
+  );
+  const libertyDisputedBoundaryLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-boundary-disputed"
+  );
+  assert.ok(libertyDisputedBoundaryLayer, "Liberty modern must include disputed boundary layer");
+  assert.deepEqual(
+    libertyDisputedBoundaryLayer.paint?.["line-dasharray"],
+    [4, 2],
+    "Liberty modern disputed boundaries must use [4,2] dash"
   );
   assert.equal(
-    expressionContainsString(libertyBoundary2Layer.filter ?? [], "adm0_l"),
-    true,
-    "Liberty modern boundary_2 filter must include adm0_l checks"
+    libertyDisputedBoundaryLayer.paint?.["line-color"],
+    "hsl(248, 1%, 41%)",
+    "Liberty modern disputed boundaries must use the shared disputed color"
+  );
+  const compiledDisputedFilter = await compileMapLibreFilter(
+    libertyDisputedBoundaryLayer.filter,
+    "liberty-modern-disputed-filter"
+  );
+  const compiledSolidFilter = await compileMapLibreFilter(
+    libertyBoundary2Layer.filter,
+    "liberty-modern-solid-filter"
+  );
+  const libertyCrimeaSupplementLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-boundary-disputed-crimea-isthmus-natural-earth-overlay"
+  );
+  assert.ok(
+    libertyCrimeaSupplementLayer,
+    "Liberty modern must include the supplemental Crimea isthmus disputed layer"
+  );
+  assert.deepEqual(
+    libertyCrimeaSupplementLayer.paint?.["line-dasharray"],
+    [4, 2],
+    "Liberty modern Crimea supplemental disputed layer must use [4,2] dash"
   );
   assert.equal(
-    expressionContainsString(libertyBoundary2Layer.filter ?? [], "adm0_r"),
+    libertyCrimeaSupplementLayer.paint?.["line-color"],
+    "hsl(248, 1%, 41%)",
+    "Liberty modern Crimea supplemental disputed layer must use the shared disputed color"
+  );
+  const undisputedLandPairProperties = {
+    admin_level: 2,
+    disputed: 0,
+    maritime: 0,
+    adm0_l: "ALB",
+    adm0_r: "MKD"
+  };
+  const disputedLandPairProperties = {
+    admin_level: 2,
+    disputed: 1,
+    maritime: 0,
+    adm0_l: "AAA",
+    adm0_r: "BBB",
+    disputed_name: "Synthetic disputed line"
+  };
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledSolidFilter, undisputedLandPairProperties),
     true,
-    "Liberty modern boundary_2 filter must include adm0_r checks"
+    "Liberty modern solid-layer filter must match a normal undisputed admin-level-2 land pair"
+  );
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledDisputedFilter, undisputedLandPairProperties),
+    false,
+    "Liberty modern disputed-layer filter must reject a normal undisputed admin-level-2 land pair"
+  );
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledDisputedFilter, disputedLandPairProperties),
+    true,
+    "Liberty modern disputed-layer filter must match a disputed admin-level-2 land pair"
+  );
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledSolidFilter, disputedLandPairProperties),
+    false,
+    "Liberty modern solid-layer filter must reject a disputed admin-level-2 land pair"
+  );
+
+  const maritimeDisputedFilterMatch = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
+    {
+      ...disputedLandPairProperties,
+      maritime: 1,
+      claimed_by: "UA"
+    }
+  );
+  assert.equal(
+    maritimeDisputedFilterMatch,
+    false,
+    "Liberty modern disputed-layer filter must reject maritime boundaries"
+  );
+  const anatoliaAdminLevel3Match = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
+    {
+      admin_level: 3,
+      disputed: 0,
+      maritime: 0
+    }
+  );
+  assert.equal(
+    anatoliaAdminLevel3Match,
+    false,
+    "Liberty modern disputed-layer filter must not match generic admin-level-3 lines"
+  );
+  const moroccanBermNamedMatch = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
+    {
+      admin_level: 2,
+      maritime: 0,
+      disputed: 1,
+      disputed_name: "Murdesécuritémarocainالجدارالأمنيالمغربي",
+      adm0_l: "MAR",
+      adm0_r: "ESH"
+    }
+  );
+  assert.equal(
+    moroccanBermNamedMatch,
+    false,
+    "Liberty modern disputed-layer filter must hide the Moroccan berm tile feature"
+  );
+  const moroccanBermUnnamedStubMatch = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
+    {
+      admin_level: 2,
+      maritime: 0,
+      disputed: 1,
+      disputed_name: "",
+      claimed_by: "",
+      adm0_l: "MAR",
+      adm0_r: "ESH"
+    }
+  );
+  assert.equal(
+    moroccanBermUnnamedStubMatch,
+    false,
+    "Liberty modern disputed-layer filter must hide unnamed Moroccan berm stubs"
   );
   const neutralBoundaryLayer = style.layers.find(
-    (layer) => layer.id === "ibm-modern-neutral-boundary"
+    (layer) => layer.id === "ibm-modern-neutral-boundary-solid"
   );
-  assert.ok(neutralBoundaryLayer, "Liberty modern must include low-zoom Natural Earth boundary layer");
+  assert.ok(neutralBoundaryLayer, "Liberty modern must include low-zoom Natural Earth solid layer");
+  const neutralBoundaryDisputedLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-neutral-boundary-disputed"
+  );
+  assert.ok(
+    neutralBoundaryDisputedLayer,
+    "Liberty modern must include low-zoom Natural Earth disputed layer"
+  );
   assert.equal(
     neutralBoundaryLayer.source,
     "ibm-modern-neutral-boundaries",
@@ -864,8 +905,10 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
     "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)"
   );
   assert.equal(
-    style.metadata["interactive-bible-map:notice"],
-    "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
+    style.metadata["interactive-bible-map:notice"].includes(
+      "Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view."
+    ),
+    true
   );
   assertLayerMissing(style, "boundary-country-disputed", "VersaTiles modern");
   assertLayerMissing(style, "boundary-state:outline", "VersaTiles modern");
@@ -879,13 +922,19 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
   assertNoLayerIdsMatching(style, /^poi-/u, "VersaTiles modern", "POI layers");
   assertLayerMissing(style, "symbol-transit-airfield", "VersaTiles modern");
   assertLayerMissing(style, "symbol-transit-airport", "VersaTiles modern");
-  assertNoDisputedBoundaryFilters(style, "VersaTiles modern");
   assertVersaTilesModernNameFields(style);
   assertOnlyCountryBoundaryLayers(style, "VersaTiles modern");
   const neutralBoundaryLayer = style.layers.find(
-    (layer) => layer.id === "ibm-modern-neutral-boundary-fallback"
+    (layer) => layer.id === "ibm-modern-neutral-boundary-fallback-solid"
   );
-  assert.ok(neutralBoundaryLayer, "VersaTiles modern must include Natural Earth boundary layer");
+  assert.ok(neutralBoundaryLayer, "VersaTiles modern must include Natural Earth solid boundary layer");
+  const neutralBoundaryDisputedLayer = style.layers.find(
+    (layer) => layer.id === "ibm-modern-neutral-boundary-fallback-disputed"
+  );
+  assert.ok(
+    neutralBoundaryDisputedLayer,
+    "VersaTiles modern must include Natural Earth disputed boundary layer"
+  );
   assert.equal(
     neutralBoundaryLayer.source,
     "ibm-modern-neutral-boundaries",
@@ -896,11 +945,9 @@ test("VersaTiles modern hosted style removes disputed boundary and POI/airport l
     '<a href="https://www.naturalearthdata.com/" target="_blank">Natural Earth</a>',
     "VersaTiles modern shared Natural Earth source attribution must be compact"
   );
-  assert.equal(
-    neutralBoundaryLayer.maxzoom,
-    undefined,
-    "VersaTiles modern boundary layer must render at all zoom levels"
-  );
+  for (const layer of [neutralBoundaryLayer, neutralBoundaryDisputedLayer]) {
+    assert.equal(layer.maxzoom, undefined, "VersaTiles modern boundary layers must render at all zoom levels");
+  }
   for (const zoom of [4, 6, 10]) {
     const minZoom = neutralBoundaryLayer.minzoom ?? 0;
     const maxZoom = neutralBoundaryLayer.maxzoom ?? Number.POSITIVE_INFINITY;
@@ -931,155 +978,216 @@ test("Modern styles do not allow non-English or local-script name fallbacks in s
   await assertNoStateOrProvinceLabelsAcrossZooms(versaTilesStyle, "VersaTiles modern");
 });
 
-test("Modern shared Natural Earth boundaries keep mask areas line-free", async () => {
-  const libertyStyle = await readStyle(libertyModernStylePath);
+test("Modern shared Natural Earth boundaries keep lineStyle for solid and dashed classes", async () => {
   const neutralBoundaryGeoJson = JSON.parse(
     await fs.readFile(sharedModernNeutralBoundaryGeoJsonPath, "utf8")
   );
-  const neutralMaskGeoJson = JSON.parse(
-    await fs.readFile(sharedModernNeutralBoundaryMasksGeoJsonPath, "utf8")
-  );
-  const maskPolygons = (neutralMaskGeoJson.features ?? []).map((feature) => feature.geometry?.coordinates);
-
+  const styleCounts = new Map();
   for (const feature of neutralBoundaryGeoJson.features ?? []) {
-    if (feature?.geometry?.type !== "LineString") {
-      continue;
+    const lineStyle = feature?.properties?.lineStyle;
+    if (lineStyle !== "solid" && lineStyle !== "dashed" && lineStyle !== "hidden") {
+      throw new Error(`Unexpected lineStyle on Natural Earth boundary feature: ${String(lineStyle)}`);
     }
-    for (const coordinate of feature.geometry.coordinates) {
-      assert.equal(
-        maskPolygons.some((polygonCoordinates) =>
-          isPointStrictlyInsidePolygon(coordinate, polygonCoordinates)
-        ),
-        false,
-        "Shared Natural Earth boundary vertices must not fall strictly inside any contested-area mask"
-      );
-    }
+    styleCounts.set(lineStyle, (styleCounts.get(lineStyle) ?? 0) + 1);
   }
 
-  const libertyBoundary2Layer = libertyStyle.layers.find((layer) => layer.id === "boundary_2");
-  assert.ok(libertyBoundary2Layer, "Liberty modern must include boundary_2");
-  const hiddenPairsInTileFilter = new Set(
-    collectAdm0PairExclusionsFromFilter(libertyBoundary2Layer.filter ?? [])
-  );
-  assert.deepEqual(
-    [...hiddenPairsInTileFilter].sort(),
-    [...expectedHiddenBoundaryPairs].sort(),
-    "Liberty tile boundary filter must hide the exact shared contested adm0 pair list"
-  );
+  assert.equal((styleCounts.get("solid") ?? 0) > 0, true, "Must include solid Natural Earth lines");
+  assert.equal((styleCounts.get("dashed") ?? 0) > 0, true, "Must include dashed Natural Earth lines");
 
-  const hiddenPairsStillPresentInNe = new Set();
-  let inspectedNePairCount = 0;
-  for (const feature of neutralBoundaryGeoJson.features ?? []) {
-    const leftCode = feature?.properties?.adm0_a3_l;
-    const rightCode = feature?.properties?.adm0_a3_r;
-    if (typeof leftCode !== "string" || typeof rightCode !== "string") {
-      continue;
-    }
-    inspectedNePairCount += 1;
-    const pair = canonicalPair(leftCode, rightCode);
-    if (expectedHiddenBoundaryPairs.includes(pair)) {
-      hiddenPairsStillPresentInNe.add(pair);
-    }
-  }
+  const southOssetiaFeature = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => Number(feature?.properties?.id) === 1746705385
+  );
   assert.ok(
-    inspectedNePairCount > 0,
-    "Natural Earth shared boundary output must include inferable country-pair codes for pair checks"
+    southOssetiaFeature,
+    "Shared Natural Earth boundaries must include South Ossetia supplemental line (1746705385)"
   );
-  assert.deepEqual(
-    [...hiddenPairsStillPresentInNe].sort(),
-    [],
-    "Natural Earth shared boundary output must not include any pair hidden in tile boundaries"
+  assert.equal(
+    southOssetiaFeature?.properties?.lineStyle,
+    "dashed",
+    "South Ossetia supplemental line must be dashed"
   );
 
-  for (const [pair, hiddenIds] of expectedHiddenNeIdsForSharedPairs) {
-    const remainingIds = new Set();
-    for (const feature of neutralBoundaryGeoJson.features ?? []) {
-      const neId = feature?.properties?.id;
-      if (typeof neId === "number" && hiddenIds.has(neId)) {
-        remainingIds.add(neId);
-      }
-    }
-    assert.deepEqual(
-      [...remainingIds].sort(),
-      [],
-      `Natural Earth shared boundary output must not include hidden ids for ${pair}`
-    );
-  }
-});
-
-test("Liberty modern boundary_2 filter hides ARM/AZE exclaves by feature properties", async () => {
-  const [style, fixture] = await Promise.all([
-    readStyle(libertyModernStylePath),
-    fs.readFile(modernBoundaryFilterFixturePath, "utf8").then((value) => JSON.parse(value))
-  ]);
-  const maplibreStyleSpecPath = path.join(
-    repositoryRoot,
-    "node_modules",
-    "@maplibre",
-    "maplibre-gl-style-spec",
-    "dist",
-    "index.mjs"
+  const egyptSudanWestSegment = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => feature?.properties?.id === "1746709045-west"
   );
-  const { featureFilter } = await import(pathToFileURL(maplibreStyleSpecPath).href);
+  const egyptSudanEastSegment = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => feature?.properties?.id === "1746709045-east"
+  );
+  assert.ok(
+    egyptSudanWestSegment,
+    "Shared Natural Earth boundaries must include the solid west Egypt–Sudan split segment"
+  );
+  assert.ok(
+    egyptSudanEastSegment,
+    "Shared Natural Earth boundaries must include the dashed east Egypt–Sudan split segment"
+  );
+  assert.equal(
+    egyptSudanWestSegment?.properties?.lineStyle,
+    "solid",
+    "West Egypt–Sudan split segment must be solid"
+  );
+  assert.equal(
+    egyptSudanEastSegment?.properties?.lineStyle,
+    "dashed",
+    "East Egypt–Sudan split segment must be dashed"
+  );
 
-  const boundaryLayerIndex = style.layers.findIndex((layer) => layer.id === "boundary_2");
-  assert.notEqual(boundaryLayerIndex, -1, "Liberty modern must include boundary_2 layer");
-  const boundaryLayer = style.layers[boundaryLayerIndex];
-  assert.ok(boundaryLayer.filter, "Liberty modern boundary_2 must define a filter");
-  const compiledFilter = featureFilter(boundaryLayer.filter, `layers[${boundaryLayerIndex}].filter`, {});
-
-  for (const feature of fixture.tileFeatures ?? []) {
-    const drawn = compiledFilter.filter(
-      { zoom: feature.z },
-      {
-        type: feature.type,
-        properties: feature.properties,
-        geometry: feature.geometry,
-        id: feature.id
-      },
-      { z: feature.z, x: feature.x, y: feature.y }
+  const singleCopySupplementalFeatureIds = [1746708491, 1746708483, 1746708787];
+  for (const featureId of singleCopySupplementalFeatureIds) {
+    const matches = (neutralBoundaryGeoJson.features ?? []).filter(
+      (feature) => Number(feature?.properties?.id) === featureId
     );
     assert.equal(
-      drawn,
-      feature.expectedVisible,
-      `boundary_2 filter visibility mismatch for decoded feature ${feature.key} (${feature.note})`
+      matches.length,
+      1,
+      `Natural Earth boundary feature ${featureId} must be present exactly once (no duplicate 1:50m + 1:10m copies)`
+    );
+    assert.equal(
+      matches[0]?.properties?.lineStyle,
+      "dashed",
+      `Natural Earth boundary feature ${featureId} must render as dashed`
     );
   }
 
-  const partialCrossingFeature = (fixture.tileFeatures ?? []).find(
-    (feature) => feature.note === "partial-mask-crossing-syr-jor"
+  const westernSaharaEastEndFeature = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => Number(feature?.properties?.id) === 1746708721
   );
   assert.ok(
-    partialCrossingFeature,
-    "Fixture must include a real partial-mask-crossing tile feature for mask/pair-rule coverage"
+    westernSaharaEastEndFeature,
+    "Natural Earth boundary features must include the east end of the Western Sahara 27°40′N line (1746708721)"
+  );
+  assert.equal(
+    westernSaharaEastEndFeature?.properties?.lineStyle,
+    "dashed",
+    "Western Sahara 27°40′N east-end feature 1746708721 must be dashed"
+  );
+
+  const westernSaharaMainFeature = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => Number(feature?.properties?.id) === 1746705527
+  );
+  assert.ok(
+    westernSaharaMainFeature,
+    "Natural Earth boundary features must include the main Western Sahara 27°40′N line (1746705527)"
+  );
+  const collectLinePoints = (geometry) => {
+    if (geometry?.type === "LineString") {
+      return geometry.coordinates ?? [];
+    }
+    if (geometry?.type === "MultiLineString") {
+      return (geometry.coordinates ?? []).flat();
+    }
+    return [];
+  };
+  const westernSaharaMainPoints = collectLinePoints(westernSaharaMainFeature?.geometry);
+  const westernSaharaEastEndPoints = collectLinePoints(westernSaharaEastEndFeature?.geometry);
+  assert.ok(
+    westernSaharaMainPoints.length > 1 && westernSaharaEastEndPoints.length > 1,
+    "Western Sahara 27°40′N main and east-end segments must both contain line coordinates"
+  );
+  const westernSaharaEastMostLongitude = Math.max(...westernSaharaEastEndPoints.map(([lng]) => lng));
+  assert.ok(
+    westernSaharaEastMostLongitude > -8.7,
+    `Western Sahara 27°40′N east-end segment must reach near Algeria (east-most longitude ${westernSaharaEastMostLongitude})`
   );
 });
 
-test("Natural Earth boundary output near Armenia hides configured ids and keeps non-hidden lines", async () => {
-  const [fixture, neutralBoundaryGeoJson] = await Promise.all([
-    fs.readFile(modernBoundaryFilterFixturePath, "utf8").then((value) => JSON.parse(value)),
-    fs.readFile(sharedModernNeutralBoundaryGeoJsonPath, "utf8").then((value) => JSON.parse(value))
-  ]);
-
-  const boundaryIds = new Set(
-    (neutralBoundaryGeoJson.features ?? [])
-      .map((feature) => feature?.properties?.id)
-      .filter((id) => typeof id === "number")
+test("Supplemental Natural Earth features reject maritime lines", async () => {
+  const { createSupplementalDisputedBoundaryFeatures } = await loadBuildBasemapStylesTestOnly();
+  assert.equal(
+    typeof createSupplementalDisputedBoundaryFeatures,
+    "function",
+    "build-basemap-styles test API must expose createSupplementalDisputedBoundaryFeatures"
   );
-
-  for (const hiddenId of fixture.naturalEarthNearArmenia?.hiddenIds ?? []) {
-    assert.equal(
-      boundaryIds.has(hiddenId),
-      false,
-      `Natural Earth boundary output must hide Armenia-region id ${hiddenId}`
-    );
-  }
-
-  for (const keptId of fixture.naturalEarthNearArmenia?.keepIds ?? []) {
-    assert.equal(
-      boundaryIds.has(keptId),
-      true,
-      `Natural Earth boundary output must keep nearby non-hidden id ${keptId}`
-    );
-  }
+  assert.throws(
+    () =>
+      createSupplementalDisputedBoundaryFeatures({
+        disputedAreas10mGeoJson: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746705527,
+                FEATURECLA: "Disputed (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [-9, 27.6],
+                  [-8.9, 27.6]
+                ]
+              }
+            }
+          ]
+        },
+        boundaryLines10mGeoJson: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708491,
+                FEATURECLA: "Line of control (please verify)",
+                MARITIME: 1
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [33.7, 35.0],
+                  [33.8, 35.05]
+                ]
+              }
+            },
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708483,
+                FEATURECLA: "Line of control (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [33.9, 35.05],
+                  [34.0, 35.06]
+                ]
+              }
+            },
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708787,
+                FEATURECLA: "Disputed (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [34.0, 45.8],
+                  [34.5, 46.0]
+                ]
+              }
+            },
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708721,
+                FEATURECLA: "Line of control (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [-8.82, 27.661],
+                  [-8.68, 27.661]
+                ]
+              }
+            }
+          ]
+        }
+      }),
+    /maritime and cannot be used as a disputed-land supplement/u,
+    "Supplemental disputed-line builder must reject maritime Natural Earth features"
+  );
 });

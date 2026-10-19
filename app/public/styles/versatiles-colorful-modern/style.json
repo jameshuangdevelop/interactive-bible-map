@@ -3,7 +3,7 @@
   "name": "Interactive Bible Map backup modern basemap (modified from VersaTiles Colorful)",
   "metadata": {
     "license": "https://creativecommons.org/publicdomain/zero/1.0/",
-    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. No border line is drawn, at any zoom, around Israel, the West Bank, Gaza and the Golan Heights, around Kosovo or Western Sahara, along the whole border between Russia and Georgia, along the border between Armenia and Azerbaijan, or across Cyprus. Leaving these lines out keeps the map neutral; it is not a claim about where these borders run or who governs these places. Max zoom set to 14."
+    "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), with disputed and cease-fire supplements, simplified where appropriate. Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place. Max zoom set to 14."
   },
   "glyphs": "https://tiles.versatiles.org/assets/glyphs/{fontstack}/{range}.pbf",
   "sprite": [
@@ -723,30 +723,18 @@
       "type": "fill",
       "source-layer": "sites",
       "filter": [
-        "any",
+        "in",
         [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "university"
+          "get",
+          "kind"
         ],
         [
-          "==",
+          "literal",
           [
-            "get",
-            "kind"
-          ],
-          "college"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "school"
+            "university",
+            "college",
+            "school"
+          ]
         ]
       ],
       "paint": {
@@ -836,22 +824,17 @@
       "type": "fill",
       "source-layer": "sites",
       "filter": [
-        "any",
+        "in",
         [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "parking"
+          "get",
+          "kind"
         ],
         [
-          "==",
+          "literal",
           [
-            "get",
-            "kind"
-          ],
-          "bicycle_parking"
+            "parking",
+            "bicycle_parking"
+          ]
         ]
       ],
       "paint": {
@@ -1698,7 +1681,7 @@
         ]
       ],
       "paint": {
-        "fill-color": "rgb(255,255,255)",
+        "fill-color": "rgb(252,250,248)",
         "fill-opacity": [
           "interpolate",
           [
@@ -1714,214 +1697,6 @@
         ]
       },
       "minzoom": 12,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-way-footway:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "footway"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(239,231,241)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-way-steps:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "steps"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(239,231,241)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-way-path:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "path"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(239,231,241)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-way-cycleway:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "cycleway"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(233,238,241)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -1952,7 +1727,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(229,228,226)",
+        "line-color": "rgb(225,223,219)",
         "line-width": [
           "interpolate",
           [
@@ -2017,7 +1792,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(229,228,226)",
+        "line-color": "rgb(225,223,219)",
         "line-width": [
           "interpolate",
           [
@@ -2026,18 +1801,16 @@
           [
             "zoom"
           ],
-          12,
-          2,
           14,
-          3,
+          2,
           16,
-          6,
+          4,
           18,
-          26,
+          14,
           19,
-          64,
+          22,
           20,
-          128
+          33
         ],
         "line-opacity": [
           "interpolate",
@@ -2084,7 +1857,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(237,236,235)",
+        "line-color": "rgb(233,231,228)",
         "line-width": [
           "interpolate",
           [
@@ -2149,7 +1922,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(229,228,226)",
+        "line-color": "rgb(225,223,219)",
         "line-width": [
           "interpolate",
           [
@@ -2222,7 +1995,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(229,228,226)",
+        "line-color": "rgb(225,223,219)",
         "line-width": [
           "interpolate",
           [
@@ -2295,7 +2068,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(237,236,235)",
+        "line-color": "rgb(233,231,228)",
         "line-width": [
           "interpolate",
           [
@@ -2368,7 +2141,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(229,228,226)",
+        "line-color": "rgb(225,223,219)",
         "line-width": [
           "interpolate",
           [
@@ -2449,7 +2222,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -2522,7 +2295,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -2595,7 +2368,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -2668,7 +2441,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(229,228,226)",
+        "line-color": "rgb(225,223,219)",
         "line-width": [
           "interpolate",
           [
@@ -2743,7 +2516,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -2818,7 +2591,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -2897,7 +2670,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -2976,7 +2749,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(243,209,180)",
+        "line-color": "rgb(240,204,173)",
         "line-width": [
           "interpolate",
           [
@@ -3043,7 +2816,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(253,244,255)",
+        "line-color": "rgb(229,220,227)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -3054,19 +2831,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -3095,7 +2872,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(253,244,255)",
+        "line-color": "rgb(229,220,227)",
+        "line-dasharray": [
+          0.5,
+          0.25
+        ],
         "line-width": [
           "interpolate",
           [
@@ -3106,19 +2887,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -3147,7 +2928,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(253,244,255)",
+        "line-color": "rgb(229,220,227)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -3158,19 +2943,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -3199,7 +2984,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(246,252,255)",
+        "line-color": "rgb(223,226,227)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -3210,19 +2999,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -3255,7 +3044,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,255,255)",
+        "line-color": "rgb(252,250,248)",
         "line-width": [
           "interpolate",
           [
@@ -3320,7 +3109,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(253,244,255)",
+        "line-color": "rgb(250,239,248)",
         "line-width": [
           "interpolate",
           [
@@ -3329,18 +3118,16 @@
           [
             "zoom"
           ],
-          12,
-          1,
           14,
-          2,
+          1,
           16,
-          5,
+          3,
           18,
-          24,
+          12,
           19,
-          60,
           20,
-          120
+          20,
+          30
         ],
         "line-opacity": [
           "interpolate",
@@ -3387,7 +3174,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(251,251,251)",
+        "line-color": "rgb(248,246,244)",
         "line-width": [
           "interpolate",
           [
@@ -3452,7 +3239,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,255,255)",
+        "line-color": "rgb(252,250,248)",
         "line-width": [
           "interpolate",
           [
@@ -3525,7 +3312,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,255,255)",
+        "line-color": "rgb(252,250,248)",
         "line-width": [
           "interpolate",
           [
@@ -3598,7 +3385,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(251,251,251)",
+        "line-color": "rgb(248,246,244)",
         "line-width": [
           "interpolate",
           [
@@ -3671,7 +3458,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(246,252,255)",
+        "line-color": "rgb(243,247,248)",
         "line-width": [
           "interpolate",
           [
@@ -3680,18 +3467,16 @@
           [
             "zoom"
           ],
-          12,
-          1,
           14,
-          2,
+          1,
           16,
-          5,
+          3,
           18,
-          24,
+          12,
           19,
-          60,
           20,
-          120
+          20,
+          30
         ],
         "line-opacity": [
           "interpolate",
@@ -3753,7 +3538,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(246,252,255)",
+        "line-color": "rgb(243,247,248)",
         "line-width": [
           "interpolate",
           [
@@ -3828,7 +3613,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,255,255)",
+        "line-color": "rgb(252,250,248)",
         "line-width": [
           "interpolate",
           [
@@ -3909,7 +3694,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,246,208)",
+        "line-color": "rgb(252,241,202)",
         "line-width": [
           "interpolate",
           [
@@ -3982,7 +3767,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,246,208)",
+        "line-color": "rgb(252,241,202)",
         "line-width": [
           "interpolate",
           [
@@ -4055,7 +3840,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,227,190)",
+        "line-color": "rgb(252,222,183)",
         "line-width": [
           "interpolate",
           [
@@ -4128,7 +3913,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,255,255)",
+        "line-color": "rgb(252,250,248)",
         "line-width": [
           "interpolate",
           [
@@ -4203,7 +3988,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,246,208)",
+        "line-color": "rgb(252,241,202)",
         "line-width": [
           "interpolate",
           [
@@ -4278,7 +4063,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,246,208)",
+        "line-color": "rgb(252,241,202)",
         "line-width": [
           "interpolate",
           [
@@ -4357,7 +4142,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,246,208)",
+        "line-color": "rgb(252,241,202)",
         "line-width": [
           "interpolate",
           [
@@ -4436,7 +4221,7 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "rgb(255,227,190)",
+        "line-color": "rgb(252,222,183)",
         "line-width": [
           "interpolate",
           [
@@ -4486,12 +4271,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
+          [
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
+          ]
         ],
         [
           "!",
@@ -4510,7 +4301,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(212,218,223)",
+        "line-color": "rgb(209,213,216)",
         "line-width": [
           "interpolate",
           [
@@ -4552,131 +4343,20 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
-        ],
-        [
-          "has",
-          "service"
-        ],
-        [
-          "==",
           [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(212,218,223)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1,
-          16,
-          1,
-          20,
-          14
-        ],
-        "line-opacity": 0.5
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-transport-lightrail:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
-          "!",
-          [
-            "has",
-            "service"
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
           ]
         ],
         [
-          "==",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(212,218,223)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          8,
-          1,
-          13,
-          1,
-          15,
-          1,
-          20,
-          14
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          11,
-          0,
-          12,
-          0.5
-        ]
-      },
-      "minzoom": 11,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-transport-lightrail-service:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
           "has",
           "service"
         ],
@@ -4690,7 +4370,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(212,218,223)",
+        "line-color": "rgb(209,213,216)",
         "line-width": [
           "interpolate",
           [
@@ -4744,7 +4424,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(206,216,224)",
+        "line-color": "rgb(203,211,217)",
         "line-width": [
           "interpolate",
           [
@@ -4883,7 +4563,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(212,218,223)",
+        "line-color": "rgb(209,213,216)",
         "line-width": [
           "interpolate",
           [
@@ -4917,12 +4597,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
+          [
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
+          ]
         ],
         [
           "!",
@@ -4941,7 +4627,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(225,229,232)",
+        "line-color": "rgb(222,224,226)",
         "line-dasharray": [
           2,
           2
@@ -4985,135 +4671,20 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
-        ],
-        [
-          "has",
-          "service"
-        ],
-        [
-          "==",
           [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(225,229,232)",
-        "line-dasharray": [
-          2,
-          2
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          15,
-          0,
-          16,
-          1,
-          20,
-          10
-        ],
-        "line-opacity": 0.5
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-transport-lightrail",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
-          "!",
-          [
-            "has",
-            "service"
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
           ]
         ],
         [
-          "==",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(225,229,232)",
-        "line-dasharray": [
-          2,
-          2
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1,
-          20,
-          10
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          0.5
-        ]
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "tunnel-transport-lightrail-service",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
           "has",
           "service"
         ],
@@ -5127,7 +4698,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(225,229,232)",
+        "line-color": "rgb(222,224,226)",
         "line-dasharray": [
           2,
           2
@@ -5183,7 +4754,7 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(221,228,233)",
+        "line-color": "rgb(218,223,227)",
         "line-dasharray": [
           2,
           2
@@ -5345,7 +4916,7 @@
           20,
           5
         ],
-        "line-color": "rgb(212,218,223)",
+        "line-color": "rgb(209,213,216)",
         "line-opacity": 0.5
       },
       "minzoom": 13,
@@ -5411,246 +4982,6 @@
         ]
       },
       "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "way-footway:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "!=",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "footway"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(226,212,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "way-steps:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "!=",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "steps"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(226,212,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "way-path:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "!=",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "path"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(226,212,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "way-cycleway:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "!=",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "cycleway"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(215,224,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "minzoom": 13,
       "source": "versatiles-shortbread"
     },
     {
@@ -5771,18 +5102,16 @@
           [
             "zoom"
           ],
-          12,
-          2,
           14,
-          3,
+          2,
           16,
-          6,
+          4,
           18,
-          26,
+          14,
           19,
-          64,
+          22,
           20,
-          128
+          33
         ],
         "line-opacity": [
           "interpolate",
@@ -6900,7 +6229,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(251,235,255)",
+        "line-color": "rgb(213,200,217)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -6911,19 +6244,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -6960,7 +6293,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(251,235,255)",
+        "line-color": "rgb(213,200,217)",
+        "line-dasharray": [
+          0.5,
+          0.25
+        ],
         "line-width": [
           "interpolate",
           [
@@ -6971,19 +6308,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -7020,7 +6357,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(251,235,255)",
+        "line-color": "rgb(213,200,217)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -7031,19 +6372,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -7080,7 +6421,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(239,249,255)",
+        "line-color": "rgb(203,212,217)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -7091,19 +6436,19 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
         "line-join": "round",
-        "line-cap": "round"
+        "line-cap": "butt"
       },
       "minzoom": 13,
       "source": "versatiles-shortbread"
@@ -7226,18 +6571,16 @@
           [
             "zoom"
           ],
-          12,
-          1,
           14,
-          2,
+          1,
           16,
-          5,
+          3,
           18,
-          24,
+          12,
           19,
-          60,
           20,
-          120
+          20,
+          30
         ],
         "line-opacity": [
           "interpolate",
@@ -7617,18 +6960,16 @@
           [
             "zoom"
           ],
-          12,
-          1,
           14,
-          2,
+          1,
           16,
-          5,
+          3,
           18,
-          24,
+          12,
           19,
-          60,
           20,
-          120
+          20,
+          30
         ],
         "line-opacity": [
           "interpolate",
@@ -8503,12 +7844,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
+          [
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
+          ]
         ],
         [
           "!",
@@ -8577,144 +7924,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
-        ],
-        [
-          "has",
-          "service"
-        ],
-        [
-          "!=",
           [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(177,187,196)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1,
-          16,
-          1,
-          20,
-          14
-        ]
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "transport-lightrail:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
-          "!",
-          [
-            "has",
-            "service"
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
           ]
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(177,187,196)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          8,
-          1,
-          13,
-          1,
-          15,
-          1,
-          20,
-          14
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          11,
-          0,
-          12,
-          1
-        ]
-      },
-      "minzoom": 11,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "transport-lightrail-service:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
         ],
         [
           "has",
@@ -9001,78 +8222,24 @@
       "type": "line",
       "source-layer": "aerialways",
       "filter": [
-        "any",
+        "in",
         [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "cable_car"
+          "get",
+          "kind"
         ],
         [
-          "==",
+          "literal",
           [
-            "get",
-            "kind"
-          ],
-          "gondola"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "goods"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "chair_lift"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "drag_lift"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "t-bar"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "j-bar"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "platter"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "rope-tow"
+            "cable_car",
+            "gondola",
+            "goods",
+            "chair_lift",
+            "drag_lift",
+            "t-bar",
+            "j-bar",
+            "platter",
+            "rope-tow"
+          ]
         ]
       ],
       "paint": {
@@ -9105,12 +8272,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
+          [
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
+          ]
         ],
         [
           "!",
@@ -9181,148 +8354,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
-        ],
-        [
-          "has",
-          "service"
-        ],
-        [
-          "!=",
           [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(200,207,214)",
-        "line-dasharray": [
-          2,
-          2
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          15,
-          0,
-          16,
-          1,
-          20,
-          10
-        ]
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "transport-lightrail",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
-          "!",
-          [
-            "has",
-            "service"
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
           ]
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "!=",
-          [
-            "get",
-            "tunnel"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(200,207,214)",
-        "line-dasharray": [
-          2,
-          2
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1,
-          20,
-          10
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1
-        ]
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "transport-lightrail-service",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
         ],
         [
           "has",
@@ -9613,78 +8656,24 @@
       "type": "line",
       "source-layer": "aerialways",
       "filter": [
-        "any",
+        "in",
         [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "cable_car"
+          "get",
+          "kind"
         ],
         [
-          "==",
+          "literal",
           [
-            "get",
-            "kind"
-          ],
-          "gondola"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "goods"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "chair_lift"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "drag_lift"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "t-bar"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "j-bar"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "platter"
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "rope-tow"
+            "cable_car",
+            "gondola",
+            "goods",
+            "chair_lift",
+            "drag_lift",
+            "t-bar",
+            "j-bar",
+            "platter",
+            "rope-tow"
+          ]
         ]
       ],
       "paint": {
@@ -9720,7 +8709,7 @@
       "source-layer": "ferries",
       "minzoom": 10,
       "paint": {
-        "line-color": "rgb(125,152,179)",
+        "line-color": "rgb(119,152,184)",
         "line-width": 1.1,
         "line-opacity": [
           "interpolate",
@@ -9786,13 +8775,11 @@
           15,
           0,
           16,
-          7,
+          4,
           18,
-          10,
-          19,
-          17,
+          8,
           20,
-          31
+          11
         ]
       },
       "minzoom": 14,
@@ -9839,13 +8826,11 @@
           15,
           0,
           16,
-          7,
+          4,
           18,
-          10,
-          19,
-          17,
+          8,
           20,
-          31
+          11
         ]
       },
       "minzoom": 14,
@@ -9898,13 +8883,11 @@
           15,
           0,
           16,
-          7,
+          4,
           18,
-          10,
-          19,
-          17,
+          8,
           20,
-          31
+          11
         ]
       },
       "minzoom": 14,
@@ -10028,15 +9011,15 @@
           12,
           3,
           14,
-          4,
+          3,
           16,
-          8,
+          6,
           18,
-          36,
           19,
-          90,
+          19,
+          30,
           20,
-          179
+          45
         ]
       },
       "minzoom": 12,
@@ -10839,214 +9822,6 @@
       "source": "versatiles-shortbread"
     },
     {
-      "id": "bridge-way-footway:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "footway"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(226,212,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "butt"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-way-steps:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "steps"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(226,212,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "butt"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-way-path:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "path"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(226,212,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "butt"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-way-cycleway:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ],
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "cycleway"
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(215,224,230)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          13,
-          0,
-          16,
-          5,
-          18,
-          7,
-          19,
-          12,
-          20,
-          22
-        ]
-      },
-      "layout": {
-        "line-join": "round",
-        "line-cap": "butt"
-      },
-      "minzoom": 13,
-      "source": "versatiles-shortbread"
-    },
-    {
       "id": "bridge-street-track:outline",
       "type": "line",
       "source-layer": "streets",
@@ -11148,18 +9923,16 @@
           [
             "zoom"
           ],
-          12,
-          2,
           14,
-          3,
+          2,
           16,
-          6,
+          4,
           18,
-          26,
+          14,
           19,
-          64,
+          22,
           20,
-          128
+          33
         ],
         "line-opacity": [
           "interpolate",
@@ -12165,7 +10938,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(251,235,255)",
+        "line-color": "rgb(213,200,217)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -12176,14 +10953,14 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
@@ -12217,7 +10994,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(251,235,255)",
+        "line-color": "rgb(213,200,217)",
+        "line-dasharray": [
+          0.5,
+          0.25
+        ],
         "line-width": [
           "interpolate",
           [
@@ -12228,14 +11009,14 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
@@ -12269,7 +11050,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(251,235,255)",
+        "line-color": "rgb(213,200,217)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -12280,14 +11065,14 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
@@ -12321,7 +11106,11 @@
         ]
       ],
       "paint": {
-        "line-color": "rgb(239,249,255)",
+        "line-color": "rgb(203,212,217)",
+        "line-dasharray": [
+          1.5,
+          0.75
+        ],
         "line-width": [
           "interpolate",
           [
@@ -12332,14 +11121,14 @@
           ],
           13,
           0,
-          16,
-          4,
+          14,
+          1,
+          15,
+          1,
           18,
-          6,
-          19,
-          10,
+          4,
           20,
-          20
+          6
         ]
       },
       "layout": {
@@ -12451,18 +11240,16 @@
           [
             "zoom"
           ],
-          12,
-          1,
           14,
-          2,
+          1,
           16,
-          5,
+          3,
           18,
-          24,
+          12,
           19,
-          60,
           20,
-          120
+          20,
+          30
         ],
         "line-opacity": [
           "interpolate",
@@ -12802,18 +11589,16 @@
           [
             "zoom"
           ],
-          12,
-          1,
           14,
-          2,
+          1,
           16,
-          5,
+          3,
           18,
-          24,
+          12,
           19,
-          60,
           20,
-          120
+          20,
+          30
         ],
         "line-opacity": [
           "interpolate",
@@ -13608,12 +12393,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
+          [
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
+          ]
         ],
         [
           "!",
@@ -13677,134 +12468,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
-        ],
-        [
-          "has",
-          "service"
-        ],
-        [
-          "==",
           [
-            "get",
-            "bridge"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(177,187,196)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1,
-          16,
-          1,
-          20,
-          14
-        ]
-      },
-      "layout": {
-        "line-cap": "butt"
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-transport-lightrail:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
-          "!",
-          [
-            "has",
-            "service"
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
           ]
-        ],
-        [
-          "==",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(177,187,196)",
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          8,
-          1,
-          13,
-          1,
-          15,
-          1,
-          20,
-          14
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          11,
-          0,
-          12,
-          1
-        ]
-      },
-      "layout": {
-        "line-cap": "butt"
-      },
-      "minzoom": 11,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-transport-lightrail-service:outline",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
         ],
         [
           "has",
@@ -14054,12 +12729,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
+          [
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
+          ]
         ],
         [
           "!",
@@ -14125,138 +12806,18 @@
       "filter": [
         "all",
         [
-          "==",
+          "in",
           [
             "get",
             "kind"
           ],
-          "rail"
-        ],
-        [
-          "has",
-          "service"
-        ],
-        [
-          "==",
           [
-            "get",
-            "bridge"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(200,207,214)",
-        "line-dasharray": [
-          2,
-          2
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          15,
-          0,
-          16,
-          1,
-          20,
-          10
-        ]
-      },
-      "layout": {
-        "line-cap": "butt"
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-transport-lightrail",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
-        ],
-        [
-          "!",
-          [
-            "has",
-            "service"
+            "literal",
+            [
+              "rail",
+              "light_rail"
+            ]
           ]
-        ],
-        [
-          "==",
-          [
-            "get",
-            "bridge"
-          ],
-          true
-        ]
-      ],
-      "paint": {
-        "line-color": "rgb(200,207,214)",
-        "line-dasharray": [
-          2,
-          2
-        ],
-        "line-width": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1,
-          20,
-          10
-        ],
-        "line-opacity": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          14,
-          0,
-          15,
-          1
-        ]
-      },
-      "layout": {
-        "line-cap": "butt"
-      },
-      "minzoom": 14,
-      "source": "versatiles-shortbread"
-    },
-    {
-      "id": "bridge-transport-lightrail-service",
-      "type": "line",
-      "source-layer": "streets",
-      "filter": [
-        "all",
-        [
-          "==",
-          [
-            "get",
-            "kind"
-          ],
-          "light_rail"
         ],
         [
           "has",
@@ -16576,37 +15137,26 @@
       "filter": [
         "all",
         [
-          "all",
+          "in",
           [
-            "in",
-            [
-              "get",
-              "admin_level"
-            ],
-            [
-              "literal",
-              [
-                2,
-                "2"
-              ]
-            ]
+            "get",
+            "admin_level"
           ],
           [
-            "<=",
+            "literal",
             [
-              "get",
-              "way_area"
-            ],
-            10000000
+              2,
+              "2"
+            ]
           ]
         ],
         [
-          "!=",
+          "<=",
           [
             "get",
-            "disputed"
+            "way_area"
           ],
-          true
+          10000000
         ]
       ],
       "layout": {
@@ -16660,45 +15210,34 @@
       "filter": [
         "all",
         [
-          "all",
+          "in",
           [
-            "in",
+            "get",
+            "admin_level"
+          ],
+          [
+            "literal",
             [
-              "get",
-              "admin_level"
-            ],
-            [
-              "literal",
-              [
-                2,
-                "2"
-              ]
+              2,
+              "2"
             ]
-          ],
-          [
-            "<",
-            [
-              "get",
-              "way_area"
-            ],
-            90000000
-          ],
-          [
-            ">",
-            [
-              "get",
-              "way_area"
-            ],
-            10000000
           ]
         ],
         [
-          "!=",
+          "<",
           [
             "get",
-            "disputed"
+            "way_area"
           ],
-          true
+          90000000
+        ],
+        [
+          ">",
+          [
+            "get",
+            "way_area"
+          ],
+          10000000
         ]
       ],
       "layout": {
@@ -16752,37 +15291,26 @@
       "filter": [
         "all",
         [
-          "all",
+          "in",
           [
-            "in",
-            [
-              "get",
-              "admin_level"
-            ],
-            [
-              "literal",
-              [
-                2,
-                "2"
-              ]
-            ]
+            "get",
+            "admin_level"
           ],
           [
-            ">=",
+            "literal",
             [
-              "get",
-              "way_area"
-            ],
-            90000000
+              2,
+              "2"
+            ]
           ]
         ],
         [
-          "!=",
+          ">=",
           [
             "get",
-            "disputed"
+            "way_area"
           ],
-          true
+          90000000
         ]
       ],
       "layout": {
@@ -16830,12 +15358,20 @@
       "source": "versatiles-shortbread"
     },
     {
-      "id": "ibm-modern-neutral-boundary-fallback",
+      "id": "ibm-modern-neutral-boundary-fallback-solid",
       "type": "line",
       "source": "ibm-modern-neutral-boundaries",
+      "filter": [
+        "==",
+        [
+          "get",
+          "lineStyle"
+        ],
+        "solid"
+      ],
       "layout": {},
       "paint": {
-        "line-color": "hsl(0, 0%, 50%)",
+        "line-color": "hsl(248, 1%, 41%)",
         "line-width": [
           "interpolate",
           [
@@ -16848,6 +15384,41 @@
           0.5,
           4,
           1
+        ],
+        "line-opacity": 1
+      }
+    },
+    {
+      "id": "ibm-modern-neutral-boundary-fallback-disputed",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "filter": [
+        "==",
+        [
+          "get",
+          "lineStyle"
+        ],
+        "dashed"
+      ],
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(248, 1%, 41%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          0.5,
+          4,
+          1
+        ],
+        "line-dasharray": [
+          4,
+          2
         ],
         "line-opacity": 1
       }
