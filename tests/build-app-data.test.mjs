@@ -926,7 +926,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
         assert.ok(galileeTouchingBordersAt30.length > 0, "expected borders touching galilee-perea at AD 30");
         const galileeMinZooms = [...new Set(galileeTouchingBordersAt30.map((feature) => feature.properties.minZoom))]
           .sort((left, right) => left - right);
-        assert.deepEqual(galileeMinZooms, [8]);
+        assert.deepEqual(galileeMinZooms, [5]);
 
         const asiaGalatiaBorderAt30 = stopAt30.holderBorders.features.find(
           (feature) =>
@@ -934,7 +934,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
             (feature.properties.holderAAreaId === "galatia" && feature.properties.holderBAreaId === "asia")
         );
         assert.ok(asiaGalatiaBorderAt30, "expected Asia-Galatia border at AD 30");
-        assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 6);
+        assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 5);
 
         const stopAt40 = await readStopPayload(40);
         const agrippaInPhilipLands = stopAt40.areas.find((area) => area.areaId === "philip-tetrarchy-lands");
@@ -1656,7 +1656,7 @@ test("buildAncientAppData real-data holder labels follow MC7 text rules", async 
   assert.equal(labelTexts.some((text) => text.startsWith("ROMAN PROVINCE OF ")), false);
 });
 
-test("buildAncientAppData real-data border minZoom gates for Galilee and Asia-Galatia", async () => {
+test("buildAncientAppData real-data border minZoom is fixed at zoom 5", async () => {
   const fixture = await loadRealDataFixture();
   const stopAt30 = fixture.stopPayloadForYear(30);
 
@@ -1668,7 +1668,7 @@ test("buildAncientAppData real-data border minZoom gates for Galilee and Asia-Ga
   assert.ok(galileeTouchingBordersAt30.length > 0, "expected borders touching galilee-perea at AD 30");
   const galileeMinZooms = [...new Set(galileeTouchingBordersAt30.map((feature) => feature.properties.minZoom))]
     .sort((left, right) => left - right);
-  assert.deepEqual(galileeMinZooms, [8]);
+  assert.deepEqual(galileeMinZooms, [5]);
 
   const asiaGalatiaBorderAt30 = stopAt30.holderBorders.features.find(
     (feature) =>
@@ -1676,7 +1676,7 @@ test("buildAncientAppData real-data border minZoom gates for Galilee and Asia-Ga
       (feature.properties.holderAAreaId === "galatia" && feature.properties.holderBAreaId === "asia")
   );
   assert.ok(asiaGalatiaBorderAt30, "expected Asia-Galatia border at AD 30");
-  assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 6);
+  assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 5);
 });
 
 test("buildAncientAppData real-data gives every non-uncertain holder at least one label per stop", async () => {

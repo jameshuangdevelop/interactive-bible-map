@@ -144,7 +144,6 @@ const layerRoutesMentionedId = "ibm-routes-mentioned";
 const layerRoutesStagePillIconId = "ibm-routes-stage-pill-icon";
 const layerRoutesStagePillLabelId = "ibm-routes-stage-pill-label";
 
-const uncertainHatchImageId = "ibm-ancient-uncertain-hatch-image";
 const routeStagePillImageId = "ibm-route-stage-pill-image";
 const routeDirectionArrowImageId = "ibm-route-direction-arrow-image";
 const selectedPlacePinImageId = "ibm-selected-place-pin-icon";
@@ -878,26 +877,6 @@ function createCanvasImage(
   };
 }
 
-function createUncertainHatchImage() {
-  return createCanvasImage(8, 8, (context, width, height) => {
-    context.clearRect(0, 0, width, height);
-    context.strokeStyle = ANCIENT_LAYER_STYLE.uncertain.hatchColor;
-    context.lineWidth = 1;
-    context.beginPath();
-    context.moveTo(0, height);
-    context.lineTo(width, 0);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(-2, height);
-    context.lineTo(2, height - 4);
-    context.stroke();
-    context.beginPath();
-    context.moveTo(width - 2, 2);
-    context.lineTo(width + 2, -2);
-    context.stroke();
-  });
-}
-
 function createCandidateIconImage({
   pinColor,
   candidateLetter,
@@ -1075,17 +1054,6 @@ function ensureCandidateImages(map: MapLibreMap, renderData: PlaceRenderData) {
   }
 }
 
-function ensureUncertainHatchImage(map: MapLibreMap) {
-  if (map.hasImage(uncertainHatchImageId)) {
-    return;
-  }
-
-  const image = createUncertainHatchImage();
-  if (image) {
-    map.addImage(uncertainHatchImageId, image.image, { pixelRatio: image.pixelRatio });
-  }
-}
-
 type AncientLineGeometry = LineStringGeometry | MultiLineStringGeometry;
 type AncientLineFeatureCollection = FeatureCollection<AncientLineGeometry, Record<string, unknown>>;
 
@@ -1251,8 +1219,6 @@ function buildAncientHolderLabelFeatures(
 }
 
 function ensureMapLayers(map: MapLibreMap) {
-  ensureUncertainHatchImage(map);
-
   if (!map.getLayer(layerAncientAreaFillId)) {
     map.addLayer({
       id: layerAncientAreaFillId,
@@ -1309,8 +1275,8 @@ function ensureMapLayers(map: MapLibreMap) {
       type: "fill",
       filter: toLayerFilter(["==", ["get", "holderKind"], "uncertain"]),
       paint: {
-        "fill-pattern": uncertainHatchImageId,
-        "fill-opacity": 0.55
+        "fill-color": "rgba(0, 0, 0, 0)",
+        "fill-opacity": 0
       }
     });
   }
@@ -1323,7 +1289,7 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         ["==", ["get", "borderStyle"], "state"],
-        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]
+        [">=", ["zoom"], 5]
       ]),
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.border.stateColor,
@@ -1341,12 +1307,12 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         ["==", ["get", "borderStyle"], "disputed"],
-        [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]
+        [">=", ["zoom"], 5]
       ]),
       paint: {
         "line-color": ANCIENT_LAYER_STYLE.border.disputedColor,
         "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
-        "line-dasharray": [1, 2]
+        "line-dasharray": [4, 2]
       }
     });
   }

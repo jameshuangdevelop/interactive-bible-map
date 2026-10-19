@@ -1180,8 +1180,6 @@ function buildStopBorderCollections({
       normalizedPair.first.id === leftAssignment.holderId ? leftAreaId : rightAreaId;
     const normalizedAreaBId =
       normalizedPair.second.id === rightAssignment.holderId ? rightAreaId : leftAreaId;
-    const areaAMinZoom = areaLabelMinZoomByAreaId.get(normalizedAreaAId) ?? 0;
-    const areaBMinZoom = areaLabelMinZoomByAreaId.get(normalizedAreaBId) ?? 0;
 
     const geometry = mesh(stopTopology, areaObject, (leftArea, rightArea) => {
       if (!leftArea || !rightArea) {
@@ -1209,7 +1207,7 @@ function buildStopBorderCollections({
           normalizedPair.first.kind === "uncertain" || normalizedPair.second.kind === "uncertain"
             ? "disputed"
             : "state",
-        minZoom: Math.max(areaAMinZoom, areaBMinZoom)
+        minZoom: 5
       },
       geometry: roundGeometry(geometry, SIMPLIFIED_COORDINATE_DECIMALS)
     });

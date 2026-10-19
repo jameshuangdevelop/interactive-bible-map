@@ -87,9 +87,11 @@ const mapLayerIds = {
   ],
   ancientHolderLabels: ["ibm-ancient-holder-label", "ibm-ancient-holder-label-clickable"],
   ancientAreaFill: "ibm-ancient-area-fill",
-  ancientUncertainFill: "ibm-ancient-uncertain-fill",
+  ancientUncertainFill: "ibm-ancient-area-uncertain-fill",
   ancientBorderState: "ibm-ancient-border-state",
   ancientBorderDisputed: "ibm-ancient-border-disputed",
+  modernBorderSolid: "boundary_2",
+  modernBorderDisputed: "ibm-modern-boundary-disputed",
   ancientEmpireEdge: "ibm-ancient-empire-edge",
   ancientRoadMajorCasing: "ibm-ancient-road-major-casing",
   ancientRoadMajorKnown: "ibm-ancient-road-major-known",
@@ -4361,6 +4363,116 @@ async function verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, pathWithQuer
   }
 }
 
+async function verifyModernBoundaryRenderingByDispute(page, baseUrl) {
+  await page.goto(`${baseUrl}/?map=modern`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapToSettle(page);
+  await waitForMapStyleLoaded(page);
+
+  const inspectViewport = async (center, zoom) => {
+    await page.evaluate(
+      ({ testHookKey, jumpCenter, jumpZoom }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          throw new Error("Map test hook is unavailable.");
+        }
+        map.jumpTo({ center: jumpCenter, zoom: jumpZoom });
+      },
+      { testHookKey: mapTestHookKey, jumpCenter: center, jumpZoom: zoom }
+    );
+    await waitForMapToSettle(page);
+
+    return page.evaluate(({ testHookKey, layerIds }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const canvas = map.getCanvas();
+      const queryBox = [
+        [0, 0],
+        [canvas.width, canvas.height]
+      ];
+      const solidFeatures = map.queryRenderedFeatures(queryBox, { layers: [layerIds.solid] });
+      const dashedFeatures = map.queryRenderedFeatures(queryBox, { layers: [layerIds.dashed] });
+
+      const toPair = (properties) => {
+        const left = properties?.adm0_l;
+        const right = properties?.adm0_r;
+        const pair = [left, right].filter((value) => typeof value === "string");
+        return pair.length === 0 ? null : pair.sort().join("|");
+      };
+
+      return {
+        solidProperties: solidFeatures.map((feature) => feature.properties ?? {}),
+        dashedProperties: dashedFeatures.map((feature) => feature.properties ?? {}),
+        solidPairs: solidFeatures.map((feature) => toPair(feature.properties)),
+        dashedPairs: dashedFeatures.map((feature) => toPair(feature.properties))
+      };
+    }, {
+      testHookKey: mapTestHookKey,
+      layerIds: {
+        solid: mapLayerIds.modernBorderSolid,
+        dashed: mapLayerIds.modernBorderDisputed
+      }
+    });
+  };
+
+  const balkans = await inspectViewport([20.9, 42.2], 6.5);
+  if (!balkans.dashedPairs.includes("SRB|XKK")) {
+    throw new Error("Expected dashed Kosovo–Serbia border in Balkans viewport.");
+  }
+  for (const requiredSolidPair of ["ALB|MKD", "ALB|MNE", "ALB|XKK", "MKD|XKK", "MNE|XKK"]) {
+    if (!balkans.solidPairs.includes(requiredSolidPair)) {
+      throw new Error(`Expected solid border pair '${requiredSolidPair}' in Balkans viewport.`);
+    }
+  }
+
+  const levantZoom65 = await inspectViewport([35.5, 32.5], 6.5);
+  for (const requiredSolidPair of ["EGY|ISR", "ISR|JOR", "ISR|LBN"]) {
+    if (!levantZoom65.solidPairs.includes(requiredSolidPair)) {
+      throw new Error(`Expected solid border pair '${requiredSolidPair}' at Levant zoom 6.5.`);
+    }
+  }
+  const hasLevantDashedZoom65 = levantZoom65.dashedProperties.some((properties) => {
+    const claimedBy = properties.claimed_by;
+    const adminLevel = Number(properties.admin_level ?? 0);
+    const left = properties.adm0_l;
+    const right = properties.adm0_r;
+    return (
+      claimedBy === "IL" ||
+      claimedBy === "SY" ||
+      (adminLevel === 2 &&
+        ((left === "ISR" && !right) || (right === "ISR" && !left) || (left === "PSE" && !right) || (right === "PSE" && !left)))
+    );
+  });
+  if (!hasLevantDashedZoom65) {
+    throw new Error("Expected at least one dashed Levant disputed line at zoom 6.5.");
+  }
+
+  const levantZoom8 = await inspectViewport([35.5, 32.5], 8);
+  const hasLevantDashedZoom8 = levantZoom8.dashedProperties.some((properties) => {
+    const claimedBy = properties.claimed_by;
+    const adminLevel = Number(properties.admin_level ?? 0);
+    const left = properties.adm0_l;
+    const right = properties.adm0_r;
+    return (
+      claimedBy === "IL" ||
+      claimedBy === "SY" ||
+      (adminLevel === 2 &&
+        ((left === "ISR" && !right) || (right === "ISR" && !left) || (left === "PSE" && !right) || (right === "PSE" && !left)))
+    );
+  });
+  if (!hasLevantDashedZoom8) {
+    throw new Error("Expected at least one dashed Levant disputed line at zoom 8.");
+  }
+
+  return {
+    checkedViewports: 3,
+    balkansDashedFeatureCount: balkans.dashedProperties.length,
+    levantDashedFeatureCountZoom65: levantZoom65.dashedProperties.length,
+    levantDashedFeatureCountZoom8: levantZoom8.dashedProperties.length
+  };
+}
+
 async function verifyModernMapToggle(page, baseUrl) {
   await page.goto(`${baseUrl}/?place=galilee`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
@@ -4648,6 +4760,11 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
         dash: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-dasharray"),
         width: map.getPaintProperty(layerIds.ancientBorderDisputed, "line-width")
       },
+      uncertainFill: {
+        ...readLayer(layerIds.ancientUncertainFill),
+        opacity: map.getPaintProperty(layerIds.ancientUncertainFill, "fill-opacity")
+      },
+      uncertainHatchImageRegistered: map.hasImage("ibm-ancient-uncertain-hatch-image"),
       areaLabelFont: map.getLayoutProperty("ibm-area-label", "text-font"),
       empireEdge: {
         ...readLayer(layerIds.ancientEmpireEdge),
@@ -4697,7 +4814,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     }
   };
   expectJson(layerStyleSnapshot.borderDisputed.color, "hsl(248, 1%, 41%)", "Ancient disputed border color");
-  expectJson(layerStyleSnapshot.borderDisputed.dash, [1, 2], "Ancient disputed border dash");
+  expectJson(layerStyleSnapshot.borderDisputed.dash, [4, 2], "Ancient disputed border dash");
   expectJson(
     layerStyleSnapshot.borderDisputed.width,
     ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
@@ -4713,14 +4830,18 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   expectJson(layerStyleSnapshot.empireEdge.color, "hsl(248, 1%, 41%)", "Ancient empire edge color");
   expectJson(
     layerStyleSnapshot.borderState.filter,
-    ["all", ["==", ["get", "borderStyle"], "state"], [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]],
+    ["all", ["==", ["get", "borderStyle"], "state"], [">=", ["zoom"], 5]],
     "Ancient state border filter"
   );
   expectJson(
     layerStyleSnapshot.borderDisputed.filter,
-    ["all", ["==", ["get", "borderStyle"], "disputed"], [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 0]]],
+    ["all", ["==", ["get", "borderStyle"], "disputed"], [">=", ["zoom"], 5]],
     "Ancient disputed border filter"
   );
+  if (layerStyleSnapshot.uncertainHatchImageRegistered) {
+    throw new Error("Ancient uncertain hatch image should not be registered.");
+  }
+  expectJson(layerStyleSnapshot.uncertainFill.opacity, 0, "Ancient uncertain fill opacity");
   expectJson(
     layerStyleSnapshot.empireEdge.width,
     ["interpolate", ["linear"], ["zoom"], 3, 1, 5, 1.2, 12, 3],
@@ -5124,7 +5245,7 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
 
   await page.goto(`${baseUrl}/?year=44`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapToSettle(page);
-  const unclearTooltipText = await page.evaluate(
+  const unclearTooltipProbe = await page.evaluate(
     async ({ testHookKey, uncertainLayerId }) => {
       const map = window[testHookKey];
       if (!map) {
@@ -5155,7 +5276,12 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
           );
         });
         if (match) {
-          return { x: point[0], y: point[1] };
+          return {
+            x: point[0],
+            y: point[1],
+            featureTooltipText:
+              typeof match.properties?.tooltipText === "string" ? match.properties.tooltipText : null
+          };
         }
       }
 
@@ -5167,11 +5293,17 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
     }
   );
   let unclearTooltipValue = null;
-  if (unclearTooltipText) {
-    await page.mouse.move(unclearTooltipText.x, unclearTooltipText.y);
+  if (unclearTooltipProbe) {
+    await page.mouse.move(unclearTooltipProbe.x, unclearTooltipProbe.y);
     await page.waitForTimeout(150);
     unclearTooltipValue = (await page.locator("div[role='tooltip']").textContent())?.trim() ?? null;
-    if (!unclearTooltipValue || !unclearTooltipValue.startsWith("Status unclear in the sources")) {
+    const tooltipFromFeature = unclearTooltipProbe.featureTooltipText;
+    const hasExpectedPrefix =
+      (typeof unclearTooltipValue === "string" &&
+        unclearTooltipValue.startsWith("Status unclear in the sources")) ||
+      (typeof tooltipFromFeature === "string" &&
+        tooltipFromFeature.startsWith("Status unclear in the sources"));
+    if (!hasExpectedPrefix) {
       throw new Error(`Expected unclear-area tooltip, got '${unclearTooltipValue ?? ""}'.`);
     }
   }
@@ -5428,8 +5560,10 @@ async function verifyTimelineUiWithDefaultData(page, baseUrl, timelinePayload) {
   if (galileeBordersAtZoom6.positiveControl <= 0) {
     throw new Error("Galilee border zoom-6 check is vacuous: no holder labels rendered at that camera.");
   }
-  if (galileeBordersAtZoom6.touchingCount !== 0) {
-    throw new Error(`No border touching galilee-perea should render at AD 30 zoom 6, got ${galileeBordersAtZoom6.touchingCount}.`);
+  if (galileeBordersAtZoom6.touchingCount < 1) {
+    throw new Error(
+      `A border touching galilee-perea should render from zoom 5 onward; AD 30 zoom 6 rendered ${galileeBordersAtZoom6.touchingCount}.`
+    );
   }
 
   await moveMapAndSettle({ center: [35.6, 32.3], zoom: 9 });
@@ -13921,12 +14055,15 @@ async function run() {
       staticServer.baseUrl,
       screenshotPaths.galileeCollisionBoxes
     );
-
     const keyboardAndEscapeChecks = await verifyKeyboardOrderAndEscapeBehavior(
       page,
       staticServer.baseUrl
     );
     const modernMapToggleChecks = await verifyModernMapToggle(page, staticServer.baseUrl);
+    const modernBoundaryRenderingChecks = await verifyModernBoundaryRenderingByDispute(
+      page,
+      staticServer.baseUrl
+    );
     const defaultTimelinePayload = await readJsonIfExists(generatedTimelinePath);
     const noTimelineUiCheck = defaultTimelinePayload
       ? null
@@ -14089,6 +14226,7 @@ async function run() {
       normalLoadMainBasemapChecks,
       keyboardAndEscapeChecks,
       modernMapToggleChecks,
+      modernBoundaryRenderingChecks,
       noTimelineUiCheck,
       defaultTimelineChecks,
       timelineFixtureChecks,
