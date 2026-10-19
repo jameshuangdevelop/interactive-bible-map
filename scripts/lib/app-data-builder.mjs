@@ -199,6 +199,8 @@ export async function buildAppData(options = {}) {
     routesPath,
     routeStopsPath,
     routeLinesPath,
+    routeLineLandPath: options.routeLineLandPath,
+    routeLineLakesPath: options.routeLineLakesPath,
     timelinePath: resolvedTimelinePath,
     ancientAreasPath,
     ancientRoadsPath,

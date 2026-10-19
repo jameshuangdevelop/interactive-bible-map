@@ -1,0 +1,47 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "featurecla": "Land",
+        "note": "Route-line test fixture: a strip of land along the Levant coast."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              35.95,
+              36.3
+            ],
+            [
+              35.95,
+              36
+            ],
+            [
+              35.39,
+              32.95
+            ],
+            [
+              35.39,
+              32.8
+            ],
+            [
+              36.6,
+              32.8
+            ],
+            [
+              36.6,
+              36.3
+            ],
+            [
+              35.95,
+              36.3
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

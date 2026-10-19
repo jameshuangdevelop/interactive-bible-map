@@ -1,4 +1,4999 @@
 {
   "type": "FeatureCollection",
-  "features": []
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-03",
+        "routeId": "jesus",
+        "stageId": "segment-03",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q430776",
+            "wikidata:Q59174"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-land",
+              "detail": "No dated road links the stops, and a straight line would cross open water, so the line follows land where it must (ADR-0038, update of 2026-10-14, item 2); legs that stay on land are straight.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "shortest-over-land",
+              "detail": "The straight line from Nazareth to Capernaum would cross 6.15 km of open water, so this leg follows the shortest path over land (33.86 km against 32.67 km straight; ADR-0038, update of 2026-10-14, item 2). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Nazareth (wikidata:Q430776) and Capernaum (wikidata:Q59174): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q430776",
+                "wikidata:Q59174"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Capernaum's site (wikidata:Q59174) lies in the water by Natural Earth's shore: the line reaches it by a straight connector of 1.10 km over water between the site and land.",
+              "sources": [
+                "wikidata:Q59174",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.29785,
+            32.702103
+          ],
+          [
+            35.553023,
+            32.888922
+          ],
+          [
+            35.575,
+            32.881111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-04",
+        "routeId": "jesus",
+        "stageId": "segment-04",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "wikidata:Q430776"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q430776"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Galilee (wikidata:Q83241) and Nazareth (wikidata:Q430776): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q430776"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.29785,
+            32.702103
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-07",
+        "routeId": "jesus",
+        "stageId": "segment-07",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q59174",
+            "wikidata:Q1218"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-land",
+              "detail": "No dated road links the stops, and a straight line would cross open water, so the line follows land where it must (ADR-0038, update of 2026-10-14, item 2); legs that stay on land are straight.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "shortest-over-land",
+              "detail": "The straight line from Capernaum to Jerusalem would cross 11.52 km of open water, so this leg follows the shortest path over land (131.04 km against 126.91 km straight; ADR-0038, update of 2026-10-14, item 2). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Capernaum (wikidata:Q59174) and Jerusalem (wikidata:Q1218): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q59174",
+                "wikidata:Q1218"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Capernaum's site (wikidata:Q59174) lies in the water by Natural Earth's shore: the line leaves it by a straight connector of 1.00 km over water between the site and land.",
+              "sources": [
+                "wikidata:Q59174",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.575,
+            32.881111
+          ],
+          [
+            35.557533,
+            32.889837
+          ],
+          [
+            35.470668,
+            32.813167
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-08",
+        "routeId": "jesus",
+        "stageId": "segment-08",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q1218",
+            "wikidata:Q104028"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q104028"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Jerusalem (wikidata:Q1218) and Judea (wikidata:Q104028): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q104028"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.306389,
+            31.698889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-09",
+        "routeId": "jesus",
+        "stageId": "segment-09",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q104028",
+            "wikidata:Q7951237"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q104028",
+                "wikidata:Q7951237"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Judea (wikidata:Q104028) and Sychar (wikidata:Q7951237): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q104028",
+                "wikidata:Q7951237"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.306389,
+            31.698889
+          ],
+          [
+            35.281944,
+            32.213611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-13",
+        "routeId": "jesus",
+        "stageId": "segment-13",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "dare:21116"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q83241",
+                "dare:21116"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Galilee (wikidata:Q83241) and Tyre (dare:21116): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q83241",
+                "dare:21116"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.209358,
+            33.268071
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-14",
+        "routeId": "jesus",
+        "stageId": "segment-14",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "dare:21116",
+            "wikidata:Q126982"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "dare:21116",
+                "wikidata:Q126982"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Tyre (dare:21116) and Sea of Galilee (wikidata:Q126982): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21116",
+                "wikidata:Q126982"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.209358,
+            33.268071
+          ],
+          [
+            35.590033,
+            32.818906
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-15",
+        "routeId": "jesus",
+        "stageId": "segment-15",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q126982",
+            "dare:33357"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Sea of Galilee to Magdala (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Sea of Galilee (wikidata:Q126982) and Magdala (dare:33357): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q126982",
+                "dare:33357"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Magdala's site (dare:33357) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 0.22 km over land between the site and the water.",
+              "sources": [
+                "dare:33357",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.590033,
+            32.818906
+          ],
+          [
+            35.515763,
+            32.825077
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-18",
+        "routeId": "jesus",
+        "stageId": "segment-18",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q2484244",
+            "wikidata:Q59174"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q2484244",
+                "wikidata:Q59174"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Caesarea Philippi (wikidata:Q2484244) and Capernaum (wikidata:Q59174): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q2484244",
+                "wikidata:Q59174"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.693333,
+            33.246111
+          ],
+          [
+            35.575,
+            32.881111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-19",
+        "routeId": "jesus",
+        "stageId": "segment-19",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q59174",
+            "wikidata:Q934904"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-land",
+              "detail": "No dated road links the stops, and a straight line would cross open water, so the line follows land where it must (ADR-0038, update of 2026-10-14, item 2); legs that stay on land are straight.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "shortest-over-land",
+              "detail": "The straight line from Capernaum to Nain would cross 8.70 km of open water, so this leg follows the shortest path over land (36.47 km against 34.67 km straight; ADR-0038, update of 2026-10-14, item 2). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Capernaum (wikidata:Q59174) and Nain (wikidata:Q934904): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q59174",
+                "wikidata:Q934904"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Capernaum's site (wikidata:Q59174) lies in the water by Natural Earth's shore: the line leaves it by a straight connector of 1.01 km over water between the site and land.",
+              "sources": [
+                "wikidata:Q59174",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.575,
+            32.881111
+          ],
+          [
+            35.558351,
+            32.889274
+          ],
+          [
+            35.529384,
+            32.87059
+          ],
+          [
+            35.35,
+            32.633333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-20",
+        "routeId": "jesus",
+        "stageId": "segment-20",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "wikidata:Q1218"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q1218"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Galilee (wikidata:Q83241) and Jerusalem (wikidata:Q1218): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-21",
+        "routeId": "jesus",
+        "stageId": "segment-21",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "wikidata:Q1218"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q1218"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Galilee (wikidata:Q83241) and Jerusalem (wikidata:Q1218): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-22",
+        "routeId": "jesus",
+        "stageId": "segment-22",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q83241",
+            "wikidata:Q2460244"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q2460244"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Galilee (wikidata:Q83241) and Jericho (wikidata:Q2460244): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q83241",
+                "wikidata:Q2460244"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.3,
+            32.9
+          ],
+          [
+            35.436238,
+            31.851872
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-23",
+        "routeId": "jesus",
+        "stageId": "segment-23",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q2460244",
+            "wikidata:Q2193088"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Jericho (wikidata:Q2460244) and Bethphage (wikidata:Q2193088): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q2460244",
+                "wikidata:Q2193088"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.436238,
+            31.851872
+          ],
+          [
+            35.250778,
+            31.777222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-24",
+        "routeId": "jesus",
+        "stageId": "segment-24",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q2193088",
+            "wikidata:Q205976",
+            "wikidata:Q1218"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Bethphage (wikidata:Q2193088) and Jerusalem (wikidata:Q1218), through Mount of Olives (wikidata:Q205976): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q2193088",
+                "wikidata:Q205976",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.250778,
+            31.777222
+          ],
+          [
+            35.245686,
+            31.777946
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-27",
+        "routeId": "jesus",
+        "stageId": "segment-27",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q7818622",
+            "pleiades:687896"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Bethany (wikidata:Q7818622) and Ephraim (pleiades:687896): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q7818622",
+                "pleiades:687896"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.255903,
+            31.771661
+          ],
+          [
+            35.299196,
+            31.954665
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-28",
+        "routeId": "jesus",
+        "stageId": "segment-28",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:687896",
+            "wikidata:Q7818622"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Ephraim (pleiades:687896) and Bethany (wikidata:Q7818622): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:687896",
+                "wikidata:Q7818622"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.299196,
+            31.954665
+          ],
+          [
+            35.255903,
+            31.771661
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-29",
+        "routeId": "jesus",
+        "stageId": "segment-29",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q1218",
+            "wikidata:Q7818622"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Jerusalem (wikidata:Q1218) and Bethany (wikidata:Q7818622): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q7818622"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.255903,
+            31.771661
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-30",
+        "routeId": "jesus",
+        "stageId": "segment-30",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q1218",
+            "wikidata:Q205333"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Jerusalem (wikidata:Q1218) and Gethsemane (wikidata:Q205333): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q205333"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.239425,
+            31.779419
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "jesus-segment-32",
+        "routeId": "jesus",
+        "stageId": "segment-32",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q1218",
+            "wikidata:Q7818622"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Jerusalem (wikidata:Q1218) and Bethany (wikidata:Q7818622): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q1218",
+                "wikidata:Q7818622"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.234156,
+            31.776679
+          ],
+          [
+            35.255903,
+            31.771661
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-01",
+        "routeId": "paul-1",
+        "stageId": "stage-01",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q200441",
+            "wikidata:Q1605894"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q200441",
+                "wikidata:Q1605894"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Antioch on the Orontes (wikidata:Q200441) and Seleucia (wikidata:Q1605894): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q200441",
+                "wikidata:Q1605894"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            36.181667,
+            36.204722
+          ],
+          [
+            35.922,
+            36.124
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-02",
+        "routeId": "paul-1",
+        "stageId": "stage-02",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q1605894",
+            "pleiades:707617"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Seleucia to Salamis (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Seleucia (wikidata:Q1605894) and Salamis (pleiades:707617): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q1605894",
+                "pleiades:707617"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Seleucia's site (wikidata:Q1605894) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.04 km over land between the site and the water.",
+              "sources": [
+                "wikidata:Q1605894",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.922,
+            36.124
+          ],
+          [
+            33.958452,
+            35.201042
+          ],
+          [
+            33.903589,
+            35.175101
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-03",
+        "routeId": "paul-1",
+        "stageId": "stage-03",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:707617",
+            "pleiades:707586"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Salamis (pleiades:707617) and Paphos (pleiades:707586): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:707617",
+                "pleiades:707586"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Salamis's site (pleiades:707617) lies in the water by Natural Earth's shore: the line leaves it by a straight connector of 0.26 km over water between the site and land.",
+              "sources": [
+                "pleiades:707617",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Paphos's site (pleiades:707586) lies in the water by Natural Earth's shore: the line reaches it by a straight connector of 0.54 km over water between the site and land.",
+              "sources": [
+                "pleiades:707586",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            33.903589,
+            35.175101
+          ],
+          [
+            32.406593,
+            34.757212
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-04",
+        "routeId": "paul-1",
+        "stageId": "stage-04",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:707586",
+            "dare:21450"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Paphos to Perga (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Paphos (pleiades:707586) and Perga (dare:21450): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:707586",
+                "dare:21450"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Perga's site (dare:21450) lies 12.01 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 12.02 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "dare:21450",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            32.406593,
+            34.757212
+          ],
+          [
+            30.861943,
+            36.853448
+          ],
+          [
+            30.854274,
+            36.961406
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-05",
+        "routeId": "paul-1",
+        "stageId": "stage-05",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "dare:21450",
+            "pleiades:609307"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Perga (dare:21450) and Antioch in Pisidia (pleiades:609307): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21450",
+                "pleiades:609307"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            30.854274,
+            36.961406
+          ],
+          [
+            31.18987,
+            38.305374
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-06",
+        "routeId": "paul-1",
+        "stageId": "stage-06",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:609307",
+            "pleiades:648647"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Antioch in Pisidia (pleiades:609307) and Iconium (pleiades:648647): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:609307",
+                "pleiades:648647"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            31.18987,
+            38.305374
+          ],
+          [
+            32.492295,
+            37.872456
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-07",
+        "routeId": "paul-1",
+        "stageId": "stage-07",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:648647",
+            "pleiades:648699"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Iconium (pleiades:648647) and Lystra (pleiades:648699): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:648647",
+                "pleiades:648699"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            32.492295,
+            37.872456
+          ],
+          [
+            32.344473,
+            37.588278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-08",
+        "routeId": "paul-1",
+        "stageId": "stage-08",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:648699",
+            "wikidata:Q20717624"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Lystra (pleiades:648699) and Derbe (wikidata:Q20717624): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:648699",
+                "wikidata:Q20717624"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            32.344473,
+            37.588278
+          ],
+          [
+            33.361453,
+            37.348569
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-09",
+        "routeId": "paul-1",
+        "stageId": "stage-09",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q20717624",
+            "pleiades:648699"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Derbe (wikidata:Q20717624) and Lystra (pleiades:648699): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q20717624",
+                "pleiades:648699"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            33.361453,
+            37.348569
+          ],
+          [
+            32.344473,
+            37.588278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-10",
+        "routeId": "paul-1",
+        "stageId": "stage-10",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:648699",
+            "pleiades:648647"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Lystra (pleiades:648699) and Iconium (pleiades:648647): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:648699",
+                "pleiades:648647"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            32.344473,
+            37.588278
+          ],
+          [
+            32.492295,
+            37.872456
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-11",
+        "routeId": "paul-1",
+        "stageId": "stage-11",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:648647",
+            "pleiades:609307"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Iconium (pleiades:648647) and Antioch in Pisidia (pleiades:609307): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:648647",
+                "pleiades:609307"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            32.492295,
+            37.872456
+          ],
+          [
+            31.18987,
+            38.305374
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-12",
+        "routeId": "paul-1",
+        "stageId": "stage-12",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "pleiades:609307",
+            "dare:21450"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "pleiades:609307",
+                "dare:21450"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Antioch in Pisidia (pleiades:609307) and Perga (dare:21450): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:609307",
+                "dare:21450"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            31.18987,
+            38.305374
+          ],
+          [
+            30.854274,
+            36.961406
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-13",
+        "routeId": "paul-1",
+        "stageId": "stage-13",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "dare:21450",
+            "openbible:attalia"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "dare:21450",
+                "openbible:attalia"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Perga (dare:21450) and Attalia (openbible:attalia): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21450",
+                "openbible:attalia"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            30.854274,
+            36.961406
+          ],
+          [
+            30.703614,
+            36.881272
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-1-stage-14",
+        "routeId": "paul-1",
+        "stageId": "stage-14",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:attalia",
+            "wikidata:Q200441"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Attalia to Antioch on the Orontes (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Attalia (openbible:attalia) and Antioch on the Orontes (wikidata:Q200441): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:attalia",
+                "wikidata:Q200441"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Attalia's site (openbible:attalia) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.24 km over land between the site and the water.",
+              "sources": [
+                "openbible:attalia",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Antioch on the Orontes's site (wikidata:Q200441) lies 24.63 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 24.65 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q200441",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            30.703614,
+            36.881272
+          ],
+          [
+            30.735063,
+            36.845598
+          ],
+          [
+            32.528176,
+            36.084966
+          ],
+          [
+            32.707141,
+            36.022813
+          ],
+          [
+            32.814327,
+            36.01549
+          ],
+          [
+            35.917873,
+            36.08867
+          ],
+          [
+            35.946401,
+            36.090509
+          ],
+          [
+            36.181667,
+            36.204722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-01",
+        "routeId": "paul-2",
+        "stageId": "stage-01",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q200441",
+            "wikidata:Q20717624"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q200441",
+                "wikidata:Q20717624"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Antioch on the Orontes (wikidata:Q200441) and Derbe (wikidata:Q20717624): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q200441",
+                "wikidata:Q20717624"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            36.181667,
+            36.204722
+          ],
+          [
+            33.361453,
+            37.348569
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-02",
+        "routeId": "paul-2",
+        "stageId": "stage-02",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q20717624",
+            "pleiades:648699"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Derbe (wikidata:Q20717624) and Lystra (pleiades:648699): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q20717624",
+                "pleiades:648699"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            33.361453,
+            37.348569
+          ],
+          [
+            32.344473,
+            37.588278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-03",
+        "routeId": "paul-2",
+        "stageId": "stage-03",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "pleiades:648699",
+            "dare:21154"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "pleiades:648699",
+                "dare:21154"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Lystra (pleiades:648699) and Troas (dare:21154): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:648699",
+                "dare:21154"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            32.344473,
+            37.588278
+          ],
+          [
+            26.15765,
+            39.75135
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-04",
+        "routeId": "paul-2",
+        "stageId": "stage-04",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "dare:21154",
+            "openbible:samothrace"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Troas to Samothrace (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Troas (dare:21154) and Samothrace (openbible:samothrace): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21154",
+                "openbible:samothrace"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Troas's site (dare:21154) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 1.79 km over land between the site and the water.",
+              "sources": [
+                "dare:21154",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Samothrace's site (openbible:samothrace) lies 5.51 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 5.51 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "openbible:samothrace",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            26.15765,
+            39.75135
+          ],
+          [
+            26.092533,
+            39.759449
+          ],
+          [
+            25.968744,
+            39.816769
+          ],
+          [
+            25.650929,
+            40.125629
+          ],
+          [
+            25.550862,
+            40.406996
+          ],
+          [
+            25.583333,
+            40.45
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-05",
+        "routeId": "paul-2",
+        "stageId": "stage-05",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:samothrace",
+            "pleiades:501523"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Samothrace to Neapolis (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Samothrace (openbible:samothrace) and Neapolis (pleiades:501523): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:samothrace",
+                "pleiades:501523"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Samothrace's site (openbible:samothrace) lies 5.51 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 5.51 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "openbible:samothrace",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            25.583333,
+            40.45
+          ],
+          [
+            25.550862,
+            40.406996
+          ],
+          [
+            25.519547,
+            40.410887
+          ],
+          [
+            24.634492,
+            40.841648
+          ],
+          [
+            24.415015,
+            40.93504
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-06",
+        "routeId": "paul-2",
+        "stageId": "stage-06",
+        "provenance": {
+          "dataset": "AWMC Geodata's dated major roads (data/geo/ancient-roads.geojson), Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "awmc-commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson; naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "awmc:roads-objectid-679",
+            "awmc:roads-feature-14",
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:501523",
+            "pleiades:501482"
+          ],
+          "changes": [
+            {
+              "kind": "awmc-road",
+              "detail": "Each leg between the stops follows the shortest path along AWMC's major roads of the Roman period that the ancient layer draws (data/geo/ancient-roads.geojson: awmc-road-679-14), joined to each stop within 15 km (ADR-0038 item 5).",
+              "sources": [
+                "awmc:roads-objectid-679",
+                "awmc:roads-feature-14"
+              ]
+            },
+            {
+              "kind": "road-over-water-replaced",
+              "detail": "Between Neapolis and Philippi, AWMC's road runs 1.99 km over Natural Earth's water; that stretch (3.23 km) follows the shortest path over land instead (2.51 km). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Neapolis's site is 0.51 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Philippi's site is 0.84 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Neapolis (pleiades:501523) and Philippi (pleiades:501482): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:501523",
+                "pleiades:501482"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Neapolis's site (pleiades:501523) lies in the water by Natural Earth's shore: the line leaves it by a straight connector of 1.28 km over water between the site and land.",
+              "sources": [
+                "pleiades:501523",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            24.415015,
+            40.93504
+          ],
+          [
+            24.38818,
+            40.94499
+          ],
+          [
+            24.3764,
+            40.9532
+          ],
+          [
+            24.36391,
+            40.96213
+          ],
+          [
+            24.35596,
+            40.97083
+          ],
+          [
+            24.35035,
+            40.97533
+          ],
+          [
+            24.33,
+            40.99175
+          ],
+          [
+            24.31858,
+            41.00282
+          ],
+          [
+            24.31019,
+            41.00674
+          ],
+          [
+            24.29199,
+            41.01781
+          ],
+          [
+            24.284637,
+            41.012651
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-07",
+        "routeId": "paul-2",
+        "stageId": "stage-07",
+        "provenance": {
+          "dataset": "AWMC Geodata's dated major roads (data/geo/ancient-roads.geojson), Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "awmc-commit:7ecf8bccea2efe1e1e9df2daf6001942de73fb87;path:Cultural-Data/roads/roads.geojson; naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "awmc:roads-objectid-679",
+            "awmc:roads-feature-14",
+            "awmc:roads-objectid-1258",
+            "awmc:roads-feature-584",
+            "awmc:roads-objectid-1259",
+            "awmc:roads-feature-585",
+            "awmc:roads-objectid-1257",
+            "awmc:roads-feature-583",
+            "awmc:roads-objectid-1265",
+            "awmc:roads-feature-589",
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:501482",
+            "openbible:amphipolis",
+            "openbible:apollonia",
+            "pleiades:491741"
+          ],
+          "changes": [
+            {
+              "kind": "awmc-road",
+              "detail": "Each leg between the stops follows the shortest path along AWMC's major roads of the Roman period that the ancient layer draws (data/geo/ancient-roads.geojson: awmc-road-679-14, awmc-road-1258-584, awmc-road-1259-585, awmc-road-1257-583, awmc-road-1265-589), joined to each stop within 15 km (ADR-0038 item 5).",
+              "sources": [
+                "awmc:roads-objectid-679",
+                "awmc:roads-feature-14",
+                "awmc:roads-objectid-1258",
+                "awmc:roads-feature-584",
+                "awmc:roads-objectid-1259",
+                "awmc:roads-feature-585",
+                "awmc:roads-objectid-1257",
+                "awmc:roads-feature-583",
+                "awmc:roads-objectid-1265",
+                "awmc:roads-feature-589"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Philippi's site is 0.84 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Amphipolis's site is 0.81 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "road-over-water-replaced",
+              "detail": "Between Amphipolis and Apollonia, AWMC's road runs 3.58 km over Natural Earth's water; that stretch (6.96 km) follows the shortest path over land instead (7.53 km). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Amphipolis's site is 0.81 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Apollonia's site is 3.95 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Apollonia's site is 3.95 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "road-join",
+              "detail": "Thessalonica's site is 1.38 km from the nearest vertex of a dated road; the line joins them straight.",
+              "sources": [
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Philippi (pleiades:501482) and Thessalonica (pleiades:491741), through Amphipolis (openbible:amphipolis) and Apollonia (openbible:apollonia): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:501482",
+                "openbible:amphipolis",
+                "openbible:apollonia",
+                "pleiades:491741"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            24.284637,
+            41.012651
+          ],
+          [
+            24.29199,
+            41.01781
+          ],
+          [
+            24.28628,
+            41.02459
+          ],
+          [
+            24.28128,
+            41.03601
+          ],
+          [
+            24.26986,
+            41.04458
+          ],
+          [
+            24.25059,
+            41.05493
+          ],
+          [
+            24.23274,
+            41.05992
+          ],
+          [
+            24.21097,
+            41.06206
+          ],
+          [
+            24.19421,
+            41.06073
+          ],
+          [
+            24.17403,
+            41.05921
+          ],
+          [
+            24.15939,
+            41.05707
+          ],
+          [
+            24.14226,
+            41.05421
+          ],
+          [
+            24.13013,
+            41.05029
+          ],
+          [
+            24.11264,
+            41.04243
+          ],
+          [
+            24.08301,
+            41.03322
+          ],
+          [
+            24.04875,
+            41.02073
+          ],
+          [
+            23.99593,
+            41.00139
+          ],
+          [
+            23.96844,
+            40.99211
+          ],
+          [
+            23.93596,
+            40.98711
+          ],
+          [
+            23.90706,
+            40.98217
+          ],
+          [
+            23.86899,
+            40.96313
+          ],
+          [
+            23.84638,
+            40.94648
+          ],
+          [
+            23.85257,
+            40.90008
+          ],
+          [
+            23.85971,
+            40.86677
+          ],
+          [
+            23.85709,
+            40.84273
+          ],
+          [
+            23.84495,
+            40.82727
+          ],
+          [
+            23.847209,
+            40.820159
+          ],
+          [
+            23.84495,
+            40.82727
+          ],
+          [
+            23.83544,
+            40.80585
+          ],
+          [
+            23.81283,
+            40.79752
+          ],
+          [
+            23.78904,
+            40.79277
+          ],
+          [
+            23.77952,
+            40.78206
+          ],
+          [
+            23.76286,
+            40.77373
+          ],
+          [
+            23.73074,
+            40.76659
+          ],
+          [
+            23.70932,
+            40.74756
+          ],
+          [
+            23.690887,
+            40.72601
+          ],
+          [
+            23.680248,
+            40.710136
+          ],
+          [
+            23.6891,
+            40.68688
+          ],
+          [
+            23.67482,
+            40.67974
+          ],
+          [
+            23.6427,
+            40.6726
+          ],
+          [
+            23.6201,
+            40.66427
+          ],
+          [
+            23.5963,
+            40.65476
+          ],
+          [
+            23.57845,
+            40.64286
+          ],
+          [
+            23.54514,
+            40.63929
+          ],
+          [
+            23.50945,
+            40.64524
+          ],
+          [
+            23.48566,
+            40.65714
+          ],
+          [
+            23.469685,
+            40.623703
+          ],
+          [
+            23.48566,
+            40.65714
+          ],
+          [
+            23.45353,
+            40.66189
+          ],
+          [
+            23.41903,
+            40.66546
+          ],
+          [
+            23.37989,
+            40.66784
+          ],
+          [
+            23.35847,
+            40.66903
+          ],
+          [
+            23.32992,
+            40.66784
+          ],
+          [
+            23.30969,
+            40.66308
+          ],
+          [
+            23.29185,
+            40.65833
+          ],
+          [
+            23.27519,
+            40.64881
+          ],
+          [
+            23.24902,
+            40.64286
+          ],
+          [
+            23.23117,
+            40.64048
+          ],
+          [
+            23.20738,
+            40.64524
+          ],
+          [
+            23.18953,
+            40.64881
+          ],
+          [
+            23.15027,
+            40.66427
+          ],
+          [
+            23.12648,
+            40.67022
+          ],
+          [
+            23.10268,
+            40.67617
+          ],
+          [
+            23.07413,
+            40.6964
+          ],
+          [
+            23.06342,
+            40.71186
+          ],
+          [
+            23.04438,
+            40.72138
+          ],
+          [
+            23.02892,
+            40.73328
+          ],
+          [
+            23.00869,
+            40.73923
+          ],
+          [
+            22.99442,
+            40.73328
+          ],
+          [
+            22.98252,
+            40.71067
+          ],
+          [
+            22.97062,
+            40.69045
+          ],
+          [
+            22.9611,
+            40.67022
+          ],
+          [
+            22.9611,
+            40.64643
+          ],
+          [
+            22.95541,
+            40.64061
+          ],
+          [
+            22.952885,
+            40.628342
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-08",
+        "routeId": "paul-2",
+        "stageId": "stage-08",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:491741",
+            "pleiades:491546"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-land",
+              "detail": "No dated road links the stops, and a straight line would cross open water, so the line follows land where it must (ADR-0038, update of 2026-10-14, item 2); legs that stay on land are straight.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "shortest-over-land",
+              "detail": "The straight line from Thessalonica to Berea would cross 6.57 km of open water, so this leg follows the shortest path over land (66.32 km against 64.55 km straight; ADR-0038, update of 2026-10-14, item 2). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Thessalonica (pleiades:491741) and Berea (pleiades:491546): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:491741",
+                "pleiades:491546"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            22.952885,
+            40.628342
+          ],
+          [
+            22.893511,
+            40.654365
+          ],
+          [
+            22.439009,
+            40.593787
+          ],
+          [
+            22.201493,
+            40.522127
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-09",
+        "routeId": "paul-2",
+        "stageId": "stage-09",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "pleiades:491546",
+            "pleiades:579885"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "pleiades:491546",
+                "pleiades:579885"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Berea (pleiades:491546) and Athens (pleiades:579885): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:491546",
+                "pleiades:579885"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            22.201493,
+            40.522127
+          ],
+          [
+            23.723914,
+            37.971637
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-10",
+        "routeId": "paul-2",
+        "stageId": "stage-10",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "pleiades:579885",
+            "pleiades:570182"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "pleiades:579885",
+                "pleiades:570182"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Athens (pleiades:579885) and Corinth (pleiades:570182): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:579885",
+                "pleiades:570182"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            23.723914,
+            37.971637
+          ],
+          [
+            22.878614,
+            37.905642
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-11",
+        "routeId": "paul-2",
+        "stageId": "stage-11",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:570182",
+            "pleiades:570347"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Corinth (pleiades:570182) and Cenchreae (pleiades:570347): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:570182",
+                "pleiades:570347"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            22.878614,
+            37.905642
+          ],
+          [
+            22.9925,
+            37.8824
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-12",
+        "routeId": "paul-2",
+        "stageId": "stage-12",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:570347",
+            "pleiades:599612"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Cenchreae to Ephesus (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Cenchreae (pleiades:570347) and Ephesus (pleiades:599612): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:570347",
+                "pleiades:599612"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Cenchreae's site (pleiades:570347) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.24 km over land between the site and the water.",
+              "sources": [
+                "pleiades:570347",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Ephesus's site (pleiades:599612) lies 6.06 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 6.06 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "pleiades:599612",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            22.9925,
+            37.8824
+          ],
+          [
+            23.753227,
+            37.741998
+          ],
+          [
+            23.941701,
+            37.630667
+          ],
+          [
+            24.118278,
+            37.63678
+          ],
+          [
+            24.344128,
+            37.697068
+          ],
+          [
+            24.963284,
+            37.676822
+          ],
+          [
+            25.057207,
+            37.696756
+          ],
+          [
+            27.274728,
+            37.929019
+          ],
+          [
+            27.342403,
+            37.940164
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-13",
+        "routeId": "paul-2",
+        "stageId": "stage-13",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:599612",
+            "pleiades:678401"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Ephesus to Caesarea Maritima (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Ephesus (pleiades:599612) and Caesarea Maritima (pleiades:678401): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:599612",
+                "pleiades:678401"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Ephesus's site (pleiades:599612) lies 6.06 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 6.06 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "pleiades:599612",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Caesarea Maritima's site (pleiades:678401) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 0.20 km over land between the site and the water.",
+              "sources": [
+                "pleiades:678401",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            27.342403,
+            37.940164
+          ],
+          [
+            27.274728,
+            37.929019
+          ],
+          [
+            27.24962,
+            37.91486
+          ],
+          [
+            27.073156,
+            37.705081
+          ],
+          [
+            27.066107,
+            37.702035
+          ],
+          [
+            27.010165,
+            37.690606
+          ],
+          [
+            26.998676,
+            37.668996
+          ],
+          [
+            27.246634,
+            36.962364
+          ],
+          [
+            27.368081,
+            36.875345
+          ],
+          [
+            27.368545,
+            36.853598
+          ],
+          [
+            27.339767,
+            36.698283
+          ],
+          [
+            27.35497,
+            36.673937
+          ],
+          [
+            27.39659,
+            36.655554
+          ],
+          [
+            27.830468,
+            36.515483
+          ],
+          [
+            29.094702,
+            36.359788
+          ],
+          [
+            29.349395,
+            36.193639
+          ],
+          [
+            34.846298,
+            32.532603
+          ],
+          [
+            34.892,
+            32.5015
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-2-stage-14",
+        "routeId": "paul-2",
+        "stageId": "stage-14",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "pleiades:678401",
+            "wikidata:Q200441"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "pleiades:678401",
+                "wikidata:Q200441"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Caesarea Maritima (pleiades:678401) and Antioch on the Orontes (wikidata:Q200441): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:678401",
+                "wikidata:Q200441"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.892,
+            32.5015
+          ],
+          [
+            36.181667,
+            36.204722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-01",
+        "routeId": "paul-3",
+        "stageId": "stage-01",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "wikidata:Q200441",
+            "pleiades:599612"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "wikidata:Q200441",
+                "pleiades:599612"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Antioch on the Orontes (wikidata:Q200441) and Ephesus (pleiades:599612): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q200441",
+                "pleiades:599612"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            36.181667,
+            36.204722
+          ],
+          [
+            27.342403,
+            37.940164
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-02",
+        "routeId": "paul-3",
+        "stageId": "stage-02",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "pleiades:599612",
+            "pleiades:501482"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "pleiades:599612",
+                "pleiades:501482"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Ephesus (pleiades:599612) and Philippi (pleiades:501482): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:599612",
+                "pleiades:501482"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            27.342403,
+            37.940164
+          ],
+          [
+            24.284637,
+            41.012651
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-03",
+        "routeId": "paul-3",
+        "stageId": "stage-03",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:501482",
+            "dare:21154"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Philippi to Troas (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Philippi (pleiades:501482) and Troas (dare:21154): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:501482",
+                "dare:21154"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Philippi's site (pleiades:501482) lies 12.35 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 12.36 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "pleiades:501482",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Troas's site (dare:21154) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 1.83 km over land between the site and the water.",
+              "sources": [
+                "dare:21154",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            24.284637,
+            41.012651
+          ],
+          [
+            24.391792,
+            40.936457
+          ],
+          [
+            24.743356,
+            40.786964
+          ],
+          [
+            25.992189,
+            39.800735
+          ],
+          [
+            26.094253,
+            39.761614
+          ],
+          [
+            26.15765,
+            39.75135
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-04",
+        "routeId": "paul-3",
+        "stageId": "stage-04",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "dare:21154",
+            "wikidata:Q744631"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Troas (dare:21154) and Assos (wikidata:Q744631): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21154",
+                "wikidata:Q744631"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            26.15765,
+            39.75135
+          ],
+          [
+            26.336667,
+            39.490556
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-05",
+        "routeId": "paul-3",
+        "stageId": "stage-05",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q744631",
+            "openbible:mitylene"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Assos to Mitylene (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Assos (wikidata:Q744631) and Mitylene (openbible:mitylene): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q744631",
+                "openbible:mitylene"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Assos's site (wikidata:Q744631) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.92 km over land between the site and the water.",
+              "sources": [
+                "wikidata:Q744631",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Mitylene's site (openbible:mitylene) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 1.04 km over land between the site and the water.",
+              "sources": [
+                "openbible:mitylene",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            26.336667,
+            39.490556
+          ],
+          [
+            26.358721,
+            39.441447
+          ],
+          [
+            26.559062,
+            39.162379
+          ],
+          [
+            26.561897,
+            39.150298
+          ],
+          [
+            26.547048,
+            39.110475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-06",
+        "routeId": "paul-3",
+        "stageId": "stage-06",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:mitylene",
+            "openbible:chios",
+            "wikidata:Q156882"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Mitylene to Samos, passing Chios in order (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "place-passed",
+              "detail": "Passes Chios (an island: within 10 km of its coast), 10.0 km away at the nearest.",
+              "sources": [
+                "openbible:chios",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Mitylene (openbible:mitylene) and Samos (wikidata:Q156882); places passed: Chios (openbible:chios): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:mitylene",
+                "openbible:chios",
+                "wikidata:Q156882"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Mitylene's site (openbible:mitylene) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 1.84 km over land between the site and the water.",
+              "sources": [
+                "openbible:mitylene",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Samos's site (wikidata:Q156882) lies 5.76 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 5.76 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q156882",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            26.547048,
+            39.110475
+          ],
+          [
+            26.579936,
+            39.099393
+          ],
+          [
+            26.629433,
+            39.04871
+          ],
+          [
+            26.620895,
+            39.008635
+          ],
+          [
+            26.315677,
+            38.632259
+          ],
+          [
+            26.306636,
+            38.482459
+          ],
+          [
+            26.266521,
+            38.441525
+          ],
+          [
+            26.216163,
+            38.268273
+          ],
+          [
+            26.86233,
+            37.811539
+          ],
+          [
+            26.875372,
+            37.789697
+          ],
+          [
+            26.8333,
+            37.75
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-07",
+        "routeId": "paul-3",
+        "stageId": "stage-07",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q156882",
+            "openbible:trogyllium"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Samos to Trogyllium (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Samos (wikidata:Q156882) and Trogyllium (openbible:trogyllium): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q156882",
+                "openbible:trogyllium"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Samos's site (wikidata:Q156882) lies 5.76 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 5.76 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q156882",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            26.8333,
+            37.75
+          ],
+          [
+            26.875372,
+            37.789697
+          ],
+          [
+            26.907101,
+            37.794805
+          ],
+          [
+            27.035679,
+            37.808935
+          ],
+          [
+            27.078963,
+            37.77793
+          ],
+          [
+            27.07365,
+            37.706147
+          ],
+          [
+            27.062277,
+            37.7035
+          ],
+          [
+            27.027854,
+            37.700764
+          ],
+          [
+            27.003279,
+            37.659431
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-08",
+        "routeId": "paul-3",
+        "stageId": "stage-08",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:trogyllium",
+            "dare:21166"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Trogyllium to Miletus (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Trogyllium (openbible:trogyllium) and Miletus (dare:21166): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:trogyllium",
+                "dare:21166"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Miletus's site (dare:21166) lies 7.04 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 7.04 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "dare:21166",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            27.003279,
+            37.659431
+          ],
+          [
+            27.165048,
+            37.555939
+          ],
+          [
+            27.171218,
+            37.556327
+          ],
+          [
+            27.204715,
+            37.555242
+          ],
+          [
+            27.2774885,
+            37.5292362
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-09",
+        "routeId": "paul-3",
+        "stageId": "stage-09",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "dare:21166",
+            "wikidata:Q187027"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Miletus to Cos (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Miletus (dare:21166) and Cos (wikidata:Q187027): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21166",
+                "wikidata:Q187027"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Miletus's site (dare:21166) lies 7.04 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 7.04 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "dare:21166",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Cos's site (wikidata:Q187027) lies 4.59 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 4.59 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q187027",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            27.2774885,
+            37.5292362
+          ],
+          [
+            27.204715,
+            37.555242
+          ],
+          [
+            27.177083,
+            37.556137
+          ],
+          [
+            27.113649,
+            37.046453
+          ],
+          [
+            27.08281,
+            36.850235
+          ],
+          [
+            27.110278,
+            36.815278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-10",
+        "routeId": "paul-3",
+        "stageId": "stage-10",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q187027",
+            "openbible:rhodes-1"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Cos to Rhodes (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Cos (wikidata:Q187027) and Rhodes (openbible:rhodes-1): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q187027",
+                "openbible:rhodes-1"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Cos's site (wikidata:Q187027) lies 4.59 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 4.59 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q187027",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Rhodes's site (openbible:rhodes-1) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 0.89 km over land between the site and the water.",
+              "sources": [
+                "openbible:rhodes-1",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            27.110278,
+            36.815278
+          ],
+          [
+            27.08281,
+            36.850235
+          ],
+          [
+            27.098304,
+            36.872026
+          ],
+          [
+            27.17378,
+            36.908205
+          ],
+          [
+            27.316769,
+            36.92217
+          ],
+          [
+            27.371236,
+            36.869377
+          ],
+          [
+            27.340935,
+            36.707652
+          ],
+          [
+            27.349753,
+            36.676119
+          ],
+          [
+            27.403787,
+            36.652627
+          ],
+          [
+            27.83416,
+            36.514295
+          ],
+          [
+            28.149472,
+            36.455809
+          ],
+          [
+            28.2109,
+            36.4402
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-11",
+        "routeId": "paul-3",
+        "stageId": "stage-11",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:rhodes-1",
+            "wikidata:Q233121"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Rhodes to Patara (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Rhodes (openbible:rhodes-1) and Patara (wikidata:Q233121): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:rhodes-1",
+                "wikidata:Q233121"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Rhodes's site (openbible:rhodes-1) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 2.31 km over land between the site and the water.",
+              "sources": [
+                "openbible:rhodes-1",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Patara's site (wikidata:Q233121) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 0.77 km over land between the site and the water.",
+              "sources": [
+                "wikidata:Q233121",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            28.2109,
+            36.4402
+          ],
+          [
+            28.25336,
+            36.444475
+          ],
+          [
+            29.278798,
+            36.257777
+          ],
+          [
+            29.314167,
+            36.260278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-12",
+        "routeId": "paul-3",
+        "stageId": "stage-12",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q233121",
+            "pleiades:707498",
+            "dare:21116"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Patara to Tyre, passing Cyprus in order (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "side-of-island",
+              "detail": "Acts 21:3 says the ship came in sight of Cyprus, \"leaving it on the left hand\", while sailing to Syria, so the line passes south of the island: it crosses the open water south of Cyprus on the meridian of the island's label point.",
+              "sources": [
+                "scripture:Acts 21:3",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Patara (wikidata:Q233121) and Tyre (dare:21116); places passed: Cyprus (pleiades:707498): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q233121",
+                "pleiades:707498",
+                "dare:21116"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Patara's site (wikidata:Q233121) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.74 km over land between the site and the water.",
+              "sources": [
+                "wikidata:Q233121",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Tyre's site (dare:21116) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 1.00 km over land between the site and the water.",
+              "sources": [
+                "dare:21116",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            29.314167,
+            36.260278
+          ],
+          [
+            29.311764,
+            36.238395
+          ],
+          [
+            29.339146,
+            36.203101
+          ],
+          [
+            29.34727,
+            36.197231
+          ],
+          [
+            33.222467,
+            34.262046
+          ],
+          [
+            35.181425,
+            33.266407
+          ],
+          [
+            35.209358,
+            33.268071
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-13",
+        "routeId": "paul-3",
+        "stageId": "stage-13",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "dare:21116",
+            "openbible:ptolemais"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Tyre to Ptolemais (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Tyre (dare:21116) and Ptolemais (openbible:ptolemais): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "dare:21116",
+                "openbible:ptolemais"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Tyre's site (dare:21116) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.95 km over land between the site and the water.",
+              "sources": [
+                "dare:21116",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.209358,
+            33.268071
+          ],
+          [
+            35.063411,
+            33.064391
+          ],
+          [
+            35.052138,
+            32.929032
+          ],
+          [
+            35.0692,
+            32.9214
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-14",
+        "routeId": "paul-3",
+        "stageId": "stage-14",
+        "provenance": {
+          "dataset": "The stops' sites only (path not known)",
+          "version": "stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "openbible:ptolemais",
+            "pleiades:678401"
+          ],
+          "changes": [
+            {
+              "kind": "path-not-known",
+              "detail": "The text gives no path for this stage, so the line is straight between the stops' sites and claims no path (ADR-0038 item 1; update of 2026-10-14, item 2).",
+              "sources": [
+                "openbible:ptolemais",
+                "pleiades:678401"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Ptolemais (openbible:ptolemais) and Caesarea Maritima (pleiades:678401): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:ptolemais",
+                "pleiades:678401"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.0692,
+            32.9214
+          ],
+          [
+            34.892,
+            32.5015
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-3-stage-15",
+        "routeId": "paul-3",
+        "stageId": "stage-15",
+        "provenance": {
+          "dataset": "The stops' sites, tested against Natural Earth 10 m land and 10 m lakes",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:678401",
+            "wikidata:Q1218"
+          ],
+          "changes": [
+            {
+              "kind": "straight-over-land",
+              "detail": "No dated road links the stops, so each leg is a straight line between the stops' sites, which keeps to land: an exact test against Natural Earth 10 m land and lakes finds no water crossed (ADR-0038 item 5).",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Caesarea Maritima (pleiades:678401) and Jerusalem (wikidata:Q1218): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:678401",
+                "wikidata:Q1218"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.892,
+            32.5015
+          ],
+          [
+            35.234156,
+            31.776679
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-01",
+        "routeId": "paul-rome",
+        "stageId": "stage-01",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:678401",
+            "openbible:sidon"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Caesarea Maritima to Sidon (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Caesarea Maritima (pleiades:678401) and Sidon (openbible:sidon): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:678401",
+                "openbible:sidon"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Caesarea Maritima's site (pleiades:678401) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.38 km over land between the site and the water.",
+              "sources": [
+                "pleiades:678401",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Sidon's site (openbible:sidon) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 0.90 km over land between the site and the water.",
+              "sources": [
+                "openbible:sidon",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.892,
+            32.5015
+          ],
+          [
+            34.882859,
+            32.528591
+          ],
+          [
+            35.023873,
+            33.281623
+          ],
+          [
+            35.344741,
+            33.551002
+          ],
+          [
+            35.371944,
+            33.560985
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-02",
+        "routeId": "paul-rome",
+        "stageId": "stage-02",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:sidon",
+            "pleiades:707498",
+            "wikidata:Q652024"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Sidon to Myra, passing Cyprus in order (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "side-of-island",
+              "detail": "Acts 27:4-5 says the ship \"sailed under the lee of Cyprus, because the winds were contrary\", and then across the sea off Cilicia and Pamphylia, so the line passes north of the island: it crosses the water between Cyprus and Asia Minor on the meridian of the island's label point.",
+              "sources": [
+                "scripture:Acts 27:4-5",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Sidon (openbible:sidon) and Myra (wikidata:Q652024); places passed: Cyprus (pleiades:707498): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:sidon",
+                "pleiades:707498",
+                "wikidata:Q652024"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Sidon's site (openbible:sidon) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 0.83 km over land between the site and the water.",
+              "sources": [
+                "openbible:sidon",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Myra's site (wikidata:Q652024) lies 4.19 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 4.19 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q652024",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.371944,
+            33.560985
+          ],
+          [
+            35.340997,
+            33.604526
+          ],
+          [
+            34.607072,
+            35.697648
+          ],
+          [
+            33.960793,
+            35.956497
+          ],
+          [
+            33.222467,
+            35.994109
+          ],
+          [
+            32.744424,
+            36.018485
+          ],
+          [
+            30.036309,
+            36.220387
+          ],
+          [
+            30.007358,
+            36.225904
+          ],
+          [
+            29.985278,
+            36.259167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-03",
+        "routeId": "paul-rome",
+        "stageId": "stage-03",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q652024",
+            "wikidata:Q690575",
+            "wikidata:Q34374",
+            "openbible:salmone",
+            "wikidata:Q11818846"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Myra to Fair Havens, passing Cnidus, then Crete, then Salmone in order (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "place-passed",
+              "detail": "Passes Cnidus (within 5 km of its site), 5.0 km away at the nearest.",
+              "sources": [
+                "wikidata:Q690575",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "place-passed",
+              "detail": "Passes Crete (an island: within 10 km of its coast), 8.4 km away at the nearest.",
+              "sources": [
+                "wikidata:Q34374",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "place-passed",
+              "detail": "Passes Salmone (within 5 km of its site), 5.0 km away at the nearest.",
+              "sources": [
+                "openbible:salmone",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "side-of-island",
+              "detail": "Acts 27:7-8 says the ship \"sailed under the lee of Crete, opposite Salmone\" and, \"sailing along it\", came to Fair Havens, so after Salmone the line follows Crete's south coast: it crosses the water south of Crete on the meridian of the island's label point.",
+              "sources": [
+                "scripture:Acts 27:7-8",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Myra (wikidata:Q652024) and Fair Havens (wikidata:Q11818846); places passed: Cnidus (wikidata:Q690575), Crete (wikidata:Q34374), Salmone (openbible:salmone): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q652024",
+                "wikidata:Q690575",
+                "wikidata:Q34374",
+                "openbible:salmone",
+                "wikidata:Q11818846"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Myra's site (wikidata:Q652024) lies 4.19 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 4.19 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q652024",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            29.985278,
+            36.259167
+          ],
+          [
+            30.007358,
+            36.225904
+          ],
+          [
+            29.985809,
+            36.209174
+          ],
+          [
+            29.874132,
+            36.158138
+          ],
+          [
+            29.740314,
+            36.110638
+          ],
+          [
+            29.548012,
+            36.110029
+          ],
+          [
+            28.055745,
+            36.512482
+          ],
+          [
+            27.819264,
+            36.517174
+          ],
+          [
+            27.392641,
+            36.643147
+          ],
+          [
+            26.363515,
+            35.382021
+          ],
+          [
+            26.340871,
+            35.354046
+          ],
+          [
+            26.332938,
+            35.17858
+          ],
+          [
+            26.25344,
+            35.028693
+          ],
+          [
+            26.129414,
+            34.984111
+          ],
+          [
+            24.970574,
+            34.917857
+          ],
+          [
+            24.893333,
+            34.92266
+          ],
+          [
+            24.864074,
+            34.924585
+          ],
+          [
+            24.800306,
+            34.929694
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-04",
+        "routeId": "paul-rome",
+        "stageId": "stage-04",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q11818846",
+            "openbible:cauda",
+            "wikidata:Q233"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Fair Havens to Malta, passing Cauda in order (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "side-of-island",
+              "detail": "Acts 27:14 says the storm wind \"beat down from shore\", from Crete to the north, and Acts 27:16 has the ship run \"under the lee of a small island called Clauda\", so the line passes Cauda on its sheltered south side rather than crossing it: it crosses the water south of the island on the meridian of its label point.",
+              "sources": [
+                "scripture:Acts 27:14",
+                "scripture:Acts 27:16",
+                "naturalearth:ne-10m-land"
+              ]
+            },
+            {
+              "kind": "detour-reason",
+              "detail": "The storm: Acts 27:15 says \"we gave way to it and were driven along\", Acts 27:16 has the ship pass under the lee of Cauda, and Acts 28:1 has it reach Malta. The text gives no course between, so after Cauda the line runs straight across the open sea to Malta.",
+              "sources": [
+                "scripture:Acts 27:15",
+                "scripture:Acts 27:16",
+                "scripture:Acts 28:1"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Fair Havens (wikidata:Q11818846) and Malta (wikidata:Q233); places passed: Cauda (openbible:cauda): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q11818846",
+                "openbible:cauda",
+                "wikidata:Q233"
+              ]
+            },
+            {
+              "kind": "end-approach",
+              "detail": "Malta's site (wikidata:Q233) lies 4.94 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and reaches it by a straight approach of 4.94 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q233",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            24.800306,
+            34.929694
+          ],
+          [
+            24.1189,
+            34.806396
+          ],
+          [
+            24.083333,
+            34.810074
+          ],
+          [
+            14.437307,
+            35.801679
+          ],
+          [
+            14.36218,
+            35.846271
+          ],
+          [
+            14.359858,
+            35.869684
+          ],
+          [
+            14.4,
+            35.9
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-05",
+        "routeId": "paul-rome",
+        "stageId": "stage-05",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "wikidata:Q233",
+            "openbible:syracuse"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Malta to Syracuse (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Malta (wikidata:Q233) and Syracuse (openbible:syracuse): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "wikidata:Q233",
+                "openbible:syracuse"
+              ]
+            },
+            {
+              "kind": "start-approach",
+              "detail": "Malta's site (wikidata:Q233) lies 4.94 km from Natural Earth's nearest coast, inland or inside an island, so the line goes by sea to the coast nearest the site and leaves it by a straight approach of 4.94 km over land, which crosses no water (ADR-0038, update of 2026-10-14, \"stops away from the water\").",
+              "sources": [
+                "wikidata:Q233",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.4,
+            35.9
+          ],
+          [
+            14.359858,
+            35.869684
+          ],
+          [
+            14.334074,
+            35.881055
+          ],
+          [
+            14.309427,
+            35.971554
+          ],
+          [
+            14.339786,
+            35.994927
+          ],
+          [
+            14.359377,
+            36.004848
+          ],
+          [
+            14.438466,
+            36.072058
+          ],
+          [
+            15.147452,
+            36.672004
+          ],
+          [
+            15.344584,
+            37.00924
+          ],
+          [
+            15.341204,
+            37.028778
+          ],
+          [
+            15.293056,
+            37.063889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-06",
+        "routeId": "paul-rome",
+        "stageId": "stage-06",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:syracuse",
+            "openbible:rhegium"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Syracuse to Rhegium (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Syracuse (openbible:syracuse) and Rhegium (openbible:rhegium): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:syracuse",
+                "openbible:rhegium"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Rhegium's site (openbible:rhegium) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 1.42 km over land between the site and the water.",
+              "sources": [
+                "openbible:rhegium",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.293056,
+            37.063889
+          ],
+          [
+            15.313887,
+            37.059306
+          ],
+          [
+            15.615266,
+            38.107368
+          ],
+          [
+            15.64412,
+            38.1088
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-07",
+        "routeId": "paul-rome",
+        "stageId": "stage-07",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "openbible:rhegium",
+            "pleiades:432815"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-water",
+              "detail": "The shortest path over water from Rhegium to Puteoli (ADR-0038, update of 2026-10-14, item 1). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing; the path keeps 1.3 km off the coast where the water allows, less only in a narrower passage or near a stop.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Rhegium (openbible:rhegium) and Puteoli (pleiades:432815): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "openbible:rhegium",
+                "pleiades:432815"
+              ]
+            },
+            {
+              "kind": "start-connector",
+              "detail": "Rhegium's site (openbible:rhegium) lies inland of Natural Earth's coast: the line leaves it by a straight connector of 1.31 km over land between the site and the water.",
+              "sources": [
+                "openbible:rhegium",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "end-connector",
+              "detail": "Puteoli's site (pleiades:432815) lies inland of Natural Earth's coast: the line reaches it by a straight connector of 0.46 km over land between the site and the water.",
+              "sources": [
+                "pleiades:432815",
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.64412,
+            38.1088
+          ],
+          [
+            15.619813,
+            38.139005
+          ],
+          [
+            15.621168,
+            38.232098
+          ],
+          [
+            15.665482,
+            38.265197
+          ],
+          [
+            15.312343,
+            39.693154
+          ],
+          [
+            14.314491,
+            40.577506
+          ],
+          [
+            14.142151,
+            40.779185
+          ],
+          [
+            14.121869,
+            40.827957
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "lineId": "paul-rome-stage-08",
+        "routeId": "paul-rome",
+        "stageId": "stage-08",
+        "provenance": {
+          "dataset": "Natural Earth 10 m land and 10 m lakes, and the stops' sites",
+          "version": "naturalearth-commit:ca96624a56bd078437bca8184e78163e5039ad19;path:geojson/ne_10m_land.geojson (sha256:1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416);path:geojson/ne_10m_lakes.geojson (sha256:2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9); stop sites: data/routes/stops.json and data/locations/*.json, each candidate's coordinateSource",
+          "upstreamFeatureIds": [
+            "naturalearth:ne-10m-land",
+            "naturalearth:ne-10m-lakes",
+            "pleiades:432815",
+            "wikidata:Q3748871",
+            "wikidata:Q622536",
+            "pleiades:423025"
+          ],
+          "changes": [
+            {
+              "kind": "shortest-over-land",
+              "detail": "No dated road links the stops, and a straight line would cross open water, so the line follows land where it must (ADR-0038, update of 2026-10-14, item 2); legs that stay on land are straight.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "shortest-over-land",
+              "detail": "The straight line from Puteoli to Forum of Appius would cross 78.23 km of open water, so this leg follows the shortest path over land (127.00 km against 117.91 km straight; ADR-0038, update of 2026-10-14, item 2). A* in 8 directions on a grid of 500 m Web Mercator cells (about 0.4 km) made from Natural Earth 10 m land and lakes, then string-pulled and relaxed toward straight lines: each straight piece is kept only if an exact test against the vector coast finds no crossing.",
+              "sources": [
+                "naturalearth:ne-10m-land",
+                "naturalearth:ne-10m-lakes"
+              ]
+            },
+            {
+              "kind": "stop-sites",
+              "detail": "Ends at the sites of Puteoli (pleiades:432815) and Rome (pleiades:423025), through Forum of Appius (wikidata:Q3748871) and Three Taverns (wikidata:Q622536): each stage's chosen candidate (ADR-0038 item 4).",
+              "sources": [
+                "pleiades:432815",
+                "wikidata:Q3748871",
+                "wikidata:Q622536",
+                "pleiades:423025"
+              ]
+            }
+          ]
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.121869,
+            40.827957
+          ],
+          [
+            14.085776,
+            40.872129
+          ],
+          [
+            13.819294,
+            41.197337
+          ],
+          [
+            13.441223,
+            41.441411
+          ],
+          [
+            12.9975,
+            41.46639
+          ],
+          [
+            12.873889,
+            41.561944
+          ],
+          [
+            12.491258,
+            41.889977
+          ]
+        ]
+      }
+    }
+  ]
 }
