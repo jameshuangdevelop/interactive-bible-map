@@ -188,7 +188,7 @@ const ROUTE_STOP_LOCATION_DUPLICATE_ALLOWLIST = new Map([
   ["bethphage|pool-of-siloam", "Distinct site at the southern end of the City of David."],
   ["bethphage|temple-mount", "Distinct site inside the Old City, across the Kidron Valley."]
 ]);
-const ADR_0029_MAJOR_PLACE_IDS = Object.freeze([
+export const ADR_0029_MAJOR_PLACE_IDS = Object.freeze([
   "antioch-syria",
   "athens",
   "bethany-beyond-the-jordan",
