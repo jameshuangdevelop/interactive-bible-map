@@ -195,6 +195,16 @@ jobs:
       - name: Merge Playwright reports
         run: npx playwright merge-reports --reporter html,github all-blob-reports
 
+      - name: Merge Playwright JSON report
+        if: always()
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-report/report.json
+        run: npx playwright merge-reports --reporter json all-blob-reports
+
+      - name: Append flaky/failure and slowest-test summary
+        if: always()
+        run: node scripts/ci-browser-summary.mjs playwright-report/report.json
+
       - name: Upload HTML browser report
         if: always()
         uses: actions/upload-artifact@v7
