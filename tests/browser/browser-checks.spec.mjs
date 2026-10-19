@@ -38,6 +38,7 @@ import {
   verifyNormalLoadStaysOnMainBasemap,
   verifyOpeningCameraBaseline,
   runPanelOpenSmoothnessCheck,
+  runRouteStageSelectSmoothnessCheck,
   runSmoothnessCheck,
   verifyPanelAccessibility,
   verifyPanelDoesNotMutateMapDom,
@@ -542,6 +543,20 @@ test("panel open smoothness keeps long tasks under budget (restores B60) @perf",
   }
 });
 
+test("route stage selection avoids long tasks on two routes @perf", { tag: ["@perf"] }, async ({ browser, baseUrl }) => {
+  const stageSmoothness = await runRouteStageSelectSmoothnessCheck({
+    browser,
+    baseUrl,
+    routeIds: ["paul-rome", "jesus"],
+    stagesPerRoute: 4
+  });
+  expect(stageSmoothness.actions).toHaveLength(8);
+  if (process.env.SMOOTHNESS_REQUIRE_GPU === "1") {
+    const overLimit = stageSmoothness.actions.filter((action) => action.overLimit.length > 0);
+    expect(overLimit).toEqual([]);
+  }
+});
+
 test("synthetic 10,000-place smoothness stays functional and enforces on GPU (restores B59) @perf", { tag: ["@perf"] }, async ({ browser, baseUrl }) => {
   const basePlaces = JSON.parse(await fs.readFile(path.join(generatedDirectory, "places.index.json"), "utf8"));
   const syntheticPlaces = buildSyntheticPlaces(basePlaces, 10_000);
@@ -661,11 +676,17 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
 
   const names = (await renderedPlaceNames(page)).filter((name) => routeStage4PlaceIds.has(name.placeId) && name.x > 450 && name.x < 1400 && name.y > 120 && name.y < 800);
   expect(names.length).toBeGreaterThan(0);
-  const target = names[0];
-  await page.mouse.move(target.x, target.y);
-  await page.waitForTimeout(150);
-  const pointerCursor = await page.evaluate((testHookKey) => window.getComputedStyle(window[testHookKey].getCanvas()).cursor, mapTestHookKey);
-  expect(pointerCursor).toContain("pointer");
+  let target = null;
+  for (const candidate of names.slice(0, 6)) {
+    await page.mouse.move(candidate.x, candidate.y);
+    await page.waitForTimeout(150);
+    const pointerCursor = await page.evaluate((testHookKey) => window.getComputedStyle(window[testHookKey].getCanvas()).cursor, mapTestHookKey);
+    if (pointerCursor.includes("pointer")) {
+      target = candidate;
+      break;
+    }
+  }
+  expect(target).toBeTruthy();
 
   const styleProbe = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];

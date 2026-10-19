@@ -815,6 +815,8 @@ function createEmptyFeatureCollection() {
   };
 }
 
+const emptyRoutePriorityPlaceIds = new Set<string>();
+
 function ensureGeoJsonSource(
   map: MapLibreMap,
   sourceId: string,
@@ -2659,19 +2661,37 @@ export function MapView({
     routesModeEnabledRef.current = routesModeEnabled;
   }, [routesModeEnabled]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
-  const routePriorityPlaceIds = useMemo(() => {
-    const ids = new Set<string>();
+  const routePriorityPlaceIdsKey = useMemo(() => {
     if (!routesOverlay) {
-      return ids;
+      return "";
     }
+
+    const orderedIds: string[] = [];
+    const seenIds = new Set<string>();
     for (const feature of routesOverlay.points.features) {
+      if (feature.properties.kind === "stage-pill") {
+        continue;
+      }
       if (feature.properties.stopKind !== "location") {
         continue;
       }
-      ids.add(feature.properties.stopId);
+      const stopId = feature.properties.stopId;
+      if (seenIds.has(stopId)) {
+        continue;
+      }
+      seenIds.add(stopId);
+      orderedIds.push(stopId);
     }
-    return ids;
+
+    return orderedIds.join("\u0001");
   }, [routesOverlay]);
+
+  const routePriorityPlaceIds = useMemo(() => {
+    if (!routePriorityPlaceIdsKey) {
+      return emptyRoutePriorityPlaceIds;
+    }
+    return new Set(routePriorityPlaceIdsKey.split("\u0001"));
+  }, [routePriorityPlaceIdsKey]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
       includeAreaLabels: mapMode === "ancient",

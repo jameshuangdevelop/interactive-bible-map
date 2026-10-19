@@ -9262,6 +9262,74 @@ async function runPanelOpenSmoothnessCheck({
   }
 }
 
+async function runRouteStageSelectSmoothnessCheck({
+  browser,
+  baseUrl,
+  routeIds = ["paul-rome", "jesus"],
+  stagesPerRoute = 4
+}) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 960 }
+  });
+  await context.addInitScript(() => {
+    window.__ibmRouteStageLongTasks = [];
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        window.__ibmRouteStageLongTasks.push({
+          start: entry.startTime,
+          duration: entry.duration
+        });
+      }
+    }).observe({ type: "longtask", buffered: true });
+  });
+  const page = await context.newPage();
+
+  try {
+    const actionResults = [];
+    for (const routeId of routeIds) {
+      await page.goto(`${baseUrl}/?tab=routes&route=${routeId}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 120_000
+      });
+      await page.locator("li[data-route-stage-index]").first().waitFor({
+        state: "visible",
+        timeout: 60_000
+      });
+      await waitForMapToSettle(page);
+
+      for (let stageIndex = 1; stageIndex <= stagesPerRoute; stageIndex += 1) {
+        const item = page.locator(`li[data-route-stage-index="${stageIndex}"]`);
+        await item.scrollIntoViewIfNeeded();
+        const startedAt = await page.evaluate(() => performance.now());
+        await item.click();
+        await waitForMapToSettle(page);
+        await page.waitForTimeout(250);
+        const durations = await page.evaluate((from) => {
+          return (window.__ibmRouteStageLongTasks ?? [])
+            .filter((entry) => Number(entry.start) >= from)
+            .map((entry) => Number(entry.duration));
+        }, startedAt);
+        const overLimit = durations.filter((duration) => duration > smoothnessLongTaskLimitMs);
+        actionResults.push({
+          routeId,
+          stageIndex,
+          longestTaskMs: durations.reduce((max, value) => Math.max(max, value), 0),
+          longTaskCount: durations.length,
+          overLimit
+        });
+      }
+    }
+
+    return {
+      renderer: await detectWebGlRenderer(page),
+      actions: actionResults
+    };
+  } finally {
+    await page.close();
+    await context.close();
+  }
+}
+
 async function verifyOpeningCameraBaseline(browser, baseUrl) {
   const targetViewports = [
     { width: 1440, height: 900 },
@@ -12260,6 +12328,7 @@ export {
   mapTestHookKey,
   panelHeaderScreenshotDirectoryName,
   runPanelOpenSmoothnessCheck,
+  runRouteStageSelectSmoothnessCheck,
   runSmoothnessCheck,
   readJsonIfExists,
   startStaticServer,
