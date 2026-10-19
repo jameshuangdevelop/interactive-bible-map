@@ -65,6 +65,9 @@ async function waitForSheetSettledAtFull(page, sheetSelector) {
               });
             });
           });
+          if (stableAcrossFrames) {
+            return sheet.getBoundingClientRect().top <= fullTopMaxPx;
+          }
 
           const transitionSettled = await new Promise((resolve) => {
             const styles = window.getComputedStyle(sheet);
@@ -113,7 +116,7 @@ async function waitForSheetSettledAtFull(page, sheetSelector) {
           });
 
           const topAtEnd = sheet.getBoundingClientRect().top;
-          return topAtEnd <= fullTopMaxPx && (stableAcrossFrames || transitionSettled);
+          return topAtEnd <= fullTopMaxPx && transitionSettled;
         }, { selector: sheetSelector, fullTopMaxPx: SHEET_FULL_TOP_MAX_PX }),
       { timeout: SHEET_SETTLE_TIMEOUT_MS }
     )
