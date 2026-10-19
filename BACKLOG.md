@@ -56,7 +56,7 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Region labels rank below other places' labels.** VISUAL_SPEC §2 ("Places on the map") puts empires, provinces and regions ahead of other places, but since M3 the area-label layers sit below other places' labels, so a small place such as Nain can hide "Galilee" at zooms 6 to 8 (found by the PO at CP4). Decide which order is right, then make the spec and the map agree.
 
 ## Phones (M7, mobile-web polish)
-- **A place panel that opens to the full screen (the human's play-test, 2026-10-13).** On phones, the place panel's bottom sheet stops at about half the screen, which makes long text hard to read. Dragging its top edge up should open it to the full screen, and dragging it down should close it. VISUAL_SPEC §1 already says the sheet "is dragged or tapped to open fully", so check M7-01's sheet against the spec, then add the drag-down-to-close gesture.
+- *(Moved into M7 as M7-02, ADR-0047, on 2026-10-19.)*
 
 ## Deferred review findings
 PR Reviewer findings that were not addressed in their PR, each with a reason.

@@ -540,3 +540,12 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   4. **Merging stays with the human.**
   5. Mini checkpoints (ADR-0031) use the PR preview links instead of a local server.
 - **Supersedes:** ADR-0040's rule that play-testable work waits for a local preview before it's pushed.
+
+## ADR-0047 — On phones, the details sheet opens to the full screen
+- **Date:** 2026-10-19 · **Status:** Accepted
+- **By:** the human, at a play-test with friends (2026-10-13): "on mobile, the details bar for a given location should be able to be expanded all the way up to take up the entire screen. Currently it's only half the screen and it makes it very difficult to read. Hold and drag the top of the details bar up should expand the details and dragging down the top of the bar should make it disappear". The PO scheduled it as M7-02 on 2026-10-19, when the human asked for the next set of tasks.
+- **Decision:**
+  1. On phones, the place sheet and the route sheet have three positions: closed, half (as today) and full. At full, the sheet fills the screen below the safe-area inset and covers the search box, the tabs and the toggle; the handle and the close button stay visible.
+  2. Dragging the top edge moves the sheet. On release it settles at the nearest position, and a flick goes one position further. Dragging down from half closes it, and so does the close button.
+  3. Tapping the handle toggles half and full. The handle is a button with `aria-expanded`. With reduced motion, the sheet jumps.
+- **Consequences:** card M7-02; VISUAL_SPEC §3 and §2 follow; `BACKLOG.md`'s item moves into M7.

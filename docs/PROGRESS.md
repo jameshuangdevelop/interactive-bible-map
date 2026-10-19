@@ -51,6 +51,7 @@ Shared memory for all agents. Every session reads this first and updates its own
 | M3-25 | CP3b summary | project-owner | `docs/cp3b-summary` | Merged (CP3b approved 2026-10-07) | #50 |
 | M4-00 | Record CP3b; plan M4 (ADR-0037); visual spec; cards M4-01 to M4-05 and M7-01 | project-owner | `docs/m4-kickoff` | Merged | #51 |
 | M7-01 | Phone basics | frontend-engineer | `feat/m7-phone-basics` | Merged (on `main` through #59) | #52 |
+| M7-02 | On phones, the details sheet opens to the full screen: closed, half and full, moved by dragging its top edge, and dragging down closes it (ADR-0047) | frontend-engineer | `feat/m7-02-full-screen-sheet` | Card ready (`docs/tasks/M7-02-full-screen-sheet.md`) | |
 | M4-01 | Timeline and ancient layer: schema and build | gis-engineer | `feat/m4-ancient-schema` | Merged (on `main` through #59) | #53 |
 | M4-02 | The timeline: who held each area, and when | research-lead → fact-checker | `data/m4-timeline` | Merged (on `main` through #59) | #54 |
 | M4-03 | Ancient layer: area shapes, roads and coastline | gis-engineer → fact-checker | `data/m4-ancient-geometry` | Merged (on `main` through #59) | #55 |
