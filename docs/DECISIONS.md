@@ -549,3 +549,14 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   2. Dragging the top edge moves the sheet. On release it settles at the nearest position, and a flick goes one position further. Dragging down from half closes it, and so does the close button.
   3. Tapping the handle toggles half and full. The handle is a button with `aria-expanded`. With reduced motion, the sheet jumps.
 - **Consequences:** card M7-02; VISUAL_SPEC §3 and §2 follow; `BACKLOG.md`'s item moves into M7.
+
+## ADR-0048 — Selected regions and the pin, like Google Maps
+- **Date:** 2026-10-19 · **Status:** Accepted
+- **By:** the human, testing #75 (2026-10-19): "The map icon on #75 looks very big and bulky, can we do what google maps does? … when a region is clicked on, the text isn't turned to blue and it's pretty confusing. … Google Maps highlight the region and have a thin red dotted line around it and grey everything else out (not completely, but slightly greyed out) … at the very least, when a clickable name is hovered over, it should turn to blue. … everything on the map should still be clickable at all times. When a region is clicked on, everything else gets a little bit greyed out but should still be clickable. When towns/regions outside the clicked on region is clicked, the previous region is no longer highlighted"
+- **Decision:**
+  1. **The pin** is Google Maps' red pin: smaller and slimmer than M5-09's. It's a red teardrop with a darker outline and a dark centre dot, tapering to a sharp point at the place.
+  2. **Hover:** every clickable name turns blue on hover and shows the pointer, regions and provinces included (ADR-0044). Grey italic names never do.
+  3. **A selected region** (a region's or province's name, on the ancient map) shows its name in blue, a thin red dotted line around its land for the timeline's year, and a light grey veil over everything outside it. Everything stays clickable, under the veil too, and the camera doesn't move.
+  4. **One selection at a time:** selecting anything else, inside the region or outside it, removes the region's highlight, and so does clearing the selection or switching to the modern map. A town inside the region replaces the region, as in Google Maps.
+  5. A region with no land drawn that year shows only its blue name.
+- **Consequences:** card M5-16; VISUAL_SPEC follows.
