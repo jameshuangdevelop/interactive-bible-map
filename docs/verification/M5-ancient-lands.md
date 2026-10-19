@@ -439,3 +439,108 @@ The note isn't data, and G1–G8 already apply these fixes. Correcting the note 
 ## Checks run
 - **Scripts:** the read-only Node and Python scripts above, on 2026-10-18 with Node 24.21.0 and the root `node_modules`, plus mapshaper 0.6 on the pinned AWMC zip.
 - **Not run:** `validate:data`, `test`, the builds and the browser suites. This commit changes no data or code, and the PO asked for no builds on this machine.
+
+## Phase 4: the drawn result
+- **Checked:** the GIS Engineer's `1627d49` and `4a11804`, and the PO's `552dcfb`, on the rebased branch (head `552dcfb`, draft PR #77). I compared them with the phase-2 base `2f2dc98`, against G1–G8 above (ruling 6).
+- **Verifier:** fact-checker (Claude Opus 5.5) · **Date:** 2026-10-19.
+- **Method:**
+  - Node scripts over the committed `data/geo/ancient-areas.geojson`, `ancient-empire-edge.geojson` and `data/timeline.json`.
+  - Strict point-in-polygon tests with no tolerance.
+  - Vertex and edge matching between neighbouring areas, and raster sampling at 0.002–0.02° for gaps and overlaps.
+  - AWMC's pinned shapefiles (SHA-256 `ae209bd5…` again) for lines 609 and 610 and the AD 14 extent.
+  - Read-only `gh` for CI on #77.
+  - No build, browser or test run.
+
+**Result: fixes needed (4 of 14 items).** The drawn borders, holders, texts, bibliography, popover and IDs match G1–G8. Four things need fixing:
+- seven slivers of `other-roman-lands` left on Mauretania's coast;
+- the "Armenia Minor" label's hover text, which shows the ruler and years of whoever holds the `pontus` area;
+- the full browser suite, which fails on #77 although it passed on its base;
+- three provenance clauses.
+
+| # | Item | Verdict | Evidence |
+|---|---|---|---|
+| 1 | `pontus` and `cappadocia` (G1 E1–E5) | Verified | Areas, edges and gaps in detail below |
+| 2 | G8 `assertInside` points | Verified | All 34, plus the Armenia Minor label point and 5 more (Amisus, Themiscyra, Sinope, Ancyra, Gangra), lie strictly in the right area |
+| 3 | `galatia`, not meant to change | Verified, with a note | +10 km² near E1's west end, details below |
+| 4 | The Mauretania areas | **Fix needed** | M-a, M-b and M-c follow their lines, but seven slivers of `other-roman-lands` sit on the coast (P4-F1) |
+| 5 | The empire's edge | Verified | Same line: no vertex of the new edge lies more than 50 m off the old one, and it is 9,928 km either way. It is now 12 pieces, not 9, and its text says "28 areas" |
+| 6 | Provenance labels and sources | **Fix needed** | Three clauses are missing or on the wrong area (P4-F4); the rest match G1 |
+| 7 | Holders and status at each stop (G2) | Verified | 15 stops × 5 areas: 0 mismatches. Every area's periods run unbroken from −4 to 101, and every holder is a known entity. |
+| 8 | Timeline entries (G3) | Verified | The 4 entities and the 4 areas' 12 periods (holder, ruler, note, sources) are character for character the same as G3, including "the freedman Aedemon" and `pleiades:289941`. `pontus` has `locationId: "pontus"`, and every new area has `focus: true`. |
+| 9 | Text that changed with the shapes (G4) | Verified | `cappadocia` 17→69 note and sources; `galatia` note; stops 6, 39, 41, 44, 67 and 72, word for word, with `bib:pliny-natural-history` added to 41 and `bib:smith-dictionary-mauretania` to 44. The 8 records tied to `galatia` and `cappadocia` changed only `politicalHistory`, which mirrors the new notes. `pontus.json` is unchanged, and no text still says these lands are drawn with Cappadocia. |
+| 10 | Bibliography (G5) | Verified | The net diff is 51 additions and 0 deletions; the 4 entries are identical to G5; 236 entries, no duplicates, and the file ends as before |
+| 11 | The popover's note (G6) | Verified | Exact wording, with "Polemon's kingdom of Pontus", in `app-shell.web.tsx`, the Playwright string and VISUAL_SPEC §2. "Sources & credits" now names Pliny (1855), matching `ATTRIBUTION.md`. |
+| 12 | The Pleiades IDs and code items (G7) | Verified | Notes below |
+| 13 | The "Armenia Minor" label | **Fix needed** | The point and style are right, but its hover text borrows the `pontus` area's ruler and years (P4-F2) |
+| 14 | CI on #77 | **Fix needed** | The "build" job passes. The full browser suite fails (P4-F3). |
+
+**10 verified, 4 fixes needed, 0 rejected.**
+
+**Item 1, `pontus` and `cappadocia`:**
+- `pontus` is 76,006 km², 0.4% above my estimate; `cappadocia` is 109,964 km².
+- E1's ends are 34.38884°E 40.55575°N and 38.71302°E 39.16729°N. At 35°, 36°, 37° and 38°E it lies at 40.189°, 39.463°, 39.666° and 39.469°N, as G8 expects.
+- Along all 455 km of E1, the nearest anchors of the two sides are equally far within 0.78 km.
+- Apart from E1, every `pontus` vertex was a vertex of the old `cappadocia`, and no old vertex is lost. So the Halys edge (E2, 183 km), the Bithynia edge (E3, 181 km, unchanged), the coast and the Euphrates (E5) are AWMC's lines as before.
+- At 0.01° sampling, no land of the old `cappadocia` or `galatia` falls in no area, and nothing overlaps.
+
+**Item 3, `galatia`:** it gains a 10 km² sliver between 34.15°E and 34.54°E. Splitting the shared arc at E1's end let simplification keep one new vertex, 34.34429°E 40.53954°N, about 550 m off the old chord and within the 600 m tolerance. The edge is still AWMC's.
+
+**Item 12, the IDs and code:**
+- All ten IDs are corrected, and so are the points for Neocaesarea `[37.0201, 40.5892]` and Nicopolis `[38.1435, 40.1486]`.
+- `OUTSIDE_LIST_PROBES` now reads "Numidia" `[[6.6, 36.37]]`.
+- `AREA_ORDER` and `SOURCE_BY_AREA` are done. The Mauretania areas use 3,500 m simplification, and `docs/research/SOURCES.md` has its note.
+- The anchor lists match G1. The one difference: Mazaca uses the existing `POINTS.caesareaMazaca` `[35.48, 38.72]`, 0.86 km from `pleiades:629035`, which is negligible.
+- Suggestion: the `pontus` assertion now allows 5 km and says an anchor "lies ... beyond the coastline". Since every point passes strictly, use the default 2 km, or no tolerance for inland anchors.
+
+**Item 4, Mauretania:**
+- Committed sizes: Tingitana 53,263 km², Caesariensis 150,036 km², the strip 24,517 km². The reported 53,664, 149,805 and 24,230 predate `4a11804`'s simplification.
+- M-a's vertices lie on line 610, and the simplified edge stays within 2.7 km of it. Only its last link to today's coast, at the Moulouya's mouth, runs 5 km past the line's start.
+- M-b lies exactly on the AD 14 outline, from 3.904°E 36.913°N on the coast to 5.386°E 35.071°N on line 609.
+- M-c stays within 3.2 km of line 609, inside the 3.5 km simplification.
+- Land outside AWMC's AD 69 extent reaches at most 2.3 km beyond it; the old `other-roman-lands` reached 3.2 km. A 0.02° sampling of North Africa and of Anatolia finds no overlaps.
+
+### Fixes for the GIS Engineer (phase 4)
+- **P4-F1. The coastal slivers in Mauretania.**
+  - `carveMauretaniaAreas` clips `other-roman-lands` with AWMC's raw AD 69 faces, which end at AWMC's coastline. The thin coastal land between that coastline and Natural Earth's therefore stays in `other-roman-lands`, as seven new detached parts (66 → 73):
+
+    | Part | Area | Where | Borders |
+    |---|---|---|---|
+    | 44 | 71 km² | Rif coast, −4.84°E 35.31°N | Tingitana, 39 km |
+    | 45 | 18 km² | −3.29°E 35.24°N | Tingitana, 32 km |
+    | 46 | 10 km² | −2.83°E 35.16°N | Tingitana, 20 km |
+    | 47 | 9 km² | Moulouya's mouth | Tingitana 5 km and Caesariensis 17 km |
+    | 48 | 29 km² | Oran, −0.65°E 35.74°N | Caesariensis, 16 km |
+    | 49 | 61 km² | 4.70°E 36.88°N | The strip, 33 km |
+    | 50 | 35 km² | Gulf of Béjaïa | The strip, 38 km |
+
+  - Every one has a different holder from its neighbour at every stop, so the map would draw about 200 km of borders along this coast, dashed wherever the Mauretanian side is unclear.
+  - **Fix:** give each part that borders only Mauretania areas to the one it shares most border with, as `rule-4-leftover` does. Part 47 goes to `mauretania-caesariensis`, or is split on line 610's line.
+  - **Check:** afterwards no `other-roman-lands` part touches only Mauretania areas, and it again has 66 parts.
+- **P4-F2. The "Armenia Minor" label's hover text.**
+  - What is right: the point `[38.3301, 39.5639]` (`pleiades:628936`) is inside `pontus` and 21 km from E1. It is drawn in the grey italic layer for labels that can't be clicked, from zoom 5, at every stop.
+  - What is wrong: it sits in `holderLabels`, so `buildAncientHolderLabelFeatures` gives it the `pontus` area's ruler and years. In the payloads built from `552dcfb`, hovering it shows "Armenia Minor · Allied kingdom · Polemon II · 36 BC – AD 64" at AD 39–53, and "Armenia Minor · Allied kingdom · from AD 64" from AD 67. Both are false: Lesser Armenia was held by Cotys and then Aristobulus, and it was annexed in 72. Before AD 39 it names Polemon I and Pythodoris, but Archelaus held Lesser Armenia until AD 17, and no source names its holder from then until 38 (H2, H3).
+  - **Fix:** give static labels a hover text of just "Armenia Minor", or none, with no kind, ruler or years.
+- **P4-F3. The full browser suite.**
+  - Run 39236208206 on `552dcfb` fails at `verify-web-export-playwright.mjs:5250`: "Expected holder tooltip with years, got ''." The same suite passed on the base `d287cd0` (run 39234804359), so M5-11 caused it.
+  - The check opens AD 44 at the default desktop view (zoom 4.7, centred on 22.5°E 35°N). It takes the first label MapLibre reports in `ibm-ancient-holder-label`, the layer for labels that can't be clicked, and moves the mouse to that label's point.
+  - In the AD 44 payload built in this worktree from `552dcfb` (`app/public/generated/ancient.stop.agrippa-i-dies.json`), only one such label is drawn below zoom 5: the new "PROVINCE OF MAURETANIA CAESARIENSIS", from zoom 4, because its holder has no place record. Its point, 1.79°E 35.08°N, lies about 46 px left of a 1,440-px window with no panel open, or under the panel if one is open.
+  - Part of its text is on screen, so MapLibre reports it, but the mouse can't reach its point, so the tooltip stays empty. Before this PR no such label was drawn at that view, so the check found none and skipped the hover. "Armenia Minor" starts at zoom 5, so P4-F2 isn't the cause. I worked this out from the payload and the code, without a browser.
+  - **Fix:** make the check pick a label whose point is on screen and outside the panels, or hover a named label at a set view. Then get the suite green.
+- **P4-F4. Provenance wording.**
+  - (a) E1's `described-line` detail on `pontus` and `cappadocia` lacks G1's clause "the Barrington Atlas's two places for Dasmenda lie inside Cappadocia". Without it, "names no point on it that can be located" overlooks Dasmenda, which Strabo does name.
+  - (b) `pontus`'s first change lacks E2's clause: its west edge follows the Halys, Paphlagonia's eastern boundary (Strabo 12.3.9; ISBE "Pontus").
+  - (c) The Ampsaga label ("The Ampsaga's mouth (Pliny 5.1, Tucca; Smith, 'Ampsaga'); inland, AWMC's line") sits only on `mauretania-caesariensis`, whose nearest vertex to the river's mouth is 172 km away. Add it to `mauretania-caesariensis-east`, which holds the mouth, 0.76 km away.
+
+### Items for the PO
+1. **The research note.** Your answers say F1–F17 were applied to it in this PR, but `docs/research/M5-ancient-lands.md` is unchanged since `aba7023`. It still says, for example, that Dasmenda is "identified with high confidence".
+2. **`BACKLOG.md`.** It has neither Sophene (ruling 2) nor Tavium and the Trocmi's land (your answer 3).
+3. **Screenshots, after P4-F1 and P4-F2:**
+   - zooms 5–7 around Pontus: check that "ARMENIA MINOR" and "KINGDOM OF PONTUS" don't hide each other, and that the `pontus` record's own label is hidden while the kingdom holds the area;
+   - Mauretania's coast at −4, 41 and 44.
+4. **Size.** CI's "build" job (lint, type-check, tests, `validate:data`, `build:data`, export) passes, and the layer totals 318,111 bytes gzip of the new 330,000: 125,448 for the shapes and 145,017 for the 15 stops.
+5. **`docs/BUDGET.md`.** The rebase dropped this branch's three ledger rows: the Research Lead's phase 1 (`c7b706c`, about 8,400 credits), my phase 2 (`5683700`, about 1,900) and the GIS Engineer's phase 3 (`bc631f0`, about 1,100). Their rebased commits `aba7023`, `aa8035f` and `1627d49` no longer touch the file. `git show <old SHA> -- docs/BUDGET.md` still has each row. I added this phase's row after the last one and left the restoring to you. The month total also skips about 7,200: M5-10's row added its credits to 282,303, not to the 289,503 above it.
+
+### Checks (phase 4)
+- **Run:** read-only Node scripts on 2026-10-19 with Node 24.21.0 and the root `node_modules`, plus mapshaper on the pinned AWMC zip.
+- **Read:** CI results through `gh`, and the stop payloads already built in this worktree after `552dcfb` (`app/public/generated/`, not committed; I didn't build them). They match the committed areas: 28 areas, with 73 parts of `other-roman-lands`.
+- **Not run:** no build, browser or test suite, as the PO asked. Nothing in data or code changed in this commit.
