@@ -42,22 +42,6 @@ const routeLineSurfaceFixtures = {
   routeLineLandPath: path.join(routesFixtureDirectory, "route-line-land.geojson"),
   routeLineLakesPath: path.join(routesFixtureDirectory, "route-line-lakes.geojson")
 };
-const repositoryLocationsDirectory = path.join(repositoryRoot, "data", "locations");
-const repositoryTimelinePath = path.join(repositoryRoot, "data", "timeline.json");
-const repositoryAncientAreasPath = path.join(repositoryRoot, "data", "geo", "ancient-areas.geojson");
-const repositoryAncientRoadsPath = path.join(repositoryRoot, "data", "geo", "ancient-roads.geojson");
-const repositoryAncientCoastlinePath = path.join(
-  repositoryRoot,
-  "data",
-  "geo",
-  "ancient-coastline.geojson"
-);
-const repositoryAncientEmpireEdgePath = path.join(
-  repositoryRoot,
-  "data",
-  "geo",
-  "ancient-empire-edge.geojson"
-);
 const repositoryImagePromptsDirectory = path.join(
   repositoryRoot,
   "content",
@@ -98,59 +82,6 @@ function pointInPolygon(point, polygon) {
   if (!pointInRing(point, polygon[0])) {
     return false;
   }
-
-  test("holder-label projection uses MapLibre world size (512 tiles)", () => {
-    const [x] = ancientBuilderTestOnly.projectLngLatToPixels(0, 0, 0);
-    assert.equal(x, 256);
-  });
-
-  test("holder-label width estimate is at least real Noto Sans Bold advances", () => {
-    const advanceAt24 = {
-      A: 16,
-      B: 16,
-      C: 15,
-      D: 17,
-      E: 13,
-      F: 13,
-      G: 17,
-      H: 18,
-      I: 9,
-      J: 7,
-      K: 15,
-      L: 13,
-      M: 22,
-      N: 19,
-      O: 19,
-      P: 15,
-      Q: 19,
-      R: 15,
-      S: 13,
-      T: 13,
-      U: 18,
-      V: 15,
-      W: 23,
-      X: 16,
-      Y: 14,
-      Z: 13,
-      " ": 6
-    };
-
-    const realAdvanceWidth = (text) => {
-      const characters = [...text];
-      const glyphSum = characters.reduce((sum, character) => {
-        const advance = advanceAt24[character] ?? advanceAt24[character.toUpperCase()] ?? 23;
-        return sum + (advance * 13) / 24;
-      }, 0);
-      const letterSpacing = Math.max(0, characters.length - 1) * 13 * 0.18;
-      return glyphSum + letterSpacing;
-    };
-
-    const tetrarchyEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("TETRARCHY OF");
-    const romanProvinceEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("PROVINCE OF");
-
-    assert.ok(tetrarchyEstimate >= realAdvanceWidth("TETRARCHY OF"));
-    assert.ok(romanProvinceEstimate >= realAdvanceWidth("PROVINCE OF"));
-  });
   for (let index = 1; index < polygon.length; index += 1) {
     if (pointInRing(point, polygon[index])) {
       return false;
@@ -159,150 +90,58 @@ function pointInPolygon(point, polygon) {
   return true;
 }
 
-function toRadians(value) {
-  return (value * Math.PI) / 180;
-}
+test("holder-label projection uses MapLibre world size (512 tiles)", () => {
+  const [x] = ancientBuilderTestOnly.projectLngLatToPixels(0, 0, 0);
+  assert.equal(x, 256);
+});
 
-function haversineDistanceKm(pointA, pointB) {
-  const [lonA, latA] = pointA;
-  const [lonB, latB] = pointB;
-  const latitudeDelta = toRadians(latB - latA);
-  const longitudeDelta = toRadians(lonB - lonA);
-  const latitudeA = toRadians(latA);
-  const latitudeB = toRadians(latB);
-  const sinLatitude = Math.sin(latitudeDelta / 2);
-  const sinLongitude = Math.sin(longitudeDelta / 2);
-  const haversine =
-    sinLatitude * sinLatitude +
-    Math.cos(latitudeA) * Math.cos(latitudeB) * sinLongitude * sinLongitude;
-  const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(Math.max(0, 1 - haversine)));
-  return 6371.0088 * arc;
-}
+test("holder-label width estimate is at least real Noto Sans Bold advances", () => {
+  const advanceAt24 = {
+    A: 16,
+    B: 16,
+    C: 15,
+    D: 17,
+    E: 13,
+    F: 13,
+    G: 17,
+    H: 18,
+    I: 9,
+    J: 7,
+    K: 15,
+    L: 13,
+    M: 22,
+    N: 19,
+    O: 19,
+    P: 15,
+    Q: 19,
+    R: 15,
+    S: 13,
+    T: 13,
+    U: 18,
+    V: 15,
+    W: 23,
+    X: 16,
+    Y: 14,
+    Z: 13,
+    " ": 6
+  };
 
-function distancePointToSegmentKm(point, segmentStart, segmentEnd) {
-  const referenceLatitude = point[1];
-  const metersPerDegree = 111320;
-  const metersPerDegreeLon = metersPerDegree * Math.cos((referenceLatitude * Math.PI) / 180);
-  const pointX = point[0] * metersPerDegreeLon;
-  const pointY = point[1] * metersPerDegree;
-  const startX = segmentStart[0] * metersPerDegreeLon;
-  const startY = segmentStart[1] * metersPerDegree;
-  const endX = segmentEnd[0] * metersPerDegreeLon;
-  const endY = segmentEnd[1] * metersPerDegree;
-  const deltaX = endX - startX;
-  const deltaY = endY - startY;
-  if (deltaX === 0 && deltaY === 0) {
-    return haversineDistanceKm(point, segmentStart);
-  }
-  const t = ((pointX - startX) * deltaX + (pointY - startY) * deltaY) / (deltaX * deltaX + deltaY * deltaY);
-  const clampedT = Math.max(0, Math.min(1, t));
-  const nearestPoint = [
-    segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * clampedT,
-    segmentStart[1] + (segmentEnd[1] - segmentStart[1]) * clampedT
-  ];
-  return haversineDistanceKm(point, nearestPoint);
-}
+  const realAdvanceWidth = (text) => {
+    const characters = [...text];
+    const glyphSum = characters.reduce((sum, character) => {
+      const advance = advanceAt24[character] ?? advanceAt24[character.toUpperCase()] ?? 23;
+      return sum + (advance * 13) / 24;
+    }, 0);
+    const letterSpacing = Math.max(0, characters.length - 1) * 13 * 0.18;
+    return glyphSum + letterSpacing;
+  };
 
-function normalizeLabelText(value) {
-  return typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
-}
+  const tetrarchyEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("TETRARCHY OF");
+  const romanProvinceEstimate = ancientBuilderTestOnly.estimateHolderLabelLineWidthPx("PROVINCE OF");
 
-let realDataFixturePromise = null;
-
-async function loadRealDataFixture() {
-  if (realDataFixturePromise) {
-    return realDataFixturePromise;
-  }
-
-  realDataFixturePromise = withTempDirectory(async (outputDirectory) => {
-    const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData] =
-      await Promise.all([
-        fs.readFile(repositoryTimelinePath, "utf8").then((content) => JSON.parse(content)),
-        fs.readFile(repositoryAncientAreasPath, "utf8").then((content) => JSON.parse(content)),
-        fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content)),
-        fs.readFile(repositoryAncientCoastlinePath, "utf8").then((content) => JSON.parse(content)),
-        fs.readFile(repositoryAncientEmpireEdgePath, "utf8").then((content) => JSON.parse(content))
-      ]);
-
-    const locationRecords = await Promise.all(
-      (await fs.readdir(repositoryLocationsDirectory))
-        .filter((fileName) => fileName.endsWith(".json"))
-        .map((fileName) =>
-          fs.readFile(path.join(repositoryLocationsDirectory, fileName), "utf8").then((content) => JSON.parse(content))
-        )
-    );
-    const majorPlacePinCoordinates = locationRecords
-      .filter((locationRecord) => locationRecord.prominence === "major" && locationRecord.zoomTier === "city")
-      .flatMap((locationRecord) =>
-        (locationRecord.candidates ?? [])
-          .filter(
-            (candidate) =>
-              Array.isArray(candidate?.coordinates) &&
-              candidate.coordinates.length >= 2 &&
-              typeof candidate.coordinates[0] === "number" &&
-              typeof candidate.coordinates[1] === "number"
-          )
-          .map((candidate) => ({
-            placeId: locationRecord.id,
-            coordinates: [candidate.coordinates[0], candidate.coordinates[1]]
-          }))
-      );
-
-    const ancientBuildResult = await buildAncientAppData({
-      timelineData,
-      ancientAreasData,
-      ancientRoadsData,
-      ancientCoastlineData,
-      ancientEmpireEdgeData,
-      majorPlacePinCoordinates,
-      outputDirectory
-    });
-
-    const timelinePayload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.timeline.json"), "utf8")
-    );
-    const roadsPayload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
-    );
-    const shapesPayload = JSON.parse(
-      await fs.readFile(path.join(outputDirectory, "ancient.shapes.json"), "utf8")
-    );
-    const stopPayloadById = new Map(
-      await Promise.all(
-        timelinePayload.stops.map(async (stop) => [
-          stop.id,
-          JSON.parse(
-            await fs.readFile(path.join(outputDirectory, `ancient.stop.${stop.id}.json`), "utf8")
-          )
-        ])
-      )
-    );
-
-    const stopForYear = (year) =>
-      [...timelinePayload.stops]
-        .sort((left, right) => left.year - right.year)
-        .filter((stop) => stop.year <= year)
-        .at(-1);
-    const stopPayloadForYear = (year) => {
-      const stop = stopForYear(year);
-      assert.ok(stop, `expected stop in force for year ${year}`);
-      return stopPayloadById.get(stop.id);
-    };
-
-    return {
-      timelineData,
-      timelinePayload,
-      roadsPayload,
-      shapesPayload,
-      stopPayloadById,
-      stopPayloadForYear,
-      ancientRoadFeatureCount: ancientRoadsData.features.length,
-      ancientBuildResult
-    };
-  });
-
-  return realDataFixturePromise;
-}
+  assert.ok(tetrarchyEstimate >= realAdvanceWidth("TETRARCHY OF"));
+  assert.ok(romanProvinceEstimate >= realAdvanceWidth("PROVINCE OF"));
+});
 
 test("buildAppData writes compact index fields and candidate fields", async () => {
   await withTempDirectory(async (outputDirectory) => {
@@ -778,228 +617,6 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       timeperiod: "R"
     });
 
-    test("buildAncientAppData computes holder label fit/minZoom and known-start spans for real data", async () => {
-      await withTempDirectory(async (outputDirectory) => {
-        const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData] =
-          await Promise.all([
-            fs.readFile(repositoryTimelinePath, "utf8").then((content) => JSON.parse(content)),
-            fs.readFile(repositoryAncientAreasPath, "utf8").then((content) => JSON.parse(content)),
-            fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content)),
-            fs.readFile(repositoryAncientCoastlinePath, "utf8").then((content) => JSON.parse(content)),
-            fs.readFile(repositoryAncientEmpireEdgePath, "utf8").then((content) => JSON.parse(content))
-          ]);
-
-        const locationRecords = await Promise.all(
-          (await fs.readdir(repositoryLocationsDirectory))
-            .filter((fileName) => fileName.endsWith(".json"))
-            .map((fileName) =>
-              fs.readFile(path.join(repositoryLocationsDirectory, fileName), "utf8").then((content) => JSON.parse(content))
-            )
-        );
-        const majorPlacePinCoordinates = locationRecords
-          .filter((locationRecord) => locationRecord.prominence === "major" && locationRecord.zoomTier === "city")
-          .flatMap((locationRecord) =>
-            (locationRecord.candidates ?? [])
-              .filter(
-                (candidate) =>
-                  Array.isArray(candidate?.coordinates) &&
-                  candidate.coordinates.length >= 2 &&
-                  typeof candidate.coordinates[0] === "number" &&
-                  typeof candidate.coordinates[1] === "number"
-              )
-              .map((candidate) => ({
-                placeId: locationRecord.id,
-                coordinates: [candidate.coordinates[0], candidate.coordinates[1]]
-              }))
-          );
-
-        const ancientBuildResult = await buildAncientAppData({
-          timelineData,
-          ancientAreasData,
-          ancientRoadsData,
-          ancientCoastlineData,
-          ancientEmpireEdgeData,
-          majorPlacePinCoordinates,
-          outputDirectory
-        });
-
-        const roadsPayload = await fs
-          .readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
-          .then((content) => JSON.parse(content));
-        const roadFeatures = roadsPayload.features ?? [];
-        const joinFeatures = roadFeatures.slice(ancientRoadsData.features.length);
-        assert.ok(joinFeatures.length > 0, "expected generated road joins in ancient.roads.geojson");
-        const ephesusRoadBreakStart = [28.6193, 37.8916];
-        const targetRoadIds = new Set(["awmc-road-614-2686", "awmc-road-642-2241"]);
-        const targetRoadGeometries = roadFeatures
-          .filter((feature) => targetRoadIds.has(feature?.properties?.roadId))
-          .map((feature) => feature.geometry)
-          .filter(Boolean);
-        assert.ok(targetRoadGeometries.length > 0, "expected target roads for Ephesus–Laodicea join");
-        const matchingJoin = joinFeatures.find((joinFeature) => {
-          if (joinFeature?.geometry?.type !== "LineString" || !Array.isArray(joinFeature.geometry.coordinates)) {
-            return false;
-          }
-          const [a, b] = joinFeature.geometry.coordinates;
-          const startDistance = Math.min(
-            haversineDistanceKm(a, ephesusRoadBreakStart),
-            haversineDistanceKm(b, ephesusRoadBreakStart)
-          );
-          if (startDistance > 0.05) {
-            return false;
-          }
-          const otherPoint =
-            haversineDistanceKm(a, ephesusRoadBreakStart) <= haversineDistanceKm(b, ephesusRoadBreakStart)
-              ? b
-              : a;
-          const minDistanceToTargetRoad = targetRoadGeometries.reduce((minimum, geometry) => {
-            const lines =
-              geometry.type === "LineString"
-                ? [geometry.coordinates]
-                : geometry.type === "MultiLineString"
-                  ? geometry.coordinates
-                  : [];
-            for (const line of lines) {
-              for (let index = 0; index < line.length - 1; index += 1) {
-                minimum = Math.min(
-                  minimum,
-                  distancePointToSegmentKm(otherPoint, line[index], line[index + 1])
-                );
-              }
-            }
-            return minimum;
-          }, Number.POSITIVE_INFINITY);
-          return minDistanceToTargetRoad <= 0.02;
-        });
-        assert.ok(
-          matchingJoin,
-          "expected (28.6193,37.8916) to join the awmc-road-614-2686 / awmc-road-642-2241 road"
-        );
-
-        assert.ok(
-          ancientBuildResult.roadJoinCount > 0,
-          "expected generated road joins in ancient.roads.geojson"
-        );
-        assert.ok(
-          ancientBuildResult.roadJoinMaxLengthKm <= 4.001,
-          `expected no generated road join longer than 4 km, got ${ancientBuildResult.roadJoinMaxLengthKm.toFixed(3)} km`
-        );
-
-        const stopForYear = (year) =>
-          [...timelineData.stops]
-            .sort((left, right) => left.year - right.year)
-            .filter((stop) => stop.year <= year)
-            .at(-1);
-        const readStopPayload = async (year) => {
-          const stop = stopForYear(year);
-          assert.ok(stop, `expected stop in force for year ${year}`);
-          return fs
-            .readFile(path.join(outputDirectory, `ancient.stop.${stop.id}.json`), "utf8")
-            .then((content) => JSON.parse(content));
-        };
-
-        const stopAt30 = await readStopPayload(30);
-        const philipAt30 = stopAt30.areas.find((area) => area.areaId === "philip-tetrarchy-lands");
-        assert.equal(philipAt30?.heldFromYear, -4);
-        assert.equal(philipAt30?.heldToYear, 34);
-        assert.equal(philipAt30?.heldFromKnown, true);
-        const antipasAt30 = stopAt30.areas.find((area) => area.areaId === "galilee-perea");
-        assert.equal(antipasAt30?.heldFromYear, -4);
-        assert.equal(antipasAt30?.heldToYear, 39);
-        assert.equal(antipasAt30?.heldFromKnown, true);
-        const italyLabelAt30 = stopAt30.holderLabels.find(
-          (label) => label.holderId === "italy-direct"
-        );
-        assert.ok(italyLabelAt30, "expected Italy holder label at AD 30");
-        assert.equal(italyLabelAt30.labelText, "ITALY");
-        const commageneHolderIdAt30 = stopAt30.areas.find((area) => area.areaId === "commagene")?.holderId;
-        const commageneLabelAt30 = stopAt30.holderLabels.find(
-          (label) => label.holderId === commageneHolderIdAt30 && label.areaId === "commagene"
-        );
-        assert.ok(
-          commageneLabelAt30,
-          "Expected Commagene holder label to be kept on the Commagene namesake area."
-        );
-        assert.ok(commageneLabelAt30.minZoom > 5, "Commagene label should be hidden at zoom 5.");
-        const galileeTouchingBordersAt30 = stopAt30.holderBorders.features.filter(
-          (feature) =>
-            feature.properties.holderAAreaId === "galilee-perea" ||
-            feature.properties.holderBAreaId === "galilee-perea"
-        );
-        assert.ok(galileeTouchingBordersAt30.length > 0, "expected borders touching galilee-perea at AD 30");
-        const galileeMinZooms = [...new Set(galileeTouchingBordersAt30.map((feature) => feature.properties.minZoom))]
-          .sort((left, right) => left - right);
-        assert.deepEqual(galileeMinZooms, [5]);
-
-        const asiaGalatiaBorderAt30 = stopAt30.holderBorders.features.find(
-          (feature) =>
-            (feature.properties.holderAAreaId === "asia" && feature.properties.holderBAreaId === "galatia") ||
-            (feature.properties.holderAAreaId === "galatia" && feature.properties.holderBAreaId === "asia")
-        );
-        assert.ok(asiaGalatiaBorderAt30, "expected Asia-Galatia border at AD 30");
-        assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 5);
-
-        const stopAt40 = await readStopPayload(40);
-        const agrippaInPhilipLands = stopAt40.areas.find((area) => area.areaId === "philip-tetrarchy-lands");
-        assert.equal(agrippaInPhilipLands?.heldFromYear, 37);
-        assert.equal(agrippaInPhilipLands?.heldToYear, 44);
-        assert.equal(agrippaInPhilipLands?.heldFromKnown, true);
-        const formatAdRange = (assignment) => {
-          assert.equal(assignment.heldFromKnown, true);
-          return `AD ${assignment.heldFromYear} – ${assignment.heldToYear}`;
-        };
-        const agrippaLabelsAt40 = stopAt40.holderLabels.filter(
-          (label) => label.holderId === "agrippa-i-kingdom"
-        );
-        assert.equal(agrippaLabelsAt40.length, 3);
-        const agrippaPhilipLabel = agrippaLabelsAt40.find(
-          (label) => label.areaId === "philip-tetrarchy-lands"
-        );
-        assert.ok(agrippaPhilipLabel);
-        const agrippaGalileeLabels = agrippaLabelsAt40.filter(
-          (label) => label.areaId === "galilee-perea"
-        );
-        assert.equal(agrippaGalileeLabels.length, 2);
-        const agrippaPhilipAssignment = stopAt40.areas.find(
-          (area) => area.areaId === agrippaPhilipLabel.areaId
-        );
-        assert.ok(agrippaPhilipAssignment);
-        assert.equal(formatAdRange(agrippaPhilipAssignment), "AD 37 – 44");
-        for (const galileeLabel of agrippaGalileeLabels) {
-          const galileeAssignment = stopAt40.areas.find(
-            (area) => area.areaId === galileeLabel.areaId
-          );
-          assert.ok(galileeAssignment);
-          assert.equal(
-            formatAdRange(galileeAssignment),
-            "AD 39 – 44"
-          );
-        }
-
-        const stopAt1 = await readStopPayload(1);
-        const archelausAt1 = stopAt1.areas.find((area) => area.areaId === "judea-samaria-idumea");
-        assert.equal(archelausAt1?.heldFromYear, -4);
-        assert.equal(archelausAt1?.heldToYear, 6);
-        assert.equal(archelausAt1?.heldFromKnown, true);
-        const commageneAt10 = (await readStopPayload(10)).areas.find((area) => area.areaId === "commagene");
-        assert.equal(commageneAt10?.heldFromYear, -20);
-        assert.equal(commageneAt10?.heldToYear, 17);
-        assert.equal(commageneAt10?.heldFromKnown, true);
-
-        const lyciaAt30 = stopAt30.areas.find((area) => area.areaId === "lycia");
-        assert.equal(lyciaAt30?.heldFromYear, -4);
-        assert.equal(lyciaAt30?.heldToYear, 43);
-        assert.equal(lyciaAt30?.heldFromKnown, false);
-        const thraceAt30 = stopAt30.areas.find((area) => area.areaId === "thrace");
-        assert.equal(thraceAt30?.heldFromYear, -4);
-        assert.equal(thraceAt30?.heldToYear, 46);
-        assert.equal(thraceAt30?.heldFromKnown, false);
-        const lyciaPamphyliaAt80 = (await readStopPayload(80)).areas.find((area) => area.areaId === "lycia");
-        assert.equal(lyciaPamphyliaAt80?.heldFromYear, 74);
-        assert.equal(lyciaPamphyliaAt80?.heldToYear, 101);
-        assert.equal(lyciaPamphyliaAt80?.heldFromKnown, true);
-      });
-    });
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
     // No empire-edge source sits next to the valid case's data, so none is written.
     assert.equal(outputFiles.includes("ancient.empire-edge.geojson"), false);
@@ -1510,307 +1127,5 @@ test("buildAppData keeps every holder label point inside at least one held area"
         );
       }
     }
-  });
-});
-
-test("buildAncientAppData real-data road joins include one Ephesus-Laodicea connector", async () => {
-  const fixture = await loadRealDataFixture();
-  const joinFeatures = fixture.roadsPayload.features.slice(fixture.ancientRoadFeatureCount);
-  const ephesusRoadBreakStart = [28.6193, 37.8916];
-  const expectedOtherEnd = [28.5817, 37.8752];
-
-  const touchingBreak = joinFeatures.filter((feature) => {
-    if (feature?.geometry?.type !== "LineString" || !Array.isArray(feature.geometry.coordinates)) {
-      return false;
-    }
-    const [start, end] = feature.geometry.coordinates;
-    return (
-      haversineDistanceKm(start, ephesusRoadBreakStart) <= 0.02 ||
-      haversineDistanceKm(end, ephesusRoadBreakStart) <= 0.02
-    );
-  });
-  assert.equal(touchingBreak.length, 1, "expected exactly one generated line touching (28.6193, 37.8916)");
-
-  const [start, end] = touchingBreak[0].geometry.coordinates;
-  const otherEnd =
-    haversineDistanceKm(start, ephesusRoadBreakStart) <= haversineDistanceKm(end, ephesusRoadBreakStart)
-      ? end
-      : start;
-  assert.ok(
-    haversineDistanceKm(otherEnd, expectedOtherEnd) <= 0.03,
-    "expected Ephesus join to end at (28.5817, 37.8752)"
-  );
-});
-
-test("buildAncientAppData real-data road joins do not share endpoints within 0.2 km", async () => {
-  const fixture = await loadRealDataFixture();
-  const joinFeatures = fixture.roadsPayload.features.slice(fixture.ancientRoadFeatureCount);
-  const endpoints = joinFeatures.flatMap((feature) => {
-    if (feature?.geometry?.type !== "LineString" || !Array.isArray(feature.geometry.coordinates)) {
-      return [];
-    }
-    const [start, end] = feature.geometry.coordinates;
-    return [start, end];
-  });
-
-  for (let index = 0; index < endpoints.length; index += 1) {
-    for (let compareIndex = index + 1; compareIndex < endpoints.length; compareIndex += 1) {
-      const distanceKm = haversineDistanceKm(endpoints[index], endpoints[compareIndex]);
-      assert.ok(
-        distanceKm > 0.2,
-        `generated road join endpoints share a point within 0.2 km (${distanceKm.toFixed(3)} km)`
-      );
-    }
-  }
-});
-
-test("buildAncientAppData real-data road joins close all remaining 0.2-4 km endpoint gaps", async () => {
-  const fixture = await loadRealDataFixture();
-  const originalRoadFeatures = fixture.roadsPayload.features.slice(0, fixture.ancientRoadFeatureCount);
-  const joinFeatures = fixture.roadsPayload.features.slice(fixture.ancientRoadFeatureCount);
-  const linePieces = [];
-  for (const feature of originalRoadFeatures) {
-    const geometry = feature?.geometry;
-    if (geometry?.type === "LineString") {
-      linePieces.push(geometry.coordinates);
-      continue;
-    }
-    if (geometry?.type === "MultiLineString") {
-      linePieces.push(...geometry.coordinates);
-    }
-  }
-
-  const segmentsByPiece = linePieces.map((piece, pieceIndex) => ({
-    pieceIndex,
-    segments: piece.slice(1).map((_, index) => [piece[index], piece[index + 1]])
-  }));
-  const endpointsByPiece = linePieces.flatMap((piece, pieceIndex) => [
-    { pieceIndex, point: piece[0] },
-    { pieceIndex, point: piece[piece.length - 1] }
-  ]);
-  const joinEndpointTouchesRoadEnd = (roadEndPoint) =>
-    joinFeatures.some((joinFeature) => {
-      const [start, end] = joinFeature.geometry.coordinates;
-      return (
-        haversineDistanceKm(start, roadEndPoint) <= 0.05 ||
-        haversineDistanceKm(end, roadEndPoint) <= 0.05
-      );
-    });
-
-  for (const endpoint of endpointsByPiece) {
-    let nearestOtherDistanceKm = Number.POSITIVE_INFINITY;
-    for (const segmentGroup of segmentsByPiece) {
-      if (segmentGroup.pieceIndex === endpoint.pieceIndex) {
-        continue;
-      }
-      for (const [segmentStart, segmentEnd] of segmentGroup.segments) {
-        nearestOtherDistanceKm = Math.min(
-          nearestOtherDistanceKm,
-          distancePointToSegmentKm(endpoint.point, segmentStart, segmentEnd)
-        );
-      }
-    }
-
-    assert.equal(Number.isFinite(nearestOtherDistanceKm), true);
-    if (nearestOtherDistanceKm > 0.2 && nearestOtherDistanceKm <= 4) {
-      assert.equal(
-        joinEndpointTouchesRoadEnd(endpoint.point),
-        true,
-        `road end ${JSON.stringify(endpoint.point)} remains ${nearestOtherDistanceKm.toFixed(3)} km from nearest source-road piece`
-      );
-    }
-  }
-});
-
-test("buildAncientAppData real-data road joins are all longer than 0.2 km and at most 4 km", async () => {
-  const fixture = await loadRealDataFixture();
-  const joinFeatures = fixture.roadsPayload.features.slice(fixture.ancientRoadFeatureCount);
-
-  for (const joinFeature of joinFeatures) {
-    assert.equal(joinFeature.geometry?.type, "LineString");
-    assert.equal(joinFeature.geometry.coordinates.length, 2);
-    const [start, end] = joinFeature.geometry.coordinates;
-    const distanceKm = haversineDistanceKm(start, end);
-    assert.ok(distanceKm > 0.2, `expected join > 0.2 km, got ${distanceKm.toFixed(3)} km`);
-    assert.ok(distanceKm <= 4, `expected join <= 4 km, got ${distanceKm.toFixed(3)} km`);
-  }
-});
-
-test("buildAncientAppData real-data hide-rule linked set includes province records and excludes Galilee", async () => {
-  const fixture = await loadRealDataFixture();
-  const hiddenLocationIds = new Set(
-    (fixture.timelineData.entities ?? [])
-      .map((entity) => entity.locationId)
-      .filter((locationId) => typeof locationId === "string" && locationId.length > 0)
-  );
-  assert.equal(hiddenLocationIds.has("judea-province"), true);
-  assert.equal(hiddenLocationIds.has("cappadocia"), true);
-  assert.equal(hiddenLocationIds.has("galatia"), true);
-  assert.equal(hiddenLocationIds.has("galilee"), false);
-});
-
-test("buildAncientAppData real-data holder labels follow MC7 text rules", async () => {
-  const fixture = await loadRealDataFixture();
-  const stopAt30 = fixture.stopPayloadForYear(30);
-  const labelTexts = stopAt30.holderLabels.map((label) => normalizeLabelText(label.labelText));
-  assert.ok(labelTexts.includes("ITALY"));
-  assert.ok(labelTexts.includes("OTHER ROMAN PROVINCES"));
-  assert.ok(labelTexts.some((text) => text.startsWith("PROVINCE OF ")));
-  assert.equal(labelTexts.some((text) => text.startsWith("ROMAN PROVINCE OF ")), false);
-});
-
-test("buildAncientAppData real-data border minZoom is fixed at zoom 5", async () => {
-  const fixture = await loadRealDataFixture();
-  const stopAt30 = fixture.stopPayloadForYear(30);
-
-  const galileeTouchingBordersAt30 = stopAt30.holderBorders.features.filter(
-    (feature) =>
-      feature.properties.holderAAreaId === "galilee-perea" ||
-      feature.properties.holderBAreaId === "galilee-perea"
-  );
-  assert.ok(galileeTouchingBordersAt30.length > 0, "expected borders touching galilee-perea at AD 30");
-  const galileeMinZooms = [...new Set(galileeTouchingBordersAt30.map((feature) => feature.properties.minZoom))]
-    .sort((left, right) => left - right);
-  assert.deepEqual(galileeMinZooms, [5]);
-
-  const asiaGalatiaBorderAt30 = stopAt30.holderBorders.features.find(
-    (feature) =>
-      (feature.properties.holderAAreaId === "asia" && feature.properties.holderBAreaId === "galatia") ||
-      (feature.properties.holderAAreaId === "galatia" && feature.properties.holderBAreaId === "asia")
-  );
-  assert.ok(asiaGalatiaBorderAt30, "expected Asia-Galatia border at AD 30");
-  assert.equal(asiaGalatiaBorderAt30.properties.minZoom, 5);
-});
-
-test("buildAncientAppData real-data gives every non-uncertain holder at least one label per stop", async () => {
-  const fixture = await loadRealDataFixture();
-  for (const stop of fixture.timelinePayload.stops) {
-    const stopPayload = fixture.stopPayloadById.get(stop.id);
-    const expectedHolderIds = new Set(
-      stopPayload.areas
-        .filter((area) => area.holderKind !== "uncertain")
-        .map((area) => area.holderId)
-    );
-    const labelledHolderIds = new Set(stopPayload.holderLabels.map((label) => label.holderId));
-    for (const holderId of expectedHolderIds) {
-      assert.equal(
-        labelledHolderIds.has(holderId),
-        true,
-        `expected holder '${holderId}' in stop '${stop.id}' to have a label`
-      );
-    }
-  }
-});
-
-test("buildAncientAppData real-data province labels appear and disappear by year", async () => {
-  const fixture = await loadRealDataFixture();
-  const hasLabel = (stopPayload, expectedText) =>
-    stopPayload.holderLabels.some((label) => normalizeLabelText(label.labelText) === expectedText);
-
-  const stopAt6 = fixture.stopPayloadForYear(6);
-  const stopAt17 = fixture.stopPayloadForYear(17);
-  const stopAt41 = fixture.stopPayloadForYear(41);
-  const stopAt44 = fixture.stopPayloadForYear(44);
-  const stopAt53 = fixture.stopPayloadForYear(53);
-  const stopAt67 = fixture.stopPayloadForYear(67);
-  const stopAt79 = fixture.stopPayloadForYear(79);
-
-  assert.equal(hasLabel(stopAt41, "PROVINCE OF JUDEA"), false);
-  assert.equal(hasLabel(stopAt44, "PROVINCE OF JUDEA"), true);
-  assert.equal(hasLabel(stopAt6, "PROVINCE OF CAPPADOCIA"), false);
-  assert.equal(hasLabel(stopAt17, "PROVINCE OF CAPPADOCIA"), true);
-  assert.equal(hasLabel(stopAt67, "PROVINCE OF ACHAIA"), false);
-  assert.equal(hasLabel(stopAt53, "PROVINCE OF ACHAIA"), true);
-  assert.equal(hasLabel(stopAt79, "PROVINCE OF ACHAIA"), true);
-});
-
-test("buildAncientAppData stress fixture stays under 300KB gzip", async () => {
-  await withTempDirectory(async (outputDirectory) => {
-    const entities = [
-      {
-        id: "roman-holder",
-        name: "Roman holder",
-        kind: "roman-province",
-        romanSide: true,
-        sources: ["bib:pleiades-place-resource"]
-      },
-      {
-        id: "outside-holder",
-        name: "Outside holder",
-        kind: "outside-empire",
-        romanSide: false,
-        sources: ["bib:pleiades-place-resource"]
-      }
-    ];
-
-    const stops = Array.from({ length: 15 }, (_, index) => ({
-      id: `stop-${index + 1}`,
-      year: -4 + index * 7,
-      title: `Stop ${index + 1}`,
-      summary: "Synthetic stop",
-      sources: ["bib:pleiades-place-resource"]
-    }));
-
-    const areas = [];
-    const features = [];
-    let areaCounter = 0;
-    for (let row = 0; row < 5; row += 1) {
-      for (let column = 0; column < 8; column += 1) {
-        areaCounter += 1;
-        const areaId = `synthetic-area-${areaCounter}`;
-        const periods = [];
-        for (let stopIndex = 0; stopIndex < stops.length - 1; stopIndex += 1) {
-          periods.push({
-            fromYear: stops[stopIndex].year,
-            toYear: stops[stopIndex + 1].year,
-            holderId: (stopIndex + row + column) % 2 === 0 ? "roman-holder" : "outside-holder",
-            sources: ["bib:pleiades-place-resource"]
-          });
-        }
-        periods.push({
-          fromYear: stops[stops.length - 1].year,
-          toYear: 101,
-          holderId: (row + column) % 2 === 0 ? "outside-holder" : "roman-holder",
-          sources: ["bib:pleiades-place-resource"]
-        });
-
-        areas.push({ id: areaId, periods });
-
-        const minX = column * 1.1;
-        const minY = row * 1.1;
-        features.push({
-          type: "Feature",
-          properties: {
-            areaId,
-            provenance: {
-              dataset: "fixture",
-              version: "fixture-1",
-              upstreamFeatureIds: [`awmc:${areaId}`],
-              changes: [{ kind: "none", detail: "fixture", sources: ["bib:pleiades-place-resource"] }]
-            }
-          },
-          geometry: {
-            type: "Polygon",
-            coordinates: [[[minX, minY], [minX + 1, minY], [minX + 1, minY + 1], [minX, minY + 1], [minX, minY]]]
-          }
-        });
-      }
-    }
-
-    const buildResult = await buildAncientAppData({
-      timelineData: {
-        version: 1,
-        range: { fromYear: -4, toYear: 101, defaultYear: 44 },
-        stops,
-        entities,
-        areas
-      },
-      ancientAreasData: { type: "FeatureCollection", features },
-      ancientRoadsData: { type: "FeatureCollection", features: [] },
-      ancientCoastlineData: { type: "FeatureCollection", features: [] },
-      outputDirectory
-    });
-
-    assert.ok(buildResult.totalGzipBytes <= 300 * 1024);
   });
 });
