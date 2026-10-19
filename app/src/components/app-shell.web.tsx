@@ -1060,8 +1060,12 @@ export function AppShell() {
         return;
       }
       const target = event.target;
+      const isDragStripTarget =
+        target instanceof HTMLElement &&
+        Boolean(target.closest("[data-sheet-drag-strip]"));
       if (
         target instanceof HTMLElement &&
+        !isDragStripTarget &&
         target.closest(
           "button, a, input, select, textarea, [role='button'], [role='link'], [contenteditable='true']"
         )
@@ -1078,6 +1082,36 @@ export function AppShell() {
         canClose: options.canClose,
         requiresDownwardMotion: true,
         allowTapToggle: false
+      });
+    },
+    [beginSmallScreenSheetDrag, isSmallScreen]
+  );
+
+  const handleSmallScreenSheetTopStripPointerDown = useCallback(
+    (
+      event: ReactPointerEvent<HTMLElement>,
+      options: {
+        canClose: boolean;
+      }
+    ) => {
+      if (!isSmallScreen) {
+        return;
+      }
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest(
+          "button, a, input, select, textarea, [role='button'], [role='link'], [contenteditable='true']"
+        )
+      ) {
+        return;
+      }
+      event.stopPropagation();
+      event.preventDefault();
+      beginSmallScreenSheetDrag(event, {
+        canClose: options.canClose,
+        requiresDownwardMotion: false,
+        allowTapToggle: true
       });
     },
     [beginSmallScreenSheetDrag, isSmallScreen]
@@ -2583,12 +2617,46 @@ export function AppShell() {
         <section
           aria-label="Route details"
           onPointerDown={(event) => {
+            const target = event.target;
+            if (
+              target instanceof HTMLElement &&
+              target.closest("[data-sheet-drag-strip='route-list']")
+            ) {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: false });
+              return;
+            }
             handleSmallScreenSheetContentPointerDown(event, { canClose: false });
           }}
           style={routePanelStyle}
         >
           {isSmallScreen ? (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: `${tokens.spacing.sm}px` }}>
+            <div
+              style={{
+                position: "relative",
+                minHeight: "44px",
+                marginBottom: `${tokens.spacing.sm}px`,
+                touchAction: "none"
+              }}
+            >
+              <button
+                aria-hidden="true"
+                data-sheet-drag-strip="route-list"
+                onPointerDown={(event) => {
+                  handleSmallScreenSheetTopStripPointerDown(event, { canClose: false });
+                }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  border: "none",
+                  padding: 0,
+                  margin: 0,
+                  background: "transparent",
+                  touchAction: "none",
+                  cursor: "grab"
+                }}
+                tabIndex={-1}
+                type="button"
+              />
               <button
                 aria-expanded={smallScreenSheetPosition === "full"}
                 aria-label={smallScreenSheetPosition === "full" ? "Collapse details" : "Expand details"}
@@ -2619,6 +2687,11 @@ export function AppShell() {
                   touchAction: "none",
                   cursor: "pointer",
                   padding: 0,
+                  position: "absolute",
+                  left: "50%",
+                  top: 0,
+                  transform: "translateX(-50%)",
+                  zIndex: 1,
                   outline: routeListSheetHandleFocused
                     ? `2px solid ${tokens.color.accent}`
                     : "none",
@@ -2693,6 +2766,14 @@ export function AppShell() {
           aria-label="Place details"
           data-route-place-panel={viewTab === "routes" ? "true" : "false"}
           onPointerDown={(event) => {
+            const target = event.target;
+            if (
+              target instanceof HTMLElement &&
+              target.closest("[data-sheet-drag-strip='place']")
+            ) {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
+              return;
+            }
             handleSmallScreenSheetContentPointerDown(event, { canClose: true });
           }}
           style={placePanelStyle}
@@ -2729,6 +2810,9 @@ export function AppShell() {
                 allowTapToggle: true
               });
             }}
+            onSmallScreenTopStripPointerDown={(event) => {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
+            }}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
             onSelectPlaceFromAbout={handlePanelSelectPlaceFromAbout}
@@ -2755,12 +2839,46 @@ export function AppShell() {
           aria-label="Place details"
           data-route-place-panel="true"
           onPointerDown={(event) => {
+            const target = event.target;
+            if (
+              target instanceof HTMLElement &&
+              target.closest("[data-sheet-drag-strip='route-stop']")
+            ) {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
+              return;
+            }
             handleSmallScreenSheetContentPointerDown(event, { canClose: true });
           }}
           style={placePanelStyle}
         >
           {isSmallScreen ? (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: `${tokens.spacing.sm}px` }}>
+            <div
+              style={{
+                position: "relative",
+                minHeight: "44px",
+                marginBottom: `${tokens.spacing.sm}px`,
+                touchAction: "none"
+              }}
+            >
+              <button
+                aria-hidden="true"
+                data-sheet-drag-strip="route-stop"
+                onPointerDown={(event) => {
+                  handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
+                }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  border: "none",
+                  padding: 0,
+                  margin: 0,
+                  background: "transparent",
+                  touchAction: "none",
+                  cursor: "grab"
+                }}
+                tabIndex={-1}
+                type="button"
+              />
               <button
                 aria-expanded={smallScreenSheetPosition === "full"}
                 aria-label={smallScreenSheetPosition === "full" ? "Collapse details" : "Expand details"}
@@ -2791,6 +2909,11 @@ export function AppShell() {
                   touchAction: "none",
                   cursor: "pointer",
                   padding: 0,
+                  position: "absolute",
+                  left: "50%",
+                  top: 0,
+                  transform: "translateX(-50%)",
+                  zIndex: 1,
                   outline: routeStopSheetHandleFocused
                     ? `2px solid ${tokens.color.accent}`
                     : "none",

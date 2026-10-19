@@ -232,6 +232,84 @@ test("tapping body text at full keeps the sheet full @phone", async ({ page, bas
   expect(Math.abs(topAfter - topBefore)).toBeLessThanOrEqual(4);
 });
 
+test("photo arrows stay on-screen even with an unbreakable About token @phone", async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  const sheet = page.locator("section[aria-label='Place details']").first();
+  await expect(sheet).toBeVisible();
+  await expect(page.getByRole("button", { name: "Next image" })).toBeVisible();
+
+  await page.evaluate(() => {
+    const aboutParagraph = document.querySelector(
+      "section[aria-label='Place details'] [data-panel-section='about'] p"
+    );
+    if (!(aboutParagraph instanceof HTMLElement) || aboutParagraph.dataset.m703ProbeInjected === "true") {
+      return;
+    }
+    aboutParagraph.dataset.m703ProbeInjected = "true";
+    aboutParagraph.textContent = `${aboutParagraph.textContent ?? ""} ${"W".repeat(600)}`;
+  });
+
+  const metrics = await page.evaluate(() => {
+    const detailsSheet = document.querySelector("section[aria-label='Place details']");
+    const frame = detailsSheet?.querySelector("[data-panel-photo-frame='true']");
+    const panelBodyFallbackFromFrame =
+      frame instanceof HTMLElement &&
+      frame.closest("section[data-panel-section='photos']")?.parentElement
+        ? frame.closest("section[data-panel-section='photos']")?.parentElement
+        : null;
+    const panelBody =
+      detailsSheet?.querySelector("[data-place-panel-body='true']") ??
+      detailsSheet?.querySelector(":scope > div > div:nth-of-type(2)") ??
+      panelBodyFallbackFromFrame;
+    const nextButton = detailsSheet?.querySelector("button[aria-label='Next image']");
+    if (
+      !(detailsSheet instanceof HTMLElement) ||
+      !(panelBody instanceof HTMLElement) ||
+      !(frame instanceof HTMLElement) ||
+      !(nextButton instanceof HTMLButtonElement)
+    ) {
+      return null;
+    }
+
+    const sheetRect = detailsSheet.getBoundingClientRect();
+    const panelBodyRect = panelBody.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const nextRect = nextButton.getBoundingClientRect();
+    const nextCenterX = nextRect.left + nextRect.width / 2;
+    const nextCenterY = nextRect.top + nextRect.height / 2;
+    const centerElement = document.elementFromPoint(nextCenterX, nextCenterY);
+    const descendants = panelBody.querySelectorAll("*");
+    let widestDescendantPx = 0;
+    descendants.forEach((element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+      widestDescendantPx = Math.max(widestDescendantPx, element.getBoundingClientRect().width);
+    });
+
+    return {
+      sheetRightPx: sheetRect.right,
+      frameRightPx: frameRect.right,
+      panelBodyWidthPx: panelBodyRect.width,
+      widestDescendantPx,
+      nextCenterInViewport:
+        nextCenterX >= 0 &&
+        nextCenterY >= 0 &&
+        nextCenterX <= window.innerWidth &&
+        nextCenterY <= window.innerHeight,
+      nextCenterOwnedByButton: Boolean(centerElement && nextButton.contains(centerElement))
+    };
+  });
+
+  if (!metrics) {
+    throw new Error("Missing sheet, panel body, frame, or next-image button.");
+  }
+  expect(metrics.frameRightPx).toBeLessThanOrEqual(metrics.sheetRightPx + 0.5);
+  expect(metrics.nextCenterInViewport).toBe(true);
+  expect(metrics.nextCenterOwnedByButton).toBe(true);
+  expect(metrics.widestDescendantPx).toBeLessThanOrEqual(metrics.panelBodyWidthPx + 0.5);
+});
+
 test("downward drags in scrolled content do not move the full sheet @phone", async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
   const sheet = page.locator("section[aria-label='Place details']").first();

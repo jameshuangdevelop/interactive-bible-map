@@ -223,7 +223,7 @@ The panel closes with its × button or with Esc. While the panel is open, the ma
 
 On phones, the panel is a draggable bottom sheet:
 - **Positions:** closed, half and full. At full, it fills the screen below the safe-area inset and covers the search box, tabs and toggle.
-- **Drag:** the top strip (handle + header, at least 44 px high) is draggable. Releasing settles to the nearest position; a quick flick moves one position further in the flick's direction. Small movements are taps.
+- **Drag:** the whole top strip is draggable, across the sheet's full width, from the sheet's top edge down to where content starts (at least 44 px high). Releasing settles to the nearest position; a quick flick moves one position further in the flick's direction. Small movements are taps, so a tap on the strip does nothing except on the handle and close button.
 - **Scroll vs drag:** content scrolls inside the sheet. A downward drag inside content moves the sheet only when that content is already at scroll top; otherwise it scrolls the content.
 - **Handle button:** labelled "Expand details" / "Collapse details", with `aria-expanded`, and keyboard activation on Enter/Space.
 - **Reduced motion:** sheet transitions jump instead of animating.

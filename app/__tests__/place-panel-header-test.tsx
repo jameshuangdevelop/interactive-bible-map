@@ -121,6 +121,7 @@ function renderPanelMarkup({
       isSmallScreenExpanded={isSmallScreenExpanded}
       onToggleSmallScreenExpanded={() => {}}
       onSmallScreenHandlePointerDown={() => {}}
+      onSmallScreenTopStripPointerDown={() => {}}
       onClose={() => {}}
       onSelectPlace={() => {}}
       onSelectPlaceFromAbout={() => {}}
