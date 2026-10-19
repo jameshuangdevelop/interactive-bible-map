@@ -567,19 +567,20 @@ The note isn't data, and G1–G8 already apply these fixes. Correcting the note 
 | The note against F1–F17 | Verified, with 2 fixes | F1–F9, F11, F12 and F14–F17 are applied. F10 and F13 each leave one sentence (R2, R3). |
 
 **Sign-off.** I sign off on M5-11's data and text, which pass G1–G8 (ruling 6). This covers the areas and edges, the provenance, the holders at every stop, the timeline entries, the stop summaries and place notes, the bibliography, the popover's note, the Pleiades IDs and the "Armenia Minor" label.
-- Not covered: the full browser suite (R1), which must pass before merging, and the note's two sentences (R2, R3), which change no data.
-- The eight records whose `politicalHistory` changed (phase 4, item 9) are already `status: "verified"`. Their `lastReviewed` still reads 2026-10-08, since this commit changes docs only, as asked.
+- Not covered: the full browser suite (R1), which must pass before merging, and the note's two sentences (R2, R3), which change no data. *(All three were resolved later on 2026-10-19; see "Follow-up" below.)*
+- The eight records whose `politicalHistory` changed (phase 4, item 9) are already `status: "verified"`. Their `lastReviewed` still reads 2026-10-08, since this commit changes docs only, as asked. *(The follow-up below set it to 2026-10-19.)*
 
 ### To fix
-- **R1. The full browser suite (front end; blocks merging, not the data).**
+- **R1. The full browser suite (front end; blocks merging, not the data).** **Resolved in `a09a48d`** ("keep the Sources popover below top controls on phones"). Every check on #77 passes at `a09a48d`, including the six browser shards (run 39275357452). The full browser suite passed on `e48b7c9`, the same change before a rebase (run 39272452053). I read the CI results only, not the code change.
   - Run 39257308450 on `ee44057` fails in `verifyExpandedAttributionAboveTimeline` (line 11707). A tap on the attribution button times out because the "Modern" button of the "Map type" switch intercepts it. This check never ran on `552dcfb`, whose run stopped at line 5250, and it passed on the base `d287cd0`.
   - It is a phone tap. Of the check's phone scenarios, only "phone-sources-open-390x844" shows text this PR changed: AD 44 with the Sources popover open.
   - The popover sits inside the timeline card with no height limit, and the attribution button sits 8 px above the card. This PR lengthens AD 44's summary (566 → 681 characters) and adds a sentence to the note. So the card most likely now reaches the switch at the top right. I inferred this from the code and the texts, without a browser.
   - **Fix:** cap the popover's height on small screens and let it scroll, or keep the attribution button below the switch. The verified texts don't need shortening.
-- **R2. The note, §4.10's confidence sentence (Research Lead).**
+- **R2. The note, §4.10's confidence sentence (Research Lead).** **Resolved in `825da4e`.** The note's line 162 now gives about 110 km, explains that 90 km is the distance from Saldae to the Ampsaga, and gives G1's two ratings: medium for the Mulucha, and medium on the coast and low inland for the Ampsaga.
   - It says Saldae "sits about 90 km east of where AWMC's own pre-42 extent ends the kingdom". That distance is about 105 km: 104.5 km from the AD 14 edge's coastal end (3.904°E 36.913°N) to Saldae (`pleiades:305142`). M7 and the drawn provenance say about 110. 90 km is Saldae's distance from the Ampsaga.
   - The same sentence rates the river edges "medium-high". G1 rates M-a medium, and M-c medium on the coast and low inland; the data follows G1.
-- **R3. The note, the "Pleiades" item under its sources (Research Lead).** It still calls the reference towns for this face (Amaseia, Neocaesarea, Nicopolis, Caesarea Mazaca) "correctly identified" Pleiades places "aside from the two id/coordinate mismatches below". The corrected list that follows shows all four IDs were wrong (`857036`, `857229`, `857238`, `628879`); this PR fixed them (G7).
+- **R3. The note, the "Pleiades" item under its sources (Research Lead).** **Resolved in `825da4e`.** The note's "Pleiades" item (line 209 after this follow-up's editor's note) now says that all four of the reference towns' Pleiades IDs were wrong, and lists them.
+  - It still calls the reference towns for this face (Amaseia, Neocaesarea, Nicopolis, Caesarea Mazaca) "correctly identified" Pleiades places "aside from the two id/coordinate mismatches below". The corrected list that follows shows all four IDs were wrong (`857036`, `857229`, `857238`, `628879`); this PR fixed them (G7).
 
 ### Notes, no fix required
 - **N1. Where M-a meets the coast.**
@@ -598,3 +599,26 @@ The note isn't data, and G1–G8 already apply these fixes. Correcting the note 
 - **Run:** read-only Node and Python scripts on 2026-10-19 with Node 24.21.0, plus mapshaper to clip Natural Earth's 10m land. The inputs are the build's cached copies, and Natural Earth's rivers came from its pinned commit `ca96624`.
 - **Read:** CI on #77 through `gh` (run 39257308450 failed and 39257308475 passed), and the built payloads in `app/public/generated/`.
 - **Not run:** no build, browser or test suite, as the PO asked. This commit changes docs only.
+
+### Follow-up: review dates and stale items
+After the GPT data review of #77 (`.git/REVIEW-77-data.md`; two should-fixes and one suggestion, all accepted by the PO).
+- **Date:** 2026-10-19 · **Verifier:** fact-checker (Claude Opus 5.5) · **Head before this commit:** `a09a48d`.
+
+- **`lastReviewed` on the eight M5-11 records:** `antioch-pisidia`, `cappadocia`, `derbe`, `galatia`, `iconium`, `lycaonia`, `lystra` and `pisidia`.
+  - I verified their new `politicalHistory` in phase 4 (item 9, 2026-10-19), and none of them has changed since `0fbb071`.
+  - `lastReviewed` moves from 2026-10-08 to 2026-10-19. `status: "verified"` and `verifiedBy: "fact-checker"` stay, as the schema requires when a record is verified.
+- **The same staleness in three more records.** I checked all 42 records that #77 changes against `main` (`28f8a1b`). Three more had a `lastReviewed` older than their last change: `sea-of-galilee` (2026-10-08), `fair-havens` and `syrtis` (both 2026-10-15).
+  - `c11af16` (2026-10-16) gave each of them `naturalFeatureKind: "water"`. No review covered that field: no verification report mentions it, and their dates didn't move.
+  - I verified the value today:
+    - The Sea of Galilee is "a freshwater lake" in its own summary; Wikidata Q126982 is a "monomictic lake".
+    - Fair Havens is "a roadstead" in its summary, and Acts 27:12 (WEB) calls it "the haven".
+    - Syrtis is "a broad gulf" in its summary; Wikidata Q187274 (Gulf of Sidra) is a "bay" and a "gulf".
+  - `lastReviewed` moves to 2026-10-19 in all three; nothing else changes.
+  - The other 31 records #77 changes are new M5-07 records, and none has a `lastReviewed` older than its last change.
+- **R1–R3:** marked resolved above, with the commits that resolved them; the original findings stay.
+- **The research note's §7 heading** ("New bibliography entries proposed (not yet added …)"): the heading stays, and an editor's note follows it.
+  - The PO's wording, "phase 3 added these entries", isn't accurate. Phase 3 added two of the four entries listed there (`smith-dictionary-mauretania`, `pliny-natural-history`), plus `smith-dictionary-mulucha` and `smith-dictionary-ampsaga`, which that list doesn't name (G5).
+  - `smith-dictionary-sophene` and `smith-dictionary-emesa` are not in `data/bibliography.json`: neither land is drawn, and no data cites them. The note says so.
+- **Run:** under `/tmp/ibm-heavy.lock`, log `/tmp/m5-11-fc.log`:
+  - `npm run validate:data`, since the repo has no `validate` script: passed, with 207 warnings, all scripture-linkage or image-width heuristics and none about review fields;
+  - `npm test`: 303 passed, 0 failed.

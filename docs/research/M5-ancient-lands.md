@@ -191,6 +191,8 @@ Proposed ids: `mauretania-caesariensis`, `mauretania-tingitana`.
 
 ### New bibliography entries proposed (not yet added to `data/bibliography.json`; phase 1 makes no data changes)
 
+*Editor's note: this is the phase-1 wording; phase 3 added the Mauretania and Pliny entries to data/bibliography.json (with Smith's "Mulucha" and "Ampsaga"), not the Sophene and Emesa ones, since neither land is drawn.*
+
 - `smith-dictionary-sophene` — "Sophene," *A Dictionary of Greek and Roman Geography* (William Smith, ed., 1854), Walton and Maberly, hosted on Perseus Digital Library: `https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=sophene-geo`, read 2026-10-18.
 - `smith-dictionary-emesa` — "Emesa," same work: `https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=emesa-geo`, read 2026-10-18.
 - `smith-dictionary-mauretania` — "Mauretania," same work: `https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=mauretania-geo`, read 2026-10-18 (promoted to a main citation for Mauretania's two internal rivers, §4.10, since it independently states the Mulucha and Ampsaga boundaries by name; not a cross-check only, as I first had it).
