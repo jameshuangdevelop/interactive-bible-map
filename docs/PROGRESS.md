@@ -81,6 +81,18 @@ Shared memory for all agents. Every session reads this first and updates its own
   3. Is the Massyas-plain description of Chalcis (Strabo 16.2.18) enough for a low-confidence line, or should it keep waiting, as recommended?
   4. Mauretania: two provinces (Caesariensis, Tingitana, split by the Mulucha/Molochath river) or one, pending the GIS Engineer's AWMC check?
   5. If part of Pontus is drawn, does the Sources popover's note still name "Polemon's kingdom of Pontus" as its example of an undrawn land?
+  - **The PO's answers (2026-10-18):**
+    1. **One combined area (option b).** It covers Pontus Galaticus, Polemon's kingdom and Armenia Minor, bounded as the note's §4.1 proposes: Strabo's line against Cappadocia, the Halys, the coast, and the empire's edge.
+       - **Status:** at each stop, the status its parts share. Where they differ, it follows Polemon's kingdom of Pontus, the land the `pontus` record names, and the area's note names each part's holder.
+       - **"Unclear":** only for a stop where the sources leave that default part's own status unclear, never just because the parts differ. The reader should get the border the human asked for, without dashes over the whole region.
+       - **Labels:** the `pontus` record names the area. "Armenia Minor" gets a grey italic label of its own if an attested point allows, like Mysia's.
+    2. **Hold Sophene.** It isn't part of the human's complaint, and the map's first land outside the empire is a visible new thing that should be the human's call. It goes to `BACKLOG.md` under the world-civilisations item, with the note's sources. The Fact-Checker skips it.
+    3. **Chalcis waits,** as recommended.
+    4. **Mauretania:**
+       - two provinces from AD 42 if the Mulucha line holds up, or else one area named "Mauretania" with the river in its note;
+       - before 42 it is one client kingdom, and the years 40–42 follow the sources.
+    5. **The note names only the lands still undrawn.** It adds one sentence: Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.
+    6. **After phase 3,** the Fact-Checker checks the drawn result (phase 4), as M4-03's shapes were checked.
 - **For the PO (M5-07, from the Fact-Checker; details in `docs/verification/M5-route-places.md` §C7 and §C9):**
   - **Note N1 (M5-05's code), still open.** `verify:web:playwright`'s real-data route-stop check will fail now that `stops.json` is empty.
 - **Answered by the PO (2026-10-16), reversing Q1 (F75):** neither (a) nor (b); instead, Q1 itself was wrong. Bethphage's `parentId` reverts to `jerusalem` (Bethany sits under Judea because Al-Eizariya lies outside Jerusalem, while Et-Tur lies inside it, like the Mount of Olives and Gethsemane). `modernCountries` is removed and `names.modern` restored to "Et-Tur (Kafr et-Tur), Jerusalem", satisfying ADR-0028's existing exemption directly; no validator change needed. Applied; checks pass; waits for the Fact-Checker's re-check.
