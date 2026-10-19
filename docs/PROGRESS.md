@@ -93,6 +93,14 @@ Shared memory for all agents. Every session reads this first and updates its own
        - before 42 it is one client kingdom, and the years 40–42 follow the sources.
     5. **The note names only the lands still undrawn.** It adds one sentence: Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.
     6. **After phase 3,** the Fact-Checker checks the drawn result (phase 4), as M4-03's shapes were checked.
+  - **The PO's answers to the Fact-Checker's items (2026-10-18; `docs/verification/M5-ancient-lands.md`, "Items for the PO"):**
+    1. **The Pontus line:** confirmed. It runs equidistant between the places Strabo assigns to each side, the method accepted for Galatia–Cappadocia, and its provenance says the course is approximate. The PO checked the Dasmenda arithmetic: it lies 95 km south of Mazaca.
+    2. **Mauretania before AD 42:** the "unclear" strip (`mauretania-caesariensis-east`), as recommended, so no stop contradicts Strabo.
+    3. **Tavium and the Trocmi's land:** they belong to Galatia. They go to `BACKLOG.md` for a later card; E1 keeps them out of `pontus`.
+    4. **The popover sentence** says "Polemon's kingdom of Pontus".
+    5. **The 1937 *Annals* volume:** noted; no data change.
+    - **Fixes to the note (F1–F17):** applied in this PR by the PO, so the note doesn't contradict the data.
+    - **The Pleiades IDs:** the PO spot-checked two of the ten wrong IDs against Wikidata (`857018` is Amasya, `629035` is Caesarea of Cappadocia).
 - **For the PO (M5-07, from the Fact-Checker; details in `docs/verification/M5-route-places.md` §C7 and §C9):**
   - **Note N1 (M5-05's code), still open.** `verify:web:playwright`'s real-data route-stop check will fail now that `stops.json` is empty.
 - **Answered by the PO (2026-10-16), reversing Q1 (F75):** neither (a) nor (b); instead, Q1 itself was wrong. Bethphage's `parentId` reverts to `jerusalem` (Bethany sits under Judea because Al-Eizariya lies outside Jerusalem, while Et-Tur lies inside it, like the Mount of Olives and Gethsemane). `modernCountries` is removed and `names.modern` restored to "Et-Tur (Kafr et-Tur), Jerusalem", satisfying ADR-0028's existing exemption directly; no validator change needed. Applied; checks pass; waits for the Fact-Checker's re-check.
