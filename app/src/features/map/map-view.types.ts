@@ -1,5 +1,11 @@
 import type { AncientTimelinePayload } from "./ancient-layer.types";
-import type { MapDisplayMode, PinLabelSource, PlaceIndexRecord, PlaceSelection } from "./types";
+import type {
+  MapDisplayMode,
+  PinLabelSource,
+  PlaceIndexRecord,
+  PlaceSelection,
+  SelectionOrigin
+} from "./types";
 import type { RouteMapOverlayData } from "../routes/map-overlay";
 
 export interface MapViewProps {
@@ -27,10 +33,10 @@ export interface MapViewProps {
   }[];
   selectedRouteStopFocusKey: string | null;
   selectedRouteStopCoordinates: [number, number] | null;
-  routeOverlayHiddenPlaceIdsKey: string;
+  selectionOrigin: SelectionOrigin;
   onSelectRouteMapEntry: (
     entry:
-      | { kind: "line"; routeId: string; stageId: string; stageIndex: number }
+      | { kind: "line"; routeId: string; stageId: string; stageIndex: number; origin: "map-line" }
       | {
           kind: "stop";
           routeId: string;
@@ -38,9 +44,13 @@ export interface MapViewProps {
           stageIndex: number;
           stopKind: "location" | "route-stop";
           stopId: string;
+          origin: "map-dot" | "keyboard-visible-place";
         }
   ) => void;
   onAncientLayerLoadStateChange: (state: "idle" | "loading" | "ready" | "error") => void;
   pinLabelSource: PinLabelSource;
-  onSelectPlace: (selection: PlaceSelection) => void;
+  onSelectPlace: (
+    selection: PlaceSelection,
+    origin: "map-name" | "map-candidate" | "keyboard-visible-place"
+  ) => void;
 }

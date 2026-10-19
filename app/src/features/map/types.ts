@@ -55,6 +55,17 @@ export interface PlaceSelection {
   candidateIndex: number | null;
 }
 
+export type SelectionOrigin =
+  | "map-name"
+  | "map-candidate"
+  | "map-dot"
+  | "keyboard-visible-place"
+  | "search"
+  | "panel"
+  | "panel-link"
+  | "route-panel-stop"
+  | "url";
+
 export interface LoadedPlacesState {
   places: PlaceIndexRecord[];
   errorMessage: string | null;
