@@ -6,6 +6,7 @@ import polylabel from "polylabel";
 import { feature, mesh, neighbors } from "topojson-client";
 import { topology } from "topojson-server";
 import { presimplify, simplify } from "topojson-simplify";
+import { ARMENIA_MINOR_LABEL_POINT } from "./ancient-compose.mjs";
 
 // Full shapes keep 5 decimals (about 1 m), which the Jordan border near Bethany beyond the Jordan
 // needs. The zoom-10 shapes, the per-stop border lines drawn from the same simplified topology and
@@ -68,7 +69,7 @@ const STATIC_NON_CLICKABLE_HOLDER_LABELS = Object.freeze([
     minZoom: 5,
     kind: "client-kingdom",
     tooltipText: "Armenia Minor",
-    labelPoint: [38.3301, 39.5639]
+    labelPoint: ARMENIA_MINOR_LABEL_POINT
   }
 ]);
 const HOLDER_LABEL_MIN_ZOOM_BY_AREA_ID = Object.freeze({
@@ -804,6 +805,19 @@ function pointInPolygon(point, polygonCoordinates) {
   return true;
 }
 
+function pointInGeometry(point, geometry) {
+  if (!geometry || typeof geometry !== "object") {
+    return false;
+  }
+  if (geometry.type === "Polygon") {
+    return pointInPolygon(point, geometry.coordinates);
+  }
+  if (geometry.type === "MultiPolygon") {
+    return geometry.coordinates.some((polygon) => pointInPolygon(point, polygon));
+  }
+  return false;
+}
+
 function polygonBoundingBox(polygonCoordinates) {
   const outerRing = polygonCoordinates[0] ?? [];
   let minX = Number.POSITIVE_INFINITY;
@@ -1132,15 +1146,21 @@ function buildHolderLabelPoints({
   });
 }
 
-function buildStaticHolderLabels(assignments) {
+function buildStaticHolderLabels(assignments, areaFeatureById) {
   const areaIds = new Set(assignments.map((assignment) => assignment.areaId));
   return STATIC_NON_CLICKABLE_HOLDER_LABELS
     .filter((label) => areaIds.has(label.areaId))
-    .map((label) => ({
-      ...label,
-      minZoom: Math.max(label.minZoom, HOLDER_LABEL_MIN_ZOOM_BY_AREA_ID[label.areaId] ?? 0),
-      labelPoint: [roundNumber(label.labelPoint[0]), roundNumber(label.labelPoint[1])]
-    }));
+    .map((label) => {
+      const areaFeature = areaFeatureById.get(label.areaId);
+      if (!areaFeature || !pointInGeometry(label.labelPoint, areaFeature.geometry)) {
+        throw new Error(`Static holder label "${label.holderId}" must lie inside "${label.areaId}".`);
+      }
+      return {
+        ...label,
+        minZoom: Math.max(label.minZoom, HOLDER_LABEL_MIN_ZOOM_BY_AREA_ID[label.areaId] ?? 0),
+        labelPoint: [roundNumber(label.labelPoint[0]), roundNumber(label.labelPoint[1])]
+      };
+    });
 }
 
 function buildStopBorderCollections({
@@ -1458,7 +1478,7 @@ export async function buildAncientAppData({
         areasById,
         majorPlacePinCoordinates
       }),
-      ...buildStaticHolderLabels(assignments)
+      ...buildStaticHolderLabels(assignments, areaFeatureById)
     ];
     const borderCollections = buildStopBorderCollections({
       stopTopology: topologyData.simplifiedTopology,

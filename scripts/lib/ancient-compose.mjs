@@ -35,6 +35,7 @@ import { ANCIENT_GEO_INPUTS, AWMC_COMMIT, NATURAL_EARTH_COMMIT } from "./ancient
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
+export const ARMENIA_MINOR_LABEL_POINT = Object.freeze([38.3301, 39.5639]);
 // The folders and files of one run, set by composeAncientAreas: `workDirectory` for this module's
 // intermediates, `partitionWorkDirectory` for the AD 69 and AD 14 partitions, and the input files.
 let reportDirectory;
@@ -209,7 +210,7 @@ const POINTS = {
   sargarausene: [36.621, 38.6875],
   meliteneDistrict: [37.6847, 38.4417],
   tavium: [34.5183, 39.8583],
-  armeniaMinorLabel: [38.3301, 39.5639],
+  armeniaMinorLabel: ARMENIA_MINOR_LABEL_POINT,
   sebasteia: [37.0166, 39.749],
   polemonion: [37.5002, 41.0309],
   pharnakeia: [38.3979, 40.9191],
@@ -1155,14 +1156,12 @@ async function drawPontusCappadociaLine(built, notes) {
         ["Polemonion", POINTS.polemonion],
         ["Pharnakeia", POINTS.pharnakeia],
         ["Trapezus", POINTS.trapezus],
-        ["Satala", POINTS.satala],
         ["Pontus label", [37.83, 40.68]],
         ["Armenia Minor label", POINTS.armeniaMinorLabel]
       ]
     ),
     "pontus",
-    notes,
-    5
+    notes
   );
   assertInside(
     built[cappadociaIndex],
