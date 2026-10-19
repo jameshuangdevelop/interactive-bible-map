@@ -1021,16 +1021,44 @@ test("Modern shared Natural Earth boundaries keep lineStyle for solid and dashed
     );
   }
 
-  const westernSaharaBermStubFeature = (neutralBoundaryGeoJson.features ?? []).find(
+  const westernSaharaEastEndFeature = (neutralBoundaryGeoJson.features ?? []).find(
     (feature) => Number(feature?.properties?.id) === 1746708721
   );
   assert.ok(
-    westernSaharaBermStubFeature,
-    "Natural Earth boundary features must include Western Sahara berm-stub feature 1746708721"
+    westernSaharaEastEndFeature,
+    "Natural Earth boundary features must include the east end of the Western Sahara 27°40′N line (1746708721)"
   );
   assert.equal(
-    westernSaharaBermStubFeature?.properties?.lineStyle,
-    "hidden",
-    "Western Sahara berm-stub feature 1746708721 must be hidden"
+    westernSaharaEastEndFeature?.properties?.lineStyle,
+    "dashed",
+    "Western Sahara 27°40′N east-end feature 1746708721 must be dashed"
+  );
+
+  const westernSaharaMainFeature = (neutralBoundaryGeoJson.features ?? []).find(
+    (feature) => Number(feature?.properties?.id) === 1746705527
+  );
+  assert.ok(
+    westernSaharaMainFeature,
+    "Natural Earth boundary features must include the main Western Sahara 27°40′N line (1746705527)"
+  );
+  const collectLinePoints = (geometry) => {
+    if (geometry?.type === "LineString") {
+      return geometry.coordinates ?? [];
+    }
+    if (geometry?.type === "MultiLineString") {
+      return (geometry.coordinates ?? []).flat();
+    }
+    return [];
+  };
+  const westernSaharaMainPoints = collectLinePoints(westernSaharaMainFeature?.geometry);
+  const westernSaharaEastEndPoints = collectLinePoints(westernSaharaEastEndFeature?.geometry);
+  assert.ok(
+    westernSaharaMainPoints.length > 1 && westernSaharaEastEndPoints.length > 1,
+    "Western Sahara 27°40′N main and east-end segments must both contain line coordinates"
+  );
+  const westernSaharaEastMostLongitude = Math.max(...westernSaharaEastEndPoints.map(([lng]) => lng));
+  assert.ok(
+    westernSaharaEastMostLongitude > -8.7,
+    `Western Sahara 27°40′N east-end segment must reach near Algeria (east-most longitude ${westernSaharaEastMostLongitude})`
   );
 });

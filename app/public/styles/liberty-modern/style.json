@@ -5000,6 +5000,63 @@
       }
     },
     {
+      "id": "ibm-modern-boundary-disputed-western-sahara-claim-line-east-end",
+      "type": "line",
+      "source": "ibm-modern-neutral-boundaries",
+      "minzoom": 5,
+      "filter": [
+        "all",
+        [
+          "==",
+          [
+            "get",
+            "lineStyle"
+          ],
+          "dashed"
+        ],
+        [
+          "in",
+          [
+            "to-string",
+            [
+              "get",
+              "id"
+            ]
+          ],
+          [
+            "literal",
+            [
+              "1746708721"
+            ]
+          ]
+        ]
+      ],
+      "layout": {},
+      "paint": {
+        "line-color": "hsl(248, 1%, 41%)",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          3,
+          1,
+          5,
+          1.2,
+          12,
+          3
+        ],
+        "line-dasharray": [
+          4,
+          2
+        ],
+        "line-opacity": 1
+      }
+    },
+    {
       "id": "ibm-modern-boundary-disputed-golan-west-line",
       "type": "line",
       "source": "ibm-modern-neutral-boundaries",

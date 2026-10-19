@@ -301,6 +301,15 @@ const modernNaturalEarthSupplementalDisputedRules = [
       "The Western Sahara disputed border at 27°40′N is dashed at every zoom using Natural Earth's 1:10m disputed-areas line."
   },
   {
+    id: "western-sahara-claim-line-east-end",
+    render: "dashed",
+    source: "ne-10m-land",
+    sourceFeatureIds: [1746708721],
+    minzoom: 5,
+    reason:
+      "Keeps the east end of the 27°40′N Morocco–Western Sahara line dashed through to Algeria."
+  },
+  {
     id: "golan-west-line",
     render: "dashed",
     source: "ne-10m-disputed-areas",
@@ -346,15 +355,6 @@ const modernNaturalEarthSupplementalDisputedRules = [
     minzoom: 5,
     reason:
       "Halaib's north 1902 administrative line is dashed at every zoom from Natural Earth's 1:10m Sudanese-claim geometry (P9)."
-  },
-  {
-    id: "western-sahara-berm-stub-natural-earth",
-    render: "hidden",
-    source: "ne-10m-land",
-    sourceFeatureIds: [1746708721],
-    minzoom: 0,
-    overlayFromMinzoom: false,
-    reason: "Hides the Moroccan berm, which is not a border (P2/P8)."
   }
 ];
 const naturalEarthBoundaryClassRules = [
