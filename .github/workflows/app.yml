@@ -196,6 +196,7 @@ jobs:
         run: npx playwright merge-reports --reporter html,github all-blob-reports
 
       - name: Merge Playwright JSON report
+        if: always()
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: playwright-report/report.json
         run: npx playwright merge-reports --reporter json all-blob-reports

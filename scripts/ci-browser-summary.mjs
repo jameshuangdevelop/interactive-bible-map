@@ -10,7 +10,7 @@ function firstErrorLine(test) {
   for (const result of results) {
     const errors = Array.isArray(result.errors) ? result.errors : [];
     for (const error of errors) {
-      const text = error?.message ?? error?.stack ?? error?.value ?? "";
+      const text = error?.message ?? "";
       const line = String(text).split(/\r?\n/u).find((entry) => entry.trim().length > 0);
       if (line) {
         return line.trim();
@@ -20,10 +20,11 @@ function firstErrorLine(test) {
   return "";
 }
 
-function collectSpecs(suites, parentTitles = [], output = []) {
+function collectSpecs(suites, parentTitles = [], output = [], isFileLevel = true) {
   for (const suite of suites ?? []) {
+    // A file-level suite's title is its file path, which the Location column already shows.
     const suiteTitle =
-      typeof suite?.title === "string" && suite.title.trim().length > 0
+      !isFileLevel && typeof suite?.title === "string" && suite.title.trim().length > 0
         ? suite.title.trim()
         : null;
     const nextParents = suiteTitle ? [...parentTitles, suiteTitle] : parentTitles;
@@ -51,7 +52,7 @@ function collectSpecs(suites, parentTitles = [], output = []) {
       }
     }
 
-    collectSpecs(suite?.suites ?? [], nextParents, output);
+    collectSpecs(suite?.suites ?? [], nextParents, output, false);
   }
   return output;
 }

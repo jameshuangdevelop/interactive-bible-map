@@ -48,6 +48,7 @@ const fullLicenseDetailsUrl =
 const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const minimumControlHitAreaPx = 44;
+// Same value as ACTION_TIMEOUT_MS in playwright.config.mjs; change both together.
 const UI_STATE_TIMEOUT_MS = 15_000;
 const timelineBorderNote =
   "Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene, Chalcis or Emesa, aren't drawn. Polemon's kingdom of Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.";
