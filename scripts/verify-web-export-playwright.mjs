@@ -49,7 +49,7 @@ const drawerFocusableSelector =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const minimumControlHitAreaPx = 44;
 const timelineBorderNote =
-  "Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene or Polemon's kingdom of Pontus, aren't drawn.";
+  "Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament's places are shown together, and lands whose borders aren't known, such as Abilene, Chalcis or Emesa, aren't drawn. Polemon's kingdom of Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.";
 const smoothnessLayerIds = {
   clusters: "ibm-cluster-circle",
   cityPins: "ibm-city-pin",

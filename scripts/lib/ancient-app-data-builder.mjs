@@ -59,6 +59,17 @@ const MAPLIBRE_GLYPH_ADVANCES_AT_24PX = Object.freeze({
   ")": 8
 });
 const FALLBACK_GLYPH_ADVANCE_AT_24PX = 23;
+const STATIC_NON_CLICKABLE_HOLDER_LABELS = Object.freeze([
+  {
+    holderId: "armenia-minor-label",
+    areaId: "pontus",
+    name: "Armenia Minor",
+    labelText: "Armenia Minor",
+    minZoom: 5,
+    kind: "client-kingdom",
+    labelPoint: [38.3301, 39.5639]
+  }
+]);
 
 function toMapById(records) {
   const map = new Map();
@@ -1117,6 +1128,16 @@ function buildHolderLabelPoints({
   });
 }
 
+function buildStaticHolderLabels(assignments) {
+  const areaIds = new Set(assignments.map((assignment) => assignment.areaId));
+  return STATIC_NON_CLICKABLE_HOLDER_LABELS
+    .filter((label) => areaIds.has(label.areaId))
+    .map((label) => ({
+      ...label,
+      labelPoint: [roundNumber(label.labelPoint[0]), roundNumber(label.labelPoint[1])]
+    }));
+}
+
 function buildStopBorderCollections({
   stopTopology,
   assignmentsByAreaId,
@@ -1262,8 +1283,8 @@ export async function buildAncientAppData({
   ancientEmpireEdgeData = null,
   majorPlacePinCoordinates = [],
   outputDirectory,
-  simplifyThreshold = 0.00002,
-  roadSimplifyTolerance = 0.0015
+  simplifyThreshold = 0.00009,
+  roadSimplifyTolerance = 0.0035
 }) {
   const entitiesById = toMapById(timelineData.entities ?? []);
   const areasById = toMapById(timelineData.areas ?? []);
@@ -1424,13 +1445,16 @@ export async function buildAncientAppData({
       assignmentsByAreaId.set(area.id, assignment);
     }
 
-    const holderLabels = buildHolderLabelPoints({
-      assignments,
-      areaFeatureById,
-      entitiesById,
-      areasById,
-      majorPlacePinCoordinates
-    });
+    const holderLabels = [
+      ...buildHolderLabelPoints({
+        assignments,
+        areaFeatureById,
+        entitiesById,
+        areasById,
+        majorPlacePinCoordinates
+      }),
+      ...buildStaticHolderLabels(assignments)
+    ];
     const borderCollections = buildStopBorderCollections({
       stopTopology: topologyData.simplifiedTopology,
       assignmentsByAreaId,

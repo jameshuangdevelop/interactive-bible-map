@@ -83,14 +83,9 @@
       "sources": [
         "bib:tacitus-annals",
         "bib:isbe-cappadocia",
-        "bib:livius-cappadocia",
-        "bib:isbe-galatia",
-        "bib:isbe-pontus",
-        "bib:cassius-dio-roman-history",
-        "bib:josephus-antiquities",
-        "bib:worldhistory-vespasian"
+        "bib:livius-cappadocia"
       ],
-      "note": "The Roman historian Tacitus calls Veranius the province's \"governor,\" though a translator's note calls his appointment \"only a temporary expedient\"; he later appears on the staff of Germanicus, a Roman prince. Equestrian governors (procurators) followed. This area's drawn land also covers three lands that aren't drawn separately: Pontus Galaticus, part of the province of Galatia from 2 BC; Polemon's kingdom of Pontus, a client kingdom until 63 or 64, when it too joined Galatia; and Lesser Armenia, held by Archelaus of Cappadocia from 20 BC, by Cotys from AD 38 and by Aristobulus, son of Herod of Chalcis, from AD 54, and annexed in AD 72. Their changes don't change Cappadocia's own holder; the AD 6, AD 39, AD 67 and AD 72 stops name them."
+      "note": "The Roman historian Tacitus calls Veranius the province's \"governor,\" though a translator's note calls his appointment \"only a temporary expedient\"; he later appears on the staff of Germanicus, a Roman prince. Equestrian governors (procurators) followed."
     },
     {
       "fromYear": 69,

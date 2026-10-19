@@ -2167,7 +2167,7 @@ export function AppShell() {
                     </div>
                   ) : null}
                   <p style={{ margin: `${tokens.spacing.xs}px 0 0` }}>
-                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene or Polemon&apos;s kingdom of Pontus, aren&apos;t drawn.
+                    Borders are approximate, and the routes of some roads are conjectured. Provinces far from the New Testament&apos;s places are shown together, and lands whose borders aren&apos;t known, such as Abilene, Chalcis or Emesa, aren&apos;t drawn. Polemon&apos;s kingdom of Pontus, Pontus Galaticus and Armenia Minor share one area because no source draws the lines between them.
                   </p>
                 </div>
               ) : null}
