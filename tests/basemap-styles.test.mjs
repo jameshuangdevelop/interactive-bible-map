@@ -52,6 +52,7 @@ const sharedModernNeutralBoundaryGeoJsonPath = path.join(
   "shared",
   "modern-neutral-boundaries.geojson"
 );
+const buildBasemapStylesScriptPath = path.join(repositoryRoot, "scripts", "build-basemap-styles.mjs");
 
 const libertyAllowedLayerIds = new Set([
   "background",
@@ -116,6 +117,47 @@ async function readStyle(stylePath) {
   return JSON.parse(await fs.readFile(stylePath, "utf8"));
 }
 
+async function loadBuildBasemapStylesTestOnly() {
+  const module = await import(pathToFileURL(buildBasemapStylesScriptPath).href);
+  return module.__testOnly;
+}
+
+let maplibreFeatureFilterPromise;
+async function getMapLibreFeatureFilter() {
+  if (!maplibreFeatureFilterPromise) {
+    const maplibreStyleSpecPath = path.join(
+      repositoryRoot,
+      "node_modules",
+      "@maplibre",
+      "maplibre-gl-style-spec",
+      "dist",
+      "index.mjs"
+    );
+    maplibreFeatureFilterPromise = import(pathToFileURL(maplibreStyleSpecPath).href).then(
+      (module) => module.featureFilter
+    );
+  }
+  return maplibreFeatureFilterPromise;
+}
+
+async function compileMapLibreFilter(filterExpression, contextLabel) {
+  const featureFilter = await getMapLibreFeatureFilter();
+  return featureFilter(filterExpression, contextLabel, {});
+}
+
+function evaluateCompiledMapLibreFilter(compiledFilter, properties, zoom = 6) {
+  return compiledFilter.filter(
+    { zoom },
+    {
+      type: 1,
+      properties,
+      geometry: [[{ x: 0, y: 0 }]],
+      id: 1
+    },
+    { z: zoom, x: 0, y: 0 }
+  );
+}
+
 function assertNoSymbolLayers(style, styleName) {
   assert.equal(
     style.layers.some((layer) => layer.type === "symbol"),
@@ -164,56 +206,6 @@ function classOpacityByName(matchExpression, description) {
     opacities.set(matchExpression[index], matchExpression[index + 1]);
   }
   return opacities;
-}
-
-function evaluateStyleExpression(expression, properties) {
-  if (!Array.isArray(expression)) {
-    return expression;
-  }
-
-  const [operator, ...argumentsList] = expression;
-  switch (operator) {
-    case "all":
-      return argumentsList.every((entry) => Boolean(evaluateStyleExpression(entry, properties)));
-    case "any":
-      return argumentsList.some((entry) => Boolean(evaluateStyleExpression(entry, properties)));
-    case "!":
-      return !Boolean(evaluateStyleExpression(argumentsList[0], properties));
-    case "==":
-      return (
-        evaluateStyleExpression(argumentsList[0], properties) ===
-        evaluateStyleExpression(argumentsList[1], properties)
-      );
-    case "!=":
-      return (
-        evaluateStyleExpression(argumentsList[0], properties) !==
-        evaluateStyleExpression(argumentsList[1], properties)
-      );
-    case "in": {
-      const needle = evaluateStyleExpression(argumentsList[0], properties);
-      const haystack = evaluateStyleExpression(argumentsList[1], properties);
-      return Array.isArray(haystack) ? haystack.includes(needle) : false;
-    }
-    case "get":
-      return properties[argumentsList[0]];
-    case "has":
-      return Object.prototype.hasOwnProperty.call(properties, argumentsList[0]);
-    case "coalesce": {
-      for (const entry of argumentsList) {
-        const value = evaluateStyleExpression(entry, properties);
-        if (value !== null && value !== undefined) {
-          return value;
-        }
-      }
-      return null;
-    }
-    case "literal":
-      return argumentsList[0];
-    case "to-string":
-      return String(evaluateStyleExpression(argumentsList[0], properties));
-    default:
-      throw new Error(`Unsupported expression operator in test evaluator: ${String(operator)}`);
-  }
 }
 
 function assertLibertyMergedLandcover(style) {
@@ -454,15 +446,7 @@ function assertLibertyModernLabels(style) {
 }
 
 async function assertNoStateOrProvinceLabelsAcrossZooms(style, styleName) {
-  const maplibreStyleSpecPath = path.join(
-    repositoryRoot,
-    "node_modules",
-    "@maplibre",
-    "maplibre-gl-style-spec",
-    "dist",
-    "index.mjs"
-  );
-  const { featureFilter } = await import(pathToFileURL(maplibreStyleSpecPath).href);
+  const featureFilter = await getMapLibreFeatureFilter();
   for (const [layerIndex, layer] of style.layers.entries()) {
     if (layer.type !== "symbol") {
       continue;
@@ -662,10 +646,11 @@ function assertOnlyCountryBoundaryLayers(style, styleName) {
     }
 
     for (const value of adminLevels) {
-      const isCyprusDisputedProxy =
+      // Disputed layer may include admin_level=3 for explicit policy exceptions (for example Cyprus).
+      const isDisputedAdminLevel3Exception =
         layer.id === "ibm-modern-boundary-disputed" && (value === 3 || value === "3");
       assert.equal(
-        value === 2 || value === "2" || isCyprusDisputedProxy,
+        value === 2 || value === "2" || isDisputedAdminLevel3Exception,
         true,
         `${styleName} boundary layer '${layer.id}' must only target admin level 2, got '${value}'`
       );
@@ -763,6 +748,14 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     "hsl(248, 1%, 41%)",
     "Liberty modern disputed boundaries must use the shared disputed color"
   );
+  const compiledDisputedFilter = await compileMapLibreFilter(
+    libertyDisputedBoundaryLayer.filter,
+    "liberty-modern-disputed-filter"
+  );
+  const compiledSolidFilter = await compileMapLibreFilter(
+    libertyBoundary2Layer.filter,
+    "liberty-modern-solid-filter"
+  );
   const libertyCrimeaSupplementLayer = style.layers.find(
     (layer) => layer.id === "ibm-modern-boundary-disputed-crimea-isthmus-natural-earth-overlay"
   );
@@ -780,11 +773,46 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     "hsl(248, 1%, 41%)",
     "Liberty modern Crimea supplemental disputed layer must use the shared disputed color"
   );
-  const maritimeDisputedFilterMatch = evaluateStyleExpression(
-    libertyDisputedBoundaryLayer.filter,
+  const undisputedLandPairProperties = {
+    admin_level: 2,
+    disputed: 0,
+    maritime: 0,
+    adm0_l: "ALB",
+    adm0_r: "MKD"
+  };
+  const disputedLandPairProperties = {
+    admin_level: 2,
+    disputed: 1,
+    maritime: 0,
+    adm0_l: "AAA",
+    adm0_r: "BBB",
+    disputed_name: "Synthetic disputed line"
+  };
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledSolidFilter, undisputedLandPairProperties),
+    true,
+    "Liberty modern solid-layer filter must match a normal undisputed admin-level-2 land pair"
+  );
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledDisputedFilter, undisputedLandPairProperties),
+    false,
+    "Liberty modern disputed-layer filter must reject a normal undisputed admin-level-2 land pair"
+  );
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledDisputedFilter, disputedLandPairProperties),
+    true,
+    "Liberty modern disputed-layer filter must match a disputed admin-level-2 land pair"
+  );
+  assert.equal(
+    evaluateCompiledMapLibreFilter(compiledSolidFilter, disputedLandPairProperties),
+    false,
+    "Liberty modern solid-layer filter must reject a disputed admin-level-2 land pair"
+  );
+
+  const maritimeDisputedFilterMatch = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
     {
-      admin_level: 2,
-      disputed: 1,
+      ...disputedLandPairProperties,
       maritime: 1,
       claimed_by: "UA"
     }
@@ -794,8 +822,8 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     false,
     "Liberty modern disputed-layer filter must reject maritime boundaries"
   );
-  const anatoliaAdminLevel3Match = evaluateStyleExpression(
-    libertyDisputedBoundaryLayer.filter,
+  const anatoliaAdminLevel3Match = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
     {
       admin_level: 3,
       disputed: 0,
@@ -807,8 +835,8 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     false,
     "Liberty modern disputed-layer filter must not match generic admin-level-3 lines"
   );
-  const moroccanBermNamedMatch = evaluateStyleExpression(
-    libertyDisputedBoundaryLayer.filter,
+  const moroccanBermNamedMatch = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
     {
       admin_level: 2,
       maritime: 0,
@@ -823,8 +851,8 @@ test("Liberty modern hosted style removes disputed boundary and POI/airport labe
     false,
     "Liberty modern disputed-layer filter must hide the Moroccan berm tile feature"
   );
-  const moroccanBermUnnamedStubMatch = evaluateStyleExpression(
-    libertyDisputedBoundaryLayer.filter,
+  const moroccanBermUnnamedStubMatch = evaluateCompiledMapLibreFilter(
+    compiledDisputedFilter,
     {
       admin_level: 2,
       maritime: 0,
@@ -1060,5 +1088,106 @@ test("Modern shared Natural Earth boundaries keep lineStyle for solid and dashed
   assert.ok(
     westernSaharaEastMostLongitude > -8.7,
     `Western Sahara 27°40′N east-end segment must reach near Algeria (east-most longitude ${westernSaharaEastMostLongitude})`
+  );
+});
+
+test("Supplemental Natural Earth features reject maritime lines", async () => {
+  const { createSupplementalDisputedBoundaryFeatures } = await loadBuildBasemapStylesTestOnly();
+  assert.equal(
+    typeof createSupplementalDisputedBoundaryFeatures,
+    "function",
+    "build-basemap-styles test API must expose createSupplementalDisputedBoundaryFeatures"
+  );
+  assert.throws(
+    () =>
+      createSupplementalDisputedBoundaryFeatures({
+        disputedAreas10mGeoJson: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746705527,
+                FEATURECLA: "Disputed (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [-9, 27.6],
+                  [-8.9, 27.6]
+                ]
+              }
+            }
+          ]
+        },
+        boundaryLines10mGeoJson: {
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708491,
+                FEATURECLA: "Line of control (please verify)",
+                MARITIME: 1
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [33.7, 35.0],
+                  [33.8, 35.05]
+                ]
+              }
+            },
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708483,
+                FEATURECLA: "Line of control (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [33.9, 35.05],
+                  [34.0, 35.06]
+                ]
+              }
+            },
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708787,
+                FEATURECLA: "Disputed (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [34.0, 45.8],
+                  [34.5, 46.0]
+                ]
+              }
+            },
+            {
+              type: "Feature",
+              properties: {
+                ne_id: 1746708721,
+                FEATURECLA: "Line of control (please verify)",
+                MARITIME: 0
+              },
+              geometry: {
+                type: "LineString",
+                coordinates: [
+                  [-8.82, 27.661],
+                  [-8.68, 27.661]
+                ]
+              }
+            }
+          ]
+        }
+      }),
+    /maritime and cannot be used as a disputed-land supplement/u,
+    "Supplemental disputed-line builder must reject maritime Natural Earth features"
   );
 });

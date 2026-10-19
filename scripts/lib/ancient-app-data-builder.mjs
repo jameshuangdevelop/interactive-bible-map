@@ -1117,48 +1117,10 @@ function buildHolderLabelPoints({
   });
 }
 
-function buildAreaLabelMinZoomByAreaId(assignments, holderLabels) {
-  const minZoomByHolderId = new Map();
-  const minZoomByHolderAndArea = new Map();
-
-  for (const label of holderLabels) {
-    const holderMinZoom = minZoomByHolderId.get(label.holderId);
-    minZoomByHolderId.set(
-      label.holderId,
-      holderMinZoom === undefined ? label.minZoom : Math.min(holderMinZoom, label.minZoom)
-    );
-
-    const key = `${label.holderId}|${label.areaId}`;
-    const areaMinZoom = minZoomByHolderAndArea.get(key);
-    minZoomByHolderAndArea.set(key, areaMinZoom === undefined ? label.minZoom : Math.min(areaMinZoom, label.minZoom));
-  }
-
-  const minZoomByAreaId = new Map();
-  for (const assignment of assignments) {
-    if (assignment.holderKind === "uncertain") {
-      minZoomByAreaId.set(assignment.areaId, 0);
-      continue;
-    }
-
-    const areaKey = `${assignment.holderId}|${assignment.areaId}`;
-    const areaLabelMinZoom = minZoomByHolderAndArea.get(areaKey);
-    if (areaLabelMinZoom !== undefined) {
-      minZoomByAreaId.set(assignment.areaId, areaLabelMinZoom);
-      continue;
-    }
-
-    const holderLabelMinZoom = minZoomByHolderId.get(assignment.holderId);
-    minZoomByAreaId.set(assignment.areaId, holderLabelMinZoom ?? 0);
-  }
-
-  return minZoomByAreaId;
-}
-
 function buildStopBorderCollections({
   stopTopology,
   assignmentsByAreaId,
-  entitiesById,
-  areaLabelMinZoomByAreaId
+  entitiesById
 }) {
   const areaObject = stopTopology.objects.areas;
   const geometries = areaObject.geometries ?? [];
@@ -1469,12 +1431,10 @@ export async function buildAncientAppData({
       areasById,
       majorPlacePinCoordinates
     });
-    const areaLabelMinZoomByAreaId = buildAreaLabelMinZoomByAreaId(assignments, holderLabels);
     const borderCollections = buildStopBorderCollections({
       stopTopology: topologyData.simplifiedTopology,
       assignmentsByAreaId,
-      entitiesById,
-      areaLabelMinZoomByAreaId
+      entitiesById
     });
 
     writtenFiles.push(

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -374,7 +374,6 @@ const naturalEarthBoundaryIdOverrides = new Map([
   [1746708787, { render: "hidden", reason: "Hide 1:50m Crimea isthmus copy so only the 1:10m supplement draws." }],
   [1746708837, { render: "hidden", reason: "Kerch Strait sea line is hidden because modern borders draw no maritime lines." }],
   [1746705351, { render: "hidden", reason: "Moroccan berm is hidden: it is a military wall, not a border line." }],
-  [1746705379, { render: "hidden", reason: "Transnistria is hidden by policy pending human check." }]
 ]);
 const libertyModernPerformanceExcludedLayerIds = new Set([
   "building-3d",
@@ -531,36 +530,6 @@ function appendModernTileRenderFilter(existingFilter, targetRender) {
     return existingFilter;
   }
   return ["all", existingFilter, renderCondition];
-}
-
-function appendDisputedFilterExclusion(existingFilter) {
-  const disputedFilter = ["!=", ["get", "disputed"], true];
-  if (!existingFilter) {
-    return disputedFilter;
-  }
-
-  return ["all", existingFilter, disputedFilter];
-}
-
-function normalizeDisputedAreaName(value) {
-  return String(value ?? "")
-    .toLowerCase()
-    .replace(/\(.*?\)/gu, "")
-    .replace(/[^a-z0-9]+/gu, " ")
-    .trim();
-}
-
-function asPolygonCoordinates(geometry) {
-  if (geometry == null) {
-    return [];
-  }
-  if (geometry.type === "Polygon") {
-    return [geometry.coordinates];
-  }
-  if (geometry.type === "MultiPolygon") {
-    return geometry.coordinates;
-  }
-  return [];
 }
 
 function simplifyLineCoordinates(lineCoordinates, toleranceDegrees) {
@@ -794,6 +763,16 @@ function createSupplementalDisputedBoundaryFeatures({
         );
       }
       const baseProperties = sourceFeature.properties ?? {};
+      const maritimeValue =
+        baseProperties.MARITIME ??
+        baseProperties.maritime ??
+        baseProperties.Maritime ??
+        0;
+      if (Number(maritimeValue) === 1) {
+        throw new Error(
+          `Natural Earth 1:10m feature ${sourceFeatureId} for rule '${rule.id}' is maritime and cannot be used as a disputed-land supplement.`
+        );
+      }
       const featurecla =
         baseProperties.FEATURECLA ?? baseProperties.featurecla ?? "Disputed (please verify)";
       const leftCode = baseProperties.ADM0_A3_L ?? baseProperties.adm0_a3_l ?? baseProperties.adm0_l;
@@ -1447,7 +1426,21 @@ async function buildStyles() {
   console.log(" - app/public/styles/shared/modern-neutral-boundaries.geojson");
 }
 
-buildStyles().catch((error) => {
-  console.error("Failed to build basemap styles:", error.message);
-  process.exitCode = 1;
-});
+const isDirectRun = (() => {
+  const entryPoint = process.argv[1];
+  if (!entryPoint) {
+    return false;
+  }
+  return import.meta.url === pathToFileURL(entryPoint).href;
+})();
+
+if (isDirectRun) {
+  buildStyles().catch((error) => {
+    console.error("Failed to build basemap styles:", error.message);
+    process.exitCode = 1;
+  });
+}
+
+export const __testOnly = {
+  createSupplementalDisputedBoundaryFeatures
+};
