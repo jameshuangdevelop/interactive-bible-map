@@ -10,9 +10,9 @@
 | Credit target | ~4,000 (session guard: 6,000; ADR-0025) |
 
 ## Goal
-On a real GPU (an Apple M1, headed), selecting a stage on the Routes tab now causes one main-thread task of 50–85 ms in 18 of 20 selections. The PO measured it with `/tmp/mc13-stage-probe.mjs` on 2026-10-19. On the MC12 preview, which stops at M5-08, it was 1 of 40 actions (54 ms), and M5-05's review recorded 0 of 40. Hovers stay clean. Find the cause and remove it, so that selecting a stage has no task over 50 ms.
+On a real GPU (an Apple M1, headed), the PO's first measurement with `/tmp/mc13-stage-probe.mjs` on 2026-10-19 reported one main-thread task of 50–85 ms in 18 of 20 stage selections on the Routes tab. The amendment below traces that figure to CPU contention. On the MC12 preview, which stops at M5-08, it was 1 of 40 actions (54 ms), and M5-05's review recorded 0 of 40. Hovers stay clean. Find the cause and remove it, so that selecting a stage has no task over 50 ms.
 
-> **PO amendment (2026-10-19):** with clean headed A/B runs on an idle M1 (`/tmp/perf-ab.log`), all builds are 0 of 20 stage selects over 50 ms; the earlier 18-of-40 result came from CPU contention. The regression is still real as wasted map work: before the fix, one select re-uploaded all 17 sources 2–3 times (34–51 `setData`, plus 78–117 `setLayoutProperty` calls); after the fix, only `ibm-route-lines` and `ibm-route-points` update (4–6 calls) with no layout calls.
+> **PO amendment (2026-10-19):** with clean headed A/B runs on an idle M1 (`/tmp/perf-ab.log`), all builds are 0 of 20 stage selects over 50 ms; the earlier 18-of-20 result came from CPU contention, not from the app. The regression is still real as wasted map work: before the fix, one select re-uploaded all 17 sources 2–3 times (34–51 `setData`, plus 78–117 `setLayoutProperty` calls); after the fix, only `ibm-route-lines` and `ibm-route-points` update (4–6 calls) with no layout calls.
 
 ## Inputs (read only these)
 - `docs/DECISIONS.md` ADR-0024, ADR-0044 (item 6: route places' names show from any zoom with the route's priority) and ADR-0045; `docs/TESTING.md`
