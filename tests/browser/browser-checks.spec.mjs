@@ -401,13 +401,42 @@ test("timeline UI behaves with default generated timeline data", { tag: ["@timel
   await slider.focus();
   const before = await slider.getAttribute("aria-valuetext");
   await slider.press("ArrowRight");
-  await page.waitForTimeout(120);
+  await expect
+    .poll(async () => slider.getAttribute("aria-valuetext"), { timeout: 10_000 })
+    .not.toBe(before);
   const after = await slider.getAttribute("aria-valuetext");
   expect(after).not.toBe(before);
   await page.getByRole("button", { name: "Sources" }).click();
   const popover = page.locator("[data-timeline-sources-popover='true']");
   await popover.waitFor({ state: "visible", timeout: 10_000 });
   await expect(popover).toContainText("Borders are approximate");
+  await page.getByRole("button", { name: "Sources" }).click();
+  await expect(popover).toBeHidden({ timeout: 10_000 });
+  const holderLabelPoint = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    const holderLabel = map
+      .queryRenderedFeatures(undefined, {
+        layers: ["ibm-ancient-holder-label-clickable", "ibm-ancient-holder-label"]
+      })
+      .find((feature) => {
+        const text = String(feature.properties?.tooltipText ?? "").trim();
+        return text.length > 0 && feature.geometry?.type === "Point";
+      });
+    if (!holderLabel || holderLabel.geometry?.type !== "Point") {
+      throw new Error("Expected at least one rendered ancient holder label with tooltipText.");
+    }
+    const projected = map.project(holderLabel.geometry.coordinates);
+    return { x: projected.x, y: projected.y };
+  }, mapTestHookKey);
+  await page.mouse.move(holderLabelPoint.x, holderLabelPoint.y);
+  const tooltip = page.locator("div[role='tooltip']").first();
+  await expect(tooltip).toBeVisible({ timeout: 8_000 });
+  await expect
+    .poll(async () => ((await tooltip.textContent()) ?? "").trim(), { timeout: 8_000 })
+    .not.toBe("");
 });
 
 test("timeline UI hides itself when generated timeline is absent", { tag: ["@timeline"] }, async ({ page, baseUrl }) => {
@@ -505,6 +534,9 @@ test("panel open smoothness keeps long tasks under budget (restores B60) @perf",
     workerConsoleEvents: [],
     workerErrors: []
   });
+  expect(Array.isArray(panelSmoothness.longTasks)).toBe(true);
+  expect(typeof panelSmoothness.frameSummary).toBe("object");
+  expect(typeof panelSmoothness.frameSummary.count).toBe("number");
   if (process.env.SMOOTHNESS_REQUIRE_GPU === "1") {
     expect(panelSmoothness.longTasks.filter((duration) => duration > 50)).toEqual([]);
   }
@@ -667,26 +699,42 @@ test("routes view keeps ARIA tabs, stage pills, and ODbL attribution (replaces r
 
 test("each real route renders lines, stops, and panel content (replaces routesRealDataChecks) @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
   const routes = [
-    ["paul-1", "Paul's first journey"],
-    ["paul-2", "Paul's second journey"],
-    ["paul-3", "Paul's third journey"],
-    ["paul-rome", "Paul's voyage to Rome"],
-    ["jesus", "Jesus' journeys"]
+    ["paul-1", "Paul's first journey", "Antioch on the Orontes"],
+    ["paul-2", "Paul's second journey", "Corinth"],
+    ["paul-3", "Paul's third journey", "Ephesus"],
+    ["paul-rome", "Paul's voyage to Rome", "Rome"],
+    ["jesus", "Jesus' journeys", "Jerusalem"]
   ];
-  for (const [routeId, heading] of routes) {
+  for (const [routeId, heading, expectedStopLabel] of routes) {
     await page.goto(`${baseUrl}/?tab=routes&route=${routeId}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await page.locator("[data-routes-panel='true']").waitFor({ state: "visible", timeout: 30_000 });
     await waitForMapIdle(page);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     const snapshot = await page.evaluate((testHookKey) => {
       const map = window[testHookKey];
+      const renderedLabelTexts = map
+        .queryRenderedFeatures(undefined, {
+          layers: [
+            "ibm-routes-major-pin",
+            "ibm-routes-city-pin",
+            "ibm-routes-site-pin",
+            "ibm-pin-label-standard",
+            "ibm-selected-major-pin-label",
+            "ibm-selected-site-pin-label",
+            "ibm-selected-pin-label"
+          ]
+        })
+        .map((feature) => String(feature.properties?.labelText ?? "").trim())
+        .filter((value) => value.length > 0);
       return {
         lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
-        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length
+        stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
+        renderedLabelTexts
       };
     }, mapTestHookKey);
     expect(snapshot.lineCount).toBeGreaterThan(0);
     expect(snapshot.stopCount).toBeGreaterThan(0);
+    expect(snapshot.renderedLabelTexts).toContain(expectedStopLabel);
   }
 });
 
@@ -735,6 +783,32 @@ test("phone layout keeps search/toggle spacing, sheet interaction, and drawer fi
     await page.waitForTimeout(250);
     const afterCollapse = await panel.boundingBox();
     expect(afterCollapse.height).toBeLessThan(afterExpand.height - 40);
+
+    await page.goto(`${baseUrl}/?tab=routes&route=paul-rome`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await waitForMapIdle(page);
+    const routesPanel = page.locator("[data-routes-panel='true']");
+    await expect(routesPanel).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Paul's voyage to Rome" })).toBeVisible();
+    const routesPanelLayout = await page.evaluate(() => {
+      const panel = document.querySelector("[data-routes-panel='true']");
+      if (!(panel instanceof HTMLElement)) {
+        return null;
+      }
+      const rect = panel.getBoundingClientRect();
+      return {
+        top: rect.top,
+        bottom: rect.bottom,
+        viewportHeight: window.innerHeight,
+        scrollHeight: panel.scrollHeight,
+        clientHeight: panel.clientHeight
+      };
+    });
+    expect(routesPanelLayout).toBeTruthy();
+    expect(routesPanelLayout.top).toBeGreaterThanOrEqual(0);
+    expect(routesPanelLayout.bottom).toBeGreaterThan(routesPanelLayout.top);
+    expect(routesPanelLayout.clientHeight).toBeGreaterThan(0);
+    expect(routesPanelLayout.scrollHeight).toBeGreaterThanOrEqual(routesPanelLayout.clientHeight);
+    await expect(page.locator("[data-route-stage-index='1']")).toBeVisible();
   } finally {
     await page.close();
     await context.close();
@@ -779,6 +853,7 @@ test("axe: timeline with Sources popover has no serious accessibility violations
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
   const violations = results.violations
     .filter((violation) => ["serious", "critical"].includes(violation.impact ?? ""))
+    // Ignore known link contrast in the timeline Sources popover list items (UI styling issue under design review).
     .filter((violation) => violation.id !== "color-contrast");
   expect(violations).toEqual([]);
 });
