@@ -2552,6 +2552,7 @@ export function MapView({
   highlightedPlaceId,
   leftPanelWidth,
   bottomPanelInset,
+  suspendSelectionCameraUpdates,
   timelineOverlayInset,
   topControlsSafeBottomInset,
   attributionReservedHeight,
@@ -4239,6 +4240,9 @@ export function MapView({
       previousFocusRequestRef.current = selection ? previousFocusRequestRef.current : "";
       return;
     }
+    if (suspendSelectionCameraUpdates) {
+      return;
+    }
 
     const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}`;
     if (selectionKey === previousFocusRequestRef.current) {
@@ -4286,6 +4290,7 @@ export function MapView({
     runtimeTuning.controlZoomDurationMs,
     runtimeTuning.flyToDurationMs,
     selectionOrigin,
+    suspendSelectionCameraUpdates,
     selection
   ]);
 

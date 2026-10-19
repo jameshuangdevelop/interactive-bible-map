@@ -41,7 +41,7 @@ describe("small screen sheet settle logic", () => {
     ).toBe("full");
   });
 
-  test("flicking down drops one position", () => {
+  test("flicking down from full settles to half", () => {
     expect(
       settle({
         startPosition: "full",
@@ -50,6 +50,17 @@ describe("small screen sheet settle logic", () => {
         velocityYPxPerMs: 0.9
       })
     ).toBe("half");
+  });
+
+  test("flicking down from half closes the sheet", () => {
+    expect(
+      settle({
+        startPosition: "half",
+        currentHeightPx: HALF_HEIGHT - 8,
+        dragDeltaYPx: 52,
+        velocityYPxPerMs: 0.9
+      })
+    ).toBe("closed");
   });
 
   test("dragging down from half can close the sheet", () => {

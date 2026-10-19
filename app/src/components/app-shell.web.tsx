@@ -393,6 +393,8 @@ export function AppShell() {
     typeof window !== "undefined" ? window.innerWidth : 0
   );
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [routeListSheetHandleFocused, setRouteListSheetHandleFocused] = useState(false);
+  const [routeStopSheetHandleFocused, setRouteStopSheetHandleFocused] = useState(false);
   const [placeDetailsById, setPlaceDetailsById] = useState<Record<string, PlaceDetailsPayload>>(
     {}
   );
@@ -433,6 +435,8 @@ export function AppShell() {
     startHeightPx: number;
     startPosition: SmallScreenSheetPosition;
     canClose: boolean;
+    requiresDownwardMotion: boolean;
+    allowTapToggle: boolean;
     lastY: number;
     lastTimestampMs: number;
     velocityYPxPerMs: number;
@@ -543,6 +547,13 @@ export function AppShell() {
         return;
       }
 
+      if (dragState.requiresDownwardMotion) {
+        if (event.clientY <= dragState.startY) {
+          return;
+        }
+        dragState.requiresDownwardMotion = false;
+      }
+
       const elapsedMs = Math.max(1, event.timeStamp - dragState.lastTimestampMs);
       const deltaY = event.clientY - dragState.lastY;
       dragState.velocityYPxPerMs = deltaY / elapsedMs;
@@ -555,7 +566,10 @@ export function AppShell() {
           dragState.startHeightPx + (dragState.startY - event.clientY)
         )
       );
-      dragState.movedPx = Math.abs(event.clientY - dragState.startY);
+      dragState.movedPx = Math.max(
+        dragState.movedPx,
+        Math.abs(event.clientY - dragState.startY)
+      );
       setSmallScreenSheetDragHeightPx(nextHeightPx);
     };
 
@@ -573,11 +587,14 @@ export function AppShell() {
           smallScreenSheetDragHeightPx ?? dragState.startHeightPx
         )
       );
+      const movedPx = dragState.allowTapToggle
+        ? dragState.movedPx
+        : Math.max(dragState.movedPx, SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX + 1);
       const nextPosition = settleSmallScreenSheetPosition({
         canClose: dragState.canClose,
         currentHeightPx: finalHeightPx,
         dragDeltaYPx: event.clientY - dragState.startY,
-        movedPx: dragState.movedPx,
+        movedPx,
         startPosition: dragState.startPosition,
         tapThresholdPx: SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX,
         velocityYPxPerMs: dragState.velocityYPxPerMs,
@@ -975,8 +992,18 @@ export function AppShell() {
   }, []);
 
   const beginSmallScreenSheetDrag = useCallback(
-    (event: ReactPointerEvent<HTMLElement>, canClose: boolean) => {
+    (
+      event: ReactPointerEvent<HTMLElement>,
+      options: {
+        canClose: boolean;
+        requiresDownwardMotion: boolean;
+        allowTapToggle: boolean;
+      }
+    ) => {
       if (!isSmallScreen) {
+        return;
+      }
+      if (smallScreenSheetDragStateRef.current) {
         return;
       }
       const currentHeightPx =
@@ -991,7 +1018,9 @@ export function AppShell() {
         startY: event.clientY,
         startHeightPx: currentHeightPx,
         startPosition: smallScreenSheetPosition,
-        canClose,
+        canClose: options.canClose,
+        requiresDownwardMotion: options.requiresDownwardMotion,
+        allowTapToggle: options.allowTapToggle,
         lastY: event.clientY,
         lastTimestampMs: event.timeStamp,
         velocityYPxPerMs: 0,
@@ -1007,6 +1036,40 @@ export function AppShell() {
       smallScreenSheetMaxHeightPx,
       smallScreenSheetPosition
     ]
+  );
+
+  const handleSmallScreenSheetContentPointerDown = useCallback(
+    (
+      event: ReactPointerEvent<HTMLElement>,
+      options: {
+        canClose: boolean;
+      }
+    ) => {
+      if (!isSmallScreen) {
+        return;
+      }
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest(
+          "button, a, input, select, textarea, [role='button'], [role='link'], [contenteditable='true']"
+        )
+      ) {
+        return;
+      }
+
+      const scrollContainer = event.currentTarget;
+      if (scrollContainer.scrollTop > 0) {
+        return;
+      }
+
+      beginSmallScreenSheetDrag(event, {
+        canClose: options.canClose,
+        requiresDownwardMotion: true,
+        allowTapToggle: false
+      });
+    },
+    [beginSmallScreenSheetDrag, isSmallScreen]
   );
 
   useEffect(() => {
@@ -1754,18 +1817,21 @@ export function AppShell() {
         : 0
     : 0;
 
+  const settledPanelHeightPx = sheetHeightForPosition(
+    smallScreenSheetPosition,
+    smallScreenSheetCollapsedHeightPx,
+    smallScreenSheetMaxHeightPx
+  );
   const panelHeightPx =
     smallScreenSheetDragHeightPx ??
-    sheetHeightForPosition(
-      smallScreenSheetPosition,
-      smallScreenSheetCollapsedHeightPx,
-      smallScreenSheetMaxHeightPx
-    );
+    settledPanelHeightPx;
   const smallScreenSheetIsFull =
     panelHeightPx >= Math.max(0, smallScreenSheetMaxHeightPx - 1);
   const panelBottomInsetForMap =
     ((selectedPlace || selectedRouteStop || viewTab === "routes") && isSmallScreen)
-      ? panelHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX
+      ? smallScreenSheetPosition === "closed"
+        ? 0
+        : smallScreenSheetCollapsedHeightPx + SMALL_SCREEN_SHEET_EDGE_GAP_PX
       : 0;
   const timelineVisible =
     viewTab === "map" &&
@@ -1890,6 +1956,8 @@ export function AppShell() {
     viewTab === "map" &&
     smallScreenSheetIsFull &&
     Boolean(selectedPlace);
+  const suspendMapSelectionRefocus =
+    isSmallScreen && viewTab === "map" && smallScreenSheetPosition === "full";
 
   const setTimelineStopByIndex = useCallback(
     (index: number) => {
@@ -1938,7 +2006,10 @@ export function AppShell() {
     boxShadow: "0 1px 2px rgba(60,64,67,.2), 0 2px 6px rgba(60,64,67,.2)",
     overflowX: "hidden",
     overflowY: "auto",
-    transition: prefersReducedMotion ? "none" : "height 160ms ease-out",
+    transition:
+      prefersReducedMotion || smallScreenSheetDragHeightPx !== null
+        ? "none"
+        : "height 160ms ease-out",
     zIndex: smallScreenSheetIsFull ? 60 : 20
   };
   const routePanelStyle: CSSProperties | null = showRoutesPanel
@@ -2173,6 +2244,7 @@ export function AppShell() {
             selectedRouteStopCoordinates={selectedRouteStopCoordinates}
             selectedRouteStopFocusKey={selectedRouteStopFocusKey}
             routesOverlay={routeMapOverlay}
+            suspendSelectionCameraUpdates={suspendMapSelectionRefocus}
             selectionOrigin={selectionOrigin}
             selectedTimelineStopId={
               viewTab === "routes" && selectedRouteTimelineStop
@@ -2492,7 +2564,13 @@ export function AppShell() {
       <div id="ibm-visible-places-portal-root" style={srOnlyStyle} />
 
       {routePanelStyle ? (
-        <section aria-label="Route details" style={routePanelStyle}>
+        <section
+          aria-label="Route details"
+          onPointerDown={(event) => {
+            handleSmallScreenSheetContentPointerDown(event, { canClose: false });
+          }}
+          style={routePanelStyle}
+        >
           {isSmallScreen ? (
             <div style={{ display: "flex", justifyContent: "center", marginBottom: `${tokens.spacing.sm}px` }}>
               <button
@@ -2507,7 +2585,15 @@ export function AppShell() {
                   setSmallScreenSheetDragHeightPx(null);
                   setSmallScreenSheetPosition((current) => (current === "full" ? "half" : "full"));
                 }}
-                onPointerDown={(event) => beginSmallScreenSheetDrag(event, false)}
+                onBlur={() => setRouteListSheetHandleFocused(false)}
+                onFocus={() => setRouteListSheetHandleFocused(true)}
+                onPointerDown={(event) =>
+                  beginSmallScreenSheetDrag(event, {
+                    canClose: false,
+                    requiresDownwardMotion: false,
+                    allowTapToggle: true
+                  })
+                }
                 style={{
                   width: "44px",
                   height: "44px",
@@ -2516,7 +2602,11 @@ export function AppShell() {
                   backgroundColor: "transparent",
                   touchAction: "none",
                   cursor: "pointer",
-                  padding: 0
+                  padding: 0,
+                  outline: routeListSheetHandleFocused
+                    ? `2px solid ${tokens.color.accent}`
+                    : "none",
+                  outlineOffset: "2px"
                 }}
                 type="button"
               >
@@ -2583,7 +2673,14 @@ export function AppShell() {
         </section>
       ) : null}
       {placePanelStyle && selectedPlace ? (
-        <section aria-label="Place details" data-route-place-panel={viewTab === "routes" ? "true" : "false"} style={placePanelStyle}>
+        <section
+          aria-label="Place details"
+          data-route-place-panel={viewTab === "routes" ? "true" : "false"}
+          onPointerDown={(event) => {
+            handleSmallScreenSheetContentPointerDown(event, { canClose: true });
+          }}
+          style={placePanelStyle}
+        >
           {showRouteBackLink ? (
             <button
               data-back-to-route="true"
@@ -2610,7 +2707,11 @@ export function AppShell() {
             onClose={() => closePanel(false)}
             onHighlightPlace={handlePanelHighlightPlace}
             onSmallScreenHandlePointerDown={(event) => {
-              beginSmallScreenSheetDrag(event, true);
+              beginSmallScreenSheetDrag(event, {
+                canClose: true,
+                requiresDownwardMotion: false,
+                allowTapToggle: true
+              });
             }}
             onSelectCandidate={handlePanelSelectCandidate}
             onSelectPlace={handlePanelSelectPlace}
@@ -2634,7 +2735,14 @@ export function AppShell() {
         </section>
       ) : null}
       {placePanelStyle && !selectedPlace && selectedRouteStop ? (
-        <section aria-label="Place details" data-route-place-panel="true" style={placePanelStyle}>
+        <section
+          aria-label="Place details"
+          data-route-place-panel="true"
+          onPointerDown={(event) => {
+            handleSmallScreenSheetContentPointerDown(event, { canClose: true });
+          }}
+          style={placePanelStyle}
+        >
           {isSmallScreen ? (
             <div style={{ display: "flex", justifyContent: "center", marginBottom: `${tokens.spacing.sm}px` }}>
               <button
@@ -2649,7 +2757,15 @@ export function AppShell() {
                   setSmallScreenSheetDragHeightPx(null);
                   setSmallScreenSheetPosition((current) => (current === "full" ? "half" : "full"));
                 }}
-                onPointerDown={(event) => beginSmallScreenSheetDrag(event, true)}
+                onBlur={() => setRouteStopSheetHandleFocused(false)}
+                onFocus={() => setRouteStopSheetHandleFocused(true)}
+                onPointerDown={(event) =>
+                  beginSmallScreenSheetDrag(event, {
+                    canClose: true,
+                    requiresDownwardMotion: false,
+                    allowTapToggle: true
+                  })
+                }
                 style={{
                   width: "44px",
                   height: "44px",
@@ -2658,7 +2774,11 @@ export function AppShell() {
                   backgroundColor: "transparent",
                   touchAction: "none",
                   cursor: "pointer",
-                  padding: 0
+                  padding: 0,
+                  outline: routeStopSheetHandleFocused
+                    ? `2px solid ${tokens.color.accent}`
+                    : "none",
+                  outlineOffset: "2px"
                 }}
                 type="button"
               >

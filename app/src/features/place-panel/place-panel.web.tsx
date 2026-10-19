@@ -1078,6 +1078,7 @@ export function PlacePanel({
   const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
   const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [sheetHandleFocused, setSheetHandleFocused] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<CollapsibleSectionId, boolean>>(
     () => ({ ...rememberedCollapsibleSectionExpandedState })
   );
@@ -1691,6 +1692,21 @@ export function PlacePanel({
       </p>
     </>
   );
+  const smallScreenSheetHandleStyle: CSSProperties = {
+    width: "44px",
+    height: "44px",
+    border: "none",
+    borderRadius: "999px",
+    backgroundColor: "transparent",
+    touchAction: "none",
+    cursor: "pointer",
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-50%)",
+    top: 0,
+    outline: sheetHandleFocused ? `2px solid ${tokens.color.accent}` : "none",
+    outlineOffset: "2px"
+  };
 
   if (isLoading && !location) {
     return (
@@ -1710,21 +1726,11 @@ export function PlacePanel({
               aria-expanded={isSmallScreenExpanded}
               aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
               data-sheet-handle="place"
+              onBlur={() => setSheetHandleFocused(false)}
+              onFocus={() => setSheetHandleFocused(true)}
               onPointerDown={onSmallScreenHandlePointerDown}
               onClick={onToggleSmallScreenExpanded}
-              style={{
-                width: "44px",
-                height: "44px",
-                border: "none",
-                borderRadius: "999px",
-                backgroundColor: "transparent",
-                touchAction: "none",
-                cursor: "pointer",
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)",
-                top: 0
-              }}
+              style={smallScreenSheetHandleStyle}
               type="button"
             >
               <span
@@ -1785,21 +1791,11 @@ export function PlacePanel({
             aria-expanded={isSmallScreenExpanded}
             aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
             data-sheet-handle="place"
+            onBlur={() => setSheetHandleFocused(false)}
+            onFocus={() => setSheetHandleFocused(true)}
             onPointerDown={onSmallScreenHandlePointerDown}
             onClick={onToggleSmallScreenExpanded}
-            style={{
-              width: "44px",
-              height: "44px",
-              border: "none",
-              borderRadius: "999px",
-              backgroundColor: "transparent",
-              touchAction: "none",
-              cursor: "pointer",
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              top: 0
-            }}
+            style={smallScreenSheetHandleStyle}
             type="button"
           >
             <span

@@ -14,6 +14,7 @@ export interface MapViewProps {
   highlightedPlaceId: string | null;
   leftPanelWidth: number;
   bottomPanelInset: number;
+  suspendSelectionCameraUpdates: boolean;
   timelineOverlayInset: number;
   topControlsSafeBottomInset: number;
   attributionReservedHeight: number;
