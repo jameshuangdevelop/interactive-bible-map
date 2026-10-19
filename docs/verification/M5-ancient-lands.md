@@ -544,3 +544,57 @@ The note isn't data, and G1–G8 already apply these fixes. Correcting the note 
 - **Run:** read-only Node scripts on 2026-10-19 with Node 24.21.0 and the root `node_modules`, plus mapshaper on the pinned AWMC zip.
 - **Read:** CI results through `gh`, and the stop payloads already built in this worktree after `552dcfb` (`app/public/generated/`, not committed; I didn't build them). They match the committed areas: 28 areas, with 73 parts of `other-roman-lands`.
 - **Not run:** no build, browser or test suite, as the PO asked. Nothing in data or code changed in this commit.
+
+## Phase 4 re-check and sign-off
+- **Date:** 2026-10-19 · **Verifier:** fact-checker (Claude Opus 5.5).
+- **Checked:** the GIS Engineer's `ee44057` (P4-F1 to P4-F4) and the Research Lead's `6e56ccc` (the note's F1–F17), on head `ee44057` (draft PR #77). I compared the areas with `552dcfb`'s.
+- **Method:**
+  - Node and Python scripts over the committed data: a part-by-part diff of every area and its provenance, and strict point-in-polygon tests.
+  - Distances to AWMC's lines 609 and 610 and its AD 14 outline, from the build's cached inputs. A 0.005° raster against Natural Earth's 10m land along the Mauretanian coast.
+  - The stop payloads built in this worktree from `ee44057`'s tree (`app/public/generated/`, 05:59–06:00). Their part and vertex counts match the committed areas. I didn't build them.
+  - CI on #77 through `gh`, read-only. No build, browser or test run.
+
+**Result: the four fixes are verified, and I sign off on the data.** The full browser suite still fails, now at a later check (R1). The note has two leftover sentences to fix (R2, R3).
+
+| Item | Verdict | Evidence |
+|---|---|---|
+| P4-F1, the coastal slivers | Verified | `other-roman-lands` has 66 parts again, each byte-identical to one it had before; only the seven slivers are gone. Parts 44–46 went to Tingitana, 47 and 48 to Caesariensis, and 49 and 50 to the strip. The three areas are still single polygons, and nothing overlaps. In the built stops the only Mauretania borders are M-a, M-b and M-c, as in G1, and `mauretania-tingitana` borders `other-roman-lands` nowhere. A guard now fails the build if a coastal part under 50 km² comes back. See N1 and N2. |
+| P4-F2, the "Armenia Minor" tooltip | Verified | The static label carries `tooltipText: "Armenia Minor"`, and the map uses it in place of a kind, ruler and years. All 15 built stops have it, from zoom 5. |
+| P4-F3, the hover check | Verified | `mauretania-caesariensis`'s label now starts at zoom 5, for the kingdom before 40 and the province from 42. In the built stops no label that can't be clicked starts below zoom 5, so at the opening zoom (4.7) the check finds none and skips, as on the base. Every border at every stop still starts at zoom 5. CI's run on `ee44057` got past line 5250 but failed later (R1). |
+| P4-F4, provenance | Verified, with a note | (a) E1's detail on `pontus` and `cappadocia` has the Dasmenda clause (see N3). (b) `pontus`'s first change has the Halys clause, with `bib:strabo-geography` and `bib:isbe-pontus`, which resolves. (c) The Ampsaga clause is on `mauretania-caesariensis-east`. `mauretania-caesariensis` keeps line 609 and its sources in its first change. Nothing else in the provenance changed, apart from `other-roman-lands` counting the 114 coastal pieces it gave up. |
+| G8's points | Verified | Tingi, Volubilis, Rusaddir, Siga, Cartenna, Saldae, Igilgili, Sitifis and Cirta lie strictly in their areas. `pontus` and `cappadocia` didn't change shape. |
+| The layer's size | Verified | 313,550 bytes gzip (Node, level 9) across the 20 built `ancient.*` files: 123,682 for the shapes and 142,222 for the 15 stops. The budget is 330,000. |
+| The note against F1–F17 | Verified, with 2 fixes | F1–F9, F11, F12 and F14–F17 are applied. F10 and F13 each leave one sentence (R2, R3). |
+
+**Sign-off.** I sign off on M5-11's data and text, which pass G1–G8 (ruling 6). This covers the areas and edges, the provenance, the holders at every stop, the timeline entries, the stop summaries and place notes, the bibliography, the popover's note, the Pleiades IDs and the "Armenia Minor" label.
+- Not covered: the full browser suite (R1), which must pass before merging, and the note's two sentences (R2, R3), which change no data.
+- The eight records whose `politicalHistory` changed (phase 4, item 9) are already `status: "verified"`. Their `lastReviewed` still reads 2026-10-08, since this commit changes docs only, as asked.
+
+### To fix
+- **R1. The full browser suite (front end; blocks merging, not the data).**
+  - Run 39257308450 on `ee44057` fails in `verifyExpandedAttributionAboveTimeline` (line 11707). A tap on the attribution button times out because the "Modern" button of the "Map type" switch intercepts it. This check never ran on `552dcfb`, whose run stopped at line 5250, and it passed on the base `d287cd0`.
+  - It is a phone tap. Of the check's phone scenarios, only "phone-sources-open-390x844" shows text this PR changed: AD 44 with the Sources popover open.
+  - The popover sits inside the timeline card with no height limit, and the attribution button sits 8 px above the card. This PR lengthens AD 44's summary (566 → 681 characters) and adds a sentence to the note. So the card most likely now reaches the switch at the top right. I inferred this from the code and the texts, without a browser.
+  - **Fix:** cap the popover's height on small screens and let it scroll, or keep the attribution button below the switch. The verified texts don't need shortening.
+- **R2. The note, §4.10's confidence sentence (Research Lead).**
+  - It says Saldae "sits about 90 km east of where AWMC's own pre-42 extent ends the kingdom". That distance is about 105 km: 104.5 km from the AD 14 edge's coastal end (3.904°E 36.913°N) to Saldae (`pleiades:305142`). M7 and the drawn provenance say about 110. 90 km is Saldae's distance from the Ampsaga.
+  - The same sentence rates the river edges "medium-high". G1 rates M-a medium, and M-c medium on the coast and low inland; the data follows G1.
+- **R3. The note, the "Pleiades" item under its sources (Research Lead).** It still calls the reference towns for this face (Amaseia, Neocaesarea, Nicopolis, Caesarea Mazaca) "correctly identified" Pleiades places "aside from the two id/coordinate mismatches below". The corrected list that follows shows all four IDs were wrong (`857036`, `857229`, `857238`, `628879`); this PR fixed them (G7).
+
+### Notes, no fix required
+- **N1. Where M-a meets the coast.**
+  - Part 47 went wholly to Caesariensis, as my P4-F1 allowed. So M-a now reaches the coast at Cap de l'Eau (2.4166°W 35.1491°N), 7.5 km west of Natural Earth's mouth of the Moulouya (2.3406°W 35.1231°N). Before, it stopped 2.9 km from the mouth, with the sliver beyond it.
+  - That is more than the 3.5 km simplification, on a medium-confidence edge drawn from zoom 5.
+  - If wanted later: split part 47 at the river, for example by extending line 610 from its start (2.3933°W 35.0885°N) to that mouth, so the land west of the river goes to Tingitana.
+- **N2. The coast.**
+  - The three areas now follow Natural Earth's coast simplified at 3,500 m, instead of AWMC's coast plus the slivers. Within 6.7 km of the coast, land in no area grows by about 80 km², and sea inside the areas by about 300 km².
+  - The composition report explains these as simplification slivers: 13 over 5 km² along these areas, 277 km² in all. It already accepts that kind across the layer (233 slivers, 3,744 km²).
+- **N3. E1's wording (optional).** The new detail drops "names no point on it that can be located", but doesn't say that Strabo puts Dasmenda at the line's western end, so a reader can't tell why Dasmenda comes up.
+  - Suggested: "…to the eastern end of Laviansene, with the stronghold of Dasmenda at its western end; the Barrington Atlas's two places for Dasmenda lie inside Cappadocia, so they cannot anchor that line."
+  - My G1 also left the two Dasmenda IDs out of the sources. Adding `pleiades:619147` and `pleiades:628964` would give that clause a cited source.
+- **N4. The hover check now tests nothing.** At the opening view it finds no label that can't be clicked at any stop, as on the base, so it passes without hovering. A later card could hover a named label at a set zoom.
+
+### Checks (re-check)
+- **Run:** read-only Node and Python scripts on 2026-10-19 with Node 24.21.0, plus mapshaper to clip Natural Earth's 10m land. The inputs are the build's cached copies, and Natural Earth's rivers came from its pinned commit `ca96624`.
+- **Read:** CI on #77 through `gh` (run 39257308450 failed and 39257308475 passed), and the built payloads in `app/public/generated/`.
+- **Not run:** no build, browser or test suite, as the PO asked. This commit changes docs only.
