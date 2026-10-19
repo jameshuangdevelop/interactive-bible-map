@@ -4,13 +4,21 @@ on:
   schedule:
     - cron: "0 7 * * 1"
   workflow_dispatch:
+  # Every PR, drafts included, runs the full suite here instead of on a laptop (ADR-0045).
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
 
 permissions:
   contents: read
 
+concurrency:
+  group: full-suite-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   full-suite:
-    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
