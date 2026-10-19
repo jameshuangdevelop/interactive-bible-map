@@ -63,6 +63,13 @@ const DIALOG_FOCUSABLE_SELECTOR =
 const PHOTO_CREDITS_NOTE =
   "Photos are unmodified, except that the panel crops them to fit. Open a photo to see it whole.";
 const PHOTO_CREDIT_HIGHLIGHT_DURATION_MS = 2_500;
+const panelTitleStyle: CSSProperties = {
+  margin: 0,
+  color: tokens.color.textPrimary,
+  fontSize: `${tokens.typography.titleSize}px`,
+  lineHeight: `${tokens.typography.titleLineHeight}px`,
+  fontWeight: 600
+};
 type CollapsibleSectionId =
   | "about"
   | "places-in"
@@ -1071,6 +1078,7 @@ export function PlacePanel({
   const [highlightedPhotoCreditId, setHighlightedPhotoCreditId] = useState<string | null>(null);
   const [focusedPhotoCreditId, setFocusedPhotoCreditId] = useState<string | null>(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [sheetHandleFocused, setSheetHandleFocused] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<CollapsibleSectionId, boolean>>(
     () => ({ ...rememberedCollapsibleSectionExpandedState })
   );
@@ -1652,6 +1660,54 @@ export function PlacePanel({
     );
   })();
 
+  const renderNamesSummary = ({ includeAlsoKnownAs }: { includeAlsoKnownAs: boolean }) => (
+    <>
+      <h1 style={panelTitleStyle}>
+        {titleName}
+      </h1>
+      {modernLocationLabel || locationStatusIndicator ? (
+        <p data-modern-name-line="true" style={todayLineStyle}>
+          {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
+          {locationStatusIndicator}
+        </p>
+      ) : null}
+      {includeAlsoKnownAs && alsoKnownAs.length > 0 ? (
+        <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
+      ) : null}
+      <p style={secondaryTextStyle}>
+        {hierarchyItems.map((item, index) => (
+          <span key={`${item.label}:${item.placeId ?? "none"}`}>
+            {index > 0 ? " · " : null}
+            {item.placeId ? (
+              <LinkLikeButton
+                label={item.label}
+                onSelectPlace={onSelectPlace}
+                placeId={item.placeId}
+              />
+            ) : (
+              item.label
+            )}
+          </span>
+        ))}
+      </p>
+    </>
+  );
+  const smallScreenSheetHandleStyle: CSSProperties = {
+    width: "44px",
+    height: "44px",
+    border: "none",
+    borderRadius: "999px",
+    backgroundColor: "transparent",
+    touchAction: "none",
+    cursor: "pointer",
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-50%)",
+    top: 0,
+    outline: sheetHandleFocused ? `2px solid ${tokens.color.accent}` : "none",
+    outlineOffset: "2px"
+  };
+
   if (isLoading && !location) {
     return (
       <div>
@@ -1667,24 +1723,14 @@ export function PlacePanel({
         >
           {isSmallScreen ? (
             <button
-              aria-label={
-                isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
-              }
+              aria-expanded={isSmallScreenExpanded}
+              aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
+              data-sheet-handle="place"
+              onBlur={() => setSheetHandleFocused(false)}
+              onFocus={() => setSheetHandleFocused(true)}
               onPointerDown={onSmallScreenHandlePointerDown}
               onClick={onToggleSmallScreenExpanded}
-              style={{
-                width: "44px",
-                height: "44px",
-                border: "none",
-                borderRadius: "999px",
-                backgroundColor: "transparent",
-                touchAction: "none",
-                cursor: "pointer",
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)",
-                top: 0
-              }}
+              style={smallScreenSheetHandleStyle}
               type="button"
             >
               <span
@@ -1711,15 +1757,7 @@ export function PlacePanel({
             ×
           </button>
         </header>
-        <h1
-          style={{
-            margin: 0,
-            color: tokens.color.textPrimary,
-            fontSize: `${tokens.typography.titleSize}px`,
-            lineHeight: `${tokens.typography.titleLineHeight}px`,
-            fontWeight: 600
-          }}
-        >
+        <h1 style={panelTitleStyle}>
           {titleName}
         </h1>
         <p
@@ -1750,24 +1788,14 @@ export function PlacePanel({
       >
       {isSmallScreen ? (
         <button
-            aria-label={
-              isSmallScreenExpanded ? "Collapse place details panel" : "Expand place details panel"
-            }
+            aria-expanded={isSmallScreenExpanded}
+            aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
+            data-sheet-handle="place"
+            onBlur={() => setSheetHandleFocused(false)}
+            onFocus={() => setSheetHandleFocused(true)}
             onPointerDown={onSmallScreenHandlePointerDown}
             onClick={onToggleSmallScreenExpanded}
-            style={{
-              width: "44px",
-              height: "44px",
-              border: "none",
-              borderRadius: "999px",
-              backgroundColor: "transparent",
-              touchAction: "none",
-              cursor: "pointer",
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              top: 0
-            }}
+            style={smallScreenSheetHandleStyle}
             type="button"
           >
             <span
@@ -1848,23 +1876,7 @@ export function PlacePanel({
             />
             {showCollapsedSummaryOnly ? (
               <section data-panel-section="names">
-                <h1
-                  style={{
-                    margin: 0,
-                    color: tokens.color.textPrimary,
-                    fontSize: `${tokens.typography.titleSize}px`,
-                    lineHeight: `${tokens.typography.titleLineHeight}px`,
-                    fontWeight: 600
-                  }}
-                >
-                  {titleName}
-                </h1>
-                {modernLocationLabel || locationStatusIndicator ? (
-                  <p data-modern-name-line="true" style={todayLineStyle}>
-                    {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
-                    {locationStatusIndicator}
-                  </p>
-                ) : null}
+                {renderNamesSummary({ includeAlsoKnownAs: false })}
                 <PhotoCaptionAndCredit
                   activeImageOrdinal={normalizedActiveImageIndex + 1}
                   caption={selectedImage.caption}
@@ -1895,44 +1907,9 @@ export function PlacePanel({
           </section>
         ) : null}
 
-        {!showCollapsedSummaryOnly ? (
+        {!showCollapsedSummaryOnly || !selectedImage ? (
           <section data-panel-section="names">
-            <h1
-              style={{
-                margin: 0,
-                color: tokens.color.textPrimary,
-                fontSize: `${tokens.typography.titleSize}px`,
-                lineHeight: `${tokens.typography.titleLineHeight}px`,
-                fontWeight: 600
-              }}
-            >
-              {titleName}
-            </h1>
-            {modernLocationLabel || locationStatusIndicator ? (
-              <p data-modern-name-line="true" style={todayLineStyle}>
-                {modernLocationLabel ? <span>{`Today: ${modernLocationLabel}`}</span> : null}
-                {locationStatusIndicator}
-              </p>
-            ) : null}
-            {alsoKnownAs.length > 0 ? (
-              <p style={secondaryTextStyle}>Also known as {alsoKnownAs.join(", ")}</p>
-            ) : null}
-            <p style={secondaryTextStyle}>
-              {hierarchyItems.map((item, index) => (
-                <span key={`${item.label}:${item.placeId ?? "none"}`}>
-                  {index > 0 ? " · " : null}
-                  {item.placeId ? (
-                    <LinkLikeButton
-                      label={item.label}
-                      onSelectPlace={onSelectPlace}
-                      placeId={item.placeId}
-                    />
-                  ) : (
-                    item.label
-                  )}
-                </span>
-              ))}
-            </p>
+            {renderNamesSummary({ includeAlsoKnownAs: !showCollapsedSummaryOnly })}
           </section>
         ) : null}
 

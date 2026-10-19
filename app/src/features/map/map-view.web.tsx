@@ -2552,9 +2552,10 @@ export function MapView({
   highlightedPlaceId,
   leftPanelWidth,
   bottomPanelInset,
+  suspendSelectionCameraUpdates,
   timelineOverlayInset,
   topControlsSafeBottomInset,
-  attributionReservedHeight,
+  compactAttributionExpandedReserveHeight,
   isSmallScreen,
   mapMode,
   selectedTimelineStopId,
@@ -4239,6 +4240,9 @@ export function MapView({
       previousFocusRequestRef.current = selection ? previousFocusRequestRef.current : "";
       return;
     }
+    if (suspendSelectionCameraUpdates) {
+      return;
+    }
 
     const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}`;
     if (selectionKey === previousFocusRequestRef.current) {
@@ -4286,6 +4290,7 @@ export function MapView({
     runtimeTuning.controlZoomDurationMs,
     runtimeTuning.flyToDurationMs,
     selectionOrigin,
+    suspendSelectionCameraUpdates,
     selection
   ]);
 
@@ -4453,7 +4458,7 @@ export function MapView({
       ? computeCompactAttributionBottomOffsetLimit({
           viewportHeight: window.innerHeight,
           topControlsSafeBottomInset,
-          expandedControlReserveHeight: attributionReservedHeight
+          expandedControlReserveHeight: compactAttributionExpandedReserveHeight
         })
       : Number.POSITIVE_INFINITY;
   const compactAttributionBottomWithTimelineOffset = Math.min(
@@ -4476,6 +4481,7 @@ export function MapView({
     <div
       aria-label="Visible places on map"
       className="ibm-hidden-visible-places"
+      role="group"
       style={{
         position: "absolute",
         width: "1px",
@@ -4572,7 +4578,7 @@ export function MapView({
         }
 
         .ibm-map-root .maplibregl-ctrl-attrib.maplibregl-compact {
-          max-height: ${isSmallScreen ? `calc(100vh - ${topControlsSafeBottomInset}px)` : "none"};
+          max-height: ${isSmallScreen ? `calc(100dvh - ${topControlsSafeBottomInset}px)` : "none"};
           overflow-y: auto;
         }
 

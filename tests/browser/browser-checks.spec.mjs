@@ -738,7 +738,8 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
   }
 });
 
-test("phone layout keeps search/toggle spacing, sheet interaction, and drawer fit (replaces phoneBasicsChecks) @phone", { tag: ["@phone"] }, async ({ browser, baseUrl }) => {
+// The sheet's handle tap and drags are covered by tests/browser/phone-sheet.spec.mjs.
+test("phone layout keeps search/toggle spacing, drawer fit, and routes panel fit (replaces phoneBasicsChecks) @phone", { tag: ["@phone"] }, async ({ browser, baseUrl }) => {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     hasTouch: true,
@@ -771,18 +772,6 @@ test("phone layout keeps search/toggle spacing, sheet interaction, and drawer fi
     expect(drawer.x).toBeGreaterThanOrEqual(15);
     expect(drawer.x + drawer.width).toBeLessThanOrEqual(390 - 14);
     await page.getByRole("button", { name: "Close app menu" }).click();
-
-    const handle = page.locator("section[aria-label='Place details'] button[aria-label$='place details panel']");
-    const panel = page.locator("section[aria-label='Place details']");
-    const before = await panel.boundingBox();
-    await handle.tap();
-    await page.waitForTimeout(250);
-    const afterExpand = await panel.boundingBox();
-    expect(afterExpand.height).toBeGreaterThan(before.height + 40);
-    await handle.tap();
-    await page.waitForTimeout(250);
-    const afterCollapse = await panel.boundingBox();
-    expect(afterCollapse.height).toBeLessThan(afterExpand.height - 40);
 
     await page.goto(`${baseUrl}/?tab=routes&route=paul-rome`, { waitUntil: "domcontentloaded", timeout: 120_000 });
     await waitForMapIdle(page);
