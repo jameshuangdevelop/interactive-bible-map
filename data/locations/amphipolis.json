@@ -1,0 +1,116 @@
+{
+  "id": "amphipolis",
+  "names": {
+    "ancient": [
+      "Amphipolis"
+    ],
+    "modern": "Amphipolis",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Ennea Hodoi",
+      "Popolia"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "macedonia",
+  "candidates": [
+    {
+      "label": "Amphipolis archaeological site",
+      "coordinates": [
+        23.847209,
+        40.820159
+      ],
+      "coordinateSource": "openbible:amphipolis",
+      "confidence": "high",
+      "support": "A town in Macedonia on the river Strymon, on the Via Egnatia. Pleiades, OpenBible.info and Wikidata agree on the site, which Wikidata places in today's municipality of Amphipolis.",
+      "sources": [
+        "pleiades:501347",
+        "openbible:amphipolis",
+        "wikidata:Q217414",
+        "bib:isbe-amphipolis"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Amphipolis was a town of Macedonia on the eastern bank of the river Strymon, standing on a terraced hill the river protected on three sides, and an important station on the Via Egnatia, the great Roman road running from the Adriatic coast toward the Hellespont. Acts records that Paul and Silas passed through Amphipolis on their way from Philippi to Thessalonica, though the account suggests they did not stay long there.",
+    "sources": [
+      "pleiades:501347",
+      "openbible:amphipolis",
+      "wikidata:Q217414",
+      "bib:isbe-amphipolis",
+      "bib:isbe-macedonia",
+      "scripture:Acts 17:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that the town was first called Ennea Hodoi, \"Nine Ways,\" reflecting its position guarding the main route from Thrace into Macedonia, and that Athenian colonists under Hagnon finally founded Amphipolis there in 437 BC after two earlier failed attempts. The city later fell away from Athens to the Spartan general Brasidas and defied every later Athenian attempt to retake it.",
+      "sources": [
+        "bib:isbe-amphipolis"
+      ]
+    },
+    {
+      "text": "The encyclopedia records that Amphipolis passed under the protection of the Macedonian kings Perdiccas and Philip, who finally made himself its master in 358 BC, and that after Rome's partition of Macedonia following the battle of Pydna in 168 BC, the city was made a free city and the capital of Macedonia Prima.",
+      "sources": [
+        "bib:isbe-amphipolis"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 17:1",
+      "book": "Acts",
+      "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -148,
+      "toYear": -27,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "macedonia"
+}

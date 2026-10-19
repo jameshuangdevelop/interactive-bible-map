@@ -1,0 +1,108 @@
+{
+  "id": "apollonia-macedonia",
+  "names": {
+    "ancient": [
+      "Apollonia"
+    ],
+    "modern": "Near Nea Apollonia",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Pollina"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "macedonia",
+  "candidates": [
+    {
+      "label": "Apollonia (Macedonia, on the Via Egnatia)",
+      "coordinates": [
+        23.469685,
+        40.623703
+      ],
+      "coordinateSource": "openbible:apollonia",
+      "confidence": "high",
+      "support": "A town in Mygdonia, Macedonia, on the Via Egnatia between Amphipolis and Thessalonica, about 30 Roman miles from Amphipolis and 38 from Thessalonica. Pleiades, OpenBible.info and Wikidata agree on the site, near the modern village of Nea Apollonia; the International Standard Bible Encyclopedia reports that its name seems to survive in the modern Pollina.",
+      "sources": [
+        "pleiades:491526",
+        "openbible:apollonia",
+        "wikidata:Q2751389",
+        "bib:isbe-apollonia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Apollonia was a town in Mygdonia, a district of Macedonia, lying a little south of Lake Bolbe on the Via Egnatia, a day's journey from Amphipolis. Acts records that Paul and Silas passed through Apollonia on their way from Philippi to Thessalonica, without any indication that they stayed there.",
+    "sources": [
+      "pleiades:491526",
+      "openbible:apollonia",
+      "wikidata:Q2751389",
+      "bib:isbe-apollonia",
+      "scripture:Acts 17:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia says Apollonia's founding may perhaps be attributed to about 432 BC, noting that coins attest its existence by the fourth century BC, and reports that its name seems to have survived into modern times as Pollina.",
+      "sources": [
+        "bib:isbe-apollonia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 17:1",
+      "book": "Acts",
+      "textWEB": "Now when they had passed through Amphipolis and Apollonia, they came to Thessalonica, where there was a Jewish synagogue."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -148,
+      "toYear": -27,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Governed with Achaia)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 15,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul)",
+      "sources": [
+        "bib:isbe-macedonia",
+        "bib:livius-macedonia"
+      ]
+    },
+    {
+      "fromYear": 15,
+      "toYear": 44,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Imperial legate of Moesia (governed with Achaia))",
+      "sources": [
+        "bib:tacitus-annals"
+      ]
+    },
+    {
+      "fromYear": 44,
+      "toYear": 101,
+      "holderId": "macedonia-province",
+      "entity": "Roman province of Macedonia (ruler: Senate, proconsul (restored by the emperor Claudius))",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "macedonia"
+}

@@ -1,0 +1,89 @@
+{
+  "id": "phoenix",
+  "names": {
+    "ancient": [
+      "Phoenix"
+    ],
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Phenice"
+    ],
+    "otherLanguages": []
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "crete",
+  "candidates": [
+    {
+      "label": "Loutro",
+      "coordinates": [
+        24.07828,
+        35.19919
+      ],
+      "coordinateSource": "pleiades:589993",
+      "confidence": "disputed",
+      "support": "A harbor on Crete's south coast, by the village of Loutro, sheltered from every wind. Pleiades describes ancient Phoinix as a coastal city of western Crete that served as the port of inland Anopolis and later Aradena. The International Standard Bible Encyclopedia calls this the only safe harbor on this coast large enough for the ship, and states that the ancient authorities agree in placing Phoenix in this neighborhood, judging the identification \"seems certain\"; an inscription found at Loutro shows that Egyptian grain ships wintered there. It calls the harbor's east-facing aspect, against Acts 27:12's \"looking southwest and northwest,\" a serious difficulty, and resolves it either by reading the phrase in sailors' language as looking down those winds, toward the northeast and southeast, which fits Loutro, or by supposing that the writer, who never saw Phoenix, described it wrongly. OpenBible.info rates this site its second identification (35% confidence). Pleiades, OpenBible.info and Wikidata agree on the site.",
+      "sources": [
+        "pleiades:589993",
+        "wikidata:Q1872352",
+        "openbible:phoenix",
+        "bib:isbe-phoenix"
+      ]
+    },
+    {
+      "label": "Finikas",
+      "coordinates": [
+        24.0668,
+        35.1991
+      ],
+      "coordinateSource": "pleiades:589992",
+      "confidence": "disputed",
+      "support": "An open roadstead on the west side of the isthmus Loutro stands on. This reading takes Acts 27:12's \"looking southwest and northwest\" at face value; the International Standard Bible Encyclopedia records the proposal but judges the roadstead \"not a suitable place for wintering in.\" OpenBible.info rates this site, at today's village of Finikas, its likelier identification (55% confidence, against 35% for Loutro), and Wikidata places the village here; Pleiades catalogs it as Phoinikous Limen.",
+      "sources": [
+        "pleiades:589992",
+        "wikidata:Q21773510",
+        "openbible:phoenix",
+        "bib:isbe-phoenix"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Phoenix was a harbor on Crete's south coast that Paul's ship was trying to reach when a storm drove it out to open sea instead. Two neighboring sites have been proposed: a well-sheltered harbor by the village of Loutro, which ancient writers place in this area and where an inscription shows Egyptian grain ships wintering, though its harbor faces east rather than the \"southwest and northwest\" that Acts describes; and an open roadstead at Finikas, on the other side of the same narrow isthmus, which matches the compass directions in Acts but which the International Standard Bible Encyclopedia judges unsuitable for wintering a ship.",
+    "sources": [
+      "pleiades:589993",
+      "wikidata:Q1872352",
+      "openbible:phoenix",
+      "pleiades:589992",
+      "wikidata:Q21773510",
+      "bib:isbe-phoenix",
+      "scripture:Acts 27:12"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 27:12",
+      "book": "Acts",
+      "textWEB": "Because the haven was not suitable to winter in, the majority advised going to sea from there, if by any means they could reach Phoenix and winter there, which is a port of Crete, looking southwest and northwest."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "crete-cyrene"
+}

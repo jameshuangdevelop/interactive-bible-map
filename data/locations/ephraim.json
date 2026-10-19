@@ -1,0 +1,157 @@
+{
+  "id": "ephraim",
+  "names": {
+    "ancient": [
+      "Ephraim"
+    ],
+    "modern": "Taybeh",
+    "modernCountries": [
+      "West Bank"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Ephrem",
+      "et-Taiyibeh"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "judea",
+  "candidates": [
+    {
+      "label": "Taybeh (et-Taiyibeh)",
+      "coordinates": [
+        35.299196,
+        31.954665
+      ],
+      "coordinateSource": "pleiades:687896",
+      "confidence": "medium",
+      "support": "The International Standard Bible Encyclopedia takes the town Jesus retired to after raising Lazarus to be probably Eusebius's Ephrem, 5 Roman miles east of Bethel, and probably the village of et-Taiyibeh. Pleiades places Ephraim here, and OpenBible.info's leading identification and Wikidata's point for the modern village agree with Pleiades' coordinate to within about 0.1 km.",
+      "sources": [
+        "pleiades:687896",
+        "wikidata:Q931667",
+        "openbible:ephraim-2",
+        "bib:isbe-ephraim"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Ephraim was a town near the wilderness, probably about five Roman miles east of Bethel, probably the village of et-Taiyibeh, which stands on a high hill overlooking the plains of Jericho and the Dead Sea. John's Gospel records that after the Jewish leaders plotted to kill him, Jesus withdrew with his disciples to a town called Ephraim and stayed there, not walking openly among the Jews, until he returned to Bethany shortly before his final Passover.",
+    "sources": [
+      "pleiades:687896",
+      "wikidata:Q931667",
+      "openbible:ephraim-2",
+      "bib:isbe-ephraim",
+      "scripture:John 11:53",
+      "scripture:John 11:54",
+      "scripture:John 12:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia judges that this Ephraim probably corresponds to the Ephrem of the fourth-century church historian Eusebius's Onomasticon, a list of biblical place names, placed five Roman miles east of Bethel, and that it probably answers to the village of et-Taiyibeh, whose ancient occupation is attested by cisterns and rock tombs there.",
+      "sources": [
+        "bib:isbe-ephraim"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "John 11:54",
+      "book": "John",
+      "textWEB": "Jesus therefore walked no more openly among the Jews, but departed from there into the country near the wilderness, to a city called Ephraim. He stayed there with his disciples."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Joshua 18:23",
+      "note": "Joshua's list of the cities of the tribe of Benjamin includes Ophrah; the International Standard Bible Encyclopedia's article on a related place, Ephron, reports that Ophrah and Ephron, also read \"Ephraim\" in some manuscripts (2 Chronicles 13:19), are thought by many to be identical with each other, both localized at the town of et-Taiyibeh, which the encyclopedia's main article on this Ephraim probably identifies with the town John's Gospel names.",
+      "sources": [
+        "scripture:Joshua 18:21",
+        "scripture:Joshua 18:23",
+        "scripture:2 Chronicles 13:19",
+        "bib:isbe-ephron-2",
+        "bib:isbe-ephraim"
+      ]
+    },
+    {
+      "ref": "2 Chronicles 13:19",
+      "note": "Chronicles records that King Abijah of Judah \"took cities\" from Jeroboam of Israel, including Ephron with its villages, also read \"Ephraim\" in some manuscripts; the International Standard Bible Encyclopedia's article on Ephron reports that this place is thought by many to be identical with Ophrah (Joshua 18:23), both localized at the town of et-Taiyibeh, which the encyclopedia's main article on this Ephraim probably identifies with the town John's Gospel names.",
+      "sources": [
+        "scripture:2 Chronicles 13:19",
+        "scripture:Joshua 18:23",
+        "bib:isbe-ephron-2",
+        "bib:isbe-ephraim"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "judea-samaria-idumea"
+}

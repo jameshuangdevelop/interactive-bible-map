@@ -1,0 +1,88 @@
+{
+  "id": "chios",
+  "names": {
+    "ancient": [
+      "Chios"
+    ],
+    "modern": "Chios",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Kios"
+    ],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Chios (island)",
+      "coordinates": [
+        26.1375,
+        38.3725
+      ],
+      "coordinateSource": "openbible:chios",
+      "confidence": "high",
+      "support": "An Aegean island south of Lesbos, close to the Asia Minor mainland. Pleiades, OpenBible.info and Wikidata agree on the island, which keeps the name Chios today. The point is the island's principal town, also called Chios.",
+      "sources": [
+        "pleiades:550496",
+        "pleiades:550497",
+        "openbible:chios",
+        "wikidata:Q160483",
+        "bib:isbe-chios"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Chios is an Aegean island south of Lesbos and close to the Asia Minor mainland, known in antiquity for its blue marble, its fine potter's clay and its skilled storytellers; a site on the island was pointed out as the place where Homer once gathered his pupils. Acts records that on his voyage from Assos toward Jerusalem, Paul's ship came the following day opposite Chios; the International Standard Bible Encyclopedia reads this as more probably meaning that, because of the dark moon, the ship lay at anchor for the night on the Asian coast across from the island, before sailing on toward Samos.",
+    "sources": [
+      "pleiades:550496",
+      "pleiades:550497",
+      "openbible:chios",
+      "wikidata:Q160483",
+      "bib:isbe-chios",
+      "scripture:Acts 20:15"
+    ]
+  },
+  "history": [
+    {
+      "text": "The first-century Jewish historian Josephus records that King Herod the Great, sailing to join the Roman general Marcus Agrippa on a campaign toward the Bosphorus, was held up for several days at Chios by a north wind; while there, Herod gave the people generous gifts, including enough money to finish rebuilding a large stoa that had been destroyed in the Mithridatic War, which Josephus says was not as easy to rebuild as the rest. The International Standard Bible Encyclopedia records the same visit.",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:isbe-chios"
+      ]
+    },
+    {
+      "text": "The encyclopedia reports that the Chians joined the Ionian cities who surrendered to the Persian king Cyrus in 546 BC, later rebelled against Persia, and after the Greek victory at Mycale in 479 BC joined the Athenian confederacy; after further shifts in allegiance between Athens, Sparta and Thebes, Athens recognized the island's independence in 355 BC. It adds that the Chians later became friends of Rome.",
+      "sources": [
+        "bib:isbe-chios"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 20:15",
+      "book": "Acts",
+      "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "asia"
+}

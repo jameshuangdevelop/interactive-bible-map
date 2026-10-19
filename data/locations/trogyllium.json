@@ -1,0 +1,80 @@
+{
+  "id": "trogyllium",
+  "names": {
+    "ancient": [
+      "Trogyllium"
+    ],
+    "modern": "Dip Burun",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Trogilion",
+      "Santa Maria"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Trogyllium (promontory opposite Samos)",
+      "coordinates": [
+        27.003279,
+        37.659431
+      ],
+      "coordinateSource": "openbible:trogyllium",
+      "confidence": "high",
+      "support": "A promontory on the Asia Minor coast opposite Samos, extending from the Mycale mountains, with an anchorage. Pleiades, OpenBible.info and Wikidata agree on the site, which Pleiades identifies as today's Dip Burun.",
+      "sources": [
+        "pleiades:599991",
+        "openbible:trogyllium",
+        "wikidata:Q2937072",
+        "bib:isbe-trogyllium"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Trogyllium is a promontory on the Asia Minor coast, projecting from the Mycale mountains toward the island of Samos across a strait less than a mile wide, where the battle of Mycale was fought in 479 BC. Acts, in the text the WEB follows, records that Paul's ship stayed at Trogyllium between touching at Samos and arriving at Miletus; the International Standard Bible Encyclopedia notes that several early manuscripts omit this detail.",
+    "sources": [
+      "pleiades:599991",
+      "openbible:trogyllium",
+      "wikidata:Q2937072",
+      "bib:isbe-trogyllium",
+      "scripture:Acts 20:15"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia notes that whether or not the words naming Trogyllium belonged to the original text, Paul's ship evidently passed the promontory and probably stopped there; the encyclopedia reports that in its own day the promontory was called Santa Maria and its anchorage Saint Paul's port.",
+      "sources": [
+        "bib:isbe-trogyllium"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 20:15",
+      "book": "Acts",
+      "textWEB": "Sailing from there, we came the following day opposite Chios. The next day we touched at Samos and stayed at Trogyllium, and the day after we came to Miletus."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "asia"
+}

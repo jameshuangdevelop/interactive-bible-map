@@ -1,0 +1,87 @@
+{
+  "id": "lasea",
+  "names": {
+    "ancient": [
+      "Lasea"
+    ],
+    "modern": "Near Kaloi Limenes",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Lasaia"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "crete",
+  "candidates": [
+    {
+      "label": "Lasea ruins",
+      "coordinates": [
+        24.811111,
+        34.940556
+      ],
+      "coordinateSource": "openbible:lasea",
+      "confidence": "high",
+      "support": "A town on Crete's south coast, about 2 km east of Fair Havens according to Pleiades' own description of that neighboring site, and south of Gortyna, a city the International Standard Bible Encyclopedia notes had many Jews; its ruins were examined in 1856. The encyclopedia reasons that having to buy stores from Lasea, had the ship stayed at Fair Havens, helps explain the ship's reluctance to winter there instead of continuing toward Phoenix. Pleiades, OpenBible.info and Wikidata agree on the site. The encyclopedia (1915) instead gives the distance from Fair Havens as about 5 miles.",
+      "sources": [
+        "pleiades:589897",
+        "pleiades:589834",
+        "openbible:lasea",
+        "wikidata:Q6492763",
+        "bib:isbe-lasea",
+        "bib:isbe-phoenix"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Lasea was a town on Crete's south coast, about 2 km east of Fair Havens and south of the city of Gortyna. Acts names Lasea only to locate Fair Havens, the nearby anchorage where Paul's ship waited on the voyage to Rome. According to the International Standard Bible Encyclopedia, if the ship had stayed at Fair Havens it would have needed to buy stores from Lasea, and this, together with the roadstead's own inconvenience, probably explains the captain's reluctance to winter there.",
+    "sources": [
+      "pleiades:589897",
+      "pleiades:589834",
+      "openbible:lasea",
+      "wikidata:Q6492763",
+      "bib:isbe-lasea",
+      "bib:isbe-phoenix",
+      "scripture:Acts 27:8"
+    ]
+  },
+  "history": [
+    {
+      "text": "Lasea's ruins were examined in 1856. The International Standard Bible Encyclopedia notes elsewhere that the anchorage's nearness to Gortyna, an important city with many Jews, may also have influenced Paul's preference to winter at Fair Havens rather than sail on. The encyclopedia (1915) gives Lasea's distance from Fair Havens as about five miles; modern gazetteers place the two about 2 km apart.",
+      "sources": [
+        "bib:isbe-lasea",
+        "bib:isbe-phoenix",
+        "pleiades:589834",
+        "pleiades:589897",
+        "wikidata:Q6492763"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:8",
+      "book": "Acts",
+      "textWEB": "With difficulty sailing along it we came to a certain place called Fair Havens, near the city of Lasea."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "crete-cyrene"
+}

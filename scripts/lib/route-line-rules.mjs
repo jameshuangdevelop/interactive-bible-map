@@ -51,8 +51,8 @@ export const ISLAND_PASS_KM = 10;
 export const ISLAND_VIAS = new Set([
   "location:cyprus",
   "location:crete",
-  "route-stop:chios",
-  "route-stop:cauda"
+  "location:chios",
+  "location:cauda"
 ]);
 
 // Lines by land follow an AWMC road only where a dated road lies within this distance of each stop.
@@ -97,7 +97,7 @@ export const SIDE_PASSES = new Map([
     "paul-rome::stage-03",
     [
       {
-        at: "route-stop:salmone",
+        at: "location:salmone",
         island: "location:crete",
         side: "south",
         placement: "after",
@@ -112,8 +112,8 @@ export const SIDE_PASSES = new Map([
     "paul-rome::stage-04",
     [
       {
-        at: "route-stop:cauda",
-        island: "route-stop:cauda",
+        at: "location:cauda",
+        island: "location:cauda",
         side: "south",
         placement: "instead",
         gateKm: 40,

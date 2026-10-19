@@ -1,0 +1,180 @@
+{
+  "id": "bethphage",
+  "names": {
+    "ancient": [
+      "Bethphage"
+    ],
+    "modern": "Et-Tur (Kafr et-Tur), Jerusalem",
+    "alternate": [
+      "Bethsphage"
+    ],
+    "otherLanguages": []
+  },
+  "type": "village",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "jerusalem",
+  "candidates": [
+    {
+      "label": "Et-Tur (Kafr et-Tur)",
+      "coordinates": [
+        35.250778,
+        31.777222
+      ],
+      "coordinateSource": "wikidata:Q2193088",
+      "confidence": "medium",
+      "support": "All six English versions compared spell the name 'Bethphage'; the WEB itself reads 'Bethsphage' at this and the other two passages below, the Majority Text's reading (footnoted in the NKJV). The International Standard Bible Encyclopedia judges the summit of the Mount of Olives, where the village of Kefr et-Tur stands, the most probable site of New Testament Bethphage, 'much more probable' than Abu Dis, since the village 'certainly occupies an ancient site and no other name is known'; it places the medieval Bethphage between the summit and Bethany, at the site the Roman Catholics had enclosed. This point marks the Franciscan Custody of the Holy Land's sanctuary of Bethphage, on the eastern part of the Mount of Olives, where Wikidata and OpenBible.info also put Bethphage; OpenBible.info scores Et-Tur far above Abu Dis.",
+      "sources": [
+        "wikidata:Q2193088",
+        "openbible:bethphage",
+        "bib:isbe-bethphage",
+        "bib:custodia-bethphage",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
+      ]
+    },
+    {
+      "label": "Abu Dis",
+      "coordinates": [
+        35.265833,
+        31.7625
+      ],
+      "coordinateSource": "openbible:bethphage",
+      "confidence": "low",
+      "support": "A minority identification that the International Standard Bible Encyclopedia judges much less probable than Et-Tur; OpenBible.info scores it far below Et-Tur for the same identification. OpenBible.info and Wikidata give the same point for the village.",
+      "sources": [
+        "openbible:bethphage",
+        "bib:isbe-bethphage",
+        "wikidata:Q246590"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Bethphage was a village on the Mount of Olives, near the road from Jerusalem to Jericho, whose Aramaic name means \"place of young figs.\" All three Synoptic Gospels record that as Jesus and his disciples approached Jerusalem, they came to Bethphage, where Jesus sent two disciples ahead into the village opposite them to bring him an animal to ride for his entry into the city; Matthew's account has the disciples bring both \"a donkey tied, and a colt with her,\" while Mark and Luke each describe a single young animal. Matthew's account states that this was done to fulfill the prophecy, \"Tell the daughter of Zion, behold, your King comes to you, humble, and riding on a donkey, on a colt, the foal of a donkey.\"",
+    "sources": [
+      "bib:isbe-bethphage",
+      "scripture:Matthew 21:1",
+      "scripture:Matthew 21:2",
+      "scripture:Mark 11:1",
+      "scripture:Mark 11:2",
+      "scripture:Luke 19:29",
+      "scripture:Luke 19:30",
+      "scripture:Matthew 21:4-5"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Bethphage is named in several passages of the Talmud, the collected body of early rabbinic teaching on Jewish law, from which it may be inferred that the village stood near but outside Jerusalem, at the limit of distance a Jew could walk on the Sabbath, and that it was enclosed by some kind of wall.",
+      "sources": [
+        "bib:isbe-bethphage",
+        "bib:isbe-talmud"
+      ]
+    },
+    {
+      "text": "The encyclopedia distinguishes the New Testament village, which it places most probably on the summit of the Mount of Olives where Kefr et-Tur stands today, from a medieval Bethphage remembered as lying between that summit and Bethany, at a site the Roman Catholic church later enclosed; the Franciscan Custody of the Holy Land's own sanctuary of Bethphage marks this site on the mountain's eastern slope.",
+      "sources": [
+        "bib:isbe-bethphage",
+        "bib:custodia-bethphage"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Matthew 21:1",
+      "book": "Matthew",
+      "textWEB": "When they came near to Jerusalem and came to Bethsphage, to the Mount of Olives, then Jesus sent two disciples,"
+    },
+    {
+      "ref": "Mark 11:1",
+      "book": "Mark",
+      "textWEB": "When they came near to Jerusalem, to Bethsphage and Bethany, at the Mount of Olives, he sent two of his disciples"
+    },
+    {
+      "ref": "Luke 19:29",
+      "book": "Luke",
+      "textWEB": "When he came near to Bethsphage and Bethany, at the mountain that is called Olivet, he sent two of his disciples,"
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Zechariah 9:9",
+      "note": "Matthew's account of Jesus sending two disciples from Bethphage to bring the donkey and its colt states that this was done so that what was spoken through the prophet would be fulfilled: \"Tell the daughter of Zion, behold, your King comes to you, humble, and riding on a donkey, on a colt, the foal of a donkey.\"",
+      "sources": [
+        "scripture:Zechariah 9:9",
+        "scripture:Matthew 21:4-5"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -37,
+      "toYear": -4,
+      "holderId": "herod-the-great",
+      "entity": "Kingdom of Herod the Great (ruler: Herod the Great)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ]
+    },
+    {
+      "fromYear": -4,
+      "toYear": 6,
+      "holderId": "archelaus-ethnarchy",
+      "entity": "Ethnarchy of Judea, Samaria and Idumea (ruler: Herod Archelaus)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The emperor Augustus did not grant Archelaus the royal title his father's will asked for, only \"ethnarch.\" The first-century Jewish historian Josephus adds that Augustus took Gaza, Gadara and Hippos from Archelaus's share and added them to the province of Syria. The map doesn't draw Gaza's land separately, so it shows Gaza, and the coast south-west of it as far as Egypt, with this area."
+    },
+    {
+      "fromYear": 6,
+      "toYear": 41,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Prefects, e.g. Pontius Pilate)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "Luke links a census \"when Quirinius was governor of Syria\" to Jesus' birth, which Luke and Matthew place in Herod's days; the Jewish historian Josephus dates Quirinius's own census of Judea to this year. This map takes no position on how the accounts relate. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 41,
+      "toYear": 44,
+      "holderId": "agrippa-i-kingdom",
+      "entity": "Kingdom of Herod Agrippa I (ruler: Herod Agrippa I)",
+      "sources": [
+        "bib:josephus-antiquities"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 70,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Procurators, e.g. Antonius Felix, Porcius Festus)",
+      "sources": [
+        "bib:josephus-antiquities",
+        "bib:livius-judaea"
+      ],
+      "note": "The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "roman-province-judea",
+      "entity": "Roman province of Judea (ruler: Legates, with a legion now based at Jerusalem)",
+      "sources": [
+        "bib:josephus-jewish-war",
+        "bib:livius-titus"
+      ],
+      "note": "An administrative upgrade (a legate instead of a procurator), not a border or name change. The map shows Gaza and the coast south-west of it, as far as Egypt, with this area, since it doesn't draw them separately."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "judea-samaria-idumea"
+}

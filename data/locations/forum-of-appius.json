@@ -1,0 +1,89 @@
+{
+  "id": "forum-of-appius",
+  "names": {
+    "ancient": [
+      "Forum of Appius"
+    ],
+    "modern": "Near Latina",
+    "modernCountries": [
+      "Italy"
+    ],
+    "alternate": [
+      "Appii Forum",
+      "The Market of Appius"
+    ],
+    "otherLanguages": [
+      "Forum Appii"
+    ]
+  },
+  "type": "town",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "italy",
+  "candidates": [
+    {
+      "label": "Forum of Appius (Forum Appii, Appian Way)",
+      "coordinates": [
+        12.9975,
+        41.46639
+      ],
+      "coordinateSource": "wikidata:Q3748871",
+      "confidence": "high",
+      "support": "A station on the Appian Way about 43 Roman miles from Rome, where a canal through the Pontine Marshes began. Pleiades, OpenBible.info and Wikidata agree on the site; Wikidata's own record places it within the comune of Latina, Italy. None of six popular English versions compared uses the World English Bible's wording, 'The Market of Appius'; three read 'Forum of Appius'. See the route's note.",
+      "sources": [
+        "pleiades:422927",
+        "openbible:forum-of-appius",
+        "wikidata:Q3748871",
+        "bib:isbe-appii-forum",
+        "bib:niv-2011-biblegateway",
+        "bib:esv-2025-biblegateway",
+        "bib:nlt-2015-biblegateway",
+        "bib:kjv-1987-biblegateway",
+        "bib:nkjv-1982-biblegateway",
+        "bib:csb-2017-biblegateway"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Forum of Appius was a station on the Appian Way about forty-three Roman miles from Rome, where travelers could transfer to canal boats for a night journey through the Pontine Marshes. According to Acts, as Paul, under guard as a prisoner, approached Rome, believers from the city came to meet him as far as Forum of Appius, and seeing them, Paul thanked God and took courage.",
+    "sources": [
+      "pleiades:422927",
+      "openbible:forum-of-appius",
+      "wikidata:Q3748871",
+      "bib:isbe-appii-forum",
+      "scripture:Acts 27:1",
+      "scripture:Acts 28:15"
+    ]
+  },
+  "history": [
+    {
+      "text": "The station probably dates from the time of Appius Claudius Caecus, who built the Appian Way from Rome to Capua in 312 BC, and by the first century AD it held the rank of a Roman municipality. The Roman poet Horace's Satires describe the discomforts of the overnight canal-boat journey from Forum of Appius, including troublesome innkeepers and biting insects.",
+      "sources": [
+        "bib:isbe-appii-forum"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:15",
+      "book": "Acts",
+      "textWEB": "From there the brothers, when they heard of us, came to meet us as far as The Market of Appius and The Three Taverns. When Paul saw them, he thanked God and took courage."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "italy-direct",
+      "entity": "Italy",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "italy"
+}

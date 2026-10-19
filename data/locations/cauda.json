@@ -1,0 +1,73 @@
+{
+  "id": "cauda",
+  "names": {
+    "ancient": [
+      "Cauda"
+    ],
+    "modern": "Gavdos",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [
+      "Clauda"
+    ],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "crete",
+  "candidates": [
+    {
+      "label": "Cauda (island south of Crete)",
+      "coordinates": [
+        24.083333,
+        34.833333
+      ],
+      "coordinateSource": "openbible:cauda",
+      "confidence": "high",
+      "support": "A small island south of Crete. Pleiades, OpenBible.info and Wikidata agree on the site, identified with today's Gavdos, whose modern Greek name reflects the 'Cauda' manuscript reading rather than 'Clauda.'",
+      "sources": [
+        "pleiades:589858",
+        "openbible:cauda",
+        "wikidata:Q213895",
+        "bib:isbe-phoenix"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Cauda is a small island south of Crete, known today as Gavdos. Acts records that when a violent northeasterly wind caught Paul's ship off Crete, the crew ran under the lee of Cauda and, with difficulty, were able to secure the ship's boat. The island's modern Greek name reflects the \"Cauda\" reading found in some ancient manuscripts rather than \"Clauda.\"",
+    "sources": [
+      "pleiades:589858",
+      "openbible:cauda",
+      "wikidata:Q213895",
+      "bib:isbe-phoenix",
+      "scripture:Acts 27:14",
+      "scripture:Acts 27:16"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 27:16",
+      "book": "Acts",
+      "textWEB": "Running under the lee of a small island called Clauda, we were able, with difficulty, to secure the boat."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "crete-cyrene"
+}

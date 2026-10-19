@@ -1,0 +1,81 @@
+{
+  "id": "fair-havens",
+  "names": {
+    "ancient": [
+      "Fair Havens"
+    ],
+    "modern": "Kaloi Limenes",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "crete",
+  "candidates": [
+    {
+      "label": "Fair Havens (Kaloi Limenes)",
+      "coordinates": [
+        24.800306,
+        34.929694
+      ],
+      "coordinateSource": "wikidata:Q11818846",
+      "confidence": "high",
+      "support": "An embayment on Crete's south coast about 5 miles east of Cape Matala, sheltered from north and northwest winds but judged unsuitable for wintering. Pleiades, OpenBible.info and Wikidata agree on the site; its Greek name, Kaloi Limenes, is a direct translation of 'Fair Havens.'",
+      "sources": [
+        "pleiades:589834",
+        "openbible:fair-havens",
+        "wikidata:Q11818846",
+        "bib:isbe-fair-havens",
+        "bib:isbe-phoenix"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Fair Havens is a roadstead on Crete's south coast, about five miles east of Cape Matala, whose modern Greek name, Kaloi Limenes, directly translates its biblical name. Acts records that Paul's ship, delayed by contrary winds, anchored here on the voyage to Rome; Paul warned that continuing the voyage would bring injury and heavy loss, but because the harbor was judged unsuitable for wintering, the majority decided to try to reach Phoenix instead.",
+    "sources": [
+      "pleiades:589834",
+      "openbible:fair-havens",
+      "wikidata:Q11818846",
+      "bib:isbe-fair-havens",
+      "scripture:Acts 27:8",
+      "scripture:Acts 27:9",
+      "scripture:Acts 27:10",
+      "scripture:Acts 27:12"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia describes the bay as further sheltered on its southwest side by two small islands.",
+      "sources": [
+        "bib:isbe-fair-havens"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 27:8",
+      "book": "Acts",
+      "textWEB": "With difficulty sailing along it we came to a certain place called Fair Havens, near the city of Lasea."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "crete-cyrene"
+}

@@ -1,0 +1,86 @@
+{
+  "id": "mitylene",
+  "names": {
+    "ancient": [
+      "Mitylene"
+    ],
+    "modern": "Mytilene",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Mutilene"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Mitylene (chief city of Lesbos)",
+      "coordinates": [
+        26.547048,
+        39.110475
+      ],
+      "coordinateSource": "openbible:mitylene",
+      "confidence": "high",
+      "support": "The chief city of the island of Lesbos, with two harbors. Pleiades, OpenBible.info and Wikidata agree on the site, the modern city of Mytilene, Greece.",
+      "sources": [
+        "pleiades:550763",
+        "openbible:mitylene",
+        "wikidata:Q189059",
+        "bib:isbe-mitylene"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Mitylene was the most important city of the Aeolian Greeks and the chief city of the island of Lesbos, noted in antiquity for its two harbors, strong fortifications and high culture. Acts records that on his third missionary journey Paul traveled by ship from Assos and came to Mitylene, where he spent the night before sailing on toward Chios and Samos.",
+    "sources": [
+      "pleiades:550763",
+      "openbible:mitylene",
+      "wikidata:Q189059",
+      "bib:isbe-mitylene",
+      "scripture:Acts 20:14",
+      "scripture:Acts 20:15"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia records that Lesbos revolted from the Athenian confederacy under Mitylene's leadership in 428 BC, after which Athens besieged and took the city and treated its people with great severity, dismantling its walls and stripping it of naval power. The city later suffered under the Persians in the time of Alexander the Great and under Macedonian occupation, but it regained prosperity and was made a free city by the Roman general Pompey.",
+      "sources": [
+        "bib:isbe-mitylene"
+      ]
+    },
+    {
+      "text": "The encyclopedia records that there is no evidence a Christian church had yet been established in Mitylene at the time of Paul's visit.",
+      "sources": [
+        "bib:isbe-mitylene"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 20:14",
+      "book": "Acts",
+      "textWEB": "When he met us at Assos, we took him aboard and came to Mitylene."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -129,
+      "toYear": 101,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia",
+      "sources": [
+        "bib:isbe-asia"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "asia"
+}

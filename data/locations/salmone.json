@@ -1,0 +1,69 @@
+{
+  "id": "salmone",
+  "names": {
+    "ancient": [
+      "Salmone"
+    ],
+    "modern": "Cape Sideros",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": []
+  },
+  "type": "natural-feature",
+  "zoomTier": "site",
+  "prominence": "standard",
+  "parentId": "crete",
+  "candidates": [
+    {
+      "label": "Salmone (promontory, Crete)",
+      "coordinates": [
+        26.3116,
+        35.316
+      ],
+      "coordinateSource": "openbible:salmone",
+      "confidence": "high",
+      "support": "The promontory forming the northeastern corner of Crete. Pleiades, OpenBible.info and Wikidata agree on the site, identified with today's Cape Sideros.",
+      "sources": [
+        "pleiades:590037",
+        "openbible:salmone",
+        "wikidata:Q2937111",
+        "bib:isbe-phoenix"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Salmone is the promontory forming the northeastern tip of Crete, known today as Cape Sideros. Acts records that on the voyage to Rome, after contrary winds near Cnidus kept Paul's ship from holding its course, it sailed under the lee of Crete opposite Salmone.",
+    "sources": [
+      "pleiades:590037",
+      "openbible:salmone",
+      "wikidata:Q2937111",
+      "scripture:Acts 27:7"
+    ]
+  },
+  "history": [],
+  "scripture": [
+    {
+      "ref": "Acts 27:7",
+      "book": "Acts",
+      "textWEB": "When we had sailed slowly many days, and had come with difficulty opposite Cnidus, the wind not allowing us further, we sailed under the lee of Crete, opposite Salmone."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -67,
+      "toYear": 101,
+      "holderId": "crete-cyrene-province",
+      "entity": "Roman province of Crete and Cyrene (ruler: Crete joined with Cyrenaica)",
+      "sources": [
+        "bib:isbe-crete"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "crete-cyrene"
+}

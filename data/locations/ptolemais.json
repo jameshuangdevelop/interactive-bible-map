@@ -1,0 +1,106 @@
+{
+  "id": "ptolemais",
+  "names": {
+    "ancient": [
+      "Ptolemais"
+    ],
+    "modern": "Acre",
+    "modernCountries": [
+      "Israel"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Acco",
+      "Akko"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "syria",
+  "candidates": [
+    {
+      "label": "Ptolemais (Phoenician coast)",
+      "coordinates": [
+        35.0692,
+        32.9214
+      ],
+      "coordinateSource": "openbible:ptolemais",
+      "confidence": "high",
+      "support": "A Phoenician coastal city, identified with the Old Testament's Acco. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Acre (Akko).",
+      "sources": [
+        "pleiades:678010",
+        "openbible:ptolemais",
+        "wikidata:Q126084",
+        "bib:isbe-ptolemais"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Ptolemais was the most prominent city on the Phoenician coast in the time of the Maccabees, a Jewish family who defended Jewish rights and customs in the second century BC, and stood on the site of the Old Testament's Acco. Acts records that Paul's ship, nearing the end of its voyage from Tyre, finished its course at Ptolemais, where Paul and his companions greeted the brothers and stayed with them one day before traveling on to Caesarea.",
+    "sources": [
+      "pleiades:678010",
+      "openbible:ptolemais",
+      "wikidata:Q126084",
+      "bib:isbe-ptolemais",
+      "bib:isbe-maccabees",
+      "scripture:Acts 21:7",
+      "scripture:Acts 21:8"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia identifies Ptolemais as the same city as Acco, named in the book of Judges; its article on Acco records that the Ptolemies, who held the city after the death of Alexander the Great, made it their stronghold on the coast and changed its name to Ptolemais. The encyclopedia's article on Ptolemais notes that the city is mentioned several times in the book of 1 Maccabees as the most prominent town of the Phoenician coast in the time of the Maccabees.",
+      "sources": [
+        "bib:isbe-ptolemais",
+        "bib:isbe-acco"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 21:7",
+      "book": "Acts",
+      "textWEB": "When we had finished the voyage from Tyre, we arrived at Ptolemais. We greeted the brothers and stayed with them one day."
+    }
+  ],
+  "otConnections": [
+    {
+      "ref": "Judges 1:31",
+      "note": "Judges records that the tribe of Asher \"didn't drive out the inhabitants of Acco,\" the town the encyclopedia identifies with Ptolemais; the next verse reports that the Asherites instead lived among the Canaanites of the land.",
+      "sources": [
+        "scripture:Judges 1:31",
+        "scripture:Judges 1:32",
+        "bib:isbe-ptolemais",
+        "bib:isbe-acco"
+      ]
+    }
+  ],
+  "politicalHistory": [
+    {
+      "fromYear": -64,
+      "toYear": -27,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria",
+      "sources": [
+        "bib:livius-damascus"
+      ]
+    },
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "roman-province-syria",
+      "entity": "Roman province of Syria (ruler: Imperial legates, governed from Antioch)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:livius-cilicia",
+        "bib:josephus-antiquities"
+      ],
+      "note": "Administers the Cilician plain throughout, and administered Philip's former tetrarchy directly for a few years after his death (34-37; Antiquities 18.4.6)."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "syria"
+}

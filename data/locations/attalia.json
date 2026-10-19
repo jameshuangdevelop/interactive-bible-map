@@ -1,0 +1,100 @@
+{
+  "id": "attalia",
+  "names": {
+    "ancient": [
+      "Attalia"
+    ],
+    "modern": "Antalya",
+    "modernCountries": [
+      "Türkiye"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Adalia",
+      "Satalia"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "pamphylia",
+  "candidates": [
+    {
+      "label": "Attalia (modern Antalya)",
+      "coordinates": [
+        30.703614,
+        36.881272
+      ],
+      "coordinateSource": "openbible:attalia",
+      "confidence": "high",
+      "support": "A city on Pamphylia's coast founded by Attalus II Philadelphus, continuously inhabited today as Antalya, Türkiye. Pleiades, OpenBible.info and Wikidata agree on the site.",
+      "sources": [
+        "pleiades:638778",
+        "openbible:attalia",
+        "wikidata:Q6487",
+        "bib:isbe-attalia"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Attalia was a city on the southern coast of Asia Minor, in ancient Pamphylia, founded by Attalus II Philadelphus, a king of Pergamum who reigned 159-138 BC. Acts records that after preaching in Perga on their return from the interior, Paul and Barnabas went down to Attalia and sailed from there back to Antioch in Syria.",
+    "sources": [
+      "pleiades:638778",
+      "openbible:attalia",
+      "wikidata:Q6487",
+      "bib:isbe-attalia",
+      "scripture:Acts 14:25",
+      "scripture:Acts 14:26"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that Attalia stood on a flat limestone terrace near where the Catarrhactes River once flowed into the sea, and that although it did not share the early ecclesiastical importance of neighboring Perga, it became a metropolis once Perga declined, in 1084. It continued as the chief port for ships from Syria and Egypt, and the entry point to the interior, until modern times, when a harbor at Mersin reopened and took over most of that trade.",
+      "sources": [
+        "bib:isbe-attalia"
+      ]
+    },
+    {
+      "text": "The encyclopedia describes an outer harbor once protected by walls and towers, its entrance closed by a chain, and an inner harbor that was little more than a recess in the cliff; among the surviving ancient monuments it names an inscribed arched gateway of the Roman emperor Hadrian and an aqueduct.",
+      "sources": [
+        "bib:isbe-attalia"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 14:25",
+      "book": "Acts",
+      "textWEB": "When they had spoken the word in Perga, they went down to Attalia."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 74,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:tacitus-histories",
+        "bib:livius-pamphylia"
+      ],
+      "note": "The Roman historians Cassius Dio (60.17.3-4) and Tacitus (Histories 2.9, with its translator's note) disagree on Pamphylia's standing in this span, so it is shown as unclear rather than as part of Galatia. The nearest mapped shape for this period is far larger than Pamphylia's own coastal plain and likely also covers southern Pisidia (part of Galatia throughout); this area's drawn land may therefore include some of Galatia's own territory for these years."
+    },
+    {
+      "fromYear": 74,
+      "toYear": 101,
+      "holderId": "lycia-pamphylia-province",
+      "entity": "Roman province of Lycia and Pamphylia",
+      "sources": [
+        "bib:isbe-pisidia",
+        "bib:livius-pamphylia"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16",
+  "politicalAreaId": "pamphylia"
+}

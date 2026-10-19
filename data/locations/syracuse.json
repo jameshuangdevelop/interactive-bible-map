@@ -1,0 +1,86 @@
+{
+  "id": "syracuse",
+  "names": {
+    "ancient": [
+      "Syracuse"
+    ],
+    "modern": "Syracuse",
+    "modernCountries": [
+      "Italy"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Syracusae",
+      "Siracusa"
+    ]
+  },
+  "type": "city",
+  "zoomTier": "city",
+  "prominence": "standard",
+  "parentId": "sicily",
+  "candidates": [
+    {
+      "label": "Syracuse (Sicily)",
+      "coordinates": [
+        15.293056,
+        37.063889
+      ],
+      "coordinateSource": "openbible:syracuse",
+      "confidence": "high",
+      "support": "A Greek colony on Sicily's east coast and capital of the Roman province of Sicily. Pleiades, OpenBible.info and Wikidata agree on the site, known today as Syracuse (Siracusa).",
+      "sources": [
+        "pleiades:462503",
+        "openbible:syracuse",
+        "wikidata:Q13670",
+        "bib:isbe-syracuse"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Syracuse was a Greek colony on Sicily's east coast, founded by Corinthian settlers in 734 BC, and capital of the Roman province of Sicily. Acts records that Paul's ship put in at Syracuse for three days on the voyage to Rome, after the shipwreck on Malta. The Roman orator Cicero called it \"the greatest of Greek cities and the most beautiful of all cities.\"",
+    "sources": [
+      "pleiades:462503",
+      "openbible:syracuse",
+      "wikidata:Q13670",
+      "bib:isbe-syracuse",
+      "scripture:Acts 28:12"
+    ]
+  },
+  "history": [
+    {
+      "text": "Founded by Corinthian colonists in 734 BC on the small island of Ortygia, Syracuse later grew to cover the mainland promontory beside it; the Greek historian Thucydides gives a detailed account of the city successfully withstanding a major siege by Athens in 414 BC.",
+      "sources": [
+        "bib:isbe-syracuse"
+      ]
+    },
+    {
+      "text": "Syracuse resisted a Roman siege under the Roman general Marcellus until the city fell in 212 BC; the International Standard Bible Encyclopedia states that it became the capital of the Roman province of Sicily from then on.",
+      "sources": [
+        "bib:isbe-syracuse"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 28:12",
+      "book": "Acts",
+      "textWEB": "Touching at Syracuse, we stayed there three days."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -27,
+      "toYear": 101,
+      "holderId": "sicily-province",
+      "entity": "Roman province of Sicily",
+      "sources": [
+        "bib:cassius-dio-roman-history"
+      ]
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-15",
+  "politicalAreaId": "sicily"
+}

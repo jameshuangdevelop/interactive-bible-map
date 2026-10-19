@@ -2114,6 +2114,45 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "smith-dictionary-cyrenaica",
+      "type": "chapter",
+      "title": "Cyrenaica",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=cyrenaica-geo",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "smith-dictionary-syrtica-regio",
+      "type": "chapter",
+      "title": "Syrtica Regio",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=syrtica-regio-geo",
+      "accessed": "2026-10-15"
+    },
+    {
+      "id": "smith-dictionary-syrtis-major",
+      "type": "chapter",
+      "title": "Syrtis Major",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=syrtis-major-geo",
+      "accessed": "2026-10-15"
+    },
+    {
       "id": "smith-dictionary-thracia",
       "type": "chapter",
       "title": "Thracia",
@@ -2313,6 +2352,31 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "smith-dictionary-samothrace",
+      "type": "chapter",
+      "title": "Samothrace",
+      "authors": [
+        "William Smith"
+      ],
+      "year": 1854,
+      "publisher": "Walton and Maberly",
+      "containerTitle": "Dictionary of Greek and Roman Geography (William Smith, ed.), hosted on Perseus Digital Library",
+      "url": "https://www.perseus.tufts.edu/hopper/text?doc=Perseus:text:1999.04.0064:entry=samothrace-geo",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "louvre-winged-victory",
+      "type": "web",
+      "title": "Victoire de Samothrace (Winged Victory of Samothrace)",
+      "authors": [
+        "Musée du Louvre"
+      ],
+      "year": 2026,
+      "publisher": "Musée du Louvre, Département des Antiquités grecques, étrusques et romaines",
+      "url": "https://collections.louvre.fr/en/ark:/53355/cl010252531",
+      "accessed": "2026-10-16"
+    },
+    {
       "id": "isbe-amphipolis",
       "type": "chapter",
       "title": "Amphipolis",
@@ -2428,6 +2492,32 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/P/patara.html",
       "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-acco",
+      "type": "chapter",
+      "title": "Acco",
+      "authors": [
+        "H. Porter"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/A/acco.html",
+      "accessed": "2026-10-16"
+    },
+    {
+      "id": "isbe-maccabees",
+      "type": "chapter",
+      "title": "Maccabaeus; Maccabees",
+      "authors": [
+        "J. Hutchison"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/M/maccabaeus-maccabees.html",
+      "accessed": "2026-10-16"
     },
     {
       "id": "isbe-myra",
@@ -2674,6 +2764,19 @@
       "accessed": "2026-10-13"
     },
     {
+      "id": "isbe-ephron-2",
+      "type": "chapter",
+      "title": "Ephron (2)",
+      "authors": [
+        "E. W. G. Masterman"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/E/ephron-(2).html",
+      "accessed": "2026-10-16"
+    },
+    {
       "id": "isbe-bethphage",
       "type": "chapter",
       "title": "Bethphage",
@@ -2685,6 +2788,19 @@
       "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
       "url": "https://www.internationalstandardbible.com/B/bethphage.html",
       "accessed": "2026-10-13"
+    },
+    {
+      "id": "isbe-talmud",
+      "type": "chapter",
+      "title": "Talmud",
+      "authors": [
+        "Hermann L. Strack"
+      ],
+      "year": 1915,
+      "publisher": "Howard-Severance Company",
+      "containerTitle": "International Standard Bible Encyclopedia (James Orr, general editor), hosted at internationalstandardbible.com",
+      "url": "https://www.internationalstandardbible.com/T/talmud.html",
+      "accessed": "2026-10-16"
     },
     {
       "id": "isbe-chronology-nt",

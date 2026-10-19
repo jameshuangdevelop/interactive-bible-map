@@ -1,0 +1,125 @@
+{
+  "id": "rhodes",
+  "names": {
+    "ancient": [
+      "Rhodes"
+    ],
+    "modern": "Rhodes",
+    "modernCountries": [
+      "Greece"
+    ],
+    "alternate": [],
+    "otherLanguages": [
+      "Rhodos"
+    ]
+  },
+  "type": "natural-feature",
+  "zoomTier": "region",
+  "prominence": "standard",
+  "parentId": "asia",
+  "candidates": [
+    {
+      "label": "Rhodes (city)",
+      "coordinates": [
+        28.2109,
+        36.4402
+      ],
+      "coordinateSource": "openbible:rhodes-1",
+      "confidence": "high",
+      "support": "The chief city of the island of Rhodes, in the southeastern Aegean. The International Standard Bible Encyclopedia describes Rhodes itself as \"an island (and city),\" with its capital, also called Rhodes, at the island's northeastern extremity. Pleiades, OpenBible.info and Wikidata agree on the city of Rhodes as the site.",
+      "sources": [
+        "pleiades:590030",
+        "openbible:rhodes-1",
+        "wikidata:Q188731",
+        "bib:isbe-rhodes"
+      ]
+    }
+  ],
+  "summary": {
+    "text": "Rhodes is an island in the southeastern Aegean Sea, west of Caria, whose capital city of the same name stood at its northeastern tip, with a fortified double harbor once marked by a colossal bronze statue of the sun god Helios, counted among the seven wonders of the ancient world. Acts records that on his return from his third missionary journey, Paul's ship came the next day to Rhodes after leaving Cos, and sailed on from there to Patara.",
+    "sources": [
+      "pleiades:590030",
+      "openbible:rhodes-1",
+      "wikidata:Q188731",
+      "bib:isbe-rhodes",
+      "bib:isbe-cos",
+      "scripture:Acts 21:1"
+    ]
+  },
+  "history": [
+    {
+      "text": "The International Standard Bible Encyclopedia reports that the bronze colossus, made by the sculptor Chares around 290 BC and reckoned one of the seven wonders of the ancient world, stood 104 feet high near the harbor entrance until an earthquake toppled it in 223 BC; the encyclopedia states that the Saracens who later held the island sold its remains to a Jewish buyer in AD 672.",
+      "sources": [
+        "bib:isbe-rhodes"
+      ]
+    },
+    {
+      "text": "The encyclopedia records that Lindus, Ialysus and Camirus, three chief cities of the island, joined with Cos, Cnidus and Halicarnassus to form the Dorian Hexapolis, and that these three Rhodian cities founded the new capital of Rhodes by uniting in 408 BC. Rhodes became a loyal ally of Rome after Rome's defeat of the Seleucid king Antiochus in 189 BC and, as a reward for her loyalty, received Caria; by 168 BC, however, only a small portion of this territory remained under Rhodian sway.",
+      "sources": [
+        "bib:isbe-rhodes"
+      ]
+    },
+    {
+      "text": "The Roman historian Cassius Dio records that in AD 44 the emperor Claudius deprived the Rhodians of their liberty because they had impaled some Romans, a loss of freedom the International Standard Bible Encyclopedia likewise dates to that year, describing Rhodes as thereafter part of the Roman province of Asia. The Roman historian Tacitus records that in AD 53 the sixteen-year-old Nero, newly married to the emperor Claudius's daughter Octavia, successfully advocated for several favors including the restoring of the Rhodians' liberty, which Tacitus notes had been \"so often forfeited or confirmed as the balance varied between their military services abroad or their seditious offences at home.\" The Roman biographer Suetonius records that the emperor Vespasian later made a province of Rhodes, along with Lycia, Byzantium, Achaia and Samos, taking away the freedom each had held; Suetonius gives no exact year for this, so this map treats Rhodes's status as uncertain from Vespasian's first full year as emperor, AD 70, onward, since no cited source identifies what province, if any, Rhodes belonged to afterward.",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-rhodes",
+        "bib:tacitus-annals",
+        "bib:suetonius-twelve-caesars"
+      ]
+    }
+  ],
+  "scripture": [
+    {
+      "ref": "Acts 21:1",
+      "book": "Acts",
+      "textWEB": "When we had departed from them and had set sail, we came with a straight course to Cos, and the next day to Rhodes, and from there to Patara."
+    }
+  ],
+  "otConnections": [],
+  "politicalHistory": [
+    {
+      "fromYear": -4,
+      "toYear": 44,
+      "entity": "Free Greek state, allied with Rome",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-rhodes"
+      ],
+      "note": "The International Standard Bible Encyclopedia describes Rhodes as the faithful ally of Rome from 189 BC and dates Rhodes's incorporation into the province of Asia to AD 44, when, as the Roman historian Cassius Dio records, the emperor Claudius deprived the Rhodians of their liberty because they had impaled some Romans."
+    },
+    {
+      "fromYear": 44,
+      "toYear": 53,
+      "holderId": "asia-province",
+      "entity": "Roman province of Asia (freedom withdrawn by the emperor Claudius)",
+      "sources": [
+        "bib:cassius-dio-roman-history",
+        "bib:isbe-rhodes"
+      ],
+      "note": "The Roman historian Cassius Dio (60.24.4) records that Claudius deprived the Rhodians of their liberty for impaling some Romans; the encyclopedia also dates the same change to AD 44."
+    },
+    {
+      "fromYear": 53,
+      "toYear": 70,
+      "entity": "Free city (liberty restored under the emperor Claudius, at the plea of the young Nero)",
+      "sources": [
+        "bib:tacitus-annals"
+      ],
+      "note": "The Roman historian Tacitus (Annals 12.58) records that in the consulship of Decimus Junius and Quintus Haterius (AD 53), the sixteen-year-old Nero, son-in-law of the reigning emperor Claudius, successfully advocated for the Rhodians to recover their liberties."
+    },
+    {
+      "fromYear": 70,
+      "toYear": 101,
+      "holderId": "uncertain-roman-side",
+      "entity": "Status uncertain (Roman-side)",
+      "sources": [
+        "bib:suetonius-twelve-caesars"
+      ],
+      "note": "The Roman biographer Suetonius records that the emperor Vespasian \"made provinces of Achaia, Lycia, Rhodes, Byzantium and Samos, taking away their freedom,\" but gives no year for this, so the status here is shown as unclear from Vespasian's first full year as emperor onward; unlike Samos, no cited source names the province Rhodes belonged to afterward."
+    }
+  ],
+  "status": "verified",
+  "verifiedBy": "fact-checker",
+  "lastReviewed": "2026-10-16"
+}

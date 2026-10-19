@@ -37,8 +37,8 @@
             "locationId": "antioch-syria"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "seleucia"
+            "kind": "location",
+            "locationId": "seleucia"
           },
           "scripture": [
             {
@@ -56,8 +56,8 @@
         {
           "id": "stage-02",
           "from": {
-            "kind": "route-stop",
-            "stopId": "seleucia"
+            "kind": "location",
+            "locationId": "seleucia"
           },
           "to": {
             "kind": "location",
@@ -355,8 +355,8 @@
             "locationId": "perga"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "attalia"
+            "kind": "location",
+            "locationId": "attalia"
           },
           "scripture": [
             {
@@ -374,8 +374,8 @@
         {
           "id": "stage-14",
           "from": {
-            "kind": "route-stop",
-            "stopId": "attalia"
+            "kind": "location",
+            "locationId": "attalia"
           },
           "to": {
             "kind": "location",
@@ -573,8 +573,8 @@
             "locationId": "troas"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "samothrace"
+            "kind": "location",
+            "locationId": "samothrace"
           },
           "scripture": [
             {
@@ -592,8 +592,8 @@
         {
           "id": "stage-05",
           "from": {
-            "kind": "route-stop",
-            "stopId": "samothrace"
+            "kind": "location",
+            "locationId": "samothrace"
           },
           "to": {
             "kind": "location",
@@ -647,12 +647,12 @@
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "amphipolis"
+              "kind": "location",
+              "locationId": "amphipolis"
             },
             {
-              "kind": "route-stop",
-              "stopId": "apollonia-macedonia"
+              "kind": "location",
+              "locationId": "apollonia-macedonia"
             }
           ],
           "scripture": [
@@ -1061,8 +1061,8 @@
             "locationId": "troas"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "assos"
+            "kind": "location",
+            "locationId": "assos"
           },
           "scripture": [
             {
@@ -1080,12 +1080,12 @@
         {
           "id": "stage-05",
           "from": {
-            "kind": "route-stop",
-            "stopId": "assos"
+            "kind": "location",
+            "locationId": "assos"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "mitylene"
+            "kind": "location",
+            "locationId": "mitylene"
           },
           "scripture": [
             {
@@ -1103,17 +1103,17 @@
         {
           "id": "stage-06",
           "from": {
-            "kind": "route-stop",
-            "stopId": "mitylene"
+            "kind": "location",
+            "locationId": "mitylene"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "samos"
+            "kind": "location",
+            "locationId": "samos"
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "chios"
+              "kind": "location",
+              "locationId": "chios"
             }
           ],
           "scripture": [
@@ -1132,12 +1132,12 @@
         {
           "id": "stage-07",
           "from": {
-            "kind": "route-stop",
-            "stopId": "samos"
+            "kind": "location",
+            "locationId": "samos"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "trogyllium"
+            "kind": "location",
+            "locationId": "trogyllium"
           },
           "scripture": [
             {
@@ -1155,8 +1155,8 @@
         {
           "id": "stage-08",
           "from": {
-            "kind": "route-stop",
-            "stopId": "trogyllium"
+            "kind": "location",
+            "locationId": "trogyllium"
           },
           "to": {
             "kind": "location",
@@ -1182,8 +1182,8 @@
             "locationId": "miletus"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "cos"
+            "kind": "location",
+            "locationId": "cos"
           },
           "scripture": [
             {
@@ -1201,12 +1201,12 @@
         {
           "id": "stage-10",
           "from": {
-            "kind": "route-stop",
-            "stopId": "cos"
+            "kind": "location",
+            "locationId": "cos"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "rhodes"
+            "kind": "location",
+            "locationId": "rhodes"
           },
           "scripture": [
             {
@@ -1224,12 +1224,12 @@
         {
           "id": "stage-11",
           "from": {
-            "kind": "route-stop",
-            "stopId": "rhodes"
+            "kind": "location",
+            "locationId": "rhodes"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "patara"
+            "kind": "location",
+            "locationId": "patara"
           },
           "scripture": [
             {
@@ -1247,8 +1247,8 @@
         {
           "id": "stage-12",
           "from": {
-            "kind": "route-stop",
-            "stopId": "patara"
+            "kind": "location",
+            "locationId": "patara"
           },
           "to": {
             "kind": "location",
@@ -1286,8 +1286,8 @@
             "locationId": "tyre"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "ptolemais"
+            "kind": "location",
+            "locationId": "ptolemais"
           },
           "scripture": [
             {
@@ -1305,8 +1305,8 @@
         {
           "id": "stage-14",
           "from": {
-            "kind": "route-stop",
-            "stopId": "ptolemais"
+            "kind": "location",
+            "locationId": "ptolemais"
           },
           "to": {
             "kind": "location",
@@ -1413,8 +1413,8 @@
             "locationId": "caesarea-maritima"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "sidon"
+            "kind": "location",
+            "locationId": "sidon"
           },
           "scripture": [
             {
@@ -1436,8 +1436,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "adramyttium"
+              "kind": "location",
+              "locationId": "adramyttium"
             },
             {
               "kind": "location",
@@ -1455,12 +1455,12 @@
         {
           "id": "stage-02",
           "from": {
-            "kind": "route-stop",
-            "stopId": "sidon"
+            "kind": "location",
+            "locationId": "sidon"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "myra"
+            "kind": "location",
+            "locationId": "myra"
           },
           "via": [
             {
@@ -1488,8 +1488,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "alexandria"
+              "kind": "location",
+              "locationId": "alexandria"
             }
           ],
           "namedRegions": [
@@ -1517,25 +1517,25 @@
         {
           "id": "stage-03",
           "from": {
-            "kind": "route-stop",
-            "stopId": "myra"
+            "kind": "location",
+            "locationId": "myra"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "fair-havens"
+            "kind": "location",
+            "locationId": "fair-havens"
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "cnidus"
+              "kind": "location",
+              "locationId": "cnidus"
             },
             {
               "kind": "location",
               "locationId": "crete"
             },
             {
-              "kind": "route-stop",
-              "stopId": "salmone"
+              "kind": "location",
+              "locationId": "salmone"
             }
           ],
           "scripture": [
@@ -1553,8 +1553,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "lasea"
+              "kind": "location",
+              "locationId": "lasea"
             }
           ],
           "sources": [
@@ -1566,8 +1566,8 @@
         {
           "id": "stage-04",
           "from": {
-            "kind": "route-stop",
-            "stopId": "fair-havens"
+            "kind": "location",
+            "locationId": "fair-havens"
           },
           "to": {
             "kind": "location",
@@ -1576,8 +1576,8 @@
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "cauda"
+              "kind": "location",
+              "locationId": "cauda"
             }
           ],
           "scripture": [
@@ -1600,13 +1600,13 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "phoenix",
+              "kind": "location",
+              "locationId": "phoenix",
               "candidateIndex": 0
             },
             {
-              "kind": "route-stop",
-              "stopId": "syrtis"
+              "kind": "location",
+              "locationId": "syrtis"
             }
           ],
           "sources": [
@@ -1626,8 +1626,8 @@
             "candidateIndex": 0
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "syracuse"
+            "kind": "location",
+            "locationId": "syracuse"
           },
           "scripture": [
             {
@@ -1644,8 +1644,8 @@
           "travelMode": "sea",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "alexandria"
+              "kind": "location",
+              "locationId": "alexandria"
             }
           ],
           "sources": [
@@ -1657,12 +1657,12 @@
         {
           "id": "stage-06",
           "from": {
-            "kind": "route-stop",
-            "stopId": "syracuse"
+            "kind": "location",
+            "locationId": "syracuse"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "rhegium"
+            "kind": "location",
+            "locationId": "rhegium"
           },
           "scripture": [
             {
@@ -1680,8 +1680,8 @@
         {
           "id": "stage-07",
           "from": {
-            "kind": "route-stop",
-            "stopId": "rhegium"
+            "kind": "location",
+            "locationId": "rhegium"
           },
           "to": {
             "kind": "location",
@@ -1718,12 +1718,12 @@
           },
           "via": [
             {
-              "kind": "route-stop",
-              "stopId": "forum-of-appius"
+              "kind": "location",
+              "locationId": "forum-of-appius"
             },
             {
-              "kind": "route-stop",
-              "stopId": "three-taverns"
+              "kind": "location",
+              "locationId": "three-taverns"
             }
           ],
           "scripture": [
@@ -2256,8 +2256,8 @@
             "locationId": "capernaum"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "country-of-the-gadarenes",
+            "kind": "location",
+            "locationId": "country-of-the-gadarenes",
             "candidateIndex": 0
           },
           "scripture": [
@@ -2322,8 +2322,8 @@
         {
           "id": "segment-12",
           "from": {
-            "kind": "route-stop",
-            "stopId": "country-of-the-gadarenes",
+            "kind": "location",
+            "locationId": "country-of-the-gadarenes",
             "candidateIndex": 0
           },
           "to": {
@@ -2393,8 +2393,8 @@
           "travelMode": "unknown",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "sidon"
+              "kind": "location",
+              "locationId": "sidon"
             }
           ],
           "namedRegions": [
@@ -2448,8 +2448,8 @@
           "travelMode": "unknown",
           "mentioned": [
             {
-              "kind": "route-stop",
-              "stopId": "sidon"
+              "kind": "location",
+              "locationId": "sidon"
             }
           ],
           "namedRegions": [
@@ -2893,8 +2893,8 @@
             "candidateIndex": 1
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "bethphage",
+            "kind": "location",
+            "locationId": "bethphage",
             "candidateIndex": 0
           },
           "scripture": [
@@ -2966,8 +2966,8 @@
         {
           "id": "segment-24",
           "from": {
-            "kind": "route-stop",
-            "stopId": "bethphage",
+            "kind": "location",
+            "locationId": "bethphage",
             "candidateIndex": 0
           },
           "to": {
@@ -3143,8 +3143,8 @@
             "locationId": "bethany"
           },
           "to": {
-            "kind": "route-stop",
-            "stopId": "ephraim"
+            "kind": "location",
+            "locationId": "ephraim"
           },
           "scripture": [
             {
@@ -3171,8 +3171,8 @@
         {
           "id": "segment-28",
           "from": {
-            "kind": "route-stop",
-            "stopId": "ephraim"
+            "kind": "location",
+            "locationId": "ephraim"
           },
           "to": {
             "kind": "location",
