@@ -49,6 +49,7 @@ import { roundScaleDistanceMeters } from "./map-scale";
 import {
   MAX_VISIBLE_PLACE_LIST_ENTRIES,
   buildPlaceRenderData,
+  routePriorityPlaceIdsKeyFromOverlay,
   type PlaceRenderData
 } from "./map-render-data";
 import {
@@ -2662,28 +2663,7 @@ export function MapView({
   }, [routesModeEnabled]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const routePriorityPlaceIdsKey = useMemo(() => {
-    if (!routesOverlay) {
-      return "";
-    }
-
-    const orderedIds: string[] = [];
-    const seenIds = new Set<string>();
-    for (const feature of routesOverlay.points.features) {
-      if (feature.properties.kind === "stage-pill") {
-        continue;
-      }
-      if (feature.properties.stopKind !== "location") {
-        continue;
-      }
-      const stopId = feature.properties.stopId;
-      if (seenIds.has(stopId)) {
-        continue;
-      }
-      seenIds.add(stopId);
-      orderedIds.push(stopId);
-    }
-
-    return orderedIds.join("\u0001");
+    return routePriorityPlaceIdsKeyFromOverlay(routesOverlay);
   }, [routesOverlay]);
 
   const routePriorityPlaceIds = useMemo(() => {
