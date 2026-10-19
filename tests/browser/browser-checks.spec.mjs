@@ -128,6 +128,101 @@ async function renderedPlaceNames(page) {
   }, mapTestHookKey);
 }
 
+async function installRouteStageUpdateProbe(page) {
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      throw new Error("Map test hook is unavailable.");
+    }
+    const probe = window.__ibmRouteStageUpdateProbe;
+    if (probe?.installed) {
+      return;
+    }
+    window.__ibmRouteStageUpdateProbe = {
+      installed: true,
+      log: []
+    };
+
+    const sourceIds = Object.keys(map.getStyle().sources);
+    for (const sourceId of sourceIds) {
+      const source = map.getSource(sourceId);
+      if (!source) {
+        continue;
+      }
+      for (const methodName of ["setData", "updateData"]) {
+        if (typeof source[methodName] !== "function") {
+          continue;
+        }
+        const original = source[methodName].bind(source);
+        source[methodName] = (...args) => {
+          const entry = window.__ibmRouteStageUpdateProbe;
+          entry?.log.push({ type: methodName, sourceId });
+          return original(...args);
+        };
+      }
+    }
+
+    const originalSetLayoutProperty = map.setLayoutProperty.bind(map);
+    map.setLayoutProperty = (...args) => {
+      const entry = window.__ibmRouteStageUpdateProbe;
+      entry?.log.push({
+        type: "setLayoutProperty",
+        layerId: typeof args[0] === "string" ? args[0] : null
+      });
+      return originalSetLayoutProperty(...args);
+    };
+  }, mapTestHookKey);
+}
+
+async function resetRouteStageUpdateProbe(page) {
+  await page.evaluate(() => {
+    const probe = window.__ibmRouteStageUpdateProbe;
+    if (probe) {
+      probe.log = [];
+    }
+  });
+}
+
+async function readRouteStageUpdateProbe(page) {
+  return page.evaluate(() => {
+    const probe = window.__ibmRouteStageUpdateProbe;
+    if (!probe) {
+      return {
+        sourceUpdateCalls: [],
+        layoutCalls: []
+      };
+    }
+    const sourceUpdateCalls = probe.log.filter((entry) => entry.type === "setData" || entry.type === "updateData");
+    const layoutCalls = probe.log.filter((entry) => entry.type === "setLayoutProperty");
+    return { sourceUpdateCalls, layoutCalls };
+  });
+}
+
+// Click a stage card on its "Stage N ·" label, never its centre: the centre can land on an
+// inline place button (fonts wrap differently on Linux CI), which selects that place instead.
+async function clickRouteStageCard(page, stageIndex) {
+  const card = page.locator(`li[data-route-stage-index="${stageIndex}"]`);
+  await card.scrollIntoViewIfNeeded();
+  const box = await card.boundingBox();
+  expect(box, `stage card ${stageIndex} should be laid out`).toBeTruthy();
+  const position = { x: 12, y: 12 };
+  const hit = await page.evaluate(
+    ({ x, y, index }) => {
+      const element = document.elementFromPoint(x, y);
+      return {
+        inCard: Boolean(element?.closest(`li[data-route-stage-index="${index}"]`)),
+        onButton: Boolean(element?.closest("button"))
+      };
+    },
+    { x: box.x + position.x, y: box.y + position.y, index: stageIndex }
+  );
+  expect(hit, `stage card ${stageIndex} click point should be on the card, not a place button`).toEqual({
+    inCard: true,
+    onButton: false
+  });
+  await card.click({ position });
+}
+
 test("map requests tiles and loads workers on startup", { tag: ["@data"] }, async ({ page, baseUrl }) => {
   const requestUrls = [];
   const workerUrls = [];
@@ -542,6 +637,38 @@ test("panel open smoothness keeps long tasks under budget (restores B60) @perf",
   }
 });
 
+test("route stage selection only updates route sources and never touches layout properties", async ({ page, baseUrl }) => {
+  const allowedRouteSourceIds = new Set(["ibm-route-lines", "ibm-route-points"]);
+  const runSelectAssertion = async ({ routeId, stageIndex }) => {
+    await page.goto(`${baseUrl}/?tab=routes&route=${routeId}`, {
+      waitUntil: "domcontentloaded",
+      timeout: 120_000
+    });
+    await page.locator("li[data-route-stage-index]").first().waitFor({ timeout: 60_000 });
+    await waitForMapIdle(page);
+    await page.waitForTimeout(200);
+    await installRouteStageUpdateProbe(page);
+    await resetRouteStageUpdateProbe(page);
+    await clickRouteStageCard(page, stageIndex);
+    await waitForMapIdle(page);
+    await page.waitForTimeout(200);
+    const urlParams = await page.evaluate(() => Object.fromEntries(new URLSearchParams(window.location.search)));
+    expect(urlParams.stage).toBe(String(stageIndex));
+    expect(urlParams.place).toBeUndefined();
+
+    const probeResult = await readRouteStageUpdateProbe(page);
+    const updatedSourceIds = [...new Set(probeResult.sourceUpdateCalls.map((entry) => entry.sourceId))];
+    const disallowedUpdates = updatedSourceIds.filter((sourceId) => !allowedRouteSourceIds.has(sourceId));
+    expect(disallowedUpdates).toEqual([]);
+    expect(probeResult.sourceUpdateCalls.length).toBeGreaterThan(0);
+    expect(probeResult.layoutCalls).toEqual([]);
+  };
+
+  for (const routeId of ["paul-rome", "jesus"]) {
+    await runSelectAssertion({ routeId, stageIndex: 2 });
+  }
+});
+
 test("synthetic 10,000-place smoothness stays functional and enforces on GPU (restores B59) @perf", { tag: ["@perf"] }, async ({ browser, baseUrl }) => {
   const basePlaces = JSON.parse(await fs.readFile(path.join(generatedDirectory, "places.index.json"), "utf8"));
   const syntheticPlaces = buildSyntheticPlaces(basePlaces, 10_000);
@@ -659,13 +786,56 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
   await page.locator("li[data-route-stage-index]").first().waitFor({ timeout: 60_000 });
   await waitForMapIdle(page);
 
-  const names = (await renderedPlaceNames(page)).filter((name) => routeStage4PlaceIds.has(name.placeId) && name.x > 450 && name.x < 1400 && name.y > 120 && name.y < 800);
+  const interactiveNameLayers = [
+    "ibm-routes-major-pin",
+    "ibm-routes-city-pin",
+    "ibm-routes-site-pin",
+    "ibm-pin-label-standard",
+    "ibm-selected-major-pin-label",
+    "ibm-selected-site-pin-label",
+    "ibm-selected-pin-label"
+  ];
+
+  const names = await page.evaluate(
+    ({ testHookKey, selectedJourneyPlaceIds, layers }) => {
+      const map = window[testHookKey];
+      if (!map) {
+        throw new Error("Map test hook is unavailable.");
+      }
+      const seen = new Map();
+      const features = map.queryRenderedFeatures(undefined, { layers });
+      for (const feature of features) {
+        const properties = feature.properties ?? {};
+        const placeId = String(properties.placeId ?? "");
+        if (!selectedJourneyPlaceIds.includes(placeId)) {
+          continue;
+        }
+        if (feature.geometry?.type !== "Point") {
+          continue;
+        }
+        const point = map.project(feature.geometry.coordinates);
+        if (point.x <= 450 || point.x >= 1400 || point.y <= 120 || point.y >= 800) {
+          continue;
+        }
+        if (!seen.has(placeId)) {
+          seen.set(placeId, {
+            placeId,
+            x: point.x,
+            y: point.y
+          });
+        }
+      }
+      return [...seen.values()];
+    },
+    {
+      testHookKey: mapTestHookKey,
+      selectedJourneyPlaceIds: [...routeStage4PlaceIds],
+      layers: interactiveNameLayers
+    }
+  );
   expect(names.length).toBeGreaterThan(0);
-  const target = names[0];
-  await page.mouse.move(target.x, target.y);
-  await page.waitForTimeout(150);
-  const pointerCursor = await page.evaluate((testHookKey) => window.getComputedStyle(window[testHookKey].getCanvas()).cursor, mapTestHookKey);
-  expect(pointerCursor).toContain("pointer");
+  const scannedPlaceIds = names.slice(0, 4).map((entry) => entry.placeId);
+  expect(scannedPlaceIds.length).toBeGreaterThan(0);
 
   const styleProbe = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
@@ -681,10 +851,81 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
   expect(styleProbe.viaOpacity).not.toContain("isDimmed");
   expect(styleProbe.mentionedOpacity).not.toContain("isDimmed");
 
-  await page.mouse.click(target.x, target.y);
-  await page.waitForFunction((id) => new URLSearchParams(window.location.search).get("place") === id, target.placeId, { timeout: 10_000 });
-  const stageAfterClick = await page.evaluate(() => new URLSearchParams(window.location.search).get("stage"));
-  expect(stageAfterClick).toBe("4");
+  for (const placeId of scannedPlaceIds) {
+    const candidatePoint = await page.evaluate(
+      ({ testHookKey, targetPlaceId, layers }) => {
+        const map = window[testHookKey];
+        if (!map) {
+          return null;
+        }
+        const match = map
+          .queryRenderedFeatures(undefined, { layers })
+          .find((feature) => String(feature.properties?.placeId ?? "") === targetPlaceId && feature.geometry?.type === "Point");
+        if (!match) {
+          return null;
+        }
+        const projected = map.project(match.geometry.coordinates);
+        const offsets = [
+          [0, 0],
+          [0, -12],
+          [0, 12],
+          [-12, 0],
+          [12, 0],
+          [-18, -10],
+          [18, -10],
+          [-18, 10],
+          [18, 10]
+        ];
+        for (const [offsetX, offsetY] of offsets) {
+          const x = projected.x + offsetX;
+          const y = projected.y + offsetY;
+          const hit = map
+            .queryRenderedFeatures(
+              [
+                [x - 2, y - 2],
+                [x + 2, y + 2]
+              ],
+              { layers }
+            )
+            .some((feature) => String(feature.properties?.placeId ?? "") === targetPlaceId);
+          if (hit) {
+            return { x, y };
+          }
+        }
+        return null;
+      },
+      {
+        testHookKey: mapTestHookKey,
+        targetPlaceId: placeId,
+        layers: interactiveNameLayers
+      }
+    );
+    expect(candidatePoint).toBeTruthy();
+    await page.mouse.move(candidatePoint.x, candidatePoint.y);
+    await page.waitForTimeout(150);
+    const pointerCursor = await page.evaluate((testHookKey) => window.getComputedStyle(window[testHookKey].getCanvas()).cursor, mapTestHookKey);
+    expect(pointerCursor, `expected pointer cursor for route place ${placeId}`).toContain("pointer");
+    let clickedPlaceId = null;
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -8],
+      [0, 8],
+      [-8, 0],
+      [8, 0]
+    ]) {
+      await page.mouse.click(candidatePoint.x + offsetX, candidatePoint.y + offsetY);
+      await page.waitForTimeout(200);
+      clickedPlaceId = await page.evaluate(() => new URLSearchParams(window.location.search).get("place"));
+      if (clickedPlaceId === placeId) {
+        break;
+      }
+    }
+    // Selecting a route place can open the side-by-side panel and pan the map; settle before the next candidate.
+    await waitForMapIdle(page);
+    expect(clickedPlaceId, `expected click to select route place ${placeId}`).toBe(placeId);
+    const stageAfterClick = await page.evaluate(() => new URLSearchParams(window.location.search).get("stage"));
+    expect(stageAfterClick).toBe("4");
+  }
 });
 
 test("routes view keeps ARIA tabs, stage pills, and ODbL attribution (replaces routesFixtureChecks) @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {

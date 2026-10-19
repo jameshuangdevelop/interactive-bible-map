@@ -49,6 +49,7 @@ import { roundScaleDistanceMeters } from "./map-scale";
 import {
   MAX_VISIBLE_PLACE_LIST_ENTRIES,
   buildPlaceRenderData,
+  routePriorityPlaceIdsKeyFromOverlay,
   type PlaceRenderData
 } from "./map-render-data";
 import {
@@ -814,6 +815,8 @@ function createEmptyFeatureCollection() {
     features: []
   };
 }
+
+const emptyRoutePriorityPlaceIds = new Set<string>();
 
 function ensureGeoJsonSource(
   map: MapLibreMap,
@@ -2659,19 +2662,16 @@ export function MapView({
     routesModeEnabledRef.current = routesModeEnabled;
   }, [routesModeEnabled]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
-  const routePriorityPlaceIds = useMemo(() => {
-    const ids = new Set<string>();
-    if (!routesOverlay) {
-      return ids;
-    }
-    for (const feature of routesOverlay.points.features) {
-      if (feature.properties.stopKind !== "location") {
-        continue;
-      }
-      ids.add(feature.properties.stopId);
-    }
-    return ids;
+  const routePriorityPlaceIdsKey = useMemo(() => {
+    return routePriorityPlaceIdsKeyFromOverlay(routesOverlay);
   }, [routesOverlay]);
+
+  const routePriorityPlaceIds = useMemo(() => {
+    if (!routePriorityPlaceIdsKey) {
+      return emptyRoutePriorityPlaceIds;
+    }
+    return new Set(routePriorityPlaceIdsKey.split("\u0001"));
+  }, [routePriorityPlaceIdsKey]);
   const renderData = useMemo(() => {
     return buildPlaceRenderData(places, selection, highlightedPlaceId, {
       includeAreaLabels: mapMode === "ancient",

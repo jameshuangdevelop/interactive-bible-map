@@ -1,9 +1,11 @@
 import {
   areaLabelSpecForType,
   buildPlaceRenderData,
-  candidateIconId
+  candidateIconId,
+  routePriorityPlaceIdsKeyFromOverlay
 } from "../src/features/map/map-render-data";
 import type { PlaceIndexRecord } from "../src/features/map/types";
+import type { RouteMapOverlayData } from "../src/features/routes/map-overlay";
 
 const fixtures: PlaceIndexRecord[] = [
   {
@@ -350,5 +352,148 @@ describe("map render data", () => {
     expect(areaLabel).toBeDefined();
     expect(cityPin).toBeDefined();
     expect(areaLabel?.geometry.coordinates).toEqual(cityPin?.geometry.coordinates);
+  });
+
+  test("route priority key excludes stage-pill points and is stable across stage emphasis changes", () => {
+    const overlayWithStageTwoSelected: RouteMapOverlayData = {
+      lines: { type: "FeatureCollection", features: [] },
+      points: {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [35.0, 32.0] },
+            properties: {
+              id: "paul-1:stop:ephesus:0",
+              routeId: "paul-1",
+              stageId: "stage-2",
+              stageIndex: 1,
+              kind: "stop",
+              stopKind: "location",
+              stopId: "ephesus",
+              label: "Ephesus",
+              isInSelectedRoute: true,
+              isSelectedStage: true,
+              isHighlightedStage: false,
+              isDimmed: false,
+              isSelectedPlace: false
+            }
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [35.1, 32.1] },
+            properties: {
+              id: "paul-1:stop:ephesus:1",
+              routeId: "paul-1",
+              stageId: "stage-3",
+              stageIndex: 2,
+              kind: "stop",
+              stopKind: "location",
+              stopId: "ephesus",
+              label: "Ephesus",
+              isInSelectedRoute: true,
+              isSelectedStage: false,
+              isHighlightedStage: false,
+              isDimmed: true,
+              isSelectedPlace: false
+            }
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [34.8, 31.8] },
+            properties: {
+              id: "paul-1:stage-2:pill",
+              routeId: "paul-1",
+              stageId: "stage-2",
+              stageIndex: 1,
+              kind: "stage-pill",
+              stopKind: "location",
+              stopId: "stage-2",
+              label: "2",
+              isInSelectedRoute: true,
+              isSelectedStage: true,
+              isHighlightedStage: false,
+              isDimmed: false,
+              isSelectedPlace: false
+            }
+          },
+          {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [36.2, 37.1] },
+            properties: {
+              id: "paul-1:stop:antioch-syria:0",
+              routeId: "paul-1",
+              stageId: "stage-2",
+              stageIndex: 1,
+              kind: "stop",
+              stopKind: "location",
+              stopId: "antioch-syria",
+              label: "Antioch",
+              isInSelectedRoute: true,
+              isSelectedStage: true,
+              isHighlightedStage: false,
+              isDimmed: false,
+              isSelectedPlace: false
+            }
+          }
+        ]
+      },
+      bounds: null,
+      routeFocusKey: "paul-1",
+      selectedStageFocusKey: "paul-1:stage-2",
+      selectedStageCenter: [35.0, 32.0]
+    };
+
+    const overlayWithStageThreeSelected: RouteMapOverlayData = {
+      ...overlayWithStageTwoSelected,
+      points: {
+        type: "FeatureCollection",
+        features: overlayWithStageTwoSelected.points.features.map((feature) => {
+          if (feature.properties.kind === "stage-pill") {
+            return {
+              ...feature,
+              properties: {
+                ...feature.properties,
+                stageId: "stage-3",
+                stageIndex: 2,
+                stopId: "stage-3",
+                label: "3",
+                isSelectedStage: true,
+                isDimmed: false
+              }
+            };
+          }
+          if (feature.properties.stageId === "stage-2") {
+            return {
+              ...feature,
+              properties: {
+                ...feature.properties,
+                isSelectedStage: false,
+                isDimmed: true
+              }
+            };
+          }
+          if (feature.properties.stageId === "stage-3") {
+            return {
+              ...feature,
+              properties: {
+                ...feature.properties,
+                isSelectedStage: true,
+                isDimmed: false
+              }
+            };
+          }
+          return feature;
+        })
+      },
+      selectedStageFocusKey: "paul-1:stage-3"
+    };
+
+    expect(routePriorityPlaceIdsKeyFromOverlay(overlayWithStageTwoSelected)).toBe(
+      "antioch-syria\u0001ephesus"
+    );
+    expect(routePriorityPlaceIdsKeyFromOverlay(overlayWithStageThreeSelected)).toBe(
+      "antioch-syria\u0001ephesus"
+    );
   });
 });

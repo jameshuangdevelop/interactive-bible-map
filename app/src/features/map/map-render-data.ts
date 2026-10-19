@@ -15,6 +15,7 @@ import type {
   PlaceSelection,
   PlaceType
 } from "./types";
+import type { RouteMapOverlayData } from "../routes/map-overlay";
 
 export const MAX_VISIBLE_PLACE_LIST_ENTRIES = 200;
 
@@ -427,6 +428,25 @@ export function candidateIconId(pinColor: string, candidateLetter: string, selec
     selected ? "selected" : "default",
     candidateLetter.toLowerCase()
   ].join("-");
+}
+
+export function routePriorityPlaceIdsKeyFromOverlay(routesOverlay: RouteMapOverlayData | null): string {
+  if (!routesOverlay) {
+    return "";
+  }
+
+  const deduplicatedStopIds = new Set<string>();
+  for (const feature of routesOverlay.points.features) {
+    if (feature.properties.kind === "stage-pill") {
+      continue;
+    }
+    if (feature.properties.stopKind !== "location") {
+      continue;
+    }
+    deduplicatedStopIds.add(feature.properties.stopId);
+  }
+
+  return [...deduplicatedStopIds].sort().join("\u0001");
 }
 
 export function buildPlaceRenderData(
