@@ -67,4 +67,18 @@ describe("ancient area label visibility", () => {
       }
     }
   });
+
+  test("keeps the selected area label visible even when linked from timeline entities", () => {
+    const timeline = readRepositoryJson("data/timeline.json") as AncientTimelinePayload;
+    const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
+
+    expect(linkedLocationIds.has("galatia")).toBe(true);
+    expect(
+      shouldShowAreaLabelOnAncientMap({
+        placeId: "galatia",
+        linkedLocationIds,
+        selectedPlaceId: "galatia"
+      })
+    ).toBe(true);
+  });
 });

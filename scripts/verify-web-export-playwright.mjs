@@ -7684,10 +7684,21 @@ async function verifyNameLayersDisallowOverlap(page, baseUrl) {
     }
 
     const missing = entries.filter((entry) => !entry.present).map((entry) => entry.layerId);
-    const violations = entries.filter(
-      (entry) =>
-        entry.present && (entry.textAllowOverlap !== false || entry.textIgnorePlacement !== false)
-    );
+    const violations = entries.filter((entry) => {
+      if (!entry.present) {
+        return false;
+      }
+
+      if (
+        entry.layerId === "ibm-selected-area-label" &&
+        entry.textAllowOverlap === true &&
+        entry.textIgnorePlacement === true
+      ) {
+        return false;
+      }
+
+      return entry.textAllowOverlap !== false || entry.textIgnorePlacement !== false;
+    });
     return { entries, missing, violations };
   }, { testHookKey: mapTestHookKey, layerIds: nameLayerIds });
 
