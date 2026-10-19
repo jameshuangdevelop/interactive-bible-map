@@ -67,9 +67,13 @@ const STATIC_NON_CLICKABLE_HOLDER_LABELS = Object.freeze([
     labelText: "Armenia Minor",
     minZoom: 5,
     kind: "client-kingdom",
+    tooltipText: "Armenia Minor",
     labelPoint: [38.3301, 39.5639]
   }
 ]);
+const HOLDER_LABEL_MIN_ZOOM_BY_AREA_ID = Object.freeze({
+  "mauretania-caesariensis": 5
+});
 
 function toMapById(records) {
   const map = new Map();
@@ -1107,7 +1111,7 @@ function buildHolderLabelPoints({
         areaId: piece.areaId,
         name: holder.name,
         labelText: wrappedLabel.wrappedText,
-        minZoom,
+        minZoom: Math.max(minZoom, HOLDER_LABEL_MIN_ZOOM_BY_AREA_ID[piece.areaId] ?? 0),
         kind: holder.kind,
         ...(typeof holder.locationId === "string" && holder.locationId.length > 0
           ? { locationId: holder.locationId }
@@ -1134,6 +1138,7 @@ function buildStaticHolderLabels(assignments) {
     .filter((label) => areaIds.has(label.areaId))
     .map((label) => ({
       ...label,
+      minZoom: Math.max(label.minZoom, HOLDER_LABEL_MIN_ZOOM_BY_AREA_ID[label.areaId] ?? 0),
       labelPoint: [roundNumber(label.labelPoint[0]), roundNumber(label.labelPoint[1])]
     }));
 }

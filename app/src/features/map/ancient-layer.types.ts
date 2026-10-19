@@ -112,6 +112,7 @@ export interface AncientHolderLabelPoint {
   minZoom: number;
   kind: AncientEntityRecord["kind"];
   locationId?: string;
+  tooltipText?: string;
   labelPoint: [number, number];
 }
 

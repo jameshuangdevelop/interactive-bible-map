@@ -1207,7 +1207,10 @@ function buildAncientHolderLabelFeatures(
             labelText,
             minZoom: label.minZoom,
             clickable: typeof label.locationId === "string" && label.locationId.length > 0,
-            tooltipText: `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
+            tooltipText:
+              typeof label.tooltipText === "string" && label.tooltipText.length > 0
+                ? label.tooltipText
+                : `${label.name} · ${holderKindLabel(label.kind, label.holderId)}${rulerText}${yearRangePart}`
           },
           geometry: {
             type: "Point" as const,
