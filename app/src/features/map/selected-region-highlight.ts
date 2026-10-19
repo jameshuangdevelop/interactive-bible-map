@@ -57,6 +57,10 @@ function toPolygonCoordinates(rings: RingCoordinates[]): PolygonCoordinates {
   return rings as unknown as PolygonCoordinates;
 }
 
+function reverseRingWinding(ring: RingCoordinates): RingCoordinates {
+  return [...ring].reverse();
+}
+
 export function findSelectedRegionGeometry({
   shapes,
   stopPayload,
@@ -101,6 +105,7 @@ export function buildSelectedRegionVeilFeatureCollection(
     return toEmptyPolygonFeatureCollection();
   }
   const interiorRings = collectInteriorRings(regionGeometry);
+  const reversedOuterRings = outerRings.map((ring) => reverseRingWinding(ring));
 
   return {
     type: "FeatureCollection",
@@ -112,7 +117,7 @@ export function buildSelectedRegionVeilFeatureCollection(
         },
         geometry: {
           type: "Polygon",
-          coordinates: toPolygonCoordinates([WORLD_RING, ...outerRings])
+          coordinates: toPolygonCoordinates([WORLD_RING, ...reversedOuterRings])
         }
       },
       ...interiorRings.map((ring, index) => ({
