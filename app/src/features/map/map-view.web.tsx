@@ -2780,6 +2780,7 @@ export function MapView({
   const [selectionToken, setSelectionToken] = useState(0);
   const selectionTokenRef = useRef(0);
   const pendingRomanHolderLabelSelectionTokenRef = useRef<number | null>(null);
+  const lastRomanHolderLabelClickPointRef = useRef<HitScreenPoint | null>(null);
   const previousRomanHolderSelectionKeyRef = useRef<string | null>(null);
   const [romanHolderLabelSelectionToken, setRomanHolderLabelSelectionToken] = useState<number | null>(null);
   const [ancientHolderUnions, setAncientHolderUnions] = useState<AncientHolderUnionsPayload>({
@@ -2824,10 +2825,12 @@ export function MapView({
       setRomanHolderLabelSelectionToken(null);
     }
     pendingRomanHolderLabelSelectionTokenRef.current = null;
+    if (selectedPlaceId !== "roman-empire") {
+      lastRomanHolderLabelClickPointRef.current = null;
+    }
   }, [selectedPlaceId, selectedPlaceSelectionKey]);
   const allowRomanHolderLabelSelection =
     selectedPlaceId === "roman-empire" &&
-    selectionOrigin === "map-name" &&
     romanHolderLabelSelectionToken !== null &&
     romanHolderLabelSelectionToken === selectionToken;
   const selectedHolderLabelEntryId = useMemo(
@@ -3319,6 +3322,85 @@ export function MapView({
     []
   );
 
+  const resolveSelectedRomanHolderEntryAtPoint = useCallback(
+    (point: PointLike, hitPaddingPx: number = interactiveHitPaddingPx) => {
+      const map = mapRef.current;
+      if (!map) {
+        return null;
+      }
+
+      const pointer = asScreenPoint(point);
+      if (!pointer) {
+        return null;
+      }
+
+      const features = map.queryRenderedFeatures(undefined, {
+        layers: [layerAncientHolderLabelSelectedId]
+      });
+      const entries = deduplicateVisibleEntries(features.flatMap((feature) => {
+        const properties = asObject(feature.properties);
+        const holderLocationId = properties ? asString(properties.holderLocationId) : null;
+        if (holderLocationId !== "roman-empire") {
+          return [];
+        }
+        const coordinates = asCoordinates(feature);
+        if (!coordinates) {
+          return [];
+        }
+        const labelText = properties ? asString(properties.labelText) : null;
+        const tooltipText = properties ? asString(properties.tooltipText) : null;
+        const holderId = properties ? asString(properties.holderId) : null;
+        return [{
+          id: `holder:${holderId ?? holderLocationId}:${labelText ?? holderLocationId}`,
+          kind: "place",
+          coordinates,
+          accessibleName: `${labelText ?? "OTHER ROMAN PROVINCES"}, area`,
+          tooltipText: tooltipText ?? "Other Roman provinces, area",
+          selection: {
+            placeId: holderLocationId,
+            candidateIndex: null
+          },
+          interactionRank: 1,
+          featureSource: feature.source ?? null,
+          featureId: feature.id ?? null
+        } satisfies VisibleListEntry];
+      }));
+      if (entries.length === 0) {
+        return null;
+      }
+
+      const candidates = entries.map((entry) => {
+        const projected = map.project(entry.coordinates as LngLatLike);
+        return {
+          value: entry,
+          point: {
+            x: projected.x,
+            y: projected.y
+          },
+          interactionRank: entry.interactionRank
+        };
+      });
+
+      const nearestSelectedRomanEntry = pickNearestCandidateWithPreferredRank(
+        pointer,
+        candidates,
+        {
+          preferredRank: 1,
+          competingRank: 0,
+          maxPreferredDistanceDeltaPx: majorInteractionPreferencePx,
+          tieBreaker: (left, right) => left.id.localeCompare(right.id)
+        }
+      );
+      if (!nearestSelectedRomanEntry) {
+        return null;
+      }
+      const projected = map.project(nearestSelectedRomanEntry.coordinates as LngLatLike);
+      const distancePx = Math.hypot(projected.x - pointer.x, projected.y - pointer.y);
+      return distancePx <= Math.max(hitPaddingPx, 120) ? nearestSelectedRomanEntry : null;
+    },
+    []
+  );
+
   const updateScaleBar = useCallback(() => {
     const map = mapRef.current;
     const mapContainer = mapContainerRef.current;
@@ -3448,13 +3530,14 @@ export function MapView({
         return;
       }
 
-      const baseFilter: FilterSpecification = selectedHolderLabelEntryId
+      const clickableFilter: FilterSpecification = selectedHolderLabelEntryId
         ? toLayerFilter([
             "all",
             holderLabelBaseFilter,
             ["!=", ["get", "holderLocationId"], selectedHolderLabelPlaceId]
           ])
         : toLayerFilter(holderLabelBaseFilter);
+      const clickTargetFilter: FilterSpecification = toLayerFilter(holderLabelBaseFilter);
       const selectedFilter: FilterSpecification = selectedHolderLabelEntryId
         ? toLayerFilter([
             "all",
@@ -3463,8 +3546,8 @@ export function MapView({
           ])
         : toLayerFilter(["==", ["get", "entryId"], "__none__"]);
 
-      map.setFilter(layerAncientHolderLabelClickableId, baseFilter);
-      map.setFilter(layerAncientHolderLabelClickTargetId, baseFilter);
+      map.setFilter(layerAncientHolderLabelClickableId, clickableFilter);
+      map.setFilter(layerAncientHolderLabelClickTargetId, clickTargetFilter);
       map.setFilter(layerAncientHolderLabelSelectedId, selectedFilter);
       selectedHolderLabelFilterSyncKeyRef.current = holderFilterSyncKey;
     },
@@ -3743,6 +3826,26 @@ export function MapView({
       entry: VisibleListEntry,
       origin: "map-name" | "map-candidate" | "keyboard-visible-place"
     ) => {
+      if (origin === "keyboard-visible-place") {
+        const keyboardActivatedRomanHolder =
+          entry.kind === "place" && entry.selection.placeId === "roman-empire";
+        if (keyboardActivatedRomanHolder) {
+          const alreadySelectedRoman =
+            selectionRef.current?.placeId === "roman-empire" &&
+            (selectionRef.current?.candidateIndex ?? null) === (entry.selection.candidateIndex ?? null);
+          if (alreadySelectedRoman) {
+            pendingRomanHolderLabelSelectionTokenRef.current = null;
+            setRomanHolderLabelSelectionToken(selectionTokenRef.current);
+          } else {
+            pendingRomanHolderLabelSelectionTokenRef.current = selectionTokenRef.current + 1;
+            setRomanHolderLabelSelectionToken(null);
+          }
+        } else {
+          pendingRomanHolderLabelSelectionTokenRef.current = null;
+          setRomanHolderLabelSelectionToken(null);
+        }
+      }
+
       if (entry.kind === "cluster") {
         void zoomToCluster(entry);
         return;
@@ -4216,6 +4319,7 @@ export function MapView({
         const clickedRomanHolderLabel =
           placeEntry.kind === "place" && placeEntry.selection.placeId === "roman-empire";
         if (clickedRomanHolderLabel) {
+          lastRomanHolderLabelClickPointRef.current = asScreenPoint(event.point);
           const alreadySelectedRoman =
             selectionRef.current?.placeId === "roman-empire" &&
             (selectionRef.current?.candidateIndex ?? null) === (placeEntry.selection.candidateIndex ?? null);
@@ -4227,10 +4331,33 @@ export function MapView({
             setRomanHolderLabelSelectionToken(null);
           }
         } else {
+          lastRomanHolderLabelClickPointRef.current = null;
           pendingRomanHolderLabelSelectionTokenRef.current = null;
           setRomanHolderLabelSelectionToken(null);
         }
         activateVisibleEntryRef.current(placeEntry, "map-name");
+        return;
+      }
+      const selectedRomanHolderEntry = resolveSelectedRomanHolderEntryAtPoint(event.point, hitPaddingPx);
+      if (selectedRomanHolderEntry) {
+        pendingRomanHolderLabelSelectionTokenRef.current = null;
+        setRomanHolderLabelSelectionToken(selectionTokenRef.current);
+        activateVisibleEntryRef.current(selectedRomanHolderEntry, "map-name");
+        return;
+      }
+      const pointer = asScreenPoint(event.point);
+      const lastRomanHolderLabelClickPoint = lastRomanHolderLabelClickPointRef.current;
+      if (
+        pointer &&
+        lastRomanHolderLabelClickPoint &&
+        selectionRef.current?.placeId === "roman-empire" &&
+        Math.hypot(
+          pointer.x - lastRomanHolderLabelClickPoint.x,
+          pointer.y - lastRomanHolderLabelClickPoint.y
+        ) <= Math.max(4, hitPaddingPx / 2)
+      ) {
+        pendingRomanHolderLabelSelectionTokenRef.current = null;
+        setRomanHolderLabelSelectionToken(selectionTokenRef.current);
         return;
       }
       pendingRomanHolderLabelSelectionTokenRef.current = null;
@@ -4426,6 +4553,7 @@ export function MapView({
     hasAncientTimeline,
     hideTooltip,
     resolveInteractiveEntryAtPoint,
+    resolveSelectedRomanHolderEntryAtPoint,
     scheduleScaleBarUpdate,
     scheduleMainSourceLoadTimeout,
     setInteractiveCursor,

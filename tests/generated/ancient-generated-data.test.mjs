@@ -300,23 +300,42 @@ function collectUnionProbeViolations({
 
 function withSeededNotch(geometry, targetPoint) {
   const clone = JSON.parse(JSON.stringify(geometry));
-  if (clone.type !== "Polygon" || clone.coordinates.length === 0) {
+  if (
+    (clone.type !== "Polygon" && clone.type !== "MultiPolygon") ||
+    !Array.isArray(clone.coordinates) ||
+    clone.coordinates.length === 0
+  ) {
     return clone;
   }
-  const outerRing = clone.coordinates[0];
-  if (!Array.isArray(outerRing) || outerRing.length < 4) {
-    return clone;
-  }
-  let bestIndex = 0;
+
+  const polygonCoordinates =
+    clone.type === "Polygon"
+      ? [clone.coordinates]
+      : clone.coordinates;
+  let bestPolygonIndex = -1;
+  let bestSegmentIndex = -1;
   let bestDistance = Number.POSITIVE_INFINITY;
-  for (let index = 0; index < outerRing.length - 1; index += 1) {
-    const distanceKm = distancePointToSegmentKm(targetPoint, outerRing[index], outerRing[index + 1]);
-    if (distanceKm < bestDistance) {
-      bestDistance = distanceKm;
-      bestIndex = index;
+  for (let polygonIndex = 0; polygonIndex < polygonCoordinates.length; polygonIndex += 1) {
+    const outerRing = polygonCoordinates[polygonIndex]?.[0];
+    if (!Array.isArray(outerRing) || outerRing.length < 4) {
+      continue;
+    }
+    for (let segmentIndex = 0; segmentIndex < outerRing.length - 1; segmentIndex += 1) {
+      const distanceKm = distancePointToSegmentKm(targetPoint, outerRing[segmentIndex], outerRing[segmentIndex + 1]);
+      if (distanceKm < bestDistance) {
+        bestDistance = distanceKm;
+        bestPolygonIndex = polygonIndex;
+        bestSegmentIndex = segmentIndex;
+      }
     }
   }
-  outerRing.splice(bestIndex + 1, 0, targetPoint);
+
+  if (bestPolygonIndex < 0 || bestSegmentIndex < 0) {
+    return clone;
+  }
+
+  const outerRing = polygonCoordinates[bestPolygonIndex][0];
+  outerRing.splice(bestSegmentIndex + 1, 0, targetPoint);
   if (
     outerRing.length > 0 &&
     (outerRing[0][0] !== outerRing[outerRing.length - 1][0] ||
@@ -781,6 +800,16 @@ test("merged holder unions stay clear of the inner shared-border probe zone (not
       }
       mergedTargets.push({ targetId: holderId, unionId, memberAreaIds });
     }
+    const romanMemberAreaIds = stopPayload.areas
+      .filter((area) => area.hasShape && area.holderRomanSide === true)
+      .map((area) => area.areaId);
+    if (romanMemberAreaIds.length >= 2 && typeof stopPayload.romanSideUnion === "string") {
+      mergedTargets.push({
+        targetId: "roman-side",
+        unionId: stopPayload.romanSideUnion,
+        memberAreaIds: romanMemberAreaIds
+      });
+    }
     for (const target of mergedTargets) {
       const unionGeometry = fixture.holderUnionsPayload.geometries?.[target.unionId];
       assert.ok(unionGeometry, `missing union geometry '${target.unionId}' in stop '${stop.id}'`);
@@ -865,5 +894,37 @@ test("merged holder unions stay clear of the inner shared-border probe zone (not
   assert.ok(
     seededNotchViolations.some((violation) => violation.reason === "near-union-outline"),
     "expected seeded judea-province notch to violate the 0.1 km inner-border clearance guard"
+  );
+
+  const romanAt50 = fixture.stopPayloadForYear(50);
+  const romanSideUnionId = romanAt50.romanSideUnion;
+  const romanSideUnion = romanSideUnionId
+    ? fixture.holderUnionsPayload.geometries?.[romanSideUnionId]
+    : null;
+  assert.ok(romanSideUnion, "expected roman-side union at year 50");
+  const romanMemberAreaIds = romanAt50.areas
+    .filter((area) => area.hasShape && area.holderRomanSide === true)
+    .map((area) => area.areaId);
+  const romanMemberAreaIdSet = new Set(romanMemberAreaIds);
+  const romanNonMemberBoundarySegmentsByAreaId = new Map(
+    romanAt50.areas
+      .filter((area) => area.hasShape && !romanMemberAreaIdSet.has(area.areaId))
+      .map((area) => [area.areaId, boundarySegmentsForGeometry(areaGeometryById.get(area.areaId))])
+  );
+  const romanProbePoints = collectInnerSharedBorderProbePoints({
+    memberAreaIds: romanMemberAreaIds,
+    areaGeometryById,
+    coastlineBoundarySegments,
+    nonMemberBoundarySegmentsByAreaId: romanNonMemberBoundarySegmentsByAreaId
+  });
+  assert.ok(romanProbePoints.length > 0, "expected roman-side probe point for seeded-notch regression");
+  const seededRomanNotchUnion = withSeededNotch(romanSideUnion, romanProbePoints[0].point);
+  const seededRomanNotchViolations = collectUnionProbeViolations({
+    unionGeometry: seededRomanNotchUnion,
+    probePoints: [romanProbePoints[0]]
+  });
+  assert.ok(
+    seededRomanNotchViolations.some((violation) => violation.reason === "near-union-outline"),
+    "expected seeded roman-side notch to violate the 0.1 km inner-border clearance guard"
   );
 });

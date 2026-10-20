@@ -1814,6 +1814,52 @@ test("clicking OTHER ROMAN PROVINCES still selects the roman holder label @names
   await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
 });
 
+test("re-clicking OTHER ROMAN PROVINCES keeps roman selection and blue label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  await clickMapPoint(page, romanHolderTarget);
+  await waitForMapIdle(page);
+  await expect
+    .poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 })
+    .toBe("roman-empire");
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+});
+
+test("keyboard activation of OTHER ROMAN PROVINCES selects the roman blue holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await jumpMap(page, [-5.6, 37.7], 5.6);
+
+  const romanHolderKeyboardButton = page
+    .getByRole("button", { name: /OTHER ROMAN[\s\S]*PROVINCES, area/i, includeHidden: true })
+    .first();
+  await expect.poll(async () => await romanHolderKeyboardButton.count(), { timeout: 10_000 }).toBe(1);
+  await romanHolderKeyboardButton.focus();
+  await romanHolderKeyboardButton.press("Enter");
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+});
+
 test("roman holder label click state does not persist across search selections @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   test.setTimeout(90_000);
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
