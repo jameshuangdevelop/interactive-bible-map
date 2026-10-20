@@ -75,6 +75,7 @@ const mapLayerIds = {
   cityPins: "ibm-city-pin",
   cityPinsNoDot: "ibm-city-pin-no-dot",
   sitePins: "ibm-site-pin",
+  sitePinsNoDot: "ibm-site-pin-no-dot",
   candidatePins: "ibm-candidate-pin",
   pinLabels: [
     "ibm-major-pin",
@@ -84,7 +85,9 @@ const mapLayerIds = {
     "ibm-city-pin-no-dot",
     "ibm-routes-city-pin",
     "ibm-site-pin",
+    "ibm-site-pin-no-dot",
     "ibm-routes-site-pin",
+    "ibm-routes-site-pin-no-dot",
     "ibm-pin-label-standard",
     "ibm-selected-major-pin-label",
     "ibm-selected-site-pin-label",
@@ -2924,7 +2927,9 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
         ...allClusterLabelLayerIds,
         mapLayerIds.candidatePins,
         mapLayerIds.sitePins,
+        mapLayerIds.sitePinsNoDot,
         "ibm-routes-site-pin",
+        "ibm-routes-site-pin-no-dot",
         ...allCityPinLayerIds,
         "ibm-routes-major-pin",
         "ibm-routes-city-pin",
@@ -5260,6 +5265,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
         ...allClusterPinLayerIds,
         ...allCityPinLayerIds,
         mapLayerIds.sitePins,
+        mapLayerIds.sitePinsNoDot,
         mapLayerIds.candidatePins
       ]
     }
@@ -7346,7 +7352,9 @@ const nameLayerIds = [
   "ibm-city-pin-no-dot",
   "ibm-routes-city-pin",
   "ibm-site-pin",
+  "ibm-site-pin-no-dot",
   "ibm-routes-site-pin",
+  "ibm-routes-site-pin-no-dot",
   "ibm-pin-label-standard",
   "ibm-selected-major-pin-label",
   "ibm-selected-site-pin-label",
@@ -7501,7 +7509,14 @@ async function verifyTouchTapTargetOnNames(browser, baseUrl) {
 
     const offsetProbe = await page.evaluate((testHookKey) => {
       const map = window[testHookKey];
-      const labelLayers = ["ibm-city-pin", "ibm-site-pin", "ibm-major-pin"];
+      const labelLayers = [
+        "ibm-city-pin",
+        "ibm-city-pin-no-dot",
+        "ibm-site-pin",
+        "ibm-site-pin-no-dot",
+        "ibm-major-pin",
+        "ibm-major-pin-no-dot"
+      ];
       const hitsPlaceAt = (x, y, placeId) =>
         map
           .queryRenderedFeatures(
@@ -10972,7 +10987,16 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       return {
         lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
         stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
+        placePinCount: map.queryRenderedFeatures(undefined, {
+          layers: [
+            "ibm-city-pin",
+            "ibm-city-pin-no-dot",
+            "ibm-major-pin",
+            "ibm-major-pin-no-dot",
+            "ibm-site-pin",
+            "ibm-site-pin-no-dot"
+          ]
+        }).length
       };
     }, mapTestHookKey);
     if (!routeListNoLineState || routeListNoLineState.lineCount > 0 || routeListNoLineState.stopCount > 0) {
@@ -11336,7 +11360,14 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         basePlaceVisibilityByZoom.push({
           zoom,
           pinCount: map.queryRenderedFeatures(undefined, {
-            layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"]
+            layers: [
+              "ibm-city-pin",
+              "ibm-city-pin-no-dot",
+              "ibm-major-pin",
+              "ibm-major-pin-no-dot",
+              "ibm-site-pin",
+              "ibm-site-pin-no-dot"
+            ]
           }).length
         });
       }
@@ -11718,11 +11749,15 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
           .queryRenderedFeatures(undefined, {
             layers: [
               "ibm-major-pin",
+              "ibm-major-pin-no-dot",
               "ibm-routes-major-pin",
               "ibm-city-pin",
+              "ibm-city-pin-no-dot",
               "ibm-routes-city-pin",
               "ibm-site-pin",
+              "ibm-site-pin-no-dot",
               "ibm-routes-site-pin",
+              "ibm-routes-site-pin-no-dot",
               "ibm-selected-major-pin-label",
               "ibm-selected-site-pin-label",
               "ibm-selected-pin-label"

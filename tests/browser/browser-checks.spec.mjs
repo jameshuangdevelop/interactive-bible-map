@@ -110,15 +110,18 @@ async function renderedPlaceNames(page) {
     if (!map) {
       throw new Error("Map test hook is unavailable.");
     }
+    // Intentionally scoped to rendered town/city/site/selected place-name layers.
     const placeNameLayers = [
       "ibm-major-pin",
       "ibm-major-pin-no-dot",
       "ibm-city-pin",
       "ibm-city-pin-no-dot",
       "ibm-site-pin",
+      "ibm-site-pin-no-dot",
       "ibm-routes-major-pin",
       "ibm-routes-city-pin",
       "ibm-routes-site-pin",
+      "ibm-routes-site-pin-no-dot",
       "ibm-pin-label-standard",
       "ibm-selected-major-pin-label",
       "ibm-selected-site-pin-label",
@@ -958,13 +961,32 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
 
   expect(targets).toHaveLength(3);
   const devicePixelRatio = await page.evaluate(() => window.devicePixelRatio || 1);
-  const minimumDotPixelCount = Math.max(6, Math.round(6 * devicePixelRatio * devicePixelRatio));
+  const minimumMajorDotPixelCount = Math.max(6, Math.round(6 * devicePixelRatio * devicePixelRatio));
+  const minimumStandardDotPixelCount = Math.max(4, Math.round(4 * devicePixelRatio * devicePixelRatio));
   for (const target of targets) {
     const dotPixels = await countNearPureBlackTownDotPixels(page, target.x, target.y);
     expect(dotPixels, `expected a black town dot under ${target.placeId}`).toBeGreaterThanOrEqual(
-      minimumDotPixelCount
+      minimumMajorDotPixelCount
     );
   }
+
+  await jumpMap(page, [35.281944, 32.213611], 12.2);
+  const sycharTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const feature = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-site-pin"] })
+      .find((candidate) => candidate.properties?.placeId === "sychar" && candidate.geometry?.type === "Point");
+    if (!feature || feature.geometry?.type !== "Point") {
+      return null;
+    }
+    const point = map.project(feature.geometry.coordinates);
+    return { x: point.x, y: point.y };
+  }, mapTestHookKey);
+  expect(sycharTarget).toBeTruthy();
+  const sycharDotPixels = await countNearPureBlackTownDotPixels(page, sycharTarget.x, sycharTarget.y);
+  expect(sycharDotPixels, "expected a black town dot under sychar").toBeGreaterThanOrEqual(
+    minimumStandardDotPixelCount
+  );
 });
 
 test("selecting a town replaces its black dot with the selected pin @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -1069,7 +1091,7 @@ test("hover turns one town, one area label and one holder label blue with unique
       name: "town",
       center: [27.34, 37.94],
       zoom: 8.2,
-      layerIds: ["ibm-city-pin", "ibm-site-pin", "ibm-major-pin"]
+      layerIds: ["ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-major-pin", "ibm-major-pin-no-dot"]
     },
     {
       name: "area",
@@ -1563,7 +1585,9 @@ test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", 
             "ibm-city-pin-no-dot",
             "ibm-routes-city-pin",
             "ibm-site-pin",
+            "ibm-site-pin-no-dot",
             "ibm-routes-site-pin",
+            "ibm-routes-site-pin-no-dot",
             "ibm-pin-label-standard",
             "ibm-selected-major-pin-label",
             "ibm-selected-site-pin-label",
@@ -1615,7 +1639,7 @@ test("with a region selected, clicking an outside town clears region highlight a
     const map = window[testHookKey];
     const hit = map
       .queryRenderedFeatures(undefined, {
-        layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-pin-label-standard"]
+        layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"]
       })
       .find((feature) => {
         if (feature.geometry?.type !== "Point") {
@@ -1652,7 +1676,7 @@ test("with a region selected, clicking an outside town clears region highlight a
             [x - 2, y - 2],
             [x + 2, y + 2]
           ],
-          { layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-routes-major-pin", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-pin-label-standard"] }
+          { layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-routes-major-pin", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"] }
         )
         .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
       if (hitAtPoint) {
@@ -1836,7 +1860,7 @@ test("clicking another region moves the highlight; towns under veil stay clickab
     const map = window[testHookKey];
     const hit = map
       .queryRenderedFeatures(undefined, {
-        layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-pin-label-standard"]
+        layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"]
       })
       .find((feature) => {
         if (feature.geometry?.type !== "Point") {
@@ -1873,7 +1897,7 @@ test("clicking another region moves the highlight; towns under veil stay clickab
             [x - 2, y - 2],
             [x + 2, y + 2]
           ],
-          { layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-pin-label-standard"] }
+          { layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"] }
         )
         .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
       if (hitAtPoint) {
@@ -1953,6 +1977,7 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
     "ibm-routes-major-pin",
     "ibm-routes-city-pin",
     "ibm-routes-site-pin",
+    "ibm-routes-site-pin-no-dot",
     "ibm-pin-label-standard",
     "ibm-selected-major-pin-label",
     "ibm-selected-site-pin-label",
@@ -2143,6 +2168,7 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
             "ibm-routes-major-pin",
             "ibm-routes-city-pin",
             "ibm-routes-site-pin",
+            "ibm-routes-site-pin-no-dot",
             "ibm-pin-label-standard",
             "ibm-selected-major-pin-label",
             "ibm-selected-site-pin-label",
