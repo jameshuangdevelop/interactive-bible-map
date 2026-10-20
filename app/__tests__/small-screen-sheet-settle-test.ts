@@ -1,4 +1,5 @@
 import {
+  resolveSheetReleaseVelocity,
   settleSmallScreenSheetPosition,
   sheetHeightForPosition,
   type SettleSmallScreenSheetPositionInput
@@ -94,5 +95,27 @@ describe("small screen sheet settle logic", () => {
     expect(sheetHeightForPosition("closed", HALF_HEIGHT, FULL_HEIGHT)).toBe(0);
     expect(sheetHeightForPosition("half", HALF_HEIGHT, FULL_HEIGHT)).toBe(HALF_HEIGHT);
     expect(sheetHeightForPosition("full", HALF_HEIGHT, FULL_HEIGHT)).toBe(FULL_HEIGHT);
+  });
+
+  test("release velocity sample under floor keeps tracked velocity", () => {
+    expect(
+      resolveSheetReleaseVelocity({
+        trackedVelocityYPxPerMs: -0.6,
+        releaseVelocityYPxPerMs: 0.9,
+        elapsedSinceLastMoveMs: 2,
+        releaseVelocityMinSampleMs: 6
+      })
+    ).toBe(-0.6);
+  });
+
+  test("release velocity sample over floor can override tracked velocity", () => {
+    expect(
+      resolveSheetReleaseVelocity({
+        trackedVelocityYPxPerMs: -0.4,
+        releaseVelocityYPxPerMs: 0.8,
+        elapsedSinceLastMoveMs: 8,
+        releaseVelocityMinSampleMs: 6
+      })
+    ).toBe(0.8);
   });
 });

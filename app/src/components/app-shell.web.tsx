@@ -19,6 +19,7 @@ import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
 import { computeTimelineSourcesPopoverMaxHeight } from "../features/map/overlay-layout";
 import {
+  resolveSheetReleaseVelocity,
   settleSmallScreenSheetPosition,
   sheetHeightForPosition,
   type SmallScreenSheetPosition
@@ -604,11 +605,12 @@ export function AppShell() {
       );
       const elapsedSinceLastMs = Math.max(1, event.timeStamp - dragState.lastTimestampMs);
       const releaseVelocityYPxPerMs = (event.clientY - dragState.lastY) / elapsedSinceLastMs;
-      const velocityYPxPerMs =
-        elapsedSinceLastMs >= SMALL_SCREEN_SHEET_RELEASE_VELOCITY_MIN_SAMPLE_MS &&
-        Math.abs(releaseVelocityYPxPerMs) > Math.abs(dragState.velocityYPxPerMs)
-          ? releaseVelocityYPxPerMs
-          : dragState.velocityYPxPerMs;
+      const velocityYPxPerMs = resolveSheetReleaseVelocity({
+        trackedVelocityYPxPerMs: dragState.velocityYPxPerMs,
+        releaseVelocityYPxPerMs,
+        elapsedSinceLastMoveMs: elapsedSinceLastMs,
+        releaseVelocityMinSampleMs: SMALL_SCREEN_SHEET_RELEASE_VELOCITY_MIN_SAMPLE_MS
+      });
       if (!dragState.allowTapToggle) {
         if (dragState.requiresDownwardMotion) {
           setSmallScreenSheetDragHeightPx(null);

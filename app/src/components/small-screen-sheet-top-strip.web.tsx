@@ -3,6 +3,7 @@ import { type CSSProperties, type ReactNode, type PointerEvent as ReactPointerEv
 import { tokens } from "../theme/tokens";
 
 const STRIP_HEIGHT_PX = 44;
+const STRIP_STICKY_TOP_OVERLAP_PX = tokens.spacing.md;
 
 interface SmallScreenSheetTopStripProps {
   stripId: "place" | "route-list" | "route-stop";
@@ -27,10 +28,13 @@ export function SmallScreenSheetTopStrip({
 }: SmallScreenSheetTopStripProps) {
   const stripContainerStyle: CSSProperties = {
     position: "sticky",
-    top: 0,
-    height: `${STRIP_HEIGHT_PX}px`,
-    minHeight: `${STRIP_HEIGHT_PX}px`,
-    marginBottom: `${tokens.spacing.sm}px`,
+    top: `-${STRIP_STICKY_TOP_OVERLAP_PX}px`,
+    marginTop: `-${STRIP_STICKY_TOP_OVERLAP_PX}px`,
+    boxSizing: "border-box",
+    height: `${STRIP_HEIGHT_PX + STRIP_STICKY_TOP_OVERLAP_PX}px`,
+    minHeight: `${STRIP_HEIGHT_PX + STRIP_STICKY_TOP_OVERLAP_PX}px`,
+    paddingTop: `${STRIP_STICKY_TOP_OVERLAP_PX}px`,
+    marginBottom: `calc(${tokens.spacing.sm}px - ${STRIP_STICKY_TOP_OVERLAP_PX}px)`,
     backgroundColor: tokens.color.surface,
     touchAction: "none",
     zIndex: 3
@@ -58,7 +62,7 @@ export function SmallScreenSheetTopStrip({
     padding: 0,
     position: "absolute",
     left: "50%",
-    top: 0,
+    top: `${STRIP_STICKY_TOP_OVERLAP_PX}px`,
     transform: "translateX(-50%)",
     zIndex: 2,
     outline: focused ? `2px solid ${tokens.color.accent}` : "none",
@@ -99,9 +103,9 @@ export function SmallScreenSheetTopStrip({
         <div
           style={{
             position: "absolute",
-            top: 0,
+            top: `${STRIP_STICKY_TOP_OVERLAP_PX}px`,
             right: 0,
-            height: "100%",
+            height: `${STRIP_HEIGHT_PX}px`,
             display: "flex",
             alignItems: "center",
             zIndex: 2

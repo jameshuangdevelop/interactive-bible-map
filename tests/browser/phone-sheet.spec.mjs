@@ -507,8 +507,23 @@ test("at full, place sheet scrolling keeps the handle and close button in view @
 
   const placeHandleState = await getControlViewportState(page, "[data-sheet-handle='place']");
   const closeButtonState = await getControlViewportState(page, "[aria-label='Close place panel']");
+  const topEdgeOwnerState = await page.evaluate(() => {
+    const sheet = document.querySelector("section[aria-label='Place details']");
+    const strip = document.querySelector("[data-sheet-drag-strip-container='place']");
+    if (!(sheet instanceof HTMLElement) || !(strip instanceof HTMLElement)) {
+      return null;
+    }
+    const sheetRect = sheet.getBoundingClientRect();
+    const probeElement = document.elementFromPoint(sheetRect.left + sheetRect.width / 2, sheetRect.top + 2);
+    return {
+      top2PxOwnedByStrip: Boolean(probeElement && strip.contains(probeElement))
+    };
+  });
   if (!placeHandleState || !closeButtonState) {
     throw new Error("Missing place top controls after scroll.");
+  }
+  if (!topEdgeOwnerState) {
+    throw new Error("Missing top-edge strip probe state.");
   }
   expect(placeHandleState.centerInViewport).toBe(true);
   expect(placeHandleState.ownsCenterPoint).toBe(true);
@@ -516,6 +531,7 @@ test("at full, place sheet scrolling keeps the handle and close button in view @
   expect(closeButtonState.centerInViewport).toBe(true);
   expect(closeButtonState.ownsCenterPoint).toBe(true);
   expect(closeButtonState.topPx).toBeGreaterThanOrEqual(0);
+  expect(topEdgeOwnerState.top2PxOwnedByStrip).toBe(true);
 
   await closeButton.click();
   await expect
