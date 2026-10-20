@@ -173,10 +173,12 @@ async function waitForSheetSettledAtHalf(page, sheetSelector) {
 
           const topAtStart = sheet.getBoundingClientRect().top;
           const viewportHeightPx = window.innerHeight;
-          const expectedHalfHeightPx = Math.min(
-            viewportHeightPx,
-            Math.max(240, Math.round(viewportHeightPx * 0.5))
+          const expectedHalfHeightPx = Number.parseFloat(
+            sheet.getAttribute("data-small-screen-half-height-px") ?? ""
           );
+          if (!Number.isFinite(expectedHalfHeightPx)) {
+            return false;
+          }
           const expectedHalfTopPx = Math.max(0, viewportHeightPx - expectedHalfHeightPx);
           if (topAtStart <= fullTopMaxPx + 20) {
             return false;
@@ -205,6 +207,29 @@ async function waitForSheetSettledAtHalf(page, sheetSelector) {
       { timeout: SHEET_SETTLE_TIMEOUT_MS }
     )
     .toBe(true);
+}
+
+async function getControlViewportState(page, selector) {
+  return page.evaluate((controlSelector) => {
+    const control = document.querySelector(controlSelector);
+    if (!(control instanceof HTMLElement)) {
+      return null;
+    }
+    const rect = control.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const ownerAtCenter = document.elementFromPoint(centerX, centerY);
+    return {
+      topPx: Math.round(rect.top),
+      bottomPx: Math.round(rect.bottom),
+      centerInViewport:
+        centerX >= 0 &&
+        centerY >= 0 &&
+        centerX <= window.innerWidth &&
+        centerY <= window.innerHeight,
+      ownsCenterPoint: Boolean(ownerAtCenter && control.contains(ownerAtCenter))
+    };
+  }, selector);
 }
 
 async function waitForPlacePanelReady(page) {
@@ -464,17 +489,51 @@ test("dragging from the place top strip moves the sheet while strip taps do noth
   await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
 });
 
-test("dragging from the place and route top strips moves sheets while strip taps do nothing @phone", async ({
+test("at full, place sheet scrolling keeps the handle and close button in view @phone", async ({
   page,
   baseUrl
 }) => {
-  await page.goto(`${baseUrl}/?tab=routes&route=paul-1`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  await waitForPlacePanelReady(page);
+  const placeSheet = page.locator("section[aria-label='Place details']").first();
+  const placeHandle = page.locator("[data-sheet-handle='place']");
+  const closeButton = page.getByRole("button", { name: "Close place panel" });
+  await placeHandle.click();
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
+  await placeSheet.evaluate((element) => {
+    element.scrollBy(0, 900);
+  });
+
+  const placeHandleState = await getControlViewportState(page, "[data-sheet-handle='place']");
+  const closeButtonState = await getControlViewportState(page, "[aria-label='Close place panel']");
+  if (!placeHandleState || !closeButtonState) {
+    throw new Error("Missing place top controls after scroll.");
+  }
+  expect(placeHandleState.centerInViewport).toBe(true);
+  expect(placeHandleState.ownsCenterPoint).toBe(true);
+  expect(placeHandleState.topPx).toBeGreaterThanOrEqual(0);
+  expect(closeButtonState.centerInViewport).toBe(true);
+  expect(closeButtonState.ownsCenterPoint).toBe(true);
+  expect(closeButtonState.topPx).toBeGreaterThanOrEqual(0);
+
+  await closeButton.click();
+  await expect
+    .poll(async () => (await page.url()).includes("place="), { timeout: SHEET_SETTLE_TIMEOUT_MS })
+    .toBe(false);
+});
+
+test("dragging from the route-list top strip moves the sheet while strip taps do nothing @phone", async ({
+  page,
+  baseUrl
+}) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-1&stage=6`, { waitUntil: "domcontentloaded" });
   await waitForRoutePanelReady(page);
+  await waitForSheetSettledAtHalf(page, "section[aria-label='Route details']");
   const routeListHandle = page.locator("[data-sheet-handle='route-list']");
   const routeListStrip = page.locator("[data-sheet-drag-strip='route-list']");
   await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
   await expect(routeListStrip).toBeVisible();
-  await waitForSheetSettledAtHalf(page, "section[aria-label='Route details']");
   const routeStripStartRatioX = await stripDragStartRatioX(page, routeListStrip, {
     minimumDistancePx: 40,
     handleLocator: routeListHandle
@@ -496,6 +555,19 @@ test("dragging from the place and route top strips moves sheets while strip taps
       timeout: SHEET_SETTLE_TIMEOUT_MS
     })
     .toBe("true");
+
+  await page.locator("section[aria-label='Route details']").evaluate((element) => {
+    element.scrollBy(0, 600);
+  });
+  const routeHandleState = await getControlViewportState(page, "[data-sheet-handle='route-list']");
+  if (!routeHandleState) {
+    throw new Error("Missing route-list handle after scroll.");
+  }
+  expect(routeHandleState.centerInViewport).toBe(true);
+  expect(routeHandleState.ownsCenterPoint).toBe(true);
+  expect(routeHandleState.topPx).toBeGreaterThanOrEqual(0);
+  await routeListHandle.click();
+  await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
 });
 
 test("downward drags in scrolled content do not move the full sheet @phone", async ({ page, baseUrl }) => {
