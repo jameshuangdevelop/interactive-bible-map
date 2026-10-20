@@ -498,6 +498,24 @@ test("at full, place sheet scrolling keeps the handle and close button in view @
   const placeSheet = page.locator("section[aria-label='Place details']").first();
   const placeHandle = page.locator("[data-sheet-handle='place']");
   const closeButton = page.getByRole("button", { name: "Close place panel" });
+  const halfContentOwnerState = await page.evaluate(() => {
+    const strip = document.querySelector("[data-sheet-drag-strip-container='place']");
+    const photoFrame = document.querySelector("[data-panel-photo-frame='true']");
+    if (!(strip instanceof HTMLElement) || !(photoFrame instanceof HTMLElement)) {
+      return null;
+    }
+    const frameRect = photoFrame.getBoundingClientRect();
+    const probeElement = document.elementFromPoint(frameRect.left + frameRect.width / 2, frameRect.top + 2);
+    return {
+      photoTop2PxOwnedByContent: Boolean(probeElement && photoFrame.contains(probeElement)),
+      photoTop2PxOwnedByStrip: Boolean(probeElement && strip.contains(probeElement))
+    };
+  });
+  if (!halfContentOwnerState) {
+    throw new Error("Missing half-sheet content ownership probe state.");
+  }
+  expect(halfContentOwnerState.photoTop2PxOwnedByContent).toBe(true);
+  expect(halfContentOwnerState.photoTop2PxOwnedByStrip).toBe(false);
   await placeHandle.click();
   await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
   await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");

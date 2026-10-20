@@ -34,7 +34,7 @@ export function SmallScreenSheetTopStrip({
     height: `${STRIP_HEIGHT_PX + STRIP_STICKY_TOP_OVERLAP_PX}px`,
     minHeight: `${STRIP_HEIGHT_PX + STRIP_STICKY_TOP_OVERLAP_PX}px`,
     paddingTop: `${STRIP_STICKY_TOP_OVERLAP_PX}px`,
-    marginBottom: `calc(${tokens.spacing.sm}px - ${STRIP_STICKY_TOP_OVERLAP_PX}px)`,
+    marginBottom: `${tokens.spacing.sm}px`,
     backgroundColor: tokens.color.surface,
     touchAction: "none",
     zIndex: 3
