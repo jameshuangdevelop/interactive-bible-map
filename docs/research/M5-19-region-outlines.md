@@ -257,3 +257,12 @@ None. Every one of the 20 regions has at least an approximate outline from a cit
 5. **Phrygia crosses the existing Asia/Galatia province line.** Unlike every other region on this card, Phrygia's own outline is not nested inside one existing area; it overlaps both `asia` and `galatia`. Confirm this is expected and acceptable for the GIS Engineer's phase (ADR-0050 item 5 already establishes that a political area's own land takes precedence over a region's outline wherever they overlap, so the overlap itself should cause no visible conflict).
 6. **Cos's extraction** should exclude the separately added Cnidian-peninsula piece in the same `asia` `MultiPolygon` (§5.4); this is an instruction for the GIS Engineer, not a judgement call, but I flag it since a careless bounding-box cut could catch it by mistake.
 7. **Libya/Cyrenaica's western edge** (the Euphrantas Tower, in the Great Syrtis, per Strabo 17.3.20) was not independently re-measured against AWMC's own Cyrenaica face in this session; I recommend the Fact-Checker spot-check this if time allows, though I found no sign of a problem.
+
+## 9. The PO's answers (2026-10-20)
+1. **Samaria and Judea reach the coast:** yes, as recommended. Their outlines run to the west edge of the `judea-samaria-idumea` polygon (the coast). Split the coast between them along the recommended Samaria–Judea line, extended west to the sea. Each outline's note says where Pliny's two readings differ (Joppa, Caesarea).
+2. **Judea's south edge:** as recommended. Judea's outline reaches the polygon's southern tip and includes Idumea, following Josephus's eleven toparchies (*War* 3.3.5). Its note says that Pliny counts Idumea separately.
+3. **Anuath Borceos:** anchor the Samaria–Judea line on Aqraba (Acrabatta), as recommended, at low confidence for that edge, with a note naming the unidentified village.
+4. **Pontus from AD 64:** reuse the existing `pontus` shape, as M5-11 ruled. Its note says that it includes Armenia Minor because no source draws a line between them, and the confidence stays medium.
+5. **Phrygia across the Asia–Galatia line:** expected and accepted. Phrygia was split between the two provinces (Phrygia Asiana and Phrygia Galatica). An outline shows only when Phrygia itself is selected, so the overlap conflicts with nothing.
+6. **Cos:** the GIS Engineer extracts the island alone and excludes the Cnidian peninsula piece of the same `asia` MultiPolygon.
+7. **Libya's west edge:** the Fact-Checker spot-checks it against Strabo 17.3.20 (the Euphrantas Tower) in phase 2.
