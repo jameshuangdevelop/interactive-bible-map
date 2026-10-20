@@ -438,6 +438,7 @@ export function AppShell() {
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
   const unmountedRef = useRef(false);
   const routesLoadStateRef = useRef(routesLoadState);
+  const smallScreenSheetDragHeightPxRef = useRef(smallScreenSheetDragHeightPx);
   const smallScreenSheetDragStateRef = useRef<{
     pointerId: number;
     startY: number;
@@ -475,6 +476,9 @@ export function AppShell() {
   useEffect(() => {
     routesLoadStateRef.current = routesLoadState;
   }, [routesLoadState]);
+  useEffect(() => {
+    smallScreenSheetDragHeightPxRef.current = smallScreenSheetDragHeightPx;
+  }, [smallScreenSheetDragHeightPx]);
   const selectedTimelineStop = useMemo(
     () =>
       ancientTimeline?.stops.find((stop) => stop.id === selectedTimelineStopId) ??
@@ -591,12 +595,23 @@ export function AppShell() {
       }
 
       smallScreenSheetDragStateRef.current = null;
+      const dragDeltaYPx = event.clientY - dragState.startY;
+      const movedPx = Math.max(
+        dragState.movedPx,
+        Math.abs(dragDeltaYPx)
+      );
+      const elapsedSinceLastMs = Math.max(1, event.timeStamp - dragState.lastTimestampMs);
+      const releaseVelocityYPxPerMs = (event.clientY - dragState.lastY) / elapsedSinceLastMs;
+      const velocityYPxPerMs =
+        Math.abs(releaseVelocityYPxPerMs) > Math.abs(dragState.velocityYPxPerMs)
+          ? releaseVelocityYPxPerMs
+          : dragState.velocityYPxPerMs;
       if (!dragState.allowTapToggle) {
         if (dragState.requiresDownwardMotion) {
           setSmallScreenSheetDragHeightPx(null);
           return;
         }
-        if (!dragState.hasEngagedDrag || dragState.movedPx <= SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX) {
+        if (!dragState.hasEngagedDrag || movedPx <= SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX) {
           setSmallScreenSheetDragHeightPx(null);
           return;
         }
@@ -605,17 +620,18 @@ export function AppShell() {
         smallScreenSheetMaxHeightPx,
         Math.max(
           dragState.canClose ? 0 : smallScreenSheetCollapsedHeightPx,
-          smallScreenSheetDragHeightPx ?? dragState.startHeightPx
+          smallScreenSheetDragHeightPxRef.current ??
+            (dragState.startHeightPx + (dragState.startY - event.clientY))
         )
       );
       const nextPosition = settleSmallScreenSheetPosition({
         canClose: dragState.canClose,
         currentHeightPx: finalHeightPx,
-        dragDeltaYPx: event.clientY - dragState.startY,
-        movedPx: dragState.movedPx,
+        dragDeltaYPx,
+        movedPx,
         startPosition: dragState.startPosition,
         tapThresholdPx: SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX,
-        velocityYPxPerMs: dragState.velocityYPxPerMs,
+        velocityYPxPerMs,
         flickVelocityThresholdPxPerMs: SMALL_SCREEN_SHEET_FLICK_VELOCITY_THRESHOLD_PX_PER_MS,
         halfHeightPx: smallScreenSheetCollapsedHeightPx,
         fullHeightPx: smallScreenSheetMaxHeightPx
@@ -656,7 +672,6 @@ export function AppShell() {
     selectedPlace,
     selectedRouteStopId,
     smallScreenSheetCollapsedHeightPx,
-    smallScreenSheetDragHeightPx,
     smallScreenSheetMaxHeightPx,
     viewTab
   ]);
@@ -1024,8 +1039,18 @@ export function AppShell() {
       if (smallScreenSheetDragStateRef.current) {
         smallScreenSheetDragStateRef.current = null;
       }
+      const sheetElement = event.currentTarget.closest(
+        "section[aria-label='Place details'], section[aria-label='Route details']"
+      );
+      const renderedHeightPx =
+        sheetElement instanceof HTMLElement
+          ? sheetElement.getBoundingClientRect().height
+          : Number.NaN;
       const currentHeightPx =
         smallScreenSheetDragHeightPx ??
+        (Number.isFinite(renderedHeightPx) && renderedHeightPx > 0
+          ? renderedHeightPx
+          : null) ??
         sheetHeightForPosition(
           smallScreenSheetPosition,
           smallScreenSheetCollapsedHeightPx,
@@ -1119,6 +1144,17 @@ export function AppShell() {
       });
     },
     [beginSmallScreenSheetDrag, isSmallScreen]
+  );
+
+  const isSmallScreenSheetTopBandPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLElement>) => {
+      if (!isSmallScreen) {
+        return false;
+      }
+      const bounds = event.currentTarget.getBoundingClientRect();
+      return event.clientY - bounds.top <= 44;
+    },
+    [isSmallScreen]
   );
 
   useEffect(() => {
@@ -2624,7 +2660,8 @@ export function AppShell() {
             const target = event.target;
             if (
               target instanceof HTMLElement &&
-              target.closest("[data-sheet-drag-strip='route-list']")
+              (target.closest("[data-sheet-drag-strip='route-list']") ||
+                isSmallScreenSheetTopBandPointerDown(event))
             ) {
               handleSmallScreenSheetTopStripPointerDown(event, { canClose: false });
               return;
@@ -2768,7 +2805,8 @@ export function AppShell() {
             const target = event.target;
             if (
               target instanceof HTMLElement &&
-              target.closest("[data-sheet-drag-strip='place']")
+              (target.closest("[data-sheet-drag-strip='place']") ||
+                isSmallScreenSheetTopBandPointerDown(event))
             ) {
               handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
               return;
@@ -2838,7 +2876,8 @@ export function AppShell() {
             const target = event.target;
             if (
               target instanceof HTMLElement &&
-              target.closest("[data-sheet-drag-strip='route-stop']")
+              (target.closest("[data-sheet-drag-strip='route-stop']") ||
+                isSmallScreenSheetTopBandPointerDown(event))
             ) {
               handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
               return;
