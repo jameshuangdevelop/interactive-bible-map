@@ -1037,7 +1037,8 @@ test("selecting a town replaces its black dot with the selected pin @names", { t
   );
   await waitForMapIdle(page);
 
-  const selectedState = await page.evaluate((testHookKey) => {
+  // The selection reaches the map a frame or more after the URL changes, so poll for it.
+  const readSelectedState = (testHookKey) => {
     const map = window[testHookKey];
     const selectedPin = map
       .queryRenderedFeatures(undefined, { layers: ["ibm-selected-place-pin"] })
@@ -1058,8 +1059,17 @@ test("selecting a town replaces its black dot with the selected pin @names", { t
       selectedLabelCount: selectedLabel ? 1 : 0,
       unselectedTownFeatureCount: unselectedTownFeatures.length
     };
-  }, mapTestHookKey);
-  expect(selectedState).toBeTruthy();
+  };
+  let selectedState = null;
+  await expect
+    .poll(
+      async () => {
+        selectedState = await page.evaluate(readSelectedState, mapTestHookKey);
+        return selectedState !== null;
+      },
+      { timeout: 5_000 }
+    )
+    .toBe(true);
   expect(selectedState.selectedLabelCount).toBe(1);
   expect(selectedState.unselectedTownFeatureCount).toBe(0);
 
