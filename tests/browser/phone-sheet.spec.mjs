@@ -41,60 +41,12 @@ async function dragInsideElement(page, element, options) {
   await page.mouse.up();
 }
 
-async function pointerDragViaEvents(element, options) {
-  const { startRatioX = 0.5, startRatioY, deltaY } = options;
-  await element.evaluate((node, dragOptions) => {
-    if (!(node instanceof HTMLElement)) {
-      return;
-    }
-    const rect = node.getBoundingClientRect();
-    const startX = rect.left + rect.width * dragOptions.startRatioX;
-    const startY = rect.top + rect.height * dragOptions.startRatioY;
-    const endY = startY + dragOptions.deltaY;
-    const pointerId = 1;
-    const init = {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      pointerId,
-      isPrimary: true,
-      pointerType: "mouse",
-      clientX: startX
-    };
-    node.dispatchEvent(
-      new PointerEvent("pointerdown", {
-        ...init,
-        clientY: startY,
-        buttons: 1
-      })
-    );
-    window.dispatchEvent(
-      new PointerEvent("pointermove", {
-        ...init,
-        clientY: endY,
-        buttons: 1
-      })
-    );
-    window.dispatchEvent(
-      new PointerEvent("pointerup", {
-        ...init,
-        clientY: endY,
-        buttons: 0
-      })
-    );
-  }, { startRatioX, startRatioY, deltaY });
-}
-
 async function stripDragStartRatioX(page, stripLocator, options = {}) {
   const {
     minimumDistancePx = 40,
     closeButtonLocator = null,
     handleLocator = page.locator("[data-sheet-handle='place']")
   } = options;
-  const stripBox = await stripLocator.boundingBox();
-  if (!stripBox) {
-    throw new Error("Missing strip bounding box.");
-  }
   const handleBox = await handleLocator.boundingBox();
   if (!handleBox) {
     throw new Error("Missing sheet handle bounding box.");
@@ -102,6 +54,10 @@ async function stripDragStartRatioX(page, stripLocator, options = {}) {
   const handleCenterX = handleBox.x + handleBox.width / 2;
   const closeBox = closeButtonLocator ? await closeButtonLocator.boundingBox() : null;
   const closeCenterX = closeBox ? closeBox.x + closeBox.width / 2 : null;
+  const stripBox = await stripLocator.boundingBox();
+  if (!stripBox) {
+    throw new Error("Missing strip bounding box.");
+  }
   const candidateXs = [
     stripBox.x + 44,
     stripBox.x + stripBox.width * 0.2,
@@ -216,7 +172,16 @@ async function waitForSheetSettledAtHalf(page, sheetSelector) {
           }
 
           const topAtStart = sheet.getBoundingClientRect().top;
+          const viewportHeightPx = window.innerHeight;
+          const expectedHalfHeightPx = Math.min(
+            viewportHeightPx,
+            Math.max(240, Math.round(viewportHeightPx * 0.5))
+          );
+          const expectedHalfTopPx = Math.max(0, viewportHeightPx - expectedHalfHeightPx);
           if (topAtStart <= fullTopMaxPx + 20) {
+            return false;
+          }
+          if (Math.abs(topAtStart - expectedHalfTopPx) > 24) {
             return false;
           }
 
@@ -234,7 +199,8 @@ async function waitForSheetSettledAtHalf(page, sheetSelector) {
             return false;
           }
 
-          return sheet.getBoundingClientRect().top > fullTopMaxPx + 20;
+          const topAtEnd = sheet.getBoundingClientRect().top;
+          return topAtEnd > fullTopMaxPx + 20 && Math.abs(topAtEnd - expectedHalfTopPx) <= 24;
         }, { selector: sheetSelector, fullTopMaxPx: SHEET_FULL_TOP_MAX_PX }),
       { timeout: SHEET_SETTLE_TIMEOUT_MS }
     )
@@ -502,17 +468,28 @@ test("dragging from the place and route top strips moves sheets while strip taps
   page,
   baseUrl
 }) => {
-  await page.goto(`${baseUrl}/?tab=routes&route=paul-1&stage=1`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-1`, { waitUntil: "domcontentloaded" });
   await waitForRoutePanelReady(page);
   const routeListHandle = page.locator("[data-sheet-handle='route-list']");
   const routeListStrip = page.locator("[data-sheet-drag-strip='route-list']");
   await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
   await expect(routeListStrip).toBeVisible();
   await waitForSheetSettledAtHalf(page, "section[aria-label='Route details']");
-  await pointerDragViaEvents(routeListStrip, {
-    startRatioX: 0.75,
+  const routeStripStartRatioX = await stripDragStartRatioX(page, routeListStrip, {
+    minimumDistancePx: 40,
+    handleLocator: routeListHandle
+  });
+  const routeStripBox = await routeListStrip.boundingBox();
+  if (!routeStripBox) {
+    throw new Error("Missing route strip bounding box.");
+  }
+  const routeDragStartY = routeStripBox.y + routeStripBox.height * 0.5;
+  const routeDragDeltaY = Math.min(-320, 12 - routeDragStartY);
+  await dragInsideElement(page, routeListStrip, {
+    startRatioX: routeStripStartRatioX,
     startRatioY: 0.5,
-    deltaY: -520
+    deltaY: routeDragDeltaY,
+    steps: 18
   });
   await expect
     .poll(async () => await routeListHandle.getAttribute("aria-expanded"), {

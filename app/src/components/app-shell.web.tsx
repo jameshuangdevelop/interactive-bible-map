@@ -1146,13 +1146,35 @@ export function AppShell() {
     [beginSmallScreenSheetDrag, isSmallScreen]
   );
 
-  const isSmallScreenSheetTopBandPointerDown = useCallback(
-    (event: ReactPointerEvent<HTMLElement>) => {
+  const isSmallScreenSheetStripPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLElement>, stripId: "route-list" | "place" | "route-stop") => {
       if (!isSmallScreen) {
         return false;
       }
-      const bounds = event.currentTarget.getBoundingClientRect();
-      return event.clientY - bounds.top <= 44;
+      const section = event.currentTarget;
+      if (!(section instanceof HTMLElement)) {
+        return false;
+      }
+      const strip = section.querySelector(`[data-sheet-drag-strip='${stripId}']`);
+      const stripContainer = section.querySelector(
+        `[data-sheet-drag-strip-container='${stripId}']`
+      );
+      const boundsSource =
+        strip instanceof HTMLElement
+          ? strip
+          : stripContainer instanceof HTMLElement
+            ? stripContainer
+            : null;
+      if (!boundsSource) {
+        return false;
+      }
+      const bounds = boundsSource.getBoundingClientRect();
+      return (
+        event.clientX >= bounds.left &&
+        event.clientX <= bounds.right &&
+        event.clientY >= bounds.top &&
+        event.clientY <= bounds.bottom
+      );
     },
     [isSmallScreen]
   );
@@ -2657,12 +2679,7 @@ export function AppShell() {
         <section
           aria-label="Route details"
           onPointerDown={(event) => {
-            const target = event.target;
-            if (
-              target instanceof HTMLElement &&
-              (target.closest("[data-sheet-drag-strip='route-list']") ||
-                isSmallScreenSheetTopBandPointerDown(event))
-            ) {
+            if (isSmallScreenSheetStripPointerDown(event, "route-list")) {
               handleSmallScreenSheetTopStripPointerDown(event, { canClose: false });
               return;
             }
@@ -2672,10 +2689,13 @@ export function AppShell() {
         >
           {isSmallScreen ? (
             <div
+              data-sheet-drag-strip-container="route-list"
               style={{
                 position: "relative",
+                height: "44px",
                 minHeight: "44px",
                 marginBottom: `${tokens.spacing.sm}px`,
+                backgroundColor: "rgba(0, 0, 0, 0.001)",
                 touchAction: "none"
               }}
             >
@@ -2688,9 +2708,11 @@ export function AppShell() {
                   border: "none",
                   padding: 0,
                   margin: 0,
-                  background: "transparent",
+                  backgroundColor: "rgba(0, 0, 0, 0.001)",
+                  pointerEvents: "auto",
                   touchAction: "none",
-                  cursor: "grab"
+                  cursor: "grab",
+                  zIndex: 1
                 }}
               />
               <button
@@ -2727,7 +2749,7 @@ export function AppShell() {
                   left: "50%",
                   top: 0,
                   transform: "translateX(-50%)",
-                  zIndex: 1,
+                  zIndex: 2,
                   outline: routeListSheetHandleFocused
                     ? `2px solid ${tokens.color.accent}`
                     : "none",
@@ -2804,9 +2826,8 @@ export function AppShell() {
           onPointerDown={(event) => {
             const target = event.target;
             if (
-              target instanceof HTMLElement &&
-              (target.closest("[data-sheet-drag-strip='place']") ||
-                isSmallScreenSheetTopBandPointerDown(event))
+              (target instanceof HTMLElement && target.closest("[data-sheet-drag-strip='place']")) ||
+              isSmallScreenSheetStripPointerDown(event, "place")
             ) {
               handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
               return;
@@ -2873,12 +2894,7 @@ export function AppShell() {
           aria-label="Place details"
           data-route-place-panel="true"
           onPointerDown={(event) => {
-            const target = event.target;
-            if (
-              target instanceof HTMLElement &&
-              (target.closest("[data-sheet-drag-strip='route-stop']") ||
-                isSmallScreenSheetTopBandPointerDown(event))
-            ) {
+            if (isSmallScreenSheetStripPointerDown(event, "route-stop")) {
               handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
               return;
             }
@@ -2888,10 +2904,13 @@ export function AppShell() {
         >
           {isSmallScreen ? (
             <div
+              data-sheet-drag-strip-container="route-stop"
               style={{
                 position: "relative",
+                height: "44px",
                 minHeight: "44px",
                 marginBottom: `${tokens.spacing.sm}px`,
+                backgroundColor: "rgba(0, 0, 0, 0.001)",
                 touchAction: "none"
               }}
             >
@@ -2904,9 +2923,11 @@ export function AppShell() {
                   border: "none",
                   padding: 0,
                   margin: 0,
-                  background: "transparent",
+                  backgroundColor: "rgba(0, 0, 0, 0.001)",
+                  pointerEvents: "auto",
                   touchAction: "none",
-                  cursor: "grab"
+                  cursor: "grab",
+                  zIndex: 1
                 }}
               />
               <button
@@ -2943,7 +2964,7 @@ export function AppShell() {
                   left: "50%",
                   top: 0,
                   transform: "translateX(-50%)",
-                  zIndex: 1,
+                  zIndex: 2,
                   outline: routeStopSheetHandleFocused
                     ? `2px solid ${tokens.color.accent}`
                     : "none",
