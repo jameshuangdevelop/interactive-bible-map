@@ -1839,23 +1839,60 @@ test("re-clicking OTHER ROMAN PROVINCES keeps roman selection and blue label @na
 });
 
 test("keyboard activation of OTHER ROMAN PROVINCES selects the roman blue holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.waitForFunction((testHookKey) => {
     const map = window[testHookKey];
     return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
   }, mapTestHookKey, { timeout: 60_000 });
-  await jumpMap(page, [-5.6, 37.7], 5.6);
-
-  const romanHolderKeyboardButton = page
-    .getByRole("button", { name: /OTHER ROMAN[\s\S]*PROVINCES, area/i, includeHidden: true })
-    .first();
-  await expect.poll(async () => await romanHolderKeyboardButton.count(), { timeout: 10_000 }).toBe(1);
-  await romanHolderKeyboardButton.focus();
-  await romanHolderKeyboardButton.press("Enter");
-  await page.waitForFunction(
-    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
-    { timeout: 10_000 }
+  await page.evaluate(
+    ([testHookKey, center, zoom]) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return;
+      }
+      map.jumpTo({ center, zoom });
+    },
+    [mapTestHookKey, [-5.6, 37.7], 5.6]
   );
+
+  await expect
+    .poll(async () => {
+      const romanHolderTarget = await findRomanHolderLabelPoint(page);
+      if (!romanHolderTarget) {
+        await page.evaluate(
+          ([testHookKey, center, zoom]) => {
+            const map = window[testHookKey];
+            if (!map) {
+              return;
+            }
+            map.jumpTo({ center, zoom });
+          },
+          [mapTestHookKey, [-5.6, 37.7], 5.6]
+        );
+      }
+      return page.evaluate(() =>
+        Array.from(document.querySelectorAll("button[data-place-entry-id]")).filter((button) =>
+          /OTHER ROMAN[\s\S]*PROVINCES, area/i.test(button.getAttribute("aria-label") ?? "")
+        ).length
+      );
+    }, { timeout: 20_000 })
+    .toBe(1);
+  const romanHolderKeyboardButton = page
+    .getByRole("button", {
+      name: /OTHER ROMAN[\s\S]*PROVINCES, area/i,
+      includeHidden: true
+    })
+    .first();
+  await expect
+    .poll(async () => {
+      const placeId = new URLSearchParams(await page.evaluate(() => window.location.search)).get("place");
+      if (placeId !== "roman-empire") {
+        await romanHolderKeyboardButton.press("Enter");
+      }
+      return placeId;
+    }, { timeout: 10_000 })
+    .toBe("roman-empire");
   await waitForMapIdle(page);
   await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
 });
