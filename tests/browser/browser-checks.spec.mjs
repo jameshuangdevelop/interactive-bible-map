@@ -1974,18 +1974,29 @@ test("selected place pin image matches Google marker proportions and tip anchor 
           height: maxY - minY + 1
         }
       : null;
-    const bottomTipRowWidths = hasBoundingBox
-      ? [0, 1].map((rowOffset) => {
-          const y = maxY - rowOffset;
-          let rowWidth = 0;
-          for (let x = minX; x <= maxX; x += 1) {
-            if (isPinPixel(readPixel(x, y))) {
-              rowWidth += 1;
-            }
-          }
-          return rowWidth;
-        })
-      : [];
+    // Alpha-weighted, so antialiasing at 1x doesn't decide the tip's width or position.
+    let lowestRow = -1;
+    for (let y = (height ?? 0) - 1; y >= 0 && lowestRow < 0; y -= 1) {
+      for (let x = 0; x < (width ?? 0); x += 1) {
+        if ((readPixel(x, y)?.[3] ?? 0) > 0) {
+          lowestRow = y;
+          break;
+        }
+      }
+    }
+    let tipCoverage = 0;
+    let tipWeightedX = 0;
+    let tipAlpha = 0;
+    for (let y = lowestRow; y >= 0 && y > lowestRow - 3; y -= 1) {
+      for (let x = 0; x < (width ?? 0); x += 1) {
+        const alpha = readPixel(x, y)?.[3] ?? 0;
+        if (y === lowestRow) {
+          tipCoverage += alpha / 255;
+        }
+        tipWeightedX += (x + 0.5) * alpha;
+        tipAlpha += alpha;
+      }
+    }
     return {
       width,
       height,
@@ -1995,7 +2006,9 @@ test("selected place pin image matches Google marker proportions and tip anchor 
       tipPixels,
       topLeftPixel,
       bbox,
-      bottomTipRowWidths
+      tipCoverageCssPx: tipCoverage / pixelRatio,
+      tipOffsetFromCentreCssPx:
+        tipAlpha > 0 && width !== null ? (tipWeightedX / tipAlpha - width / 2) / pixelRatio : null
     };
   }, mapTestHookKey);
 
@@ -2009,7 +2022,8 @@ test("selected place pin image matches Google marker proportions and tip anchor 
   const bboxRatio = (probe.bbox?.height ?? 0) / (probe.bbox?.width ?? 1);
   expect(bboxRatio).toBeGreaterThanOrEqual(1.33);
   expect(bboxRatio).toBeLessThanOrEqual(1.53);
-  expect(Math.max(...probe.bottomTipRowWidths, 0)).toBeLessThanOrEqual(2);
+  expect(probe.tipCoverageCssPx).toBeLessThanOrEqual(2);
+  expect(Math.abs(probe.tipOffsetFromCentreCssPx ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(0.25);
 });
 
 test("routes stage-4 names stay interactive while only non-selected lines dim @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {

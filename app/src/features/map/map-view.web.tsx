@@ -1013,7 +1013,7 @@ function createSelectedPlacePinImage() {
     const targetHeight = 25.8;
     const scale = targetHeight / sourceBounds.height;
     const scaledWidth = sourceBounds.width * scale;
-    const offsetX = (width - scaledWidth) / 2 + 0.35;
+    const offsetX = (width - scaledWidth) / 2;
     const offsetY = height - sourceBounds.height * scale - 0.5;
     const strokeWidth = 1;
 
