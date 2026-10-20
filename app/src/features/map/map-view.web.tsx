@@ -129,7 +129,6 @@ const layerSelectedPlacePinId = "ibm-selected-place-pin";
 const layerRoutePriorityMajorPinId = "ibm-routes-major-pin";
 const layerRoutePriorityCityPinId = "ibm-routes-city-pin";
 const layerRoutePrioritySitePinId = "ibm-routes-site-pin";
-const layerRoutePrioritySitePinNoDotId = "ibm-routes-site-pin-no-dot";
 const layerAreaLabelOverviewId = "ibm-area-label-overview";
 const layerAreaLabelId = "ibm-area-label";
 const layerSelectedAreaLabelId = "ibm-selected-area-label";
@@ -193,7 +192,6 @@ const interactiveLayerIds = [
   layerRoutePriorityMajorPinId,
   layerRoutePriorityCityPinId,
   layerRoutePrioritySitePinId,
-  layerRoutePrioritySitePinNoDotId,
   layerCityPinId,
   layerCityPinNoDotId,
   layerSitePinId,
@@ -395,7 +393,6 @@ function applyMapModeOverlayVisibility(
     layerRoutePriorityMajorPinId,
     layerRoutePriorityCityPinId,
     layerRoutePrioritySitePinId,
-    layerRoutePrioritySitePinNoDotId,
     layerMajorAreaLabelOverviewId,
     layerMajorAreaLabelId,
     layerCityPinId,
@@ -2138,45 +2135,6 @@ function ensureMapLayers(map: MapLibreMap) {
       filter: toLayerFilter([
         "all",
         basePlaceLabelVisibilityFilter,
-        townPlaceTypeFilter,
-        ["==", ["get", "isInSelectedRoute"], true]
-      ]),
-      layout: {
-        "icon-image": townDotImages.cityIconImageId,
-        "icon-size": townDotImages.cityIconSize,
-        "icon-anchor": "center",
-        "icon-allow-overlap": false,
-        "icon-ignore-placement": false,
-        "icon-padding": 0,
-        "icon-optional": false,
-        "text-field": ["get", "labelText"],
-        "text-font": placeNameFontExpression,
-        "text-size": 13,
-        "text-anchor": "bottom",
-        "text-offset": [0, -0.1],
-        "text-padding": 0,
-        "symbol-sort-key": ["get", "labelPriority"],
-        "text-allow-overlap": false,
-        "text-ignore-placement": false,
-        "text-optional": false
-      },
-      paint: {
-        "text-color": placeNameColorExpression,
-        "text-halo-color": "rgba(255,255,255,0.95)",
-        "text-halo-width": placeNameHaloWidthExpression
-      }
-    });
-  }
-
-  if (!map.getLayer(layerRoutePrioritySitePinNoDotId)) {
-    map.addLayer({
-      id: layerRoutePrioritySitePinNoDotId,
-      source: sourceSitePinsId,
-      type: "symbol",
-      filter: toLayerFilter([
-        "all",
-        basePlaceLabelVisibilityFilter,
-        nonTownPlaceTypeFilter,
         ["==", ["get", "isInSelectedRoute"], true]
       ]),
       layout: {
@@ -2555,7 +2513,6 @@ function ensureMapLayers(map: MapLibreMap) {
     layerMajorPinNoDotId,
     layerMajorPinId,
     layerRoutePriorityCityPinId,
-    layerRoutePrioritySitePinNoDotId,
     layerRoutePrioritySitePinId,
     layerRoutePriorityMajorPinId,
     layerCandidatePinId,

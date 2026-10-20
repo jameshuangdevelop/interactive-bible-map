@@ -121,7 +121,6 @@ async function renderedPlaceNames(page) {
       "ibm-routes-major-pin",
       "ibm-routes-city-pin",
       "ibm-routes-site-pin",
-      "ibm-routes-site-pin-no-dot",
       "ibm-pin-label-standard",
       "ibm-selected-major-pin-label",
       "ibm-selected-site-pin-label",
@@ -987,6 +986,26 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
   expect(sycharDotPixels, "expected a black town dot under sychar").toBeGreaterThanOrEqual(
     minimumStandardDotPixelCount
   );
+
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus&stage=9&year=30`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  const sycharRouteTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const feature = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-routes-site-pin"] })
+      .find((candidate) => candidate.properties?.placeId === "sychar" && candidate.geometry?.type === "Point");
+    if (!feature || feature.geometry?.type !== "Point") {
+      return null;
+    }
+    const point = map.project(feature.geometry.coordinates);
+    return { x: point.x, y: point.y };
+  }, mapTestHookKey);
+  expect(sycharRouteTarget).toBeTruthy();
+  const sycharRouteDotPixels = await countNearPureBlackTownDotPixels(page, sycharRouteTarget.x, sycharRouteTarget.y);
+  expect(sycharRouteDotPixels, "expected no black town dot under sychar in routes mode").toBeLessThanOrEqual(1);
 });
 
 test("selecting a town replaces its black dot with the selected pin @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -1587,7 +1606,6 @@ test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", 
             "ibm-site-pin",
             "ibm-site-pin-no-dot",
             "ibm-routes-site-pin",
-            "ibm-routes-site-pin-no-dot",
             "ibm-pin-label-standard",
             "ibm-selected-major-pin-label",
             "ibm-selected-site-pin-label",
@@ -1977,7 +1995,6 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
     "ibm-routes-major-pin",
     "ibm-routes-city-pin",
     "ibm-routes-site-pin",
-    "ibm-routes-site-pin-no-dot",
     "ibm-pin-label-standard",
     "ibm-selected-major-pin-label",
     "ibm-selected-site-pin-label",
@@ -2168,7 +2185,6 @@ test("each real route renders lines, stops, and panel content (replaces routesRe
             "ibm-routes-major-pin",
             "ibm-routes-city-pin",
             "ibm-routes-site-pin",
-            "ibm-routes-site-pin-no-dot",
             "ibm-pin-label-standard",
             "ibm-selected-major-pin-label",
             "ibm-selected-site-pin-label",
