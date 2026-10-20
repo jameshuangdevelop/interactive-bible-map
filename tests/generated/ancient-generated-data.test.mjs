@@ -3,6 +3,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import polylabel from "polylabel";
+import { polygonsOf, polygonAreaKm2 } from "../../scripts/lib/geometry-cleanup.mjs";
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..", "..");
@@ -58,6 +60,38 @@ function normalizeLabelText(value) {
   return typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
 }
 
+function isPolygonGeometry(geometry) {
+  return geometry?.type === "Polygon" || geometry?.type === "MultiPolygon";
+}
+
+function unionHoleSignatures(geometry) {
+  if (!isPolygonGeometry(geometry)) {
+    return [];
+  }
+  const signatures = [];
+  for (const polygon of polygonsOf(geometry)) {
+    for (const ring of polygon.slice(1)) {
+      const areaKm2 = polygonAreaKm2([ring]);
+      const labelPoint = polylabel([ring], 0.0005);
+      signatures.push({
+        areaKm2: Number(areaKm2.toFixed(3)),
+        center: [Number(labelPoint[0].toFixed(3)), Number(labelPoint[1].toFixed(3))]
+      });
+    }
+  }
+  signatures.sort((left, right) => {
+    if (right.areaKm2 !== left.areaKm2) {
+      return right.areaKm2 - left.areaKm2;
+    }
+    if (left.center[0] !== right.center[0]) {
+      return left.center[0] - right.center[0];
+    }
+    return left.center[1] - right.center[1];
+  });
+  return signatures;
+}
+
+
 let generatedDataPromise = null;
 
 async function assertGeneratedOutputAvailable() {
@@ -78,11 +112,12 @@ async function loadGeneratedAncientData() {
   generatedDataPromise = (async () => {
     await assertGeneratedOutputAvailable();
 
-    const [timelinePayload, roadsPayload, timelineData, sourceRoads] = await Promise.all([
+    const [timelinePayload, roadsPayload, timelineData, sourceRoads, holderUnionsPayload] = await Promise.all([
       fs.readFile(path.join(generatedDirectory, "ancient.timeline.json"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(path.join(generatedDirectory, "ancient.roads.geojson"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(repositoryTimelinePath, "utf8").then((content) => JSON.parse(content)),
-      fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content))
+      fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content)),
+      fs.readFile(path.join(generatedDirectory, "ancient.holder-unions.json"), "utf8").then((content) => JSON.parse(content))
     ]);
 
     const stopPayloadById = new Map(
@@ -116,6 +151,7 @@ async function loadGeneratedAncientData() {
       roadsPayload,
       stopPayloadById,
       stopPayloadForYear,
+      holderUnionsPayload,
       ancientRoadFeatureCount: sourceRoads.features.length
     };
   })();
@@ -435,4 +471,48 @@ test("generated ancient stops keep holder spans and label coverage", async () =>
       );
     }
   }
+});
+
+test("generated holder unions keep only expected real holes and judea-province has one hole-free piece", async () => {
+  const fixture = await loadGeneratedAncientData();
+
+  for (const stop of fixture.timelinePayload.stops) {
+    const stopPayload = fixture.stopPayloadById.get(stop.id);
+    assert.ok(stopPayload, `expected payload for stop '${stop.id}'`);
+
+    for (const [holderId, unionId] of Object.entries(stopPayload.holderUnions ?? {})) {
+      const geometry = fixture.holderUnionsPayload.geometries?.[unionId];
+      assert.ok(geometry, `missing union geometry '${unionId}' for holder '${holderId}' at '${stop.id}'`);
+      const holes = unionHoleSignatures(geometry);
+      assert.deepEqual(
+        holes,
+        [],
+        `expected holder union '${holderId}' in '${stop.id}' to have no holes`
+      );
+    }
+
+    const romanSideUnionGeometry = stopPayload.romanSideUnion
+      ? fixture.holderUnionsPayload.geometries?.[stopPayload.romanSideUnion]
+      : null;
+    assert.ok(romanSideUnionGeometry, `missing roman-side union geometry at stop '${stop.id}'`);
+    const romanSideHoles = unionHoleSignatures(romanSideUnionGeometry);
+    assert.deepEqual(
+      romanSideHoles,
+      [],
+      `unexpected roman-side union holes at stop '${stop.id}'`
+    );
+  }
+
+  const judeaAt70 = fixture.stopPayloadForYear(70);
+  const judeaProvinceUnionId = judeaAt70.holderUnions?.["judea-province"];
+  const judeaProvinceUnion = judeaProvinceUnionId
+    ? fixture.holderUnionsPayload.geometries?.[judeaProvinceUnionId]
+    : null;
+  assert.ok(judeaProvinceUnion, "expected precomputed judea-province union at year 70");
+  assert.equal(polygonsOf(judeaProvinceUnion).length, 1, "expected judea-province union to be one piece");
+  assert.deepEqual(
+    unionHoleSignatures(judeaProvinceUnion),
+    [],
+    "expected judea-province union to have no holes"
+  );
 });

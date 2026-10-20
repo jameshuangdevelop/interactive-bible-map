@@ -78,11 +78,11 @@ import {
 import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry,
-  findSelectedRegionOutlineGeometry
+  findSelectedRegionGeometry
 } from "./selected-region-highlight";
 import type { MapViewProps } from "./map-view.types";
 import type {
+  AncientHolderUnionsPayload,
   AncientEntityRecord,
   AncientShapesPayload,
   AncientStopPayload,
@@ -90,7 +90,12 @@ import type {
   LineStringGeometry,
   MultiLineStringGeometry
 } from "./ancient-layer.types";
-import type { Coordinates, MapDisplayMode, PlaceIndexRecord, PlaceSelection } from "./types";
+import type {
+  Coordinates,
+  MapDisplayMode,
+  PlaceIndexRecord,
+  PlaceSelection
+} from "./types";
 
 setWorkerUrl(MAP_WORKER_URL);
 const configuredBasemapMode = resolveInitialBasemapMode(process.env.EXPO_PUBLIC_BASEMAP);
@@ -1266,9 +1271,13 @@ function buildAncientHolderLabelFeatures(
 
 function selectedHolderLabelEntryIdForPlace(
   stopPayload: AncientStopPayload | null,
-  selectedPlaceId: string | null | undefined
+  selectedPlaceId: string | null | undefined,
+  allowRomanHolderLabelSelection: boolean
 ) {
   if (!stopPayload || !selectedPlaceId) {
+    return null;
+  }
+  if (selectedPlaceId === "roman-empire" && !allowRomanHolderLabelSelection) {
     return null;
   }
 
@@ -2768,6 +2777,10 @@ export function MapView({
     });
   }, [highlightedPlaceId, mapMode, pinLabelSource, places, routePriorityPlaceIds, selection]);
   const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
+  const [romanHolderLabelClicked, setRomanHolderLabelClicked] = useState(false);
+  const [ancientHolderUnions, setAncientHolderUnions] = useState<AncientHolderUnionsPayload>({
+    geometries: {}
+  });
   const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
@@ -2784,9 +2797,15 @@ export function MapView({
     [ancientStopsById, selectedTimelineStopId]
   );
   const selectedPlaceId = selection?.placeId ?? null;
+  const allowRomanHolderLabelSelection = selectedPlaceId === "roman-empire" && romanHolderLabelClicked;
   const selectedHolderLabelEntryId = useMemo(
-    () => selectedHolderLabelEntryIdForPlace(selectedAncientStopPayload, selectedPlaceId),
-    [selectedAncientStopPayload, selectedPlaceId]
+    () =>
+      selectedHolderLabelEntryIdForPlace(
+        selectedAncientStopPayload,
+        selectedPlaceId,
+        allowRomanHolderLabelSelection
+      ),
+    [allowRomanHolderLabelSelection, selectedAncientStopPayload, selectedPlaceId]
   );
   const selectedHolderLabelPlaceId = selectedHolderLabelEntryId ? selectedPlaceId : null;
   const effectiveRenderData = useMemo(() => {
@@ -2861,42 +2880,27 @@ export function MapView({
     }
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
+      holderUnionGeometries: ancientHolderUnions.geometries,
       stopPayload: selectedAncientStopPayload,
       placeId: selectedPlace.id,
       placeType: selectedPlace.type,
       politicalAreaId: selectedPlace.politicalAreaId,
       politicalUnitAreaTypes
     });
-  }, [ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
-  const selectedRegionOutlineGeometry = useMemo(() => {
-    if (!selection || mapMode !== "ancient") {
-      return null;
-    }
-    return findSelectedRegionOutlineGeometry({
-      stopPayload: selectedAncientStopPayload,
-      placeId: selection.placeId
-    });
-  }, [mapMode, selectedAncientStopPayload, selection]);
+  }, [ancientHolderUnions, ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
   const selectedRegionSourceSyncKey = useMemo(() => {
-    if (!selectedRegionGeometry && !selectedRegionOutlineGeometry) {
+    if (!selectedRegionGeometry) {
       return "none";
     }
-    return JSON.stringify({
-      regionGeometry: selectedRegionGeometry,
-      outlineGeometry: selectedRegionOutlineGeometry
-    });
-  }, [selectedRegionGeometry, selectedRegionOutlineGeometry]);
+    return JSON.stringify(selectedRegionGeometry);
+  }, [selectedRegionGeometry]);
   const selectedRegionVeilFeatures = useMemo(
     () => buildSelectedRegionVeilFeatureCollection(selectedRegionGeometry),
     [selectedRegionGeometry]
   );
   const selectedRegionOutlineFeatures = useMemo(
-    () =>
-      buildSelectedRegionOutlineFeatureCollection(
-        selectedRegionGeometry,
-        selectedRegionOutlineGeometry
-      ),
-    [selectedRegionGeometry, selectedRegionOutlineGeometry]
+    () => buildSelectedRegionOutlineFeatureCollection(selectedRegionGeometry),
+    [selectedRegionGeometry]
   );
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
@@ -2909,6 +2913,7 @@ export function MapView({
   const previousAncientLayerRetryTokenRef = useRef(ancientLayerRetryToken);
   const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
     setAncientShapes(null);
+    setAncientHolderUnions({ geometries: {} });
     setAncientRoads(createEmptyFeatureCollection());
     setAncientCoastline(createEmptyFeatureCollection());
     setAncientEmpireEdge(createEmptyFeatureCollection());
@@ -3071,6 +3076,13 @@ export function MapView({
 
         return (await response.json()) as GeoJsonSourceData;
       }),
+      fetch("/generated/ancient.holder-unions.json", { cache: "no-store" }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient holder unions (${response.status})`);
+        }
+
+        return (await response.json()) as AncientHolderUnionsPayload;
+      }),
       fetch("/generated/ancient.empire-edge.geojson", { cache: "no-store" }).then(async (response) => {
         if (response.status === 404) {
           return createEmptyFeatureCollection() as GeoJsonSourceData;
@@ -3083,7 +3095,14 @@ export function MapView({
         return (await response.json()) as GeoJsonSourceData;
       })
     ])
-      .then(([shapesPayload, roadsPayload, coastlinePayload, empireEdgePayload]) => {
+      .then(
+        ([
+          shapesPayload,
+          roadsPayload,
+          coastlinePayload,
+          holderUnionsPayload,
+          empireEdgePayload
+        ]) => {
         if (cancelled) {
           return;
         }
@@ -3091,8 +3110,10 @@ export function MapView({
         setAncientShapes(shapesPayload);
         setAncientRoads(roadsPayload);
         setAncientCoastline(coastlinePayload);
+        setAncientHolderUnions(holderUnionsPayload);
         setAncientEmpireEdge(empireEdgePayload);
-      })
+        }
+      )
       .catch((error) => {
         console.error("Failed to load ancient map layer data.", error);
         setAncientLayerLoadState("error");
@@ -4160,6 +4181,9 @@ export function MapView({
       const hitPaddingPx = interactiveHitPaddingForEvent(event.originalEvent);
       const placeEntry = resolveInteractiveEntryAtPoint(event.point, hitPaddingPx);
       if (placeEntry) {
+        setRomanHolderLabelClicked(
+          placeEntry.kind === "place" && placeEntry.selection.placeId === "roman-empire"
+        );
         activateVisibleEntryRef.current(placeEntry, "map-name");
         return;
       }
