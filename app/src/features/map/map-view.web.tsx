@@ -78,7 +78,8 @@ import {
 import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  findSelectedRegionOutlineGeometry
 } from "./selected-region-highlight";
 import type { MapViewProps } from "./map-view.types";
 import type {
@@ -1025,32 +1026,37 @@ function createRouteDirectionArrowImage() {
 }
 
 function createSelectedPlacePinImage() {
-  return createCanvasImage(18, 27, (context, width, height) => {
+  return createCanvasImage(19, 27, (context, width, height) => {
     context.clearRect(0, 0, width, height);
-    const centerX = width / 2;
-    const headRadius = 7;
-    const headCenterY = 8;
-    const tipY = height - 1;
-    const controlY = 17.5;
-    const leftX = centerX - headRadius;
-    const rightX = centerX + headRadius;
-    const centerDotRadius = 1.9;
+    // The "place" icon from Google Material Icons (Apache License 2.0); see ATTRIBUTION.md.
+    const pinPath = new Path2D(
+      "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+    );
+    const sourceBounds = { minX: 5, minY: 2, width: 14, height: 20 };
+    const targetHeight = 25.8;
+    const scale = targetHeight / sourceBounds.height;
+    const scaledWidth = sourceBounds.width * scale;
+    const offsetX = (width - scaledWidth) / 2;
+    const offsetY = height - sourceBounds.height * scale - 0.5;
+    const strokeWidth = 1;
 
+    context.save();
+    context.translate(offsetX - sourceBounds.minX * scale, offsetY - sourceBounds.minY * scale);
+    context.scale(scale, scale);
     context.fillStyle = "#EA4335";
-    context.strokeStyle = "#B31412";
-    context.lineWidth = 1;
-    context.beginPath();
-    context.arc(centerX, headCenterY, headRadius, Math.PI * 0.04, Math.PI * 0.96, true);
-    context.quadraticCurveTo(leftX + 1.1, controlY, centerX, tipY);
-    context.quadraticCurveTo(rightX - 1.1, controlY, rightX, headCenterY);
-    context.closePath();
-    context.fill();
-    context.stroke();
+    context.fill(pinPath);
+
+    context.lineJoin = "miter";
+    context.lineCap = "butt";
+    context.lineWidth = strokeWidth / scale;
+    context.strokeStyle = "#C5221F";
+    context.stroke(pinPath);
 
     context.fillStyle = "#B31412";
     context.beginPath();
-    context.arc(centerX, headCenterY, centerDotRadius, 0, Math.PI * 2);
+    context.arc(12, 9, 2.5, 0, Math.PI * 2);
     context.fill();
+    context.restore();
   });
 }
 
@@ -2196,7 +2202,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["==", ["get", "hasMultipleCandidates"], true],
           ["literal", [0, -0.45]],
           ["literal", [0, 0]]
@@ -2360,7 +2366,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["==", ["get", "hasMultipleCandidates"], true],
           ["literal", [0, -MAJOR_SELECTED_NAME_RAISE_EM]],
           ["literal", [0, 0]]
@@ -2412,7 +2418,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["==", ["get", "hasMultipleCandidates"], true],
           ["literal", [0, -0.45]],
           ["literal", [0, 0]]
@@ -2453,7 +2459,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["literal", [0, 0]]
         ]),
         "text-allow-overlap": false,
@@ -3041,35 +3047,44 @@ export function MapView({
     if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
       return null;
     }
-    const politicalAreaId = selectedPlace.politicalAreaId;
-    if (!politicalAreaId) {
-      return null;
-    }
-    const placeType = selectedPlace.type as string;
-    const shouldHighlightPoliticalArea =
-      politicalUnitAreaTypes.has(placeType) || politicalAreaId === selectedPlace.id;
-    if (!shouldHighlightPoliticalArea) {
-      return null;
-    }
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
       stopPayload: selectedAncientStopPayload,
-      politicalAreaId
+      placeId: selectedPlace.id,
+      placeType: selectedPlace.type,
+      politicalAreaId: selectedPlace.politicalAreaId,
+      politicalUnitAreaTypes
     });
   }, [ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+  const selectedRegionOutlineGeometry = useMemo(() => {
+    if (!selection || mapMode !== "ancient") {
+      return null;
+    }
+    return findSelectedRegionOutlineGeometry({
+      stopPayload: selectedAncientStopPayload,
+      placeId: selection.placeId
+    });
+  }, [mapMode, selectedAncientStopPayload, selection]);
   const selectedRegionSourceSyncKey = useMemo(() => {
-    if (!selectedRegionGeometry) {
+    if (!selectedRegionGeometry && !selectedRegionOutlineGeometry) {
       return "none";
     }
-    return JSON.stringify(selectedRegionGeometry);
-  }, [selectedRegionGeometry]);
+    return JSON.stringify({
+      regionGeometry: selectedRegionGeometry,
+      outlineGeometry: selectedRegionOutlineGeometry
+    });
+  }, [selectedRegionGeometry, selectedRegionOutlineGeometry]);
   const selectedRegionVeilFeatures = useMemo(
     () => buildSelectedRegionVeilFeatureCollection(selectedRegionGeometry),
     [selectedRegionGeometry]
   );
   const selectedRegionOutlineFeatures = useMemo(
-    () => buildSelectedRegionOutlineFeatureCollection(selectedRegionGeometry),
-    [selectedRegionGeometry]
+    () =>
+      buildSelectedRegionOutlineFeatureCollection(
+        selectedRegionGeometry,
+        selectedRegionOutlineGeometry
+      ),
+    [selectedRegionGeometry, selectedRegionOutlineGeometry]
   );
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
