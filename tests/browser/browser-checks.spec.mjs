@@ -1064,6 +1064,177 @@ test("selected region veil darkens outside the region while keeping inside lumin
   expect(outsideMeanDelta).toBeGreaterThan(8);
 });
 
+test("clicking KINGDOM OF PONTUS draws veil and outline while keeping inside luminance stable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await jumpMap(page, [36.5, 40.6], 6.9);
+
+  const pontusTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const layers = [
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-selected-area-label",
+      "ibm-ancient-holder-label-click-target",
+      "ibm-ancient-holder-label-clickable",
+      "ibm-ancient-holder-label-selected"
+    ];
+    const hit = map
+      .queryRenderedFeatures(undefined, { layers })
+      .find(
+        (feature) =>
+          String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus"
+      );
+    if (!hit || hit.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(hit.geometry.coordinates);
+    return { x: projected.x, y: projected.y };
+  }, mapTestHookKey);
+  expect(pontusTarget).toBeTruthy();
+  await clickMapPoint(page, pontusTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "pontus",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+
+  const overlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(overlay.veilFeatures).toBeGreaterThan(0);
+  expect(overlay.outlineFeatures).toBeGreaterThan(0);
+
+  const samplePoints = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const selectedName = map
+      .queryRenderedFeatures(undefined, {
+        layers: [
+          "ibm-selected-area-label",
+          "ibm-ancient-holder-label-selected"
+        ]
+      })
+      .find((feature) => String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus");
+    const insidePoint = selectedName?.geometry?.type === "Point" ? map.project(selectedName.geometry.coordinates) : null;
+    const canvas = map.getCanvas();
+    const outsideCandidates = (() => {
+      for (let y = 140; y <= canvas.height - 140; y += 36) {
+        for (let x = 520; x <= canvas.width - 120; x += 36) {
+          const hasVeil = map.queryRenderedFeatures(
+            [
+              [x - 2, y - 2],
+              [x + 2, y + 2]
+            ],
+            { layers: ["ibm-selected-region-veil"] }
+          ).length > 0;
+          if (hasVeil) {
+            return { x, y };
+          }
+        }
+      }
+      return null;
+    })();
+    return {
+      inside: insidePoint ? [{ x: insidePoint.x, y: insidePoint.y }] : [],
+      outside: outsideCandidates ? [{ x: outsideCandidates.x, y: outsideCandidates.y }] : []
+    };
+  }, mapTestHookKey);
+  expect(samplePoints.inside.length).toBe(1);
+  expect(samplePoints.outside.length).toBe(1);
+
+  const withVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "none");
+  }, mapTestHookKey);
+  await waitForMapIdle(page);
+  const withoutVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withoutVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "visible");
+  }, mapTestHookKey);
+
+  expect(Math.abs(withoutVeilInside[0] - withVeilInside[0])).toBeLessThan(3);
+  expect(withoutVeilOutside[0] - withVeilOutside[0]).toBeGreaterThan(2);
+});
+
+test("roman empire veil follows the stop edge at year 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await jumpMap(page, [38.5, 39.0], 5.0);
+
+  const overlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(overlay.veilFeatures).toBeGreaterThan(0);
+  expect(overlay.outlineFeatures).toBeGreaterThan(0);
+
+  const romanVeilProbe = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const pointHasVeil = (projected) =>
+      map.queryRenderedFeatures(
+        [
+          [projected.x - 2, projected.y - 2],
+          [projected.x + 2, projected.y + 2]
+        ],
+        { layers: ["ibm-selected-region-veil"] }
+      ).length > 0;
+    const insideCandidates = [
+      [23.8, 38.2], // Achaia
+      [33.1, 39.0] // Galatia
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const outsideCandidates = [
+      [57.0, 39.0],
+      [61.0, 40.2],
+      [53.5, 35.5]
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const insideHasVeil = insideCandidates.map((projected) => pointHasVeil(projected));
+    const eastOutsideHasVeil = outsideCandidates.map((projected) => pointHasVeil(projected));
+    const fallbackOutsidePoint = (() => {
+      const canvas = map.getCanvas();
+      for (let y = 140; y <= canvas.height - 140; y += 36) {
+        for (let x = 140; x <= canvas.width - 140; x += 36) {
+          const projected = { x, y };
+          if (
+            pointHasVeil(projected) &&
+            map.unproject([x, y]).lng > 50
+          ) {
+            return projected;
+          }
+        }
+      }
+      return null;
+    })();
+    return {
+      insideHasVeil,
+      eastOutsideHasVeil,
+      fallbackOutsideHasVeil: fallbackOutsidePoint
+        ? pointHasVeil(fallbackOutsidePoint)
+        : false
+    };
+  }, mapTestHookKey);
+
+  expect(romanVeilProbe.insideHasVeil.some(Boolean)).toBe(false);
+  expect(
+    romanVeilProbe.eastOutsideHasVeil.some(Boolean) || romanVeilProbe.fallbackOutsideHasVeil
+  ).toBe(true);
+});
+
 test("regions only highlight when they own a shaped area in the selected year @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
@@ -1764,6 +1935,56 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
     const topLeftPixel = readPixel(0, 0);
     const cssWidth = width === null ? null : width / pixelRatio;
     const cssHeight = height === null ? null : height / pixelRatio;
+    const isPinPixel = (pixel) => {
+      if (!pixel) {
+        return false;
+      }
+      const [red, green, blue, alpha] = pixel;
+      if (alpha < 150) {
+        return false;
+      }
+      const isMainRed = Math.abs(red - 216) <= 34 && Math.abs(green - 66) <= 34 && Math.abs(blue - 53) <= 34;
+      const isCenterDotRed = Math.abs(red - 110) <= 30 && Math.abs(green - 45) <= 30 && Math.abs(blue - 39) <= 30;
+      return isMainRed || isCenterDotRed;
+    };
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    if (pixels && width && height) {
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const pixel = readPixel(x, y);
+          if (!isPinPixel(pixel)) {
+            continue;
+          }
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        }
+      }
+    }
+    const hasBoundingBox =
+      Number.isFinite(minX) && Number.isFinite(maxX) && Number.isFinite(minY) && Number.isFinite(maxY);
+    const bbox = hasBoundingBox
+      ? {
+          width: maxX - minX + 1,
+          height: maxY - minY + 1
+        }
+      : null;
+    const bottomRowWidths = hasBoundingBox
+      ? [0, 1, 2].map((rowOffset) => {
+          const y = maxY - rowOffset;
+          let rowWidth = 0;
+          for (let x = minX; x <= maxX; x += 1) {
+            if (isPinPixel(readPixel(x, y))) {
+              rowWidth += 1;
+            }
+          }
+          return rowWidth;
+        })
+      : [];
     return {
       width,
       height,
@@ -1771,17 +1992,22 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
       cssWidth,
       cssHeight,
       tipPixels,
-      topLeftPixel
+      topLeftPixel,
+      bbox,
+      bottomRowWidths
     };
   }, mapTestHookKey);
 
-  expect(probe.cssWidth).toBe(18);
+  expect(probe.cssWidth).toBe(15);
   expect(probe.cssHeight).toBe(27);
   const maxTipAlpha = Math.max(...probe.tipPixels.map((pixel) => pixel[3]), 0);
   const maxTipRed = Math.max(...probe.tipPixels.map((pixel) => pixel[0]), 0);
   expect(maxTipAlpha).toBeGreaterThan(0);
   expect(maxTipRed).toBeGreaterThan(140);
   expect(probe.topLeftPixel?.[3] ?? 0).toBe(0);
+  const bboxRatio = (probe.bbox?.width ?? 0) / (probe.bbox?.height ?? 1);
+  expect(bboxRatio).toBeLessThanOrEqual(0.62);
+  expect(Math.max(...probe.bottomRowWidths, 0)).toBeLessThanOrEqual(2);
 });
 
 test("routes stage-4 names stay interactive while only non-selected lines dim @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {

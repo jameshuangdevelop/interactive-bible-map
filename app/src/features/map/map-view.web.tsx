@@ -78,7 +78,8 @@ import {
 import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  findSelectedRegionOutlineGeometry
 } from "./selected-region-highlight";
 import type { MapViewProps } from "./map-view.types";
 import type {
@@ -1002,29 +1003,40 @@ function createRouteDirectionArrowImage() {
 }
 
 function createSelectedPlacePinImage() {
-  return createCanvasImage(18, 27, (context, width, height) => {
+  return createCanvasImage(15, 27, (context, width, height) => {
     context.clearRect(0, 0, width, height);
     const centerX = width / 2;
-    const headRadius = 7;
-    const headCenterY = 8;
+    const headRadius = 6.2;
+    const headCenterY = 7.6;
     const tipY = height - 1;
-    const controlY = 17.5;
-    const leftX = centerX - headRadius;
-    const rightX = centerX + headRadius;
-    const centerDotRadius = 1.9;
+    const leftHeadX = centerX - headRadius;
+    const rightHeadX = centerX + headRadius;
+    const stemShoulderY = 11.2;
+    const centerDotRadius = headRadius * 0.36;
 
-    context.fillStyle = "#EA4335";
-    context.strokeStyle = "#B31412";
-    context.lineWidth = 1;
+    context.fillStyle = "#D84235";
     context.beginPath();
-    context.arc(centerX, headCenterY, headRadius, Math.PI * 0.04, Math.PI * 0.96, true);
-    context.quadraticCurveTo(leftX + 1.1, controlY, centerX, tipY);
-    context.quadraticCurveTo(rightX - 1.1, controlY, rightX, headCenterY);
+    context.arc(centerX, headCenterY, headRadius, Math.PI * 0.02, Math.PI * 0.98, true);
+    context.bezierCurveTo(
+      leftHeadX + 0.15,
+      stemShoulderY + 2.3,
+      centerX - 1.2,
+      height - 8.8,
+      centerX,
+      tipY
+    );
+    context.bezierCurveTo(
+      centerX + 1.2,
+      height - 8.8,
+      rightHeadX - 0.15,
+      stemShoulderY + 2.3,
+      rightHeadX,
+      headCenterY
+    );
     context.closePath();
     context.fill();
-    context.stroke();
 
-    context.fillStyle = "#B31412";
+    context.fillStyle = "#6E2D27";
     context.beginPath();
     context.arc(centerX, headCenterY, centerDotRadius, 0, Math.PI * 2);
     context.fill();
@@ -2853,35 +2865,44 @@ export function MapView({
     if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
       return null;
     }
-    const politicalAreaId = selectedPlace.politicalAreaId;
-    if (!politicalAreaId) {
-      return null;
-    }
-    const placeType = selectedPlace.type as string;
-    const shouldHighlightPoliticalArea =
-      politicalUnitAreaTypes.has(placeType) || politicalAreaId === selectedPlace.id;
-    if (!shouldHighlightPoliticalArea) {
-      return null;
-    }
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
       stopPayload: selectedAncientStopPayload,
-      politicalAreaId
+      placeId: selectedPlace.id,
+      placeType: selectedPlace.type,
+      politicalAreaId: selectedPlace.politicalAreaId,
+      politicalUnitAreaTypes
     });
   }, [ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+  const selectedRegionOutlineGeometry = useMemo(() => {
+    if (!selection || mapMode !== "ancient") {
+      return null;
+    }
+    return findSelectedRegionOutlineGeometry({
+      stopPayload: selectedAncientStopPayload,
+      placeId: selection.placeId
+    });
+  }, [mapMode, selectedAncientStopPayload, selection]);
   const selectedRegionSourceSyncKey = useMemo(() => {
-    if (!selectedRegionGeometry) {
+    if (!selectedRegionGeometry && !selectedRegionOutlineGeometry) {
       return "none";
     }
-    return JSON.stringify(selectedRegionGeometry);
-  }, [selectedRegionGeometry]);
+    return JSON.stringify({
+      regionGeometry: selectedRegionGeometry,
+      outlineGeometry: selectedRegionOutlineGeometry
+    });
+  }, [selectedRegionGeometry, selectedRegionOutlineGeometry]);
   const selectedRegionVeilFeatures = useMemo(
     () => buildSelectedRegionVeilFeatureCollection(selectedRegionGeometry),
     [selectedRegionGeometry]
   );
   const selectedRegionOutlineFeatures = useMemo(
-    () => buildSelectedRegionOutlineFeatureCollection(selectedRegionGeometry),
-    [selectedRegionGeometry]
+    () =>
+      buildSelectedRegionOutlineFeatureCollection(
+        selectedRegionGeometry,
+        selectedRegionOutlineGeometry
+      ),
+    [selectedRegionGeometry, selectedRegionOutlineGeometry]
   );
 
   const [basemapState, setBasemapState] = useState(() => basemapController.getState());
