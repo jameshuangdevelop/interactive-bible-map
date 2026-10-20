@@ -595,3 +595,6 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   5. Precedence: the land a place holds that year (ADR-0048's update) first, then the region's own outline, then the name alone.
   6. The Fact-Checker verifies every outline and its licensing before it ships.
 - **Consequences:** amends ADR-0048 item 5. Card M5-19 draws the outlines (research, check, geometry); then a small frontend step uses them.
+- **Update, 2026-10-20 (the PO, from M5-19's fact-check and geometry):**
+  - **Scope:** M5-19 ships outlines for 11 regions: Galilee, Samaria, Judea, Pontus, Crete, Libya, Chios, Cos, Malta, Rhodes and Samos. Seven more (Pisidia, Lycaonia, Mysia, Phrygia, Media, Mesopotamia and the Parthian Empire) need landmarks named on both sides of each edge before their edges can be built from sources. Card M5-20 does them; until then they show their name alone (item 5).
+  - **Loading:** a reader needs an outline only after selecting a region that holds no land, so the app loads `ancient.region-outlines.json` on first use. The file has its own budget of 25,000 bytes gzip, outside the ancient layer's 330,000 (ADR-0037).
