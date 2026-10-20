@@ -1,5 +1,7 @@
 # M5-19 research note — An outline for every region
 
+> **Read the verification report first.** The Fact-Checker's report, `docs/verification/M5-19-region-outlines.md` (phase 2), corrects this note in many places: the region count (18, not 20), several Pleiades IDs, Pisidia's south edge, the Samaria–Judea line, and readings of Pliny and Strabo. Its "Fixes for the Research Lead" list (R1–R17) names each one. Where this note and the report differ, the report and the PO's rulings in §10 govern.
+
 Research for card `docs/tasks/M5-19-region-outlines.md`, phase 1, under ADR-0050. This note does not change any data file; it is the Research Lead's input to the Fact-Checker (phase 2) and the GIS Engineer (phase 3).
 
 ## 1. How to read this note
@@ -266,3 +268,16 @@ None. Every one of the 20 regions has at least an approximate outline from a cit
 5. **Phrygia across the Asia–Galatia line:** expected and accepted. Phrygia was split between the two provinces (Phrygia Asiana and Phrygia Galatica). An outline shows only when Phrygia itself is selected, so the overlap conflicts with nothing.
 6. **Cos:** the GIS Engineer extracts the island alone and excludes the Cnidian peninsula piece of the same `asia` MultiPolygon.
 7. **Libya's west edge:** the Fact-Checker spot-checks it against Strabo 17.3.20 (the Euphrantas Tower) in phase 2.
+
+## 10. The PO's rulings after the fact-check (2026-10-20)
+The Fact-Checker's report (phase 2) checked this note and §9 against the sources. The PO accepts each of its recommendations.
+
+1. **The coast (P1):** keep the split along the Samaria–Judea line, as a convention neither author states. Each region's note gives both authors: Josephus gives Judea the coast "as far as Ptolemais" (*War* 3.3.5), and Pliny calls the coast from Ascalon to Caesarea "the region of Samaria" (5.14) but lists Joppa among Judea's toparchies (5.15).
+2. **The Samaria–Judea line (P2; this replaces answer 3 in §9):** answer 3 rested on a wrong premise. Pleiades locates Anuath Borceos (`pleiades:687825`, "Anouath Borkeos", Khirbet Berqit, 35.2655°E 32.0954°N; checked by the PO), and Josephus and Pliny both count the Acrabatta toparchy in Judea. The line runs through Anouath Borkeos and north of Akraba, as the report's G1.1 describes, so Akraba is in Judea. That edge's confidence is low.
+3. **Pontus (P3):** option A. The outline is the `pontus` shape plus the part of `bithynia` east of the lower Halys (G8.1), so it holds Amisus and Themiscyra, which ISBE and Strabo count as Pontus.
+4. **Judea (P4):** leave out the coastal face from Gaza to Rhinocolura (G3.1). Augustus gave Gaza to Syria (*Antiquities* 17.11.4), and Pliny puts that coast in "Idumæa and Palæstina".
+5. **Iconium (P5):** in Phrygia, not Lycaonia, following ISBE, the existing records and Acts 14:6 (Paul and Barnabas flee from Iconium "to the cities of Lycaonia"). The notes say that Strabo describes Iconium under Lycaonia.
+6. **Mysia (P6):** include the Troad, at low confidence, and say that its inclusion is disputed.
+7. **Malta (P7):** outline Malta only; the note names Mljet, the other candidate.
+8. **Cauda (P8):** leave it out of Crete's outline. It has its own name on the map.
+9. **Existing data that conflicts with the sources (P9):** out of scope for this card, listed in `BACKLOG.md` under Data.
