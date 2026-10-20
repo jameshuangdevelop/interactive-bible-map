@@ -185,7 +185,6 @@ export async function buildAppData(options = {}) {
     options.regionOutlinesPath ??
       path.join(path.dirname(ancientAreasPath), "region-outlines.geojson")
   );
-  // Optional: when this file is missing the other ancient files are still built.
   const ancientEmpireEdgePath = path.resolve(
     options.ancientEmpireEdgePath ??
       path.join(ancientDataRoot, "geo", "ancient-empire-edge.geojson")
@@ -427,7 +426,13 @@ export async function buildAppData(options = {}) {
     roadJoinMaxLengthKm: 0
   };
 
-  if (timelineExists && areasExists && roadsExists && coastlineExists && regionOutlinesExists) {
+  if (timelineExists && areasExists && roadsExists && coastlineExists && !regionOutlinesExists) {
+    throw new Error(
+      `Ancient build requires region outlines source '${path.relative(repositoryRoot, regionOutlinesPath)}'; run node scripts/build-region-outlines.mjs first.`
+    );
+  }
+
+  if (timelineExists && areasExists && roadsExists && coastlineExists) {
     const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, regionOutlinesData] =
       await Promise.all([
         readJsonFile(resolvedTimelinePath),

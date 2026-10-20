@@ -31,8 +31,8 @@
     },
     "naturalEarthSourceId": {
       "type": "string",
-      "description": "Natural Earth feature ne_id where present, or a pinned Natural Earth 10m route-line dataset id such as naturalearth:ne-10m-land, naturalearth:ne-10m-coastline or naturalearth:ne-10m-lakes.",
-      "pattern": "^naturalearth:(?:[0-9]+|ne-10m-(?:land|coastline|lakes))$"
+      "description": "Natural Earth feature ne_id where present, or a pinned Natural Earth 10m dataset id such as naturalearth:ne-10m-land, naturalearth:ne-10m-coastline, naturalearth:ne-10m-lakes or naturalearth:ne-10m-rivers-lake-centerlines.",
+      "pattern": "^naturalearth:(?:[0-9]+|ne-10m-(?:land|coastline|lakes|rivers-lake-centerlines))$"
     },
     "commonsSourceId": {
       "type": "string",

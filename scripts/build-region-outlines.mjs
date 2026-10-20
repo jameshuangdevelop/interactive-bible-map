@@ -18,6 +18,9 @@ const outputPath = path.join(repositoryRoot, "data", "geo", "region-outlines.geo
 const OUTPUT_PRECISION = 0.00001;
 const MIN_NON_ISLAND_PART_KM2 = 1;
 const ISLAND_REGION_IDS = new Set(["crete", "chios", "cos", "malta", "rhodes", "samos"]);
+const ALLOWED_DROPPED_ISLAND_PARTS = Object.freeze({
+  pontus: [{ name: "pontus-lower-halys-coastal-islet", maxAreaKm2: 10 }]
+});
 
 function featureCollection(features) {
   return { type: "FeatureCollection", features };
@@ -225,13 +228,39 @@ function pruneSmallParts(feature) {
   if (ISLAND_REGION_IDS.has(feature.id)) return feature;
   const polygons = polygonsOf(feature.geometry);
   if (polygons.length <= 1) return feature;
-  const kept = polygons.filter((polygon) => geometryAreaKm2({ type: "Polygon", coordinates: polygon }) >= MIN_NON_ISLAND_PART_KM2);
+  const measured = polygons.map((polygon) => ({
+    polygon,
+    areaKm2: geometryAreaKm2({ type: "Polygon", coordinates: polygon })
+  }));
+  const kept = measured
+    .filter((entry) => entry.areaKm2 >= MIN_NON_ISLAND_PART_KM2)
+    .map((entry) => entry.polygon);
   if (kept.length === 0) {
     throw new Error(`${feature.id}: removing parts under ${MIN_NON_ISLAND_PART_KM2} km² removed the entire geometry.`);
   }
   const dominant = kept
     .map((polygon) => ({ polygon, areaKm2: geometryAreaKm2({ type: "Polygon", coordinates: polygon }) }))
     .sort((left, right) => right.areaKm2 - left.areaKm2);
+  const dropped = dominant.slice(1);
+  if (dropped.length > 0) {
+    const droppedSummary = dropped.map((entry) => entry.areaKm2.toFixed(3)).join(", ");
+    console.warn(`${feature.id}: dropping ${dropped.length} detached part(s) after simplification (${droppedSummary} km²).`);
+    const allowed = ALLOWED_DROPPED_ISLAND_PARTS[feature.id] ?? [];
+    if (allowed.length > 0) {
+      console.warn(
+        `${feature.id}: allowed dropped island exceptions: ${allowed
+          .map((island) => `${island.name} <= ${island.maxAreaKm2} km²`)
+          .join("; ")}.`
+      );
+    }
+    const largeDrop = dropped.find((entry) => {
+      if (entry.areaKm2 < MIN_NON_ISLAND_PART_KM2) return false;
+      return !allowed.some((island) => entry.areaKm2 <= island.maxAreaKm2);
+    });
+    if (largeDrop) {
+      throw new Error(`${feature.id}: dropped detached part ${largeDrop.areaKm2.toFixed(3)} km² (>= ${MIN_NON_ISLAND_PART_KM2} km²); refusing silent geometry loss.`);
+    }
+  }
   const selected = dominant.length > 1 ? [dominant[0].polygon] : kept;
   const geometry = selected.length === 1
     ? { type: "Polygon", coordinates: selected[0] }
@@ -240,9 +269,13 @@ function pruneSmallParts(feature) {
 }
 
 function simplifyMetresByRegion(regionId) {
+  // 25 m for Levant neighbours that share one synthetic split line; this keeps that seam
+  // visually stable while preserving precise coastline/river turns near each anchor.
   if (regionId === "galilee") return 25;
   if (regionId === "samaria") return 25;
   if (regionId === "judea") return 25;
+  // 600 m for the rest: island extracts are already coarse from area parts, and Pontus follows
+  // long coast/river stretches where this tolerance keeps gzip size within the lazy-load cap.
   if (regionId === "pontus") return 600;
   return 600;
 }
@@ -281,7 +314,6 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     const inputFiles = await fetchPinnedInputs(cache.inputs);
     const naturalEarthLand = await readJsonFile(inputFiles.naturalEarthLand);
     const naturalEarthRiversMain = await readJsonFile(inputFiles.naturalEarthRiversMain);
-    const naturalEarthRiversEurope = await readJsonFile(inputFiles.naturalEarthRiversEurope);
     const gazaFaceSource = await readJsonFile(gazaFacePath);
     const landMask = (naturalEarthLand.features ?? []).filter((feature) => feature.geometry);
 
@@ -295,9 +327,9 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "galilee",
       geometry: polygonPart(areas, "galilee-perea", 0),
-      sources: ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678163", "pleiades:678378"],
+      sources: ["bib:josephus-jewish-war", "wikidata:Q185318", "wikidata:Q374748", "pleiades:678163", "pleiades:678378", "bib:isbe-en-gannim", "osm:relation/2246907"],
       confidence: "medium",
-      note: "Extracted from galilee-perea part 0. It keeps inherited coastline/river edges from the ancient area build."
+      note: "Galilee as Josephus bounds it (Jewish War 3.3.1): Ptolemais's territory and Mount Carmel to the west, Samaria and Scythopolis to the south, the Jordan and the lake to the east, and Tyre's country to the north. The edges are approximate. The line runs through the eastern end of Carmel, through Ginea and Scythopolis, and includes the north-east Jordan strip from this project's Herodian-area build where Josephus gives no exact line."
     });
     addFeature(features, {
       id: "crete",
@@ -311,7 +343,7 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
       geometry: polygonPart(areas, "crete-cyrene", 1),
       sources: ["bib:strabo-geography", "bib:pliny-natural-history", "bib:isbe-libya", "bib:isbe-cyrene", "pleiades:373777", "pleiades:363959", "pleiades:363924", "scripture:Acts 2:10"],
       confidence: "medium",
-      note: "Extracted whole from crete-cyrene part 1, with inherited AWMC land edges."
+      note: "Cyrenaica, 'the parts of Libya around Cyrene' (Acts 2:10), as this project's AD 69 area draws it. Its west edge meets the Great Syrtis coast 158 km east of Euphrantas Tower (Euphranta/Sirte), following Strabo's distance (17.3.20); that point is 79 km west of the Altars of the Philaeni named by Strabo and Pliny (5.4). No source here gives a first-century survey line, so the west, desert and east edges are approximate."
     });
     addFeature(features, { id: "chios", geometry: polygonPart(areas, "asia", 2), sources: ["bib:strabo-geography", "bib:isbe-chios"], confidence: "high", note: "Extracted whole from asia part 2." });
     addFeature(features, { id: "cos", geometry: polygonPart(areas, "asia", 4), sources: ["bib:strabo-geography", "bib:isbe-cos"], confidence: "high", note: "Extracted whole from asia part 4." });
@@ -359,6 +391,12 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     });
     const samariaPieces = westClip.some((feature) => pointInGeometry(anchorPoint(anchorsById, "samaria-point"), feature.geometry)) ? westClip : westErase;
     const judeaPiecesRaw = samariaPieces === westClip ? westErase : westClip;
+    if (!samariaPieces.some((feature) => pointInGeometry(anchorPoint(anchorsById, "samaria-point"), feature.geometry))) {
+      throw new Error("Samaria/Judea split failed: the Samaria anchor is not inside the Samaria side.");
+    }
+    if (!judeaPiecesRaw.some((feature) => pointInGeometry(anchorPoint(anchorsById, "akrabatta"), feature.geometry))) {
+      throw new Error("Samaria/Judea split failed: Akrabatta is not inside the Judea side.");
+    }
     const gazaFaceInArea = await booleanOpStrict({
       workDirectory,
       tag: "gaza-rhinocolura-face-from-ad69",
@@ -380,22 +418,22 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "samaria",
       geometry: samaria.geometry,
-      sources: ["bib:josephus-jewish-war", "bib:pliny-natural-history", "pleiades:687825", "pleiades:687820", "pleiades:678403", "pleiades:678163", "wikidata:Q374748", "wikidata:Q185318", "bib:isbe-en-gannim"],
+      sources: ["bib:josephus-jewish-war", "bib:pliny-natural-history", "pleiades:687825", "pleiades:687820", "pleiades:678403", "pleiades:678163", "pleiades:678378", "wikidata:Q374748", "wikidata:Q185318", "bib:isbe-en-gannim", "osm:relation/2246907"],
       confidence: "medium",
-      note: "Computed from judea-samaria-idumea with G1.1 line (coast at 32.0954°N → Anouath Borkeos → midpoint north of Akraba → due east to Jordan edge), so coast and Jordan come from the area geometry and Samaria/Judea share the divider exactly."
+      note: "Samaria, which Josephus says 'begins at a village...called Ginea, and ends at the Acrabbene toparchy' (Jewish War 3.3.4). Its south edge runs through Anouath Borkeos, 'the northern boundary of Judea' (3.3.5), and north of Akraba (Acrabatta), so between those anchors the line is approximate. The coast is split with Judea on that line as a convention: Josephus gives Judea's breadth from the Jordan to Joppa and says its maritime places reach Ptolemais, while Pliny calls the coast from Ascalon to Caesarea 'the region of Samaria' but lists Joppa among Judea's toparchies (Natural History 5.14-15)."
     });
     addFeature(features, {
       id: "judea",
       geometry: judea.geometry,
-      sources: ["bib:josephus-jewish-war", "bib:josephus-antiquities", "bib:pliny-natural-history", "pleiades:687825", "pleiades:687820", "pleiades:678403"],
+      sources: ["bib:josephus-jewish-war", "bib:josephus-antiquities", "bib:pliny-natural-history", "pleiades:687825", "pleiades:687820", "pleiades:678403", "awmc:ad69-face-raw-0001", "osm:relation/2246907"],
       confidence: "medium",
-      note: "Computed as judea-samaria-idumea south of G1.1, then removing the existing Gaza–Rhinocolura face piece (G3.1), with Idumea retained."
+      note: "Judea as Josephus describes it (Jewish War 3.3.5), including Idumea among Judea's portions; Pliny lists Idumea separately (Natural History 5.14-15). Its north edge is the same approximate Anouath Borkeos-to-Akraba split line used with Samaria. The coast split is a convention from the two authors' wording, and the Raphia-to-Rhinocolura face is left out: Pliny places those towns and Gaza in Idumaea/Palaestina and calls Ascalon a free town, while Josephus says Augustus added Gaza to Syria (Antiquities 17.11.4). Gaza and Ascalon districts are not drawn as separate regions here."
     });
 
     // Pontus option A: pontus union bithynia east of lower Halys (Kızılırmak) downstream to mouth.
     const pontusArea = areaById(areas, "pontus");
     const bithyniaArea = areaById(areas, "bithynia");
-    const kizilirmak = findKizilirmakFeature(naturalEarthRiversMain, naturalEarthRiversEurope);
+    const kizilirmak = findKizilirmakFeature(naturalEarthRiversMain);
     const riverCoordinates = kizilirmak.geometry?.type === "LineString"
       ? kizilirmak.geometry.coordinates
       : (kizilirmak.geometry?.coordinates?.[0] ?? []);
@@ -409,8 +447,8 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
         ...halysLine.slice(1),
         [halysMouth[0], 43.5],
         [42.5, 43.5],
-        [42.5, 39.0],
-        [35.621, 39.0],
+        [42.5, 40.5],
+        [35.621, 40.5],
         [35.621, 41.287]
       ]]
     });
@@ -430,9 +468,9 @@ export async function buildRegionOutlinesData({ writeOutput = false } = {}) {
     addFeature(features, {
       id: "pontus",
       geometry: pontusUnion.geometry,
-      sources: ["bib:strabo-geography", "bib:isbe-pontus", "bib:isbe-galatia", "pleiades:857024", "pleiades:857350", "naturalearth:ne_10m_rivers_lake_centerlines", "naturalearth:ne_10m_rivers_europe"],
+      sources: ["bib:strabo-geography", "bib:isbe-pontus", "bib:isbe-galatia", "pleiades:857024", "pleiades:857350", "naturalearth:ne-10m-rivers-lake-centerlines"],
       confidence: "medium",
-      note: "Option A: pontus plus the part of bithynia east of the lower Halys (Natural Earth's Kızılırmak), cut from the 35.621°E 41.287°N tripoint downstream to the Black Sea mouth."
+      note: "The kingdom of Pontus, including Pontus Galaticus and Lesser Armenia as this project's Pontus area draws them, plus the coast east of the lower Halys with Amisus and Themiscyra (Strabo 12.3.9; ISBE, 'Pontus'). The west cut follows Natural Earth's Kızılırmak line from the 35.621°E, 41.287°N tripoint downstream; one short straight segment ties the tripoint to the first river vertex, and a second runs north to the sea where the river line ends."
     });
 
     // Clip every region to land.

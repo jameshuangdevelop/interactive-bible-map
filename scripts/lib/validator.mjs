@@ -2838,16 +2838,16 @@ export async function validateData(options = {}) {
         `Schema validation failed: ${issue.message}`
       );
     }
+  }
 
-    if (regionOutlinesData && !validateRegionOutlinesSchema(regionOutlinesData)) {
-      for (const issue of validateRegionOutlinesSchema.errors ?? []) {
-        recordError(
-          errors,
-          regionOutlinesRelativePath,
-          pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
-          `Schema validation failed: ${issue.message}`
-        );
-      }
+  if (regionOutlinesData && !validateRegionOutlinesSchema(regionOutlinesData)) {
+    for (const issue of validateRegionOutlinesSchema.errors ?? []) {
+      recordError(
+        errors,
+        regionOutlinesRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
     }
   }
 

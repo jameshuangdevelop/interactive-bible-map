@@ -15,9 +15,12 @@ import booleanValid from "@turf/boolean-valid";
 import { distancePointToSegmentKm, distanceToGeometryKm, pointInGeometry } from "./lib/ancient-area-checks.mjs";
 import { buildRegionOutlinesData } from "./build-region-outlines.mjs";
 import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
+import { regenerateGazaRhinocoluraFaceFromCache } from "./lib/gaza-rhinocolura-face.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const regionOutlinePath = path.join(repositoryRoot, "data", "geo", "region-outlines.geojson");
+const anchorsPath = path.join(repositoryRoot, "data", "geo", "region-anchors.json");
+const gazaFacePath = path.join(repositoryRoot, "data", "geo", "sources", "gaza-rhinocolura-face.geojson");
 const locationsDirectory = path.join(repositoryRoot, "data", "locations");
 const REQUIRED_REGION_IDS = Object.freeze([
   "samaria",
@@ -36,24 +39,24 @@ const SHARED_EDGE_PAIRS = Object.freeze([
   ["samaria", "judea"]
 ]);
 const ANCHOR_CHECKS = Object.freeze([
-  { name: "Anouath Borkeos", coordinates: [35.265455, 32.095369], mode: "boundary", regions: ["samaria", "judea"] },
-  { name: "Akrabatta", coordinates: [35.342849, 32.127218], mode: "inside", regionId: "judea" },
-  { name: "Sychem", coordinates: [35.2815224, 32.2135568], mode: "inside", regionId: "samaria" },
-  { name: "Ginai(a)", coordinates: [35.302465, 32.461848], mode: "inside", regionId: "galilee" },
-  { name: "Scythopolis", coordinates: [35.504002, 32.504649], mode: "inside", regionId: "galilee" },
-  { name: "Amisus", coordinates: [36.3313, 41.292721], mode: "inside", regionId: "pontus" },
-  { name: "Themiscyra", coordinates: [36.967737, 41.215176], mode: "inside", regionId: "pontus" },
-  { name: "Nicomedia", coordinates: [29.9175, 40.7625], mode: "outside", regionId: "pontus" },
-  { name: "Claudiopolis", coordinates: [31.611561, 40.739479], mode: "outside", regionId: "pontus" },
-  { name: "Prusa", coordinates: [29.06, 40.19], mode: "outside", regionId: "pontus" },
-  { name: "Sinope (west of Halys)", coordinates: [35.151111, 42.026667], mode: "outside", regionId: "pontus" },
-  { name: "Raphia", coordinates: [34.25, 31.29], mode: "outside", regionId: "judea" },
-  { name: "Rhinocolura", coordinates: [33.79694444, 31.11166667], mode: "outside", regionId: "judea" },
-  { name: "Ptolemais outside Samaria", coordinates: [35.0692, 32.9214], mode: "outside", regionId: "samaria" },
-  { name: "Ptolemais outside Judea", coordinates: [35.0692, 32.9214], mode: "outside", regionId: "judea" },
-  { name: "Tyre outside Galilee", coordinates: [35.2, 33.26666667], mode: "outside", regionId: "galilee" },
-  { name: "Cauda", coordinates: [24.083333, 34.833333], mode: "outside", regionId: "crete" },
-  { name: "Mljet", coordinates: [17.528067, 42.761007], mode: "outside", regionId: "malta" }
+  { anchorId: "anouath-borkeos", name: "Anouath Borkeos", mode: "boundary", regions: ["samaria", "judea"] },
+  { anchorId: "akrabatta", name: "Akrabatta", mode: "inside", regionId: "judea" },
+  { anchorId: "sychem", name: "Sychem", mode: "inside", regionId: "samaria" },
+  { anchorId: "ginaia", name: "Ginai(a)", mode: "inside", regionId: "galilee" },
+  { anchorId: "scythopolis", name: "Scythopolis", mode: "inside", regionId: "galilee" },
+  { anchorId: "amisus", name: "Amisus", mode: "inside", regionId: "pontus" },
+  { anchorId: "themiscyra", name: "Themiscyra", mode: "inside", regionId: "pontus" },
+  { anchorId: "nicomedia", name: "Nicomedia", mode: "outside", regionId: "pontus" },
+  { anchorId: "claudiopolis-bithynia", name: "Claudiopolis", mode: "outside", regionId: "pontus" },
+  { anchorId: "prusa", name: "Prusa", mode: "outside", regionId: "pontus" },
+  { anchorId: "sinope-west-halys", name: "Sinope (west of Halys)", mode: "outside", regionId: "pontus" },
+  { anchorId: "raphia", name: "Raphia", mode: "outside", regionId: "judea" },
+  { anchorId: "rhinocolura", name: "Rhinocolura", mode: "outside", regionId: "judea" },
+  { anchorId: "ptolemais", name: "Ptolemais outside Samaria", mode: "outside", regionId: "samaria" },
+  { anchorId: "ptolemais", name: "Ptolemais outside Judea", mode: "outside", regionId: "judea" },
+  { anchorId: "tyre", name: "Tyre outside Galilee", mode: "outside", regionId: "galilee" },
+  { anchorId: "cauda", name: "Cauda", mode: "outside", regionId: "crete" },
+  { anchorId: "mljet", name: "Mljet", mode: "outside", regionId: "malta" }
 ]);
 const COAST_EXCEPTIONS = Object.freeze(new Set([
   "cauda",
@@ -68,7 +71,10 @@ function changedGeoFiles() {
     "data/geo/ancient-areas.geojson",
     "data/geo/ancient-roads.geojson",
     "data/geo/ancient-coastline.geojson",
-    "data/geo/ancient-empire-edge.geojson"
+    "data/geo/ancient-empire-edge.geojson",
+    "data/geo/region-outlines.geojson",
+    "data/geo/region-anchors.json",
+    "data/geo/sources/gaza-rhinocolura-face.geojson"
   ];
   const result = spawnSync("git", ["status", "--porcelain", "--", ...trackedTargets], {
     cwd: repositoryRoot,
@@ -239,6 +245,7 @@ function applySeededError(featureById, seededError) {
 
 async function runRegionOutlineChecks({ seededError }) {
   const outlines = JSON.parse(await fs.readFile(regionOutlinePath, "utf8"));
+  const anchors = JSON.parse(await fs.readFile(anchorsPath, "utf8"));
   const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
   const locationFiles = (await fs.readdir(locationsDirectory))
     .filter((name) => name.endsWith(".json"))
@@ -251,6 +258,11 @@ async function runRegionOutlineChecks({ seededError }) {
   const locationById = new Map(locations.map((location) => [location.id, location]));
   const features = outlines.features ?? [];
   const featureById = new Map(features.map((feature) => [feature.id, feature]));
+  const anchorCoordinatesById = new Map(
+    (anchors.anchors ?? [])
+      .filter((anchor) => typeof anchor?.id === "string" && Array.isArray(anchor?.coordinates))
+      .map((anchor) => [anchor.id, anchor.coordinates])
+  );
   const failures = [];
   const rebuiltBytes = `${JSON.stringify(rebuilt.collection, null, 2)}\n`;
   const committedBytes = await fs.readFile(regionOutlinePath, "utf8");
@@ -332,14 +344,21 @@ async function runRegionOutlineChecks({ seededError }) {
   }
 
   // (e) Anchors on stated sides.
-  const anchorChecks = ANCHOR_CHECKS.map((anchor) => ({ ...anchor }));
+  const anchorChecks = ANCHOR_CHECKS.map((anchor) => {
+    const coordinates = anchorCoordinatesById.get(anchor.anchorId);
+    if (!coordinates) {
+      failures.push(`(e) Missing anchor '${anchor.anchorId}' in data/geo/region-anchors.json.`);
+    }
+    return { ...anchor, coordinates };
+  });
   if (seededError === "e") {
-    const amisus = anchorChecks.find((anchor) => anchor.name === "Amisus");
+    const amisus = anchorChecks.find((anchor) => anchor.anchorId === "amisus");
     if (amisus) {
       amisus.coordinates = [33, 39];
     }
   }
   for (const anchor of anchorChecks) {
+    if (!Array.isArray(anchor.coordinates) || anchor.coordinates.length < 2) continue;
     if (anchor.mode === "boundary") {
       const [leftId, rightId] = anchor.regions;
       const left = featureById.get(leftId);
@@ -417,10 +436,16 @@ async function proofEgOn20320e9() {
   const oldById = new Map((oldCollection.features ?? []).map((feature) => [feature.id, feature]));
   const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
   const failures = [];
+  const anchors = JSON.parse(await fs.readFile(anchorsPath, "utf8"));
+  const anchorCoordinatesById = new Map(
+    (anchors.anchors ?? []).map((anchor) => [anchor.id, anchor.coordinates])
+  );
   for (const anchor of ANCHOR_CHECKS) {
     if (anchor.mode !== "outside") continue;
+    const coordinates = anchorCoordinatesById.get(anchor.anchorId);
+    if (!Array.isArray(coordinates) || coordinates.length < 2) continue;
     const feature = oldById.get(anchor.regionId);
-    if (feature && pointInGeometry(anchor.coordinates, feature.geometry)) {
+    if (feature && pointInGeometry(coordinates, feature.geometry)) {
       failures.push(`(e) ${anchor.name} is inside ${anchor.regionId} in 20320e9.`);
     }
   }
@@ -430,6 +455,18 @@ async function proofEgOn20320e9() {
   }
   console.log("Proof for new checks on 20320e9:");
   for (const failure of failures) console.log(`- ${failure}`);
+}
+
+async function verifyGazaFaceReproducibility(cacheRoot) {
+  const committed = JSON.parse(await fs.readFile(gazaFacePath, "utf8"));
+  const regenerated = await regenerateGazaRhinocoluraFaceFromCache(cacheRoot);
+  const committedBytes = `${JSON.stringify(committed, null, 2)}\n`;
+  const regeneratedBytes = `${JSON.stringify(regenerated, null, 2)}\n`;
+  if (committedBytes !== regeneratedBytes) {
+    throw new Error(
+      "data/geo/sources/gaza-rhinocolura-face.geojson is not reproducible from the pinned AD 69 compose output."
+    );
+  }
 }
 
 async function main() {
@@ -447,6 +484,7 @@ async function main() {
     if (build.status !== 0) throw new Error(`npm run build:ancient-geo failed (exit code ${build.status})`);
     const after = changedGeoFiles();
     if (after.length > 0) throw new Error(`The rebuild from an empty cache differs from the committed data/geo/:\n${after.join("\n")}`);
+    await verifyGazaFaceReproducibility(cache);
     await runRegionOutlineChecks({ seededError });
     if (runProof) {
       await proofFOnFe27276();

@@ -4,7 +4,13 @@
     {
       "type": "Feature",
       "properties": {
-        "source": "awmc:ad69-face-f0052-derived"
+        "source": "awmc:ad69-face-raw-0001",
+        "provenance": {
+          "dataset": "AWMC Roman Empire AD 69 land faces (raw) clipped by pinned Natural Earth land in scripts/build-ancient-geo.mjs",
+          "awmcCommit": "7ecf8bccea2efe1e1e9df2daf6001942de73fb87",
+          "naturalEarthCommit": "ca96624a56bd078437bca8184e78163e5039ad19",
+          "derivation": "Derived by scripts/lib/ancient-compose.mjs as booleanOp('raphia-coast','erase'): AD 69 raw face raw-0001, minus Aegyptus, the AD 69 Syria merged face and the Herodian base; this is the 1,570 km² Gaza-Rhinocolura coastal face used by the judea-samaria-idumea ruling change."
+        }
       },
       "geometry": {
         "type": "Polygon",
