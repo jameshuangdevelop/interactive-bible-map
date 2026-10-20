@@ -1003,43 +1003,37 @@ function createRouteDirectionArrowImage() {
 }
 
 function createSelectedPlacePinImage() {
-  return createCanvasImage(15, 27, (context, width, height) => {
+  return createCanvasImage(19, 27, (context, width, height) => {
     context.clearRect(0, 0, width, height);
-    const centerX = width / 2;
-    const headRadius = 6.2;
-    const headCenterY = 7.6;
-    const tipY = height - 1;
-    const leftHeadX = centerX - headRadius;
-    const rightHeadX = centerX + headRadius;
-    const stemShoulderY = 11.2;
-    const centerDotRadius = headRadius * 0.36;
-
-    context.fillStyle = "#D84235";
-    context.beginPath();
-    context.arc(centerX, headCenterY, headRadius, Math.PI * 0.02, Math.PI * 0.98, true);
-    context.bezierCurveTo(
-      leftHeadX + 0.15,
-      stemShoulderY + 2.3,
-      centerX - 1.2,
-      height - 8.8,
-      centerX,
-      tipY
+    // The "place" icon from Google Material Icons (Apache License 2.0); see ATTRIBUTION.md.
+    const pinPath = new Path2D(
+      "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
     );
-    context.bezierCurveTo(
-      centerX + 1.2,
-      height - 8.8,
-      rightHeadX - 0.15,
-      stemShoulderY + 2.3,
-      rightHeadX,
-      headCenterY
-    );
-    context.closePath();
-    context.fill();
+    const sourceBounds = { minX: 5, minY: 2, width: 14, height: 20 };
+    const targetHeight = 25.8;
+    const scale = targetHeight / sourceBounds.height;
+    const scaledWidth = sourceBounds.width * scale;
+    const offsetX = (width - scaledWidth) / 2 + 0.35;
+    const offsetY = height - sourceBounds.height * scale - 0.5;
+    const strokeWidth = 1;
 
-    context.fillStyle = "#6E2D27";
+    context.save();
+    context.translate(offsetX - sourceBounds.minX * scale, offsetY - sourceBounds.minY * scale);
+    context.scale(scale, scale);
+    context.fillStyle = "#EA4335";
+    context.fill(pinPath);
+
+    context.lineJoin = "miter";
+    context.lineCap = "butt";
+    context.lineWidth = strokeWidth / scale;
+    context.strokeStyle = "#C5221F";
+    context.stroke(pinPath);
+
+    context.fillStyle = "#B31412";
     context.beginPath();
-    context.arc(centerX, headCenterY, centerDotRadius, 0, Math.PI * 2);
+    context.arc(12, 9, 2.5, 0, Math.PI * 2);
     context.fill();
+    context.restore();
   });
 }
 
@@ -2023,7 +2017,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["==", ["get", "hasMultipleCandidates"], true],
           ["literal", [0, -0.45]],
           ["literal", [0, 0]]
@@ -2187,7 +2181,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["==", ["get", "hasMultipleCandidates"], true],
           ["literal", [0, -MAJOR_SELECTED_NAME_RAISE_EM]],
           ["literal", [0, 0]]
@@ -2239,7 +2233,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["==", ["get", "hasMultipleCandidates"], true],
           ["literal", [0, -0.45]],
           ["literal", [0, 0]]
@@ -2280,7 +2274,7 @@ function ensureMapLayers(map: MapLibreMap) {
         "text-offset": toExpression([
           "case",
           ["==", ["get", "showSelectionPin"], true],
-          ["literal", [0.95, 0]],
+          ["literal", [1.05, 0]],
           ["literal", [0, 0]]
         ]),
         "text-allow-overlap": false,

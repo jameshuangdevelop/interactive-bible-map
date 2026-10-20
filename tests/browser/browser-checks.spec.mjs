@@ -1903,7 +1903,7 @@ test("clicking another region moves the highlight; towns under veil stay clickab
   );
 });
 
-test("selected place pin image is slimmer and anchored to a bottom tip pixel @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("selected place pin image matches Google marker proportions and tip anchor @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
 
@@ -1943,9 +1943,10 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
       if (alpha < 150) {
         return false;
       }
-      const isMainRed = Math.abs(red - 216) <= 34 && Math.abs(green - 66) <= 34 && Math.abs(blue - 53) <= 34;
-      const isCenterDotRed = Math.abs(red - 110) <= 30 && Math.abs(green - 45) <= 30 && Math.abs(blue - 39) <= 30;
-      return isMainRed || isCenterDotRed;
+      const isFillRed = Math.abs(red - 234) <= 35 && Math.abs(green - 67) <= 35 && Math.abs(blue - 53) <= 35;
+      const isBorderRed = Math.abs(red - 197) <= 35 && Math.abs(green - 34) <= 35 && Math.abs(blue - 31) <= 35;
+      const isCenterDotRed = Math.abs(red - 179) <= 35 && Math.abs(green - 20) <= 35 && Math.abs(blue - 18) <= 35;
+      return isFillRed || isBorderRed || isCenterDotRed;
     };
     let minX = Number.POSITIVE_INFINITY;
     let maxX = Number.NEGATIVE_INFINITY;
@@ -1973,8 +1974,8 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
           height: maxY - minY + 1
         }
       : null;
-    const bottomRowWidths = hasBoundingBox
-      ? [0, 1, 2].map((rowOffset) => {
+    const bottomTipRowWidths = hasBoundingBox
+      ? [0, 1].map((rowOffset) => {
           const y = maxY - rowOffset;
           let rowWidth = 0;
           for (let x = minX; x <= maxX; x += 1) {
@@ -1994,20 +1995,21 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
       tipPixels,
       topLeftPixel,
       bbox,
-      bottomRowWidths
+      bottomTipRowWidths
     };
   }, mapTestHookKey);
 
-  expect(probe.cssWidth).toBe(15);
+  expect(probe.cssWidth).toBe(19);
   expect(probe.cssHeight).toBe(27);
   const maxTipAlpha = Math.max(...probe.tipPixels.map((pixel) => pixel[3]), 0);
   const maxTipRed = Math.max(...probe.tipPixels.map((pixel) => pixel[0]), 0);
   expect(maxTipAlpha).toBeGreaterThan(0);
   expect(maxTipRed).toBeGreaterThan(140);
   expect(probe.topLeftPixel?.[3] ?? 0).toBe(0);
-  const bboxRatio = (probe.bbox?.width ?? 0) / (probe.bbox?.height ?? 1);
-  expect(bboxRatio).toBeLessThanOrEqual(0.62);
-  expect(Math.max(...probe.bottomRowWidths, 0)).toBeLessThanOrEqual(2);
+  const bboxRatio = (probe.bbox?.height ?? 0) / (probe.bbox?.width ?? 1);
+  expect(bboxRatio).toBeGreaterThanOrEqual(1.33);
+  expect(bboxRatio).toBeLessThanOrEqual(1.53);
+  expect(Math.max(...probe.bottomTipRowWidths, 0)).toBeLessThanOrEqual(2);
 });
 
 test("routes stage-4 names stay interactive while only non-selected lines dim @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
