@@ -1,0 +1,24 @@
+{
+  "anchors": [
+    { "id": "anouath-borkeos", "sourceId": "pleiades:687825", "coordinates": [35.265455, 32.095369] },
+    { "id": "akrabatta", "sourceId": "pleiades:687820", "coordinates": [35.342849, 32.127218] },
+    { "id": "sychem", "sourceId": "pleiades:678403", "coordinates": [35.2815224, 32.2135568] },
+    { "id": "ginaia", "sourceId": "pleiades:678163", "coordinates": [35.302465, 32.461848] },
+    { "id": "scythopolis", "sourceId": "pleiades:678378", "coordinates": [35.504002, 32.504649] },
+    { "id": "samaria-point", "sourceId": "wikidata:Q44836840", "coordinates": [35.190436, 32.276529] },
+    { "id": "gaza-rhinocolura-face", "sourceId": "pleiades:687898", "coordinates": [34.25, 31.29] },
+
+    { "id": "amisus", "sourceId": "pleiades:857024", "coordinates": [36.3313, 41.292721] },
+    { "id": "themiscyra", "sourceId": "pleiades:857350", "coordinates": [36.967737, 41.215176] },
+    { "id": "nicomedia", "sourceId": "wikidata:Q209349", "coordinates": [29.9175, 40.7625] },
+    { "id": "claudiopolis-bithynia", "sourceId": "wikidata:Q65088749", "coordinates": [31.611561, 40.739479] },
+    { "id": "prusa", "sourceId": "pleiades:511384", "coordinates": [29.06, 40.19] },
+    { "id": "sinope-west-halys", "sourceId": "wikidata:Q599416", "coordinates": [35.151111, 42.026667] },
+    { "id": "rhinocolura", "sourceId": "wikidata:Q2148121", "coordinates": [33.79694444, 31.11166667] },
+    { "id": "ptolemais", "sourceId": "pleiades:678010", "coordinates": [35.0692, 32.9214] },
+    { "id": "tyre", "sourceId": "wikidata:Q82070", "coordinates": [35.2, 33.26666667] },
+
+    { "id": "cauda", "sourceId": "pleiades:589748", "coordinates": [24.083333, 34.833333] },
+    { "id": "mljet", "sourceId": "pleiades:197376", "coordinates": [17.528067, 42.761007] }
+  ]
+}

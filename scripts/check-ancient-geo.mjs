@@ -11,16 +11,429 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import booleanValid from "@turf/boolean-valid";
+import { distancePointToSegmentKm, distanceToGeometryKm, pointInGeometry } from "./lib/ancient-area-checks.mjs";
+import { buildRegionOutlinesData } from "./build-region-outlines.mjs";
+import { geometryAreaKm2, polygonsOf } from "./lib/geometry-cleanup.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const regionOutlinePath = path.join(repositoryRoot, "data", "geo", "region-outlines.geojson");
+const locationsDirectory = path.join(repositoryRoot, "data", "locations");
+const REQUIRED_REGION_IDS = Object.freeze([
+  "samaria",
+  "galilee",
+  "judea",
+  "pontus",
+  "crete",
+  "libya",
+  "chios",
+  "cos",
+  "malta",
+  "rhodes",
+  "samos"
+]);
+const SHARED_EDGE_PAIRS = Object.freeze([
+  ["samaria", "judea"]
+]);
+const ANCHOR_CHECKS = Object.freeze([
+  { name: "Anouath Borkeos", coordinates: [35.265455, 32.095369], mode: "boundary", regions: ["samaria", "judea"] },
+  { name: "Akrabatta", coordinates: [35.342849, 32.127218], mode: "inside", regionId: "judea" },
+  { name: "Sychem", coordinates: [35.2815224, 32.2135568], mode: "inside", regionId: "samaria" },
+  { name: "Ginai(a)", coordinates: [35.302465, 32.461848], mode: "inside", regionId: "galilee" },
+  { name: "Scythopolis", coordinates: [35.504002, 32.504649], mode: "inside", regionId: "galilee" },
+  { name: "Amisus", coordinates: [36.3313, 41.292721], mode: "inside", regionId: "pontus" },
+  { name: "Themiscyra", coordinates: [36.967737, 41.215176], mode: "inside", regionId: "pontus" },
+  { name: "Nicomedia", coordinates: [29.9175, 40.7625], mode: "outside", regionId: "pontus" },
+  { name: "Claudiopolis", coordinates: [31.611561, 40.739479], mode: "outside", regionId: "pontus" },
+  { name: "Prusa", coordinates: [29.06, 40.19], mode: "outside", regionId: "pontus" },
+  { name: "Sinope (west of Halys)", coordinates: [35.151111, 42.026667], mode: "outside", regionId: "pontus" },
+  { name: "Raphia", coordinates: [34.25, 31.29], mode: "outside", regionId: "judea" },
+  { name: "Rhinocolura", coordinates: [33.79694444, 31.11166667], mode: "outside", regionId: "judea" },
+  { name: "Ptolemais outside Samaria", coordinates: [35.0692, 32.9214], mode: "outside", regionId: "samaria" },
+  { name: "Ptolemais outside Judea", coordinates: [35.0692, 32.9214], mode: "outside", regionId: "judea" },
+  { name: "Tyre outside Galilee", coordinates: [35.2, 33.26666667], mode: "outside", regionId: "galilee" },
+  { name: "Cauda", coordinates: [24.083333, 34.833333], mode: "outside", regionId: "crete" },
+  { name: "Mljet", coordinates: [17.528067, 42.761007], mode: "outside", regionId: "malta" }
+]);
+const COAST_EXCEPTIONS = Object.freeze(new Set([
+  "cauda",
+  "sea-of-galilee",
+  "cana:qana",
+  "malta:mljet"
+]));
+const EPSILON = 1e-9;
 
 function changedGeoFiles() {
-  const result = spawnSync("git", ["status", "--porcelain", "--", "data/geo"], { cwd: repositoryRoot, encoding: "utf8" });
+  const trackedTargets = [
+    "data/geo/ancient-areas.geojson",
+    "data/geo/ancient-roads.geojson",
+    "data/geo/ancient-coastline.geojson",
+    "data/geo/ancient-empire-edge.geojson"
+  ];
+  const result = spawnSync("git", ["status", "--porcelain", "--", ...trackedTargets], {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
   if (result.status !== 0) throw new Error(`git status failed: ${result.stderr}`);
   return result.stdout.split(/\r?\n/).filter(Boolean);
 }
 
+function parseArguments(argv) {
+  let seededError = null;
+  let proofFOnFe27276 = false;
+  let proofEgOn20320e9 = false;
+  for (const argument of argv) {
+    if (argument.startsWith("--seed-error=")) {
+      seededError = argument.slice("--seed-error=".length).trim();
+      continue;
+    }
+    if (argument === "--proof-f-on-fe27276") {
+      proofFOnFe27276 = true;
+      continue;
+    }
+    if (argument === "--proof-eg-on-20320e9") {
+      proofEgOn20320e9 = true;
+      continue;
+    }
+    throw new Error(`Unknown argument '${argument}'.`);
+  }
+  if (seededError && !["b", "d", "e"].includes(seededError)) {
+    throw new Error("--seed-error supports only b, d or e.");
+  }
+  return { seededError, proofFOnFe27276, proofEgOn20320e9 };
+}
+
+function ringsOf(geometry) {
+  if (!geometry) return [];
+  if (geometry.type === "Polygon") return geometry.coordinates;
+  if (geometry.type === "MultiPolygon") return geometry.coordinates.flatMap((polygon) => polygon);
+  return [];
+}
+
+function ringSegments(geometry) {
+  const segments = [];
+  for (const ring of ringsOf(geometry)) {
+    for (let index = 1; index < ring.length; index += 1) {
+      segments.push([ring[index - 1], ring[index]]);
+    }
+  }
+  return segments;
+}
+
+function normalizedSegmentKey(start, end) {
+  const a = `${start[0].toFixed(5)},${start[1].toFixed(5)}`;
+  const b = `${end[0].toFixed(5)},${end[1].toFixed(5)}`;
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+function vertexList(geometry) {
+  const points = [];
+  for (const ring of ringsOf(geometry)) {
+    for (let index = 0; index < ring.length - 1; index += 1) {
+      points.push(ring[index]);
+    }
+  }
+  return points;
+}
+
+function distanceToAnyGeometryKm(point, geometry) {
+  if (!geometry) return Number.POSITIVE_INFINITY;
+  if (geometry.type === "Polygon" || geometry.type === "MultiPolygon") {
+    return distanceToGeometryKm(point, geometry);
+  }
+  if (geometry.type === "LineString") {
+    let minimum = Number.POSITIVE_INFINITY;
+    const line = geometry.coordinates ?? [];
+    for (let index = 1; index < line.length; index += 1) {
+      minimum = Math.min(minimum, distancePointToSegmentKm(point, line[index - 1], line[index]));
+    }
+    return minimum;
+  }
+  if (geometry.type === "MultiLineString") {
+    return Math.min(...(geometry.coordinates ?? []).map((line) => distanceToAnyGeometryKm(point, { type: "LineString", coordinates: line })));
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
+function candidateExceptionKey(locationId, candidate) {
+  const label = typeof candidate?.label === "string" ? candidate.label.toLowerCase() : "";
+  if (locationId === "cana" && label.includes("qana")) return "cana:qana";
+  if (locationId === "malta" && label.includes("mljet")) return "malta:mljet";
+  return locationId;
+}
+
+function mutateGeometryVertices(geometry, mutator) {
+  if (!geometry) return;
+  if (geometry.type === "Polygon") {
+    for (const ring of geometry.coordinates ?? []) {
+      for (const position of ring ?? []) mutator(position);
+    }
+    return;
+  }
+  if (geometry.type === "MultiPolygon") {
+    for (const polygon of geometry.coordinates ?? []) {
+      for (const ring of polygon ?? []) {
+        for (const position of ring ?? []) mutator(position);
+      }
+    }
+  }
+}
+
+function partCount(geometry) {
+  return polygonsOf(geometry).length;
+}
+
+function evaluateAreaSanity(featureById, sanity) {
+  const failures = [];
+  const pontus = featureById.get("pontus");
+  if (pontus && sanity?.pontusBaseAreaKm2 != null) {
+    const pontusAreaKm2 = geometryAreaKm2(pontus.geometry);
+    if (pontusAreaKm2 < sanity.pontusBaseAreaKm2 || pontusAreaKm2 > sanity.pontusBaseAreaKm2 + 6000) {
+      failures.push(
+        `(g) pontus area ${pontusAreaKm2.toFixed(1)} km² is outside [${sanity.pontusBaseAreaKm2.toFixed(1)}, ${(sanity.pontusBaseAreaKm2 + 6000).toFixed(1)}].`
+      );
+    }
+  }
+
+  const judea = featureById.get("judea");
+  const samaria = featureById.get("samaria");
+  if (judea && samaria && sanity?.judeaSamariaCombinedKm2 != null) {
+    const combined = geometryAreaKm2(judea.geometry) + geometryAreaKm2(samaria.geometry);
+    const ratio = combined / sanity.judeaSamariaCombinedKm2;
+    if (Math.abs(ratio - 1) > 0.01) {
+      failures.push(
+        `(g) judea+samaria area ${combined.toFixed(1)} km² differs from source target ${sanity.judeaSamariaCombinedKm2.toFixed(1)} km² by ${((ratio - 1) * 100).toFixed(2)}%.`
+      );
+    }
+  }
+
+  for (const regionId of sanity?.nonIslandIds ?? []) {
+    const feature = featureById.get(regionId);
+    if (!feature) continue;
+    const parts = partCount(feature.geometry);
+    if (parts !== 1) {
+      failures.push(`(g) ${regionId} has ${parts} parts (expected 1 for non-island outlines).`);
+    }
+  }
+  return failures;
+}
+
+function applySeededError(featureById, seededError) {
+  if (seededError === "b") {
+    const samaria = featureById.get("samaria");
+    if (!samaria) return;
+    mutateGeometryVertices(samaria.geometry, (position) => {
+      position[0] += 2;
+    });
+    return;
+  }
+  if (seededError === "d") {
+    const judea = featureById.get("judea");
+    if (!judea) return;
+    mutateGeometryVertices(judea.geometry, (position) => {
+      position[0] += 0.01;
+    });
+    return;
+  }
+}
+
+async function runRegionOutlineChecks({ seededError }) {
+  const outlines = JSON.parse(await fs.readFile(regionOutlinePath, "utf8"));
+  const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
+  const locationFiles = (await fs.readdir(locationsDirectory))
+    .filter((name) => name.endsWith(".json"))
+    .sort((left, right) => left.localeCompare(right));
+  const locations = await Promise.all(
+    locationFiles.map(async (name) =>
+      JSON.parse(await fs.readFile(path.join(locationsDirectory, name), "utf8"))
+    )
+  );
+  const locationById = new Map(locations.map((location) => [location.id, location]));
+  const features = outlines.features ?? [];
+  const featureById = new Map(features.map((feature) => [feature.id, feature]));
+  const failures = [];
+  const rebuiltBytes = `${JSON.stringify(rebuilt.collection, null, 2)}\n`;
+  const committedBytes = await fs.readFile(regionOutlinePath, "utf8");
+
+  if (committedBytes !== rebuiltBytes) {
+    failures.push("(a) data/geo/region-outlines.geojson is not reproducible from scripts/build-region-outlines.mjs.");
+  }
+
+  applySeededError(featureById, seededError);
+
+  for (const regionId of REQUIRED_REGION_IDS) {
+    if (!featureById.has(regionId)) {
+      failures.push(`Missing outline feature '${regionId}'.`);
+    }
+  }
+
+  for (const [regionId, feature] of featureById.entries()) {
+    const confidence = feature?.properties?.confidence;
+    if (!["high", "medium", "low"].includes(confidence)) {
+      failures.push(`${regionId}: confidence must be high|medium|low.`);
+    }
+    const sources = feature?.properties?.sources;
+    if (!Array.isArray(sources) || sources.length === 0) {
+      failures.push(`${regionId}: missing properties.sources.`);
+    }
+    const geometryType = feature?.geometry?.type;
+    if (geometryType !== "Polygon" && geometryType !== "MultiPolygon") {
+      failures.push(`${regionId}: geometry must be Polygon or MultiPolygon.`);
+      continue;
+    }
+    if (!booleanValid(feature)) {
+      failures.push(`${regionId}: geometry is invalid.`);
+    }
+  }
+
+  // (b) Region point inside.
+  for (const regionId of REQUIRED_REGION_IDS) {
+    const location = locationById.get(regionId);
+    const feature = featureById.get(regionId);
+    if (!location || !feature) continue;
+    const regionPoint = location?.candidates?.[0]?.coordinates;
+    if (!Array.isArray(regionPoint) || regionPoint.length < 2) continue;
+    if (!pointInGeometry(regionPoint, feature.geometry)) {
+      failures.push(`(b) ${regionId}: region point is outside its outline.`);
+    }
+  }
+
+  // (c) Child places inside or within 1 km, with named exceptions.
+  for (const regionId of REQUIRED_REGION_IDS) {
+    const feature = featureById.get(regionId);
+    if (!feature) continue;
+    const children = locations.filter((location) => location.parentId === regionId);
+    for (const child of children) {
+      for (const candidate of child.candidates ?? []) {
+        const key = candidateExceptionKey(child.id, candidate);
+        if (COAST_EXCEPTIONS.has(key)) continue;
+        const coordinates = candidate?.coordinates;
+        if (!Array.isArray(coordinates) || coordinates.length < 2) continue;
+        if (pointInGeometry(coordinates, feature.geometry)) continue;
+        const distanceKm = distanceToGeometryKm(coordinates, feature.geometry);
+        if (distanceKm > 1) {
+          failures.push(
+            `(c) ${child.id} (${regionId}) candidate '${candidate.label}' is ${distanceKm.toFixed(2)} km from the outline.`
+          );
+        }
+      }
+    }
+  }
+
+  // (d) Shared borders are built once.
+  for (const [leftId, rightId] of SHARED_EDGE_PAIRS) {
+    const left = featureById.get(leftId);
+    const right = featureById.get(rightId);
+    if (!left || !right) continue;
+    const leftSegments = new Set(ringSegments(left.geometry).map(([start, end]) => normalizedSegmentKey(start, end)));
+    const rightSegments = new Set(ringSegments(right.geometry).map(([start, end]) => normalizedSegmentKey(start, end)));
+    const shared = [...leftSegments].filter((segment) => rightSegments.has(segment));
+    if (shared.length === 0) failures.push(`(d) ${leftId}|${rightId} has no shared boundary segments.`);
+  }
+
+  // (e) Anchors on stated sides.
+  const anchorChecks = ANCHOR_CHECKS.map((anchor) => ({ ...anchor }));
+  if (seededError === "e") {
+    const amisus = anchorChecks.find((anchor) => anchor.name === "Amisus");
+    if (amisus) {
+      amisus.coordinates = [33, 39];
+    }
+  }
+  for (const anchor of anchorChecks) {
+    if (anchor.mode === "boundary") {
+      const [leftId, rightId] = anchor.regions;
+      const left = featureById.get(leftId);
+      const right = featureById.get(rightId);
+      if (!left || !right) continue;
+      const leftDistance = distanceToGeometryKm(anchor.coordinates, left.geometry);
+      const rightDistance = distanceToGeometryKm(anchor.coordinates, right.geometry);
+      if (leftDistance > 0.15 || rightDistance > 0.15) {
+        failures.push(`(e) ${anchor.name} expected on the ${leftId}/${rightId} boundary (distances ${leftDistance.toFixed(3)} km, ${rightDistance.toFixed(3)} km).`);
+      }
+      continue;
+    }
+    const feature = featureById.get(anchor.regionId);
+    if (!feature) continue;
+    const inside = pointInGeometry(anchor.coordinates, feature.geometry);
+    const shouldBeInside = anchor.mode === "inside";
+    if (inside !== shouldBeInside) {
+      failures.push(`(e) ${anchor.name} expected ${shouldBeInside ? "inside" : "outside"} ${anchor.regionId}.`);
+    }
+  }
+
+  // (f) Every vertex is from an allowed input edge/line (within 100 m).
+  const allowed = rebuilt.allowedInputGeometries;
+  for (const feature of features) {
+    for (const vertex of vertexList(feature.geometry)) {
+      let nearest = Infinity;
+      for (const geometry of allowed) {
+        nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry));
+      }
+      if (nearest > 0.1) {
+        failures.push(`(f) ${feature.id} has vertex ${JSON.stringify(vertex)} farther than 100 m from permitted inputs (${nearest.toFixed(3)} km).`);
+        break;
+      }
+    }
+  }
+
+  // (g) Area sanity and part sanity.
+  failures.push(...evaluateAreaSanity(featureById, rebuilt.sanity));
+
+  if (failures.length > 0) {
+    throw new Error(`Region outline checks failed:\n- ${failures.join("\n- ")}`);
+  }
+  console.log("Region outline checks passed (a) through (g).");
+}
+
+async function proofFOnFe27276() {
+  const previous = spawnSync("git", ["show", "fe27276:data/geo/region-outlines.geojson"], {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
+  if (previous.status !== 0) throw new Error(`git show failed: ${previous.stderr}`);
+  const oldCollection = JSON.parse(previous.stdout);
+  const oldSamaria = (oldCollection.features ?? []).find((feature) => feature.id === "samaria");
+  if (!oldSamaria) throw new Error("fe27276 has no samaria feature.");
+  const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
+  let maxDistanceKm = 0;
+  for (const vertex of vertexList(oldSamaria.geometry)) {
+    let nearest = Infinity;
+    for (const geometry of rebuilt.allowedInputGeometries) {
+      nearest = Math.min(nearest, distanceToAnyGeometryKm(vertex, geometry));
+    }
+    maxDistanceKm = Math.max(maxDistanceKm, nearest);
+  }
+  if (maxDistanceKm <= 0.1) throw new Error(`Expected fe27276 Samaria to fail (f), but max distance is ${maxDistanceKm.toFixed(3)} km.`);
+  console.log(`Proof for (f): fe27276 samaria fails with max vertex distance ${maxDistanceKm.toFixed(3)} km (> 0.100 km).`);
+}
+
+async function proofEgOn20320e9() {
+  const previous = spawnSync("git", ["show", "20320e9:data/geo/region-outlines.geojson"], {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
+  if (previous.status !== 0) throw new Error(`git show failed: ${previous.stderr}`);
+  const oldCollection = JSON.parse(previous.stdout);
+  const oldById = new Map((oldCollection.features ?? []).map((feature) => [feature.id, feature]));
+  const rebuilt = await buildRegionOutlinesData({ writeOutput: false });
+  const failures = [];
+  for (const anchor of ANCHOR_CHECKS) {
+    if (anchor.mode !== "outside") continue;
+    const feature = oldById.get(anchor.regionId);
+    if (feature && pointInGeometry(anchor.coordinates, feature.geometry)) {
+      failures.push(`(e) ${anchor.name} is inside ${anchor.regionId} in 20320e9.`);
+    }
+  }
+  failures.push(...evaluateAreaSanity(oldById, rebuilt.sanity));
+  if (failures.length === 0) {
+    throw new Error("Expected 20320e9 to fail new (e)/(g) checks, but it passed.");
+  }
+  console.log("Proof for new checks on 20320e9:");
+  for (const failure of failures) console.log(`- ${failure}`);
+}
+
 async function main() {
+  const { seededError, proofFOnFe27276: runProof, proofEgOn20320e9: runProofEg } = parseArguments(process.argv.slice(2));
   const before = changedGeoFiles();
   if (before.length > 0) throw new Error(`data/geo/ has uncommitted changes, so the rebuild can't be compared with it:\n${before.join("\n")}`);
   const cache = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-ancient-geo-check-"));
@@ -34,6 +447,13 @@ async function main() {
     if (build.status !== 0) throw new Error(`npm run build:ancient-geo failed (exit code ${build.status})`);
     const after = changedGeoFiles();
     if (after.length > 0) throw new Error(`The rebuild from an empty cache differs from the committed data/geo/:\n${after.join("\n")}`);
+    await runRegionOutlineChecks({ seededError });
+    if (runProof) {
+      await proofFOnFe27276();
+    }
+    if (runProofEg) {
+      await proofEgOn20320e9();
+    }
     console.log(`Reproduced data/geo/ byte for byte from an empty cache in ${Math.round((Date.now() - started) / 1000)} s.`);
   } finally {
     await fs.rm(cache, { recursive: true, force: true });

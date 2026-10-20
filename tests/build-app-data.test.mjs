@@ -966,7 +966,28 @@ test("buildAppData fails when ancient generated files exceed the gzip budget", a
           outputDirectory,
           maxAncientLayerGzipBytes: 1
         }),
-      /Ancient layer generated files exceed/u
+      /Ancient startup layer generated files exceed/u
+    );
+  });
+});
+
+test("buildAppData fails when ancient region outlines exceed the separate gzip cap", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(validCaseDirectory, "locations"),
+          mediaDirectory: path.join(validCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          ancientSourceDirectory: ancientFixtureDirectory,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          requireEmpireRoot: false,
+          requireModernCountries: false,
+          outputDirectory,
+          maxAncientRegionOutlinesGzipBytes: 1
+        }),
+      /Ancient region outlines exceed/u
     );
   });
 });
@@ -1054,6 +1075,7 @@ test("buildAncientAppData keeps label points inside concave polygons", async () 
       ancientAreasData,
       ancientRoadsData: { type: "FeatureCollection", features: [] },
       ancientCoastlineData: { type: "FeatureCollection", features: [] },
+      regionOutlinesData: { type: "FeatureCollection", features: [] },
       outputDirectory
     });
 
