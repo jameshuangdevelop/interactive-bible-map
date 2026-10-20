@@ -91,6 +91,241 @@ function unionHoleSignatures(geometry) {
   return signatures;
 }
 
+function pointInRing(point, ring) {
+  let inside = false;
+  for (
+    let index = 0, previousIndex = ring.length - 1;
+    index < ring.length;
+    previousIndex = index, index += 1
+  ) {
+    const [x1, y1] = ring[index];
+    const [x2, y2] = ring[previousIndex];
+    const intersects =
+      (y1 > point[1]) !== (y2 > point[1]) &&
+      point[0] < ((x2 - x1) * (point[1] - y1)) / (y2 - y1) + x1;
+    if (intersects) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
+
+function pointInPolygon(point, polygonCoordinates) {
+  if (!pointInRing(point, polygonCoordinates[0])) {
+    return false;
+  }
+  for (let index = 1; index < polygonCoordinates.length; index += 1) {
+    if (pointInRing(point, polygonCoordinates[index])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function pointInRegionGeometry(point, geometry) {
+  if (!isPolygonGeometry(geometry)) {
+    return false;
+  }
+  return polygonsOf(geometry).some((polygonCoordinates) => pointInPolygon(point, polygonCoordinates));
+}
+
+function ringVertices(ring) {
+  if (!Array.isArray(ring) || ring.length === 0) {
+    return [];
+  }
+  const [firstLon, firstLat] = ring[0];
+  const [lastLon, lastLat] = ring[ring.length - 1] ?? [];
+  const isClosed =
+    Number.isFinite(firstLon) &&
+    Number.isFinite(firstLat) &&
+    Number.isFinite(lastLon) &&
+    Number.isFinite(lastLat) &&
+    firstLon === lastLon &&
+    firstLat === lastLat;
+  return isClosed ? ring.slice(0, -1) : ring;
+}
+
+function boundarySegmentsForGeometry(geometry) {
+  if (!geometry) {
+    return [];
+  }
+  const segments = [];
+  const rings =
+    geometry.type === "Polygon"
+      ? geometry.coordinates
+      : geometry.type === "MultiPolygon"
+        ? geometry.coordinates.flatMap((polygon) => polygon)
+        : geometry.type === "LineString"
+          ? [geometry.coordinates]
+          : geometry.type === "MultiLineString"
+            ? geometry.coordinates
+            : [];
+  for (const ring of rings) {
+    if (!Array.isArray(ring) || ring.length < 2) {
+      continue;
+    }
+    for (let index = 0; index < ring.length - 1; index += 1) {
+      const start = ring[index];
+      const end = ring[index + 1];
+      const minLon = Math.min(start[0], end[0]);
+      const maxLon = Math.max(start[0], end[0]);
+      const minLat = Math.min(start[1], end[1]);
+      const maxLat = Math.max(start[1], end[1]);
+      segments.push({ start, end, minLon, maxLon, minLat, maxLat });
+    }
+  }
+  return segments;
+}
+
+function kmToLatitudeDegrees(km) {
+  return km / 110.574;
+}
+
+function kmToLongitudeDegrees(km, latitude) {
+  const denominator = 111.32 * Math.max(0.1, Math.cos(toRadians(latitude)));
+  return km / denominator;
+}
+
+function maybeWithinThresholdBox(point, segment, thresholdKm) {
+  const lonPad = kmToLongitudeDegrees(thresholdKm, point[1]);
+  const latPad = kmToLatitudeDegrees(thresholdKm);
+  return !(
+    point[0] < segment.minLon - lonPad ||
+    point[0] > segment.maxLon + lonPad ||
+    point[1] < segment.minLat - latPad ||
+    point[1] > segment.maxLat + latPad
+  );
+}
+
+function distanceToBoundaryAtMostKm(point, segments, thresholdKm) {
+  for (const segment of segments) {
+    if (!maybeWithinThresholdBox(point, segment, thresholdKm)) {
+      continue;
+    }
+    if (distancePointToSegmentKm(point, segment.start, segment.end) <= thresholdKm) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function areaGeometryOuterRings(geometry) {
+  if (!isPolygonGeometry(geometry)) {
+    return [];
+  }
+  return polygonsOf(geometry).map((polygonCoordinates) => ringVertices(polygonCoordinates[0]));
+}
+
+function collectInnerSharedBorderProbePoints({
+  memberAreaIds,
+  areaGeometryById,
+  coastlineBoundarySegments,
+  nonMemberBoundarySegmentsByAreaId
+}) {
+  const probes = [];
+  const seen = new Set();
+  for (let leftIndex = 0; leftIndex < memberAreaIds.length; leftIndex += 1) {
+    const areaAId = memberAreaIds[leftIndex];
+    const areaAGeometry = areaGeometryById.get(areaAId);
+    if (!isPolygonGeometry(areaAGeometry)) {
+      continue;
+    }
+    const areaARings = areaGeometryOuterRings(areaAGeometry);
+    for (let rightIndex = leftIndex + 1; rightIndex < memberAreaIds.length; rightIndex += 1) {
+      const areaBId = memberAreaIds[rightIndex];
+      const areaBGeometry = areaGeometryById.get(areaBId);
+      if (!isPolygonGeometry(areaBGeometry)) {
+        continue;
+      }
+      const areaBBoundary = boundarySegmentsForGeometry(areaBGeometry);
+      const nonMemberBoundarySegments = [...nonMemberBoundarySegmentsByAreaId.values()].flat();
+      for (const ring of areaARings) {
+        const ringLength = ring.length;
+        if (ringLength < 3) {
+          continue;
+        }
+        for (let vertexIndex = 0; vertexIndex < ringLength; vertexIndex += 1) {
+          const point = ring[vertexIndex];
+          const previousPoint = ring[(vertexIndex - 1 + ringLength) % ringLength];
+          const previousPoint2 = ring[(vertexIndex - 2 + ringLength) % ringLength];
+          const nextPoint = ring[(vertexIndex + 1) % ringLength];
+          const nextPoint2 = ring[(vertexIndex + 2) % ringLength];
+          if (!distanceToBoundaryAtMostKm(point, areaBBoundary, 2)) {
+            continue;
+          }
+          if (
+            !distanceToBoundaryAtMostKm(previousPoint, areaBBoundary, 2) ||
+            !distanceToBoundaryAtMostKm(nextPoint, areaBBoundary, 2) ||
+            !distanceToBoundaryAtMostKm(previousPoint2, areaBBoundary, 2) ||
+            !distanceToBoundaryAtMostKm(nextPoint2, areaBBoundary, 2)
+          ) {
+            continue;
+          }
+          if (distanceToBoundaryAtMostKm(point, coastlineBoundarySegments, 5)) {
+            continue;
+          }
+          if (distanceToBoundaryAtMostKm(point, nonMemberBoundarySegments, 5)) {
+            continue;
+          }
+          const key = `${point[0].toFixed(6)}:${point[1].toFixed(6)}:${areaAId}:${areaBId}`;
+          if (seen.has(key)) {
+            continue;
+          }
+          seen.add(key);
+          probes.push({ point, areaAId, areaBId });
+        }
+      }
+    }
+  }
+  return probes;
+}
+
+function collectUnionProbeViolations({
+  unionGeometry,
+  probePoints
+}) {
+  const violations = [];
+  const unionBoundary = boundarySegmentsForGeometry(unionGeometry);
+  for (const probe of probePoints) {
+    if (!pointInRegionGeometry(probe.point, unionGeometry)) {
+      violations.push({ ...probe, reason: "outside-union" });
+      continue;
+    }
+    if (distanceToBoundaryAtMostKm(probe.point, unionBoundary, 0.1)) {
+      violations.push({ ...probe, reason: "near-union-outline" });
+    }
+  }
+  return violations;
+}
+
+function withSeededNotch(geometry, targetPoint) {
+  const clone = JSON.parse(JSON.stringify(geometry));
+  if (clone.type !== "Polygon" || clone.coordinates.length === 0) {
+    return clone;
+  }
+  const outerRing = clone.coordinates[0];
+  if (!Array.isArray(outerRing) || outerRing.length < 4) {
+    return clone;
+  }
+  let bestIndex = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < outerRing.length - 1; index += 1) {
+    const distanceKm = distancePointToSegmentKm(targetPoint, outerRing[index], outerRing[index + 1]);
+    if (distanceKm < bestDistance) {
+      bestDistance = distanceKm;
+      bestIndex = index;
+    }
+  }
+  outerRing.splice(bestIndex + 1, 0, targetPoint);
+  if (
+    outerRing.length > 0 &&
+    (outerRing[0][0] !== outerRing[outerRing.length - 1][0] ||
+      outerRing[0][1] !== outerRing[outerRing.length - 1][1])
+  ) {
+    outerRing.push([...outerRing[0]]);
+  }
+  return clone;
+}
 
 let generatedDataPromise = null;
 
@@ -112,12 +347,14 @@ async function loadGeneratedAncientData() {
   generatedDataPromise = (async () => {
     await assertGeneratedOutputAvailable();
 
-    const [timelinePayload, roadsPayload, timelineData, sourceRoads, holderUnionsPayload] = await Promise.all([
+    const [timelinePayload, roadsPayload, timelineData, sourceRoads, holderUnionsPayload, shapesPayload, coastlinePayload] = await Promise.all([
       fs.readFile(path.join(generatedDirectory, "ancient.timeline.json"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(path.join(generatedDirectory, "ancient.roads.geojson"), "utf8").then((content) => JSON.parse(content)),
       fs.readFile(repositoryTimelinePath, "utf8").then((content) => JSON.parse(content)),
       fs.readFile(repositoryAncientRoadsPath, "utf8").then((content) => JSON.parse(content)),
-      fs.readFile(path.join(generatedDirectory, "ancient.holder-unions.json"), "utf8").then((content) => JSON.parse(content))
+      fs.readFile(path.join(generatedDirectory, "ancient.holder-unions.json"), "utf8").then((content) => JSON.parse(content)),
+      fs.readFile(path.join(generatedDirectory, "ancient.shapes.json"), "utf8").then((content) => JSON.parse(content)),
+      fs.readFile(path.join(generatedDirectory, "ancient.coastline.geojson"), "utf8").then((content) => JSON.parse(content))
     ]);
 
     const stopPayloadById = new Map(
@@ -152,6 +389,8 @@ async function loadGeneratedAncientData() {
       stopPayloadById,
       stopPayloadForYear,
       holderUnionsPayload,
+      shapesPayload,
+      coastlinePayload,
       ancientRoadFeatureCount: sourceRoads.features.length
     };
   })();
@@ -514,5 +753,117 @@ test("generated holder unions keep only expected real holes and judea-province h
     unionHoleSignatures(judeaProvinceUnion),
     [],
     "expected judea-province union to have no holes"
+  );
+});
+
+test("merged holder unions stay clear of the inner shared-border probe zone (notch guard)", async () => {
+  const fixture = await loadGeneratedAncientData();
+  const areaGeometryById = new Map(
+    (fixture.shapesPayload?.areas?.features ?? [])
+      .filter((feature) => typeof feature?.properties?.areaId === "string" && isPolygonGeometry(feature.geometry))
+      .map((feature) => [feature.properties.areaId, feature.geometry])
+  );
+  const coastlineBoundarySegments = (fixture.coastlinePayload?.features ?? []).flatMap((feature) =>
+    boundarySegmentsForGeometry(feature?.geometry)
+  );
+  let probeCount = 0;
+
+  for (const stop of fixture.timelinePayload.stops) {
+    const stopPayload = fixture.stopPayloadById.get(stop.id);
+    assert.ok(stopPayload, `expected payload for stop '${stop.id}'`);
+    const mergedTargets = [];
+    for (const [holderId, unionId] of Object.entries(stopPayload.holderUnions ?? {})) {
+      const memberAreaIds = stopPayload.areas
+        .filter((area) => area.hasShape && area.holderLocationId === holderId)
+        .map((area) => area.areaId);
+      if (memberAreaIds.length < 2) {
+        continue;
+      }
+      mergedTargets.push({ targetId: holderId, unionId, memberAreaIds });
+    }
+    for (const target of mergedTargets) {
+      const unionGeometry = fixture.holderUnionsPayload.geometries?.[target.unionId];
+      assert.ok(unionGeometry, `missing union geometry '${target.unionId}' in stop '${stop.id}'`);
+      const memberAreaIdSet = new Set(target.memberAreaIds);
+      const nonMemberBoundarySegmentsByAreaId = new Map(
+        stopPayload.areas
+          .filter((area) => area.hasShape && !memberAreaIdSet.has(area.areaId))
+          .map((area) => [area.areaId, boundarySegmentsForGeometry(areaGeometryById.get(area.areaId))])
+      );
+      const probePoints = collectInnerSharedBorderProbePoints({
+        memberAreaIds: target.memberAreaIds,
+        areaGeometryById,
+        coastlineBoundarySegments,
+        nonMemberBoundarySegmentsByAreaId
+      });
+      probeCount += probePoints.length;
+      const violations = collectUnionProbeViolations({
+        unionGeometry,
+        probePoints
+      });
+      assert.deepEqual(
+        violations,
+        [],
+        `expected merged union '${target.targetId}' in '${stop.id}' to avoid inner shared-border notches`
+      );
+
+    }
+  }
+  assert.ok(probeCount > 0, "expected at least one inner shared-border probe point");
+  const judeaAt70 = fixture.stopPayloadForYear(70);
+  const judeaProvinceUnionId = judeaAt70.holderUnions?.["judea-province"];
+  const judeaProvinceUnion = judeaProvinceUnionId
+    ? fixture.holderUnionsPayload.geometries?.[judeaProvinceUnionId]
+    : null;
+  assert.ok(judeaProvinceUnion && judeaProvinceUnion.type === "Polygon", "expected polygon judea-province union");
+  const judeaMemberAreaIds = judeaAt70.areas
+    .filter((area) => area.hasShape && area.holderLocationId === "judea-province")
+    .map((area) => area.areaId);
+  assert.deepEqual(
+    new Set(judeaMemberAreaIds),
+    new Set(["galilee-perea", "judea-samaria-idumea"])
+  );
+  const galileeGeometry = areaGeometryById.get("galilee-perea");
+  const samariaGeometry = areaGeometryById.get("judea-samaria-idumea");
+  assert.ok(isPolygonGeometry(galileeGeometry), "expected galilee-perea geometry");
+  assert.ok(isPolygonGeometry(samariaGeometry), "expected judea-samaria-idumea geometry");
+  const samariaBoundary = boundarySegmentsForGeometry(samariaGeometry);
+  const judeaNonMemberBoundaries = judeaAt70.areas
+    .filter((area) => area.hasShape && !new Set(judeaMemberAreaIds).has(area.areaId))
+    .flatMap((area) => boundarySegmentsForGeometry(areaGeometryById.get(area.areaId)));
+  const judeaProbePoint = areaGeometryOuterRings(galileeGeometry).flatMap((ring) => {
+    const ringLength = ring.length;
+    const points = [];
+    for (let index = 0; index < ringLength; index += 1) {
+      const point = ring[index];
+      const previousPoint = ring[(index - 1 + ringLength) % ringLength];
+      const nextPoint = ring[(index + 1) % ringLength];
+      if (
+        !distanceToBoundaryAtMostKm(point, samariaBoundary, 2) ||
+        !distanceToBoundaryAtMostKm(previousPoint, samariaBoundary, 2) ||
+        !distanceToBoundaryAtMostKm(nextPoint, samariaBoundary, 2)
+      ) {
+        continue;
+      }
+      if (distanceToBoundaryAtMostKm(point, coastlineBoundarySegments, 5)) {
+        continue;
+      }
+      if (distanceToBoundaryAtMostKm(point, judeaNonMemberBoundaries, 5)) {
+        continue;
+      }
+      points.push(point);
+    }
+    return points;
+  })[0];
+  assert.ok(judeaProbePoint, "expected judea-province probe point for seeded-notch regression");
+
+  const seededNotchUnion = withSeededNotch(judeaProvinceUnion, judeaProbePoint);
+  const seededNotchViolations = collectUnionProbeViolations({
+    unionGeometry: seededNotchUnion,
+    probePoints: [{ point: judeaProbePoint, areaAId: "galilee-perea", areaBId: "judea-samaria-idumea" }]
+  });
+  assert.ok(
+    seededNotchViolations.some((violation) => violation.reason === "near-union-outline"),
+    "expected seeded judea-province notch to violate the 0.1 km inner-border clearance guard"
   );
 });

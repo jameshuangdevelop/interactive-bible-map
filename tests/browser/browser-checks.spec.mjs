@@ -1495,6 +1495,7 @@ test("regions only highlight when they own a shaped area in the selected year @n
 });
 
 test("selected region updates holder label and overlay when the year changes @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
   await page.goto(`${baseUrl}/?tab=map&year=53&place=achaia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
   const before = await page.evaluate((testHookKey) => {
@@ -1547,8 +1548,16 @@ test("selected region updates holder label and overlay when the year changes @na
     }, mapTestHookKey);
 
   await expect
-    .poll(async () => JSON.stringify(await probeSelectionState()), { timeout: 10_000 })
-    .not.toBe(JSON.stringify(before));
+    .poll(async () => {
+      const next = await probeSelectionState();
+      return (
+        JSON.stringify(next) !== JSON.stringify(before) &&
+        next.selectedHolderCount + next.selectedAreaCount === 1 &&
+        next.veilCount > 0 &&
+        next.outlineCount > 0
+      );
+    }, { timeout: 10_000 })
+    .toBe(true);
   const after = await probeSelectionState();
 
   expect(after.selectedHolderCount + after.selectedAreaCount).toBe(1);
@@ -1736,38 +1745,15 @@ test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", 
   expect(selectedBlueCount).toBeGreaterThan(20);
 });
 
-test("deep-linking to roman empire leaves holder labels unselected @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await page.waitForFunction((testHookKey) => {
-    const map = window[testHookKey];
-    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
-  }, mapTestHookKey, { timeout: 60_000 });
-  await waitForMapIdle(page);
-
-  const selectedLabelCount = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return map
-      .queryRenderedFeatures(undefined, { layers: ["ibm-ancient-holder-label-selected"] })
-      .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "roman-empire").length;
-  }, mapTestHookKey);
-  expect(selectedLabelCount).toBe(0);
-});
-
-test("clicking OTHER ROMAN PROVINCES still selects the roman holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await page.waitForFunction((testHookKey) => {
-    const map = window[testHookKey];
-    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
-  }, mapTestHookKey, { timeout: 60_000 });
+async function findRomanHolderLabelPoint(page) {
   const viewpoints = [
     { center: [-5.6, 37.7], zoom: 5.6 },
     { center: [-2.5, 38.0], zoom: 5.2 },
     { center: [0.5, 38.4], zoom: 5.0 }
   ];
-  let romanHolderTarget = null;
   for (const viewpoint of viewpoints) {
     await jumpMap(page, viewpoint.center, viewpoint.zoom);
-    romanHolderTarget = await page.evaluate((testHookKey) => {
+    const romanHolderTarget = await page.evaluate((testHookKey) => {
       const map = window[testHookKey];
       const hit = map
         .queryRenderedFeatures(undefined, {
@@ -1783,9 +1769,40 @@ test("clicking OTHER ROMAN PROVINCES still selects the roman holder label @names
       return { x: projected.x, y: projected.y };
     }, mapTestHookKey);
     if (romanHolderTarget) {
-      break;
+      return romanHolderTarget;
     }
   }
+  return null;
+}
+
+async function selectedRomanHolderLabelCount(page) {
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-ancient-holder-label-selected"] })
+      .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "roman-empire").length;
+  }, mapTestHookKey);
+}
+
+test("deep-linking to roman empire leaves holder labels unselected @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await waitForMapIdle(page);
+
+  const selectedLabelCount = await selectedRomanHolderLabelCount(page);
+  expect(selectedLabelCount).toBe(0);
+});
+
+test("clicking OTHER ROMAN PROVINCES still selects the roman holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
   expect(romanHolderTarget).toBeTruthy();
   await clickMapPoint(page, romanHolderTarget);
   await page.waitForFunction(
@@ -1794,13 +1811,82 @@ test("clicking OTHER ROMAN PROVINCES still selects the roman holder label @names
   );
   await waitForMapIdle(page);
 
-  const selectedRomanLabelCount = await page.evaluate((testHookKey) => {
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+});
+
+test("roman holder label click state does not persist across search selections @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
     const map = window[testHookKey];
-    return map
-      .queryRenderedFeatures(undefined, { layers: ["ibm-ancient-holder-label-selected"] })
-      .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "roman-empire").length;
-  }, mapTestHookKey);
-  expect(selectedRomanLabelCount).toBe(1);
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  const searchInput = page.getByRole("combobox", { name: "Search biblical places" });
+  await searchInput.click();
+  await searchInput.fill("Ephesus");
+  await expect(page.getByRole("option", { name: /Ephesus/i }).first()).toBeVisible();
+  await searchInput.press("ArrowDown");
+  await searchInput.press("Enter");
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "ephesus",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(0);
+
+  await searchInput.click();
+  await searchInput.fill("Roman Empire");
+  await expect(page.getByRole("option", { name: /Roman Empire/i }).first()).toBeVisible();
+  await searchInput.press("ArrowDown");
+  await searchInput.press("Enter");
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(0);
+});
+
+test("roman holder label click state clears after close and stays clear on deep link @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  await page.getByRole("button", { name: "Close" }).click();
+  await page.waitForFunction(
+    () => !new URLSearchParams(window.location.search).has("place"),
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(0);
 });
 
 test("with a region selected, clicking an outside town clears region highlight and selects the town @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {

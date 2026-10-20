@@ -2777,7 +2777,11 @@ export function MapView({
     });
   }, [highlightedPlaceId, mapMode, pinLabelSource, places, routePriorityPlaceIds, selection]);
   const [ancientShapes, setAncientShapes] = useState<AncientShapesPayload | null>(null);
-  const [romanHolderLabelClicked, setRomanHolderLabelClicked] = useState(false);
+  const [selectionToken, setSelectionToken] = useState(0);
+  const selectionTokenRef = useRef(0);
+  const pendingRomanHolderLabelSelectionTokenRef = useRef<number | null>(null);
+  const previousRomanHolderSelectionKeyRef = useRef<string | null>(null);
+  const [romanHolderLabelSelectionToken, setRomanHolderLabelSelectionToken] = useState<number | null>(null);
   const [ancientHolderUnions, setAncientHolderUnions] = useState<AncientHolderUnionsPayload>({
     geometries: {}
   });
@@ -2797,7 +2801,35 @@ export function MapView({
     [ancientStopsById, selectedTimelineStopId]
   );
   const selectedPlaceId = selection?.placeId ?? null;
-  const allowRomanHolderLabelSelection = selectedPlaceId === "roman-empire" && romanHolderLabelClicked;
+  const selectedCandidateIndex =
+    typeof selection?.candidateIndex === "number" ? selection.candidateIndex : null;
+  const selectedPlaceSelectionKey =
+    selectedPlaceId === null
+      ? `__none__:${selectionOrigin}`
+      : `${selectedPlaceId}:${selectedCandidateIndex ?? -1}:${selectionOrigin}`;
+  useEffect(() => {
+    if (previousRomanHolderSelectionKeyRef.current === selectedPlaceSelectionKey) {
+      return;
+    }
+    previousRomanHolderSelectionKeyRef.current = selectedPlaceSelectionKey;
+    const nextSelectionToken = selectionTokenRef.current + 1;
+    selectionTokenRef.current = nextSelectionToken;
+    setSelectionToken(nextSelectionToken);
+    if (
+      pendingRomanHolderLabelSelectionTokenRef.current === nextSelectionToken &&
+      selectedPlaceId === "roman-empire"
+    ) {
+      setRomanHolderLabelSelectionToken(nextSelectionToken);
+    } else {
+      setRomanHolderLabelSelectionToken(null);
+    }
+    pendingRomanHolderLabelSelectionTokenRef.current = null;
+  }, [selectedPlaceId, selectedPlaceSelectionKey]);
+  const allowRomanHolderLabelSelection =
+    selectedPlaceId === "roman-empire" &&
+    selectionOrigin === "map-name" &&
+    romanHolderLabelSelectionToken !== null &&
+    romanHolderLabelSelectionToken === selectionToken;
   const selectedHolderLabelEntryId = useMemo(
     () =>
       selectedHolderLabelEntryIdForPlace(
@@ -4181,12 +4213,28 @@ export function MapView({
       const hitPaddingPx = interactiveHitPaddingForEvent(event.originalEvent);
       const placeEntry = resolveInteractiveEntryAtPoint(event.point, hitPaddingPx);
       if (placeEntry) {
-        setRomanHolderLabelClicked(
-          placeEntry.kind === "place" && placeEntry.selection.placeId === "roman-empire"
-        );
+        const clickedRomanHolderLabel =
+          placeEntry.kind === "place" && placeEntry.selection.placeId === "roman-empire";
+        if (clickedRomanHolderLabel) {
+          const alreadySelectedRoman =
+            selectionRef.current?.placeId === "roman-empire" &&
+            (selectionRef.current?.candidateIndex ?? null) === (placeEntry.selection.candidateIndex ?? null);
+          if (alreadySelectedRoman) {
+            pendingRomanHolderLabelSelectionTokenRef.current = null;
+            setRomanHolderLabelSelectionToken(selectionTokenRef.current);
+          } else {
+            pendingRomanHolderLabelSelectionTokenRef.current = selectionTokenRef.current + 1;
+            setRomanHolderLabelSelectionToken(null);
+          }
+        } else {
+          pendingRomanHolderLabelSelectionTokenRef.current = null;
+          setRomanHolderLabelSelectionToken(null);
+        }
         activateVisibleEntryRef.current(placeEntry, "map-name");
         return;
       }
+      pendingRomanHolderLabelSelectionTokenRef.current = null;
+      setRomanHolderLabelSelectionToken(null);
 
       if (routesModeEnabledRef.current) {
         const pointer = asScreenPoint(event.point);
