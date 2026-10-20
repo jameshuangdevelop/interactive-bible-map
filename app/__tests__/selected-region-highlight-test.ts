@@ -3,12 +3,17 @@ import type {
   AncientStopPayload
 } from "../src/features/map/ancient-layer.types";
 import {
+  buildSelectedRegionOutlineCoordinates,
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  findSelectedRegionOutlineGeometry,
+  hasSharedRingEdge
 } from "../src/features/map/selected-region-highlight";
 
 describe("selected region highlight geometry", () => {
+  const politicalUnitAreaTypes = new Set(["province", "kingdom", "tetrarchy"]);
+
   test("builds a world veil polygon with the selected polygon as a hole", () => {
     const geometry = {
       type: "Polygon" as const,
@@ -165,7 +170,10 @@ describe("selected region highlight geometry", () => {
       findSelectedRegionGeometry({
         shapes,
         stopPayload,
-        politicalAreaId: "area-galatia"
+        placeId: "galatia",
+        placeType: "province",
+        politicalAreaId: "area-galatia",
+        politicalUnitAreaTypes
       })
     ).not.toBeNull();
 
@@ -176,8 +184,87 @@ describe("selected region highlight geometry", () => {
           ...stopPayload,
           areas: [{ ...stopPayload.areas[0], hasShape: false }]
         },
-        politicalAreaId: "area-galatia"
+        placeId: "galatia",
+        placeType: "province",
+        politicalAreaId: "area-galatia",
+        politicalUnitAreaTypes
       })
     ).toBeNull();
+  });
+
+  test("uses all held areas for a place and removes shared edges from its outline", () => {
+    const geometry = {
+      type: "MultiPolygon" as const,
+      coordinates: [
+        [
+          [
+            [0, 0],
+            [2, 0],
+            [2, 2],
+            [0, 2],
+            [0, 0]
+          ]
+        ],
+        [
+          [
+            [2, 0],
+            [4, 0],
+            [4, 2],
+            [2, 2],
+            [2, 0]
+          ]
+        ]
+      ]
+    };
+
+    expect(hasSharedRingEdge(geometry)).toBe(true);
+    const outline = buildSelectedRegionOutlineCoordinates(geometry);
+    expect(
+      outline.some((line) =>
+        line.some(
+          (coordinate, index) =>
+            index < line.length - 1 &&
+            ((coordinate[0] === 2 &&
+              coordinate[1] === 0 &&
+              line[index + 1][0] === 2 &&
+              line[index + 1][1] === 2) ||
+              (coordinate[0] === 2 &&
+                coordinate[1] === 2 &&
+                line[index + 1][0] === 2 &&
+                line[index + 1][1] === 0))
+        )
+      )
+    ).toBe(false);
+  });
+
+  test("uses roman empire edge for the selected roman empire outline", () => {
+    const stopPayload: AncientStopPayload = {
+      stopId: "ad-50",
+      year: 50,
+      areas: [],
+      holderBorders: {
+        type: "FeatureCollection",
+        features: []
+      },
+      romanEmpireEdge: {
+        type: "LineString",
+        coordinates: [
+          [1, 1],
+          [2, 2]
+        ]
+      },
+      holderLabels: []
+    };
+
+    const outlineGeometry = findSelectedRegionOutlineGeometry({
+      stopPayload,
+      placeId: "roman-empire"
+    });
+    const outline = buildSelectedRegionOutlineFeatureCollection(null, outlineGeometry);
+    expect(outline.features).toHaveLength(1);
+    expect(outline.features[0].geometry.coordinates).toEqual([
+      [1, 1],
+      [2, 2]
+    ]);
   });
 });

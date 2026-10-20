@@ -1037,7 +1037,8 @@ test("selecting a town replaces its black dot with the selected pin @names", { t
   );
   await waitForMapIdle(page);
 
-  const selectedState = await page.evaluate((testHookKey) => {
+  // The selection reaches the map a frame or more after the URL changes, so poll for it.
+  const readSelectedState = (testHookKey) => {
     const map = window[testHookKey];
     const selectedPin = map
       .queryRenderedFeatures(undefined, { layers: ["ibm-selected-place-pin"] })
@@ -1058,8 +1059,17 @@ test("selecting a town replaces its black dot with the selected pin @names", { t
       selectedLabelCount: selectedLabel ? 1 : 0,
       unselectedTownFeatureCount: unselectedTownFeatures.length
     };
-  }, mapTestHookKey);
-  expect(selectedState).toBeTruthy();
+  };
+  let selectedState = null;
+  await expect
+    .poll(
+      async () => {
+        selectedState = await page.evaluate(readSelectedState, mapTestHookKey);
+        return selectedState !== null;
+      },
+      { timeout: 5_000 }
+    )
+    .toBe(true);
   expect(selectedState.selectedLabelCount).toBe(1);
   expect(selectedState.unselectedTownFeatureCount).toBe(0);
 
@@ -1260,6 +1270,177 @@ test("selected region veil darkens outside the region while keeping inside lumin
 
   expect(Math.abs(insideMeanDelta)).toBeLessThan(3);
   expect(outsideMeanDelta).toBeGreaterThan(8);
+});
+
+test("clicking KINGDOM OF PONTUS draws veil and outline while keeping inside luminance stable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await jumpMap(page, [36.5, 40.6], 6.9);
+
+  const pontusTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const layers = [
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-selected-area-label",
+      "ibm-ancient-holder-label-click-target",
+      "ibm-ancient-holder-label-clickable",
+      "ibm-ancient-holder-label-selected"
+    ];
+    const hit = map
+      .queryRenderedFeatures(undefined, { layers })
+      .find(
+        (feature) =>
+          String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus"
+      );
+    if (!hit || hit.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(hit.geometry.coordinates);
+    return { x: projected.x, y: projected.y };
+  }, mapTestHookKey);
+  expect(pontusTarget).toBeTruthy();
+  await clickMapPoint(page, pontusTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "pontus",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+
+  const overlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(overlay.veilFeatures).toBeGreaterThan(0);
+  expect(overlay.outlineFeatures).toBeGreaterThan(0);
+
+  const samplePoints = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const selectedName = map
+      .queryRenderedFeatures(undefined, {
+        layers: [
+          "ibm-selected-area-label",
+          "ibm-ancient-holder-label-selected"
+        ]
+      })
+      .find((feature) => String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus");
+    const insidePoint = selectedName?.geometry?.type === "Point" ? map.project(selectedName.geometry.coordinates) : null;
+    const canvas = map.getCanvas();
+    const outsideCandidates = (() => {
+      for (let y = 140; y <= canvas.height - 140; y += 36) {
+        for (let x = 520; x <= canvas.width - 120; x += 36) {
+          const hasVeil = map.queryRenderedFeatures(
+            [
+              [x - 2, y - 2],
+              [x + 2, y + 2]
+            ],
+            { layers: ["ibm-selected-region-veil"] }
+          ).length > 0;
+          if (hasVeil) {
+            return { x, y };
+          }
+        }
+      }
+      return null;
+    })();
+    return {
+      inside: insidePoint ? [{ x: insidePoint.x, y: insidePoint.y }] : [],
+      outside: outsideCandidates ? [{ x: outsideCandidates.x, y: outsideCandidates.y }] : []
+    };
+  }, mapTestHookKey);
+  expect(samplePoints.inside.length).toBe(1);
+  expect(samplePoints.outside.length).toBe(1);
+
+  const withVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "none");
+  }, mapTestHookKey);
+  await waitForMapIdle(page);
+  const withoutVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withoutVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "visible");
+  }, mapTestHookKey);
+
+  expect(Math.abs(withoutVeilInside[0] - withVeilInside[0])).toBeLessThan(3);
+  expect(withoutVeilOutside[0] - withVeilOutside[0]).toBeGreaterThan(2);
+});
+
+test("roman empire veil follows the stop edge at year 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await jumpMap(page, [38.5, 39.0], 5.0);
+
+  const overlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(overlay.veilFeatures).toBeGreaterThan(0);
+  expect(overlay.outlineFeatures).toBeGreaterThan(0);
+
+  const romanVeilProbe = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const pointHasVeil = (projected) =>
+      map.queryRenderedFeatures(
+        [
+          [projected.x - 2, projected.y - 2],
+          [projected.x + 2, projected.y + 2]
+        ],
+        { layers: ["ibm-selected-region-veil"] }
+      ).length > 0;
+    const insideCandidates = [
+      [23.8, 38.2], // Achaia
+      [33.1, 39.0] // Galatia
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const outsideCandidates = [
+      [57.0, 39.0],
+      [61.0, 40.2],
+      [53.5, 35.5]
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const insideHasVeil = insideCandidates.map((projected) => pointHasVeil(projected));
+    const eastOutsideHasVeil = outsideCandidates.map((projected) => pointHasVeil(projected));
+    const fallbackOutsidePoint = (() => {
+      const canvas = map.getCanvas();
+      for (let y = 140; y <= canvas.height - 140; y += 36) {
+        for (let x = 140; x <= canvas.width - 140; x += 36) {
+          const projected = { x, y };
+          if (
+            pointHasVeil(projected) &&
+            map.unproject([x, y]).lng > 50
+          ) {
+            return projected;
+          }
+        }
+      }
+      return null;
+    })();
+    return {
+      insideHasVeil,
+      eastOutsideHasVeil,
+      fallbackOutsideHasVeil: fallbackOutsidePoint
+        ? pointHasVeil(fallbackOutsidePoint)
+        : false
+    };
+  }, mapTestHookKey);
+
+  expect(romanVeilProbe.insideHasVeil.some(Boolean)).toBe(false);
+  expect(
+    romanVeilProbe.eastOutsideHasVeil.some(Boolean) || romanVeilProbe.fallbackOutsideHasVeil
+  ).toBe(true);
 });
 
 test("regions only highlight when they own a shaped area in the selected year @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -1933,7 +2114,7 @@ test("clicking another region moves the highlight; towns under veil stay clickab
   );
 });
 
-test("selected place pin image is slimmer and anchored to a bottom tip pixel @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("selected place pin image matches Google marker proportions and tip anchor @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
 
@@ -1965,6 +2146,68 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
     const topLeftPixel = readPixel(0, 0);
     const cssWidth = width === null ? null : width / pixelRatio;
     const cssHeight = height === null ? null : height / pixelRatio;
+    const isPinPixel = (pixel) => {
+      if (!pixel) {
+        return false;
+      }
+      const [red, green, blue, alpha] = pixel;
+      if (alpha < 150) {
+        return false;
+      }
+      const isFillRed = Math.abs(red - 234) <= 35 && Math.abs(green - 67) <= 35 && Math.abs(blue - 53) <= 35;
+      const isBorderRed = Math.abs(red - 197) <= 35 && Math.abs(green - 34) <= 35 && Math.abs(blue - 31) <= 35;
+      const isCenterDotRed = Math.abs(red - 179) <= 35 && Math.abs(green - 20) <= 35 && Math.abs(blue - 18) <= 35;
+      return isFillRed || isBorderRed || isCenterDotRed;
+    };
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    if (pixels && width && height) {
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const pixel = readPixel(x, y);
+          if (!isPinPixel(pixel)) {
+            continue;
+          }
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        }
+      }
+    }
+    const hasBoundingBox =
+      Number.isFinite(minX) && Number.isFinite(maxX) && Number.isFinite(minY) && Number.isFinite(maxY);
+    const bbox = hasBoundingBox
+      ? {
+          width: maxX - minX + 1,
+          height: maxY - minY + 1
+        }
+      : null;
+    // Alpha-weighted, so antialiasing at 1x doesn't decide the tip's width or position.
+    let lowestRow = -1;
+    for (let y = (height ?? 0) - 1; y >= 0 && lowestRow < 0; y -= 1) {
+      for (let x = 0; x < (width ?? 0); x += 1) {
+        if ((readPixel(x, y)?.[3] ?? 0) > 0) {
+          lowestRow = y;
+          break;
+        }
+      }
+    }
+    let tipCoverage = 0;
+    let tipWeightedX = 0;
+    let tipAlpha = 0;
+    for (let y = lowestRow; y >= 0 && y > lowestRow - 3; y -= 1) {
+      for (let x = 0; x < (width ?? 0); x += 1) {
+        const alpha = readPixel(x, y)?.[3] ?? 0;
+        if (y === lowestRow) {
+          tipCoverage += alpha / 255;
+        }
+        tipWeightedX += (x + 0.5) * alpha;
+        tipAlpha += alpha;
+      }
+    }
     return {
       width,
       height,
@@ -1972,17 +2215,26 @@ test("selected place pin image is slimmer and anchored to a bottom tip pixel @na
       cssWidth,
       cssHeight,
       tipPixels,
-      topLeftPixel
+      topLeftPixel,
+      bbox,
+      tipCoverageCssPx: tipCoverage / pixelRatio,
+      tipOffsetFromCentreCssPx:
+        tipAlpha > 0 && width !== null ? (tipWeightedX / tipAlpha - width / 2) / pixelRatio : null
     };
   }, mapTestHookKey);
 
-  expect(probe.cssWidth).toBe(18);
+  expect(probe.cssWidth).toBe(19);
   expect(probe.cssHeight).toBe(27);
   const maxTipAlpha = Math.max(...probe.tipPixels.map((pixel) => pixel[3]), 0);
   const maxTipRed = Math.max(...probe.tipPixels.map((pixel) => pixel[0]), 0);
   expect(maxTipAlpha).toBeGreaterThan(0);
   expect(maxTipRed).toBeGreaterThan(140);
   expect(probe.topLeftPixel?.[3] ?? 0).toBe(0);
+  const bboxRatio = (probe.bbox?.height ?? 0) / (probe.bbox?.width ?? 1);
+  expect(bboxRatio).toBeGreaterThanOrEqual(1.33);
+  expect(bboxRatio).toBeLessThanOrEqual(1.53);
+  expect(probe.tipCoverageCssPx).toBeLessThanOrEqual(2);
+  expect(Math.abs(probe.tipOffsetFromCentreCssPx ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(0.25);
 });
 
 test("routes stage-4 names stay interactive while only non-selected lines dim @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
