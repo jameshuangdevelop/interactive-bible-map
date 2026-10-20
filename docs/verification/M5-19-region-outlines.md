@@ -403,3 +403,120 @@ The outlines can be built from this report. The note should still be corrected s
 | Samos | Approved | `asia` part 1; high |
 
 **Licensing: signed off.** Every source used is public domain (Josephus, Strabo, Pliny, ISBE, Natural Earth), CC BY 3.0 (Pleiades), CC0 (Wikidata), ODbL 1.0 (AWMC and OSM, through the existing areas), or cite-only and unquoted (Livius, HMML). DARE is used as a cross-check only. Nothing is traced from a copyrighted map. `ATTRIBUTION.md` needs no new line; widen the Natural Earth row's use if phase 3 draws on its rivers or lakes.
+
+## Phase 4: the drawn outlines
+- **Checked:** branch `data/m5-19-region-outlines` at `bdfcb6a`:
+  - `data/geo/region-outlines.geojson`, built by `scripts/build-region-outlines.mjs`;
+  - `data/geo/region-anchors.json`;
+  - `data/geo/sources/gaza-rhinocolura-face.geojson`;
+  - the outline checks (a)–(g) in `scripts/check-ancient-geo.mjs` and `schema/region-outlines.schema.json`.
+
+  I checked them against this report's G items, the PO's rulings in the note's §10, and ADR-0050's update, which cuts the scope to 11 regions (the other 7 are card M5-20).
+- **Verifier:** fact-checker (Claude Opus 5.5) · **Date:** 2026-10-20.
+
+**Result: every outline's geometry follows the sources and my instructions, but the outlines can't ship yet.** Four things must change first, none of which moves a line:
+1. Five outlines' notes lack what G1.2, G2.1, G3.2 and G13.1 and the PO's ruling 4 require.
+2. The committed file fails its own schema (Pontus's two Natural Earth IDs). `validate:data` misses this because of a nesting bug in the validator.
+3. The Gaza face file is labelled with the wrong AWMC face.
+4. Four anchors cite a source that isn't theirs, and two more don't match their source's coordinates.
+
+Six regions are approved and five are approved with changes. Licensing passes once the anchors' citations are corrected.
+
+### What I checked
+
+| # | Check | Finding | Verdict |
+|---|---|---|---|
+| P4-1 | G1.1, the Samaria–Judea line | The two outlines share exactly G1.1's vertices: the coast at 34.77332°E 32.09538°N; Anouath Borkeos, 35.26546°E 32.09537°N (0.000 km from `pleiades:687825`); 35.31250°E 32.17040°N; and the Jordan edge at 35.55219°E 32.17040°N. Akraba is in Judea, 4.8 km south of the line. Sychem (`pleiades:678403`), Sychar and Samaria's own point are in Samaria; Ephraim, Jericho and Jerusalem (their records' points) are in Judea. Caesarea (`caesarea-maritima.json`) is in Samaria, as answer 1 has it. | Verified |
+| P4-2 | Samaria, Judea and the face divide `judea-samaria-idumea` | Samaria (3,212.1 km²), Judea (10,127.9 km²) and the face (1,569.9 km²) make up the area to within 0.07 km², with no overlap | Verified |
+| P4-3 | G3.1, the face left out | Judea and the face share no land. Raphia (`pleiades:688015`) and Rhinocolura (`688016`) lie outside Judea. Gaza (`687902`) and Anthedon (`687826`) lie inside; Gaza belongs to the AD 69 Judaea face, not to the face that was removed. The note must say so (P4-12). | Verified |
+| P4-4 | The face file is AWMC's AD 69 face f0052, extracted | **It is extracted, but it isn't f0052.**<br>• The file matches the build's own "Raphia coast" piece vertex for vertex (47 of 47).<br>• That piece is AD 69 raw face `raw-0001` (1,814.3 km², which holds Raphia) less Egypt, the AD 69 Syria face and the Herodian base (Herod's kingdom with the Judaea face).<br>• Its area, 1,569.9 km², is the 1,570 km² of the area's `ruling` change.<br>• Its vertices come from AWMC's AD 69 province lines (8), its AD 69 extent line (8) and the Herodian base's edge (29), plus one intersection point. Nothing is hand-drawn, and it lies inside `judea-samaria-idumea` (0.01 km² outside).<br>• f0052 is the AD 69 *Judaea* face (18,152 km², which holds Gaza) and shares only 3 vertices with the file.<br>• The area's own provenance calls this piece `awmc:ad69-face-raw-0001`. I compared against the intermediate files of the pinned build. That build is deterministic: today's `check:ancient-geo` rebuilt `data/geo/` byte for byte from the same inputs. | **Fix needed** (P4-F3) |
+| P4-5 | G8.1, the lower Halys | The outline is the `pontus` area plus 5,365 km² and loses none of that area. Independently, I clipped `bithynia` east of Natural Earth's Kızılırmak and got 5,374 km²; the outline reaches 2.8 km² beyond, from simplification.<br>• The cut follows Natural Earth's line (one part, 356 vertices). A 6.2 km straight connector joins it to the 35.621°E 41.287°N tripoint, the same gap M5-11 measured between the drawn edges and the river. From the line's last vertex (35.915°E 41.646°N) the cut runs due north to the sea.<br>• Amisus, Themiscyra and Amaseia (`pleiades:857018`) are in. Sinope (Q599416), Nicomedia and Claudiopolis are out. Test points on either bank near the mouth fall on the right sides. | Verified (the note names the two straight pieces: P4-12) |
+| P4-6 | The islands, taken whole | Differences from their parts, all from the 600 m simplification: Crete 0.01 km², Chios 0.01, Samos 0.01, Malta 0.16, Cos 0.83 km² more and Rhodes 1.94 km² more. Cos is still Kos alone. | Verified |
+| P4-7 | Galilee and Libya, taken whole | Galilee equals `galilee-perea` part 0 (0.00 km²). Libya equals `crete-cyrene` part 1 to within 6 km² of 77,309 km². | Verified |
+| P4-8 | Reproducible, and checks (a)–(g) | `npm run check:ancient-geo`, from an empty cache: all 15 pinned SHA-256s match, `data/geo/` is rebuilt byte for byte, and "Region outline checks passed (a) through (g)", in 137 s. Every region's own point lies inside its outline. | Verified |
+| P4-9 | The schema | **The committed file fails `schema/region-outlines.schema.json`.** `features[10].properties.sources[5]` and `[6]`, `naturalearth:ne_10m_rivers_lake_centerlines` and `naturalearth:ne_10m_rivers_europe`, match no pattern in `schema/source-id.schema.json`. `validate:data` still passes because `scripts/lib/validator.mjs` checks the outlines' schema inside the block `if (ancientEmpireEdgeData && !validateAncientEmpireEdgeSchema(ancientEmpireEdgeData)) { … }`, so the check runs only when the empire's edge is itself invalid. Separately, the Europe rivers file holds no Kızılırmak, so it contributes nothing. | **Fix needed** (P4-F1) |
+| P4-10 | Every `sources` id | Every `bib:` id is in `data/bibliography.json`, and every `pleiades:` and `wikidata:` id names the place it stands for. Missing, but not blocking:<br>• Galilee: `bib:isbe-en-gannim` (Ginea's identification) and `osm:relation/2246907` (the Jordan, its east edge).<br>• Samaria: `pleiades:678378` (Scythopolis, an anchor of its north edge) and `osm:relation/2246907`.<br>• Judea: `awmc:ad69-face-raw-0001` (the face it leaves out) and `osm:relation/2246907`. | Verified, with additions (P4-F5) |
+| P4-11 | Confidence | `high` for the six islands; `medium` for Galilee, Samaria, Judea, Pontus and Libya. All are schema values and match §4. | Verified |
+| P4-12 | Each note | Crete's names Cauda and Malta's names Mljet. The notes for Samaria, Judea, Galilee, Libya and Pontus lack the required content: both authors on the coast; Anuath Borceos; Idumea in Josephus and in Pliny; Ascalon and Gaza not drawn separately; Carmel, Scythopolis and the north-east tongue; 158 km and 79 km; Armenia Minor. All five notes describe the build ("G1.1", "galilee-perea part 0") rather than the land, and they ship in the app's copy. | **Fix needed** (P4-F2) |
+| P4-13 | `data/geo/region-anchors.json` | Four anchors cite the wrong source, and two don't match their source's point (the table below). The build reads two of the anchors; the checks repeat the coordinates in code. | **Fix needed** (P4-F4) |
+
+**The anchors (P4-13).** The figures are the distance from Pleiades' representative point.
+
+| Anchor | As committed | Finding | Fix |
+|---|---|---|---|
+| `samaria-point` | `wikidata:Q44836840` | Q44836840 is a 1970 scientific article ("Facial pain with vascular topography"). The point is Pleiades 44836840, "Samaria (province)". | `pleiades:44836840` |
+| `gaza-rhinocolura-face` | `pleiades:687898`, [34.25, 31.29] | 687898 is "Euthymios", a church in the Judean desert. The point is Raphia's, rounded (0.72 km). | id `raphia`, `pleiades:688015`, [34.242503, 31.290688] |
+| `cauda` | `pleiades:589748` | 589748 is "Creta (island)". `cauda.json` cites `pleiades:589858` "Kaudos (island)", and its point comes from `openbible:cauda`. | `openbible:cauda`, or `pleiades:589858` with [24.090099, 34.841661] |
+| `mljet` | `pleiades:197376`, [17.528067, 42.761007] | The point is 1.63 km from Pleiades' and 1.87 km from Wikidata's (Q211306, [17.535, 42.745], which `malta.json`'s candidate uses). It isn't the mean or the box centre of Pleiades' outline of the island either. | `wikidata:Q211306` with [17.535, 42.745], or Pleiades' [17.516185, 42.749230] |
+| `ptolemais` | `pleiades:678010`, [35.0692, 32.9214] | The point is `ptolemais.json`'s, which comes from `openbible:ptolemais`. It is 0.99 km from Pleiades'. | `openbible:ptolemais`, or Pleiades' [35.079835, 32.921287] |
+| `prusa` | `pleiades:511384`, [29.06, 40.19] | Rounded: 0.85 km from Pleiades' [29.063819, 40.182899] | Pleiades' point |
+
+The other anchors match their sources: Anouath Borkeos, Akraba, Ginai(a), Amisus, Themiscyra, Nicomedia (Q209349), Claudiopolis (Q65088749, "Bithynium"), Sinop (Q599416), Rhinocolura (Q2148121) and Tyre (Q82070). The anchors for Sychem and Scythopolis use two of Pleiades' own location points ("OSM location of Tell Balata"; "DARMC location 4862"), 0.06 km and 0.14 km from the representative points. That is acceptable.
+
+### Changes required before shipping (GIS Engineer)
+None of these moves a line, so the geometry stays as verified.
+- **P4-F1. The schema and the validator.**
+  1. In `scripts/lib/validator.mjs`, move the region outlines' schema check out of the empire-edge block, to sit beside the other files' checks.
+  2. Add a test in which an outline with an invalid source id fails `validate:data`.
+  3. Give Pontus a valid source id for the river. The existing ids are `naturalearth:ne-10m-land` and `naturalearth:ne-10m-lakes`, so widen `naturalEarthSourceId` in `schema/source-id.schema.json` to allow `ne-10m-rivers-lake-centerlines`, and cite `naturalearth:ne-10m-rivers-lake-centerlines`. The Kızılırmak feature has no `ne_id` to cite instead.
+  4. Drop `naturalearth:ne_10m_rivers_europe` from the sources, and stop reading the Europe file if nothing else needs it.
+- **P4-F2. The notes.** Write them for a reader, in the project's own words, since they ship in `ancient.region-outlines.json`. Suggested texts follow; any wording that keeps their facts and sources will do.
+  - **Samaria:** "Samaria, which Josephus says 'begins at a village that is in the great plain called Ginea, and ends at the Acrabbene toparchy' (*Jewish War* 3.3.4). Its south edge runs through Anuath Borceos, 'the northern boundary of Judea' (3.3.5; Khirbet Berqit, located by Pleiades and DARE), and north of Aqraba (Acrabatta), a toparchy that both Josephus and Pliny count in Judea. Between these places the line is approximate. The coast is split between Samaria and Judea along that line, a convention neither author states. Josephus gives Judea a breadth 'from the river Jordan to Joppa' and says its 'maritime places extend as far as Ptolemais'. Pliny calls the coast from Ascalon to Caesarea 'the region of Samaria' (*Natural History* 5.14), but lists Joppa among Judea's toparchies (5.15)."
+  - **Judea:** "Judea as Josephus describes it (*Jewish War* 3.3.5), with Idumea, which he counts among Judea's eleven portions; Pliny counts Idumea apart (*Natural History* 5.14–15). The north edge, shared with Samaria, runs through Anuath Borceos and north of Aqraba (Acrabatta), and is approximate. The coast is split with Samaria as a convention: Josephus gives Judea a breadth 'from the river Jordan to Joppa' and 'maritime places' that 'extend as far as Ptolemais'. Pliny calls the coast from Ascalon to Caesarea 'the region of Samaria' (5.14), but lists Joppa among Judea's toparchies (5.15). The coast from Raphia to Rhinocolura is left out: Pliny places those towns and Gaza in 'Idumæa and Palæstina' (5.14), and Augustus added Gaza to the province of Syria (Josephus, *Antiquities* 17.11.4). The districts of Gaza itself and of Ascalon, 'a free town' (Pliny 5.14), aren't drawn separately and lie inside."
+  - **Galilee:** "Galilee as Josephus bounds it (*Jewish War* 3.3.1): Ptolemais's territory and Mount Carmel to the west, Samaria and Scythopolis to the south, the Jordan and the lake to the east, and the country of the Tyrians to the north. The edges are approximate. The line runs through the eastern end of Carmel, which Josephus says 'now belonged to the Tyrians', and through Ginea and Scythopolis. North of the lake, a strip up the Jordan valley to about 33.37°N follows the Ancient World Mapping Center's outline of Herod's kingdom; Josephus gives no line there. The outline takes the western half of the Sea of Galilee."
+  - **Libya:** "Cyrenaica, 'the parts of Libya around Cyrene' (Acts 2:10), as the Ancient World Mapping Center draws the province in AD 69. Its west edge meets the coast of the Great Syrtis 158 km east of the Euphrantas Tower (Euphranta, modern Sirte), which Strabo gives as the boundary 'as it was under Ptolemy' (17.3.20). That is 79 km west of the Altars of the Philaeni, which Strabo and Pliny (5.4) name at the head of the gulf. No source this project cites gives the first-century line, so that edge, like the desert and eastern edges, is approximate."
+  - **Pontus:** "The kingdom of Pontus, with Pontus Galaticus and Lesser Armenia, as this map's area of Pontus draws them: no source draws a line between these lands. To these it adds the coast east of the lower Halys: Amisus's territory, with Themiscyra (Strabo 12.3.9), which Rome governed with Bithynia (ISBE, 'Pontus'). The west edge follows Natural Earth's line for the Kızılırmak (the Halys). A straight 6 km stretch joins that line to the point where the areas of Pontus, Galatia and Bithynia meet, and another runs north to the sea from where Natural Earth's line ends."
+  - Crete, Chios, Cos, Malta, Rhodes and Samos can keep their notes; a reader-facing wording would be better.
+- **P4-F3. The face file.**
+  - Label it `awmc:ad69-face-raw-0001`, the id `judea-samaria-idumea` already uses. f0052 is the Judaea face.
+  - Give it a `provenance` block with the dataset, the AWMC and Natural Earth commits, and the upstream id. Its derivation: AD 69 raw face `raw-0001`, less Egypt, the AD 69 Syria face and the Herodian base, as in the area's `ruling` change (1,570 km²).
+- **P4-F4. The anchors.**
+  - Fix the six rows in the table above.
+  - Have `check-ancient-geo.mjs` read its anchor points from `region-anchors.json` instead of repeating them in code, so the two can't drift apart.
+- **P4-F5. Sources** (not blocking): add the ids listed in P4-10.
+- **P4-F6.** Rebuild, then run `check:ancient-geo`, `validate:data` (it should now check the schema) and `build:data`.
+
+### Licensing (phase 4)
+**Signed off, once P4-F3 and P4-F4 are done.**
+- **Natural Earth rivers.** Natural Earth's terms of use (re-read 2026-10-20): "All versions of Natural Earth raster + vector map data found on this website are in the public domain", and "No permission is needed to use Natural Earth. Crediting the authors is unnecessary." The rivers file comes from the same pinned commit (`ca96624`), and its SHA-256 is pinned in `ancient-geo-inputs.mjs`.
+  - The widened `ATTRIBUTION.md` row is adequate.
+  - I've widened `docs/LICENSES.md` to match: the `data/geo/` row, the Natural Earth row of the ancient layer's table, and the Natural Earth row under "Source compatibility". I also added a section, "Region outlines (M5-19)".
+- **Pleiades.** CC BY 3.0 is satisfied by the existing `ATTRIBUTION.md` row ("Ancient place data from Pleiades (pleiades.stoa.org), CC BY 3.0.", for "Ancient place IDs and coordinates") and by Pleiades' entry in "Sources & credits". Each anchor is a single fact, as already ruled for the routes' stops.
+  - Correct attribution also means each anchor must cite the record its point really comes from, which four don't yet (P4-F4).
+  - Sychem's point is Pleiades' "OSM location of Tell Balata", from OpenStreetMap. That is fine in `data/geo/` (ODbL), and A2 already credits OSM.
+- **AWMC.** The face file is an ODbL extract and needs its upstream id (P4-F3). The outlines inherit ODbL 1.0, and so does the app copy.
+- **When the frontend draws the outlines,** their map source carries the ancient layer's attribution string (LICENSES A1, and O1 in the new section). Nothing in `app/` reads the file yet.
+- Nothing is traced from a map. Every vertex lies within 100 m of a permitted input (check (f)).
+
+### Sign-off by region (phase 4)
+
+| Region | Verdict | Must change |
+|---|---|---|
+| Galilee | Approved with changes | Note (P4-F2); sources (P4-F5) |
+| Samaria | Approved with changes | Note: both authors on the coast, Anuath Borceos (P4-F2); sources (P4-F5) |
+| Judea | Approved with changes | Note: Idumea, the coast, Gaza and Ascalon (P4-F2); the face's label (P4-F3); sources (P4-F5) |
+| Pontus | Approved with changes | Source ids that pass the schema (P4-F1); note: Armenia Minor and the two straight pieces (P4-F2) |
+| Libya | Approved with changes | Note: 158 km and 79 km (P4-F2) |
+| Crete | Approved | — (the note names Cauda) |
+| Chios | Approved | — |
+| Cos | Approved | — |
+| Malta | Approved | — (the note names Mljet) |
+| Rhodes | Approved | — |
+| Samos | Approved | — |
+
+The validator fix (P4-F1) and the anchor fixes (P4-F4) apply to the whole file. I'll re-check the notes, the schema, the face file and the anchors when they are done.
+
+### Items for the PO (phase 4)
+- **PO-1.** `validate:data` hasn't schema-checked `region-outlines.geojson` in any run so far, because of P4-F1. Other new files may have the same gap; a test that seeds one error per file would show it.
+- **PO-2.** The notes ship in the app's copy, so readers may see them. P4-F2 asks for wording written for readers, not build notes.
+- **PO-3.** Antipatris (`pleiades:687996`) lies 1.1 km north of the Samaria–Judea line, so it falls in Samaria. No cited source puts it on either side. That is acceptable for an approximate line, but the human may notice it, since Acts 23:31–33 names it.
+
+### Checks run (phase 4)
+- `npm run check:ancient-geo`: passed. It rebuilt `data/geo/` byte for byte from an empty cache, and the outline checks (a)–(g) passed.
+- `npm run validate:data`: passes, but it skips the outlines' schema (P4-9). Compiling `schema/region-outlines.schema.json` directly with Ajv rejects the file at `features[10].properties.sources[5]` and `[6]`.
+- Scratch scripts (not committed) did the following:
+  - compared every outline with its source parts by `mapshaper` erase in both directions;
+  - matched the face file's vertices against the AD 69 raw and named faces and against the build's intermediates;
+  - tested points in polygons against the outlines;
+  - measured the Halys cut's distance to Natural Earth's line;
+  - looked up every anchor in the Pleiades dump and JSON, and on Wikidata.
