@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import AxeBuilder from "@axe-core/playwright";
+import sharp from "sharp";
 
 import {
   buildSyntheticPlaces,
@@ -109,25 +110,39 @@ async function renderedPlaceNames(page) {
     if (!map) {
       throw new Error("Map test hook is unavailable.");
     }
-    const seen = new Map();
+    const seen = new Set();
+    const rendered = [];
     for (const feature of map.queryRenderedFeatures()) {
       const properties = feature.properties ?? {};
-      if (!properties.placeId || typeof properties.labelText !== "string" || feature.geometry?.type !== "Point") {
+      const labelText =
+        typeof properties.labelText === "string"
+          ? String(properties.labelText)
+          : typeof properties.placeName === "string"
+            ? String(properties.placeName)
+            : null;
+      if (!properties.placeId || !labelText || feature.geometry?.type !== "Point") {
         continue;
       }
       const point = map.project(feature.geometry.coordinates);
-      if (!seen.has(properties.placeId)) {
-        seen.set(properties.placeId, {
-          placeId: String(properties.placeId),
-          text: String(properties.labelText),
-          source: String(feature.source ?? ""),
+      const placeId = String(properties.placeId);
+      const source = String(feature.source ?? "");
+      const layerId = typeof feature.layer?.id === "string" ? feature.layer.id : "";
+      const dedupeKey = `${placeId}:${source}:${layerId}`;
+      if (!seen.has(dedupeKey)) {
+        seen.add(dedupeKey);
+        rendered.push({
+          placeId,
+          text: labelText,
+          placeType: typeof properties.placeType === "string" ? String(properties.placeType) : null,
+          source,
+          layerId,
           id: feature.id ?? null,
           x: point.x,
           y: point.y
         });
       }
     }
-    return [...seen.values()];
+    return rendered;
   }, mapTestHookKey);
 }
 
@@ -227,6 +242,108 @@ async function clickRouteStageCard(page, stageIndex) {
     onButton: false
   });
   await card.click({ position: clickOffset });
+}
+
+function clipAroundPoint(page, x, y, width = 180, height = 72) {
+  const viewport = page.viewportSize();
+  const viewportWidth = viewport?.width ?? 1280;
+  const viewportHeight = viewport?.height ?? 720;
+  const left = Math.max(0, Math.min(Math.round(x - width / 2), viewportWidth - width));
+  const top = Math.max(0, Math.min(Math.round(y - height / 2), viewportHeight - height));
+  return { x: left, y: top, width, height };
+}
+
+async function countBluePixelsNearLabel(page, x, y) {
+  const screenshot = await page.screenshot({
+    clip: clipAroundPoint(page, x, y)
+  });
+  const { data } = await sharp(screenshot).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let nearGoogleBlueCount = 0;
+  for (let index = 0; index < data.length; index += 4) {
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+    const alpha = data[index + 3];
+    if (alpha < 200) {
+      continue;
+    }
+    if (Math.abs(red - 26) <= 20 && Math.abs(green - 115) <= 25 && Math.abs(blue - 232) <= 25) {
+      nearGoogleBlueCount += 1;
+    }
+  }
+  return nearGoogleBlueCount;
+}
+
+function relativeLuminance(red, green, blue) {
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+async function sampleLuminanceAtMapPoints(page, points) {
+  const screenshot = await page.screenshot();
+  const {
+    data,
+    info: { width, height }
+  } = await sharp(screenshot).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  return points.map(({ x, y }) => {
+    const px = Math.max(0, Math.min(width - 1, Math.round(x)));
+    const py = Math.max(0, Math.min(height - 1, Math.round(y)));
+    const index = (py * width + px) * 4;
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+    return relativeLuminance(red, green, blue);
+  });
+}
+
+async function mapPointToViewportPoint(page, point) {
+  const { x, y } = point;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return null;
+  }
+  return { x, y };
+}
+
+async function moveMouseToMapPoint(page, point) {
+  const viewportPoint = await mapPointToViewportPoint(page, point);
+  expect(viewportPoint).toBeTruthy();
+  await page.mouse.move(viewportPoint.x, viewportPoint.y);
+}
+
+async function clickMapPoint(page, point) {
+  const viewportPoint = await mapPointToViewportPoint(page, point);
+  expect(viewportPoint).toBeTruthy();
+  await page.mouse.click(viewportPoint.x, viewportPoint.y);
+}
+
+async function cursorAtMapPoint(page, point) {
+  await moveMouseToMapPoint(page, point);
+  await page.waitForTimeout(60);
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return window.getComputedStyle(map.getCanvas()).cursor;
+  }, mapTestHookKey);
+}
+
+async function moveMouseToInteractiveMapPoint(page, originPoint) {
+  const offsets = [
+    [0, 0],
+    [0, -10],
+    [0, 10],
+    [-10, 0],
+    [10, 0],
+    [-18, -10],
+    [18, -10],
+    [-18, 10],
+    [18, 10]
+  ];
+  for (const [offsetX, offsetY] of offsets) {
+    const point = { x: originPoint.x + offsetX, y: originPoint.y + offsetY };
+    const cursor = await cursorAtMapPoint(page, point);
+    if (cursor.includes("pointer")) {
+      return point;
+    }
+  }
+  return null;
 }
 
 test("map requests tiles and loads workers on startup", { tag: ["@data"] }, async ({ page, baseUrl }) => {
@@ -788,8 +905,1130 @@ test("selected place pin rules stay accurate for towns, areas, candidate places,
   expect(modernState.selectedLabelCount).toBe(0);
 });
 
+test("hover turns one town, one area label and one holder label blue with unique feature ids @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  const hoverScenarioDefinitions = [
+    {
+      name: "town",
+      center: [27.34, 37.94],
+      zoom: 8.2,
+      layerIds: ["ibm-city-pin", "ibm-site-pin", "ibm-major-pin"]
+    },
+    {
+      name: "area",
+      center: [33.3, 38.6],
+      zoom: 6.5,
+      layerIds: ["ibm-area-label-overview", "ibm-area-label", "ibm-major-area-label-overview", "ibm-major-area-label"]
+    },
+    {
+      name: "holder",
+      center: [31.5, 39.0],
+      zoom: 6.2,
+      layerIds: ["ibm-ancient-holder-label-clickable"]
+    }
+  ];
+
+  for (const scenario of hoverScenarioDefinitions) {
+    await jumpMap(page, scenario.center, scenario.zoom);
+    await waitForMapIdle(page);
+    const target = await page.evaluate(
+      ({ testHookKey, layerIds, scenarioName }) => {
+        const map = window[testHookKey];
+        const predicate =
+          scenarioName === "town"
+            ? (feature) => feature.properties?.placeId === "ephesus"
+            : scenarioName === "area"
+              ? (feature) => feature.properties?.placeId === "lycaonia"
+              : (feature) => feature.properties?.holderLocationId === "asia";
+        const feature = map.queryRenderedFeatures(undefined, { layers: layerIds }).find(predicate);
+        if (!feature || feature.geometry?.type !== "Point") {
+          return null;
+        }
+        const projected = map.project(feature.geometry.coordinates);
+        let hoverPoint = { x: projected.x, y: projected.y };
+        for (const [offsetX, offsetY] of [
+          [0, 0],
+          [0, -10],
+          [0, 10],
+          [-10, 0],
+          [10, 0]
+        ]) {
+          const x = projected.x + offsetX;
+          const y = projected.y + offsetY;
+          const hit = map
+            .queryRenderedFeatures(
+              [
+                [x - 2, y - 2],
+                [x + 2, y + 2]
+              ],
+              { layers: [feature.layer?.id ?? ""] }
+            )
+            .some((entry) => entry.id === feature.id);
+          if (hit) {
+            hoverPoint = { x, y };
+            break;
+          }
+        }
+        const sameIdCount =
+          feature.id === null || feature.id === undefined
+            ? null
+            : map.queryRenderedFeatures(undefined, { layers: [feature.layer?.id ?? ""] }).filter(
+                (entry) => entry.id === feature.id
+              ).length;
+        return {
+          x: hoverPoint.x,
+          y: hoverPoint.y,
+          source: String(feature.source ?? ""),
+          id: feature.id,
+          layerId: feature.layer?.id ?? "",
+          sameIdCount
+        };
+      },
+      { testHookKey: mapTestHookKey, layerIds: scenario.layerIds, scenarioName: scenario.name }
+    );
+    expect(target, `${scenario.name} hover target should exist`).toBeTruthy();
+    expect(target.id, `${target.layerId} should expose a stable id`).not.toBeNull();
+    expect(target.sameIdCount, `${target.layerId} id should not be shared`).toBe(1);
+
+    const beforeBlueCount = await countBluePixelsNearLabel(page, target.x, target.y);
+    expect(beforeBlueCount).toBeLessThan(8);
+
+    let afterBlueCount = 0;
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0],
+      [-18, -10],
+      [18, -10],
+      [-18, 10],
+      [18, 10]
+    ]) {
+      const hoverPoint = { x: target.x + offsetX, y: target.y + offsetY };
+      await moveMouseToMapPoint(page, hoverPoint);
+      await page.waitForTimeout(120);
+      const sampleBlueCount = await countBluePixelsNearLabel(page, hoverPoint.x, hoverPoint.y);
+      afterBlueCount = Math.max(afterBlueCount, sampleBlueCount);
+      if (afterBlueCount > beforeBlueCount + 20) {
+        break;
+      }
+    }
+    expect(afterBlueCount).toBeGreaterThan(beforeBlueCount + 20);
+  }
+});
+
+test("selected region veil darkens outside the region while keeping inside luminance stable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await jumpMap(page, [33.3, 39.0], 6.6);
+
+  const samplePoints = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const inside = [
+      [33.2, 39.1],
+      [33.6, 39.0],
+      [33.0, 38.8]
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const outside = [
+      [30.1, 38.8],
+      [36.8, 39.0],
+      [33.2, 35.8]
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    return {
+      inside: inside.map((point) => ({ x: point.x, y: point.y })),
+      outside: outside.map((point) => ({ x: point.x, y: point.y }))
+    };
+  }, mapTestHookKey);
+
+  const withVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "none");
+  }, mapTestHookKey);
+  await waitForMapIdle(page);
+  const withoutVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withoutVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "visible");
+  }, mapTestHookKey);
+
+  const insideDeltas = withVeilInside.map((value, index) => withoutVeilInside[index] - value);
+  const outsideDeltas = withVeilOutside.map((value, index) => withoutVeilOutside[index] - value);
+  const insideMeanDelta = insideDeltas.reduce((sum, value) => sum + value, 0) / insideDeltas.length;
+  const outsideMeanDelta = outsideDeltas.reduce((sum, value) => sum + value, 0) / outsideDeltas.length;
+
+  expect(Math.abs(insideMeanDelta)).toBeLessThan(3);
+  expect(outsideMeanDelta).toBeGreaterThan(8);
+});
+
+test("clicking KINGDOM OF PONTUS draws veil and outline while keeping inside luminance stable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await jumpMap(page, [36.5, 40.6], 6.9);
+
+  const pontusTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const layers = [
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-selected-area-label",
+      "ibm-ancient-holder-label-click-target",
+      "ibm-ancient-holder-label-clickable",
+      "ibm-ancient-holder-label-selected"
+    ];
+    const hit = map
+      .queryRenderedFeatures(undefined, { layers })
+      .find(
+        (feature) =>
+          String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus"
+      );
+    if (!hit || hit.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(hit.geometry.coordinates);
+    return { x: projected.x, y: projected.y };
+  }, mapTestHookKey);
+  expect(pontusTarget).toBeTruthy();
+  await clickMapPoint(page, pontusTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "pontus",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+
+  const overlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(overlay.veilFeatures).toBeGreaterThan(0);
+  expect(overlay.outlineFeatures).toBeGreaterThan(0);
+
+  const samplePoints = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const selectedName = map
+      .queryRenderedFeatures(undefined, {
+        layers: [
+          "ibm-selected-area-label",
+          "ibm-ancient-holder-label-selected"
+        ]
+      })
+      .find((feature) => String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus");
+    const insidePoint = selectedName?.geometry?.type === "Point" ? map.project(selectedName.geometry.coordinates) : null;
+    const canvas = map.getCanvas();
+    const outsideCandidates = (() => {
+      for (let y = 140; y <= canvas.height - 140; y += 36) {
+        for (let x = 520; x <= canvas.width - 120; x += 36) {
+          const hasVeil = map.queryRenderedFeatures(
+            [
+              [x - 2, y - 2],
+              [x + 2, y + 2]
+            ],
+            { layers: ["ibm-selected-region-veil"] }
+          ).length > 0;
+          if (hasVeil) {
+            return { x, y };
+          }
+        }
+      }
+      return null;
+    })();
+    return {
+      inside: insidePoint ? [{ x: insidePoint.x, y: insidePoint.y }] : [],
+      outside: outsideCandidates ? [{ x: outsideCandidates.x, y: outsideCandidates.y }] : []
+    };
+  }, mapTestHookKey);
+  expect(samplePoints.inside.length).toBe(1);
+  expect(samplePoints.outside.length).toBe(1);
+
+  const withVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "none");
+  }, mapTestHookKey);
+  await waitForMapIdle(page);
+  const withoutVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
+  const withoutVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
+  await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "visible");
+  }, mapTestHookKey);
+
+  expect(Math.abs(withoutVeilInside[0] - withVeilInside[0])).toBeLessThan(3);
+  expect(withoutVeilOutside[0] - withVeilOutside[0]).toBeGreaterThan(2);
+});
+
+test("roman empire veil follows the stop edge at year 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await jumpMap(page, [38.5, 39.0], 5.0);
+
+  const overlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(overlay.veilFeatures).toBeGreaterThan(0);
+  expect(overlay.outlineFeatures).toBeGreaterThan(0);
+
+  const romanVeilProbe = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const pointHasVeil = (projected) =>
+      map.queryRenderedFeatures(
+        [
+          [projected.x - 2, projected.y - 2],
+          [projected.x + 2, projected.y + 2]
+        ],
+        { layers: ["ibm-selected-region-veil"] }
+      ).length > 0;
+    const insideCandidates = [
+      [23.8, 38.2], // Achaia
+      [33.1, 39.0] // Galatia
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const outsideCandidates = [
+      [57.0, 39.0],
+      [61.0, 40.2],
+      [53.5, 35.5]
+    ].map(([lng, lat]) => map.project([lng, lat]));
+    const insideHasVeil = insideCandidates.map((projected) => pointHasVeil(projected));
+    const eastOutsideHasVeil = outsideCandidates.map((projected) => pointHasVeil(projected));
+    const fallbackOutsidePoint = (() => {
+      const canvas = map.getCanvas();
+      for (let y = 140; y <= canvas.height - 140; y += 36) {
+        for (let x = 140; x <= canvas.width - 140; x += 36) {
+          const projected = { x, y };
+          if (
+            pointHasVeil(projected) &&
+            map.unproject([x, y]).lng > 50
+          ) {
+            return projected;
+          }
+        }
+      }
+      return null;
+    })();
+    return {
+      insideHasVeil,
+      eastOutsideHasVeil,
+      fallbackOutsideHasVeil: fallbackOutsidePoint
+        ? pointHasVeil(fallbackOutsidePoint)
+        : false
+    };
+  }, mapTestHookKey);
+
+  expect(romanVeilProbe.insideHasVeil.some(Boolean)).toBe(false);
+  expect(
+    romanVeilProbe.eastOutsideHasVeil.some(Boolean) || romanVeilProbe.fallbackOutsideHasVeil
+  ).toBe(true);
+});
+
+test("regions only highlight when they own a shaped area in the selected year @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await jumpMap(page, [34.0, 38.7], 6.8);
+  const pisidiaTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const layers = [
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-selected-area-label"
+    ];
+    const target = map
+      .queryRenderedFeatures(undefined, { layers })
+      .find(
+        (feature) =>
+          feature.geometry?.type === "Point" &&
+          String(feature.properties?.placeId ?? "") === "pisidia"
+      );
+    if (!target || target.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(target.geometry.coordinates);
+    return { x: projected.x, y: projected.y };
+  }, mapTestHookKey);
+  expect(pisidiaTarget).toBeTruthy();
+  await clickMapPoint(page, pisidiaTarget);
+  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("place") === "pisidia", { timeout: 10_000 });
+  await waitForMapIdle(page);
+
+  const pisidiaOverlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(pisidiaOverlay.veilFeatures).toBe(0);
+  expect(pisidiaOverlay.outlineFeatures).toBe(0);
+
+  let pisidiaNameProbe = null;
+  await expect
+    .poll(
+      async () => {
+        pisidiaNameProbe = await page.evaluate((testHookKey) => {
+          const map = window[testHookKey];
+          const layers = [
+            "ibm-major-area-label-overview",
+            "ibm-major-area-label",
+            "ibm-area-label-overview",
+            "ibm-area-label",
+            "ibm-selected-area-label",
+            "ibm-ancient-holder-label-clickable",
+            "ibm-ancient-holder-label-selected"
+          ];
+          const features = map.queryRenderedFeatures(undefined, { layers }).filter((feature) => {
+            const placeId = String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "");
+            return placeId === "pisidia";
+          });
+          const single = features[0];
+          if (!single || single.geometry?.type !== "Point") {
+            return { count: features.length, layerId: null, x: null, y: null };
+          }
+          const projected = map.project(single.geometry.coordinates);
+          for (const [offsetX, offsetY] of [
+            [0, 0],
+            [0, -12],
+            [0, 12],
+            [-12, 0],
+            [12, 0],
+            [-20, -10],
+            [20, -10],
+            [-20, 10],
+            [20, 10]
+          ]) {
+            const x = projected.x + offsetX;
+            const y = projected.y + offsetY;
+            const hit = map
+              .queryRenderedFeatures(
+                [
+                  [x - 2, y - 2],
+                  [x + 2, y + 2]
+                ],
+                { layers }
+              )
+              .some(
+                (entry) =>
+                  String(entry.properties?.placeId ?? entry.properties?.holderLocationId ?? "") === "pisidia"
+              );
+            if (hit) {
+              return { count: features.length, layerId: single.layer?.id ?? null, x, y };
+            }
+          }
+          return { count: features.length, layerId: single.layer?.id ?? null, x: projected.x, y: projected.y };
+        }, mapTestHookKey);
+        return `${pisidiaNameProbe.count}:${pisidiaNameProbe.layerId ?? "none"}`;
+      },
+      { timeout: 10_000 }
+    )
+    .toBe("1:ibm-selected-area-label");
+
+  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea-province`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  const judeaProvinceOverlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(judeaProvinceOverlay.veilFeatures).toBeGreaterThan(0);
+  expect(judeaProvinceOverlay.outlineFeatures).toBeGreaterThan(0);
+
+  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  const judeaRegionOverlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(judeaRegionOverlay.veilFeatures).toBe(0);
+  expect(judeaRegionOverlay.outlineFeatures).toBe(0);
+
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  const galatiaOverlay = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(galatiaOverlay.veilFeatures).toBeGreaterThan(0);
+  expect(galatiaOverlay.outlineFeatures).toBeGreaterThan(0);
+});
+
+test("selected region updates holder label and overlay when the year changes @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=53&place=achaia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  const before = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const selectedHolderFeatures = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-ancient-holder-label-selected"] })
+      .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "achaia");
+    const selectedHolder = selectedHolderFeatures[0];
+    return {
+      selectedHolderCount: selectedHolderFeatures.length,
+      selectedHolderEntryId: String(selectedHolder?.properties?.entryId ?? ""),
+      selectedHolderText: String(selectedHolder?.properties?.labelText ?? ""),
+      selectedAreaCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-selected-area-label"] }).filter(
+        (feature) => String(feature.properties?.placeId ?? "") === "achaia"
+      ).length,
+      veilCount: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineCount: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(before.selectedHolderCount).toBeGreaterThan(0);
+  expect(before.selectedAreaCount).toBe(0);
+  expect(before.veilCount).toBeGreaterThan(0);
+  expect(before.outlineCount).toBeGreaterThan(0);
+
+  const slider = page.locator("input[data-timeline-slider='true']").first();
+  await slider.focus();
+  await slider.press("ArrowRight");
+  await expect
+    .poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("year"), { timeout: 10_000 })
+    .toBe("67");
+  await waitForMapIdle(page);
+
+  const probeSelectionState = () =>
+    page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      const selectedHolderFeatures = map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-ancient-holder-label-selected"] })
+        .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "achaia");
+      const selectedHolder = selectedHolderFeatures[0];
+      return {
+        selectedHolderCount: selectedHolderFeatures.length,
+        selectedHolderEntryId: String(selectedHolder?.properties?.entryId ?? ""),
+        selectedHolderText: String(selectedHolder?.properties?.labelText ?? ""),
+        selectedAreaCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-selected-area-label"] }).filter(
+          (feature) => String(feature.properties?.placeId ?? "") === "achaia"
+        ).length,
+        veilCount: map.querySourceFeatures("ibm-selected-region-veil").length,
+        outlineCount: map.querySourceFeatures("ibm-selected-region-outline").length
+      };
+    }, mapTestHookKey);
+
+  await expect
+    .poll(async () => JSON.stringify(await probeSelectionState()), { timeout: 10_000 })
+    .not.toBe(JSON.stringify(before));
+  const after = await probeSelectionState();
+
+  expect(after.selectedHolderCount + after.selectedAreaCount).toBe(1);
+  expect(after.veilCount).toBeGreaterThan(0);
+  expect(after.outlineCount).toBeGreaterThan(0);
+});
+
+test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=53`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const viewpoints = [
+    { center: [34.2, 39.1], zoom: 6.6 },
+    { center: [33.4, 38.9], zoom: 6.9 },
+    { center: [34.8, 39.3], zoom: 7.2 }
+  ];
+  let galatiaHolderLabel = null;
+  for (const viewpoint of viewpoints) {
+    await jumpMap(page, viewpoint.center, viewpoint.zoom);
+    galatiaHolderLabel = await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      const holderLayers = [
+        "ibm-ancient-holder-label-click-target",
+        "ibm-ancient-holder-label-clickable",
+        "ibm-ancient-holder-label-selected"
+      ];
+      const feature = map
+        .queryRenderedFeatures(undefined, {
+          layers: holderLayers
+        })
+        .find((entry) => {
+          const locationId = entry.properties?.holderLocationId;
+          const text = String(entry.properties?.labelText ?? "");
+          if (!(locationId === "galatia" || text.includes("GALATIA"))) {
+            return false;
+          }
+          return entry.geometry?.type === "Point";
+        });
+      if (!feature || feature.geometry?.type !== "Point") {
+        return null;
+      }
+      const projected = map.project(feature.geometry.coordinates);
+      const targetPlaceId = String(feature.properties?.holderLocationId ?? "");
+      for (const [offsetX, offsetY] of [
+        [0, 0],
+        [0, -10],
+        [0, 10],
+        [-10, 0],
+        [10, 0],
+        [-20, -10],
+        [20, -10],
+        [-20, 10],
+        [20, 10]
+      ]) {
+        const x = projected.x + offsetX;
+        const y = projected.y + offsetY;
+        const hit = map
+          .queryRenderedFeatures(
+            [
+              [x - 2, y - 2],
+              [x + 2, y + 2]
+            ],
+            { layers: holderLayers }
+          )
+          .some(
+            (entry) => String(entry.properties?.holderLocationId ?? "") === targetPlaceId
+          );
+        if (hit) {
+          return { x, y };
+        }
+      }
+      return { x: projected.x, y: projected.y };
+    }, mapTestHookKey);
+    if (galatiaHolderLabel) {
+      break;
+    }
+  }
+  expect(galatiaHolderLabel).toBeTruthy();
+
+  let selectedPlaceAfterHolderClick = null;
+  for (const [offsetX, offsetY] of [
+    [0, 0],
+    [0, -8],
+    [0, 8],
+    [-8, 0],
+    [8, 0],
+    [0, -16],
+    [0, 16],
+    [-16, 0],
+    [16, 0],
+    [-16, -12],
+    [16, -12],
+    [-16, 12],
+    [16, 12],
+    [0, -24],
+    [0, 24],
+    [-24, 0],
+    [24, 0]
+  ]) {
+    await clickMapPoint(page, { x: galatiaHolderLabel.x + offsetX, y: galatiaHolderLabel.y + offsetY });
+    await page.waitForTimeout(200);
+    selectedPlaceAfterHolderClick = await page.evaluate(
+      () => new URLSearchParams(window.location.search).get("place")
+    );
+    if (selectedPlaceAfterHolderClick === "galatia") {
+      break;
+    }
+  }
+  expect(selectedPlaceAfterHolderClick).toBe("galatia");
+  await waitForMapIdle(page);
+  const holderTransitionProbe = await page.evaluate(async (testHookKey) => {
+    const map = window[testHookKey];
+    const sampledFrames = [];
+    for (let frame = 0; frame < 24; frame += 1) {
+      await new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+      const features = map
+        .queryRenderedFeatures(undefined, {
+          layers: ["ibm-ancient-holder-label-clickable", "ibm-ancient-holder-label-selected"]
+        })
+        .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "galatia");
+      const clickableCount = features.filter((feature) => feature.layer?.id === "ibm-ancient-holder-label-clickable").length;
+      const selectedCount = features.filter((feature) => feature.layer?.id === "ibm-ancient-holder-label-selected").length;
+      sampledFrames.push({ clickableCount, selectedCount, total: clickableCount + selectedCount });
+    }
+    return {
+      zeroNameFrameCount: sampledFrames.filter((frame) => frame.total === 0).length,
+      overlappingNameFrameCount: sampledFrames.filter((frame) => frame.total > 1).length
+    };
+  }, mapTestHookKey);
+  expect(holderTransitionProbe.zeroNameFrameCount).toBe(0);
+  expect(holderTransitionProbe.overlappingNameFrameCount).toBe(0);
+
+  let selectedNameProbe = null;
+  await expect
+    .poll(
+      async () => {
+        selectedNameProbe = await page.evaluate((testHookKey) => {
+          const map = window[testHookKey];
+          const nameLayers = [
+            "ibm-major-pin",
+            "ibm-routes-major-pin",
+            "ibm-city-pin",
+            "ibm-routes-city-pin",
+            "ibm-site-pin",
+            "ibm-routes-site-pin",
+            "ibm-pin-label-standard",
+            "ibm-selected-major-pin-label",
+            "ibm-selected-site-pin-label",
+            "ibm-selected-pin-label",
+            "ibm-major-area-label-overview",
+            "ibm-major-area-label",
+            "ibm-area-label-overview",
+            "ibm-area-label",
+            "ibm-selected-area-label",
+            "ibm-ancient-holder-label",
+            "ibm-ancient-holder-label-clickable",
+            "ibm-ancient-holder-label-selected"
+          ];
+          const galatiaNames = map.queryRenderedFeatures(undefined, { layers: nameLayers }).filter((feature) => {
+            const placeId = feature.properties?.placeId;
+            const holderLocationId = feature.properties?.holderLocationId;
+            return placeId === "galatia" || holderLocationId === "galatia";
+          });
+          const single = galatiaNames[0];
+          if (!single || single.geometry?.type !== "Point") {
+            return { count: galatiaNames.length, layerId: null, x: null, y: null };
+          }
+          const projected = map.project(single.geometry.coordinates);
+          return {
+            count: galatiaNames.length,
+            layerId: single.layer?.id ?? null,
+            x: projected.x,
+            y: projected.y
+          };
+        }, mapTestHookKey);
+        return `${selectedNameProbe.count}:${selectedNameProbe.layerId ?? "none"}`;
+      },
+      { timeout: 10_000 }
+    )
+    .toBe("1:ibm-ancient-holder-label-selected");
+
+  const selectedBlueCount = await countBluePixelsNearLabel(page, selectedNameProbe.x, selectedNameProbe.y);
+  expect(selectedBlueCount).toBeGreaterThan(20);
+});
+
+test("with a region selected, clicking an outside town clears region highlight and selects the town @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=53&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await jumpMap(page, [27.34, 37.94], 7.4);
+  const townTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const hit = map
+      .queryRenderedFeatures(undefined, {
+        layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"]
+      })
+      .find((feature) => {
+        if (feature.geometry?.type !== "Point") {
+          return false;
+        }
+        const placeId = feature.properties?.placeId;
+        const placeType = feature.properties?.placeType;
+        return (
+          typeof placeId === "string" &&
+          placeId !== "galatia" &&
+          (placeType === "city" ||
+            placeType === "town" ||
+            placeType === "village" ||
+            placeType === "site" ||
+            placeType === "natural-feature")
+        );
+      });
+    if (!hit || hit.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(hit.geometry.coordinates);
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0]
+    ]) {
+      const x = projected.x + offsetX;
+      const y = projected.y + offsetY;
+      const hitAtPoint = map
+        .queryRenderedFeatures(
+          [
+            [x - 2, y - 2],
+            [x + 2, y + 2]
+          ],
+          { layers: ["ibm-major-pin", "ibm-routes-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"] }
+        )
+        .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
+      if (hitAtPoint) {
+        return { x, y, placeId: String(hit.properties.placeId) };
+      }
+    }
+    return null;
+  }, mapTestHookKey);
+  expect(townTarget).toBeTruthy();
+  await clickMapPoint(page, townTarget);
+  await page.waitForFunction(
+    () => {
+      const selectedPlaceId = new URLSearchParams(window.location.search).get("place");
+      return typeof selectedPlaceId === "string" && selectedPlaceId.length > 0 && selectedPlaceId !== "galatia";
+    },
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+
+  const highlightProbe = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return {
+      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+  expect(highlightProbe.veilFeatures).toBe(0);
+  expect(highlightProbe.outlineFeatures).toBe(0);
+});
+
+test("clicking another region moves the highlight; towns under veil stay clickable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=53&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await jumpMap(page, [34.2, 38.4], 6.6);
+  const nextRegion = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const regionLayers = [
+      "ibm-area-label-overview",
+      "ibm-area-label",
+      "ibm-major-area-label-overview",
+      "ibm-major-area-label",
+      "ibm-selected-area-label",
+      "ibm-ancient-holder-label-click-target",
+      "ibm-ancient-holder-label-clickable",
+      "ibm-ancient-holder-label-selected"
+    ];
+    const preferredTargetPlaceIds = [
+      "asia",
+      "bithynia-and-pontus",
+      "lycaonia",
+      "phrygia",
+      "pisidia"
+    ];
+    const features = map.queryRenderedFeatures(undefined, {
+      layers: regionLayers
+    });
+    const hit =
+      preferredTargetPlaceIds
+        .map((targetPlaceId) =>
+          features.find((feature) => {
+            if (feature.geometry?.type !== "Point") {
+              return false;
+            }
+            const placeId = String(
+              feature.properties?.holderLocationId ?? feature.properties?.placeId ?? ""
+            );
+            const placeType = String(feature.properties?.placeType ?? "");
+            return (
+              placeId === targetPlaceId &&
+              (placeType === "region" || placeType === "province")
+            );
+          })
+        )
+        .find(Boolean) ??
+      features.find((feature) => {
+        if (feature.geometry?.type !== "Point") {
+          return false;
+        }
+        const placeId = String(
+          feature.properties?.holderLocationId ?? feature.properties?.placeId ?? ""
+        );
+        const placeType = String(feature.properties?.placeType ?? "");
+        return (
+          placeId.length > 0 &&
+          placeId !== "galatia" &&
+          (placeType === "region" || placeType === "province")
+        );
+      });
+    if (!hit || hit.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(hit.geometry.coordinates);
+    const targetPlaceId = String(hit.properties?.holderLocationId ?? hit.properties?.placeId ?? "");
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0],
+      [-20, -10],
+      [20, -10],
+      [-20, 10],
+      [20, 10]
+    ]) {
+      const x = projected.x + offsetX;
+      const y = projected.y + offsetY;
+      const hitAtPoint = map
+        .queryRenderedFeatures(
+          [
+            [x - 2, y - 2],
+            [x + 2, y + 2]
+          ],
+          { layers: regionLayers }
+        )
+        .some((feature) => {
+          const featurePlaceId = String(
+            feature.properties?.holderLocationId ?? feature.properties?.placeId ?? ""
+          );
+          return featurePlaceId === targetPlaceId;
+        });
+      if (hitAtPoint) {
+        return { x, y, placeId: targetPlaceId };
+      }
+    }
+    return { x: projected.x, y: projected.y, placeId: targetPlaceId };
+  }, mapTestHookKey);
+  expect(nextRegion).toBeTruthy();
+  let selectedPlaceAfterRegionClick = "galatia";
+  for (const [offsetX, offsetY] of [
+    [0, 0],
+    [0, -8],
+    [0, 8],
+    [-8, 0],
+    [8, 0],
+    [0, -16],
+    [0, 16],
+    [-16, 0],
+    [16, 0],
+    [-16, -12],
+    [16, -12],
+    [-16, 12],
+    [16, 12],
+    [0, -24],
+    [0, 24],
+    [-24, 0],
+    [24, 0]
+  ]) {
+    await clickMapPoint(page, { x: nextRegion.x + offsetX, y: nextRegion.y + offsetY });
+    await page.waitForTimeout(200);
+    selectedPlaceAfterRegionClick = await page.evaluate(
+      () => new URLSearchParams(window.location.search).get("place") ?? ""
+    );
+    if (selectedPlaceAfterRegionClick && selectedPlaceAfterRegionClick !== "galatia") {
+      break;
+    }
+  }
+  expect(selectedPlaceAfterRegionClick).toBe(nextRegion.placeId);
+  await waitForMapIdle(page);
+  expect(selectedPlaceAfterRegionClick).toBeTruthy();
+
+  const movedHighlight = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const selectedName = map
+      .queryRenderedFeatures(undefined, {
+        layers: ["ibm-selected-area-label", "ibm-ancient-holder-label-selected"]
+      })
+      .find(
+        (feature) =>
+          typeof feature.properties?.placeId === "string" ||
+          typeof feature.properties?.holderLocationId === "string"
+      );
+    return selectedName?.properties?.placeId ?? selectedName?.properties?.holderLocationId ?? null;
+  }, mapTestHookKey);
+  expect(movedHighlight).toBe(selectedPlaceAfterRegionClick);
+
+  await jumpMap(page, [27.34, 37.94], 7.4);
+  const townUnderVeil = await page.evaluate(({ testHookKey, selectedRegionId }) => {
+    const map = window[testHookKey];
+    const hit = map
+      .queryRenderedFeatures(undefined, {
+        layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"]
+      })
+      .find((feature) => {
+        if (feature.geometry?.type !== "Point") {
+          return false;
+        }
+        const placeId = feature.properties?.placeId;
+        const placeType = feature.properties?.placeType;
+        return (
+          typeof placeId === "string" &&
+          placeId !== selectedRegionId &&
+          (placeType === "city" ||
+            placeType === "town" ||
+            placeType === "village" ||
+            placeType === "site" ||
+            placeType === "natural-feature")
+        );
+      });
+    if (!hit || hit.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(hit.geometry.coordinates);
+    for (const [offsetX, offsetY] of [
+      [0, 0],
+      [0, -10],
+      [0, 10],
+      [-10, 0],
+      [10, 0]
+    ]) {
+      const x = projected.x + offsetX;
+      const y = projected.y + offsetY;
+      const hitAtPoint = map
+        .queryRenderedFeatures(
+          [
+            [x - 2, y - 2],
+            [x + 2, y + 2]
+          ],
+          { layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"] }
+        )
+        .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
+      if (hitAtPoint) {
+        return { x, y, placeId: String(hit.properties.placeId) };
+      }
+    }
+    return null;
+  }, { testHookKey: mapTestHookKey, selectedRegionId: nextRegion.placeId });
+  expect(townUnderVeil).toBeTruthy();
+  await clickMapPoint(page, townUnderVeil);
+  await page.waitForFunction(
+    (placeId) => new URLSearchParams(window.location.search).get("place") === placeId,
+    townUnderVeil.placeId,
+    { timeout: 10_000 }
+  );
+});
+
+test("selected place pin image matches Google marker proportions and tip anchor @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?place=ephesus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+
+  const probe = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const imageEntry = map.style?.imageManager?.images?.["ibm-selected-place-pin-icon"] ?? null;
+    const imageData = imageEntry?.data ?? imageEntry?.userImage?.data ?? null;
+    const width = imageData?.width ?? imageEntry?.width ?? null;
+    const height = imageData?.height ?? imageEntry?.height ?? null;
+    const pixelRatio = imageEntry?.pixelRatio ?? 1;
+    const pixels = imageData?.data ?? null;
+    const readPixel = (x, y) => {
+      if (!pixels || width === null || height === null) {
+        return null;
+      }
+      if (x < 0 || y < 0 || x >= width || y >= height) {
+        return null;
+      }
+      const offset = (y * width + x) * 4;
+      return [pixels[offset], pixels[offset + 1], pixels[offset + 2], pixels[offset + 3]];
+    };
+    const centerX = width === null ? null : Math.floor(width / 2);
+    const tipPixels =
+      centerX === null || height === null
+        ? []
+        : [readPixel(centerX, height - 1), readPixel(centerX, height - 2), readPixel(centerX, height - 3)].filter(
+            Boolean
+          );
+    const topLeftPixel = readPixel(0, 0);
+    const cssWidth = width === null ? null : width / pixelRatio;
+    const cssHeight = height === null ? null : height / pixelRatio;
+    const isPinPixel = (pixel) => {
+      if (!pixel) {
+        return false;
+      }
+      const [red, green, blue, alpha] = pixel;
+      if (alpha < 150) {
+        return false;
+      }
+      const isFillRed = Math.abs(red - 234) <= 35 && Math.abs(green - 67) <= 35 && Math.abs(blue - 53) <= 35;
+      const isBorderRed = Math.abs(red - 197) <= 35 && Math.abs(green - 34) <= 35 && Math.abs(blue - 31) <= 35;
+      const isCenterDotRed = Math.abs(red - 179) <= 35 && Math.abs(green - 20) <= 35 && Math.abs(blue - 18) <= 35;
+      return isFillRed || isBorderRed || isCenterDotRed;
+    };
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    if (pixels && width && height) {
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const pixel = readPixel(x, y);
+          if (!isPinPixel(pixel)) {
+            continue;
+          }
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        }
+      }
+    }
+    const hasBoundingBox =
+      Number.isFinite(minX) && Number.isFinite(maxX) && Number.isFinite(minY) && Number.isFinite(maxY);
+    const bbox = hasBoundingBox
+      ? {
+          width: maxX - minX + 1,
+          height: maxY - minY + 1
+        }
+      : null;
+    // Alpha-weighted, so antialiasing at 1x doesn't decide the tip's width or position.
+    let lowestRow = -1;
+    for (let y = (height ?? 0) - 1; y >= 0 && lowestRow < 0; y -= 1) {
+      for (let x = 0; x < (width ?? 0); x += 1) {
+        if ((readPixel(x, y)?.[3] ?? 0) > 0) {
+          lowestRow = y;
+          break;
+        }
+      }
+    }
+    let tipCoverage = 0;
+    let tipWeightedX = 0;
+    let tipAlpha = 0;
+    for (let y = lowestRow; y >= 0 && y > lowestRow - 3; y -= 1) {
+      for (let x = 0; x < (width ?? 0); x += 1) {
+        const alpha = readPixel(x, y)?.[3] ?? 0;
+        if (y === lowestRow) {
+          tipCoverage += alpha / 255;
+        }
+        tipWeightedX += (x + 0.5) * alpha;
+        tipAlpha += alpha;
+      }
+    }
+    return {
+      width,
+      height,
+      pixelRatio,
+      cssWidth,
+      cssHeight,
+      tipPixels,
+      topLeftPixel,
+      bbox,
+      tipCoverageCssPx: tipCoverage / pixelRatio,
+      tipOffsetFromCentreCssPx:
+        tipAlpha > 0 && width !== null ? (tipWeightedX / tipAlpha - width / 2) / pixelRatio : null
+    };
+  }, mapTestHookKey);
+
+  expect(probe.cssWidth).toBe(19);
+  expect(probe.cssHeight).toBe(27);
+  const maxTipAlpha = Math.max(...probe.tipPixels.map((pixel) => pixel[3]), 0);
+  const maxTipRed = Math.max(...probe.tipPixels.map((pixel) => pixel[0]), 0);
+  expect(maxTipAlpha).toBeGreaterThan(0);
+  expect(maxTipRed).toBeGreaterThan(140);
+  expect(probe.topLeftPixel?.[3] ?? 0).toBe(0);
+  const bboxRatio = (probe.bbox?.height ?? 0) / (probe.bbox?.width ?? 1);
+  expect(bboxRatio).toBeGreaterThanOrEqual(1.33);
+  expect(bboxRatio).toBeLessThanOrEqual(1.53);
+  expect(probe.tipCoverageCssPx).toBeLessThanOrEqual(2);
+  expect(Math.abs(probe.tipOffsetFromCentreCssPx ?? Number.POSITIVE_INFINITY)).toBeLessThanOrEqual(0.25);
+});
+
 test("routes stage-4 names stay interactive while only non-selected lines dim @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=routes&route=paul-rome&stage=4`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  const stage4Url = `${baseUrl}/?tab=routes&route=paul-rome&stage=4`;
+  await page.goto(stage4Url, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await page.locator("li[data-route-stage-index]").first().waitFor({ timeout: 60_000 });
   await waitForMapIdle(page);
 
@@ -841,8 +2080,11 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
     }
   );
   expect(names.length).toBeGreaterThan(0);
-  const scannedPlaceIds = names.slice(0, 4).map((entry) => entry.placeId);
-  expect(scannedPlaceIds.length).toBeGreaterThan(0);
+  const preferredStablePlaceOrder = ["myra", "crete", "fair-havens", "cnidus", "salmone"];
+  const scannedPlaceIds = preferredStablePlaceOrder.filter((placeId) =>
+    names.some((entry) => entry.placeId === placeId)
+  );
+  expect(scannedPlaceIds.length).toBeGreaterThanOrEqual(3);
 
   const styleProbe = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
@@ -857,8 +2099,21 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
   expect(styleProbe.stopsOpacity).not.toContain("isDimmed");
   expect(styleProbe.viaOpacity).not.toContain("isDimmed");
   expect(styleProbe.mentionedOpacity).not.toContain("isDimmed");
+  const routesViewport = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const center = map.getCenter();
+    return {
+      center: [center.lng, center.lat],
+      zoom: map.getZoom()
+    };
+  }, mapTestHookKey);
 
+  let hoveredNameCount = 0;
   for (const placeId of scannedPlaceIds) {
+    await page.goto(stage4Url, { waitUntil: "domcontentloaded", timeout: 120_000 });
+    await page.locator("li[data-route-stage-index]").first().waitFor({ timeout: 60_000 });
+    await waitForMapIdle(page);
+    await jumpMap(page, routesViewport.center, routesViewport.zoom);
     const candidatePoint = await page.evaluate(
       ({ testHookKey, targetPlaceId, layers }) => {
         const map = window[testHookKey];
@@ -907,11 +2162,12 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
         layers: interactiveNameLayers
       }
     );
-    expect(candidatePoint).toBeTruthy();
-    await page.mouse.move(candidatePoint.x, candidatePoint.y);
-    await page.waitForTimeout(150);
+    expect(candidatePoint, `expected rendered name point for route place ${placeId}`).toBeTruthy();
+    const interactiveCandidatePoint = await moveMouseToInteractiveMapPoint(page, candidatePoint);
+    expect(interactiveCandidatePoint, `expected pointer-target hit for route place ${placeId}`).toBeTruthy();
     const pointerCursor = await page.evaluate((testHookKey) => window.getComputedStyle(window[testHookKey].getCanvas()).cursor, mapTestHookKey);
     expect(pointerCursor, `expected pointer cursor for route place ${placeId}`).toContain("pointer");
+    hoveredNameCount += 1;
     let clickedPlaceId = null;
     for (const [offsetX, offsetY] of [
       [0, 0],
@@ -920,7 +2176,10 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
       [-8, 0],
       [8, 0]
     ]) {
-      await page.mouse.click(candidatePoint.x + offsetX, candidatePoint.y + offsetY);
+      await clickMapPoint(page, {
+        x: interactiveCandidatePoint.x + offsetX,
+        y: interactiveCandidatePoint.y + offsetY
+      });
       await page.waitForTimeout(200);
       clickedPlaceId = await page.evaluate(() => new URLSearchParams(window.location.search).get("place"));
       if (clickedPlaceId === placeId) {
@@ -933,6 +2192,7 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
     const stageAfterClick = await page.evaluate(() => new URLSearchParams(window.location.search).get("stage"));
     expect(stageAfterClick).toBe("4");
   }
+  expect(hoveredNameCount).toBe(scannedPlaceIds.length);
 });
 
 test("routes view keeps ARIA tabs, stage pills, and ODbL attribution (replaces routesFixtureChecks) @routes", { tag: ["@routes"] }, async ({ page, baseUrl }) => {

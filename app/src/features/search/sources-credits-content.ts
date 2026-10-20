@@ -99,6 +99,10 @@ export const UPSTREAM_SOURCES: UpstreamSourceItem[] = [
     url: "https://openmaptiles.org/"
   },
   {
+    name: "Google Material Icons (`place`, 24px SVG path)",
+    url: "https://github.com/google/material-design-icons/blob/master/src/maps/place/materialicons/24px.svg"
+  },
+  {
     name: "OpenStreetMap and its contributors (basemap data)",
     url: "https://www.openstreetmap.org/copyright"
   },
