@@ -60,7 +60,7 @@ These are real renders, not wireframes. They are what the app's map will look li
 
 ### Places on the map
 
-Our places are drawn as their names, centred on their points, with no pins (ADR-0043). A name's style says whether it can be clicked: an upright name opens something and shows the pointer cursor, as on Google Maps; a grey name in the thinner italic doesn't.
+Our places are drawn as names (ADR-0043), and towns also have a solid black dot at their point (ADR-0049): major places, cities, towns and villages have the dot, with the name just above it. Sites, regions, provinces, water and natural features keep names only. A name's style says whether it can be clicked: an upright name opens something and shows the pointer cursor, as on Google Maps; a grey name in the thinner italic doesn't.
 
 | Record | Shown as |
 |---|---|
@@ -71,6 +71,7 @@ Our places are drawn as their names, centred on their points, with no pins (ADR-
 | The ancient layer's names without a record (for example "KINGDOM OF COMMAGENE"), and the "Roman shore" labels | Grey `#5F6368`, Noto Sans Italic, as region names were drawn before ADR-0043 (the human: "exactly like how "CRETE" looks today"): they can't be clicked |
 
 - **Drawn by the map (ADR-0024):** names, the selected place's pin and candidate letters are MapLibre layers, drawn on the graphics card in the same frame as the map, so they never lag behind a drag or zoom. Names that would overlap are hidden by priority; a hidden name still appears in the hover tooltip. Label priority is: the selected place; then, on the Routes tab, the names of the chosen route's places (ADR-0044 item 6); then major places in importance order (including the major areas Galatia and Crete); then empires, provinces and regions; then other places (ADR-0035 item 4). There are no grouped names such as "Jerusalem +4" (ADR-0044 item 1).
+- **Town dots:** the town dot is part of the same symbol as the town name, so they show and hide together on collisions and share the same hover and click target. The dot stays black on hover while the name turns blue. Dots are about 6 px for major places and 4 px for other towns, with no ring, and they show at every zoom where the name shows (ADR-0049 items 2, 3 and 7).
 - **Contrast:** every name has a white halo, and each colour has at least 4.5:1 contrast against it.
 - **Selected place:** its name turns bold accent blue `#1A73E8`, 2 px larger, and always shows. A place drawn as a single name (a town, village or site, or a natural feature) also gets Google Maps' red pin at its point, with its name to the pin's right (ADR-0044 item 3). The pin is a slim teardrop about **18 × 27 px** (ADR-0048), red `#EA4335` with a 1 px `#B31412` outline and centre dot, with its tip on the point. An area (an empire, province or region, or a large island such as Crete) gets no pin. A place with several candidates gets no pin either; it shows its candidate dots instead (below).
 - **Selected region/province on the ancient map (ADR-0048):** the selected name is blue and always shown; the selected political area gets a thin red dotted outline (`#EA4335`, ~1.5 px), and a light grey veil (`#5F6368` at about 15%) greys everything outside it. Names and places under the veil stay clickable. The highlight clears when another selection replaces it, when selection is cleared, or when the map switches to Modern.
