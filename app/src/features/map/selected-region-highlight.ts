@@ -3,7 +3,6 @@ import type {
   AncientStopPayload,
   FeatureCollection,
   LineStringGeometry,
-  MultiLineStringGeometry,
   MultiPolygonGeometry,
   PolygonGeometry
 } from "./ancient-layer.types";
@@ -11,8 +10,6 @@ import type {
 type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
 type RingCoordinates = number[][];
 type PolygonCoordinates = PolygonGeometry["coordinates"];
-type OutlineGeometry = LineStringGeometry | MultiLineStringGeometry;
-
 const WORLD_RING: [number, number][] = [
   [-180, -85],
   [180, -85],
@@ -75,67 +72,6 @@ function isRegionGeometry(
   );
 }
 
-function asCoordinateKey(coordinate: number[]) {
-  return `${coordinate[0]},${coordinate[1]}`;
-}
-
-function asUnorderedEdgeKey(start: number[], end: number[]) {
-  const startKey = asCoordinateKey(start);
-  const endKey = asCoordinateKey(end);
-  return startKey < endKey ? `${startKey}|${endKey}` : `${endKey}|${startKey}`;
-}
-
-function collectEdgeCounts(rings: RingCoordinates[]) {
-  const counts = new Map<string, number>();
-  for (const ring of rings) {
-    for (let index = 0; index < ring.length - 1; index += 1) {
-      const edgeKey = asUnorderedEdgeKey(ring[index], ring[index + 1]);
-      counts.set(edgeKey, (counts.get(edgeKey) ?? 0) + 1);
-    }
-  }
-  return counts;
-}
-
-function ringToUniqueEdgeSegments(
-  ring: RingCoordinates,
-  edgeCounts: Map<string, number>
-): RingCoordinates[] {
-  const segments: RingCoordinates[] = [];
-  let activeSegment: RingCoordinates = [];
-
-  const flushActiveSegment = () => {
-    if (activeSegment.length >= 2) {
-      segments.push(activeSegment);
-    }
-    activeSegment = [];
-  };
-
-  for (let index = 0; index < ring.length - 1; index += 1) {
-    const start = ring[index];
-    const end = ring[index + 1];
-    const edgeKey = asUnorderedEdgeKey(start, end);
-    const isUniqueEdge = (edgeCounts.get(edgeKey) ?? 0) === 1;
-    if (!isUniqueEdge) {
-      flushActiveSegment();
-      continue;
-    }
-    if (activeSegment.length === 0) {
-      activeSegment = [start, end];
-      continue;
-    }
-    const last = activeSegment[activeSegment.length - 1];
-    if (last[0] === start[0] && last[1] === start[1]) {
-      activeSegment.push(end);
-      continue;
-    }
-    flushActiveSegment();
-    activeSegment = [start, end];
-  }
-  flushActiveSegment();
-
-  return segments;
-}
-
 function mergeRegionParts(parts: RegionGeometry[]): RegionGeometry | null {
   if (parts.length === 0) {
     return null;
@@ -168,6 +104,7 @@ function mergeRegionParts(parts: RegionGeometry[]): RegionGeometry | null {
 
 export function findSelectedRegionGeometry({
   shapes,
+  holderUnionGeometries,
   stopPayload,
   placeId,
   placeType,
@@ -175,6 +112,7 @@ export function findSelectedRegionGeometry({
   politicalUnitAreaTypes
 }: {
   shapes: AncientShapesPayload | null;
+  holderUnionGeometries: Record<string, RegionGeometry> | null | undefined;
   stopPayload: AncientStopPayload | null;
   placeId: string | null | undefined;
   placeType: string | null | undefined;
@@ -192,6 +130,20 @@ export function findSelectedRegionGeometry({
   );
 
   const selectedAreaIds = new Set<string>();
+  if (
+    placeId === "roman-empire" &&
+    typeof stopPayload.romanSideUnion === "string" &&
+    isRegionGeometry(holderUnionGeometries?.[stopPayload.romanSideUnion])
+  ) {
+    return holderUnionGeometries[stopPayload.romanSideUnion];
+  }
+  const holderUnionId = stopPayload.holderUnions?.[placeId];
+  const holderUnion =
+    typeof holderUnionId === "string" ? holderUnionGeometries?.[holderUnionId] : null;
+  if (isRegionGeometry(holderUnion)) {
+    return holderUnion;
+  }
+
   if (placeId === "roman-empire") {
     for (const area of stopPayload.areas) {
       if (area.holderRomanSide && area.hasShape) {
@@ -229,16 +181,6 @@ export function findSelectedRegionGeometry({
   return mergeRegionParts(selectedGeometries);
 }
 
-function buildOutlineFromRingsWithoutSharedEdges(
-  rings: RingCoordinates[]
-): RingCoordinates[] {
-  if (rings.length === 0) {
-    return [];
-  }
-  const edgeCounts = collectEdgeCounts(rings);
-  return rings.flatMap((ring) => ringToUniqueEdgeSegments(ring, edgeCounts));
-}
-
 function asOutlineLineFeatures(
   coordinatesCollection: number[][][]
 ): FeatureCollection<LineStringGeometry, { kind: "selected-region-outline" }> {
@@ -258,57 +200,15 @@ function asOutlineLineFeatures(
   };
 }
 
-function toLineCollectionFromGeometry(
-  geometry: OutlineGeometry
-): FeatureCollection<LineStringGeometry, { kind: "selected-region-outline" }> {
-  if (geometry.type === "LineString") {
-    return asOutlineLineFeatures([geometry.coordinates]);
-  }
-
-  return asOutlineLineFeatures(geometry.coordinates);
-}
-
-export function findSelectedRegionOutlineGeometry({
-  stopPayload,
-  placeId
-}: {
-  stopPayload: AncientStopPayload | null;
-  placeId: string | null | undefined;
-}): OutlineGeometry | null {
-  if (!stopPayload || !placeId) {
-    return null;
-  }
-
-  if (placeId !== "roman-empire") {
-    return null;
-  }
-
-  return stopPayload.romanEmpireEdge ?? null;
-}
-
-export function hasSharedRingEdge(
-  geometry: RegionGeometry
-): boolean {
-  const rings = [...collectOuterRings(geometry), ...collectInteriorRings(geometry)];
-  const edgeCounts = collectEdgeCounts(rings);
-  return [...edgeCounts.values()].some((count) => count > 1);
-}
-
 export function buildSelectedRegionOutlineCoordinates(
   geometry: RegionGeometry
 ): number[][][] {
-  const allRings = [...collectOuterRings(geometry), ...collectInteriorRings(geometry)];
-  return buildOutlineFromRingsWithoutSharedEdges(allRings);
+  return [...collectOuterRings(geometry), ...collectInteriorRings(geometry)];
 }
 
 export function buildSelectedRegionOutlineFeatureCollection(
-  regionGeometry: RegionGeometry | null,
-  outlineGeometryOverride: OutlineGeometry | null = null
+  regionGeometry: RegionGeometry | null
 ): FeatureCollection<LineStringGeometry, { kind: "selected-region-outline" }> {
-  if (outlineGeometryOverride) {
-    return toLineCollectionFromGeometry(outlineGeometryOverride);
-  }
-
   if (!regionGeometry) {
     return toEmptyLineFeatureCollection();
   }
