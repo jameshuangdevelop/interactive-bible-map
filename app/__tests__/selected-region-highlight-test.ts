@@ -6,9 +6,7 @@ import {
   buildSelectedRegionOutlineCoordinates,
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry,
-  findSelectedRegionOutlineGeometry,
-  hasSharedRingEdge
+  findSelectedRegionGeometry
 } from "../src/features/map/selected-region-highlight";
 
 describe("selected region highlight geometry", () => {
@@ -163,12 +161,15 @@ describe("selected region highlight geometry", () => {
         features: []
       },
       romanEmpireEdge: null,
+      holderUnions: {},
+      romanSideUnion: null,
       holderLabels: []
     };
 
     expect(
       findSelectedRegionGeometry({
         shapes,
+        holderUnionGeometries: null,
         stopPayload,
         placeId: "galatia",
         placeType: "province",
@@ -180,6 +181,7 @@ describe("selected region highlight geometry", () => {
     expect(
       findSelectedRegionGeometry({
         shapes,
+        holderUnionGeometries: null,
         stopPayload: {
           ...stopPayload,
           areas: [{ ...stopPayload.areas[0], hasShape: false }]
@@ -192,52 +194,80 @@ describe("selected region highlight geometry", () => {
     ).toBeNull();
   });
 
-  test("uses all held areas for a place and removes shared edges from its outline", () => {
-    const geometry = {
-      type: "MultiPolygon" as const,
-      coordinates: [
-        [
+  test("uses precomputed holder union geometry when present", () => {
+    const stopPayload: AncientStopPayload = {
+      stopId: "ad-70",
+      year: 70,
+      areas: [
+        {
+          areaId: "galatia",
+          holderId: "galatia-direct",
+          holderKind: "roman-province",
+          holderRomanSide: true,
+          holderLocationId: "galatia",
+          ruler: null,
+          heldFromYear: 25,
+          heldToYear: 101,
+          heldFromKnown: true,
+          note: null,
+          hasShape: true
+        },
+        {
+          areaId: "pontus",
+          holderId: "galatia-direct",
+          holderKind: "roman-province",
+          holderRomanSide: true,
+          holderLocationId: "galatia",
+          ruler: null,
+          heldFromYear: 64,
+          heldToYear: 101,
+          heldFromKnown: true,
+          note: null,
+          hasShape: true
+        }
+      ],
+      holderBorders: {
+        type: "FeatureCollection",
+        features: []
+      },
+      romanEmpireEdge: null,
+      holderUnions: {
+        galatia: "union-galatia"
+      },
+      romanSideUnion: null,
+      holderLabels: []
+    };
+    const holderUnionGeometries = {
+      "union-galatia": {
+        type: "Polygon" as const,
+        coordinates: [
           [
-            [0, 0],
-            [2, 0],
-            [2, 2],
-            [0, 2],
-            [0, 0]
-          ]
-        ],
-        [
-          [
-            [2, 0],
-            [4, 0],
-            [4, 2],
-            [2, 2],
-            [2, 0]
+            [30, 38],
+            [32, 38],
+            [32, 40],
+            [30, 40],
+            [30, 38]
           ]
         ]
-      ]
+      }
     };
 
-    expect(hasSharedRingEdge(geometry)).toBe(true);
-    const outline = buildSelectedRegionOutlineCoordinates(geometry);
-    expect(
-      outline.some((line) =>
-        line.some(
-          (coordinate, index) =>
-            index < line.length - 1 &&
-            ((coordinate[0] === 2 &&
-              coordinate[1] === 0 &&
-              line[index + 1][0] === 2 &&
-              line[index + 1][1] === 2) ||
-              (coordinate[0] === 2 &&
-                coordinate[1] === 2 &&
-                line[index + 1][0] === 2 &&
-                line[index + 1][1] === 0))
-        )
-      )
-    ).toBe(false);
+    const selectedRegion = findSelectedRegionGeometry({
+      shapes: {
+        areas: { type: "FeatureCollection", features: [] },
+        areasSimplifiedForZoom10: { type: "FeatureCollection", features: [] }
+      },
+      holderUnionGeometries,
+      stopPayload,
+      placeId: "galatia",
+      placeType: "province",
+      politicalAreaId: "galatia",
+      politicalUnitAreaTypes
+    });
+    expect(selectedRegion).toEqual(holderUnionGeometries["union-galatia"]);
   });
 
-  test("uses roman empire edge for the selected roman empire outline", () => {
+  test("uses precomputed roman side union geometry when present", () => {
     const stopPayload: AncientStopPayload = {
       stopId: "ad-50",
       year: 50,
@@ -246,25 +276,40 @@ describe("selected region highlight geometry", () => {
         type: "FeatureCollection",
         features: []
       },
-      romanEmpireEdge: {
-        type: "LineString",
-        coordinates: [
-          [1, 1],
-          [2, 2]
-        ]
-      },
+      romanEmpireEdge: null,
+      holderUnions: {},
+      romanSideUnion: "union-roman-side",
       holderLabels: []
     };
+    const holderUnionGeometries = {
+      "union-roman-side": {
+        type: "MultiPolygon" as const,
+        coordinates: [
+          [
+            [
+              [1, 1],
+              [2, 1],
+              [2, 2],
+              [1, 2],
+              [1, 1]
+            ]
+          ]
+        ]
+      }
+    };
 
-    const outlineGeometry = findSelectedRegionOutlineGeometry({
+    const selectedRegion = findSelectedRegionGeometry({
+      shapes: {
+        areas: { type: "FeatureCollection", features: [] },
+        areasSimplifiedForZoom10: { type: "FeatureCollection", features: [] }
+      },
+      holderUnionGeometries,
       stopPayload,
-      placeId: "roman-empire"
+      placeId: "roman-empire",
+      placeType: "empire",
+      politicalAreaId: null,
+      politicalUnitAreaTypes
     });
-    const outline = buildSelectedRegionOutlineFeatureCollection(null, outlineGeometry);
-    expect(outline.features).toHaveLength(1);
-    expect(outline.features[0].geometry.coordinates).toEqual([
-      [1, 1],
-      [2, 2]
-    ]);
+    expect(selectedRegion).toEqual(holderUnionGeometries["union-roman-side"]);
   });
 });

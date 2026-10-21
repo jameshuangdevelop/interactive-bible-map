@@ -7,6 +7,7 @@ import { feature, mesh, neighbors } from "topojson-client";
 import { topology } from "topojson-server";
 import { presimplify, simplify } from "topojson-simplify";
 import { ARMENIA_MINOR_LABEL_POINT } from "./ancient-compose.mjs";
+import { buildAncientHolderUnions } from "./ancient-holder-unions.mjs";
 
 // Full shapes keep 5 decimals (about 1 m), which the Jordan border near Bethany beyond the Jordan
 // needs. The zoom-10 shapes, the per-stop border lines drawn from the same simplified topology and
@@ -954,6 +955,29 @@ function pairKey(leftId, rightId) {
   return leftId.localeCompare(rightId) <= 0 ? `${leftId}|${rightId}` : `${rightId}|${leftId}`;
 }
 
+function asStableGeometryKey(geometry) {
+  return JSON.stringify(geometry);
+}
+
+function registerUnionGeometry({
+  geometry,
+  geometryIdByKey,
+  geometryById
+}) {
+  if (!geometry) {
+    return null;
+  }
+  const key = asStableGeometryKey(geometry);
+  const existingId = geometryIdByKey.get(key);
+  if (existingId) {
+    return existingId;
+  }
+  const nextId = `union-${geometryIdByKey.size + 1}`;
+  geometryIdByKey.set(key, nextId);
+  geometryById.set(nextId, geometry);
+  return nextId;
+}
+
 async function writeJsonWithSize(outputDirectory, relativePath, payload) {
   const destinationPath = path.join(outputDirectory, relativePath);
   await fs.mkdir(path.dirname(destinationPath), { recursive: true });
@@ -1328,9 +1352,19 @@ export async function buildAncientAppData({
       .filter((feature) => typeof feature?.properties?.areaId === "string")
       .map((feature) => [feature.properties.areaId, feature])
   );
-
   const topologyData = buildTopologyFeatureCollection(baseAreas, simplifyThreshold);
+  const areaGeometryById = new Map(
+    topologyData.simplifiedFeatures.features
+      .map((feature) => [feature.properties?.areaId, feature.geometry])
+      .filter(
+        (entry) =>
+          typeof entry[0] === "string" &&
+          (entry[1]?.type === "Polygon" || entry[1]?.type === "MultiPolygon")
+      )
+  );
   const writtenFiles = [];
+  const holderUnionGeometryIdByKey = new Map();
+  const holderUnionGeometryById = new Map();
 
   const bibliographyEntryIds = new Set();
   for (const stop of stops) {
@@ -1503,6 +1537,28 @@ export async function buildAncientAppData({
       assignmentsByAreaId,
       entitiesById
     });
+    const holderUnions = await buildAncientHolderUnions({
+      assignments,
+      areaGeometryById,
+      decimals: SIMPLIFIED_COORDINATE_DECIMALS
+    });
+    const holderUnionIds = Object.fromEntries(
+      Object.entries(holderUnions.holderUnions)
+        .map(([holderLocationId, geometry]) => [
+          holderLocationId,
+          registerUnionGeometry({
+            geometry,
+            geometryIdByKey: holderUnionGeometryIdByKey,
+            geometryById: holderUnionGeometryById
+          })
+        ])
+        .filter((entry) => typeof entry[1] === "string")
+    );
+    const romanSideUnionId = registerUnionGeometry({
+      geometry: holderUnions.romanSideUnion,
+      geometryIdByKey: holderUnionGeometryIdByKey,
+      geometryById: holderUnionGeometryById
+    });
 
     writtenFiles.push(
       await writeJsonWithSize(outputDirectory, `ancient.stop.${stop.id}.json`, {
@@ -1511,10 +1567,20 @@ export async function buildAncientAppData({
         areas: assignments.sort((left, right) => left.areaId.localeCompare(right.areaId)),
         holderBorders: borderCollections.holderBorders,
         romanEmpireEdge: borderCollections.romanEmpireEdge,
+        holderUnions: holderUnionIds,
+        romanSideUnion: romanSideUnionId,
         holderLabels
       })
     );
   }
+
+  writtenFiles.push(
+    await writeJsonWithSize(outputDirectory, "ancient.holder-unions.json", {
+      geometries: Object.fromEntries(
+        [...holderUnionGeometryById.entries()].sort(([left], [right]) => left.localeCompare(right))
+      )
+    })
+  );
 
   const totalBytes = writtenFiles.reduce((sum, item) => sum + item.bytes, 0);
   const totalGzipBytes = writtenFiles.reduce((sum, item) => sum + item.gzipBytes, 0);
