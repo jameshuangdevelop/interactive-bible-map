@@ -86,7 +86,11 @@ const mapLayerIds = {
     "ibm-selected-site-pin-label",
     "ibm-selected-pin-label"
   ],
-  ancientHolderLabels: ["ibm-ancient-holder-label", "ibm-ancient-holder-label-clickable"],
+  ancientHolderLabels: [
+    "ibm-ancient-holder-label",
+    "ibm-ancient-holder-label-clickable",
+    "ibm-ancient-holder-label-selected"
+  ],
   ancientAreaFill: "ibm-ancient-area-fill",
   ancientUncertainFill: "ibm-ancient-area-uncertain-fill",
   ancientBorderState: "ibm-ancient-border-state",
@@ -7347,7 +7351,8 @@ const nameLayerIds = [
   "ibm-area-label",
   "ibm-selected-area-label",
   "ibm-ancient-holder-label",
-  "ibm-ancient-holder-label-clickable"
+  "ibm-ancient-holder-label-clickable",
+  "ibm-ancient-holder-label-selected"
 ];
 
 async function settleMapInPage(page) {
@@ -7686,10 +7691,13 @@ async function verifyNameLayersDisallowOverlap(page, baseUrl) {
     }
 
     const missing = entries.filter((entry) => !entry.present).map((entry) => entry.layerId);
-    const violations = entries.filter(
-      (entry) =>
-        entry.present && (entry.textAllowOverlap !== false || entry.textIgnorePlacement !== false)
-    );
+    const violations = entries.filter((entry) => {
+      if (!entry.present) {
+        return false;
+      }
+
+      return entry.textAllowOverlap !== false || entry.textIgnorePlacement !== false;
+    });
     return { entries, missing, violations };
   }, { testHookKey: mapTestHookKey, layerIds: nameLayerIds });
 
