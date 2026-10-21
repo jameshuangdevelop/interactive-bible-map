@@ -1166,7 +1166,7 @@ test("clicking KINGDOM OF PONTUS draws veil and outline while keeping inside lum
   expect(withoutVeilOutside[0] - withVeilOutside[0]).toBeGreaterThan(2);
 });
 
-test("roman empire veil follows the stop edge at year 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("roman empire highlight has no internal seams and keeps an outer edge at year 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, {
     waitUntil: "domcontentloaded",
     timeout: 120_000
@@ -1184,9 +1184,17 @@ test("roman empire veil follows the stop edge at year 50 @names", { tag: ["@name
   expect(overlay.veilFeatures).toBeGreaterThan(0);
   expect(overlay.outlineFeatures).toBeGreaterThan(0);
 
-  const romanVeilProbe = await page.evaluate((testHookKey) => {
+  const romanSeamProbe = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
-    const pointHasVeil = (projected) =>
+    const hasOutlineAtProjectedPoint = (projected) =>
+      map.queryRenderedFeatures(
+        [
+          [projected.x - 2, projected.y - 2],
+          [projected.x + 2, projected.y + 2]
+        ],
+        { layers: ["ibm-selected-region-outline"] }
+      ).length > 0;
+    const hasVeilAtProjectedPoint = (projected) =>
       map.queryRenderedFeatures(
         [
           [projected.x - 2, projected.y - 2],
@@ -1194,45 +1202,157 @@ test("roman empire veil follows the stop edge at year 50 @names", { tag: ["@name
         ],
         { layers: ["ibm-selected-region-veil"] }
       ).length > 0;
-    const insideCandidates = [
-      [23.8, 38.2], // Achaia
-      [33.1, 39.0] // Galatia
-    ].map(([lng, lat]) => map.project([lng, lat]));
-    const outsideCandidates = [
-      [57.0, 39.0],
-      [61.0, 40.2],
-      [53.5, 35.5]
-    ].map(([lng, lat]) => map.project([lng, lat]));
-    const insideHasVeil = insideCandidates.map((projected) => pointHasVeil(projected));
-    const eastOutsideHasVeil = outsideCandidates.map((projected) => pointHasVeil(projected));
-    const fallbackOutsidePoint = (() => {
+    const borderMidpoints = (areaAId, areaBId) => {
+      const pairMatches = (feature) =>
+        (feature.properties?.holderAAreaId === areaAId &&
+          feature.properties?.holderBAreaId === areaBId) ||
+        (feature.properties?.holderAAreaId === areaBId &&
+          feature.properties?.holderBAreaId === areaAId);
+      const borderFeature = map
+        .querySourceFeatures("ibm-ancient-borders")
+        .find((feature) => pairMatches(feature));
+      if (!borderFeature) {
+        return [];
+      }
+      const lineCoordinates =
+        borderFeature.geometry?.type === "LineString"
+          ? borderFeature.geometry.coordinates
+          : borderFeature.geometry?.type === "MultiLineString"
+            ? borderFeature.geometry.coordinates[0]
+            : [];
+      if (!Array.isArray(lineCoordinates) || lineCoordinates.length < 4) {
+        return [];
+      }
+      const sampleIndexes = [0.25, 0.5, 0.75].map((ratio) =>
+        Math.max(1, Math.min(lineCoordinates.length - 2, Math.floor((lineCoordinates.length - 1) * ratio)))
+      );
+      return sampleIndexes.map((index) => map.project(lineCoordinates[index]));
+    };
+    const internalBorderPoints = [
+      ...borderMidpoints("galatia", "cappadocia"),
+      ...borderMidpoints("asia", "galatia")
+    ];
+    const seamOutlineHits = internalBorderPoints.map((point) => hasOutlineAtProjectedPoint(point));
+    const seamVeilHits = internalBorderPoints.map((point) => hasVeilAtProjectedPoint(point));
+    const outerEdgeDrawn = map.queryRenderedFeatures(undefined, { layers: ["ibm-selected-region-outline"] }).length > 0;
+    const outsideEastHasVeil = (() => {
       const canvas = map.getCanvas();
       for (let y = 140; y <= canvas.height - 140; y += 36) {
         for (let x = 140; x <= canvas.width - 140; x += 36) {
-          const projected = { x, y };
-          if (
-            pointHasVeil(projected) &&
-            map.unproject([x, y]).lng > 50
-          ) {
-            return projected;
+          const lngLat = map.unproject([x, y]);
+          if (lngLat.lng <= 44) {
+            continue;
+          }
+          if (hasVeilAtProjectedPoint({ x, y })) {
+            return true;
           }
         }
       }
-      return null;
+      return false;
     })();
     return {
-      insideHasVeil,
-      eastOutsideHasVeil,
-      fallbackOutsideHasVeil: fallbackOutsidePoint
-        ? pointHasVeil(fallbackOutsidePoint)
-        : false
+      seamPointCount: internalBorderPoints.length,
+      seamOutlineHits,
+      seamVeilHits,
+      outerEdgeDrawn,
+      outsideEastHasVeil
     };
   }, mapTestHookKey);
 
-  expect(romanVeilProbe.insideHasVeil.some(Boolean)).toBe(false);
-  expect(
-    romanVeilProbe.eastOutsideHasVeil.some(Boolean) || romanVeilProbe.fallbackOutsideHasVeil
-  ).toBe(true);
+  expect(romanSeamProbe.seamPointCount).toBeGreaterThanOrEqual(6);
+  expect(romanSeamProbe.seamOutlineHits.some(Boolean)).toBe(false);
+  expect(romanSeamProbe.seamVeilHits.some(Boolean)).toBe(false);
+  expect(romanSeamProbe.outerEdgeDrawn).toBe(true);
+  expect(romanSeamProbe.outsideEastHasVeil).toBe(true);
+});
+
+test("judea province union has no inner seam along Galilee-Samaria at year 70 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea-province`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-borders").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await waitForMapIdle(page);
+  const seamLngLats = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const borderFeature = map
+      .querySourceFeatures("ibm-ancient-borders")
+      .find(
+        (feature) =>
+          (feature.properties?.holderAAreaId === "galilee-perea" &&
+            feature.properties?.holderBAreaId === "judea-samaria-idumea") ||
+          (feature.properties?.holderAAreaId === "judea-samaria-idumea" &&
+            feature.properties?.holderBAreaId === "galilee-perea")
+      );
+    const borderLine =
+      borderFeature?.geometry?.type === "LineString"
+        ? borderFeature.geometry.coordinates
+        : borderFeature?.geometry?.type === "MultiLineString"
+          ? borderFeature.geometry.coordinates[0]
+          : [];
+    if (!Array.isArray(borderLine) || borderLine.length < 4) {
+      return [];
+    }
+    return [0.25, 0.5, 0.75].map((ratio) => {
+      const index = Math.max(
+        1,
+        Math.min(borderLine.length - 2, Math.floor((borderLine.length - 1) * ratio))
+      );
+      return borderLine[index];
+    });
+  }, mapTestHookKey);
+  expect(seamLngLats.length).toBeGreaterThanOrEqual(3);
+
+  await page.goto(`${baseUrl}/?tab=map&year=70&place=judea-province`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await jumpMap(page, [35.55, 32.62], 8.2);
+
+  const judeaSeamProbe = await page.evaluate(({ testHookKey, seamCoordinates }) => {
+    const map = window[testHookKey];
+    const hasOutlineAtProjectedPoint = (projected) =>
+      map.queryRenderedFeatures(
+        [
+          [projected.x - 2, projected.y - 2],
+          [projected.x + 2, projected.y + 2]
+        ],
+        { layers: ["ibm-selected-region-outline"] }
+      ).length > 0;
+    const hasVeilAtProjectedPoint = (projected) =>
+      map.queryRenderedFeatures(
+        [
+          [projected.x - 2, projected.y - 2],
+          [projected.x + 2, projected.y + 2]
+        ],
+        { layers: ["ibm-selected-region-veil"] }
+      ).length > 0;
+    const seamPoints = seamCoordinates.map((coordinates) => map.project(coordinates));
+    const seamOutlineHits = seamPoints.map((point) => hasOutlineAtProjectedPoint(point));
+    const seamVeilHits = seamPoints.map((point) => hasVeilAtProjectedPoint(point));
+    const insidePoint = map.project([35.53, 32.65]);
+    const outsidePoint = map.project([35.7, 32.55]);
+    return {
+      seamPointCount: seamPoints.length,
+      seamOutlineHits,
+      seamVeilHits,
+      insideHasVeil: hasVeilAtProjectedPoint(insidePoint),
+      outsideHasVeil: hasVeilAtProjectedPoint(outsidePoint),
+      outerEdgeDrawn:
+        map.queryRenderedFeatures(undefined, { layers: ["ibm-selected-region-outline"] }).length > 0
+    };
+  }, { testHookKey: mapTestHookKey, seamCoordinates: seamLngLats });
+
+  expect(judeaSeamProbe.seamPointCount).toBeGreaterThanOrEqual(3);
+  expect(judeaSeamProbe.seamOutlineHits.some(Boolean)).toBe(false);
+  expect(judeaSeamProbe.seamVeilHits.some(Boolean)).toBe(false);
+  expect(judeaSeamProbe.insideHasVeil).toBe(false);
+  expect(judeaSeamProbe.outsideHasVeil).toBe(true);
+  expect(judeaSeamProbe.outerEdgeDrawn).toBe(true);
 });
 
 test("regions only highlight when they own a shaped area in the selected year @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -1375,6 +1495,7 @@ test("regions only highlight when they own a shaped area in the selected year @n
 });
 
 test("selected region updates holder label and overlay when the year changes @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
   await page.goto(`${baseUrl}/?tab=map&year=53&place=achaia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
   const before = await page.evaluate((testHookKey) => {
@@ -1427,8 +1548,16 @@ test("selected region updates holder label and overlay when the year changes @na
     }, mapTestHookKey);
 
   await expect
-    .poll(async () => JSON.stringify(await probeSelectionState()), { timeout: 10_000 })
-    .not.toBe(JSON.stringify(before));
+    .poll(async () => {
+      const next = await probeSelectionState();
+      return (
+        JSON.stringify(next) !== JSON.stringify(before) &&
+        next.selectedHolderCount + next.selectedAreaCount === 1 &&
+        next.veilCount > 0 &&
+        next.outlineCount > 0
+      );
+    }, { timeout: 10_000 })
+    .toBe(true);
   const after = await probeSelectionState();
 
   expect(after.selectedHolderCount + after.selectedAreaCount).toBe(1);
@@ -1614,6 +1743,297 @@ test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", 
 
   const selectedBlueCount = await countBluePixelsNearLabel(page, selectedNameProbe.x, selectedNameProbe.y);
   expect(selectedBlueCount).toBeGreaterThan(20);
+});
+
+async function findRomanHolderLabelPoint(page) {
+  const viewpoints = [
+    { center: [-5.6, 37.7], zoom: 5.6 },
+    { center: [-2.5, 38.0], zoom: 5.2 },
+    { center: [0.5, 38.4], zoom: 5.0 }
+  ];
+  for (const viewpoint of viewpoints) {
+    await jumpMap(page, viewpoint.center, viewpoint.zoom);
+    const romanHolderTarget = await page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      const hit = map
+        .queryRenderedFeatures(undefined, {
+          layers: ["ibm-ancient-holder-label-click-target", "ibm-ancient-holder-label-clickable"]
+        })
+        .find(
+          (feature) => String(feature.properties?.holderLocationId ?? "") === "roman-empire"
+        );
+      if (!hit || hit.geometry?.type !== "Point") {
+        return null;
+      }
+      const projected = map.project(hit.geometry.coordinates);
+      return { x: projected.x, y: projected.y };
+    }, mapTestHookKey);
+    if (romanHolderTarget) {
+      return romanHolderTarget;
+    }
+  }
+  return null;
+}
+
+async function selectedRomanHolderLabelCount(page) {
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    return map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-ancient-holder-label-selected"] })
+      .filter((feature) => String(feature.properties?.holderLocationId ?? "") === "roman-empire").length;
+  }, mapTestHookKey);
+}
+
+test("deep-linking to roman empire leaves holder labels unselected @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await waitForMapIdle(page);
+
+  const selectedLabelCount = await selectedRomanHolderLabelCount(page);
+  expect(selectedLabelCount).toBe(0);
+});
+
+test("clicking OTHER ROMAN PROVINCES still selects the roman holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+});
+
+test("re-clicking OTHER ROMAN PROVINCES keeps roman selection and blue label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  await clickMapPoint(page, romanHolderTarget);
+  await waitForMapIdle(page);
+  await expect
+    .poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 })
+    .toBe("roman-empire");
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+});
+
+test("clicking empty map keeps the roman holder label blue while roman empire stays selected @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  // The nearest point that is the map itself (not a panel or control) with nothing clickable within 30 px.
+  const emptyPoint = await page.evaluate(({ testHookKey, origin }) => {
+    const map = window[testHookKey];
+    const canvas = map.getCanvas();
+    const rect = canvas.getBoundingClientRect();
+    let best = null;
+    for (let x = 40; x < canvas.clientWidth - 40; x += 20) {
+      for (let y = 40; y < canvas.clientHeight - 40; y += 20) {
+        const distance = Math.hypot(x - origin.x, y - origin.y);
+        if (distance < 120 || (best && distance >= best.distance)) {
+          continue;
+        }
+        if (document.elementFromPoint(rect.left + x, rect.top + y) !== canvas) {
+          continue;
+        }
+        const hits = map
+          .queryRenderedFeatures([
+            [x - 30, y - 30],
+            [x + 30, y + 30]
+          ])
+          .filter((feature) => /pin|label|holder|routes/.test(feature.layer.id));
+        if (hits.length === 0) {
+          best = { x, y, distance };
+        }
+      }
+    }
+    return best ? { x: best.x, y: best.y } : null;
+  }, { testHookKey: mapTestHookKey, origin: romanHolderTarget });
+  expect(emptyPoint).toBeTruthy();
+  await clickMapPoint(page, emptyPoint);
+  // Let the click's state update reach the map: two frames for the app, then the map's next idle.
+  await page.evaluate(
+    (testHookKey) =>
+      new Promise((resolve) => {
+        const map = window[testHookKey];
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            map.once("idle", () => resolve());
+            map.triggerRepaint();
+          })
+        );
+      }),
+    mapTestHookKey
+  );
+  expect(new URLSearchParams(await page.evaluate(() => window.location.search)).get("place")).toBe("roman-empire");
+  expect(await selectedRomanHolderLabelCount(page)).toBe(1);
+});
+
+test("keyboard activation of OTHER ROMAN PROVINCES selects the roman blue holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await page.evaluate(
+    ([testHookKey, center, zoom]) => {
+      const map = window[testHookKey];
+      if (!map) {
+        return;
+      }
+      map.jumpTo({ center, zoom });
+    },
+    [mapTestHookKey, [-5.6, 37.7], 5.6]
+  );
+
+  await expect
+    .poll(async () => {
+      const romanHolderTarget = await findRomanHolderLabelPoint(page);
+      if (!romanHolderTarget) {
+        await page.evaluate(
+          ([testHookKey, center, zoom]) => {
+            const map = window[testHookKey];
+            if (!map) {
+              return;
+            }
+            map.jumpTo({ center, zoom });
+          },
+          [mapTestHookKey, [-5.6, 37.7], 5.6]
+        );
+      }
+      return page.evaluate(() =>
+        Array.from(document.querySelectorAll("button[data-place-entry-id]")).filter((button) =>
+          /OTHER ROMAN[\s\S]*PROVINCES, area/i.test(button.getAttribute("aria-label") ?? "")
+        ).length
+      );
+    }, { timeout: 20_000 })
+    .toBe(1);
+  const romanHolderKeyboardButton = page
+    .getByRole("button", {
+      name: /OTHER ROMAN[\s\S]*PROVINCES, area/i,
+      includeHidden: true
+    })
+    .first();
+  await expect
+    .poll(async () => {
+      const placeId = new URLSearchParams(await page.evaluate(() => window.location.search)).get("place");
+      if (placeId !== "roman-empire") {
+        await romanHolderKeyboardButton.press("Enter");
+      }
+      return placeId;
+    }, { timeout: 10_000 })
+    .toBe("roman-empire");
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+});
+
+test("roman holder label click state does not persist across search selections @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  const searchInput = page.getByRole("combobox", { name: "Search biblical places" });
+  await searchInput.click();
+  await searchInput.fill("Ephesus");
+  await expect(page.getByRole("option", { name: /Ephesus/i }).first()).toBeVisible();
+  await searchInput.press("ArrowDown");
+  await searchInput.press("Enter");
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "ephesus",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(0);
+
+  await searchInput.click();
+  await searchInput.fill("Roman Empire");
+  await expect(page.getByRole("option", { name: /Roman Empire/i }).first()).toBeVisible();
+  await searchInput.press("ArrowDown");
+  await searchInput.press("Enter");
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(0);
+});
+
+test("roman holder label click state clears after close and stays clear on deep link @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  test.setTimeout(90_000);
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  await page.getByRole("button", { name: "Close" }).click();
+  await page.waitForFunction(
+    () => !new URLSearchParams(window.location.search).has("place"),
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=roman-empire`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(0);
 });
 
 test("with a region selected, clicking an outside town clears region highlight and selects the town @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -1828,20 +2248,25 @@ test("clicking another region moves the highlight; towns under veil stay clickab
   await waitForMapIdle(page);
   expect(selectedPlaceAfterRegionClick).toBeTruthy();
 
-  const movedHighlight = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const selectedName = map
-      .queryRenderedFeatures(undefined, {
-        layers: ["ibm-selected-area-label", "ibm-ancient-holder-label-selected"]
-      })
-      .find(
-        (feature) =>
-          typeof feature.properties?.placeId === "string" ||
-          typeof feature.properties?.holderLocationId === "string"
-      );
-    return selectedName?.properties?.placeId ?? selectedName?.properties?.holderLocationId ?? null;
-  }, mapTestHookKey);
-  expect(movedHighlight).toBe(selectedPlaceAfterRegionClick);
+  await expect
+    .poll(
+      () =>
+        page.evaluate((testHookKey) => {
+          const map = window[testHookKey];
+          const selectedName = map
+            .queryRenderedFeatures(undefined, {
+              layers: ["ibm-selected-area-label", "ibm-ancient-holder-label-selected"]
+            })
+            .find(
+              (feature) =>
+                typeof feature.properties?.placeId === "string" ||
+                typeof feature.properties?.holderLocationId === "string"
+            );
+          return selectedName?.properties?.placeId ?? selectedName?.properties?.holderLocationId ?? null;
+        }, mapTestHookKey),
+      { timeout: 5_000 }
+    )
+    .toBe(selectedPlaceAfterRegionClick);
 
   await jumpMap(page, [27.34, 37.94], 7.4);
   const townUnderVeil = await page.evaluate(({ testHookKey, selectedRegionId }) => {
