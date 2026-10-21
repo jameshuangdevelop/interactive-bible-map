@@ -90,6 +90,11 @@ const DEFAULT_ANCIENT_EMPIRE_EDGE_SCHEMA_PATH = path.join(
   "schema",
   "ancient-empire-edge.schema.json"
 );
+const DEFAULT_REGION_OUTLINES_SCHEMA_PATH = path.join(
+  repositoryRoot,
+  "schema",
+  "region-outlines.schema.json"
+);
 const DEFAULT_OSM_WATERWAYS_SCHEMA_PATH = path.join(
   repositoryRoot,
   "schema",
@@ -123,6 +128,12 @@ const DEFAULT_ANCIENT_COASTLINE_PATH = path.join(
   "data",
   "geo",
   "ancient-coastline.geojson"
+);
+const DEFAULT_REGION_OUTLINES_PATH = path.join(
+  repositoryRoot,
+  "data",
+  "geo",
+  "region-outlines.geojson"
 );
 const DEFAULT_IMAGE_PROMPTS_DIRECTORY = path.join(
   repositoryRoot,
@@ -663,6 +674,7 @@ async function loadSchemas(
   ancientRoadsSchemaPath,
   ancientCoastlineSchemaPath,
   ancientEmpireEdgeSchemaPath,
+  regionOutlinesSchemaPath,
   osmWaterwaysSchemaPath,
   geoProvenanceSchemaPath
 ) {
@@ -679,6 +691,7 @@ async function loadSchemas(
     ancientRoadsSchema,
     ancientCoastlineSchema,
     ancientEmpireEdgeSchema,
+    regionOutlinesSchema,
     osmWaterwaysSchema,
     geoProvenanceSchema
   ] =
@@ -695,6 +708,7 @@ async function loadSchemas(
       readJsonFile(ancientRoadsSchemaPath),
       readJsonFile(ancientCoastlineSchemaPath),
       readJsonFile(ancientEmpireEdgeSchemaPath),
+      readJsonFile(regionOutlinesSchemaPath),
       readJsonFile(osmWaterwaysSchemaPath),
       readJsonFile(geoProvenanceSchemaPath)
     ]);
@@ -711,6 +725,7 @@ async function loadSchemas(
     ancientRoadsSchema,
     ancientCoastlineSchema,
     ancientEmpireEdgeSchema,
+    regionOutlinesSchema,
     osmWaterwaysSchema,
     geoProvenanceSchema
   };
@@ -2357,6 +2372,10 @@ export async function validateData(options = {}) {
     options.ancientCoastlinePath ??
       path.join(inferredDataRoot, "geo", "ancient-coastline.geojson")
   );
+  const regionOutlinesPath = path.resolve(
+    options.regionOutlinesPath ??
+      path.join(inferredDataRoot, "geo", "region-outlines.geojson")
+  );
   // The empire edge is optional: it is validated when present and never required.
   const ancientEmpireEdgePath = path.resolve(
     options.ancientEmpireEdgePath ??
@@ -2385,6 +2404,9 @@ export async function validateData(options = {}) {
   );
   const ancientEmpireEdgeSchemaPath = path.resolve(
     options.ancientEmpireEdgeSchemaPath ?? DEFAULT_ANCIENT_EMPIRE_EDGE_SCHEMA_PATH
+  );
+  const regionOutlinesSchemaPath = path.resolve(
+    options.regionOutlinesSchemaPath ?? DEFAULT_REGION_OUTLINES_SCHEMA_PATH
   );
   // The pinned OpenStreetMap rivers the ancient layer's build reads: validated when present.
   const osmWaterwaysPath = path.resolve(
@@ -2470,6 +2492,7 @@ export async function validateData(options = {}) {
     ancientRoadsSchema,
     ancientCoastlineSchema,
     ancientEmpireEdgeSchema,
+    regionOutlinesSchema,
     osmWaterwaysSchema,
     geoProvenanceSchema
   } = await loadSchemas(
@@ -2485,6 +2508,7 @@ export async function validateData(options = {}) {
     ancientRoadsSchemaPath,
     ancientCoastlineSchemaPath,
     ancientEmpireEdgeSchemaPath,
+    regionOutlinesSchemaPath,
     osmWaterwaysSchemaPath,
     geoProvenanceSchemaPath
   );
@@ -2504,6 +2528,7 @@ export async function validateData(options = {}) {
   const validateAncientRoadsSchema = ajv.compile(ancientRoadsSchema);
   const validateAncientCoastlineSchema = ajv.compile(ancientCoastlineSchema);
   const validateAncientEmpireEdgeSchema = ajv.compile(ancientEmpireEdgeSchema);
+  const validateRegionOutlinesSchema = ajv.compile(regionOutlinesSchema);
   const validateOsmWaterwaysSchema = ajv.compile(osmWaterwaysSchema);
   const validateSourceIdSchema = ajv.compile({
     $ref: "https://interactive-bible-map/schemas/source-id.schema.json#/$defs/sourceId"
@@ -2685,27 +2710,31 @@ export async function validateData(options = {}) {
     ancientRoadsExists,
     ancientCoastlineExists,
     ancientEmpireEdgeExists,
+    regionOutlinesExists,
     osmWaterwaysExists
   ] = await Promise.all([
     pathExists(ancientAreasPath),
     pathExists(ancientRoadsPath),
     pathExists(ancientCoastlinePath),
     pathExists(ancientEmpireEdgePath),
+    pathExists(regionOutlinesPath),
     pathExists(osmWaterwaysPath)
   ]);
 
-  const [ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData, osmWaterwaysData] =
+  const [ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData, regionOutlinesData, osmWaterwaysData] =
     await Promise.all([
       ancientAreasExists ? readFeatureCollection(ancientAreasPath, errors) : null,
       ancientRoadsExists ? readFeatureCollection(ancientRoadsPath, errors) : null,
       ancientCoastlineExists ? readFeatureCollection(ancientCoastlinePath, errors) : null,
       ancientEmpireEdgeExists ? readFeatureCollection(ancientEmpireEdgePath, errors) : null,
+      regionOutlinesExists ? readFeatureCollection(regionOutlinesPath, errors) : null,
       osmWaterwaysExists ? readFeatureCollection(osmWaterwaysPath, errors) : null
     ]);
   const ancientAreasRelativePath = relativeFromRepositoryRoot(ancientAreasPath);
   const ancientRoadsRelativePath = relativeFromRepositoryRoot(ancientRoadsPath);
   const ancientCoastlineRelativePath = relativeFromRepositoryRoot(ancientCoastlinePath);
   const ancientEmpireEdgeRelativePath = relativeFromRepositoryRoot(ancientEmpireEdgePath);
+  const regionOutlinesRelativePath = relativeFromRepositoryRoot(regionOutlinesPath);
   const osmWaterwaysRelativePath = relativeFromRepositoryRoot(osmWaterwaysPath);
   // The routes' lines audit measures against Natural Earth 10 m land and lakes (pinned), or against
   // the land and lakes given by `routeLineLandPath` and `routeLineLakesPath` (test fixtures).
@@ -2757,6 +2786,14 @@ export async function validateData(options = {}) {
         "Unable to read ancient coastline file: ENOENT"
       );
     }
+    if (!regionOutlinesExists) {
+      recordError(
+        errors,
+        regionOutlinesRelativePath,
+        "$",
+        "Unable to read region outlines file: ENOENT"
+      );
+    }
   }
 
   if (ancientAreasData && !validateAncientAreasSchema(ancientAreasData)) {
@@ -2797,6 +2834,17 @@ export async function validateData(options = {}) {
       recordError(
         errors,
         ancientEmpireEdgeRelativePath,
+        pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
+        `Schema validation failed: ${issue.message}`
+      );
+    }
+  }
+
+  if (regionOutlinesData && !validateRegionOutlinesSchema(regionOutlinesData)) {
+    for (const issue of validateRegionOutlinesSchema.errors ?? []) {
+      recordError(
+        errors,
+        regionOutlinesRelativePath,
         pointerToJsonPath(issue.instancePath, issue.params?.missingProperty),
         `Schema validation failed: ${issue.message}`
       );
@@ -3236,6 +3284,11 @@ export async function validateData(options = {}) {
     errors
   });
   validateCoordinateRanges({
+    featureCollection: regionOutlinesData,
+    file: regionOutlinesRelativePath,
+    errors
+  });
+  validateCoordinateRanges({
     featureCollection: ancientEmpireEdgeData,
     file: ancientEmpireEdgeRelativePath,
     errors
@@ -3250,9 +3303,19 @@ export async function validateData(options = {}) {
     file: ancientAreasRelativePath,
     errors
   });
+  validatePolygonRings({
+    featureCollection: regionOutlinesData,
+    file: regionOutlinesRelativePath,
+    errors
+  });
   validateGeometryTopology({
     featureCollection: ancientAreasData,
     file: ancientAreasRelativePath,
+    errors
+  });
+  validateGeometryTopology({
+    featureCollection: regionOutlinesData,
+    file: regionOutlinesRelativePath,
     errors
   });
 

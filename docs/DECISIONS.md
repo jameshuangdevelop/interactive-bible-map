@@ -447,6 +447,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   7. **The modern map shows no ancient places:** no names, no dots and no candidate sites. A route keeps its lines and dots there, without their names. The selected place has no marker, but the camera centres on it. To compare ancient and modern, the reader switches maps; the camera stays put.
   8. **The timeline stays hidden on the Routes tab** (ADR-0042 item 7).
 - **Consequences:** M5-08 builds this, and VISUAL_SPEC §2 follows. The vanishing "other" pins and the grey dot that turned red go away with the pins. The data gains `naturalFeatureKind` for water features. M5-08 has its own play-test (MC12).
+- **Update (2026-10-19):** item 1 is amended by ADR-0049: on the ancient map, towns get a dot again, black this time, as on the modern map.
 
 ## ADR-0044 — Names that work like Google Maps', and borders drawn the way Google Maps draws them
 - **Date:** 2026-10-18 · **Status:** Accepted. The PO chose item 3's details, item 7's reach and item 8's zoom while the human was away; the human sees them at the play-test (MC13) · **By:** the human at mini checkpoint MC12, after play-testing M5-08 with friends ("you don't have to do the "+5" thing at the top levels of the map. Just list out the some important places and allow the users to organically zoom in or search for spots"; "When a location is clicked on, don't zoom in please. Maintain the same level of zoom and if the user wants to zoom in, they can. When a location is clicked on (not a region), have a map pointer icon right by the name just like how google map does it. When a location is hovered over, turn it blue just like how google map does it"; "when navigating the map, let's not do the palm icon (drag icon). Instead let's just do the normal mouse pointer icon. When a location is hovered over, let's still do the pointer finger icon"; "all locations should be able to be hovered over and clicked on if the font is standard (aka not italic or greyed out) at all times, even in routes mode, even when the stage isn't clicked on. In routes mode, we only want to grey out the lines of the segments/stages that aren't selected"; "some borders are really clear like the province borders between Achaia, Macedonia etc. But some others are really confusing to look at or don't exist at all like between Syria, Cappadocia, etc."; "between north macedonia, albania, kosovo, montenegro, there are no borders for some reason. On google maps, I see that the borders between Kosovo and Serbia are dotted lines … but the border between Kosovo and Albania/North Macedonia are solid. Let's do what google maps does"), and the PO for the details. This supersedes ADR-0043 item 5 and amends ADR-0043 items 6 and 7, ADR-0042 item 2, ADR-0041 item 7 for the Map tab, ADR-0037 items 3 and 4 for the borders, and ADR-0009 and ADR-0022 where they hide disputed borders.
@@ -565,3 +566,40 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
      - **Update, 2026-10-20:** the human, play-testing #81: "the red dotted highlight looks great … Can we do it for all regions like Samaria, Kingdom of Pontus … can we do them for all types of regions". A place's land for a year is every drawn area it holds that year (the stop's `holderLocationId`): the Kingdom of Pontus lights up its kingdom, and a province that held two areas lights up both. The Roman Empire's land is every area on Rome's side that year. A region holding no area keeps the own-land rule from #81's review. Regions with no drawn land at all (Samaria, Galilee, Pisidia and others) get their own outlines from card M5-19 and ADR-0050.
      - **Update, 2026-10-20 (from the review of round 4):** neighbouring areas are traced independently along their shared borders, up to about 1.6 km apart. So a place's land is merged at build time, with gaps between neighbours filled, and isn't merged in the browser. The veil and the dotted line follow the merged shape, so no line runs inside it. The Roman Empire has no label of its own: "Other Roman provinces", the label of the lands its provinces don't cover, turns blue only when the reader clicks that label.
 - **Consequences:** card M5-16; VISUAL_SPEC follows.
+
+## ADR-0049 — Towns on the ancient map get a dot, as on the modern map
+- **Date:** 2026-10-19 · **Status:** Accepted. The PO chose items 2–7 while writing the card; the human sees them at the PR's play-test · **By:** the human, after play-testing #79 on a phone: "also I think the one solid black dot underneath the city names actually help a lot (like in the modern map). Let's do that for the ancient map as well".
+- **Context:** ADR-0043 item 1 removed our pins: each place is drawn as its name, centred on its point, and the only dots are a route's and a selected place's candidate sites. On the modern map, the basemap draws a town as a small solid black dot with its name just above it (`label_town`, `label_city` and `label_city_capital` in `app/public/styles/liberty-modern/style.json`: icon `circle_11_black`, `text-anchor: bottom`, a larger dot for capitals). The human finds the dot helps: it shows exactly where the town is.
+- **Decision:**
+  1. On the ancient map, each town is drawn as a small solid black dot at its point, with its name just above it, as the modern map draws towns. Towns are the places drawn in the town style (ADR-0043 item 3): the major places, cities, towns and villages. Sites, regions, provinces, water and natural features keep their names only.
+  2. The dot looks like the modern map's: solid black, with no ring, about 6 px across for the major places (ADR-0029) and 4 px for the others.
+  3. A dot and its name are one: they show and hide together when names collide, and the dot is part of the name's click and hover target. Hovering turns the name blue, as now; the dot stays black.
+  4. A selected town shows its pin instead of its dot (ADR-0048), and its blue name doesn't overlap the pin.
+  5. A place with several candidate sites has its dot at the first-listed candidate (ADR-0043 item 4). While the place is selected, the lettered candidate dots replace it.
+  6. In Routes mode, where a route draws its own dot for a place, the black dot isn't drawn as well.
+  7. Dots show at every zoom at which their names show. The modern map drops its dots from zoom 9 or 10, where streets mark the town; the ancient map has no streets.
+  8. The modern map doesn't change: it shows no ancient places (ADR-0043 item 7).
+- **Consequences:** amends ADR-0043 item 1. Card M5-18 builds it, stacked on M5-16, and VISUAL_SPEC §2 follows.
+
+## ADR-0050 — Every region the reader can click gets its outline
+- **Date:** 2026-10-20 · **Status:** Accepted. The PO chose items 2–6; the human sees them at the PR's play-test · **By:** the human, play-testing #81: "the red dotted highlight looks great, I like it a lot. Can we do it for all regions like Samaria, Kingdom of Pontus (just examples, but can we do them for all types of regions)".
+- **Context:** ADR-0048 outlines a selected region's land for the timeline's year from the ancient layer's drawn areas. Its 2026-10-20 update covers every place that holds an area that year: provinces, kingdoms and the Roman Empire. That still leaves clickable region names with no drawn land:
+  - regions inside provinces: Samaria, Galilee, Judea, Pisidia, Lycaonia, Mysia, Phrygia, and Pontus once it no longer holds an area;
+  - lands beyond Rome's edge: Media, Mesopotamia and the Parthian Empire;
+  - islands and separate parts: Crete and Libya (parts of Crete and Cyrene), and Chios, Cos, Malta, Rhodes and Samos (islands shown as region names).
+- **Decision:**
+  1. Each of them gets its own outline: a drawn shape of its extent in the first century, used only for the selection highlight.
+  2. Islands and a province's separate parts take their land from the coastlines and areas already drawn, or from an open dataset for the coast.
+  3. The other regions are drawn approximately from cited, openly licensed sources:
+     - ancient descriptions first: Josephus, *Jewish War* 3.3, for Galilee, Samaria and Judea; Strabo and Pliny for Asia Minor and the East;
+     - checked against modern open scholarship;
+     - following the coasts, rivers, ridges and province borders the sources name.
+     
+     Each outline records its sources and a confidence. The map's note already says borders are approximate.
+  4. An outline holds for every year from 4 BC to AD 100, unless a source says the region's extent changed.
+  5. Precedence: the land a place holds that year (ADR-0048's update) first, then the region's own outline, then the name alone.
+  6. The Fact-Checker verifies every outline and its licensing before it ships.
+- **Consequences:** amends ADR-0048 item 5. Card M5-19 draws the outlines (research, check, geometry); then a small frontend step uses them.
+- **Update, 2026-10-20 (the PO, from M5-19's fact-check and geometry):**
+  - **Scope:** M5-19 ships outlines for 11 regions: Galilee, Samaria, Judea, Pontus, Crete, Libya, Chios, Cos, Malta, Rhodes and Samos. Seven more (Pisidia, Lycaonia, Mysia, Phrygia, Media, Mesopotamia and the Parthian Empire) need landmarks named on both sides of each edge before their edges can be built from sources. Card M5-20 does them; until then they show their name alone (item 5).
+  - **Loading:** a reader needs an outline only after selecting a region that holds no land, so the app loads `ancient.region-outlines.json` on first use. The file has its own budget of 25,000 bytes gzip, outside the ancient layer's 330,000 (ADR-0037).

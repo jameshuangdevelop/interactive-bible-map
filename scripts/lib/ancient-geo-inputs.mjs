@@ -31,7 +31,9 @@ export const ANCIENT_GEO_INPUTS = Object.freeze({
   awmcHerodsKingdom: awmc("Cultural-Data/political_shading/herod/herods_kingdom.geojson", "awmc-herods-kingdom.geojson", "98dfe0590206677ce4984a3c95dae805412b83eef7545c959ba9d0681dd65c31"),
   naturalEarthLand: naturalEarth("geojson/ne_10m_land.geojson", "ne-10m-land.geojson", "1ac90796408bc6ad6911d69448485d3c4dbf2190370080368a09976e1c9f7416"),
   naturalEarthCoastline: naturalEarth("geojson/ne_10m_coastline.geojson", "ne-10m-coastline.geojson", "6f75ae0e0de157b14946e2255eb1f5486d9a13819032e26d4610852d296788f6"),
-  naturalEarthLakes: naturalEarth("geojson/ne_10m_lakes.geojson", "ne-10m-lakes.geojson", "2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9")
+  naturalEarthLakes: naturalEarth("geojson/ne_10m_lakes.geojson", "ne-10m-lakes.geojson", "2d036f53dedec578001c5c30c2959ee7d4eebc1306900fa4367c49929ec8f2d9"),
+  naturalEarthRiversMain: naturalEarth("geojson/ne_10m_rivers_lake_centerlines.geojson", "ne-10m-rivers-lake-centerlines.geojson", "bb854a900ecbd3b408df46d5e16e3e0f974ba55993f9d8b5c26e855273c0905a"),
+  naturalEarthRiversEurope: naturalEarth("geojson/ne_10m_rivers_europe.geojson", "ne-10m-rivers-europe.geojson", "90712202ac46985812e90840df9acd5101599a9c649868d5bc55ee96c2fedd4c")
 });
 
 // The cache folder: `inputs/` keeps the checked downloads between runs, `work/` holds intermediates and

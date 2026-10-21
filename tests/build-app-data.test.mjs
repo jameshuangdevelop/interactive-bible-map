@@ -752,6 +752,30 @@ test("buildAppData supports ancient-source fixture directory", async () => {
   });
 });
 
+test("buildAppData fails fast when region-outlines source is missing", async () => {
+  await withTempDirectory(async (temporaryDirectory) => {
+    const isolatedAncientSource = path.join(temporaryDirectory, "ancient");
+    await fs.cp(ancientFixtureDirectory, isolatedAncientSource, { recursive: true });
+    await fs.rm(path.join(isolatedAncientSource, "geo", "region-outlines.geojson"));
+
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(validCaseDirectory, "locations"),
+          mediaDirectory: path.join(validCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          ancientSourceDirectory: isolatedAncientSource,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          requireEmpireRoot: false,
+          requireModernCountries: false,
+          outputDirectory: path.join(temporaryDirectory, "output")
+        }),
+      /Ancient build requires region outlines source/u
+    );
+  });
+});
+
 test("buildAppData writes routes generated files and fixture files", async () => {
   await withTempDirectory(async (outputDirectory) => {
     const result = await buildAppData({
@@ -971,7 +995,28 @@ test("buildAppData fails when ancient generated files exceed the gzip budget", a
           outputDirectory,
           maxAncientLayerGzipBytes: 1
         }),
-      /Ancient layer generated files exceed/u
+      /Ancient startup layer generated files exceed/u
+    );
+  });
+});
+
+test("buildAppData fails when ancient region outlines exceed the separate gzip cap", async () => {
+  await withTempDirectory(async (outputDirectory) => {
+    await assert.rejects(
+      () =>
+        buildAppData({
+          locationsDirectory: path.join(validCaseDirectory, "locations"),
+          mediaDirectory: path.join(validCaseDirectory, "media"),
+          bibliographyPath: bibliographyFixturePath,
+          ancientSourceDirectory: ancientFixtureDirectory,
+          webVplPath: webFixturePath,
+          skipSnapshotChecksumCheck: true,
+          requireEmpireRoot: false,
+          requireModernCountries: false,
+          outputDirectory,
+          maxAncientRegionOutlinesGzipBytes: 1
+        }),
+      /Ancient region outlines exceed/u
     );
   });
 });
@@ -1059,6 +1104,7 @@ test("buildAncientAppData keeps label points inside concave polygons", async () 
       ancientAreasData,
       ancientRoadsData: { type: "FeatureCollection", features: [] },
       ancientCoastlineData: { type: "FeatureCollection", features: [] },
+      regionOutlinesData: { type: "FeatureCollection", features: [] },
       outputDirectory
     });
 

@@ -52,6 +52,11 @@ const ancientEmpireEdgeFixturePath = path.join(
   "geo",
   "ancient-empire-edge.geojson"
 );
+const regionOutlinesFixturePath = path.join(
+  ancientFixtureDirectory,
+  "geo",
+  "region-outlines.geojson"
+);
 const routesFixtureDirectory = path.join(fixturesDirectory, "routes");
 const routesFixturePath = path.join(routesFixtureDirectory, "routes.json");
 const routeStopsFixturePath = path.join(routesFixtureDirectory, "stops.json");
@@ -409,6 +414,7 @@ async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
       areas: JSON.parse(fs.readFileSync(ancientAreasFixturePath, "utf8")),
       roads: JSON.parse(fs.readFileSync(ancientRoadsFixturePath, "utf8")),
       coastline: JSON.parse(fs.readFileSync(ancientCoastlineFixturePath, "utf8")),
+      regionOutlines: JSON.parse(fs.readFileSync(regionOutlinesFixturePath, "utf8")),
       // Set to null in a mutation to leave the optional empire-edge file out.
       empireEdge: JSON.parse(fs.readFileSync(ancientEmpireEdgeFixturePath, "utf8"))
     };
@@ -422,10 +428,12 @@ async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
     const roadsPath = path.join(geoDirectory, "ancient-roads.geojson");
     const coastlinePath = path.join(geoDirectory, "ancient-coastline.geojson");
     const empireEdgePath = path.join(geoDirectory, "ancient-empire-edge.geojson");
+    const regionOutlinesPath = path.join(geoDirectory, "region-outlines.geojson");
     fs.writeFileSync(timelinePath, `${JSON.stringify(ancient.timeline, null, 2)}\n`);
     fs.writeFileSync(areasPath, `${JSON.stringify(ancient.areas, null, 2)}\n`);
     fs.writeFileSync(roadsPath, `${JSON.stringify(ancient.roads, null, 2)}\n`);
     fs.writeFileSync(coastlinePath, `${JSON.stringify(ancient.coastline, null, 2)}\n`);
+    fs.writeFileSync(regionOutlinesPath, `${JSON.stringify(ancient.regionOutlines, null, 2)}\n`);
     if (ancient.empireEdge !== null) {
       fs.writeFileSync(empireEdgePath, `${JSON.stringify(ancient.empireEdge, null, 2)}\n`);
     }
@@ -439,6 +447,7 @@ async function runWithTemporaryAncientCase(mutateAncient, options = {}) {
       ancientRoadsPath: roadsPath,
       ancientCoastlinePath: coastlinePath,
       ancientEmpireEdgePath: empireEdgePath,
+      regionOutlinesPath,
       imagePromptsDirectory: path.join(temporaryDirectory, "content", "image-prompts"),
       aiMediaDirectory: path.join(temporaryDirectory, "media", "ai"),
       webVplPath,
@@ -2668,6 +2677,23 @@ test("ancient empire edge is optional and validated when present", async () => {
         isEmpireEdgeError(error) &&
         error.path === "$.features[0].properties.provenance.changes[0].sources[0]" &&
         /was not found in data\/bibliography\.json/u.test(error.message)
+    ),
+    true
+  );
+});
+
+test("region outlines schema catches invalid source ids", async () => {
+  const result = await runWithTemporaryAncientCase(({ regionOutlines }) => {
+    regionOutlines.features[0].properties.sources[0] = "naturalearth:not-a-valid-id";
+  });
+
+  assert.equal(
+    hasError(
+      result,
+      (error) =>
+        /region-outlines\.geojson$/u.test(error.file) &&
+        error.path === "$.features[0].properties.sources[0]" &&
+        /Schema validation failed/u.test(error.message)
     ),
     true
   );
