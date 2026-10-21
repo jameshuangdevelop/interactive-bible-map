@@ -1707,6 +1707,16 @@ export function PlacePanel({
     outline: sheetHandleFocused ? `2px solid ${tokens.color.accent}` : "none",
     outlineOffset: "2px"
   };
+  const smallScreenStripDragTargetStyle: CSSProperties = {
+    position: "absolute",
+    inset: 0,
+    border: "none",
+    padding: 0,
+    margin: 0,
+    background: "transparent",
+    touchAction: "none",
+    cursor: "grab"
+  };
 
   if (isLoading && !location) {
     return (
@@ -1718,9 +1728,17 @@ export function PlacePanel({
             justifyContent: "flex-end",
             position: "relative",
             minHeight: "44px",
+            touchAction: isSmallScreen ? "none" : undefined,
             marginBottom: `${tokens.spacing.md}px`
           }}
         >
+          {isSmallScreen ? (
+            <div
+              aria-hidden="true"
+              data-sheet-drag-strip="place"
+              style={smallScreenStripDragTargetStyle}
+            />
+          ) : null}
           {isSmallScreen ? (
             <button
               aria-expanded={isSmallScreenExpanded}
@@ -1730,7 +1748,7 @@ export function PlacePanel({
               onFocus={() => setSheetHandleFocused(true)}
               onPointerDown={onSmallScreenHandlePointerDown}
               onClick={onToggleSmallScreenExpanded}
-              style={smallScreenSheetHandleStyle}
+              style={{ ...smallScreenSheetHandleStyle, zIndex: 1 }}
               type="button"
             >
               <span
@@ -1751,7 +1769,7 @@ export function PlacePanel({
           <button
             aria-label="Close place panel"
             onClick={onClose}
-            style={closeButtonStyle}
+            style={{ ...closeButtonStyle, position: "relative", zIndex: 1 }}
             type="button"
           >
             ×
@@ -1783,9 +1801,17 @@ export function PlacePanel({
           justifyContent: "flex-end",
           position: "relative",
           minHeight: "44px",
+          touchAction: isSmallScreen ? "none" : undefined,
           marginBottom: `${tokens.spacing.md}px`
         }}
       >
+        {isSmallScreen ? (
+          <div
+            aria-hidden="true"
+            data-sheet-drag-strip="place"
+            style={smallScreenStripDragTargetStyle}
+          />
+        ) : null}
       {isSmallScreen ? (
         <button
             aria-expanded={isSmallScreenExpanded}
@@ -1795,7 +1821,7 @@ export function PlacePanel({
             onFocus={() => setSheetHandleFocused(true)}
             onPointerDown={onSmallScreenHandlePointerDown}
             onClick={onToggleSmallScreenExpanded}
-            style={smallScreenSheetHandleStyle}
+            style={{ ...smallScreenSheetHandleStyle, zIndex: 1 }}
             type="button"
           >
             <span
@@ -1816,7 +1842,7 @@ export function PlacePanel({
         <button
           aria-label="Close place panel"
           onClick={onClose}
-          style={closeButtonStyle}
+          style={{ ...closeButtonStyle, position: "relative", zIndex: 1 }}
           type="button"
         >
           ×
@@ -1824,8 +1850,10 @@ export function PlacePanel({
       </header>
 
       <div
+        data-place-panel-body="true"
         style={{
           display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr)",
           gap: `${PANEL_SECTION_GAP}px`,
           minWidth: 0,
           maxWidth: "100%",
@@ -1919,7 +1947,13 @@ export function PlacePanel({
             <h2 style={sectionHeadingStyle}>
               {isDisputed ? "Proposed sites" : "Sites"}
             </h2>
-            <div style={{ display: "grid", gap: `${tokens.spacing.sm}px` }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 1fr)",
+                gap: `${tokens.spacing.sm}px`
+              }}
+            >
               {location.candidates.map((candidate, candidateIndex) => {
                 const selected = selection.candidateIndex === candidateIndex;
                 const chip = typeChipStyle(candidate.confidence);
@@ -1962,7 +1996,13 @@ export function PlacePanel({
                           gap: `${tokens.spacing.sm}px`
                         }}
                       >
-                        <strong style={{ color: tokens.color.textPrimary }}>
+                        <strong
+                          style={{
+                            color: tokens.color.textPrimary,
+                            minWidth: 0,
+                            overflowWrap: "anywhere"
+                          }}
+                        >
                           {letter}. {candidate.label}
                         </strong>
                         <span
@@ -1988,6 +2028,7 @@ export function PlacePanel({
                         color: tokens.color.textSecondary,
                         fontSize: `${tokens.typography.bodySize}px`,
                         lineHeight: `${tokens.typography.bodyLineHeight}px`,
+                        overflowWrap: "anywhere",
                         ...(expanded
                           ? {}
                           : {
@@ -2692,7 +2733,8 @@ const secondaryTextStyle: CSSProperties = {
   marginBottom: 0,
   color: tokens.color.textSecondary,
   fontSize: `${tokens.typography.bodySize}px`,
-  lineHeight: `${tokens.typography.bodyLineHeight}px`
+  lineHeight: `${tokens.typography.bodyLineHeight}px`,
+  overflowWrap: "anywhere"
 };
 
 const todayLineStyle: CSSProperties = {
@@ -2708,7 +2750,8 @@ const bodyTextStyle: CSSProperties = {
   marginBottom: `${tokens.spacing.sm}px`,
   color: tokens.color.textPrimary,
   fontSize: `${tokens.typography.bodySize}px`,
-  lineHeight: `${tokens.typography.bodyLineHeight}px`
+  lineHeight: `${tokens.typography.bodyLineHeight}px`,
+  overflowWrap: "anywhere"
 };
 
 const textActionStyle: CSSProperties = {
