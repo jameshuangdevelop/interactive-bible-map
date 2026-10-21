@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build:ancient-geo": "node scripts/build-ancient-geo.mjs",
+    "build:gaza-face": "node scripts/build-gaza-rhinocolura-face.mjs",
     "check:ancient-geo": "node scripts/check-ancient-geo.mjs",
     "build:route-lines": "node scripts/build-route-lines.mjs",
     "check:route-lines": "node scripts/check-route-lines.mjs",

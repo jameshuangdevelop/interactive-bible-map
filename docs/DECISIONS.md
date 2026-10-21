@@ -579,3 +579,26 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
   7. Dots show at every zoom at which their names show. The modern map drops its dots from zoom 9 or 10, where streets mark the town; the ancient map has no streets.
   8. The modern map doesn't change: it shows no ancient places (ADR-0043 item 7).
 - **Consequences:** amends ADR-0043 item 1. Card M5-18 builds it, stacked on M5-16, and VISUAL_SPEC §2 follows.
+
+## ADR-0050 — Every region the reader can click gets its outline
+- **Date:** 2026-10-20 · **Status:** Accepted. The PO chose items 2–6; the human sees them at the PR's play-test · **By:** the human, play-testing #81: "the red dotted highlight looks great, I like it a lot. Can we do it for all regions like Samaria, Kingdom of Pontus (just examples, but can we do them for all types of regions)".
+- **Context:** ADR-0048 outlines a selected region's land for the timeline's year from the ancient layer's drawn areas. Its 2026-10-20 update covers every place that holds an area that year: provinces, kingdoms and the Roman Empire. That still leaves clickable region names with no drawn land:
+  - regions inside provinces: Samaria, Galilee, Judea, Pisidia, Lycaonia, Mysia, Phrygia, and Pontus once it no longer holds an area;
+  - lands beyond Rome's edge: Media, Mesopotamia and the Parthian Empire;
+  - islands and separate parts: Crete and Libya (parts of Crete and Cyrene), and Chios, Cos, Malta, Rhodes and Samos (islands shown as region names).
+- **Decision:**
+  1. Each of them gets its own outline: a drawn shape of its extent in the first century, used only for the selection highlight.
+  2. Islands and a province's separate parts take their land from the coastlines and areas already drawn, or from an open dataset for the coast.
+  3. The other regions are drawn approximately from cited, openly licensed sources:
+     - ancient descriptions first: Josephus, *Jewish War* 3.3, for Galilee, Samaria and Judea; Strabo and Pliny for Asia Minor and the East;
+     - checked against modern open scholarship;
+     - following the coasts, rivers, ridges and province borders the sources name.
+     
+     Each outline records its sources and a confidence. The map's note already says borders are approximate.
+  4. An outline holds for every year from 4 BC to AD 100, unless a source says the region's extent changed.
+  5. Precedence: the land a place holds that year (ADR-0048's update) first, then the region's own outline, then the name alone.
+  6. The Fact-Checker verifies every outline and its licensing before it ships.
+- **Consequences:** amends ADR-0048 item 5. Card M5-19 draws the outlines (research, check, geometry); then a small frontend step uses them.
+- **Update, 2026-10-20 (the PO, from M5-19's fact-check and geometry):**
+  - **Scope:** M5-19 ships outlines for 11 regions: Galilee, Samaria, Judea, Pontus, Crete, Libya, Chios, Cos, Malta, Rhodes and Samos. Seven more (Pisidia, Lycaonia, Mysia, Phrygia, Media, Mesopotamia and the Parthian Empire) need landmarks named on both sides of each edge before their edges can be built from sources. Card M5-20 does them; until then they show their name alone (item 5).
+  - **Loading:** a reader needs an outline only after selecting a region that holds no land, so the app loads `ancient.region-outlines.json` on first use. The file has its own budget of 25,000 bytes gzip, outside the ancient layer's 330,000 (ADR-0037).

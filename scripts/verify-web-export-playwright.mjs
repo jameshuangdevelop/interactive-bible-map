@@ -4888,7 +4888,7 @@ async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
 
 async function buildFixtureGeneratedOutput() {
   const outputDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-m4-05-fixture-generated-"));
-  const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData, bibliography] =
+  const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, regionOutlinesData, ancientEmpireEdgeData, bibliography] =
     await Promise.all([
       fs
         .readFile(path.join(fixtureAncientSourceDirectory, "timeline.json"), "utf8")
@@ -4901,6 +4901,9 @@ async function buildFixtureGeneratedOutput() {
         .then((content) => JSON.parse(content)),
       fs
         .readFile(path.join(fixtureAncientSourceDirectory, "geo", "ancient-coastline.geojson"), "utf8")
+        .then((content) => JSON.parse(content)),
+      fs
+        .readFile(path.join(fixtureAncientSourceDirectory, "geo", "region-outlines.geojson"), "utf8")
         .then((content) => JSON.parse(content)),
       readJsonIfExists(path.join(fixtureAncientSourceDirectory, "geo", "ancient-empire-edge.geojson")),
       fs.readFile(bibliographyPath, "utf8").then((content) => JSON.parse(content))
@@ -4917,6 +4920,7 @@ async function buildFixtureGeneratedOutput() {
     ancientAreasData,
     ancientRoadsData,
     ancientCoastlineData,
+    regionOutlinesData,
     ancientEmpireEdgeData,
     bibliographyById,
     outputDirectory
