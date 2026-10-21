@@ -550,6 +550,7 @@ Lightweight architecture decision records, oldest first. From ADR-0051 on, each 
 - **Decision:**
   1. On phones, the place sheet and the route sheet have three positions: closed, half (as today) and full. At full, the sheet fills the screen below the safe-area inset and covers the search box, the tabs and the toggle; the handle and the close button stay visible.
   2. Dragging the top edge moves the sheet. On release it settles at the nearest position, and a flick goes one position further. Dragging down from half closes it, and so does the close button.
+     - **Update, 2026-10-19:** the human play-tested #79 on a phone: "Let's just make it such that drag and hold the entire top part of the panel can make it full screen (instead of just holding and dragging the little bar)". Item 2's "top edge" is the sheet's whole top strip: from its top edge down to its content, across the full width, on every phone sheet. A drag there moves the sheet up or down. A tap there does nothing, except on the handle (item 3) and the close button. Card M7-03.
   3. Tapping the handle toggles half and full. The handle is a button with `aria-expanded`. With reduced motion, the sheet jumps.
 - **Consequences:** card M7-02; VISUAL_SPEC §3 and §2 follow; `BACKLOG.md`'s item moves into M7.
 

@@ -13,11 +13,13 @@ import {
 } from "react";
 
 import { SearchMenu } from "./search-menu";
+import { SmallScreenSheetTopStrip } from "./small-screen-sheet-top-strip.web";
 import { PlacePanel } from "../features/place-panel/place-panel.web";
 import { formatSourceCitation } from "../features/place-panel/source-format";
 import { sortPlacesByImportance } from "../features/map/place-importance";
 import { computeTimelineSourcesPopoverMaxHeight } from "../features/map/overlay-layout";
 import {
+  resolveSheetReleaseVelocity,
   settleSmallScreenSheetPosition,
   sheetHeightForPosition,
   type SmallScreenSheetPosition
@@ -67,6 +69,7 @@ const SMALL_SCREEN_SHEET_EDGE_GAP_PX = 16;
 const SMALL_SCREEN_SHEET_HALF_RATIO = 0.47;
 const SMALL_SCREEN_SHEET_MIN_COLLAPSED_HEIGHT_PX = 260;
 const SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX = 6;
+const SMALL_SCREEN_SHEET_RELEASE_VELOCITY_MIN_SAMPLE_MS = 6;
 const SMALL_SCREEN_SHEET_FLICK_VELOCITY_THRESHOLD_PX_PER_MS = 0.55;
 const ROUTES_SIDE_BY_SIDE_MIN_WIDTH_PX = 1280;
 const MAP_TOGGLE_TOP_OFFSET_PX = SEARCH_TOP_OFFSET + SEARCH_HEIGHT + 8;
@@ -284,7 +287,15 @@ export function RouteStopDetailsPanel({
         </button>
       ) : null}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: `${tokens.spacing.sm}px` }}>
-        <h1 style={{ margin: 0, fontSize: `${tokens.typography.titleSize}px`, lineHeight: `${tokens.typography.titleLineHeight}px` }}>
+        <h1
+          style={{
+            margin: 0,
+            minWidth: 0,
+            overflowWrap: "anywhere",
+            fontSize: `${tokens.typography.titleSize}px`,
+            lineHeight: `${tokens.typography.titleLineHeight}px`
+          }}
+        >
           {selectedRouteStop.name}
         </h1>
         <button
@@ -430,6 +441,7 @@ export function AppShell() {
   const placeDetailsRequestGenerationByIdRef = useRef(new Map<string, number>());
   const unmountedRef = useRef(false);
   const routesLoadStateRef = useRef(routesLoadState);
+  const smallScreenSheetDragHeightPxRef = useRef(smallScreenSheetDragHeightPx);
   const smallScreenSheetDragStateRef = useRef<{
     pointerId: number;
     startY: number;
@@ -467,6 +479,9 @@ export function AppShell() {
   useEffect(() => {
     routesLoadStateRef.current = routesLoadState;
   }, [routesLoadState]);
+  useEffect(() => {
+    smallScreenSheetDragHeightPxRef.current = smallScreenSheetDragHeightPx;
+  }, [smallScreenSheetDragHeightPx]);
   const selectedTimelineStop = useMemo(
     () =>
       ancientTimeline?.stops.find((stop) => stop.id === selectedTimelineStopId) ??
@@ -583,12 +598,25 @@ export function AppShell() {
       }
 
       smallScreenSheetDragStateRef.current = null;
+      const dragDeltaYPx = event.clientY - dragState.startY;
+      const movedPx = Math.max(
+        dragState.movedPx,
+        Math.abs(dragDeltaYPx)
+      );
+      const elapsedSinceLastMs = Math.max(1, event.timeStamp - dragState.lastTimestampMs);
+      const releaseVelocityYPxPerMs = (event.clientY - dragState.lastY) / elapsedSinceLastMs;
+      const velocityYPxPerMs = resolveSheetReleaseVelocity({
+        trackedVelocityYPxPerMs: dragState.velocityYPxPerMs,
+        releaseVelocityYPxPerMs,
+        elapsedSinceLastMoveMs: elapsedSinceLastMs,
+        releaseVelocityMinSampleMs: SMALL_SCREEN_SHEET_RELEASE_VELOCITY_MIN_SAMPLE_MS
+      });
       if (!dragState.allowTapToggle) {
         if (dragState.requiresDownwardMotion) {
           setSmallScreenSheetDragHeightPx(null);
           return;
         }
-        if (!dragState.hasEngagedDrag || dragState.movedPx <= SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX) {
+        if (!dragState.hasEngagedDrag || movedPx <= SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX) {
           setSmallScreenSheetDragHeightPx(null);
           return;
         }
@@ -597,17 +625,18 @@ export function AppShell() {
         smallScreenSheetMaxHeightPx,
         Math.max(
           dragState.canClose ? 0 : smallScreenSheetCollapsedHeightPx,
-          smallScreenSheetDragHeightPx ?? dragState.startHeightPx
+          smallScreenSheetDragHeightPxRef.current ??
+            (dragState.startHeightPx + (dragState.startY - event.clientY))
         )
       );
       const nextPosition = settleSmallScreenSheetPosition({
         canClose: dragState.canClose,
         currentHeightPx: finalHeightPx,
-        dragDeltaYPx: event.clientY - dragState.startY,
-        movedPx: dragState.movedPx,
+        dragDeltaYPx,
+        movedPx,
         startPosition: dragState.startPosition,
         tapThresholdPx: SMALL_SCREEN_SHEET_TAP_THRESHOLD_PX,
-        velocityYPxPerMs: dragState.velocityYPxPerMs,
+        velocityYPxPerMs,
         flickVelocityThresholdPxPerMs: SMALL_SCREEN_SHEET_FLICK_VELOCITY_THRESHOLD_PX_PER_MS,
         halfHeightPx: smallScreenSheetCollapsedHeightPx,
         fullHeightPx: smallScreenSheetMaxHeightPx
@@ -648,7 +677,6 @@ export function AppShell() {
     selectedPlace,
     selectedRouteStopId,
     smallScreenSheetCollapsedHeightPx,
-    smallScreenSheetDragHeightPx,
     smallScreenSheetMaxHeightPx,
     viewTab
   ]);
@@ -1016,8 +1044,18 @@ export function AppShell() {
       if (smallScreenSheetDragStateRef.current) {
         smallScreenSheetDragStateRef.current = null;
       }
+      const sheetElement = event.currentTarget.closest(
+        "section[aria-label='Place details'], section[aria-label='Route details']"
+      );
+      const renderedHeightPx =
+        sheetElement instanceof HTMLElement
+          ? sheetElement.getBoundingClientRect().height
+          : Number.NaN;
       const currentHeightPx =
         smallScreenSheetDragHeightPx ??
+        (Number.isFinite(renderedHeightPx) && renderedHeightPx > 0
+          ? renderedHeightPx
+          : null) ??
         sheetHeightForPosition(
           smallScreenSheetPosition,
           smallScreenSheetCollapsedHeightPx,
@@ -1081,6 +1119,69 @@ export function AppShell() {
       });
     },
     [beginSmallScreenSheetDrag, isSmallScreen]
+  );
+
+  const handleSmallScreenSheetTopStripPointerDown = useCallback(
+    (
+      event: ReactPointerEvent<HTMLElement>,
+      options: {
+        canClose: boolean;
+      }
+    ) => {
+      if (!isSmallScreen) {
+        return;
+      }
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.closest(
+          "button, a, input, select, textarea, [role='button'], [role='link'], [contenteditable='true']"
+        )
+      ) {
+        return;
+      }
+      event.stopPropagation();
+      event.preventDefault();
+      beginSmallScreenSheetDrag(event, {
+        canClose: options.canClose,
+        requiresDownwardMotion: false,
+        allowTapToggle: false
+      });
+    },
+    [beginSmallScreenSheetDrag, isSmallScreen]
+  );
+
+  const isSmallScreenSheetStripPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLElement>, stripId: "route-list" | "place" | "route-stop") => {
+      if (!isSmallScreen) {
+        return false;
+      }
+      const section = event.currentTarget;
+      if (!(section instanceof HTMLElement)) {
+        return false;
+      }
+      const strip = section.querySelector(`[data-sheet-drag-strip='${stripId}']`);
+      const stripContainer = section.querySelector(
+        `[data-sheet-drag-strip-container='${stripId}']`
+      );
+      const boundsSource =
+        strip instanceof HTMLElement
+          ? strip
+          : stripContainer instanceof HTMLElement
+            ? stripContainer
+            : null;
+      if (!boundsSource) {
+        return false;
+      }
+      const bounds = boundsSource.getBoundingClientRect();
+      return (
+        event.clientX >= bounds.left &&
+        event.clientX <= bounds.right &&
+        event.clientY >= bounds.top &&
+        event.clientY <= bounds.bottom
+      );
+    },
+    [isSmallScreen]
   );
 
   useEffect(() => {
@@ -2582,63 +2683,39 @@ export function AppShell() {
       {routePanelStyle ? (
         <section
           aria-label="Route details"
+          data-small-screen-half-height-px={isSmallScreen ? `${Math.round(smallScreenSheetCollapsedHeightPx)}` : undefined}
           onPointerDown={(event) => {
+            if (isSmallScreenSheetStripPointerDown(event, "route-list")) {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: false });
+              return;
+            }
             handleSmallScreenSheetContentPointerDown(event, { canClose: false });
           }}
           style={routePanelStyle}
         >
           {isSmallScreen ? (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: `${tokens.spacing.sm}px` }}>
-              <button
-                aria-expanded={smallScreenSheetPosition === "full"}
-                aria-label={smallScreenSheetPosition === "full" ? "Collapse details" : "Expand details"}
-                data-sheet-handle="route-list"
-                onClick={() => {
-                  if (suppressNextHandleClickRef.current) {
-                    suppressNextHandleClickRef.current = false;
-                    return;
-                  }
-                  setSmallScreenSheetDragHeightPx(null);
-                  setSmallScreenSheetPosition((current) => (current === "full" ? "half" : "full"));
-                }}
-                onBlur={() => setRouteListSheetHandleFocused(false)}
-                onFocus={() => setRouteListSheetHandleFocused(true)}
-                onPointerDown={(event) =>
-                  beginSmallScreenSheetDrag(event, {
-                    canClose: false,
-                    requiresDownwardMotion: false,
-                    allowTapToggle: true
-                  })
+            <SmallScreenSheetTopStrip
+              expanded={smallScreenSheetPosition === "full"}
+              focused={routeListSheetHandleFocused}
+              onHandleBlur={() => setRouteListSheetHandleFocused(false)}
+              onHandleClick={() => {
+                if (suppressNextHandleClickRef.current) {
+                  suppressNextHandleClickRef.current = false;
+                  return;
                 }
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  border: "none",
-                  borderRadius: "999px",
-                  backgroundColor: "transparent",
-                  touchAction: "none",
-                  cursor: "pointer",
-                  padding: 0,
-                  outline: routeListSheetHandleFocused
-                    ? `2px solid ${tokens.color.accent}`
-                    : "none",
-                  outlineOffset: "2px"
-                }}
-                type="button"
-              >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    display: "block",
-                    width: "36px",
-                    height: "6px",
-                    margin: "0 auto",
-                    borderRadius: "999px",
-                    backgroundColor: tokens.color.divider
-                  }}
-                />
-              </button>
-            </div>
+                setSmallScreenSheetDragHeightPx(null);
+                setSmallScreenSheetPosition((current) => (current === "full" ? "half" : "full"));
+              }}
+              onHandleFocus={() => setRouteListSheetHandleFocused(true)}
+              onHandlePointerDown={(event) =>
+                beginSmallScreenSheetDrag(event, {
+                  canClose: false,
+                  requiresDownwardMotion: false,
+                  allowTapToggle: true
+                })
+              }
+              stripId="route-list"
+            />
           ) : null}
           <div data-routes-panel="true">
             <RoutesPanel
@@ -2691,8 +2768,13 @@ export function AppShell() {
       {placePanelStyle && selectedPlace ? (
         <section
           aria-label="Place details"
+          data-small-screen-half-height-px={isSmallScreen ? `${Math.round(smallScreenSheetCollapsedHeightPx)}` : undefined}
           data-route-place-panel={viewTab === "routes" ? "true" : "false"}
           onPointerDown={(event) => {
+            if (isSmallScreenSheetStripPointerDown(event, "place")) {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
+              return;
+            }
             handleSmallScreenSheetContentPointerDown(event, { canClose: true });
           }}
           style={placePanelStyle}
@@ -2753,64 +2835,40 @@ export function AppShell() {
       {placePanelStyle && !selectedPlace && selectedRouteStop ? (
         <section
           aria-label="Place details"
+          data-small-screen-half-height-px={isSmallScreen ? `${Math.round(smallScreenSheetCollapsedHeightPx)}` : undefined}
           data-route-place-panel="true"
           onPointerDown={(event) => {
+            if (isSmallScreenSheetStripPointerDown(event, "route-stop")) {
+              handleSmallScreenSheetTopStripPointerDown(event, { canClose: true });
+              return;
+            }
             handleSmallScreenSheetContentPointerDown(event, { canClose: true });
           }}
           style={placePanelStyle}
         >
           {isSmallScreen ? (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: `${tokens.spacing.sm}px` }}>
-              <button
-                aria-expanded={smallScreenSheetPosition === "full"}
-                aria-label={smallScreenSheetPosition === "full" ? "Collapse details" : "Expand details"}
-                data-sheet-handle="route-stop"
-                onClick={() => {
-                  if (suppressNextHandleClickRef.current) {
-                    suppressNextHandleClickRef.current = false;
-                    return;
-                  }
-                  setSmallScreenSheetDragHeightPx(null);
-                  setSmallScreenSheetPosition((current) => (current === "full" ? "half" : "full"));
-                }}
-                onBlur={() => setRouteStopSheetHandleFocused(false)}
-                onFocus={() => setRouteStopSheetHandleFocused(true)}
-                onPointerDown={(event) =>
-                  beginSmallScreenSheetDrag(event, {
-                    canClose: true,
-                    requiresDownwardMotion: false,
-                    allowTapToggle: true
-                  })
+            <SmallScreenSheetTopStrip
+              expanded={smallScreenSheetPosition === "full"}
+              focused={routeStopSheetHandleFocused}
+              onHandleBlur={() => setRouteStopSheetHandleFocused(false)}
+              onHandleClick={() => {
+                if (suppressNextHandleClickRef.current) {
+                  suppressNextHandleClickRef.current = false;
+                  return;
                 }
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  border: "none",
-                  borderRadius: "999px",
-                  backgroundColor: "transparent",
-                  touchAction: "none",
-                  cursor: "pointer",
-                  padding: 0,
-                  outline: routeStopSheetHandleFocused
-                    ? `2px solid ${tokens.color.accent}`
-                    : "none",
-                  outlineOffset: "2px"
-                }}
-                type="button"
-              >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    display: "block",
-                    width: "36px",
-                    height: "6px",
-                    margin: "0 auto",
-                    borderRadius: "999px",
-                    backgroundColor: tokens.color.divider
-                  }}
-                />
-              </button>
-            </div>
+                setSmallScreenSheetDragHeightPx(null);
+                setSmallScreenSheetPosition((current) => (current === "full" ? "half" : "full"));
+              }}
+              onHandleFocus={() => setRouteStopSheetHandleFocused(true)}
+              onHandlePointerDown={(event) =>
+                beginSmallScreenSheetDrag(event, {
+                  canClose: true,
+                  requiresDownwardMotion: false,
+                  allowTapToggle: true
+                })
+              }
+              stripId="route-stop"
+            />
           ) : null}
           <RouteStopDetailsPanel
             bibliographyById={routeBibliographyById}

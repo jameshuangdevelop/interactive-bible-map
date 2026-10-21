@@ -41,6 +41,44 @@ async function dragInsideElement(page, element, options) {
   await page.mouse.up();
 }
 
+async function stripDragStartRatioX(page, stripLocator, options = {}) {
+  const {
+    minimumDistancePx = 40,
+    closeButtonLocator = null,
+    handleLocator = page.locator("[data-sheet-handle='place']")
+  } = options;
+  const handleBox = await handleLocator.boundingBox();
+  if (!handleBox) {
+    throw new Error("Missing sheet handle bounding box.");
+  }
+  const handleCenterX = handleBox.x + handleBox.width / 2;
+  const closeBox = closeButtonLocator ? await closeButtonLocator.boundingBox() : null;
+  const closeCenterX = closeBox ? closeBox.x + closeBox.width / 2 : null;
+  const stripBox = await stripLocator.boundingBox();
+  if (!stripBox) {
+    throw new Error("Missing strip bounding box.");
+  }
+  const candidateXs = [
+    stripBox.x + 44,
+    stripBox.x + stripBox.width * 0.2,
+    stripBox.x + stripBox.width * 0.8,
+    stripBox.x + stripBox.width - 44
+  ];
+  const safeX = candidateXs.find((candidateX) => {
+    if (Math.abs(candidateX - handleCenterX) < minimumDistancePx) {
+      return false;
+    }
+    if (typeof closeCenterX === "number" && Math.abs(candidateX - closeCenterX) < minimumDistancePx) {
+      return false;
+    }
+    return true;
+  });
+  if (typeof safeX !== "number") {
+    throw new Error("No safe strip drag start point found.");
+  }
+  return (safeX - stripBox.x) / stripBox.width;
+}
+
 async function waitForSheetSettledAtFull(page, sheetSelector) {
   await expect
     .poll(
@@ -121,6 +159,90 @@ async function waitForSheetSettledAtFull(page, sheetSelector) {
       { timeout: SHEET_SETTLE_TIMEOUT_MS }
     )
     .toBe(true);
+}
+
+async function waitForSheetSettledAtHalf(page, sheetSelector) {
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(async ({ selector, fullTopMaxPx }) => {
+          const sheet = document.querySelector(selector);
+          if (!(sheet instanceof HTMLElement)) {
+            return false;
+          }
+
+          const topAtStart = sheet.getBoundingClientRect().top;
+          const viewportHeightPx = window.innerHeight;
+          const expectedHalfHeightPx = Number.parseFloat(
+            sheet.getAttribute("data-small-screen-half-height-px") ?? ""
+          );
+          if (!Number.isFinite(expectedHalfHeightPx)) {
+            return false;
+          }
+          const expectedHalfTopPx = Math.max(0, viewportHeightPx - expectedHalfHeightPx);
+          if (topAtStart <= fullTopMaxPx + 20) {
+            return false;
+          }
+          if (Math.abs(topAtStart - expectedHalfTopPx) > 24) {
+            return false;
+          }
+
+          const stableAcrossFrames = await new Promise((resolve) => {
+            requestAnimationFrame(() => {
+              const top1 = sheet.getBoundingClientRect().top;
+              requestAnimationFrame(() => {
+                const top2 = sheet.getBoundingClientRect().top;
+                resolve(Math.abs(top2 - top1) <= 0.5);
+              });
+            });
+          });
+
+          if (!stableAcrossFrames) {
+            return false;
+          }
+
+          const topAtEnd = sheet.getBoundingClientRect().top;
+          return topAtEnd > fullTopMaxPx + 20 && Math.abs(topAtEnd - expectedHalfTopPx) <= 24;
+        }, { selector: sheetSelector, fullTopMaxPx: SHEET_FULL_TOP_MAX_PX }),
+      { timeout: SHEET_SETTLE_TIMEOUT_MS }
+    )
+    .toBe(true);
+}
+
+async function getControlViewportState(page, selector) {
+  return page.evaluate((controlSelector) => {
+    const control = document.querySelector(controlSelector);
+    if (!(control instanceof HTMLElement)) {
+      return null;
+    }
+    const rect = control.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const ownerAtCenter = document.elementFromPoint(centerX, centerY);
+    return {
+      topPx: Math.round(rect.top),
+      bottomPx: Math.round(rect.bottom),
+      centerInViewport:
+        centerX >= 0 &&
+        centerY >= 0 &&
+        centerX <= window.innerWidth &&
+        centerY <= window.innerHeight,
+      ownsCenterPoint: Boolean(ownerAtCenter && control.contains(ownerAtCenter))
+    };
+  }, selector);
+}
+
+async function waitForPlacePanelReady(page) {
+  const placeSheet = page.locator("section[aria-label='Place details']").first();
+  await expect(placeSheet).toBeVisible();
+  await expect(placeSheet.getByText("Loading details…")).toHaveCount(0);
+}
+
+async function waitForRoutePanelReady(page) {
+  const routeSheet = page.locator("section[aria-label='Route details']").first();
+  await expect(routeSheet).toBeVisible();
+  await expect(routeSheet.getByText("Loading routes…")).toHaveCount(0);
+  await expect(routeSheet.locator("[data-route-stage-index='1']")).toBeVisible();
 }
 
 
@@ -230,6 +352,256 @@ test("tapping body text at full keeps the sheet full @phone", async ({ page, bas
   await expect(handle).toHaveAttribute("aria-expanded", "true");
   const topAfter = (await sheet.boundingBox())?.y ?? 999;
   expect(Math.abs(topAfter - topBefore)).toBeLessThanOrEqual(4);
+});
+
+test("photo arrows stay on-screen even with an unbreakable About token @phone", async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  const sheet = page.locator("section[aria-label='Place details']").first();
+  await expect(sheet).toBeVisible();
+  await expect(page.getByRole("button", { name: "Next image" })).toBeVisible();
+
+  await page.evaluate(() => {
+    const aboutParagraph = document.querySelector(
+      "section[aria-label='Place details'] [data-panel-section='about'] p"
+    );
+    if (!(aboutParagraph instanceof HTMLElement) || aboutParagraph.dataset.m703ProbeInjected === "true") {
+      return;
+    }
+    aboutParagraph.dataset.m703ProbeInjected = "true";
+    aboutParagraph.textContent = `${aboutParagraph.textContent ?? ""} ${"W".repeat(52)}`;
+  });
+
+  const metrics = await page.evaluate(() => {
+    const detailsSheet = document.querySelector("section[aria-label='Place details']");
+    const frame = detailsSheet?.querySelector("[data-panel-photo-frame='true']");
+    const panelBody =
+      detailsSheet?.querySelector("[data-place-panel-body='true']") ??
+      detailsSheet?.querySelector(":scope > div > div:nth-of-type(2)");
+    const nextButton = detailsSheet?.querySelector("button[aria-label='Next image']");
+    const aboutParagraph = detailsSheet?.querySelector("[data-panel-section='about'] p");
+    if (
+      !(detailsSheet instanceof HTMLElement) ||
+      !(panelBody instanceof HTMLElement) ||
+      !(frame instanceof HTMLElement) ||
+      !(nextButton instanceof HTMLButtonElement) ||
+      !(aboutParagraph instanceof HTMLElement)
+    ) {
+      return null;
+    }
+
+    const sheetRect = detailsSheet.getBoundingClientRect();
+    const panelBodyRect = panelBody.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const nextRect = nextButton.getBoundingClientRect();
+    const nextCenterX = nextRect.left + nextRect.width / 2;
+    const nextCenterY = nextRect.top + nextRect.height / 2;
+    const centerElement = document.elementFromPoint(nextCenterX, nextCenterY);
+    const descendants = panelBody.querySelectorAll("*");
+    let widestDescendantPx = 0;
+    descendants.forEach((element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+      widestDescendantPx = Math.max(widestDescendantPx, element.getBoundingClientRect().width);
+    });
+
+    return {
+      sheetRightPx: sheetRect.right,
+      frameRightPx: frameRect.right,
+      panelBodyWidthPx: panelBodyRect.width,
+      widestDescendantPx,
+      aboutParagraphClientWidthPx: aboutParagraph.clientWidth,
+      aboutParagraphScrollWidthPx: aboutParagraph.scrollWidth,
+      nextCenterInViewport:
+        nextCenterX >= 0 &&
+        nextCenterY >= 0 &&
+        nextCenterX <= window.innerWidth &&
+        nextCenterY <= window.innerHeight,
+      nextCenterOwnedByButton: Boolean(centerElement && nextButton.contains(centerElement))
+    };
+  });
+
+  if (!metrics) {
+    throw new Error("Missing sheet, panel body, frame, or next-image button.");
+  }
+  expect(metrics.frameRightPx).toBeLessThanOrEqual(metrics.sheetRightPx + 0.5);
+  expect(metrics.nextCenterInViewport).toBe(true);
+  expect(metrics.nextCenterOwnedByButton).toBe(true);
+  expect(metrics.widestDescendantPx).toBeLessThanOrEqual(metrics.panelBodyWidthPx + 0.5);
+  expect(metrics.aboutParagraphScrollWidthPx).toBeLessThanOrEqual(
+    metrics.aboutParagraphClientWidthPx + 1
+  );
+});
+
+test("dragging from the place top strip moves the sheet while strip taps do nothing @phone", async ({
+  page,
+  baseUrl
+}) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  await waitForPlacePanelReady(page);
+  const placeSheet = page.locator("section[aria-label='Place details']").first();
+  const placeHandle = page.locator("[data-sheet-handle='place']");
+  const placeStrip = page.locator("[data-sheet-drag-strip='place']");
+  const closeButton = page.getByRole("button", { name: "Close place panel" });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
+  await expect(placeStrip).toBeVisible();
+  await waitForSheetSettledAtHalf(page, "section[aria-label='Place details']");
+
+  const placeStripStartRatioX = await stripDragStartRatioX(page, placeStrip, {
+    minimumDistancePx: 40,
+    handleLocator: placeHandle,
+    closeButtonLocator: closeButton
+  });
+  const placeStripBox = await placeStrip.boundingBox();
+  if (!placeStripBox) {
+    throw new Error("Missing place strip bounding box.");
+  }
+  const stripTapX = Math.round(placeStripStartRatioX * placeStripBox.width);
+  await waitForSheetSettledAtHalf(page, "section[aria-label='Place details']");
+  const halfTopBeforeTap = (await placeSheet.boundingBox())?.y ?? 999;
+  await placeStrip.click({ position: { x: stripTapX, y: 22 } });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
+  const halfTopAfterTap = (await placeSheet.boundingBox())?.y ?? 999;
+  expect(Math.abs(halfTopAfterTap - halfTopBeforeTap)).toBeLessThanOrEqual(4);
+
+  await waitForSheetSettledAtHalf(page, "section[aria-label='Place details']");
+  await dragInsideElement(page, placeStrip, {
+    startRatioX: placeStripStartRatioX,
+    startRatioY: 0.5,
+    deltaY: -320
+  });
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
+
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
+  const fullTopBeforeTap = (await placeSheet.boundingBox())?.y ?? 999;
+  await placeStrip.click({ position: { x: stripTapX, y: 22 } });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
+  const fullTopAfterTap = (await placeSheet.boundingBox())?.y ?? 999;
+  expect(Math.abs(fullTopAfterTap - fullTopBeforeTap)).toBeLessThanOrEqual(4);
+
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
+  await dragInsideElement(page, placeStrip, {
+    startRatioX: placeStripStartRatioX,
+    startRatioY: 0.5,
+    deltaY: 320
+  });
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "false");
+});
+
+test("at full, place sheet scrolling keeps the handle and close button in view @phone", async ({
+  page,
+  baseUrl
+}) => {
+  await page.goto(`${baseUrl}/?place=jerusalem`, { waitUntil: "domcontentloaded" });
+  await waitForPlacePanelReady(page);
+  const placeSheet = page.locator("section[aria-label='Place details']").first();
+  const placeHandle = page.locator("[data-sheet-handle='place']");
+  const closeButton = page.getByRole("button", { name: "Close place panel" });
+  const halfContentOwnerState = await page.evaluate(() => {
+    const strip = document.querySelector("[data-sheet-drag-strip-container='place']");
+    const photoFrame = document.querySelector("[data-panel-photo-frame='true']");
+    if (!(strip instanceof HTMLElement) || !(photoFrame instanceof HTMLElement)) {
+      return null;
+    }
+    const frameRect = photoFrame.getBoundingClientRect();
+    const probeElement = document.elementFromPoint(frameRect.left + frameRect.width / 2, frameRect.top + 2);
+    return {
+      photoTop2PxOwnedByContent: Boolean(probeElement && photoFrame.contains(probeElement)),
+      photoTop2PxOwnedByStrip: Boolean(probeElement && strip.contains(probeElement))
+    };
+  });
+  if (!halfContentOwnerState) {
+    throw new Error("Missing half-sheet content ownership probe state.");
+  }
+  expect(halfContentOwnerState.photoTop2PxOwnedByContent).toBe(true);
+  expect(halfContentOwnerState.photoTop2PxOwnedByStrip).toBe(false);
+  await placeHandle.click();
+  await expect(placeHandle).toHaveAttribute("aria-expanded", "true");
+  await waitForSheetSettledAtFull(page, "section[aria-label='Place details']");
+  await placeSheet.evaluate((element) => {
+    element.scrollBy(0, 900);
+  });
+
+  const placeHandleState = await getControlViewportState(page, "[data-sheet-handle='place']");
+  const closeButtonState = await getControlViewportState(page, "[aria-label='Close place panel']");
+  const topEdgeOwnerState = await page.evaluate(() => {
+    const sheet = document.querySelector("section[aria-label='Place details']");
+    const strip = document.querySelector("[data-sheet-drag-strip-container='place']");
+    if (!(sheet instanceof HTMLElement) || !(strip instanceof HTMLElement)) {
+      return null;
+    }
+    const sheetRect = sheet.getBoundingClientRect();
+    const probeElement = document.elementFromPoint(sheetRect.left + sheetRect.width / 2, sheetRect.top + 2);
+    return {
+      top2PxOwnedByStrip: Boolean(probeElement && strip.contains(probeElement))
+    };
+  });
+  if (!placeHandleState || !closeButtonState) {
+    throw new Error("Missing place top controls after scroll.");
+  }
+  if (!topEdgeOwnerState) {
+    throw new Error("Missing top-edge strip probe state.");
+  }
+  expect(placeHandleState.centerInViewport).toBe(true);
+  expect(placeHandleState.ownsCenterPoint).toBe(true);
+  expect(placeHandleState.topPx).toBeGreaterThanOrEqual(0);
+  expect(closeButtonState.centerInViewport).toBe(true);
+  expect(closeButtonState.ownsCenterPoint).toBe(true);
+  expect(closeButtonState.topPx).toBeGreaterThanOrEqual(0);
+  expect(topEdgeOwnerState.top2PxOwnedByStrip).toBe(true);
+
+  await closeButton.click();
+  await expect
+    .poll(async () => (await page.url()).includes("place="), { timeout: SHEET_SETTLE_TIMEOUT_MS })
+    .toBe(false);
+});
+
+test("dragging from the route-list top strip moves the sheet while strip taps do nothing @phone", async ({
+  page,
+  baseUrl
+}) => {
+  await page.goto(`${baseUrl}/?tab=routes&route=paul-1&stage=6`, { waitUntil: "domcontentloaded" });
+  await waitForRoutePanelReady(page);
+  await waitForSheetSettledAtHalf(page, "section[aria-label='Route details']");
+  const routeListHandle = page.locator("[data-sheet-handle='route-list']");
+  const routeListStrip = page.locator("[data-sheet-drag-strip='route-list']");
+  await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
+  await expect(routeListStrip).toBeVisible();
+  const routeStripStartRatioX = await stripDragStartRatioX(page, routeListStrip, {
+    minimumDistancePx: 40,
+    handleLocator: routeListHandle
+  });
+  const routeStripBox = await routeListStrip.boundingBox();
+  if (!routeStripBox) {
+    throw new Error("Missing route strip bounding box.");
+  }
+  const routeDragStartY = routeStripBox.y + routeStripBox.height * 0.5;
+  const routeDragDeltaY = Math.min(-320, 12 - routeDragStartY);
+  await dragInsideElement(page, routeListStrip, {
+    startRatioX: routeStripStartRatioX,
+    startRatioY: 0.5,
+    deltaY: routeDragDeltaY,
+    steps: 18
+  });
+  await expect
+    .poll(async () => await routeListHandle.getAttribute("aria-expanded"), {
+      timeout: SHEET_SETTLE_TIMEOUT_MS
+    })
+    .toBe("true");
+
+  await page.locator("section[aria-label='Route details']").evaluate((element) => {
+    element.scrollBy(0, 600);
+  });
+  const routeHandleState = await getControlViewportState(page, "[data-sheet-handle='route-list']");
+  if (!routeHandleState) {
+    throw new Error("Missing route-list handle after scroll.");
+  }
+  expect(routeHandleState.centerInViewport).toBe(true);
+  expect(routeHandleState.ownsCenterPoint).toBe(true);
+  expect(routeHandleState.topPx).toBeGreaterThanOrEqual(0);
+  await routeListHandle.click();
+  await expect(routeListHandle).toHaveAttribute("aria-expanded", "false");
 });
 
 test("downward drags in scrolled content do not move the full sheet @phone", async ({ page, baseUrl }) => {
