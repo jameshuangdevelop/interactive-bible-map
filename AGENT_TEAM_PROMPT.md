@@ -37,7 +37,7 @@ A Google-Maps-style, 2D interactive web map of New Testament locations, with the
    - Keep output short: diffs over full rewrites; no repeating context; summaries under 200 words unless asked.
    - Read only the files you need. Use `docs/` as shared memory instead of re-researching.
    - Use the cheapest model that can do the task well (see §3).
-   - Every PR appends a row to `docs/BUDGET.md` (date, agent, model, task, estimated tokens in/out, AI credits used, running monthly total in AI credits).
+   - Every PR's description carries its budget row (date, agent, model, task, estimated tokens in/out, AI credits used). The PO copies the rows, with the running monthly total in AI credits, into `docs/BUDGET.md` in a docs PR after each batch of merges (ADR-0051).
    - At **80%** of the monthly budget the PO stops starting new milestones. At **95%**, all agents stop at a clean handoff point, update `docs/PROGRESS.md` with the exact resume point, and open or refresh a "Paused – budget" PR/issue.
 
 ---
@@ -142,7 +142,7 @@ Each checkpoint = a PR labeled `checkpoint`, with a summary, decisions needed, a
 - [ ] CI green (lint, type-check, tests, data schema validation)
 - [ ] Data changes: sources cited, Fact-Checker sign-off, `ATTRIBUTION.md` updated
 - [ ] Images: license + author + source stored and shown; AI images labeled
-- [ ] Row appended to `docs/BUDGET.md`; `docs/PROGRESS.md` updated
+- [ ] Budget row and status in the PR description; the PO copies them into `docs/BUDGET.md` and `docs/PROGRESS.md` (ADR-0051)
 - [ ] PR Reviewer comments addressed or explicitly deferred to `BACKLOG.md`
 - [ ] GIS/new concepts briefly explained with a learning link for the human
 
@@ -160,5 +160,5 @@ Each checkpoint = a PR labeled `checkpoint`, with a summary, decisions needed, a
 - **One session = one task = one branch.** At the start, the agent creates or switches to the branch named in its task. At the end, it commits with a conventional message and prints the exact `git push` and `gh pr create` commands for the human to run.
 - **Handoffs:** the PO does not start other agents itself. For each task it writes a ready-to-paste task card to `docs/tasks/<id>.md` with: agent, model, branch, inputs, expected outputs and acceptance criteria. The human opens a new chat with that agent and pastes the card. Parallel work = several task cards on separate branches.
 - **PR review:** the human starts the `pr-reviewer` agent on the PR branch (or uses Copilot code review on github.com if enabled). The reviewer writes its findings as a PR comment the human can paste, or as a `gh pr review` command.
-- **Keeping context small:** every session starts by reading only `AGENT_TEAM_PROMPT.md`, `docs/PROGRESS.md` and its task card. It ends by updating `docs/PROGRESS.md` and `docs/BUDGET.md`. AI credits are taken from the tool's usage view where it shows them (otherwise estimated from tokens and the model's rate, see `docs/BUDGET.md`); tokens are estimates.
+- **Keeping context small:** every session starts by reading only `AGENT_TEAM_PROMPT.md`, `docs/PROGRESS.md` and its task card. It ends by putting its status and budget row in its PR description; the PO copies them into `docs/PROGRESS.md` and `docs/BUDGET.md` (ADR-0051). AI credits are taken from the tool's usage view where it shows them (otherwise estimated from tokens and the model's rate, see `docs/BUDGET.md`); tokens are estimates.
 - If the cloud agent is enabled later, the same agent files and task cards are used unchanged. Record the switch in `docs/DECISIONS.md`.

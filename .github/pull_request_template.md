@@ -12,7 +12,8 @@
 ## Definition of done
 - [ ] One task only; branch prefix is `feat/`, `data/`, `docs/`, `chore/` or `fix/`
 - [ ] CI green (lint, type-check, tests, data schema validation), or "no CI yet" before it exists
-- [ ] `docs/PROGRESS.md` updated
+- [ ] Branched from `main`, not stacked on another PR, and merges into it cleanly (ADR-0051)
+- [ ] Status for `docs/PROGRESS.md` given in this description; the PO copies it (ADR-0051)
 - [ ] PR Reviewer findings addressed, or deferred to `BACKLOG.md` with a reason
 - [ ] New GIS or web concepts explained below, each with a learning link
 
@@ -27,7 +28,7 @@
 - [ ] AI reconstructions are labeled "AI-generated reconstruction"
 
 ## Budget
-- [ ] Row appended to `docs/BUDGET.md`
+- [ ] Budget row in the table below; the PO copies it into `docs/BUDGET.md` (ADR-0051)
 
 | Tokens in / out (est.) | AI credits | Month total |
 |---|---:|---:|

@@ -1,6 +1,6 @@
 # Progress
 
-Shared memory for all agents. Every session reads this first and updates its own task row before committing.
+Shared memory for all agents. Every session reads this first. Only the PO edits it, in a docs PR after each batch of merges (ADR-0051). Other PRs give their status in their description, and agents report open questions to the PO.
 
 **Current milestone:** M5 – Routes Tab (CP4 approved 2026-10-12, #58) · **Status:** M5-00 to M5-03 merged (#60 to #64); the lines (M5-04, #65) and the route text (M5-06, #66) verified and in PRs; the Routes tab (M5-05), the route places (M5-07), names instead of pins (M5-08) and the phone-title fix are done and unpushed; the human's MC12 play-test (2026-10-18) led to ADR-0044, built by M5-09 (names like Google Maps'), M5-10 (borders like Google Maps') and M5-11 (the ancient lands left undrawn), which go to the human together at MC13 · **Budget used this month:** see [BUDGET.md](BUDGET.md)
 

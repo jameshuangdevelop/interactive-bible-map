@@ -1,6 +1,6 @@
 # Decisions (ADR log)
 
-Lightweight architecture decision records, oldest first. Each ADR has a status: **Proposed** (waiting for the human at a checkpoint), **Accepted**, or **Superseded by ADR-xxxx**. To change a decision, add a new ADR; do not edit an accepted one.
+Lightweight architecture decision records, oldest first. From ADR-0051 on, each decision is its own file in `docs/decisions/`. Each ADR has a status: **Proposed** (waiting for the human at a checkpoint), **Accepted**, or **Superseded by ADR-xxxx**. To change a decision, add a new ADR; do not edit an accepted one.
 
 ---
 
@@ -50,12 +50,14 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Date:** 2026-09-22 · **Status:** Accepted · **By:** PO
 - **Decision:** A task ID is `M<milestone>-<nn>` (for example `M1-01`). Each card lives at `docs/tasks/<ID>-<slug>.md`. Branch prefixes follow brief §6. Parallel tasks edit only their own row in `docs/PROGRESS.md` and only append to `docs/BUDGET.md`, which keeps merge conflicts trivial. PR bodies and review text are written to `.git/PR_BODY.md` and `.git/REVIEW-<n>.md`, inside `.git/`, so they are never committed.
 - **Consequences:** When two parallel PRs touch the same shared file, the second one to merge rebases and re-applies its one-row change.
+- **Update, 2026-10-21:** amended by ADR-0051. PRs no longer edit `docs/PROGRESS.md` or `docs/BUDGET.md`; the PO copies their rows in a docs PR after each batch of merges.
 
 ## ADR-0007 — The PO can dispatch task cards as Copilot CLI subagents
 - **Date:** 2026-09-23 · **Status:** Accepted · **By:** PO, at the human's request ("continue driving the project"). This amends ADR-0002.
 - **Context:** Under ADR-0002, the human pastes each card into a new VS Code chat. After CP0, the human asked the PO to drive the project from Copilot CLI, which can run subagents with a chosen model.
 - **Decision:** When the human asks the PO to drive, the PO runs each task card as a Copilot CLI subagent. The subagent uses the model from ADR-0003 and follows the role's agent file. Parallel tasks each get their own git worktree under `.worktrees/`, excluded locally through `.git/info/exclude`, so their branches never collide. Subagents only commit. The PO then checks each result against its card, runs the PR Reviewer (following ADR-0004), and asks the human before every push, PR or PR comment. Checkpoint approvals and merges stay with the human. Pasting cards into VS Code chats (ADR-0002) remains a valid alternative.
 - **Consequences:** Fewer manual handoffs, and still one task = one branch = one PR. Subagent sessions have no usage view of their own, so their credits are estimates. The PO reconciles them with GitHub's billing report at each checkpoint. Parallel branches all edit neighbouring rows in `docs/PROGRESS.md` and `docs/BUDGET.md`, so before pushing, the PO rebases the finished branches into one linear stack and resolves those rows locally. Each PR says which PR it is stacked on, and the human merges them in that order, so no merge conflicts reach GitHub.
+- **Update, 2026-10-21:** ADR-0051 supersedes the stacking in the consequences. PRs no longer edit the two ledgers, so they no longer need stacking: every PR branches from `main`.
 
 ## ADR-0008 — Map library: MapLibre
 - **Date:** 2026-09-23 · **Status:** Accepted (CP1, 2026-09-23, #7) · **By:** PO, from M1-02 ([STACK_OPTIONS.md](research/STACK_OPTIONS.md) §1)
@@ -391,7 +393,7 @@ Lightweight architecture decision records, oldest first. Each ADR has a status: 
 - **Update (2026-10-14, the PO, from M5-04's audit): stops away from the water.** Some stops of stages by sea lie inland or inside an island: Antioch in Syria, about 25 km up the Orontes from its port; Philippi, Perga, Myra, and Ephesus and Miletus behind today's silted shore; and the sites given for Samos, Samothrace, Cos and Malta. Such a line goes by sea to the coast nearest the stop, then over land to the stop. That approach may be up to 30 km, must cross no water, and is recorded in the line's provenance with its length; the audit checks it as a line by land. Giving island stops a harbour town from sources waits for the M6 batch that makes stops into places.
 
 ## ADR-0039 — Stacked PRs target `main`
-- **Date:** 2026-10-12 · **Status:** Accepted · **By:** PO, after the M4 stack merged into its own branches. This amends ADR-0007.
+- **Date:** 2026-10-12 · **Status:** Superseded by ADR-0051 (`docs/decisions/0051-every-pr-merges-on-its-own.md`) · **By:** PO, after the M4 stack merged into its own branches. This amends ADR-0007.
 - **Context:** ADR-0007 has the PO stack finished branches, and each PR in M4's stack targeted the branch below it. On 2026-10-12 the human merged #51 to #58 in order. #51 merged into `main`, but each of the others merged into the branch below it, because GitHub moves a PR's target to `main` only when the branch below it is deleted, and ADR-0023's clean-up comes after the merges. So only #51 reached `main` and the live site. #59 brought the top of the stack, which holds all seven, into `main`.
 - **Decision:** Every PR in a stack targets `main`. Its description says which PR it's stacked on, that its list of changes includes that PR's until it merges, and gives a link that shows its own changes only. The human merges the stack in order, as before; a PR merged early brings the ones below it along, so nothing is stranded. After a stack merges, the PO checks that `main` holds its top before deleting branches (ADR-0023).
 - **Consequences:** No repository setting changes. Until the PRs below it merge, a PR's "Files changed" tab on GitHub shows their changes too, so reviews use each PR's own link.

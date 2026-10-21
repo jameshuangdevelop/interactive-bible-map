@@ -11,7 +11,7 @@
 | Session guard | 10,000 per agent session (ADR-0025) | The agent stops at a clean point and hands off. A session this large usually means a loop or an oversized task. |
 
 ## How to record usage
-- Every PR appends one row to the current month's ledger below. The PR Reviewer does not commit, so it puts its row in the review comment and the PO copies it here at the next checkpoint.
+- Every PR puts its row in its description, and the PR Reviewer puts its row in its review comment. After each batch of merges, the PO copies them into the current month's ledger below in one docs PR. No other PR edits this file (ADR-0051).
 - **AI credits**: if your tool shows the credits the session used (in Copilot CLI, run `/usage`), record that figure. Otherwise estimate it from the rates below, add 50% for cache writes and cache misses (the same allowance the forecast uses), and prefix the estimate with `~`.
 - **Tokens in / out** (rough estimates, used only to spot sessions that read too much): *in* is the context-window total at session end (VS Code: hover over the context indicator in the chat input; Copilot CLI: `/context`), and *out* is the generated text, about characters written ÷ 4.
 - **Month total** is the previous row's total plus this row's credits. Parallel branches may start from the same previous total, so the PO recomputes it at each checkpoint and reconciles it with GitHub's billing usage report, which is authoritative (ADR-0005).
