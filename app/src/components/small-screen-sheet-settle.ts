@@ -13,6 +13,27 @@ export interface SettleSmallScreenSheetPositionInput {
   fullHeightPx: number;
 }
 
+export function resolveSheetReleaseVelocity(input: {
+  trackedVelocityYPxPerMs: number;
+  releaseVelocityYPxPerMs: number;
+  elapsedSinceLastMoveMs: number;
+  releaseVelocityMinSampleMs: number;
+}) {
+  const {
+    trackedVelocityYPxPerMs,
+    releaseVelocityYPxPerMs,
+    elapsedSinceLastMoveMs,
+    releaseVelocityMinSampleMs
+  } = input;
+  if (
+    elapsedSinceLastMoveMs >= releaseVelocityMinSampleMs &&
+    Math.abs(releaseVelocityYPxPerMs) > Math.abs(trackedVelocityYPxPerMs)
+  ) {
+    return releaseVelocityYPxPerMs;
+  }
+  return trackedVelocityYPxPerMs;
+}
+
 export function sheetHeightForPosition(
   position: SmallScreenSheetPosition,
   halfHeightPx: number,

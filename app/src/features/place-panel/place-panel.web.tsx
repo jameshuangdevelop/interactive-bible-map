@@ -46,6 +46,7 @@ import {
   buildCommonsThumbnailUrl,
   selectCommonsThumbnailWidthForFrame
 } from "./commons-thumbnail";
+import { SmallScreenSheetTopStrip } from "../../components/small-screen-sheet-top-strip.web";
 import { tokens } from "../../theme/tokens";
 
 const PANEL_SECTION_GAP = tokens.spacing.lg;
@@ -1692,89 +1693,49 @@ export function PlacePanel({
       </p>
     </>
   );
-  const smallScreenSheetHandleStyle: CSSProperties = {
-    width: "44px",
-    height: "44px",
-    border: "none",
-    borderRadius: "999px",
-    backgroundColor: "transparent",
-    touchAction: "none",
-    cursor: "pointer",
-    position: "absolute",
-    left: "50%",
-    transform: "translateX(-50%)",
-    top: 0,
-    outline: sheetHandleFocused ? `2px solid ${tokens.color.accent}` : "none",
-    outlineOffset: "2px"
-  };
-  const smallScreenStripDragTargetStyle: CSSProperties = {
-    position: "absolute",
-    inset: 0,
-    border: "none",
-    padding: 0,
-    margin: 0,
-    background: "transparent",
-    touchAction: "none",
-    cursor: "grab"
-  };
-
   if (isLoading && !location) {
     return (
       <div>
-        <header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            position: "relative",
-            minHeight: "44px",
-            touchAction: isSmallScreen ? "none" : undefined,
-            marginBottom: `${tokens.spacing.md}px`
-          }}
-        >
-          {isSmallScreen ? (
-            <div
-              aria-hidden="true"
-              data-sheet-drag-strip="place"
-              style={smallScreenStripDragTargetStyle}
-            />
-          ) : null}
-          {isSmallScreen ? (
+        {isSmallScreen ? (
+          <SmallScreenSheetTopStrip
+            expanded={isSmallScreenExpanded}
+            focused={sheetHandleFocused}
+            onHandleBlur={() => setSheetHandleFocused(false)}
+            onHandleClick={onToggleSmallScreenExpanded}
+            onHandleFocus={() => setSheetHandleFocused(true)}
+            onHandlePointerDown={onSmallScreenHandlePointerDown}
+            rightAction={(
+              <button
+                aria-label="Close place panel"
+                onClick={onClose}
+                style={closeButtonStyle}
+                type="button"
+              >
+                ×
+              </button>
+            )}
+            stripId="place"
+          />
+        ) : (
+          <header
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              minHeight: "44px",
+              marginBottom: `${tokens.spacing.md}px`
+            }}
+          >
             <button
-              aria-expanded={isSmallScreenExpanded}
-              aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
-              data-sheet-handle="place"
-              onBlur={() => setSheetHandleFocused(false)}
-              onFocus={() => setSheetHandleFocused(true)}
-              onPointerDown={onSmallScreenHandlePointerDown}
-              onClick={onToggleSmallScreenExpanded}
-              style={{ ...smallScreenSheetHandleStyle, zIndex: 1 }}
+              aria-label="Close place panel"
+              onClick={onClose}
+              style={closeButtonStyle}
               type="button"
             >
-              <span
-                aria-hidden="true"
-                style={{
-                  display: "block",
-                  width: "36px",
-                  height: "6px",
-                  margin: "0 auto",
-                  borderRadius: "999px",
-                  backgroundColor: tokens.color.divider
-                }}
-              />
+              ×
             </button>
-          ) : (
-            <span />
-          )}
-          <button
-            aria-label="Close place panel"
-            onClick={onClose}
-            style={{ ...closeButtonStyle, position: "relative", zIndex: 1 }}
-            type="button"
-          >
-            ×
-          </button>
-        </header>
+          </header>
+        )}
         <h1 style={panelTitleStyle}>
           {titleName}
         </h1>
@@ -1794,60 +1755,46 @@ export function PlacePanel({
 
   return (
     <div style={{ minWidth: 0, maxWidth: "100%" }}>
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          position: "relative",
-          minHeight: "44px",
-          touchAction: isSmallScreen ? "none" : undefined,
-          marginBottom: `${tokens.spacing.md}px`
-        }}
-      >
-        {isSmallScreen ? (
-          <div
-            aria-hidden="true"
-            data-sheet-drag-strip="place"
-            style={smallScreenStripDragTargetStyle}
-          />
-        ) : null}
       {isSmallScreen ? (
-        <button
-            aria-expanded={isSmallScreenExpanded}
-            aria-label={isSmallScreenExpanded ? "Collapse details" : "Expand details"}
-            data-sheet-handle="place"
-            onBlur={() => setSheetHandleFocused(false)}
-            onFocus={() => setSheetHandleFocused(true)}
-            onPointerDown={onSmallScreenHandlePointerDown}
-            onClick={onToggleSmallScreenExpanded}
-            style={{ ...smallScreenSheetHandleStyle, zIndex: 1 }}
+        <SmallScreenSheetTopStrip
+          expanded={isSmallScreenExpanded}
+          focused={sheetHandleFocused}
+          onHandleBlur={() => setSheetHandleFocused(false)}
+          onHandleClick={onToggleSmallScreenExpanded}
+          onHandleFocus={() => setSheetHandleFocused(true)}
+          onHandlePointerDown={onSmallScreenHandlePointerDown}
+          rightAction={(
+            <button
+              aria-label="Close place panel"
+              onClick={onClose}
+              style={closeButtonStyle}
+              type="button"
+            >
+              ×
+            </button>
+          )}
+          stripId="place"
+        />
+      ) : (
+        <header
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            minHeight: "44px",
+            marginBottom: `${tokens.spacing.md}px`
+          }}
+        >
+          <button
+            aria-label="Close place panel"
+            onClick={onClose}
+            style={closeButtonStyle}
             type="button"
           >
-            <span
-              aria-hidden="true"
-              style={{
-                display: "block",
-                width: "36px",
-                height: "6px",
-                margin: "0 auto",
-                borderRadius: "999px",
-                backgroundColor: tokens.color.divider
-              }}
-            />
+            ×
           </button>
-        ) : (
-          <span />
-        )}
-        <button
-          aria-label="Close place panel"
-          onClick={onClose}
-          style={{ ...closeButtonStyle, position: "relative", zIndex: 1 }}
-          type="button"
-        >
-          ×
-        </button>
-      </header>
+        </header>
+      )}
 
       <div
         data-place-panel-body="true"
