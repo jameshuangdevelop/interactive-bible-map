@@ -70,16 +70,22 @@ const mapLayerIds = {
   majorClusterLabelLayers: [],
   clusterPins: "ibm-cluster-circle",
   majorPins: "ibm-major-pin",
-  majorPinLabels: ["ibm-major-pin"],
+  majorPinsNoDot: "ibm-major-pin-no-dot",
+  majorPinLabels: ["ibm-major-pin", "ibm-major-pin-no-dot"],
   cityPins: "ibm-city-pin",
+  cityPinsNoDot: "ibm-city-pin-no-dot",
   sitePins: "ibm-site-pin",
+  sitePinsNoDot: "ibm-site-pin-no-dot",
   candidatePins: "ibm-candidate-pin",
   pinLabels: [
     "ibm-major-pin",
+    "ibm-major-pin-no-dot",
     "ibm-routes-major-pin",
     "ibm-city-pin",
+    "ibm-city-pin-no-dot",
     "ibm-routes-city-pin",
     "ibm-site-pin",
+    "ibm-site-pin-no-dot",
     "ibm-routes-site-pin",
     "ibm-pin-label-standard",
     "ibm-selected-major-pin-label",
@@ -107,8 +113,8 @@ const allMajorClusterPinLayerIds = mapLayerIds.majorClusterPins ? [mapLayerIds.m
 const allMajorClusterLabelLayerIds = [...mapLayerIds.majorClusterLabelLayers];
 const allClusterPinLayerIds = [...allMajorClusterPinLayerIds, mapLayerIds.clusterPins];
 const allClusterLabelLayerIds = [...allMajorClusterLabelLayerIds, mapLayerIds.clusterPins];
-const allMajorPinLayerIds = [mapLayerIds.majorPins];
-const allCityPinLayerIds = [...allMajorPinLayerIds, mapLayerIds.cityPins];
+const allMajorPinLayerIds = [mapLayerIds.majorPins, mapLayerIds.majorPinsNoDot];
+const allCityPinLayerIds = [...allMajorPinLayerIds, mapLayerIds.cityPins, mapLayerIds.cityPinsNoDot];
 const selectedPlaceLabelLayerIds = ["ibm-selected-major-pin-label", "ibm-selected-pin-label"];
 const expectedMajorPinPlaceIds = [
   "jerusalem",
@@ -2920,6 +2926,7 @@ async function verifyPointerCursorAndNearPinClick(page, baseUrl) {
         ...allClusterLabelLayerIds,
         mapLayerIds.candidatePins,
         mapLayerIds.sitePins,
+        mapLayerIds.sitePinsNoDot,
         "ibm-routes-site-pin",
         ...allCityPinLayerIds,
         "ibm-routes-major-pin",
@@ -4881,7 +4888,7 @@ async function verifyNoTimelineUiOnDefaultBuild(page, baseUrl) {
 
 async function buildFixtureGeneratedOutput() {
   const outputDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "ibm-m4-05-fixture-generated-"));
-  const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, ancientEmpireEdgeData, bibliography] =
+  const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, regionOutlinesData, ancientEmpireEdgeData, bibliography] =
     await Promise.all([
       fs
         .readFile(path.join(fixtureAncientSourceDirectory, "timeline.json"), "utf8")
@@ -4894,6 +4901,9 @@ async function buildFixtureGeneratedOutput() {
         .then((content) => JSON.parse(content)),
       fs
         .readFile(path.join(fixtureAncientSourceDirectory, "geo", "ancient-coastline.geojson"), "utf8")
+        .then((content) => JSON.parse(content)),
+      fs
+        .readFile(path.join(fixtureAncientSourceDirectory, "geo", "region-outlines.geojson"), "utf8")
         .then((content) => JSON.parse(content)),
       readJsonIfExists(path.join(fixtureAncientSourceDirectory, "geo", "ancient-empire-edge.geojson")),
       fs.readFile(bibliographyPath, "utf8").then((content) => JSON.parse(content))
@@ -4910,6 +4920,7 @@ async function buildFixtureGeneratedOutput() {
     ancientAreasData,
     ancientRoadsData,
     ancientCoastlineData,
+    regionOutlinesData,
     ancientEmpireEdgeData,
     bibliographyById,
     outputDirectory
@@ -5256,6 +5267,7 @@ async function verifyAreaLabelsAvoidPins(page, url) {
         ...allClusterPinLayerIds,
         ...allCityPinLayerIds,
         mapLayerIds.sitePins,
+        mapLayerIds.sitePinsNoDot,
         mapLayerIds.candidatePins
       ]
     }
@@ -7336,10 +7348,13 @@ async function verifyMajorPlacesRemainCoveredAcrossZooms(page, baseUrl) {
 // Every layer that draws our places' or a route's names.
 const nameLayerIds = [
   "ibm-major-pin",
+  "ibm-major-pin-no-dot",
   "ibm-routes-major-pin",
   "ibm-city-pin",
+  "ibm-city-pin-no-dot",
   "ibm-routes-city-pin",
   "ibm-site-pin",
+  "ibm-site-pin-no-dot",
   "ibm-routes-site-pin",
   "ibm-pin-label-standard",
   "ibm-selected-major-pin-label",
@@ -7495,7 +7510,14 @@ async function verifyTouchTapTargetOnNames(browser, baseUrl) {
 
     const offsetProbe = await page.evaluate((testHookKey) => {
       const map = window[testHookKey];
-      const labelLayers = ["ibm-city-pin", "ibm-site-pin", "ibm-major-pin"];
+      const labelLayers = [
+        "ibm-city-pin",
+        "ibm-city-pin-no-dot",
+        "ibm-site-pin",
+        "ibm-site-pin-no-dot",
+        "ibm-major-pin",
+        "ibm-major-pin-no-dot"
+      ];
       const hitsPlaceAt = (x, y, placeId) =>
         map
           .queryRenderedFeatures(
@@ -10966,7 +10988,16 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
       return {
         lineCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-lines-foreground"] }).length,
         stopCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-routes-stops"] }).length,
-        placePinCount: map.queryRenderedFeatures(undefined, { layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"] }).length
+        placePinCount: map.queryRenderedFeatures(undefined, {
+          layers: [
+            "ibm-city-pin",
+            "ibm-city-pin-no-dot",
+            "ibm-major-pin",
+            "ibm-major-pin-no-dot",
+            "ibm-site-pin",
+            "ibm-site-pin-no-dot"
+          ]
+        }).length
       };
     }, mapTestHookKey);
     if (!routeListNoLineState || routeListNoLineState.lineCount > 0 || routeListNoLineState.stopCount > 0) {
@@ -11330,7 +11361,14 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
         basePlaceVisibilityByZoom.push({
           zoom,
           pinCount: map.queryRenderedFeatures(undefined, {
-            layers: ["ibm-city-pin", "ibm-major-pin", "ibm-site-pin"]
+            layers: [
+              "ibm-city-pin",
+              "ibm-city-pin-no-dot",
+              "ibm-major-pin",
+              "ibm-major-pin-no-dot",
+              "ibm-site-pin",
+              "ibm-site-pin-no-dot"
+            ]
           }).length
         });
       }
@@ -11712,10 +11750,13 @@ async function verifyRoutesTabRealDataScenarios(browser, baseUrl) {
           .queryRenderedFeatures(undefined, {
             layers: [
               "ibm-major-pin",
+              "ibm-major-pin-no-dot",
               "ibm-routes-major-pin",
               "ibm-city-pin",
+              "ibm-city-pin-no-dot",
               "ibm-routes-city-pin",
               "ibm-site-pin",
+              "ibm-site-pin-no-dot",
               "ibm-routes-site-pin",
               "ibm-selected-major-pin-label",
               "ibm-selected-site-pin-label",

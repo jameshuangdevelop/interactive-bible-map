@@ -1328,6 +1328,7 @@ export async function buildAncientAppData({
   ancientAreasData,
   ancientRoadsData,
   ancientCoastlineData,
+  regionOutlinesData,
   bibliographyById = new Map(),
   ancientEmpireEdgeData = null,
   majorPlacePinCoordinates = [],
@@ -1445,6 +1446,23 @@ export async function buildAncientAppData({
         features: (ancientCoastlineData.features ?? []).map((feature) => ({
           ...feature,
           geometry: roundGeometry(feature.geometry)
+        }))
+      }
+    )
+  );
+
+  writtenFiles.push(
+    await writeJsonWithSize(
+      outputDirectory,
+      "ancient.region-outlines.json",
+      {
+        type: "FeatureCollection",
+        features: (regionOutlinesData?.features ?? []).map((feature) => ({
+          ...feature,
+          properties: {
+            ...feature.properties
+          },
+          geometry: roundGeometry(feature.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
         }))
       }
     )

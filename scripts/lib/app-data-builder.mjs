@@ -17,6 +17,7 @@ const DEFAULT_BIBLIOGRAPHY_PATH = path.join(repositoryRoot, "data", "bibliograph
 const DEFAULT_OUTPUT_DIRECTORY = path.join(repositoryRoot, "app", "public", "generated");
 // ADR-0037, update of 2026-10-19.
 const DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES = 330_000;
+const DEFAULT_MAX_ANCIENT_REGION_OUTLINES_GZIP_BYTES = 25_000;
 const DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES = 100_000;
 const DEFAULT_ROUTES_FIXTURE_DIRECTORY = path.join(
   repositoryRoot,
@@ -180,7 +181,10 @@ export async function buildAppData(options = {}) {
     options.ancientCoastlinePath ??
       path.join(ancientDataRoot, "geo", "ancient-coastline.geojson")
   );
-  // Optional: when this file is missing the other ancient files are still built.
+  const regionOutlinesPath = path.resolve(
+    options.regionOutlinesPath ??
+      path.join(path.dirname(ancientAreasPath), "region-outlines.geojson")
+  );
   const ancientEmpireEdgePath = path.resolve(
     options.ancientEmpireEdgePath ??
       path.join(ancientDataRoot, "geo", "ancient-empire-edge.geojson")
@@ -191,6 +195,8 @@ export async function buildAppData(options = {}) {
   const outputDirectory = path.resolve(options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY);
   const maxAncientLayerGzipBytes =
     options.maxAncientLayerGzipBytes ?? DEFAULT_MAX_ANCIENT_LAYER_GZIP_BYTES;
+  const maxAncientRegionOutlinesGzipBytes =
+    options.maxAncientRegionOutlinesGzipBytes ?? DEFAULT_MAX_ANCIENT_REGION_OUTLINES_GZIP_BYTES;
   const maxRoutesLayerGzipBytes =
     options.maxRoutesLayerGzipBytes ?? DEFAULT_MAX_ROUTES_LAYER_GZIP_BYTES;
 
@@ -399,11 +405,12 @@ export async function buildAppData(options = {}) {
     routesBuild.fixtureGenerated = true;
   }
 
-  const [timelineExists, areasExists, roadsExists, coastlineExists] = await Promise.all([
+  const [timelineExists, areasExists, roadsExists, coastlineExists, regionOutlinesExists] = await Promise.all([
     pathExists(resolvedTimelinePath),
     pathExists(ancientAreasPath),
     pathExists(ancientRoadsPath),
-    pathExists(ancientCoastlinePath)
+    pathExists(ancientCoastlinePath),
+    pathExists(regionOutlinesPath)
   ]);
 
   let ancientBuild = {
@@ -412,18 +419,27 @@ export async function buildAppData(options = {}) {
       "Skipped ancient generated files because timeline or ancient geo source files are missing.",
     gzipBytes: 0,
     maxGzipBytes: maxAncientLayerGzipBytes,
+    regionOutlinesGzipBytes: 0,
+    maxRegionOutlinesGzipBytes: maxAncientRegionOutlinesGzipBytes,
     roadJoinCount: 0,
     roadJoinTotalLengthKm: 0,
     roadJoinMaxLengthKm: 0
   };
 
+  if (timelineExists && areasExists && roadsExists && coastlineExists && !regionOutlinesExists) {
+    throw new Error(
+      `Ancient build requires region outlines source '${path.relative(repositoryRoot, regionOutlinesPath)}'; run node scripts/build-region-outlines.mjs first.`
+    );
+  }
+
   if (timelineExists && areasExists && roadsExists && coastlineExists) {
-    const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData] =
+    const [timelineData, ancientAreasData, ancientRoadsData, ancientCoastlineData, regionOutlinesData] =
       await Promise.all([
         readJsonFile(resolvedTimelinePath),
         readJsonFile(ancientAreasPath),
         readJsonFile(ancientRoadsPath),
-        readJsonFile(ancientCoastlinePath)
+        readJsonFile(ancientCoastlinePath),
+        readJsonFile(regionOutlinesPath)
       ]);
     const ancientEmpireEdgeData = (await pathExists(ancientEmpireEdgePath))
       ? await readJsonFile(ancientEmpireEdgePath)
@@ -433,18 +449,27 @@ export async function buildAppData(options = {}) {
       ancientAreasData,
       ancientRoadsData,
       ancientCoastlineData,
+      regionOutlinesData,
       bibliographyById,
       ancientEmpireEdgeData,
       majorPlacePinCoordinates,
       outputDirectory
     });
-    const ancientLayerGzipBytes = ancientBuildResult.writtenFiles.reduce(
-      (sum, file) => sum + file.gzipBytes,
-      0
+    const regionOutlinesFile = ancientBuildResult.writtenFiles.find(
+      (file) => file.file === "ancient.region-outlines.json"
     );
+    const regionOutlinesGzipBytes = regionOutlinesFile?.gzipBytes ?? 0;
+    if (regionOutlinesGzipBytes > maxAncientRegionOutlinesGzipBytes) {
+      throw new Error(
+        `Ancient region outlines exceed ${maxAncientRegionOutlinesGzipBytes} bytes gzip (${regionOutlinesGzipBytes} bytes).`
+      );
+    }
+    const ancientLayerGzipBytes = ancientBuildResult.writtenFiles
+      .filter((file) => file.file !== "ancient.region-outlines.json")
+      .reduce((sum, file) => sum + file.gzipBytes, 0);
     if (ancientLayerGzipBytes > maxAncientLayerGzipBytes) {
       throw new Error(
-        `Ancient layer generated files exceed ${maxAncientLayerGzipBytes} bytes gzip (${ancientLayerGzipBytes} bytes).`
+        `Ancient startup layer generated files exceed ${maxAncientLayerGzipBytes} bytes gzip (${ancientLayerGzipBytes} bytes), excluding ancient.region-outlines.json which is lazily loaded.`
       );
     }
     outputFiles.push(...ancientBuildResult.writtenFiles);
@@ -453,6 +478,8 @@ export async function buildAppData(options = {}) {
       skippedReason: null,
       gzipBytes: ancientLayerGzipBytes,
       maxGzipBytes: maxAncientLayerGzipBytes,
+      regionOutlinesGzipBytes,
+      maxRegionOutlinesGzipBytes: maxAncientRegionOutlinesGzipBytes,
       roadJoinCount: ancientBuildResult.roadJoinCount ?? 0,
       roadJoinTotalLengthKm: ancientBuildResult.roadJoinTotalLengthKm ?? 0,
       roadJoinMaxLengthKm: ancientBuildResult.roadJoinMaxLengthKm ?? 0

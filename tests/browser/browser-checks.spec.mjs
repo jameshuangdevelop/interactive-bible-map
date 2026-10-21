@@ -110,9 +110,25 @@ async function renderedPlaceNames(page) {
     if (!map) {
       throw new Error("Map test hook is unavailable.");
     }
+    // Intentionally scoped to rendered town/city/site/selected place-name layers.
+    const placeNameLayers = [
+      "ibm-major-pin",
+      "ibm-major-pin-no-dot",
+      "ibm-city-pin",
+      "ibm-city-pin-no-dot",
+      "ibm-site-pin",
+      "ibm-site-pin-no-dot",
+      "ibm-routes-major-pin",
+      "ibm-routes-city-pin",
+      "ibm-routes-site-pin",
+      "ibm-pin-label-standard",
+      "ibm-selected-major-pin-label",
+      "ibm-selected-site-pin-label",
+      "ibm-selected-pin-label"
+    ];
     const seen = new Set();
     const rendered = [];
-    for (const feature of map.queryRenderedFeatures()) {
+    for (const feature of map.queryRenderedFeatures(undefined, { layers: placeNameLayers })) {
       const properties = feature.properties ?? {};
       const labelText =
         typeof properties.labelText === "string"
@@ -272,6 +288,36 @@ async function countBluePixelsNearLabel(page, x, y) {
     }
   }
   return nearGoogleBlueCount;
+}
+
+function clipAroundTownDotPoint(page, x, y, width = 12, height = 12) {
+  const viewport = page.viewportSize();
+  const viewportWidth = viewport?.width ?? 1280;
+  const viewportHeight = viewport?.height ?? 720;
+  const left = Math.max(0, Math.min(Math.round(x - width / 2), viewportWidth - width));
+  const top = Math.max(0, Math.min(Math.round(y - height / 2), viewportHeight - height));
+  return { x: left, y: top, width, height };
+}
+
+async function countNearPureBlackTownDotPixels(page, x, y) {
+  const screenshot = await page.screenshot({
+    clip: clipAroundTownDotPoint(page, x, y)
+  });
+  const { data } = await sharp(screenshot).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let nearPureBlackCount = 0;
+  for (let index = 0; index < data.length; index += 4) {
+    const red = data[index];
+    const green = data[index + 1];
+    const blue = data[index + 2];
+    const alpha = data[index + 3];
+    if (alpha < 220) {
+      continue;
+    }
+    if (Math.max(red, green, blue) <= 24) {
+      nearPureBlackCount += 1;
+    }
+  }
+  return nearPureBlackCount;
 }
 
 function relativeLuminance(red, green, blue) {
@@ -873,6 +919,168 @@ test("important names stay discoverable: hover pointer/blue state, arrow while d
   expect(Math.abs(after.zoom - before.zoom)).toBeLessThan(0.01);
 });
 
+test("Asia Minor towns render black dots under names at year 50 (major + standard) @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await jumpMap(page, [27.34, 37.94], 6.2);
+
+  const targets = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const layerIds = ["ibm-major-pin", "ibm-city-pin"];
+    const majorTargetId = "ephesus";
+    const standardTargetIds = [
+      "smyrna",
+      "laodicea",
+      "philadelphia-lydia",
+      "sardis",
+      "thyatira",
+      "pergamum"
+    ];
+    const byPlaceId = new Map();
+    for (const feature of map.queryRenderedFeatures(undefined, { layers: layerIds })) {
+      const placeId = String(feature.properties?.placeId ?? "");
+      if (feature.geometry?.type !== "Point") {
+        continue;
+      }
+      if (placeId !== majorTargetId && !standardTargetIds.includes(placeId)) {
+        continue;
+      }
+      if (byPlaceId.has(placeId)) {
+        continue;
+      }
+      const point = map.project(feature.geometry.coordinates);
+      byPlaceId.set(placeId, { placeId, x: point.x, y: point.y });
+    }
+    const majorTarget = byPlaceId.get(majorTargetId) ?? null;
+    const standardTargets = standardTargetIds
+      .map((placeId) => byPlaceId.get(placeId))
+      .filter(Boolean)
+      .slice(0, 2);
+    return majorTarget ? [majorTarget, ...standardTargets] : standardTargets;
+  }, mapTestHookKey);
+
+  expect(targets).toHaveLength(3);
+  const devicePixelRatio = await page.evaluate(() => window.devicePixelRatio || 1);
+  const minimumMajorDotPixelCount = Math.max(6, Math.round(6 * devicePixelRatio * devicePixelRatio));
+  const minimumStandardDotPixelCount = Math.max(4, Math.round(4 * devicePixelRatio * devicePixelRatio));
+  for (const target of targets) {
+    const dotPixels = await countNearPureBlackTownDotPixels(page, target.x, target.y);
+    expect(dotPixels, `expected a black town dot under ${target.placeId}`).toBeGreaterThanOrEqual(
+      minimumMajorDotPixelCount
+    );
+  }
+
+  await jumpMap(page, [35.281944, 32.213611], 12.2);
+  const sycharTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const feature = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-site-pin"] })
+      .find((candidate) => candidate.properties?.placeId === "sychar" && candidate.geometry?.type === "Point");
+    if (!feature || feature.geometry?.type !== "Point") {
+      return null;
+    }
+    const point = map.project(feature.geometry.coordinates);
+    return { x: point.x, y: point.y };
+  }, mapTestHookKey);
+  expect(sycharTarget).toBeTruthy();
+  const sycharDotPixels = await countNearPureBlackTownDotPixels(page, sycharTarget.x, sycharTarget.y);
+  expect(sycharDotPixels, "expected a black town dot under sychar").toBeGreaterThanOrEqual(
+    minimumStandardDotPixelCount
+  );
+
+  await page.goto(`${baseUrl}/?tab=routes&route=jesus&stage=9&year=30`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  const sycharRouteTarget = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const feature = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-routes-site-pin"] })
+      .find((candidate) => candidate.properties?.placeId === "sychar" && candidate.geometry?.type === "Point");
+    if (!feature || feature.geometry?.type !== "Point") {
+      return null;
+    }
+    const point = map.project(feature.geometry.coordinates);
+    return { x: point.x, y: point.y };
+  }, mapTestHookKey);
+  expect(sycharRouteTarget).toBeTruthy();
+  const sycharRouteDotPixels = await countNearPureBlackTownDotPixels(page, sycharRouteTarget.x, sycharRouteTarget.y);
+  expect(sycharRouteDotPixels, "expected no black town dot under sychar in routes mode").toBeLessThanOrEqual(1);
+});
+
+test("selecting a town replaces its black dot with the selected pin @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await jumpMap(page, [27.34, 37.94], 6.2);
+
+  const ephesusPoint = await page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    const feature = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-major-pin", "ibm-city-pin"] })
+      .find((candidate) => candidate.properties?.placeId === "ephesus" && candidate.geometry?.type === "Point");
+    if (!feature || feature.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(feature.geometry.coordinates);
+    return { x: projected.x, y: projected.y };
+  }, mapTestHookKey);
+  expect(ephesusPoint).toBeTruthy();
+
+  const devicePixelRatio = await page.evaluate(() => window.devicePixelRatio || 1);
+  const minimumDotPixelCount = Math.max(6, Math.round(6 * devicePixelRatio * devicePixelRatio));
+  const beforeSelectDotPixels = await countNearPureBlackTownDotPixels(page, ephesusPoint.x, ephesusPoint.y);
+  expect(beforeSelectDotPixels).toBeGreaterThanOrEqual(minimumDotPixelCount);
+
+  await clickMapPoint(page, ephesusPoint);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "ephesus",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+
+  // The selection reaches the map a frame or more after the URL changes, so poll for it.
+  const readSelectedState = (testHookKey) => {
+    const map = window[testHookKey];
+    const selectedPin = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-selected-place-pin"] })
+      .find((feature) => feature.properties?.placeId === "ephesus" && feature.geometry?.type === "Point");
+    const selectedLabel = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-selected-major-pin-label", "ibm-selected-pin-label"] })
+      .find((feature) => feature.properties?.placeId === "ephesus");
+    const unselectedTownFeatures = map
+      .queryRenderedFeatures(undefined, { layers: ["ibm-major-pin", "ibm-city-pin"] })
+      .filter((feature) => feature.properties?.placeId === "ephesus");
+    if (!selectedPin || selectedPin.geometry?.type !== "Point") {
+      return null;
+    }
+    const projected = map.project(selectedPin.geometry.coordinates);
+    return {
+      x: projected.x,
+      y: projected.y,
+      selectedLabelCount: selectedLabel ? 1 : 0,
+      unselectedTownFeatureCount: unselectedTownFeatures.length
+    };
+  };
+  let selectedState = null;
+  await expect
+    .poll(
+      async () => {
+        selectedState = await page.evaluate(readSelectedState, mapTestHookKey);
+        return selectedState !== null;
+      },
+      { timeout: 5_000 }
+    )
+    .toBe(true);
+  expect(selectedState.selectedLabelCount).toBe(1);
+  expect(selectedState.unselectedTownFeatureCount).toBe(0);
+
+  const afterSelectDotPixels = await countNearPureBlackTownDotPixels(
+    page,
+    selectedState.x,
+    selectedState.y
+  );
+  expect(afterSelectDotPixels).toBeLessThan(Math.max(2, Math.floor(minimumDotPixelCount / 3)));
+});
+
 test("selected place pin rules stay accurate for towns, areas, candidate places, and modern mode @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   const readPinState = async (placeId) =>
     page.evaluate(({ testHookKey, targetPlaceId }) => {
@@ -912,7 +1120,7 @@ test("hover turns one town, one area label and one holder label blue with unique
       name: "town",
       center: [27.34, 37.94],
       zoom: 8.2,
-      layerIds: ["ibm-city-pin", "ibm-site-pin", "ibm-major-pin"]
+      layerIds: ["ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-major-pin", "ibm-major-pin-no-dot"]
     },
     {
       name: "area",
@@ -1700,10 +1908,13 @@ test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", 
           const map = window[testHookKey];
           const nameLayers = [
             "ibm-major-pin",
+            "ibm-major-pin-no-dot",
             "ibm-routes-major-pin",
             "ibm-city-pin",
+            "ibm-city-pin-no-dot",
             "ibm-routes-city-pin",
             "ibm-site-pin",
+            "ibm-site-pin-no-dot",
             "ibm-routes-site-pin",
             "ibm-pin-label-standard",
             "ibm-selected-major-pin-label",
@@ -2047,7 +2258,7 @@ test("with a region selected, clicking an outside town clears region highlight a
     const map = window[testHookKey];
     const hit = map
       .queryRenderedFeatures(undefined, {
-        layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"]
+        layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"]
       })
       .find((feature) => {
         if (feature.geometry?.type !== "Point") {
@@ -2084,7 +2295,7 @@ test("with a region selected, clicking an outside town clears region highlight a
             [x - 2, y - 2],
             [x + 2, y + 2]
           ],
-          { layers: ["ibm-major-pin", "ibm-routes-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"] }
+          { layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-routes-major-pin", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"] }
         )
         .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
       if (hitAtPoint) {
@@ -2273,7 +2484,7 @@ test("clicking another region moves the highlight; towns under veil stay clickab
     const map = window[testHookKey];
     const hit = map
       .queryRenderedFeatures(undefined, {
-        layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"]
+        layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"]
       })
       .find((feature) => {
         if (feature.geometry?.type !== "Point") {
@@ -2310,7 +2521,7 @@ test("clicking another region moves the highlight; towns under veil stay clickab
             [x - 2, y - 2],
             [x + 2, y + 2]
           ],
-          { layers: ["ibm-major-pin", "ibm-city-pin", "ibm-site-pin", "ibm-pin-label-standard"] }
+          { layers: ["ibm-major-pin", "ibm-major-pin-no-dot", "ibm-city-pin", "ibm-city-pin-no-dot", "ibm-site-pin", "ibm-site-pin-no-dot", "ibm-pin-label-standard"] }
         )
         .some((feature) => String(feature.properties?.placeId ?? "") === String(hit.properties.placeId ?? ""));
       if (hitAtPoint) {
