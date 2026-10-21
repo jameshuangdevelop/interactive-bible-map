@@ -1838,6 +1838,70 @@ test("re-clicking OTHER ROMAN PROVINCES keeps roman selection and blue label @na
   await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
 });
 
+test("clicking empty map keeps the roman holder label blue while roman empire stays selected @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  const romanHolderTarget = await findRomanHolderLabelPoint(page);
+  expect(romanHolderTarget).toBeTruthy();
+  await clickMapPoint(page, romanHolderTarget);
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "roman-empire",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedRomanHolderLabelCount(page), { timeout: 10_000 }).toBe(1);
+
+  // The nearest point that is the map itself (not a panel or control) with nothing clickable within 30 px.
+  const emptyPoint = await page.evaluate(({ testHookKey, origin }) => {
+    const map = window[testHookKey];
+    const canvas = map.getCanvas();
+    const rect = canvas.getBoundingClientRect();
+    let best = null;
+    for (let x = 40; x < canvas.clientWidth - 40; x += 20) {
+      for (let y = 40; y < canvas.clientHeight - 40; y += 20) {
+        const distance = Math.hypot(x - origin.x, y - origin.y);
+        if (distance < 120 || (best && distance >= best.distance)) {
+          continue;
+        }
+        if (document.elementFromPoint(rect.left + x, rect.top + y) !== canvas) {
+          continue;
+        }
+        const hits = map
+          .queryRenderedFeatures([
+            [x - 30, y - 30],
+            [x + 30, y + 30]
+          ])
+          .filter((feature) => /pin|label|holder|routes/.test(feature.layer.id));
+        if (hits.length === 0) {
+          best = { x, y, distance };
+        }
+      }
+    }
+    return best ? { x: best.x, y: best.y } : null;
+  }, { testHookKey: mapTestHookKey, origin: romanHolderTarget });
+  expect(emptyPoint).toBeTruthy();
+  await clickMapPoint(page, emptyPoint);
+  // Let the click's state update reach the map: two frames for the app, then the map's next idle.
+  await page.evaluate(
+    (testHookKey) =>
+      new Promise((resolve) => {
+        const map = window[testHookKey];
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            map.once("idle", () => resolve());
+            map.triggerRepaint();
+          })
+        );
+      }),
+    mapTestHookKey
+  );
+  expect(new URLSearchParams(await page.evaluate(() => window.location.search)).get("place")).toBe("roman-empire");
+  expect(await selectedRomanHolderLabelCount(page)).toBe(1);
+});
+
 test("keyboard activation of OTHER ROMAN PROVINCES selects the roman blue holder label @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   test.setTimeout(90_000);
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });

@@ -4360,8 +4360,8 @@ export function MapView({
         setRomanHolderLabelSelectionToken(selectionTokenRef.current);
         return;
       }
-      pendingRomanHolderLabelSelectionTokenRef.current = null;
-      setRomanHolderLabelSelectionToken(null);
+      // A click on empty map leaves the selection as it is, so the blue name stays. The
+      // selection-change effect above resets the token whenever the selection does change.
 
       if (routesModeEnabledRef.current) {
         const pointer = asScreenPoint(event.point);
