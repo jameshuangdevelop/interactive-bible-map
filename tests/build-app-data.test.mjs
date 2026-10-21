@@ -569,6 +569,8 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       "expected province/client border"
     );
     assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
+    assert.equal(typeof stopPayload.holderUnions, "object");
+    assert.equal(typeof stopPayload.romanSideUnion, "string");
     const ad44Payload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.stop.ad44.json"), "utf8")
     );
@@ -605,6 +607,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
 
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.roads.geojson"));
+    assert.ok(outputFiles.includes("ancient.holder-unions.json"));
     // The app's roads keep the drawing flags but, like the shapes, leave the provenance in data/geo/.
     const roadsPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
@@ -663,6 +666,8 @@ test("buildAppData writes the static empire edge once when the layer is present"
       await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
     );
     assert.equal(stopPayload.romanEmpireEdge.type, "MultiLineString");
+    assert.equal(typeof stopPayload.holderUnions, "object");
+    assert.equal(typeof stopPayload.romanSideUnion, "string");
   });
 });
 

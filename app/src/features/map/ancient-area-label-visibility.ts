@@ -15,26 +15,35 @@ export function linkedTimelineLocationIds(
 
 export function shouldShowAreaLabelOnAncientMap({
   placeId,
-  linkedLocationIds
+  linkedLocationIds,
+  visibleLinkedLocationIds
 }: {
   placeId: string;
   linkedLocationIds: ReadonlySet<string>;
+  visibleLinkedLocationIds?: ReadonlySet<string>;
 }) {
+  if (visibleLinkedLocationIds?.has(placeId)) {
+    return true;
+  }
   return !linkedLocationIds.has(placeId);
 }
 
 export function filterAreaLabelsForAncientMap({
-  areaLabels, linkedLocationIds
+  areaLabels,
+  linkedLocationIds,
+  visibleLinkedLocationIds
 }:{
   areaLabels: FeatureCollection<Point, AreaFeatureProperties>;
   linkedLocationIds: ReadonlySet<string>;
+  visibleLinkedLocationIds?: ReadonlySet<string>;
 }) : FeatureCollection<Point, AreaFeatureProperties> {
   return {
     ...areaLabels,
     features: areaLabels.features.filter((feature) => {
       return shouldShowAreaLabelOnAncientMap({
         placeId: feature.properties.placeId,
-        linkedLocationIds
+        linkedLocationIds,
+        visibleLinkedLocationIds
       });
     })
   };

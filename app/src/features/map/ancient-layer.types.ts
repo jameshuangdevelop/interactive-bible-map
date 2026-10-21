@@ -125,7 +125,13 @@ export interface AncientStopPayload {
     AncientHolderBorderFeatureProperties
   >;
   romanEmpireEdge: MultiLineStringGeometry | LineStringGeometry | null;
+  holderUnions: Record<string, string>;
+  romanSideUnion: string | null;
   holderLabels: AncientHolderLabelPoint[];
+}
+
+export interface AncientHolderUnionsPayload {
+  geometries: Record<string, PolygonGeometry | MultiPolygonGeometry>;
 }
 
 export interface AncientShapesPayload {

@@ -67,4 +67,24 @@ describe("ancient area label visibility", () => {
       }
     }
   });
+
+  test("can keep one linked area label visible only when explicitly requested", () => {
+    const timeline = readRepositoryJson("data/timeline.json") as AncientTimelinePayload;
+    const linkedLocationIds = linkedTimelineLocationIds(timeline.entities);
+
+    expect(linkedLocationIds.has("galatia")).toBe(true);
+    expect(
+      shouldShowAreaLabelOnAncientMap({
+        placeId: "galatia",
+        linkedLocationIds
+      })
+    ).toBe(false);
+    expect(
+      shouldShowAreaLabelOnAncientMap({
+        placeId: "galatia",
+        linkedLocationIds,
+        visibleLinkedLocationIds: new Set(["galatia"])
+      })
+    ).toBe(true);
+  });
 });

@@ -90,6 +90,7 @@ export interface CandidateFeatureProperties extends BaseMapFeatureProperties {
 export interface AreaFeatureProperties extends BaseMapFeatureProperties {
   areaKind: "region" | "province" | "empire";
   areaFontSize: number;
+  isSelectedPlace: boolean;
 }
 
 export type PinFeature = Feature<Point, PinFeatureProperties>;
@@ -409,7 +410,8 @@ function toAreaFeature({
       importanceRank,
       interactionRank: interactionRankForPlace(place),
       areaKind,
-      areaFontSize: labelSpec.fontSize
+      areaFontSize: labelSpec.fontSize,
+      isSelectedPlace: selected
     }
   };
 }
