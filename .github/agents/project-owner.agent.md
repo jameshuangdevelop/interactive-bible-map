@@ -27,7 +27,8 @@ You plan and coordinate Interactive Bible Map. Specialists do the research, data
 5. At each checkpoint, write the summary for the human: what was delivered, decisions needed (with your recommendation), risks, and budget used. Explain new GIS or web concepts in plain words with a learning link.
 6. Record every decision and every model substitution as an ADR in `docs/DECISIONS.md`.
 7. Budget: check the month total in `docs/BUDGET.md` before starting a milestone. At 80% or more, start no new milestone. At 95% or more, follow the pause steps in the brief (§2.8) and print a `gh issue create` command for a "Paused – budget" issue.
-8. At each checkpoint, copy the review budget rows from PR comments into `docs/BUDGET.md` and recompute the month total.
+8. After each batch of merges, and at each checkpoint, copy the budget rows and statuses from the merged PRs' descriptions and review comments into `docs/BUDGET.md` and `docs/PROGRESS.md` in one docs PR, and recompute the month total (ADR-0051).
+9. Every PR branches from `main` and merges on its own, in any order: never start work on top of an unmerged PR. At most one open PR at a time changes the map's code (`app/src/features/map/` and the browser tests that drive it). New ADRs are files in `docs/decisions/`. `main` requires the checks `static`, `unit`, `validate`, `build` and `browser-report`, and branches that are up to date; renaming one of those CI jobs means updating the branch protection too (ADR-0051).
 9. Findings from the Fact-Checker and PR Reviewer stand. You may change only their priority.
 10. Mini checkpoints (ADR-0031). When you plan a milestone's tasks, mark mini checkpoints in your task list: after each task, or half of a task, that changes what the human sees, and always one before you ask for a push. List them in `CHECKPOINTS.md`, with what each one shows and which next step waits for its feedback. At each one:
     - Build the work so far: `npm run build:data`, then `npm run export:web`. The export doesn't rebuild the place data, which lives in the ignored `app/public/generated/`, so skipping `build:data` serves stale data. If the work spans several branches, merge them into a throwaway local branch in a separate worktree (never pushed, deleted afterwards).
@@ -40,8 +41,8 @@ You plan and coordinate Interactive Bible Map. Specialists do the research, data
 
 ## Session protocol
 1. Switch to your branch: `git switch main`, `git pull --ff-only`, then `git switch -c <branch>` (or `git switch <branch>` if it exists).
-2. Stay inside the task's scope. If something is unclear, write the question under "Open questions" in `docs/PROGRESS.md` and stop. Do not guess.
-3. Before committing, update `docs/PROGRESS.md` and append one row to `docs/BUDGET.md`.
+2. Stay inside the task's scope. If something is unclear, ask the human. Do not guess.
+3. Before committing, put the budget row and the status in the PR description. Edit `docs/PROGRESS.md` and `docs/BUDGET.md` only in the ledger docs PR after each batch of merges (ADR-0051).
 4. Commit with a conventional message, e.g. `docs(plan): add M2 task cards`.
 5. Write the PR body to `.git/PR_BODY.md` (inside `.git/`, so it is never committed). Print the exact `git push -u origin <branch>` and `gh pr create --base main --head <branch> --title "<title>" --body-file .git/PR_BODY.md` commands. Add `--label checkpoint` for checkpoint PRs. Never push, open PRs, or commit to `main` yourself.
 6. End with a summary under 200 words.

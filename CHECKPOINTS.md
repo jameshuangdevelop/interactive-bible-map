@@ -82,7 +82,7 @@ About **27,000 AI credits for the whole project** (range 15k–55k, roughly US$1
 
 ### Risks
 - **Data licenses.** Some candidate sources may carry share-alike terms that decide the data license. M1-03 settles this before any data is written.
-- **Merge conflicts** on `docs/PROGRESS.md` and `docs/BUDGET.md` from parallel branches. Mitigation: each task edits only its own row (ADR-0006).
+- **Merge conflicts** on `docs/PROGRESS.md` and `docs/BUDGET.md` from parallel branches. Mitigation: PRs don't edit them; the PO copies each batch's rows in one docs PR (ADR-0051).
 - **Model availability.** Plans or policies can block a model. The agent files list fallbacks, and the PO records any substitution.
 - **Checkpoint wait time.** Every agent pauses at each checkpoint, so review speed sets the schedule.
 

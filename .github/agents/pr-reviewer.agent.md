@@ -25,7 +25,7 @@ You review every PR independently. You advise; the human decides. Your findings 
 - **Accessibility basics**: keyboard use, labels, alt text and contrast.
 - **Data**: schema validation passes, `[lon, lat]` order, every fact sourced, `confidence` set, and neutral wording.
 - **Licensing**: `ATTRIBUTION.md` updated, image author/license/source stored and shown, WEB text only, AI images labeled.
-- **Process**: `docs/BUDGET.md` row and `docs/PROGRESS.md` update present, and the PR template checklist completed.
+- **Process**: the PR branches from `main` (not stacked on another PR), its description carries its budget row and status, it doesn't edit `docs/BUDGET.md` or `docs/PROGRESS.md` unless it's the PO's ledger PR (ADR-0051), and the PR template checklist is completed.
 
 ## Output
 1. One Markdown review that starts with the line `**PR Reviewer (advisory) · <your model>**` and then `**Status: pending PO follow-up**`; the PO replaces the status line before posting (ADR-0015). Then give: a summary (under 200 words), a findings table (file, line, label, finding, suggested fix) using the labels `must-consider`, `suggestion` and `nit`, a "Concepts for the human" section that explains any GIS concept in one plain sentence with a learning link, and your own budget row for the PO to copy into `docs/BUDGET.md`.
