@@ -1563,7 +1563,7 @@ test("judea province union has no inner seam along Galilee-Samaria at year 70 @n
   expect(judeaSeamProbe.outerEdgeDrawn).toBe(true);
 });
 
-test("regions only highlight when they own a shaped area in the selected year @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("a selected region shows its land, else its own outline, else its name alone (ADR-0050 item 5) @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
   await jumpMap(page, [34.0, 38.7], 6.8);
@@ -1590,8 +1590,14 @@ test("regions only highlight when they own a shaped area in the selected year @n
     return { x: projected.x, y: projected.y };
   }, mapTestHookKey);
   expect(pisidiaTarget).toBeTruthy();
+  // Pisidia holds no land, so selecting it loads the outlines; it has none yet (M5-20), so its name stands alone.
+  const regionOutlinesResponse = page.waitForResponse(
+    (response) => response.url().includes("/generated/ancient.region-outlines.json"),
+    { timeout: 10_000 }
+  );
   await clickMapPoint(page, pisidiaTarget);
   await page.waitForFunction(() => new URLSearchParams(window.location.search).get("place") === "pisidia", { timeout: 10_000 });
+  expect((await regionOutlinesResponse).ok()).toBe(true);
   await waitForMapIdle(page);
 
   const pisidiaOverlay = await page.evaluate((testHookKey) => {
@@ -1679,15 +1685,8 @@ test("regions only highlight when they own a shaped area in the selected year @n
 
   await page.goto(`${baseUrl}/?tab=map&year=30&place=judea`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
-  const judeaRegionOverlay = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return {
-      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
-      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
-    };
-  }, mapTestHookKey);
-  expect(judeaRegionOverlay.veilFeatures).toBe(0);
-  expect(judeaRegionOverlay.outlineFeatures).toBe(0);
+  // Judea the region holds no land of its own, so it shows its own outline, loaded on first use.
+  await waitForSelectedRegionOverlay(page);
 
   await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await waitForMapIdle(page);
@@ -1700,6 +1699,142 @@ test("regions only highlight when they own a shaped area in the selected year @n
   }, mapTestHookKey);
   expect(galatiaOverlay.veilFeatures).toBeGreaterThan(0);
   expect(galatiaOverlay.outlineFeatures).toBeGreaterThan(0);
+});
+
+async function readRegionOutlineRing(regionId) {
+  const payload = JSON.parse(
+    await fs.readFile(path.join(generatedDirectory, "ancient.region-outlines.json"), "utf8")
+  );
+  const feature = payload.features.find((candidate) => candidate.id === regionId);
+  if (!feature) {
+    throw new Error(`No outline for '${regionId}' in ancient.region-outlines.json.`);
+  }
+  return feature.geometry.type === "Polygon"
+    ? feature.geometry.coordinates[0]
+    : feature.geometry.coordinates[0][0];
+}
+
+async function waitForSelectedRegionOverlay(page) {
+  await expect
+    .poll(
+      async () =>
+        page.evaluate((testHookKey) => {
+          const map = window[testHookKey];
+          return (
+            map.querySourceFeatures("ibm-selected-region-veil").length > 0 &&
+            map.querySourceFeatures("ibm-selected-region-outline").length > 0
+          );
+        }, mapTestHookKey),
+      { timeout: 10_000 }
+    )
+    .toBe(true);
+}
+
+// Checks that the drawn red outline runs along the region's ring in the outlines file,
+// and that the veil greys the outside point but not the inside one.
+async function probeSelectedRegionOutline(page, { ring, insideLngLat, outsideLngLat }) {
+  return page.evaluate(
+    ({ testHookKey, outlineRing, inside, outside }) => {
+      const map = window[testHookKey];
+      const canvas = map.getCanvas();
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      const hasFeatureNear = (layerId, point, radius) =>
+        map.queryRenderedFeatures(
+          [
+            [point.x - radius, point.y - radius],
+            [point.x + radius, point.y + radius]
+          ],
+          { layers: [layerId] }
+        ).length > 0;
+      const step = Math.max(1, Math.floor(outlineRing.length / 24));
+      const sampledPoints = outlineRing
+        .filter((_, index) => index % step === 0)
+        .map((coordinates) => map.project(coordinates))
+        .filter((point) => point.x >= 4 && point.y >= 4 && point.x <= width - 4 && point.y <= height - 4);
+      return {
+        sampledCount: sampledPoints.length,
+        outlineHitCount: sampledPoints.filter((point) => hasFeatureNear("ibm-selected-region-outline", point, 3)).length,
+        insideHasVeil: hasFeatureNear("ibm-selected-region-veil", map.project(inside), 2),
+        outsideHasVeil: hasFeatureNear("ibm-selected-region-veil", map.project(outside), 2)
+      };
+    },
+    { testHookKey: mapTestHookKey, outlineRing: ring, inside: insideLngLat, outside: outsideLngLat }
+  );
+}
+
+test("region outlines load on first use, then outline a searched region with no land (ADR-0050 update) @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  const outlineRequestUrls = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/generated/ancient.region-outlines.json")) {
+      outlineRequestUrls.push(request.url());
+    }
+  });
+  await page.goto(`${baseUrl}/?tab=map&year=30`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await page.waitForFunction((testHookKey) => {
+    const map = window[testHookKey];
+    return Boolean(map && map.querySourceFeatures("ibm-ancient-holder-labels").length > 0);
+  }, mapTestHookKey, { timeout: 60_000 });
+  await waitForMapIdle(page);
+  expect(outlineRequestUrls, "the outlines file is not part of the startup load").toEqual([]);
+
+  const searchInput = page.getByRole("combobox", { name: "Search biblical places" });
+  await searchInput.click();
+  await searchInput.fill("Samaria");
+  await expect(page.getByRole("option", { name: /Samaria/i }).first()).toBeVisible();
+  await searchInput.press("ArrowDown");
+  await searchInput.press("Enter");
+  await page.waitForFunction(
+    () => new URLSearchParams(window.location.search).get("place") === "samaria",
+    { timeout: 10_000 }
+  );
+  await waitForMapIdle(page);
+  await waitForSelectedRegionOverlay(page);
+  expect(outlineRequestUrls).toHaveLength(1);
+
+  const probe = await probeSelectedRegionOutline(page, {
+    ring: await readRegionOutlineRing("samaria"),
+    // Samaria's own point lies inside its outline; Jerusalem lies in Judea, outside it.
+    insideLngLat: [35.190436, 32.276529],
+    outsideLngLat: [35.234156, 31.776679]
+  });
+  expect(probe.sampledCount).toBeGreaterThanOrEqual(8);
+  expect(probe.outlineHitCount).toBeGreaterThanOrEqual(Math.ceil(probe.sampledCount * 0.9));
+  expect(probe.insideHasVeil).toBe(false);
+  expect(probe.outsideHasVeil).toBe(true);
+});
+
+test("Pontus after AD 64 and an island shown as a region name use their own outlines (ADR-0050 item 5) @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  // In AD 70 the area of Pontus belongs to the province of Galatia, so Pontus itself holds no land.
+  await page.goto(`${baseUrl}/?tab=map&year=70&place=pontus`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await waitForSelectedRegionOverlay(page);
+  const pontusProbe = await probeSelectedRegionOutline(page, {
+    ring: await readRegionOutlineRing("pontus"),
+    // Pontus's own point lies inland; the Black Sea to its north lies outside the outline.
+    insideLngLat: [37.83, 40.68],
+    outsideLngLat: [37.6, 41.6]
+  });
+  expect(pontusProbe.sampledCount).toBeGreaterThanOrEqual(8);
+  expect(pontusProbe.outlineHitCount).toBeGreaterThanOrEqual(Math.ceil(pontusProbe.sampledCount * 0.9));
+  expect(pontusProbe.insideHasVeil).toBe(false);
+  expect(pontusProbe.outsideHasVeil).toBe(true);
+
+  // Chios is a natural feature drawn as a region name (zoomTier "region").
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=chios`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+  await waitForMapIdle(page);
+  await waitForSelectedRegionOverlay(page);
+  const chiosProbe = await probeSelectedRegionOutline(page, {
+    ring: await readRegionOutlineRing("chios"),
+    // Chios's own point sits on its east coast, so the inside check uses the middle of the island;
+    // Smyrna, on the mainland, lies outside.
+    insideLngLat: [26.06, 38.4],
+    outsideLngLat: [27.14, 38.42]
+  });
+  expect(chiosProbe.sampledCount).toBeGreaterThanOrEqual(8);
+  expect(chiosProbe.outlineHitCount).toBeGreaterThanOrEqual(Math.ceil(chiosProbe.sampledCount * 0.9));
+  expect(chiosProbe.insideHasVeil).toBe(false);
+  expect(chiosProbe.outsideHasVeil).toBe(true);
 });
 
 test("selected region updates holder label and overlay when the year changes @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {

@@ -1,4 +1,5 @@
 import type {
+  AncientRegionOutlinesPayload,
   AncientShapesPayload,
   AncientStopPayload
 } from "../src/features/map/ancient-layer.types";
@@ -6,7 +7,8 @@ import {
   buildSelectedRegionOutlineCoordinates,
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  toRegionOutlineGeometries
 } from "../src/features/map/selected-region-highlight";
 
 describe("selected region highlight geometry", () => {
@@ -311,5 +313,201 @@ describe("selected region highlight geometry", () => {
       politicalUnitAreaTypes
     });
     expect(selectedRegion).toEqual(holderUnionGeometries["union-roman-side"]);
+  });
+
+  describe("region outlines (ADR-0050 item 5)", () => {
+    const square = (west: number, south: number) => ({
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [west, south],
+          [west + 1, south],
+          [west + 1, south + 1],
+          [west, south + 1],
+          [west, south]
+        ]
+      ]
+    });
+    const pontusArea = square(36, 40);
+    const pontusOutline = square(35, 40);
+    const samariaOutline = square(35, 32);
+    const shapes: AncientShapesPayload = {
+      areas: {
+        type: "FeatureCollection",
+        features: [
+          { type: "Feature", properties: { areaId: "pontus" }, geometry: pontusArea },
+          {
+            type: "Feature",
+            properties: { areaId: "judea-samaria-idumea" },
+            geometry: square(34, 31)
+          }
+        ]
+      },
+      areasSimplifiedForZoom10: { type: "FeatureCollection", features: [] }
+    };
+    const pontusAssignment: AncientStopPayload["areas"][number] = {
+      areaId: "pontus",
+      holderId: "pontus-kingdom",
+      holderKind: "client-kingdom",
+      holderRomanSide: true,
+      holderLocationId: "pontus",
+      ruler: "Polemon II",
+      heldFromYear: 38,
+      heldToYear: 64,
+      heldFromKnown: true,
+      note: null,
+      hasShape: true
+    };
+    const stopWithAreas = (year: number, areas: AncientStopPayload["areas"]): AncientStopPayload => ({
+      stopId: `ad-${year}`,
+      year,
+      areas,
+      holderBorders: { type: "FeatureCollection", features: [] },
+      romanEmpireEdge: null,
+      holderUnions: {},
+      romanSideUnion: null,
+      holderLabels: []
+    });
+    const judeaProvinceAssignment: AncientStopPayload["areas"][number] = {
+      ...pontusAssignment,
+      areaId: "judea-samaria-idumea",
+      holderId: "roman-province-judea",
+      holderKind: "roman-province",
+      holderLocationId: "judea-province",
+      ruler: null,
+      heldFromYear: 6,
+      heldToYear: 41
+    };
+    const outlinesPayload: AncientRegionOutlinesPayload = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          id: "pontus",
+          properties: { sources: ["bib:strabo-geography"], confidence: "medium", note: "Pontus." },
+          geometry: pontusOutline
+        },
+        {
+          type: "Feature",
+          id: "samaria",
+          properties: { sources: ["bib:josephus-war"], confidence: "medium", note: "Samaria." },
+          geometry: samariaOutline
+        }
+      ]
+    };
+    const regionOutlineGeometries = toRegionOutlineGeometries(outlinesPayload);
+
+    test("parses the outlines file into one geometry per region id", () => {
+      expect([...regionOutlineGeometries.keys()]).toEqual(["pontus", "samaria"]);
+      expect(regionOutlineGeometries.get("samaria")).toEqual(samariaOutline);
+      expect(toRegionOutlineGeometries(null).size).toBe(0);
+    });
+
+    test("skips outlines without a usable id or polygon geometry, and keeps the first of a repeated id", () => {
+      const malformed = {
+        type: "FeatureCollection",
+        features: [
+          { type: "Feature", id: "galilee", properties: {}, geometry: square(35, 33) },
+          { type: "Feature", id: "galilee", properties: {}, geometry: square(0, 0) },
+          { type: "Feature", properties: {}, geometry: square(1, 1) },
+          { type: "Feature", id: 7, properties: {}, geometry: square(2, 2) },
+          { type: "Feature", id: "rhodes", properties: {}, geometry: { type: "Point", coordinates: [28, 36] } },
+          { type: "Feature", id: "samos", properties: {}, geometry: null },
+          { type: "Feature", id: "chios", properties: {}, geometry: { type: "Polygon", coordinates: [] } }
+        ]
+      } as unknown as AncientRegionOutlinesPayload;
+
+      const outlines = toRegionOutlineGeometries(malformed);
+      expect([...outlines.keys()]).toEqual(["galilee"]);
+      expect(outlines.get("galilee")).toEqual(square(35, 33));
+    });
+
+    test("a region that holds no land this year gets its own outline", () => {
+      expect(
+        findSelectedRegionGeometry({
+          shapes,
+          holderUnionGeometries: null,
+          regionOutlineGeometries,
+          stopPayload: stopWithAreas(30, [judeaProvinceAssignment]),
+          placeId: "samaria",
+          placeType: "region",
+          politicalAreaId: "judea-samaria-idumea",
+          politicalUnitAreaTypes
+        })
+      ).toEqual(samariaOutline);
+    });
+
+    test("the land a region holds that year wins over its outline", () => {
+      expect(
+        findSelectedRegionGeometry({
+          shapes,
+          holderUnionGeometries: null,
+          regionOutlineGeometries,
+          stopPayload: stopWithAreas(50, [pontusAssignment]),
+          placeId: "pontus",
+          placeType: "region",
+          politicalAreaId: null,
+          politicalUnitAreaTypes
+        })
+      ).toEqual(pontusArea);
+
+      expect(
+        findSelectedRegionGeometry({
+          shapes,
+          holderUnionGeometries: null,
+          regionOutlineGeometries,
+          stopPayload: stopWithAreas(70, [
+            { ...pontusAssignment, holderId: "galatia-province", holderKind: "roman-province", holderLocationId: "galatia" }
+          ]),
+          placeId: "pontus",
+          placeType: "region",
+          politicalAreaId: null,
+          politicalUnitAreaTypes
+        })
+      ).toEqual(pontusOutline);
+    });
+
+    test("a region with neither land nor an outline, or outlines not loaded yet, shows its name alone", () => {
+      const judeaStop = stopWithAreas(30, [judeaProvinceAssignment]);
+      expect(
+        findSelectedRegionGeometry({
+          shapes,
+          holderUnionGeometries: null,
+          regionOutlineGeometries,
+          stopPayload: judeaStop,
+          placeId: "pisidia",
+          placeType: "region",
+          politicalAreaId: "galatia",
+          politicalUnitAreaTypes
+        })
+      ).toBeNull();
+      expect(
+        findSelectedRegionGeometry({
+          shapes,
+          holderUnionGeometries: null,
+          regionOutlineGeometries: null,
+          stopPayload: judeaStop,
+          placeId: "samaria",
+          placeType: "region",
+          politicalAreaId: "judea-samaria-idumea",
+          politicalUnitAreaTypes
+        })
+      ).toBeNull();
+    });
+
+    test("draws nothing until the year's stop has loaded, so an outline never flashes before held land", () => {
+      expect(
+        findSelectedRegionGeometry({
+          shapes,
+          holderUnionGeometries: null,
+          regionOutlineGeometries,
+          stopPayload: null,
+          placeId: "pontus",
+          placeType: "region",
+          politicalAreaId: null,
+          politicalUnitAreaTypes
+        })
+      ).toBeNull();
+    });
   });
 });

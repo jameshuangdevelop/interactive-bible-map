@@ -121,7 +121,9 @@ function isPinPlace(place: PlaceIndexRecord) {
   return !isAreaLabelPlace(place);
 }
 
-function isAreaLabelPlace(place: PlaceIndexRecord) {
+// A place drawn as an area name: an empire, province or region, or a
+// region-tier record such as an island shown as a region name.
+export function isAreaLabelPlace(place: PlaceIndexRecord) {
   return place.zoomTier === "region" || isAreaLabelType(place.type);
 }
 

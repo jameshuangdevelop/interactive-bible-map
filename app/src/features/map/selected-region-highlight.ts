@@ -1,4 +1,5 @@
 import type {
+  AncientRegionOutlinesPayload,
   AncientShapesPayload,
   AncientStopPayload,
   FeatureCollection,
@@ -8,6 +9,7 @@ import type {
 } from "./ancient-layer.types";
 
 type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
+export type RegionOutlineGeometries = ReadonlyMap<string, RegionGeometry>;
 type RingCoordinates = number[][];
 type PolygonCoordinates = PolygonGeometry["coordinates"];
 const WORLD_RING: [number, number][] = [
@@ -102,9 +104,12 @@ function mergeRegionParts(parts: RegionGeometry[]): RegionGeometry | null {
   };
 }
 
+// Precedence (ADR-0050 item 5): the land the place holds this year, then the
+// region's own outline, then nothing (the name alone).
 export function findSelectedRegionGeometry({
   shapes,
   holderUnionGeometries,
+  regionOutlineGeometries,
   stopPayload,
   placeId,
   placeType,
@@ -113,6 +118,7 @@ export function findSelectedRegionGeometry({
 }: {
   shapes: AncientShapesPayload | null;
   holderUnionGeometries: Record<string, RegionGeometry> | null | undefined;
+  regionOutlineGeometries?: RegionOutlineGeometries | null;
   stopPayload: AncientStopPayload | null;
   placeId: string | null | undefined;
   placeType: string | null | undefined;
@@ -175,10 +181,33 @@ export function findSelectedRegionGeometry({
     .map((areaId) => shapeByAreaId.get(areaId))
     .filter((geometry): geometry is RegionGeometry => Boolean(geometry));
   if (selectedGeometries.length === 0) {
-    return null;
+    const outline = regionOutlineGeometries?.get(placeId);
+    return isRegionGeometry(outline) ? outline : null;
   }
 
   return mergeRegionParts(selectedGeometries);
+}
+
+export function toRegionOutlineGeometries(
+  payload: AncientRegionOutlinesPayload | null | undefined
+): RegionOutlineGeometries {
+  const outlines = new Map<string, RegionGeometry>();
+  const features = Array.isArray(payload?.features) ? payload.features : [];
+  for (const feature of features) {
+    const regionId = feature?.id;
+    if (typeof regionId !== "string" || regionId.length === 0 || outlines.has(regionId)) {
+      continue;
+    }
+    if (
+      isRegionGeometry(feature.geometry) &&
+      Array.isArray(feature.geometry.coordinates) &&
+      feature.geometry.coordinates.length > 0
+    ) {
+      outlines.set(regionId, feature.geometry);
+    }
+  }
+
+  return outlines;
 }
 
 function asOutlineLineFeatures(

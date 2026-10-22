@@ -134,6 +134,25 @@ export interface AncientHolderUnionsPayload {
   geometries: Record<string, PolygonGeometry | MultiPolygonGeometry>;
 }
 
+export interface AncientRegionOutlineProperties {
+  sources: string[];
+  confidence: "high" | "medium" | "low";
+  note: string;
+  years?: TimelineYear[];
+}
+
+// `ancient.region-outlines.json`: one outline per region that can hold no land (ADR-0050).
+// Each feature's `id` is the region's location id.
+export interface AncientRegionOutlinesPayload {
+  type: "FeatureCollection";
+  features: {
+    type: "Feature";
+    id: string;
+    properties: AncientRegionOutlineProperties;
+    geometry: PolygonGeometry | MultiPolygonGeometry;
+  }[];
+}
+
 export interface AncientShapesPayload {
   areas: FeatureCollection<PolygonGeometry | MultiPolygonGeometry, { areaId: string }>;
   areasSimplifiedForZoom10: FeatureCollection<

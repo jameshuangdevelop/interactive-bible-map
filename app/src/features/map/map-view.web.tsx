@@ -49,6 +49,7 @@ import { roundScaleDistanceMeters } from "./map-scale";
 import {
   MAX_VISIBLE_PLACE_LIST_ENTRIES,
   buildPlaceRenderData,
+  isAreaLabelPlace,
   routePriorityPlaceIdsKeyFromOverlay,
   type PlaceRenderData
 } from "./map-render-data";
@@ -78,12 +79,15 @@ import {
 import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  toRegionOutlineGeometries,
+  type RegionOutlineGeometries
 } from "./selected-region-highlight";
 import type { MapViewProps } from "./map-view.types";
 import type {
   AncientHolderUnionsPayload,
   AncientEntityRecord,
+  AncientRegionOutlinesPayload,
   AncientShapesPayload,
   AncientStopPayload,
   FeatureCollection,
@@ -2977,6 +2981,8 @@ export function MapView({
   const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
+  const [ancientRegionOutlines, setAncientRegionOutlines] = useState<RegionOutlineGeometries | null>(null);
+  const regionOutlinesRequestedRef = useRef(false);
   const [ancientStopsById, setAncientStopsById] = useState<Record<string, AncientStopPayload>>({});
   const ancientEntitiesById = useMemo(
     () => new Map((ancientTimeline?.entities ?? []).map((entity) => [entity.id, entity] as const)),
@@ -3093,24 +3099,37 @@ export function MapView({
     const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
     return buildAncientHolderLabelFeatures(selectedAncientStopPayload, timelineRangeEndYear);
   }, [ancientTimeline, selectedAncientStopPayload]);
-  const selectedRegionGeometry = useMemo(() => {
+  const selectedAreaPlace = useMemo(() => {
     if (!selection || mapMode !== "ancient") {
       return null;
     }
     const selectedPlace = placeById.get(selection.placeId);
-    if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
+    return selectedPlace && isAreaLabelPlace(selectedPlace) ? selectedPlace : null;
+  }, [mapMode, placeById, selection]);
+  const selectedRegionGeometry = useMemo(() => {
+    if (!selectedAreaPlace) {
       return null;
     }
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
       holderUnionGeometries: ancientHolderUnions.geometries,
+      regionOutlineGeometries: ancientRegionOutlines,
       stopPayload: selectedAncientStopPayload,
-      placeId: selectedPlace.id,
-      placeType: selectedPlace.type,
-      politicalAreaId: selectedPlace.politicalAreaId,
+      placeId: selectedAreaPlace.id,
+      placeType: selectedAreaPlace.type,
+      politicalAreaId: selectedAreaPlace.politicalAreaId,
       politicalUnitAreaTypes
     });
-  }, [ancientHolderUnions, ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+  }, [ancientHolderUnions, ancientRegionOutlines, ancientShapes, selectedAncientStopPayload, selectedAreaPlace]);
+  // A selected area name that holds no land this year falls back to its own outline (ADR-0050 item 5).
+  const regionOutlinesNeededByPlaceId =
+    selectedAreaPlace &&
+    !selectedRegionGeometry &&
+    !ancientRegionOutlines &&
+    ancientShapes &&
+    selectedAncientStopPayload
+      ? selectedAreaPlace.id
+      : null;
   const selectedRegionSourceSyncKey = useMemo(() => {
     if (!selectedRegionGeometry) {
       return "none";
@@ -3346,6 +3365,32 @@ export function MapView({
       cancelled = true;
     };
   }, [ancientLayerLoadState, ancientShapes, hasAncientTimeline, mapReadyVersion]);
+
+  // The outlines load on first use, not at startup, under their own size cap
+  // (ADR-0050's update). If they fail, the region keeps its name alone, and the
+  // next region selected tries again.
+  useEffect(() => {
+    if (!regionOutlinesNeededByPlaceId || regionOutlinesRequestedRef.current) {
+      return;
+    }
+
+    regionOutlinesRequestedRef.current = true;
+    void fetch("/generated/ancient.region-outlines.json", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient region outlines (${response.status})`);
+        }
+
+        return (await response.json()) as AncientRegionOutlinesPayload;
+      })
+      .then((outlinesPayload) => {
+        setAncientRegionOutlines(toRegionOutlineGeometries(outlinesPayload));
+      })
+      .catch((error) => {
+        regionOutlinesRequestedRef.current = false;
+        console.error("Failed to load ancient region outlines.", error);
+      });
+  }, [regionOutlinesNeededByPlaceId]);
 
   useEffect(() => {
     if (
