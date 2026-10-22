@@ -29,7 +29,7 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Other journeys in Acts,** such as Paul's journey to Damascus (Acts 9), his visits to Jerusalem (Acts 11:30, 15:2), and the travels of Philip (Acts 8) and Peter (Acts 9–10). The Routes tab shows Paul's three journeys and his voyage to Rome, which the brief names (ADR-0038 item 1).
 
 ## Process and tooling
-- **Replay tile requests in browser tests (ADR-0045).** Record the OpenFreeMap tiles the browser tests load, as a HAR file or a small PMTiles extract, and serve them locally, so that the tests stop depending on the network. That was the main cause of ADR-0036's failed CI runs.
+- **Replay tile requests in browser tests (ADR-0045); now card M5-22.** Record the OpenFreeMap tiles the browser tests load, as a HAR file or a small PMTiles extract, and serve them locally, so that the tests stop depending on the network. That was the main cause of ADR-0036's failed CI runs.
 - **Mutation testing** (e.g. Stryker) of the data validator and builders, run weekly, to show whether the tests would catch real mistakes. Most of the code is written by AI agents.
 - **Lighthouse in CI as a weekly, advisory run** (median of 5). The desktop gate stays the one that counts (ADR-0034, ADR-0045).
 - **Path filters,** so that a PR changing only data or only styles runs only the affected checks.
@@ -38,6 +38,8 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - Move to Copilot cloud agent if it becomes available, and record the switch in an ADR (brief §8).
 - **A time limit for CI's build job.** `.github/workflows/app.yml`'s `build` job has no `timeout-minutes`, so a stuck run waits for GitHub's 6-hour default. On 2026-10-07, three runs on `main` hung at the Playwright install, a step lean CI (ADR-0036) has since removed from the build. Add a 20-minute limit the next time the workflow changes.
 - **Share border geometry across the ancient layer's stops.** Each stop file repeats the borders it draws, about 145 KB of the layer's 318 KB gzip. A shared file of border segments that each stop lists by id would win most of that back, and the budget could return to 300,000 bytes (ADR-0037, update of 2026-10-19).
+
+- **A `waitForMapIdle` that waits for the selection to reach the map.** Several October flakes had one cause: a test read the map once, right after `waitForMapIdle`, before the app's new selection had reached the map. They were #81's region-click and year-change tests and #84's town-dot test, each fixed with a poll. A helper that waits two animation frames, and then the map's `idle` event after `triggerRepaint`, would close the whole class.
 
 ## Map
 - **Sophene, the first land drawn outside the empire (M5-11's research §4.7).** Three of its four sides are sourced (Strabo 11.14.2 and 12.2.1; Smith's *Dictionary*). The Fact-Checker found that the note swaps Mount Masius and the Antitaurus (verification U2). This fits the later item on civilisations around the world.
@@ -58,6 +60,15 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Colossae is no longer unexcavated.** Its location record still says it has never been excavated, but excavation has begun (Biblical Archaeology Society interview, July 2026; found by the M3.5-03 Fact-Checker). After CP3.5, a small sourced data task updates the record.
 - **Flickr Commons "No restrictions" images.** Many Internet Archive book scans on Commons carry only this license, which `docs/LICENSES.md` doesn't list, so higher-resolution scans of public-domain plates can't be used (for example a 2,256 px scan of Allom's 1836 Philadelphia plate; M3.5-04). The Fact-Checker decides whether to accept it for works that are public domain by age, and if so how to record the license.
 - **Region labels rank below other places' labels.** VISUAL_SPEC §2 ("Places on the map") puts empires, provinces and regions ahead of other places, but since M3 the area-label layers sit below other places' labels, so a small place such as Nain can hide "Galilee" at zooms 6 to 8 (found by the PO at CP4). Decide which order is right, then make the spec and the map agree.
+
+- **Jesus' journeys in a few big parts (the human, 2026-10-22).** "for Jesus's journeys, can we break it down into a few big chunks? Right now it looks way too busy and because some routes aren't known, they're not numbered which also makes it quite hard to see."
+  - **Now:** the route has 32 stages in no single order (`structure: "standalone-segments"`). 12 of them have no line, because one of their places has a disputed site (Bethany beyond the Jordan, Cana, the country of the Gadarenes, Bethsaida, Emmaus), and those stages carry no number on the map.
+  - **The idea:** split the journeys into a few parts that the Gospels' own order supports, each shown on its own like Paul's journeys. For example: the early ministry in Judea and Samaria; Galilee; the journeys north and east of the lake; and the last journey to Jerusalem, with the appearances after the resurrection.
+  - **Numbers:** number every stage, and show the ones without a line another way, such as numbered places with a dashed hint, or a "site disputed" mark.
+  - **Steps:** research and a fact-check for the parts and their sources, then the Routes tab.
+- **The per-year Roman frontier never draws** (found by #81's delta review). Each stop's `romanEmpireEdge` has been null since M5-11, because `topology()` in `scripts/lib/ancient-app-data-builder.mjs` finds no arc that a Roman and a non-Roman area share; their borders are traced independently. So the map layer meant to draw Rome's frontier for each year draws nothing, and only the static `ancient.empire-edge.geojson` shows. Build the frontier from #87's merged Roman shape minus the coast, and drop the dead computation.
+- **Load the merged-land file on first use too.** `ancient.holder-unions.json` (#87, about 13.7 KB gzip) loads at startup, and the startup layer sits at about 327,800 of 330,000 bytes. Loading it on first use with the region outlines (M5-21) would free that room, but both files together come to about 26 KB, over the 25,000-byte cap for files loaded on first use. So the cap would rise, with the reason recorded in an ADR-0050 update.
+- **Fewer source uploads per click.** Every place click re-uploads about 15 map sources, as before #81. Headed runs on a real GPU show no long tasks, but headless runs measured up to 401 ms. A card like M5-15 can skip sources whose data didn't change.
 
 ## Phones (M7, mobile-web polish)
 - *(Moved into M7 as M7-02, ADR-0047, on 2026-10-19.)*
