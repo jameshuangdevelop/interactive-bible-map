@@ -12,14 +12,11 @@ concurrency:
   group: full-suite-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PLAYWRIGHT_IMAGE_TAG: v1.63.0-noble
-
 jobs:
   full-suite:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:${{ env.PLAYWRIGHT_IMAGE_TAG }}
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --user 1001 --ipc=host
     timeout-minutes: 20
     env:
@@ -36,7 +33,7 @@ jobs:
           cache: npm
 
       - name: Check Playwright container version
-        run: node scripts/check-playwright-image.mjs --image-tag "${{ env.PLAYWRIGHT_IMAGE_TAG }}"
+        run: node scripts/check-playwright-image.mjs --image-tag v1.63.0-noble
 
       - name: Install dependencies
         run: npm ci
