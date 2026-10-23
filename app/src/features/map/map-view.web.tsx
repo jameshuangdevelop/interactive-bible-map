@@ -285,7 +285,11 @@ const areaLabelMajorVariableAnchorFilter = [
   ["!=", ["get", "isSelectedPlace"], true],
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
-const selectedAreaLabelFilter = ["==", ["get", "isSelectedPlace"], true];
+const selectedAreaLabelFilter = [
+  "all",
+  ["<", ["zoom"], ["get", "maxZoom"]],
+  ["==", ["get", "isSelectedPlace"], true]
+];
 const holderLabelBaseFilter = [
   "all",
   ["==", ["get", "clickable"], true],
@@ -2946,9 +2950,13 @@ export function MapView({
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
   const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
+  const routesModeEnabled = Boolean(routesOverlay);
+  const usesDesktopTimelineFitInset =
+    !routesModeEnabled && !isSmallScreen && mapMode === "ancient" && hasAncientTimeline;
+  const desktopTimelineFitInsetReady = !usesDesktopTimelineFitInset || timelineOverlayInset > 0;
   const fitBottomInset = Math.max(
     bottomInset,
-    !isSmallScreen && mapMode === "ancient" && hasAncientTimeline ? Math.max(0, timelineOverlayInset) : 0
+    usesDesktopTimelineFitInset ? timelineOverlayInset : 0
   );
   const regionOutlineIds = useMemo(
     () =>
@@ -2959,7 +2967,6 @@ export function MapView({
       ),
     [ancientTimeline?.regionOutlineIds]
   );
-  const routesModeEnabled = Boolean(routesOverlay);
   useEffect(() => {
     routesModeEnabledRef.current = routesModeEnabled;
   }, [routesModeEnabled]);
@@ -5005,13 +5012,20 @@ export function MapView({
       return;
     }
 
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}:${fitBottomInset}`;
-    if (selectionKey === previousFocusRequestRef.current) {
+    const place = placeById.get(selection.placeId);
+    if (!place) {
       return;
     }
 
-    const place = placeById.get(selection.placeId);
-    if (!place) {
+    const focusPlan = planSelectionFocus(place, selection);
+    if (!focusPlan) {
+      return;
+    }
+    if (focusPlan.kind === "fit-bounds" && !desktopTimelineFitInsetReady) {
+      return;
+    }
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}:${desktopTimelineFitInsetReady ? "ready" : "pending"}`;
+    if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
 
@@ -5052,12 +5066,17 @@ export function MapView({
       runtimeTuning.flyToDurationMs
     );
   }, [
+    desktopTimelineFitInsetReady,
     fitBottomInset,
     bottomInset,
+    hasAncientTimeline,
+    isSmallScreen,
     mapReadyVersion,
+    mapMode,
     panelInset,
     placeById,
     routesModeEnabled,
+    timelineOverlayInset,
     runtimeTuning.controlZoomDurationMs,
     runtimeTuning.flyToDurationMs,
     selectionOrigin,

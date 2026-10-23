@@ -2007,7 +2007,7 @@ test("desktop deep link keeps Malta's selected candidate above the timeline card
 
   await expect
     .poll(async () => {
-      return page.evaluate((testHookKey) => {
+      const fitProbe = await page.evaluate((testHookKey) => {
         const map = window[testHookKey];
         const card = document.querySelector("[data-timeline-card='true']");
         if (!map || !(card instanceof HTMLElement)) {
@@ -2020,25 +2020,9 @@ test("desktop deep link keeps Malta's selected candidate above the timeline card
           cardTop: cardRect.top
         };
       }, mapTestHookKey);
+      return fitProbe !== null && fitProbe.candidateY < fitProbe.cardTop - 4;
     }, { timeout: 30_000 })
-    .toMatchObject({
-      candidateY: expect.any(Number),
-      cardTop: expect.any(Number)
-    });
-  const fitProbe = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const card = document.querySelector("[data-timeline-card='true']");
-    if (!map || !(card instanceof HTMLElement)) {
-      throw new Error("Expected map and timeline card.");
-    }
-    const candidatePoint = map.project([14.4, 35.9]);
-    const cardRect = card.getBoundingClientRect();
-    return {
-      candidateY: candidatePoint.y,
-      cardTop: cardRect.top
-    };
-  }, mapTestHookKey);
-  expect(fitProbe.candidateY).toBeLessThan(fitProbe.cardTop - 4);
+    .toBe(true);
 });
 
 test("selected region deep links render the selected area label layer for Judea and Malta @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -2050,6 +2034,20 @@ test("selected region deep links render the selected area label layer for Judea 
     await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe(placeId);
     await expect.poll(async () => selectedAreaLabelLayerCount(page, placeId), { timeout: 30_000 }).toBe(1);
   }
+});
+
+test("Judea selection still allows Jerusalem label placement at zoom 12 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&place=judea&year=50`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await expect.poll(async () => selectedAreaLabelLayerCount(page, "judea"), { timeout: 30_000 }).toBe(1);
+  await jumpMap(page, [35.23, 31.78], 12);
+  await expect.poll(async () => selectedAreaLabelLayerCount(page, "judea"), { timeout: 10_000 }).toBe(0);
+  await expect.poll(async () => {
+    const visibleNames = await renderedPlaceNames(page);
+    return visibleNames.some((entry) => entry.placeId === "jerusalem");
+  }, { timeout: 10_000 }).toBe(true);
 });
 
 test("clicking PROVINCE OF GALATIA shows one blue rendered region name @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
