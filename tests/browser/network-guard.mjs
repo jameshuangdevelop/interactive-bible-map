@@ -868,7 +868,22 @@ export async function attachNetworkGuardsToContext(context) {
         return;
       }
 
-      const body = await loadReplayBodyForUrl(requestUrl, fixtureEntry);
+      let body;
+      try {
+        body = await loadReplayBodyForUrl(requestUrl, fixtureEntry);
+      } catch (error) {
+        // Keep rejected per-URL cache entries: a corrupt fixture body will not self-heal mid-run.
+        const readableError = error instanceof Error ? error.message : String(error);
+        const message = `Fixture body unreadable for ${requestUrl}: ${readableError}. Re-fetch with npm run fetch:basemap-fixture (or re-record).`;
+        recordFailure(context, message);
+        requestDecisions.set(request, "unreadable-deterministic-basemap-body");
+        await route.fulfill({
+          status: 599,
+          contentType: "text/plain; charset=utf-8",
+          body: message
+        });
+        return;
+      }
       if (!body) {
         const missingBodyDecision = decideReplayRequestPolicy({
           url: requestUrl,

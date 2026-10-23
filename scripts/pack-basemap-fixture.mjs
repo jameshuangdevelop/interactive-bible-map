@@ -185,7 +185,25 @@ function buildSourceSummaryLines({ planetVersion, reliefTileCount }) {
 }
 
 function countNoun(count, singular, plural = `${singular}s`) {
-  return `${count} ${count === 1 ? singular : plural}`;
+  let resolvedPlural = plural;
+  if (plural === `${singular}s` && /[^aeiou]y$/iu.test(singular)) {
+    resolvedPlural = `${singular.slice(0, -1)}ies`;
+  }
+  return `${formatNumber(count)} ${count === 1 ? singular : resolvedPlural}`;
+}
+
+function formatNumber(value) {
+  return Number(value).toLocaleString("en-US");
+}
+
+function joinWithAnd(items) {
+  if (items.length <= 1) {
+    return items.join("");
+  }
+  if (items.length === 2) {
+    return `${items[0]} and ${items[1]}`;
+  }
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 }
 
 function formatOpenFreeMapContentLine(summary) {
@@ -198,7 +216,7 @@ function formatOpenFreeMapContentLine(summary) {
   if (summary.openFreeMap.reliefTiles > 0) {
     parts.push(countNoun(summary.openFreeMap.reliefTiles, "relief tile"));
   }
-  return parts.join(", ");
+  return joinWithAnd(parts);
 }
 
 export function buildNoticeMarkdown({ date, planetVersion, reliefTileCount }) {
@@ -282,7 +300,6 @@ ${noticesBody}
 
 export function buildReleaseNotesMarkdown({
   date,
-  tag,
   archiveName,
   sha256,
   bytes,
@@ -294,18 +311,11 @@ export function buildReleaseNotesMarkdown({
     planetVersion,
     reliefTileCount: summary.openFreeMap.reliefTiles
   });
-  return `<!-- Release metadata -->
-<!-- tag: ${tag} -->
-<!-- asset: ${archiveName} -->
-<!-- sha256: ${sha256} -->
-<!-- bytes: ${bytes} -->
-<!-- files: ${files} -->
+  return `**Test fixture, not an app release.** This archive holds the basemap responses that the browser tests of Interactive Bible Map replay, so the tests don't depend on the network. It is not part of the app and is never deployed with it.
 
-**Test fixture, not an app release.** This archive holds the basemap responses that the browser tests of Interactive Bible Map replay, so the tests don't depend on the network. It is not part of the app and is never deployed with it.
-
-- File: \`${archiveName}\` · SHA-256 \`${sha256}\` · ${bytes} bytes · ${files} files
+- File: \`${archiveName}\` · SHA-256 \`${sha256}\` · ${formatNumber(bytes)} bytes · ${formatNumber(files)} files
 - Recorded: ${date}. OpenFreeMap planet build: \`${planetVersion}\`.
-- Contents: ${countNoun(summary.totalResponses, "response")}. From OpenFreeMap: ${formatOpenFreeMapContentLine(summary)}. From VersaTiles: ${countNoun(summary.versaTiles.vectorTiles, "vector tile")}, ${countNoun(summary.versaTiles.glyphRanges, "glyph range")}, ${countNoun(summary.versaTiles.spriteFiles, "sprite file")} and ${countNoun(summary.versaTiles.notFoundResponses, '"not found" (404) reply')}.
+- Contents: ${countNoun(summary.totalResponses, "response")}. From OpenFreeMap: ${formatOpenFreeMapContentLine(summary)}. From VersaTiles: ${joinWithAnd([countNoun(summary.versaTiles.vectorTiles, "vector tile"), countNoun(summary.versaTiles.glyphRanges, "glyph range"), countNoun(summary.versaTiles.spriteFiles, "sprite file"), countNoun(summary.versaTiles.notFoundResponses, '"not found" (404) reply')])}.
 - OpenFreeMap files: ${sourceLines.openFreeMap}
 - VersaTiles files: ${sourceLines.versaTiles}
 - ${sourceLines.storage} \`manifest.json\` maps each URL to its file. \`NOTICE.md\` and the \`LICENSES/\` folder inside the archive give the full notices.
@@ -316,7 +326,6 @@ ${releaseNotesLicenceBlock}`;
 async function writeReleaseNotesDraft({
   outputRoot,
   date,
-  tag,
   archiveName,
   sha256,
   bytes,
@@ -327,7 +336,6 @@ async function writeReleaseNotesDraft({
   const releaseNotesPath = path.join(outputRoot, `${archiveName.replace(/\.tar$/u, "")}-release-notes.md`);
   const contents = buildReleaseNotesMarkdown({
     date,
-    tag,
     archiveName,
     sha256,
     bytes,
@@ -413,7 +421,6 @@ export async function run() {
   const releaseNotesDraftPath = await writeReleaseNotesDraft({
     outputRoot: path.resolve(outputRoot),
     date,
-    tag,
     archiveName,
     sha256: archiveSha256,
     bytes: archiveStats.size,
