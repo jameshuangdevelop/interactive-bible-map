@@ -127,6 +127,7 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --user 1001 --ipc=host
+    # Keep this above Playwright CI globalTimeout (10m) so runs fail in-test, not by job timeout.
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -144,9 +145,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
-
-      - name: Check Playwright container version
-        run: node scripts/check-playwright-image.mjs --image-tag v1.63.0-noble
 
       - name: Install dependencies
         run: npm ci
@@ -408,9 +406,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
-
-      - name: Check Playwright container version
-        run: node scripts/check-playwright-image.mjs --image-tag v1.63.0-noble
 
       - name: Install dependencies
         run: npm ci

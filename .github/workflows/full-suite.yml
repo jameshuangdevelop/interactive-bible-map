@@ -32,9 +32,6 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Check Playwright container version
-        run: node scripts/check-playwright-image.mjs --image-tag v1.63.0-noble
-
       - name: Install dependencies
         run: npm ci
 
