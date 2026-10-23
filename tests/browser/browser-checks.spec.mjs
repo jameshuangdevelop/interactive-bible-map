@@ -520,24 +520,48 @@ test("map requests tiles and loads workers on startup", { tag: ["@data"] }, asyn
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   // Canvas mount can exceed 15s when Chromium starts the map worker on CI.
   await page.waitForSelector("canvas.maplibregl-canvas", { timeout: MAP_CANVAS_TIMEOUT_MS });
-  await page.waitForTimeout(500);
-
-  const tileRequestCount = requestUrls.filter(
-    (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
-  ).length;
-  const workerRequestCount = requestUrls.filter(
-    (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
-  ).length;
-  const distinctWorkerRequestUrlCount = new Set(
-    requestUrls.filter(
-      (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
+  let startupCounts = null;
+  await expect
+    .poll(
+      () => {
+        const tileRequestCount = requestUrls.filter(
+          (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
+        ).length;
+        const workerRequestCount = requestUrls.filter(
+          (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
+        ).length;
+        const distinctWorkerRequestUrlCount = new Set(
+          requestUrls.filter(
+            (url) =>
+              url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
+          )
+        ).size;
+        startupCounts = {
+          tileRequestCount,
+          workerUrlsCount: workerUrls.length,
+          workerRequestCount,
+          distinctWorkerRequestUrlCount
+        };
+        return (
+          tileRequestCount > 0 &&
+          workerUrls.length > 0 &&
+          workerRequestCount >= 2 &&
+          distinctWorkerRequestUrlCount >= 2
+        );
+      },
+      {
+        timeout: 10_000,
+        message:
+          "Expected startup to finish at least one tile request and both maplibre worker requests"
+      }
     )
-  ).size;
+    .toBe(true);
 
-  expect(tileRequestCount).toBeGreaterThan(0);
-  expect(workerUrls.length).toBeGreaterThan(0);
-  expect(workerRequestCount).toBeGreaterThanOrEqual(2);
-  expect(distinctWorkerRequestUrlCount).toBeGreaterThanOrEqual(2);
+  expect(startupCounts).not.toBeNull();
+  expect(startupCounts.tileRequestCount).toBeGreaterThan(0);
+  expect(startupCounts.workerUrlsCount).toBeGreaterThan(0);
+  expect(startupCounts.workerRequestCount).toBeGreaterThanOrEqual(2);
+  expect(startupCounts.distinctWorkerRequestUrlCount).toBeGreaterThanOrEqual(2);
 });
 
 test.describe.serial("sequential panel checks", () => {

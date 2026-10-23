@@ -52,7 +52,7 @@ let eventLogChain = Promise.resolve();
 let fixtureMissLogChain = Promise.resolve();
 let placeholderCachePromise = null;
 let manifestCachePromise = null;
-let replayBodyCachePromise = null;
+const replayBodyPromisesByUrl = new Map();
 let recordEntriesByUrl = new Map();
 let replayFixtureDirectoryPromise = null;
 let openFreeMapPlanetVersionPromise = null;
@@ -577,21 +577,23 @@ async function loadManifest() {
   return manifestCachePromise;
 }
 
-async function loadReplayBodies() {
-  if (!replayBodyCachePromise) {
-    replayBodyCachePromise = (async () => {
-      const { entriesByUrl } = await loadManifest();
-      const responseBodiesByUrl = new Map();
-      await Promise.all(
-        [...entriesByUrl.values()].map(async (entry) => {
-          const compressedBody = await fs.readFile(entry.absolutePath);
-          responseBodiesByUrl.set(entry.url, await gunzip(compressedBody));
-        })
-      );
-      return responseBodiesByUrl;
-    })();
+async function loadReplayBodyForUrl(url, fixtureEntry) {
+  if (!replayBodyPromisesByUrl.has(url)) {
+    replayBodyPromisesByUrl.set(
+      url,
+      (async () => {
+        const resolvedEntry =
+          fixtureEntry ??
+          (await loadManifest()).entriesByUrl.get(url);
+        if (!resolvedEntry) {
+          return null;
+        }
+        const compressedBody = await fs.readFile(resolvedEntry.absolutePath);
+        return gunzip(compressedBody);
+      })()
+    );
   }
-  return replayBodyCachePromise;
+  return replayBodyPromisesByUrl.get(url);
 }
 
 function queueEventWrite(event) {
@@ -866,8 +868,7 @@ export async function attachNetworkGuardsToContext(context) {
         return;
       }
 
-      const responseBodiesByUrl = await loadReplayBodies();
-      const body = responseBodiesByUrl.get(requestUrl);
+      const body = await loadReplayBodyForUrl(requestUrl, fixtureEntry);
       if (!body) {
         const missingBodyDecision = decideReplayRequestPolicy({
           url: requestUrl,
