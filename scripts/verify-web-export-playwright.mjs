@@ -696,7 +696,7 @@ async function routeGalleryFixtureRequests(page, galleryFixturePayload, imageReq
       return;
     }
 
-    await route.continue();
+    await route.fallback();
   });
 }
 
@@ -2310,7 +2310,7 @@ async function verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl) {
     } else if (requestUrl.endsWith("/generated/places/emmaus.json")) {
       emmausRequestCount += 1;
     }
-    await route.continue();
+    await route.fallback();
   });
 
   try {
@@ -3540,7 +3540,7 @@ async function verifyImageFailurePlaceholderKeepsCredit(browser, baseUrl) {
       return;
     }
 
-    route.continue();
+    route.fallback();
   });
 
   try {
@@ -4972,7 +4972,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
       });
     } catch {
       missingFixtureFiles.add(fileName);
-      await route.continue();
+      await route.fallback();
     }
   });
 
@@ -5158,7 +5158,7 @@ async function verifyTimelineUiWithFixtureData(browser, baseUrl, fixtureGenerate
           body: content
         });
       } catch {
-        await route.continue();
+        await route.fallback();
       }
     });
     try {
@@ -8369,7 +8369,7 @@ async function verifyFallbackOutageMode({
   await page.route("**/*", (route) => {
     const requestUrl = route.request().url();
     if (!requestUrl.includes("tiles.openfreemap.org")) {
-      return route.continue();
+      return route.fallback();
     }
 
     if (abortMode === "all-requests") {
@@ -8380,7 +8380,7 @@ async function verifyFallbackOutageMode({
       return route.abort("failed");
     }
 
-    return route.continue();
+    return route.fallback();
   });
 
   page.on("requestfinished", (request) => {
@@ -8477,7 +8477,7 @@ async function captureFallbackSelectionScreenshot({
       route.abort("failed");
       return;
     }
-    route.continue();
+    route.fallback();
   });
 
   try {

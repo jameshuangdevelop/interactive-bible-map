@@ -80,7 +80,12 @@ describe("sources and credits text constants", () => {
   });
 
   test("lists every upstream source from ATTRIBUTION.md", () => {
-    const tableStart = attributionDocument.indexOf("| Source | Used for |");
+    const upstreamSectionStart = attributionDocument.indexOf("## Upstream sources");
+    if (upstreamSectionStart < 0) {
+      throw new Error("Could not locate '## Upstream sources' in ATTRIBUTION.md.");
+    }
+
+    const tableStart = attributionDocument.indexOf("| Source | Used for |", upstreamSectionStart);
     if (tableStart < 0) {
       throw new Error("Could not locate upstream sources table in ATTRIBUTION.md.");
     }

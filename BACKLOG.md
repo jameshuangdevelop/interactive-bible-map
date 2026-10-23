@@ -29,7 +29,6 @@ Ideas that are deferred and not scheduled. The PO moves an item into a milestone
 - **Other journeys in Acts,** such as Paul's journey to Damascus (Acts 9), his visits to Jerusalem (Acts 11:30, 15:2), and the travels of Philip (Acts 8) and Peter (Acts 9–10). The Routes tab shows Paul's three journeys and his voyage to Rome, which the brief names (ADR-0038 item 1).
 
 ## Process and tooling
-- **Replay tile requests in browser tests (ADR-0045); now card M5-22.** Record the OpenFreeMap tiles the browser tests load, as a HAR file or a small PMTiles extract, and serve them locally, so that the tests stop depending on the network. That was the main cause of ADR-0036's failed CI runs.
 - **Mutation testing** (e.g. Stryker) of the data validator and builders, run weekly, to show whether the tests would catch real mistakes. Most of the code is written by AI agents.
 - **Lighthouse in CI as a weekly, advisory run** (median of 5). The desktop gate stays the one that counts (ADR-0034, ADR-0045).
 - **Path filters,** so that a PR changing only data or only styles runs only the affected checks.

@@ -520,24 +520,48 @@ test("map requests tiles and loads workers on startup", { tag: ["@data"] }, asyn
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   // Canvas mount can exceed 15s when Chromium starts the map worker on CI.
   await page.waitForSelector("canvas.maplibregl-canvas", { timeout: MAP_CANVAS_TIMEOUT_MS });
-  await page.waitForTimeout(500);
-
-  const tileRequestCount = requestUrls.filter(
-    (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
-  ).length;
-  const workerRequestCount = requestUrls.filter(
-    (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
-  ).length;
-  const distinctWorkerRequestUrlCount = new Set(
-    requestUrls.filter(
-      (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
+  let startupCounts = null;
+  await expect
+    .poll(
+      () => {
+        const tileRequestCount = requestUrls.filter(
+          (url) => url.includes("tiles.openfreemap.org") || url.includes("tiles.versatiles.org")
+        ).length;
+        const workerRequestCount = requestUrls.filter(
+          (url) => url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
+        ).length;
+        const distinctWorkerRequestUrlCount = new Set(
+          requestUrls.filter(
+            (url) =>
+              url.includes("maplibre-gl-worker.mjs") || url.includes("maplibre-gl-shared.mjs")
+          )
+        ).size;
+        startupCounts = {
+          tileRequestCount,
+          workerUrlsCount: workerUrls.length,
+          workerRequestCount,
+          distinctWorkerRequestUrlCount
+        };
+        return (
+          tileRequestCount > 0 &&
+          workerUrls.length > 0 &&
+          workerRequestCount >= 2 &&
+          distinctWorkerRequestUrlCount >= 2
+        );
+      },
+      {
+        timeout: 10_000,
+        message:
+          "Expected startup to finish at least one tile request and both maplibre worker requests"
+      }
     )
-  ).size;
+    .toBe(true);
 
-  expect(tileRequestCount).toBeGreaterThan(0);
-  expect(workerUrls.length).toBeGreaterThan(0);
-  expect(workerRequestCount).toBeGreaterThanOrEqual(2);
-  expect(distinctWorkerRequestUrlCount).toBeGreaterThanOrEqual(2);
+  expect(startupCounts).not.toBeNull();
+  expect(startupCounts.tileRequestCount).toBeGreaterThan(0);
+  expect(startupCounts.workerUrlsCount).toBeGreaterThan(0);
+  expect(startupCounts.workerRequestCount).toBeGreaterThanOrEqual(2);
+  expect(startupCounts.distinctWorkerRequestUrlCount).toBeGreaterThanOrEqual(2);
 });
 
 test.describe.serial("sequential panel checks", () => {
@@ -574,7 +598,7 @@ test.describe.serial("sequential panel checks", () => {
   });
 });
 
-test("normal loads stay on the main basemap in a 5s observation window", { tag: ["@modern"] }, async ({ browser, baseUrl }) => {
+test("normal loads stay on the main basemap in a 5s observation window", { tag: ["@modern", "@live-smoke"] }, async ({ browser, baseUrl }) => {
   await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/", { observeWindowMs: 5_000 });
   await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern", { observeWindowMs: 5_000 });
   await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?place=galilee", { observeWindowMs: 5_000 });
@@ -765,7 +789,7 @@ test("keyboard order and Escape behavior follow map accessibility contract", { t
   await verifyKeyboardOrderAndEscapeBehavior(page, baseUrl);
 });
 
-test("modern map toggle preserves state and attribution", { tag: ["@modern"] }, async ({ page, baseUrl }) => {
+test("modern map toggle preserves state and attribution", { tag: ["@modern", "@live-smoke"] }, async ({ page, baseUrl }) => {
   await verifyModernMapToggle(page, baseUrl);
 });
 
@@ -864,7 +888,7 @@ test("place details recover from stale request races", { tag: ["@panel"] }, asyn
   await verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl);
 });
 
-test("fallback outage mode works in pbf-only and all-request scenarios", { tag: ["@fallback", "@network"] }, async ({ browser, baseUrl }) => {
+test("fallback outage mode works in pbf-only and all-request scenarios", { tag: ["@fallback"] }, async ({ browser, baseUrl }) => {
   await verifyFallbackOutageMode({
     browser,
     baseUrl,
@@ -1034,7 +1058,7 @@ test("important names stay discoverable: hover pointer/blue state, arrow while d
   expect(Math.abs(after.zoom - before.zoom)).toBeLessThan(0.01);
 });
 
-test("Asia Minor towns render black dots under names at year 50 (major + standard) @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("Asia Minor towns render black dots under names at year 50 (major + standard) @names", { tag: ["@names", "@live-smoke"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await jumpMap(page, [27.34, 37.94], 6.2);
 
@@ -3157,7 +3181,7 @@ test("routes load failure shows retry and recovers after Try again @routes", { t
       await route.abort("failed");
       return;
     }
-    await route.continue();
+    await route.fallback();
   });
   await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await expect(page.getByText("Routes couldn't load.")).toBeVisible();

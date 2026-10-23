@@ -18,7 +18,7 @@ Write each test at the lowest level that can catch the problem. A rule in the da
 | **Medium** | Files on disk and localhost: the built data, the exported site served locally, a headless browser | `test:generated` (checks on the data that ships), the browser tests in `tests/browser/` | 60 s per browser test (up to 180 s for a few, each with a reason in the test); about 4 min per shard | Every PR, in parallel shards |
 | **Large** | The real network or a real GPU | live basemap fallback against VersaTiles, Lighthouse, `bench:map`, the GPU smoothness gate | Per tool | Weekly on `main` and on demand; GPU checks on a desktop |
 
-PR runs skip Large and quarantined tests (`@network`, `@gpu`, `@quarantine`); the weekly run includes them. Browser tests still load the real OpenFreeMap tiles until the tile requests are replayed from a recording (BACKLOG). Until then CI retries a failed test twice and reports it as flaky (§4).
+PR runs skip Large and quarantined tests (`@network`, `@gpu`, `@quarantine`); the weekly run includes them. Browser tests replay a pinned basemap fixture from local cache, so they run without network. A weekly live-network smoke keeps one upstream check on real tiles (§2, §8).
 
 ## 2. What runs where
 
@@ -83,5 +83,25 @@ The target for a PR's wall time is **under 10 minutes.** A newer push to the sam
   - Google's test sizes [7];
   - avoiding change-detector tests [8];
   - mostly integration-level tests of what users do [9].
+
+## 8. Basemap fixture replay (browser tests without network)
+- Browser tests replay OpenFreeMap and VersaTiles responses from a pinned release asset (`tests/fixtures/basemap-fixture.lock.json`) extracted into `.cache/basemap-fixture/<sha256>/`.
+- Fetch once before tests:
+  - local: `npm run fetch:basemap-fixture` (also called by Playwright `globalSetup`);
+  - CI: cache `.cache/basemap-fixture` by lockfile hash, then run `npm run fetch:basemap-fixture`.
+- If the fixture is missing or mismatched, tests fail fast with a clear fetch/re-record message. They never fall back to live network unless `IBM_LIVE_NETWORK=1`.
+- Replay miss policy:
+  - missing vector tile fixture URLs (`/planet/.../*.pbf`, `/tiles/osm/...`) are served as empty 204 tiles and logged as `basemap-fixture-miss` annotations;
+  - missing Natural Earth relief raster fixture URLs (`/natural_earth/ne2sr/...png`) are served as transparent PNG tiles and logged as `basemap-fixture-miss` annotations;
+  - missing glyph-range fixture URLs (`/fonts/.../*.pbf`, `/assets/glyphs/.../*.pbf`) are served as empty 200 glyph PBF responses and logged as `basemap-fixture-miss` annotations;
+  - missing deterministic assets (TileJSON and sprites) fail the test loudly.
+  - global teardown prints a miss summary (count + first 20 URLs) from `tests/artifacts/basemap-fixture-misses.ndjson`.
+- Re-record flow (record mode does **not** collect from `tiles.openfreemap.org`; OpenFreeMap URLs are synthesized from OpenFreeMap public downloads and upstream public assets):
+  1. `lockf -k -t 7200 /tmp/ibm-heavy.lock npm run record:basemap`
+  2. `npm run pack:basemap-fixture` (writes `/tmp/m5-22-basemap-fixture/basemap-fixture-<YYYY-MM-DD>.tar`, prints SHA-256/size/files and a `gh release create ... --prerelease` command for the PO)
+  3. PO publishes the release asset; lockfile is updated to the new tag/asset/hash.
+- Glyph coverage for re-records: include at least these ranges for every glyph fontstack used by the basemap styles, so normal labels do not miss transiently: `0-255`, `256-511`, `512-767`, `768-1023`, `7680-7935`, `8192-8447`. `record:basemap` now prefetches these ranges in record mode for OpenFreeMap and VersaTiles glyph fontstacks.
+- Re-record sign-off gate: if a new archive includes glyph ranges beyond what the last signed-off archive held (for example above U+02FF, such as `7680-7935` or `8192-8447`), the Fact-Checker must re-check `LICENSES/OFL-1.1-Noto-Sans.txt` and sign off the new archive SHA-256 before publication. The PO publishes only signed-off archives.
+- Tile URL stability: replaying the recorded OpenFreeMap TileJSON keeps tests pinned to that planet-version path.
 
 [1] https://playwright.dev/docs/test-sharding · [2] https://playwright.dev/docs/test-retries · [3] https://playwright.dev/docs/test-timeouts · [4] https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes · [5] https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs · [6] https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow · [7] https://testing.googleblog.com/2010/12/test-sizes.html · [8] https://testing.googleblog.com/2015/01/testing-on-toilet-change-detector-tests.html · [9] https://kentcdodds.com/blog/write-tests

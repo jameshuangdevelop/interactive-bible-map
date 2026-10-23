@@ -1,0 +1,13 @@
+{
+  "repo": "jameshuangdevelop/interactive-bible-map",
+  "tag": "test-fixture-basemap-2026-10-23",
+  "asset": "basemap-fixture-2026-10-23.tar",
+  "sha256": "08fb2d6b6d61b9afd3d66010d05872bb50d62f5f608cbe490a5afa450df0ef40",
+  "bytes": 79912960,
+  "files": 1213,
+  "recordedAt": "2026-10-23T09:22:48.206Z",
+  "upstream": {
+    "openfreemapPlanetVersion": "20261018_080001_pt",
+    "versatiles": "Recorded from tiles.versatiles.org (demo server), including landcover attribution obligations."
+  }
+}

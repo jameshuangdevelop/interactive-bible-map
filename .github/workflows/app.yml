@@ -124,7 +124,10 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    # "Install Playwright Chromium" alone has taken 7–12 min on some runners (runs 39901139774,
+    # 39942838734, 39948839927), so 12 min cancelled shards whose tests had passed. Caching
+    # Chromium is the real fix and has its own card.
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -144,6 +147,15 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Cache basemap fixture
+        uses: actions/cache@v4
+        with:
+          path: .cache/basemap-fixture
+          key: basemap-fixture-${{ hashFiles('tests/fixtures/basemap-fixture.lock.json') }}
+
+      - name: Fetch basemap fixture
+        run: npm run fetch:basemap-fixture
 
       - name: Download web export artifact
         uses: actions/download-artifact@v8
