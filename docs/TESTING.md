@@ -28,6 +28,8 @@ PR runs skip Large and quarantined tests (`@network`, `@gpu`, `@quarantine`); th
 3. **Browser tests,** sharded: about 6 parallel jobs, each running its share of `tests/browser/`. Each shard stops after 5 failures. The shards' reports are merged into one HTML report. Target: under 4 minutes per shard.
 4. **Preview:** the Cloudflare preview deploy, then smoke and accessibility checks against it.
 
+The PR browser shards, preview smoke/a11y checks and the weekly full-suite job run inside Playwright's official container image (`mcr.microsoft.com/playwright:v1.63.0-noble`) with shared IPC. The image tag and both packages in `package.json` (`@playwright/test` and `playwright`) are pinned to the same version and are bumped together.
+
 The target for a PR's wall time is **under 10 minutes.** A newer push to the same PR cancels the older run.
 
 **Weekly on `main`, and on demand:** everything above, plus the Large tests.

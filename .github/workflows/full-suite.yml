@@ -12,9 +12,15 @@ concurrency:
   group: full-suite-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PLAYWRIGHT_IMAGE_TAG: v1.63.0-noble
+
 jobs:
   full-suite:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:${{ env.PLAYWRIGHT_IMAGE_TAG }}
+      options: --user 1001 --ipc=host
     timeout-minutes: 20
     env:
       CI: true
@@ -28,6 +34,9 @@ jobs:
         with:
           node-version: 24
           cache: npm
+
+      - name: Check Playwright container version
+        run: node scripts/check-playwright-image.mjs --image-tag "${{ env.PLAYWRIGHT_IMAGE_TAG }}"
 
       - name: Install dependencies
         run: npm ci
@@ -46,9 +55,6 @@ jobs:
 
       - name: Export web app
         run: npm run export:web
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Verify exported web app
         run: npm run verify:web:playwright

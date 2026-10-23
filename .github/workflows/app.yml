@@ -8,6 +8,7 @@ on:
 
 env:
   CLOUDFLARE_PAGES_PROJECT: interactive-bible-map
+  PLAYWRIGHT_IMAGE_TAG: v1.63.0-noble
 
 permissions:
   contents: read
@@ -124,9 +125,9 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
-    # "Install Playwright Chromium" alone has taken 7–12 min on some runners (runs 39901139774,
-    # 39942838734, 39948839927), so 12 min cancelled shards whose tests had passed. Caching
-    # Chromium is the real fix and has its own card.
+    container:
+      image: mcr.microsoft.com/playwright:${{ env.PLAYWRIGHT_IMAGE_TAG }}
+      options: --user 1001 --ipc=host
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -145,6 +146,9 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Check Playwright container version
+        run: node scripts/check-playwright-image.mjs --image-tag "${{ env.PLAYWRIGHT_IMAGE_TAG }}"
+
       - name: Install dependencies
         run: npm ci
 
@@ -162,9 +166,6 @@ jobs:
         with:
           name: web-export
           path: app/dist
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Run browser shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
@@ -390,6 +391,9 @@ jobs:
       - build
       - deploy_preview
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:${{ env.PLAYWRIGHT_IMAGE_TAG }}
+      options: --user 1001 --ipc=host
     timeout-minutes: 25
     concurrency:
       group: pages-preview-${{ github.event.pull_request.number }}
@@ -406,11 +410,11 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Check Playwright container version
+        run: node scripts/check-playwright-image.mjs --image-tag "${{ env.PLAYWRIGHT_IMAGE_TAG }}"
+
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Run smoke test against preview
         env:
