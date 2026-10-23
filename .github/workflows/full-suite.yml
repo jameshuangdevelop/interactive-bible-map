@@ -56,4 +56,4 @@ jobs:
       - name: Live-network weekly smoke
         env:
           IBM_LIVE_NETWORK: "1"
-        run: npx playwright test --workers=1 --retries=0 --grep "normal loads stay on the main basemap in a 5s observation window|modern map toggle preserves state and attribution|Asia Minor towns render black dots under names at year 50"
+        run: npx playwright test --workers=1 --retries=0 --grep "@live-smoke"

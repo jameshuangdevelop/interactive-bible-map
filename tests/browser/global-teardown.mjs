@@ -42,10 +42,25 @@ export default async function globalTeardown() {
 
   const uniqueUrls = [...new Set(urls)];
   const sample = uniqueUrls.slice(0, 20);
+  const summaryBody = `[basemap-fixture-miss] ${urls.length} miss(es), ${uniqueUrls.length} unique URL(s). First ${sample.length}:\n${sample
+    .map((url, index) => `${index + 1}. ${url}`)
+    .join("\n")}`;
   // eslint-disable-next-line no-console
-  console.warn(
-    `[basemap-fixture-miss] ${urls.length} miss(es), ${uniqueUrls.length} unique URL(s). First ${sample.length}:\n${sample
-      .map((url, index) => `${index + 1}. ${url}`)
-      .join("\n")}`
-  );
+  console.warn(summaryBody);
+
+  const githubStepSummaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (githubStepSummaryPath) {
+    // Do not fail CI on misses: misses are warning telemetry and failing here would reintroduce timing flakes.
+    const markdown = [
+      "### Basemap fixture misses (warning only)",
+      "",
+      `- Total misses: ${urls.length}`,
+      `- Unique URLs: ${uniqueUrls.length}`,
+      "",
+      "First 20 unique URLs:",
+      ...sample.map((url, index) => `${index + 1}. \`${url}\``),
+      ""
+    ].join("\n");
+    await fs.appendFile(githubStepSummaryPath, `${markdown}\n`).catch(() => {});
+  }
 }

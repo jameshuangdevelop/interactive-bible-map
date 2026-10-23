@@ -2,17 +2,26 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "..");
 const defaultOutputRoot = "/tmp/m5-22-basemap-fixture";
-const releaseNotesDraftPath =
-  "/Users/jameshuang/Repos/interactive-bible-map/.git/M5-22-release-notes.md";
 
 const odblTextUrl = "https://opendatacommons.org/licenses/odbl/odbl-10.txt";
 const notoOflTextUrl =
   "https://raw.githubusercontent.com/versatiles-org/versatiles-fonts/main/fonts/Noto%20Sans/LICENSE";
+
+const releaseNotesLicenceBlock = `**Licences.** This archive is not covered by the repository's MIT licence or by the project's CC BY-SA 4.0 data licence. Each part keeps its own licence:
+
+- **OpenStreetMap data (all vector tiles):** Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), available under the [Open Database License 1.0 (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). The tiles are an unmodified extract of the tilesets that OpenFreeMap and VersaTiles publish, and this archive holds the whole extract. The full tilesets: [OpenFreeMap planet downloads](https://btrfs.openfreemap.com/files.txt) and [VersaTiles downloads](https://download.versatiles.org/).
+- **OpenFreeMap tiles and TileJSON:** [OpenFreeMap](https://openfreemap.org) [© OpenMapTiles](https://www.openmaptiles.org/) Data from [OpenStreetMap](https://www.openstreetmap.org/copyright). OpenMapTiles schema © MapTiler.com & OpenMapTiles contributors: design [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), code [BSD 3-Clause](https://github.com/openmaptiles/openmaptiles/blob/master/LICENSE.md). Low-zoom data from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
+- **VersaTiles tiles:** [VersaTiles](https://versatiles.org) © OpenStreetMap contributors (ODbL 1.0), in the [Shortbread](https://shortbread-tiles.org/) schema (CC0 1.0). Land cover: © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), through VersaTiles' [Landcover Vectors](https://github.com/versatiles-org/landcover-vectors) (CC BY 4.0). Dataset: Zanaga, D., Van De Kerchove, R., Daems, D., De Keersmaecker, W., Brockmann, C., Kirches, G., Wevers, J., Cartus, O., Santoro, M., Fritz, S., Lesiv, M., Herold, M., Tsendbazar, N.E., Xu, P., Ramoino, F., Arino, O., 2022. ESA WorldCover 10 m 2021 v200. https://doi.org/10.5281/zenodo.7254221
+- **Label glyphs:** Noto Sans, under the [SIL Open Font License 1.1](https://openfontlicense.org/). The copyright notices and the licence text are in \`LICENSES/OFL-1.1-Noto-Sans.txt\`.
+- **Icons:** OpenFreeMap's \`ofm_f384\` sprite ([openfreemap-styles](https://github.com/hyperknot/openfreemap-styles), MIT; icons from the Liberty and OSM Bright styles, BSD 3-Clause and CC BY 3.0/4.0; [Maki](https://github.com/mapbox/maki), CC0 1.0). Full notices are in \`LICENSES/OpenFreeMap-sprite.txt\`. VersaTiles' \`base\` sprite ([versatiles-style](https://github.com/versatiles-org/versatiles-style)), CC0 1.0.
+
+The licensors provide this material as is, without warranty. See each licence.
+`;
 
 function currentDateString() {
   const now = new Date();
@@ -101,16 +110,108 @@ async function fetchText(url) {
   return response.text();
 }
 
-function buildNoticeMarkdown({ date, planetVersion }) {
+export function summarizeFixtureManifest(manifest) {
+  const summary = {
+    totalResponses: 0,
+    openFreeMap: {
+      vectorTiles: 0,
+      tilejson: 0,
+      glyphRanges: 0,
+      spriteFiles: 0,
+      reliefTiles: 0
+    },
+    versaTiles: {
+      vectorTiles: 0,
+      glyphRanges: 0,
+      spriteFiles: 0,
+      notFoundResponses: 0
+    }
+  };
+
+  for (const entry of manifest.entries ?? []) {
+    if (typeof entry?.url !== "string") {
+      continue;
+    }
+    summary.totalResponses += 1;
+    const parsed = new URL(entry.url);
+    const status = Number(entry.status);
+    if (parsed.hostname === "tiles.openfreemap.org") {
+      if (/^\/planet\/[^/]+\/\d+\/\d+\/\d+\.pbf$/u.test(parsed.pathname)) {
+        summary.openFreeMap.vectorTiles += 1;
+      } else if (
+        parsed.pathname === "/planet" ||
+        /^\/planet\/[^/]+\/tiles\.json$/u.test(parsed.pathname)
+      ) {
+        summary.openFreeMap.tilejson += 1;
+      } else if (/^\/fonts\/[^/]+\/\d+-\d+\.pbf$/u.test(parsed.pathname)) {
+        summary.openFreeMap.glyphRanges += 1;
+      } else if (/^\/sprites\/[^/]+\/[^/]+\.(?:json|png)$/u.test(parsed.pathname)) {
+        summary.openFreeMap.spriteFiles += 1;
+      } else if (/^\/natural_earth\/ne2sr\/\d+\/\d+\/\d+\.png$/u.test(parsed.pathname)) {
+        summary.openFreeMap.reliefTiles += 1;
+      }
+      continue;
+    }
+
+    if (parsed.hostname === "tiles.versatiles.org") {
+      if (/^\/tiles\/osm\/\d+\/\d+\/\d+$/u.test(parsed.pathname)) {
+        summary.versaTiles.vectorTiles += 1;
+      } else if (/^\/assets\/glyphs\/[^/]+\/\d+-\d+\.pbf$/u.test(parsed.pathname)) {
+        summary.versaTiles.glyphRanges += 1;
+      } else if (/^\/assets\/sprites\/[^/]+\.(?:json|png)$/u.test(parsed.pathname)) {
+        summary.versaTiles.spriteFiles += 1;
+      }
+      if (status === 404) {
+        summary.versaTiles.notFoundResponses += 1;
+      }
+    }
+  }
+
+  return summary;
+}
+
+function buildSourceSummaryLines({ planetVersion, reliefTileCount }) {
+  const reliefSuffix =
+    reliefTileCount > 0
+      ? ` This archive includes ${reliefTileCount} relief tile${reliefTileCount === 1 ? "" : "s"}.`
+      : " This archive holds no relief tiles.";
+  return {
+    openFreeMap:
+      `nothing was fetched from OpenFreeMap's public tile service (tiles.openfreemap.org). The vector tiles were read from OpenFreeMap's public planet download for that build (https://btrfs.openfreemap.com/areas/planet/${planetVersion}/tiles.pmtiles). This project's recorder built the TileJSON from the same file's metadata, with its attribution and layer list unchanged. The label glyphs come from maplibre/demotiles (https://github.com/maplibre/demotiles) and the \`ofm_f384\` sprite from hyperknot/openfreemap-styles (https://github.com/hyperknot/openfreemap-styles). They are the same files OpenFreeMap serves.${reliefSuffix}`,
+    versaTiles: "recorded from https://tiles.versatiles.org.",
+    storage:
+      "Apart from that TileJSON, each response body is stored unmodified, as received from the sources above, and compressed with gzip."
+  };
+}
+
+function countNoun(count, singular, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+function formatOpenFreeMapContentLine(summary) {
+  const parts = [
+    countNoun(summary.openFreeMap.vectorTiles, "vector tile"),
+    summary.openFreeMap.tilejson === 1 ? "the TileJSON" : `${summary.openFreeMap.tilejson} TileJSON files`,
+    countNoun(summary.openFreeMap.glyphRanges, "glyph range"),
+    countNoun(summary.openFreeMap.spriteFiles, "sprite file")
+  ];
+  if (summary.openFreeMap.reliefTiles > 0) {
+    parts.push(countNoun(summary.openFreeMap.reliefTiles, "relief tile"));
+  }
+  return parts.join(", ");
+}
+
+export function buildNoticeMarkdown({ date, planetVersion, reliefTileCount }) {
+  const sourceLines = buildSourceSummaryLines({ planetVersion, reliefTileCount });
   return `# Notice: recorded basemap responses (test fixture)
 
 This archive is a test fixture of Interactive Bible Map (https://github.com/jameshuangdevelop/interactive-bible-map). It holds the basemap responses that the project's browser tests replay, so the tests don't need the network. It is not part of the app.
 
 Recorded: ${date}. OpenFreeMap planet build: ${planetVersion}.
-OpenFreeMap files: nothing was fetched from https://tiles.openfreemap.org. Vector tiles: read from OpenFreeMap's public planet download (https://btrfs.openfreemap.com/areas/planet/${planetVersion}/tiles.pmtiles). TileJSON: built by this project's recorder from that file's metadata, with its attribution and layer list unchanged. Glyphs: from maplibre/demotiles (https://demotiles.maplibre.org/font/). Sprite: from hyperknot/openfreemap-styles (https://github.com/hyperknot/openfreemap-styles/tree/main/sprites/sprites/ofm_f384). Relief tiles, if any: from https://github.com/lukasmartinelli/naturalearthtiles.
-VersaTiles files: recorded from https://tiles.versatiles.org.
+OpenFreeMap files: ${sourceLines.openFreeMap}
+VersaTiles files: ${sourceLines.versaTiles}
 
-\`manifest.json\` lists each URL and the file in \`responses/\` that holds its body. Apart from the TileJSON, each body is stored unmodified, as received from the sources above, and compressed with gzip. This project wrote \`manifest.json\`; it holds only URLs, HTTP headers and file names.
+\`manifest.json\` lists each URL and the file in \`responses/\` that holds its body. ${sourceLines.storage} This project wrote \`manifest.json\`; it holds only URLs, HTTP headers and file names.
 
 This archive is not covered by the project's MIT licence or its CC BY-SA 4.0 data licence. Each part keeps its own licence, listed below by URL. Nothing here adds any condition to those licences.
 
@@ -179,30 +280,66 @@ ${noticesBody}
 `;
 }
 
-async function writeReleaseNotesDraft({ date, archiveName, sha256, bytes, files, planetVersion }) {
-  const contents = `**Test fixture, not an app release.** This archive holds the basemap responses that the browser tests of Interactive Bible Map replay, so the tests don't depend on the network. It is not part of the app and is never deployed with it.
+export function buildReleaseNotesMarkdown({
+  date,
+  tag,
+  archiveName,
+  sha256,
+  bytes,
+  files,
+  planetVersion,
+  summary
+}) {
+  const sourceLines = buildSourceSummaryLines({
+    planetVersion,
+    reliefTileCount: summary.openFreeMap.reliefTiles
+  });
+  return `<!-- Release metadata -->
+<!-- tag: ${tag} -->
+<!-- asset: ${archiveName} -->
+<!-- sha256: ${sha256} -->
+<!-- bytes: ${bytes} -->
+<!-- files: ${files} -->
+
+**Test fixture, not an app release.** This archive holds the basemap responses that the browser tests of Interactive Bible Map replay, so the tests don't depend on the network. It is not part of the app and is never deployed with it.
 
 - File: \`${archiveName}\` · SHA-256 \`${sha256}\` · ${bytes} bytes · ${files} files
 - Recorded: ${date}. OpenFreeMap planet build: \`${planetVersion}\`.
-- OpenFreeMap files: taken from OpenFreeMap's public downloads: the planet build's \`tiles.pmtiles\` (https://btrfs.openfreemap.com/areas/planet/${planetVersion}/tiles.pmtiles), and fonts, sprite and relief tiles from https://assets.openfreemap.com/ or their upstream repositories.
-- VersaTiles files: recorded from https://tiles.versatiles.org.
-- Each response body is stored as received, unmodified, and compressed with gzip. \`manifest.json\` maps each URL to its file. \`NOTICE.md\` and the \`LICENSES/\` folder inside the archive give the full notices.
+- Contents: ${countNoun(summary.totalResponses, "response")}. From OpenFreeMap: ${formatOpenFreeMapContentLine(summary)}. From VersaTiles: ${countNoun(summary.versaTiles.vectorTiles, "vector tile")}, ${countNoun(summary.versaTiles.glyphRanges, "glyph range")}, ${countNoun(summary.versaTiles.spriteFiles, "sprite file")} and ${countNoun(summary.versaTiles.notFoundResponses, '"not found" (404) reply')}.
+- OpenFreeMap files: ${sourceLines.openFreeMap}
+- VersaTiles files: ${sourceLines.versaTiles}
+- ${sourceLines.storage} \`manifest.json\` maps each URL to its file. \`NOTICE.md\` and the \`LICENSES/\` folder inside the archive give the full notices.
 
-**Licences.** This archive is not covered by the repository's MIT licence or by the project's CC BY-SA 4.0 data licence. Each part keeps its own licence:
-
-- **OpenStreetMap data (all vector tiles):** Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), available under the [Open Database License 1.0 (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). The tiles are an unmodified extract of the tilesets that OpenFreeMap and VersaTiles publish, and this archive holds the whole extract. The full tilesets: [OpenFreeMap planet downloads](https://btrfs.openfreemap.com/files.txt) and [VersaTiles downloads](https://download.versatiles.org/).
-- **OpenFreeMap tiles and TileJSON:** [OpenFreeMap](https://openfreemap.org) [© OpenMapTiles](https://www.openmaptiles.org/) Data from [OpenStreetMap](https://www.openstreetmap.org/copyright). OpenMapTiles schema © MapTiler.com & OpenMapTiles contributors: design [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), code [BSD 3-Clause](https://github.com/openmaptiles/openmaptiles/blob/master/LICENSE.md). Low-zoom data from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
-- **VersaTiles tiles:** [VersaTiles](https://versatiles.org) © OpenStreetMap contributors (ODbL 1.0), in the [Shortbread](https://shortbread-tiles.org/) schema (CC0 1.0). Land cover: © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), through VersaTiles' [Landcover Vectors](https://github.com/versatiles-org/landcover-vectors) (CC BY 4.0). Dataset: Zanaga, D., Van De Kerchove, R., Daems, D., De Keersmaecker, W., Brockmann, C., Kirches, G., Wevers, J., Cartus, O., Santoro, M., Fritz, S., Lesiv, M., Herold, M., Tsendbazar, N.E., Xu, P., Ramoino, F., Arino, O., 2022. ESA WorldCover 10 m 2021 v200. https://doi.org/10.5281/zenodo.7254221
-- **Label glyphs:** Noto Sans, under the [SIL Open Font License 1.1](https://openfontlicense.org/). The copyright notices and the licence text are in \`LICENSES/OFL-1.1-Noto-Sans.txt\`.
-- **Icons:** OpenFreeMap's \`ofm_f384\` sprite ([openfreemap-styles](https://github.com/hyperknot/openfreemap-styles), MIT; icons from the Liberty and OSM Bright styles, BSD 3-Clause and CC BY 3.0/4.0; [Maki](https://github.com/mapbox/maki), CC0 1.0). Full notices are in \`LICENSES/OpenFreeMap-sprite.txt\`. VersaTiles' \`base\` sprite ([versatiles-style](https://github.com/versatiles-org/versatiles-style)), CC0 1.0.
-- **Relief tiles:** Natural Earth II shaded relief ([Natural Earth](https://www.naturalearthdata.com/), public domain; the tiles are PDDL 1.0). Made with Natural Earth.
-
-The licensors provide this material as is, without warranty. See each licence.
-`;
-  await fs.writeFile(releaseNotesDraftPath, `${contents}\n`);
+${releaseNotesLicenceBlock}`;
 }
 
-async function run() {
+async function writeReleaseNotesDraft({
+  outputRoot,
+  date,
+  tag,
+  archiveName,
+  sha256,
+  bytes,
+  files,
+  planetVersion,
+  summary
+}) {
+  const releaseNotesPath = path.join(outputRoot, `${archiveName.replace(/\.tar$/u, "")}-release-notes.md`);
+  const contents = buildReleaseNotesMarkdown({
+    date,
+    tag,
+    archiveName,
+    sha256,
+    bytes,
+    files,
+    planetVersion,
+    summary
+  });
+  await fs.writeFile(releaseNotesPath, `${contents}\n`);
+  return releaseNotesPath;
+}
+
+export async function run() {
   const date = process.env.IBM_BASEMAP_FIXTURE_DATE?.trim() || currentDateString();
   const inputDirectory =
     parseArg("input-dir") || path.join(defaultOutputRoot, `store-${date}`);
@@ -224,11 +361,16 @@ async function run() {
     await fs.readFile(path.join(stagingDirectory, "manifest.json"), "utf8")
   );
   const planetVersion = readOpenFreeMapPlanetVersion(manifest);
+  const summary = summarizeFixtureManifest(manifest);
 
   await fs.mkdir(path.join(stagingDirectory, "LICENSES"), { recursive: true });
   await fs.writeFile(
     path.join(stagingDirectory, "NOTICE.md"),
-    buildNoticeMarkdown({ date, planetVersion })
+    buildNoticeMarkdown({
+      date,
+      planetVersion,
+      reliefTileCount: summary.openFreeMap.reliefTiles
+    })
   );
   const oflText = await fetchText(notoOflTextUrl);
   await fs.writeFile(
@@ -268,13 +410,16 @@ async function run() {
   const allFiles = await listFilesRecursively(stagingDirectory);
   const tag = `test-fixture-basemap-${date}`;
 
-  await writeReleaseNotesDraft({
+  const releaseNotesDraftPath = await writeReleaseNotesDraft({
+    outputRoot: path.resolve(outputRoot),
     date,
+    tag,
     archiveName,
     sha256: archiveSha256,
     bytes: archiveStats.size,
     files: allFiles.length,
-    planetVersion
+    planetVersion,
+    summary
   });
 
   console.log(`Archive: ${archivePath}`);
@@ -313,7 +458,9 @@ async function run() {
   );
 }
 
-run().catch((error) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  run().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}

@@ -238,7 +238,6 @@ On the modern backup map, which draws Natural Earth's country borders at every z
 }
 ```
 
-## Ancient layer (M4-03)
 ## Test fixtures (M5-22)
 Decided on 2026-10-22. Evidence: `docs/verification/M5-22-basemap-fixture.md`.
 

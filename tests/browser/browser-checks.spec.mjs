@@ -598,7 +598,7 @@ test.describe.serial("sequential panel checks", () => {
   });
 });
 
-test("normal loads stay on the main basemap in a 5s observation window", { tag: ["@modern"] }, async ({ browser, baseUrl }) => {
+test("normal loads stay on the main basemap in a 5s observation window", { tag: ["@modern", "@live-smoke"] }, async ({ browser, baseUrl }) => {
   await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/", { observeWindowMs: 5_000 });
   await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern", { observeWindowMs: 5_000 });
   await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?place=galilee", { observeWindowMs: 5_000 });
@@ -789,7 +789,7 @@ test("keyboard order and Escape behavior follow map accessibility contract", { t
   await verifyKeyboardOrderAndEscapeBehavior(page, baseUrl);
 });
 
-test("modern map toggle preserves state and attribution", { tag: ["@modern"] }, async ({ page, baseUrl }) => {
+test("modern map toggle preserves state and attribution", { tag: ["@modern", "@live-smoke"] }, async ({ page, baseUrl }) => {
   await verifyModernMapToggle(page, baseUrl);
 });
 
@@ -1058,7 +1058,7 @@ test("important names stay discoverable: hover pointer/blue state, arrow while d
   expect(Math.abs(after.zoom - before.zoom)).toBeLessThan(0.01);
 });
 
-test("Asia Minor towns render black dots under names at year 50 (major + standard) @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+test("Asia Minor towns render black dots under names at year 50 (major + standard) @names", { tag: ["@names", "@live-smoke"] }, async ({ page, baseUrl }) => {
   await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await jumpMap(page, [27.34, 37.94], 6.2);
 
