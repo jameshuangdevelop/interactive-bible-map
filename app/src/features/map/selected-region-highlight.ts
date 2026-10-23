@@ -105,6 +105,7 @@ function mergeRegionParts(parts: RegionGeometry[]): RegionGeometry | null {
 export function findSelectedRegionGeometry({
   shapes,
   holderUnionGeometries,
+  regionOutlineGeometry,
   stopPayload,
   placeId,
   placeType,
@@ -113,6 +114,7 @@ export function findSelectedRegionGeometry({
 }: {
   shapes: AncientShapesPayload | null;
   holderUnionGeometries: Record<string, RegionGeometry> | null | undefined;
+  regionOutlineGeometry?: RegionGeometry | null | undefined;
   stopPayload: AncientStopPayload | null;
   placeId: string | null | undefined;
   placeType: string | null | undefined;
@@ -175,7 +177,7 @@ export function findSelectedRegionGeometry({
     .map((areaId) => shapeByAreaId.get(areaId))
     .filter((geometry): geometry is RegionGeometry => Boolean(geometry));
   if (selectedGeometries.length === 0) {
-    return null;
+    return isRegionGeometry(regionOutlineGeometry) ? regionOutlineGeometry : null;
   }
 
   return mergeRegionParts(selectedGeometries);

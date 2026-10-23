@@ -312,4 +312,105 @@ describe("selected region highlight geometry", () => {
     });
     expect(selectedRegion).toEqual(holderUnionGeometries["union-roman-side"]);
   });
+
+  test("falls back to a region outline when no held land is present for the stop", () => {
+    const regionOutlineGeometry = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [35.0, 32.0],
+          [35.4, 32.0],
+          [35.4, 32.4],
+          [35.0, 32.4],
+          [35.0, 32.0]
+        ]
+      ]
+    };
+    const stopPayload: AncientStopPayload = {
+      stopId: "ad-50",
+      year: 50,
+      areas: [],
+      holderBorders: {
+        type: "FeatureCollection",
+        features: []
+      },
+      romanEmpireEdge: null,
+      holderUnions: {},
+      romanSideUnion: null,
+      holderLabels: []
+    };
+
+    const selectedRegion = findSelectedRegionGeometry({
+      shapes: {
+        areas: { type: "FeatureCollection", features: [] },
+        areasSimplifiedForZoom10: { type: "FeatureCollection", features: [] }
+      },
+      holderUnionGeometries: null,
+      regionOutlineGeometry,
+      stopPayload,
+      placeId: "samaria",
+      placeType: "region",
+      politicalAreaId: null,
+      politicalUnitAreaTypes
+    });
+    expect(selectedRegion).toEqual(regionOutlineGeometry);
+  });
+
+  test("prefers held-land geometry over region-outline fallback", () => {
+    const heldLandGeometry = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [36, 40],
+          [37, 40],
+          [37, 41],
+          [36, 41],
+          [36, 40]
+        ]
+      ]
+    };
+    const outlineFallbackGeometry = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [35, 39],
+          [35.5, 39],
+          [35.5, 39.5],
+          [35, 39.5],
+          [35, 39]
+        ]
+      ]
+    };
+    const stopPayload: AncientStopPayload = {
+      stopId: "ad-50",
+      year: 50,
+      areas: [],
+      holderBorders: {
+        type: "FeatureCollection",
+        features: []
+      },
+      romanEmpireEdge: null,
+      holderUnions: {
+        pontus: "union-pontus-kingdom"
+      },
+      romanSideUnion: null,
+      holderLabels: []
+    };
+    const selectedRegion = findSelectedRegionGeometry({
+      shapes: {
+        areas: { type: "FeatureCollection", features: [] },
+        areasSimplifiedForZoom10: { type: "FeatureCollection", features: [] }
+      },
+      holderUnionGeometries: {
+        "union-pontus-kingdom": heldLandGeometry
+      },
+      regionOutlineGeometry: outlineFallbackGeometry,
+      stopPayload,
+      placeId: "pontus",
+      placeType: "region",
+      politicalAreaId: null,
+      politicalUnitAreaTypes
+    });
+    expect(selectedRegion).toEqual(heldLandGeometry);
+  });
 });

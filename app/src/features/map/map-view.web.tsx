@@ -88,7 +88,9 @@ import type {
   AncientStopPayload,
   FeatureCollection,
   LineStringGeometry,
-  MultiLineStringGeometry
+  MultiLineStringGeometry,
+  MultiPolygonGeometry,
+  PolygonGeometry
 } from "./ancient-layer.types";
 import type {
   Coordinates,
@@ -290,6 +292,7 @@ const holderLabelBaseFilter = [
   [">=", ["zoom"], ["coalesce", ["get", "minZoom"], 4]]
 ];
 const politicalUnitAreaTypes = new Set(["province", "kingdom", "tetrarchy"]);
+type RegionOutlineGeometry = PolygonGeometry | MultiPolygonGeometry;
 const areaLabelTextFontExpression = toExpression([
   "literal",
   ["Noto Sans Bold"]
@@ -2974,6 +2977,12 @@ export function MapView({
   const [ancientHolderUnions, setAncientHolderUnions] = useState<AncientHolderUnionsPayload>({
     geometries: {}
   });
+  const [ancientRegionOutlinesByPlaceId, setAncientRegionOutlinesByPlaceId] = useState<
+    Record<string, RegionOutlineGeometry>
+  >({});
+  const regionOutlinesLoadPromiseRef = useRef<Promise<void> | null>(null);
+  const regionOutlinesLoadAttemptedRef = useRef(false);
+  const regionOutlinesLoadSucceededRef = useRef(false);
   const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
@@ -3101,16 +3110,27 @@ export function MapView({
     if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
       return null;
     }
+    const outlineFallbackGeometry =
+      selectedPlace.type === "region" ? ancientRegionOutlinesByPlaceId[selectedPlace.id] : null;
     return findSelectedRegionGeometry({
       shapes: ancientShapes,
       holderUnionGeometries: ancientHolderUnions.geometries,
+      regionOutlineGeometry: outlineFallbackGeometry,
       stopPayload: selectedAncientStopPayload,
       placeId: selectedPlace.id,
       placeType: selectedPlace.type,
       politicalAreaId: selectedPlace.politicalAreaId,
       politicalUnitAreaTypes
     });
-  }, [ancientHolderUnions, ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+  }, [
+    ancientHolderUnions,
+    ancientRegionOutlinesByPlaceId,
+    ancientShapes,
+    mapMode,
+    placeById,
+    selectedAncientStopPayload,
+    selection
+  ]);
   const selectedRegionSourceSyncKey = useMemo(() => {
     if (!selectedRegionGeometry) {
       return "none";
@@ -3134,6 +3154,49 @@ export function MapView({
   const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const ancientLayerLoadStateRef = useRef<"idle" | "loading" | "ready" | "error">("idle");
   const previousAncientLayerRetryTokenRef = useRef(ancientLayerRetryToken);
+  const loadAncientRegionOutlinesOnce = useCallback(() => {
+    if (regionOutlinesLoadSucceededRef.current || regionOutlinesLoadAttemptedRef.current) {
+      return regionOutlinesLoadPromiseRef.current ?? Promise.resolve();
+    }
+
+    regionOutlinesLoadAttemptedRef.current = true;
+    const request = fetch("/generated/ancient.region-outlines.json", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient region outlines (${response.status})`);
+        }
+        const payload = (await response.json()) as {
+          type?: string;
+          features?: {
+            id?: unknown;
+            geometry?: unknown;
+          }[];
+        };
+        const nextOutlinesByPlaceId: Record<string, RegionOutlineGeometry> = {};
+        for (const feature of payload.features ?? []) {
+          if (typeof feature.id !== "string") {
+            continue;
+          }
+          const geometry = feature.geometry;
+          if (
+            !geometry ||
+            typeof geometry !== "object" ||
+            ((geometry as { type?: unknown }).type !== "Polygon" &&
+              (geometry as { type?: unknown }).type !== "MultiPolygon")
+          ) {
+            continue;
+          }
+          nextOutlinesByPlaceId[feature.id] = geometry as RegionOutlineGeometry;
+        }
+        regionOutlinesLoadSucceededRef.current = true;
+        setAncientRegionOutlinesByPlaceId(nextOutlinesByPlaceId);
+      })
+      .catch(() => {
+        regionOutlinesLoadSucceededRef.current = false;
+      });
+    regionOutlinesLoadPromiseRef.current = request;
+    return request;
+  }, []);
   const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
     setAncientShapes(null);
     setAncientHolderUnions({ geometries: {} });
@@ -3270,6 +3333,62 @@ export function MapView({
       });
     }
   }, [ancientLayerRetryToken, hasAncientTimeline, loadStopPayload]);
+
+  const selectedRegionWithoutOutlineFallback = useMemo(() => {
+    if (!selection || mapMode !== "ancient" || !ancientShapes || !selectedAncientStopPayload) {
+      return null;
+    }
+    const selectedPlace = placeById.get(selection.placeId);
+    if (!selectedPlace || selectedPlace.type !== "region") {
+      return null;
+    }
+    return findSelectedRegionGeometry({
+      shapes: ancientShapes,
+      holderUnionGeometries: ancientHolderUnions.geometries,
+      stopPayload: selectedAncientStopPayload,
+      placeId: selectedPlace.id,
+      placeType: selectedPlace.type,
+      politicalAreaId: selectedPlace.politicalAreaId,
+      politicalUnitAreaTypes
+    });
+  }, [ancientHolderUnions, ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+
+  useEffect(() => {
+    if (
+      !hasAncientTimeline ||
+      mapMode !== "ancient" ||
+      !selection ||
+      !ancientShapes ||
+      !selectedAncientStopPayload
+    ) {
+      return;
+    }
+
+    const selectedPlace = placeById.get(selection.placeId);
+    if (!selectedPlace || selectedPlace.type !== "region") {
+      return;
+    }
+
+    if (selectedRegionWithoutOutlineFallback) {
+      return;
+    }
+
+    if (ancientRegionOutlinesByPlaceId[selectedPlace.id]) {
+      return;
+    }
+
+    void loadAncientRegionOutlinesOnce();
+  }, [
+    ancientRegionOutlinesByPlaceId,
+    ancientShapes,
+    hasAncientTimeline,
+    loadAncientRegionOutlinesOnce,
+    mapMode,
+    placeById,
+    selectedAncientStopPayload,
+    selectedRegionWithoutOutlineFallback,
+    selection
+  ]);
 
   useEffect(() => {
     if (mapReadyVersion === 0 || ancientShapes || !hasAncientTimeline || ancientLayerLoadState === "error") {
