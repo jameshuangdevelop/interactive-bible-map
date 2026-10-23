@@ -2038,7 +2038,7 @@ test("desktop Malta deep link refits above timeline card when timeline payload l
       mapTestHookKey,
       { timeout: 60_000 }
     );
-    await route.continue();
+    await route.fallback();
   });
 
   await page.goto(`${baseUrl}/?tab=map&place=malta&year=50`, {
