@@ -334,3 +334,59 @@ Apply as written. Where a quotation below runs to an ellipsis, replace the whole
 - **No npm checks.** This branch changes no data, schema or code, so I didn't run them.
 
 **Sign-off.** M5-24's research is signed off once corrections 1–28 are applied as written, or with the same facts. If they're pasted verbatim and nothing else changes, no re-check is needed. No blockers. The choices in §9 stay with the PO and the human.
+
+## Re-check (2026-10-24)
+I checked `git diff d238cbb..befa93c`, which changes only the research note, against the PO's five rulings. I did no new research: the year citations were checked against the source text I read on 2026-10-23 (§1).
+
+**Result: ready for phase 3 once five small fixes (R1–R5) are applied.** Only R5, the years, changes any fact. The rest is wording.
+
+| Ruling | Result |
+|---|---|
+| 1. List by arrival | **Pass.** Part 1 is 01, 05, 06, 07, 08, 09, 02, 10, 04, 03 and Part 3 is 25, 26, 27, 22, 28, 23, 24, as ruled. Both harmonies agree on every step between Gospels. Confidence is now 26 high, 6 medium and 0 low, with segment-22 medium. The reason given for segment-02's place is muddled (R1). |
+| 2. My 28 corrections | **Pass.** All 28 are applied, plus nits a–d, and correction 1 is superseded as ruled. 9(a)–(d) and 17 keep their facts and read correctly under the new rule. 16 keeps a stale "(followed here)" (R2). 10's facts are kept, but its reason for position 7 is muddled (R1). |
+| 3. Two groupings | **The split passes; one summary needs change.** The split matches R §72 (Part VIII, §72–95) and S&B §70 (Part VI, §70–85). 2a's four stages sit at R §49–67 and S&B §44–60; 2b's seven sit at R §78–96 and S&B §70–82. 2a and 2b together give Part 2's order, and both scripture ranges match. 2a's title and summary are neutral, and 2b's title is fair. But 2b's summary brings back "north and east beyond Galilee" and "to Tyre and Sidon", which correction 2 removed (R3). |
+| 4. Years | **Citations pass, with one misquotation; coverage fails.** All six quotations from Robertson's Chief Divisions are exact, and ISBE's Summary of Dates matches. The WHE quotation isn't exact (R4). The ranges for Parts 1–3, 2a and 2b don't cover the sources (R5). |
+| 5. Coverage | **Pass.** There are 32 rows, each id appears once, and the parts have 10, 11, 7, 2 and 2 stages. |
+
+**The years.**
+- **Part 3 contradicts Part 4.** Part 3 runs AD 29–30 but Part 4 runs AD 29–33. Part 3 ends with the entry, and Part 4 begins the same day: both cite Mark 11:11. If the last week can fall in AD 33, so can the entry.
+- **Parts 1–3 don't cover the dates Parts 4–5 accept.** Parts 4 and 5 rightly widen to cover WHE's AD 30–33 and Robertson's "or 29", but Parts 1–3 keep Robertson's chronology alone.
+  - ISBE §I.5 ties Parts 2 and 3 to the death year: the indications of time from John 6:4 to 11:55 are "definite and clear (7:2; 10:22)".
+  - So the Passover of John 6:4 (the start of 2b), the Feast of Booths (the last stage of Part 2 and of 2b) and the Feast of Dedication (the first stage of Part 3) all fall in the year before the last Passover.
+  - With the death in AD 29–33, that year is AD 28–32.
+- **Part 1 leaves out ISBE's other start.** ISBE's other reckoning of Luke 3:1 gives AD 28–29 for the start, and the route's own `notes[2]` already reports it.
+- **The narrowest ranges that cover the sources:**
+  - Part 1: AD 26–29
+  - Part 2: AD 27–32 (2a AD 27–32, 2b AD 28–32)
+  - Part 3: AD 28–33
+  - Parts 4 and 5: AD 29–33, unchanged
+
+  Any wider range, such as the whole route's AD 26–33, also meets ADR-0038 item 7.
+
+**The remaining fixes.**
+1. **R1. Segment-02's place.** Robertson prints Matthew 4:12 only in §34, before Sychar (§35). Taken as the arrival, it would put segment-02 before segment-09. Make three replacements:
+   - In the rule in §1, replace "(for segment-02, Matthew 4:12's "he withdrew into Galilee," not the temptation that opens its own citations;" with "(for segment-02, its arrival in Galilee, which both harmonies print beside John's arrival after Samaria, John 4:43-45: Robertson §36-37, where Mark 1:14 and Luke 4:14 are repeated in brackets, and Stevens & Burton §34; not the temptation that opens its own citations;".
+   - In §4.1, replace the last sentence ("This note lists segment-02 right after segment-09 … which is why it is listed first.") with "Listed by the second placement, the arrival, segment-02 comes after segment-09's arrival at Sychar (Robertson §35; Stevens & Burton §32-33) and before segment-10's arrival at Cana (Robertson §38; Stevens & Burton §35)."
+   - In Part 1 row 7, replace the evidence with "Both harmonies print its arrival ("withdrew into Galilee," Matthew 4:12; Mark 1:14; Luke 4:14) twice: beside John's departure from Judea (John 4:1-3; Robertson §34; Stevens & Burton §31) and beside John's arrival in Galilee after Samaria (John 4:43-45; Robertson §36-37; Stevens & Burton §34). Listed by the second, it comes after segment-09's arrival at Sychar (Robertson §35; Stevens & Burton §32-33) and before segment-10's at Cana (Robertson §38; Stevens & Burton §35) — see §4.1."
+2. **R2. Part 3 row 4.** Replace "Robertson (followed here) places it" with "Robertson places it". Listed by arrival, the note no longer follows one harmony here.
+3. **R3. 2b's summary (§7(b)).** Replace "Jesus withdraws north and east beyond Galilee, to Tyre and Sidon, the Decapolis, Bethsaida and the villages of Caesarea Philippi," with "Jesus travels to the borders of Tyre and Sidon, through the region of the Decapolis, and to Bethsaida and the villages of Caesarea Philippi,". The reasons are those of correction 2, plus one more: the route's `notes[6]` says Sidon is named but not shown as a place Jesus passed.
+4. **R4. The WHE quotation (§2.1).** Replace "the common date for the death is between 30-33 CE" with "the common date for the death of Jesus falls between 30-33 CE".
+5. **R5. The years.**
+   - In the §2 table, change the years to "AD 26–29" for Part 1, "AD 27–32" for Part 2 and "AD 28–33" for Part 3.
+   - In §2.1's opening, replace "this note's years follow those, checked against" with "this note's years start from those and widen them to cover the dates given by".
+   - Replace §2.1's table rows 1–3 with:
+
+     | Part | fromYear | toYear | Robertson's own words (Chief Divisions) | Check against ISBE/WHE |
+     |---|---|---|---|---|
+     | 1 | 26 | 29 | Part VI, "In all parts of Palestine. Probably A.D. 26 and 27" | ISBE dates the baptism to AD 26 and the first Passover to AD 27, but its other reckoning of Tiberius's fifteenth year (Luke 3:1), from the death of Augustus, gives AD 28-29 for the start, which the route's own `notes[2]` already reports; the range runs to 29 to cover it |
+     | 2 | 27 | 32 | Part VII, "Probably A.D. 27 to 29"; Part VIII, "Probably Passover in A.D. 29 to Tabernacles in A.D. 29" | Its last stage, the Feast of Booths (John 7:2), falls in the year before the last Passover: ISBE calls the indications of time from John 6:4 to 11:55 "definite and clear (7:2; 10:22)". With the death in AD 29-33 (Parts 4 and 5), that is AD 28-32. Within Pilate's term (26-36, WHE) |
+     | 3 | 28 | 33 | Part IX, "Probably Tabernacles to Dedication in A.D. 29"; Part X, "Probably Dedication in A.D. 29 to Last Journey in A.D. 30" | It begins at the Feast of Dedication (John 10:22), in the year before the last Passover (ISBE, as for Part 2), and ends at the entry, the same day Part 4 begins (Mark 11:11). With the death in AD 29-33, that is AD 28-33 |
+   - In §7(b), change 2a's years to "AD 27–32" and 2b's to "AD 28–32", and replace the "**Years, with citations.**" paragraph with:
+     > **Years, with citations.** Part 2a falls within Robertson's Part VII, "Probably A.D. 27 to 29" (Chief Divisions), and Part 2b within his Part VIII, "Probably Passover in A.D. 29 to Tabernacles in A.D. 29," and the very start of Part IX ("Probably Tabernacles to Dedication in A.D. 29"). On Robertson's dates both end in AD 29, the year before his last Passover. To cover the death years Parts 4 and 5 accept (AD 29-33, §2.1), each runs to the year before the last Passover on every view, since ISBE calls the indications of time from John 6:4 to 11:55 "definite and clear (7:2; 10:22)": Part 2a runs AD 27-32, and Part 2b, from the Passover of John 6:4 to the Feast of Booths, AD 28-32. Both fall within Pilate's term (AD 26-36, `bib:worldhistory-jesus-christ`).
+
+**For phase 3.**
+- Each part's notes give every view: Robertson's dates, ISBE's (including the AD 28–29 start and the early tradition of AD 29 for the death) and WHE's AD 30–33.
+- The two `bib:` entries also go into the app's credits list (`app/src/features/search/sources-credits-content.ts`), which `npm run test:app` checks against `ATTRIBUTION.md`. The note's question 7 names only `docs/LICENSES.md` and `ATTRIBUTION.md`.
+- P1–P4 in §12 still apply.
+
+**Verdict for phase 3: signed off once R1–R5 are applied as written, or with the same facts.** If they're pasted verbatim, no re-check is needed. R5 needs only the PO's agreement on the ranges; any ranges that cover those in "The years" above pass.
