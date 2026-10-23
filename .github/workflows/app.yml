@@ -125,6 +125,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     container:
+      # Keep this literal: container.image cannot read env; using it failed in run 40014854855.
       image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --user 1001 --ipc=host
     # Keep this above Playwright CI globalTimeout (10m) so runs fail in-test, not by job timeout.
@@ -389,8 +390,10 @@ jobs:
       - deploy_preview
     runs-on: ubuntu-latest
     container:
+      # Keep this literal: container.image cannot read env; using it failed in run 40014854855.
       image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --user 1001 --ipc=host
+    # Keep this above Playwright CI globalTimeout (10m) so runs fail in-test, not by job timeout.
     timeout-minutes: 25
     concurrency:
       group: pages-preview-${{ github.event.pull_request.number }}

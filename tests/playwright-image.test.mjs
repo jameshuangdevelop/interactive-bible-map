@@ -8,7 +8,8 @@ const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(testDirectory, "..");
 const workflowsDirectory = path.join(repositoryRoot, ".github", "workflows");
 const packageJsonPath = path.join(repositoryRoot, "package.json");
-const workflowImageRegex = /mcr\.microsoft\.com\/playwright:v(\d+\.\d+\.\d+)-[a-z0-9.-]+/g;
+const anyPlaywrightImageReferenceRegex = /mcr\.microsoft\.com\/playwright(?:[:@])[^\s'"]+/g;
+const expectedPlaywrightTagRegex = /^mcr\.microsoft\.com\/playwright:v(\d+\.\d+\.\d+)-[a-z0-9.-]+$/;
 const exactPackageVersionRegex = /^\d+\.\d+\.\d+$/;
 
 function readPackageVersions() {
@@ -37,6 +38,28 @@ function readPackageVersions() {
   return playwrightVersion;
 }
 
+function extractPlaywrightImageReferences(content, fileName = "<inline>") {
+  const found = [];
+  const invalid = [];
+
+  for (const match of content.matchAll(anyPlaywrightImageReferenceRegex)) {
+    const image = match[0];
+    const parsed = expectedPlaywrightTagRegex.exec(image);
+    if (!parsed) {
+      invalid.push({ fileName, image });
+      continue;
+    }
+
+    found.push({
+      fileName,
+      image,
+      version: parsed[1]
+    });
+  }
+
+  return { found, invalid };
+}
+
 function readWorkflowImageVersions() {
   const workflowFiles = fs
     .readdirSync(workflowsDirectory, { withFileTypes: true })
@@ -45,24 +68,42 @@ function readWorkflowImageVersions() {
     .sort();
 
   const found = [];
+  const invalid = [];
   for (const fileName of workflowFiles) {
     const filePath = path.join(workflowsDirectory, fileName);
     const content = fs.readFileSync(filePath, "utf8");
-    for (const match of content.matchAll(workflowImageRegex)) {
-      found.push({
-        fileName,
-        image: match[0],
-        version: match[1]
-      });
-    }
+    const extracted = extractPlaywrightImageReferences(content, fileName);
+    found.push(...extracted.found);
+    invalid.push(...extracted.invalid);
   }
 
-  return found;
+  return { found, invalid };
 }
+
+test("Playwright image matcher rejects digest references", () => {
+  const sample = "image: mcr.microsoft.com/playwright@sha256:abc123";
+  const { found, invalid } = extractPlaywrightImageReferences(sample, "sample.yml");
+
+  assert.equal(found.length, 0);
+  assert.deepEqual(invalid, [
+    {
+      fileName: "sample.yml",
+      image: "mcr.microsoft.com/playwright@sha256:abc123"
+    }
+  ]);
+});
 
 test("Playwright container image version in workflows matches package.json", () => {
   const packageVersion = readPackageVersions();
-  const workflowImages = readWorkflowImageVersions();
+  const { found: workflowImages, invalid: invalidWorkflowImages } = readWorkflowImageVersions();
+
+  assert.equal(
+    invalidWorkflowImages.length,
+    0,
+    `Unsupported Playwright image reference(s). Use 'mcr.microsoft.com/playwright:vX.Y.Z-<os>' only: ${invalidWorkflowImages
+      .map((entry) => `${entry.fileName}:${entry.image}`)
+      .join(", ")}`
+  );
 
   assert.ok(
     workflowImages.length > 0,
