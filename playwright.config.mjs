@@ -8,6 +8,7 @@ const NAVIGATION_TIMEOUT_MS = 30_000;
 export default defineConfig({
   testDir: "tests/browser",
   globalSetup: "./tests/browser/global-setup.mjs",
+  globalTeardown: "./tests/browser/global-teardown.mjs",
   fullyParallel: true,
   timeout: 60_000,
   globalTimeout: isCi ? 10 * 60_000 : undefined,

@@ -7,6 +7,11 @@ import { promisify } from "node:util";
 import sharp from "sharp";
 import { PMTiles } from "pmtiles";
 import { resolveBasemapFixtureDirectory } from "../../scripts/lib/basemap-fixture.mjs";
+import {
+  classifyBasemapUrl,
+  decideReplayRequestPolicy,
+  isLocalhostUrl
+} from "./network-policy.mjs";
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
@@ -15,11 +20,16 @@ const repositoryRoot = path.resolve(moduleDirectory, "..", "..");
 const defaultEventLogPath = path.join(repositoryRoot, "tests", "artifacts", "network-events.ndjson");
 
 const basemapHosts = new Set(["tiles.openfreemap.org", "tiles.versatiles.org"]);
-const localHosts = new Set(["127.0.0.1", "localhost"]);
 const replayDisabled = process.env.IBM_LIVE_NETWORK === "1";
 const recordMode = process.env.IBM_BASEMAP_RECORD === "1";
 const replayMode = !replayDisabled && !recordMode;
 const eventLogPath = process.env.IBM_NETWORK_EVENTS_PATH ?? null;
+const fixtureMissLogPath = path.join(
+  repositoryRoot,
+  "tests",
+  "artifacts",
+  "basemap-fixture-misses.ndjson"
+);
 
 const recordDirectoryOverride = process.env.IBM_BASEMAP_RECORD_DIR?.trim() || null;
 const recordDirectory = recordDirectoryOverride
@@ -35,8 +45,10 @@ const openFreeMapAttributionHtml =
 const requestDecisionsByContext = new WeakMap();
 const bufferedFailuresByContext = new WeakMap();
 const networkEscapeCountsByContext = new WeakMap();
+const fixtureMissesByContext = new WeakMap();
 
 let eventLogChain = Promise.resolve();
+let fixtureMissLogChain = Promise.resolve();
 let placeholderCachePromise = null;
 let manifestCachePromise = null;
 let replayBodyCachePromise = null;
@@ -424,12 +436,7 @@ function isWikimediaCommonsHost(parsedUrl) {
 }
 
 function shouldBypassNetworkGuard(urlString) {
-  try {
-    const parsedUrl = new URL(urlString);
-    return localHosts.has(parsedUrl.hostname);
-  } catch {
-    return true;
-  }
+  return isLocalhostUrl(urlString);
 }
 
 function mapExtensionToContentType(requestPathname) {
@@ -471,6 +478,23 @@ async function ensurePlaceholderCache() {
         )
       };
     })();
+  }
+
+  let transparentRasterTilePromise = null;
+  async function getTransparentRasterReliefTile() {
+    if (!transparentRasterTilePromise) {
+      transparentRasterTilePromise = sharp({
+        create: {
+          width: 256,
+          height: 256,
+          channels: 4,
+          background: { r: 0, g: 0, b: 0, alpha: 0 }
+        }
+      })
+        .png({ compressionLevel: 9 })
+        .toBuffer();
+    }
+    return transparentRasterTilePromise;
   }
   return placeholderCachePromise;
 }
@@ -536,6 +560,26 @@ function recordFailure(context, message) {
   const failures = bufferedFailuresByContext.get(context) ?? [];
   failures.push(message);
   bufferedFailuresByContext.set(context, failures);
+}
+
+function recordFixtureMiss(context, url) {
+  const misses = fixtureMissesByContext.get(context) ?? new Set();
+  misses.add(url);
+  fixtureMissesByContext.set(context, misses);
+  fixtureMissLogChain = fixtureMissLogChain
+    .then(async () => {
+      await fs.mkdir(path.dirname(fixtureMissLogPath), { recursive: true });
+      await fs.appendFile(
+        fixtureMissLogPath,
+        `${JSON.stringify({ at: new Date().toISOString(), url })}\n`
+      );
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(
+        `Failed to write basemap fixture miss log: ${error instanceof Error ? error.message : String(error)}`
+      );
+    });
 }
 
 async function recordBasemapResponse({
@@ -614,6 +658,7 @@ export async function attachNetworkGuardsToContext(context) {
   requestDecisionsByContext.set(context, requestDecisions);
   networkEscapeCountsByContext.set(context, 0);
   bufferedFailuresByContext.set(context, []);
+  fixtureMissesByContext.set(context, new Set());
 
   await context.route("**/*", async (route) => {
     const request = route.request();
@@ -700,10 +745,48 @@ export async function attachNetworkGuardsToContext(context) {
     if (basemapHosts.has(parsedUrl.hostname)) {
       const { entriesByUrl } = await loadManifest();
       const fixtureEntry = entriesByUrl.get(requestUrl);
+      const decision = decideReplayRequestPolicy({
+        url: requestUrl,
+        hasFixtureEntry: Boolean(fixtureEntry)
+      });
       if (!fixtureEntry) {
-        const message = `Missing basemap fixture for ${requestUrl}. Re-record fixtures with npm run record:basemap.`;
+        if (decision.type === "missing-vector-tile") {
+          recordFixtureMiss(context, requestUrl);
+          requestDecisions.set(request, "missing-vector-tile-empty-204");
+          await route.fulfill({
+            status: 204,
+            headers: {
+              "content-type": "application/x-protobuf",
+              "access-control-allow-origin": "*",
+              "cache-control": "no-store",
+              "content-length": "0"
+            },
+            body: ""
+          });
+          return;
+        }
+
+        if (decision.type === "missing-raster-relief-tile") {
+          const body = await getTransparentRasterReliefTile();
+          recordFixtureMiss(context, requestUrl);
+          requestDecisions.set(request, "missing-raster-relief-transparent-200");
+          await route.fulfill({
+            status: 200,
+            headers: {
+              "content-type": "image/png",
+              "access-control-allow-origin": "*",
+              "cache-control": "no-store",
+              "content-length": String(body.length)
+            },
+            body
+          });
+          return;
+        }
+
+        const resource = classifyBasemapUrl(requestUrl).resourceType;
+        const message = `Missing deterministic basemap fixture (${resource}) for ${requestUrl}. Re-record fixtures with npm run record:basemap.`;
         recordFailure(context, message);
-        requestDecisions.set(request, "missing-basemap");
+        requestDecisions.set(request, "missing-strict-basemap");
         await route.fulfill({
           status: 599,
           contentType: "text/plain; charset=utf-8",
@@ -770,12 +853,17 @@ export function collectNetworkGuardFailures(context) {
   return [...(bufferedFailuresByContext.get(context) ?? [])];
 }
 
+export function collectBasemapFixtureMisses(context) {
+  return [...(fixtureMissesByContext.get(context) ?? new Set())];
+}
+
 export function collectNetworkEscapes(context) {
   return networkEscapeCountsByContext.get(context) ?? 0;
 }
 
 export async function flushNetworkEventLogWrites() {
   await eventLogChain;
+  await fixtureMissLogChain;
 }
 
 export async function writeRecordedBasemapManifest() {

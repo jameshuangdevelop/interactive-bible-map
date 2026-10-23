@@ -90,6 +90,11 @@ The target for a PR's wall time is **under 10 minutes.** A newer push to the sam
   - local: `npm run fetch:basemap-fixture` (also called by Playwright `globalSetup`);
   - CI: cache `.cache/basemap-fixture` by lockfile hash, then run `npm run fetch:basemap-fixture`.
 - If the fixture is missing or mismatched, tests fail fast with a clear fetch/re-record message. They never fall back to live network unless `IBM_LIVE_NETWORK=1`.
+- Replay miss policy:
+  - missing vector tile fixture URLs (`/planet/.../*.pbf`, `/tiles/osm/...`) are served as empty 204 tiles and logged as `basemap-fixture-miss` annotations;
+  - missing Natural Earth relief raster fixture URLs (`/natural_earth/ne2sr/...png`) are served as transparent PNG tiles and logged as `basemap-fixture-miss` annotations;
+  - missing deterministic assets (TileJSON, glyphs, sprites) fail the test loudly.
+  - global teardown prints a miss summary (count + first 20 URLs) from `tests/artifacts/basemap-fixture-misses.ndjson`.
 - Re-record flow (record mode does **not** collect from `tiles.openfreemap.org`; OpenFreeMap URLs are synthesized from OpenFreeMap public downloads and upstream public assets):
   1. `lockf -k -t 7200 /tmp/ibm-heavy.lock npm run record:basemap`
   2. `npm run pack:basemap-fixture` (writes `/tmp/m5-22-basemap-fixture/basemap-fixture-<YYYY-MM-DD>.tar`, prints SHA-256/size/files and a `gh release create ... --prerelease` command for the PO)

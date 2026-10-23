@@ -2,6 +2,7 @@ import { test as base, expect } from "@playwright/test";
 import { distDirectory, startStaticServer } from "../../scripts/verify-web-export-playwright.mjs";
 import {
   attachNetworkGuardsToContext,
+  collectBasemapFixtureMisses,
   collectNetworkEscapes,
   collectNetworkGuardFailures,
   flushNetworkEventLogWrites,
@@ -92,6 +93,13 @@ export const test = base.extend({
       }
       for (const context of trackedContexts) {
         failures.push(...collectNetworkGuardFailures(context));
+        const misses = collectBasemapFixtureMisses(context);
+        for (const url of misses) {
+          testInfo.annotations.push({
+            type: "basemap-fixture-miss",
+            description: url
+          });
+        }
       }
       if (networkGuardMode === "replay") {
         const networkEscapeCount = [...trackedContexts].reduce(

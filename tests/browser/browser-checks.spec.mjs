@@ -574,22 +574,12 @@ test.describe.serial("sequential panel checks", () => {
   });
 });
 
-test(
-  "normal loads stay on the main basemap in a 5s observation window",
-  { tag: ["@modern"], timeout: 120_000 },
-  async ({ browser, baseUrl }) => {
-    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/", { observeWindowMs: 5_000 });
-    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern", {
-      observeWindowMs: 5_000
-    });
-    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?place=galilee", {
-      observeWindowMs: 5_000
-    });
-    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern&place=galilee", {
-      observeWindowMs: 5_000
-    });
-  }
-);
+test("normal loads stay on the main basemap in a 5s observation window", { tag: ["@modern"] }, async ({ browser, baseUrl }) => {
+  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/", { observeWindowMs: 5_000 });
+  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern", { observeWindowMs: 5_000 });
+  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?place=galilee", { observeWindowMs: 5_000 });
+  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern&place=galilee", { observeWindowMs: 5_000 });
+});
 
 test("gallery fixture keeps viewer layout and controls accessible", { tag: ["@panel"] }, async ({ browser, baseUrl }) => {
   await verifyGalleryFixtureWithViewer(browser, baseUrl);
