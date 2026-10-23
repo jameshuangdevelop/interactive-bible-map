@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Cache basemap fixture
+        uses: actions/cache@v4
+        with:
+          path: .cache/basemap-fixture
+          key: basemap-fixture-${{ hashFiles('tests/fixtures/basemap-fixture.lock.json') }}
+
+      - name: Fetch basemap fixture
+        run: npm run fetch:basemap-fixture
+
       - name: Build app data
         run: npm run build:data
 
@@ -43,3 +52,8 @@ jobs:
 
       - name: Verify exported web app
         run: npm run verify:web:playwright
+
+      - name: Live-network weekly smoke
+        env:
+          IBM_LIVE_NETWORK: "1"
+        run: npx playwright test --workers=1 --retries=0 --grep "normal loads stay on the main basemap in a 5s observation window|modern map toggle preserves state and attribution|Asia Minor towns render black dots under names at year 50"

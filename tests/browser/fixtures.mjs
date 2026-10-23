@@ -1,5 +1,13 @@
 import { test as base, expect } from "@playwright/test";
 import { distDirectory, startStaticServer } from "../../scripts/verify-web-export-playwright.mjs";
+import {
+  attachNetworkGuardsToContext,
+  collectNetworkEscapes,
+  collectNetworkGuardFailures,
+  flushNetworkEventLogWrites,
+  getNetworkGuardMode,
+  writeRecordedBasemapManifest
+} from "./network-guard.mjs";
 
 export const test = base.extend({
   server: [
@@ -23,6 +31,7 @@ export const test = base.extend({
       const missingPathsStart = server.notFoundPaths.length;
       const trackedContexts = new Set();
       const trackedPages = new Set();
+      const networkGuardMode = getNetworkGuardMode();
 
       const attachPage = (page) => {
         if (trackedPages.has(page)) {
@@ -43,11 +52,12 @@ export const test = base.extend({
         });
       };
 
-      const attachContext = (context) => {
+      const attachContext = async (context) => {
         if (trackedContexts.has(context)) {
           return;
         }
         trackedContexts.add(context);
+        await attachNetworkGuardsToContext(context);
         context.on("page", attachPage);
         for (const page of context.pages()) {
           attachPage(page);
@@ -57,13 +67,11 @@ export const test = base.extend({
       const originalNewContext = browser.newContext.bind(browser);
       browser.newContext = async (...args) => {
         const context = await originalNewContext(...args);
-        attachContext(context);
+        await attachContext(context);
         return context;
       };
 
-      for (const context of browser.contexts()) {
-        attachContext(context);
-      }
+      await Promise.all(browser.contexts().map((context) => attachContext(context)));
 
       try {
         await use();
@@ -82,6 +90,20 @@ export const test = base.extend({
       if (missingPaths.length > 0) {
         failures.push(`Missing files: ${JSON.stringify(missingPaths.slice(0, 10))}`);
       }
+      for (const context of trackedContexts) {
+        failures.push(...collectNetworkGuardFailures(context));
+      }
+      if (networkGuardMode === "replay") {
+        const networkEscapeCount = [...trackedContexts].reduce(
+          (sum, context) => sum + collectNetworkEscapes(context),
+          0
+        );
+        if (networkEscapeCount > 0) {
+          failures.push(`Network replay leaked ${networkEscapeCount} outside request(s) to the live network.`);
+        }
+      }
+      await flushNetworkEventLogWrites();
+      await writeRecordedBasemapManifest();
 
       expect(
         failures,

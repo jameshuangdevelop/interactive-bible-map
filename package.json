@@ -30,6 +30,9 @@
     "check:images": "node scripts/check-images.mjs",
     "build:openbible-ids": "node scripts/build-openbible-ids.mjs",
     "build:basemap-styles": "node scripts/build-basemap-styles.mjs",
+    "fetch:basemap-fixture": "node scripts/fetch-basemap-fixture.mjs",
+    "record:basemap": "node scripts/record-basemap.mjs",
+    "pack:basemap-fixture": "node scripts/pack-basemap-fixture.mjs",
     "bench:map": "node scripts/bench-map.mjs",
     "lint": "npm run lint --workspace interactive-bible-map-app",
     "typecheck": "npm run typecheck --workspace interactive-bible-map-app",
@@ -53,12 +56,13 @@
     "topojson-simplify": "3.0.3"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
     "@axe-core/playwright": "4.11.0",
+    "@playwright/test": "1.63.0",
     "fflate": "0.8.2",
     "lighthouse": "^12.8.2",
     "mapshaper": "0.6.113",
     "playwright": "1.63.0",
+    "pmtiles": "^4.3.0",
     "sharp": "^0.35.5-rc.0",
     "undici": "^7.24.4"
   }

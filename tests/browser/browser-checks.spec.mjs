@@ -574,12 +574,22 @@ test.describe.serial("sequential panel checks", () => {
   });
 });
 
-test("normal loads stay on the main basemap in a 5s observation window", { tag: ["@modern"] }, async ({ browser, baseUrl }) => {
-  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/", { observeWindowMs: 5_000 });
-  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern", { observeWindowMs: 5_000 });
-  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?place=galilee", { observeWindowMs: 5_000 });
-  await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern&place=galilee", { observeWindowMs: 5_000 });
-});
+test(
+  "normal loads stay on the main basemap in a 5s observation window",
+  { tag: ["@modern"], timeout: 120_000 },
+  async ({ browser, baseUrl }) => {
+    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/", { observeWindowMs: 5_000 });
+    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern", {
+      observeWindowMs: 5_000
+    });
+    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?place=galilee", {
+      observeWindowMs: 5_000
+    });
+    await verifyNormalLoadStaysOnMainBasemap(browser, baseUrl, "/?map=modern&place=galilee", {
+      observeWindowMs: 5_000
+    });
+  }
+);
 
 test("gallery fixture keeps viewer layout and controls accessible", { tag: ["@panel"] }, async ({ browser, baseUrl }) => {
   await verifyGalleryFixtureWithViewer(browser, baseUrl);
@@ -864,7 +874,7 @@ test("place details recover from stale request races", { tag: ["@panel"] }, asyn
   await verifyPlaceDetailsFetchRaceRecovery(browser, baseUrl);
 });
 
-test("fallback outage mode works in pbf-only and all-request scenarios", { tag: ["@fallback", "@network"] }, async ({ browser, baseUrl }) => {
+test("fallback outage mode works in pbf-only and all-request scenarios", { tag: ["@fallback"] }, async ({ browser, baseUrl }) => {
   await verifyFallbackOutageMode({
     browser,
     baseUrl,
@@ -3157,7 +3167,7 @@ test("routes load failure shows retry and recovers after Try again @routes", { t
       await route.abort("failed");
       return;
     }
-    await route.continue();
+    await route.fallback();
   });
   await page.goto(`${baseUrl}/?tab=routes`, { waitUntil: "domcontentloaded", timeout: 120_000 });
   await expect(page.getByText("Routes couldn't load.")).toBeVisible();
