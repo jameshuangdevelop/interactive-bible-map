@@ -596,3 +596,15 @@ Table rows are shown with escaped pipes (`\|`) so they don't render as tables he
 | Licensing | Signed off | — |
 
 When the note is revised, I'll re-check the changed rows and passages and the ten IDs that rest on Wikidata alone. The rest of this report stands.
+
+## PO rulings (2026-10-24)
+The PO rules on §9's items as the Fact-Checker advises. The human was away, and every ruling can be reversed later.
+- **PO-1. The Parthian Empire: option A.** The empire is not outlinable on its east, so it keeps its name only (ADR-0050 item 5; the card allows "not outlinable, with the reason"). M5-20 therefore draws six outlines. The note keeps its sourced west, north and south edges as research, with the reason the empire isn't drawn.
+- **PO-2. Rhagae:** inside Media, following ISBE, Strabo 11.13.6–8 and M5-19 §4.9. Both notes name Strabo 11.9.1, and Media's east edge is low confidence.
+- **PO-3. Lake Tatta:** in neither outline. It is outside Lycaonia (Strabo 12.5.4) and outside Phrygia (12.8.13), and stays in the drawn `galatia`. Both notes give both passages.
+- **PO-4. Lycaonia's point** (33°E 38°N): if no sourced anchor lies nearer to it than Iconium, it is named as an exception to check (b), as M5-19 did with Cauda.
+- **PO-5. Cadi:** on the shared line (M5-19's G6.4) if the build allows it; otherwise on Phrygia's side, not Mysia's. Both notes give both readings.
+- **PO-6. Elaea:** inside Mysia by default, following Strabo's Caicus reading, and named as disputed (Pliny 5.32; Pleiades' "Aeolis").
+- **PO-7. Media's Caspian coast:** confirmed. Media reaches the Caspian, and its north and north-east are a coast. The coast's east end is disputed (the Tapyri, Strabo 11.9.1).
+- **PO-8. Mesopotamia's south:** Strabo's close from Babylon to Seleucia. The note names Pliny's broader Mesopotamia and the record's narrower one (Arrian).
+- **PO-9.** Noted. M5-19's conclusion stands on Strabo 11.13.1 and ISBE, so nothing shipped changes.
