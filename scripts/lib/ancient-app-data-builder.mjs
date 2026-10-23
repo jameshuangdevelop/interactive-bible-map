@@ -1365,6 +1365,18 @@ export async function buildAncientAppData({
   const writtenFiles = [];
   const holderUnionGeometryIdByKey = new Map();
   const holderUnionGeometryById = new Map();
+  const regionOutlineFeatures = (regionOutlinesData?.features ?? []).map((feature) => ({
+    ...feature,
+    properties: {
+      ...feature.properties
+    },
+    geometry: roundGeometry(feature.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
+  }));
+  const regionOutlineIds = [...new Set(
+    regionOutlineFeatures
+      .map((feature) => feature.id)
+      .filter((id) => typeof id === "string")
+  )].sort((left, right) => left.localeCompare(right));
 
   const bibliographyEntryIds = new Set();
   for (const stop of stops) {
@@ -1399,7 +1411,8 @@ export async function buildAncientAppData({
         kind: entity.kind,
         romanSide: entity.romanSide,
         locationId: entity.locationId ?? null
-      }))
+      })),
+      regionOutlineIds
     })
   );
 
@@ -1457,13 +1470,7 @@ export async function buildAncientAppData({
       "ancient.region-outlines.json",
       {
         type: "FeatureCollection",
-        features: (regionOutlinesData?.features ?? []).map((feature) => ({
-          ...feature,
-          properties: {
-            ...feature.properties
-          },
-          geometry: roundGeometry(feature.geometry, SIMPLIFIED_COORDINATE_DECIMALS)
-        }))
+        features: regionOutlineFeatures
       }
     )
   );

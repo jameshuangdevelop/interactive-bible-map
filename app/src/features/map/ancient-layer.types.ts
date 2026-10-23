@@ -81,6 +81,7 @@ export interface AncientTimelinePayload {
     accessed?: string;
   }[];
   entities: AncientEntityRecord[];
+  regionOutlineIds?: string[];
 }
 
 export interface AncientAreaAssignment {

@@ -1,4 +1,10 @@
-import type { PinLabelSource, PlaceIndexRecord, PlaceType, ZoomTier } from "./types";
+import type {
+  MapDisplayMode,
+  PinLabelSource,
+  PlaceIndexRecord,
+  PlaceType,
+  ZoomTier
+} from "./types";
 
 export function getPrimaryPlaceName(
   place: PlaceIndexRecord,
@@ -17,6 +23,18 @@ export function isDisputedPlace(place: PlaceIndexRecord) {
 
 export function isAreaLabelType(placeType: PlaceType) {
   return placeType === "region" || placeType === "province" || placeType === "empire";
+}
+
+export function isSelectedRegionPlace({
+  mapMode,
+  place,
+  regionOutlineIds
+}: {
+  mapMode: MapDisplayMode;
+  place: Pick<PlaceIndexRecord, "id" | "type">;
+  regionOutlineIds: ReadonlySet<string>;
+}) {
+  return isAreaLabelType(place.type) || (mapMode === "ancient" && regionOutlineIds.has(place.id));
 }
 
 export function isZoomTierVisible(zoomTier: ZoomTier, zoom: number) {

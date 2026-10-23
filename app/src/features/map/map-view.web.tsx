@@ -68,7 +68,7 @@ import {
   type ScreenPoint as HitScreenPoint
 } from "./interactive-hit";
 import { interactiveHitPaddingForEvent } from "./interactive-hit-padding";
-import { isAreaLabelType } from "./place-visibility";
+import { isSelectedRegionPlace } from "./place-visibility";
 import { formatHolderYearRange } from "./holder-year-range";
 import { ANCIENT_LAYER_STYLE } from "./ancient-layer-style";
 import {
@@ -78,7 +78,9 @@ import {
 import {
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  resolveSelectedRegionGeometry,
+  type RegionGeometry
 } from "./selected-region-highlight";
 import type { MapViewProps } from "./map-view.types";
 import type {
@@ -2887,6 +2889,7 @@ export function MapView({
   const selectionRef = useRef<PlaceSelection | null>(null);
   const selectionOriginRef = useRef<MapViewProps["selectionOrigin"]>(selectionOrigin);
   const mapModeRef = useRef<MapDisplayMode>(mapMode);
+  const regionOutlineIdsRef = useRef<ReadonlySet<string>>(new Set());
   const mapModeEffectInitializedRef = useRef(false);
   const activateVisibleEntryRef = useRef<
     (
@@ -2942,10 +2945,22 @@ export function MapView({
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
   const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
+  const regionOutlineIds = useMemo(
+    () =>
+      new Set(
+        (ancientTimeline?.regionOutlineIds ?? []).filter(
+          (id): id is string => typeof id === "string"
+        )
+      ),
+    [ancientTimeline?.regionOutlineIds]
+  );
   const routesModeEnabled = Boolean(routesOverlay);
   useEffect(() => {
     routesModeEnabledRef.current = routesModeEnabled;
   }, [routesModeEnabled]);
+  useEffect(() => {
+    regionOutlineIdsRef.current = regionOutlineIds;
+  }, [regionOutlineIds]);
   const placeById = useMemo(() => new Map(places.map((place) => [place.id, place])), [places]);
   const routePriorityPlaceIdsKey = useMemo(() => {
     return routePriorityPlaceIdsKeyFromOverlay(routesOverlay);
@@ -2974,6 +2989,12 @@ export function MapView({
   const [ancientHolderUnions, setAncientHolderUnions] = useState<AncientHolderUnionsPayload>({
     geometries: {}
   });
+  const [ancientRegionOutlinesByPlaceId, setAncientRegionOutlinesByPlaceId] = useState<
+    Record<string, RegionGeometry>
+  >({});
+  const regionOutlinesLoadPromiseRef = useRef<Promise<void> | null>(null);
+  const regionOutlinesLoadedRef = useRef(false);
+  const regionOutlinesLastFailedPlaceIdRef = useRef<string | null>(null);
   const [ancientRoads, setAncientRoads] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientCoastline, setAncientCoastline] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
   const [ancientEmpireEdge, setAncientEmpireEdge] = useState<GeoJsonSourceData>(createEmptyFeatureCollection());
@@ -3054,7 +3075,14 @@ export function MapView({
       return createEmptyFeatureCollection();
     }
     const place = placeById.get(selection.placeId);
-    if (!place || isAreaLabelType(place.type) || place.candidates.length !== 1) {
+    const isSelectedRegion = place
+      ? isSelectedRegionPlace({
+          mapMode,
+          place,
+          regionOutlineIds
+        })
+      : false;
+    if (!place || isSelectedRegion || place.candidates.length !== 1) {
       return createEmptyFeatureCollection();
     }
     return {
@@ -3073,7 +3101,7 @@ export function MapView({
         }
       ]
     } satisfies GeoJsonSourceData;
-  }, [placeById, selection]);
+  }, [mapMode, placeById, regionOutlineIds, selection]);
   const ancientAreaFeatures = useMemo(
     () => buildAncientAreaFeatures(ancientShapes, selectedAncientStopPayload, ancientEntitiesById),
     [ancientEntitiesById, ancientShapes, selectedAncientStopPayload]
@@ -3093,12 +3121,19 @@ export function MapView({
     const timelineRangeEndYear = ancientTimeline?.range.toYear ?? 101;
     return buildAncientHolderLabelFeatures(selectedAncientStopPayload, timelineRangeEndYear);
   }, [ancientTimeline, selectedAncientStopPayload]);
-  const selectedRegionGeometry = useMemo(() => {
+  const selectedRegionHeldGeometry = useMemo(() => {
     if (!selection || mapMode !== "ancient") {
       return null;
     }
     const selectedPlace = placeById.get(selection.placeId);
-    if (!selectedPlace || !isAreaLabelType(selectedPlace.type)) {
+    if (
+      !selectedPlace ||
+      !isSelectedRegionPlace({
+        mapMode,
+        place: selectedPlace,
+        regionOutlineIds
+      })
+    ) {
       return null;
     }
     return findSelectedRegionGeometry({
@@ -3110,7 +3145,41 @@ export function MapView({
       politicalAreaId: selectedPlace.politicalAreaId,
       politicalUnitAreaTypes
     });
-  }, [ancientHolderUnions, ancientShapes, mapMode, placeById, selectedAncientStopPayload, selection]);
+  }, [
+    ancientHolderUnions,
+    ancientShapes,
+    mapMode,
+    placeById,
+    regionOutlineIds,
+    selectedAncientStopPayload,
+    selection
+  ]);
+  const selectedRegionGeometry = useMemo(() => {
+    if (!selection || mapMode !== "ancient") {
+      return null;
+    }
+    const selectedPlace = placeById.get(selection.placeId);
+    if (!selectedPlace) {
+      return null;
+    }
+    const isSelectedRegion = isSelectedRegionPlace({
+      mapMode,
+      place: selectedPlace,
+      regionOutlineIds
+    });
+    return resolveSelectedRegionGeometry({
+      heldRegionGeometry: selectedRegionHeldGeometry,
+      regionOutlineGeometry: ancientRegionOutlinesByPlaceId[selectedPlace.id] ?? null,
+      isSelectedRegion
+    });
+  }, [
+    ancientRegionOutlinesByPlaceId,
+    mapMode,
+    placeById,
+    regionOutlineIds,
+    selectedRegionHeldGeometry,
+    selection
+  ]);
   const selectedRegionSourceSyncKey = useMemo(() => {
     if (!selectedRegionGeometry) {
       return "none";
@@ -3134,6 +3203,58 @@ export function MapView({
   const [ancientLayerLoadState, setAncientLayerLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const ancientLayerLoadStateRef = useRef<"idle" | "loading" | "ready" | "error">("idle");
   const previousAncientLayerRetryTokenRef = useRef(ancientLayerRetryToken);
+  const loadAncientRegionOutlinesOnce = useCallback((placeId: string) => {
+    if (regionOutlinesLoadedRef.current) {
+      return Promise.resolve();
+    }
+    if (regionOutlinesLastFailedPlaceIdRef.current === placeId) {
+      return regionOutlinesLoadPromiseRef.current ?? Promise.resolve();
+    }
+    if (regionOutlinesLoadPromiseRef.current) {
+      return regionOutlinesLoadPromiseRef.current;
+    }
+
+    const request = fetch("/generated/ancient.region-outlines.json", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Could not load ancient region outlines (${response.status})`);
+        }
+        const payload = (await response.json()) as {
+          type?: string;
+          features?: {
+            id?: unknown;
+            geometry?: unknown;
+          }[];
+        };
+        const nextOutlinesByPlaceId: Record<string, RegionGeometry> = {};
+        for (const feature of payload.features ?? []) {
+          if (typeof feature.id !== "string") {
+            continue;
+          }
+          const geometry = feature.geometry;
+          if (
+            !geometry ||
+            typeof geometry !== "object" ||
+            ((geometry as { type?: unknown }).type !== "Polygon" &&
+              (geometry as { type?: unknown }).type !== "MultiPolygon")
+          ) {
+            continue;
+          }
+          nextOutlinesByPlaceId[feature.id] = geometry as RegionGeometry;
+        }
+        regionOutlinesLoadedRef.current = true;
+        regionOutlinesLastFailedPlaceIdRef.current = null;
+        setAncientRegionOutlinesByPlaceId(nextOutlinesByPlaceId);
+      })
+      .catch(() => {
+        regionOutlinesLastFailedPlaceIdRef.current = placeId;
+      })
+      .finally(() => {
+        regionOutlinesLoadPromiseRef.current = null;
+      });
+    regionOutlinesLoadPromiseRef.current = request;
+    return request;
+  }, []);
   const resetAncientLayerData = useCallback((nextState: "idle" | "loading") => {
     setAncientShapes(null);
     setAncientHolderUnions({ geometries: {} });
@@ -3270,6 +3391,55 @@ export function MapView({
       });
     }
   }, [ancientLayerRetryToken, hasAncientTimeline, loadStopPayload]);
+
+  useEffect(() => {
+    if (
+      !hasAncientTimeline ||
+      mapMode !== "ancient" ||
+      !selection ||
+      !ancientShapes ||
+      !selectedAncientStopPayload
+    ) {
+      return;
+    }
+
+    const selectedPlace = placeById.get(selection.placeId);
+    if (
+      !selectedPlace ||
+      !isSelectedRegionPlace({
+        mapMode,
+        place: selectedPlace,
+        regionOutlineIds
+      })
+    ) {
+      return;
+    }
+
+    if (selectedRegionHeldGeometry) {
+      return;
+    }
+
+    if (!regionOutlineIds.has(selectedPlace.id)) {
+      return;
+    }
+
+    if (regionOutlinesLoadedRef.current || ancientRegionOutlinesByPlaceId[selectedPlace.id]) {
+      return;
+    }
+
+    void loadAncientRegionOutlinesOnce(selectedPlace.id);
+  }, [
+    ancientRegionOutlinesByPlaceId,
+    ancientShapes,
+    hasAncientTimeline,
+    loadAncientRegionOutlinesOnce,
+    mapMode,
+    placeById,
+    regionOutlineIds,
+    selectedAncientStopPayload,
+    selectedRegionHeldGeometry,
+    selection
+  ]);
 
   useEffect(() => {
     if (mapReadyVersion === 0 || ancientShapes || !hasAncientTimeline || ancientLayerLoadState === "error") {
@@ -4847,7 +5017,11 @@ export function MapView({
       origin === "map-candidate" ||
       origin === "map-dot" ||
       origin === "keyboard-visible-place";
-    const isAreaSelection = isAreaLabelType(place.type);
+    const isAreaSelection = isSelectedRegionPlace({
+      mapMode: mapModeRef.current,
+      place,
+      regionOutlineIds: regionOutlineIdsRef.current
+    });
     if (isMapInitiatedSelection && isAreaSelection) {
       return;
     }

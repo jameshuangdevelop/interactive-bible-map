@@ -361,6 +361,121 @@ async function clickMapPoint(page, point) {
   await page.mouse.click(viewportPoint.x, viewportPoint.y);
 }
 
+async function selectedRegionOverlayCounts(page) {
+  return page.evaluate((testHookKey) => {
+    const map = window[testHookKey];
+    if (!map) {
+      return {
+        veilCount: 0,
+        outlineCount: 0
+      };
+    }
+    return {
+      veilCount: map.querySourceFeatures("ibm-selected-region-veil").length,
+      outlineCount: map.querySourceFeatures("ibm-selected-region-outline").length
+    };
+  }, mapTestHookKey);
+}
+
+async function selectedAreaLabelCount(page, placeId) {
+  return page.evaluate(
+    ({ testHookKey, selectedPlaceId }) => {
+      const map = window[testHookKey];
+      return map
+        .queryRenderedFeatures(undefined, {
+          layers: ["ibm-selected-area-label", "ibm-ancient-holder-label-selected"]
+        })
+        .filter(
+          (feature) =>
+            String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") ===
+            selectedPlaceId
+        ).length;
+    },
+    { testHookKey: mapTestHookKey, selectedPlaceId: placeId }
+  );
+}
+
+async function selectedPlacePinCount(page, placeId) {
+  return page.evaluate(
+    ({ testHookKey, selectedPlaceId }) => {
+      const map = window[testHookKey];
+      return map
+        .queryRenderedFeatures(undefined, { layers: ["ibm-selected-place-pin"] })
+        .filter((feature) => String(feature.properties?.placeId ?? "") === selectedPlaceId).length;
+    },
+    { testHookKey: mapTestHookKey, selectedPlaceId: placeId }
+  );
+}
+
+async function areaLabelViewportPoint(page, placeId) {
+  return page.evaluate(
+    ({ testHookKey, targetPlaceId }) => {
+      const map = window[testHookKey];
+      const hit = map
+        .queryRenderedFeatures(undefined, {
+          layers: [
+            "ibm-area-label-overview",
+            "ibm-area-label",
+            "ibm-major-area-label-overview",
+            "ibm-major-area-label",
+            "ibm-selected-area-label"
+          ]
+        })
+        .find((feature) => String(feature.properties?.placeId ?? "") === targetPlaceId);
+      if (!hit || hit.geometry?.type !== "Point") {
+        return null;
+      }
+      const projected = map.project(hit.geometry.coordinates);
+      return { x: projected.x, y: projected.y };
+    },
+    { testHookKey: mapTestHookKey, targetPlaceId: placeId }
+  );
+}
+
+async function mapVeilCoverageProbe(page, insideLngLats) {
+  return page.evaluate(
+    ({ testHookKey, insideCoordinates }) => {
+      const map = window[testHookKey];
+      const hasVeilAt = (lngLat) => {
+        const projected = map.project(lngLat);
+        return map.queryRenderedFeatures(
+          [
+            [projected.x - 2, projected.y - 2],
+            [projected.x + 2, projected.y + 2]
+          ],
+          { layers: ["ibm-selected-region-veil"] }
+        ).length > 0;
+      };
+      const hasAnyOutsideVeil = (() => {
+        const canvas = map.getCanvas();
+        for (let y = 120; y <= canvas.height - 120; y += 36) {
+          for (let x = 120; x <= canvas.width - 120; x += 36) {
+            const hit = map.queryRenderedFeatures(
+              [
+                [x - 2, y - 2],
+                [x + 2, y + 2]
+              ],
+              { layers: ["ibm-selected-region-veil"] }
+            );
+            if (hit.length > 0) {
+              return true;
+            }
+          }
+        }
+        return false;
+      })();
+      return {
+        insideHasVeil: insideCoordinates.map((lngLat) => hasVeilAt(lngLat)),
+        hasAnyOutsideVeil
+      };
+    },
+    {
+      testHookKey: mapTestHookKey,
+      insideCoordinates: insideLngLats
+    }
+  );
+}
+
 async function cursorAtMapPoint(page, point) {
   await moveMouseToMapPoint(page, point);
   await page.waitForTimeout(60);
@@ -970,6 +1085,23 @@ test("Asia Minor towns render black dots under names at year 50 (major + standar
   }
 
   await jumpMap(page, [35.281944, 32.213611], 12.2);
+  await expect
+    .poll(
+      () =>
+        page.evaluate((testHookKey) => {
+          const map = window[testHookKey];
+          const feature = map
+            .queryRenderedFeatures(undefined, { layers: ["ibm-site-pin"] })
+            .find((candidate) => candidate.properties?.placeId === "sychar" && candidate.geometry?.type === "Point");
+          if (!feature || feature.geometry?.type !== "Point") {
+            return null;
+          }
+          const point = map.project(feature.geometry.coordinates);
+          return { x: point.x, y: point.y };
+        }, mapTestHookKey),
+      { timeout: 10_000 }
+    )
+    .not.toBeNull();
   const sycharTarget = await page.evaluate((testHookKey) => {
     const map = window[testHookKey];
     const feature = map
@@ -1272,106 +1404,30 @@ test("selected region veil darkens outside the region while keeping inside lumin
   expect(outsideMeanDelta).toBeGreaterThan(8);
 });
 
-test("clicking KINGDOM OF PONTUS draws veil and outline while keeping inside luminance stable @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapIdle(page);
-  await jumpMap(page, [36.5, 40.6], 6.9);
-
-  const pontusTarget = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const layers = [
-      "ibm-area-label-overview",
-      "ibm-area-label",
-      "ibm-major-area-label-overview",
-      "ibm-major-area-label",
-      "ibm-selected-area-label",
-      "ibm-ancient-holder-label-click-target",
-      "ibm-ancient-holder-label-clickable",
-      "ibm-ancient-holder-label-selected"
-    ];
-    const hit = map
-      .queryRenderedFeatures(undefined, { layers })
-      .find(
-        (feature) =>
-          String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus"
-      );
-    if (!hit || hit.geometry?.type !== "Point") {
-      return null;
+test("Pontus uses held land in AD 50 and its own outline in AD 70 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  const regionOutlinesRequests = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/generated/ancient.region-outlines.json")) {
+      regionOutlinesRequests.push(request.url());
     }
-    const projected = map.project(hit.geometry.coordinates);
-    return { x: projected.x, y: projected.y };
-  }, mapTestHookKey);
-  expect(pontusTarget).toBeTruthy();
-  await clickMapPoint(page, pontusTarget);
-  await page.waitForFunction(
-    () => new URLSearchParams(window.location.search).get("place") === "pontus",
-    { timeout: 10_000 }
-  );
+  });
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=pontus`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
   await waitForMapIdle(page);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  expect(regionOutlinesRequests).toHaveLength(0);
 
-  const overlay = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return {
-      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
-      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
-    };
-  }, mapTestHookKey);
-  expect(overlay.veilFeatures).toBeGreaterThan(0);
-  expect(overlay.outlineFeatures).toBeGreaterThan(0);
-
-  const samplePoints = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const selectedName = map
-      .queryRenderedFeatures(undefined, {
-        layers: [
-          "ibm-selected-area-label",
-          "ibm-ancient-holder-label-selected"
-        ]
-      })
-      .find((feature) => String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "") === "pontus");
-    const insidePoint = selectedName?.geometry?.type === "Point" ? map.project(selectedName.geometry.coordinates) : null;
-    const canvas = map.getCanvas();
-    const outsideCandidates = (() => {
-      for (let y = 140; y <= canvas.height - 140; y += 36) {
-        for (let x = 520; x <= canvas.width - 120; x += 36) {
-          const hasVeil = map.queryRenderedFeatures(
-            [
-              [x - 2, y - 2],
-              [x + 2, y + 2]
-            ],
-            { layers: ["ibm-selected-region-veil"] }
-          ).length > 0;
-          if (hasVeil) {
-            return { x, y };
-          }
-        }
-      }
-      return null;
-    })();
-    return {
-      inside: insidePoint ? [{ x: insidePoint.x, y: insidePoint.y }] : [],
-      outside: outsideCandidates ? [{ x: outsideCandidates.x, y: outsideCandidates.y }] : []
-    };
-  }, mapTestHookKey);
-  expect(samplePoints.inside.length).toBe(1);
-  expect(samplePoints.outside.length).toBe(1);
-
-  const withVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
-  const withVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
-  await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "none");
-  }, mapTestHookKey);
+  await page.goto(`${baseUrl}/?tab=map&year=70&place=pontus`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
   await waitForMapIdle(page);
-  const withoutVeilInside = await sampleLuminanceAtMapPoints(page, samplePoints.inside);
-  const withoutVeilOutside = await sampleLuminanceAtMapPoints(page, samplePoints.outside);
-  await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    map.setLayoutProperty("ibm-selected-region-veil", "visibility", "visible");
-  }, mapTestHookKey);
-
-  expect(Math.abs(withoutVeilInside[0] - withVeilInside[0])).toBeLessThan(3);
-  expect(withoutVeilOutside[0] - withVeilOutside[0]).toBeGreaterThan(2);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => regionOutlinesRequests.length, { timeout: 10_000 }).toBe(1);
 });
 
 test("roman empire highlight has no internal seams and keeps an outer edge at year 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -1563,143 +1619,271 @@ test("judea province union has no inner seam along Galilee-Samaria at year 70 @n
   expect(judeaSeamProbe.outerEdgeDrawn).toBe(true);
 });
 
-test("regions only highlight when they own a shaped area in the selected year @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
-  await page.goto(`${baseUrl}/?tab=map&year=50`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+test("Samaria uses its own outline in AD 50 with veil outside only @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=samaria`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
   await waitForMapIdle(page);
-  await jumpMap(page, [34.0, 38.7], 6.8);
-  const pisidiaTarget = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    const layers = [
-      "ibm-area-label-overview",
-      "ibm-area-label",
-      "ibm-major-area-label-overview",
-      "ibm-major-area-label",
-      "ibm-selected-area-label"
-    ];
-    const target = map
-      .queryRenderedFeatures(undefined, { layers })
-      .find(
-        (feature) =>
-          feature.geometry?.type === "Point" &&
-          String(feature.properties?.placeId ?? "") === "pisidia"
-      );
-    if (!target || target.geometry?.type !== "Point") {
-      return null;
-    }
-    const projected = map.project(target.geometry.coordinates);
-    return { x: projected.x, y: projected.y };
-  }, mapTestHookKey);
-  expect(pisidiaTarget).toBeTruthy();
-  await clickMapPoint(page, pisidiaTarget);
-  await page.waitForFunction(() => new URLSearchParams(window.location.search).get("place") === "pisidia", { timeout: 10_000 });
-  await waitForMapIdle(page);
+  await jumpMap(page, [35.25, 32.3], 7.3);
 
-  const pisidiaOverlay = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return {
-      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
-      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
-    };
-  }, mapTestHookKey);
-  expect(pisidiaOverlay.veilFeatures).toBe(0);
-  expect(pisidiaOverlay.outlineFeatures).toBe(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
 
-  let pisidiaNameProbe = null;
   await expect
     .poll(
-      async () => {
-        pisidiaNameProbe = await page.evaluate((testHookKey) => {
-          const map = window[testHookKey];
-          const layers = [
-            "ibm-major-area-label-overview",
-            "ibm-major-area-label",
-            "ibm-area-label-overview",
-            "ibm-area-label",
-            "ibm-selected-area-label",
-            "ibm-ancient-holder-label-clickable",
-            "ibm-ancient-holder-label-selected"
-          ];
-          const features = map.queryRenderedFeatures(undefined, { layers }).filter((feature) => {
-            const placeId = String(feature.properties?.placeId ?? feature.properties?.holderLocationId ?? "");
-            return placeId === "pisidia";
-          });
-          const single = features[0];
-          if (!single || single.geometry?.type !== "Point") {
-            return { count: features.length, layerId: null, x: null, y: null };
-          }
-          const projected = map.project(single.geometry.coordinates);
-          for (const [offsetX, offsetY] of [
-            [0, 0],
-            [0, -12],
-            [0, 12],
-            [-12, 0],
-            [12, 0],
-            [-20, -10],
-            [20, -10],
-            [-20, 10],
-            [20, 10]
-          ]) {
-            const x = projected.x + offsetX;
-            const y = projected.y + offsetY;
-            const hit = map
-              .queryRenderedFeatures(
-                [
-                  [x - 2, y - 2],
-                  [x + 2, y + 2]
-                ],
-                { layers }
-              )
-              .some(
-                (entry) =>
-                  String(entry.properties?.placeId ?? entry.properties?.holderLocationId ?? "") === "pisidia"
-              );
-            if (hit) {
-              return { count: features.length, layerId: single.layer?.id ?? null, x, y };
-            }
-          }
-          return { count: features.length, layerId: single.layer?.id ?? null, x: projected.x, y: projected.y };
-        }, mapTestHookKey);
-        return `${pisidiaNameProbe.count}:${pisidiaNameProbe.layerId ?? "none"}`;
-      },
+      async () =>
+        mapVeilCoverageProbe(
+          page,
+          [
+            [35.18, 32.28],
+            [35.29, 32.24]
+          ]
+        ),
       { timeout: 10_000 }
     )
-    .toBe("1:ibm-selected-area-label");
+    .toEqual({
+      insideHasVeil: [false, false],
+      hasAnyOutsideVeil: true
+    });
+});
 
-  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea-province`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+test("Crete uses its own island outline in AD 50 @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=crete`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
   await waitForMapIdle(page);
-  const judeaProvinceOverlay = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return {
-      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
-      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
-    };
-  }, mapTestHookKey);
-  expect(judeaProvinceOverlay.veilFeatures).toBeGreaterThan(0);
-  expect(judeaProvinceOverlay.outlineFeatures).toBeGreaterThan(0);
+  await jumpMap(page, [24.95, 35.2], 7);
 
-  await page.goto(`${baseUrl}/?tab=map&year=30&place=judea`, { waitUntil: "domcontentloaded", timeout: 120_000 });
-  await waitForMapIdle(page);
-  const judeaRegionOverlay = await page.evaluate((testHookKey) => {
-    const map = window[testHookKey];
-    return {
-      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
-      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
-    };
-  }, mapTestHookKey);
-  expect(judeaRegionOverlay.veilFeatures).toBe(0);
-  expect(judeaRegionOverlay.outlineFeatures).toBe(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect
+    .poll(
+      async () =>
+        mapVeilCoverageProbe(
+          page,
+          [[24.95, 35.2]]
+        ),
+      { timeout: 10_000 }
+    )
+    .toEqual({
+      insideHasVeil: [false],
+      hasAnyOutsideVeil: true
+    });
+});
 
-  await page.goto(`${baseUrl}/?tab=map&year=50&place=galatia`, { waitUntil: "domcontentloaded", timeout: 120_000 });
+for (const placeId of ["galilee", "judea", "libya", "chios", "cos", "malta", "rhodes", "samos"]) {
+  test(`region outline renders at year 50 for ${placeId} @names`, { tag: ["@names"] }, async ({ page, baseUrl }) => {
+    await page.goto(`${baseUrl}/?tab=map&year=50&place=${placeId}`, {
+      waitUntil: "domcontentloaded",
+      timeout: 120_000
+    });
+
+    await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBeGreaterThan(0);
+    await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
+
+    if (["chios", "cos", "rhodes", "samos"].includes(placeId)) {
+      await expect.poll(async () => selectedPlacePinCount(page, placeId), { timeout: 10_000 }).toBe(0);
+    }
+  });
+}
+
+test("clicking Cos keeps camera fixed in ancient mode, then shows pin in modern mode @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  const cosCoordinates = [27.29, 36.89];
+  const readCamera = async () =>
+    page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      const center = map.getCenter();
+      return {
+        center: [center.lng, center.lat],
+        zoom: map.getZoom()
+      };
+    }, mapTestHookKey);
+
+  await page.goto(`${baseUrl}/?tab=map&year=50`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
   await waitForMapIdle(page);
-  const galatiaOverlay = await page.evaluate((testHookKey) => {
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBeNull();
+  await jumpMap(page, [27.35, 36.9], 7.2);
+
+  const panelOverlapCenter = await page.evaluate(({ testHookKey, targetCoordinates }) => {
     const map = window[testHookKey];
-    return {
-      veilFeatures: map.querySourceFeatures("ibm-selected-region-veil").length,
-      outlineFeatures: map.querySourceFeatures("ibm-selected-region-outline").length
+    const mapCenterPoint = map.project(map.getCenter());
+    const targetPoint = map.project(targetCoordinates);
+    const desiredPoint = {
+      x: 180,
+      y: Math.min(Math.max(targetPoint.y, 180), map.getCanvas().height - 180)
     };
-  }, mapTestHookKey);
-  expect(galatiaOverlay.veilFeatures).toBeGreaterThan(0);
-  expect(galatiaOverlay.outlineFeatures).toBeGreaterThan(0);
+    const delta = {
+      x: desiredPoint.x - targetPoint.x,
+      y: desiredPoint.y - targetPoint.y
+    };
+    const shiftedCenterPoint = {
+      x: mapCenterPoint.x - delta.x,
+      y: mapCenterPoint.y - delta.y
+    };
+    const shiftedCenter = map.unproject(shiftedCenterPoint);
+    return [shiftedCenter.lng, shiftedCenter.lat];
+  }, { testHookKey: mapTestHookKey, targetCoordinates: cosCoordinates });
+  await jumpMap(page, panelOverlapCenter, 7.2);
+
+  await expect.poll(async () => Boolean(await areaLabelViewportPoint(page, "cos")), { timeout: 10_000 }).toBe(true);
+  const cosPoint = await areaLabelViewportPoint(page, "cos");
+  expect(cosPoint).toBeTruthy();
+
+  const beforeCamera = await readCamera();
+  await clickMapPoint(page, cosPoint);
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe("cos");
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedPlacePinCount(page, "cos"), { timeout: 10_000 }).toBe(0);
+
+  const afterCamera = await readCamera();
+  expect(Math.abs(afterCamera.center[0] - beforeCamera.center[0])).toBeLessThan(0.00001);
+  expect(Math.abs(afterCamera.center[1] - beforeCamera.center[1])).toBeLessThan(0.00001);
+  expect(Math.abs(afterCamera.zoom - beforeCamera.zoom)).toBeLessThan(0.00001);
+
+  await page.locator("button[role='radio'][data-map-mode='modern']").click();
+  await waitForMapIdle(page);
+  await expect.poll(async () => selectedPlacePinCount(page, "cos"), { timeout: 10_000 }).toBe(1);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBe(0);
+});
+
+test("Pisidia stays name-only when no held land and no own outline are available @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  const regionOutlinesRequests = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/generated/ancient.region-outlines.json")) {
+      regionOutlinesRequests.push(request.url());
+    }
+  });
+
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=pisidia`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+
+  await expect.poll(async () => selectedRegionOverlayCounts(page), { timeout: 10_000 }).toEqual({
+    veilCount: 0,
+    outlineCount: 0
+  });
+  await expect.poll(async () => selectedAreaLabelCount(page, "pisidia"), { timeout: 10_000 }).toBe(1);
+  expect(regionOutlinesRequests).toHaveLength(0);
+});
+
+test("region outlines load on first needed selection only once per session @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  const regionOutlinesRequests = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/generated/ancient.region-outlines.json")) {
+      regionOutlinesRequests.push(request.url());
+    }
+  });
+
+  await page.goto(`${baseUrl}/?tab=map&year=50`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await jumpMap(page, [35.25, 32.3], 7.3);
+  await expect.poll(async () => {
+    return page.evaluate((testHookKey) => {
+      const map = window[testHookKey];
+      return map
+        .queryRenderedFeatures(undefined, {
+          layers: ["ibm-area-label-overview", "ibm-area-label", "ibm-major-area-label-overview", "ibm-major-area-label"]
+        })
+        .filter((feature) => String(feature.properties?.placeId ?? "") === "samaria").length;
+    }, mapTestHookKey);
+  }, { timeout: 10_000 }).toBeGreaterThan(0);
+  expect(regionOutlinesRequests).toHaveLength(0);
+
+  await expect.poll(async () => Boolean(await areaLabelViewportPoint(page, "samaria")), { timeout: 10_000 }).toBe(true);
+  const samariaPoint = await areaLabelViewportPoint(page, "samaria");
+  expect(samariaPoint).toBeTruthy();
+  await clickMapPoint(page, samariaPoint);
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe("samaria");
+  await expect.poll(async () => regionOutlinesRequests.length, { timeout: 10_000 }).toBe(1);
+
+  await jumpMap(page, [24.95, 35.2], 7);
+  await expect.poll(async () => Boolean(await areaLabelViewportPoint(page, "crete")), { timeout: 10_000 }).toBe(true);
+  const cretePoint = await areaLabelViewportPoint(page, "crete");
+  expect(cretePoint).toBeTruthy();
+  await clickMapPoint(page, cretePoint);
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe("crete");
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).veilCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => (await selectedRegionOverlayCounts(page)).outlineCount, { timeout: 10_000 }).toBeGreaterThan(0);
+  await expect.poll(async () => regionOutlinesRequests.length, { timeout: 10_000 }).toBe(1);
+});
+
+test("aborted region outline fetch keeps name-only fallback and logs no console errors @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
+  const regionOutlinesRequests = [];
+  const appConsoleErrors = [];
+  const outlinesPath = "/generated/ancient.region-outlines.json";
+  page.on("request", (request) => {
+    if (request.url().includes(outlinesPath)) {
+      regionOutlinesRequests.push(request.url());
+    }
+  });
+  page.on("console", (message) => {
+    const url = message.location().url ?? "";
+    const isOutlinesLoadError = url.includes("ancient.region-outlines.json");
+    if (message.type() === "error" && !isOutlinesLoadError) {
+      appConsoleErrors.push(message.text());
+    }
+  });
+  await page.route(`**${outlinesPath}`, async (route) => {
+    await route.abort("failed");
+  });
+  const firstFailedRequest = page.waitForEvent("requestfailed", (request) =>
+    request.url().includes(outlinesPath)
+  );
+
+  await page.goto(`${baseUrl}/?tab=map&year=50&place=samaria`, {
+    waitUntil: "domcontentloaded",
+    timeout: 120_000
+  });
+  await waitForMapIdle(page);
+  await firstFailedRequest;
+
+  await expect.poll(async () => selectedAreaLabelCount(page, "samaria"), { timeout: 10_000 }).toBe(1);
+
+  // The app rewrites year=50 to its stop's year (44) on load, so wait for a later year, not just "not 50".
+  const urlYear = async () =>
+    Number(new URLSearchParams(await page.evaluate(() => window.location.search)).get("year"));
+  const yearBeforeStep = await urlYear();
+  const slider = page.locator("input[data-timeline-slider='true']").first();
+  await slider.focus();
+  await slider.press("ArrowRight");
+  await expect.poll(urlYear, { timeout: 10_000 }).toBeGreaterThan(yearBeforeStep);
+  await waitForMapIdle(page);
+
+  await expect.poll(async () => selectedRegionOverlayCounts(page), { timeout: 10_000 }).toEqual({
+    veilCount: 0,
+    outlineCount: 0
+  });
+  await expect.poll(async () => selectedAreaLabelCount(page, "samaria"), { timeout: 10_000 }).toBe(1);
+  expect(regionOutlinesRequests).toHaveLength(1);
+  expect(appConsoleErrors).toEqual([]);
+
+  await jumpMap(page, [24.95, 35.2], 7);
+  await expect.poll(async () => Boolean(await areaLabelViewportPoint(page, "crete")), { timeout: 10_000 }).toBe(true);
+  const cretePoint = await areaLabelViewportPoint(page, "crete");
+  expect(cretePoint).toBeTruthy();
+  const secondFailedRequest = page.waitForEvent("requestfailed", (request) =>
+    request.url().includes(outlinesPath)
+  );
+  await clickMapPoint(page, cretePoint);
+  await expect.poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("place"), { timeout: 10_000 }).toBe("crete");
+  await secondFailedRequest;
+  await expect.poll(async () => selectedAreaLabelCount(page, "crete"), { timeout: 10_000 }).toBe(1);
+  await expect.poll(async () => selectedRegionOverlayCounts(page), { timeout: 10_000 }).toEqual({
+    veilCount: 0,
+    outlineCount: 0
+  });
+  expect(regionOutlinesRequests).toHaveLength(2);
 });
 
 test("selected region updates holder label and overlay when the year changes @names", { tag: ["@names"] }, async ({ page, baseUrl }) => {
@@ -2816,9 +3000,20 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
         x: interactiveCandidatePoint.x + offsetX,
         y: interactiveCandidatePoint.y + offsetY
       });
-      await page.waitForTimeout(200);
+      // Wait for this click's selection to reach the URL before trying another offset. A fixed 200 ms
+      // sleep let a slow update trigger a second, off-target click that could land on stage 3's line.
+      const selected = await page
+        .waitForFunction(
+          (expectedPlaceId) => new URLSearchParams(window.location.search).get("place") === expectedPlaceId,
+          placeId,
+          { timeout: 3_000 }
+        )
+        .then(
+          () => true,
+          () => false
+        );
       clickedPlaceId = await page.evaluate(() => new URLSearchParams(window.location.search).get("place"));
-      if (clickedPlaceId === placeId) {
+      if (selected) {
         break;
       }
     }

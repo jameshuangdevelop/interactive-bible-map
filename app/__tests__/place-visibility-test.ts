@@ -2,6 +2,7 @@ import {
   candidateIndexToLetter,
   getSelectionZoomTarget,
   isAreaLabelType,
+  isSelectedRegionPlace,
   isDisputedPlace,
   isZoomTierVisible
 } from "../src/features/map/place-visibility";
@@ -92,5 +93,57 @@ describe("place visibility helpers", () => {
     expect(isAreaLabelType("city")).toBe(false);
     expect(candidateIndexToLetter(0)).toBe("A");
     expect(candidateIndexToLetter(3)).toBe("D");
+  });
+
+  test("identifies selected-region places across modes and outline ids", () => {
+    const outlineIds = new Set(["chios", "cos", "malta", "rhodes", "samos"]);
+    const regionPlace: Pick<PlaceIndexRecord, "id" | "type"> = { id: "galilee", type: "region" };
+    const provincePlace: Pick<PlaceIndexRecord, "id" | "type"> = { id: "asia", type: "province" };
+    const listedNaturalFeature: Pick<PlaceIndexRecord, "id" | "type"> = {
+      id: "chios",
+      type: "natural-feature"
+    };
+    const unlistedNaturalFeature: Pick<PlaceIndexRecord, "id" | "type"> = {
+      id: "patmos",
+      type: "natural-feature"
+    };
+    const cityPlace: Pick<PlaceIndexRecord, "id" | "type"> = { id: "ephesus", type: "city" };
+
+    expect(
+      isSelectedRegionPlace({ mapMode: "ancient", place: regionPlace, regionOutlineIds: outlineIds })
+    ).toBe(true);
+    expect(
+      isSelectedRegionPlace({ mapMode: "modern", place: regionPlace, regionOutlineIds: outlineIds })
+    ).toBe(true);
+    expect(
+      isSelectedRegionPlace({ mapMode: "ancient", place: provincePlace, regionOutlineIds: outlineIds })
+    ).toBe(true);
+    expect(
+      isSelectedRegionPlace({ mapMode: "modern", place: provincePlace, regionOutlineIds: outlineIds })
+    ).toBe(true);
+    expect(
+      isSelectedRegionPlace({
+        mapMode: "ancient",
+        place: listedNaturalFeature,
+        regionOutlineIds: outlineIds
+      })
+    ).toBe(true);
+    expect(
+      isSelectedRegionPlace({
+        mapMode: "modern",
+        place: listedNaturalFeature,
+        regionOutlineIds: outlineIds
+      })
+    ).toBe(false);
+    expect(
+      isSelectedRegionPlace({
+        mapMode: "ancient",
+        place: unlistedNaturalFeature,
+        regionOutlineIds: outlineIds
+      })
+    ).toBe(false);
+    expect(
+      isSelectedRegionPlace({ mapMode: "ancient", place: cityPlace, regionOutlineIds: outlineIds })
+    ).toBe(false);
   });
 });

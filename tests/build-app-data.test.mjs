@@ -539,6 +539,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     assert.equal(Array.isArray(timelinePayload.bibliography), true);
     assert.equal(timelinePayload.bibliography.length, 1);
     assert.equal(timelinePayload.bibliography[0].id, "pleiades-place-resource");
+    assert.equal(Array.isArray(timelinePayload.regionOutlineIds), true);
 
     const stopPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.stop.4bc.json"), "utf8")
@@ -608,6 +609,7 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
     const outputFiles = await fs.readdir(outputDirectory);
     assert.ok(outputFiles.includes("ancient.roads.geojson"));
     assert.ok(outputFiles.includes("ancient.holder-unions.json"));
+    assert.ok(outputFiles.includes("ancient.region-outlines.json"));
     // The app's roads keep the drawing flags but, like the shapes, leave the provenance in data/geo/.
     const roadsPayload = JSON.parse(
       await fs.readFile(path.join(outputDirectory, "ancient.roads.geojson"), "utf8")
@@ -619,6 +621,24 @@ test("buildAppData writes ancient generated files with holder borders, empire ed
       known: false,
       timeperiod: "R"
     });
+    const outlinesPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "ancient.region-outlines.json"), "utf8")
+    );
+    const outlineIds = outlinesPayload.features
+      .map((feature) => feature.id)
+      .filter((id) => typeof id === "string")
+      .sort((left, right) => left.localeCompare(right));
+    const uniqueTimelineOutlineIds = [...new Set(timelinePayload.regionOutlineIds)];
+    assert.deepEqual(timelinePayload.regionOutlineIds, uniqueTimelineOutlineIds);
+    assert.deepEqual(timelinePayload.regionOutlineIds, outlineIds);
+
+    const placesIndexPayload = JSON.parse(
+      await fs.readFile(path.join(outputDirectory, "places.index.json"), "utf8")
+    );
+    const placeIds = new Set(placesIndexPayload.map((record) => record.id));
+    for (const outlineId of timelinePayload.regionOutlineIds) {
+      assert.equal(placeIds.has(outlineId), true);
+    }
 
     assert.ok(outputFiles.includes("ancient.coastline.geojson"));
     // No empire-edge source sits next to the valid case's data, so none is written.

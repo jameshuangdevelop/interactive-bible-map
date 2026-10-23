@@ -7,7 +7,7 @@ import type {
   PolygonGeometry
 } from "./ancient-layer.types";
 
-type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
+export type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
 type RingCoordinates = number[][];
 type PolygonCoordinates = PolygonGeometry["coordinates"];
 const WORLD_RING: [number, number][] = [
@@ -102,9 +102,28 @@ function mergeRegionParts(parts: RegionGeometry[]): RegionGeometry | null {
   };
 }
 
+export function resolveSelectedRegionGeometry({
+  heldRegionGeometry,
+  regionOutlineGeometry,
+  isSelectedRegion
+}: {
+  heldRegionGeometry: RegionGeometry | null;
+  regionOutlineGeometry: RegionGeometry | null;
+  isSelectedRegion: boolean;
+}) {
+  if (isRegionGeometry(heldRegionGeometry)) {
+    return heldRegionGeometry;
+  }
+  if (isSelectedRegion && isRegionGeometry(regionOutlineGeometry)) {
+    return regionOutlineGeometry;
+  }
+  return null;
+}
+
 export function findSelectedRegionGeometry({
   shapes,
   holderUnionGeometries,
+  regionOutlineGeometry,
   stopPayload,
   placeId,
   placeType,
@@ -113,6 +132,7 @@ export function findSelectedRegionGeometry({
 }: {
   shapes: AncientShapesPayload | null;
   holderUnionGeometries: Record<string, RegionGeometry> | null | undefined;
+  regionOutlineGeometry?: RegionGeometry | null | undefined;
   stopPayload: AncientStopPayload | null;
   placeId: string | null | undefined;
   placeType: string | null | undefined;
@@ -175,7 +195,7 @@ export function findSelectedRegionGeometry({
     .map((areaId) => shapeByAreaId.get(areaId))
     .filter((geometry): geometry is RegionGeometry => Boolean(geometry));
   if (selectedGeometries.length === 0) {
-    return null;
+    return isRegionGeometry(regionOutlineGeometry) ? regionOutlineGeometry : null;
   }
 
   return mergeRegionParts(selectedGeometries);
