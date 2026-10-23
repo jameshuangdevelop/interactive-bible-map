@@ -5024,7 +5024,7 @@ export function MapView({
     if (focusPlan.kind === "fit-bounds" && !desktopTimelineFitInsetReady) {
       return;
     }
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}:${desktopTimelineFitInsetReady ? "ready" : "pending"}`;
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}:${usesDesktopTimelineFitInset ? "inset" : "noinset"}:${desktopTimelineFitInsetReady ? "ready" : "pending"}`;
     if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
@@ -5077,6 +5077,7 @@ export function MapView({
     placeById,
     routesModeEnabled,
     timelineOverlayInset,
+    usesDesktopTimelineFitInset,
     runtimeTuning.controlZoomDurationMs,
     runtimeTuning.flyToDurationMs,
     selectionOrigin,
