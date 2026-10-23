@@ -1850,12 +1850,14 @@ test("aborted region outline fetch keeps name-only fallback and logs no console 
 
   await expect.poll(async () => selectedAreaLabelCount(page, "samaria"), { timeout: 10_000 }).toBe(1);
 
+  // The app rewrites year=50 to its stop's year (44) on load, so wait for a later year, not just "not 50".
+  const urlYear = async () =>
+    Number(new URLSearchParams(await page.evaluate(() => window.location.search)).get("year"));
+  const yearBeforeStep = await urlYear();
   const slider = page.locator("input[data-timeline-slider='true']").first();
   await slider.focus();
   await slider.press("ArrowRight");
-  await expect
-    .poll(async () => new URLSearchParams(await page.evaluate(() => window.location.search)).get("year"), { timeout: 10_000 })
-    .not.toBe("50");
+  await expect.poll(urlYear, { timeout: 10_000 }).toBeGreaterThan(yearBeforeStep);
   await waitForMapIdle(page);
 
   await expect.poll(async () => selectedRegionOverlayCounts(page), { timeout: 10_000 }).toEqual({
@@ -2998,9 +3000,20 @@ test("routes stage-4 names stay interactive while only non-selected lines dim @r
         x: interactiveCandidatePoint.x + offsetX,
         y: interactiveCandidatePoint.y + offsetY
       });
-      await page.waitForTimeout(200);
+      // Wait for this click's selection to reach the URL before trying another offset. A fixed 200 ms
+      // sleep let a slow update trigger a second, off-target click that could land on stage 3's line.
+      const selected = await page
+        .waitForFunction(
+          (expectedPlaceId) => new URLSearchParams(window.location.search).get("place") === expectedPlaceId,
+          placeId,
+          { timeout: 3_000 }
+        )
+        .then(
+          () => true,
+          () => false
+        );
       clickedPlaceId = await page.evaluate(() => new URLSearchParams(window.location.search).get("place"));
-      if (clickedPlaceId === placeId) {
+      if (selected) {
         break;
       }
     }
