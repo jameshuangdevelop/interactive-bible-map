@@ -135,7 +135,7 @@ All of these are compatible with the project: the code stays MIT, and the basema
 - **L5. "Sources & credits".** Show the drawer text below, reachable from the map screen through the menu (spec §9). This is where the style's design credit lives: Mapbox and OpenMapTiles require it to be "reasonably accessible" from the map, not printed on it.
 - **L6. Keep modern borders in style-only rendering rules.** The ancient copy draws no modern boundaries. The modern copy keeps country borders everywhere, with one style rule table that maps each boundary case to solid, dashed or hidden rendering (ADR-0044 item 7), and does not use geographic mask boxes. Never delete or filter features in the tile data itself (see the rulings below).
 - **L7. Fonts and sprite.** Keep loading the glyphs and sprite from OpenFreeMap; no extra notice is then needed. If we ever host copies of the glyph files, put the Noto Sans `OFL.txt`, with its copyright line, beside them (OFL condition 2).
-- **L8. OpenFreeMap's terms.** The person integrating OpenFreeMap must be at least 18 (ToS "Eligibility"). The OpenFreeMap Terms of Service (last updated 2026-10-14; read 2026-10-23 at <https://openfreemap.org/tos/>) state: "You will not: ... Collect data from the service in automated ways, except for offline downloads." Do not automate collection from the public tile service outside that exception.
+- **L8. OpenFreeMap's terms.** The person integrating OpenFreeMap must be at least 18 (ToS "Eligibility"). Do not collect data from the public instance in automated ways. Its ToS (updated 2026-10-14) forbids this ("Collect data from the service in automated ways, except for offline downloads as described below"). The only exception is in-app offline downloads of at most 3,000 tiles or 50 MB, with at most 4 parallel requests and a unique User-Agent.
 - **L9. No implied endorsement.** Do not name the style or the app in a way that suggests endorsement by Mapbox, OpenMapTiles, OpenFreeMap or OpenStreetMap (BSD clause 3; CC BY 3.0 §4(b)). Crediting them, as below, is fine.
 - **L10. Keep the modern notices true.** The modern copies' notices (string 4 below, its `LICENSE.txt`, the backup's string 3 and `NOTICE.txt`) and the "Sources & credits" text must match the current border policy: all country borders are drawn, disputed ones are dashed, and the dashed line is not a sovereignty claim. When this rendering policy changes, update those notices and the drawer text in the same change.
 
@@ -237,6 +237,23 @@ On the modern backup map, which draws Natural Earth's country borders at every z
   "interactive-bible-map:notice": "Modified for outage-only fallback use by Interactive Bible Map. Changes: modern-map treatment. Labels are in English only. Points of interest, airport labels, and state and province names are removed. To keep map dragging smooth, 3D buildings, road shields, one-way arrows, park outlines, runway/taxiway layers, house numbers, and motorway exit/shield labels are removed. The tiles' boundary lines are removed, and the country borders at every zoom are Natural Earth's boundary lines (https://www.naturalearthdata.com/, public domain), simplified. Disputed borders, and cease-fire and armistice lines, are drawn as dashed lines, following the convention of Google Maps' international view. A dashed line marks a line whose status is disputed; it is not a claim about where a border runs or who governs a place. Max zoom set to 14."
 }
 ```
+
+## Ancient layer (M4-03)
+## Test fixtures (M5-22)
+Decided on 2026-10-22. Evidence: `docs/verification/M5-22-basemap-fixture.md`.
+
+The browser tests replay recorded basemap responses from a public pre-release asset (`test-fixture-basemap-<date>`). Publishing it passes on OpenStreetMap data, so the ODbL applies to its vector tiles. The archive is a collection: each part keeps its upstream licence (ODbL §4.5(a)), and none of it is under the project's MIT or CC BY-SA 4.0 licences.
+
+- **T1. How the OpenFreeMap files are obtained.** Never by recording from `tiles.openfreemap.org`. OpenFreeMap's Terms of Service (updated 2026-10-14) forbid collecting data from the service in automated ways, except for in-app offline downloads. In record mode, the recorder (`tests/browser/network-guard.mjs`) works like this:
+  - It reads vector tiles from OpenFreeMap's public planet download (`https://btrfs.openfreemap.com/areas/planet/<version>/tiles.pmtiles`), and builds the TileJSON from that file's metadata.
+  - It takes the glyphs from maplibre/demotiles and the `ofm_f384` sprite from hyperknot/openfreemap-styles. These are the same files OpenFreeMap serves.
+  - It fails on any other OpenFreeMap URL.
+  Record from the public instance only with OpenFreeMap's written permission, quoted here with its date.
+- **T2. Notices inside the archive:** `NOTICE.md`, `LICENSES/OFL-1.1-Noto-Sans.txt`, `LICENSES/OpenFreeMap-sprite.txt` and `LICENSES/ODbL-1.0.txt` (ODbL §4.2(b)–(d); OFL condition 2; BSD clause 2; CC BY 4.0 §3(a)).
+- **T3. Notices in the release notes:** the same credits and links (ODbL §4.2(b), "any relevant documentation").
+- **T4. Licences stay as they are.** The OpenStreetMap-derived tiles stay ODbL 1.0, and the glyphs stay OFL 1.1. Describe the archive as a test fixture, but add no term that limits its use (ODbL §4.7(a), §4.8; CC BY 4.0 §2(a)(5)(B); OFL condition 5).
+- **T5. Never in the app.** The fixture lives in the git-ignored `.cache/basemap-fixture/`, outside `app/`. `tests/fixtures/basemap-fixture.lock.json` holds only its tag, file name, size and SHA-256.
+- **T6. New content, new check.** If a re-recording adds a host, a kind of file, or glyph ranges above U+02FF, the Fact-Checker re-checks the notices before it is published.
 
 ## Ancient layer (M4-03)
 Decided on 2026-10-08. The evidence for every line, with its source URL and the date read, is in [`docs/verification/M4-ancient-geometry.md`](verification/M4-ancient-geometry.md). The ancient layer is the area shapes, the empire's edge, the roads and the ancient coastline in `data/geo/`, and the copies of them that `npm run build:data` writes for the app.

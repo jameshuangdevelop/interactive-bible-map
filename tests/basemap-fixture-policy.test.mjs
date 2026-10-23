@@ -27,10 +27,25 @@ test("missing raster relief tiles return transparent PNG policy", () => {
   assert.equal(decision.status, 200);
 });
 
-test("missing deterministic basemap assets stay strict failures", () => {
+test("missing glyph ranges are lenient", () => {
+  const openFreeMapGlyphDecision = decideReplayRequestPolicy({
+    url: "https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/8192-8447.pbf",
+    hasFixtureEntry: false
+  });
+  assert.equal(openFreeMapGlyphDecision.type, "missing-glyph");
+  assert.equal(openFreeMapGlyphDecision.status, 200);
+
+  const versaTilesGlyphDecision = decideReplayRequestPolicy({
+    url: "https://tiles.versatiles.org/assets/glyphs/noto_sans_regular/8192-8447.pbf",
+    hasFixtureEntry: false
+  });
+  assert.equal(versaTilesGlyphDecision.type, "missing-glyph");
+  assert.equal(versaTilesGlyphDecision.status, 200);
+});
+
+test("missing deterministic non-tile basemap assets stay strict failures", () => {
   for (const url of [
     "https://tiles.openfreemap.org/planet",
-    "https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf",
     "https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json"
   ]) {
     const decision = decideReplayRequestPolicy({

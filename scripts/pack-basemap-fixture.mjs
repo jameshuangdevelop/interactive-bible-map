@@ -107,10 +107,10 @@ function buildNoticeMarkdown({ date, planetVersion }) {
 This archive is a test fixture of Interactive Bible Map (https://github.com/jameshuangdevelop/interactive-bible-map). It holds the basemap responses that the project's browser tests replay, so the tests don't need the network. It is not part of the app.
 
 Recorded: ${date}. OpenFreeMap planet build: ${planetVersion}.
-OpenFreeMap files: taken from OpenFreeMap's public downloads (https://btrfs.openfreemap.com/areas/planet/${planetVersion}/tiles.pmtiles and https://assets.openfreemap.com/), and from upstream repositories where noted.
+OpenFreeMap files: nothing was fetched from https://tiles.openfreemap.org. Vector tiles: read from OpenFreeMap's public planet download (https://btrfs.openfreemap.com/areas/planet/${planetVersion}/tiles.pmtiles). TileJSON: built by this project's recorder from that file's metadata, with its attribution and layer list unchanged. Glyphs: from maplibre/demotiles (https://demotiles.maplibre.org/font/). Sprite: from hyperknot/openfreemap-styles (https://github.com/hyperknot/openfreemap-styles/tree/main/sprites/sprites/ofm_f384). Relief tiles, if any: from https://github.com/lukasmartinelli/naturalearthtiles.
 VersaTiles files: recorded from https://tiles.versatiles.org.
 
-\`manifest.json\` lists each URL and the file in \`responses/\` that holds its body. Each body is stored as received, unmodified, and compressed with gzip. This project wrote \`manifest.json\`; it holds only URLs, HTTP headers and file names.
+\`manifest.json\` lists each URL and the file in \`responses/\` that holds its body. Apart from the TileJSON, each body is stored unmodified, as received from the sources above, and compressed with gzip. This project wrote \`manifest.json\`; it holds only URLs, HTTP headers and file names.
 
 This archive is not covered by the project's MIT licence or its CC BY-SA 4.0 data licence. Each part keeps its own licence, listed below by URL. Nothing here adds any condition to those licences.
 

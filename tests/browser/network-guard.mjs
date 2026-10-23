@@ -30,6 +30,7 @@ const fixtureMissLogPath = path.join(
   "artifacts",
   "basemap-fixture-misses.ndjson"
 );
+const upstreamFetchCountsDirectoryName = "upstream-fetch-counts";
 
 const recordDirectoryOverride = process.env.IBM_BASEMAP_RECORD_DIR?.trim() || null;
 const recordDirectory = recordDirectoryOverride
@@ -55,12 +56,26 @@ let replayBodyCachePromise = null;
 let recordEntriesByUrl = new Map();
 let replayFixtureDirectoryPromise = null;
 let openFreeMapPlanetVersionPromise = null;
+let glyphPrefetchPromise = null;
+let transparentRasterTilePromise = null;
+const emptyGlyphPbfBody = Buffer.alloc(0);
 const pmtilesInstancesByVersion = new Map();
 const openFreeMapPublicResponsesByUrl = new Map();
 const versatilesPublicResponsesByUrl = new Map();
 const upstreamFetchCounts = new Map();
 let upstreamRequestsInFlight = 0;
 const upstreamRequestQueue = [];
+const requiredGlyphRanges = ["0-255", "256-511", "512-767", "768-1023", "7680-7935", "8192-8447"];
+const openFreeMapGlyphFontStacks = [
+  "Noto Sans Regular",
+  "Noto Sans Bold",
+  "Noto Sans Italic"
+];
+const versaTilesGlyphFontStacks = [
+  "noto_sans_regular",
+  "Noto Sans Regular",
+  "Noto Sans Bold"
+];
 
 async function resolveReplayFixtureDirectory() {
   if (!replayFixtureDirectoryPromise) {
@@ -428,6 +443,46 @@ async function loadVersaTilesPublicResponse(requestUrl) {
   return versatilesPublicResponsesByUrl.get(requestUrl);
 }
 
+async function prefetchRequiredGlyphRanges() {
+  if (!recordMode) {
+    return;
+  }
+  if (!glyphPrefetchPromise) {
+    glyphPrefetchPromise = (async () => {
+      const openFreeMapUrls = openFreeMapGlyphFontStacks.flatMap((fontStack) =>
+        requiredGlyphRanges.map(
+          (range) =>
+            `https://tiles.openfreemap.org/fonts/${encodeURIComponent(fontStack)}/${range}.pbf`
+        )
+      );
+      const versaTilesUrls = versaTilesGlyphFontStacks.flatMap((fontStack) =>
+        requiredGlyphRanges.map(
+          (range) =>
+            `https://tiles.versatiles.org/assets/glyphs/${encodeURIComponent(fontStack)}/${range}.pbf`
+        )
+      );
+      const allUrls = [...openFreeMapUrls, ...versaTilesUrls];
+      await Promise.all(
+        allUrls.map(async (url) => {
+          const parsed = new URL(url);
+          const response =
+            parsed.hostname === "tiles.openfreemap.org"
+              ? await loadOpenFreeMapPublicResponse(url)
+              : await loadVersaTilesPublicResponse(url);
+          await recordBasemapResponse({
+            responseUrl: url,
+            status: response.status,
+            headers: response.headers,
+            body: response.body,
+            resourceType: "font"
+          });
+        })
+      );
+    })();
+  }
+  await glyphPrefetchPromise;
+}
+
 function isWikimediaCommonsHost(parsedUrl) {
   return (
     parsedUrl.hostname === "upload.wikimedia.org" &&
@@ -479,24 +534,23 @@ async function ensurePlaceholderCache() {
       };
     })();
   }
-
-  let transparentRasterTilePromise = null;
-  async function getTransparentRasterReliefTile() {
-    if (!transparentRasterTilePromise) {
-      transparentRasterTilePromise = sharp({
-        create: {
-          width: 256,
-          height: 256,
-          channels: 4,
-          background: { r: 0, g: 0, b: 0, alpha: 0 }
-        }
-      })
-        .png({ compressionLevel: 9 })
-        .toBuffer();
-    }
-    return transparentRasterTilePromise;
-  }
   return placeholderCachePromise;
+}
+
+async function getTransparentRasterReliefTile() {
+  if (!transparentRasterTilePromise) {
+    transparentRasterTilePromise = sharp({
+      create: {
+        width: 256,
+        height: 256,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+  }
+  return transparentRasterTilePromise;
 }
 
 function buildFixturePathForUrl(url) {
@@ -653,6 +707,7 @@ async function setupResponseObserver(context) {
 
 export async function attachNetworkGuardsToContext(context) {
   await setupResponseObserver(context);
+  await prefetchRequiredGlyphRanges();
 
   const requestDecisions = requestDecisionsByContext.get(context) ?? new WeakMap();
   requestDecisionsByContext.set(context, requestDecisions);
@@ -783,6 +838,22 @@ export async function attachNetworkGuardsToContext(context) {
           return;
         }
 
+        if (decision.type === "missing-glyph") {
+          recordFixtureMiss(context, requestUrl);
+          requestDecisions.set(request, "missing-glyph-empty-200");
+          await route.fulfill({
+            status: 200,
+            headers: {
+              "content-type": "application/x-protobuf",
+              "access-control-allow-origin": "*",
+              "cache-control": "no-store",
+              "content-length": String(emptyGlyphPbfBody.length)
+            },
+            body: emptyGlyphPbfBody
+          });
+          return;
+        }
+
         const resource = classifyBasemapUrl(requestUrl).resourceType;
         const message = `Missing deterministic basemap fixture (${resource}) for ${requestUrl}. Re-record fixtures with npm run record:basemap.`;
         recordFailure(context, message);
@@ -798,9 +869,60 @@ export async function attachNetworkGuardsToContext(context) {
       const responseBodiesByUrl = await loadReplayBodies();
       const body = responseBodiesByUrl.get(requestUrl);
       if (!body) {
-        const message = `Fixture body missing for ${requestUrl}. Re-record fixtures with npm run record:basemap.`;
+        const missingBodyDecision = decideReplayRequestPolicy({
+          url: requestUrl,
+          hasFixtureEntry: false
+        });
+        if (missingBodyDecision.type === "missing-vector-tile") {
+          recordFixtureMiss(context, requestUrl);
+          requestDecisions.set(request, "missing-vector-tile-body-empty-204");
+          await route.fulfill({
+            status: 204,
+            headers: {
+              "content-type": "application/x-protobuf",
+              "access-control-allow-origin": "*",
+              "cache-control": "no-store",
+              "content-length": "0"
+            },
+            body: ""
+          });
+          return;
+        }
+        if (missingBodyDecision.type === "missing-raster-relief-tile") {
+          const transparentPng = await getTransparentRasterReliefTile();
+          recordFixtureMiss(context, requestUrl);
+          requestDecisions.set(request, "missing-raster-relief-body-transparent-200");
+          await route.fulfill({
+            status: 200,
+            headers: {
+              "content-type": "image/png",
+              "access-control-allow-origin": "*",
+              "cache-control": "no-store",
+              "content-length": String(transparentPng.length)
+            },
+            body: transparentPng
+          });
+          return;
+        }
+        if (missingBodyDecision.type === "missing-glyph") {
+          recordFixtureMiss(context, requestUrl);
+          requestDecisions.set(request, "missing-glyph-body-empty-200");
+          await route.fulfill({
+            status: 200,
+            headers: {
+              "content-type": "application/x-protobuf",
+              "access-control-allow-origin": "*",
+              "cache-control": "no-store",
+              "content-length": String(emptyGlyphPbfBody.length)
+            },
+            body: emptyGlyphPbfBody
+          });
+          return;
+        }
+
+        const message = `Fixture body missing for deterministic basemap asset ${requestUrl}. Re-record fixtures with npm run record:basemap.`;
         recordFailure(context, message);
-        requestDecisions.set(request, "missing-basemap-body");
+        requestDecisions.set(request, "missing-deterministic-basemap-body");
         await route.fulfill({
           status: 599,
           contentType: "text/plain; charset=utf-8",
@@ -871,6 +993,44 @@ export async function writeRecordedBasemapManifest() {
     return null;
   }
   const manifestPath = path.join(recordDirectory, "manifest.json");
+  const upstreamCountsDirectory = path.join(recordDirectory, upstreamFetchCountsDirectoryName);
+  await fs.mkdir(upstreamCountsDirectory, { recursive: true });
+  const workerCountPath = path.join(
+    upstreamCountsDirectory,
+    `${process.pid}.json`
+  );
+  await fs.writeFile(
+    workerCountPath,
+    `${JSON.stringify(
+      Object.fromEntries(
+        [...upstreamFetchCounts.entries()].sort((left, right) => left[0].localeCompare(right[0]))
+      ),
+      null,
+      2
+    )}\n`
+  );
+
+  const aggregateUpstreamCounts = new Map();
+  const countFileNames = await fs.readdir(upstreamCountsDirectory);
+  for (const fileName of countFileNames) {
+    if (!fileName.endsWith(".json")) {
+      continue;
+    }
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const raw = await fs.readFile(path.join(upstreamCountsDirectory, fileName), "utf8");
+      const parsed = JSON.parse(raw);
+      for (const [host, count] of Object.entries(parsed)) {
+        if (typeof count !== "number" || !Number.isFinite(count) || count < 0) {
+          continue;
+        }
+        aggregateUpstreamCounts.set(host, (aggregateUpstreamCounts.get(host) ?? 0) + count);
+      }
+    } catch {
+      // Ignore malformed count files; next manifest write will attempt aggregation again.
+    }
+  }
+
   const mergedEntriesByUrl = new Map();
   try {
     const existingManifestRaw = await fs.readFile(manifestPath, "utf8");
@@ -896,7 +1056,9 @@ export async function writeRecordedBasemapManifest() {
       sourceHosts: [...basemapHosts],
       notice: "NOTICE.md",
       recordModeUpstreamFetchCounts: Object.fromEntries(
-        [...upstreamFetchCounts.entries()].sort((left, right) => left[0].localeCompare(right[0]))
+        [...aggregateUpstreamCounts.entries()].sort((left, right) =>
+          left[0].localeCompare(right[0])
+        )
       ),
       note:
         "Recorded by tests/browser/network-guard.mjs. Keep tile URLs stable by replaying the recorded TileJSON."

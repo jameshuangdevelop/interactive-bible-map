@@ -323,3 +323,87 @@ Under either option, the §10 notices are still needed.
 - Project files (origin/main `d1c94e2`): `docs/tasks/M5-22-tests-without-network.md`, `ATTRIBUTION.md`, `docs/LICENSES.md`, `docs/verification/M3-basemap.md`, `app/src/features/search/sources-credits-content.ts`, `app/public/styles/*/style.json`, `app/public/styles/liberty/LICENSE.txt`. Worktree `.worktrees/m5-22` (uncommitted, read-only): `scripts/record-basemap.mjs`, `scripts/pack-basemap-fixture.mjs`, `scripts/lib/basemap-fixture.mjs`, the `ATTRIBUTION.md` and `docs/TESTING.md` diffs. Recording: `/tmp/m5-22-basemap-fixture/store-2026-10-22/manifest.json` (generated 2026-10-23T06:50:20Z).
 
 **Budget row (for the PO; rough estimate):** | 2026-10-22 | fact-checker | Claude (Copilot CLI) | M5-22 fixture licence check (read-only) | ≈6M in (mostly cached) / ≈45k out | ≈1,500 |
+
+## 14. Sign-off (2026-10-23)
+
+**Verifier:** Fact-Checker (Claude, Copilot CLI) · **Date:** 2026-10-23 · **What I checked:**
+- the archive `/tmp/m5-22-basemap-fixture/basemap-fixture-2026-10-23.tar`;
+- commit `163c7e8` on `chore/m5-22-tests-without-network`;
+- the release-notes draft `.git/M5-22-release-notes.md`.
+
+This was a focused check: no licence was re-researched. It replaces the line "Sign-off: not given yet" at the top of this report.
+
+**Result: signed off.** The archive is SHA-256 `08fb2d6b6d61b9afd3d66010d05872bb50d62f5f608cbe490a5afa450df0ef40` (79,912,960 bytes, 1,213 files). Publish it with the release notes in §14.3, not the draft. The blocker in §11 is cleared: no OpenFreeMap file came from `tiles.openfreemap.org`. Before the PR merges, make the two docs-only fixes in §14.2; they don't change the archive.
+
+| # | Check | Verdict | Evidence |
+|---|---|---|---|
+| 1 | The archive's SHA-256 | **Pass** | `shasum -a 256` gives `08fb2d6b…ef40`. Size: 79,912,960 bytes. The 1,213 files are `manifest.json`, `NOTICE.md`, 3 files in `LICENSES/` and 1,208 responses. The lock file at `163c7e8` names the same tag (`test-fixture-basemap-2026-10-23`), asset, SHA-256, size and file count. |
+| 2 | `NOTICE.md` and `LICENSES/` match §10 | **Pass, with 2 errata** | `NOTICE.md` is §10.3's text with the blanks filled in. `LICENSES/OFL-1.1-Noto-Sans.txt` has §10.3's header lines, and its OFL 1.1 text is identical to versatiles-fonts' `LICENSE`. `LICENSES/OpenFreeMap-sprite.txt` is the intro line plus parts (b)–(e) of `app/public/styles/liberty/LICENSE.txt`, identical line for line. `LICENSES/ODbL-1.0.txt` is byte-identical to <https://opendatacommons.org/licenses/odbl/odbl-10.txt> (SHA-256 `60768071…`). **Errata.** These come from my own §10.3 template; they describe the sources, not the licences. (a) `NOTICE.md` names <https://assets.openfreemap.com/> as a source, but nothing was fetched from it. (b) It says every body is "stored as received", but the TileJSON was built by the recorder from the planet PMTiles' metadata (its attribution and `vector_layers` copied unchanged). Every required notice is present and correct, so the archive can be published as it is. The release notes give the exact account (§14.3), and `NOTICE.md` gets corrected at the next re-record (§14.2, fix 4). |
+| 3a | Release-notes draft | **Needs change: publish §14.3 instead** | Its licence section is §10.2 word for word: the ESA credit and citation, "not covered by the repository's MIT licence", and no use restriction. But its source lines repeat errata (a) and (b). They also say the fonts, the sprite "and relief tiles" came "from https://assets.openfreemap.com/ or their upstream repositories". The archive holds no relief tiles, and nothing came from that bucket. |
+| 3b | `ATTRIBUTION.md` "Test fixtures" entry | **Pass on content; 2 docs fixes before merge** | It is §10.1 word for word, including ESA, the not-MIT statement and no use restriction. (i) It points to `docs/LICENSES.md`, "Test fixtures (M5-22)", but `163c7e8` doesn't add that section. (ii) The OpenFreeMap row says the files come from OpenFreeMap's public downloads or with its permission, yet the glyphs and sprite came from their upstream repositories. Text for both is in §14.2. |
+| 4 | The record path takes OpenFreeMap files per Option A | **Pass** | See §14.1. |
+| 5 | Old ToS quotes updated | **Pass** | `docs/LICENSES.md` L8 and `docs/verification/M3-basemap.md` row 3 now quote the ToS of 2026-10-14 ("Collect data from the service in automated ways, except for offline downloads"). Optional nit: L8 closes its quote after "offline downloads.", but the ToS continues "as described below". |
+
+### 14.1 Evidence for check 4 (the record path)
+- **Code at `163c7e8`.** In record mode, `context.route("**/*")` in `tests/browser/network-guard.mjs` answers every request to `tiles.openfreemap.org` with `loadOpenFreeMapPublicResponse()`:
+  - **Vector tiles:** read by byte range from `https://btrfs.openfreemap.com/areas/planet/<version>/tiles.pmtiles`.
+  - **TileJSON:** built from that same file's metadata.
+  - **`ofm_f384` sprite:** from `raw.githubusercontent.com/hyperknot/openfreemap-styles`.
+  - **Glyphs:** from `demotiles.maplibre.org`.
+  - **Relief tiles:** from `raw.githubusercontent.com/lukasmartinelli/naturalearthtiles` (none were recorded).
+  - **Any other OpenFreeMap URL** throws "No public-source mapping configured", and errors are rethrown rather than passed to the network. No path sends a request to `tiles.openfreemap.org`.
+- **Every context is guarded.** The automatic `runtimeGuards` fixture (`tests/browser/fixtures.mjs`, `auto: true`) wraps `browser.newContext`, which `browser.newPage` also goes through. Both spec files import `test` from `./fixtures.mjs`. The guard bypasses only local hosts, and the app registers no service worker that could get round it.
+- **Upstream fetches** run at most 4 at a time, with the User-Agent `interactive-bible-map-test-fixture (+https://github.com/jameshuangdevelop/interactive-bible-map)`.
+- **Data in the archive:**
+  - None of the 1,026 OpenFreeMap entries carries the live server's headers (the `W/"386d3570-…"` ETags, the 1999 `Last-Modified` and `max-age=604800` that the direct recording of 2026-10-22 showed).
+  - 1,016 entries (1,015 tiles and the TileJSON) carry the recorder's PMTiles headers. 8 carry GitHub Pages headers (the glyphs) and 2 carry raw.githubusercontent.com headers (the sprite).
+  - All 8 glyph files and both sprite files match, byte for byte, the files OpenFreeMap served on 2026-10-22. VersaTiles' `base` sprite still matches versatiles-style v7.0.1.
+  - Sample tiles decode as valid vector tiles (OpenMapTiles layers; Shortbread with land cover).
+  - The 2026-10-22 recording from the public instance is no longer in `/tmp/m5-22-basemap-fixture/`.
+- **Note:** `recordModeUpstreamFetchCounts` in `manifest.json` is not a full count. The manifest writer merges the entries of every worker process that writes the manifest, but keeps only the last process's counts. For example, VersaTiles shows 174 fetches against 182 VersaTiles entries. The counts support the finding; the proof is the code and the headers.
+- This pass covers the record path at `163c7e8`. The uncommitted changes now in the worktree (how a missing tile is answered in replay) don't touch it. If the record path changes, re-check it before the next re-record (§10.4, T6).
+
+### 14.2 Fixes before merge (docs only; the archive doesn't change)
+1. **`docs/LICENSES.md`:** add the section that `ATTRIBUTION.md` points to. Use §10.4's text, with T1 replaced by:
+   > **T1. How the OpenFreeMap files are obtained.** Never by recording from `tiles.openfreemap.org`. OpenFreeMap's Terms of Service (updated 2026-10-14) forbid collecting data from the service in automated ways, except for in-app offline downloads. In record mode, the recorder (`tests/browser/network-guard.mjs`) works like this:
+   > - It reads vector tiles from OpenFreeMap's public planet download (`https://btrfs.openfreemap.com/areas/planet/<version>/tiles.pmtiles`), and builds the TileJSON from that file's metadata.
+   > - It takes the glyphs from maplibre/demotiles and the `ofm_f384` sprite from hyperknot/openfreemap-styles. These are the same files OpenFreeMap serves.
+   > - It fails on any other OpenFreeMap URL.
+   > Record from the public instance only with OpenFreeMap's written permission, quoted here with its date.
+2. **`ATTRIBUTION.md`**, the OpenFreeMap row of "Test fixtures":
+   - Replace: "The files come from OpenFreeMap's public downloads, or from its public instance only with its written permission: since 2026-10-14 its ToS forbids collecting data from the service in automated ways, except for in-app offline downloads."
+   - With: "The files come from OpenFreeMap's public planet download (the vector tiles, and the TileJSON built from its metadata) and from the files' upstream repositories (glyphs: maplibre/demotiles; sprite: hyperknot/openfreemap-styles). None come from its public instance: since 2026-10-14 its ToS forbids collecting data from the service in automated ways, except for in-app offline downloads."
+3. *(Optional)* `docs/LICENSES.md` L8: make the quote exact: "…except for offline downloads as described below".
+4. **At the next re-record** (the `NOTICE.md` template in `scripts/pack-basemap-fixture.mjs`):
+   - Replace the "OpenFreeMap files:" line with: "OpenFreeMap files: nothing was fetched from https://tiles.openfreemap.org. Vector tiles: read from OpenFreeMap's public planet download (https://btrfs.openfreemap.com/areas/planet/<version>/tiles.pmtiles). TileJSON: built by this project's recorder from that file's metadata, with its attribution and layer list unchanged. Glyphs: from maplibre/demotiles (https://demotiles.maplibre.org/font/). Sprite: from hyperknot/openfreemap-styles (https://github.com/hyperknot/openfreemap-styles/tree/main/sprites/sprites/ofm_f384). Relief tiles, if any: from https://github.com/lukasmartinelli/naturalearthtiles."
+   - Replace "Each body is stored as received, unmodified, and compressed with gzip." with "Apart from the TileJSON, each body is stored unmodified, as received from the sources above, and compressed with gzip."
+5. *(Optional, code)* Make `recordModeUpstreamFetchCounts` add up across worker processes, so the counts in the manifest are complete.
+
+### 14.3 The release to publish
+- **Tag:** `test-fixture-basemap-2026-10-23`. Mark it as a pre-release (`--prerelease`).
+- **Asset:** `basemap-fixture-2026-10-23.tar`. After uploading, check that the downloaded asset's SHA-256 is `08fb2d6b6d61b9afd3d66010d05872bb50d62f5f608cbe490a5afa450df0ef40`.
+- **Title:** `Test fixture: recorded basemap responses, 2026-10-23 (not an app release)`
+- **Notes** (exact text; pass it with `--notes-file`):
+
+```markdown
+**Test fixture, not an app release.** This archive holds the basemap responses that the browser tests of Interactive Bible Map replay, so the tests don't depend on the network. It is not part of the app and is never deployed with it.
+
+- File: `basemap-fixture-2026-10-23.tar` · SHA-256 `08fb2d6b6d61b9afd3d66010d05872bb50d62f5f608cbe490a5afa450df0ef40` · 79,912,960 bytes · 1,213 files
+- Recorded: 2026-10-23. OpenFreeMap planet build: `20261018_080001_pt`.
+- Contents: 1,208 responses. From OpenFreeMap: 1,015 vector tiles, the TileJSON, 8 glyph ranges and 2 sprite files. From VersaTiles: 174 vector tiles, 3 glyph ranges, 2 sprite files and 3 "not found" (404) replies.
+- OpenFreeMap files: nothing was fetched from OpenFreeMap's public tile service (tiles.openfreemap.org). The vector tiles were read from OpenFreeMap's public planet download for that build (https://btrfs.openfreemap.com/areas/planet/20261018_080001_pt/tiles.pmtiles). This project's recorder built the TileJSON from the same file's metadata, with its attribution and layer list unchanged. The label glyphs come from maplibre/demotiles (https://github.com/maplibre/demotiles) and the `ofm_f384` sprite from hyperknot/openfreemap-styles (https://github.com/hyperknot/openfreemap-styles). They are the same files OpenFreeMap serves. This archive holds no relief tiles.
+- VersaTiles files: recorded from https://tiles.versatiles.org.
+- Apart from that TileJSON, each response body is stored unmodified, as received from the sources above, and compressed with gzip. `manifest.json` maps each URL to its file. `NOTICE.md` and the `LICENSES/` folder inside the archive give the full notices. Two lines of `NOTICE.md` describe the sources less exactly: they name https://assets.openfreemap.com/, from which nothing was taken, and they say every body is stored as received. The list above is the exact account.
+
+**Licences.** This archive is not covered by the repository's MIT licence or by the project's CC BY-SA 4.0 data licence. Each part keeps its own licence:
+
+- **OpenStreetMap data (all vector tiles):** Map data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), available under the [Open Database License 1.0 (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/). The tiles are an unmodified extract of the tilesets that OpenFreeMap and VersaTiles publish, and this archive holds the whole extract. The full tilesets: [OpenFreeMap planet downloads](https://btrfs.openfreemap.com/files.txt) and [VersaTiles downloads](https://download.versatiles.org/).
+- **OpenFreeMap tiles and TileJSON:** [OpenFreeMap](https://openfreemap.org) [© OpenMapTiles](https://www.openmaptiles.org/) Data from [OpenStreetMap](https://www.openstreetmap.org/copyright). OpenMapTiles schema © MapTiler.com & OpenMapTiles contributors: design [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), code [BSD 3-Clause](https://github.com/openmaptiles/openmaptiles/blob/master/LICENSE.md). Low-zoom data from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
+- **VersaTiles tiles:** [VersaTiles](https://versatiles.org) © OpenStreetMap contributors (ODbL 1.0), in the [Shortbread](https://shortbread-tiles.org/) schema (CC0 1.0). Land cover: © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), through VersaTiles' [Landcover Vectors](https://github.com/versatiles-org/landcover-vectors) (CC BY 4.0). Dataset: Zanaga, D., Van De Kerchove, R., Daems, D., De Keersmaecker, W., Brockmann, C., Kirches, G., Wevers, J., Cartus, O., Santoro, M., Fritz, S., Lesiv, M., Herold, M., Tsendbazar, N.E., Xu, P., Ramoino, F., Arino, O., 2022. ESA WorldCover 10 m 2021 v200. https://doi.org/10.5281/zenodo.7254221
+- **Label glyphs:** Noto Sans, under the [SIL Open Font License 1.1](https://openfontlicense.org/). The copyright notices and the licence text are in `LICENSES/OFL-1.1-Noto-Sans.txt`.
+- **Icons:** OpenFreeMap's `ofm_f384` sprite ([openfreemap-styles](https://github.com/hyperknot/openfreemap-styles), MIT; icons from the Liberty and OSM Bright styles, BSD 3-Clause and CC BY 3.0/4.0; [Maki](https://github.com/mapbox/maki), CC0 1.0). Full notices are in `LICENSES/OpenFreeMap-sprite.txt`. VersaTiles' `base` sprite ([versatiles-style](https://github.com/versatiles-org/versatiles-style)), CC0 1.0.
+
+The licensors provide this material as is, without warranty. See each licence.
+```
+
+**Budget row (for the PO; rough estimate):** | 2026-10-23 | fact-checker | Claude (Copilot CLI) | M5-22 fixture sign-off (focused, read-only) | ≈2M in (mostly cached) / ≈15k out | ≈400 |

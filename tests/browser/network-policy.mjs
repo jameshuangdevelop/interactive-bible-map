@@ -50,6 +50,9 @@ export function classifyBasemapUrl(urlString) {
   if (/^\/fonts\/[^/]+\/\d+-\d+\.pbf$/u.test(pathname)) {
     return { isBasemapHost: true, resourceType: "glyph" };
   }
+  if (/^\/assets\/glyphs\/[^/]+\/\d+-\d+\.pbf$/u.test(pathname)) {
+    return { isBasemapHost: true, resourceType: "glyph" };
+  }
   if (/^\/sprites\/[^/]+\/[^/]+\.(?:json|png)$/u.test(pathname)) {
     return { isBasemapHost: true, resourceType: "sprite" };
   }
@@ -78,6 +81,10 @@ export function decideReplayRequestPolicy({ url, hasFixtureEntry }) {
 
     if (basemapInfo.resourceType === "raster-relief-tile") {
       return { type: "missing-raster-relief-tile", status: 200 };
+    }
+
+    if (basemapInfo.resourceType === "glyph") {
+      return { type: "missing-glyph", status: 200 };
     }
 
     return { type: "missing-strict-basemap", basemapResourceType: basemapInfo.resourceType };
