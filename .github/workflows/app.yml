@@ -124,7 +124,10 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    # "Install Playwright Chromium" alone has taken 7–12 min on some runners (runs 39901139774,
+    # 39942838734, 39948839927), so 12 min cancelled shards whose tests had passed. Caching
+    # Chromium is the real fix and has its own card.
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
