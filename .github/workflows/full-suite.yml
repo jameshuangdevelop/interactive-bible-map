@@ -15,6 +15,11 @@ concurrency:
 jobs:
   full-suite:
     runs-on: ubuntu-latest
+    container:
+      # Keep this literal: container.image cannot read env; using it failed in run 40014854855.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001 --ipc=host
+    # Keep this above Playwright CI globalTimeout (10m) so runs fail in-test, not by job timeout.
     timeout-minutes: 20
     env:
       CI: true
@@ -46,9 +51,6 @@ jobs:
 
       - name: Export web app
         run: npm run export:web
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Verify exported web app
         run: npm run verify:web:playwright

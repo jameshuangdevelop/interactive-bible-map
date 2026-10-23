@@ -124,9 +124,11 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
-    # "Install Playwright Chromium" alone has taken 7–12 min on some runners (runs 39901139774,
-    # 39942838734, 39948839927), so 12 min cancelled shards whose tests had passed. Caching
-    # Chromium is the real fix and has its own card.
+    container:
+      # Keep this literal: container.image cannot read env; using it failed in run 40014854855.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001 --ipc=host
+    # Keep this above Playwright CI globalTimeout (10m) so runs fail in-test, not by job timeout.
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -162,9 +164,6 @@ jobs:
         with:
           name: web-export
           path: app/dist
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Run browser shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
@@ -390,6 +389,11 @@ jobs:
       - build
       - deploy_preview
     runs-on: ubuntu-latest
+    container:
+      # Keep this literal: container.image cannot read env; using it failed in run 40014854855.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001 --ipc=host
+    # Keep this above Playwright CI globalTimeout (10m) so runs fail in-test, not by job timeout.
     timeout-minutes: 25
     concurrency:
       group: pages-preview-${{ github.event.pull_request.number }}
@@ -408,9 +412,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Run smoke test against preview
         env:
