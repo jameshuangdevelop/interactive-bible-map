@@ -285,7 +285,7 @@ const areaLabelMajorVariableAnchorFilter = [
   ["!=", ["get", "isSelectedPlace"], true],
   [">=", ["zoom"], areaLabelVariableAnchorMinZoom]
 ];
-const selectedAreaLabelFilter = ["all", areaLabelVisibilityFilter, ["==", ["get", "isSelectedPlace"], true]];
+const selectedAreaLabelFilter = ["==", ["get", "isSelectedPlace"], true];
 const holderLabelBaseFilter = [
   "all",
   ["==", ["get", "clickable"], true],
@@ -551,6 +551,7 @@ function focusSelection(
   selection: PlaceSelection,
   leftInset: number,
   bottomInset: number,
+  fitBottomInset: number,
   durationMs: number
 ) {
   const focusPlan = planSelectionFocus(place, selection);
@@ -559,7 +560,7 @@ function focusSelection(
   }
 
   if (focusPlan.kind === "fit-bounds") {
-    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, bottomInset, durationMs);
+    fitBoundsForPlace(map, focusPlan.coordinates, focusPlan.zoom, leftInset, fitBottomInset, durationMs);
     return;
   }
 
@@ -2945,6 +2946,10 @@ export function MapView({
   const panelInset = Math.max(0, leftPanelWidth);
   const bottomInset = Math.max(0, bottomPanelInset);
   const hasAncientTimeline = (ancientTimeline?.stops?.length ?? 0) > 0;
+  const fitBottomInset = Math.max(
+    bottomInset,
+    !isSmallScreen && mapMode === "ancient" && hasAncientTimeline ? Math.max(0, timelineOverlayInset) : 0
+  );
   const regionOutlineIds = useMemo(
     () =>
       new Set(
@@ -5000,7 +5005,7 @@ export function MapView({
       return;
     }
 
-    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}`;
+    const selectionKey = `${selection.placeId}:${selection.candidateIndex ?? ""}:${panelInset}:${bottomInset}:${fitBottomInset}`;
     if (selectionKey === previousFocusRequestRef.current) {
       return;
     }
@@ -5043,9 +5048,11 @@ export function MapView({
       selection,
       panelInset,
       bottomInset,
+      fitBottomInset,
       runtimeTuning.flyToDurationMs
     );
   }, [
+    fitBottomInset,
     bottomInset,
     mapReadyVersion,
     panelInset,
@@ -5079,7 +5086,7 @@ export function MapView({
     map.fitBounds(bounds, {
       padding: resolveMapFitPadding({
         leftInset: panelInset,
-        bottomInset,
+        bottomInset: fitBottomInset,
         top: focusPaddingTop,
         side: 64,
         bottom: 64
@@ -5088,7 +5095,7 @@ export function MapView({
       duration: prefersReducedMotion() ? 0 : runtimeTuning.flyToDurationMs
     });
     previousRouteFocusKeyRef.current = routesOverlay.routeFocusKey;
-  }, [bottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs, styleReadyVersion]);
+  }, [fitBottomInset, panelInset, routesOverlay, runtimeTuning.flyToDurationMs, styleReadyVersion]);
 
   useEffect(() => {
     if (!routesOverlay) {
