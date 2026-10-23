@@ -7,7 +7,7 @@ import type {
   PolygonGeometry
 } from "./ancient-layer.types";
 
-type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
+export type RegionGeometry = PolygonGeometry | MultiPolygonGeometry;
 type RingCoordinates = number[][];
 type PolygonCoordinates = PolygonGeometry["coordinates"];
 const WORLD_RING: [number, number][] = [
@@ -100,6 +100,24 @@ function mergeRegionParts(parts: RegionGeometry[]): RegionGeometry | null {
     type: "MultiPolygon",
     coordinates: polygons
   };
+}
+
+export function resolveSelectedRegionGeometry({
+  heldRegionGeometry,
+  regionOutlineGeometry,
+  isSelectedRegion
+}: {
+  heldRegionGeometry: RegionGeometry | null;
+  regionOutlineGeometry: RegionGeometry | null;
+  isSelectedRegion: boolean;
+}) {
+  if (isRegionGeometry(heldRegionGeometry)) {
+    return heldRegionGeometry;
+  }
+  if (isSelectedRegion && isRegionGeometry(regionOutlineGeometry)) {
+    return regionOutlineGeometry;
+  }
+  return null;
 }
 
 export function findSelectedRegionGeometry({

@@ -6,7 +6,8 @@ import {
   buildSelectedRegionOutlineCoordinates,
   buildSelectedRegionOutlineFeatureCollection,
   buildSelectedRegionVeilFeatureCollection,
-  findSelectedRegionGeometry
+  findSelectedRegionGeometry,
+  resolveSelectedRegionGeometry
 } from "../src/features/map/selected-region-highlight";
 
 describe("selected region highlight geometry", () => {
@@ -412,5 +413,54 @@ describe("selected region highlight geometry", () => {
       politicalUnitAreaTypes
     });
     expect(selectedRegion).toEqual(heldLandGeometry);
+  });
+
+  test("selected region precedence resolves held land, then outline, then name-only", () => {
+    const heldRegionGeometry = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [36, 40],
+          [37, 40],
+          [37, 41],
+          [36, 41],
+          [36, 40]
+        ]
+      ]
+    };
+    const outlineGeometry = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [35, 39],
+          [35.5, 39],
+          [35.5, 39.5],
+          [35, 39.5],
+          [35, 39]
+        ]
+      ]
+    };
+
+    expect(
+      resolveSelectedRegionGeometry({
+        heldRegionGeometry,
+        regionOutlineGeometry: outlineGeometry,
+        isSelectedRegion: true
+      })
+    ).toEqual(heldRegionGeometry);
+    expect(
+      resolveSelectedRegionGeometry({
+        heldRegionGeometry: null,
+        regionOutlineGeometry: outlineGeometry,
+        isSelectedRegion: true
+      })
+    ).toEqual(outlineGeometry);
+    expect(
+      resolveSelectedRegionGeometry({
+        heldRegionGeometry: null,
+        regionOutlineGeometry: outlineGeometry,
+        isSelectedRegion: false
+      })
+    ).toBeNull();
   });
 });
